@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-2 · base b2a330be · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -39,11 +39,11 @@ the operator's transcript store came from inside a sidechain.
   "Then the diff-scoped gates" with the rule in §4, rendered to `memory/guides/BUILD-METHOD.md`
   under M1's unraised budget. `KIT_MEMORY_TREE_VERSION` in `tools/memory-tree/check-memory-hygiene.sh`
   moves `2.74` to `2.75`, and every live carrier of the `gov:kit memory-tree@` marker moves with it.
-  Observed by AC5, AC6, AC7 and AC9.
+  Observed by AC5, AC6, AC7, AC9 and AC15.
 - **S4** — One bullet under "While it runs" in `tools/unattended/SKILL.template.md`, rendered to
   `.claude/skills/unattended/SKILL.md`. `KIT_UNATTENDED_VERSION` in `tools/unattended/unattended.sh`
   moves `1.19` to `1.20`, and every live carrier of the `gov:kit unattended@` marker moves with it.
-  Observed by AC10 and AC11.
+  Observed by AC10, AC11 and AC15.
 - **S5** — Line 263 of `memory/guides/SESSION-KICKOFF.md` is qualified in place so the "run the
   full bar, never a list" trap reads as the push-boundary sentence it is, and the manifest is
   re-stamped in the same commit: `last-audit` and `last-body-change`, with a `manifest-audit: delta`
@@ -51,7 +51,9 @@ the operator's transcript store came from inside a sidechain.
 - **S6** — This spec obeys the rule it states: no criterion in §6 names a bar, a `GATE_*=` prefix
   or a `*.test.sh` suite as its observation, and its §7 leg line resolves against the manifest.
   Observed by AC14 for the joins; the bar-token absence is hand-checked at the acceptance ledger
-  until `TOOL-aDeferredBar-2` lands the gate that grades it.
+  until `TOOL-aDeferredBar-2` lands the gate that grades it. AC1's greps carry two banned
+  spellings as grep ARGUMENTS, with `grep` at command position; the `BAR` regex unit 2 §4 spells
+  matches none of AC1's five tokens, probed 2026-09-14 on that regex typed from the section.
 
 ## 3. Non-goals (OUT)
 
@@ -286,10 +288,12 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
 
 - security — N/A. Prose in five carriers and two version constants; no write path, no input, no
   egress.
-- perf / scale — the direct observations in §6 are greps, a `sed` render, `wc`, and seven leg
-  scripts run by hand, each of which finished in under 84 s on the last recorded bar
-  (`<git-dir>/gate-ledger.tsv`, read 2026-09-13; `memory hygiene` 83 s, the rest under 20 s).
-  The rule itself is what removes minutes-to-hours from every later unit.
+- perf / scale — the direct observations in §6 are greps, a `sed` render, `wc`, and nine leg
+  scripts run by hand — the eight names on the §7 line plus `spec tokens` in AC14, with AC15
+  carrying the two the round-1 audit found unrun — each of which finished in under 84 s on the
+  last recorded bar (`<git-dir>/gate-ledger.tsv`, re-read 2026-09-14; `memory hygiene` 83 s,
+  `method carriers` 14 s, the rest under 20 s). The rule itself is what removes minutes-to-hours
+  from every later unit.
 - error / empty / loading states — a grep count of `0` where `1` is expected is the red state of
   every carrier criterion, and a `git grep -l` over the OLD marker that prints anything is the red
   state of both bumps; AC7 and AC11 assert the old marker is gone and the new one has the derived
@@ -318,11 +322,19 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -c 'RUN NO MERGE BAR AND NO SELF-TEST SUITE' tools/workflows/unattended-unit.js`
-  runs, it prints `1`.
-  Red when: it prints `0`, or the sentence names fewer than the five forms §4 pins.
-- **AC2** — When `grep -c 'the main loop runs the owed bar once' tools/workflows/unattended-unit.js`
-  runs, it prints `1`, and the sentence tells the child to name the unrun criterion in `summary`.
-  Red when: it prints `0`, or the substitute says "run it later" instead of "return it".
+  runs, it prints `1`, and one grep per pinned form prints `1` each, because the five forms span
+  three source lines the header grep never reads:
+  `grep -c 'not run-gates.sh in any form' tools/workflows/unattended-unit.js`,
+  `grep -cE 'GATE_(FULL|SELFTESTS)= prefix' tools/workflows/unattended-unit.js`,
+  `grep -c 'not run-selftests.sh, not run-unattended-gates.sh' tools/workflows/unattended-unit.js`,
+  `grep -cF '*.test.sh suite' tools/workflows/unattended-unit.js`.
+  Red when: any of the five prints `0` — a form dropped, respelled, or split across a
+  concatenation so that no single line carries it.
+- **AC2** — When `grep -c 'name it in .summary. and the main loop' tools/workflows/unattended-unit.js`
+  runs, it prints `1`: the `summary` rule and the hand-off to the main loop sit on one source line,
+  and the phrase is the one that says "return it" rather than "run it later".
+  Red when: it prints `0` — the substitute tells the child to run the criterion later, drops the
+  `summary` rule, or splits it from the hand-off across a concatenation.
 - **AC3** — When `grep -c 'No stage of this program runs the merge bar or a self-test suite' tools/workflows/unattended-build.js`
   runs, it prints `1`, and the match is inside the `GROUND` constant rather than a stage prompt.
   Red when: it prints `0`, or `2` or more because a stage prompt repeated it.
@@ -333,20 +345,27 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
   runs, it prints `1`, and `grep -c 'diff-scoped' memory/guides/BUILD-METHOD.md` prints `0`.
   Red when: either count is wrong, or the template carries the sentence and the render does not.
 - **AC6** — When `sed -e 's#{{KIT_DIR}}#tools/memory-tree#g' -e 's#{{TOOL_ROOT}}#tools/#g' tools/memory-tree/BUILD-METHOD.template.md | diff - memory/guides/BUILD-METHOD.md`
-  runs, it prints nothing, and `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md`
-  exits 0 with a byte figure at or under 27648 and a line count at or under 350.
-  Red when: the diff prints a hunk, or the checker exits 1 on the budget.
-  figure: DERIVED at observation time by the checker; the 26910-byte estimate in §4 is PINNED and
-  is not the figure this criterion asserts.
+  runs, it prints nothing; `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md`
+  exits 0 with a byte figure at or under 27648; and `wc -l memory/guides/BUILD-METHOD.md` prints
+  a count at or under 350, as its own observation, because the size checker grades bytes and
+  reads no line figure (`tools/template-size-limits.txt` says so for this subject).
+  Red when: the diff prints a hunk, the checker exits 1 on the budget, or `wc -l` prints 351 or
+  more.
+  figure: DERIVED at observation time by the checker and by `wc -l`; the 26910-byte and 341-line
+  estimates in §4 are PINNED and are not the figures this criterion asserts.
 - **AC7** — When `git grep -l 'gov:kit memory-tree@2.74' -- tools memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides`
   runs, it prints nothing, and the same command with `2.75` prints nine paths.
   Red when: any live carrier still spells `2.74`, or the count is not nine.
   figure: PINNED — nine, counted 2026-09-13 at `e3d0f68c` by the same `git grep -l` over `2.74`.
-- **AC8** — When `grep -c "gov:kit unattended-unit@1.1" tools/workflows/unattended-unit.js` and
-  `grep -c "gov:kit unattended-build@1.1" tools/workflows/unattended-build.js` run, each prints
-  `1`, and `node tools/workflows/check-workflow-syntax.js tools/workflows/unattended-unit.js tools/workflows/unattended-build.js`
+- **AC8** — When `grep -c "version: '1.1', // gov:kit unattended-unit@1.1" tools/workflows/unattended-unit.js`
+  and `grep -c "version: '1.1', // gov:kit unattended-build@1.1" tools/workflows/unattended-build.js`
+  run, each prints `1` — the whole line, so `meta.version` and the comment marker are read
+  together and a half-moved line cannot pass — and
+  `node tools/workflows/check-workflow-syntax.js tools/workflows/unattended-unit.js tools/workflows/unattended-build.js`
   exits 0.
-  Red when: a marker or `meta.version` still reads `1.0`, or the syntax checker prints a file.
+  Red when: either prints `0`, which is an unmoved line or a half-moved one
+  (`version: '1.0', // gov:kit unattended-unit@1.1`, or the reverse), or the syntax checker
+  prints a file.
 - **AC9** — When `bash tools/memory-tree/check-verdict-epoch.sh` runs after the build commit, it
   exits 0.
   Red when: it names `check-memory-hygiene.sh` as moved without a bump, which happens if the constant
@@ -374,6 +393,14 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
   exits 0, and `python tools/check-spec-tokens.py --list` resolves every name on this spec's §7 leg
   line against `tools/gate-legs.json`.
   Red when: a §7 name resolves to no leg, or a §6 path-shaped token is untracked.
+- **AC15** — When `bash tools/memory-tree/check-memory-hygiene.sh` and
+  `bash tools/memory-tree/check-method-carriers.sh` run at the build commit, each exits 0: the
+  hygiene engine caps the guide S3 grows, and the carriers checker's arm 5 reads the Skill bullet
+  S4 adds. These are the two §7 names no other criterion runs, so without this bullet their first
+  verdict on this unit's files would arrive at the close.
+  Red when: either exits non-zero; the failing line that this unit can cause names
+  `memory/guides/BUILD-METHOD.md` (the guide cap) or `.claude/skills/unattended/SKILL.md` (a
+  `## M<n>` heading the bullet must not carry).
 
 ## 7. Gates
 
@@ -413,11 +440,28 @@ mark rather than the record.
   `cfg.ground`.
   RESOLVED (agent, 2026-09-13, delegated): `GROUND`, once, plus the writer-prompt acceptance rule,
   which is a different sentence about a different reader.
+- **Fork D — the round-1 audit's M2: a criterion for the two §7 legs no criterion ran, or delete
+  the §7 claim that every leg is hand-run?** `memory hygiene` and `method carriers` sat on the §7
+  line with no §6 bullet running either script, so the claim was false. Against deletion: those two
+  legs read exactly the files S3 and S4 change, and a unit whose first verdict on its own files
+  arrives at the close is the shape this build exists to remove. Against the criterion: nothing —
+  both are direct scripts, 83 s and 14 s on the last recorded bar, and neither is a suite.
+  RESOLVED (agent, 2026-09-14, delegated): the criterion, AC15; the §7 sentence stands as written
+  and is now true.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft, authored in the SPEC stage of the `aDeferredBar` run from the
   brief `prompts/2026-09-13-prompt-TOOL-aDeferredBar-1-1-spec-brief.md` and the research record.
+- rev-2 · 2026-09-14 · S3 · S4 · S6 · §5 · §6 · §8 · AC1 · AC2 · AC6 · AC8 · AC15 · folded round 1 of the
+  spec audit, `reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md`: M2 adds AC15
+  (the hygiene engine and the method-carriers checker each exit 0 at the build commit), which makes
+  §7's hand-run claim true, recorded as Fork D in §8 and named by S3 and S4; M3 makes AC8 grep the
+  whole `version:` line so a half-moved marker reds; M4 gives AC1 one grep per pinned form and AC2
+  the `summary` grep, so the red-whens the old header grep could not see are observable; M7 gives
+  AC6 its own `wc -l` observation for the 350-line clause the size checker never reads. §5 perf
+  counts nine hand-run leg scripts instead of seven; S6 records that AC1's grep arguments are not
+  hits under unit 2's `BAR`.
 
 ## 10. Reuse audit
 

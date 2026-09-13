@@ -187,10 +187,11 @@ worktrees — so nothing in flight goes red at its merge. This unit measured at 
 and takes its own date.
 
 Run with the spec's own `BAR` over every 2026-09-13-dated spec on every local and remote ref, four
-LIVE specs hit: `TOOL-aBatchedArm-5` on `branch/unattended-checks-performance-a37d8d`
-(`run-selftests.sh --pooled`, `run-unattended-gates.sh`), and `KICK-aReplayedCard-1`,
-`KICK-aReplayedCard-2`, `TOOL-aReplayedCard-1` on `branch/session-orientation-tooling-2faa9f`
-(`manifest-check.test.sh`, `scratch-guard.test.sh`). The `spec tokens` leg is `subject: repo` and
+LIVE specs hit: tooling unit 5 of build aBatchedArm on `branch/unattended-checks-performance-a37d8d`
+(`run-selftests.sh --pooled`, `run-unattended-gates.sh`), and kickoff units 1 and 2 plus tooling
+unit 1 of build aReplayedCard on `branch/session-orientation-tooling-2faa9f`
+(`manifest-check.test.sh`, `scratch-guard.test.sh`) — paraphrased by build and unit because the ids
+exist only on those branches and a citation here would mint each as an orphan on this one. The `spec tokens` leg is `subject: repo` and
 unguarded, so each reds its own bar at its merge with `origin/main`. The escape S10 contemplates
 does not exist: `memory/project/spec-token-waivers.txt` is SHRINK-ONLY by its header, and
 `TOOL-aKeyedAnnotation-9` records that absorbing a class there is unavailable.

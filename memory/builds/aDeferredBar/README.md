@@ -5,7 +5,7 @@ opened: 2026-09-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3
+ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6
 ---
 
 # aDeferredBar — no merge bar and no self-test suite inside a build pass
@@ -62,14 +62,14 @@ than the bar, and nothing at the act that refuses. The trace and the corpus coun
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 3 unit(s) · node a · opened 2026-09-13 · streams tooling
-ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3
+ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads](spec/2026-09-13-spec-TOOL-aDeferredBar-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-13 |
-| [TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation](spec/2026-09-13-spec-TOOL-aDeferredBar-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-13 |
-| [TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING](spec/2026-09-13-spec-TOOL-aDeferredBar-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads](spec/2026-09-13-spec-TOOL-aDeferredBar-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation](spec/2026-09-13-spec-TOOL-aDeferredBar-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING](spec/2026-09-13-spec-TOOL-aDeferredBar-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-14 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 4 record folder(s).
