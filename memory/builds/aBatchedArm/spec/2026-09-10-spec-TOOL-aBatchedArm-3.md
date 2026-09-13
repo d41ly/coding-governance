@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards
 
-**Status:** OPEN · rev-5 · 2026-09-13 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
+**Status:** OPEN · rev-6 · 2026-09-13 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md) | spec-audit | — |
+| [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round4.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round4.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -16,7 +17,7 @@
 
 `unattended gate selftest` is the costliest row in the declared self-test population. Split its
 293 invocations across eight declared rows the runner's `--pooled` mode executes concurrently, and
-MEASURE what that buys on this host against a two-shard reading taken at the same commit — because
+MEASURE what that buys on this host against a two-shard reading taken on the same clone at BASE — because
 `TOOL-aPacedTurnstile-8` measured the crossover at two, and `TOOL-aScannedThrottle-6` measured the
 pool's dilation. **This unit lowers ONE row.** The kit's pooled wall stays floored at the driver
 suite's row until that suite is declared sharded, which `aPacedTurnstile-8` records as "both must
@@ -53,20 +54,24 @@ number so a moved line is a moved anchor rather than a wrong one.
   calls WITH `--shard`. Retarget BOTH whole-suite notes at it in the same commit: the kit runner's
   help text at `run-unattended-gates.sh` (the text `run UNSHARDED on purpose`) and the suite's own
   note at the text `WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT`. Observed by **AC5**.
-- **S5** — the replay rule DERIVES its own population by VERDICT, and types no count. The checker
-  under test reads every remote head via `ls-remote` on every run, so every remote-head difference
-  is READ by every later arm and a "which refs are read" scan cannot separate the boundaries that
-  matter from the ones that do not; the file's diff is non-empty at every region-two boundary. So:
-  for each boundary the cut produces, the shard that starts there is run WITH the existing
-  `SH_I = 2`-shaped replay (the text `REPLAY WHAT REGION ONE LEAVES`, generalised to that boundary's
-  observed ref state) and WITHOUT it, and the two `FAIL` sets are compared. **A replay is KEPT at
-  every boundary where removing it changes the shard's `FAIL` set, DROPPED where it does not, and
-  the build log records the verdict per boundary.** The three carriers — variables, functions,
-  refs — are all scanned per boundary and the scan is recorded, but the scan informs the replay's
-  CONTENT and never decides whether one is owed. **One real leak is fixed on the way:** the ref
-  pushed at the text `"$ahead:refs/heads/ahead"` is never deleted, because `reset_tree` clears only
-  `refs/remotes/` and `refs/replace/`; `reset_tree` gains the origin-side delete so a bare shard
-  starts from the state the whole run would have. Observed by **AC8**.
+- **S5** — the replay rule REUSES `TOOL-aShardedFloor-3` AC2's oracle, which sharded this file
+  once and rejected the two oracles this spec has tried since: **compare STATE, not verdicts.** At
+  each boundary the cut produces, the unsharded run captures `git ls-remote --heads "$ORIGIN"` and
+  `git for-each-ref refs/heads refs/remotes` at that line, and shard k captures the same at its
+  start; **a replay is owed at every boundary where the two differ, and is correct when they match
+  after it**, failing with both listings named. Verdict sets cannot do this: the helpers print only
+  on failure, so a red-at-BASE arm, a vacuous control or a shared needle leaves the `FAIL` set
+  unchanged with the state wrong — the blindness that record names and that rev-5 re-derived.
+  **The named negative, per boundary:** run the shard with the boundary's leaked refs planted and
+  again with them absent and require a DIFFERENCE in the capture, naming the arm each boundary
+  breaks, so the check reads the leak rather than passing over it. The leaks are DERIVED, not named:
+  every head `ls-remote` shows on the fixture origin that a fresh start does not — `refs/heads/ahead`
+  from the text `"$ahead:refs/heads/ahead"` and `trunk` from the text `refs/heads/trunk` are the two
+  at this base, and the derivation catches a third the day one lands. `reset_tree` gains one
+  origin-side delete of that derived set, batched into the `update-ref --stdin` it already runs on
+  the bare repo rather than one push per ref, so the unsharded run pays one spawn and not one per
+  leaked head per reset. The three carriers — variables, functions, refs — are scanned per boundary
+  and the scan is recorded. Observed by **AC8** and **AC12**.
 - **S6** — the accumulation-dependent control gets a MECHANISM, not a placement, and the count it
   asserts is DECLARED BY ITS BLOCK, not typed here. The population by the note's own key is ONE arm,
   at the text `the tree is still clean after nine mutations`. Its block (the text `Nine branches,
@@ -109,8 +114,8 @@ sharded both unattended suites and found "TWO shards each is sufficient: past th
 throughput-bound and further splitting buys exactly zero" — on the BAR's pool, filled with other
 legs. The on-demand pooled run of the eight rows alone fills eight slots, but shares one serialised
 spawn path (~190 ms per fork, per the full-sweep record) that `TOOL-aScannedThrottle-6` measures
-dilating a bar leg 1.5 to 1.85x. So AC4 takes TWO readings at the same commit: the two-shard pooled
-wall BEFORE S1 lands, and the eight-shard pooled wall after. **The 20-minute arm decides the goal.
+dilating a bar leg 1.5 to 1.85x. So AC4 takes TWO readings on the same frozen clone: the two-shard
+wall at BASE before S1 lands, and the eight-shard pooled wall at HEAD after. **The 20-minute arm decides the goal.
 The ratio of eight's longest shard to two's longest decides the arity**: at or above 0.5, eight
 bought less than two would, F2's fallback applies, and the arity is lowered with both readings beside
 it. Neither result is hidden inside the other.
@@ -137,7 +142,7 @@ AC1 by 14 on a correct cut.
 
 S1, S3, S5 and S6 land together — a re-cut region without its floor, its replay or its instrumented
 control is a shard that cannot fail on coverage. S2 follows once the serial readings exist. S4 last.
-AC4's two-shard reading is taken FIRST, before any of it.
+AC4's two-shard reading is taken FIRST, at BASE, before any of it.
 
 ### Alternatives rejected
 
@@ -145,7 +150,7 @@ AC4's two-shard reading is taken FIRST, before any of it.
 
 **Cutting spawns.** `TOOL-aTracedSpawn-2` bounds it at roughly 2 s per invocation of real work.
 
-**Two shards.** Not rejected: it is F2's fallback, and AC4 measures it at the same commit.
+**Two shards.** Not rejected: it is F2's fallback, and AC4 measures it at BASE on the same clone.
 
 ### Files touched (estimate)
 
@@ -190,7 +195,10 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
   two-shard longest wall taken on the SAME frozen clone at this spec's BASE, before S1 landed,
   as two concurrent direct invocations `check-unattended.test.sh --shard 1/2` and `--shard 2/2`
   timed with `date +%s` — direct, because at BASE no shard row exists for the runner to pool and
-  the arity-2 contract does.
+  the arity-2 contract does. **Every timed invocation, all ten, is a reading only if its own
+  summary line (`PASS (…)` or `FAIL executed …`) is present in its captured output**; a timing with
+  no summary is an arm that did not run to its end, the class this repo's `ab-arm-must-prove-it-ran`
+  note records, and it is recorded as NO READING rather than as a number.
   `figure:` every number DERIVED from the two runs.
   `fixture:` the eight rows via the substring filter the runner honours; the profile row; the
   two-shard reading needs no row.
@@ -206,20 +214,30 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
 - **AC6** — When the split lands, the `FAIL` set across the eight shards is identical to the
   unsharded `FAIL` set at the same commit; and the unsharded run's floor-graded count equals the
   pre-split unsharded count, so no `in_shard k` region went green by absence when the arity moved.
+  This is the VERDICT oracle and it is deliberately second to AC8's STATE oracle: it catches a
+  verdict that moved, and AC8 catches the state that would move one silently.
   `cost:` one unsharded run plus eight sharded runs on the frozen clone.
   Red when: any `FAIL` line appears or disappears, or the unsharded count fell.
 - **AC7** — When the eight rows are staged, `bash tools/check-install-prefix.sh` is green with the
   budgets-file count raised by hand and a fourth-column reason naming the eight literals.
   Red when: `ROSE`.
-- **AC8** — When each of the seven boundaries is run with and without its replay, the build log
-  carries the two `FAIL` sets per boundary and the verdict KEPT or DROPPED; every KEPT replay is one
-  whose removal changed the set, every DROPPED one is one whose removal did not, and
-  `check-unattended.test.sh --shard <i>/8` at each index runs green with the kept set in place. And
-  after `reset_tree`'s origin-side delete lands, `git ls-remote` on the fixture origin after a reset
-  names no `refs/heads/ahead`.
-  `cost:` fourteen shard runs, two per boundary, on the frozen clone.
-  Red when: a boundary has no recorded pair, a KEPT replay's removal did not move the set, a DROPPED
-  one's did, or the leaked ref survives a reset.
+- **AC8** — When shard k starts at each of the seven boundaries, its ref-state capture
+  (`git ls-remote --heads "$ORIGIN"` plus `git for-each-ref refs/heads refs/remotes`) EQUALS the
+  unsharded run's capture at that boundary's line, and the build log carries both listings per
+  boundary; and the named negative holds at every boundary: the same shard with that boundary's
+  derived leaked refs planted and with them absent yields two DIFFERENT captures, with the arm each
+  boundary breaks named.
+  `cost:` one unsharded run capturing at seven lines, seven shard starts, and seven planted/absent
+  pairs, on the frozen clone.
+  Red when: any boundary's captures differ after the replay, any negative shows no difference, or
+  a boundary has no recorded pair. No shard is required to run GREEN; the suite is red at BASE and
+  §3 forbids changing that.
+- **AC12** — When `reset_tree` runs after the leak-producing arms, `git ls-remote --heads` on the
+  fixture origin shows the same head set a fresh start shows; and the unsharded run's `FAIL` set
+  with the delete in place is byte-identical to its `FAIL` set at this spec's base.
+  Red when: a leaked head survives a reset, or the delete moved any unsharded verdict — which would
+  be this unit changing an arm's verdict through a fixture fix, the thing §3 forbids and AC6 cannot
+  see when both sides change together.
 - **AC9** — When the `still clean after nine mutations` control is separated from its counted block,
   the shard carrying it REDS on the `same` over `$MUT` against `$MUT_EXPECTED`; and the correct
   unsharded run stays GREEN on the same assertion.
@@ -233,6 +251,7 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
   its floor; and every `FLOOR_SHARD_i` sits within the ~3 % headroom of its reading, both figures
   written beside it.
   Red when: the stranded shard runs green, or a floor is outside its headroom.
+  `cost:` one stranded run per shard the arm is staged in; the floors come from AC1's nine runs.
 
 ## 7. Gates
 
@@ -250,11 +269,24 @@ move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
   as ONE function fed by the budget rows here and by the manifest in `TOOL-aGradedDoorway-8`'s kit
   file, scoped to `--shard` callers.
 - **F2 · Eight, or fewer?** Eight is the owner's ruling. RESOLVED (owner, 2026-08-29): eight, with
-  the fallback now MEASURED rather than argued — AC4's two-shard reading at the same commit, and the
-  arity lowered with both readings beside it if eight's longest is at or above half of two's.
+  the fallback now MEASURED rather than argued — AC4's two-shard reading at BASE on the same clone,
+  and the arity lowered with both readings beside it if eight's longest is at or above half of two's.
 
 ## 9. Revision log
 
+- rev-6 · 2026-09-13 · §1 · §2 S5 · §4 · §6 AC4 · AC6 · AC8 · AC11 · AC12 · F2 · folded spec-audit
+  round 4 (BLOCKED, 4 blocker rows, CONVERGING from 8, precision 0.40, scoped to S5/S6/AC4/AC8/AC9).
+  S6, AC9 and the base bump drew zero confirmed findings and stand. The blocker: rev-5's
+  verdict-based replay oracle compares `FAIL` sets, which the helpers print only on failure, so a
+  red-at-BASE arm, a vacuous control or a shared needle leaves the set unchanged with the state
+  wrong — and `TOOL-aShardedFloor-3` AC2 had already rejected exactly that oracle for exactly this
+  file, in favour of comparing STATE with a named negative. rev-1 of that spec made the same mistake
+  for the same reason. S5 and AC8 now REUSE that oracle; AC8 no longer requires a green shard, which
+  §3 forbade. New AC12 observes that the leak delete moves no unsharded verdict, since AC6 cannot
+  see a change on both sides. The leaks are derived (`ahead` and `trunk` at this base) and the
+  delete is batched into the existing `update-ref --stdin`, not one push per ref. AC4's ten timed
+  arms now require their own summary line as a completion witness, the `ab-arm-must-prove-it-ran`
+  class. Five "at the same commit" sites corrected to "same clone, BASE then HEAD".
 - rev-5 · 2026-09-13 · §2 S1 · §2 S5 · §2 S6 · §6 AC4 · AC6 · AC8 · AC9 · base · folded spec-audit
   round 3 (BLOCKED, 8 blocker rows, CONVERGING from 9, precision 0.42). Both blockers were the same
   defect as round 2's: a figure typed where the build should derive it. S5's "exactly one non-empty
@@ -301,8 +333,9 @@ move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
   — and returned `build_self_chain`, `git` and `resolve_shell_argv`, none of which is any of these
   seams; it reports `unscanned layers: .sh`, so it cannot see the suite or the runner and its result
   is not evidence either way. The seams were found by reading the files.
-  **Disposition of every record cited**: `TOOL-aShardedFloor-2` and `-3` REUSED (the contract and the
-  block-edge cut rule); `TOOL-aPacedTurnstile-8` REUSED (the crossover and "both must move
+  **Disposition of every record cited**: `TOOL-aShardedFloor-2` and `-3` REUSED (the contract, the
+  block-edge cut rule, and — found at round 4 rather than at rev-1, which is the finding — `-3`'s AC2
+  state-equality oracle with its named negative, which S5 and AC8 now carry verbatim in shape); `TOOL-aPacedTurnstile-8` REUSED (the crossover and "both must move
   together"); `TOOL-aScannedThrottle-6` REUSED (the dilation); `TOOL-aGradedDoorway-7` S2 SUPERSEDED
   for this suite; `TOOL-aGradedDoorway-8` REUSED (the join, one function two feeders);
   `TOOL-aTracedSpawn-1` REUSED (the driver's remedy); `TOOL-dScriptedRepeat-15` NOT-THIS-SEAM (a
