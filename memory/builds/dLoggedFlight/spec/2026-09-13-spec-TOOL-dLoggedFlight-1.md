@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -26,7 +26,10 @@ producer invents a format and no consumer re-parses one.
   and a codebase-map dossier `memory/map/features/runlog.md`. The self-test and every file under
   `fixtures/` are withheld from adopters by a `project-owned` rule, and the leg is carried by an
   `[[exempt_leg]]` registry row rather than a descriptor `[[gate_leg]]`, per TOOL-aQuenchedHarness-3:
-  a self-test never reaches an adopter, as a leg or as a file. Observed by AC1.
+  a self-test never reaches an adopter, as a leg or as a file. The new registry rows raise the
+  `tools/govkit/registry.toml` row of `tools/install-prefix-carried.txt` by hand, with `runlog` added
+  to its kits and its reason extended, per TOOL-dRetiredFork-17 and the precedent of
+  TOOL-aReapedSpinner-6. The count is derived when the rows land, never typed here. Observed by AC1.
 - **S2** The journal location contract: the directory `runlog` under the git COMMON dir, holding one
   file per producer, `driver.log`, `gates.log` and `pushes.log`. It is a data location, not a kit
   path. `resolve_journal_root` returns the same absolute path from the primary tree and from any
@@ -42,6 +45,11 @@ producer invents a format and no consumer re-parses one.
   Observed by AC5, AC7 and AC9.
 - **S6** The kit self-test `tools/runlog/selftest.py`, a new held leg `runlog selftest`, and its
   budget row. Observed by AC6.
+- **S7** The memory root. `resolve_memory_root` reads `MEMORY_ROOT` from `.memory-tree.conf` at the
+  repository root, strips its slashes, and returns the kit default `memory` when the key is absent, as
+  drift-audit's reader does. A key set to nothing refuses with a named line. Every later unit addresses
+  the memory tree through it, since the kit ships and `docs/mem` is a real adopter value. Observed by
+  AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -96,7 +104,7 @@ same pass, so the grammar and its three users cannot drift apart unseen.
 | identifier | kind | cell |
 |---|---|---|
 | `tools/runlog/runlog_lib.py` | module | none |
-| `parse_line`, `read_journal`, `resolve_journal_root`, `build_invocations`, `check_line` | functions | `py.function`, each led by a declared verb |
+| `parse_line`, `read_journal`, `resolve_journal_root`, `resolve_memory_root`, `build_invocations`, `check_line` | functions | `py.function`, each led by a declared verb |
 | `Invocation`, `JournalLine` | types | `py.type`, no banned suffix |
 | `KIT_RUNLOG_VERSION = "1.0"` with `# gov:kit runlog@1.0` | version pair | kit version markers |
 | `tools/runlog/runlog.py` with `main` and `cmd_journal` | CLI | reserved verbs |
@@ -114,7 +122,8 @@ the file is absent, which is a named state, not an error.
 ### Files touched (estimate)
 
 `tools/runlog/{kit.toml,README.md,runlog_lib.py,runlog.py,selftest.py}`, `tools/govkit/registry.toml`,
-`tools/gate-legs.json`, `tools/govkit/subject-pins.tsv`, `tools/run-gates/selftest-budgets.txt`,
+`tools/install-prefix-carried.txt`, `tools/gate-legs.json`, `tools/govkit/subject-pins.tsv`,
+`tools/run-gates/selftest-budgets.txt`,
 `memory/map/features/runlog.md` and the regenerated `memory/map/generated/*`.
 
 ### Alternatives rejected
@@ -180,6 +189,11 @@ because the spec-tokens leg joins every path a live spec's criteria name against
   lines and one torn line, stdout carries two JSON objects whose keys match the lines, and stderr
   carries a bad-line count of 1 and the resolved path.
   Red when: `journal` prints nothing, drops a key, or omits the count.
+- **AC10** — When `resolve_memory_root` reads scratch trees whose conf sets `MEMORY_ROOT=docs/mem/`,
+  sets nothing, and sets `MEMORY_ROOT=/`, it returns `docs/mem`, returns `memory`, and refuses with a
+  named line.
+  Red when: a literal `memory` is returned for a conf naming another root, or an empty root is
+  accepted.
 
 ## 7. Gates
 
@@ -202,6 +216,8 @@ none
 - rev-3 · 2026-09-13 · S1 S5 · §4 · AC1 AC9 · folded round-2 spec audit M1 (the self-test and fixtures
   are withheld, per TOOL-aQuenchedHarness-3, and AC1 observes it), M14 (`journal`'s success output gains
   AC9) and H3's left-shift (the grammar states the start-end pairing duty every producer suite checks).
+- rev-4 · 2026-09-13 · S1 S7 · §4 · AC10 · folded round-3 spec audit M10 (the carried-prefix row is
+  raised by hand, with its reason) and M12 (one memory-root resolver, since the kit ships).
 
 ## 10. Reuse audit
 

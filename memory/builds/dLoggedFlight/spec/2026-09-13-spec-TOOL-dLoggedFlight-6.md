@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -60,9 +60,11 @@ streamed, located through the session ids the driver recorded, and kept under th
   attribution `heuristic`. Observed by AC7.
 - **S8** A report-only measurement, `runlog.py extract --measure <tree>`, that prints rate and peak
   working memory over a real tree and grades nothing. The self-test never reads or writes a real
-  store. Before any arm runs it points every root the kit resolves at scratch: `CLAUDE_CONFIG_DIR` and
-  `--transcripts` for reads, and `RUNLOG_STATE_DIR`, `HOME`, `USERPROFILE`, `LOCALAPPDATA` and
-  `XDG_STATE_HOME` for writes. Observed by AC8.
+  store, and proves it in two layers. Its launcher points the ambient roots, `HOME`, `USERPROFILE`,
+  `LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR`, at a DECOY tree. Each arm then points the
+  roots it uses at its own scratch: `CLAUDE_CONFIG_DIR` and `--transcripts` for reads, and
+  `RUNLOG_STATE_DIR` and the four profile roots for writes. An arm that forgets a redirection falls
+  into the decoy, where it is seen. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -172,10 +174,12 @@ tree unless it names another command.
   it attributes that session to `tFixture` with `attribution=heuristic`.
   Red when: discovery attributes a session whose only mention is inside tool output.
 - **AC8** — When `read_records` streams a generated scratch tree of 20,000 records, the high-water
-  count of records it holds at once stays at one per open file. The self-test's environment points every
-  root S8 names at scratch, and a sentinel file planted in a decoy "real" state root is untouched after
-  every arm. `extract --measure` prints a rate and a peak and exits 0 without grading either.
-  Red when: a hold-everything reader returns, or an arm reads or writes a real store.
+  count of records it holds at once stays at one per open file. The decoy tree's recursive listing, by
+  path, size and mtime, is identical before and after each arm. A decoy transcript planted under the
+  decoy `CLAUDE_CONFIG_DIR/projects`, with a unique session id, is named by no arm's output or store.
+  `extract --measure` prints a rate and a peak and exits 0 without grading either.
+  Red when: a hold-everything reader returns, an arm writes anything into the decoy, or an arm's output
+  names the decoy session id.
 - **AC9** — When `build_usage` reads a fixture whose `requestId` repeats across three records, with
   usage in the main file, a direct agent file and a workflow agent file, the request counts once and
   the totals split three ways.
@@ -208,6 +212,9 @@ New arm: `tools/runlog/selftest.py` · each rule staged RED on its fixture · fl
 - rev-3 · 2026-09-13 · S8 · AC3 AC8 · folded round-2 spec audit M10 (the self-test isolates every root
   it writes as well as reads, with a sentinel arm) and L3 (the keepalive fixture's wording defeats a
   prefix matcher).
+- rev-4 · 2026-09-13 · S8 · AC8 · folded round-3 spec audit M5 (a decoy tree the launcher aims the
+  ambient roots at, graded by a whole-tree listing and a read canary, since a sentinel beside a write
+  sees nothing).
 
 ## 10. Reuse audit
 

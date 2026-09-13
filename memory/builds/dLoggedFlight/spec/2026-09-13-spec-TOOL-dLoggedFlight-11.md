@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 11
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -33,7 +33,9 @@ make every keepalive fire leave a heartbeat line, so a stalled run is visible in
   - Every run that lands: render after `--close` and before the merge, in the close's records commit,
     so the record travels with the merge and the push-boundary bar grades it.
   - After `--landed`: re-render into the SAME file, which `record --write` finds by its runkey, in the
-    LANDED record commit the Skill already requires, so the record gains the landing facts.
+    LANDED record commit the Skill already requires. The landing push is made from the primary tree and
+    joins this run by what it pushed (`TOOL-dLoggedFlight-8` S3), so the record gains the landing push
+    and the landing bar's verdict.
 
   Each render is followed by the build-index re-render and a commit subject naming the slug and no unit
   id. The section states that a commit between the lander's push and `--landed` wedges check 34, so no
@@ -68,6 +70,8 @@ make every keepalive fire leave a heartbeat line, so a stalled run is visible in
 ### Edges
 
 - **consumes-from** `TOOL-dLoggedFlight-2` — the protocol section 2 paragraph this unit extends.
+- **consumes-from** `TOOL-dLoggedFlight-8` — the push join by what was pushed, which lets the re-render
+  after `--landed` see the landing push.
 - **consumes-from** `TOOL-dLoggedFlight-9` — the `record` command, its re-render by runkey and the index
   follow-up it prints.
 - **consumes-from** `TOOL-dLoggedFlight-10` — the schema leg that grades this run's own record.
@@ -166,6 +170,8 @@ none
   file after `--landed`, which is the placement this run takes), M11 (the landing is observed in
   `pushes.log`, which can tell a bypass apart) and M13 (an anchored presence grep for the protocol
   sentence).
+- rev-4 · 2026-09-13 · S2 · folded round-3 spec audit H3: the landing push from the primary tree joins
+  this run through unit 8's push join, which the third placement relies on.
 
 ## 10. Reuse audit
 

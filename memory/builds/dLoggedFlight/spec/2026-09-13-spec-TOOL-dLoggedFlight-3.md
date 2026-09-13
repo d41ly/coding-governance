@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -44,8 +44,10 @@ the one seam every exit path after startup passes through, with no added process
   `GOV_RUNLOG=0` turns the line off. Observed by AC5.
 - **S6** A new small suite, `tools/run-gates/run-gates.runlog.test.sh`, with its held leg and budget
   row. It is added to `tools/run-gates/kit.toml`'s `project-owned` list and its leg is carried by an
-  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. The kit version moves from 1.6 to 1.7
-  across its carriers, and the README's run-record section names the line. Observed by AC6.
+  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. That row raises the
+  `tools/govkit/registry.toml` row of `tools/install-prefix-carried.txt` by hand, with its reason, per
+  TOOL-dRetiredFork-17. The kit version moves from 1.6 to 1.7 across its carriers, and the README's
+  run-record section names the line. Observed by AC6.
 - **S7** A gotcha record under `memory/gotchas/` for the shape a signal trap takes when it calls the
   exit handler and then exits: the handler runs twice. It is anchored on `tools/run-gates/run-gates.sh`
   and claimed by a dossier. Observed by AC10.
@@ -54,8 +56,9 @@ the one seam every exit path after startup passes through, with no added process
 
 - No change to the run record, the ledger, the retention of five runs, or any verdict.
 - No session field. The gate runner is its own kit and reads no unattended declaration. The run model
-  joins a gate line to a run by worktree and time, and by run id where the pre-push hook of
-  `TOOL-dLoggedFlight-4` pinned one.
+  joins a gate line to a run by run id where a push line it joined pinned one, and otherwise by the
+  run's worktree and time. The landing bar runs in the primary tree, and its line joins through the
+  landing push's pinned id (`TOOL-dLoggedFlight-8` S3).
 - Exits before the EXIT trap is installed write no line: not a repo, no python, a bad profile, the
   profile print, the turnstile queue and beacon traps, and the work-dir `mktemp`. §4 lists them.
 
@@ -100,7 +103,8 @@ wall_breach rc fail.1..fail.20 fail_more kit`.
 
 `tools/run-gates/{run-gates.sh,README.md,kit.toml,run-gates.runlog.test.sh}` with its version carriers,
 `tools/gate-legs.json`, `tools/govkit/{registry.toml,subject-pins.tsv}`,
-`tools/run-gates/selftest-budgets.txt`, one `memory/gotchas/` record with its index and dossier claim,
+`tools/run-gates/selftest-budgets.txt`, `tools/install-prefix-carried.txt`, one `memory/gotchas/` record
+with its index and dossier claim,
 `memory/map/features/run-gates.md` and the regenerated map.
 
 ### Alternatives rejected
@@ -188,6 +192,9 @@ none
   `commondir` file; the git dir itself is the common dir) and H3 (a linked-worktree arm).
 - rev-3 · 2026-09-13 · S6 · AC6 · folded round-2 spec audit M1 (the suite is withheld from adopters, per
   TOOL-aQuenchedHarness-3, and AC6 observes it).
+- rev-4 · 2026-09-13 · S6 · §3 · §4 · folded round-3 spec audit H3 (a gate line joins through the push
+  line that pinned it, so the landing bar joins from the primary tree) and M10 (the carried-prefix row is
+  raised by hand).
 
 ## 10. Reuse audit
 

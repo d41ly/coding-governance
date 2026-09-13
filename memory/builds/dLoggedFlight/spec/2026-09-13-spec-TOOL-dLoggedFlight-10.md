@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -23,8 +23,9 @@ schema, independently of the renderer.
 ## 2. Scope (IN)
 
 - **S1** `runlog.py check-records`, run as a new repo-subject leg `runlog record schema`. It reads every
-  tracked `memory/builds/*/build/*-runlog-*.md` from the index, not the working tree, and validates
-  each against `RECORD_SCHEMA` from `TOOL-dLoggedFlight-9`. Observed by AC1.
+  tracked `<memory-root>/builds/*/build/*-runlog-*.md` from the index, not the working tree, with the
+  root from `resolve_memory_root` of `TOOL-dLoggedFlight-1`, and validates each against
+  `RECORD_SCHEMA` from `TOOL-dLoggedFlight-9`. Observed by AC1.
 - **S2** The refusals, each naming the record, the line and the rule. Observed by AC2. A record is
   refused for:
   - a heading set or order other than S3's;
@@ -37,17 +38,21 @@ schema, independently of the renderer.
   - a `Serves:` line naming an id outside the record's own build.
 - **S3** Liveness. The leg prints the population it graded. An empty population is reported as
   `0 records (none committed yet)` and exits 0, because a repo with no run records yet is a legitimate
-  state. The leg asserts the tracked glob it reads is the one the renderer writes, so a renamed
-  pattern cannot empty the population in silence. Observed by AC3.
+  state. The leg asserts the tracked glob it reads is the one the renderer writes, and that the
+  declared root holds tracked files, so a renamed pattern or a wrong root cannot empty the population in
+  silence. Observed by AC3.
 - **S4** Cost: the leg reads the whole population in a constant number of git calls, one `ls-files`
   and one `cat-file --batch`, and declares a 60 s ceiling. Observed by AC4.
 - **S5** A render-then-grade arm. The clean fixture the leg is tested against is produced by
   `render_record` from a model fixture that populates every section with one value of each closed
   class. So a renderer and a leg that disagree fail the self-test. Observed by AC1.
-- **S6** A real-population arm for the runkey. The leg also derives, through
-  `derive_run_starts`, the start commit of every tracked `memory/builds/*/RUN*.md`, and refuses a build
-  in which two records share one. That uses one extra git call for the whole population. On this tree
-  it grades six rotated builds. Observed by AC5.
+- **S6** A real-population arm for runs. The leg derives, through the population form of
+  `derive_run_starts`, the start commit of every tracked run-state file under the declared root, and
+  refuses a build in which two records share one. Through `derive_run_eras` it also computes each run's
+  window from git alone, as a fresh clone must, and refuses one that ends before its start or overlaps
+  another window of its build. That costs one `git log` for the whole population, plus one log and one
+  batch read over the run-state paths, whatever the number of builds. On this tree it grades six
+  rotated builds. Observed by AC4 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -115,17 +120,23 @@ command.
   line.
   Red when: any staged violation passes.
 - **AC3** — When no record is tracked, the leg prints `0 records` and exits 0. When the glob is
-  pointed at a pattern the renderer does not write, the self-test fails.
-  Red when: an empty population reads as a green grade with no announcement.
-- **AC4** — When `check-records` runs over fixture indexes of 1 and of 100 records, it makes the same
-  number of git subprocess calls for both, and `tools/gate-legs.json` declares its ceiling. When a
+  pointed at a pattern the renderer does not write, the self-test fails. With `MEMORY_ROOT=docs/mem`,
+  the leg grades records under `docs/mem/builds/`, and with the declared root holding no tracked file
+  it reds rather than reporting zero.
+  Red when: an empty population reads as a green grade with no announcement, or a wrong root does.
+- **AC4** — When `check-records` runs over fixture indexes of 1 and of 100 records, and of 1 and of 50
+  builds carrying run-state files, it makes the same number of git subprocess calls for each pair, and
+  `tools/gate-legs.json` declares its ceiling. When a
   staged record violates S2 while its working copy is clean, the leg reds, and in the reverse case it
   stays green.
-  Red when: the leg reads git per record, or grades the working tree instead of the index.
+  Red when: the leg reads git per record or per build, or grades the working tree instead of the
+  index.
 - **AC5** — When `check-records` runs on this tree, it reports the start commits of the six rotated
-  builds as pairwise distinct, and on a fixture build whose two records share a start commit it exits 1
-  naming both.
-  Red when: the key derivation collapses an archive into its successor and the leg stays green.
+  builds as pairwise distinct and their windows as ending at or after their starts and disjoint. On a
+  fixture build whose two records share a start commit, and on one whose live window would end at its
+  predecessor's terminal write, it exits 1 naming the build.
+  Red when: the key derivation collapses an archive into its successor, or a window ends before its
+  start, and the leg stays green.
 
 ## 7. Gates
 
@@ -145,6 +156,9 @@ none
   and H9 (AC4's wall-clock floor becomes a constant git-call count), and L2 (the hand-off to unit 11).
 - rev-3 · 2026-09-13 · S6 · AC4 AC5 · folded round-2 spec audit L2 (an index-versus-working-tree arm) and
   B1's left-shift (the leg asserts every build's run keys are distinct over the real population).
+- rev-4 · 2026-09-13 · S1 S3 S6 · AC3 AC4 AC5 · folded round-3 spec audit M12 (the declared memory root,
+  with a two-segment fixture and a wrong-root refusal), L3 (the cost criterion varies the build count)
+  and H2's left-shift (every run's window is graded over the real population).
 
 ## 10. Reuse audit
 

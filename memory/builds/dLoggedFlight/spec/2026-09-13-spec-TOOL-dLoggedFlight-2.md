@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -95,16 +95,18 @@ process spawn on the hot path and must not change how the driver dies.
   the conf source at `:294`, so a conf that set its own EXIT trap is REPLACED by ours rather than
   replacing it. The install uses `builtin trap`, so a conf function named `trap` cannot intercept it.
 - Every shell exit after the install sets `RUNLOG_CLEAN=1` first. The sites are `:4973`, `:5009`,
-  `:5015`, `:5019`, `:5020`, `:5032`, `:5039`, `:5040` and `:5059`. `:5021` is `--version`, which is not
-  journaled. The suite enumerates every `exit` across the whole of `tools/unattended/unattended.sh`
+  `:5015`, `:5019`, `:5020`, `:5021`, `:5032`, `:5039`, `:5040` and `:5059`. A marker on an exit that
+  is not journaled, as `--plan`'s and `--version`'s are not, is harmless. The suite enumerates every `exit` across the whole of `tools/unattended/unattended.sh`
   and `tools/unattended/lib-unattended.sh`, excluding awk program text and comments, and fails on one
   without the marker. The only exemptions are the named pre-install lines `:74`, `:275`, `:276`, `:279`
   and `:310`. So an exit added later inside a verb body, the likeliest place, cannot slip past.
 - The START verb is `$1` when it is a declared verb. The START slug is `$2` when it matches the grammar
   `check_slug` enforces at `tools/unattended/unattended.sh:1060-1070`, a letter followed by letters,
-  digits or dashes, bounded at 64. The shape test is factored out of `check_slug` into one predicate
-  both call, so there is no second grammar. END uses the parsed `VERB` and `SLUG`, and reads every
-  other variable as `${NAME:-}` because the driver runs under `set -u`. The unit field comes from
+  digits or dashes, with no length bound, as at base. The shape test is factored out of `check_slug`
+  into one predicate both call, so there is no second grammar. END reads the verb and slug START
+  captured from `$1` and `$2` at install, each set once, so the two lines cannot disagree. The parsed
+  `VERB` is not used: the `--phase` arm exits inline before anything assigns it. END reads every other
+  variable as `${NAME:-}` because the driver runs under `set -u`. The unit field comes from
   `BR_UNIT` for `--brief`, `PK_ITEM` for `--dispatch` and `--rescope` only, and `RV_SUBJECT` for
   `--review`. `PH_SLUG` is read for `--phase` only. `PK_ITEM` is also the free-text item of `--park`,
   `--propose` and `--attest`, so it is never read for those. `unit` is written only when the value
@@ -152,7 +154,7 @@ digits>`. A START carries at most 8 session fields, which keeps it well under th
 
 `tools/unattended/{unattended.sh,.unattended.conf.example,PROTOCOL.template.md,VERBS.template.md,kit.toml,runlog-writer.test.sh}`,
 `.unattended.conf`, `memory/guides/UNATTENDED-{PROTOCOL,VERBS}.md`, the 15 version carriers,
-`tools/run-gates/selftest-budgets.txt`, two `memory/gotchas/` records with their index and dossier
+`tools/run-gates/selftest-budgets.txt`, three `memory/gotchas/` records with their index and dossier
 claims, and the regenerated map.
 
 ### Alternatives rejected
@@ -191,15 +193,18 @@ one build folder, and never runs the existing unattended suites.
 - **AC1** — When `--park`, a refused `--park` (unknown argument, check 14) and `--phase` run in the
   sandbox, `driver.log` holds a START and an END for each. The END lines carry `rc=0`, `rc=1
   checks=14` and a `phase_to` read from the file, all with `exit=clean`. Over the whole journal the
-  suite writes, every END nonce has a START.
-  Red when: `fail()` stops recording checks, `phase_to` is taken from `rc`, or an END is unpaired.
+  suite writes, every END nonce has a START, and every END's verb equals its START's.
+  Red when: `fail()` stops recording checks, `phase_to` is taken from `rc`, an END is unpaired, or the
+  `--phase` END carries an empty verb.
 - **AC2** — When a verb exits through each shell exit shape the driver has, END reads `exit=clean` with
   `rc` equal to the process exit status. The shapes are `exit "$status"`, an inline `--phase` exit and
   a usage error. A sandbox conf that sets its own `trap 'exit 0' EXIT` changes neither. The suite also
-  enumerates every `exit` after the install line in `tools/unattended/unattended.sh` and fails on one
-  with no clean-exit marker. Observed with `bash <suite>`.
+  enumerates every `exit` in `tools/unattended/unattended.sh` and `tools/unattended/lib-unattended.sh`
+  by §4's rule, with §4's five exemptions, and fails on one with no clean-exit marker. The enumeration
+  is staged RED with an unmarked `exit` inside a verb body above the install line, and with one in
+  `lib-unattended.sh`. Observed with `bash <suite>`.
   Red when: the trap is installed after the argument loop, or before the conf source, or an exit site
-  loses its marker.
+  anywhere in either file loses its marker.
 - **AC3** — When `--close` runs in the sandbox with `GATE_CMD` set to a stub that writes a ready file
   as its first act and then sleeps 20 s, and the driver is sent TERM only after that file appears,
   checked with a bounded poll that also asserts the stub is still running, its END reads
@@ -272,6 +277,9 @@ none
   defaults), M12 (AC3's TERM waits on a ready file the stub writes), L4 (the exit enumeration spans
   both driver files), M13 (anchored presence greps for the carriers) and M1 (AC9 observes the
   withholding), with the pairing duty and a third gotcha record.
+- rev-4 · 2026-09-13 · §4 · AC1 AC2 · folded round-3 spec audit M2 (AC2 grades §4's whole population,
+  and `:5021` joins the marker list), M3 (END reads the verb START captured, since `VERB` is empty on
+  the `--phase` path) and L4 (no 64-character bound, which `check_slug` never had).
 
 ## 10. Reuse audit
 

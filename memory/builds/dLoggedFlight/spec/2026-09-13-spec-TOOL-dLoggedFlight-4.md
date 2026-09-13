@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -52,8 +52,10 @@ to `pushes.log`, and pin the bar's run id so a push joins to its gate line exact
   and AC7.
 - **S7** A new small suite, `.githooks/pre-push.runlog.test.sh`, with its leg and budget row. It is
   claimed by the `push-main` govkit entry as `project-owned`, with its leg carried by an
-  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. `.githooks/pre-push.test.sh` ships to
-  adopters today, and changing that is not this unit's. Observed by AC8.
+  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. That row raises the
+  `tools/govkit/registry.toml` row of `tools/install-prefix-carried.txt` by hand, with its reason, per
+  TOOL-dRetiredFork-17. `.githooks/pre-push.test.sh` ships to adopters today, and changing that is not
+  this unit's. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -103,13 +105,17 @@ under the 2048-byte cap.
 
 | identifier | kind | cell |
 |---|---|---|
-| `write_push_start`, `write_push_end`, `resolve_push_dirs` | shell functions | `sh.function`, verb-led |
+| `write_push_start`, `write_push_end`, `write_push_once`, `render_push_remote`, `resolve_push_dirs` | shell functions | `sh.function`, verb-led |
+
+`render_push_remote` renders the remote fields of S3 once, and both `write_push_start` and
+`write_push_once` call it, so the refusal line cannot carry a weaker guard than START.
 | `pre-push run-log line` | leg, `repo` / `selftests`, as `pre-push self-test` is | manifest |
 
 ### Files touched (estimate)
 
 `.githooks/pre-push`, `.githooks/pre-push.runlog.test.sh`, `tools/govkit/entries/push-main.kit.toml`,
-`.gitattributes`, `tools/gate-legs.json`, `tools/govkit/subject-pins.tsv`,
+`.gitattributes`, `tools/gate-legs.json`, `tools/govkit/{registry.toml,subject-pins.tsv}`,
+`tools/install-prefix-carried.txt`,
 `tools/run-gates/selftest-budgets.txt`, the dossier that claims the hook's legs, and the regenerated map.
 
 ### Alternatives rejected
@@ -149,8 +155,11 @@ remote and a work clone the way `.githooks/pre-push.test.sh` does, with the bar 
   is unpaired.
 - **AC2** — When `bash <suite>` pushes once through a named remote whose URL carries `user:pass@` and
   once to that bare URL, both line pairs carry `url_userinfo=1`, the bare push carries
-  `remote_unnamed=1`, and no line contains `pass`.
-  Red when: `$1` or `$2` reaches the line.
+  `remote_unnamed=1`, and no line contains `pass`. A third push to the credentialed bare URL, with the
+  default branch misconfigured so the hook refuses before its stdin loop, writes an `ev=once` line
+  carrying `remote_unnamed=1`, `url_userinfo=1` and `lander`. After every arm of the suite, no line of
+  the whole journal contains `pass`.
+  Red when: `$1` or `$2` reaches any line, the refusal line's remote fields included.
 - **AC3** — When the stubbed bar writes a ready file as its first act and then sleeps 20 s, and the
   hook is sent TERM only after that file appears, checked with a bounded poll that also asserts the stub
   is still running, the END reads `exit=unclean` and the hook has exited before the stub's 20 s would
@@ -198,6 +207,9 @@ none
   write an `ev=once` line, so no END is ever unpaired, and AC1 checks the pairing over the journal),
   M12 (AC3's TERM waits on a ready file the stub writes) and the withholding of the new suite per
   TOOL-aQuenchedHarness-3.
+- rev-4 · 2026-09-13 · S7 · §4 · AC2 · folded round-3 spec audit M6 (the refusal line's remote fields
+  meet the credential check through one shared renderer) and M10 (the carried-prefix row is raised by
+  hand, and the registry is in the write set).
 
 ## 10. Reuse audit
 

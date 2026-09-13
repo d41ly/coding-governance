@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -23,7 +23,8 @@ leg can prove nothing else got in.
 ## 2. Scope (IN)
 
 - **S1** `runlog.py record <slug> [--run <n>] --write` writes
-  `memory/builds/<slug>/build/<date>-build-<FAMILY>-<slug>-<seq>-runlog-<runkey>.md`.
+  `<memory-root>/builds/<slug>/build/<date>-build-<FAMILY>-<slug>-<seq>-runlog-<runkey>.md`, where
+  `<memory-root>` comes from `resolve_memory_root` of `TOOL-dLoggedFlight-1`.
   `<FAMILY>-<slug>-<seq>` is the lowest unit id the record serves, which check 21's filename
   projection requires. `<runkey>` is the first 8 hex of the commit that STARTED the run, read from the
   model's `derive_run_starts` in `TOOL-dLoggedFlight-8` and never re-derived here, so the filename and
@@ -53,7 +54,9 @@ leg can prove nothing else got in.
     - coverage states: `present`, `absent`, `partial`, `dead` and `not-local`;
     - source names: `run-state`, `driver`, `gates`, `pushes`, `git`, `transcripts` and `build-folder`;
     - ledger sources: `decision`, `abort`, `override`, `waiver`, `rescope-retire`, `rescope-supersede`,
-      `review`, `trailer`, `spec-mark`, `decision-log` and `ledger`;
+      `review`, `trailer`, `spec-mark`, `decision-log` and `ledger`. The first six are the driver's
+      `PARK_KINDS_OWED` and, prefixed `rescope-`, its `PARK_ACTS_OWED`, and the driver-source arm of
+      `TOOL-dLoggedFlight-8` S4 holds them to the driver;
     - owner-turn positions: `launch`, `pre-run`, `in-window` and `post-close`;
     - gate verdicts: `GREEN`, `RED`, `REFUSED` and `NONE`;
     - the push decisions of `TOOL-dLoggedFlight-4`;
@@ -155,9 +158,10 @@ command.
   `<runkey>`. Each key equals that run's `derive_run_starts` value, and each passes check 5's name
   grammar and check 21's projection in `bash tools/memory-tree/check-memory-hygiene.sh` over a scratch
   tree. Re-rendering the first run on a later date rewrites its existing file. A never-committed
-  run-state file refuses with a named line.
-  Red when: the two runs share a key, the name drops the family or the runkey, or a re-render makes a
-  second file.
+  run-state file refuses with a named line. With `MEMORY_ROOT=docs/mem` in the scratch tree's conf, the
+  record is written under `docs/mem/builds/`.
+  Red when: the two runs share a key, the name drops the family or the runkey, a re-render makes a
+  second file, or the record lands outside the declared root.
 - **AC2** — When `derive_serves` reads a fixture run that dispatched units 2, 3 and 5 of a build whose
   specs define 1 to 5, the record serves `…-2..3 …-5`. A fixture with no spec-defined id writes nothing
   and exits 0 with a `no spec-defined unit` line.
@@ -169,6 +173,8 @@ command.
   plus an absolute path, a session UUID, a command string and a free-text reason, every class value
   appears and none of the four intruders does.
   Red when: a closed-vocabulary value is refused, or any field outside `RECORD_SCHEMA` reaches the file.
+  Where the driver's source is present, the driver-source arm finds the first six ledger sources equal
+  to its owed sets in both directions, and where it is absent the arm prints its skip.
 - **AC5** — When `python <kit>/runlog.py verify` reads a record whose journal was edited after the
   render, it exits 1 naming the mismatch, and exits 0 on the untouched journal. On AC1's journal-less
   record it reads `commitment=none` and exits 0 with its nothing-to-verify line.
@@ -205,6 +211,9 @@ none
   successor; a re-render keeps its file), M2 (units and decisions aggregate too, and the twin follows
   the markdown's elision), L1 (`commitment=none` and its `verify` are observed) and L5 (the ledger
   sources are the driver's four owed kinds and two owed acts).
+- rev-4 · 2026-09-13 · S1 S4 · AC1 AC4 · folded round-3 spec audit M11 (the owed ledger sources are held
+  to the driver's source) and M12 (the record's root is the declared memory root, with a two-segment
+  fixture).
 
 ## 10. Reuse audit
 
