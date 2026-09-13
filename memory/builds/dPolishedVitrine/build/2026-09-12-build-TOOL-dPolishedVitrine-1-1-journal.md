@@ -360,13 +360,20 @@ rewritten.
   a sentence naming `update`, the flag and a silence word must name `re-rendered`. The `[-PV] R2-7`
   arms run a flag-off update over a vintage C and assert that line with no render. Before wiring,
   the predicate ran over the real tree. It found three hits, all in review-harness, none in the
-  unattended kit, and no near-miss. Observed red: selfcheck printed `3 problem(s)` naming the three
-  carriers. With the flag-off verdict relabelled in govkit, the `[-PV]` arm read `stale-render` and
+  unattended kit, and no near-miss. Observed red: selfcheck printed `3 problem(s)`, naming the
+  script's header, the README and the descriptor; the spec sits outside the kit, so it was reworded
+  by hand. With the flag-off verdict relabelled in govkit, the `[-PV]` arm read `stale-render` and
   redded.
 - **R2-8, low: the F3 fold left the refusal standing.** S3, §5's error-states and risks lines and two
   build-README bullets are amended to the per-pair skip. No gate, as the review says. The rev-7 line
   in spec §9 lists every `refus` clause over the spec and the README with its disposition, which is
   the gotcha's own Check.
+
+The review held the hand-off to core on R2-1, R2-2 and R2-3, and the hand-off to NicoCares on R2-2.
+All three are fixed here. This fold's own text, the three blocks and the fixture that runs them, has
+not been read by any review. The review's disposition reads `memory/guides/BUILD-METHOD.md` M4 as
+making R2-1 a fold that is not re-reviewed, because one blocker followed by one is not fewer; whether
+that rule governs this loop is the lander's call.
 
 Found while fixing, and not this unit's:
 
@@ -376,6 +383,29 @@ Found while fixing, and not this unit's:
   `requires` chain was not assembled here.
 - The first name for the hooked-commit helper led with `commit`, which the verb table does not carry,
   and the lexicon counted 987 over its pin of 986. It was renamed through `--suggest`.
+
+## The full bar after round 2
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at `72ac1a96` ran from 11:33 to
+11:45 UTC, while other sessions' bars were running on the node. 104 of 106 legs were green. Two were
+red:
+
+- `python resolver (behaviour + inline parity + idiom ban)`, on the line it is red on at base:
+  `tools/run-gates/run-gates.evidence.test.sh:643`, `DC_PY=python`. Round 2 does not touch it.
+- `process-monitor census selftest`, on one timing arm: `test_live_tree_dies_completely` found pid
+  36808 still alive after the tree kill. Round 2 touches nothing under `tools/process-monitor/`. Run
+  alone at the same tip it printed `66 passed, 0 failed` in 13 s.
+
+Every leg this round touched was green inside the bar: the govkit selftest with all its `[-PV]`
+arms, `govkit selfcheck` with arm 7l's negative half, the parity leg, the install-prefix ban, the
+lexicon at its pin, spec tokens and memory hygiene. Two earlier starts of the same bar, at
+`694d4d4e` and `a7ca1b5e`, were stopped within three minutes, because the self-review found the
+three-block split and the one-sided containment first. Their leftover processes and the beacon they
+held were removed before the next start.
+
+`tools/workflows/unattended-build.test.sh`, which no bar runs, printed `237 arms, exit 0` at the
+same tip. Round 2 leaves `tools/unattended/` untouched, so the unattended kit's on-demand suites
+were not re-run; round 1's record of them stands.
 
 ## The criteria
 
@@ -407,7 +437,8 @@ Found while fixing, and not this unit's:
   every shard's set is identical at both. The full bar at `44be8934` was green on 102 of 106 legs.
   The python resolver is red at base too, and the other three pass when run alone at that tip. After
   round 1 and the merge, the bar at `4ce472e3` was green on 105 of 106, and its one red is that same
-  python resolver line.
+  python resolver line. After round 2, the bar at `72ac1a96` was green on 104 of 106: the same
+  python resolver line, and the census self-test's timing arm, which passed when run alone.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
