@@ -40,22 +40,19 @@ replay, and the commit-time deny the design record specifies, without the subage
   counterfactual harness ships an agent definition as a TEMPLATE the harness installs for a run and
   removes after. Owner decision 1, 2026-09-13.
 - **No `--waive` verb and no waiver line.** Doc-only sessions pay a kickoff. Owner decision 2.
-- **The prompt-path build-folder commit is EXEMPTED by the deny** when the cwd holds a build folder
-  declaring `authorized-by: prompt`; hook logic with its own RED arm. Owner decision 3.
+- **The commit that CREATES a build README declaring `authorized-by: prompt` or `recipe` is
+  EXEMPTED by the deny** — staged-added or untracked, never a folder already in the tree; hook logic
+  with its own RED arm. Owner decision 3, read as `TOOL-aReplayedCard-1` §8 records.
 - **The traps eviction is inside this unit**, as `TOOL-aReplayedCard-4`. Owner decision 4.
 - **The design record is `build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md`**;
-  its appendix carries every load-bearing claim with a skeptic verdict. A refuted claim is not a
-  design input. Three UNVERIFIED claims are settled by criteria in the specs that rest on them.
-- **Classification at M2, 2026-09-13:** every unit MISSING at the run's start; all eight authored
-  in the opening commit, so each is unreviewed and M4 audits the set before any code. Round 1 came
-  back BLOCKED on four units; the fold is rev-2 of seven specs, and two forks it settled are
-  delegated marks in `TOOL-aReplayedCard-1` §8: the deny set is `git commit` alone, and the
-  exemption keys on a NEW build README, staged or untracked. Round 2 blocked TOOL-1 alone; rev-3
-  adds a third delegated mark there: an ABSENT card allows with one line, because a deny on absence
-  refused this run's own landing commits and every session open on the node.
-- **Every gate arm is observed RED before it lands.** No exceptions for a print-only verb.
-- **The kit self-tests are held**; the DoD for the kit units owes `GATE_SELFTESTS=1` on the full
-  bar because this is kit work.
+  a refuted claim in its appendix is not a design input.
+- **Classification at M2, 2026-09-13:** all eight MISSING, authored in the opening commit, audited
+  before any code. Three rounds: BLOCKED on four, then on TOOL-1 alone, then NON-CONVERGENT on
+  TOOL-1 at one blocker, disposed by FOLD. The three delegated marks are `TOOL-aReplayedCard-1` §8:
+  the deny set is `git commit` alone; the exemption keys on a NEW build README; an absent or
+  replay-written card allows.
+- **Every gate arm is observed RED before it lands.** The kit self-tests are held; the kit units'
+  DoD owes `GATE_SELFTESTS=1` on the full bar.
 
 ## Parked decisions
 
@@ -84,10 +81,10 @@ ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplaye
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aReplayedCard-4 — path-bearing manifest trap bullets become `memory/gotchas/` records](spec/2026-09-13-spec-TOOL-aReplayedCard-4.md) | 1 | 1 | SPECCED | rev-1 | 2026-09-13 |
-| [KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card](spec/2026-09-13-spec-KICK-aReplayedCard-1.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card](spec/2026-09-13-spec-KICK-aReplayedCard-1.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-14 |
 | [TOOL-aReplayedCard-5 — `orient-counterfactual.js` measures one stage-2 arm per call](spec/2026-09-13-spec-TOOL-aReplayedCard-5.md) | 2 | 1 | SPECCED | rev-2 | 2026-09-13 |
-| [KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check](spec/2026-09-13-spec-KICK-aReplayedCard-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-14 |
-| [TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` on an un-oriented card](spec/2026-09-13-spec-TOOL-aReplayedCard-1.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check](spec/2026-09-13-spec-KICK-aReplayedCard-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-14 |
+| [TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` on an un-oriented card](spec/2026-09-13-spec-TOOL-aReplayedCard-1.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-14 |
 | [TOOL-aReplayedCard-2 — SessionStart matchers, two card fragments, a rematching merge, a wiring arm](spec/2026-09-13-spec-TOOL-aReplayedCard-2.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-14 |
 | [KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5](spec/2026-09-13-spec-KICK-aReplayedCard-3.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-14 |
 | [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-14 |

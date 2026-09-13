@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 2
+**Status:** SPECCED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 2
 
 <!-- gen:spec-records -->
 
@@ -52,8 +52,10 @@ no manifest bytes beyond one audit-block key.
   prints `node — UNKNOWN` with the user name, and the card still writes. Observed by AC4.
 - **S5** `--card --replay` prints the stored card unchanged and appends one `now —` line carrying
   HEAD, the branch and clean or dirty, computed at replay and never stored. A missing card under
-  replay writes a fresh one by S3's derivation, node cell included, and says so on the first line.
-  Observed by AC5.
+  replay writes a fresh one by S3's derivation, node cell included, whose header line names
+  `--card --replay` as the writer — the one byte-level fact that tells a session which started
+  before the writer was wired from one whose startup ran it, and the fact
+  `TOOL-aReplayedCard-1` allows on — and says so on the first line. Observed by AC5.
 - **S6** `--card --path` prints the card's path and exits 0 before any other work, the print-only
   shape `--locations` already has. Observed by AC6.
 - **S7** The card is LF, capped at 8192 bytes by one constant in the verb, and the constant is the
@@ -107,7 +109,7 @@ path. `KICK-aReplayedCard-2`'s append rewrites the cell to the tree the kickoff 
 writes it once.
 
 ```
-orientation — <session_id> · written <iso> · by manifest-check.sh --card --write
+orientation — <session_id> · written <iso> · by manifest-check.sh --card --write | --card --replay
 node — <tag> · <machine/user>          | node — UNKNOWN: <why>
 tree — <toplevel> · primary|worktree · branch <b> · BASE <sha> · clean|dirty <n>
 worktrees — <n>
@@ -228,9 +230,11 @@ carries no information.
   writes.
 - **AC5** — When `--card --replay --session t1` runs after AC1, stdout is AC1's bytes followed by
   exactly one `now —` line, and the file on disk is byte-identical to before; when it runs for a
-  session with no card, the card it writes carries a `node —` tag, not `UNKNOWN`.
-  Red when: the `now —` line is stored, so a second replay prints two; or the replay-written card
-  skips the registry.
+  session with no card, the card it writes carries a `node —` tag, not `UNKNOWN`, and its header
+  line names `--card --replay` as the writer.
+  Red when: the `now —` line is stored, so a second replay prints two; the replay-written card
+  skips the registry; or it claims `--card --write` as its writer and the deny binds a session
+  that started before the wiring.
 - **AC6** — When `--card --path --session t1` runs, it prints one path and exits 0 without touching
   the file.
   Red when: the path verb writes a card as a side effect.
@@ -290,6 +294,9 @@ none
   criterion observes in a scratch clone and AC11 asserts the shared common dir is left clean, which
   is what lets `TOOL-aReplayedCard-1` allow an absent card without a bootstrap (round-2 B1); the
   headroom figure is the measured 3 B (L2); the append's cell rewrite is named in §4 (H4).
+- rev-4 · 2026-09-14 · §2 · §4 · §6 · S5 · AC5 · folded the round-3 spec audit's exit: a card the
+  replay writes fresh names `--card --replay` in its header, so the deny can tell a pre-wiring
+  session from one that skipped its kickoff (round-3 B1).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
+**Status:** SPECCED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
 
 <!-- gen:spec-records -->
 
@@ -41,7 +41,11 @@ line stays with the charter's verify-before-act rule.
   declares, exits 2 naming the overage and leaves the file byte-identical. Observed by AC4.
 - **S5** A body carrying a `READY —` line whose tail is not `none yet` replaces the card's
   `READY — none yet` sentinel in place, so the card holds exactly one READY line; a body with no
-  such line leaves the sentinel. Observed by AC5.
+  such line leaves the sentinel. A second such body, appended to a card that already holds a real
+  READY line, REPLACES the previous READY line and the six sections beneath the startup lines, so
+  the card holds one body — the latest kickoff's — and the cap is never consumed twice; a session
+  that kicks off again, in a sibling worktree say, is never refused for a body it no longer needs.
+  Observed by AC5 and AC10.
 - **S6** A body whose READY line carries a `base <sha>` that is not `git rev-parse HEAD` at append
   time is refused with exit 2 naming both shas, so a BASE stale by a commit, a compaction or a
   resume cannot land on the card whatever engine text produced it. Observed by AC8.
@@ -204,8 +208,11 @@ as vetted, and the lint this rule comes from prints its skip count for exactly t
 - **AC10** — When a card written by `--card --write` in worktree A of the self-test's fixture is
   appended to with a real READY line by `--card --append` run from sibling worktree B, the card's
   `tree —` cell names B's toplevel in the declared spelling and the rest of the startup lines are
-  byte-identical.
-  Red when: the cell keeps A, so the deny refuses every commit from B for the session's life.
+  byte-identical; when a card already holding a real READY line and its body from A is appended to
+  again from B with a second full body, the card holds one READY line, one `## task` section and
+  B's cell, and its size is under the cap where two bodies would not be.
+  Red when: the cell keeps A, so the deny refuses every commit from B for the session's life; or
+  the second append stacks a second body and the cap refuses the moved session.
 - **AC11** — When `--card --check` runs over a card holding a real READY line and no `## task`
   heading, it exits 1 naming the missing section; over a card holding both it exits 0.
   Red when: a kickoff's READY line lands with no scope beneath it and the check calls it clean.
@@ -242,6 +249,9 @@ none
   The append rewrites the `tree —` cell to the tree it runs in, so a session that moved worktrees
   has a remedy (round-2 H4); `--check` refuses a READY line with no `## task` beneath it (round-2
   M3's left-shift).
+- rev-4 · 2026-09-14 · §2 · §6 · S5 · AC10 · folded the round-3 spec audit's exit: a second real
+  READY append replaces the previous READY line and body, so a re-kickoff never stacks bodies
+  against the cap (round-3 M5).
 
 ## 10. Reuse audit
 
