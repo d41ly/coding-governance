@@ -79,7 +79,7 @@ is unit 5. Units 4 and 5 were adopted after those measurements, not planned.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-09-10 · streams tooling
+**Build status:** OPEN · 5 unit(s) · node a · opened 2026-09-10 · streams tooling
 ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 TOOL-aBatchedArm-5
 
 <!-- gen:build-units -->
@@ -87,15 +87,16 @@ ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 
 |---|---|---|---|---|---|
 | [TOOL-aBatchedArm-4 — declared execution modes for the self-test runner](spec/2026-09-13-spec-TOOL-aBatchedArm-4.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-13 |
 | [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 2 | 2 | OPEN | rev-2 | 2026-09-13 |
+| [TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip](spec/2026-09-13-spec-TOOL-aBatchedArm-5.md) | 3 | 2 | OPEN | rev-1 | 2026-09-13 |
 | [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 4 | 2 | OPEN | rev-3 | 2026-09-10 |
 | [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 5 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
 Records: 9 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBatchedArm-5.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -104,6 +105,7 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 |---|---|---|
 | 1 | `TOOL-aBatchedArm-4` | no |
 | 2 | `TOOL-aBatchedArm-3` | no |
+| 3 | `TOOL-aBatchedArm-5` | no |
 | 4 | `TOOL-aBatchedArm-1` | no |
 | 5 | `TOOL-aBatchedArm-2` | no |
 <!-- /gen:build-order -->
