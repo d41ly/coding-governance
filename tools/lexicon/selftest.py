@@ -2964,6 +2964,12 @@ check("returns R25: ...and a literal that spans the break, or opens the later li
 _f = lex.read_ts_jsx_defs("const f = () =>" + _NL + "  'x'" + _NL + "const el = <A />" + _NL)
 check("returns R25: ...while an arrow whose value is a literal on its own line still owns nothing "
       "after it", _f == [], f"{_f}")
+# ...and the mark a literal hands on goes to a token on ITS line only: a statement on the line
+# after `x +` / `'a'` is a statement, whatever operator preceded the literal.
+_AFTER = [_lit for _lit in ("'a'", chr(96) + "a" + chr(96), "/a/") if lex.read_ts_jsx_defs(
+    "const A = () => x +" + _NL + "  " + _lit + _NL + "const el = <B />" + _NL)]
+check("returns R25: ...and a literal that opens a continuation line hands the mark to a token on "
+      "its own line only, never to the next statement", not _AFTER, f"{_AFTER}")
 # A `{` BODY after a return type ending in a literal TYPE is a body, not a literal-valued arrow
 # (round 5): the refusal keys on the `=>` before the body token.
 _BRACE = [_k for _k, _src in {

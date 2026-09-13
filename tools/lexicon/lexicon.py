@@ -1019,15 +1019,22 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
     i, n, line = 0, len(src), 1
 
     pend = False
+    lit_line = None   # the line a silent literal that OPENED a continuation ended on
+    tmpl_cont = False
 
     def add_token(kind: str, text: str) -> None:
         """Emit one token, unless we are inside a suppressed span; note a continuation."""
-        nonlocal pend
+        nonlocal pend, lit_line
         if not suppress:
-            if pend and conts is not None and toks and line > toks[-1][2]:
+            # A continuation is a token opening a line after a silent operator (`pend`), or the
+            # token that follows, ON THE SAME LINE, a silent literal that itself opened such a
+            # line (`lit_line`). A token on a LATER line than that literal is a new statement:
+            # `x +` / `'a'` / `const el = <B />` must not mark `const`.
+            if conts is not None and toks and line > toks[-1][2] and (pend or lit_line == line):
                 conts.add(len(toks))
             toks.append((kind, text, line))
         pend = False
+        lit_line = None
 
     def read_string(j: int, q: str, wrap: bool = False) -> int:
         """The index just past the `q` that closes a string opened before `j`.
@@ -1087,6 +1094,9 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
                 opens.pop()
                 expr_end = True
                 pend = False
+                if tmpl_cont and not suppress:
+                    lit_line = line
+                tmpl_cont = False
                 if lits is not None and not suppress:
                     lits[len(toks)] = line
                 i += 1
@@ -1245,30 +1255,31 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
             # A literal OPENING a line after a silent operator is the continuation itself, and
             # it clears `pend` before any token can be marked: hand the mark to the token that
             # follows it (`cond &&` newline `'a' in x`). Closing review round 5, found staging.
-            if pend and conts is not None and not suppress and toks and line > toks[-1][2]:
-                conts.add(len(toks))
+            opens_cont = pend and not suppress and toks and line > toks[-1][2]
             j = read_string(i + 1, c)
             line += src.count("\n", i, j)
             i = j
+            if opens_cont:
+                lit_line = line
             expr_end = True
             pend = False
             if lits is not None and not suppress:
                 lits[len(toks)] = line
             continue
         if c == "`":
-            if pend and conts is not None and not suppress and toks and line > toks[-1][2]:
-                conts.add(len(toks))
+            tmpl_cont = bool(pend and not suppress and toks and line > toks[-1][2])
             stack.append("tmpl")
             opens.append(("template literal", line))
             i += 1
             continue
         if c == "/":
             if not expr_end:
-                if pend and conts is not None and not suppress and toks and line > toks[-1][2]:
-                    conts.add(len(toks))
+                opens_cont = pend and not suppress and toks and line > toks[-1][2]
                 j = read_regex(i + 1)
                 line += src.count("\n", i, j)
                 i = j
+                if opens_cont:
+                    lit_line = line
                 expr_end = True
                 pend = False
                 if lits is not None and not suppress:
