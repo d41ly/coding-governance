@@ -28,7 +28,7 @@ R='bash tools/run-gates/run-selftests.sh'
 B='tools/run-gates/selftest-budgets.txt'
 LEGS='tools/gate-legs.json'
 
-SELFTEST_FLOOR=53
+SELFTEST_FLOOR=55
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -143,7 +143,23 @@ arm "a row with no argv and no leg of that name reds" 1 "has no argv and no leg 
 # glob would have lost: a digit-led directory name is still handed to git and still reds.
 arm "a numeric-ratio token such as --shard 1/8 is admitted by --check, because it is not a path" 0 \
     "declaration clean" \
-    "printf 'sharded\t60\tbash tools/suite-ok.sh --shard 1/8\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "for i in 1 2 3 4 5 6 7 8; do printf 'sharded %s\t60\tbash tools/suite-ok.sh --shard %s/8\tmeasured 2s on node t 2026-09-07, x1.5\n' \$i \$i; done >> $B && git add -A" \
+    "$R --check"
+
+# ---------------------------------------------------------------- the shard join, TOOL-aBatchedArm-3 S4
+# Ported from the gov canary's shard contract, FORWARD half only: a script called with `--shard`
+# is called at one arity and every index 1..n is declared once. Seven of eight rows report green on
+# their own, which is green-by-absence one row at a time — so the arm above stages the COMPLETE set
+# and this one deletes a row from it. The second arm is the half deliberately NOT ported: a suite
+# that declares `SHARD_ARITY` and is called whole is a declaration this file is right to carry.
+arm "a deleted shard row reds the join NAMING the missing index, rather than seven green rows" 1 \
+    "no row for index 5" \
+    "for i in 1 2 3 4 6 7 8; do printf 'sharded %s\t60\tbash tools/suite-ok.sh --shard %s/8\tmeasured 2s on node t 2026-09-07, x1.5\n' \$i \$i; done >> $B && git add -A" \
+    "$R --check"
+
+arm "a suite that declares SHARD_ARITY and is called WHOLE is not graded by the join" 0 \
+    "declaration clean" \
+    "printf '#!/usr/bin/env bash\nSHARD_ARITY=2\nexit 0\n' > tools/suite-arity.sh && printf 'whole\t60\tbash tools/suite-arity.sh\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
     "$R --check"
 
 arm "a DIGIT-LED untracked path is still refused by name, so the ratio predicate is a regex and not a glob" 1 \

@@ -172,8 +172,10 @@ case "$_arg" in
     echo "               because the one that was is what round 8 filed. Takes no mode."
     echo "  --all        both, and it REFUSES without a mode exactly as --selftests does"
     echo ""
-    echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
-    echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
+    echo "The gate selftest is declared as EIGHT --shard rows and the driver suite as one whole row;"
+    echo "a --shard run is evidence about its region and nothing else, and the whole-suite claim"
+    echo "for a sharded suite is the shard JOIN in run-selftests.sh --check: one arity per script,"
+    echo "every index 1..n declared exactly once, so no region is green by absence."
     exit 0 ;;
   *) echo "run-unattended-gates: unknown argument '$_arg'"; exit 2 ;;
 esac

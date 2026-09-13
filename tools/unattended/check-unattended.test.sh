@@ -20,13 +20,18 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 
 # ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
 # The contract is TOOL-aShardedFloor-2's and its reasoning lives in the head of
-# tools/unattended/unattended.test.sh: one file and two guarded contiguous regions rather than a
+# tools/unattended/unattended.test.sh: one file and guarded contiguous regions rather than a
 # physical split (which `check-arms.py`'s one-gate-one-sibling map and the armed-branch pin refuse),
 # the flag PARSED rather than position-read, and the refusal before any scratch dir exists.
 #
-# What differs here is the SEAM and the floors, which is why this is a second unit rather than a
-# second paragraph. Its HOIST SET is two — `anchor_break` and `anchor_restore`.
-SHARD_ARITY=2
+# EIGHT regions since TOOL-aBatchedArm-3 (two before it), cut ONLY at `reset_tree`-led block edges
+# and balanced against per-shard SERIAL readings, which the budget rows carry. What differs from the
+# driver suite is the seams and the floors. Three carriers can break at a cut and each is handled
+# once: shell VARIABLES (none cross a boundary — scanned per boundary, recorded in the build),
+# FUNCTIONS (every region-defined helper is HOISTED; the block below `anchor_restore` names the
+# population and its derivation) and REFS (`topo_capture` at every boundary, `replay_landed_main`
+# at the boundaries where the unsharded run's topology differs from a fresh start).
+SHARD_ARITY=8
 SHARD=""; SHARD_GIVEN=0
 if [ "${1:-}" = --shard ]; then
   SHARD_GIVEN=1; SHARD="${2:-}"
@@ -246,7 +251,15 @@ PRISTINE=$(git rev-parse HEAD)
 # The set is DERIVED, not guessed - every `git push`/`git branch` in this file whose target is not
 # `main` or `unit` - and re-deriving it is one grep when an arm grows a new head: a `delete` of a
 # ref that does not exist is a silent no-op, so a stale entry costs nothing and a MISSING one leaks.
+# MUT counts `reset_tree`-led cycles IN THIS PROCESS (TOOL-aBatchedArm-3 S6). A control that says
+# "still clean after N mutations" is evidence only if those N cycles ran here; cut into another
+# shard it degrades into a copy of the opening control, still green. Its block declares the count
+# it expects and the control asserts the counter against it BEFORE running the leg, so separating
+# the two is a red rather than a silent loss of meaning. Both start at 0 so a control that lands
+# in a shard whose block did not run compares 0 against what that shard did run, and reds.
+MUT=0; MUT_EXPECTED=0
 reset_tree() {
+  MUT=$((MUT+1))
   git reset -q --hard "$PRISTINE"; git clean -qfd
   { git for-each-ref --format='delete %(refname)' refs/remotes/ refs/replace/ refs/heads/ \
       | grep -v -e ' refs/remotes/origin/main$' -e ' refs/heads/main$' -e ' refs/heads/unit$'
@@ -303,7 +316,169 @@ anchor_restore() {
   reset_tree
 }
 
-# ---- REGION ONE ----------------------------------------------------------------------------------
+# ---- THE HOIST SET (TOOL-aBatchedArm-3 S1). Every helper a region used to define beside its first
+# ---- caller lives here instead, because a function defined in one shard and called from another
+# ---- is a command-not-found that no gate sees until the shard runs. The population is DERIVED,
+# ---- not typed from memory: every `name() {` definition between the first `in_shard` line and the
+# ---- floor line — 27 of them at BASE 0422ea2e, 2026-09-13 — and ALL of them moved, whether or not a
+# ---- cut separates one from a caller today, so a re-balance can never strand one. Bodies are
+# ---- byte-identical to their old positions and keep their order; the comment that explained each
+# ---- stayed with the arm that uses it. A helper that READS a variable (`WP`, `_c31_skill`, `URO`,
+# ---- `UEND`) still reads one the calling block sets first — a definition crossing a cut is safe,
+# ---- its caller's block crossing one is what the variable scan is for.
+dispconf() { mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
+mkdisp() { # base-region-rows · head-region-rows · run rows
+  mkdir -p memory/builds/tDisp
+  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
+  git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m dispbase --no-verify
+  DISPBASE=$(git rev-parse HEAD)
+  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
+  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
+  # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
+  # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
+  # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
+  # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
+  git add -A >/dev/null 2>&1
+  GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
+}
+drop_readme()  { rm -f memory/builds/tRun/README.md; }
+break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
+break_slug()   { sed -i 's|^slug: .*|slug: someoneElse|' memory/builds/tRun/README.md; }
+noop_break() { :; }
+_bm_sections() { printf '# method
+
+## M2
+
+## M3
+
+## M4
+
+## M5
+
+## M6
+%s
+## M7
+
+## M8
+
+## M9
+
+## M10
+
+## M12
+' "$1"; }
+wreset() { git reset -q --hard "$WP"; git clean -qfd; }
+drive() { bash "$KIT_REL"/unattended.sh "$@" 2>&1; }
+wline() { grep -F ' waiver · item ' memory/builds/tWaive/RUN.md; }
+kick_engine() { # stage a conforming engine + declare it, so check 12 stays silent and only 18 speaks
+  mkdir -p skills/session-kickoff
+  cat > skills/session-kickoff/SKILL.md <<'ENG'
+## Step 5 — READY card, then stop
+control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building.
+## Step 5b — the unattended hand-back
+ENG
+  printf 'KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"\n' >> .unattended.conf
+  git add -A && git commit -q -m engine --no-verify
+}
+_bm31() { # [route path]; with no argument the section names no route at all
+  local body
+  body=$(printf '\n`parallel-when-disjoint` `passes-committed` `passes-harnessed`')
+  [ $# -gt 0 ] && body=$(printf '%s — the route is `%s`' "$body" "$1")
+  _bm_sections "$body" > memory/guides/BUILD-METHOD.md
+}
+_mkskill() { # <route path>...; the Skill's harness bullet and nothing else
+  mkdir -p "$(dirname "$_c31_skill")"
+  { printf 'the harness is:\n'; for _s in "$@"; do printf -- '- `%s`\n' "$_s"; done; } > "$_c31_skill"
+}
+pedit() { mutate $KIT_REL/PROTOCOL.template.md "$1"
+          mutate memory/guides/UNATTENDED-PROTOCOL.md "$1"; }
+frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
+           sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md; }
+add_mode() { sed -i '/^slug: /a authorized-by: prompt' memory/builds/tRun/README.md; }
+add_bad_mode() { sed -i '/^slug: /a authorized-by: slugg' memory/builds/tRun/README.md; }
+add_recipe_seam() { sed -i '/^slug: /a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3' memory/builds/tRun/README.md; }
+add_recipe_mode() { sed -i '/^slug: /a authorized-by: recipe' memory/builds/tRun/README.md; }
+gut_parser() { # fn-name · whole replacement body (one line)
+  local f
+  for f in $KIT_REL/check-playbook.sh $KIT_REL/unattended.sh; do
+    mutate "$f" "/^$1() {/,/^}/ { /^$1() {/b; /^}/b; d; }"
+    mutate "$f" "/^$1() {/a\\$2"
+  done
+}
+seed_ros() {
+  reset_tree
+  build tRos
+  awk -v r="$URO" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros.$$ \
+    && mv /tmp/ros.$$ memory/builds/tRos/README.md
+  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+  git add -A && git commit -q -m "tRos baseline" --no-verify
+  # THE PINNED BASE IS THIS COMMIT, not the merge-base. `pinned_units` reads the units REGION at the
+  # pinned commit, and the merge-base predates this fixture build folder entirely — so the RETIRE arm
+  # would refuse rather than grade, and every arm below would be green because the arm found nothing.
+  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
+  git add -A && git commit -q -m "tRos baseline pin" --no-verify
+}
+add_u7() {
+  awk -v r="$UR7" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros7.$$ \
+    && mv /tmp/ros7.$$ memory/builds/tRos/README.md
+}
+rrow() { printf '\n2026-08-20T00:00:00Z rescope · item %s · reason %s\n' "$1" "$2" >> memory/builds/tRos/RUN.md; }
+drow() {               # unit · declared paths — a dispatch row at the CURRENT HEAD
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' \
+    "$(git rev-parse --short=8 HEAD)" "$1" "$2" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1" --no-verify
+}
+drows() {              # unit · paths-for-row-1 · paths-for-row-2 — BOTH at the current anchor
+  G=$(git rev-parse --short=8 HEAD)
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
+  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$3" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1" --no-verify
+}
+gdrows() {             # unit1 · paths1 · unit2 · paths2 — both rows at the CURRENT anchor
+  G=$(git rev-parse --short=8 HEAD)
+  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
+  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$3" "$4" >> memory/builds/tRun/RUN.md
+  git add -A && git commit -q -m "declare $1 and $3" --no-verify
+}
+land_as() {            # anchor-kind · witness
+  sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+  sed -i "s/^witness: .*/witness: $2/" memory/builds/tRun/RUN.md
+  [ -n "$1" ] && printf 'landed-anchor: %s\n' "$1" >> memory/builds/tRun/RUN.md
+  git add -A
+}
+
+# ---- THE REF CARRIER, and the rule the two-shard file wrote by hand once (TOOL-aBatchedArm-3 S5).
+# ---- A shard starts from a FRESH fixture; the unsharded run reaches the same line carrying what
+# ---- every earlier region left behind. Region one's lifecycle control merges `unit` into `main`
+# ---- and pushes, so from there `unit` is an ANCESTOR of `main` on both stores, and the tWaive
+# ---- fixture fast-forwards onto that without saying so — a bare shard hits a real merge that
+# ---- CONFLICTS on tRun/RUN.md and is swallowed whole; measured when the two-shard seam was cut,
+# ---- three arms failing naming a waiver and none naming the cause. The replay re-establishes that
+# ---- topology at every boundary whose unsharded capture carries it; `topo_capture` is what says
+# ---- whether a boundary owes it, and whether the replay was enough.
+replay_landed_main() {
+  git checkout -qf main && git merge -q --no-edit unit >/dev/null 2>&1
+  git push -q -f origin main >/dev/null 2>&1
+  git checkout -qf unit
+}
+# TOPOLOGY, never shas: the ref NAME sets on the fixture origin and in the clone, plus the ancestry
+# verdicts a later arm depends on. Two processes never share a sha, which is why the sha-bearing
+# oracle was refused. ENV-GATED and inert by default — it adds no assertion and moves no verdict;
+# CHECK_UNATTENDED_TOPO=1 prints one `topo` line per boundary, which the unsharded run emits at the
+# boundary's line and shard k at its start. The two must be byte-identical after the replay (AC8).
+# A second line carries the clock and the count, which differ by construction and are not compared.
+topo_capture() { # <boundary index>
+  [ -n "${CHECK_UNATTENDED_TOPO:-}" ] || return 0
+  local o l a b
+  o=$(git ls-remote --heads "$ORIGIN" 2>/dev/null | cut -f2 | tr '\n' ' ')
+  l=$(git for-each-ref --format='%(refname)' refs/heads/ | tr '\n' ' ')
+  a=$(git merge-base --is-ancestor unit main 2>/dev/null && echo yes || echo no)
+  b=$(git merge-base --is-ancestor unit "$(git --git-dir="$ORIGIN" rev-parse refs/heads/main)" 2>/dev/null && echo yes || echo no)
+  echo "topo boundary=$1 origin=[$o] local=[$l] unit<main=$a unit<origin-main=$b"
+  echo "topo-at boundary=$1 t=$SECONDS n=$n"
+}
+
+# ---- REGION 1 ------------------------------------------------------------------------------------
 # Bodies are NOT reindented: `check-arms.py` reads lines and skips comments, so an unindented wrapper
 # leaves every arm signature byte-identical and the armed-branch pin untouched.
 if in_shard 1; then
@@ -720,6 +895,12 @@ same "a young tree with no run-state file anywhere exits 0" "$rc" "0"
 same "a young tree prints nothing" "$out" ""
 
 # ---- check 4 branches 2 and 3: no phase, and a phase outside the vocabulary.
+
+fi   # ---- end REGION 1 -----------------------------------------------------------------------------------
+
+# ---- REGION 2 -----------------------------------------------------------------------------------
+if in_shard 2; then
+topo_capture 2
 reset_tree; sed -i '/^phase: /d' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file declares no phase, and a file with no phase is outside every check keyed on one"
 reset_tree; sed -i 's/^phase: RUNNING$/phase: MARINATING/' memory/builds/tRun/RUN.md
@@ -850,21 +1031,6 @@ reset_tree
 # STRIPS BEFORE IT APPENDS, since mkconf now declares the key itself. Appending alone would leave the
 # conf carrying two declarations of one key: the leg's import reads the last and would behave, but a
 # fixture that declares a key twice is a fixture check 22 grades on a key set nobody meant to write.
-dispconf() { mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
-mkdisp() { # base-region-rows · head-region-rows · run rows
-  mkdir -p memory/builds/tDisp
-  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
-  git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m dispbase --no-verify
-  DISPBASE=$(git rev-parse HEAD)
-  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
-  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
-  # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
-  # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
-  # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
-  # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
-  git add -A >/dev/null 2>&1
-  GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
-}
 D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
 D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
 
@@ -1040,6 +1206,12 @@ reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-PROTOCOL.md
 out=$(run)
 hit "$out" "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
+
+fi   # ---- end REGION 2 -----------------------------------------------------------------------------------
+
+# ---- REGION 3 -----------------------------------------------------------------------------------
+if in_shard 3; then
+topo_capture 3
 reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
 hit "$(run)" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
 
@@ -1196,9 +1368,6 @@ miss "$(GOV_DEFAULT_BRANCH= run)" "a record claims LANDED with a witness that is
 # ----
 # ---- The anchor helpers are HOISTED to the prologue for the shard contract.
 
-drop_readme()  { rm -f memory/builds/tRun/README.md; }
-break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
-break_slug()   { sed -i 's|^slug: .*|slug: someoneElse|' memory/builds/tRun/README.md; }
 
 anchor_break drop_readme
 hit "$(run)" "no build README at a run's recorded BASE, so nothing committed before that run branched authorizes it"
@@ -1214,7 +1383,6 @@ anchor_restore
 
 # ---- and the GREEN control for all three: the same machinery with NOTHING broken must stay silent,
 # ---- or these arms are indistinguishable from a leg that reds on any anchor edit at all.
-noop_break() { :; }
 anchor_break noop_break
 miss "$(run)" "recorded BASE"
 anchor_restore
@@ -1270,37 +1438,13 @@ same "a LANDED run-state record leaves the bar green" "$out" ""
 same "a LANDED run-state record exits 0" "$rc" "0"
 git checkout -q unit; reset_tree
 
-fi   # ---- end REGION ONE ----------------------------------------------------------------------
 
-# ---- REGION TWO ----------------------------------------------------------------------------------
-# THE SEAM, chosen between two block-edge candidates and MEASURED. It sits at the end of the
-# lifecycle block, which is the safer of the two: it keeps that block's un-restored `main`/origin
-# state on one side rather than straddling the boundary. The alternative, the end of check 14, is
-# the more balanced candidate and its timing is recorded in this build's record beside this one.
-#
-# NOT chosen by arm count. One tokenisation of this file splits nearly evenly while the
-# git-operation weight splits about 2:1 — and the bar's floor is the LARGER shard, so an imbalance
-# measured the wrong way eats the win directly.
-#
-# Neither candidate separates an arm from its control. The obvious-looking cut one line earlier
-# does exactly that, which is why the boundary is stated here rather than left to a line number.
-if in_shard 2; then
-# REPLAY WHAT REGION ONE LEAVES, and it is one property rather than a pile of state: region one's
-# anchor arms repeatedly check out main, commit, force-push and then merge main back into unit, so by
-# this seam `unit` is an ANCESTOR of `main`. The tWaive fixture below relies on that without saying
-# so — its `git merge -q --no-edit main >/dev/null 2>&1` is a FAST-FORWARD in the whole-suite run.
-#
-# MEASURED, both ways. Whole suite at this point: `Updating d0faf46..ab26c43`, merge rc 0. Shard two
-# without this line: the branches have diverged, that merge is a real one, it CONFLICTS on
-# memory/builds/tRun/RUN.md, and `>/dev/null 2>&1` swallows the conflict whole. `BUILD-METHOD.md`
-# then never reaches unit, `--preflight` refuses on check 34 with "no build method under the memory
-# root", no run-state file is written — and THREE arms fail naming a waiver, none of them naming the
-# cause. That is what this one line buys, and it is why it is a line rather than a comment.
-if [ "$SH_I" = 2 ]; then
-  git checkout -qf main && git merge -q --no-edit unit >/dev/null 2>&1
-  git push -q -f origin main >/dev/null 2>&1
-  git checkout -qf unit
-fi
+fi   # ---- end REGION 3 -----------------------------------------------------------------------------------
+
+# ---- REGION 4 -----------------------------------------------------------------------------------
+if in_shard 4; then
+[ "$SH_I" = 4 ] && replay_landed_main   # owed here: the unsharded capture at this line carries unit<main=yes
+topo_capture 4
 reset_tree
 
 # ---- check 14: a replace ref or a graft file is itself the violation. The GIT() pin makes THIS
@@ -1416,6 +1560,10 @@ n=$((n+1)); [ -z "$nf" ] || { echo "FAIL a hot accessor reverted to the fork-per
 # ---- constant against a hand-authored markdown table in a different file. A generator would make
 # ---- the two agree by construction and check nothing.
 
+# THE COUNT THE CONTROL ASSERTS IS DECLARED HERE, BY ITS OWN BLOCK (TOOL-aBatchedArm-3 S6): every
+# `reset_tree`-led cycle from this line to the control increments MUT, and "nine" is the ARM count,
+# not the cycle count — arm 6b alone runs three. Counted from the file, not typed from the note.
+MUT=0; MUT_EXPECTED=13
 # arm 1: the kit ships no template at all — a broken install, not a project choice.
 reset_tree; mv $KIT_REL/SKILL.template.md $KIT_REL/SKILL.template.md.bak
 hit "$(run)" "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
@@ -1466,28 +1614,6 @@ rm -f memory/guides/BUILD-METHOD.md
 # proves the term that opens it. FOUR FIXTURES, because the block-wise comment strip is the whole
 # point of the term and only the fourth separates it from the naive line-prefix filter that was
 # measured ADMITTING that evasion.
-_bm_sections() { printf '# method
-
-## M2
-
-## M3
-
-## M4
-
-## M5
-
-## M6
-%s
-## M7
-
-## M8
-
-## M9
-
-## M10
-
-## M12
-' "$1"; }
 # every section present, every handle absent from every body -> RED, naming the pair
 reset_tree; _bm_sections "" > memory/guides/BUILD-METHOD.md
 hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
@@ -1520,6 +1646,7 @@ hit "$(run)" "the kit's CORE directive set has shrunk below its floor, and delet
 # ---- work tree, but a suite that only ever reds is a suite that arms every branch and checks
 # ---- nothing; this is what says the mutations above were the cause.
 reset_tree
+same "the tree is still clean after nine mutations: every cycle of its block ran in this process" "$MUT" "$MUT_EXPECTED"
 same "the tree is still clean after nine mutations" "$(run >/dev/null 2>&1; echo $?)" "0"
 
 # ---- check 17, the parked WAIVER: a declared handle, a non-empty reason, and presence in the
@@ -1597,9 +1724,6 @@ git add -A && git commit -q -m tWaive --no-verify && git push -q -f origin main
 # on tRun/RUN.md and this redirection swallows it whole — measured, and the reason that opener exists.
 git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1
 WP=$(git rev-parse HEAD)
-wreset() { git reset -q --hard "$WP"; git clean -qfd; }
-drive() { bash "$KIT_REL"/unattended.sh "$@" 2>&1; }
-wline() { grep -F ' waiver · item ' memory/builds/tWaive/RUN.md; }
 
 # GREEN CONTROL: the driver writes the waiver, the record's first commit carries it, the leg is silent.
 wreset
@@ -1657,16 +1781,6 @@ git checkout -q main; git reset -q --hard "$ANCHOR0"; git push -q -f origin main
 
 # ---- check 18: the kickoff step is ORDERED after preflight in the Skill an agent reads. Keyed on a
 # ---- non-blank KICKOFF_ENGINE like check 12, because an adopter may ship no kickoff skill at all.
-kick_engine() { # stage a conforming engine + declare it, so check 12 stays silent and only 18 speaks
-  mkdir -p skills/session-kickoff
-  cat > skills/session-kickoff/SKILL.md <<'ENG'
-## Step 5 — READY card, then stop
-control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building.
-## Step 5b — the unattended hand-back
-ENG
-  printf 'KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"\n' >> .unattended.conf
-  git add -A && git commit -q -m engine --no-verify
-}
 
 # GREEN CONTROL: the template this kit actually ships orders the two correctly.
 reset_tree; kick_engine
@@ -1775,12 +1889,6 @@ _c31_route="$_c31_dir/unattended-unit.js"
 # comes from the derived variable. A backtick inside a double-quoted string in this suite is command
 # substitution, and the fixture would then be written by whatever it ran - the trap `mkconf` carries
 # a loud comment about, which cost a 50-minute run to find.
-_bm31() { # [route path]; with no argument the section names no route at all
-  local body
-  body=$(printf '\n`parallel-when-disjoint` `passes-committed` `passes-harnessed`')
-  [ $# -gt 0 ] && body=$(printf '%s — the route is `%s`' "$body" "$1")
-  _bm_sections "$body" > memory/guides/BUILD-METHOD.md
-}
 
 # branch F1, and this is the POSITIVE assertion `fail 31` owes under check-arms: the section names a
 # script this tree does not carry while the directory that would hold it IS present, which is a kit
@@ -1847,10 +1955,6 @@ miss "$(run)" "check 31"
 # ---- format for the same reason `_bm31` uses one: a backtick inside a double-quoted string in this
 # ---- suite is command substitution.
 _c31_skill=".claude/skills/unattended/SKILL.md"
-_mkskill() { # <route path>...; the Skill's harness bullet and nothing else
-  mkdir -p "$(dirname "$_c31_skill")"
-  { printf 'the harness is:\n'; for _s in "$@"; do printf -- '- `%s`\n' "$_s"; done; } > "$_c31_skill"
-}
 
 # branch S6, the Skill absent. The fixture ships no render, so this state is the shipped one and the
 # arm breaks nothing - the point being that the announcement exists at all, where before this the
@@ -1919,10 +2023,14 @@ reset_tree
 # ---- satisfied by a refusal that has nothing to do with the join it is testing.
 # Through `mutate`, so a locator that stops matching after a document reword FAILS here instead of
 # silently turning six arms into six no-ops that still read as tests.
-pedit() { mutate $KIT_REL/PROTOCOL.template.md "$1"
-          mutate memory/guides/UNATTENDED-PROTOCOL.md "$1"; }
 
 # GREEN CONTROL: the shipped contract already agrees with the driver in both tables.
+
+fi   # ---- end REGION 4 -----------------------------------------------------------------------------------
+
+# ---- REGION 5 -----------------------------------------------------------------------------------
+if in_shard 5; then
+topo_capture 5
 reset_tree
 same "the shipped protocol's two tables join clean" "$(run)" ""
 
@@ -2074,8 +2182,6 @@ reset_tree
 # ---- silence: widening DIRECTIVES_CORE reds check 16 by construction, and a builder chasing total
 # ---- silence would exempt check 16 on terminal records — the over-wide exemption this build has
 # ---- already committed once.
-frozen() { sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
-           sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md; }
 
 # MOVE 1 — a COPY appears in the run-state region, which is what every pre-redesign record holds.
 # Collides with check 8. On a TERMINAL record it must be silent: no verb can empty that region once
@@ -2131,7 +2237,6 @@ reset_tree
 # ---- THE AGREEING DIRECTION. Without it the arm above passes over a check that fires on every
 # ---- record carrying a mode at all, which would red the bar for every honest prompt-mode run. The
 # ---- README has to gain the key AT THE ANCHOR, so this one does need `anchor_break`.
-add_mode() { sed -i '/^slug: /a authorized-by: prompt' memory/builds/tRun/README.md; }
 anchor_break add_mode
 sed -i '/^base: /a mode: prompt' memory/builds/tRun/RUN.md
 git add -A >/dev/null
@@ -2152,7 +2257,6 @@ miss "$(run)" "a run-state file records an authorization mode the build README a
 # ---- whole defect - it asked whether two values MATCH and never whether either was LEGAL. This
 # ---- arm therefore asserts the membership message HITS and the agreement message MISSES: an arm
 # ---- that only asserted a red would have passed on the old code for the wrong reason.
-add_bad_mode() { sed -i '/^slug: /a authorized-by: slugg' memory/builds/tRun/README.md; }
 anchor_break add_bad_mode
 sed -i '/^base: /a mode: slugg' memory/builds/tRun/RUN.md
 git add -A >/dev/null
@@ -2180,6 +2284,12 @@ anchor_restore
 # ---- exactly what the second anchor produces — no stub, because the discriminator is an ancestry
 # ---- test against a real advertisement and a fixture that faked it would assert this file's own
 # ---- imagination. The README at that base carries no `authorized-by:` key, which reads as `slug`.
+
+fi   # ---- end REGION 5 -----------------------------------------------------------------------------------
+
+# ---- REGION 6 -----------------------------------------------------------------------------------
+if in_shard 6; then
+topo_capture 6
 reset_tree
 git commit -q --allow-empty -m unit-only --no-verify
 sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
@@ -2211,7 +2321,6 @@ reset_tree
 # ---- the DECLARATION SEAM second-opinioned. The record claims a
 # ---- playbook and a count the README at its own BASE does not declare. Two branches, two
 # ---- fixtures, because one arm asserting either message would pass on whichever fired.
-add_recipe_seam() { sed -i '/^slug: /a authorized-by: recipe\nplaybook: content/pb.md\npieces: 3' memory/builds/tRun/README.md; }
 anchor_break add_recipe_seam
 sed -i '/^base: /a mode: recipe' memory/builds/tRun/RUN.md
 sed -i '/^base: /a playbook: content/other.md' memory/builds/tRun/RUN.md
@@ -2225,7 +2334,6 @@ anchor_restore
 # ---- THE NEW MEMBER IS LEGAL. Without this the two arms above pass over a set that could have
 # ---- been narrowed to nothing, and a membership test against an empty vocabulary reds everything -
 # ---- which looks like rigour and is the vacuity this repo reds by name.
-add_recipe_mode() { sed -i '/^slug: /a authorized-by: recipe' memory/builds/tRun/README.md; }
 anchor_break add_recipe_mode
 sed -i '/^base: /a mode: recipe' memory/builds/tRun/RUN.md
 git add -A >/dev/null
@@ -2435,6 +2543,12 @@ hit "$(run)" "the Skill's routing section carries no row naming an authorization
 # A declared mode with no row. The playbook row's cell is retyped as an existing mode, so the table
 # stays well-formed and one mode simply stops being reachable — the failure that does not look like
 # a failure.
+
+fi   # ---- end REGION 6 -----------------------------------------------------------------------------------
+
+# ---- REGION 7 -----------------------------------------------------------------------------------
+if in_shard 7; then
+topo_capture 7
 reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `slug` |/'
 hit "$(run)" "the driver declares an authorization mode that no routing row names, so a build may legally declare a mode the Skill never tells anyone how to start: recipe against"
 
@@ -2463,13 +2577,6 @@ reset_tree
 # ---- and the ANSWER assertions are what speak. Replacing only the first line left the pipeline's
 # ---- continuation lines orphaned, which fired the rc branch instead of the one under test — caught
 # ---- because `mutate` proves the edit landed and the arm still named the wrong branch.
-gut_parser() { # fn-name · whole replacement body (one line)
-  local f
-  for f in $KIT_REL/check-playbook.sh $KIT_REL/unattended.sh; do
-    mutate "$f" "/^$1() {/,/^}/ { /^$1() {/b; /^}/b; d; }"
-    mutate "$f" "/^$1() {/a\\$2"
-  done
-}
 # ---- ROUND 7's BLOCKER 1: A PARSER BROKEN ONLY FOR ONE INPUT SHAPE. `gut_parser` above breaks a
 # ---- parser for EVERY input, which the fixed specimen loops catch on their own. This taints it for
 # ---- the SHIPPED TEMPLATE's block alone - `step_selector` is in that block and in none of the
@@ -2698,6 +2805,12 @@ hit "$(run)" "the declared-list parser is missing from one of the two scripts th
 
 # ...and the ANSWER, over the line the shipped template actually carries. Agreement alone is
 # satisfied by two identical wrong copies, which is how the defect that produced this check shipped.
+
+fi   # ---- end REGION 7 -----------------------------------------------------------------------------------
+
+# ---- REGION 8 -----------------------------------------------------------------------------------
+if in_shard 8; then
+topo_capture 8
 reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's/^piece_checks = \[\]/piece_checks = [oops]/'
 hit "$(run)" "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow:"
 
@@ -2726,24 +2839,6 @@ UR7='| [ARCH-tRos-7 — a later unit](spec/seven.md) | OPEN | rev-1 | 2026-08-01
 # A unit that is WONTDO in the BASELINE region itself — the case the retire loop exempts.
 UROW='| [ARCH-tRos-8 — retired before the run](spec/eight.md) | WONTDO | rev-1 | 2026-08-01 |'
 UEND='<!-- /gen:build-units -->'
-seed_ros() {
-  reset_tree
-  build tRos
-  awk -v r="$URO" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros.$$ \
-    && mv /tmp/ros.$$ memory/builds/tRos/README.md
-  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
-  git add -A && git commit -q -m "tRos baseline" --no-verify
-  # THE PINNED BASE IS THIS COMMIT, not the merge-base. `pinned_units` reads the units REGION at the
-  # pinned commit, and the merge-base predates this fixture build folder entirely — so the RETIRE arm
-  # would refuse rather than grade, and every arm below would be green because the arm found nothing.
-  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tRos/RUN.md
-  git add -A && git commit -q -m "tRos baseline pin" --no-verify
-}
-add_u7() {
-  awk -v r="$UR7" -v e="$UEND" '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros7.$$ \
-    && mv /tmp/ros7.$$ memory/builds/tRos/README.md
-}
-rrow() { printf '\n2026-08-20T00:00:00Z rescope · item %s · reason %s\n' "$1" "$2" >> memory/builds/tRos/RUN.md; }
 
 # an id present now and absent at the baseline, with NO rescope row, is the whole point of the check
 seed_ros; add_u7
@@ -2821,11 +2916,6 @@ reset_tree
 # ---- The sibling verb records what a dispatched pass said it would write; this is the half that can
 # ---- catch the declaration out, because the two artifacts are made by different acts at different
 # ---- times. What it cannot buy is in its own header: both are authored by the run.
-drow() {               # unit · declared paths — a dispatch row at the CURRENT HEAD
-  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' \
-    "$(git rev-parse --short=8 HEAD)" "$1" "$2" >> memory/builds/tRun/RUN.md
-  git add -A && git commit -q -m "declare $1" --no-verify
-}
 
 # a pass that commits INSIDE its declared set is clean
 reset_tree
@@ -2847,12 +2937,6 @@ hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outsid
 # ---- asked for AFTER the pass committed cannot reuse that anchor — the driver no longer finds the
 # ---- row to supersede — so it lands under a new key and the original narrow row is still graded.
 # ---- That is the ordering constraint, obtained by construction instead of by comparing timestamps.
-drows() {              # unit · paths-for-row-1 · paths-for-row-2 — BOTH at the current anchor
-  G=$(git rev-parse --short=8 HEAD)
-  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
-  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$3" >> memory/builds/tRun/RUN.md
-  git add -A && git commit -q -m "declare $1" --no-verify
-}
 
 # A: the sanctioned repair. Widened at its own anchor, commits inside the widened set.
 reset_tree
@@ -2908,12 +2992,6 @@ hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outsid
 # the anchoring left the whole suite green. `ARCH-tRun-1` is a prefix of `ARCH-tRun-10`, so under an
 # unanchored `case ... in *"$dssunit"*` the `-10` commit reads as naming `-1` too and a correct run is
 # refused for ambiguous attribution.
-gdrows() {             # unit1 · paths1 · unit2 · paths2 — both rows at the CURRENT anchor
-  G=$(git rev-parse --short=8 HEAD)
-  printf '\n2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$1" "$2" >> memory/builds/tRun/RUN.md
-  printf '2026-08-21T00:00:00Z dispatch · item %s %s · reason %s\n' "$G" "$3" "$4" >> memory/builds/tRun/RUN.md
-  git add -A && git commit -q -m "declare $1 and $3" --no-verify
-}
 reset_tree
 gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-10 "work/ten.txt"
 mkdir -p work && printf 'b\n' > work/ten.txt
@@ -3031,12 +3109,6 @@ miss "$out" "FAILED"
 # ---- than an observation of one — so a clone that never had that merge says so instead of redding.
 # ---- Without that, a run lands locally on one node and the same leg reds on every other node that
 # ---- has not fast-forwarded its own default branch.
-land_as() {            # anchor-kind · witness
-  sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
-  sed -i "s/^witness: .*/witness: $2/" memory/builds/tRun/RUN.md
-  [ -n "$1" ] && printf 'landed-anchor: %s\n' "$1" >> memory/builds/tRun/RUN.md
-  git add -A
-}
 
 # ---- ADV_NAME IS GRADED, and before this nothing distinguished the working parse from an empty one.
 # ---- The local arm reaches `refs/heads/$ADV_NAME`; with ADV_NAME empty the test short-circuits, the
@@ -3121,7 +3193,7 @@ reset_tree
 # ---- Main sharded this suite while this branch added arms to it. The SHARDING is kept — it is
 # ---- the structure — and the floors below are RE-MEASURED against the merged suite rather than
 # ---- carried over, because a floor inherited across a merge is a number, not a floor.
-fi   # ---- end REGION TWO ----------------------------------------------------------------------
+fi   # ---- end REGION 8 ------------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
 # ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is
@@ -3152,37 +3224,44 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- re-armed after round 5 found all three of them instance gates - eight staged breaks and, as much
 # ---- to the point, two CONTROLS: a rule tightened until it reds on an honest caller has traded one
 # ---- false answer for another, and only a control says which happened.
+# ---- RE-MEASURED at TOOL-aBatchedArm-3, 2026-09-13, node a, from the xtrace of one unsharded run at
+# ---- BASE (every `n=` increment attributed to the region it fired in) and confirmed by the eight
+# ---- shard runs and the unsharded run at the commit: figures beside each constant below, ~3 % under
+# ---- the reading. The sum of the eight shard readings equals the unsharded reading EXACTLY, so
+# ---- PROLOGUE_ARMS is still 0 for the floor-graded count: the C21 pair below runs AFTER the grade
+# ---- and is an epilogue constant only the PASS line carries. The floors are not asserted to sum to
+# ---- FLOOR_ASSERTIONS: with one discount over a clean partition they nearly do, and that is a
+# ---- coincidence of the numbers, not an invariant.
 FLOOR_ASSERTIONS=392
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
-# per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
-# measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
-# the first arm anyone legitimately removes.
-#
-# MEASURED on node a: unsharded 230 assertions / 478 s, shard one 84 / 190 s, shard two 146 / 246 s.
-# `84 + 146 = 230` EXACTLY: unlike the driver suite this file has no prologue arms, so its
-# PROLOGUE_ARMS is 0 and the two shards partition the count with nothing paid twice. Balance is
-# max(shard) 246 s over 478 s = 51.5 %, which is what the floor actually drops to.
-#
-# The two per-shard floors sum to exactly FLOOR_ASSERTIONS, which falls out of one discount applied
-# to a clean partition. That is a coincidence of these numbers and NOT an invariant — do not write a
-# check asserting it, because the driver suite's own three constants cannot satisfy the same
-# relation, and asserting it over floors rather than executed counts is how the first draft of the
-# sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=83
-FLOOR_SHARD_2=309
+# per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
+# at 100 % of observation, which would red on the first arm anyone legitimately removes. The
+# figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
+FLOOR_SHARD_1=1
+FLOOR_SHARD_2=1
+FLOOR_SHARD_3=1
+FLOOR_SHARD_4=1
+FLOOR_SHARD_5=1
+FLOOR_SHARD_6=1
+FLOOR_SHARD_7=1
+FLOOR_SHARD_8=1
 case "$SH_I" in
-  1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
-  2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
-  *) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
+  0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
+  *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
 esac
+# PRINTED ON EVERY RUN, green or red: a RED run prints no PASS line, so without this the floor-graded
+# count of a shard that is red at BASE is readable nowhere, and AC1's identity cannot be observed.
+echo "  ($n assertions executed in $MODE against a floor of $FLOOR)"
 [ "$n" -ge "$FLOOR" ] || { echo "FAIL executed $n assertions in $MODE against a floor of $FLOOR — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
-# WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT: its own region, and nothing else. Neither shard alone is
-# this suite, and the whole-suite claim lives only in a run with no `--shard` argument.
+# WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT: its own region, and nothing else. No shard alone is
+# this suite, and the whole-suite claim lives only in a run with no `--shard` argument. That every
+# index 1..8 is declared, each once, is the shard join `run-selftests.sh --check` carries.
 #
-# TWO CONTROLS LOSE THEIR MEANING WITHOUT FAILING when this file is split, and they are named here
-# because no gate sees it: a "the tree is still clean after N mutations" control is a control only if
-# those N mutations ran in the same process. Split away from them it degrades into a duplicate of the
-# opening control — still green, and no longer evidence.
+# ONE CONTROL LOSES ITS MEANING WITHOUT FAILING when this file is split, and it is named here
+# because no gate sees it: a "the tree is still clean after N mutations" control is a control only
+# if those N mutations ran in the same process. Split away from them it degrades into a duplicate
+# of the opening control — still green, and no longer evidence. Since TOOL-aBatchedArm-3 S6 its
+# block declares the cycle count and the control asserts MUT against it, so the split is a red.
 
 
 # ---- TOOL-dRetiredFork-9 S3: the BATCHED C21 join agrees with the per-file loop -------------------
@@ -3234,6 +3313,6 @@ case "$c21_batched" in *noopen*|*noclose*|*dup*) echo "ok   C21: the fixture is 
   *) echo "FAIL C21: the fixture caught nothing, so the equality proves nothing"; st=1 ;; esac
 rm -rf "$c21_fixture"
 
-[ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
+[ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other $((SHARD_ARITY - 1)) regions were NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

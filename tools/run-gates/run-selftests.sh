@@ -381,6 +381,42 @@ PY
   done <<EOF
 $POP
 EOF
+  # ---- THE SHARD JOIN, ported from the gov canary's shard contract (run-gates.gov.test.sh, the
+  # ---- text `shard contract`) to this file's row format. TOOL-aBatchedArm-3 S4. FORWARD HALF ONLY:
+  # ---- a script any row calls with `--shard i/n` is called at ONE arity, and its indices 1..n are
+  # ---- each declared exactly once — a missing index is a region nobody runs while the other seven
+  # ---- rows report green, which is green-by-absence one row at a time. The canary's REVERSE half
+  # ---- ("declares SHARD_ARITY but is called whole") is deliberately NOT ported: the driver suite
+  # ---- declares an arity and is called whole here on purpose, so that half would red a row this
+  # ---- declaration is right to carry. Scoped to rows that carry `--shard`, so it never reads that
+  # ---- row. WHAT IT DOES NOT CHECK: that a shard runs the region it claims — only the suite's own
+  # ---- per-mode floor sees that. Run over the real tree before it was wired: 0 sharded scripts.
+  shard_faults=$(printf '%s\n' "$POP" | awk -F'\t' '
+    { n = split($4, t, " ")
+      for (i = 1; i <= n; i++) if (t[i] == "--shard") {
+        s = "?"; for (j = 1; j <= n; j++) if (t[j] ~ /\.(sh|py)$/) { s = t[j]; break }
+        v = (i < n) ? t[i + 1] : ""
+        if (v !~ /^[0-9]+\/[0-9]+$/) { print "row " $2 " carries a malformed --shard value " v; next }
+        split(v, p, "/")
+        if (!(s in arity)) { arity[s] = p[2]; order[++k] = s }
+        else if (arity[s] != p[2]) multi[s] = multi[s] " " p[2]
+        seen[s, p[1]]++
+      } }
+    END {
+      for (q = 1; q <= k; q++) { s = order[q]; a = arity[s]
+        if (s in multi) { print s " is called with more than one shard arity: " a multi[s]; continue }
+        miss = ""; dup = ""; wide = ""
+        for (j = 1; j <= a; j++) { if (!((s, j) in seen)) miss = miss " " j; else if (seen[s, j] > 1) dup = dup " " j }
+        for (key in seen) { split(key, kk, SUBSEP); if (kk[1] == s && (kk[2] + 0 < 1 || kk[2] + 0 > a)) wide = wide " " kk[2] }
+        if (miss != "") print s " declares arity " a " but the declaration carries no row for index" miss " — every index 1.." a " is a region, and one nobody runs is green by absence"
+        if (dup != "") print s " declares arity " a " but index" dup " is declared more than once, so one region is graded twice and paid twice"
+        if (wide != "") print s " declares arity " a " but the declaration carries index" wide ", outside 1.." a
+      } }')
+  if [ -n "$shard_faults" ]; then
+    echo "run-selftests: the shard join fails — a script called with --shard must be called at one arity with every index 1..n declared once:" >&2
+    printf '%s\n' "$shard_faults" | sed 's/^/  /' >&2
+    fails=1
+  fi
   [ "$NROWS" -gt 0 ] || { echo "run-selftests: the declaration is EMPTY, so both directions above passed by finding nothing" >&2; fails=1; }
   [ "$fails" = 0 ] && echo "run-selftests: declaration clean — $NROWS row(s), every held leg budgeted, every row resolvable"
   exit "$fails"
