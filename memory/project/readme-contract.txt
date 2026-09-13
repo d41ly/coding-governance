@@ -138,3 +138,4 @@ memory/builds/aLeakedHandle/README.md
 memory/builds/dMuffledSentinel/README.md
 memory/builds/cGradedDebt/README.md
 memory/builds/cSpliceWarden/README.md
+memory/builds/aReplayedCard/README.md
