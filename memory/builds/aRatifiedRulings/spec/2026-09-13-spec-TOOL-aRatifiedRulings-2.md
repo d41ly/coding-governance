@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names
 
-**Status:** CLOSED · rev-4 · 2026-09-13 · node a · Tier-2 · base 9fac2b53 · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 9fac2b53 · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -185,9 +185,15 @@ here.
 
 What this does NOT buy, said in the header as well: a run that writes the brief row and the stray
 file into the same pass commit still hides the stray file. Both artifacts are authored by the run,
-which is the limit check 23's own header already states for dispatch rows, and a brief row naming a
-stray path is a lie the `brief-recorded` leg later joins against a build commit. This unit does not
-claim to reach it.
+which is the limit check 23's own header already states for dispatch rows. A brief row naming a
+stray path is excluded here and joined by NOTHING downstream: `brief-recorded` grades CLOSED units
+only, at the BUILD commit `build_commit` selects rather than the pass commit, reads the LAST row per
+unit (`tail -1`) where this check takes the union, and asserts only a twelve-hex shape, tracked at
+that commit, and hash-prefix equals blob — never that the path was a brief. This unit does not
+claim to reach it, and the diff-review round 1 (finding ids 2 and 5) is where the earlier claim
+that the sibling leg joins it was withdrawn; a build-folder containment line was weighed there and
+not taken, because the only actor who can plant such a row is the run, which the stated limit
+already covers.
 
 ### The arm
 
@@ -524,6 +530,14 @@ epoch-gate observation the kit has no gate to make.
   reverted by `git checkout` was made on a frozen copy of `tools/unattended/` instead, one
   copy per run, so the seven suite runs could go concurrently and no working-tree edit existed
   to revert; the acceptance ledger under `build/` names each copy's one-line delta. Status CLOSED.
+- rev-5 · 2026-09-14 · §4 · after close, from the closing diff review round 1, and only the prose
+  that review names. Ids 2 and 5: the "What this does NOT buy" paragraph credited `brief-recorded`
+  with a join it does not make; it now states what that leg proves (CLOSED units, the build commit,
+  the last row, hash-only) and that a stray-path row is joined by nothing. Id 7, the HIGH, is a
+  code fix outside this spec's prose and is recorded here for the reader of §4's "The exclusion":
+  the brief-row parse moved into the kit library as `read_brief_paths`, `pass_commit` subtracts
+  that set before it selects a commit, and check 23 calls the same helper; fixture F in the suite
+  pins the `{run-state, brief}` bookkeeping commit as skipped. No re-declaration; status unchanged.
 
 ## 10. Reuse audit
 

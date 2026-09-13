@@ -3027,6 +3027,21 @@ printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s ./%s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 miss "$(run)" "unattended: check 23 —"
+# F: THE BOOKKEEPING COMMIT IS NOT THE PASS COMMIT (closing diff review, finding 7). The ordinary
+# shape: `--brief` requires the brief tracked and stages the run-state file, so the run commits
+# `{brief, brief row}` first, naming the unit, and the pass's real commit follows. With the brief
+# forgiven only in this check, `pass_commit` SELECTED that bookkeeping commit, the exclusion emptied
+# it, and the stray in the commit that followed was never graded — silent where B reports. Now the
+# library subtracts the same set before selecting, so the walk reaches the commit with the stray.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 brief handed" --no-verify
+printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
 
 # ---- THE COMPARISON NEVER FAILS THE LEG (spec 23 S1 / AC9). Both halves, because a check that is
 # ---- silent AND exits 0 is indistinguishable from one that is working, and that is the shape this
@@ -3169,7 +3184,9 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- RAISED by exactly the arm, 2026-09-13, node a (TOOL-aRatifiedRulings-2): the five check-23 brief
 # ---- fixtures execute seven assertions, all in region two, so both floors below carry +7 and
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
-FLOOR_ASSERTIONS=399
+# ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
+# ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
+FLOOR_ASSERTIONS=400
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -3186,7 +3203,7 @@ FLOOR_ASSERTIONS=399
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=83
-FLOOR_SHARD_2=316
+FLOOR_SHARD_2=317
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

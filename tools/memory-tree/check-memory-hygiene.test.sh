@@ -2219,9 +2219,9 @@ esac
 # cut ran every arm over a `git archive` of this whole repository: 1902 tracked files at 28 s a
 # run, seven proceeding runs plus the archive build, 37% of the suite's wall clock -- and its
 # control arm was red whenever the live corpus was, mid-build included, so every arm beneath it
-# graded a red no key owned. The arms vary ONE CONF LINE. The 29-file tree above is already
-# asserted clean at rc 0 and already provokes a notice, which is the positive artifact the control
-# needs; 8 s a run. One run per arm, and every arm that grades a RED asserts the finding's TEXT,
+# graded a red no key owned. The arms vary ONE CONF LINE. The check-16 fixture tree above is
+# already asserted clean at rc 0 and already provokes a notice, which is the positive artifact the
+# control needs; 8 s a run. Its size is `git ls-files | wc -l` in that tree, not a number typed here. One run per arm, and every arm that grades a RED asserts the finding's TEXT,
 # never an rc alone -- the rc-only violated-slug arm printed `ok` on that unowned red.
 #
 # THE ONE RUNNER: stdout and stderr on stdout, the checker's rc as its own. `pk_rc` is gone -- an

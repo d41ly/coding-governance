@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus
 
-**Status:** CLOSED · rev-5 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-6 · 2026-09-14 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -21,8 +21,8 @@ ceiling in `tools/gate-legs.json` is not re-declared. The ruling names the direc
 this spec measured the suite on this tree, tested three mechanisms against the numbers, and builds
 the one that survived: the project-key arms at the tail of
 `tools/memory-tree/check-memory-hygiene.test.sh` stop running the whole checker over a `git archive`
-of this repository and run it over the 29-file tree the suite already builds and already asserts
-clean, one run per arm, with every arm asserting the VALUE it grades rather than an exit code.
+of this repository and run it over the check-16 fixture tree the suite already builds and already
+asserts clean, one run per arm, with every arm asserting the VALUE it grades rather than an exit code.
 
 ## 2. Scope (IN)
 
@@ -105,8 +105,8 @@ clean, one run per arm, with every arm asserting the VALUE it grades rather than
   ever seen there and because the quiet-to-loaded relationship for this suite is on record as not a
   multiplier (§4); the run pays it once and copies the row into the ledger before the runner prunes
   the window.
-- **hands-off** external — the per-invocation floor of the checker itself: 8.0 s over a 29-file
-  tree, of which `corpus_ids.py --check` is 3.2 s because it re-enters the checker in a print mode
+- **hands-off** external — the per-invocation floor of the checker itself: 8.0 s over the
+  check-16 fixture tree, of which `corpus_ids.py --check` is 3.2 s because it re-enters the checker in a print mode
   after probing every `bash` on PATH, times the 66 invocations one suite run makes. That is a unit
   on the engine, with the bump obligation §3 names, and it is the lever after this one. If AC3
   reads red, its row is that unit's input, parked per §8 F3; this unit does not promote it.
@@ -128,8 +128,13 @@ Every figure below is PINNED to that measurement; the ledger re-derives them aft
 | suite, plain | 790.7 s | 187.7 s | 355.8 s | 1 |
 | suite, traced | 598.7 s | 168.1 s | 290.1 s | 1 |
 | one checker run, archive fixture (min of 3) | 28.0 s | 8.0 s | 10.6 s | 1 |
-| one checker run, 29-file fixture (min of 3) | 8.0 s | 1.5 s | 2.6 s | 0 |
+| one checker run, check-16 fixture (min of 3) | 8.0 s | 1.5 s | 2.6 s | 0 |
 | one checker run, invalid key, archive fixture | 0.08 s | 0.00 s | 0.05 s | 2 |
+
+The fixture is the check-16 note tree in `check-memory-hygiene.test.sh` (the `git init` block
+that calls `pk_set ""`); its size is `git ls-files | wc -l` run inside that tree, and the
+checker's own population is `git ls-files memory/` there. Neither number is typed here: the
+closing diff review (id 4) found the figure this spec carried did not reproduce.
 
 Two consecutive quiet runs differ by 1.32×. The gotcha says wall clock on this node is not
 measurable to better than a factor of two, and the acceptance below is written against that spread
@@ -190,7 +195,7 @@ proceed walk 1902 tracked files, and that a fixture is built to hold them.
 One archive run spends 11.2 s in its five python delegates (`corpus_ids.py --check` 7.2 s,
 `gen_build_index.py --check` 1.8 s, `gotchas.py --check` 1.4 s, `--print-bindings` 0.5 s,
 `row_grammar.py --check` 0.2 s) and makes 186 external spawns (grep 102, awk 30, sort 14, git 11,
-sed 7, python 7). One 29-file run spends 4.4 s in the same delegates (`corpus_ids.py` 3.2 s of it)
+sed 7, python 7). One fixture run spends 4.4 s in the same delegates (`corpus_ids.py` 3.2 s of it)
 and makes 119 spawns (grep 75, awk 17, sort 10, python 6, git 4). Python startup alone is 0.29 s on
 this node; a grep is 0.03 s.
 
@@ -211,14 +216,14 @@ What the numbers said:
 
 - **A LOSES on its first test.** The archive fixture is red at `16da4c6a` on checks 21 and 14, and
   it reds on `base` resolution once this build's specs land, so no batching over it yields a `PASS`.
-  On the 29-file tree the four runs it would save are 32 s against a 190 s spread between two quiet
+  On the check-16 fixture tree the four runs it would save are 32 s against a 190 s spread between two quiet
   readings, so its second test could not have changed the pick either. Attribution is its price: rc
   0 over three keys names none of them when it fails.
 - **B SURVIVES.** 8.0 s against 28.0 s per run, rc 0 on every one of three readings, and the archive
   build (17.9 s) and the separate control run (8.6 s) disappear with it. Check 4 names
   `memory/builds/tOne` under `^zzz[A-Za-z]+$`, and check 3 names a committed probe under
   `PROJECT_REGISTRY_EXTRA`, so every red case has a host.
-- **C LOSES for this unit and is the next one.** The floor is 8.0 s on a 29-file tree and 4.4 s of
+- **C LOSES for this unit and is the next one.** The floor is 8.0 s on the check-16 fixture tree and 4.4 s of
   it is python startup plus `corpus_ids.py --check` at 3.2 s, which probes every `bash` on PATH with
   `-c :` and re-runs the checker in a print mode. That is engine work with the bump obligation §3
   names, and it cannot be one mechanism with B. Its yield is recorded rather than lost: about 3 s
@@ -348,7 +353,7 @@ a red suite is what it is today.
   checker's own `pop_guard`, which is what the rc 0 control proves.
 - observability — the section prints one `ok` or `FAIL` line per arm and the suite prints
   `PASS (n assertions)`; the ledger carries real, user, sys, rc and the invocation count per reading.
-- risks — (1) the four keys are graded against a 29-file corpus, so a key whose defect shows only
+- risks — (1) the four keys are graded against the check-16 fixture corpus, so a key whose defect shows only
   at scale is not caught here; every key is validated in the preset block before any walk, and the
   `memory hygiene` leg runs the checker over the real tree on every bar. (2) Wall clock on this
   node varies 1.88× across the standalone readings §4 admits and the loaded reading is not a
@@ -616,6 +621,10 @@ and its comparison moves to immediately above that line.
   the after run's section output. The status stays CLOSED because F3 already rules that this unit
   lands on its other criteria while a loaded reading is parked; the park is in `RUN.md`. The rev-4
   and rev-5 text is unreviewed fold surface for the closing diff review.
+- rev-6 · 2026-09-14 · §1 · §4 · §5 · after close, from the closing diff review round 1, and only
+  the prose that review names (id 4). The `29-file` fixture size did not reproduce; every
+  occurrence now names the check-16 fixture, and §4's table carries the command that produces the
+  size instead of a number. The timings are unchanged. No re-declaration; status unchanged.
 
 ## 10. Reuse audit
 

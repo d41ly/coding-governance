@@ -2244,10 +2244,18 @@ done
 # ---- boundaries, both load-bearing: the PATH the row names and not its directory — a row naming
 # ---- `prompts/` excludes nothing under it, or a pass could hide any write there — and the rows in the
 # ---- PASS COMMIT'S TREE and not the working copy, so a row appended after the commit hides nothing.
+# ---- THE SET IS THE LIBRARY'S (`read_brief_paths`), AND `pass_commit` SUBTRACTS IT FIRST. When only
+# ---- this check forgave the brief, a `{run-state, brief}` bookkeeping commit naming the unit was
+# ---- selected as the pass commit, graded clean, and the real pass commit was never read — silent on
+# ---- the ordinary shape. Now that commit is skipped as bookkeeping and the walk reaches the commit
+# ---- that wrote something; the exclusion stays here because that commit still carries the brief
+# ---- when the run makes one commit (arm A), and forgiving it there is this check's job.
 # ---- What that does NOT buy: a run that writes the brief row and a stray file into the same pass
 # ---- commit still hides the stray file — both artifacts are the run's, the limit stated above for
-# ---- dispatch rows, and a row naming a path no brief was handed at is a lie the `brief-recorded`
-# ---- leg joins against the build commit.
+# ---- dispatch rows — and a row naming a path no brief was handed at is excluded here and joined by
+# ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
+# ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
+# ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -2353,23 +2361,12 @@ DSSIBS
       continue
     fi
     # THE EXCLUSION SET: every path a ` brief · item <unit> · reason ` row names for THIS unit, read
-    # from the run-state file AT THE PASS COMMIT — a row appended afterwards is outside that tree by
-    # construction, which is the ordering `pass_commit` obtains for itself. Selected on the whole
-    # field with both separators, so `-1` is not a prefix of `-10`; parsed with the sibling leg's own
-    # three expansions (`check-brief-recorded.sh`), so a grammar change breaks both readers the same
-    # way. Only the row's side is normalised: `diff-tree` already prints git's canonical spelling.
-    # The read lands in a VARIABLE and the loop reads the variable — a substitution in the heredoc
-    # body is the class `pass_commit` deadlocked on. Newline-delimited with a newline at both ends,
-    # so the membership test below is an exact match and never a prefix or a containment.
-    dsnl=$'\n'; dsbrief=$dsnl
-    dsrun=$(GIT show "$dshit:$f" 2>/dev/null || true)
-    while IFS= read -r dsbr; do
-      case "$dsbr" in *" brief · item $dsunit · reason "*) ;; *) continue ;; esac
-      dsbr=${dsbr#* · reason }; dsbr=${dsbr#* }
-      dsbrief="$dsbrief$(normpath "$dsbr")$dsnl"
-    done <<DSBRIEF
-$dsrun
-DSBRIEF
+    # from the run-state file AT THE PASS COMMIT by the kit library — the same `read_brief_paths`
+    # that `pass_commit` subtracted before it selected `$dshit`, so the selector and this grader
+    # cannot forgive different paths. Only the row's side is normalised: `diff-tree` already prints
+    # git's canonical spelling. Newline-delimited with a newline at both ends, so the membership test
+    # below is an exact match and never a prefix or a containment.
+    dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
     dsout=""
