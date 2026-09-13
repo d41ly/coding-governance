@@ -548,6 +548,89 @@ on the fold's tree, which the two later commits leave unchanged under `tools/una
 this fold changed only one key's comment there. The protocol row they could see is compared by the
 kit gate's parity check, which passed on both bars.
 
+## What the consumer runs changed
+
+The migration ran for the first time at both real consumers on 2026-09-13, on branches, from blocks
+cut byte-exact out of the runbook at `5cea0dfd`. Neither converged as written. inCMS core's record
+is its `ARCH-dPolishedVitrine-1` journal and NicoCares' its `PKG-dPolishedVitrine-15` journal, both
+dated 2026-09-13. Every finding was a consumer shape the fixture lacked, the class round 3 named.
+Each is repaired in the runbook, and in govkit where the runbook could not carry it.
+
+**How the reds were observed.** The round-3 instrument again: the selftest's `[-PV]` section cut into
+a standalone runner in the session scratchpad, which reads the runbook and the govkit its fixture
+gov copies from named files. Each break below is one edit to a copy of the fixed runbook or the
+fixed govkit, never to this tree. At `5cea0dfd` the section held 84 arms and all passed. On the
+fixed tree it holds 102 and all pass, in about 70 s.
+
+- **W1, both consumers: block 1 had no scope.** Its unscoped `update --write` moved every kit the
+  tree was behind on. At NicoCares that was nine kits. At core it landed gate-lint's seed under
+  `memory/project/`, which core's hygiene arm refused, so block 1 stopped on every rerun, which core
+  records as `ABL-dMuffledSentinel-7`. Block 1 now sets `RELEASE`, a new `scope` mode keeps the kits
+  the receipt claims and stops when review-harness is not one, and the update passes `--kits`. The
+  runbook's new "The scope" paragraph says why gov names the release: a receipt knows how far behind
+  each kit is, and a kit behind for another reason reads the same, so no consumer can derive it.
+  The fixture gained `seedy`, a kit outside the release whose seed the bootstrapped consumer never
+  kept and whose version moves at B. The pre-commit now models core's hygiene arm as a commit that
+  adds a `memory/` file. The hook declaration's pre-commit line said the runbook could reach only a
+  protocol render core does not track, which W1 falsified, and it is corrected. Observed red: with
+  the update unscoped again, 19 arms failed, and the fixture reproduced core's wedge line for line.
+  `update` landed `memory/project/seedy-loops.txt`, the hygiene arm refused the commit, and block 1
+  stopped on "that commit was refused".
+- **W2, NicoCares: the scope did not carry a shared version marker.** review-harness ships
+  `drift-audit-code.js` and `drift-audit-state.js`, which carry drift-audit's marker, so a pull of
+  review-harness 1.8 without drift-audit 1.10 redded NicoCares' cross-kit version parity. A
+  derivation already existed: drift-audit declares those two files in `marker_carriers`, and
+  selfcheck holds that list complete. govkit's `update --kits` now adds every claimed kit that shares
+  a marker with one in scope, through `derive_marker_coupling`, both ways and transitively, and
+  prints a `scope:` line for each. It never adds a kit the receipt does not claim, so the S5b
+  refusal is unchanged. In the fixture, churn's marker rides in review-harness's directory and
+  notes' in churn's. Observed red: with the coupling emptied in a copy of govkit, 5 arms failed. They
+  were the read-only coupling arm, block 1's scope arm, both R3-2 churn arms, because churn's
+  regenerate never ran, and R2-2's decline arm, because notes never moved.
+- **The pin rule, core: a render pinned over a template `update` never moved.** Block 2 pinned
+  `.claude/skills/unattended/SKILL.md` at `5cea0dfd` because the unattended regenerate exited 0,
+  while its template was a 1.19 fork `update` writes no bytes over. So the pin claimed V for bytes
+  rendered from a 1.19 template. `pins` now also asks each template a render reads to hold gov's
+  blob at V, judged by its index blob. The template for each render comes from gov's own
+  descriptors, `include` against `to`, and its copy here from the receipt row whose `source` names
+  it. The check names the fork as the reason, first of five, because it is the reason that asks for
+  work. The runbook's new paragraph says a fork takes gov's diff by hand, and where: after block 3,
+  then the kit's regenerate, a commit, and blocks 2 and 3 again. It names core's refusal of that
+  commit, `ABL-dMuffledSentinel-3`, and core's throwaway-clone workaround. In the fixture, gov's
+  protocol template moves at B, and `pv-qf` bootstraps with a hand-spelled fork of it. Observed red:
+  with the template condition removed, 2 arms failed, and the fork's render was pinned at B. The
+  carry arm, which ends with the render `pinned` at B and the template `vintage-match`, redded alone
+  when the template's identity was read from its receipt row rather than the index.
+- **W3, NicoCares: the re-adopt stamped the measuring vintage's version on every row.** Pinned at
+  `013b1af9`, NicoCares' `check-memory-hygiene.sh` row read 2.69 while the file declared 2.68, so
+  `update`'s per-kit delta read `level` for kits the migration never pulled. The fix was contained,
+  so no backlog row is filed: `adopt` now stamps a row whose commit's blob gov no longer holds with
+  its kit's version at that commit. A row whose blob is unchanged keeps the measuring vintage's,
+  because its bytes are that vintage's too. Observed red: with the new block disabled in a copy of
+  govkit, 2 arms failed. `seedy.sh` read `SEEDY_VERSION=1.1` over commit A, and the next update
+  printed `seedy level`.
+- **W4, NicoCares: the STOP put the resolution before the reset that destroys it.** The text now
+  puts `git reset -q --hard HEAD` first, then the resolution, its commit, and the rerun, and says the
+  order under `.governance/outbox/` is untracked and survives the reset. The restore block now
+  serves every file block 1's last update named as conflicting, not the harness alone, and judges a
+  local edit by the file's index blob. The row's `oid` is the wrong witness in a receipt `apply`
+  wrote, which records gov's blob there whatever the tree did since. Each edit is set aside under
+  `harness-migration-local-edits/` in the git directory, so R3-9's arm reads it there now. `pv-ty` is
+  an `apply` fixture that edits a plain engine file on the line gov changes at B. Observed red: with
+  the old STOP text, 1 arm failed. With the restore judged by `oid` again, 2 arms failed, and the
+  restore refused with "already holds gov's blob at its recorded base". With it restoring the
+  harness alone again, the same 2 arms failed.
+
+Found while fixing, and fixed here because the arms needed it:
+
+- The restore block had never met a receipt `apply` wrote. R3-9's twin is `adopt`-bootstrapped,
+  where `oid` holds the edited bytes, so the `oid` guard passed there and would have refused every
+  local edit in an `apply` receipt. That is the second W4 break above.
+
+govkit stays at 1.11. `main` still holds 1.10 at `09a22d2b`, so 1.11 is unreleased, and both
+consumers ran it from this branch. The two govkit changes ride the same number rather than minting a
+1.12 nobody has pulled.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -631,3 +714,21 @@ kit gate's parity check, which passed on both bars.
 - AC28 — `restore` — OBSERVED: on the `adopt` twin, step 1 conflicts and stops, the restore block
   commits `gov_oid` through the hooks and keeps the edit byte for byte, and block 1 then runs
   clean. Restoring to `oid` redded two arms.
+- AC29 — `RELEASE` — OBSERVED: on the bootstrapped fixture block 1's update runs with `--kits`
+  naming churn, notes and review-harness, lands no seed, and leaves `seedy`'s rows at A; the hygiene
+  arm's LIVENESS arm and the registry arm pass. Unscoped, 19 arms redded on core's wedge.
+- AC30 — `marker_carriers` — OBSERVED: a read-only `update --kits notes` adds churn and
+  review-harness with a `scope:` line each, block 1 carries both couplings, and the review-harness-only
+  receipt adds none. With the coupling emptied, 5 arms redded.
+- AC31 — `[-PV] PIN` — OBSERVED: on `pv-qf` block 2 pins the harness at B and not the protocol,
+  and the check flags the protocol naming its forked template. With the template condition removed,
+  2 arms redded.
+- AC32 — `vintage-match` — OBSERVED: after the carry, the declared regenerate and a commit, blocks 2
+  and 3 end the protocol `pinned` at B and its template `vintage-match` there. With the template read
+  from its receipt row, that arm redded alone.
+- AC33 — `[-PV] W3` — OBSERVED: `seedy.sh`'s row reads the version at A after the re-adopt, and the
+  next update's delta does not read `seedy` level. With the stamp at the measuring vintage, both arms
+  redded, printing `seedy level`.
+- AC34 — `oid` — OBSERVED: on `pv-ty` the STOP names the reset first, the restore block sets the
+  plain engine file's edit aside through the hooks, and block 1 then lands gov's line. The old STOP
+  text redded 1 arm, and the restore judged by `oid`, or restoring the harness alone, redded 2.

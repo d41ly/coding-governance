@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-8 · 2026-09-13 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-9 · 2026-09-14 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -83,6 +83,14 @@ Skill's copy of the same checklist line is fixed the same way.
   receipt row the re-adopt no longer measures. Block 3 refuses pins whose GOV or receipt moved and
   deletes them when it finishes. A restore block sets a conflicting harness edit aside at the row's
   `gov_oid`. Observed by AC21, AC22, AC23, AC24, AC25, AC26, AC27 and AC28.
+- **S11** — the consumer runs' repairs, rev-9. Block 1 takes the release's scope: gov names its
+  kits in `RELEASE`, block 1 keeps those the receipt claims, and govkit's `update --kits` adds every
+  claimed kit that shares a version marker with one in scope, derived from `marker_carriers`. Block
+  2 pins a render at the vintage moved to only when its template holds gov's blob there, and the
+  runbook says a fork takes gov's diff by hand after block 3. govkit's `adopt` stamps each row with
+  its kit's version at the vintage its bytes come from. Block 1's STOP puts the return to HEAD
+  before the resolution, and the restore block sets aside every conflicted file, judged by its
+  index blob. Observed by AC29, AC30, AC31, AC32, AC33 and AC34.
 
 ## 3. Non-goals (OUT)
 
@@ -103,8 +111,10 @@ Skill's copy of the same checklist line is fixed the same way.
   `DEPL-dPolishedVitrine-1`, and the consumer migration in §4 Rollout stands in for it. rev-7 adds
   the negative half of selfcheck arm 7l and changes no verb; a withheld-stamp message naming the
   pinned re-adopt, and govkit reporting a file a regenerate created, are round 2's two govkit
-  improvements, carried by `DEPL-dPolishedVitrine-1` and `DEPL-dPolishedVitrine-2`. There is
-  still no write-time relocate of engine bodies. `govkit.py` calls its carry derivation a proof
+  improvements, carried by `DEPL-dPolishedVitrine-1` and `DEPL-dPolishedVitrine-2`. rev-9 adds two
+  more the consumer runs measured: a scoped `update` carries a claimed kit that shares a version
+  marker with one in scope, and `adopt` stamps a row's version at the vintage its bytes come from.
+  Neither moves a role. There is still no write-time relocate of engine bodies. `govkit.py` calls its carry derivation a proof
   instrument, not a write-time transform, and a relocate would mis-carry the checklist line anyway
   (§4 Alternatives rejected).
 - **The harness suite stays on no bar.** `TOOL-dBriefedPass-7` owns that question.
@@ -124,8 +134,9 @@ Skill's copy of the same checklist line is fixed the same way.
   renders the protocol without it, and the unattended adopter refuses without it.
 - **hands-off** external — the consumer re-pulls by the runbook's migration, not by `update` alone.
   On govkit 1.11 or later it runs the runbook's three blocks, verbatim, in place of its routine pull
-  for the introducing vintage, with `TRAILER` set, and reads the FLAG lines of blocks 1 and 2 before
-  block 3. §4 Rollout says why each step is there (rev-8; rev-7's sequence could not commit through
+  of the release's kits for the introducing vintage, with `TRAILER` set, and reads the FLAG lines of
+  blocks 1 and 2 before block 3. It carries gov's diff into its forks of those kits by hand after
+  block 3, then runs blocks 2 and 3 again (rev-9). §4 Rollout says why each step is there (rev-8; rev-7's sequence could not commit through
   core's `commit-msg` rule, and rev-5's wedged at its receipt check). The hand-off also covers
   NicoCares carrying its cap carve-out into the template after block 3, retiring core's untagged Skill
   delta and NicoCares' untagged driver delta, and adding the parity leg core lacks.
@@ -515,6 +526,43 @@ review-harnesses dossier, the generated map, and this build's records.
   the row's base through the hooks, sets the edit aside in the git directory, and block 1 then runs
   clean.
   Red when: the recovery restores the row's `oid`, which recreates the conflict.
+- **AC29** — When block 1 runs on a bootstrapped receipt that claims a kit outside `RELEASE`, whose
+  seed the tree never kept and whose version moved, `update` runs with `--kits` naming only this
+  release's claimed kits and the kits coupled to them, lands no seed, and leaves that kit's rows at
+  their base; a commit adding a `memory/` file is refused by the fixture's model of core's hygiene
+  arm, and a LIVENESS arm shows it refusing. Every kit `RELEASE` names is an entry of this repo's
+  registry.
+  Red when: block 1's update is unscoped, so it lands the seed and the hygiene arm refuses block 1's
+  commit, as core's refused gate-lint's.
+- **AC30** — When a scoped `update` names a kit that shares a version marker with another the
+  receipt claims, through a descriptor's `marker_carriers`, it adds that kit, both ways and
+  transitively, and prints a `scope:` line naming it; it never adds a coupled kit the receipt does
+  not claim. The `[-PV] W2` arms run it read-only and through block 1.
+  Red when: the scope is not widened, so the coupled kit's rows stay behind, its regenerate never
+  runs, and its marker splits from its constant, as drift-audit's did at NicoCares.
+- **AC31** — When a bootstrapped receipt holds a forked copy of a template `update` does not write,
+  block 2 pins the render of it at no vintage while the harness, whose template landed, is pinned,
+  and the check flags the render unattributed naming the fork. The `[-PV] PIN` arms run it.
+  Red when: block 2 pins a render whose kit's regenerate exited 0 and whose template did not move,
+  as it pinned core's unattended Skill.
+- **AC32** — When gov's diff is carried into that fork after block 3, the render regenerated by the
+  kit's declared argv, both committed, and blocks 2 and 3 run again, the render ends `pinned` at the
+  vintage moved to and the template `vintage-match` there. The arm runs on a fixture without a
+  receipt hook, as NicoCares has none; the runbook names core's refusal of that commit.
+  Red when: the pin rule reads the template's identity from the receipt rather than the tree, so the
+  carried template never qualifies.
+  fixture: `ABL-dMuffledSentinel-3` is core's, and nothing here repairs it.
+- **AC33** — When the re-adopt pins a kit's rows at an older commit whose blob gov no longer holds,
+  each row carries its kit's version at that commit, and the next update's per-kit delta does not
+  read that kit `level`. The `[-PV] W3` arms observe it.
+  Red when: `adopt` stamps every row with the measuring vintage's version, as it stamped memory-tree
+  2.69 over 2.68 bytes at NicoCares.
+- **AC34** — When step 1 conflicts on a file that is not the harness, in a receipt `apply` wrote,
+  block 1's STOP names the return to HEAD before the resolution, its commit and the rerun; after
+  the reset the restore block sets that file's edit aside at gov's base through the hooks, and
+  block 1 then runs clean.
+  Red when: the STOP puts the resolution before the reset, or the restore judges a local edit by the
+  row's `oid`, which an `apply` receipt records as gov's blob.
 
 ## 7. Gates
 
@@ -535,6 +583,7 @@ New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv witho
 New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a block 2 that writes, a relabelled flag-off verdict · none
 New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off update silent · none
 New arm: `tools/govkit/selftest.py` · rev-7's runbook whole, and one staged break per round-3 finding in a copy of the fixed runbook: no `TRAILER`, no `PYTHONUTF8`, every unstaged change as a render, no dropped-row flag, no hand-run regenerate, pins replayed, block 2 at any vintage, `project-owned` left unpinned, a fork read by its key, and a restore to `oid` · none
+New arm: `tools/govkit/selftest.py` · one staged break per consumer finding in a copy of the fixed runbook or govkit: an unscoped block 1, no coupling, a pin for any render whose kit regenerated, the template read from the receipt, the old STOP order, the restore judged by `oid`, and the measuring vintage's version on every row · none
 
 ## 8. Open questions
 
@@ -620,6 +669,21 @@ New arm: `tools/govkit/selftest.py` · rev-7's runbook whole, and one staged bre
   names `TRAILER` and the replaced routine pull, and §4's parity-leg sentence says where the leg is
   wired. `TOOL-dPolishedVitrine-14` carries R3-4 and R3-10. Whether this fold is re-reviewed is the
   lander's call, because M4's convergence rule counts one blocker after one after one as not fewer.
+- rev-9 · 2026-09-14 · S11 · §3 · AC29–AC34 · §7 · AMENDED by the migration's first two real runs,
+  at inCMS core and NicoCares on 2026-09-13, neither of which converged as written. W1: block 1's
+  unscoped update moved every kit either tree was behind on and, at core, landed gate-lint's seed,
+  which core's hygiene refused on every rerun; block 1 now takes the release's scope, which gov
+  names in `RELEASE` because no consumer can derive it. W2: a review-harness pull without
+  drift-audit split drift-audit's marker from its constant at NicoCares; `update --kits` now adds
+  every claimed kit coupled through `marker_carriers`. The pin rule pinned core's unattended Skill
+  at the new vintage over a 1.19 template fork; block 2 now also asks the template to hold gov's
+  blob, and the runbook places a fork's hand carry after block 3. W3: the re-adopt stamped the
+  measuring vintage's version on rows it pinned at older commits; `adopt` now stamps the version
+  of the vintage the bytes come from. W4: the STOP text put the resolution before the reset that
+  destroys it; it now puts the reset first, and the restore block serves any conflicted file,
+  judged by its index blob. §3's govkit bullet and hand-off edge name both govkit changes and the
+  carry. The fixture gained core's hygiene arm, which the hook declaration had said the runbook
+  could not reach.
 
 ## 10. Reuse audit
 
