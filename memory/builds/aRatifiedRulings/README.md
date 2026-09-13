@@ -4,7 +4,6 @@ node: a
 opened: 2026-09-13
 streams: tooling
 roster: TOOL
-status: OPEN
 parents: aLeakedHandle
 authorized-by: prompt
 ids: TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4
@@ -63,18 +62,23 @@ the parks that motivated them live under `builds/aLeakedHandle/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-13 · streams tooling
+**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-09-13 · streams tooling
 ids TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus](spec/2026-09-13-spec-TOOL-aRatifiedRulings-3.md) | — | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | SPECCED | rev-1 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
