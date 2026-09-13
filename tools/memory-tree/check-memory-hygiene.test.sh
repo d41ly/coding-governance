@@ -1455,6 +1455,43 @@ n=$((n+1))
 awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outst" \
   | grep -qF 'memory/backlog/ARCH.md (' \
   && { echo "FAIL a curation-debt-listed file was still capped by check 6"; st=1; }
+# ---- the curation-debt STALE-ENTRY guard (TOOL-cGradedDebt-1), which is a DIFFERENT question from
+# ---- the stale-LINE guard above: that one asks whether the path still exists, this one whether the
+# ---- row still hides anything.
+# ---- TWO subjects, because a guard with only a positive is indistinguishable from "the registry is
+# ---- non-empty". `tRunOk/README.md` is tracked, in the index set, and compliant on all three, so
+# ---- listing it buys nothing and must RED. `tRunBig/RUN.md` is the file check 6 already names three
+# ---- hundred lines up (`chit 6`), so listing it buys a real silence and must NOT be named.
+# ---- NEITHER subject is `ARCH.md`, deliberately: the assertion above it grades that check 6 stays
+# ---- SILENT on a listed ARCH.md, which is equally true of a file earning nothing, so resting this
+# ---- arm on it would rest it on a property that arm never established. Measured: it earns none.
+n=$((n+1))
+printf '# debt\nmemory/builds/tRunBig/RUN.md\nmemory/builds/tRunOk/README.md\n' > memory/project/curation-debt.txt
+git add -A >/dev/null 2>&1; git commit -q -m stalerow --no-verify
+outsr=$(bash "$SCRIPT" 2>/dev/null)
+grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived' <<<"$outsr" \
+  || { echo "FAIL the curation-debt stale-ENTRY guard did not fire on a row that hides nothing"; st=1; }
+n=$((n+1))
+awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outsr" \
+  | grep -qF 'memory/builds/tRunOk/README.md' \
+  || { echo "FAIL the curation-debt stale-ENTRY guard did not name the row that hides nothing"; st=1; }
+n=$((n+1))
+awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outsr" \
+  | grep -qF 'memory/builds/tRunBig/RUN.md' \
+  && { echo "FAIL the stale-ENTRY guard named a row that is still earning its listing"; st=1; }
+# the PER-ROW report names what the EARNING row earns, which is the half that makes an over-wide
+# waiver visible: this row is waived from three checks and buys one.
+n=$((n+1))
+grep -qF 'memory-hygiene: curation-debt.txt — memory/builds/tRunBig/RUN.md earns check(s) 6 of the 6 7 8 it is waived from' <<<"$outsr" \
+  || { echo "FAIL the curation-debt per-row report did not name what the earning row earns"; st=1; }
+# the GRADED-ROW population of check 8. `pop_guard` counts shard FILES, so a waiver over most of the
+# rows reported green and printed no number at all; this is the liveness half.
+n=$((n+1))
+grep -qE '^memory-hygiene: check 8 graded [1-9][0-9]* backlog row\(s\) across [1-9][0-9]* shard\(s\)$' <<<"$outsr" \
+  || { echo "FAIL check 8 did not report its graded-row population"; st=1; }
+n=$((n+1))
+grep -qF '#rows ' <<<"$outsr" \
+  && { echo "FAIL check 8's row-count sentinel leaked into the findings"; st=1; }
 printf '# legacy\n' > memory/project/legacy-files.txt
 printf '# debt\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify

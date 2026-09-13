@@ -60,6 +60,21 @@ That is deliberately the OPPOSITE of every measured pin in the same conf block, 
 skip — because a cap an adopter can disable by emptying a line is a gate that reports green for a tree
 nobody is checking, and `project/curation-debt.txt` is already the deliberate per-file exemption.
 
+**That exemption is now GRADED rather than granted.** A listed file stays IN checks 6, 7 and 8; the
+findings are partitioned by leading path into the unwaived ones, which fail as before, and the waived
+ones, which are RECORDED. A row that recorded nothing reds as stale, because a row hiding nothing has
+stopped shrinking — the `TOOL.md` row was listed for a byte cap raised past it the same day and
+outlived its own fault by three weeks. The partition helper assigns to a global and returns nothing:
+a command substitution or a pipe would run it in a subshell and drop every write, leaving a guard
+that reds every row. The per-row report names which of the three each row EARNS, which is how an
+over-wide waiver is made visible without failing a row whose remedy is an open owner call.
+`TOOL-cGradedDebt-1`.
+
+**Check 8 reports its graded ROW count.** `pop_guard` counts shard FILES, so a waiver covering 438
+of 499 rows reported green over an 88% waived population and printed no number at all. The count
+rides a sentinel line out of the same awk, summed across `xargs` invocations because each runs its
+own `END`, and stripped before the findings are read.
+
 **The dossier selector is guarded on a non-empty prefix.** `index(f, "")` is 1 for every string, so an
 unguarded dossier branch resolves to a bare prefix in a tree with no codebase map and hands the
 DOSSIER bound to the whole tree — silently undoing the row cap. Check 7's `ex7` adds its map
