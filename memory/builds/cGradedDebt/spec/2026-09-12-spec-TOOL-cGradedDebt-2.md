@@ -1,10 +1,13 @@
 # TOOL-cGradedDebt-2 — the six status-token faults the TOOL.md row was hiding
 
-**Status:** INPROGRESS · rev-2 · 2026-09-12 · node c · Tier-1 · base 09a22d2b · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-09-13 · node c · Tier-1 · base 09a22d2b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cGradedDebt-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cGradedDebt-1-acceptance-ledger.md) | journal | TOOL-cGradedDebt-1 |
+| [2026-09-13-review-TOOL-cGradedDebt-1-diff-review-round1.md](../reviews/2026-09-13-review-TOOL-cGradedDebt-1-diff-review-round1.md) | diff-review | TOOL-cGradedDebt-1 |
 
 <!-- /gen:spec-records -->
 
@@ -88,9 +91,15 @@ findings over the 61 rows of the other three shards.
 
 No new arm: this unit changes records, not a checker.
 
+## 8. Open questions
+
+none
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · initial draft.
 - rev-2 · 2026-09-12 · §4 · S2 · the reword for a quoted table cell must drop the PIPE, not the
   spaces inside the backticks. The rev-1 design claimed the spaces, and the measured result was
   both rows still red.
+- rev-3 · 2026-09-13 · §8 · added the Open questions section, which a terminal status requires and
+  a Tier-1 spec does not otherwise owe. Silence and a resolved fork are the same byte without it.

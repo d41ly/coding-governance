@@ -64,19 +64,19 @@ ROWS, so it reports a green verdict over an 88% waived population and prints no 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node c · opened 2026-09-12 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node c · opened 2026-09-12 · streams tooling
 ids TOOL-cGradedDebt-1 TOOL-cGradedDebt-2 TOOL-cGradedDebt-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cGradedDebt-1 — a curation-debt row earns its listing, and check 8 counts what it graded](spec/2026-09-12-spec-TOOL-cGradedDebt-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-12 |
-| [TOOL-cGradedDebt-2 — the six status-token faults the TOOL.md row was hiding](spec/2026-09-12-spec-TOOL-cGradedDebt-2.md) | 2 | 1 | INPROGRESS | rev-2 | 2026-09-12 |
+| [TOOL-cGradedDebt-1 — a curation-debt row earns its listing, and check 8 counts what it graded](spec/2026-09-12-spec-TOOL-cGradedDebt-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-13 |
+| [TOOL-cGradedDebt-2 — the six status-token faults the TOOL.md row was hiding](spec/2026-09-12-spec-TOOL-cGradedDebt-2.md) | 2 | 1 | CLOSED | rev-3 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-cGradedDebt-1 TOOL-cGradedDebt-2.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-cGradedDebt-1 TOOL-cGradedDebt-2.
 <!-- /gen:build-index -->

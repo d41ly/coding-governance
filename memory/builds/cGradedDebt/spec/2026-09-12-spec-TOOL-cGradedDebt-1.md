@@ -1,10 +1,13 @@
 # TOOL-cGradedDebt-1 — a curation-debt row earns its listing, and check 8 counts what it graded
 
-**Status:** SPECCED · rev-1 · 2026-09-12 · node c · Tier-2 · base 09a22d2b · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cGradedDebt-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cGradedDebt-1-acceptance-ledger.md) | journal | TOOL-cGradedDebt-2 |
+| [2026-09-13-review-TOOL-cGradedDebt-1-diff-review-round1.md](../reviews/2026-09-13-review-TOOL-cGradedDebt-1-diff-review-round1.md) | diff-review | TOOL-cGradedDebt-2 |
 
 <!-- /gen:spec-records -->
 
@@ -168,10 +171,14 @@ already owns the shrink assertion.
   Red when: the report prints the waived set rather than the earned set, which would name three for
   every row and tell a reader nothing.
 - **AC4** — When that same run's stdout is read, a `memory-hygiene:` line states how many backlog
-  rows check 8 graded, and the number is 499 rather than the 61 it grades today.
+  rows check 8 graded, and the number equals the corpus's total row count across all four shards
+  rather than the 61 it grades today.
   Red when: the sentinel line reaches the findings variable instead of being stripped, which turns
   the count into a finding and fails check 8 on every run.
-  figure: DERIVED — 499 is this corpus's row count at `09a22d2b`, and the criterion re-derives it.
+  figure: DERIVED at observation time, and NOT pinned here. Every row this build's own records add
+  moves it — rev-1 wrote `499`, measured before this build filed a backlog row of its own, and the
+  landing run prints one more. A criterion that pins a number its own commit changes is a criterion
+  that reds on itself.
 - **AC5** — When `python tools/memory-tree/check-arms.py --check` runs it passes with this gate's
   `ARMS_FLOORS` entry at `27:27`, and the new arm is absent from
   `memory/project/unarmed-branches.txt`.
@@ -194,6 +201,16 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · initial draft.
+- rev-2 · 2026-09-13 · §4 · S4 · AC4 · folded round-1 diff review, BLOCKED, 14 confirmed of 19.
+  The report denominator is DERIVED from the three selections rather than the literal `6 7 8` (M1),
+  the stale guard skips a path absent from the WORKTREE as well as one absent from the index (L1),
+  the `--staged` hold announces itself (L4), and AC4 stops pinning a row count its own commit
+  moves (L2). Four blockers, all gates red at the landing commit: the arm carried a PREFIX of the
+  fail signature and left the branch unarmed (B1), the shared `cblock()` extractor swallowed the new
+  report lines (B2), `HYGIENE.template.md` did not receive the prose its rendered copy did (B3), and
+  a product source cited a spec still non-terminal (B4). One further defect found while settling B4
+  and fixed in the same pass: the project-keys fixture builds a one-commit repo, so `BASE_RESOLVE_CUTOFF`
+  reds there for any live spec in the corpus. See the round-1 review record.
 
 ## 10. Reuse audit
 

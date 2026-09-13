@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-12T23:30:47+03:00 @ 09a22d2bf5c3fc51bdc3ccee8c727b0793664106
+last-audit: 2026-09-13T00:48:12+03:00 @ 09a22d2bf5c3fc51bdc3ccee8c727b0793664106
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 094a1ce93ae5142e866e1d82695968b3fa3f5332
@@ -249,8 +249,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
 - Check 8's population is the backlog shards ALONE: `memory/builds/*/STATUS.md` was retired at
   kit 2.17 and the dead-path gate keeps it gone. It now PRINTS how many rows it graded.
-- A `memory/project/curation-debt.txt` row that would pass unwaived REDS, and the run prints which
-  of checks 6, 7 and 8 each row earns. Add a row only with a measured fault. `TOOL-cGradedDebt-1`.
+- A `memory/project/curation-debt.txt` row that would pass unwaived REDS, and the run prints what
+  each row earns over the checks it is actually IN. Add a row only with a measured fault.
+  `TOOL-cGradedDebt-1`.
 - A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
   reservation range and a planned unit cannot be added to it by hand; the next render removes it.
 - A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a

@@ -1801,19 +1801,35 @@ fi
 # this registry does not have, and would red two rows on the day this lands, one of them the subject
 # of an open owner call. Naming the width costs a line and pre-empts nobody.
 if [ "$STAGED" = 0 ] && [ -n "$DEBT" ]; then
-  # A path git no longer tracks is the SIBLING guard's finding and is skipped here: it earns nothing
-  # by being absent, and reporting one row under two rules tells a reader it has two problems.
-  # `TRACKED_SET` is in scope because a non-empty `$DEBT` is one of the two things that fills it.
+  # TWO absences, and NEITHER is this guard's question. A path git no longer tracks is the SIBLING
+  # guard's finding. A path still in the INDEX but gone from the WORKTREE is in no check's population
+  # either — `index_set` and `files8` both end on `[ -f "$f" ]` — so it records nothing by being
+  # absent rather than by being compliant, and printing "delete the row" at it would drain a waiver
+  # that is still load-bearing the moment the file comes back. `TRACKED_SET` is in scope because a
+  # non-empty `$DEBT` is one of the two things that fills it.
   staleD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
     [ -n "${TRACKED_SET[$p]+x}" ] || continue
+    [ -f "$p" ] || continue
     [ -n "${DEBT_EARNED[$p]+x}" ] || printf '%s\n' "$p"; done)
   [ -n "$staleD" ] && fail 6 "curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived, so the row hides nothing and the registry has stopped shrinking — delete the row rather than re-justifying it:
 $staleD"
+  # The denominator is DERIVED, never the literal `6 7 8`. A build README is structurally outside
+  # check 8's population and a RUN.md outside check 7's, so a constant denominator reports a row
+  # whose waiver is exactly as wide as its fault as though it were two checks over-wide — which is
+  # the opposite of what this report is for. The three selections are still in scope.
   printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
     [ -n "${DEBT_EARNED[$p]+x}" ] || continue
-    printf 'memory-hygiene: curation-debt.txt — %s earns check(s) %sof the 6 7 8 it is waived from\n' \
-      "$p" "${DEBT_EARNED[$p]}"
+    _appl=""
+    grep -qxF "$p" <<<"$sel6"   && _appl="${_appl}6 "
+    grep -qxF "$p" <<<"$sel7"   && _appl="${_appl}7 "
+    grep -qxF "$p" <<<"$files8" && _appl="${_appl}8 "
+    printf 'memory-hygiene: curation-debt.txt — %s earns check(s) %sof the %sit is waived from\n' \
+      "$p" "${DEBT_EARNED[$p]}" "$_appl"
   done
+else
+  # A skip that looks like a pass is indistinguishable from coverage, and this one is silent in the
+  # leg a pre-commit hook runs. Its two siblings in this same run announce their holds; so does this.
+  [ "$STAGED" = 1 ] && printf 'memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale\n'
 fi
 
 # ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
