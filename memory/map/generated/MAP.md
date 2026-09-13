@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 49 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 52 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -195,6 +195,7 @@ Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fallback-fabricates-the-passing-value.md` | unattended |
+| `fixed-sleep-does-not-place-a-signal.md` | runlog |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `fixture-removes-the-path-under-test.md` | run-gates |
@@ -209,6 +210,7 @@ Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `naming-leg-grades-what-python-named.md` | lexicon |
+| `nt-against-a-missing-file-is-true.md` | runlog |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `process-creation-is-the-suite-cost.md` | unattended |
@@ -224,6 +226,7 @@ Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |
+| `trapped-signal-waits-for-the-foreground-child.md` | runlog |
 | `two-answers-to-one-question.md` | baseline |
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |

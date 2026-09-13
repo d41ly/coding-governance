@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md) | research | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
+| [2026-09-13-build-TOOL-dLoggedFlight-2-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-dLoggedFlight-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md) | journal | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
@@ -46,7 +47,10 @@ process spawn on the hot path and must not change how the driver dies.
   Observed by AC4.
 - **S6** Session fields come from environment variables whose NAMES `.unattended.conf` declares in a
   new key, `RUNLOG_SESSION_VARS`. Each value is written as `sess.<NAME>=<value>` only if it matches
-  `^[A-Za-z0-9_.:-]{1,128}$`; otherwise the field is empty and `sess_bad=1` is set. Observed by AC5.
+  `^[A-Za-z0-9_.:-]{1,128}$`; otherwise the field is empty and `sess_bad=1` is set. An unset or empty
+  variable writes no field and no flag, because absence is a state and not a refusal. A declared name
+  that is not a shell identifier sets `sess_bad=1`. At most eight names are read, and any beyond them
+  are counted in `sess_more`. Observed by AC5.
 - **S7** Not journaled: `--version`, whose contract is "touching no record", and `--plan`, a
   read-only verb the merge bar calls on every run. Everything else is journaled, `--status` and
   `--resume` included. `GOV_RUNLOG=0` in the environment turns every line off. Observed by AC6.
@@ -100,7 +104,10 @@ process spawn on the hot path and must not change how the driver dies.
   is not journaled, as `--plan`'s and `--version`'s are not, is harmless. The suite enumerates every `exit` across the whole of `tools/unattended/unattended.sh`
   and `tools/unattended/lib-unattended.sh`, excluding awk program text and comments, and fails on one
   without the marker. The only exemptions are the named pre-install lines `:74`, `:275`, `:276`, `:279`
-  and `:310`. So an exit added later inside a verb body, the likeliest place, cannot slip past.
+  and `:310`. So an exit added later inside a verb body, the likeliest place, cannot slip past. The
+  suite names each exemption by its line's TEXT, never its number, and requires each text to match
+  exactly one site above the install: this unit's own insertions move the numbers, and a second copy
+  of an exempt line is an exit nobody exempted.
 - The START verb is `$1` when it is a declared verb. The START slug is `$2` when it matches the grammar
   `check_slug` enforces at `tools/unattended/unattended.sh:1060-1070`, a letter followed by letters,
   digits or dashes, with no length bound, as at base. The shape test is factored out of `check_slug`
@@ -109,9 +116,14 @@ process spawn on the hot path and must not change how the driver dies.
   `VERB` is not used: the `--phase` arm exits inline before anything assigns it. END reads every other
   variable as `${NAME:-}` because the driver runs under `set -u`. The unit field comes from
   `BR_UNIT` for `--brief`, `PK_ITEM` for `--dispatch` and `--rescope` only, and `RV_SUBJECT` for
-  `--review`. `PH_SLUG` is read for `--phase` only. `PK_ITEM` is also the free-text item of `--park`,
+  `--review`. `PH_SLUG` is never read, because END takes the slug START captured. A call whose first
+  argument is not a declared verb is journaled with an empty verb and slug, since its `$2` is then a
+  flag's value and not a slug. `PK_ITEM` is also the free-text item of `--park`,
   `--propose` and `--attest`, so it is never read for those. `unit` is written only when the value
-  matches the unit-id shape; otherwise `unit_bad=1` is set.
+  matches the unit-id shape `_ids_of` greps for; otherwise `unit_bad=1` is set, and an empty value
+  writes neither.
+- `GOV_RUNLOG` is read BEFORE the conf is sourced, so the switch is the environment's: a tracked conf
+  the run commits itself does not turn its own log off by assigning it.
 
 ### Why no signal traps
 
@@ -141,13 +153,18 @@ noise to be read, not an accusation.
 
 START: `v t p=driver ev=start n verb slug wt kit pid phase_from oob sess.<NAME>...`. END: `v t
 p=driver ev=end n verb slug unit rc exit checks phase_to dur_us`. The nonce `n` is `<pid>.<EPOCHREALTIME
-digits>`. A START carries at most 8 session fields, which keeps it well under the 2048-byte cap.
+digits>`. `checks` joins the numbers with commas and is written empty when nothing refused;
+`phase_from` and `phase_to` are empty when RUN.md is absent or names no phase. A START carries at
+most 8 session fields. The slug, the worktree path and the phase are UNBOUNDED, so "well under the
+cap" is not a construction: a line over 2048 bytes is fitted by the runlog kit's reference rule. The
+driver writes no indexed family, so only the value cut applies, and the suite compares its output
+with `render_line` byte for byte, on an ASCII value and on one whose cut lands inside a character.
 
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
-| `write_runlog_start`, `write_runlog_end`, `read_phase_into`, `resolve_runlog_dirs`, `check_slug_shape` | shell functions | `sh.function`, snake_case, verb-led |
+| `write_runlog_start`, `write_runlog_end`, `write_runlog_line`, `read_phase_into`, `resolve_runlog_dirs`, `check_slug_shape` | shell functions | `sh.function`, snake_case, verb-led |
 | `RUNLOG_SESSION_VARS` | conf key, `[A-Z_]` only as check 22 requires | protocol section 8 |
 | `GOV_RUNLOG` | environment switch | none |
 
@@ -224,9 +241,14 @@ one build folder, and never runs the existing unattended suites.
   Red when: either exclusion is dropped.
 - **AC7** — When `bash -x` traces `--status dLoggedFlight` with `PS4='+ ${EPOCHREALTIME} '` on this
   worktree before and after the unit, with the journal directory already present, the external-exec
-  count is identical.
+  count is identical. The trace goes to its own descriptor through `BASH_XTRACEFD`, because a trace
+  on stderr goes blind inside every function called with `2>/dev/null`. That before-and-after pair is
+  observed once, in the ledger, since the "before" driver does not outlive this unit; the suite's arm
+  is its perpetual form, tracing `--status` in its sandbox with `GOV_RUNLOG=0` and with the writer on.
   Red when: the writer adds a `date`, `git` or `mkdir` call to the hot path.
-  figure: the count is DERIVED at observation time; 13 was measured on 2026-09-13.
+  figure: the count is DERIVED at observation time and moves with RUN.md, because `--status` hashes
+  each briefed unit's file. On 2026-09-13 it read 15 and then 17, before and after this unit's own
+  `--brief` row, with the trace on its own descriptor. Traced on stderr, the 15 read as 12.
 - **AC8** — When the journal directory is a file, so the append fails, the verb's exit code and stdout
   are unchanged and stderr carries one `unattended: run log` line.
   Red when: the write failure changes `rc` or prints to stdout.
@@ -281,6 +303,14 @@ none
 - rev-4 · 2026-09-13 · §4 · AC1 AC2 · folded round-3 spec audit M2 (AC2 grades §4's whole population,
   and `:5021` joins the marker list), M3 (END reads the verb START captured, since `VERB` is empty on
   the `--phase` path) and L4 (no 64-character bound, which `check_slug` never had).
+- rev-5 · 2026-09-13 · S6 · §4 · AC7 · the build pass. S6 says what an unset variable, a bad name and
+  a ninth name do, which rev-4 left to the writer. §4 drops the `PH_SLUG` read rev-4 made redundant,
+  names the exemptions by text because the unit's own insertions move their numbers, reads
+  `GOV_RUNLOG` before the conf, and adds `write_runlog_line`: the data model's "well under the cap"
+  was false for an unbounded slug, path or phase, so the line is fitted by the runlog kit's reference
+  rule and graded against it. AC7's trace moves to its own descriptor, since the stderr trace of this
+  very call missed three execs inside `2>/dev/null` callees, and its before-and-after pair becomes a
+  ledger observation with a perpetual on-and-off arm in the suite.
 
 ## 10. Reuse audit
 

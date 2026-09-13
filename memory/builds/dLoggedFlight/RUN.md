@@ -36,3 +36,11 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-13T17:01:43Z dispatch · item 05adb28a TOOL-dLoggedFlight-1 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-09-13T17:04:20Z dispatch · item 03ae473c TOOL-dLoggedFlight-1 · reason tools/runlog/runlog_lib.py tools/runlog/runlog.py tools/runlog/README.md memory/map/features/runlog.md memory/map/generated memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md memory/builds/dLoggedFlight/build/2026-09-13-build-TOOL-dLoggedFlight-1-1-acceptance-ledger.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T17:28:20Z dispatch · item 01f01aa1 TOOL-dLoggedFlight-2 · reason tools/unattended .unattended.conf .claude/skills/unattended/SKILL.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/SESSION-KICKOFF.md tools/run-gates/selftest-budgets.txt tools/govkit/subject-pins.tsv memory/gotchas memory/map/features/runlog.md memory/map/generated memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md memory/builds/dLoggedFlight/build/2026-09-13-build-TOOL-dLoggedFlight-2-1-acceptance-ledger.md memory/builds/dLoggedFlight/prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T17:28:24Z brief · item TOOL-dLoggedFlight-2 · reason 60247e23e53e memory/builds/dLoggedFlight/prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md
+
+2026-09-13T17:29:24Z dispatch · item 01f01aa1 TOOL-dLoggedFlight-2 · reason tools/install-prefix-carried.txt
+
+2026-09-13T17:55:58Z dispatch · item 01f01aa1 TOOL-dLoggedFlight-2 · reason tools/runlog/README.md

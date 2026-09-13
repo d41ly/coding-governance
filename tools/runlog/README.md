@@ -90,8 +90,8 @@ verdict.
   COUNTED rather than dropped.
 - **Whether a journal is complete.** A producer that never wrote leaves nothing to count.
 - **Retention.** Nothing prunes the journals, and every run adds to them.
-- **A cut value is not marked.** No producer's data model reaches the value-cutting step, so nothing
-  records that it happened.
+- **A cut value is not marked.** The unattended driver reaches the value-cutting step, because its
+  slug, worktree path and phase are unbounded, and nothing on the line records that a cut happened.
 
 ## Running the self-test
 

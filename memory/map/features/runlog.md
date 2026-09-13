@@ -5,7 +5,7 @@ feature = "runlog"
 title = "The line grammar the three run-log producers write, and the one reader every consumer parses them through"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-dLoggedFlight-1"]
+decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2"]
 
 [claims]
 gate-legs = ["runlog selftest"]
@@ -14,7 +14,8 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["nt-against-a-missing-file-is-true.md",
+  "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -61,9 +62,10 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
-  this grammar, and each one's golden
-  line sits in this kit's fixtures, so a producer spec that changes its data model changes the golden
-  line in the same pass and the self-test reds on any key the grammar would refuse.
+  this grammar. The driver's writer shipped first, and its three gotcha classes are claimed here
+  rather than beside the driver, whose dossier sits at its byte cap. Each producer's golden line sits
+  in this kit's fixtures, so a producer spec that changes its data model changes the golden line in
+  the same pass and the self-test reds on any key the grammar would refuse.
 - The consumers — the extractor, the run model and the committed record, units 6, 8 and 9 — import
   `runlog_lib` rather than re-parsing.
 - `.memory-tree.conf` — read, never written. The reader is a narrow copy of the sourced-conf grammar,
@@ -74,8 +76,9 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
 - **Retention.** Nothing prunes the journals; the spec's non-goals carry the growth estimate.
 - **A line cut at a field boundary still parses.** Only a cut that breaks the grammar is caught.
 - **A cut value carries no marker.** The reference writer cuts a value only after every indexed field
-  has dropped, and no producer's data model reaches that step, so the case is named rather than
-  instrumented.
+  has dropped. The driver reaches that step, since its slug, worktree path and phase are unbounded and
+  it writes no indexed family, so `TOOL-dLoggedFlight-2` fits its lines by that rule and its suite
+  compares them with `render_line`; nothing on a cut line says it was cut.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
