@@ -170,6 +170,7 @@
       "empty-field-collapses-unless-it-is-last.md",
       "fallback-fabricates-the-passing-value.md",
       "fixture-inherits-ambient-machine-state.md",
+      "fixture-lacks-a-gate-the-consumer-has.md",
       "fixture-passes-by-finding-nothing.md",
       "fixture-removes-the-path-under-test.md",
       "fold-text-is-unreviewed-surface.md",
