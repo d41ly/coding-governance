@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 12
+**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -28,7 +28,8 @@ text is treated as data.
   cost, or why it stopped, and does not trigger on ordinary code search. Observed by AC2.
 - **S3** The answer procedure, in order. Observed by AC3.
   1. Locate the run's committed record under `memory/builds/<slug>/build/`.
-  2. Build the local model with `model <slug>`.
+  2. Build the local model with `model <slug>`. Its cost section carries the usage totals of
+     `TOOL-dLoggedFlight-8`, and its coverage block says which sources exist.
   3. Where the question needs the WHY behind an act and the transcript is local, print the window
      with `narration`.
   4. Cite a record line, a run-state line, a sha or a journal line for every claim.
@@ -51,6 +52,8 @@ text is treated as data.
 ### Edges
 
 - **consumes-from** `TOOL-dLoggedFlight-6` — the `narration` command, redacted and printed live.
+- **consumes-from** `TOOL-dLoggedFlight-8` — the `model` command, its cost section and its coverage
+  block.
 - **consumes-from** `TOOL-dLoggedFlight-9` — the committed record, read first.
 
 ## 4. Design
@@ -97,17 +100,19 @@ populations, so it may carry the rendered path.
 
 ## 6. Acceptance criteria
 
+`<kit>` below is `tools/runlog`.
+
 - **AC1** — When `bash <kit>/adopt-runlog.sh --check` runs, the rendered Skill is byte-identical to a
-  fresh render, carries no surviving brace, and names the CLI by its rendered path. Here `<kit>` is
-  `tools/runlog`.
+  fresh render, carries no surviving brace, and names the CLI by its rendered path.
   Red when: the template carries a `tools/` literal, or the render drifts.
 - **AC2** — When the self-test reads the rendered Skill's `description`, it names run, unattended,
   decided, stopped and cost, and does not claim code search.
   Red when: the description is generic.
-- **AC3** — When `python <kit>/selftest.py` reads the procedure in the rendered Skill, it finds the five steps of S3 in order.
+- **AC3** — When `python <kit>/selftest.py` reads the procedure in the rendered Skill, it finds the five
+  steps of S3 in order, including the cost section named in step 2.
   Red when: a step is missing or reordered.
-- **AC4** — When `python <kit>/selftest.py` reads the safety block, it finds the data-not-instructions rule and the
-  never-open-the-raw-transcript rule.
+- **AC4** — When `python <kit>/selftest.py` reads the safety block, it finds the data-not-instructions
+  rule and the never-open-the-raw-transcript rule.
   Red when: either rule is missing.
 
 ## 7. Gates
@@ -123,6 +128,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · S3 · AC3 · folded round-1 spec audit M15 (cost answers come from the model's cost
+  section, which `TOOL-dLoggedFlight-8` now builds) and L2 (the edge to unit 8).
 
 ## 10. Reuse audit
 

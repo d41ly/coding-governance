@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-7 — the `Decided:` commit trailer, so a choice with no commit of its own has a home
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -22,15 +22,19 @@ the commit that carries the work, and make the wrap-up derive from it.
 ## 2. Scope (IN)
 
 - **S1** `tools/memory-tree/BUILD-METHOD.template.md` M10's first bullet adds the home: a choice with
-  no spec, record or park of its own goes to a `Decided: <the choice> — <why>` trailer, one line per
-  choice, on the commit that carries it. Observed by AC1.
+  no spec, record or park of its own goes to a `Decided: <the choice> — <why>` line, one per choice, in
+  the commit message's FINAL trailer block beside `Co-Authored-By:`. M10 carries one example line.
+  Observed by AC1 and AC3.
 - **S2** M9's "decisions taken" row adds the source: every `Decided:` trailer on the build's own
   commits. Observed by AC1.
 - **S3** The dogfood copy `memory/guides/BUILD-METHOD.md` is re-rendered byte-identical, and the
   method stays under its own 27648-byte cap. Observed by AC2.
 - **S4** The grammar is git's own trailer format, so `git log --format='%(trailers:key=Decided,valueonly)'`
-  reads it with no new parser. This unit states that, and `TOOL-dLoggedFlight-8` harvests it.
-  Observed by AC3.
+  reads it with no new parser. Git parses trailers only in the message's last paragraph, which is why
+  S1 places the lines there. `TOOL-dLoggedFlight-8` harvests them. Observed by AC3.
+- **S5** The memory-tree kit version moves from 2.69 to 2.70 across its carriers, because the unit
+  changes shipped memory-tree bytes. TOOL-dMuffledSentinel-3 records an adopter refusing a pull whose
+  shipped bytes moved at an unchanged version. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -38,8 +42,6 @@ the commit that carries the work, and make the wrap-up derive from it.
   over its stated budget on 12 of 56 records.
 - A gate that demands trailers. Whether a choice was made is not observable, so there is nothing to
   gate. The harvest reports how many trailers a run left, and nothing refuses a run that left none.
-- A memory-tree version move. The verdict-epoch rule dates the engine's verdicts, and this unit moves
-  no engine line.
 
 ### Edges
 
@@ -48,8 +50,12 @@ the commit that carries the work, and make the wrap-up derive from it.
 ## 4. Design
 
 M10 is a pointer section, and M1 forbids restating a rule a carrier owns, so the addition is one
-clause, not a paragraph. The trailer rides the commit the work is in. It is timestamped and public by
-the same standard commit bodies already are. It costs no protocol-carrier bytes.
+clause and one example line, not a paragraph. The trailer rides the commit the work is in. It is
+timestamped and public by the same standard commit bodies already are. It costs no protocol-carrier
+bytes.
+
+The verdict-epoch rule dates the engine's verdicts, and this unit moves no engine line. The version
+still moves, for the adopter-vintage reason in S5, which is a separate rule from the verdict epoch.
 
 ### Inventory
 
@@ -59,7 +65,8 @@ the same standard commit bodies already are. It costs no protocol-carrier bytes.
 
 ### Files touched (estimate)
 
-`tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md`.
+`tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md`, and the memory-tree
+version carriers `tools/check-kit-versions.sh` names.
 
 ### Alternatives rejected
 
@@ -71,28 +78,33 @@ the same standard commit bodies already are. It costs no protocol-carrier bytes.
 - security — N/A. A trailer is commit-message text, public by the same rule as the subject.
 - perf / scale — N/A. A doc change.
 - error / empty / loading states — a run that leaves no trailer harvests to an empty list, reported as
-  zero, not as an absence.
+  zero, not as an absence. A `Decided:` line written above the trailer block is invisible to git, and
+  the harvest counts those as near-misses (`TOOL-dLoggedFlight-8`).
 - observability — the harvest count in the run record.
 - risks — the method's byte budget. The addition stays under 300 bytes against 1,209 of headroom.
-- testing — the dogfood parity leg and the size leg. There is no behaviour to test.
-- migration — none.
+- testing — the dogfood parity leg, the size leg, the version leg, and a scratch-repo arm for the
+  grammar.
+- migration — adopters take the M10 line on their next memory-tree update, at 2.70.
 - user docs — M10 is the documentation.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -n 'Decided:' memory/guides/BUILD-METHOD.md` runs after this unit, it finds the
-  M10 home and the M9 source row.
-  Red when: either clause is missing from the rendered copy.
+  M10 home, its example line and the M9 source row.
+  Red when: any of the three is missing from the rendered copy.
 - **AC2** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` and
   `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` run, both are green.
   Red when: the dogfood copy differs from the template, or the method passes 27648 bytes.
-- **AC3** — When a scratch repo carries a commit with two `Decided:` trailers,
-  `git log --format='%(trailers:key=Decided,valueonly)'` prints exactly those two values.
-  Red when: the grammar written in M10 is not the one git parses.
+- **AC3** — When a scratch repo's commit message is built from M10's own example line placed in the
+  final trailer block, `git log --format='%(trailers:key=Decided,valueonly)'` prints that value. A
+  second commit with the same line written mid-body, above a paragraph break, prints nothing.
+  Red when: M10's placement rule is not the one git parses, or the example cannot be parsed.
+- **AC4** — When `bash tools/check-kit-versions.sh` runs, memory-tree is green at 2.70 in every carrier.
+  Red when: a carrier still reads 2.69.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `unattended kit gate` · `memory hygiene`
+`kit/dogfood doc parity` · `build-method size` · `kit version markers` · `method carriers (every pointer declared)` · `unattended kit gate` · `memory hygiene`
 
 ## 8. Open questions
 
@@ -101,6 +113,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · S1 S4 S5 · §4 · AC1 AC3 AC4 · folded round-1 spec audit M11 (the lines go in
+  the final trailer block, since git parses trailers only there; AC3 builds its commit from M10's own
+  example and adds a mid-body negative) and M21 (the memory-tree version moves to 2.70 on the
+  adopter-vintage precedent of TOOL-dMuffledSentinel-3).
 
 ## 10. Reuse audit
 

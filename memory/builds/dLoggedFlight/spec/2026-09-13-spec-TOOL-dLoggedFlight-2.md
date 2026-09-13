@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -17,17 +17,19 @@ The driver is the one program every unattended run calls, often a hundred times 
 leave a start line and an end line that carry the verb, the slug, the driver's OWN exit code, the
 checks it refused on, the phase before and after, and the session that called it. That covers the
 refusals, phase moves, resumes and killed calls the run-state file cannot hold. It must cost no
-process spawn on the hot path.
+process spawn on the hot path and must not change how the driver dies.
 
 ## 2. Scope (IN)
 
 - **S1** A START line written before the argument loop, and an END line written from an EXIT trap,
-  both to `driver.log` under the journal root in the grammar of `TOOL-dLoggedFlight-1`. Observed by
-  AC1 and AC2.
-- **S2** The END line's `rc` is the process's exit status on every in-shell path. TERM, HUP and INT
-  are trapped to exit `128+n`, so the END line reads 143, 129 or 130, not the zero a bare EXIT trap
-  sees. A killed call leaves its START line alone, and that absence is the signal. Observed by AC2
-  and AC3.
+  both to `driver.log` under the journal root in the grammar of `TOOL-dLoggedFlight-1`. From a linked
+  worktree the line lands in the common dir, never under `.git/worktrees/`. Observed by AC1 and AC11.
+- **S2** END carries `rc` and `exit=clean|unclean`. Every shell exit the driver makes after the
+  trap is installed sets a clean-exit marker immediately before it, so `exit=clean` means the driver
+  chose its exit and `rc` is that exit's status. A call killed by a signal reaches the EXIT trap with
+  no marker and records `exit=unclean`. No TERM, HUP or INT trap is installed, so a signal still ends
+  the driver as promptly as it does today. A call killed by KILL leaves its START alone, and that
+  absence is the signal. Observed by AC2 and AC3.
 - **S3** `fail()` appends each check number to an array, and END carries them as `checks=` in call
   order. Observed by AC1.
 - **S4** START records `phase_from` from RUN.md, and END records `phase_to` read from the file after
@@ -35,9 +37,11 @@ process spawn on the hot path.
   bash with no fork. Observed by AC1.
 - **S5** START sets `oob=1` when RUN.md is newer than the stamp the previous END left for this slug in
   this worktree. That catches an edit made outside the driver between two calls, including a git
-  operation that rewrote the file. The comparison is the `-nt` builtin, with no hash. Observed by AC4.
+  operation that rewrote the file. The comparison is the `-nt` builtin, with no hash. With no stamp
+  yet, `oob` is omitted: `-nt` against a missing file is true, and a first call is not an edit.
+  Observed by AC4.
 - **S6** Session fields come from environment variables whose NAMES `.unattended.conf` declares in a
-  new key, `RUNLOG_SESSION_VARS`. Each value is recorded only if it matches
+  new key, `RUNLOG_SESSION_VARS`. Each value is written as `sess.<NAME>=<value>` only if it matches
   `^[A-Za-z0-9_.:-]{1,128}$`; otherwise the field is empty and `sess_bad=1` is set. Observed by AC5.
 - **S7** Not journaled: `--version`, whose contract is "touching no record", and `--plan`, a
   read-only verb the merge bar calls on every run. Everything else is journaled, `--status` and
@@ -47,26 +51,34 @@ process spawn on the hot path.
   Observed by AC7.
 - **S9** A failed write never changes the exit code or stdout. It prints one line on stderr and the
   verb continues. Observed by AC8.
-- **S10** A new small suite, `tools/unattended/runlog-writer.test.sh`, and its held leg. The owner
-  approved it on 2026-09-13 because the existing unattended suites carry a standing do-not-run rule.
-  Observed by AC9.
+- **S10** A new small suite, `tools/unattended/runlog-writer.test.sh`, approved by the owner on
+  2026-09-13. It is withheld from adopters in `tools/unattended/kit.toml`'s `project-owned` list and
+  budgeted as a non-held row in `tools/run-gates/selftest-budgets.txt`. It is NOT a gate leg: the
+  2026-08-23 owner ruling in `tools/unattended/kit.toml` keeps this kit's self-tests off the bar, and
+  TOOL-aQuenchedHarness-3 keeps them out of adopters' trees. It runs directly, never through
+  `run-unattended-gates.sh`. Observed by AC9.
 - **S11** Carriers: a run-log paragraph in the protocol's section 2, a key row in its section 8, and
   one sentence in the verbs preamble. Each goes to its template and its installed byte copy, and the
   kit version moves from 1.19 to 1.20 across its carriers. Observed by AC10.
+- **S12** Two gotcha records under `memory/gotchas/`, one for `-nt` against a missing file and one
+  for a trapped signal waiting on a foreground child. Each is registered with `gotchas.py --write`
+  and claimed by a dossier. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
 - No verb reads the log. It is evidence, never an input (protocol section 2, facts 5-7).
 - No free text in a line: no `--reason`, `--item` or refusal message. Check numbers only.
-- No change to any existing refusal, and no new `fail N` branch.
+- No change to any existing refusal, exit code or signal behaviour, and no new `fail N` branch.
 - No hash of RUN.md. The `-nt` stamp replaces it, and §4 states what that cannot see.
 - No agent attribution. The session variables are identical in the main loop and in sidechain agents,
   measured 2026-09-12. Attribution is the extractor's job, by command and time.
+- No gate leg for the suite (S10).
 
 ### Edges
 
 - **consumes-from** `TOOL-dLoggedFlight-1` — the line grammar and the journal location contract.
 - **hands-off** `TOOL-dLoggedFlight-8` — the run model reads these lines for the verb and phase timeline.
+- **hands-off** `TOOL-dLoggedFlight-11` — the protocol paragraph this unit adds, which unit 11 extends.
 
 ## 4. Design
 
@@ -78,9 +90,24 @@ process spawn on the hot path.
   where the full argv is still in `"$@"`, just before the `--waive` pre-scan at `:4925`. That is after
   the conf source at `:294`, so a conf that set its own EXIT trap is REPLACED by ours rather than
   replacing it. The install uses `builtin trap`, so a conf function named `trap` cannot intercept it.
-- The START verb is `$1` when it is a declared verb. The START slug is `$2` when it matches
-  `^[A-Za-z]{2,64}$`. END uses the parsed `VERB`, `SLUG`, `PH_SLUG` and the unit field from whichever
-  of `BR_UNIT`, the dispatch pass, `RS_ITEM` or `RV_SUBJECT` the verb set.
+- Every shell exit after the install sets `RUNLOG_CLEAN=1` first. The sites are `:4973`, `:5009`,
+  `:5015`, `:5019`, `:5020`, `:5032`, `:5039`, `:5040` and `:5059`. `:5021` is `--version`, which is not
+  journaled. The suite enumerates every `exit` after the install line and fails if one lacks the
+  marker, so a future exit site cannot slip past.
+- The START verb is `$1` when it is a declared verb. The START slug is `$2` when it matches the grammar
+  `check_slug` enforces at `tools/unattended/unattended.sh:1060-1070`, a letter followed by letters,
+  digits or dashes, bounded at 64. The shape test is factored out of `check_slug` into one predicate
+  both call, so there is no second grammar. END uses the parsed `VERB`, `SLUG`, `PH_SLUG` and the unit
+  field from whichever of `BR_UNIT`, the dispatch pass, `RS_ITEM` or `RV_SUBJECT` the verb set.
+
+### Why no signal traps
+
+A trapped signal waits for the running foreground child. Measured on node `d` by the round-1 audit, TERM
+ended an untrapped script running `sleep 4` in 0.33 s, and one with `trap 'exit 143' TERM` in 4.05 s.
+The driver runs `$GATE_CMD` in the foreground under `GATE_BOUND`, which defaults to 3600 s. A TERM trap
+would therefore hold a killed `--close` for up to an hour. The clean-exit marker records the same fact,
+killed or chosen, with no change to how the driver dies. The price is that an unclean END carries the
+`$?` the trap saw, often 0, so the model reads `exit=unclean` and never `rc` alone.
 
 ### Pure-bash resolution
 
@@ -88,7 +115,7 @@ process spawn on the hot path.
 |---|---|
 | time | `${EPOCHREALTIME/,/.}`, since the radix is locale-dependent; fallback `printf -v t '%(%s)T' -1` on bash 4.x |
 | git dir | `$ROOT/.git` is a directory, or a file read with `read -r` for its `gitdir:` line |
-| common dir | the git dir itself, or `<git-dir>/<commondir contents>` read with `read -r` |
+| common dir | `<git-dir>/<commondir contents>` when that file exists, else the git dir itself, which is the primary tree's case |
 | phase | a `while read` over RUN.md into a variable, never `$(fact …)`, which forks |
 | duration | integer microseconds from the two `EPOCHREALTIME` values |
 
@@ -100,29 +127,29 @@ noise to be read, not an accusation.
 ### Data model
 
 START: `v t p=driver ev=start n verb slug wt kit pid phase_from oob sess.<NAME>...`. END: `v t
-p=driver ev=end n verb slug unit rc checks phase_to dur_us`. The nonce `n` is `<pid>.<EPOCHREALTIME
-digits>`.
+p=driver ev=end n verb slug unit rc exit checks phase_to dur_us`. The nonce `n` is `<pid>.<EPOCHREALTIME
+digits>`. A START carries at most 8 session fields, which keeps it well under the 2048-byte cap.
 
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
-| `write_runlog_start`, `write_runlog_end`, `read_phase_into`, `resolve_runlog_dirs` | shell functions | `sh.function`, snake_case, verb-led |
+| `write_runlog_start`, `write_runlog_end`, `read_phase_into`, `resolve_runlog_dirs`, `check_slug_shape` | shell functions | `sh.function`, snake_case, verb-led |
 | `RUNLOG_SESSION_VARS` | conf key, `[A-Z_]` only as check 22 requires | protocol section 8 |
 | `GOV_RUNLOG` | environment switch | none |
-| `unattended run-log writer` | leg, `kit` / `selftests` | manifest |
 
 ### Files touched (estimate)
 
 `tools/unattended/{unattended.sh,.unattended.conf.example,PROTOCOL.template.md,VERBS.template.md,kit.toml,runlog-writer.test.sh}`,
 `.unattended.conf`, `memory/guides/UNATTENDED-{PROTOCOL,VERBS}.md`, the 15 version carriers,
-`tools/gate-legs.json`, `tools/govkit/{registry.toml,subject-pins.tsv}`,
-`tools/run-gates/selftest-budgets.txt`, `memory/map/features/unattended.md` and the regenerated map.
+`tools/run-gates/selftest-budgets.txt`, two `memory/gotchas/` records with their index and dossier
+claims, and the regenerated map.
 
 ### Alternatives rejected
 
 - One END-only line: rejected because a killed call would leave nothing. Measured: KILL leaves no trap
   line, and TERM's trap sees `$?` of 0.
+- TERM, HUP and INT traps: rejected by the deferral measured above.
 - Two `git hash-object` calls per verb for out-of-band detection: rejected by S8's budget, at about
   40 ms each on node `d`.
 - Logging the refusal text: rejected because it is free text carrying paths, and the check number
@@ -130,15 +157,16 @@ digits>`.
 
 ## 5. Production-readiness checklist
 
-- security — the slug is used in a path only after it matches the slug pattern. Session values are
-  shape-checked before they are written. The conf can still `exit` before the trap is installed,
+- security — the slug is used in a path only after it passes `check_slug`'s grammar. Session values
+  are shape-checked before they are written. The conf can still `exit` before the trap is installed,
   which is recorded as a known hole in the writer's header, as charter §7 requires.
 - perf / scale — zero added spawns on the hot path (AC7). About two appends of under 1 ms each per call.
 - error / empty / loading states — an unwritable or absent journal gives one stderr line and an
-  unchanged exit code. An absent RUN.md gives an empty `phase_from`.
-- observability — the killed-call signature is a START with no END. `checks=` names every refusal.
+  unchanged exit code. An absent RUN.md gives an empty `phase_from`. No stamp gives no `oob`.
+- observability — the killed-call signatures are a START with no END, or an END with `exit=unclean`.
+  `checks=` names every refusal.
 - risks — `oob` false positives after git operations, disclosed in §4. A future driver exit that
-  bypasses the trap, which the suite's arm for each exit shape guards.
+  bypasses the marker, which the suite's enumeration arm guards.
 - testing — the new suite stages each property RED before landing, and AC7 compares exec counts from
   an xtrace, which is deterministic where wall time on this node is not.
 - migration — none. An adopter who declares no `RUNLOG_SESSION_VARS` gets lines with no session fields.
@@ -152,22 +180,26 @@ one build folder, and never runs the existing unattended suites.
 
 - **AC1** — When `--park`, a refused `--park` (unknown argument, check 14) and `--phase` run in the
   sandbox, `driver.log` holds a START and an END for each. The END lines carry `rc=0`, `rc=1
-  checks=14` and a `phase_to` read from the file.
+  checks=14` and a `phase_to` read from the file, all with `exit=clean`.
   Red when: `fail()` stops recording checks, or `phase_to` is taken from `rc`.
-- **AC2** — When a verb exits through each shell exit shape the driver has, the END `rc` equals the
-  process exit status. The shapes are `exit "$status"`, an inline `--phase` exit and an unbound-variable
-  error. A sandbox conf that sets its own `trap 'exit 0' EXIT` changes neither. Observed with
-  `bash <suite>`.
-  Red when: the trap is installed after the argument loop, so the inline exit writes no END, or
-  before the conf source, so the conf's trap replaces it.
-- **AC3** — When a running verb is sent TERM, its END reads `rc=143`. When one is sent KILL, its START
-  stands alone and the nonce has no END.
-  Red when: the signal traps are removed and the TERM end reads `rc=0`.
+- **AC2** — When a verb exits through each shell exit shape the driver has, END reads `exit=clean` with
+  `rc` equal to the process exit status. The shapes are `exit "$status"`, an inline `--phase` exit and
+  a usage error. A sandbox conf that sets its own `trap 'exit 0' EXIT` changes neither. The suite also
+  enumerates every `exit` after the install line in `tools/unattended/unattended.sh` and fails on one
+  with no clean-exit marker. Observed with `bash <suite>`.
+  Red when: the trap is installed after the argument loop, or before the conf source, or an exit site
+  loses its marker.
+- **AC3** — When `--close` runs in the sandbox with `GATE_CMD` set to a 20 s `sleep` and the driver is
+  sent TERM after one second, its END reads `exit=unclean` and the driver has exited before the
+  child's 20 s would have elapsed. When a verb is sent KILL, its START stands alone and the nonce has no
+  END.
+  Red when: a TERM trap is added, so the driver outlives the signal until the child returns, or the END
+  reads `exit=clean`.
 - **AC4** — When RUN.md is edited by a plain write between two verbs, the second START carries `oob=1`.
-  When nothing touched it, the flag is absent.
-  Red when: the stamp is not refreshed at END, so every START reads `oob=1`.
+  When nothing touched it, and on the first call for a slug with no stamp yet, the key is absent.
+  Red when: the stamp is not refreshed at END, or a missing stamp reads as `oob=1`.
 - **AC5** — With `RUNLOG_SESSION_VARS` naming a variable set to a UUID and one set to a value holding
-  `/`, the START carries the first and records `sess_bad=1` for the second.
+  `/`, the START carries `sess.<NAME>=<uuid>` for the first and `sess_bad=1` for the second.
   Red when: an unvalidated value reaches the line.
 - **AC6** — When `--version` and `--plan <slug>` run, no line is written. When `GOV_RUNLOG=0` is set,
   no verb writes a line.
@@ -180,17 +212,24 @@ one build folder, and never runs the existing unattended suites.
 - **AC8** — When the journal directory is a file, so the append fails, the verb's exit code and stdout
   are unchanged and stderr carries one `unattended: run log` line.
   Red when: the write failure changes `rc` or prints to stdout.
-- **AC9** — When `GATE_SELFTESTS=1` runs the `unattended run-log writer` leg, it passes at or above
-  `FLOOR_ASSERTIONS`, prints `PASS (<n> assertions)` and finishes inside its budget row.
-  Red when: the suite is unbudgeted, uncounted or under its floor.
+- **AC9** — When `bash <suite>` runs, it passes at or above its
+  `FLOOR_ASSERTIONS`, prints `PASS (<n> assertions)` and finishes inside its budget row, and
+  `tools/gate-legs.json` names no `tools/unattended/*.test.sh`.
+  Red when: the suite is unbudgeted, under its floor, or appears as a manifest leg.
 - **AC10** — When `bash tools/unattended/adopt-unattended.sh --check` and `bash tools/check-kit-versions.sh`
   run, both are green with the protocol and verbs copies byte-identical to their templates at 1.20,
   and check 22 of `tools/unattended/check-unattended.sh` accepts the new key.
   Red when: the section 8 row or the example line is missing.
+- **AC11** — When the suite runs a verb from a linked worktree of its sandbox and from the sandbox's
+  primary tree, both lines land in `<common-dir>/runlog/driver.log`.
+  Red when: the linked worktree writes under `.git/worktrees/`, or the primary tree finds no journal.
+- **AC12** — When `python tools/memory-tree/gotchas.py --for-paths tools/unattended/unattended.sh`
+  runs, it selects both new gotcha classes.
+  Red when: a record is unregistered or unanchored.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `kit version markers` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `every held leg is budgeted, every budget row resolves` · `govkit selfcheck` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene`
+`unattended kit gate` · `unattended skill wiring` · `kit version markers` · `harness arms (fail branches armed or pinned)` · `every held leg is budgeted, every budget row resolves` · `govkit selfcheck` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `shell hygiene (a loop fed by a command substitution)` · `gotchas selftest` · `memory hygiene`
 
 New arm: `tools/unattended/runlog-writer.test.sh` · each AC staged RED by removing the property it observes · floor set at landing
 
@@ -201,6 +240,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · S1 S2 S5 S10 S12 · §4 · AC2 AC3 AC4 AC9 AC11 AC12 · folded round-1 spec audit
+  B4 (the suite is withheld and budgeted, never a leg, per the 2026-08-23 ruling and
+  TOOL-aQuenchedHarness-3), M18 (no signal traps; a clean-exit marker replaces them, because a trap
+  defers a killed `--close` up to `GATE_BOUND`), M5 (no stamp means no `oob`), L1 (START's slug uses
+  `check_slug`'s grammar through one shared predicate), H3 (a linked-worktree arm) and the two gotcha
+  records the audit's left-shifts name.
 
 ## 10. Reuse audit
 
@@ -209,6 +254,7 @@ found no seam: the `.sh` layer is unscanned, and no shell writer in `tools/` app
 today. The measured precedents are `park()` at `tools/unattended/unattended.sh:3911-3920`, which
 appends with `printf >>` but forks `date`, and the gate runner's run record, which is written once
 per run. This unit reuses the `printf >>` append and replaces the `date` fork with `EPOCHREALTIME`.
-No existing seam fits. Rejected candidates and their tests are in the design research record.
+It reuses `check_slug`'s grammar rather than writing a second one. No existing seam fits the writer.
+Rejected candidates and their tests are in the design research record.
 
 Recall terms used: run-state RUN.md parked rows driver verb witness phase transcript session keepalive gate-ledger wrap-up telemetry

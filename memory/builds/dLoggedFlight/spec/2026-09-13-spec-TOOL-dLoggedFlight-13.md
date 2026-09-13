@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 13
+**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -21,9 +21,9 @@ Report them from tracked bytes alone, sub-classified by why each stopped, as a d
 
 - **S1** A new signal, `run_records_nonterminal_but_merged`, built by a new function in
   `tools/drift-audit/drift_report.py` and added to its `SIGNALS` registry. The function reads each
-  tracked `memory/builds/*/RUN*.md` at HEAD, takes its `phase:` and `witness:` facts, and counts the
-  records whose phase is not terminal and whose witness is an ancestor of the engine's base ref.
-  Observed by AC1.
+  tracked `memory/builds/*/RUN*.md` at HEAD, never the working tree, takes its `phase:` and `witness:`
+  facts, and counts the records whose phase is not terminal and whose witness is an ancestor of the
+  engine's base ref. Observed by AC1.
 - **S2** Report-only: `gateable` is false. §4 records why a gate here would red the fleet for a
   landing the owner sanctioned. Observed by AC2.
 - **S3** Each detail row names the record, phase and witness, and one sub-class from the record's own
@@ -32,8 +32,10 @@ Report them from tracked bytes alone, sub-classified by why each stopped, as a d
   and the row says so. Observed by AC3.
 - **S4** Liveness: `live` is true when the population of run records is non-empty, and `of` is that
   population. Observed by AC1.
-- **S5** Cost: two git calls in total, one `rev-list` of the base and one `cat-file --batch-check`
-  over the witnesses, measured at 0.07 s against 3.4 s for two calls per record. Observed by AC4.
+- **S5** Cost: three git calls in total, whatever the record count. They are one `ls-tree -r HEAD`
+  to enumerate, one `rev-list` of the base ref, and one `cat-file --batch` that returns each record's
+  content from `HEAD:<path>` and tests each witness with `<witness>^{commit}` in the same stream.
+  Observed by AC4.
 - **S6** The kit version moves from 1.10 to 1.11 across its carriers, with a self-test arm. Observed
   by AC5.
 
@@ -49,14 +51,15 @@ none
 
 ## 4. Design
 
-A gate here would red every bar after any worktree landing, and the owner has sanctioned those.
-This run is one: it lands from a worktree and ends at LANDING by the owner's choice of 2026-09-13. As
-soon as local `main` moves past its witness, the count would rise above any pin, on every node,
+A gate here would red every bar after any worktree landing, and the owner has sanctioned those. As soon
+as local `main` moves past such a run's witness, the count would rise above any pin, on every node,
 through no one's fault. So the signal reports and does not gate. A report-only signal is still judged
 against its pin in the table output, so a rising count is visible.
 
 The engine's base ref is resolved the way every other signal resolves it: `--base-ref`, then
-`GOV_DEFAULT_BRANCH`, then the local short name of `refs/remotes/origin/HEAD`.
+`GOV_DEFAULT_BRANCH`, then the local short name of `refs/remotes/origin/HEAD`. The kit's existing
+at-sha reader, `_read_defs_at_sha`, spends an `ls-tree` plus a `cat-file --batch`; this function
+follows the same pattern and adds the witness test to the batch rather than a fourth call.
 
 ### Data model
 
@@ -80,11 +83,13 @@ with the version carriers, and `memory/map/features/` if a dossier claims the si
 - Gateable with a pin of 6: rejected by §4.
 - Subject-grep for merges: rejected. The evidence reviewer measured that a slug appears in unrelated
   merge subjects, and ancestry is exact.
+- Two git calls: rejected, since `cat-file --batch-check` returns no content and the records must be
+  read at HEAD.
 
 ## 5. Production-readiness checklist
 
 - security — N/A; it reads tracked files and the object store.
-- perf / scale — two git calls; S5.
+- perf / scale — three git calls; S5.
 - error / empty / loading states — a record with no `witness:` is `unjudgeable` and counted apart.
   An unresolvable witness is `unjudgeable`, not merged.
 - observability — the detail rows.
@@ -97,7 +102,9 @@ with the version carriers, and `memory/map/features/` if a dossier claims the si
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/drift-audit/drift_report.py` runs on this tree, the new signal reports
-  a value of 6 or more, with `of` equal to the tracked run-record count, and `live` true.
+  a value of 6 or more, with `of` equal to the tracked run-record count, and `live` true. In the
+  self-test, a fixture RUN.md edited in the working tree to a non-terminal phase that HEAD does not
+  carry is not counted.
   Red when: the signal reads the working tree rather than HEAD, or matches no record.
   figure: 6 was measured on 2026-09-13; the arm asserts the value against a fixture, not against this
   tree.
@@ -108,7 +115,8 @@ with the version carriers, and `memory/map/features/` if a dossier claims the si
   signal names each with its sub-class. A terminal record and an unmerged witness are not counted.
   Red when: a terminal record or an unmerged witness is counted.
 - **AC4** — When `tools/drift-audit/selftest.py` counts the git subprocess calls that
-  `build_nonterminal_merged_runs` makes over 50 fixture records, it counts two.
+  `build_nonterminal_merged_runs` makes over fixture trees of 5 and of 50 records, it counts three for
+  both.
   Red when: the function calls git per record.
 - **AC5** — When `bash tools/check-kit-versions.sh` runs, drift-audit is green at 1.11, and the
   `drift-audit selftest` leg passes.
@@ -118,7 +126,7 @@ with the version carriers, and `memory/map/features/` if a dossier claims the si
 
 `drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `kit version markers` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/drift-audit/selftest.py` · each sub-class and the non-gateable property staged RED · floor raised by the arm count
+New arm: `tools/drift-audit/selftest.py` · each sub-class, the HEAD-not-worktree read and the non-gateable property staged RED · floor raised by the arm count
 
 ## 8. Open questions
 
@@ -127,13 +135,15 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · S1 S5 · §4 · AC1 AC4 · folded round-1 spec audit M12 (reading content at HEAD
+  takes a content-returning `cat-file --batch`, so the budget is three calls, constant in the record
+  count, and AC1 gains an arm whose working tree differs from HEAD).
 
 ## 10. Reuse audit
 
 The seam is drift-audit's `SIGNALS` registry at `tools/drift-audit/drift_report.py:1749-1755` and its
-`Git` helper. `tools/codebase-map/reuse_lookup.py "report run records left non-terminal"` returned the
-drift-audit dossier. No signal reads a run-state file today, so the reader is new. The two-call
-strategy was measured by the records acquisition probe to agree with the kit's per-record shape on
-every row.
+`Git` helper, with `_read_defs_at_sha` as the at-sha read pattern. `tools/codebase-map/reuse_lookup.py
+"report run records left non-terminal"` returned the drift-audit dossier. No signal reads a run-state
+file today, so the reader is new.
 
 Recall terms used: run-state RUN.md parked rows driver verb witness phase transcript session keepalive gate-ledger wrap-up telemetry

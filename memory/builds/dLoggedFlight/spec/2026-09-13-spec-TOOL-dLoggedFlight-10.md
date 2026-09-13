@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -37,8 +37,11 @@ schema, independently of the renderer.
   `0 records (none committed yet)` and exits 0, because a repo with no run records yet is a legitimate
   state. The leg asserts the tracked glob it reads is the one the renderer writes, so a renamed
   pattern cannot empty the population in silence. Observed by AC3.
-- **S4** Cost: the leg declares a 60 s ceiling and runs in under 5 s over 100 records on node `d`.
-  Observed by AC4.
+- **S4** Cost: the leg reads the whole population in a constant number of git calls, one `ls-files`
+  and one `cat-file --batch`, and declares a 60 s ceiling. Observed by AC4.
+- **S5** A render-then-grade arm. The clean fixture the leg is tested against is produced by
+  `render_record` from a model fixture that populates every section with one value of each closed
+  class. So a renderer and a leg that disagree fail the self-test. Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
@@ -48,14 +51,17 @@ schema, independently of the renderer.
 
 ### Edges
 
-- **consumes-from** `TOOL-dLoggedFlight-9` — the closed schema and the record naming.
+- **consumes-from** `TOOL-dLoggedFlight-9` — the closed schema, the record naming and the renderer the
+  clean fixture comes from.
+- **hands-off** `TOOL-dLoggedFlight-11` — the leg that grades this run's own record before its landing.
 
 ## 4. Design
 
 The leg is the second of two enforcement points. The renderer builds the record from the allow-list,
 and this leg re-derives every value's class from the committed bytes, so a disagreement between the two
-is itself a finding. It shares `RECORD_SCHEMA` as data, not the renderer's code path. That is the
-repo's rule against a second implementation that merely confirms the first.
+is itself a finding, and S5 makes that disagreement a red. It shares `RECORD_SCHEMA` as data, not the
+renderer's code path. That is the repo's rule against a second implementation that merely confirms the
+first.
 
 ### Inventory
 
@@ -74,17 +80,19 @@ repo's rule against a second implementation that merely confirms the first.
 
 - Folding the check into the hygiene gate: rejected, since the schema is this kit's, and a hygiene
   check naming it would be a cross-kit literal.
+- A hand-written clean fixture: rejected, since it would pass the leg while the renderer drifted.
 
 ## 5. Production-readiness checklist
 
 - security — this is the enforcement point for the public record's privacy promise.
-- perf / scale — one read per record; AC4 pins the floor.
+- perf / scale — a constant number of git calls over any population (AC4). The wall time is printed
+  report-only; the ceiling is the cost verdict.
 - error / empty / loading states — an empty population is named and legal. An unreadable record is a
   refusal, not a skip.
 - observability — the population line on every run.
-- risks — a schema too strict to render a real run. Mitigated because `TOOL-dLoggedFlight-11` renders
-  this run's own record and lands it under this leg.
-- testing — one fixture per refusal staged RED, and one clean fixture.
+- risks — a schema too strict to render a real run. Mitigated by S5, and because
+  `TOOL-dLoggedFlight-11` renders this run's own record and grades it under this leg before landing.
+- testing — one fixture per refusal staged RED, and the rendered clean fixture.
 - migration — none; no record exists before this build.
 - user docs — the leg's header, which states what it does not check.
 
@@ -93,17 +101,19 @@ repo's rule against a second implementation that merely confirms the first.
 `<kit>` below is `tools/runlog`. Every criterion runs `python <kit>/selftest.py` unless it names another
 command.
 
-- **AC1** — When `python <kit>/runlog.py check-records` runs over a fixture index holding one clean
-  record, it exits 0 and prints `1 record`.
-  Red when: the clean record is refused.
-- **AC2** — When fixtures stage each refusal in S2, `check-records` exits 1 naming that rule and the line.
+- **AC1** — When `python <kit>/runlog.py check-records` runs over a fixture index holding one record
+  that `render_record` produced from a model fixture populating every closed class, it exits 0 and
+  prints `1 record`.
+  Red when: the rendered record is refused, so the renderer and the leg disagree.
+- **AC2** — When fixtures stage each refusal in S2, `check-records` exits 1 naming that rule and the
+  line.
   Red when: any staged violation passes.
 - **AC3** — When no record is tracked, the leg prints `0 records` and exits 0. When the glob is
   pointed at a pattern the renderer does not write, the self-test fails.
   Red when: an empty population reads as a green grade with no announcement.
-- **AC4** — When the leg runs over 100 generated records, it finishes in under 5 s, and
-  `tools/gate-legs.json` declares its ceiling.
-  Red when: the leg re-reads git per record.
+- **AC4** — When `check-records` runs over fixture indexes of 1 and of 100 records, it makes the same
+  number of git subprocess calls for both, and `tools/gate-legs.json` declares its ceiling.
+  Red when: the leg reads git per record.
 
 ## 7. Gates
 
@@ -118,6 +128,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · S4 S5 · AC1 AC4 · folded round-1 spec audit B3 (the clean fixture is rendered by
+  `render_record` from a model fixture carrying every closed class, so renderer-leg disagreement reds)
+  and H9 (AC4's wall-clock floor becomes a constant git-call count), and L2 (the hand-off to unit 11).
 
 ## 10. Reuse audit
 

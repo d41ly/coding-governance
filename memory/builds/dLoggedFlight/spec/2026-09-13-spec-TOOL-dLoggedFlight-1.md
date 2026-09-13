@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -24,14 +24,17 @@ producer invents a format and no consumer re-parses one.
   and a codebase-map dossier `memory/map/features/runlog.md`. Observed by AC1.
 - **S2** The journal location contract: the directory `runlog` under the git COMMON dir, holding one
   file per producer, `driver.log`, `gates.log` and `pushes.log`. It is a data location, not a kit
-  path. Observed by AC2.
+  path. `resolve_journal_root` returns the same absolute path from the primary tree and from any
+  linked worktree of one clone. Observed by AC7.
 - **S3** The line grammar, stated once in the kit README and implemented once in
-  `tools/runlog/runlog_lib.py`. Observed by AC2 and AC3.
+  `tools/runlog/runlog_lib.py`, with a golden line from each producer's data model parsing clean.
+  Observed by AC2, AC3 and AC8.
 - **S4** The reader: parse a line, read a journal with a count of unparseable lines, and pair `start`
-  and `end` lines by nonce into invocations whose state is `ended`, `killed-or-running` or `orphan-end`.
-  Observed by AC3 and AC4.
+  and `end` lines by nonce into invocations whose state is `ended`, `killed-or-running` or
+  `orphan-end`. Observed by AC3 and AC4.
 - **S5** A CLI entry `tools/runlog/runlog.py` with one subcommand here, `journal`, which prints the
-  parsed lines of one producer file as JSON, with the bad-line count on stderr. Observed by AC5.
+  parsed lines of one producer file as JSON, with the bad-line count and the resolved path on stderr.
+  Observed by AC5 and AC7.
 - **S6** The kit self-test `tools/runlog/selftest.py`, a new held leg `runlog selftest`, and its
   budget row. Observed by AC6.
 
@@ -43,6 +46,8 @@ producer invents a format and no consumer re-parses one.
 - A JSON or JSONL on-disk format. A tracked `.jsonl` file is an undeclared lexicon extension, and the
   producers are shell scripts that cannot hand-build JSON safely.
 - Any consumer beyond `journal`: the model is unit 8 and the record is unit 9.
+- An absolute wall-clock floor as a red condition. A held self-test runs in a contended pool, and
+  TOOL-cSteadyMetronome-1 records that a gate grades what the subject does, never what the node does.
 
 ### Edges
 
@@ -60,17 +65,25 @@ One act is one line. A line is TAB-separated fields, and every field is `key=val
 
 | rule | value |
 |---|---|
-| key | `[a-z][a-z0-9_.]*`; a dotted key such as `sess.CLAUDE_CODE_SESSION_ID` carries a declared name |
+| key | `[a-z][a-z0-9_]*` with an optional `.` suffix of `[A-Za-z0-9_]+`, so `sess.CLAUDE_CODE_SESSION_ID`, `fail.1` and `ref.3` parse |
 | value escaping | `\` becomes `\\`, TAB `\t`, LF `\n`, CR `\r`; nothing else is escaped |
 | field 1 | `v=1`, the grammar version; a reader refuses a line whose `v` it does not know |
 | always present | `v`, `t` (epoch seconds, `.` radix, up to six fraction digits), `p` (producer), `ev` (event) |
 | `ev` values | `start` and `end` pair on `n`, the nonce; `once` is an unpaired act |
-| line length | a producer truncates values so a line stays at or under 2048 bytes |
+| line length | at most 2048 bytes. A producer that would exceed it drops whole indexed fields, highest index first, and records how many as `<key>_more=<n>`, before it cuts any value |
 | unknown keys | preserved; a reader never drops a line for an extra key |
 
 Small appends are atomic in practice here: 8 concurrent shell writers produced 1600 of 1600 intact
 lines, measured 2026-09-13 on node `a` by the acquisition probe (PINNED). The grammar does not rely
 on it: a torn line fails to parse, is counted, and surfaces as a bad-line count rather than vanishing.
+
+### Golden lines
+
+The self-test carries one line copied from each producer spec's data model: a driver START with
+`sess.CLAUDE_CODE_SESSION_ID`, a driver END with `checks=14` and `exit=clean`, a gate line with
+`fail.1` and `fail_more`, and a push START with `lander=0` and `ref.1`. All of them must parse with a
+bad-line count of zero. A producer spec that changes its data model changes its golden line in the
+same pass, so the grammar and its three users cannot drift apart unseen.
 
 ### Inventory
 
@@ -109,7 +122,8 @@ the file is absent, which is a named state, not an error.
 
 - security — the reader treats every byte as data. The directory is machine-local and never pushed;
   the repo is public and nothing here is tracked except code and fixtures.
-- perf / scale — parsing is one split per line. AC4 pins a throughput floor.
+- perf / scale — parsing is one split per line with no per-line subprocess or regex compile, which
+  AC4 counts. The wall time is printed report-only; the leg's budget row is the cost verdict.
 - error / empty / loading states — an absent file, an empty file, a torn line and an unknown `v` each
   have a named result, and none raises.
 - observability — the bad-line count is always printed, so a writer that emits garbage is loud.
@@ -131,14 +145,15 @@ because the spec-tokens leg joins every path a live spec's criteria name against
 - **AC2** — When `parse_line` in `<kit>/runlog_lib.py` reads back a line whose values carry a TAB, a
   newline, a CR and a backslash, every value comes back byte-identical to what was written.
   Red when: the escaping is dropped from either direction and the arm compares a mangled value.
-- **AC3** — When `read_journal` reads a fixture holding one torn line, one line with an unknown `v`
-  and three good lines, it returns three lines and a bad count of two.
-  Red when: a bad line is silently dropped, so the count reads zero.
+- **AC3** — When `read_journal` reads a fixture holding one torn line, one line with an unknown `v`,
+  one line carrying dotted and unknown keys, and two plain good lines, it returns three lines with the
+  dotted and unknown keys preserved and a bad count of two.
+  Red when: a bad line is silently dropped, so the count reads zero, or an unknown key is lost.
 - **AC4** — When `build_invocations` pairs a fixture of a start with its end, a start with no end and
-  an end with no start, it returns one `ended`, one `killed-or-running` and one `orphan-end`, and
-  parsing 100,000 lines takes under 1 s on node `d`.
-  Red when: an unmatched start reads as ended, or the floor is missed.
-  figure: the 1 s floor is PINNED; the measured time is printed by the arm.
+  an end with no start, it returns one `ended`, one `killed-or-running` and one `orphan-end`. Parsing
+  100,000 lines makes zero `subprocess` calls and zero `re.compile` calls per line, counted by patching
+  both in the arm.
+  Red when: an unmatched start reads as ended, or the parser compiles or spawns per line.
 - **AC5** — When `python <kit>/runlog.py journal --producer driver` runs in a clone with no journal,
   it exits 0 and prints `runlog: <path> absent` on stderr.
   Red when: an absent journal raises or prints an empty success.
@@ -146,6 +161,13 @@ because the spec-tokens leg joins every path a live spec's criteria name against
   runs and passes at or above its assertion floor, inside its budget row.
   Red when: the leg is unbudgeted, unclaimed, or under its floor.
   cost: the held selftest chunk; this unit runs only the new leg directly.
+- **AC7** — When `resolve_journal_root` runs in a scratch clone's primary tree and in a linked
+  worktree of it, both return the same absolute `<common-dir>/runlog`, and `journal` names that path.
+  Red when: the linked worktree resolves under `.git/worktrees/`.
+- **AC8** — When the self-test parses the four golden lines of §4, each parses with a bad-line count
+  of zero, and a line with 30 indexed fields rendered through the kit's reference truncation stays at
+  or under 2048 bytes with a `_more` count.
+  Red when: the key grammar rejects a producer's key, or a value is cut before an indexed field drops.
 
 ## 7. Gates
 
@@ -160,6 +182,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · S2 S3 S5 · §4 · AC3 AC4 AC7 AC8 · folded round-1 spec audit H3 (S2's location
+  contract gains AC7, run from a primary tree and a linked worktree), H4 (the key grammar admits the
+  uppercase dotted suffix its own example and the driver use; golden lines per producer), M4 (the
+  truncation order: whole indexed fields drop into `_more` before any value is cut) and H9 (AC4's
+  wall-clock floor becomes a count of per-line spawns and compiles).
 
 ## 10. Reuse audit
 
