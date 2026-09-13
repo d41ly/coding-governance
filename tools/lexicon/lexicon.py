@@ -982,8 +982,10 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
     round 3: keying this on `expr_end` instead re-opened the generic-close boundary, because a
     `>` clears `expr_end` too.
 
-    `lits`, when a set is passed, is the other half of the same blindness: the INDEX the next
-    token will take after a silent LITERAL — a string, a template, a regex — so a reader that
+    `lits`, when a dict is passed, is the other half of the same blindness: the INDEX the next
+    token will take after a silent LITERAL — a string, a template, a regex — mapped to the LINE
+    the literal ended on, so a literal that spans the break, or opens the later line before a
+    word operator (`'a' in x`), is not read as the earlier line's close (round 5); so a reader that
     decides a line break from the last emitted token can see that `open ? 'Open' : 'Closed'`
     closed its line with an operand and not with the `:`. Closing review round 4.
 
@@ -1086,7 +1088,7 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
                 expr_end = True
                 pend = False
                 if lits is not None and not suppress:
-                    lits.add(len(toks))
+                    lits[len(toks)] = line
                 i += 1
                 continue
             if src.startswith("${", i):
@@ -1240,28 +1242,37 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
             i = j + 2
             continue
         if c in "\"'":
+            # A literal OPENING a line after a silent operator is the continuation itself, and
+            # it clears `pend` before any token can be marked: hand the mark to the token that
+            # follows it (`cond &&` newline `'a' in x`). Closing review round 5, found staging.
+            if pend and conts is not None and not suppress and toks and line > toks[-1][2]:
+                conts.add(len(toks))
             j = read_string(i + 1, c)
             line += src.count("\n", i, j)
             i = j
             expr_end = True
             pend = False
             if lits is not None and not suppress:
-                lits.add(len(toks))
+                lits[len(toks)] = line
             continue
         if c == "`":
+            if pend and conts is not None and not suppress and toks and line > toks[-1][2]:
+                conts.add(len(toks))
             stack.append("tmpl")
             opens.append(("template literal", line))
             i += 1
             continue
         if c == "/":
             if not expr_end:
+                if pend and conts is not None and not suppress and toks and line > toks[-1][2]:
+                    conts.add(len(toks))
                 j = read_regex(i + 1)
                 line += src.count("\n", i, j)
                 i = j
                 expr_end = True
                 pend = False
                 if lits is not None and not suppress:
-                    lits.add(len(toks))
+                    lits[len(toks)] = line
                 continue
             i += 1
             expr_end = False
@@ -1575,7 +1586,7 @@ _TS_EXPR_CONTINUES = frozenset(("(", "[", "{", "=", ":", ",", "<", ">", "=>", "@
 
 
 
-def read_ts_expr_end(toks: list, k: int, conts=frozenset(), lits=frozenset()) -> int:
+def read_ts_expr_end(toks: list, k: int, conts=frozenset(), lits=None) -> int:
     """The index just past the brace-less arrow body that starts at `k`.
 
     It ends at a depth-0 `;` or `,`, at an unbalanced closer, or at a line break that ends a
@@ -1594,11 +1605,12 @@ def read_ts_expr_end(toks: list, k: int, conts=frozenset(), lits=frozenset()) ->
     after the arrow, and a module-level element two lines down would make a plain helper a
     component. `check_ts_returned` is the backward twin and reads the same facts.
     """
+    lits = lits or {}
     depth, m, j = 0, len(toks), k
     while j < m:
         kind, text, ln = toks[j]
         if depth == 0 and j > k and ln > toks[j - 1][2] and j not in conts \
-                and (j in lits or toks[j - 1][1] not in _TS_EXPR_CONTINUES
+                and (lits.get(j, ln) < ln or toks[j - 1][1] not in _TS_EXPR_CONTINUES
                      or check_ts_generic_close(toks, j - 1)) \
                 and kind != "jsx" and text not in (":", ","):
             return j
@@ -1778,7 +1790,7 @@ def parse_ts_source(src: str, jsx: bool = False):
     """
     calls: set = set()
     conts: set = set()
-    lits: set = set()
+    lits: dict = {}
     toks = scan_ts_tokens(src, jsx, calls, conts, lits)
     funcs: list = []
     types_: list = []
@@ -1796,10 +1808,13 @@ def parse_ts_source(src: str, jsx: bool = False):
         """
         if body is None or body >= m:
             return
-        if body in lits and body not in conts and body and toks[body][2] > toks[body - 1][2]:
+        if body and toks[body - 1][1] == "=>" and body not in conts \
+                and lits.get(body, toks[body][2]) < toks[body][2]:
             # The arrow's value was a silent literal — `(i) => `k-${i}`` — and `body` is the
             # NEXT statement's first token; the scope is empty, and opening it there graded
-            # the next line's element as the helper's (closing review round 4).
+            # the next line's element as the helper's (closing review round 4). Keyed on the
+            # `=>` before it: a `{` after a return type ending in a literal TYPE is a body
+            # (round 5).
             return
         if toks[body][0] == "op" and toks[body][1] == "{":
             scopes.append((body, read_ts_brace_end(toks, body), owner))
@@ -1958,6 +1973,13 @@ def parse_ts_source(src: str, jsx: bool = False):
 #: `return a < b && c >`, and the comparison is the shape prettier emits (round 4, stated).
 _TS_GENERIC_HEADS = frozenset(("as", "satisfies", "new"))
 
+#: The expression words a type-argument run can NEVER hold. `typeof`, `void`, `new`, `in` and
+#: `extends` all can — `ReturnType<typeof f>`, `Promise<void>`, `Map<string, () => void>`,
+#: `T extends U` — so bounding the search on every expression word read those runs as
+#: comparisons (closing review round 5). A `;` is not here either: `read_ts_angle_end` already
+#: refuses one at depth zero, and a `{ a: string; b: number }` type literal holds one inside.
+_TS_STMT_WORDS = _TS_EXPR_WORDS - frozenset(("typeof", "void", "new", "in", "extends"))
+
 
 def check_ts_generic_close(toks: list, j: int) -> bool:
     """Does the `>` at `j` CLOSE a statement-ending type-argument run — `v as Foo<Bar>` — rather
@@ -1968,22 +1990,22 @@ def check_ts_generic_close(toks: list, j: int) -> bool:
     if toks[j][0] != "op" or toks[j][1] != ">":
         return False
     for i in range(j - 1, max(j - 400, 0), -1):
-        # No type-argument run holds a `;` or a statement keyword, so reaching one before the
-        # `<` means the `>` pairs with nothing in ITS statement — an `as` two statements up
-        # must not make a comparison here a boundary (closing review round 4).
-        if (toks[i][0] == "op" and toks[i][1] == ";") \
-                or (toks[i][0] == "word" and toks[i][1] in _TS_EXPR_WORDS):
+        # No type-argument run holds a statement keyword, so reaching one before the `<` means
+        # the `>` pairs with nothing in ITS statement — an `as` two statements up must not make
+        # a comparison here a boundary (round 4). STATEMENT words, not expression words: the
+        # run may hold `typeof`, `void`, `new` (round 5).
+        if toks[i][0] == "word" and toks[i][1] in _TS_STMT_WORDS:
             return False
         if toks[i][0] == "op" and toks[i][1] == "<" and read_ts_angle_end(toks, i) == j + 1:
             p = i - 1
             while p >= 0 and toks[p][0] == "word" and toks[p][1] not in _TS_GENERIC_HEADS \
-                    and toks[p][1] not in _TS_EXPR_WORDS:
+                    and toks[p][1] not in _TS_STMT_WORDS:
                 p -= 1
             return p >= 0 and p < i - 1 and toks[p][0] == "word" and toks[p][1] in _TS_GENERIC_HEADS
     return False
 
 
-def check_ts_returned(toks: list, calls: set, conts: set, lits: set, start: int, mk: int) -> bool:
+def check_ts_returned(toks: list, calls: set, conts: set, lits: dict, start: int, mk: int) -> bool:
     """Is the element at `mk` the VALUE of the body that starts at `start`?
 
     `m_` below is the token count, bound once because two walks need it.
@@ -2026,7 +2048,8 @@ def check_ts_returned(toks: list, calls: set, conts: set, lits: set, start: int,
             # found the closer-first ordering breaking INSIDE that expression, on prettier's own
             # output. `read_ts_expr_end` states the ceiling.
             if depth == 0 and toks[j][2] < toks[j + 1][2] and (j + 1) not in conts \
-                    and ((j + 1) in lits or text not in _TS_EXPR_CONTINUES
+                    and (lits.get(j + 1, toks[j + 1][2]) < toks[j + 1][2]
+                         or text not in _TS_EXPR_CONTINUES
                          or check_ts_generic_close(toks, j)) \
                     and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
                 break

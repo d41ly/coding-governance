@@ -2901,11 +2901,16 @@ _f = lex.read_ts_jsx_defs("function useX(v) {" + _NL + "  if (!v) return new Map
                          + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)
 check("returns R24: ...and `new Map<string, Foo>` with no call parens is a boundary, like `as`",
       _f == [], f"{_f}")
-_TAILS = {"satisfies": "v satisfies Foo<Bar>", "as-unknown-as": "v as unknown as Foo<Bar>"}
+# Runs that HOLD an expression word or a `;` are still runs: bounding the helper's search on every
+# expression word read these as comparisons (closing review round 5).
+_TAILS = {"satisfies": "v satisfies Foo<Bar>", "as-unknown-as": "v as unknown as Foo<Bar>",
+          "void": "v as Promise<void>", "typeof": "v as ReturnType<typeof f>",
+          "semicolon-inside": "v as Record<string, { a: string; b: number }>",
+          "arrow-inside": "new Map<string, () => void>", "typeof-head": "v as typeof makeBox<string>"}
 _LEAK2 = [k for k, _t in _TAILS.items() if lex.read_ts_jsx_defs(
     "function useX(v) {" + _NL + "  if (!v) return " + _t + _NL + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)]
-check("returns R24: ...and `satisfies Foo<Bar>` and `as unknown as Foo<Bar>` at line end are "
-      "boundaries too", not _LEAK2, f"{_LEAK2}")
+check("returns R24: ...and `satisfies`, `as unknown as`, and runs holding `void`, `typeof`, a `;` "
+      "or an arrow at line end are boundaries too", not _LEAK2, f"{_LEAK2}")
 # THE CEILING THE KEY BUYS, pinned at its current verdict so a change is a red and not a
 # surprise: a bare instantiation expression at line end has no head and reads as a comparison.
 _f = lex.read_ts_jsx_defs("function useBox(v) {" + _NL + "  if (!v) return makeBox<string>" + _NL
@@ -2918,7 +2923,9 @@ check("returns R24: ...while a bare instantiation expression `makeBox<string>` a
 # continued into the next line; and `read_ts_arrow_body` handed back the NEXT statement's first
 # token as the body of `(i) => `k-${i}``. Two wrong verdicts from one line, opposite
 # directions -- the helper routed, the component not. `lits` is the lexer's record of where a
-# literal ended, and both readers and `add_scope` take it.
+# literal ended -- the index the next token takes, mapped to the line the literal ENDED on, so a
+# literal that spans the break or opens the later line is not read as the earlier line's close
+# -- and both readers and `add_scope` take it.
 _BAD = []
 for _helper in ("const label = () => open ? 'Open' : 'Closed'", "const reset = () => state.value = ''",
                 "const key = (i) => `k-${i}`", "const re = () => /x/"):
@@ -2938,6 +2945,33 @@ check("returns R25: ...and a string-ended early return is a boundary in the bloc
 _f = lex.read_ts_jsx_defs("const A = () => 'x' +" + _NL + "  (cond && <B />)" + _NL)
 check("returns R25: ...while a literal followed by an operator still continues the line",
       _f == [("A", 1)], f"{_f}")
+# THE LINE, not only the index (round 5): a template spanning the break, a literal opening the
+# later line before a word operator, in both readers -- each a component the index-only record
+# dropped. And the arrow whose literal really does end its line still refuses (round 4's target).
+_DROP = [_k for _k, _src in {
+    "template spanning the break": "const A = () => " + chr(96) + _NL + "x" + chr(96) + " === y ? <B /> : null" + _NL,
+    "'a' in x after `return (`": "function A() {" + _NL + "  return (" + _NL + "    'a' in x ? <A /> : null" + _NL + "  )" + _NL + "}" + _NL,
+    "=> newline 'debug' in window": "const A = () =>" + _NL + "  'debug' in window ? <B /> : null" + _NL,
+    "arrow `(` then a literal line": "const A = () => (" + _NL + "  'a' in x ? <B /> : null" + _NL + ")" + _NL,
+    "&& then a string line, arrow": "const A = () => cond &&" + _NL + "  'a' in x ? <B /> : null" + _NL,
+    "&& then a template line, arrow": "const A = () => cond &&" + _NL + "  " + chr(96) + "a" + chr(96) + " in x ? <B /> : null" + _NL,
+    "&& then a string line, block": "function A() {" + _NL + "  return cond &&" + _NL + "    'a' in x ? <B /> : null" + _NL + "}" + _NL,
+    "colon then a literal line, arrow": "const A = () => cond ? x :" + _NL + "  'a' in y ? <B /> : null" + _NL,
+}.items() if lex.read_ts_jsx_defs(_src) != [("A", 1)]]
+check("returns R25: ...and a literal that spans the break, or opens the later line before a word "
+      "operator, or opens it after a silent operator, is not the earlier line's close -- the "
+      "component routes", not _DROP, f"{_DROP}")
+_f = lex.read_ts_jsx_defs("const f = () =>" + _NL + "  'x'" + _NL + "const el = <A />" + _NL)
+check("returns R25: ...while an arrow whose value is a literal on its own line still owns nothing "
+      "after it", _f == [], f"{_f}")
+# A `{` BODY after a return type ending in a literal TYPE is a body, not a literal-valued arrow
+# (round 5): the refusal keys on the `=>` before the body token.
+_BRACE = [_k for _k, _src in {
+    "Allman brace after a literal type": "function A(): JSX.Element | 'x'" + _NL + "{" + _NL + "  return <A />" + _NL + "}" + _NL,
+    "wrapped union ending in a literal": "function A(x: number):" + _NL + "  | 'primary'" + _NL + "  | 'secondary' {" + _NL + "  return <A />" + _NL + "}" + _NL,
+}.items() if lex.read_ts_jsx_defs(_src) != [("A", 1)]]
+check("returns R25: ...and a body brace after a return type ending in a literal type is a body, "
+      "so the component routes", not _BRACE, f"{_BRACE}")
 
 # D1..D5 — the declaration: one legal spelling, four named refusals at the row.
 check("returns D1: `tsx.function+returns:jsx` parses to its four parts",
