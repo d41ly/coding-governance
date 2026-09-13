@@ -2906,11 +2906,17 @@ check("returns R24: ...and `new Map<string, Foo>` with no call parens is a bound
 _TAILS = {"satisfies": "v satisfies Foo<Bar>", "as-unknown-as": "v as unknown as Foo<Bar>",
           "void": "v as Promise<void>", "typeof": "v as ReturnType<typeof f>",
           "semicolon-inside": "v as Record<string, { a: string; b: number }>",
-          "arrow-inside": "new Map<string, () => void>", "typeof-head": "v as typeof makeBox<string>"}
+          "arrow-inside": "new Map<string, () => void>", "typeof-head": "v as typeof makeBox<string>",
+          # round 6: a statement word as a KEY, a METHOD name, or an elided-dot MEMBER inside the run
+          "keyword-key": "v as Record<string, { delete: boolean }>",
+          "keyword-member": "v as ReturnType<typeof api.delete>",
+          "keyword-method": "v as Api<{ delete: () => void }>",
+          "keyword-param-key": "v as Fn<(o: { return: number }) => void>"}
 _LEAK2 = [k for k, _t in _TAILS.items() if lex.read_ts_jsx_defs(
     "function useX(v) {" + _NL + "  if (!v) return " + _t + _NL + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)]
-check("returns R24: ...and `satisfies`, `as unknown as`, and runs holding `void`, `typeof`, a `;` "
-      "or an arrow at line end are boundaries too", not _LEAK2, f"{_LEAK2}")
+check("returns R24: ...and `satisfies`, `as unknown as`, and runs holding `void`, `typeof`, a `;`, "
+      "an arrow, or a statement word as a key, a method or a member, at line end are boundaries "
+      "too", not _LEAK2, f"{_LEAK2}")
 # THE CEILING THE KEY BUYS, pinned at its current verdict so a change is a red and not a
 # surprise: a bare instantiation expression at line end has no head and reads as a comparison.
 _f = lex.read_ts_jsx_defs("function useBox(v) {" + _NL + "  if (!v) return makeBox<string>" + _NL
@@ -2957,6 +2963,10 @@ _DROP = [_k for _k, _src in {
     "&& then a template line, arrow": "const A = () => cond &&" + _NL + "  " + chr(96) + "a" + chr(96) + " in x ? <B /> : null" + _NL,
     "&& then a string line, block": "function A() {" + _NL + "  return cond &&" + _NL + "    'a' in x ? <B /> : null" + _NL + "}" + _NL,
     "colon then a literal line, arrow": "const A = () => cond ? x :" + _NL + "  'a' in y ? <B /> : null" + _NL,
+    # round 6: a literal that STARTED earlier and ended on this line is an operand on this line
+    "template then `as`, arrow": "const A = () => cond ? " + chr(96) + _NL + "x" + chr(96) + " as string : <B />" + _NL,
+    "template then `as`, block": "function A() {" + _NL + "  return cond ? " + chr(96) + _NL + "x" + chr(96) + " as string : <B />" + _NL + "}" + _NL,
+    "&& then a regex line, arrow": "const A = () => cond &&" + _NL + "  /a/ instanceof RegExp ? <B /> : null" + _NL,
 }.items() if lex.read_ts_jsx_defs(_src) != [("A", 1)]]
 check("returns R25: ...and a literal that spans the break, or opens the later line before a word "
       "operator, or opens it after a silent operator, is not the earlier line's close -- the "
@@ -2964,12 +2974,19 @@ check("returns R25: ...and a literal that spans the break, or opens the later li
 _f = lex.read_ts_jsx_defs("const f = () =>" + _NL + "  'x'" + _NL + "const el = <A />" + _NL)
 check("returns R25: ...while an arrow whose value is a literal on its own line still owns nothing "
       "after it", _f == [], f"{_f}")
-# ...and the mark a literal hands on goes to a token on ITS line only: a statement on the line
-# after `x +` / `'a'` is a statement, whatever operator preceded the literal.
+# ...and a statement on the line after `x +` / `'a'` is a statement, whatever operator preceded
+# the literal: the literal's own record ends the line, and no continuation mark reaches past it.
 _AFTER = [_lit for _lit in ("'a'", chr(96) + "a" + chr(96), "/a/") if lex.read_ts_jsx_defs(
     "const A = () => x +" + _NL + "  " + _lit + _NL + "const el = <B />" + _NL)]
-check("returns R25: ...and a literal that opens a continuation line hands the mark to a token on "
-      "its own line only, never to the next statement", not _AFTER, f"{_AFTER}")
+check("returns R25: ...and a literal that opens a continuation line never reaches the next "
+      "statement", not _AFTER, f"{_AFTER}")
+# THE CEILING of the block reader's ASI-`return` test, pinned at its verdict: `return` followed on
+# its own line by a template that spans lines reads as a bare `return`, because `lits` carries
+# the line a literal ended on and that test asks where the value started. Prettier never emits
+# it; a change here is a red and not a surprise.
+_f = lex.read_ts_jsx_defs("function A() {" + _NL + "  return " + chr(96) + _NL + "x" + chr(96) + ".length > 0 ? <B /> : null" + _NL + "}" + _NL)
+check("returns R25: ...while `return` then a newline then a spanning template is the stated ceiling "
+      "-- read as a bare `return`", _f == [], f"{_f}")
 # A `{` BODY after a return type ending in a literal TYPE is a body, not a literal-valued arrow
 # (round 5): the refusal keys on the `=>` before the body token.
 _BRACE = [_k for _k, _src in {

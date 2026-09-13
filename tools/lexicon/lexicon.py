@@ -974,7 +974,9 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
 
     `conts`, when a set is passed, receives the INDEX of every token that opens a LINE while an
     operator this lexer does not emit was the last thing consumed — `isValid(a) &&` then a
-    newline then `isValid(b)`, or `getItems()` then `.length`. The token stream cannot tell that
+    newline then `isValid(b)`, or `getItems()` then `.length`. A silent literal opening such a
+    line (`cond &&` then `'a' in x`) needs no mark: `lits` below records where it ended, and
+    the readers decide the token after it by that record. The token stream cannot tell that
     line from `return noop()` then `const el`, and the two ASI readers need to: the first
     continues an expression, the second ends a statement. `pend` is the flag — set where an
     operator is consumed silently, cleared where an operand ends, whether or not the operand
@@ -1019,22 +1021,19 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
     i, n, line = 0, len(src), 1
 
     pend = False
-    lit_line = None   # the line a silent literal that OPENED a continuation ended on
-    tmpl_cont = False
 
     def add_token(kind: str, text: str) -> None:
         """Emit one token, unless we are inside a suppressed span; note a continuation."""
-        nonlocal pend, lit_line
+        nonlocal pend
         if not suppress:
-            # A continuation is a token opening a line after a silent operator (`pend`), or the
-            # token that follows, ON THE SAME LINE, a silent literal that itself opened such a
-            # line (`lit_line`). A token on a LATER line than that literal is a new statement:
-            # `x +` / `'a'` / `const el = <B />` must not mark `const`.
-            if conts is not None and toks and line > toks[-1][2] and (pend or lit_line == line):
+            # A continuation is a token opening a line after a silent operator. A silent LITERAL
+            # opening such a line needs no mark: `lits` records where it ended, and the readers
+            # decide the token after it by that record alone (rounds 5 to 7 of the closing
+            # review built a mark for it, then found the record made the mark unobservable).
+            if pend and conts is not None and toks and line > toks[-1][2]:
                 conts.add(len(toks))
             toks.append((kind, text, line))
         pend = False
-        lit_line = None
 
     def read_string(j: int, q: str, wrap: bool = False) -> int:
         """The index just past the `q` that closes a string opened before `j`.
@@ -1094,9 +1093,6 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
                 opens.pop()
                 expr_end = True
                 pend = False
-                if tmpl_cont and not suppress:
-                    lit_line = line
-                tmpl_cont = False
                 if lits is not None and not suppress:
                     lits[len(toks)] = line
                 i += 1
@@ -1252,34 +1248,24 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=Non
             i = j + 2
             continue
         if c in "\"'":
-            # A literal OPENING a line after a silent operator is the continuation itself, and
-            # it clears `pend` before any token can be marked: hand the mark to the token that
-            # follows it (`cond &&` newline `'a' in x`). Closing review round 5, found staging.
-            opens_cont = pend and not suppress and toks and line > toks[-1][2]
             j = read_string(i + 1, c)
             line += src.count("\n", i, j)
             i = j
-            if opens_cont:
-                lit_line = line
             expr_end = True
             pend = False
             if lits is not None and not suppress:
                 lits[len(toks)] = line
             continue
         if c == "`":
-            tmpl_cont = bool(pend and not suppress and toks and line > toks[-1][2])
             stack.append("tmpl")
             opens.append(("template literal", line))
             i += 1
             continue
         if c == "/":
             if not expr_end:
-                opens_cont = pend and not suppress and toks and line > toks[-1][2]
                 j = read_regex(i + 1)
                 line += src.count("\n", i, j)
                 i = j
-                if opens_cont:
-                    lit_line = line
                 expr_end = True
                 pend = False
                 if lits is not None and not suppress:
@@ -1620,9 +1606,13 @@ def read_ts_expr_end(toks: list, k: int, conts=frozenset(), lits=None) -> int:
     depth, m, j = 0, len(toks), k
     while j < m:
         kind, text, ln = toks[j]
+        # A literal that ended right before `j` is decided by ITS record, never by the token
+        # before the literal: one that started earlier and ended on this line is an operand on
+        # this line, whatever sat before it (round 6).
         if depth == 0 and j > k and ln > toks[j - 1][2] and j not in conts \
-                and (lits.get(j, ln) < ln or toks[j - 1][1] not in _TS_EXPR_CONTINUES
-                     or check_ts_generic_close(toks, j - 1)) \
+                and (lits[j] < ln if j in lits else
+                     (toks[j - 1][1] not in _TS_EXPR_CONTINUES
+                      or check_ts_generic_close(toks, j - 1))) \
                 and kind != "jsx" and text not in (":", ","):
             return j
         if kind == "op":
@@ -2000,14 +1990,30 @@ def check_ts_generic_close(toks: list, j: int) -> bool:
     """
     if toks[j][0] != "op" or toks[j][1] != ">":
         return False
+    depth = 0
     for i in range(j - 1, max(j - 400, 0), -1):
-        # No type-argument run holds a statement keyword, so reaching one before the `<` means
-        # the `>` pairs with nothing in ITS statement — an `as` two statements up must not make
-        # a comparison here a boundary (round 4). STATEMENT words, not expression words: the
-        # run may hold `typeof`, `void`, `new` (round 5).
-        if toks[i][0] == "word" and toks[i][1] in _TS_STMT_WORDS:
+        # No type-argument run holds a statement keyword AT ITS OWN DEPTH, so reaching one
+        # before the `<` means the `>` pairs with nothing in ITS statement — an `as` two
+        # statements up must not make a comparison here a boundary (round 4). STATEMENT words,
+        # not expression words: the run may hold `typeof`, `void`, `new` (round 5). And not
+        # inside a group or in member position: `Record<string, { delete: boolean }>` holds
+        # `delete` as a KEY and `ReturnType<typeof api.delete>` as an elided-dot MEMBER, a word
+        # directly after a word on the same line (round 6).
+        kind_i, text_i, line_i = toks[i]
+        if kind_i == "op" and text_i in (")", "]", "}"):
+            depth += 1
+            continue
+        if kind_i == "op" and text_i in ("(", "[", "{"):
+            if depth == 0:
+                return False
+            depth -= 1
+            continue
+        if depth:
+            continue
+        if kind_i == "word" and text_i in _TS_STMT_WORDS \
+                and not (toks[i - 1][0] == "word" and toks[i - 1][2] == line_i):
             return False
-        if toks[i][0] == "op" and toks[i][1] == "<" and read_ts_angle_end(toks, i) == j + 1:
+        if kind_i == "op" and text_i == "<" and read_ts_angle_end(toks, i) == j + 1:
             p = i - 1
             while p >= 0 and toks[p][0] == "word" and toks[p][1] not in _TS_GENERIC_HEADS \
                     and toks[p][1] not in _TS_STMT_WORDS:
@@ -2030,6 +2036,10 @@ def check_ts_returned(toks: list, calls: set, conts: set, lits: dict, start: int
     `calls` opens an argument list, and `[` or `{` opens a literal; an element under any of them
     is passed or held, not returned. A grouping `(` is transparent. `f<T>(` and `f?.(` are calls
     too: the first is read from the angle run here, the second is recorded by the lexer.
+
+    THE CEILING: `return` followed on its own line by a template literal that spans lines reads
+    as a bare `return`, because `lits` carries the line a literal ENDED on and the test above
+    asks where the value STARTED. Prettier never emits it; the arm pins the verdict (round 6).
     """
     m_ = len(toks)
     if toks[start][0] == "op" and toks[start][1] == "{":
@@ -2059,9 +2069,9 @@ def check_ts_returned(toks: list, calls: set, conts: set, lits: dict, start: int
             # found the closer-first ordering breaking INSIDE that expression, on prettier's own
             # output. `read_ts_expr_end` states the ceiling.
             if depth == 0 and toks[j][2] < toks[j + 1][2] and (j + 1) not in conts \
-                    and (lits.get(j + 1, toks[j + 1][2]) < toks[j + 1][2]
-                         or text not in _TS_EXPR_CONTINUES
-                         or check_ts_generic_close(toks, j)) \
+                    and (lits[j + 1] < toks[j + 1][2] if (j + 1) in lits else
+                         (text not in _TS_EXPR_CONTINUES
+                          or check_ts_generic_close(toks, j))) \
                     and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
                 break
             if kind == "op" and text in (")", "]", "}"):
