@@ -107,6 +107,10 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - Four negatives first held none of their own rule's hints, so the prefilter, not the pattern, left
   them alone and a widening could not red them. Those were `pem-block`, `env-assign`, `cookie` and
   `azure-key`. Each gained a near miss that reaches its regex, and an arm now asserts it per row.
+- Two negatives landed in the build commit carrying a filesystem path, an absolute Windows one in the
+  `env-table` row and a home-relative key file in the `pem-block` row. This repository is public, so a
+  second fold replaced both with path-free near misses before the unit returned, and the suite still
+  printed `370 passed`.
 - `tools/install-prefix-carried.txt` did not move: no shipped file of the kit gained a kit-path
   literal. `tools/govkit/subject-pins.tsv` did not move, since no leg was added.
 - The runlog kit stays at 1.0, as the brief sets it, and no kit version moved in this unit.
