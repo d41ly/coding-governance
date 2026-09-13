@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.69 -->
+<!-- gov:kit memory-tree@2.73 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -71,14 +71,30 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   cap for a build README, and 20 KB with no line cap for a codebase-map dossier. `archive/` is wholly
   exempt. A LINE cap of 0 means no independent line cap for that class, which is how a project retires
   the line axis — this repo has, for row documents.
-- **The live-row floor.** Because rotation carries forward every non-terminal row, a shard's floor is
-  its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the cap.
-  So the number that actually bounds a shard is its LIVE ROW COUNT, and `drift-audit` reports that per
-  shard on every run (`live_backlog_rows_per_shard`, report-only). `TOOL-aRelaxedShard-4`.
-- **Rotation** (on cap breach): `git mv <INDEX>.md archive/<INDEX>.<YYYY-MM-DD>.md`; create a fresh index
-  whose line 1 notes the rotation + the id range archived. BACKLOG rotation carries forward every
-  non-CLOSED/non-WONTDO row. Rotated archives stay inside `memory/` so the all-time id collision grep still
-  covers them. Rotation moves whole files — it never rewrites or renumbers a ratified record.
+- **Rotation mode is DECLARED, never assumed.** `.memory-tree.conf` sets `ROTATION_MODE` to one of
+  `cut | snapshot`, and a repo that declares neither has not decided rather than defaulted. **`cut`** —
+  move only the TERMINAL rows out to `archive/<INDEX>.<date>.md`, leaving every non-terminal row in the
+  live index, so an id sits in exactly ONE file and its status has exactly one owner. **`snapshot`** —
+  `git mv <INDEX>.md archive/<INDEX>.<date>.md` whole, then open a fresh index carrying the
+  non-terminal rows forward, so a live id sits in two files and the archived copy is a dated
+  PHOTOGRAPH of the index, never a second answer about that id's status.
+- **The two do not blend, and blending them is the defect this key exists to prevent.** A whole-file
+  move PLUS a carry-forward writes every live row into a frozen file, and each of those rows then
+  drifts, one status edit at a time, into contradicting the shard it was cut from. That is not
+  hypothetical: it is how one archive in this kit's own dogfood repo came to hold 66 non-terminal rows
+  under a header promising terminal ones only, with 49 of its ids also live in the shard and 7 of
+  those disagreeing about status.
+- **Either mode:** the fresh or surviving index notes the rotation in its PREAMBLE, naming the archive
+  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `memory/` so the all-time id-collision
+  grep still reaches them; and rotation never rewrites or renumbers a ratified record.
+- **The live-row floor.** Non-terminal rows survive the rotation under either mode, so a shard's floor
+  is its LIVE ROW COUNT: when nothing terminal is left, rotating is a no-op and the next row breaches
+  the cap. `drift-audit` reports that per shard on every run (`live_backlog_rows_per_shard`,
+  report-only). `TOOL-aRelaxedShard-4`. Under `cut` that floor is reached sooner, because a cut
+  rotation sheds less.
+- **NOT CHECKED, and it matters:** nothing in this engine asserts that a tree HONOURS its declared
+  mode. `ROTATION_MODE` is validated against the closed set and then read by no check. A green bar is
+  therefore not evidence that an archive holds what the mode says it should.
 
 ## Status vocabulary (backlogs)
 
@@ -169,7 +185,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
    Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
-10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
+10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved by BASENAME anywhere under the memory root rather than at
+    a fixed path; a stem resolving to zero or several live indexes is a NAMED finding, never a
+    skip. The reference is read from everything above the index's first row, and never fewer
+    than its first three lines. It grades ANNOUNCEMENT, never the archive's CONTENTS.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
 12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it
@@ -253,14 +272,32 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     because every universal record is emitted on EVERY reviewer's checklist.
 
 20. **one id, one row per document** — within a single row document (the decision index, a backlog
-    shard, a rotated archive) an id appears at most once. The count of survivors is pinned
-    shrink-only by `ROW_DUPLICATE_PIN`, and an UNDECLARED pin is a refusal, not a disabled check.
+    shard, and the rotated archive of either) an id appears at most once. An archive is recognised by
+    the name of the document it ROTATED — `DECISIONS` or a declared FAMILY, plus a date and an
+    optional same-day disambiguator — and NOT by being any `.md` under `archive/`, which would sweep
+    in frozen snapshots where a quoted example row would red a file nobody may edit. Until
+    `TOOL-cSpliceWarden-3` the archive half admitted only `DECISIONS.`-prefixed names, so a rotated
+    BACKLOG shard was outside this check entirely; three were, and one of them carried two duplicated
+    ids past a green bar for a month. The count of survivors is pinned shrink-only by
+    `ROW_DUPLICATE_PIN`, and an UNDECLARED pin means ZERO — the strictest value, never a refusal and
+    never off, because a default that can only TIGHTEN needs no ceremony.
     Scope is PER FILE deliberately: corpus-wide would red every designed backlog-row-plus-decision-row
     pair. NAMED GAP — the live index and its rotated archive are two files, so a row that rotates out
     and is re-minted is not caught here; the all-time collision grep the index's own header
     prescribes covers that. Keyability is asserted alongside it, but only as the precondition that
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
+
+24. **the declared rotation mode is HONOURED** — under `ROTATION_MODE=cut` a rotated archive of a
+    status-bearing shard holds TERMINAL rows only, and no id sits in both an archive and the live
+    index it was cut from. Those two together are what `cut` means: one id, one file. Delegated to
+    `row_grammar.py`, which owns the row grammar — a second spelling of it in shell passed a
+    bold-wrapped id silently, and the decision index carries fifteen such rows. NOT GRADED, and
+    announced on every run rather than passed over: `snapshot`, whose assertion inverts to "an
+    archived row is never edited after the rotation" and whose baseline commit is not resolvable
+    here; an UNDECLARED mode; a DECISIONS archive's terminal half, since a decision row carries no
+    lifecycle token; and the CONTENT of any archive, ever. A `cut` tree with no rotated archive says
+    it graded nothing rather than reporting clean.
 
 21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
     and everything else in it (an adversarial review, a build ledger, a research report, a

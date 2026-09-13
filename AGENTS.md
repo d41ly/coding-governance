@@ -199,17 +199,16 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   freshness checks are merge-bar legs like any other (§7).
 - Ask periodically whether this repo's RECORD of its own state still matches the tree — stale claims,
   closed plans with no product commit, hand-kept inventories disagreeing with what they describe.
-  Every such signal carries a LIVENESS assertion, so a probe that cannot move says so rather than
-  reporting a reassuring zero; a green audit must mean the checks ran, not that nothing was reported.
+  Every such signal carries the liveness assertion §7 requires of any probe.
 - Retrieval over the decision corpus beats grepping it: ask a question, get the records that answer
   it, ranked. It ADDS to grep rather than replacing it — a symbol, caller or filename is still a grep.
 - **Required — a structured, machine-linted memory tree** (`memory-tree/` kit): one FLAT
   `memory/` tree of per-feature `builds/` folders — the discipline is a
-  `playbook kickoff tooling deployer` value in each spec's status header, not a directory — plus index caps +
-  archive rotation, a status vocabulary, a GENERATED work-state index rendered from build front
-  matter, and a **hygiene gate** whose check count is stated by the kit README and the gate-leg name
-  and is deliberately not restated here, wired into CI + pre-commit + `bash tools/run-gates/run-gates.sh`;
-  `.memory-tree.conf` holds the specifics. Adopt/migrate per the kit README.
+  `playbook kickoff tooling deployer` value in each spec's status header, not a directory — plus index caps, a
+  DECLARED archive-rotation mode, a status vocabulary, a GENERATED work-state index rendered from
+  build front matter, and a **hygiene gate** whose check count is stated by the kit README and the
+  gate-leg name and is deliberately not restated here, wired into CI + pre-commit +
+  `bash tools/run-gates/run-gates.sh`; `.memory-tree.conf` holds both. Adopt per the kit README.
 
 ## §6 — Decisions, backlogs & the governing doc
 

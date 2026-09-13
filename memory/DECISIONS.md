@@ -15,6 +15,13 @@
 
 ## TOOL — tooling
 
+- TOOL-cSpliceWarden-6 · a check that grades a declared mode DELEGATES to whatever owns the grammar it reads. Spelling a second row predicate in shell let five of six evasions pass, a bold-wrapped id among them, and the decision index carries fifteen of those
+- TOOL-cSpliceWarden-7 · an archive pair is made to partition by DELETING the duplicate side, never by widening what the invariant asserts. Lossless because the rows were byte-identical, which was checked before choosing rather than assumed after
+- TOOL-cSpliceWarden-8 · a false clause beside a sound conclusion does not overturn it. The retirement it questioned was correct when written; the audit's finding is that the coverage claim was never load-bearing, and that there were four carriers of it, not three
+- TOOL-cSpliceWarden-1 · rotation semantics is DECLARED per project, `ROTATION_MODE` = `cut` or `snapshot`, because both are coherent disciplines and neither is a safe default. HYGIENE.md had stated both in one paragraph, and the pair writes every live row into a frozen file
+- TOOL-cSpliceWarden-4 · a ratified archive is repaired by SUPERSESSION plus evacuation, never a silent rewrite: the note states every false claim and quotes every removed row. 17 archive-only IDS were 15 ROWS — two already had a correct CLOSED row there
+- TOOL-cSpliceWarden-2 · a rotated archive's live index resolves by BASENAME anywhere under the memory root, and zero-or-many is a named finding, never a skip. Two filed rows had half the defect each; the `head -3` window was the half only a real-tree run found
+- TOOL-cSpliceWarden-3 · check 20 recognises a rotated archive by the document it ROTATED, `DECISIONS` or a declared FAMILY plus a date — NOT every `.md` under `archive/`, which sweeps in frozen snapshots where a quoted row would red a file nobody may edit
 - TOOL-dRetiredFork-4 · inCMS's D1 is nested template INTERPOLATION, not a nested agent loop; two spec revisions argued a fixture the adopter never claimed. At HEAD the view still corrupts, the fail-open does not. Disposition (b); latent scalar is `TOOL-dRetiredFork-24`
 - TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
 - TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
