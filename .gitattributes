@@ -207,3 +207,9 @@ tools/run-gates/*.txt text eol=lf
 # process-monitor kit (TOOL-aReapedSpinner-6): the shell and the conf are execution-sensitive.
 tools/process-monitor/*.sh text eol=lf
 .process-monitor.conf text eol=lf
+
+# runlog kit (TOOL-dLoggedFlight-1). The fixtures are journal lines whose bytes ARE the test: TAB
+# separators, LF terminators, and one file whose final line deliberately has no LF. A CRLF
+# smudge would turn every fixture line into one the reader refuses for its unescaped CR.
+tools/runlog/*.py text eol=lf
+tools/runlog/fixtures/* text eol=lf

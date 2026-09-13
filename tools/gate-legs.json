@@ -777,6 +777,19 @@
     "ceiling": 360
   },
   {
+    "name": "runlog selftest",
+    "argv": [
+      "python",
+      "tools/runlog/selftest.py"
+    ],
+    "guard": [
+      "tools/runlog/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 180
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",

@@ -13,3 +13,4 @@
 
 lib     gov-internal. Ships nothing to an adopter; every copy-installed kit carries its contents inline instead.
 run-gates	the merge-bar runner. The playbook names the BAR as a project obligation rather than naming this kit: an adopter reaches it through govkit's default selection, and the three shipped files describe the gate discipline without prescribing gov's runner by name. Promoted from a registry exemption by the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`.
+runlog	the run-log reader and its grammar (TOOL-dLoggedFlight-1). It lands with no producer writing yet and no adopter, so a runbook section would prescribe an install with nothing to wire. Naming a kit in the charter template or the runbook is a governance-carrier edit this build's mandate does not cover; the row drains itself, because this gate reds on it the day either file names the kit.

@@ -73,6 +73,10 @@ id = "process-monitor"
 descriptor = "tools/process-monitor/kit.toml"
 
 [[entry]]
+id = "runlog"
+descriptor = "tools/runlog/kit.toml"
+
+[[entry]]
 id = "agent-instructions"
 descriptor = "tools/agent-instructions/kit.toml"
 
@@ -458,6 +462,10 @@ why = "it runs `agent-cap.test.sh`, which `tools/hooks/kit.toml` withholds with 
 [[exempt_leg]]
 name = "lexicon selftest"
 why = "it runs `selftest.py`, which `tools/lexicon/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+
+[[exempt_leg]]
+name = "runlog selftest"
+why = "it runs `selftest.py`, which `tools/runlog/kit.toml` withholds with `role = \"project-owned\"` together with the `fixtures/` it reads: the suite's subject is the reader in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "memory-recall kit selftest"

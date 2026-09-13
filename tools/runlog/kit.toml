@@ -1,0 +1,52 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/.
+# Contract: memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md
+
+id = "runlog"
+home = "tools/runlog"
+scope = "repo"
+
+# Pinned at the reader module, which lands in the SAME unit as this descriptor, so the file the
+# pattern reads exists from the first commit. The process-monitor descriptor records the defect a
+# pin at a not-yet-landed file causes; this one cannot have it.
+version_from = { file = "runlog_lib.py", pattern = "^KIT_RUNLOG_VERSION = " }
+
+[[files]]
+include = "**"
+role = "engine"
+
+# THIS KIT'S SELF-TEST AND ITS FIXTURES ARE WITHHELD. TOOL-aQuenchedHarness-3: a suite whose subject
+# is the code in this directory has a job only when that code changes, and none in a tree that
+# copy-installs the kit and never edits it. Withheld by CLAIMING THE DESTINATION, the mechanism the
+# codebase-map descriptor explains: govkit has no `exclude` key, a `**` rule's pool drops only what
+# another rule owns, and `project-owned` is absent from LANDABLE_ROLES, so `apply` never writes it.
+# The fixtures go with the suite because nothing else reads them.
+#
+# The `runlog selftest` leg is NOT declared here. It is a leg on GOV's bar carried by an
+# [[exempt_leg]] row in the deployer's registry, for the reason recorded beside the run-gates gov
+# canary: a descriptor row naming a leg the target cannot carry is what reds the deployer.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
+
+# EACH FIXTURE IS NAMED, because a LIST include claims literal paths only: govkit's `rule_sources`
+# drops any element carrying a glob character, so `fixtures/**` here claimed nothing and `plan` put
+# every fixture under `engine`. Measured with `govkit plan` into a scratch target before this list
+# replaced it. The self-test asserts this list equals the files under `fixtures/`, so a new fixture
+# reds there instead of shipping.
+[[files]]
+include = ["fixtures/driver-torn.txt", "fixtures/golden-lines.txt", "fixtures/invocations.txt",
+           "fixtures/journal-mixed.txt"]
+role = "project-owned"
+
+[adopt]
+argv = []
+mutates_index = false
+why_no_adopter = "the kit is a reader and a CLI with no configuration of its own: it resolves the journal from git and the memory root from the memory-tree conf, so there is nothing to seed and nothing to wire"
+
+[check]
+none = """
+nothing is wired, so there is no wiring to check. A later unit that renders a Skill from this kit brings its adopter and its check together
+"""
+
+# No [[lf_pin]]. The shipped files are Python modules and a README, which read the same with either
+# line ending. The byte-exact files are the fixtures, which are withheld, so their pin is gov's own.

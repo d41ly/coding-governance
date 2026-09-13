@@ -90,6 +90,7 @@
       "run-gates turnstile",
       "run-gates wiring",
       "run-selftests self-test",
+      "runlog selftest",
       "scratch-guard self-test",
       "selftest harness self-test",
       "settings-merge selftest",
@@ -125,6 +126,7 @@
       "process-monitor",
       "pytest-parallel-guardrails",
       "run-gates",
+      "runlog",
       "unattended",
       "workflows"
     ],

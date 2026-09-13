@@ -62,7 +62,7 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-dLoggedFlight-1` | MISSING | the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses |
+| 1 | `TOOL-dLoggedFlight-1` | CLOSED | the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses |
 | 2 | `TOOL-dLoggedFlight-2` | MISSING | the unattended driver writes a start and an end line for every run verb |
 | 3 | `TOOL-dLoggedFlight-3` | MISSING | the gate runner writes one verdict line per bar run |
 | 4 | `TOOL-dLoggedFlight-4` | MISSING | the pre-push hook writes one line per push |
@@ -85,7 +85,7 @@ ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedF
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses](spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-13 |
+| [TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses](spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-13 |
 | [TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb](spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-13 |
 | [TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run](spec/2026-09-13-spec-TOOL-dLoggedFlight-3.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-13 |
 | [TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push](spec/2026-09-13-spec-TOOL-dLoggedFlight-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-13 |
@@ -100,7 +100,7 @@ ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedF
 | [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | SPECCED | rev-4 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

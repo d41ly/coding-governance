@@ -28,3 +28,9 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-13T14:39:51Z review · item dLoggedFlight-spec-set · reason verdict BLOCKED · blockers 1
 
 2026-09-13T16:03:12Z review · item dLoggedFlight-spec-set · reason verdict CLEAN · blockers 0 · CONVERGED
+
+2026-09-13T16:31:59Z dispatch · item 05adb28a TOOL-dLoggedFlight-1 · reason tools/runlog tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/install-prefix-carried.txt tools/playbook-kit-waivers.txt tools/gate-legs.json tools/run-gates/selftest-budgets.txt .gitattributes memory/map/features/runlog.md memory/map/generated memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md memory/builds/dLoggedFlight/build/2026-09-13-build-TOOL-dLoggedFlight-1-1-acceptance-ledger.md memory/builds/dLoggedFlight/prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T16:32:03Z brief · item TOOL-dLoggedFlight-1 · reason d3965db939c5 memory/builds/dLoggedFlight/prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md
+
+2026-09-13T17:01:43Z dispatch · item 05adb28a TOOL-dLoggedFlight-1 · reason memory/guides/SESSION-KICKOFF.md

@@ -1,11 +1,12 @@
 # TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-dLoggedFlight-1-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md) | research | TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-0-run-mandate.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-0-run-mandate.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md) | journal | TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
@@ -48,9 +49,10 @@ producer invents a format and no consumer re-parses one.
   budget row. Observed by AC6.
 - **S7** The memory root. `resolve_memory_root` reads `MEMORY_ROOT` from `.memory-tree.conf` at the
   repository root, strips its slashes, and returns the kit default `memory` when the key is absent, as
-  drift-audit's reader does. A key set to nothing refuses with a named line. Every later unit addresses
-  the memory tree through it, since the kit ships and `docs/mem` is a real adopter value. Observed by
-  AC10.
+  drift-audit's reader does. An absent conf is an absent key. A key set to nothing refuses with a
+  named line, and so does a value that would leave the repository: a `..` segment, a drive colon or a
+  backslash, because unit 9 WRITES under this root. Every later unit addresses the memory tree through
+  it, since the kit ships and `docs/mem` is a real adopter value. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -83,8 +85,9 @@ One act is one line. A line is TAB-separated fields, and every field is `key=val
 | value escaping | `\` becomes `\\`, TAB `\t`, LF `\n`, CR `\r`; nothing else is escaped |
 | field 1 | `v=1`, the grammar version; a reader refuses a line whose `v` it does not know |
 | always present | `v`, `t` (epoch seconds, `.` radix, up to six fraction digits), `p` (producer), `ev` (event) |
-| `ev` values | `start` and `end` pair on `n`, the nonce; `once` is an unpaired act |
-| line length | at most 2048 bytes. A producer that would exceed it drops whole indexed fields, highest index first, and records how many as `<key>_more=<n>`, before it cuts any value |
+| `ev` values | `start` and `end` pair on `n`, the nonce, keyed with `p`; `once` is an unpaired act and is never an invocation |
+| line length | at most 2048 bytes, not counting the terminating LF. A producer that would exceed it drops whole indexed fields (a numeric `.` suffix), highest index first, and records how many as `<key>_more=<n>`, before it cuts any value |
+| terminator | every line ends in LF; a final line without one is torn and counts as bad |
 | unknown keys | preserved; a reader never drops a line for an extra key |
 | pairing duty | every `ev=end` line's nonce has an `ev=start` line in the same file; each producer's suite asserts it over its whole journal |
 
@@ -105,8 +108,8 @@ same pass, so the grammar and its three users cannot drift apart unseen.
 | identifier | kind | cell |
 |---|---|---|
 | `tools/runlog/runlog_lib.py` | module | none |
-| `parse_line`, `read_journal`, `resolve_journal_root`, `resolve_memory_root`, `build_invocations`, `check_line` | functions | `py.function`, each led by a declared verb |
-| `Invocation`, `JournalLine` | types | `py.type`, no banned suffix |
+| `parse_line`, `read_journal`, `resolve_journal_root`, `resolve_memory_root`, `build_invocations`, `check_line`, `render_line` | functions | `py.function`, each led by a declared verb |
+| `Invocation`, `JournalLine`, `Journal` | types | `py.type`, no banned suffix |
 | `KIT_RUNLOG_VERSION = "1.0"` with `# gov:kit runlog@1.0` | version pair | kit version markers |
 | `tools/runlog/runlog.py` with `main` and `cmd_journal` | CLI | reserved verbs |
 | `runlog selftest` | leg, `kit` / `selftests` | manifest |
@@ -115,6 +118,11 @@ same pass, so the grammar and its three users cannot drift apart unseen.
 bare form prints a relative `.git` in the primary tree. The trap is recorded at
 `tools/unattended/adopt-unattended.sh:77-85`.
 
+`render_line` is the kit's reference writer: escaping plus the truncation order above, which AC8
+runs. `read_journal` returns a `Journal` carrying its path, a named state (`absent`, `empty`,
+`read` or `unreadable`), the good lines and one refusal reason per bad line, so the count and the
+reasons come from one list.
+
 ### Rollout
 
 The kit lands with no producer writing yet, so `journal` over a fresh clone prints nothing and says
@@ -122,10 +130,15 @@ the file is absent, which is a named state, not an error.
 
 ### Files touched (estimate)
 
-`tools/runlog/{kit.toml,README.md,runlog_lib.py,runlog.py,selftest.py}`, `tools/govkit/registry.toml`,
-`tools/install-prefix-carried.txt`, `tools/gate-legs.json`, `tools/govkit/subject-pins.tsv`,
-`tools/run-gates/selftest-budgets.txt`,
-`memory/map/features/runlog.md` and the regenerated `memory/map/generated/*`.
+`tools/runlog/{kit.toml,README.md,runlog_lib.py,runlog.py,selftest.py}` and its `fixtures/`,
+`tools/govkit/registry.toml`, `tools/install-prefix-carried.txt`, `tools/gate-legs.json`,
+`tools/govkit/subject-pins.tsv`, `tools/run-gates/selftest-budgets.txt`, `.gitattributes`,
+`tools/playbook-kit-waivers.txt`, `memory/map/features/runlog.md` and the regenerated
+`memory/map/generated/*`.
+
+The waiver row exists because the `playbook parity` leg reds on a kit directory neither the charter
+template nor the runbook names. Naming it there is a governance-carrier edit this mandate does not
+cover, and the row drains itself: the leg reds on it the day either file names the kit.
 
 ### Alternatives rejected
 
@@ -192,9 +205,9 @@ because the spec-tokens leg joins every path a live spec's criteria name against
   Red when: `journal` prints nothing, drops a key, or omits the count.
 - **AC10** — When `resolve_memory_root` reads scratch trees whose conf sets `MEMORY_ROOT=docs/mem/`,
   sets nothing, and sets `MEMORY_ROOT=/`, it returns `docs/mem`, returns `memory`, and refuses with a
-  named line.
-  Red when: a literal `memory` is returned for a conf naming another root, or an empty root is
-  accepted.
+  named line. A conf setting `MEMORY_ROOT=../x` refuses with a named line too.
+  Red when: a literal `memory` is returned for a conf naming another root, or an empty root or one
+  leaving the repository is accepted.
 
 ## 7. Gates
 
@@ -219,6 +232,17 @@ none
   AC9) and H3's left-shift (the grammar states the start-end pairing duty every producer suite checks).
 - rev-4 · 2026-09-13 · S1 S7 · §4 · AC10 · folded round-3 spec audit M10 (the carried-prefix row is
   raised by hand, with its reason) and M12 (one memory-root resolver, since the kit ships).
+- rev-5 · 2026-09-13 · S7 · §4 · AC10 · the build pass, before its code. The inventory gains
+  `render_line`, which AC8's "reference truncation" needed and no name carried, and `Journal`, the
+  result `read_journal` returns. The data model now states that the byte cap excludes the LF, that a
+  final line with no LF is torn, that an index is a numeric suffix, and that pairing keys on `p` and
+  `n` and never makes a `once` line an invocation. S7 refuses a root that leaves the repository,
+  because unit 9 writes under it, and AC10 observes that. The files touched gain the fixtures,
+  `.gitattributes` and `tools/playbook-kit-waivers.txt`, the last because `playbook parity` reds on
+  a kit dir that nothing names. The `project-owned` rule NAMES each fixture: a list include claims
+  literal paths only, so a `fixtures/**` element claimed nothing and `govkit plan` shipped every
+  fixture as `engine`. `govkit selfcheck` does not see that, so AC1's third red condition is
+  observed by `govkit plan` into a scratch target and by a self-test arm over the declaration.
 
 ## 10. Reuse audit
 
