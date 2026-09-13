@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards
 
-**Status:** OPEN · rev-4 · 2026-09-13 · node a · Tier-2 · base c2db2f5d · streams tooling · order 2
+**Status:** OPEN · rev-5 · 2026-09-13 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md) | spec-audit | — |
+| [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -31,10 +32,10 @@ number so a moved line is a moved anchor rather than a wrong one.
   requires. Invocation count is the first guess; the cut is re-balanced against the per-shard SERIAL
   readings S2 takes, iterating until `max(shard)` is within a declared tolerance of `sum / 8`, and
   every candidate's timing is recorded beside the one chosen. **Every helper defined inside a region
-  and called past a cut is hoisted to the prologue** beside `anchor_break` — 28 helpers are defined
-  inside the regions today (`anchor_restore` at the text `anchor_restore() {` through `frozen`), and
-  the HOIST SET count is DERIVED at build time, never asserted. Observed by **AC1**, **AC2** and
-  **AC10**.
+  and called past a cut is hoisted to the prologue** beside `anchor_break`; the population is
+  DERIVED at build time as every `name() {` definition between the first `in_shard` line and the
+  floor line, and the count is written into the HOIST SET note from that derivation — this spec
+  types no figure for it. Observed by **AC1**, **AC2** and **AC10**.
 - **S2** — replace the single unsharded row in `tools/run-gates/selftest-budgets.txt` with eight
   rows, one per shard, each carrying a SERIAL reading from one `--serial` pass. The rows' argv
   literals raise the file's count in `tools/install-prefix-carried.txt`, a BAN the ratchet cannot
@@ -52,21 +53,30 @@ number so a moved line is a moved anchor rather than a wrong one.
   calls WITH `--shard`. Retarget BOTH whole-suite notes at it in the same commit: the kit runner's
   help text at `run-unattended-gates.sh` (the text `run UNSHARDED on purpose`) and the suite's own
   note at the text `WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT`. Observed by **AC5**.
-- **S5** — the replay rule, not a count: for each boundary the cut produces, dump the whole-run ref
-  state at that boundary's first line — local branches, `refs/remotes`, the bare origin's heads and
-  HEAD — and diff it against fresh-start state. **A replay exists exactly where a ref some arm at or
-  after that line reads differs.** The file has one producer today (the text `git push -q -f origin
-  main` inside the `ahead` block) and one consumer (the `tWaive` fixture's fast-forward merge), so a
-  replay is expected at exactly the boundary preceding the shard holding the consumer, if that shard
-  does not also hold the producer; the `refs/heads/ahead` leak at the text `"$ahead:refs/heads/ahead"`
-  is a second producer the dump must catch. The scan covers all three carriers — variables, functions,
-  refs — and the per-boundary result is recorded in the build log. Observed by **AC8**.
-- **S6** — the accumulation-dependent control gets a MECHANISM, not a placement. The population by the
-  note's own key is ONE arm: the text `the tree is still clean after nine mutations`. Each mutating
-  arm in its counted block increments a process-local `MUT`, and the control asserts
-  `same "nine mutations ran in this process" "$MUT" 9` BEFORE calling `run`, so a control cut away
-  from its mutations reds at runtime in whichever shard carries it. The note's "TWO CONTROLS" is
-  corrected to the count found. Observed by **AC9**.
+- **S5** — the replay rule DERIVES its own population by VERDICT, and types no count. The checker
+  under test reads every remote head via `ls-remote` on every run, so every remote-head difference
+  is READ by every later arm and a "which refs are read" scan cannot separate the boundaries that
+  matter from the ones that do not; the file's diff is non-empty at every region-two boundary. So:
+  for each boundary the cut produces, the shard that starts there is run WITH the existing
+  `SH_I = 2`-shaped replay (the text `REPLAY WHAT REGION ONE LEAVES`, generalised to that boundary's
+  observed ref state) and WITHOUT it, and the two `FAIL` sets are compared. **A replay is KEPT at
+  every boundary where removing it changes the shard's `FAIL` set, DROPPED where it does not, and
+  the build log records the verdict per boundary.** The three carriers — variables, functions,
+  refs — are all scanned per boundary and the scan is recorded, but the scan informs the replay's
+  CONTENT and never decides whether one is owed. **One real leak is fixed on the way:** the ref
+  pushed at the text `"$ahead:refs/heads/ahead"` is never deleted, because `reset_tree` clears only
+  `refs/remotes/` and `refs/replace/`; `reset_tree` gains the origin-side delete so a bare shard
+  starts from the state the whole run would have. Observed by **AC8**.
+- **S6** — the accumulation-dependent control gets a MECHANISM, not a placement, and the count it
+  asserts is DECLARED BY ITS BLOCK, not typed here. The population by the note's own key is ONE arm,
+  at the text `the tree is still clean after nine mutations`. Its block (the text `Nine branches,
+  nine arms` through that control) holds more than nine `reset_tree`-led cycles — arm 6b alone runs
+  three — and none is a `mutate()` call, so "nine" is the arm count and not the cycle count. The
+  block sets `MUT_EXPECTED` beside its first cycle and each `reset_tree`-led cycle in it increments
+  a process-local `MUT`; the control asserts `same "<label>" "$MUT" "$MUT_EXPECTED"` BEFORE calling
+  `run`. A control cut from its block reds at runtime; the correct unsharded run stays green because
+  the constant and the counter are both the block's own. The note's "TWO CONTROLS" is corrected to
+  the count found. Observed by **AC9**.
 
 ## 3. Non-goals (OUT)
 
@@ -177,9 +187,13 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
   a frozen clone with no other bar on the box (asserted by `ps` before the run and named in the
   record), the runner's own `SWEEP of N suite(s), width W (outer O, inner I)` line shows N = 8 and
   O ≥ 8, and the record carries: all eight shard walls, their max and mean, the longest wall, and the
-  two-shard longest wall taken at the SAME commit before S1 landed.
+  two-shard longest wall taken on the SAME frozen clone at this spec's BASE, before S1 landed,
+  as two concurrent direct invocations `check-unattended.test.sh --shard 1/2` and `--shard 2/2`
+  timed with `date +%s` — direct, because at BASE no shard row exists for the runner to pool and
+  the arity-2 contract does.
   `figure:` every number DERIVED from the two runs.
-  `fixture:` the eight rows via the substring filter the runner honours; the profile row.
+  `fixture:` the eight rows via the substring filter the runner honours; the profile row; the
+  two-shard reading needs no row.
   `cost:` per-row bound = shard budget × `sweep-ceiling-factor`; run wall = the runner's `SWEEP_WALL`
   over the eight rows, printed at start; no typed number.
   Red when: the longest eight-shard wall exceeds 20 minutes (the GOAL, sends the remainder to
@@ -190,19 +204,27 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
   called whole.
   Red when: eight-minus-one rows report green, or the sibling reds the join.
 - **AC6** — When the split lands, the `FAIL` set across the eight shards is identical to the
-  unsharded `FAIL` set at the same commit.
-  Red when: any `FAIL` line appears or disappears.
+  unsharded `FAIL` set at the same commit; and the unsharded run's floor-graded count equals the
+  pre-split unsharded count, so no `in_shard k` region went green by absence when the arity moved.
+  `cost:` one unsharded run plus eight sharded runs on the frozen clone.
+  Red when: any `FAIL` line appears or disappears, or the unsharded count fell.
 - **AC7** — When the eight rows are staged, `bash tools/check-install-prefix.sh` is green with the
   budgets-file count raised by hand and a fourth-column reason naming the eight literals.
   Red when: `ROSE`.
-- **AC8** — When S5's dump is taken at each boundary, the per-boundary diff is recorded; at every
-  boundary where it is non-empty, the replay is observed FAILING when removed (`--shard <i>/8` reds
-  with the consumer's merge conflicting); at every boundary where it is empty, the arm SKIPS naming
-  the boundary and that no ref differed.
-  Red when: a non-empty boundary's replay is absent, or a boundary is neither replayed nor named.
+- **AC8** — When each of the seven boundaries is run with and without its replay, the build log
+  carries the two `FAIL` sets per boundary and the verdict KEPT or DROPPED; every KEPT replay is one
+  whose removal changed the set, every DROPPED one is one whose removal did not, and
+  `check-unattended.test.sh --shard <i>/8` at each index runs green with the kept set in place. And
+  after `reset_tree`'s origin-side delete lands, `git ls-remote` on the fixture origin after a reset
+  names no `refs/heads/ahead`.
+  `cost:` fourteen shard runs, two per boundary, on the frozen clone.
+  Red when: a boundary has no recorded pair, a KEPT replay's removal did not move the set, a DROPPED
+  one's did, or the leaked ref survives a reset.
 - **AC9** — When the `still clean after nine mutations` control is separated from its counted block,
-  the shard carrying it REDS on `same "nine mutations ran in this process"`.
-  Red when: the separated control runs green.
+  the shard carrying it REDS on the `same` over `$MUT` against `$MUT_EXPECTED`; and the correct
+  unsharded run stays GREEN on the same assertion.
+  Red when: the separated control runs green, OR the unsharded run reds — which is a typed count
+  disagreeing with the block's own.
 - **AC10** — When any helper defined inside a region is called from a different shard,
   `check-unattended.test.sh --shard <i>/8` REDS with command-not-found; observed by hoisting all but
   one and running the shard that calls it.
@@ -233,6 +255,19 @@ move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-13 · §2 S1 · §2 S5 · §2 S6 · §6 AC4 · AC6 · AC8 · AC9 · base · folded spec-audit
+  round 3 (BLOCKED, 8 blocker rows, CONVERGING from 9, precision 0.42). Both blockers were the same
+  defect as round 2's: a figure typed where the build should derive it. S5's "exactly one non-empty
+  boundary" was false — the checker reads every remote head by `ls-remote` on every run, so the diff
+  is non-empty at every region-two boundary and a read-based rule cannot decide; the rule is now
+  VERDICT-based, each boundary run with and without its replay and the `FAIL` sets compared, and the
+  `refs/heads/ahead` leak that `reset_tree` never cleared is fixed. S6's "nine" was the arm count,
+  not the cycle count, and would have redded the correct unsharded run; the block now declares its
+  own expected count and the control asserts that. AC4's two readings "at the same commit" cannot
+  coexist across the arity change; the two-shard reading is two concurrent direct invocations at
+  BASE on the same clone. The hoist population is derived, not typed as 28. AC6 gains the
+  green-by-absence guard for `in_shard k > 8`. Base bumped to `0422ea2e`, since this unit consumes
+  `--pooled` and the old base predates it.
 - rev-4 · 2026-09-13 · §1 · §2 S1 through S6 · §3 · Edges · §4 · §5 · §6 AC1, AC3, AC4, AC8 through
   AC11 · §7 · F1 · F2 · §10 · folded spec-audit round 2 (BLOCKED, 9 blocker rows, precision 0.67).
   Three round-1 folds were half-right. `PROLOGUE_ARMS`: the floor-graded count EXCLUDES the C21 pair,
