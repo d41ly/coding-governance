@@ -1,10 +1,12 @@
 # TOOL-cSpliceWarden-1 — rotation becomes a DECLARED mode, and one semantics replaces two
 
-**Status:** SPECCED · rev-1 · 2026-09-12 · node c · Tier-2 · base 09a22d2b · streams tooling+playbook · order 1
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling+playbook · order 1 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md) | journal | TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5 |
 
 <!-- /gen:spec-records -->
 
@@ -178,6 +180,7 @@ mode; this repo declares `cut`.
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-2 · 2026-09-13 · §2 S3 S6 · §3 · §4 · AC4 AC5 — the key's readership stated as minimal rather than implied; the grading check moved OUT of scope and §3's promise that unit 3 supplies it removed with it; the parity direction and the CRLF trap written into §4; the kit version bump added as S6 after `check-kit-versions.sh` red on three unbumped markers
 
 ## 10. Reuse audit
 

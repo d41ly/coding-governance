@@ -1,10 +1,12 @@
 # TOOL-cSpliceWarden-5 — two rows filing one gap become one, and a false retirement is superseded
 
-**Status:** SPECCED · rev-1 · 2026-09-12 · node c · Tier-1 · base 09a22d2b · streams tooling · order 5
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-1 · base 09a22d2b · streams tooling · order 5 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md) | journal | TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 |
 
 <!-- /gen:spec-records -->
 
@@ -103,3 +105,4 @@ none.
 ## 8. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-2 · 2026-09-13 · §4 · AC2 — the disposition table rewritten as prose, because a foreign id in a leading table cell is a DEFINITION anchor and made this build a second claimant of another build's id

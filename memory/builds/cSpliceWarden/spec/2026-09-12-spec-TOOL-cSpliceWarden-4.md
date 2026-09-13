@@ -1,10 +1,12 @@
 # TOOL-cSpliceWarden-4 — the archive repair: superseded, evacuated, and fifteen rows re-homed
 
-**Status:** SPECCED · rev-1 · 2026-09-12 · node c · Tier-1 · base 09a22d2b · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-1 · base 09a22d2b · streams tooling · order 3 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md) | journal | TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-5 |
 
 <!-- /gen:spec-records -->
 
@@ -125,3 +127,4 @@ defect wearing the repair's clothes.
 ## 8. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-2 · 2026-09-13 · §4 · AC2 — the four-way partition and the (a)/(c) overlap written in after deriving it; AC2 given a backticked witness

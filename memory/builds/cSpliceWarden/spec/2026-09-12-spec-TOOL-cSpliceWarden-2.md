@@ -1,10 +1,12 @@
 # TOOL-cSpliceWarden-2 — hygiene check 10 reaches a backlog archive, and stops reporting a reassuring zero
 
-**Status:** SPECCED · rev-1 · 2026-09-12 · node c · Tier-2 · base 09a22d2b · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling · order 2 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md) | journal | TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5 |
 
 <!-- /gen:spec-records -->
 
@@ -132,6 +134,7 @@ none — the four defects are established by measurement and the remedy for each
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-2 · 2026-09-13 · §3 · §10 — the enumeration contract split into its shared ENUMERATION half and check-10-only RESOLUTION half, after the cross-reader arm proved the two readers had drifted; edges completed both ways
 
 ## 10. Reuse audit
 

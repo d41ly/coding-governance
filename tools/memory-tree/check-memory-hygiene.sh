@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.69   # gov:kit memory-tree@2.69 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.71   # gov:kit memory-tree@2.71 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -107,6 +107,9 @@ BUILD_SLUG_RE=""              # blank = ^[A-Za-z][A-Za-z0-9-]*$ ; must be anchor
 PROJECT_REGISTRY_EXTRA=""     # whitespace-separated extra filenames legal under <M>/project/
 RECORD_SERVES_CUTOFF=""       # blank = grade every record; else ISO date, records BEFORE it are exempt
 ENTRY_CAP_UNIT=""             # blank = today's locale-decided counting; or `chars` / `bytes`
+ROTATION_MODE=""              # blank = UNDECLARED; or `cut` / `snapshot`. PRESET for `set -u`: the
+                              # observability loop below reads it unguarded, so a conf predating the
+                              # key would abort the engine rather than run it.
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 : "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"   # see the declaration above: blank resolves forward, never off
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
@@ -167,10 +170,21 @@ case "${ENTRY_CAP_UNIT:-}" in
   ""|chars|bytes) ;;
   *) _cfgbad="$_cfgbad ENTRY_CAP_UNIT='$ENTRY_CAP_UNIT' (not one of: chars bytes)" ;;
 esac
+# ROTATION_MODE is a CLOSED set, validated the way ENTRY_CAP_UNIT is. Blank is UNDECLARED and passes:
+# an adopter conf predating the key must not red on a kit upgrade, and `adopt-memory-tree.sh` never
+# back-fills. An unrecognised value is a DIFFERENT answer from a blank one and must not collapse into
+# it, which is this block's own rule three keys up -- so `cut ` or `Cut` aborts rather than reading as
+# undeclared. NOTE what this does NOT do: nothing here, and nothing anywhere in this engine, asserts
+# that a tree actually HONOURS its declared mode. The value is validated and then read by nobody.
+# TOOL-cSpliceWarden-1, and the grading check is filed rather than built.
+case "${ROTATION_MODE:-}" in
+  ""|cut|snapshot) ;;
+  *) _cfgbad="$_cfgbad ROTATION_MODE='$ROTATION_MODE' (not one of: cut snapshot)" ;;
+esac
 [ -n "$_cfgbad" ] && { echo "HYGIENE — cannot run: project key(s) declared in .memory-tree.conf are unusable:$_cfgbad"; exit 2; }
 
 # OBSERVABILITY: a divergent configuration is visible without opening the conf.
-for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT; do
+for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT ROTATION_MODE; do
   eval "_dv=\${$_dk}"
   [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)"
 done
@@ -196,13 +210,32 @@ STAGED=0; [ "${1:-}" = "--staged" ] && STAGED=1
 status=0
 FILES=$(git ls-files "$M/")
 
-# --- PRINT MODES: this script OWNS two sets that a sibling gate needs, and a transcription of
-# --- either is the drift class the kit exists to remove. `corpus_ids.py` ASKS instead of copying.
+# --- PRINT MODES: this script OWNS three sets that a sibling gate needs, and a transcription of
+# --- any of them is the drift class the kit exists to remove. Siblings ASK instead of copying.
 # --- The dependency runs ONE WAY: these return before check 1, so nothing recurses back here.
 # --- The append-only set is check 2's exemption; the index set is check 6's byte-capped population.
 APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
+# A rotated archive: FLAT under archive/, named for the document it ROTATED — `DECISIONS` or a
+# DECLARED family — plus a date and an optional same-day disambiguator (two builds rotated to
+# 2026-08-17 and the second is the `b` one).
+#
+# THE TWO HALVES ARE A CONJUNCTION and each carries the other's weight. The date keeps a
+# family-named file that is not a rotation out; the stem keeps a dated file that is not a row
+# document out. Shipping the date half alone was caught by the cross-reader arm BEFORE it landed:
+# the shell selected a `NOTAFAMILY.<date>.md` fixture that the Python side correctly refused, which
+# is precisely the drift two copies of one rule produce.
+#
+# PRINTABLE because `row_grammar.py` enumerates the same set in Python for check 20, and two readers
+# of one rule are joined by an arm rather than by a promise. Check 10 adds RESOLUTION on top of this
+# — which live index should name the archive — and `row_docs` deliberately does not.
+#
+# The alternation is DERIVED from FAMILIES, never typed: a family added to the conf must join the id
+# grammar and this set together, or a rotated shard of it goes unscanned while its rows still key.
+_fam_alt=$(printf '%s\n' $FAMILIES | sed 's/^[^:]*://' | tr '\n' '|')
+ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|${_fam_alt%|})\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
+  --print-rotated-archive-ere) printf '%s\n' "$ROTATED_ARCHIVE_ERE"; exit 0 ;;
 esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
@@ -922,13 +955,52 @@ $over21"
 $proj21"
 fi
 
-# 10 — rotation note (always; cheap). FLAT (1.5): one archive at the memory root.
-bad10=$(printf '%s\n' "$FILES" | grep -E "^$M/archive/[^/]+\.[0-9]{4}-[0-9]{2}-[0-9]{2}\.md$" | while IFS= read -r a; do
-    base=${a##*/}; idx="$M/${base%%.*}.md"
-    [ -f "$idx" ] || continue
-    head -3 "$idx" | grep -qF "$base" || echo "$a (not referenced in lines 1-3 of $idx)"
+# 10 — rotation note (always; cheap). FLAT (1.5): one archive directory at the memory root.
+#
+# WHAT THIS CHECKS: that a rotated archive is ANNOUNCED by the index it was cut from. WHAT IT DOES
+# NOT: anything about the archive's CONTENTS. It does not read a row, a status or an id, so it is no
+# evidence that an archive holds what the declared ROTATION_MODE says it should — nothing in this
+# engine asserts that. A structural check reads as a semantic one to everybody who did not write it.
+#
+# THE LIVE INDEX IS RESOLVED BY BASENAME, anywhere under $M/ outside archive/ — not at the fixed path
+# `$M/<stem>.md`. TOOL-cTracedPromise-6 and TOOL-aBoundedVerdict-9 filed the same defect from two
+# angles: every backlog shard lives at `$M/backlog/<FAMILY>.md`, the old `[ -f ]` guard never found
+# one, and `continue` then exempted it in silence. MEASURED 2026-09-12 on this repo: of four rotated
+# archives the shipped check graded exactly ONE — DECISIONS, which happens to sit at the root — and
+# skipped all three TOOL cuts without a word. That is the reassuring-zero shape, on the check whose
+# whole job is catching a lost archive.
+#
+# TWO MORE, unfiled until TOOL-cSpliceWarden-2, and the second was found only by running the
+# candidate over the real tree before wiring it:
+#   * the name may carry a same-day DISAMBIGUATOR after the date — two builds rotated to 2026-08-17
+#     and the second is `TOOL.2026-08-17b.md` — and the old `<date>\.md$` anchor did not enumerate it.
+#   * the note is read from the index PREAMBLE, never a fixed `head -3`. This repo's own shard carries
+#     its rotation notes on lines 4 and 5, so widening the path resolution WITHOUT widening the window
+#     manufactures two false reds against notes that are plainly there. The preamble is the leading run
+#     of heading, blank and blockquote lines; rows begin at the first line that is none of those, so
+#     the window cannot swallow one and cannot be outgrown by a third rotation.
+#
+# A stem resolving to NONE, or to SEVERAL, is a named finding and never a `continue`: a skipped
+# archive prints exactly what a referenced one prints, which is how this check went inert. The
+# membership test is a shell string compare rather than a regex, because the stem is a filename and a
+# `+` or `*` in one would silently widen a `grep -E` predicate.
+#
+# The enumeration here and `ROTATED`/`row_docs` in row_grammar.py are two readers of ONE rule. They
+# are joined by an arm in the row-grammar self-test, not by this comment.
+bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= read -r a; do
+    base=${a##*/}; stem=${base%%.*}
+    idx=$(printf '%s\n' "$FILES" | grep -v "^$M/archive/" | while IFS= read -r f; do
+        [ "${f##*/}" = "$stem.md" ] && printf '%s\n' "$f"
+      done)
+    n10=$(printf '%s\n' "$idx" | grep -c .)
+    if [ "$n10" -ne 1 ]; then
+      echo "$a (stem '$stem' resolves to $n10 live index(es) named $stem.md under $M/, expected exactly 1:$(printf '%s\n' "$idx" | tr '\n' ' '))"
+      continue
+    fi
+    awk '/^[[:space:]]*$/ || /^#/ || /^>/ { print; next } { exit }' "$idx" |
+      grep -qF "$base" || echo "$a (not referenced in the preamble of $idx)"
   done)
-[ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index (lines 1-3):
+[ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index preamble:
 $bad10"
 
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).

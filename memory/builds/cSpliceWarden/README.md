@@ -4,7 +4,7 @@ node: c
 opened: 2026-09-12
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5
+ids: TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5 TOOL-cSpliceWarden-6 TOOL-cSpliceWarden-7 TOOL-cSpliceWarden-8
 ---
 
 # cSpliceWarden — the archive that contradicted itself, and the rotation nobody declared
@@ -118,22 +118,22 @@ duplicates today and 3 after the evacuation.
 - No figure in this build's prose is authored where a command can derive it.
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node c · opened 2026-09-12 · streams tooling+playbook
-ids TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5
+**Build status:** CLOSED · 5 unit(s) · node c · opened 2026-09-12 · streams tooling+playbook
+ids TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5 TOOL-cSpliceWarden-6 TOOL-cSpliceWarden-7 TOOL-cSpliceWarden-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cSpliceWarden-1 — rotation becomes a DECLARED mode, and one semantics replaces two](spec/2026-09-12-spec-TOOL-cSpliceWarden-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-12 |
-| [TOOL-cSpliceWarden-2 — hygiene check 10 reaches a backlog archive, and stops reporting a reassuring zero](spec/2026-09-12-spec-TOOL-cSpliceWarden-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-12 |
-| [TOOL-cSpliceWarden-4 — the archive repair: superseded, evacuated, and fifteen rows re-homed](spec/2026-09-12-spec-TOOL-cSpliceWarden-4.md) | 3 | 1 | SPECCED | rev-1 | 2026-09-12 |
-| [TOOL-cSpliceWarden-3 — hygiene check 20 scans a rotated backlog shard](spec/2026-09-12-spec-TOOL-cSpliceWarden-3.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-12 |
-| [TOOL-cSpliceWarden-5 — two rows filing one gap become one, and a false retirement is superseded](spec/2026-09-12-spec-TOOL-cSpliceWarden-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-09-12 |
+| [TOOL-cSpliceWarden-1 — rotation becomes a DECLARED mode, and one semantics replaces two](spec/2026-09-12-spec-TOOL-cSpliceWarden-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-13 |
+| [TOOL-cSpliceWarden-2 — hygiene check 10 reaches a backlog archive, and stops reporting a reassuring zero](spec/2026-09-12-spec-TOOL-cSpliceWarden-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-13 |
+| [TOOL-cSpliceWarden-4 — the archive repair: superseded, evacuated, and fifteen rows re-homed](spec/2026-09-12-spec-TOOL-cSpliceWarden-4.md) | 3 | 1 | CLOSED | rev-2 | 2026-09-13 |
+| [TOOL-cSpliceWarden-3 — hygiene check 20 scans a rotated backlog shard](spec/2026-09-12-spec-TOOL-cSpliceWarden-3.md) | 4 | 2 | CLOSED | rev-2 | 2026-09-13 |
+| [TOOL-cSpliceWarden-5 — two rows filing one gap become one, and a false retirement is superseded](spec/2026-09-12-spec-TOOL-cSpliceWarden-5.md) | 5 | 1 | CLOSED | rev-2 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5.
 <!-- /gen:build-index -->

@@ -101,6 +101,21 @@ def load_conf(root):
     return conf
 
 
+def declared_families(conf):
+    """The DECLARED family tokens. One derivation, read by `id_pattern` and by `row_docs`.
+
+    Lifted out when `row_docs` grew its second consumer: two copies of one split is the
+    two-answers-to-one-question class, and this one would have drifted silently — a family added to
+    the conf would have joined the id grammar and NOT the document set, so its rotated archive would
+    have gone unscanned while every row in it still keyed.
+    """
+    fams = [p.split(":")[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    if not fams:
+        raise Problem("row-grammar: FAMILIES is empty, so no row could be recognised and this check "
+                      "would pass by finding nothing")
+    return fams
+
+
 def id_pattern(conf):
     """Built from the DECLARED families, so this module and the index generator read one source.
 
@@ -109,10 +124,7 @@ def id_pattern(conf):
     this reason. The family alternation is declared in this kit's own conf, so both consumers derive
     from one declaration rather than one copying the other.
     """
-    fams = [p.split(":")[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
-    if not fams:
-        raise Problem("row-grammar: FAMILIES is empty, so no row could be recognised and this check "
-                      "would pass by finding nothing")
+    fams = declared_families(conf)
     # The sequence admits a REVISION SUFFIX (`-9b`), because a revision row is a row: it occupies a
     # line, carries a key and must survive a key-merge. This is deliberately WIDER than the roster
     # derivation in the index generator, which excludes the same shape — a roster answers "which ids
@@ -133,16 +145,47 @@ def id_pattern(conf):
 GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
 
 
-def row_docs(root, m):
-    """Every row-shaped document: the live index, the backlog shards, and the rotated archives."""
+# A rotated archive, by the name of the document it ROTATED: `<STEM>.<iso-date><suffix?>.md`, flat.
+# The date half and the STEM half are a conjunction and each carries the other's weight — the date
+# keeps a family-named file that is not a rotation out, the stem keeps a dated file that is not a row
+# document out. The optional trailing `[a-z0-9]*` is a same-day DISAMBIGUATOR: two builds rotated to
+# one date on 2026-08-17 and the second is `TOOL.2026-08-17b.md`. Shared with check 10 in
+# `check-memory-hygiene.sh`, which enumerates the same set in shell and is joined to this one by an
+# arm in the self-test rather than by a promise.
+ROTATED = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$")
+
+
+def row_docs(root, m, conf):
+    """Every row-shaped document: the live index, the backlog shards, and the rotated archives.
+
+    An archive is a ROTATION of one of those documents, so it is recognised by the name of the
+    document it rotated — `DECISIONS` or a DECLARED family. The first cut kept only the `DECISIONS.`
+    prefix, which left every rotated BACKLOG shard unscanned: measured at the widening, three files
+    and 161 rows, carrying two duplicated ids that had been invisible to the bar since the day the
+    archive holding them was written.
+
+    NOT "every .md under archive/". That sweeps in the frozen charter snapshots and the retired
+    ledger shards, which are prose. They contribute no keyed rows today, so the naive widening looks
+    harmless — measured, it moves the row count by nothing and the `loose` count by seven — but a
+    quoted example row inside one would red the `unkeyed` branch on a file nobody is permitted to
+    edit, and the only remedy would be to edit it.
+
+    The family set is DECLARED rather than derived from the tree, deliberately: resolving an
+    archive's stem against a live index would mean that deleting a shard silently removes its
+    archives from the scan, which is the vacuity class this module exists to avoid. Check 10 DOES
+    resolve, because its question is "which index should name this"; this one's question is "is this
+    a row document", and a declared answer cannot narrow behind your back.
+    """
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
+    stems = tuple(f"{x}." for x in ["DECISIONS"] + declared_families(conf))
     keep = []
     for p in tracked:
         base = os.path.basename(p)
         if p == f"{m}/DECISIONS.md" or p.startswith(f"{m}/backlog/"):
             keep.append(p)
-        elif p.startswith(f"{m}/archive/") and base.startswith("DECISIONS.") and base.endswith(".md"):
-            keep.append(p)
+        elif p.startswith(f"{m}/archive/") and "/" not in p[len(f"{m}/archive/"):]:
+            if base.startswith(stems) and ROTATED.search(base):
+                keep.append(p)
     return sorted(keep)
 
 
@@ -165,7 +208,7 @@ def scan(root, conf):
     rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + idre.pattern + r")\b")
     rows = loose = 0
     unkeyed, dupes, open_fences = [], [], []
-    for p in row_docs(root, m):
+    for p in row_docs(root, m, conf):
         seen = {}
         for n, line in unfenced_lines(read(os.path.join(root, p))):
             if line is None:          # the document ended inside a fence; n is where it opened
@@ -279,7 +322,7 @@ def cmd_emit_pin(root, conf):
 
 
 # ----------------------------------------------------------------------------------------- selftest
-def _tree(tmp, decisions, *, families="arch:ARCH", pin="0"):
+def _tree(tmp, decisions, *, families="arch:ARCH", pin="0", archives=None):
     run("git", "init", "-q", ".", cwd=tmp)
     run("git", "config", "user.email", "t@t.test", cwd=tmp)
     run("git", "config", "user.name", "t", cwd=tmp)
@@ -288,6 +331,14 @@ def _tree(tmp, decisions, *, families="arch:ARCH", pin="0"):
     os.makedirs(os.path.join(tmp, "memory", "backlog"), exist_ok=True)
     with open(os.path.join(tmp, "memory", "DECISIONS.md"), "w", encoding="utf-8") as fh:
         fh.write(decisions)
+    # ARCHIVES ARE WRITTEN BEFORE `git add -A`, and that ordering is load-bearing rather than tidy:
+    # `row_docs` enumerates through `git ls-files`, so a fixture staged afterwards is invisible and
+    # every arm over it would pass by finding nothing — this module's own vacuity class.
+    for name, body in (archives or {}).items():
+        dest = os.path.join(tmp, "memory", "archive", name)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        with open(dest, "w", encoding="utf-8") as fh:
+            fh.write(body)
     run("git", "add", "-A", cwd=tmp)
     run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=tmp)
     return load_conf(tmp)
@@ -400,6 +451,93 @@ def cmd_selftest():
             lambda: cap(t, c, cmd_report))
         arm("--emit-pin survives the return-shape change", f'{PIN_KEY}="0"',
             lambda: cap(t, c, cmd_emit_pin))
+
+        # THE WIDENING (TOOL-cSpliceWarden-3). The archive branch admitted a file only when its
+        # basename began `DECISIONS.`, so every rotated BACKLOG shard went unscanned — three of them
+        # in this kit's own dogfood repo, one carrying two duplicated ids past a green bar for a
+        # month. The duplicate below uses an id the live index does NOT carry, so a red can only have
+        # come from the archive file itself.
+        t10 = os.path.join(base, "archivedupe"); os.makedirs(t10)
+        c10 = _tree(t10, "- ARCH-tOne-1 · one\n",
+                    archives={"ARCH.2026-01-01.md": "- ARCH-tTwo-1 · a rotated row\n"
+                                                    "- ARCH-tTwo-1 · the same id again\n"})
+        arm("a duplicate inside a rotated BACKLOG archive is found, not skipped",
+            "two answers to one question", lambda: cap(t10, c10))
+        arm("the rotated backlog archive is named with its lines",
+            "memory/archive/ARCH.2026-01-01.md: ARCH-tTwo-1 at lines 1, 2", lambda: cap(t10, c10))
+
+        # THE SCOPE NEGATIVE, which is what pins the narrow predicate against the naive one. "Every
+        # .md under archive/" would sweep in frozen snapshots and retired shards; a quoted example
+        # row inside one would then red the unkeyed branch on a file nobody is permitted to edit, and
+        # the only remedy would be to edit it. Three shapes are refused here: a name with no date, a
+        # date whose stem is not a declared family, and a file nested below archive/.
+        t11 = os.path.join(base, "archivescope"); os.makedirs(t11)
+        c11 = _tree(t11, "- ARCH-tOne-1 · one\n",
+                    archives={"playbook-v-2-0.md": "- ARCH-tNope-1 · quoted in a frozen snapshot\n"
+                                                   "- ARCH-tNope-1 · and quoted twice\n",
+                              "NOTAFAMILY.2026-01-01.md": "- ARCH-tNope-2 · dated, wrong stem\n"
+                                                          "- ARCH-tNope-2 · twice\n",
+                              os.path.join("ledger", "a.md"): "- ARCH-tNope-3 · a retired shard\n"
+                                                              "- ARCH-tNope-3 · twice\n"})
+        arm("a frozen non-row file under archive/ is NOT scanned",
+            "row-grammar: clean", lambda: cap(t11, c11))
+
+        # THE TWO READERS OF ONE RULE. check 10 in check-memory-hygiene.sh enumerates the same set in
+        # shell; this module does it in Python. Neither can import the other, so the rule would be
+        # two copies free to drift — and the drift is silent in the worst direction, since a narrower
+        # Python side simply scans less and still prints a clean count. The shell PRINTS its ERE and
+        # this arm asserts the two agree over a tree holding one of every shape.
+        def _ask_shell(sh, cwd):
+            """The shell's own ERE, or None. Every candidate is RUN — being on PATH is not evidence.
+
+            On Windows `bash` resolves to the WSL launcher, which tries to boot a VM and returns
+            UTF-16 "the timeout period expired" at rc=1. That is the MS-Store-python3 shape one
+            interpreter over, and it is why this probes rather than assuming.
+            """
+            cands = [os.environ.get("GOV_BASH", ""), "bash",
+                     "C:/Program Files/Git/bin/bash.exe", "/bin/bash", "sh"]
+            for c in cands:
+                if not c:
+                    continue
+                try:
+                    r = subprocess.run([c, sh, "--print-rotated-archive-ere"], cwd=cwd,
+                                       capture_output=True, text=True, timeout=60)
+                except (OSError, subprocess.TimeoutExpired):
+                    continue
+                if r.returncode != 0:
+                    continue
+                out = [l for l in (r.stdout or "").strip().split("\n") if l.strip()]
+                # The print modes sit below an observability echo, so the ERE is the LAST line.
+                if out and out[-1].startswith("^"):
+                    return out[-1]
+            return None
+
+        def _joined():
+            sh = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check-memory-hygiene.sh")
+            if not os.path.isfile(sh):
+                return ("JOIN-OK SKIPPED — check-memory-hygiene.sh is not installed beside this "
+                        "module, so the two readers were NOT compared and nothing here asserts they "
+                        "agree")
+            ere = _ask_shell(sh, t11)
+            if ere is None:
+                return ("JOIN-OK SKIPPED — no candidate shell RAN `--print-rotated-archive-ere` on "
+                        "this node, so the two readers were NOT compared. Set GOV_BASH to a usable "
+                        "bash. This arm verifies nothing when it prints this line")
+            rx = re.compile(ere.replace("$M", "memory"))
+            tracked = [x for x in run("git", "ls-files", "--", "memory/", cwd=t11).split("\n") if x]
+            shell_set = sorted(x for x in tracked if rx.search(x))
+            py_set = sorted(x for x in row_docs(t11, "memory", c11) if x.startswith("memory/archive/"))
+            if shell_set != py_set:
+                return f"DISAGREE shell={shell_set} python={py_set}"
+            # Anti-vacuity: agreeing on two EMPTY sets is what a broken predicate on both sides also
+            # produces, and this fixture deliberately holds three archive-shaped files that must NOT
+            # be selected plus none that must, so the agreement has to be checked against a tree
+            # where the answer is known rather than merely equal.
+            if len(tracked) < 4:
+                return f"VACUOUS — the fixture held {len(tracked)} tracked files, too few to discriminate"
+            return f"JOIN-OK AGREE (both selected {len(py_set)} of {len(tracked)} tracked files)"
+        arm("check 10's shell enumeration and row_docs() select the same archives",
+            "JOIN-OK", _joined)
 
         # THE ARM THE FIRST CUT DID NOT HAVE. Every arm above passes an explicit root, so none of
         # them executes the resolver — which is exactly how this module shipped a review blocker:

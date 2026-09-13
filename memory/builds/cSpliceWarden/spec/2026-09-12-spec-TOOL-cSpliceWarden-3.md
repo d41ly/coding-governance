@@ -1,10 +1,12 @@
 # TOOL-cSpliceWarden-3 — hygiene check 20 scans a rotated backlog shard
 
-**Status:** SPECCED · rev-1 · 2026-09-12 · node c · Tier-2 · base 09a22d2b · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling · order 4 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md) | journal | TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-4 TOOL-cSpliceWarden-5 |
 
 <!-- /gen:spec-records -->
 
@@ -132,7 +134,7 @@ caused by our upgrade. That sentence goes in the kit README's upgrade note, whic
   Red when: one reader is edited and the other is not — the two-answers-to-one-question class this
   arm exists to convert into a red bar.
 - **AC5** — When `bash tools/memory-tree/check-verdict-epoch.sh` and
-  `python tools/codebase-map/map_check.py` run, both exit 0.
+  `python tools/codebase-map/test_codebase_map.py` run, both exit 0.
   Red when: the kit version did not bump for a behaviour-bearing delegate change, or `symbols.json`
   was not re-rendered for the changed signature.
 
@@ -157,6 +159,7 @@ New arm: `tools/memory-tree/row_grammar.py --selftest` · a rotated backlog arch
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-2 · 2026-09-13 · §2 S1 · §3 · AC5 — `<iso-date>` replaces a literal the placeholder check reads as an unfilled skeleton; the ungraded rotation mode recorded as §8 F1 and filed; AC5's invented `map_check.py` corrected to the real `test_codebase_map.py` after `check-spec-tokens.py` red on it
 
 ## 10. Reuse audit
 

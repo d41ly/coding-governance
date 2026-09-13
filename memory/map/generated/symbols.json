@@ -1163,6 +1163,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "declared_families",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "declared_in_kits_json",
       "kind": "function",
       "file": "tools/govkit/census.py"
