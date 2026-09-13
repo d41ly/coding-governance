@@ -236,7 +236,7 @@ APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
 # first added a SECOND derivation two lines up — two answers to one question, in the build that
 # added an arm to catch exactly that. One derivation, and every later consumer inherits its guards.
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)
-# REFUSED, not defaulted, and for the same two reasons `declared_families()` refuses on the Python
+# REFUSED, not defaulted, and for the same two reasons `derive_families()` refuses on the Python
 # side — one reader that raises and one that shrugs is the divergence this pair is built to avoid.
 # An EMPTY alternation renders `(DECISIONS|)`, whose empty branch widens the ERE; a token carrying an
 # ERE metacharacter renders e.g. `A+B`, which matches `AAB`. Python `re.escape`s each token, so the
@@ -991,9 +991,14 @@ fi
 #     and the second is `TOOL.2026-08-17b.md` — and the old `<date>\.md$` anchor did not enumerate it.
 #   * the note is read from the index PREAMBLE, never a fixed `head -3`. This repo's own shard carries
 #     its rotation notes on lines 4 and 5, so widening the path resolution WITHOUT widening the window
-#     manufactures two false reds against notes that are plainly there. The preamble is the leading run
-#     of heading, blank and blockquote lines; rows begin at the first line that is none of those, so
-#     the window cannot swallow one and cannot be outgrown by a third rotation.
+#     manufactures two false reds against notes that are plainly there.
+#     THE WINDOW IS A UNION, and it is deliberately not "the leading run of heading, blank and
+#     blockquote lines". That was the first cut and it was NARROWER than the `head -3` it replaced:
+#     an index whose line 2 is plain prose and whose note is on line 3 was accepted before and refused
+#     after — a widening that reds a tree which had been green. The window is everything before the
+#     first ROW, and never fewer than three lines. Strictly wider than both predecessors, so nothing
+#     that passed can start failing, and still bounded by the first row, so it cannot swallow one and
+#     cannot be outgrown by a third rotation.
 #
 # A stem resolving to NONE, or to SEVERAL, is a named finding and never a `continue`: a skipped
 # archive prints exactly what a referenced one prints, which is how this check went inert. The
@@ -1012,7 +1017,7 @@ bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= rea
       echo "$a (stem '$stem' resolves to $n10 live index(es) named $stem.md under $M/, expected exactly 1:$(printf '%s\n' "$idx" | tr '\n' ' '))"
       continue
     fi
-    awk '/^[[:space:]]*$/ || /^#/ || /^>/ { print; next } { exit }' "$idx" |
+    awk 'NR <= 3 { print; next } /^[[:space:]]*[-*][[:space:]]/ { exit } { print }' "$idx" |
       grep -qF "$base" || echo "$a (not referenced in the preamble of $idx)"
   done)
 [ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index preamble:

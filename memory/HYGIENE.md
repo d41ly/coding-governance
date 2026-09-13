@@ -185,7 +185,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no
    README, an unpaired generated-region marker, or two answers to its own status is a NAMED error.
    Pin the generated files `eol=lf` in `.gitattributes` — the gate byte-compares them.
-10. **rotation note** — every rotated `archive/<INDEX>.<date>.md` is referenced from lines 1–3 of its live index.
+10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved by BASENAME anywhere under the memory root rather than at
+    a fixed path; a stem resolving to zero or several live indexes is a NAMED finding, never a
+    skip. The reference is read from everything above the index's first row, and never fewer
+    than its first three lines. It grades ANNOUNCEMENT, never the archive's CONTENTS.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
     the gate fails if that tree ever regains a tracked file. Blank = skipped (fresh-scaffold projects).
 12. **spec format** — when `.memory-tree.conf` sets `SPEC_FORMAT_CUTOFF`, spec files dated ≥ it

@@ -101,7 +101,7 @@ def load_conf(root):
     return conf
 
 
-def declared_families(conf):
+def derive_families(conf):
     """The DECLARED family tokens. One derivation, read by `id_pattern` and by `row_docs`.
 
     Lifted out when `row_docs` grew its second consumer: two copies of one split is the
@@ -124,7 +124,7 @@ def id_pattern(conf):
     this reason. The family alternation is declared in this kit's own conf, so both consumers derive
     from one declaration rather than one copying the other.
     """
-    fams = declared_families(conf)
+    fams = derive_families(conf)
     # The sequence admits a REVISION SUFFIX (`-9b`), because a revision row is a row: it occupies a
     # line, carries a key and must survive a key-merge. This is deliberately WIDER than the roster
     # derivation in the index generator, which excludes the same shape — a roster answers "which ids
@@ -157,8 +157,8 @@ GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
 # readers of one rule that disagree on a real filename is the defect the cross-reader arm exists to
 # catch, and it missed this one because its fixture held no such name — so the fixture now does.
 # Built from the declared stems so it is the same conjunction the shell spells, in the same order.
-def rotated_re(conf):
-    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + declared_families(conf))
+def build_rotated_re(conf):
+    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + derive_families(conf))
     return re.compile(r"(?:" + stems + r")\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md\Z")
 
 
@@ -184,7 +184,7 @@ def row_docs(root, m, conf):
     a row document", and a declared answer cannot narrow behind your back.
     """
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
-    rot = rotated_re(conf)
+    rot = build_rotated_re(conf)
     keep = []
     for p in tracked:
         base = os.path.basename(p)
@@ -503,7 +503,7 @@ def cmd_selftest():
         # two copies free to drift — and the drift is silent in the worst direction, since a narrower
         # Python side simply scans less and still prints a clean count. The shell PRINTS its ERE and
         # this arm asserts the two agree over a tree holding one of every shape.
-        def _ask_shell(sh, cwd):
+        def resolve_shell_ere(sh, cwd):
             """The shell's own ERE, or None. Every candidate is RUN — being on PATH is not evidence.
 
             On Windows `bash` resolves to the WSL launcher, which tries to boot a VM and returns
@@ -528,13 +528,13 @@ def cmd_selftest():
                     return out[-1]
             return None
 
-        def _joined():
+        def check_readers_agree():
             sh = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check-memory-hygiene.sh")
             if not os.path.isfile(sh):
                 return ("JOIN-OK SKIPPED — check-memory-hygiene.sh is not installed beside this "
                         "module, so the two readers were NOT compared and nothing here asserts they "
                         "agree")
-            ere = _ask_shell(sh, t11)
+            ere = resolve_shell_ere(sh, t11)
             if ere is None:
                 # PRINTED, not merely returned. `arm()` prints the label alone on success, so a skip
                 # returned as a passing value is indistinguishable from a verified one — which is the
@@ -561,7 +561,7 @@ def cmd_selftest():
                         "discriminated")
             return f"JOIN-OK AGREE (both selected {sorted(py_set)} of {len(tracked)} tracked files)"
         arm("check 10's shell enumeration and row_docs() select the same archives",
-            "JOIN-OK", _joined)
+            "JOIN-OK", check_readers_agree)
 
         # THE ARM THE FIRST CUT DID NOT HAVE. Every arm above passes an explicit root, so none of
         # them executes the resolver — which is exactly how this module shipped a review blocker:
