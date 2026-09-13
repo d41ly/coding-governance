@@ -768,6 +768,51 @@ o=$(run_layout "$RO" scripts/workflows)
 has "PV-F3 a drifted protocol still reds in that install" "$o" "DRIFT"
 has "PV-F3 ...at exit 1" "$o" "rc=1"
 
+# ---- ROUND 2 R2-3: THE REGENERATE REFRESHES AN INSTALL, IT NEVER CREATES ONE. govkit runs the argv
+# ---- `kit.toml` declares on every update with GOVKIT_RERENDER=1, captures its output and prints one
+# ---- line, and rows nothing it writes. So a render mode that creates a missing live copy put a
+# ---- second review protocol into a consumer that keeps its own extract on purpose, and nothing named
+# ---- the file. The argv is read out of `kit.toml` and run exactly as declared, because a mode this
+# ---- arm chose for itself would pass while the descriptor still asked for the other one.
+
+RG="$LAY/regenerate"; build_layout "$RG" scripts/workflows scripts/unattended scripts/gotchas.py
+run_layout "$RG" scripts/workflows --render >/dev/null
+( cd "$RG" && git add scripts/workflows/unattended-build.js ) && rm -f "$RG/memory/guides/REVIEW-PROTOCOL.md"
+printf '// a stale render\n' >> "$RG/scripts/workflows/unattended-build.js"
+rg_argv=$(sed -n '/^\[\[regenerate\]\]/,/^argv/s/^argv = //p' "$HERE/kit.toml")
+rg_cmd=$(node -e 'console.log(JSON.parse(process.argv[1]).map(a => a.split("{kit}").join(process.argv[2])).join("\n"))' \
+           "$rg_argv" scripts/workflows 2>/dev/null)
+n=$((n+1))
+if [ -n "$rg_cmd" ]; then echo "ok   PV-R2-3 LIVENESS the regenerate argv was read out of kit.toml"
+else echo "FAIL PV-R2-3 LIVENESS no [[regenerate]] argv could be read out of $HERE/kit.toml, so the arms below grade nothing"; st=1; fi
+mapfile -t rg_words <<EOF
+$rg_cmd
+EOF
+o=$( (cd "$RG" && "${rg_words[@]}" 2>&1; echo "rc=$?") )
+has "PV-R2-3 the declared regenerate exits 0 over an install with no protocol copy" "$o" "rc=0"
+has "PV-R2-3 ...and still refreshes the harness this install tracks" "$o" "rendered scripts/workflows/unattended-build.js from"
+has "PV-R2-3 ...and names the pair it would not create" "$o" "SKIP memory/guides/REVIEW-PROTOCOL.md"
+absent_proto=yes; [ -e "$RG/memory/guides/REVIEW-PROTOCOL.md" ] && absent_proto=no
+same "PV-R2-3 ...and writes no protocol the install never had" "$absent_proto" "yes"
+hasnt_ "PV-R2-3 ...and the refreshed harness lost its stale line" "$(cat "$RG/scripts/workflows/unattended-build.js")" "a stale render"
+
+# The same mode in --check, which the runbook's migration runs once its first step is done: an absent
+# and untracked protocol is a named skip there too, and the harness it tracks is still graded.
+
+o=$( (cd "$RG" && bash scripts/workflows/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
+has "PV-R2-3 --check --tracked-only passes over the same install" "$o" "rc=0"
+has "PV-R2-3 ...naming the protocol it skipped" "$o" "SKIP memory/guides/REVIEW-PROTOCOL.md"
+has "PV-R2-3 ...and counting it in the green line" "$o" "1 pair(s) SKIPPED"
+printf '// drift\n' >> "$RG/scripts/workflows/unattended-build.js"
+o=$( (cd "$RG" && bash scripts/workflows/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
+has "PV-R2-3 ...and a drifted harness still reds under it" "$o" "DRIFT"
+
+# CREATION STAYS WITH THE HAND RENDER a fresh install runs, which the runbook's copy-install step
+# prescribes: without the flag, the same install gets the protocol it asks for.
+
+o=$(run_layout "$RG" scripts/workflows --render)
+has "PV-R2-3 the hand --render still creates a missing protocol" "$o" "rendered memory/guides/REVIEW-PROTOCOL.md from"
+
 # ---- AC5: the parity script catches what it exists to catch.
 cp "$FL/scripts/workflows/unattended-build.js" "$LAY/flat-render.js"
 # APPENDED rather than substituted. The first cut edited one path in place, and when the template it

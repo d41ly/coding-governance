@@ -4,6 +4,8 @@
 #
 #   bash tools/workflows/check-protocol-parity.test.sh            # assert parity
 #   bash tools/workflows/check-protocol-parity.test.sh --render    # (re)write every rendered copy
+#   ... --tracked-only    with either mode: SKIP, by name, a pair whose live copy is absent AND
+#                         untracked, so the run refreshes what this install holds and creates nothing
 #
 # WHY THIS KIT OWNS IT. `tools/memory-tree/kit-dogfood-parity.test.sh` does exactly this job for the
 # memory-tree kit's two documents, and the obvious move was to add a third pair to its list. That
@@ -18,9 +20,17 @@
 # checklist, the sub-workflow it awaits and the child it hands the caller. A workflow script has no
 # filesystem at run time, so it cannot derive those paths itself. Rendering at install is the one
 # derivation it can have, and the owner chose it on 2026-09-12 over having each caller pass the paths
-# in. `kit.toml` declares both pairs `rendered` and names `--render` as the entry's `[[regenerate]]`
-# argv, so an update run with GOVKIT_RERENDER=1 re-renders them. With GOVKIT_RERENDER unset
-# `update` re-renders nothing and says nothing about it, and this leg is what reds the stale copy.
+# in. `kit.toml` declares both pairs `rendered` and names `--render --tracked-only` as the entry's
+# `[[regenerate]]` argv, so an update run with GOVKIT_RERENDER=1 re-renders every pair this install
+# already holds. With GOVKIT_RERENDER unset `update` declines that block without printing anything
+# about it, yet it still prints each moved render's row as `re-rendered` although no render ran, and
+# this leg is what reds the stale copy.
+#
+# WHY THE REGENERATE CREATES NOTHING (round 2, R2-3). govkit runs that argv with its output captured,
+# prints one `ran` line, and rows nothing the argv writes. A render mode that created a missing live
+# copy therefore installed a second review protocol into a consumer that keeps its own extract on
+# purpose, and no line anywhere named the file. Creating a live copy is an install decision, so it
+# stays with the hand `--render` a fresh install runs; `--tracked-only` refreshes and skips out loud.
 #
 # THREE TOKENS, and each one is DERIVED here rather than typed:
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
@@ -40,11 +50,14 @@
 # suite, `unattended-build.test.sh`, holds the class arm that every path the harness emits is
 # tracked, and it is a kit self-test that no boundary runs.
 set -u
-MODE="${1:---check}"
-case "$MODE" in
-  --check|--render) ;;
-  *) echo "usage: $0 [--check|--render]"; exit 2 ;;
-esac
+MODE=--check; TRACKED_ONLY=0
+for _a in "$@"; do
+  case "$_a" in
+    --check|--render) MODE=$_a ;;
+    --tracked-only) TRACKED_ONLY=1 ;;
+    *) echo "usage: $0 [--check|--render] [--tracked-only]"; exit 2 ;;
+  esac
+done
 
 # THE KIT'S OWN LOCATION, BY A LOGICAL WALK TO THE NEAREST `.git`. This used to strip the repo root
 # off the kit dir as two path STRINGS, and under MSYS one directory has two spellings — git reports
@@ -159,11 +172,20 @@ fi
 
 TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
-bad=0; i=0; skipped=" "; nskip=0
+bad=0; i=0; skipped=" "; nskip=0; skipped_live=" "
 while IFS='|' read -r LIVE SHIP; do
   [ -n "$LIVE" ] || continue
   i=$((i+1))
   [ -f "$SHIP" ] || { echo "protocol-parity: missing shipped copy $SHIP"; bad=1; continue; }
+  # --tracked-only: A LIVE COPY THIS INSTALL NEVER TOOK IS NOT CREATED, and not graded either. Absent
+  # from the worktree AND from the index is the only case: a tracked copy somebody deleted is still
+  # this install's, and a present untracked one is somebody's render to refresh.
+  if [ "$TRACKED_ONLY" = 1 ] && [ ! -e "$LIVE" ] && ! check_tracked "$LIVE"; then
+    echo "protocol-parity: SKIP $LIVE — it is absent and untracked, and --tracked-only refreshes only"
+    echo "  what this install already holds, so this pair was neither rendered nor graded. To install"
+    echo "  it, run bash $KITREL/check-protocol-parity.test.sh --render and commit what it writes."
+    skipped="$skipped$i "; skipped_live="$skipped_live$LIVE "; nskip=$((nskip+1)); continue
+  fi
   # THE SKIP, per pair and out loud. It names what went ungraded and what would grade it, because a
   # skip that reads as a pass is indistinguishable from coverage.
   if [ -n "$MTD_SKIP" ] && grep -qF '{{MEMORY_TREE_DIR}}' "$SHIP"; then
@@ -171,7 +193,7 @@ while IFS='|' read -r LIVE SHIP; do
     echo "  $MTD_SKIP, so this pair was neither rendered nor graded$([ -f "$LIVE" ] && echo " (the live copy that exists was NOT checked)")."
     echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
     echo "  gotchas.py> and re-run. A guessed path is a checklist command that runs nothing."
-    skipped="$skipped$i "; nskip=$((nskip+1)); continue
+    skipped="$skipped$i "; skipped_live="$skipped_live$LIVE "; nskip=$((nskip+1)); continue
   fi
   if ! render "$SHIP" > "$TMPD/$i"; then
     echo "protocol-parity: the render of $SHIP FAILED — the template could not be read"; bad=1; continue
@@ -242,8 +264,16 @@ LIVE="$M/guides/REVIEW-PROTOCOL.md"
 # resolver, never that the named file resolves anything. The second half — that the pointed-at
 # carrier is one the hook actually reads — belongs to the commit that makes the hook read it, and no
 # such commit exists yet.
-_p_bad=0
-for _sec in 'The hard cap' 'Concurrency'; do
+#
+# A PROTOCOL PAIR --tracked-only SKIPPED has no live copy to read, and this arm says so rather than
+# redding an install that never took the document or passing by reading nothing.
+_p_bad=0; _secs='The hard cap
+Concurrency'
+case "$skipped_live" in
+  *" $LIVE "*) echo "protocol-parity: the pointer arm over $LIVE did NOT run — that pair was skipped above"; _secs="" ;;
+esac
+while IFS= read -r _sec; do
+  [ -n "$_sec" ] || continue
   # `next` DROPS the heading from the body. Without it this arm graded the heading line, and both
   # headings already contain the literal `agent-cap.js` -- so `grep -qF` passed on the heading no
   # matter what the body said, and the arm could not detect the body losing its pointer. A predicate
@@ -257,10 +287,12 @@ for _sec in 'The hard cap' 'Concurrency'; do
   fi
   printf '%s\n' "$_body" | grep -qF 'agent-cap.js' \
     || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected 'agent-cap.js' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
-done
+done <<EOF
+$_secs
+EOF
 [ "$_p_bad" = 0 ] || exit 1
 if [ "$nskip" -gt 0 ]; then
-  echo "protocol-parity: in parity — $((i-nskip)) rendered pair(s) match their templates for '$KITREL'; $nskip pair(s) SKIPPED (MEMORY_TREE_DIR unresolved)"
+  echo "protocol-parity: in parity — $((i-nskip)) rendered pair(s) match their templates for '$KITREL'; $nskip pair(s) SKIPPED, each named above"
 else
   echo "protocol-parity: in parity — $i rendered pair(s) match their templates for '$KITREL' (MEMORY_TREE_DIR '$MTD')"
 fi

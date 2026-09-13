@@ -5,7 +5,7 @@ opened: 2026-09-12
 streams: tooling+deployer
 roster: TOOL+DEPL
 authorized-by: prompt
-ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12
+ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13
 ---
 
 # dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
@@ -23,7 +23,8 @@ the same checklist path, and it breaks the same way.
 
 - The harness names files the installing tree actually has, at any prefix and any memory-tree layout.
 - One kit release fixes both adopters, with no hand-repath and no untagged delta.
-- A missing checklist script is a refusal at render time, never a command that runs nothing.
+- A missing checklist script is never a command that runs nothing. The unattended adopter refuses
+  there, and the parity script skips, by name, only the pair that needs the script.
 
 ## Detriments if this is not built
 
@@ -33,7 +34,8 @@ the same checklist path, and it breaks the same way.
 ## Build-level rules
 
 - **Derive, never guess.** The checklist's directory is probed from the tracked tree. A path nobody
-  has proved exists is a refusal that names the override.
+  has proved exists is never rendered: the unattended adopter refuses, the parity script skips that
+  pair out loud, and both name the override.
 - **Every new arm is observed red before it lands.** HEAD's verbatim harness is the staged break.
 - **Consumers are not touched here.** Core and NicoCares re-pull this release later, and their own
   records carry that.
@@ -46,7 +48,9 @@ the same checklist path, and it breaks the same way.
   recognises by name. The agent resolved it under the brief; `TOOL-aWeldedTribunal-12` keeps the
   underlying tension, every conforming harness costing two offenders, for the owner.
 - **`update` still keeps a schema-3 receipt's `engine` role** when a kit makes that destination
-  `rendered`. Round 1 repaired it for this release by a fixture-verified consumer migration.
+  `rendered`. Round 1 repaired it for this release by a consumer migration, and round 2 found that
+  migration wedged at core's commit-time receipt check; rev-7's two runbook blocks are what the
+  govkit selftest now runs, verbatim, on a hooked and `adopt`-bootstrapped fixture.
   `DEPL-dPolishedVitrine-1` holds the govkit move, whose blast radius is the owner's to rule on.
 
 <!-- roster:units -->
@@ -60,15 +64,15 @@ the same checklist path, and it breaks the same way.
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
 ids DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
-ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12
+ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-6 | 2026-09-12 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-7 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

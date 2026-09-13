@@ -1979,11 +1979,24 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          the real tree before it was wired: four hits in the review-harness kit, the four the
     #          review named, one in the unattended descriptor it did not, and no near-miss that was a
     #          claim.
+    #
+    #          THE NEGATIVE HALF, from round 2's R2-7. Naming the flag is not enough when the sentence
+    #          then says the flag-off run is SILENT. It is not: the verdict loop relabels a moved
+    #          template's `rendered` row `re-rendered` and prints it before the flag is read, so a
+    #          flag-off update prints `re-rendered` over a render nothing ran. Three carriers said
+    #          "prints nothing" beside that line, and a reader takes the line as proof. So a sentence
+    #          naming `update`, the flag, and a silence word has to name the `re-rendered` line it
+    #          still prints. Probed over the real tree first: three hits, all in the review-harness
+    #          kit, the three the review named plus the descriptor sentence it offered as the model,
+    #          and no near-miss.
     _rr_lead = re.compile(r"^\s*(#+|//+|\*+|>+|-\s)?\s?")
     _rr_split = re.compile(r"(?<=[.!?])\s+(?=[A-Z`(\"'*_])")
     _rr_update = re.compile(r"\bupdate\b", re.I)
     _rr_claim = re.compile(r"re-?render|regenerat|re-runs? the render|vintage stale", re.I)
-    n_rr_kits = n_rr_claims = 0
+    _rr_flag = re.compile(r"GOVKIT_RERENDER|\bflag\b")
+    _rr_silent = re.compile(r"\b(?:prints?|says?|outputs?|reports?)\s+nothing\b|without\s+printing"
+                            r"|\bin\s+silence\b|\bsilent(?:ly)?\b|\bno\s+output\b", re.I)
+    n_rr_kits = n_rr_claims = n_rr_silent = 0
     for eid, (d, dpath) in descs.items():
         if not d.get("regenerate"):
             continue
@@ -2007,7 +2020,16 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                     _sents += _rr_split.split(" ".join(_para))
                     _para = []
             for _s in _sents:
-                if not (_rr_update.search(_s) and _rr_claim.search(_s)):
+                if not _rr_update.search(_s):
+                    continue
+                if _rr_flag.search(_s) and _rr_silent.search(_s):
+                    n_rr_silent += 1
+                    if "re-rendered" not in _s:
+                        r.fail(f"'{_f}' (kit '{eid}', which declares [[regenerate]]) says a "
+                               f"flag-off `update` is silent, and it is not: it still prints the "
+                               f"row as `re-rendered` while no render ran. Say so in the same "
+                               f"sentence: {_s[:200]}")
+                if not _rr_claim.search(_s):
                     continue
                 n_rr_claims += 1
                 if "GOVKIT_RERENDER" not in _s:
@@ -2015,8 +2037,9 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                            f"re-renders without naming GOVKIT_RERENDER in the same sentence, and "
                            f"with that flag unset `update` declines the regenerate in silence: "
                            f"{_s[:200]}")
-    r.note(f"re-render claims: {n_rr_claims} sentence(s) naming `update` and a re-render, across "
-           f"{n_rr_kits} kit(s) declaring [[regenerate]]")
+    r.note(f"re-render claims: {n_rr_claims} sentence(s) naming `update` and a re-render, and "
+           f"{n_rr_silent} calling a flag-off run silent, across {n_rr_kits} kit(s) declaring "
+           f"[[regenerate]]")
 
     # ---- 8: the SURFACE predicate, both directions (spec S12). This is the arm that stops a
     #         population claim going stale, and the one place a count is derived rather than spelled.

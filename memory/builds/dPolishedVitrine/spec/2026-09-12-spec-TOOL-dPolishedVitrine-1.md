@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-6 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-7 · 2026-09-13 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md](../build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md) | journal | — |
 | [2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md](../prompts/2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md) | journal | — |
 | [2026-09-12-review-TOOL-dPolishedVitrine-1-diff-review-round1.md](../reviews/2026-09-12-review-TOOL-dPolishedVitrine-1-diff-review-round1.md) | diff-review | — |
+| [2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round2.md](../reviews/2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round2.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
@@ -32,10 +33,12 @@ Skill's copy of the same checklist line is fixed the same way.
   script's `--render`. `why_no_adopter` names both renders. Observed by AC1 and AC7; what `govkit
   update` does with the block in a consumer is NOT OBSERVED, because no consumer is re-pulled here.
 - **S3** — `tools/workflows/check-protocol-parity.test.sh` grades a PAIR LIST rather than one pair.
-  It fills `{{KIT_DIR}}`, probes `{{MEMORY_TREE_DIR}}` and refuses when the probe finds nothing, and
-  its `--render` creates a missing live copy. A template in the kit dir with no pair is a red. The
-  kit dir is found by the logical walk to `.git` instead of a string strip. Observed by AC1, AC3,
-  AC4 and AC5.
+  It fills `{{KIT_DIR}}` and probes `{{MEMORY_TREE_DIR}}`. When the probe finds nothing it skips, by
+  name, only the pair whose template carries that token, and an override naming nothing tracked is
+  refused. Its `--render` creates a missing live copy, and `--tracked-only`, which the regenerate
+  passes, skips one that is absent and untracked instead (rev-7). A template in the kit dir with no
+  pair is a red. The kit dir is found by the logical walk to `.git` instead of a string strip.
+  Observed by AC1, AC3, AC4, AC5 and AC19.
 - **S4** — the unattended kit. `SKILL.template.md`'s checklist line takes `{{MEMORY_TREE_DIR}}`, and
   `adopt-unattended.sh` gains the same probe, refusal and override. `tools/unattended/kit.toml`
   declares the placeholder and a `[[regenerate]]` block running the adopter. `cross-component.test.sh`
@@ -60,6 +63,14 @@ Skill's copy of the same checklist line is fixed the same way.
   The parity script resolves `MEMORY_TREE_DIR` per pair, so an unanswered probe skips only the pair
   that needs it. The parity leg is unguarded in both carriers. The runbook's Maintenance section and
   the kit README carry the consumer migration. Observed by AC4, AC13, AC14, AC15 and AC16.
+- **S9** — round 2's repairs, rev-7. The runbook's migration becomes two blocks the govkit selftest
+  cuts out of `WIRE-INTO-PROJECT.md` and runs: block 1 stops on update's exit code, commits only
+  update's own writes with the receipt, derives the pins from `plan`, and checks a read-only re-adopt
+  that counts the rows it leaves unattributed; block 2 re-adopts, commits the renders with the
+  receipt, and re-adopts once more. The `[-PV]` arms run it on an `adopt`-bootstrapped fixture with
+  a receipt hook, over this repo's real parity script. The parity script gains `--tracked-only` and
+  the regenerate argv passes it. Selfcheck arm 7l gains its negative half, and three carriers stop
+  calling a flag-off update silent. Observed by AC13, AC17, AC18, AC19 and AC20.
 
 ## 3. Non-goals (OUT)
 
@@ -77,7 +88,10 @@ Skill's copy of the same checklist line is fixed the same way.
   landing now precedes the regenerate; S8 lists the rest. `update` still does NOT re-resolve a row's
   role at schema 3. That durable repair reaches every row whose descriptor role moved, including the
   self-tests `TOOL-aQuenchedHarness-3` withheld, so it waits for its own spec as
-  `DEPL-dPolishedVitrine-1`, and the consumer migration in §4 Rollout stands in for it. There is
+  `DEPL-dPolishedVitrine-1`, and the consumer migration in §4 Rollout stands in for it. rev-7 adds
+  the negative half of selfcheck arm 7l and changes no verb; a withheld-stamp message naming the
+  pinned re-adopt, and govkit reporting a file a regenerate created, are round 2's two govkit
+  improvements, carried by `DEPL-dPolishedVitrine-1` and `DEPL-dPolishedVitrine-2`. There is
   still no write-time relocate of engine bodies. `govkit.py` calls its carry derivation a proof
   instrument, not a write-time transform, and a relocate would mis-carry the checklist line anyway
   (§4 Alternatives rejected).
@@ -97,12 +111,11 @@ Skill's copy of the same checklist line is fixed the same way.
   probed spellings, or named by the override, before the harness renders. The parity script still
   renders the protocol without it, and the unattended adopter refuses without it.
 - **hands-off** external — the consumer re-pulls by the runbook's migration, not by `update` alone.
-  On govkit 1.11 or later: `update --write` with `GOVKIT_RERENDER=1`, commit, then
-  `adopt --re-adopt --write` with one `--pin` per tracked receipt row, each at the row's recorded
-  commit or, for a `rendered` row recording none, at the new vintage, then commit. §4 Rollout says why
-  each step is there. The hand-off also covers NicoCares carrying its cap carve-out into the template
-  between the update and its commit, retiring core's untagged Skill delta and NicoCares' untagged
-  driver delta, and adding the parity leg core lacks.
+  On govkit 1.11 or later it runs the runbook's two blocks, verbatim, and reads block 1's FLAG lines
+  between them. §4 Rollout says why each step is there (rev-7; rev-5's sequence wedged at core's
+  commit-time receipt check). The hand-off also covers NicoCares carrying its cap carve-out into the
+  template after block 2, retiring core's untagged Skill delta and NicoCares' untagged driver delta,
+  and adding the parity leg core lacks.
 
 ## 4. Design
 
@@ -207,20 +220,45 @@ render stays tracked at its old path, because this repo runs its own harness.
 That last fact is why `update` alone cannot migrate a consumer (rev-5, round 1 F1). Both consumer
 receipts are schema 3 and row the harness as `engine`. `update` takes a row's role from the receipt,
 and gov still tracks the source, so the raw arm writes gov's own `tools/`-spelled render. So the
-consumer migrates in two moves, verified on a fixture installed at 24f8c712, prefix `scripts`, with
-memory-tree flat:
+consumer migrates by the runbook's two blocks, on govkit 1.11 or later (rev-7, round 2):
 
-1. `update --write` with `GOVKIT_RERENDER=1` on govkit 1.11 or later. The template lands as an
-   unclaimed source, and then both `[[regenerate]]` blocks render. Then commit.
-2. `adopt --re-adopt --write`, which is the only verb that re-reads a role from the descriptor, so
-   the harness row becomes `rendered`. It re-measures EVERY row, so it takes one `--pin` per tracked
-   row: the row's recorded commit, or the new vintage for a `rendered` row that records none. Then
-   commit. Unpinned, a row with a local edit and every render come back `unattributed`, and every
-   later `update` then withholds its re-stamp. That was measured on the same fixture.
+1. Block 1 runs `update --write` with `GOVKIT_RERENDER=1`: the template lands as an unclaimed
+   source, and then every `[[regenerate]]` block renders. It STOPS unless update exits 0 with no
+   conflict, the review-harness regenerate exits 0, and the parity check grades the harness green
+   under `--tracked-only`. A conflicted three-way leaves the row at its old commit while the
+   regenerate still runs, so the parity check alone would pass it (R2-6).
+2. It commits update's own writes with the receipt that records them, and nothing the regenerate
+   wrote. Until the re-adopt the row is still `engine`, so a commit-time check comparing staged
+   engine blobs with the receipt reds the re-rendered harness, and the re-adopt refuses a staged
+   tree (R2-1). The regenerate's changes to tracked files are recorded by name; a file it created is
+   flagged and never staged (R2-3).
+3. It derives the pins. A tracked row that records a commit, and that the plan still resolves, is
+   pinned to that commit. A tracked destination that `plan` at the new vintage resolves as
+   `rendered` is pinned to that vintage when its kit's regenerate ran at exit 0, and left unpinned
+   otherwise, so a declined render is never recorded as current (R2-2). The rendered set comes from
+   the plan, not the receipt, because a receipt `adopt` bootstrapped never rows a destination
+   tracked after it was written (R2-5), and a rendered destination is never pinned to a recorded
+   commit (R2-6).
+4. It runs the re-adopt READ-ONLY and checks it. Every row new to the receipt is flagged, every row
+   left `unattributed` is flagged with its reason, a row that loses a recorded base stops the block,
+   and the last line counts the unattributed rows.
+5. Block 2 runs `adopt --re-adopt --write` with the pins, which is the only verb that re-reads a role
+   from the descriptor, so the harness row becomes `rendered`. It stages the recorded renders with
+   the receipt and commits, which the receipt check exempts, because the rows are now `rendered`.
+6. It re-adopts once more with the same pins, because step 5 read each render's identity from the
+   index before the render was staged, and commits the receipt. The end state asserted is the one
+   where the receipt's `oid` is the committed render's blob.
 
-With `GOVKIT_RERENDER` unset, `update` runs neither regenerate and prints nothing about it. The
-review-harness renders are then left stale in silence, and the parity leg reds them at the next bar.
-The unattended kit is worse off. Its template lands, its Skill is left stale, and its own post-write
+Done is: the harness row `rendered` and `pinned`, and the next `update --write` writes nothing to it
+and either re-stamps or withholds the stamp over exactly the rows step 4 counted (R2-4). At both
+consumers it withholds, because each carries rows that were unattributed before. That message
+suggests the bare `adopt --re-adopt --write`, which drops every pin, so the runbook says to re-run
+block 2 instead; making the message name the pinned form is `DEPL-dPolishedVitrine-1`'s.
+
+With `GOVKIT_RERENDER` unset, `update` declines both regenerates without printing a line naming
+them, yet it still prints each moved render's row as `re-rendered` although no render ran (R2-7).
+The review-harness renders are then left stale, and the parity leg reds them at the next bar. The
+unattended kit is worse off. Its template lands, its Skill is left stale, and its own post-write
 check rolls the kit back, which is the 2026-09-11 NicoCares event. That was read from the code, not
 run.
 
@@ -251,17 +289,19 @@ review-harnesses dossier, the generated map, and this build's records.
 - perf / scale — one bash parameter substitution per token over a 58 KB template, plus one
   `git ls-files` per probe rung. The parity leg's cost moves by well under a second.
 - error / empty / loading states — an empty render, an unreadable template, a surviving placeholder,
-  an unpaired template, a missing live copy and a failed probe each have their own refusal. None of
-  them writes anything.
+  an unpaired template and a missing live copy under `--check` each have their own refusal, and none
+  of them writes anything. An unanswered probe is not one of them: it skips, by name, only the pair
+  whose template needs the answer, and an override naming nothing tracked is the refusal (rev-7).
 - observability — the parity leg's green line names the pair count and the probed directory, so a
   reader can see which checklist spelling a tree derived.
 - risks — `MEMORY_TREE_DIR` and the driver path assume the kit layouts measured today. The first is
-  probed and refused, and the second is not, as §3 states. The lexicon pin rises by two, because the
+  probed, with its pair skipped out loud when the probe finds nothing and a misplaced override
+  refused, and the second is not probed at all, as §3 states. The lexicon pin rises by two, because the
   template repeats two helper names that `agent-cap.js` recognises by name.
 - testing — five harness fixtures, two negative controls, three parity refusals, and four adopter
   arms. Every new arm is observed red before the fix, and the journal records it.
 - migration — none in gov: its render is byte-identical at every code line. Consumers migrate by
-  the two moves in §4 Rollout, handed off in §3, and not by `update` alone.
+  the runbook's two blocks in §4 Rollout, handed off in §3, and not by `update` alone.
 - user docs — N/A as a `help/` tree, which this repo does not ship. The runbook's copy-install step
   and both kit READMEs are the agent-facing docs, and S7 updates them.
 
@@ -339,8 +379,9 @@ review-harnesses dossier, the generated map, and this build's records.
 - **AC13** — When a target installed at vintage A rows a kit's file as `engine`, and gov's vintage B
   claims that destination `rendered` while still tracking the file, the §4 Rollout migration leaves
   the row `rendered` with the destination holding the target's render. An edited row keeps its
-  recorded base, and the next `update` writes nothing and re-stamps. The govkit selftest's `[-PV] F1`
-  arms run it, with an unpinned control.
+  recorded base, and the next `update` writes nothing to the harness and either re-stamps or
+  withholds its stamp over exactly the rows the migration's check counted (rev-7). The govkit
+  selftest's `[-PV] F1` arms run the runbook's own blocks, with an unpinned control.
   Red when: `update` alone is taken for the migration, so the row stays `engine` over gov's bytes; or
   the pins are dropped, so a render or an edited row comes back `unattributed`.
 - **AC14** — When the introducing update of such a kit runs with `GOVKIT_RERENDER=1`, its
@@ -358,6 +399,35 @@ review-harnesses dossier, the generated map, and this build's records.
   `GOVKIT_RERENDER`.
   Red when: a carrier promises a re-render the flag-off run does not perform, and selfcheck stays
   green.
+- **AC17** — When the runbook's two blocks, cut from `WIRE-INTO-PROJECT.md`, run on a target whose
+  pre-commit refuses a staged engine blob its receipt does not record, every commit they make lands,
+  and the tree ends clean. The govkit selftest's `[-PV] R2-1` arms run them on an `apply`-built and
+  an `adopt`-bootstrapped target, and a LIVENESS arm shows the hook refusing an engine edit.
+  Red when: block 1 stages the regenerated harness before the re-adopt, as rev-5's `git add -A` did,
+  and the hook refuses the commit.
+- **AC18** — When the migration runs on a receipt `adopt` bootstrapped, holding rows unattributed
+  before it, a render from a kit with no regenerate, and two tracked destinations it never rowed,
+  the pins cover every tracked destination the plan renders whose kit regenerated, at the new
+  vintage and never at an older commit; the declined render is left unpinned and the next update
+  grades it `re-rendered`; block 1 flags both new destinations and counts the unattributed rows, and
+  the next update withholds its stamp over exactly that count. A conflicted step 1 stops the block
+  before its commit, with no pin derived. The `[-PV] R2-2`, `R2-4`, `R2-5` and `R2-6` arms run it.
+  Red when: the pins come from the receipt, as rev-5's rule took them; the declined render is pinned
+  and graded `patched`; the check is blind to rows new to the receipt; or step 1 carries on past
+  update's exit 1.
+- **AC19** — When the regenerate argv `tools/workflows/kit.toml` declares runs over an install that
+  tracks the harness and has no protocol copy, it refreshes the harness, writes no protocol, and
+  names the pair it skipped; `--check --tracked-only` passes over the same install and still reds a
+  drifted harness; and a hand `--render` still creates the protocol. The `PV-R2-3` arms in
+  `tools/workflows/unattended-build.test.sh` read that argv out of the descriptor, and a `[-PV]`
+  arm runs it through `update`.
+  Red when: the declared argv creates a live copy the install never had.
+- **AC20** — When a kit declares `[[regenerate]]`, `govkit selfcheck` reds a sentence in its tracked
+  files or descriptor that names `update`, the flag and a silence word without naming the
+  `re-rendered` line a flag-off update still prints. And a flag-off `update` over a moved template
+  prints that line while no render runs, which the `[-PV] R2-7` arms pin.
+  Red when: a carrier says a flag-off update prints nothing and selfcheck stays green, or the
+  printed line changes and no arm notices.
 
 ## 7. Gates
 
@@ -374,6 +444,9 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · a seed tracking no gotch
 New arm: `tools/govkit/selftest.py` · the old hand-off, HEAD's engine order, a no-rollback promise · none
 New arm: `tools/govkit/govkit.py` · the five carriers round 1 named, unfixed · none
 New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only install · none
+New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv without `--tracked-only` · none
+New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a relabelled flag-off verdict · none
+New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off update silent · none
 
 ## 8. Open questions
 
@@ -428,6 +501,24 @@ New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only ins
   its own unattended 1.19 for other content, and the two version lines merged byte for byte, so
   the merge takes unattended to 1.20 at every carrier the version gate reads and at the kit
   README's marker. AC10 now names 1.20, and govkit's 1.11 from rev-5 as well.
+- rev-7 · 2026-09-13 · S3 · S9 · §3 · §4 · §5 · AC13 · AC17–AC20 · §7 · AMENDED by the round-2
+  Tier-2 diff review, verdict BLOCKED on round 1's F1 still open at core, with eight defects in all.
+  §4 Rollout is replaced by the runbook's two blocks, because rev-5's step-1 `git add -A` staged the
+  regenerated harness while its row was still `engine`, core's commit-time receipt check refused
+  it, and the re-adopt that would clear it refuses a staged tree (R2-1). The pins now come from
+  `plan` and from each kit's regenerate, not from the receipt (R2-2, R2-5, R2-6); step 1 stops on
+  update's exit code (R2-6); Done names the count block 1's check prints (R2-4). The regenerate argv
+  passes `--tracked-only` (R2-3). Selfcheck arm 7l gains its negative half, and the flag-off
+  sentences say the row still prints `re-rendered` (R2-7). S9 and AC17 to AC20 carry them. R2-8 is
+  this rev's S3, §5 and build-README text, and its Check is this list of every `refus` clause that
+  `grep -n` returns over the spec and the README, each with its disposition: S3 (:35) AMENDED to the
+  per-pair skip; §5 error states and risks AMENDED; README "A missing checklist script" and "A path
+  nobody has proved exists" AMENDED; KEPT, because each is true as written: S4's adopter refusal,
+  §3's unbuilt driver-path refusal, §3 Edges' adopter refusal, the "probe and its refusal" section's
+  heading and its override and charset refusals, the parity script's surviving-placeholder refusal,
+  §4's history of the string strip, the adopter's `AUTH_PARAM` and `no-project-layer` refusals, §5
+  security's override refusal, §5 testing's three parity refusals, AC8, AC15's red-when, rev-5's log
+  line, and §10's probe-and-refuse provenance.
 
 ## 10. Reuse audit
 

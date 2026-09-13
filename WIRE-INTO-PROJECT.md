@@ -996,59 +996,217 @@ row as an engine file, and a correct render reads as a local edit. This needs go
 which lands a new template BEFORE it re-renders; an older govkit refuses the render with
 `missing shipped copy`.
 
-The sequence that converges, from `<project>`'s root with `<gov>` checked out at the vintage you are
-moving to:
+**The migration is two blocks, with a reading step between them.** Set three variables in the shell
+you run them from, at `<project>`'s root:
 
 ```bash
-# 1. Move forward and re-render. The template lands, then the harness is rendered from it.
-GOVKIT_RERENDER=1 python <gov>/tools/govkit/govkit.py update --target <project> --write
-bash <kit>/check-protocol-parity.test.sh                  # in parity, 2 rendered pair(s)
-git add -A && git commit -m "govkit update: review-harness 1.8"
+GOV=<gov>        # a gov checkout at the vintage you are moving to
+KIT=<kit>        # where review-harness is installed, e.g. scripts/workflows
+PY=python        # whatever runs Python 3 here
+```
 
-# 2. Re-row it: re-adopt at that vintage, pinning every row's recorded base.
-TO=$(git -C <gov> rev-parse HEAD)
-PINS=$(python -c 'import json, subprocess, sys
-t, to = sys.argv[1], sys.argv[2]
-tracked = set(subprocess.run(["git", "-C", t, "ls-files"], capture_output=True, text=True).stdout.split())
-for f in json.load(open(t + "/.governance/install.json", encoding="utf-8"))["files"]:
-    if f["path"] in tracked and f.get("role") not in ("merged", "attributes", "project-owned", "generated"):
-        base = f.get("commit") or (to if f.get("role") == "rendered" else "")
-        if base:
-            print("--pin", f["path"] + "=" + base)' . "$TO")
-python <gov>/tools/govkit/govkit.py adopt --target <project> --re-adopt $PINS           # READ-ONLY: read it
-python <gov>/tools/govkit/govkit.py adopt --target <project> --re-adopt $PINS --write
-git add -A && git commit -m "govkit adopt --re-adopt: the build harness is rendered"
+Each block is a subshell, so a `STOP` ends that block and leaves your shell standing. Everything
+the two blocks pass between them, including the small program block 1 writes, sits in your git
+directory and never in the tree.
+
+<!-- harness-migration 1 -->
+```bash
+( G=$(git rev-parse --git-dir); rm -f "$G/harness-migration-ready"
+  git ls-files -z --others --exclude-standard > "$G/harness-migration-before.txt"
+  cat > "$G/harness-migration.py" <<'PY'
+import json, re, subprocess, sys
+g, mode = sys.argv[1], sys.argv[2]
+def read(name):  # text mode, so output a platform wrote with CRLF reads the same
+    with open(f"{g}/harness-migration-{name}.txt", encoding="utf-8") as fh:
+        return fh.read()
+def stop(why):
+    print("STOP: " + why); sys.exit(1)
+def ran_ok():  # kits whose every regenerate argv exited 0, unrefused, in step 1
+    ok = {}
+    for kit, rest in re.findall(r"  ran ([\w.-]+): .*? -> exit (\d+.*)$", read("update"), re.M):
+        ok[kit] = ok.get(kit, True) and rest.strip() == "0"
+    return {k for k, v in ok.items() if v}
+def tracked(*args):
+    return {p for p in subprocess.run(["git", "ls-files", "-z", *args], capture_output=True,
+                                      text=True).stdout.split("\0") if p}
+def planned():  # every destination the plan at this vintage resolves: {path: (role, kit)}
+    return {d: (r, k) for m, r, d, k in re.findall(r"^  (\S+) +\[(\S+) *\] (.+?)   <- (\S+)$",
+                                                   read("plan"), re.M) if m != "UNRES."}
+def rendered_here():  # every TRACKED destination the plan renders, with its kit
+    t = tracked()
+    return {d: k for d, (r, k) in planned().items() if r == "rendered" and d in t}
+def receipt():
+    with open(".governance/install.json", encoding="utf-8") as fh:
+        return {f.get("path"): f for f in json.load(fh).get("files", [])}
+if mode == "step1":
+    upd, par = read("update"), read("parity")
+    rc = re.search(r"^update exit (\d+)", upd, re.M).group(1)
+    if rc != "0" or " 0 conflict(s)" not in upd:
+        stop(f"update exited {rc} or left a conflict. Resolve what it names, re-run update by "
+             "hand until it exits 0, then run this block again.")
+    if "review-harness" not in ran_ok():
+        stop("the review-harness regenerate did not run at exit 0, so the harness is gov's render.")
+    if not re.search(r"^parity exit 0$", par, re.M) or re.search(r"SKIP \S*unattended-build\.js", par):
+        stop("the parity check did not grade the harness green, and its output above says why.")
+    for p in sorted(tracked("--others", "--exclude-standard") - set(read("before").split(chr(0)))):
+        print(f"FLAG {p}: step 1 created it and nothing rows it, so it is NOT staged")
+elif mode == "pins":
+    to, rendered, ran = sys.argv[3], rendered_here(), ran_ok()
+    pins = [f"--pin {d}={to}" for d, k in sorted(rendered.items()) if k in ran]
+    t, plan = tracked(), planned()
+    for p, f in sorted(receipt().items()):
+        if (p in t and p in plan and p not in rendered and f.get("commit") and f.get("role")
+                not in ("merged", "attributes", "project-owned", "generated", "rendered")):
+            pins.append(f"--pin {p}={f['commit']}")
+    with open(f"{g}/harness-migration-pins.txt", "w", encoding="utf-8") as fh:
+        fh.write("".join(x + "\n" for x in pins))
+elif mode == "check":
+    old, rendered = receipt(), rendered_here()
+    pinned = {x.split(" ", 1)[1].rsplit("=", 1)[0] for x in read("pins").splitlines() if x}
+    counted, bad = [], []
+    for key, role, d in re.findall(r"^  (\S+) +\[(\S+) *\] (.+?)(?: <- [0-9a-f]+)?$",
+                                   read("adopt"), re.M):
+        was = old.get(d)
+        if key == "not-installed":
+            continue
+        if key != "unattributed":
+            if was is None:
+                print(f"FLAG {d}: new to the receipt, measured {key}")
+            continue
+        if was is None:
+            why = "new to the receipt, so nothing ever recorded a base for it"
+        elif was.get("evidence") == "unattributed":
+            why = "it was unattributed before this migration"
+        elif d in rendered and d not in pinned:
+            why = "its kit did not regenerate it in step 1, so no vintage is claimed for its bytes"
+        elif not was.get("commit"):
+            why = "it recorded no base before, and adopt now says so"
+        else:
+            bad.append(d)
+            continue
+        counted.append(d)
+        print(f"FLAG {d}: unattributed, because {why}")
+    for d in bad:
+        print(f"STOP: the receipt recorded a base for {d}, and the re-adopt cannot attribute it")
+    print(f"the re-adopt leaves {len(counted)} row(s) unattributed, and the next update withholds "
+          "its stamp over exactly those, or re-stamps when there are none")
+    sys.exit(1 if bad else 0)
+PY
+  # 1. Move forward and re-render, then grade the harness this install holds. STOP unless update
+  #    exits 0 with no conflict, the review harness's regenerate exited 0, and the harness is green.
+  GOVKIT_RERENDER=1 "$PY" "$GOV/tools/govkit/govkit.py" update --target . --write > "$G/harness-migration-update.txt"
+  echo "update exit $?" >> "$G/harness-migration-update.txt"; cat "$G/harness-migration-update.txt"
+  bash "$KIT/check-protocol-parity.test.sh" --tracked-only > "$G/harness-migration-parity.txt" 2>&1
+  echo "parity exit $?" >> "$G/harness-migration-parity.txt"; cat "$G/harness-migration-parity.txt"
+  "$PY" "$G/harness-migration.py" "$G" step1 || exit 1
+  # 2. Commit update's own writes with the receipt that records them, and nothing the regenerate
+  #    wrote: those stay unstaged until block 2 rows them `rendered`.
+  git add -- .governance/install.json .governance/install.sums
+  git commit -q -m "govkit update: review-harness 1.8" || { echo "STOP: that commit was refused."; exit 1; }
+  git diff --name-only -z > "$G/harness-migration-renders.z"
+  # 3. Derive the pins from the plan at this vintage. 4. Run the re-adopt READ-ONLY and check it.
+  "$PY" "$GOV/tools/govkit/govkit.py" plan --target . > "$G/harness-migration-plan.txt" \
+    || { echo "STOP: plan failed."; exit 1; }
+  "$PY" "$G/harness-migration.py" "$G" pins "$(git -C "$GOV" rev-parse HEAD)" || exit 1
+  "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $(cat "$G/harness-migration-pins.txt") \
+    > "$G/harness-migration-adopt.txt"; rc=$?; cat "$G/harness-migration-adopt.txt"
+  [ "$rc" = 0 ] || { echo "STOP: the read-only re-adopt refused."; exit 1; }
+  "$PY" "$G/harness-migration.py" "$G" check && touch "$G/harness-migration-ready" )
+```
+
+Read every `FLAG` line block 1 printed before you run block 2. Each names its reason, and the
+paragraphs after block 2 say why each reason is expected.
+
+<!-- harness-migration 2 -->
+```bash
+( G=$(git rev-parse --git-dir); PINS=$(cat "$G/harness-migration-pins.txt")
+  [ -f "$G/harness-migration-ready" ] || { echo "STOP: block 1 has not finished clean."; exit 1; }
+  # 5. Re-row, then commit the re-rendered files with the receipt that now rows them `rendered`.
+  "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
+  git add -- .governance/install.json .governance/install.sums
+  [ ! -s "$G/harness-migration-renders.z" ] \
+    || git add --pathspec-from-file="$G/harness-migration-renders.z" --pathspec-file-nul
+  git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: the build harness is rendered" \
+    || { echo "STOP: that commit was refused."; exit 1; }
+  # 6. Re-adopt once more. Step 5 read each render's identity from the index before the render was
+  #    staged, and this run reads the commit that holds it. Both commits are skipped when there is
+  #    nothing to commit, so this block can be run again.
+  "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
+  git add -- .governance/install.json .governance/install.sums
+  git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: record the committed renders" \
+    || { echo "STOP: that commit was refused."; exit 1; } )
 ```
 
 **Why the re-adopt.** It is the only verb that re-reads a row's role from the descriptor, and it
 re-measures EVERY row, not just this one.
 
-**Why the pins, and every one of them.** Unpinned, a row carrying a local edit matches no gov
-vintage and comes back `unattributed`, which loses the base its three-way merge needs. Every
-`rendered` row comes back `unattributed` too, because a render never equals its template. After
-either, every later `update` withholds its re-stamp. The rule pins each tracked row that records a
-`commit` to that commit, so its base survives. It pins each tracked `rendered` row that records none
-to the vintage you moved to. It leaves block rows (`merged`, `attributes`) and rows gov supplies no
-bytes for (`project-owned`, `generated`) to `adopt`, which re-synthesizes them.
+**Why step 1 stops on update's exit code, and not on the parity check.** When the three-way merge
+conflicts on a file, `update` leaves that row untouched at its old commit, writes an order under
+`.governance/outbox/` and exits 1, and the regenerate still runs, so the parity check alone passes.
+Carried on, block 2 would record the regenerated harness as current over an edit the merge could not
+place. Resolve the order, re-run `update` until it exits 0, then run block 1 again.
 
-**Read the read-only run.** Its tally should show `pinned` and `verbatim`, and no `unattributed` row
-that the old receipt attributed. `adopt` re-measures only the kits `.governance/deploy.toml` names in
+**Why block 1 commits only what `update` staged.** Until block 2 the receipt still rows the harness
+as an engine file. A commit-time check that compares staged engine blobs with the receipt therefore
+reds the re-rendered harness, and the re-adopt that would clear that refuses a staged tree. So step
+2 commits update's own writes with the receipt that records them, which passes such a check, and
+block 2 stages the renders once their rows are `rendered`. It stages them by name, from the list
+step 2 recorded. A file step 1 CREATED is flagged and never staged, because nothing rows it.
+
+**Why these pins, and where each one comes from.**
+
+- Every tracked row that records a `commit`, and that the plan at this vintage still resolves, is
+  pinned to it. Unpinned, a row carrying a local edit matches no gov vintage and comes back
+  `unattributed`, which loses the base its three-way merge needs. A row the plan no longer resolves
+  is not measured, and `adopt` refuses a pin on it.
+- A render never equals its template, so it comes back `unattributed` too unless it is pinned. A
+  rendered destination is pinned to the vintage you moved to, and only when its kit's regenerate
+  ran at exit 0 in step 1, because only then do its bytes come from that vintage.
+- The rendered destinations come from `plan` at that vintage, never from the receipt. A receipt
+  `adopt` bootstrapped rows only what was tracked when it ran, so a destination tracked since then
+  is one the receipt never names, while `adopt` measures every destination the plan and the index
+  share.
+- A render whose kit declined its regenerate keeps the bytes of the vintage it was rendered at, so
+  it stays unpinned. Pinned to the new vintage, it would record stale bytes as current, and the
+  next update would grade it `patched` rather than `re-rendered`. Pinning it to the receipt's old
+  stamp is true only when that stamp is the vintage it was rendered at, which a flag-off update or
+  `--allow-ungraded` can break, so that is an assertion you make by hand and never a default.
+- A rendered destination is never pinned to a recorded commit. After a conflicted step 1 that
+  commit predates the template, and `adopt` refuses a pin naming a base gov does not hold.
+- Block rows (`merged`, `attributes`) and rows gov supplies no bytes for (`project-owned`,
+  `generated`) are left to `adopt`, which re-synthesizes them.
+
+**What block 1's check reports.** It flags every row new to the receipt, pinned or not, because
+nothing recorded a base for it before. It flags every row the re-adopt leaves `unattributed`, with
+one of four reasons: new to the receipt, unattributed before, a render its kit did not regenerate,
+or a row that recorded no base before. It STOPs on a row the receipt recorded a base for that the
+re-adopt cannot attribute, because the migration would have made that row worse. Its last line
+counts the unattributed rows. `adopt` re-measures only the kits `.governance/deploy.toml` names in
 `kits`, so check that list covers every kit the receipt claims first. The pin list is split on
 whitespace, so a path holding a space needs its flags passed by hand.
 
 **A local edit to the old harness does not survive step 1.** The re-render overwrites the harness
-with the template's render. Carry the edit into `<kit>/unattended-build.template.js` after step 1,
-re-run `bash <kit>/check-protocol-parity.test.sh --render`, then commit; step 2 records it as the
-template row's local delta.
+with the template's render. Carry the edit into `<kit>/unattended-build.template.js` after block 2,
+re-run `bash <kit>/check-protocol-parity.test.sh --render`, commit the template and its render, then
+run block 2 again, which records the template's delta. A target whose pre-commit compares staged
+engine blobs with its receipt refuses that commit, as it refuses any local edit to an engine file,
+and that is its own check's rule rather than this migration's.
 
-**Done looks like this.** The receipt rows the harness `rendered` with `evidence: "pinned"`. No row is
-`unattributed` that was not before. The index blob of every non-rendered row equals its receipt
-`oid`. The next `update` writes nothing to the harness and re-stamps, and both parity legs are green.
-That end state was measured on a fixture installed at gov `24f8c712` at prefix `scripts`, with the
-memory-tree kit flat, the unattended kit present and one local edit. The record is build
-`dPolishedVitrine`'s journal, and the govkit selftest's `[-PV]` arms run the same sequence on every
-self-test run. `update` learning to move a role itself is `DEPL-dPolishedVitrine-1`, and it retires
-this section when it lands.
+**Done looks like this.** The receipt rows the harness `rendered` with `evidence: "pinned"`, and
+every row block 1 did not flag keeps the attribution it had. The next `update --write` writes
+nothing to the harness. It either re-stamps, or it withholds the stamp over exactly the rows block
+1's last line counted, and says how many. **Do not answer that message with the bare
+`adopt --re-adopt --write` it suggests.** That is the unpinned re-adopt, and it drops the harness's
+`pinned` evidence and every edited row's base. Run block 2 again, which carries the pins, or pass
+`--allow-ungraded` to `update` knowingly. Having the message name the pinned form is
+`DEPL-dPolishedVitrine-1`'s, and so is `update` learning to move a role itself, which retires this
+section.
+
+The govkit selftest's `[-PV]` arms cut these two blocks out of this file and run them on every
+self-test run, so the text you copy is the text that was tested. They run on a fixture `apply`
+installed and on one `adopt` bootstrapped, which carries a commit-time receipt check, a row
+unattributed before the migration, a kit that declines its regenerate, and two destinations the
+receipt never rowed.
 
 ### The hooks ship ONE copy each — migrating a tree that has two
 

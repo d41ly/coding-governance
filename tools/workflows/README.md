@@ -26,8 +26,14 @@ the bug-class checklist, the review sub-workflow it awaits and the child it hand
 workflow script has no filesystem when it runs, so it cannot find its siblings, and apply would
 write a shipped copy verbatim, naming this repo's `tools/` layout in every adopter. So the kit
 renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on an update run
-with `GOVKIT_RERENDER=1`. With `GOVKIT_RERENDER` unset `update` re-renders nothing and prints
-nothing about it, and the parity leg is what reds the stale copy at your next bar.
+with `GOVKIT_RERENDER=1`. With `GOVKIT_RERENDER` unset `update` declines that block without
+printing anything about it, yet it still prints the harness row as `re-rendered` although no render
+ran, and the parity leg is what reds the stale copy at your next bar.
+
+**The regenerate refreshes an install and never creates one.** It runs `--render --tracked-only`,
+which skips by name any pair whose live copy is absent and untracked, because govkit rows nothing
+a regenerate writes. So an install that never took `REVIEW-PROTOCOL.md` does not receive one from
+an update. To install it, run `--render` by hand and commit what it writes.
 
 **`MEMORY_TREE_DIR` is probed, not derived.** An adopter may install the memory-tree kit flat in
 its tool root, so the tool root plus `memory-tree/` is not an answer. The render takes the first

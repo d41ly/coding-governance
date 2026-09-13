@@ -275,6 +275,96 @@ added is in the result, 48 files on this side and 31 on `main`'s. review-harness
 1.11 are unclaimed on `main`, which holds 1.7 and 1.10. `main` touched no kickoff watch path, and
 `manifest-check.sh` passes after the merge, so the manifest was not re-stamped again.
 
+## What the round-2 review changed
+
+The round-2 Tier-2 diff review of `24f8c712...d36549fb` returned BLOCKED again: round 1's F1 was
+still open at core, and it confirmed eight defects in all. Its report is committed under `reviews/`
+beside this journal. Each defect is below, with the gate it left behind and the red that gate showed
+before the fix. Every staged break was made in the worktree, run, recorded, and restored from a copy
+taken before it, and `cmp` confirmed each restore.
+
+The fixture itself changed first, because each finding was a way the old one differed from a real
+consumer. The `[-PV]` kit is now `review-harness`, and its regenerate runs this repo's real
+`check-protocol-parity.test.sh` through the argv the real `kit.toml` declares, over small templates.
+The migration's two blocks are cut out of `WIRE-INTO-PROJECT.md` by their markers and run by bash,
+so `derive_pv_pins`, which was a hand copy of the runbook's pin rule, is gone. There are now four
+targets. One is built by `apply`, one is bootstrapped by `adopt` the way core's receipt was, one
+carries a harness edit beside gov's change, and one is the unpinned control. Every commit on them
+after setup is a real `git commit` through a pre-commit hook written from core's receipt-check rule.
+
+- **R2-1, blocker: step 1's commit wedged at core.** rev-5's `git add -A` staged the regenerated
+  harness while its row was still `engine`. Core's commit-time receipt check refuses that, and the
+  re-adopt that would clear it refuses a staged tree. Block 1 now commits only update's own writes
+  with the receipt that records them. Block 2 stages the recorded renders once their rows are
+  `rendered`, then re-adopts again so the receipt's `oid` names the committed render. That is the
+  end state the arms assert. The gate is the hook, with a LIVENESS arm that shows it refusing an
+  engine edit, and the `[-PV] R2-1` arms, which assert that every commit lands and the tree ends
+  clean. Observed red: with block 1's commit put back to `git add -A && git commit`, the hook printed
+  `receipt check: scripts/workflows/unattended-build.js is 645c238a but the receipt records
+  edc60316`, block 1 stopped, and 24 arms redded.
+- **R2-2, medium: declined renders were pinned as current.** A render is pinned to the new vintage
+  only when its kit's regenerate ran at exit 0 in step 1, and otherwise it is left unpinned. The gate
+  is a second fixture kit, `notes`, which ships a render, declares no regenerate, and moves its
+  template between A and B. The next update must grade that render `re-rendered`. Observed red: with
+  rev-5's receipt pin rule back in block 1's program, `notes.md` was pinned at B and the next update
+  printed `patched [rendered] scripts/notes/notes.md`. Six arms redded, R2-5's among them.
+- **R2-3, medium: the regenerate created a document nobody installed.** The parity script gained
+  `--tracked-only`, which skips by name a pair whose live copy is absent and untracked. The
+  regenerate argv now passes it, and the `--check` form lets the runbook grade the harness at an
+  install that never took the protocol. The gate is eleven `PV-R2-3` arms in
+  `tools/workflows/unattended-build.test.sh`, which read the argv out of `kit.toml` and run it as
+  declared, plus one `[-PV]` arm that runs it through `update`. Observed red: six of the eleven
+  failed against the unfixed script and argv, and the protocol was written. At the govkit level, with
+  the flag taken out of the argv, the regenerate created the protocol and block 1 flagged it
+  `step 1 created it and nothing rows it`. govkit reporting such a file itself is a govkit change
+  outside §3, added to `DEPL-dPolishedVitrine-2`.
+- **R2-4, medium: the Done state could not be met at a consumer.** Block 1's check now counts the
+  rows the re-adopt leaves `unattributed`, each with its reason. Done says the next update either
+  re-stamps or withholds its stamp over exactly that count. The runbook also warns against the bare
+  re-adopt that message suggests. The gate is the bootstrapped fixture, which starts with two rows
+  unattributed and gains one new to its receipt. On it the check counts 3 and the next update
+  withholds over 3. Under rev-5's Done the same run would have had to re-stamp, and it printed
+  `NOT re-stamped: 3 row(s)`. Observed red: with the check blind to rows new to the receipt, which is
+  what rev-5's reading guidance was, block 1 counted 2 against a withheld 3, and three arms redded.
+  The message naming the pinned form is added to `DEPL-dPolishedVitrine-1`.
+- **R2-5, low: the pin set came from the old receipt.** Rendered destinations now come from `plan`
+  at the new vintage, intersected with what the tree tracks. The check flags every row new to the
+  receipt, pinned or not. The gate is the bootstrapped fixture, which tracks a render and an edited
+  project-owned file after its receipt was written. Observed red: rev-5's rule emitted no pin for
+  `memory/guides/REVIEW-PROTOCOL.md`, and the re-adopt left it `unattributed`.
+- **R2-6, low: a conflicted step 1 carried on.** Block 1 now stops on update's exit code, whatever
+  the parity check says, and a rendered destination is never pinned to a recorded commit. The gate
+  is the fixture whose harness edit sits beside gov's change. Its arms assert that the block stops
+  naming `update exit 1`, that update named the conflict, and that nothing was committed and no pin
+  derived. A further arm asserts that every rendered pin in every fixture names B. Observed red: with
+  the exit check removed and rev-5's pin rule restored, that fixture committed, derived
+  `scripts/workflows/unattended-build.js=<A>`, and the read-only re-adopt refused. Three R2-6 arms
+  redded.
+- **R2-7, low: three carriers called a flag-off update silent.** They now say it declines the
+  regenerate without printing anything, yet still prints the row `re-rendered` although no render
+  ran: the parity script's header, the kit README, the descriptor's comment, and spec §4. The
+  descriptor's sentence was the wording the review offered as the model, and it matched the same
+  predicate, so it took the same clause. The gates are two. Selfcheck arm 7l gains a negative half:
+  a sentence naming `update`, the flag and a silence word must name `re-rendered`. The `[-PV] R2-7`
+  arms run a flag-off update over a vintage C and assert that line with no render. Before wiring,
+  the predicate ran over the real tree. It found three hits, all in review-harness, none in the
+  unattended kit, and no near-miss. Observed red: selfcheck printed `3 problem(s)` naming the three
+  carriers. With the flag-off verdict relabelled in govkit, the `[-PV]` arm read `stale-render` and
+  redded.
+- **R2-8, low: the F3 fold left the refusal standing.** S3, §5's error-states and risks lines and two
+  build-README bullets are amended to the per-pair skip. No gate, as the review says. The rev-7 line
+  in spec §9 lists every `refus` clause over the spec and the README with its disposition, which is
+  the gotcha's own Check.
+
+Found while fixing, and not this unit's:
+
+- `apply` fails an install whose `rendered` destination is absent after its adopters ran. So a
+  fixture kit carrying the protocol's rule at vintage A could not be applied, and the fixture's rule
+  arrives at B instead. Whether a real `apply` of review-harness meets the same was not measured. Its
+  `requires` chain was not assembled here.
+- The first name for the hooked-commit helper led with `commit`, which the verb table does not carry,
+  and the lexicon counted 987 over its pin of 986. It was renamed through `--suggest`.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -309,9 +399,10 @@ added is in the result, 48 files on this side and 31 on `main`'s. review-harness
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
-- AC13 — `tools/govkit/selftest.py` — OBSERVED: the `[-PV] F1` arms pass inside the whole suite,
-  which printed `all arms held`. With the re-adopt swapped for the old hand-off, five of them redded.
-  The same sequence converged on both consumer fixtures described above.
+- AC13 — amended rev-7 — the next update after the migration either re-stamps or withholds its stamp
+  over exactly the rows the migration's check counted, and the `[-PV] F1` arms now run the runbook's
+  own blocks. That is spec section 9's rev-7 line. Round 1's red, the re-adopt swapped for the old
+  hand-off, still stands for the row move itself.
 - AC14 — `GOVKIT_RERENDER` — OBSERVED: the `[-PV] F2` arms pass, and on HEAD's engine three of them
   and the negative's no-promise arm redded. The consumer fixture read `-> exit 1 REFUSED` before
   the move and `-> exit 0` after it.
@@ -320,3 +411,16 @@ added is in the result, 48 files on this side and 31 on `main`'s. review-harness
   parity script.
 - AC16 — `govkit selfcheck` — OBSERVED: arm 7l reported `5 problem(s)` on the unfixed carriers and
   exits 0 on the corrected ones.
+- AC17 — `WIRE-INTO-PROJECT.md` — OBSERVED: both blocks, cut from the runbook, run clean through the
+  receipt hook on the `apply` and `adopt` fixtures, and every commit lands. rev-5's `git add -A` is
+  the red recorded under R2-1 above.
+- AC18 — `R2-4` — OBSERVED: on the bootstrapped fixture the pins cover the protocol and the harness
+  at B and never `notes.md`, the next update grades `notes.md` `re-rendered`, block 1 counts 3, and
+  the next update withholds over 3. The conflicted fixture stops at step 1 with no commit and no pin.
+  The reds are under R2-2, R2-4, R2-5 and R2-6 above.
+- AC19 — `--tracked-only` — OBSERVED: the eleven `PV-R2-3` arms pass, and the `[-PV] R2-3` arm
+  passes through `update`. Six of the suite's arms, and the govkit-level one, are the reds recorded
+  under R2-3 above.
+- AC20 — `re-rendered` — OBSERVED: `govkit selfcheck` is green on the reworded carriers after
+  printing `3 problem(s)` on the old ones, and the `[-PV] R2-7` arms pass after one redded against
+  a relabelled verdict.

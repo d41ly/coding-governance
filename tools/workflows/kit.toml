@@ -67,18 +67,25 @@ argv = []
 mutates_index = false
 why_no_adopter = "both rendered artifacts, the review protocol and the build harness, are written by the parity gate's own --render mode rather than by a separate adopter; the [[regenerate]] block below runs that mode, so an update run with GOVKIT_RERENDER=1 re-renders them"
 
-# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. With the flag unset `update` lands a new
-# template, declines this block without printing anything, and so leaves both renders one vintage
-# stale with no output naming GOVKIT_RERENDER; the parity leg is what reds them at the next bar. The
-# argv is this kit's own gate in its render mode, so the renderer and the leg that grades its output
-# are one file and cannot disagree about a token.
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. With GOVKIT_RERENDER unset `update` lands a
+# new template, declines this block without printing anything, and so leaves both renders one
+# vintage stale, while its verdict loop still prints each moved render's row as `re-rendered`
+# although no render ran; the parity leg is what reds them at the next bar. The argv is this kit's
+# own gate in its render mode, so the renderer and the leg that grades its output are one file and
+# cannot disagree about a token.
+#
+# `--tracked-only` BECAUSE A REGENERATE REFRESHES, IT DOES NOT INSTALL (round 2, R2-3). govkit
+# captures the argv's output and rows nothing it writes, so a plain `--render` put a second review
+# protocol into a consumer that keeps its own extract on purpose, with no line naming the file. The
+# flag skips, by name, a pair whose live copy is absent and untracked; creating one stays with the
+# hand `--render` the runbook's copy-install step runs.
 #
 # THE INTRODUCING UPDATE, run with GOVKIT_RERENDER=1, needs a govkit that lands an unclaimed source
 # BEFORE it re-renders, because the template reaches an existing install only through that landing.
 # govkit 1.11 moved the landing; against an older govkit the render refuses with
 # `missing shipped copy`.
 [[regenerate]]
-argv = ["bash", "{kit}/check-protocol-parity.test.sh", "--render"]
+argv = ["bash", "{kit}/check-protocol-parity.test.sh", "--render", "--tracked-only"]
 
 [[gate_leg]]
 name = "verifier fan-out"
