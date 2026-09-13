@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** SPECCED · rev-3 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -75,9 +75,19 @@ same question again. The park that motivated it is the `2026-09-10T08:43:58Z dec
 ### Edges
 
 - **hands-off** external — the `KIT_UNATTENDED_VERSION` bump, 1.19 to 1.20, across every carrier
-  `tools/check-kit-versions.sh` pairs and the renders `adopt-unattended.sh` re-makes. The closing
-  pass owns it, once for the kit, per `TOOL-aRatifiedRulings-2` §8 F1. No epoch gate observes that
-  bump's placement: `check-verdict-epoch.sh` is hardcoded to the memory-tree engine, which
+  `git grep -l 'gov:kit unattended@1\.19' -- tools/unattended .claude/skills/unattended memory/guides`
+  returns, run before the bump at the value being left. At base `16da4c6a` that is FIFTEEN files,
+  DERIVED by that probe on 2026-09-13: the four `.sh` constants, reached through their same-line
+  markers; the five `tools/unattended/*.template.md`; the five renders `adopt-unattended.sh --check`
+  re-makes and diffs, `.claude/skills/unattended/SKILL.md`, the two `memory/guides/UNATTENDED-*.md`
+  copies, `memory/guides/PLAYBOOK-TEMPLATE.md` and `tools/unattended/playbook.fixture.md`; and
+  `tools/unattended/README.md:1`, which `tools/check-kit-versions.sh` pairs with nothing
+  (`DEPL-aHoistedPass-10`, OPEN). `b8e8d6dc`, the commit `TOOL-dMuffledSentinel-3` names, is the
+  commit shape: it moved exactly those fifteen. The closing pass owns the bump, once for the kit,
+  per `TOOL-aRatifiedRulings-2` §8 F1, and declares every file the probe returns; a pass that
+  declares only what `check-kit-versions.sh` pairs plus the renders writes `README.md:1`
+  undeclared, or leaves it at 1.19 with no gate to say so. No epoch gate observes that bump's
+  placement: `check-verdict-epoch.sh` is hardcoded to the memory-tree engine, which
   `tools/check-kit-versions.sh:49` says in its own comment, so the closing pass's declaration is the
   only record of which commit moved the constant relative to the two commits that moved the bytes.
 - **hands-off** external — the status flip of backlog row `TOOL-dCarriedReceipt-2`, which records
@@ -240,22 +250,34 @@ The pass writes `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUI
 `.template.md` under `tools/memory-tree/`, the four renders re-made by `--render`. No unattended
 carrier moves here; section 3's edge names who owns that.
 
-The write set is DISJOINT from unit 2's. `TOOL-aRatifiedRulings-2` §4 lists
+The PRODUCT write set is disjoint from unit 2's. `TOOL-aRatifiedRulings-2` §4 lists
 `tools/unattended/check-unattended.sh`, where check 23 of the LEG opens at `check-unattended.sh:2222`
 and closes at `:2361`, `tools/unattended/check-unattended.test.sh`, and its own ledger under
 `build/`; the `fail 23` at `unattended.sh:712` is the driver's object-substitution refusal and unit 2
-does not touch it.
-Nothing in this unit's list appears in that one. Under M6's `parallel-when-disjoint` condition 1, and
-`--dispatch` check 49 at `unattended.sh:4853` which refuses only an overlap, the pair may run
-concurrently, and this spec derives no ordering rule: the unattended version bump was the only
-shared line and the closing pass owns it. Two facts the roster still weighs, stated so it does not
-re-derive them: each unit's self-test reads the other's product file at lines the other does not
-move — `check-unattended.test.sh:147` greps `unattended.sh` for its `_CORE` constants, and
-`unattended.test.sh:3729` greps `check-unattended.sh` for `ls-remote` — which is M6 condition 2 at
-file grain and false at line grain; and both units write under
-`memory/builds/aRatifiedRulings/build/`, so each declares its ledger by FILE, never the directory,
-or check 49's prefix `overlaps` refuses the second declaration. Which order the M2 roster picks, if
-it sequences anyway, is not this spec's.
+does not touch it. Nothing in this unit's product list appears in that one.
+
+Disjoint product files do NOT make the passes concurrent. A pass's declared set is never only its
+product files: every pass commit moves its spec's status header, hygiene check 9
+(`gen_build_index.py --check`, run by the pre-commit staged leg whenever `memory/` is touched)
+then forces `memory/LIVE.md` and `memory/ledger/<month>.md` to be re-rendered in the same commit,
+and every pass edits the build README — so every pass of this build declares its spec, the README
+and those two indexes beside its products, as every dispatch row of the parent build
+`aLeakedHandle` did and as its pass commit `922fd926` wrote. `--dispatch` check 49 condition 1 at
+`unattended.sh:4853` refuses a declared path that `overlaps` any still-open sibling's, and
+`overlaps` at `lib-unattended.sh:100-105` is `covers` both ways with `covers` true on EQUALITY, so
+the second of two open passes honestly declaring `memory/LIVE.md` is refused and the run parks; a
+pass declaring less than it writes prints check-23 lines instead. Units 1 and 4 additionally both
+declare `memory/guides/SESSION-KICKOFF.md`, which is no `SHARED_RECORDS` member and collides on
+equality the same way. The passes of this build are therefore SEQUENTIAL, and the M2 roster orders
+them; this spec derives no order among them. The second of units 1 and 4 to land re-stamps
+`last-audit` over the first, per the charter's kickoff-manifest merge exception. One fact the
+roster still weighs, stated so it does not re-derive it: each unit's self-test reads the other's
+product file at lines the other does not move — `check-unattended.test.sh:147` greps
+`unattended.sh` for its `_CORE` constants, and `unattended.test.sh:3729` greps
+`check-unattended.sh` for `ls-remote` — which is M6 condition 2 at file grain, false at line grain,
+and moot while the passes are sequential. Declaring the ledger under
+`memory/builds/aRatifiedRulings/build/` by FILE rather than by directory would matter only if two
+passes were ever open together, which check 49 makes impossible here.
 
 Landing owes no data step. Existing `review` rows keep their grammar and their meaning; a run-state
 file written before this unit reads identically after it.
@@ -341,17 +363,20 @@ file written before this unit reads identically after it.
   failure text and the leg cannot see this pair at all.
   fixture: the real tree; the staged half is the state between the driver edit and the arm edit,
   observed before the arm edit is made.
-- **AC4** — When `bash tools/unattended/unattended.test.sh --shard 2/2` is run twice with its
-  output redirected to a file, once against the landed driver and once against a copy of the driver
-  with the message at `unattended.sh:4096` reverted to the base text, the reverted run's file holds
-  `FAIL missing:` followed by the new signature exactly three times — the two moved arms and the new
-  one — and the landed run's file holds that line zero times and holds `MARK review-loop`.
+- **AC4** — When `bash tools/unattended/unattended.test.sh --shard 2/2` is run twice with BOTH
+  streams redirected to one file, `> <file> 2>&1`, once against the landed driver and once against
+  a copy of the driver with the message at `unattended.sh:4096` reverted to the base text, the
+  reverted run's file holds `FAIL missing:` followed by the new signature exactly three times — the
+  two moved arms and the new one — and the landed run's file holds that line zero times and holds
+  `MARK review-loop`. The MARK is written to stderr (`unattended.test.sh:4532`, `>&2`) while
+  `hit`, `miss` and `same` at `:69-71` print their `FAIL` lines to stdout, so a stdout-only
+  redirect holds the FAIL delta and no MARK, and reads a correct landing as "the region never ran".
   Red when: the reverted run shows fewer than three, which means an arm did not execute or quotes
-  something the driver already prints; or the landed run lacks `MARK review-loop`, which means the
-  region never ran and an absent FAIL line is silence rather than a pass.
+  something the driver already prints; or the landed run's file lacks `MARK review-loop`, which
+  means the region never ran and an absent FAIL line is silence rather than a pass.
   cost: shard two of the suite, last recorded at 2013.7 s in the comment block of
   `tools/unattended/run-unattended-gates.sh`, on each of the two runs. Never read the result through
-  `tail`; redirect and grep the file.
+  `tail`; redirect both streams and grep the file.
   permission: this suite is a kit self-test and is on no boundary bar by the owner's 2026-08-23
   ruling; nothing sets `GATE_SELFTESTS=1` and `tools/gate-legs.json` carries no row for it. The
   direct sharded invocation above is the only one this run executes. The shard carries a
@@ -377,21 +402,39 @@ file written before this unit reads identically after it.
   marker reading `gov:kit memory-tree@2.70`; `grep -c '^KIT_UNATTENDED_VERSION=1\.19 ' tools/unattended/*.sh`
   reports `1` for `unattended.sh`, `check-unattended.sh`, `check-pass-order.sh` and
   `check-brief-recorded.sh` and `0` for every other file; and `bash tools/memory-tree/check-verdict-epoch.sh`
-  prints `clean`. The commit that changes the constant's VALUE, found by
-  `git log -G'^KIT_MEMORY_TREE_VERSION=' <base>..<tip> -- tools/memory-tree/check-memory-hygiene.sh`,
-  also lists `tools/memory-tree/BUILD-METHOD.template.md` in its `git diff-tree --name-only`.
+  prints `clean` and exits 0. S5's same-commit rule is joined on the BYTES the bump dates, never on
+  the file: `git log -G'^KIT_MEMORY_TREE_VERSION=' --format=%H 16da4c6a..<tip> -- tools/memory-tree/check-memory-hygiene.sh`
+  prints exactly one sha, and `git show <that-sha> -- tools/memory-tree/BUILD-METHOD.template.md`
+  piped through `grep -c '^+.*CONVERGED is terminal for its subject'` prints `1`, as does the same
+  pipe through `grep -c "^+.*by anything but that review.s own fold"`. The marker on the template's
+  line 1 does NOT satisfy the join, and no file-level join can: `check-kit-versions.sh:135-147`
+  reds any tracked `tools/memory-tree/*.template.md` whose marker disagrees with the constant, so
+  the bump commit always touches the template's line 1, and
+  `git diff-tree -r --no-commit-id --name-only <sha>` lists the template whether or not the M4
+  bytes rode along. `a3b4ca1e`, the last real bump, lists it for a 2-line marker move and no
+  method edit. Without `-r` that command prints only `memory` and `tools`, which is why the rev-2
+  spelling read red against a correct build.
   Red when: a memory-tree carrier still reads 2.69, which the leg names as
   `marker != KIT_MEMORY_TREE_VERSION`; or any of those four counts reads `0`, which means this pass
   performed the bump `TOOL-aRatifiedRulings-2` §8 F1 assigns to the closing pass, or moved a
-  constant the closing pass expects to find at 1.19; or the value-changing commit's tree does not
-  carry the template, which means the bump and
-  the bytes it dates landed apart and S5's same-commit rule was not kept.
+  constant the closing pass expects to find at 1.19; or the `-G` log prints no sha or two; or
+  either added-line count prints `0`, which is the split S5 forbids — the M4 bytes in one commit,
+  the constant and the markers in a later one. Staged break, observed before the fold is trusted:
+  on a scratch branch off `16da4c6a`, commit the two M4 edits alone, then the constant, the
+  markers and the `--render` as a second commit; the `-G` log prints the second sha and both
+  counts print `0` against it. `grep -c` exits 1 on a zero count, so the figure is read from
+  stdout and the pipe is never chained with `&&`.
   figure: 2.70 is PINNED as the next value above base `16da4c6a`, where every memory-tree carrier
   reads 2.69; 1.19 is DERIVED from the four `tools/unattended/` scripts at that base and this unit
-  moves it nowhere. `clean` here is the gate's `no behaviour-bearing engine line moved` form, since
-  its scan set is the engine and six delegates and never the template; it cannot grade the
-  placement of a template-only bump, which is why the `git log -G` join above does that job, and it
-  says nothing about the unattended kit at all.
+  moves it nowhere. `clean` here is the gate's second clean form,
+  `clean — 2 line(s) moved in <W> and the version moved 2.69 -> 2.70 in <S>`, with W and S the
+  same sha by construction: the constant line at `check-memory-hygiene.sh:20` is itself a
+  non-comment engine line, so `behav_in` counts the bump as the 2 lines moved, and no other engine
+  line moves in this unit. That form prints wherever the range holds the bump — the pass branch,
+  or local `main` before the push; once `origin/main` carries the tip the range is empty and the
+  first form, `no behaviour-bearing engine line moved`, prints instead. Either way the gate scans
+  the engine and six delegates and never the template, so it cannot grade the placement of the M4
+  bytes, which is the `git show` join's job, and it says nothing about the unattended kit at all.
 
 ## 7. Gates
 
@@ -400,10 +443,12 @@ file written before this unit reads identically after it.
 Chunks and guards, read from `tools/gate-legs.json` on 2026-09-13: `harness arms`, `method
 carriers`, `kit version markers` and `verdict epoch` are `chunk: declarations` with no guard, so
 every bar runs them; `build-method size` is `chunk: product`, unguarded; `kit/dogfood doc parity` is
-`chunk: declarations` guarded on `memory/guides/BUILD-METHOD.md` and `tools/memory-tree/`, so a
-scoped bar whose diff misses both skips it and the push boundary's full bar does not;
-`kickoff-manifest ratchet` and `memory hygiene` are `chunk: records`; `spec tokens` is
-`chunk: declarations`. None of them is `chunk: selftests`.
+`chunk: declarations` guarded on six paths, `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`,
+`memory/guides/BUILD-METHOD.md`, `memory/guides/ANNOTATION-STYLE.md`, `tools/lib/` and
+`tools/memory-tree/`, so a scoped bar whose diff misses all six skips it and the push boundary's
+full bar does not — and this pass's diff cannot miss them, because the marker bump plus `--render`
+rewrites all four docs in the leg's `PAIRS` line; `kickoff-manifest ratchet` and `memory hygiene`
+are `chunk: records`; `spec tokens` is `chunk: declarations`. None of them is `chunk: selftests`.
 
 The suite that observes AC4 and AC5 is `chunk: selftests` by ruling and is on no bar at all: it is
 absent from `tools/gate-legs.json`, and its row in `tools/run-gates/selftest-budgets.txt` is a budget
@@ -449,6 +494,16 @@ quote the new signature in full · no floor moves.
   a sequencing rule from that; it now states the sets are disjoint against unit 2's own §4 and
   `unattended.sh:4853`. L: the M4 cost re-measured at 304 bytes, not 310, and its headroom pair
   moved with it in §4, §5 and F1's option figures; the F1 mark stands.
+- rev-3 · 2026-09-13 · §3 · §4 · §7 · AC4 · AC7 · folded round-2 spec-audit clusters A (ids 1, 8,
+  24, 10), B (ids 17, 9), F (ids 11, 21), G (id 23) and I (id 13); terminal fold, the loop is
+  CONVERGED for this subject. A: AC7's same-commit join read red as spelled (`diff-tree` without
+  `-r`) and could not fail once spelled, since the bump always moves the template's line-1 marker;
+  it now joins on the M4 bytes in the `-G` commit and names the two-commit split that reds it. B:
+  the Rollout paragraph licensed a concurrent pass with unit 2, which check 49 condition 1 refuses
+  because every pass declares the two generated indexes, the README and its spec; the passes are
+  SEQUENTIAL. F: AC4's redirect carries stderr, where the MARK lives. G: the closing pass's carrier
+  set is the derived fifteen-file probe, `README.md:1` included, not the paired-plus-two
+  enumeration. I: the parity leg's guard list quoted as the manifest has it, six paths.
 
 ## 10. Reuse audit
 

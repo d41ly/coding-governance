@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** SPECCED · rev-3 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -49,12 +49,17 @@ clean, one run per arm, with every arm asserting the VALUE it grades rather than
   (§8 F2). Observed by AC4.
 - **S5** — The suite's cost is measured on this node twice, by the method in
   `memory/gotchas/process-creation-is-the-suite-cost.md`: a PAIRED standalone reading, the same
-  invocation before and after on the same box back-to-back (AC2), and the one full-bar row the
-  landing bar produces (AC3). Both readings go into the unit's acceptance ledger with the
-  checker-invocation count beside each figure, whatever they read. The standalone pair must show
-  the cut; the full-bar row is OBSERVED against the untouched ceiling and its red has the disposition
-  AC3 and §8 F3 state, because this repo's own record says the loaded reading is not derivable from
-  the quiet one. Observed by AC2 and AC3.
+  traced invocation before and after on the same box back-to-back (AC2), and the one full bar the
+  run buys BY HAND as `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` (AC3). The
+  landing bar produces no such row: `.unattended.conf`'s `GATE_CMD` is
+  `bash tools/run-gates/run-gates.sh`, `.githooks/pre-push` reads `GATE_SELFTESTS` and never sets
+  it, so the leg is held on every boundary (§7) and a landing push's green is not the AC3
+  observation. Both readings go into the unit's acceptance ledger with the checker-invocation count
+  beside each figure, whatever they read: the standalone pair's counts come from each run's own
+  trace (AC2), and the full-bar row, which the runner runs untraced, carries the count AC1 derives
+  from the arm list. The standalone pair must show the cut; the full-bar row is OBSERVED against the
+  untouched ceiling and its red has the disposition AC3 and §8 F3 state, because this repo's own
+  record says the loaded reading is not derivable from the quiet one. Observed by AC2 and AC3.
 - **S6** — Every arm this unit adds or moves has its failing case observed RED by hand before it
   lands, from a driver that refuses a run which executed fewer arms than the section holds.
   Observed by AC6.
@@ -367,16 +372,26 @@ a red suite is what it is today.
   figure: the before counts 19 and 1 are PINNED, read from the 2026-09-13 trace on node `a`; the
   after count is DERIVED from the arm list at observation time and resolves to 13 on the arm list
   this spec holds.
-- **AC2** — When `time bash tools/memory-tree/check-memory-hygiene.test.sh` runs on node `a` with
-  `TIMEFORMAT='real %R user %U sys %S'` as a PAIRED reading — before at `16da4c6a` from a frozen
+- **AC2** — When `time PS4='+ ${LINENO} ' bash -x tools/memory-tree/check-memory-hygiene.test.sh 2><trace>`
+  runs on node `a`, with `TIMEFORMAT='real %R user %U sys %S'` set in the calling shell and
+  `<trace>` a fresh file per run, as a PAIRED reading — before at `16da4c6a` from a frozen
   `git clone --local` under a short root, after at the landed tip, interleaved before-after-before-after
   on the same box with the same `ps -W` process count at each start — the minimum `real` of the two
   after runs is at most 0.8 times the minimum `real` of the two before runs, every after run exits
-  0 and prints `PASS (n assertions)`, and each of the four readings goes into the ledger with its
-  checker-invocation count from a `PS4` trace beside it, which is the positive artifact that the
-  arm ran the suite and not a stub.
+  0 and prints `PASS (n assertions)`, and each of the four readings goes into the ledger with the
+  checker-invocation count read from ITS OWN trace file beside it, counted the way AC1 counts: 20
+  for a before run (the 19 over the archive fixture plus the one clean run at line 2198) and 13 for
+  an after run. That count is the per-reading artifact that the run executed the section and not a
+  stub, and it is the only artifact a before run has, because the suite is red at `16da4c6a` (§4)
+  and prints no `PASS` line. All four readings are the TRACED class of the §4 table, which is the
+  class 0.72 and therefore 0.8 were derived on (433 s of the 598.7 s traced reading); the plain
+  790.7 s reading is not a term of this ratio. The trace costs the ratio nothing it can measure:
+  §4's traced reading was the FASTER of its two quiet runs, so the trace's own cost sits inside the
+  1.32× run-to-run noise §4 records, and it is the same on both sides of the pair.
   Red when: the after-over-before ratio exceeds 0.8, or an after run exits non-zero or prints no
-  `PASS` line, or a reading is recorded without its invocation count. The bound is derived from
+  `PASS` line, or a reading is recorded without a count read from its own trace, or a before run's
+  count is not 20 or an after run's count is not 13 — the section did not run to its end and the
+  wall figure timed a partial suite. The bound is derived from
   the mechanism, not from a reading: §4 predicts 0.72 (433 s of 598.7 s traced), and 0.8 leaves the
   residual noise of a back-to-back pair eight points. A change that only cuts four of the seven
   archive runs — candidate A's shape — saves about 112 s of the traced 598.7 s, a ratio of 0.81,
@@ -389,8 +404,9 @@ a red suite is what it is today.
   because `git clone --local` into the scratchpad's path fails with "Filename too long" on this
   node; and it is FROZEN — no commit lands in it between the two before runs, since a suite run
   over a tree that moved under it measures nothing.
-  figure: no wall figure is pinned; 0.8 is DERIVED from §4's 0.72 as stated; the four readings and
-  their counts are DERIVED by the commands.
+  figure: no wall figure is pinned; 0.8 is DERIVED from §4's 0.72 as stated; the four readings are
+  DERIVED by the command; the before count 20 is PINNED from the 2026-09-13 trace AC1 cites and
+  the after count 13 is DERIVED from the arm list as AC1 derives it.
 - **AC3** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on node `a`
   after the change, the run's `.leg` row for `memory-hygiene self-test` under the runner's
   `gate-run` window records status `ok`, rc 0 and seconds below the ceiling `tools/gate-legs.json`
@@ -553,6 +569,11 @@ and its comparison moves to immediately above that line.
   one staged break per assertion, the control's applied to line 2198 at rc 0. J: F2's body agrees
   with its mark, and the floor comparison hoists to above the `PASS` line. K: the 55% figure points
   at the §4 table; `pk_rc` goes and the pin lowers, no wrapper branch.
+- rev-3 · 2026-09-13 · S5 · AC2 · folded round-2 spec audit clusters J (id 14), K (id 15). J: S5
+  names the hand-run `GATE_FULL=1 GATE_SELFTESTS=1` bar as AC3's observation and says why the
+  landing bar produces no such row (`GATE_CMD`, `.githooks/pre-push`). K: AC2's four readings are
+  traced runs, each ledger count read from its own trace, on the class 0.8 was derived from; the
+  full-bar row's count is AC1's derived one, said once in S5.
 
 ## 10. Reuse audit
 
