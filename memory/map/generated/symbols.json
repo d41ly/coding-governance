@@ -848,6 +848,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_ts_generic_close",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "check_ts_generic_fn_type",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -861,6 +866,11 @@
       "id": "check_ts_reading",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "check_ts_returned",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "check_ts_tag_start",
@@ -1611,6 +1621,11 @@
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "extract_jsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "extract_phrases",
@@ -2603,6 +2618,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "parse_ts_source",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3008,7 +3028,17 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_ts_arrow_body",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_ts_block_kind",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_ts_body_start",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
@@ -3018,9 +3048,19 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_ts_expr_end",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_ts_fixtures",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ts_jsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_ts_mode",

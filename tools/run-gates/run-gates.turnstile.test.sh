@@ -31,7 +31,7 @@ bad=0
 # Raised from 42 to 62 by TOOL-aReapedTicket-3, which adds arms 15-21 — the QUEUE side, which this
 # suite had no arm for at all. The 20 they contribute were counted by running them, not derived on
 # paper: 11 of the 20 are RED against the runner at that build's BASE and all 20 green after it.
-FLOOR_ASSERTIONS=65
+FLOOR_ASSERTIONS=66
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -225,15 +225,35 @@ fi
 # holder inside a leg of any length stays live and the successor QUEUES. The old behaviour was
 # reproduced before the fix — a successor printed `reaping the beacon of a stalled holder
 # (heartbeat 13s old, ttl 6s)` against a holder that was alive and working, and both bars ran.
+# THE NUMBERS ARE SIZED FOR A CONTENDED HOST, and the control is graded before the property. A TTL
+# of 2 s with a 1 s tick redded twice on this box while another repository's gate ran beside it:
+# one late tick — a `date` and an `mv` through MSYS cost 0.3 to 0.75 s each here — and the
+# heartbeat read older than the TTL, so a LIVE holder was reaped and the arm named a ticker
+# defect that was not there (TOOL-aGradedDialect-13). A TTL of 6 keeps the same property — the leg
+# is still several TTLs long, and a ticker that does NOT refresh leaves a 14 s-old heartbeat that
+# the successor reaps exactly as before — while a tick a few hundred milliseconds late changes
+# nothing. And the successor used to launch after a flat 5 s whether or not the holder had
+# claimed; launch-to-claim measured 6 to 11.5 s under load, and an unclaimed beacon makes the
+# property pass VACUOUSLY. The claim is now the control, polled the way 4b polls it.
 R6=$tmp/ceiling; mk_repo "$R6"; B6=$(beacon "$R6")
 legs "$R6" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
-( cd "$R6" && env GATE_FULL=1 TS_LONG=8 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
-h6=$!; sleep 5
-out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
-wait "$h6" 2>/dev/null
-printf '%s' "$out6" | grep -q 'stalled holder' \
-  && nope "a LIVE holder inside a leg longer than the TTL was reaped — the ticker is not refreshing the beacon" \
-  || ok "a live holder inside a leg longer than the TTL is NOT reaped; the successor queues instead"
+( cd "$R6" && env GATE_FULL=1 TS_LONG=14 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
+h6=$!; claimed6=0
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
+  sleep 1; kill -0 "$h6" 2>/dev/null || break; [ -d "$B6" ] && { claimed6=1; break; }
+done
+if [ "$claimed6" = 1 ]; then
+  ok "control: the long-leg holder claimed the beacon (the ceiling arm has something to grade)"
+  out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
+  wait "$h6" 2>/dev/null
+  printf '%s' "$out6" | grep -q 'stalled holder' \
+    && nope "a LIVE holder inside a leg longer than the TTL was reaped — the ticker is not refreshing the beacon" \
+    || ok "a live holder inside a leg longer than the TTL is NOT reaped; the successor queues instead"
+else
+  wait "$h6" 2>/dev/null
+  skipped "the long-leg holder did not claim the beacon within 30s on this host — the control did not establish, so no defect was observed"
+  skipped "whether a live holder inside a long leg is reaped went UNGRADED, because the control above did not establish"
+fi
 
 # ---- 4d: the ticker is DETACHED, so GATE_JOBS=1 still dispatches -------------------------------
 # The turnstile block and the dispatch pool are one shell. An undetached ticker is a live job
@@ -242,10 +262,14 @@ printf '%s' "$out6" | grep -q 'stalled holder' \
 # a hung bar prints nothing to grep for, which is the whole point.
 R6b=$tmp/serial; mk_repo "$R6b"
 legs "$R6b" '[ {"name": "q1", "argv": ["bash", "fx/quick.sh"]}, {"name": "q2", "argv": ["bash", "fx/quick.sh"]} ]'
-( cd "$R6b" && env GATE_FULL=1 GATE_JOBS=1 GATE_TURNSTILE_TTL=12 GATE_TURNSTILE_TICK=1 timeout 60 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
+# 180 s, not 60: the bound exists to catch a bar that never returns, and a HUNG bar hits 180 exactly
+# as it hit 60. A two-leg serial bar merely SLOW on a contended host — the profile probe, the
+# manifest parse and two legs, each a handful of MSYS spawns — crossed 60 twice on this box with
+# another repository's gate beside it and was named a dispatch defect (TOOL-aGradedDialect-13).
+( cd "$R6b" && env GATE_FULL=1 GATE_JOBS=1 GATE_TURNSTILE_TTL=12 GATE_TURNSTILE_TICK=1 timeout 180 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
 rc6b=$?
 [ "$rc6b" != 124 ] && ok "a two-leg bar at GATE_JOBS=1 dispatches and completes with the ticker running (rc $rc6b)" \
-                   || nope "GATE_JOBS=1 hit the 60s outer bound — the ticker is counted as a live job and the pool never dispatches"
+                   || nope "GATE_JOBS=1 hit the 180s outer bound — the ticker is counted as a live job and the pool never dispatches"
 
 # ---- 4e: a SIGKILLed holder's ticker stops, so nothing refreshes a beacon its owner has left ----
 # No trap runs on SIGKILL. The ticker's own nonce and pid guards are the mitigation, and this is the
