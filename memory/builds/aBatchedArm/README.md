@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3
+ids: TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4
 authorized-by: prompt
 ---
 
@@ -78,7 +78,7 @@ adopted under protocol §11 after that measurement, not planned.
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 3 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3
+ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
