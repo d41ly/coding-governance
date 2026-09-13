@@ -50,7 +50,9 @@ replay, and the commit-time deny the design record specifies, without the subage
   in the opening commit, so each is unreviewed and M4 audits the set before any code. Round 1 came
   back BLOCKED on four units; the fold is rev-2 of seven specs, and two forks it settled are
   delegated marks in `TOOL-aReplayedCard-1` §8: the deny set is `git commit` alone, and the
-  exemption keys on a NEW build README, staged or untracked.
+  exemption keys on a NEW build README, staged or untracked. Round 2 blocked TOOL-1 alone; rev-3
+  adds a third delegated mark there: an ABSENT card allows with one line, because a deny on absence
+  refused this run's own landing commits and every session open on the node.
 - **Every gate arm is observed RED before it lands.** No exceptions for a print-only verb.
 - **The kit self-tests are held**; the DoD for the kit units owes `GATE_SELFTESTS=1` on the full
   bar because this is kit work.
@@ -67,10 +69,10 @@ None yet.
 | 2 | `KICK-aReplayedCard-1` | 2 | `manifest-check.sh --card` writes and replays the session card |
 | 2 | `TOOL-aReplayedCard-5` | 1 | `orient-counterfactual.js` measures one stage-2 arm per call |
 | 3 | `KICK-aReplayedCard-2` | 2 | `--card --append` and `--card --check` run the batched citation check |
-| 3 | `TOOL-aReplayedCard-1` | 2 | `scratch-guard.js` denies a `git commit` with no READY line |
+| 3 | `TOOL-aReplayedCard-1` | 2 | `scratch-guard.js` denies a `git commit` on an un-oriented card |
 | 5 | `KICK-aReplayedCard-3` | 2 | the engine consumes the card at Step 1 and appends at Step 5 |
 | 4 | `TOOL-aReplayedCard-2` | 2 | SessionStart matchers, two card fragments, a rematching merge, a wiring arm |
-| 5 | `TOOL-aReplayedCard-3` | 2 | the unattended Skill's resume section kicks off after `--resume` |
+| 6 | `TOOL-aReplayedCard-3` | 2 | the unattended Skill's resume section kicks off after `--resume` |
 
 <!-- /roster:units -->
 
@@ -82,13 +84,13 @@ ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplaye
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aReplayedCard-4 — path-bearing manifest trap bullets become `memory/gotchas/` records](spec/2026-09-13-spec-TOOL-aReplayedCard-4.md) | 1 | 1 | SPECCED | rev-1 | 2026-09-13 |
-| [KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card](spec/2026-09-13-spec-KICK-aReplayedCard-1.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-13 |
+| [KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card](spec/2026-09-13-spec-KICK-aReplayedCard-1.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-14 |
 | [TOOL-aReplayedCard-5 — `orient-counterfactual.js` measures one stage-2 arm per call](spec/2026-09-13-spec-TOOL-aReplayedCard-5.md) | 2 | 1 | SPECCED | rev-2 | 2026-09-13 |
-| [KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check](spec/2026-09-13-spec-KICK-aReplayedCard-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-13 |
-| [TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` with no READY line](spec/2026-09-13-spec-TOOL-aReplayedCard-1.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-13 |
-| [TOOL-aReplayedCard-2 — SessionStart matchers, two card fragments, a rematching merge, a wiring arm](spec/2026-09-13-spec-TOOL-aReplayedCard-2.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-13 |
-| [KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5](spec/2026-09-13-spec-KICK-aReplayedCard-3.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-13 |
-| [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-13 |
+| [KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check](spec/2026-09-13-spec-KICK-aReplayedCard-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` on an un-oriented card](spec/2026-09-13-spec-TOOL-aReplayedCard-1.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [TOOL-aReplayedCard-2 — SessionStart matchers, two card fragments, a rematching merge, a wiring arm](spec/2026-09-13-spec-TOOL-aReplayedCard-2.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5](spec/2026-09-13-spec-KICK-aReplayedCard-3.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 4 record folder(s).
@@ -106,7 +108,8 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 2 | `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-5` | yes |
 | 3 | `KICK-aReplayedCard-2`, `TOOL-aReplayedCard-1` | yes |
 | 4 | `TOOL-aReplayedCard-2` | no |
-| 5 | `KICK-aReplayedCard-3`, `TOOL-aReplayedCard-3` | yes |
+| 5 | `KICK-aReplayedCard-3` | no |
+| 6 | `TOOL-aReplayedCard-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -141,6 +141,8 @@ none
   clone with a throwaway run-state file and its own keepalive, never this build's live `RUN.md`,
   whose keepalive the resume section would reap from a second session (H9); a `consumes-from
   TOOL-aReplayedCard-2` edge and order 5, because AC2 needs a wired writer (M5).
+- rev-3 · 2026-09-14 · header · order 6, because AC2 also consumes `KICK-aReplayedCard-3`'s Step 5b
+  append and the two cannot share a parallel step (round-2 M2).
 
 ## 10. Reuse audit
 

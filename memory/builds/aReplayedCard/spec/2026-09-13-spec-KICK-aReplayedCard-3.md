@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams kickoff · order 5
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 5
 
 <!-- gen:spec-records -->
 
@@ -25,19 +25,27 @@ recompute", gets its first live source.
 
 - **S1** Step 1 states which items a card opening `orientation —` in context satisfies — the node
   tag, the tree kind, the worktree count and the recent subjects — and which the engine still runs
-  in its one batched command: `git rev-parse HEAD` as the BASE, `status --short` for the STOP
-  conditions a count cannot carry, and the fast-forward on the default branch with a clean tree,
-  exactly as today. No card → the whole batch as today. Observed by AC1.
-- **S2** Step 5 pipes the READY micro-format, the manifest-audit delta line, the gotcha class
-  names, the record ids the recall probe returned and were judged binding, and the open items, to
-  `bash <check-script> --card --append --session <sid>`, taking `<sid>` from the card header in
-  context, with `base <sha>` equal to the BASE Step 1 pinned. Then it stops exactly as today.
-  Observed by AC2.
-- **S3** Step 2b's repair commit, when the audit finds drift, is made AFTER Step 5's append and
-  never before it, so the deny sees a READY line when the engine's own commit reaches it; Step 2b
-  stages the repair and Step 5 names it in the READY card's delta line. Observed by AC5.
+  in its one batched command: `git branch --show-current`, `git rev-parse HEAD` as the BASE,
+  `status --short` for the STOP conditions a count cannot carry, and the fast-forward on the
+  default branch with a clean tree, exactly as today; the card's branch is never consumed. No card
+  → the whole batch as today. Observed by AC1.
+- **S2** Step 5 pipes the six sections `KICK-aReplayedCard-2` §4 declares — `## task` with the
+  sealed skeleton fields as derived, `## manifest` with the audit delta, `## read` with the
+  pointer-map slices and entrypoints, `## records` with the recall ids judged binding and the terms
+  line, `## classes` with the gotcha class names, `## open` with the parked items — and the READY
+  micro-format, to `bash <check-script> --card --append --session <sid>`, taking `<sid>` from the
+  card header in context, with `base <sha>` equal to the BASE Step 1 pinned. Then it stops exactly
+  as today. Observed by AC2.
+- **S3** Step 2b's repair commit, when the audit finds drift, is made INSIDE Step 5, after the
+  append and before the halt — and in Step 5b after the append and before continuing — never
+  earlier, so the deny sees a READY line when the engine's own commit reaches it and the READY
+  card's delta line names a commit that exists. Step 2b stages the repair; Step 5 commits it. This
+  reorders the moment `memory/builds/aRatchetForge/spec/manifest-ratchet-spec.md` §4 set at
+  "repair NOW as part of kickoff"; the repair still happens at kickoff, and only the commit moves
+  behind the append. Observed by AC5.
 - **S4** Step 5b appends the same body plus the build slug and the run-state path, then continues
-  without halting, as today. Observed by AC2.
+  without halting, as today. NOT OBSERVED by a criterion here: AC1 and AC2 observe an attended
+  kickoff that halts at Step 5; the 5b append is observed by `TOOL-aReplayedCard-3` AC2.
 - **S5** The engine's file stays under the `kickoff engine size <=18KiB` gate. The headroom at base
   is 207 B (`wc -c` 18225 against 18432); the clauses fit by trimming the Step 1 batch prose the
   card now makes redundant. If they do not fit, the fallback is the design record's split of
@@ -51,7 +59,8 @@ recompute", gets its first live source.
 ## 3. Non-goals (OUT)
 
 - No subagent, no `.claude/agents/orient.md`, no Step 0 spawn clause. Owner decision 1.
-- No change to the manifest body, to Steps 2 through 4, or to the READY card's fields.
+- No change to the manifest body, to Steps 2, 3 and 4, or to the READY card's fields; Step 2b
+  changes only WHEN its repair commits.
 - No re-render of the memory-recall Skill line about kickoff probes; that is stage 2.
 - No consumption of the card by the unattended driver; `TOOL-aReplayedCard-3` is the resume seam.
 - No use of the card's `tree —` BASE as the kickoff BASE: the card is written at session start and
@@ -79,9 +88,12 @@ No identifier is minted; the change is engine prose.
 
 ### Migration
 
-An adopter's installed engine is a junction to the tracked copy on this node and a copy elsewhere;
-`tools/check-wiring.sh --session` already reports a tracked-versus-installed mismatch, so a stale
-copy is visible at the next start.
+On this node the installed `/session-kickoff` is a junction to the PRIMARY tree's
+`skills/session-kickoff/`, on `main`, so a session on this branch invokes the OLD engine until the
+landing merge fast-forwards the primary. AC1 and AC2 are therefore observed by a fixture session
+that re-points the junction to this worktree's copy for the observation and restores it after,
+recording both acts and `tools/check-wiring.sh --session`'s tracked-versus-installed line in the
+ledger; an adopter's copy elsewhere is reported by that same line at the next start.
 
 ### Rollout
 
@@ -123,12 +135,15 @@ commands cost seconds and keep both.
 ## 6. Acceptance criteria
 
 - **AC1** — When `/session-kickoff` runs in a session whose context holds a card, the transcript
-  shows no `git worktree list` and no `git log` in the Step 1 batch, shows one `git rev-parse HEAD`
-  and one `status --short`, and the READY card's BASE equals `git rev-parse HEAD` at that moment,
-  not the card's `tree —` BASE.
-  Red when: the engine re-derives what the card carried, or pins the session-start BASE.
-  fixture: a session started after `TOOL-aReplayedCard-2` wires the hook; observed once, recorded
-  in the acceptance ledger with the session id.
+  shows no `git worktree list` and no `git log` in the Step 1 batch, shows one
+  `git branch --show-current`, one `git rev-parse HEAD` and one `status --short`, and the READY
+  card's BASE and branch equal `git rev-parse HEAD` and `git branch --show-current` at that moment,
+  not the card's `tree —` cell, in a fixture that checked out a new branch after the card was
+  written.
+  Red when: the engine re-derives what the card carried, or pins the session-start BASE or branch.
+  fixture: a session started after `TOOL-aReplayedCard-2` wires the hook, with the junction
+  re-pointed per §4 Migration; observed once, recorded in the acceptance ledger with the session id
+  and the wiring line.
 - **AC2** — When that kickoff reaches Step 5, the card on disk ends with the READY line the
   transcript printed, and `bash skills/session-kickoff/manifest-check.sh --card --check` over it
   exits 0.
@@ -140,11 +155,11 @@ commands cost seconds and keep both.
 - **AC4** — When `bash skills/session-kickoff/manifest-check.sh` runs at the landing commit, the
   ratchet is green and the commit touching `SKILL.md` carries a `manifest-audit:` delta line.
   Red when: a watched file moved and the stamp did not.
-- **AC5** — When `skills/session-kickoff/SKILL.md` is read at the landing commit, Step 2b's repair
-  commit is stated to follow Step 5's append, and the fenced git commands of Steps 0 through 4
-  contain no `git commit`.
+- **AC5** — When `skills/session-kickoff/SKILL.md` is read at the landing commit, Step 5 states by
+  text that the repair commit follows the append and precedes the halt, Step 5b states the same
+  before continuing, and no inline code span in Steps 0 through 4 contains `git commit`.
   Red when: the engine's own repair commit precedes the READY line and the deny refuses the remedy
-  it named.
+  it named, or the ordering sentence is absent.
 
 ## 7. Gates
 
@@ -163,6 +178,13 @@ none
   Step 2b's repair commit follows Step 5's append, so the engine never commits before the READY
   line the deny needs (B1); a `consumes-from TOOL-aReplayedCard-2` edge and order 5, because AC1
   needs a wired writer (M5); this unit alone writes the dossier (L2).
+- rev-3 · 2026-09-14 · §2 · §3 · §4 · §6 · S1 · S2 · S3 · S4 · AC1 · AC5 · folded the round-2
+  spec audit. S2 names the six sections the append body carries, `## task` and `## read` included
+  (M3); the branch joins the still-run list and AC1 (M4); the repair commit's moment is inside
+  Step 5 between the append and the halt, Step 2b leaves §3's unchanged list, and the ratchet spec
+  is cited as the text reordered (M5); AC1 and AC2 are observed with the junction re-pointed to
+  this worktree's engine, because the installed skill is the primary's (M8); S4's observation is
+  `TOOL-aReplayedCard-3` AC2 (L1); AC5 reads inline spans and the ordering sentence by text (H2).
 
 ## 10. Reuse audit
 

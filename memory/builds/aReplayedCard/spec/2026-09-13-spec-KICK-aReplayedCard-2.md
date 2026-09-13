@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
 
 <!-- gen:spec-records -->
 
@@ -52,6 +52,13 @@ line stays with the charter's verify-before-act rule.
 - **S9** Every refusal uses the script's `MANIFEST env ERROR — …` shape with its exit code, not the
   numbered `fail` recorder, so `ARMS_FLOORS` does not move; every refusal is armed in
   `manifest-check.test.sh` and `FLOOR_ASSERTIONS` moves in the same commit. Observed by AC7.
+- **S10** An append carrying a real READY line rewrites the card's `tree —` cell to the toplevel
+  the append runs in, spelled as `KICK-aReplayedCard-1` S3 declares, because the kickoff ran THERE
+  and that is what the cell asserts; a session that moved to a sibling worktree is then oriented in
+  the tree it commits from. Observed by AC10.
+- **S11** `--card --check` also refuses, exit 1, a card that carries a real READY line and no
+  `## task` section — the shape that says a kickoff ran and left no scope on disk. Observed by
+  AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -193,6 +200,14 @@ as vetted, and the lint this rule comes from prints its skip count for exactly t
   with `n` equal to the count of tracked files named `README.md`.
   Red when: a basename citation is neither resolved nor annotated.
   figure: DERIVED — `git ls-files | grep -c '/README.md$'` at observation.
+- **AC10** — When a card written by `--card --write` in worktree A of the self-test's fixture is
+  appended to with a real READY line by `--card --append` run from sibling worktree B, the card's
+  `tree —` cell names B's toplevel in the declared spelling and the rest of the startup lines are
+  byte-identical.
+  Red when: the cell keeps A, so the deny refuses every commit from B for the session's life.
+- **AC11** — When `--card --check` runs over a card holding a real READY line and no `## task`
+  heading, it exits 1 naming the missing section; over a card holding both it exits 0.
+  Red when: a kickoff's READY line lands with no scope beneath it and the check calls it clean.
 
 ## 7. Gates
 
@@ -203,6 +218,8 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · a token-free body ·
 New arm: `skills/session-kickoff/manifest-check.test.sh` · a body past the cap · same
 New arm: `skills/session-kickoff/manifest-check.test.sh` · a READY line with a stale base · same
 New arm: `skills/session-kickoff/manifest-check.test.sh` · a unique and an ambiguous basename citation · same
+New arm: `skills/session-kickoff/manifest-check.test.sh` · an append from a sibling worktree of the fixture · same
+New arm: `skills/session-kickoff/manifest-check.test.sh` · a READY line with no `## task` section · same
 
 The full bar is owed with `GATE_SELFTESTS=1`.
 
@@ -220,6 +237,10 @@ none
   READY line with a stale base is refused at the write boundary (M3's left-shift); `--check` skips
   its own annotations (S7); refusals use the env-error shape and `ARMS_FLOORS` is dropped for
   `FLOOR_ASSERTIONS` (M10); the user-docs row names the script header (L1).
+- rev-3 · 2026-09-14 · §2 · §6 · §7 · S10 · S11 · AC10 · AC11 · folded the round-2 spec audit.
+  The append rewrites the `tree —` cell to the tree it runs in, so a session that moved worktrees
+  has a remedy (round-2 H4); `--check` refuses a READY line with no `## task` beneath it (round-2
+  M3's left-shift).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams kickoff · order 2
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 2
 
 <!-- gen:spec-records -->
 
@@ -41,8 +41,11 @@ no manifest bytes beyond one audit-block key.
   `git rev-parse --show-toplevel` prints, forward-slash with a drive letter on Windows, before the
   script's own `pwd` normalisation. Observed by AC2 and AC10.
 - **S4** The `node —` cell is resolved from the registry file the manifest's audit block names in a
-  `registry:` key, which this unit adds to `memory/guides/SESSION-KICKOFF.md` as `registry: AGENTS.md`;
-  an absent manifest or key prints `node — UNKNOWN: no registry`. The reader takes the FIRST table
+  `registry:` key, which this unit adds to `memory/guides/SESSION-KICKOFF.md` as `registry: AGENTS.md`
+  and to the seed `skills/session-kickoff/MANIFEST-TEMPLATE.md` as `registry: {{REGISTRY_PATH}}`,
+  bumping `KIT_MANIFEST_VERSION` and the template's `kickoff-manifest:` marker together and
+  extending the runbook's retrofit list, the way `check-script:` arrived at v1.1 and
+  `last-body-change:` at v1.3; an absent manifest or key prints `node — UNKNOWN: no registry`. The reader takes the FIRST table
   under a `## Node registry` heading, strips backticks from cells, and matches `$USERNAME` against
   the Machine/user cell by equality or by the prefix `$USERNAME @`, never row-wide. No unique match
   prints `node — UNKNOWN` with the user name, and the card still writes. Observed by AC4.
@@ -88,7 +91,7 @@ no manifest bytes beyond one audit-block key.
 - **hands-off** `KICK-aReplayedCard-3` — the card header line Step 1 recognises in context.
 - **hands-off** `TOOL-aReplayedCard-5` — the card an Explore-typed arm reads at Step 1, once wired.
 - **consumes-from** `TOOL-aReplayedCard-4` — the manifest bytes the eviction frees; the `registry:`
-  key this unit adds does not fit the 5 B of headroom at base.
+  key this unit adds does not fit the 3 B of headroom at base.
 - **consumes-from** external — `git rev-parse --git-common-dir`, which resolves the primary tree's
   `.git` from any worktree; without it the card has no home shared across worktrees.
 
@@ -99,7 +102,8 @@ no manifest bytes beyond one audit-block key.
 One file per session under the git common dir, so every worktree of one repository shares the
 directory and a card names the tree it was written in. The `tree —` cell is what tells a card from
 a sibling worktree apart, and the deny compares it, after normalising both sides, rather than the
-path.
+path. `KICK-aReplayedCard-2`'s append rewrites the cell to the tree the kickoff ran in; this verb
+writes it once.
 
 ```
 orientation — <session_id> · written <iso> · by manifest-check.sh --card --write
@@ -136,7 +140,10 @@ key; the checker tolerates keys beyond the four it requires, as `check-script:` 
 ### Rollout
 
 Dark until `TOOL-aReplayedCard-2` wires the invocations. The verb is callable by hand from the
-commit that lands it, which is how AC1 through AC10 are observed before any hook exists.
+commit that lands it, which is how AC1 through AC10 are observed before any hook exists — every
+one of them in the self-test's scratch clone of this repository, never in this worktree, because
+the card home is the common dir every worktree on the node shares and a card left there is a
+fixture a sibling session trips on; AC11 asserts the clone left nothing behind.
 
 ### Files touched (estimate)
 
@@ -145,12 +152,14 @@ commit that lands it, which is how AC1 through AC10 are observed before any hook
 | `skills/session-kickoff/manifest-check.sh` | the verb dispatch, four functions, one constant, the header's verb table |
 | `skills/session-kickoff/manifest-check.test.sh` | arms for S2, S3, S4, S5, S7, S8; `FLOOR_ASSERTIONS` |
 | `memory/guides/SESSION-KICKOFF.md` | `registry: AGENTS.md` in the audit block; `last-audit` re-stamped |
-| `WIRE-INTO-PROJECT.md` | the `registry:` key in the manifest recipe |
+| `skills/session-kickoff/MANIFEST-TEMPLATE.md` | `registry: {{REGISTRY_PATH}}` in the seed's audit block; the marker bumped |
+| `skills/session-kickoff/manifest-check.sh` | `KIT_MANIFEST_VERSION` bumped with the marker; the seed arm asserts the key |
+| `WIRE-INTO-PROJECT.md` | the `registry:` key in the manifest recipe and in the §4 retrofit list |
 
 ### Alternatives rejected
 
 **A separate `orientation-card.sh` beside the checker.** It needs a new `watch:` literal in a
-manifest with 5 B of headroom, a new install-prefix row, and a second place the engine resolves a
+manifest with 3 B of headroom, a new install-prefix row, and a second place the engine resolves a
 script from. The checker already ships beside the engine and is already watched.
 
 **Writing the card under the worktree's `.git` file.** A linked worktree's `.git` is a file, not a
@@ -189,8 +198,9 @@ carries no information.
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash skills/session-kickoff/manifest-check.sh --card --write --session t1` runs
-  from this worktree, a file exists under the directory `git rev-parse --git-common-dir` names, in
-  an `orientation` subdirectory, named `t1.md`, and stdout equals its bytes.
+  in the self-test's scratch clone of this repository, a file exists under the directory
+  `git rev-parse --git-common-dir` names there, in an `orientation` subdirectory, named `t1.md`,
+  and stdout equals its bytes.
   Red when: the verb falls into the manifest-path catch-all and the script reports the argument as
   a manifest that does not exist.
 - **AC2** — When that card is read, it carries the `tree —` line with the bytes
@@ -206,14 +216,15 @@ carries no information.
   containing `/` or `..`, it exits 2 naming the channel or the offending id and writes nothing under
   `orientation/`.
   Red when: a card named after an empty string, a literal `null` or a path appears.
-- **AC4** — When `--card --write` runs in this worktree with the manifest naming `registry: AGENTS.md`,
-  the card reads `node — a · daily-agent` on this node; when the self-test points the key at a
+- **AC4** — When `--card --write` runs in the scratch clone with the manifest naming
+  `registry: AGENTS.md`, the card reads `node — a · daily-agent` on this node; when the self-test points the key at a
   fixture registry whose Remote column repeats one user name on every row and whose Machine/user
   cell matches on exactly one, the card names that row's tag; pointed at a fixture with no matching
   cell, it prints `node — UNKNOWN`; with the key absent, `node — UNKNOWN: no registry`.
   Red when: a row-wide match hits every row, the charter's second registry-shaped table wins, or a
   backticked cell fails to match.
-  fixture: the real `AGENTS.md` at HEAD, and two registry tables the self-test writes.
+  fixture: the real `AGENTS.md` at HEAD inside the clone, and two registry tables the self-test
+  writes.
 - **AC5** — When `--card --replay --session t1` runs after AC1, stdout is AC1's bytes followed by
   exactly one `now —` line, and the file on disk is byte-identical to before; when it runs for a
   session with no card, the card it writes carries a `node —` tag, not `UNKNOWN`.
@@ -236,6 +247,11 @@ carries no information.
 - **AC10** — When the self-test runs `--card --write` in a scratch repository with no
   `.memory-tree.conf`, the exit is 0 and the card reads `live — skipped:` with the reason.
   Red when: an absent conf refuses the card, so every commit in that repository is denied.
+- **AC11** — When this repository's real common dir is listed after the whole self-test, no
+  `orientation/` entry the suite wrote is present, and the seed arm of the self-test asserts the
+  template's audit block carries every key the card verb reads.
+  Red when: a fixture card is left in the shared common dir, or a fresh adopter's seed lacks the
+  key and every card it writes reads `UNKNOWN` with no version WARN.
 
 ## 7. Gates
 
@@ -246,6 +262,7 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · the real `AGENTS.md`
 New arm: `skills/session-kickoff/manifest-check.test.sh` · `CARD_CAP_BYTES` forced under the startup size · same
 New arm: `skills/session-kickoff/manifest-check.test.sh` · a remote one commit ahead, refs unchanged after · same
 New arm: `skills/session-kickoff/manifest-check.test.sh` · no `.memory-tree.conf` in the tree · same
+New arm: `skills/session-kickoff/manifest-check.test.sh` · the shared common dir after the suite, and the seed's key set · same
 
 The full bar is owed with `GATE_SELFTESTS=1`: kit work, and the manifest-check self-test is held.
 
@@ -266,6 +283,12 @@ none
   and `ARMS_FLOORS` is dropped in favour of `FLOOR_ASSERTIONS` (M10); the user-docs row names the
   script header and the runbook (L1); a `consumes-from TOOL-aReplayedCard-4` edge for the manifest
   bytes the key needs.
+- rev-3 · 2026-09-14 · §2 · §3 · §4 · §6 · §7 · S4 · AC1 · AC4 · AC11 · folded the round-2 spec
+  audit. The `registry:` key rides a manifest format bump — seed template, `KIT_MANIFEST_VERSION`,
+  marker and retrofit list together — so a fresh adopter's card resolves a node (M9); every
+  criterion observes in a scratch clone and AC11 asserts the shared common dir is left clean, which
+  is what lets `TOOL-aReplayedCard-1` allow an absent card without a bootstrap (round-2 B1); the
+  headroom figure is the measured 3 B (L2); the append's cell rewrite is named in §4 (H4).
 
 ## 10. Reuse audit
 
