@@ -100,3 +100,24 @@ same empty list. Runs were sequential, never concurrent. The unbroken copy print
   allows two, and the after run's own output — thirteen section `ok` lines and the `PASS` line —
   is the proof the whole invocation reaches the section; rev-4 had left the one-through-the-whole
   sentence standing above that rule
+
+## The closing pass's AC2 half, attempted 2026-09-14 and still contended
+
+One run of `bash tools/memory-tree/check-memory-hygiene.test.sh`, alone by intent, timed with
+bash's builtin `time` after `/usr/bin/time` proved absent on MSYS (exit 127, no verdict line — the
+run that never executed, caught by the missing `PASS` line and not by the exit code).
+
+- Verdict: `PASS (374 assertions)`, rc 0.
+- Wall: `real 1275.088 user 159.195 sys 379.320`. CPU 538 s against the spec's before-runs at
+  543 s and 458 s: the change added no work. The wall is waiting.
+- Contention, measured after the fact: `unattended-asurfaced-lexicon-7cf573`'s bar wrote `.leg`
+  files from 23:34:44 to 00:00:13 on this box; this run spanned about 23:41 to 00:02. Nineteen of
+  twenty-one minutes shared the machine with a 67-leg bar. A `ps` probe at launch read 0 because
+  it landed in a gap between that bar's legs.
+
+So the 0.8 ratio verdict is STILL unmeasured: two after-readings exist (775.7 s under thirteen
+sibling bars; 1275.1 s under one 67-leg bar) and no quiet one. The deterministic criteria stand —
+13 invocations, zero `git archive`, PASS at the raised floor — and the park in `RUN.md` stands with
+them: the owner reads the count as the claim, or a quiet box is found. This ledger does not loop
+for one; `TOOL-aReapedSpinner-23` is the record of what generalising from a loaded reading costs.
+
