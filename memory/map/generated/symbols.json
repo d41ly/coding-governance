@@ -793,6 +793,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "check_rotation",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_self_containment",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -981,6 +986,11 @@
       "id": "cmd_check_format",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_check_rotation",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_contribute",

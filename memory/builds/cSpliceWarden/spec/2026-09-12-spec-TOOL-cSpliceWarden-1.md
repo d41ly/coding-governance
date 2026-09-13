@@ -1,6 +1,6 @@
 # TOOL-cSpliceWarden-1 — rotation becomes a DECLARED mode, and one semantics replaces two
 
-**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling+playbook · order 1 · ratified 2026-09-12
+**Status:** CLOSED · rev-3 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling+playbook · order 1 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -58,6 +58,9 @@ and write that one semantics into the HYGIENE pair and the charter template.
 
 - **hands-off** `TOOL-cSpliceWarden-3` — that unit widens check 20 to the archives this mode governs,
   and its §8 F1 records that grading the mode itself is filed rather than built.
+- **hands-off** `TOOL-cSpliceWarden-6` — that unit READS the key this one declares. It was filed
+  rather than built at the time, and built on 2026-09-13 when the owner asked for the three
+  filed rows.
 - **consumes-from** external — the owner's ratified 2026-09-12 decision that the mode is DECLARED per
   project rather than fixed by the kit, and that this repo declares `cut`.
 
@@ -181,6 +184,8 @@ mode; this repo declares `cut`.
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-3 · 2026-09-13 · §3 — the hands-off edge to `TOOL-cSpliceWarden-6`, which was filed at the
+  time and has since been built; the reciprocity check reds without it
 - rev-2 · 2026-09-13 · §2 S3 S6 · §3 · §4 · AC4 AC5 — the key's readership stated as minimal rather than implied; the grading check moved OUT of scope and §3's promise that unit 3 supplies it removed with it; the parity direction and the CRLF trap written into §4; the kit version bump added as S6 after `check-kit-versions.sh` red on three unbumped markers
 
 ## 10. Reuse audit

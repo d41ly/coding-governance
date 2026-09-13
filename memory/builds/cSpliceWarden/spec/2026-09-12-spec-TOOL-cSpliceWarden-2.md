@@ -1,6 +1,6 @@
 # TOOL-cSpliceWarden-2 — hygiene check 10 reaches a backlog archive, and stops reporting a reassuring zero
 
-**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling · order 2 · ratified 2026-09-12
+**Status:** CLOSED · rev-3 · 2026-09-13 · node c · Tier-2 · base 09a22d2b · streams tooling · order 2 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -47,6 +47,8 @@ shard actually lives, and fix the two further defects that surface the moment it
   against this unit there.
 - **hands-off** `TOOL-cSpliceWarden-3` — that unit reuses the enumeration half of this unit's §10
   contract for `row_docs()`, and its S4 is the arm joining the two readers.
+- **hands-off** `TOOL-cSpliceWarden-6` — check 24 reuses this unit's enumeration AND its
+  basename resolution rather than spelling a third copy of either.
 
 ## 4. Design
 
@@ -134,6 +136,8 @@ none — the four defects are established by measurement and the remedy for each
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · the first draft.
+- rev-3 · 2026-09-13 · §3 — the hands-off edge to `TOOL-cSpliceWarden-6`, which consumes this
+  unit's enumeration contract and its resolution
 - rev-2 · 2026-09-13 · §3 · §10 — the enumeration contract split into its shared ENUMERATION half and check-10-only RESOLUTION half, after the cross-reader arm proved the two readers had drifted; edges completed both ways
 
 ## 10. Reuse audit

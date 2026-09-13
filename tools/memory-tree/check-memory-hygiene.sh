@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.72   # gov:kit memory-tree@2.72 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.73   # gov:kit memory-tree@2.73 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1039,6 +1039,16 @@ bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= rea
   done)
 [ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index preamble:
 $bad10"
+
+# 24 — the declared ROTATION_MODE is HONOURED. Delegated to row_grammar.py for the reason 13-20 are:
+# the assertion is a corpus walk over ROW DOCUMENTS, and this file must not spell a second row
+# grammar. The first cut of this check did exactly that and five of six evasions passed silently —
+# a bold-wrapped id among them, which `memory/DECISIONS.md` carries fifteen of. TOOL-cSpliceWarden-6.
+if [ "$STAGED" = 0 ]; then
+  if ! rotm=$("$_PY" "$HERE/row_grammar.py" --check-rotation 2>&1); then
+    printf '%s\n' "$rotm"; status=1
+  fi
+fi
 
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).
 for old in $TOMBSTONE_ROOTS; do

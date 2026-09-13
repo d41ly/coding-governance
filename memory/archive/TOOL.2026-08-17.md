@@ -2,8 +2,9 @@
 
 > Terminal rows only (24, all CLOSED), moved from `../backlog/TOOL.md`, with no id appearing twice
 > in this file. TWO rotations landed on this date from concurrent builds and `TOOL.2026-08-17b.md`
-> is the other; 17 of the rows below are also rows of that file, so this pair does not partition the
-> family between them. The all-time id-collision grep still reaches every row here.
+> is the other; the seventeen rows the two once shared were removed from THAT file by
+> `TOOL-cSpliceWarden-7`, so the pair now partitions the family and every id below sits in exactly
+> one archive. The all-time id-collision grep still reaches every row here.
 
 > **SUPERSEDED 2026-09-12 by `TOOL-cSpliceWarden-4`.** The header ABOVE is the corrected one. The
 > header this file shipped with read "Terminal rows only, moved byte-identical from

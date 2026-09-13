@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.72 -->
+<!-- gov:kit memory-tree@2.73 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -287,6 +287,17 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     prescribes covers that. Keyability is asserted alongside it, but only as the precondition that
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
+
+24. **the declared rotation mode is HONOURED** — under `ROTATION_MODE=cut` a rotated archive of a
+    status-bearing shard holds TERMINAL rows only, and no id sits in both an archive and the live
+    index it was cut from. Those two together are what `cut` means: one id, one file. Delegated to
+    `row_grammar.py`, which owns the row grammar — a second spelling of it in shell passed a
+    bold-wrapped id silently, and the decision index carries fifteen such rows. NOT GRADED, and
+    announced on every run rather than passed over: `snapshot`, whose assertion inverts to "an
+    archived row is never edited after the rotation" and whose baseline commit is not resolvable
+    here; an UNDECLARED mode; a DECISIONS archive's terminal half, since a decision row carries no
+    lifecycle token; and the CONTENT of any archive, ever. A `cut` tree with no rotated archive says
+    it graded nothing rather than reporting clean.
 
 21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
     and everything else in it (an adversarial review, a build ledger, a research report, a

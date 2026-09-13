@@ -1,10 +1,12 @@
 # TOOL-cSpliceWarden-6 — hygiene check 24 grades the declared rotation mode
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node c · Tier-2 · base 2aff637e · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-09-13 · node c · Tier-2 · base 2aff637e · streams tooling · order 6 · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cSpliceWarden-6-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-6-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
