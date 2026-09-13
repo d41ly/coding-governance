@@ -1,248 +1,276 @@
 # TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards
 
-**Status:** OPEN · rev-3 · 2026-09-13 · node a · Tier-2 · base e9ed269b · streams tooling · order 2
+**Status:** OPEN · rev-4 · 2026-09-13 · node a · Tier-2 · base c2db2f5d · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md) | spec-audit | — |
+| [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-`unattended gate selftest` is the costliest row in the declared self-test population and the member
-the pooled runner's wall clock cannot fall below. Its 293 invocations are independent by
-construction — the suite resets the tree before nearly every arm. Split them across eight declared
-rows the runner's `--pooled` mode executes concurrently, and MEASURE what that buys on this host,
-because the tree's own record says the crossover was two.
+`unattended gate selftest` is the costliest row in the declared self-test population. Split its
+293 invocations across eight declared rows the runner's `--pooled` mode executes concurrently, and
+MEASURE what that buys on this host against a two-shard reading taken at the same commit — because
+`TOOL-aPacedTurnstile-8` measured the crossover at two, and `TOOL-aScannedThrottle-6` measured the
+pool's dilation. **This unit lowers ONE row.** The kit's pooled wall stays floored at the driver
+suite's row until that suite is declared sharded, which `aPacedTurnstile-8` records as "both must
+move together" and which is a separate unit.
+
+Every line anchor below is against the tree at the base this header names, cited by text beside the
+number so a moved line is a moved anchor rather than a wrong one.
 
 ## 2. Scope (IN)
 
 - **S1** — raise `SHARD_ARITY` from 2 to 8 in `tools/unattended/check-unattended.test.sh` and re-cut
-  the two `in_shard` regions into eight, balanced by invocation count. Declare a REAL
-  `PROLOGUE_ARMS` constant derived from the arms outside every `in_shard` region — the file today
-  asserts 0 in a comment at `:3153` and the true figure is 2, from the epilogue — and correct that
-  comment. Observed by **AC1**.
+  the regions. **Cuts fall ONLY at `reset_tree`-led block edges**, as `TOOL-aShardedFloor-3` §4
+  requires. Invocation count is the first guess; the cut is re-balanced against the per-shard SERIAL
+  readings S2 takes, iterating until `max(shard)` is within a declared tolerance of `sum / 8`, and
+  every candidate's timing is recorded beside the one chosen. **Every helper defined inside a region
+  and called past a cut is hoisted to the prologue** beside `anchor_break` — 28 helpers are defined
+  inside the regions today (`anchor_restore` at the text `anchor_restore() {` through `frozen`), and
+  the HOIST SET count is DERIVED at build time, never asserted. Observed by **AC1**, **AC2** and
+  **AC10**.
 - **S2** — replace the single unsharded row in `tools/run-gates/selftest-budgets.txt` with eight
-  rows, one per shard, each carrying a SERIAL reading taken by one `--serial` pass of the eight.
-  The rows' explicit argv literals raise the file's count in `tools/install-prefix-carried.txt`, a
-  BAN the ratchet cannot raise, so the count is raised by hand with a fourth-column reason in the
-  same commit. The `--shard i/8` token passes `run-selftests.sh --check` because
-  `TOOL-aBatchedArm-4` S1 landed the regex. Observed by **AC3** and **AC7**.
-- **S3** — declare eight per-shard assertion floors and re-measure `FLOOR_ASSERTIONS`, each carrying
-  the reading it was set against, and state which printed figure — the floor-graded count or the
-  PASS-printed count, which differ by 2 today — every reading is taken from. Observed by **AC2**.
-- **S4** — PORT the gov canary's shard-join predicate (`run-gates.gov.test.sh:360-406`, which
-  iterates `gate-legs.json` argv lists) to the budget file's row format, so eight green shards
-  constitute a whole-suite claim. A port and not a reuse: the canary is manifest-scoped and this
-  suite has no manifest row. Scoped to scripts a budget row calls WITH `--shard`, or it reds at once
-  on `unattended.test.sh`, which declares an arity and is called whole. Observed by **AC5**.
-- **S5** — derive a per-boundary REPLAY for each of indices 2 through 8, generalising the `SH_I = 2`
-  block at `check-unattended.test.sh:1277-1293`, which the file already hand-replays because region
-  one's anchor arms leave `unit` an ancestor of `main` and region two's `tWaive` fixture depends on
-  it. The coupling is git REF state, not shell variables; the zero-variable scan in rev-1 measured
-  the wrong carrier. Each replay is observed FAILING when removed. Observed by **AC8**.
-- **S6** — enumerate BY LINE the accumulation-dependent controls — the "tree is still clean after N
-  mutations" shape the file's own shard note at `:3132-3140` says LOSE THEIR MEANING WITHOUT FAILING
-  when split — and pin each into the same shard as the mutations it counts. Observed by **AC9**.
+  rows, one per shard, each carrying a SERIAL reading from one `--serial` pass. The rows' argv
+  literals raise the file's count in `tools/install-prefix-carried.txt`, a BAN the ratchet cannot
+  raise, so the count is raised by hand with a fourth-column reason in the same commit. Observed by
+  **AC3** and **AC7**.
+- **S3** — declare eight per-shard floors and re-measure `FLOOR_ASSERTIONS`, each within the ~3 %
+  headroom the file's own floor block argues for, both figures beside each constant. **The figure
+  every floor and AC1 read is the FLOOR-GRADED count** — `$n` at the text `[ "$n" -ge "$FLOOR" ]` —
+  and `PROLOGUE_ARMS` is DERIVED as that count's prologue share, which is 0 at this base: the C21
+  pair at the text `c21_fixture=$(mktemp -d)` runs AFTER the floor grade and is an EPILOGUE constant
+  only the PASS line carries. The comment at the text `PROLOGUE_ARMS is 0` is therefore TRUE and
+  stands; rev-3 said to correct it and was wrong. Observed by **AC2** and **AC11**.
+- **S4** — PORT the gov canary's shard-join predicate (`run-gates.gov.test.sh`, the text `shard
+  contract`) to the budget file's row format as ONE join function, scoped to scripts a budget row
+  calls WITH `--shard`. Retarget BOTH whole-suite notes at it in the same commit: the kit runner's
+  help text at `run-unattended-gates.sh` (the text `run UNSHARDED on purpose`) and the suite's own
+  note at the text `WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT`. Observed by **AC5**.
+- **S5** — the replay rule, not a count: for each boundary the cut produces, dump the whole-run ref
+  state at that boundary's first line — local branches, `refs/remotes`, the bare origin's heads and
+  HEAD — and diff it against fresh-start state. **A replay exists exactly where a ref some arm at or
+  after that line reads differs.** The file has one producer today (the text `git push -q -f origin
+  main` inside the `ahead` block) and one consumer (the `tWaive` fixture's fast-forward merge), so a
+  replay is expected at exactly the boundary preceding the shard holding the consumer, if that shard
+  does not also hold the producer; the `refs/heads/ahead` leak at the text `"$ahead:refs/heads/ahead"`
+  is a second producer the dump must catch. The scan covers all three carriers — variables, functions,
+  refs — and the per-boundary result is recorded in the build log. Observed by **AC8**.
+- **S6** — the accumulation-dependent control gets a MECHANISM, not a placement. The population by the
+  note's own key is ONE arm: the text `the tree is still clean after nine mutations`. Each mutating
+  arm in its counted block increments a process-local `MUT`, and the control asserts
+  `same "nine mutations ran in this process" "$MUT" 9` BEFORE calling `run`, so a control cut away
+  from its mutations reds at runtime in whichever shard carries it. The note's "TWO CONTROLS" is
+  corrected to the count found. Observed by **AC9**.
 
 ## 3. Non-goals (OUT)
 
 - **Batching arms.** `TOOL-aBatchedArm-1`, measured at 40 to 44 minutes on its own.
 - **The group linter.** `TOOL-aBatchedArm-2`.
 - **The pooled hang bound and the carrier flip.** `TOOL-aBatchedArm-5`. This unit's rows run under
-  `--sweep`'s inherited bound until it lands, and this unit's AC4 run is what seeds its evidence.
+  `--sweep`'s inherited bound until it lands, and AC4's reading is what seeds its evidence.
 - **Repairing the suite's pre-existing RED.** `TOOL-aQuenchedHarness-9` and `TOOL-aHoistedPass-38`
-  own those; 12 failures in shard 1 and 23 in shard 2 at BASE. This unit must not change any arm's
-  verdict.
-- **Sharding the sibling driver suite.** `TOOL-aTracedSpawn-1` records it cannot run unsharded.
+  own those. This unit must not change any arm's verdict.
+- **Sharding the driver suite.** `TOOL-aTracedSpawn-1` records that quoting one `$1` makes it run
+  unsharded; that is its remedy, not a reason it cannot be sharded. Its row is the kit's pooled floor
+  after this unit lands, and `aPacedTurnstile-8` says both suites must move together for the pool to
+  move. A separate unit, named here so the floor is not a surprise.
 
 ### Edges
 
 - **consumes-from** `TOOL-aBatchedArm-4` — the regex that lets a `--shard i/8` row pass `--check`, the
-  declared `--pooled` mode, and the kit runner's `--pooled` path that runs the eight rows concurrently.
-- **hands-off** `TOOL-aBatchedArm-5` — the evidence-derived pooled hang bound; AC4's reading is what
-  seeds it.
+  declared `--pooled` mode, and the kit runner's `--pooled` path.
+- **hands-off** `TOOL-aBatchedArm-5` — the evidence-derived pooled hang bound; AC4's reading seeds it.
 - **hands-off** `TOOL-aBatchedArm-1` — the conversion, which lands on top of this split.
 
 ## 4. Design
 
-### What the split is expected to buy, and why the number is not eight
+### What the split is expected to buy, and how the measurement decides the arity
 
-The owner ruled eight on 2026-08-29 (`TOOL-aGradedDoorway-7` S2, "pick 8 and fix what breaks"). The
-tree's own measurement says the crossover was TWO: `TOOL-aPacedTurnstile-8`, CLOSED, sharded both
-unattended suites and found "TWO shards each is sufficient: past that the bar is throughput-bound at
-~766s and further splitting buys exactly zero". That was the BAR's pool, filled with other legs; the
-on-demand pooled run holds only these rows, so eight fill eight slots. But the resource they share is
-the spawn path, which the full-sweep record measures as serialised at ~190 ms per fork, and
-`TOOL-aScannedThrottle-6` measures in-pool dilation at 1.5 to 1.85x for a bar leg. Eight shards of a
-fork-bound suite may buy far less than 4x over two. **AC4 therefore reports the RATIO of the pooled
-wall to the serial sum, not only whether it cleared 20 minutes**, so a throughput-bound result is
-recorded rather than hidden inside a red.
+The owner ruled eight (`TOOL-aGradedDoorway-7` S2, 2026-08-29), and this id CARRIES that ruling for
+this suite — `-7` S2 is superseded here and keeps the driver half; the edge grammar admits only
+`consumes-from` and `hands-off`, so the supersession is stated here rather than as a bullet. `TOOL-aPacedTurnstile-8`, CLOSED,
+sharded both unattended suites and found "TWO shards each is sufficient: past that the bar is
+throughput-bound and further splitting buys exactly zero" — on the BAR's pool, filled with other
+legs. The on-demand pooled run of the eight rows alone fills eight slots, but shares one serialised
+spawn path (~190 ms per fork, per the full-sweep record) that `TOOL-aScannedThrottle-6` measures
+dilating a bar leg 1.5 to 1.85x. So AC4 takes TWO readings at the same commit: the two-shard pooled
+wall BEFORE S1 lands, and the eight-shard pooled wall after. **The 20-minute arm decides the goal.
+The ratio of eight's longest shard to two's longest decides the arity**: at or above 0.5, eight
+bought less than two would, F2's fallback applies, and the arity is lowered with both readings beside
+it. Neither result is hidden inside the other.
 
-### Why the split is safe, and what the first measurement got wrong
+### Why the split is safe, on three carriers
 
-rev-1 measured zero shell variables crossing an `in_shard` boundary and called the split safe. The
-carrier that matters is git REF state: region one's anchor arms check out `main`, commit, force-push
-and merge back, leaving `unit` an ancestor of `main`, and region two's `tWaive` fixture relies on that
-without saying so — its merge is a fast-forward in the whole-suite run and a CONFLICT in a bare
-shard-2 run. The file already knows this: `:1277-1293` hand-replays it for `SH_I = 2` and records
-three arms failing silently without the replay. An eight-way cut owes seven such replays, derived
-rather than hand-written, and each observed failing when removed. `anchor_break` and `anchor_restore`
-are already hoisted; the replay is the other half of the HOIST SET.
+Shell variables: zero cross a boundary (measured at rev-1, and it was the wrong carrier to stop at).
+Functions: 28 are defined inside regions and any cut past one that is called later breaks it; S1
+hoists them and derives the count. Refs: region one's `ahead` block force-pushes `main` and leaves
+`unit` its ancestor, and region two's `tWaive` fixture fast-forwards onto that without saying so — a
+CONFLICT in a bare shard-2 run, which the file's existing `SH_I = 2` replay (the text `REPLAY WHAT
+REGION ONE LEAVES`) exists to prevent and records three arms failing silently without. S5 turns that
+one hand-written replay into a rule the cut is checked against at every boundary.
 
-### Why the two counts differ and which one grades
+### Why the floor-graded count is the figure
 
-The floor at `:3130` grades `$n`, the executed assertion count. The PASS line prints a figure that
-is 2 higher at HEAD, because the epilogue's two arms run after the floor check. `PROLOGUE_ARMS` is
-undeclared in this file (the sibling declares 18) and the comment at `:3153` claiming 0 is false.
-S3 declares it, and every reading names the floor-graded figure, because that is the one a shard
-can fail on.
+The floor grades `$n` at the text `[ "$n" -ge "$FLOOR" ]`. The C21 pair runs after it, so the PASS
+line prints 2 more than the floor graded. Every floor, and AC1's identity, reads the floor-graded
+figure, because that is the one a shard can fail on; `PROLOGUE_ARMS` for that figure is 0 and the
+existing comment saying so is correct. rev-3 declared it 2 from the PASS line and would have redded
+AC1 by 14 on a correct cut.
 
 ### Rollout
 
-S1, S3, S5 and S6 land together — a re-cut region without its floor, its replay or its pinned
-controls is a shard that cannot fail on coverage. S2 follows once the serial readings exist. S4 last,
-since a join over eight rows needs the eight rows.
+S1, S3, S5 and S6 land together — a re-cut region without its floor, its replay or its instrumented
+control is a shard that cannot fail on coverage. S2 follows once the serial readings exist. S4 last.
+AC4's two-shard reading is taken FIRST, before any of it.
 
 ### Alternatives rejected
 
-**Batching alone.** 40 to 44 minutes unsharded, because excluding the control arms leaves 95 blocks
-carrying 136 solo invocations.
+**Batching alone.** 40 to 44 minutes unsharded.
 
-**Cutting spawns.** `TOOL-aTracedSpawn-2` bounds it at roughly 2 s per invocation of real non-spawn
-work.
+**Cutting spawns.** `TOOL-aTracedSpawn-2` bounds it at roughly 2 s per invocation of real work.
 
-**Two shards, as the crossover measured.** Not rejected — it is the fallback F2 names if AC1 cannot
-be satisfied at eight, and it is what AC4's ratio will show is or is not enough.
+**Two shards.** Not rejected: it is F2's fallback, and AC4 measures it at the same commit.
 
 ### Files touched (estimate)
 
 `tools/unattended/check-unattended.test.sh` · `tools/run-gates/selftest-budgets.txt` ·
-`tools/install-prefix-carried.txt` · `tools/run-gates/run-selftests.sh` or a sibling, for the
-ported join · `tools/unattended/run-unattended-gates.sh:157-158`, whose help text says the suites run
-UNSHARDED on purpose and is false after S2 · this build's records.
+`tools/install-prefix-carried.txt` · `tools/run-gates/run-selftests.sh` or a sibling, for the ported
+join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this build's records.
 
 ## 5. Production-readiness checklist
 
-- security — N/A. Scheduling only; no arm's subject changes.
-- perf / scale — the whole unit, and it may not reach the target on this host; AC4 records the ratio
-  either way.
-- error / empty / loading states — the suite already REFUSES an out-of-range or wrong-arity
-  `--shard`; S1 keeps that refusal exact at the new arity. A row with no serial reading refuses the
-  pooled run, by `TOOL-aBatchedArm-5`'s rule once it lands and by `--sweep`'s inherited bound before.
-- observability — each shard prints its executed count against its own floor; the ported join names
-  any missing index; AC4 prints the ratio.
-- risks — a cut that separates an arm from state a sibling established produces a GREEN that proves
-  nothing. S5's replays and S6's pinned controls are the mitigation; AC8 and AC9 observe them
-  failing when removed. **The class AC1 cannot see** — an arm that executes and passes vacuously — is
-  exactly S6's population, and the count identity is not a substitute for it.
-- testing — AC1 is the control and is observed FAILING on a deliberately mis-cut region before the
-  split is trusted.
-- migration — none. Reverting is restoring the constant and one budget row.
-- user docs — the kit runner's help text at `:157-158` is rewritten; N/A otherwise.
+- security — N/A.
+- perf / scale — the whole unit, measured twice at one commit so the arity is decided by evidence.
+- error / empty / loading states — the arity and range refusals stay exact at 8; a row with no serial
+  reading has no budget and `--check` reds it.
+- observability — each shard prints its floor-graded count against its floor; the join names any
+  missing index; AC4 prints all eight walls, max/mean, and the two ratios.
+- risks — the class AC1 cannot see is an arm that executes and passes vacuously; S6's `MUT` counter
+  is the mechanism that makes the one such arm FAIL when separated. Everything else a cut can break
+  is on one of the three carriers S5 scans.
+- testing — AC1 observed FAILING on a deliberately mis-cut region; AC8's replay observed failing when
+  removed; AC9's control observed failing when separated; AC11's floor observed failing on a stranded
+  block.
+- migration — none. Reverting is the constant and one budget row.
+- user docs — the two whole-suite notes are retargeted.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `check-unattended.test.sh` runs at all eight shard indices and unsharded, reading
-  the FLOOR-GRADED count from each, `sum(eight counts) == unsharded + (SHARD_ARITY - 1) * PROLOGUE_ARMS`
-  holds exactly.
-  `figure:` DERIVED from the nine runs; `PROLOGUE_ARMS` read from the declaration S1 adds.
-  Red when: any other value, which is an arm in no shard or in two.
+  the FLOOR-GRADED count from each, `sum(eight) == unsharded` holds exactly, `PROLOGUE_ARMS` being 0
+  for that figure.
+  `figure:` DERIVED from the nine runs.
+  Red when: any other value.
 - **AC2** — When an arm is deliberately moved into a shard that does not carry the state it depends
-  on, `check-unattended.test.sh --shard <i>/8` REDS for that index. Staged and observed before the
-  split is trusted.
-  Red when: the move runs green, which is a split that proves nothing.
-- **AC3** — When `bash tools/run-gates/run-selftests.sh --kit tools/unattended --list` runs, it names
-  eight `unattended gate selftest` rows and not one; and `--check` exits 0 with them present.
-  Red when: it names one, or `--check` reds the shard token.
-- **AC4** — When `bash tools/unattended/run-unattended-gates.sh --pooled` runs on a frozen clone with
-  no other bar on the box, the longest shard's wall clock is recorded, AND the ratio of that wall to
-  the sum of the eight serial readings is printed and recorded.
-  `figure:` both DERIVED from that run.
-  `fixture:` the eight rows; the box's idleness is asserted by `ps` before the run and named in the
-  record, since nothing in the runner observes it.
-  `cost:` one pooled pass under `--sweep`'s inherited bound, 27200 s at the largest row.
-  Red when: the longest shard exceeds 20 minutes — which sends the goal to `TOOL-aBatchedArm-1`'s
-  batching on top — OR the ratio is above 0.5, which means eight bought less than 2x and
-  `TOOL-aPacedTurnstile-8`'s crossover held; both are recorded, neither is hidden.
+  on, `check-unattended.test.sh --shard <i>/8` REDS for that index.
+  Red when: the move runs green.
+- **AC3** — When `run-selftests.sh --kit tools/unattended/check-unattended.test.sh --list` runs, it
+  names exactly eight rows; and `--check` exits 0 with them present.
+  Red when: it names one, or `--check` reds.
+- **AC4** — When `run-selftests.sh --pooled --kit tools/unattended/check-unattended.test.sh` runs on
+  a frozen clone with no other bar on the box (asserted by `ps` before the run and named in the
+  record), the runner's own `SWEEP of N suite(s), width W (outer O, inner I)` line shows N = 8 and
+  O ≥ 8, and the record carries: all eight shard walls, their max and mean, the longest wall, and the
+  two-shard longest wall taken at the SAME commit before S1 landed.
+  `figure:` every number DERIVED from the two runs.
+  `fixture:` the eight rows via the substring filter the runner honours; the profile row.
+  `cost:` per-row bound = shard budget × `sweep-ceiling-factor`; run wall = the runner's `SWEEP_WALL`
+  over the eight rows, printed at start; no typed number.
+  Red when: the longest eight-shard wall exceeds 20 minutes (the GOAL, sends the remainder to
+  batching); OR the longest eight-shard wall is ≥ 0.5 × the two-shard longest (the ARITY, F2's
+  fallback applies); OR O < 8 on a host whose width is not (the run cannot pass and SKIPS by name).
 - **AC5** — When one shard row is deleted from the declaration, the ported join REDS naming the
-  missing index; and when `unattended.test.sh`, which declares an arity and is called whole, is
-  present, the join does NOT red on it.
-  Red when: eight-minus-one rows report a whole-suite green, or the sibling suite reds the join.
+  missing index; and the join does NOT red on `unattended.test.sh`, which declares an arity and is
+  called whole.
+  Red when: eight-minus-one rows report green, or the sibling reds the join.
 - **AC6** — When the split lands, the `FAIL` set across the eight shards is identical to the
   unsharded `FAIL` set at the same commit.
-  `cost:` one unsharded run plus eight sharded runs on a frozen clone.
   Red when: any `FAIL` line appears or disappears.
 - **AC7** — When the eight rows are staged, `bash tools/check-install-prefix.sh` is green with the
-  `selftest-budgets.txt` count raised by hand and a fourth-column reason naming the eight literals.
-  Red when: the leg reds `ROSE`, which is the ban firing on a raise nobody explained.
-- **AC8** — When any one of the seven derived replays for indices 2 through 8 is removed, that
-  shard's `tWaive` merge conflicts and the shard REDS.
-  Red when: a shard without its replay runs green, which is the silent-failure mode `:1277`'s own
-  comment records three arms taking.
-- **AC9** — When an accumulation-dependent control is separated from the mutations it counts, its
-  shard REDS rather than degrading into a duplicate of the opening control.
-  Red when: the separated control runs green, which the file's own note at `:3132` says is the
-  failure mode of a split.
+  budgets-file count raised by hand and a fourth-column reason naming the eight literals.
+  Red when: `ROSE`.
+- **AC8** — When S5's dump is taken at each boundary, the per-boundary diff is recorded; at every
+  boundary where it is non-empty, the replay is observed FAILING when removed (`--shard <i>/8` reds
+  with the consumer's merge conflicting); at every boundary where it is empty, the arm SKIPS naming
+  the boundary and that no ref differed.
+  Red when: a non-empty boundary's replay is absent, or a boundary is neither replayed nor named.
+- **AC9** — When the `still clean after nine mutations` control is separated from its counted block,
+  the shard carrying it REDS on `same "nine mutations ran in this process"`.
+  Red when: the separated control runs green.
+- **AC10** — When any helper defined inside a region is called from a different shard,
+  `check-unattended.test.sh --shard <i>/8` REDS with command-not-found; observed by hoisting all but
+  one and running the shard that calls it.
+  Red when: the un-hoisted helper's caller runs green.
+- **AC11** — When a block is deliberately stranded past an `exit` inside one shard, that shard REDS
+  its floor; and every `FLOOR_SHARD_i` sits within the ~3 % headroom of its reading, both figures
+  written beside it.
+  Red when: the stranded shard runs green, or a floor is outside its headroom.
 
 ## 7. Gates
 
 `memory hygiene` · `unattended kit gate` · `every held leg is budgeted, every budget row resolves`
 · `install-prefix (shipped surface)` · `run-gates canary` · `run-selftests self-test`
 
-New arm: `tools/unattended/check-unattended.test.sh` · a region deliberately mis-cut so an arm loses
-its state, a replay removed, and a control separated from its mutations, each staged and observed RED
-then unstaged · `tools/run-gates/run-selftests.test.sh` · a deleted shard row redding the ported join
-· floor to move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, all measured under S3.
+New arm: `tools/unattended/check-unattended.test.sh` · a mis-cut region, a removed replay, a
+separated control, an un-hoisted helper, a stranded block, each staged and observed RED then unstaged
+· `tools/run-gates/run-selftests.test.sh` · a deleted shard row redding the ported join · floor to
+move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
 
 ## 8. Open questions
 
-- **F1 · Where does the shard-join predicate live?** REOPENED at rev-3: the gov canary's predicate
-  is manifest-scoped and this suite has no manifest row, so applying it is a PORT. RESOLVED (agent,
-  2026-09-13, delegated): port it to the budget file's row format in the runner or a sibling, scoped
-  to scripts a row calls WITH `--shard`; the kit-shipping half stays `TOOL-aGradedDoorway-8`'s row.
-- **F2 · Eight, or fewer?** Eight is the owner's ruling. RESOLVED (owner, 2026-08-29): eight. If AC1
-  cannot be satisfied at eight, or AC4's ratio shows eight bought less than two would, the finding
-  is recorded and the arity is lowered with the reading beside it, never raised to fit.
+- **F1 · Where does the shard-join predicate live?** RESOLVED (agent, 2026-09-13, delegated): ported
+  as ONE function fed by the budget rows here and by the manifest in `TOOL-aGradedDoorway-8`'s kit
+  file, scoped to `--shard` callers.
+- **F2 · Eight, or fewer?** Eight is the owner's ruling. RESOLVED (owner, 2026-08-29): eight, with
+  the fallback now MEASURED rather than argued — AC4's two-shard reading at the same commit, and the
+  arity lowered with both readings beside it if eight's longest is at or above half of two's.
 
 ## 9. Revision log
 
-- rev-3 · 2026-09-13 · §1 · §2 S1 through S6 · §4 · §5 · §6 AC1 · AC3 · AC4 · AC5 · AC8 · AC9 · §7
-  · F1 · §10 · folded spec-audit round 1 (BLOCKED, 8 blockers), held until the runner unit's shape
-  settled because three of them were about the runner. Two dissolved with `TOOL-aBatchedArm-4`: the
-  row checker admits the shard token (B3, B4) and `--pooled` exists (B1, B2). The rest were real:
-  the zero-variable scan measured the wrong carrier and `:1277-1293` already hand-replays the git
-  ref state that actually couples regions (B5, H4), now S5 and AC8; the join is a port not a reuse
-  and would red on the sibling suite (B6), now S4 and AC5 scoped; the file's own note names controls
-  that lose meaning when split and AC1 cannot see them (B7, H3), now S6 and AC9; the reuse audit was
-  declined and four deciding records were absent (B8), now §10 with this unit's own probe, which
-  surfaced `TOOL-aPacedTurnstile-8`'s crossover at TWO — AC4 now reports the ratio so a
-  throughput-bound result is recorded; `PROLOGUE_ARMS` undeclared and the two counts differ (H1, H2),
-  now S1, S3 and AC1's arithmetic; §7's leg wrong (M1); the kit runner's help text falsified by S2
-  (M2), now in Files touched.
+- rev-4 · 2026-09-13 · §1 · §2 S1 through S6 · §3 · Edges · §4 · §5 · §6 AC1, AC3, AC4, AC8 through
+  AC11 · §7 · F1 · F2 · §10 · folded spec-audit round 2 (BLOCKED, 9 blocker rows, precision 0.67).
+  Three round-1 folds were half-right. `PROLOGUE_ARMS`: the floor-graded count EXCLUDES the C21 pair,
+  which runs after the grade, so it is 0 and the comment rev-3 ordered corrected is TRUE — rev-3's 2
+  would have redded AC1 by 14 on a correct cut. Replays: "seven" was the arity minus one; the file has
+  one producer, one consumer and one leak, so S5 is a per-boundary ref-state DIFF rule and AC8 expects
+  exactly one non-empty boundary. Controls: S6 was placement-only where the note says a separated
+  control stays GREEN; it now carries a `MUT` counter the control asserts, and the population is one.
+  Also: cuts only at block edges and re-balanced by serial readings, not invocation count
+  (`aShardedFloor-3` §4); AC4's population isolated to the eight rows by the substring filter, its
+  width asserted from the runner's own line, and a two-shard reading taken at the same commit so the
+  ratio compares like with like; 28 region-local helpers hoisted with a derived count; the driver row
+  named as the kit's pooled floor with the `aTracedSpawn-1` citation corrected; floors given an
+  observable; `supersedes` edge to `aGradedDoorway-7` S2; anchors by text; `cost:` derived; the
+  suite's own whole-suite note retargeted; a backlog-sharding citation dropped from §10.
+- rev-3 · 2026-09-13 · §2 S1 through S6 · §4 · AC1 · AC4 · AC8 · AC9 · §10 · folded round 1's eight
+  blockers, held until the runner settled.
 - rev-2 · 2026-09-13 · Edges · §2 S2 · order · mirrors `TOOL-aBatchedArm-4` rev-2's split.
-- rev-1 · 2026-09-10 · initial draft, from round 2's measurement that batching alone lands at 40 to
-  44 minutes. Adopted by `--rescope --act add` under protocol §11.
+- rev-1 · 2026-09-10 · initial draft, from the measurement that batching alone lands at 40 to 44
+  minutes. Adopted by `--rescope --act add` under protocol §11.
 
 ## 10. Reuse audit
 
-- **The seam is the suite's own shard contract**, verified at source at
-  `tools/unattended/check-unattended.test.sh:29-56` — `SHARD_ARITY`, the parsed `--shard <i>/<n>`
-  flag, the arity and range refusals, `in_shard()` — plus the `SH_I = 2` replay at `:1277-1293`,
-  which S5 generalises rather than reinvents, and the HOIST SET note that already names
-  `anchor_break` and `anchor_restore`. The declaration seam is `tools/run-gates/selftest-budgets.txt`'s
-  row grammar, which carries a per-row argv and needs no format change. The join seam is
-  `tools/run-gates/run-gates.gov.test.sh:360-406`, which F1 resolves to PORTING. The reuse probe was
-  run —
-  `python tools/codebase-map/reuse_lookup.py "batch staged breaks into one fixture and assert the emitted failure set"`
-  — for the build's first unit, and reports `unscanned layers: .sh`; it cannot see any of these seams
-  and its result is not evidence either way. The seams were found by reading the file.
-- **The retrieval arguments, verbatim, THIS unit's own:**
+- **The seams**, verified at source: the suite's shard contract — `SHARD_ARITY`, the parsed flag, the
+  arity and range refusals, `in_shard()` — and its existing `SH_I = 2` replay at the text `REPLAY WHAT
+  REGION ONE LEAVES`, which S5 generalises into a rule; the budget file's row grammar, which carries
+  a per-row argv and needs no change; the runner's substring `--kit` filter, which AC4 uses to isolate
+  the eight rows; and the gov canary's join at `run-gates.gov.test.sh`, which S4 PORTS. The reuse
+  probe was run for THIS unit —
+  `python tools/codebase-map/reuse_lookup.py "split a shell self-test into concurrent shard regions with a per-boundary replay of git ref state and a per-shard floor"`
+  — and returned `build_self_chain`, `git` and `resolve_shell_argv`, none of which is any of these
+  seams; it reports `unscanned layers: .sh`, so it cannot see the suite or the runner and its result
+  is not evidence either way. The seams were found by reading the files.
+  **Disposition of every record cited**: `TOOL-aShardedFloor-2` and `-3` REUSED (the contract and the
+  block-edge cut rule); `TOOL-aPacedTurnstile-8` REUSED (the crossover and "both must move
+  together"); `TOOL-aScannedThrottle-6` REUSED (the dilation); `TOOL-aGradedDoorway-7` S2 SUPERSEDED
+  for this suite; `TOOL-aGradedDoorway-8` REUSED (the join, one function two feeders);
+  `TOOL-aTracedSpawn-1` REUSED (the driver's remedy); `TOOL-dScriptedRepeat-15` NOT-THIS-SEAM (a
+  scoping ruling, and rev-3 cited it as a shard decision, which it is not).
+- **The retrieval arguments, verbatim:**
   `python tools/memory-recall/query.py "what was measured about sharding a self-test suite, where the crossover is between shard count and throughput on a serialised spawn path, and how per-shard budgets and the whole-suite claim are derived" --terms "shard arity crossover throughput-bound dilation budget derivation whole-suite claim prologue floor in_shard region replay spawn serialised"`.
-  It returned `TOOL-aPacedTurnstile-8` first — the measured crossover at two — and
-  `TOOL-aRelaxedShard-4`, `TOOL-aShardedFloor-3` and `TOOL-dScriptedRepeat-15`, which are the shard
-  contract's own decisions. rev-1's §10 cited a probe run for a different unit; round 1 B8 was right
-  that a probe for batching is not a reuse audit for sharding.

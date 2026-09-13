@@ -36,3 +36,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-13T11:59:15Z brief · item TOOL-aBatchedArm-4 · reason b56f676efee7 memory/builds/aBatchedArm/prompts/2026-09-13-prompt-TOOL-aBatchedArm-4-build-brief.md
 
 2026-09-13T12:06:10Z dispatch · item 1ed8bf22 TOOL-aBatchedArm-4 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/unattended/run-unattended-gates.sh tools/unattended/README.md tools/unattended/kit.toml .githooks/gate-env.sh AGENTS.md memory/guides/SESSION-KICKOFF.md memory/builds/aBatchedArm/spec/2026-09-13-spec-TOOL-aBatchedArm-4.md memory/builds/aBatchedArm/build/2026-09-13-build-TOOL-aBatchedArm-4-1-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T13:40:07Z review · item TOOL-aBatchedArm-3 · reason verdict BLOCKED · blockers 9

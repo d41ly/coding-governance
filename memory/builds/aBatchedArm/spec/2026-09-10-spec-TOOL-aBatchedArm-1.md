@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-3 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 4
+**Status:** OPEN · rev-4 · 2026-09-13 · node a · Tier-2 · base e9ed269b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -71,7 +71,8 @@ another route, so the ruling binds here unchanged. rev-1 did not cite it and its
 
 ### Edges
 
-- **consumes-from** `none`
+- **consumes-from** `TOOL-aBatchedArm-3` — the eight shards the conversion lands on top of; a group
+  never spans a shard boundary, and AC6 grades the pair.
 - **hands-off** `TOOL-aBatchedArm-2` — the group linter that mechanically enforces S3's partition,
   which this unit states as a rule and cannot enforce per group.
 
@@ -254,6 +255,8 @@ under S4.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-13 · §3 Edges · mirrors `TOOL-aBatchedArm-3`'s `hands-off` as `consumes-from`, which
+  memory hygiene check 12 had been redding on since the edge was declared one way only.
 - rev-3 · 2026-09-10 · §2 S1 · §2 S3 · §3 · §4 · AC6 · AC7 · order · folded spec-audit round 2
   (BLOCKED, 13 blockers, NON-CONVERGENT, disposition FOLD, so this is the loop's exit and this spec
   is not re-reviewed). **rev-2's admissibility rule is WITHDRAWN, not narrowed.** It keyed a control's
