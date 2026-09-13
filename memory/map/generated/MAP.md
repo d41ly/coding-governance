@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 52 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 108 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 54 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -94,6 +94,7 @@ Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `run-gates canary` | baseline |
 | `run-gates evidence` | foundation |
 | `run-gates gov canary` | run-gates |
+| `run-gates run-log line` | run-gates |
 | `run-gates turnstile` | run-gates |
 | `run-gates wiring` | run-gates |
 | `run-selftests self-test` | run-gates |
@@ -188,6 +189,7 @@ Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `arm-literal-strands-on-message-edit.md` | testsuite-counts |
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
+| `async-job-starts-with-sigint-ignored.md` | run-gates |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `containment-tested-one-way.md` | unattended |
@@ -216,6 +218,7 @@ Inventories: gate-legs: 107 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `process-creation-is-the-suite-cost.md` | unattended |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
+| `signal-trap-runs-the-exit-handler-twice.md` | run-gates |
 | `spec-names-code-its-base-lacks.md` | unattended |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |

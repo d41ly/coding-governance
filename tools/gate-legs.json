@@ -912,6 +912,20 @@
     "ceiling": 300
   },
   {
+    "name": "run-gates run-log line",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-gates.runlog.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/",
+      "tools/runlog/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 900
+  },
+  {
     "name": "run-gates adopter e2e",
     "argv": [
       "bash",

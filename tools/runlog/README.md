@@ -91,7 +91,8 @@ verdict.
 - **Whether a journal is complete.** A producer that never wrote leaves nothing to count.
 - **Retention.** Nothing prunes the journals, and every run adds to them.
 - **A cut value is not marked.** The unattended driver reaches the value-cutting step, because its
-  slug, worktree path and phase are unbounded, and nothing on the line records that a cut happened.
+  slug, worktree path and phase are unbounded, and so does the gate runner, whose run id is the
+  caller's. Nothing on the line records that a cut happened.
 
 ## Running the self-test
 

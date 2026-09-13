@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md) | research | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
+| [2026-09-13-build-TOOL-dLoggedFlight-3-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-dLoggedFlight-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md) | journal | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
@@ -82,11 +83,43 @@ The writer reads `$RUNDIR/header` and `$RUNDIR/verdict` with a `while read` loop
 needs. It globs `$RUNDIR/*.leg` and reads each row's name and state with builtin `read`. No `cat`,
 `awk` or `git` is added.
 
+The failing legs are ordered by manifest index, the number each `.leg` file is named by, so `fail.1`
+is the first failing leg in the manifest and not the first in glob order, where `10.leg` sorts before
+`2.leg`. `stage` is `pre-header` when the record holds no header and empty otherwise, so a killed
+run's `verdict=NONE` with an empty stage says it died after its header was written. `wall_breach` is
+the verdict file's own key and is empty on every other path. `selftests` is `1` or empty, the
+full-green stamp's spelling. Every read is defaulted, because `set -u` holds inside a trap, and a handler that aborts on
+an unset name writes nothing for exactly the run it exists to record. A line over the cap is fitted by
+the runlog kit's reference rule, both steps. Whole `fail.<i>` fields drop highest first into
+`fail_more`, and only then is the longest other value cut. The run id is the value that reaches the
+second step, because `GATE_RUN_ID` is the caller's and has no bound.
+
 The exits before `:1041` are `:35`, `:36`, `:75`, `:186`, `:518`, `:804-806`, `:867-869` and `:979`.
 They leave no line, because each refuses before a bar exists or runs `--print-profile`. The exits after
 it and before the header is written are `:1093`, the run-dir `mkdir`, and `:1182`, the manifest
 parse. Each writes `verdict=NONE stage=pre-header rc=2` with the header keys empty. The suite enumerates
-every `exit` after `:1041` and fails if one has no arm or no named exemption.
+every `exit` after `:1041` and fails if one has no arm or no named exemption. It keys a site on its line
+text AND the number of sites carrying that text, so a third `exit 1` is a count that moved rather than
+a match. The two named exemptions are the `exit 0`s at `:1601-1602`, inside the wall watcher's
+`( … ) &` subshell, which exit that subshell and run no trap of the runner's.
+
+Two arms need a harness detail the criteria do not state. AC3 launches each bar through
+`timeout --foreground`, because an `&` job of a non-interactive shell starts with SIGINT ignored and
+bash cannot trap a signal that was ignored at entry. `set -m` helps only while the suite itself did not
+start with INT ignored, and a leg of the bar always does. The signal goes to the runner's own pid, the
+tail of its default run id, and never to `timeout`. A signal that interrupts `wait -n` leaves `$?` at
+128+n when the trap starts, so those three bars read the right status even without `RUNLOG_RC`. A
+fourth TERM therefore lands while the runner waits on its first `$(fingerprint)`, held open by a stub,
+where the trap runs only after the command ends and `$?` is the command's 0. That is the case the
+explicit status decides, and its line also shows a run killed before its header.
+
+AC4 counts from the first depth-one `remove_wall_watcher` trace line, which follows the last leg's
+`wait`, to the end of the trace, with the wall and the turnstile off so no background subshell traces
+into that window. Its recurring arm compares a copy of the same runner whose `cleanup` no longer calls
+the writer, which is the base teardown byte for byte. `GOV_RUNLOG=0` would not do: the writer runs its
+guard before it reads the switch, so an exec placed there would be counted on both sides.
+`RGRL_BEFORE=<runner>` traces a named runner in that arm's place, and that is how the landing
+observation compares against the base.
 
 ### Data model
 
@@ -98,6 +131,8 @@ wall_breach rc fail.1..fail.20 fail_more kit`.
 | identifier | kind | cell |
 |---|---|---|
 | `write_runlog_verdict`, `read_record_keys` | shell functions | `sh.function`, verb-led |
+| `RUNLOG_RC`, `GOV_RUNLOG` | a signal's status, the environment's switch | runner variables |
+| `RGRL_BEFORE` | the runner AC4 traces as its baseline | suite environment seam |
 | `run-gates run-log line` | leg, `kit` / `selftests` | manifest |
 
 ### Files touched (estimate)
@@ -196,6 +231,10 @@ none
 - rev-4 · 2026-09-13 · S6 · §3 · §4 · folded round-3 spec audit H3 (a gate line joins through the push
   line that pinned it, so the landing bar joins from the primary tree) and M10 (the carried-prefix row is
   raised by hand).
+- rev-5 · 2026-09-13 · §4 · Inventory · written by the build pass before its code. Section 4 now states
+  the failing-leg order, the `stage` rule, the keys left empty, the two-step fit, the text-and-count key
+  of the exit enumeration with its two subshell exemptions, INT delivered through `timeout`, and AC4's
+  trace window and baseline seam. The inventory gains the two variables and the seam.
 
 ## 10. Reuse audit
 

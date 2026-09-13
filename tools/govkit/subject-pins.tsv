@@ -94,6 +94,7 @@ run-gates adopter e2e	kit	e2e
 run-gates canary	repo	selftests
 run-gates evidence	kit	selftests
 run-gates gov canary	repo	selftests
+run-gates run-log line	kit	selftests
 run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
 run-selftests self-test	kit	selftests

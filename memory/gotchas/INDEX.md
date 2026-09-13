@@ -23,6 +23,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [arm-literal-strands-on-message-edit](arm-literal-strands-on-message-edit.md) | class | 3 |  | editing a fail message strands its arm silently — the branch stays armed-looking, the count drops by one, and only the arms gate notices |
 | [armed-but-unreachable-rule](armed-but-unreachable-rule.md) | class | 4 |  | a declaration can be non-empty, well-formed and still impossible to violate — testing that a rule EXISTS is not testing that it can FIRE |
 | [assertion-between-two-derived-values](assertion-between-two-derived-values.md) | class | 4 |  | a check comparing two values the same code derives from one source is a tautology, and it arms cleanly |
+| [async-job-starts-with-sigint-ignored](async-job-starts-with-sigint-ignored.md) | class | 1 |  | a job a non-interactive shell starts with `&` has SIGINT ignored, bash cannot trap a signal it started with ignored, so an INT sent to it, or to anything it starts, is silently dropped |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 7 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 3 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
 | [containment-tested-one-way](containment-tested-one-way.md) | class | 5 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
@@ -51,6 +52,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [process-creation-is-the-suite-cost](process-creation-is-the-suite-cost.md) | class | 2 |  | a shell suite that is 93% not-CPU is paying an on-access antivirus scanner per exec, so its cost is spawn count and nothing in the code reads that way |
 | [record-citing-a-foreign-id-defines-or-orphans-it](record-citing-a-foreign-id-defines-or-orphans-it.md) | class | 2 |  | writing another build's id into a record either DEFINES it or ORPHANS it, and the orphan count sees only one of those, so the obvious check passes on the worse half |
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
+| [signal-trap-runs-the-exit-handler-twice](signal-trap-runs-the-exit-handler-twice.md) | class | 2 |  | a signal trap that calls the exit handler and then exits runs that handler twice, because the exit fires the EXIT trap too, so anything the handler appends is appended twice |
 | [spec-names-code-its-base-lacks](spec-names-code-its-base-lacks.md) | class | 1 |  | a spec written from review records instead of from the code names machinery a commit ancestral to its own base already deleted |
 | [staged-break-substitutes-a-synthetic-value](staged-break-substitutes-a-synthetic-value.md) | class | 1 | yes | an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value |
 | [status-set-in-a-subshell](status-set-in-a-subshell.md) | class | 2 |  | a gate that prints FAILED from inside a pipeline sets a status the parent never sees, so it reports the violation and exits 0 |
@@ -67,6 +69,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-52 record(s): 52 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+54 record(s): 54 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

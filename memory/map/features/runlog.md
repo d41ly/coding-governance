@@ -63,7 +63,8 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
   this grammar. The driver's writer shipped first, and its three gotcha classes are claimed here
-  rather than beside the driver, whose dossier sits at its byte cap. Each producer's golden line sits
+  rather than beside the driver, whose dossier sits at its byte cap. The gate runner's shipped second,
+  and its two classes are claimed by the run-gates dossier. Each producer's golden line sits
   in this kit's fixtures, so a producer spec that changes its data model changes the golden line in
   the same pass and the self-test reds on any key the grammar would refuse.
 - The consumers — the extractor, the run model and the committed record, units 6, 8 and 9 — import
@@ -78,7 +79,9 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
 - **A cut value carries no marker.** The reference writer cuts a value only after every indexed field
   has dropped. The driver reaches that step, since its slug, worktree path and phase are unbounded and
   it writes no indexed family, so `TOOL-dLoggedFlight-2` fits its lines by that rule and its suite
-  compares them with `render_line`; nothing on a cut line says it was cut.
+  compares them with `render_line`. The gate runner reaches both steps, dropping `fail.<i>` fields
+  first and then cutting its run id, and `TOOL-dLoggedFlight-3`'s suite compares each the same way.
+  Nothing on a cut line says it was cut.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.

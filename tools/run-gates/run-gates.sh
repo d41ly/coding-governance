@@ -16,7 +16,10 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.6   # gov:kit run-gates@1.6
+KIT_RUN_GATES_VERSION=1.7   # gov:kit run-gates@1.7
+# 1.6 -> 1.7: every bar appends one line to the run log under the git common dir, from the EXIT trap
+# (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
+# a skew between the runner and its table or manifest changes a verdict.
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -1037,11 +1040,200 @@ run_outstanding_reap() {
   return 0
 }
 
-cleanup() { run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# ---- the run log (TOOL-dLoggedFlight-3) ------------------------------------------------------------
+# ONE LINE PER BAR, appended to `gates.log` under `runlog/` in the git COMMON dir, in the runlog kit's
+# grammar, from the one seam every exit below this point passes through: `cleanup`, the EXIT trap. The
+# common dir is shared by the primary tree and every linked worktree of a clone, so every bar a clone
+# runs lands in one file. The grammar is stated in that kit's README; this block writes it and reads
+# none of it.
+#
+# READ BACK, NEVER RECOMPUTED. The run id, the header's worktree, head, start time and full flag, the
+# verdict file's counts and the failing legs' names from their `.leg` rows are all read from the run
+# record below, so the line cannot disagree with the record it summarises. A run killed before its
+# verdict has no verdict file, so its line says `verdict=NONE` and carries the signal's status; a
+# refusal before the header says `stage=pre-header` with the header's keys empty.
+#
+# EVIDENCE, NEVER AN INPUT. Nothing in this runner or any gate branches on a line. A failed append
+# prints ONE `run-gates: run log` line on stderr and changes neither the exit code nor stdout, and
+# `GOV_RUNLOG=0` in the environment writes nothing.
+#
+# ONCE PER PROCESS, and the guard is load-bearing. Each signal trap below runs `cleanup` and then
+# `exit`s, and that exit fires the EXIT trap, which runs `cleanup` again: the handler runs TWICE on
+# every caught signal, which is the gotcha class `signal-trap-runs-the-exit-handler-twice`. The first
+# entry takes the signal's status from `RUNLOG_RC`, because its own `$?` is 128+n only when the signal
+# interrupted `wait -n`: a signal held behind a foreground command, a `$(fingerprint)` say, runs its
+# trap when that command ends and arrives with the command's status. The second entry appends
+# nothing. `cleanup`'s existing work is unchanged and still runs on both entries.
+#
+# ZERO SPAWNS: builtin reads, a glob, parameter expansion and one `printf >>`. The first bar a clone
+# ever runs pays one `mkdir` for the journal directory, and a clone that has one pays nothing.
+#
+# WHAT THIS DOES NOT CATCH. An exit above the EXIT trap: not a repo, no python, a refused profile,
+# `--print-profile`, the turnstile queue and the scratch-dir `mktemp`. A SIGKILL, which runs no trap.
+# A leg reported `(no result)`, which is counted in `failed` but has no `.leg` row and so no name on
+# the line. And an unset name read inside the handler, which `set -u` would turn into a handler that
+# writes nothing: every read here is defaulted for that reason, and a new read must be too.
+RUNLOG_MAX_BYTES=2048   # the grammar's line cap, LF not counted
+RUNLOG_FAIL_CAP=20      # fail.1 .. fail.20; the rest are counted into fail_more
+RUNLOG_RC=""; RUNLOG_DONE=""
+
+# `<key>TAB<value>` per line, the header's and the verdict's grammar, into `<prefix><key>` for each key
+# the caller names and for nothing else, so a line the runner did not expect cannot set a variable.
+# The caller declares the variables it names, as locals, before calling. Rc 1 when the file is absent.
+read_record_keys() { # file · variable prefix · key... -> sets <prefix><key> for each named key present
+  local _rk_f=$1 _rk_p=$2 _rk_k="" _rk_v="" _rk_want
+  shift 2
+  _rk_want=" $* "
+  [ -f "$_rk_f" ] || return 1
+  while IFS=$'\t' read -r _rk_k _rk_v || [ -n "$_rk_k" ]; do
+    case "$_rk_want" in *" $_rk_k "*) printf -v "$_rk_p$_rk_k" '%s' "${_rk_v%$'\r'}" ;; esac
+    _rk_k=""; _rk_v=""
+  done 2>/dev/null < "$_rk_f"
+  return 0
+}
+
+# THE ONE APPEND, in the grammar's own bytes. Each value is escaped backslash FIRST, then TAB, LF and CR,
+# so the first pass cannot re-escape the others. A line over the cap is fitted by the runlog kit's
+# REFERENCE rule, and its suite compares the result with that kit's `render_line`: drop whole indexed
+# fields, highest index first, counting each into `fail_more`; only when none is left, cut the longest
+# value outside `v n t p ev` and the `_more` counts from its end, never inside a UTF-8 character and
+# never inside an escape, and measure again. `LC_ALL=C` for this function alone, so `${#v}` counts
+# BYTES, which is what the cap counts.
+write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appended to the gates journal
+  [ -z "${RUNLOG_DONE:-}" ] || return 0
+  RUNLOG_DONE=1
+  [ "${GOV_RUNLOG:-}" != 0 ] || return 0
+  local LC_ALL=C bs='\' tab=$'\t' rc="${RUNLOG_RC:-${1:-}}" t="" g="" c="" dir="" line="" stage=""
+  local i f nm st n=0 more=0 size=0 best blen top cut b need
+  local rh_worktree="" rh_head="" rh_started="" rh_full=""
+  local rv_verdict=NONE rv_ran="" rv_failed="" rv_skipped="" rv_held="" rv_reused="" rv_wall_breach=""
+  local -a key=() val=() fails=()
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  # The COMMON dir from the git dir this runner already resolved, with no `git` process. A linked
+  # worktree's git dir holds a `commondir` file naming the common dir relative to itself, and its `..`
+  # segments are folded so a path this prints is the one git would print; the primary tree has no such
+  # file and its git dir IS the common dir. Never `.git/worktrees/<name>/runlog`, which would split
+  # one clone's journal in two.
+  g=${GD:-}
+  if [ -n "$g" ]; then
+    case "$g" in /*|[A-Za-z]:[/\\]*) ;; *) g="${ROOT:-.}/$g" ;; esac
+    if [ -f "$g/commondir" ]; then
+      { IFS= read -r c < "$g/commondir"; } 2>/dev/null || [ -n "$c" ] || c=""
+      c=${c%$'\r'}
+      case "$c" in
+        "") ;;
+        /*|[A-Za-z]:[/\\]*) dir="$c/runlog" ;;
+        *) while :; do
+             case "$c" in
+               ..)   g=${g%/*}; c=""; break ;;
+               ../*) g=${g%/*}; c=${c#../} ;;
+               *)    break ;;
+             esac
+           done
+           dir="$g${c:+/$c}/runlog" ;;
+      esac
+    else
+      dir="$g/runlog"
+    fi
+  fi
+  if [ -n "${RUNDIR:-}" ]; then
+    read_record_keys "$RUNDIR/header" rh_ worktree head started full || stage=pre-header
+    read_record_keys "$RUNDIR/verdict" rv_ verdict ran failed skipped held reused wall_breach
+    # Indexed by the leg's MANIFEST position, which names its file, so the array walks in manifest
+    # order whatever order the glob returned.
+    for f in "$RUNDIR"/*.leg; do
+      [ -f "$f" ] || continue
+      i=${f##*/}; i=${i%.leg}
+      case "$i" in ""|*[!0-9]*) continue ;; esac
+      nm=""; st=""
+      { IFS=$'\t' read -r nm st _ < "$f"; } 2>/dev/null || [ -n "$nm" ] || continue
+      [ "$st" = fail ] && fails[10#$i]=$nm
+    done
+  else
+    stage=pre-header
+  fi
+  key=(v t p ev run wt head started full selftests verdict stage ran failed skipped held reused
+       wall_breach rc)
+  val=(1 "$t" gates once "${RUNID:-}" "$rh_worktree" "$rh_head" "$rh_started" "$rh_full"
+       "${GATE_SELFTESTS:+1}" "$rv_verdict" "$stage" "$rv_ran" "$rv_failed" "$rv_skipped" "$rv_held"
+       "$rv_reused" "$rv_wall_breach" "$rc")
+  for i in ${fails[@]+"${!fails[@]}"}; do
+    if [ "$n" -lt "$RUNLOG_FAIL_CAP" ]; then n=$((n + 1)); key+=("fail.$n"); val+=("${fails[i]}")
+    else more=$((more + 1)); fi
+  done
+  [ "$more" -gt 0 ] && { key+=(fail_more); val+=("$more"); }
+  key+=(kit); val+=("${KIT_RUN_GATES_VERSION:-}")
+  for i in "${!val[@]}"; do
+    f=${val[i]//"$bs"/"$bs$bs"}; f=${f//$'\t'/'\t'}; f=${f//$'\n'/'\n'}; f=${f//$'\r'/'\r'}
+    val[i]=$f
+    size=$(( size + ${#key[i]} + ${#f} + 2 ))
+  done
+  size=$(( size - 1 ))
+  # STEP ONE: whole indexed fields, the highest index first, a tie going to the later field.
+  while [ "$size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    best=-1; top=-1
+    for i in "${!key[@]}"; do
+      case "${key[i]}" in
+        *.*) nm=${key[i]#*.}
+             case "$nm" in ""|*[!0-9]*) ;; *) [ "$((10#$nm))" -ge "$top" ] && { best=$i; top=$((10#$nm)); } ;; esac ;;
+      esac
+    done
+    [ "$best" -ge 0 ] || break
+    nm="${key[best]%%.*}_more"
+    size=$(( size - ${#key[best]} - ${#val[best]} - 2 ))
+    key=("${key[@]:0:best}" "${key[@]:best+1}"); val=("${val[@]:0:best}" "${val[@]:best+1}")
+    f=-1
+    for i in "${!key[@]}"; do [ "${key[i]}" = "$nm" ] && { f=$i; break; }; done
+    if [ "$f" -ge 0 ]; then
+      size=$(( size - ${#val[f]} )); val[f]=$(( ${val[f]} + 1 )); size=$(( size + ${#val[f]} ))
+    else
+      key+=("$nm"); val+=(1); size=$(( size + ${#nm} + 3 ))
+    fi
+  done
+  # STEP TWO: cut the longest value outside the protected keys, the first of equals, from its end.
+  while [ "$size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    best=-1; blen=0
+    for i in "${!key[@]}"; do
+      case "${key[i]}" in v|n|t|p|ev|*_more) continue ;; esac
+      [ "${#val[i]}" -gt "$blen" ] && { best=$i; blen=${#val[i]}; }
+    done
+    [ "$best" -ge 0 ] || break
+    b=$(( blen - (size - RUNLOG_MAX_BYTES) )); [ "$b" -gt 0 ] || b=0
+    cut=${val[best]:0:b}
+    # A character cut in half is dropped whole, as the reference's decode drops it: count the
+    # continuation bytes that end the value, then ask the lead byte before them how many it needed.
+    b=0
+    while [ "$b" -lt "${#cut}" ] && [ "$b" -lt 3 ]; do
+      case "${cut:$(( ${#cut} - b - 1 )):1}" in [$'\x80'-$'\xbf']) b=$((b + 1)) ;; *) break ;; esac
+    done
+    if [ "$b" -lt "${#cut}" ]; then
+      case "${cut:$(( ${#cut} - b - 1 )):1}" in
+        [$'\xc0'-$'\xdf']) need=1 ;;
+        [$'\xe0'-$'\xef']) need=2 ;;
+        [$'\xf0'-$'\xf7']) need=3 ;;
+        *)                 need=0 ;;
+      esac
+      [ "$b" -lt "$need" ] && cut=${cut:0:$(( ${#cut} - b - 1 ))}
+    fi
+    # ...and an escape cut in half leaves an ODD run of trailing backslashes: drop one.
+    b=0
+    while [ "$b" -lt "${#cut}" ] && [ "${cut:$(( ${#cut} - b - 1 )):1}" = "$bs" ]; do b=$((b + 1)); done
+    [ $(( b % 2 )) -eq 1 ] && cut=${cut%?}
+    size=$(( size - blen + ${#cut} )); val[best]=$cut
+  done
+  for i in "${!key[@]}"; do line+="${line:+$tab}${key[i]}=${val[i]}"; done
+  [ -n "$dir" ] && [ ! -d "$dir" ] && mkdir "$dir" 2>/dev/null
+  [ -n "$dir" ] && { printf '%s\n' "$line" >> "$dir/gates.log"; } 2>/dev/null && return 0
+  printf 'run-gates: run log — cannot append to %s, so this bar is not recorded there; its verdict, its output and its exit code are unaffected\n' \
+    "${dir:-(no git dir resolved)}/gates.log" >&2
+  return 0
+}
+
+cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
-trap 'cleanup; exit 130' INT
-trap 'cleanup; exit 143' TERM
-trap 'cleanup; exit 129' HUP
+trap 'RUNLOG_RC=130; cleanup; exit 130' INT
+trap 'RUNLOG_RC=143; cleanup; exit 143' TERM
+trap 'RUNLOG_RC=129; cleanup; exit 129' HUP
 
 # ---- the run record (the run-record unit) --------------------------------------------------------
 # The runner used to forget everything on exit: the per-leg results lived in $WORK, which the trap

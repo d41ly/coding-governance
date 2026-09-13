@@ -98,6 +98,7 @@ run-gates adopter e2e	300		worst of 8 readings 198s, x1.5
 run-gates canary	3660		worst of 12 readings 2436s, x1.5
 run-gates evidence	2250		worst of 12 readings 1500s, x1.5
 run-gates gov canary	60		worst of 11 readings 19s, x1.5
+run-gates run-log line	160		worst of 4 readings 105s on node d 2026-09-13 by direct invocation, x1.5. TOOL-dLoggedFlight-3, withheld from adopters
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
 runlog selftest	60		worst of 3 readings 2.4s on node d 2026-09-13 by direct invocation, x1.5 floored at this file 60s minimum
