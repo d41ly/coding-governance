@@ -52,3 +52,5 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-13T22:19:51Z dispatch · item 5a551aa5 TOOL-aReplayedCard-4 · reason memory/gotchas memory/guides/SESSION-KICKOFF.md memory/map memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-4.md memory/builds/aReplayedCard/build/2026-09-14-build-TOOL-aReplayedCard-4-1-acceptance-ledger.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger
 
 2026-09-13T22:20:41Z brief · item TOOL-aReplayedCard-4 · reason 821b06de1dc9 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-4-brief.md
+
+2026-09-13T22:48:58Z dispatch · item 354cd462 TOOL-aReplayedCard-4 · reason memory/project/trace-waiver.txt
