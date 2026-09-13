@@ -560,9 +560,9 @@ review-harnesses dossier, the generated map, and this build's records.
 - **AC34** — When step 1 conflicts on a file that is not the harness, in a receipt `apply` wrote,
   block 1's STOP names the return to HEAD before the resolution, its commit and the rerun; after
   the reset the restore block sets that file's edit aside at gov's base through the hooks, and
-  block 1 then runs clean.
-  Red when: the STOP puts the resolution before the reset, or the restore judges a local edit by the
-  row's `oid`, which an `apply` receipt records as gov's blob.
+  block 1 then runs clean. The restore refuses a row carrying a `relocate` rung and writes nothing.
+  Red when: the STOP puts the resolution before the reset, the restore judges a local edit by the
+  row's `oid`, which an `apply` receipt records as gov's blob, or it restores a relocated row raw.
 
 ## 7. Gates
 
@@ -583,7 +583,7 @@ New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv witho
 New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a block 2 that writes, a relabelled flag-off verdict · none
 New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off update silent · none
 New arm: `tools/govkit/selftest.py` · rev-7's runbook whole, and one staged break per round-3 finding in a copy of the fixed runbook: no `TRAILER`, no `PYTHONUTF8`, every unstaged change as a render, no dropped-row flag, no hand-run regenerate, pins replayed, block 2 at any vintage, `project-owned` left unpinned, a fork read by its key, and a restore to `oid` · none
-New arm: `tools/govkit/selftest.py` · one staged break per consumer finding in a copy of the fixed runbook or govkit: an unscoped block 1, no coupling, a pin for any render whose kit regenerated, the template read from the receipt, the old STOP order, the restore judged by `oid`, and the measuring vintage's version on every row · none
+New arm: `tools/govkit/selftest.py` · one staged break per consumer finding in a copy of the fixed runbook or govkit: an unscoped block 1, no coupling, a pin for any render whose kit regenerated, the template read from the receipt, the old STOP order, the restore judged by `oid`, restoring the harness alone, no refusal of a relocated row, and the measuring vintage's version on every row · none
 
 ## 8. Open questions
 
@@ -681,7 +681,7 @@ New arm: `tools/govkit/selftest.py` · one staged break per consumer finding in 
   measuring vintage's version on rows it pinned at older commits; `adopt` now stamps the version
   of the vintage the bytes come from. W4: the STOP text put the resolution before the reset that
   destroys it; it now puts the reset first, and the restore block serves any conflicted file,
-  judged by its index blob. §3's govkit bullet and hand-off edge name both govkit changes and the
+  judged by its index blob, and refuses a row carrying a `relocate` rung. §3's govkit bullet and hand-off edge name both govkit changes and the
   carry. The fixture gained core's hygiene arm, which the hook declaration had said the runbook
   could not reach.
 

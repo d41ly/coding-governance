@@ -560,7 +560,7 @@ Each is repaired in the runbook, and in govkit where the runbook could not carry
 a standalone runner in the session scratchpad, which reads the runbook and the govkit its fixture
 gov copies from named files. Each break below is one edit to a copy of the fixed runbook or the
 fixed govkit, never to this tree. At `5cea0dfd` the section held 84 arms and all passed. On the
-fixed tree it holds 102 and all pass, in about 70 s.
+fixed tree it holds 103 and all pass, in about 70 s.
 
 - **W1, both consumers: block 1 had no scope.** Its unscoped `update --write` moved every kit the
   tree was behind on. At NicoCares that was nine kits. At core it landed gate-lint's seed under
@@ -620,6 +620,18 @@ fixed tree it holds 102 and all pass, in about 70 s.
   the old STOP text, 1 arm failed. With the restore judged by `oid` again, 2 arms failed, and the
   restore refused with "already holds gov's blob at its recorded base". With it restoring the
   harness alone again, the same 2 arms failed.
+
+Found while fixing, by reading the diff while the first bar ran:
+
+- **Restoring any conflicted file reaches rows the harness never was.** A row carrying a `relocate`
+  rung records gov's blob at its base in gov's spelling, so restored raw it would name paths this
+  tree does not have. The restore block now refuses such a row and asks for a hand resolution. The
+  arm writes the rung into `pv-ty`'s committed receipt, sees the refusal leave the tree untouched,
+  and undoes the commit. Observed red: with the refusal removed, 2 arms failed.
+- **The template lookup keyed rows with no `source` under `None`.** The synthesized `attributes`
+  row has none, so a render with no template in the map compared a `.gitattributes` blob and failed
+  closed only by accident. It now skips rows without one. No arm could tell the two apart, because
+  both refuse the pin, so this one has no red.
 
 Found while fixing, and fixed here because the arms needed it:
 
@@ -730,5 +742,6 @@ consumers ran it from this branch. The two govkit changes ride the same number r
   next update's delta does not read `seedy` level. With the stamp at the measuring vintage, both arms
   redded, printing `seedy level`.
 - AC34 — `oid` — OBSERVED: on `pv-ty` the STOP names the reset first, the restore block sets the
-  plain engine file's edit aside through the hooks, and block 1 then lands gov's line. The old STOP
-  text redded 1 arm, and the restore judged by `oid`, or restoring the harness alone, redded 2.
+  plain engine file's edit aside through the hooks, and block 1 then lands gov's line; a row
+  carrying a `relocate` rung is refused. The old STOP text redded 1 arm, and the restore judged by
+  `oid`, restoring the harness alone, or with no rung refusal, redded 2.
