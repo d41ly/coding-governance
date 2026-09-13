@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus
 
-**Status:** CLOSED · rev-4 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-5 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -380,42 +380,49 @@ a red suite is what it is today.
   this spec holds.
 - **AC2** — When `time PS4='+ ${LINENO} ' bash -x tools/memory-tree/check-memory-hygiene.test.sh 2><trace>`
   runs on node `a`, with `TIMEFORMAT='real %R user %U sys %S'` set in the calling shell and
-  `<trace>` a fresh file per run, as a PAIRED reading — before at `16da4c6a` from a frozen
-  `git clone --local` under a short root, after at the landed tip, interleaved before-after-before-after
-  on the same box with the same `ps -W` process count at each start — the minimum `real` of the two
-  after runs is at most 0.8 times the minimum `real` of the two before runs, every after run exits
-  0 and prints `PASS (n assertions)`, and each of the four readings goes into the ledger with the
-  checker-invocation count read from ITS OWN trace file beside it, counted the way AC1 counts: 20
-  for a before run (the 19 over the archive fixture plus the one clean run at line 2198) and 13 for
-  an after run. That count is the per-reading artifact that the run executed the section and not a
-  stub, and it is the only artifact a before run has, because the suite is red at `16da4c6a` (§4)
-  and prints no `PASS` line. All four readings are the TRACED class of the §4 table, which is the
-  class 0.72 and therefore 0.8 were derived on (433 s of the 598.7 s traced reading); the plain
-  790.7 s reading is not a term of this ratio. The trace costs the ratio nothing it can measure:
-  §4's traced reading was the FASTER of its two quiet runs, so the trace's own cost sits inside the
-  1.32× run-to-run noise §4 records, and it is the same on both sides of the pair.
-  Red when: the after-over-before ratio exceeds 0.8, or an after run exits non-zero or prints no
-  `PASS` line, or a reading is recorded without a count read from its own trace, or a before run's
-  count is not 20 or an after run's count is not 13 — the section did not run to its end and the
-  wall figure timed a partial suite. The bound is derived from
-  the mechanism, not from a reading: §4 predicts 0.72 (433 s of 598.7 s traced), and 0.8 leaves the
-  residual noise of a back-to-back pair eight points. A change that only cuts four of the seven
-  archive runs — candidate A's shape — saves about 112 s of the traced 598.7 s, a ratio of 0.81,
-  and prints no `PASS` line, so it reds on both halves. A pair that lands between 0.72 and 0.8 is
-  green; one above 0.8 with AC1 green is re-measured once with a second interleaved pair per the
-  gotcha's take-the-minimum rule and reds if it stays above, because the ruling's word is CHEAPER
-  and an invocation count alone does not prove a wall clock fell on this box.
-  rev-4: under the owner's per-pass rule (S5) the pass takes ONE traced after run and the §4
-  traced row as its before — 598.7 s, rc 1, count 20 — so the ratio is that after over 598.7,
-  recorded as EVIDENCE with the box state beside it; the interleaved second pair is not available
-  to a pass, and the deterministic claim stays AC1's count. The pair the criterion spells is the
-  closing pass's to take if the owner wants the noise bounded.
-  cost: four suite runs on this node, about 40 to 75 minutes by the standalone band §4 admits.
+  `<trace>` a fresh file per run, in TWO halves that grade two passes (rev-5; rev-4 appended the
+  second and left the first returning its own verdict on the second's reading).
+  The BUILD-PASS half, under the owner's per-pass rule (S5): ONE traced after run, alone, at the
+  tree the pass commits, exits 0 and prints `PASS (n assertions)`, goes into the ledger with the
+  checker-invocation count read from ITS OWN trace file beside it, counted the way AC1 counts —
+  13, the per-reading artifact that the run executed the section and not a stub — and with its
+  `real` over the §4 traced row's 598.7 s recorded as EVIDENCE beside the box state, never graded:
+  one reading on one box state is inside the 1.88× band §4 admits, and the deterministic claim is
+  AC1's count.
+  The CLOSING-PASS half: a PAIRED reading — before at `16da4c6a` from a frozen `git clone --local`
+  under a short root, after at the landed tip, interleaved before-after-before-after on the same box
+  with the same `ps -W` process count at each start — where the minimum `real` of the two after
+  runs is at most 0.8 times the minimum `real` of the two before runs, every after run exits 0 and
+  prints `PASS (n assertions)`, and each of the four readings goes into the ledger with its own
+  trace's count: 20 for a before run (the 19 over the archive fixture plus the one clean run at
+  line 2198), 13 for an after run. That count is the only artifact a before run has, because the
+  suite is red at `16da4c6a` (§4) and prints no `PASS` line. All four readings are the TRACED class
+  of the §4 table, which is the class 0.72 and therefore 0.8 were derived on (433 s of the 598.7 s
+  traced reading); the plain 790.7 s reading is not a term of this ratio. The trace costs the ratio
+  nothing it can measure: §4's traced reading was the FASTER of its two quiet runs, so the trace's
+  own cost sits inside the 1.32× run-to-run noise §4 records, and it is the same on both sides.
+  Red when: build-pass half — the after run exits non-zero or prints no `PASS` line, or its count
+  is not 13 — the section did not run to its end and the wall figure timed a partial suite — or its
+  reading is recorded without the count from its own trace or without the box state.
+  Red when: closing-pass half — the after-over-before ratio exceeds 0.8, or an after run exits
+  non-zero or prints no `PASS` line, or a reading is recorded without a count read from its own
+  trace, or a before run's count is not 20 or an after run's count is not 13. The bound is derived
+  from the mechanism, not from a reading: §4 predicts 0.72 (433 s of 598.7 s traced), and 0.8
+  leaves the residual noise of a back-to-back pair eight points. A change that only cuts four of
+  the seven archive runs — candidate A's shape — saves about 112 s of the traced 598.7 s, a ratio
+  of 0.81, and prints no `PASS` line, so it reds on both halves. A pair that lands between 0.72
+  and 0.8 is green; one above 0.8 with AC1 green is re-measured once with a second interleaved pair
+  per the gotcha's take-the-minimum rule and reds if it stays above, because the ruling's word is
+  CHEAPER and an invocation count alone does not prove a wall clock fell on this box. A closing
+  pass that cannot take the pair PARKS this half with the build-pass reading as the owner's input,
+  the way F3 parks a red AC3; it does not grade the pair on that one reading.
+  cost: one suite run for the build pass and four for the closing pass, about 50 to 95 minutes by
+  the standalone band §4 admits.
   fixture: the before clone lives under a short root such as `%TEMP%`, not the session scratchpad,
   because `git clone --local` into the scratchpad's path fails with "Filename too long" on this
   node; and it is FROZEN — no commit lands in it between the two before runs, since a suite run
   over a tree that moved under it measures nothing.
-  figure: no wall figure is pinned; 0.8 is DERIVED from §4's 0.72 as stated; the four readings are
+  figure: no wall figure is pinned; 0.8 is DERIVED from §4's 0.72 as stated; the five readings are
   DERIVED by the command; the before count 20 is PINNED from the 2026-09-13 trace AC1 cites and
   the after count 13 is DERIVED from the arm list as AC1 derives it.
 - **AC3** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on node `a`
@@ -487,14 +494,14 @@ a red suite is what it is today.
   dropped (the registry arm's probe half goes red), and the `READ_PATH_CEILING` line dropped from
   the check-16 fixture conf for that one run (the control arm's notice half goes red at rc 0). The
   ledger row per break names the break AND the invocation the arm read, line 2198 or `pk_out`.
-  At least one break is observed through the whole named invocation,
-  `bash tools/memory-tree/check-memory-hygiene.test.sh`; the rest may be observed through the
-  section run from its own prologue. Whatever runs REFUSES a run whose count of `ok` and `FAIL`
-  lines from the section differs from the arm count the section holds.
-  rev-4: the whole-invocation break is a third long run and the owner's per-pass rule (S5) allows
-  the pass two; every break is observed through the section run from its own prologue, and the
-  proof that the whole invocation REACHES the section is the after run itself, whose output holds
-  the section's thirteen `ok` lines and the `PASS` line, which no stranded section can print.
+  Every break is observed through the section run from its own prologue (rev-5; rev-4 appended
+  this rule under a sentence that still demanded one break through the whole invocation, and the
+  whole-invocation break is a third long run under the owner's per-pass rule, S5, which allows the
+  pass two). What proves the whole invocation `bash tools/memory-tree/check-memory-hygiene.test.sh`
+  REACHES the section is the build pass's after run itself, whose output holds the section's
+  thirteen `ok` lines and the `PASS` line, which no stranded section can print. Whatever runs
+  REFUSES a run whose count of `ok` and `FAIL` lines from the section differs from the arm count
+  the section holds.
   Red when: an assertion passes with its subject reverted, or a value assertion's only staged break
   is one that also reds its rc-only form (the 127 break applied to the control), or an observation
   is taken from a run whose arm count nothing asserted — a break that reds nothing and a harness
@@ -598,6 +605,16 @@ and its comparison moves to immediately above that line.
   every break observed through the section from its own prologue. The mechanism is built as §4
   states it, with `pk_set` hoisted above the check-16 fixture so the fixture and the arms write
   the conf through one helper; `KIT_REL` left the suite with its last use. Status CLOSED.
+- rev-5 · 2026-09-13 · AC2 AC6 · the pass commit's bug-class checklist selected
+  `amendment-leaves-its-other-half-standing`, and rev-4 was two instances of it: AC2's "Red when:
+  the ratio exceeds 0.8" still graded the one reading rev-4 had just called evidence (1.296 on a
+  box carrying thirteen sibling bars), and AC6's "at least one break through the whole invocation"
+  still stood above rev-4's "not taken". Each is now ONE rule: AC2 has a build-pass half (one run,
+  count 13, ratio recorded) and a closing-pass half (the pair, the 0.8 verdict, parked with the
+  build reading as input if the pair cannot be taken); AC6's whole-invocation reach is proven by
+  the after run's section output. The status stays CLOSED because F3 already rules that this unit
+  lands on its other criteria while a loaded reading is parked; the park is in `RUN.md`. The rev-4
+  and rev-5 text is unreviewed fold surface for the closing diff review.
 
 ## 10. Reuse audit
 

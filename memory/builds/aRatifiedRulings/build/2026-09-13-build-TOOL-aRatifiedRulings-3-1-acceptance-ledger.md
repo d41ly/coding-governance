@@ -71,13 +71,12 @@ same empty list. Runs were sequential, never concurrent. The unbroken copy print
   six that proceed, six that abort at rc 2), every one with the fixture's `mktemp` root as cwd.
   The §4 trace at `16da4c6a` showed 19 over the archive fixture plus the separate clean run, and
   one `git archive` at its line 2227
-- AC2 — amended rev-4 — one traced after run, alone, against the §4 traced before at `16da4c6a`:
-  775.682 s over 598.7 s is 1.296, ABOVE 0.8, on the loaded box the table above records, with the
-  section's own region at 0.59 of its §4 seconds by trace attribution; the after run exits 0 and prints
-  `PASS (374 assertions)`, the `PASS (n assertions)` line; its count 13 is read from its own
-  trace; the before count 20 is the §4 trace's. The interleaved second pair the criterion spells is
-  the closing pass's if the owner wants the noise bounded, and the box state of this reading is in
-  the table above
+- AC2 — amended rev-5 — the build-pass half: one traced after run, alone, at `90348fde` plus
+  this diff, exits 0 and prints `PASS (374 assertions)`, the `PASS (n assertions)` line; its count
+  13 is read from its own trace; its 775.682 s over the §4 traced row's 598.7 s at `16da4c6a` is
+  1.296, recorded beside the box state in the table above and not graded. The closing-pass half —
+  the interleaved pair and its 0.8 verdict — is the closing pass's, parked in `RUN.md` with this
+  reading as the owner's input; rev-4 had left the 0.8 clause grading this one reading
 - AC3 — amended rev-4 — the `GATE_FULL=1 GATE_SELFTESTS=1` bar is the closing pass's under the
   owner's per-pass rule; its `.leg` row for `memory-hygiene self-test` is appended here when
   `--close` buys it, with the disposition §8 F3 states if it reads red
@@ -94,9 +93,10 @@ same empty list. Runs were sequential, never concurrent. The unbroken copy print
   and not `memory/project/my-registry.txt`, red under `pkset-noop` (registry named) and `no-probe`
   (probe absent); the control reads `_b1rc` and `_b1out` from line 2203, rc 0 and the
   `READ_PATH_CEILING is declared` notice, red under `no-ceiling` at rc 0
-- AC6 — amended rev-4 — every break in the table above was observed RED through the section run
+- AC6 — amended rev-5 — every break in the table above was observed RED through the section run
   from its own prologue, one observation per assertion, each naming the invocation the arm read,
   and the driver refused nothing because every run printed 13 section lines and incremented `n`
   by 13; the whole-invocation break is not taken because it is a third long run under a rule that
   allows two, and the after run's own output — thirteen section `ok` lines and the `PASS` line —
-  is the proof the whole invocation reaches the section
+  is the proof the whole invocation reaches the section; rev-4 had left the one-through-the-whole
+  sentence standing above that rule
