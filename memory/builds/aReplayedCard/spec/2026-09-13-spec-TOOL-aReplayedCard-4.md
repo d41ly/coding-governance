@@ -1,6 +1,6 @@
 # TOOL-aReplayedCard-4 — path-bearing manifest trap bullets become `memory/gotchas/` records
 
-**Status:** CLOSED · rev-2 · 2026-09-14 · node a · Tier-1 · base c4f02308 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-1 · base c4f02308 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -93,8 +93,8 @@ under S2. A record needs `git add` before `gotchas.py --check` or the hygiene le
 ## 5. Production-readiness checklist
 
 - security — N/A.
-- perf / scale — the manifest shrinks by roughly half; measured by `wc -c` before and after and
-  recorded in the ledger.
+- perf / scale — the manifest shrinks by the evicted bullets' bytes net of the names the evicted
+  sentence gains; measured by `wc -c` before and after and recorded in the ledger.
 - error / empty / loading states — N/A.
 - observability — `gotchas.py --for-paths` output.
 - risks — a record with inert anchors; check 19 is the arm.
@@ -146,6 +146,9 @@ none
   `memory/backlog` (`SHARED_RECORDS`), so S5 is the orchestrator's and AC5 is AMENDED. AC3's byte
   bound is net of the sentence S3 grows. Resolution named as `selectable`, with the two figures the
   ledger carries. Built and CLOSED by the pass that made these changes.
+- rev-3 · 2026-09-14 · §5 · the perf row said "roughly half", a figure that belonged to evicting the
+  whole section and not to the anchored subset; rewritten to the AC3 measurement. Found by the
+  post-commit bug-class checklist (`amendment-leaves-its-other-half-standing`), records only.
 
 ## 10. Reuse audit
 
