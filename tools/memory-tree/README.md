@@ -54,7 +54,7 @@ put the KA tag in each discipline's `README.md`, not in the folder name.
 ## Adopt — new project (scaffold)
 
 ```bash
-cp memory-tree/.memory-tree.conf.example .memory-tree.conf   # then edit
+cp <kit>/.memory-tree.conf.example .memory-tree.conf   # then edit
 bash tools/memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
 bash tools/memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
 git add memory/ .memory-tree.conf && git commit
@@ -124,6 +124,29 @@ Measured — that is what the previously published mixed-prefix literal did. Two
 section honest rather than merely correct today: `check-wiring.sh` RUNS the configured command on a
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
+
+## Upgrading to 2.73 — check 20's population widened, and your bar may red on arrival
+
+Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
+so **every rotated BACKLOG shard went unscanned**. From 2.73 an archive is recognised by the name of
+the document it ROTATED — `DECISIONS` or a value declared in `FAMILIES`, plus a date and an optional
+same-day disambiguator such as the `b` in `TOOL.2026-08-17b.md`.
+
+**Your `ROW_DUPLICATE_PIN` may red on the first upgraded bar, with no change of your own.** A
+duplicate id that has always been sitting in a rotated shard becomes visible, and the pin is an
+EQUALITY: too high reds as well as too low.
+
+**The remedy is the duplicate, not the pin.** Raising a shrink-only pin to absorb a defect our upgrade
+made visible is a weakening move caused by us, and it is permanent slack nobody will drain. Run
+`python <kit>/row_grammar.py --report`, read the named ids and lines, fix the rows, then re-run
+`--emit-pin` and take the number it prints.
+
+Two smaller changes ride along. Check 10 now resolves a rotated archive's live index by BASENAME
+anywhere under the memory root instead of at `<MEMORY_ROOT>/<stem>.md` — if your backlog shards live
+one level down, which the shipped layout does, that check has never graded them and may now have
+something to say. And `ROTATION_MODE` is a new `.memory-tree.conf` key (`cut` or `snapshot`): leaving
+it undeclared changes nothing and reds nothing, an unrecognised value aborts the engine at exit 2,
+and **no check grades the declared mode** — it is validated and then read by nobody.
 
 ## Notes
 

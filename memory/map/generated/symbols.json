@@ -518,6 +518,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_rotated_re",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "build_row",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -788,6 +793,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "check_rotation",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_self_containment",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -986,6 +996,11 @@
       "id": "cmd_check_format",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "cmd_check_rotation",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_contribute",
@@ -1306,6 +1321,11 @@
       "id": "derive_ext",
       "kind": "function",
       "file": "tools/codebase-map/map_imports.py"
+    },
+    {
+      "id": "derive_families",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_gate_runner",
