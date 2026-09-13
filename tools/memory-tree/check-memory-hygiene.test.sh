@@ -1648,7 +1648,10 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
 A=$TMP/rotarchive
 mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$A/memory/project"
 ( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  # DEPL is declared and has NO live shard, deliberately: the archive below is named for it, so its
+  # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
+  # for every backlog archive, and until this fixture existed it shipped unobserved.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
   printf -- '---\nslug: tRot\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRot-1\n---\n\n# tRot\n' > memory/builds/tRot/README.md
@@ -1670,6 +1673,7 @@ mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$
   # A SAME-DAY DISAMBIGUATED name, announced on line 5. Without it the `[a-z0-9]*` in both readers'
   # patterns is dead weight that can be deleted with every arm still green.
   printf '# rotated, second of its day\n' > memory/archive/ARCH.2026-08-02b.md
+  printf '# rotated from a family with no live shard\n' > memory/archive/DEPL.2026-08-04.md
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
   git commit -q -m rotated --no-verify )
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
@@ -1688,6 +1692,15 @@ grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$outa" \
 n=$((n+1))
 grep -qF 'memory/archive/ARCH.2026-08-02b.md' <<<"$outa" \
   && { echo "FAIL check 10 red a SAME-DAY DISAMBIGUATED archive its shard announces on line 5 — either the [a-z0-9]* suffix left the filename anchor or the preamble window is short"; st=1; }
+# ---- the ZERO-RESOLUTION branch, which is the one whose `continue` made this check inert. An
+# ---- archive whose stem names no live index must be NAMED, and the message must say how many it
+# ---- resolved to, because "skipped in silence" and "referenced" printed the same nothing before.
+n=$((n+1))
+grep -qF "resolves to 0 live index(es)" <<<"$outa" \
+  || { echo "FAIL check 10 SKIPPED an archive whose stem resolves to no live index instead of naming it — that silent \`continue\` is exactly how this check graded 1 of 4 archives for a month"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/DEPL.2026-08-04.md' <<<"$outa" \
+  || { echo "FAIL check 10's zero-resolution finding does not name the archive it is about"; st=1; }
 # ---- ...and now the SAME rotation with the archive unstaged. This is the state cSteadyMetronome saw.
 n=$((n+1))
 ( cd "$A" && git rm -q --cached memory/archive/ARCH.2026-08-01.md >/dev/null 2>&1 \

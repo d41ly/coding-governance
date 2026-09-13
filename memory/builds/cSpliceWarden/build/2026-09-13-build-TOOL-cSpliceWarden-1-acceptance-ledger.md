@@ -33,10 +33,12 @@ grades the declared rotation mode at all.
   exactly the four real archives. The eight `parallel-coding-governance.template-v-2-*.md` snapshots
   and the four `memory/archive/ledger/*.md` shards are excluded, which was verified by running the
   candidate over the tree before wiring it.
-- AC2 — covered by the `n10 -ne 1` branch in `check-memory-hygiene.sh`, which names the archive,
-  the stem and the count. WEAKER THAN THE REST: this branch has no fixture in the tree, because no stem in this repo
-  resolves to zero or several. It is an arm nobody has watched fail and is labelled so rather than
-  counted as verified.
+- AC2 — OBSERVED. `check-memory-hygiene.sh` over a tree declaring `deployer:DEPL` with no
+  `memory/backlog/DEPL.md` reports `memory/archive/DEPL.2026-08-04.md (stem 'DEPL' resolves to 0 live
+  index(es) named DEPL.md under memory/, expected exactly 1: )`. The rotarchive fixture now carries
+  that shape, so the branch has an arm. Until round 5 this line read WEAKER THAN THE REST and said
+  the branch had never been watched fail; the Tier-2 review's vacuity lens called that out and the
+  fixture closed it.
 - AC3 — observed both ways on the real tree. With the `TOOL.2026-08-17b.md` reference removed from
   `memory/backlog/TOOL.md`: `HYGIENE check 10 FAILED — rotated archives not referenced from their
   live index preamble: memory/archive/TOOL.2026-08-17b.md`. Restored: green. The control matters —
