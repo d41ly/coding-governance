@@ -10,6 +10,7 @@
 | [2026-09-13-prompt-TOOL-aDeferredBar-1-0-run-mandate.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-1-0-run-mandate.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aDeferredBar-1-1-spec-brief.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-1-1-spec-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md) | spec-audit | TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 |
+| [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md) | spec-audit | TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 |
 
 <!-- /gen:spec-records -->
 
