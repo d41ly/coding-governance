@@ -161,9 +161,12 @@ turns the cap rules off with no diff.
   table matches its own rule, and `check-review-join.sh` carries a self-exclusion row for the hook.
   The exclusion is measured rather than defensive, and it is the kind of row that silently widens if
   the table ever moves.
-- **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** That script runs
-  with no hooks, so no process observes those spawns. Declared here and in the protocol rather than
-  implied away; it is the reason the `Workflow` half is static.
+- **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** The script's
+  `agent()` is a runtime call and not a TOOL call, so the `Workflow|Agent` matcher has nothing to
+  match, and a sidechain agent holds neither tool to re-fan-out with. NOT because a sidechain runs no
+  hooks — it does, MEASURED 2026-09-12: a project `PreToolUse` guard on `Bash|PowerShell` denied a
+  Bash command issued from inside one. Declared here and in the protocol rather than implied away; it
+  is the reason the `Workflow` half is static.
 - **A `Workflow({name:'…'})` run supplies no source to the hook.** Covered second-hand by the
   merge-bar leg over `tools/workflows/`, which is why that leg exists at all.
 - **The runtime count does not distinguish a verifier from any other agent.** Keying on "is this a
