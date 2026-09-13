@@ -88,11 +88,11 @@ ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplaye
 | [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

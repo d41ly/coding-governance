@@ -22,3 +22,19 @@ anchor-ref: refs/heads/main
 base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 
 ## Parked
+
+2026-09-13T20:10:21Z review · item KICK-aReplayedCard-1 · reason verdict BLOCKED · blockers 1
+
+2026-09-13T20:10:23Z review · item KICK-aReplayedCard-2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-13T20:10:25Z review · item KICK-aReplayedCard-3 · reason verdict BLOCKED · blockers 1
+
+2026-09-13T20:10:28Z review · item TOOL-aReplayedCard-1 · reason verdict BLOCKED · blockers 3
+
+2026-09-13T20:10:31Z review · item TOOL-aReplayedCard-2 · reason verdict BLOCKED · blockers 1
+
+2026-09-13T20:10:33Z review · item TOOL-aReplayedCard-3 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-13T20:10:36Z review · item TOOL-aReplayedCard-4 · reason verdict CLEAN · blockers 0 · CONVERGED
+
+2026-09-13T20:10:38Z review · item TOOL-aReplayedCard-5 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
