@@ -213,3 +213,6 @@ tools/process-monitor/*.sh text eol=lf
 # smudge would turn every fixture line into one the reader refuses for its unescaped CR.
 tools/runlog/*.py text eol=lf
 tools/runlog/fixtures/* text eol=lf
+# The redaction table (TOOL-dLoggedFlight-5) is read with a TAB split, and the kit's scan of its own
+# files reads bytes. The loader tolerates a CRLF checkout; this pin keeps gov's own copy from needing it.
+tools/runlog/*.tsv text eol=lf

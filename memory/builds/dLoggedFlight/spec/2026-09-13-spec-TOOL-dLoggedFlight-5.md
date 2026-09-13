@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-5 — one redaction table, applied once on read, with a staged positive per rule
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md) | research | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
+| [2026-09-14-build-TOOL-dLoggedFlight-5-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-dLoggedFlight-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md) | journal | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
@@ -24,8 +25,9 @@ near-miss negative, and cheap enough to run over every command head of a large s
 ## 2. Scope (IN)
 
 - **S1** A data table at `tools/runlog/redaction.tsv`, one row per rule, with the columns `id`, `hint`,
-  `pattern`, `positive` and `negative`. `hint` is a lowercase substring prefilter, and the rule's
-  regex runs only on text holding it. Observed by AC1 and AC4.
+  `pattern`, `positive` and `negative`. `hint` is a lowercase substring prefilter, written as one or
+  more substrings joined by `|`, and the rule's regex runs only on text whose lowercased form holds at
+  least one of them. Observed by AC1 and AC4.
 - **S2** The rule set is a CLOSED list of class ids, each covering one class the security review
   measured. It holds 17 ids, and AC5 asserts the table against the list in both directions:
 
@@ -51,7 +53,9 @@ near-miss negative, and cheap enough to run over every command head of a large s
 
 - **S3** Two functions, `scan_secrets(text)`, which returns the matched spans with their rule ids, and
   `render_redacted(text)`, which replaces each secret VALUE with `<redacted:<id>>` and keeps the key or
-  prefix that names it. Observed by AC1 and AC2.
+  prefix that names it. Both live in `runlog_lib.py`, the module every consumer already imports, and
+  both take an optional `rules` sequence that defaults to the kit's own table: that is the seam AC4's
+  counting wrapper uses. Observed by AC1 and AC2.
 - **S4** The positives are written as generator templates, for example `{A36}` for 36 alphanumerics,
   and expanded only in the self-test. No committed file under the kit carries text the table itself
   flags, outside the `positive` column's templates. That is the property GitHub push protection needs
@@ -60,7 +64,7 @@ near-miss negative, and cheap enough to run over every command head of a large s
 
 ## 3. Non-goals (OUT)
 
-- Replacing the gate runner's `redact()` at `tools/run-gates/run-gates.sh:117`. It stays as it is; two
+- Replacing the gate runner's `redact()` in `tools/run-gates/run-gates.sh`. It stays as it is; two
   kits, two stated scopes.
 - Redacting journal values. The producers write no free text and no URL, so a journal line has no
   secret to redact.
@@ -79,14 +83,27 @@ Each rule compiles on its own, because one alternation was measured to change wh
 when inline flags go global. A rule's regex names the secret VALUE with a named group `v`, so the
 replacement keeps the prefix, as in `Authorization: Bearer <redacted:auth-header>`. Rules run in table
 order, and a span one rule has already redacted is not matched again. The known traps are named
-negatives: a `task-` id for `sk-key`, and `PIN_KEY =` and `NOT_A_TOKEN` for `env-assign`.
+negatives: a `task-` id for `sk-key`, and `PIN_KEY =` and `NOT_A_TOKEN` for `env-assign`. So is
+`ssh://git@` for `url-userinfo`: its colon-less form is redacted only from 16 characters, since a
+login name is not a token, and every token class this table names is at least 20 long. Every
+negative holds one of its own rule's hints, so the pattern, not the prefilter, is what leaves it
+alone.
+
+"Not matched again" holds two ways. Within one call, a span overlapping one an earlier rule took is
+dropped. Across calls, a value that already reads `<redacted:` is skipped, so a rendered text scans
+clean and rendering twice changes nothing. A template token is `{<class><count>}`, the class one of
+`A` alphanumeric, `U` uppercase or digit, `L` letter, `a` lowercase or digit, `D` digit, `H` hex, `B`
+base64 and `S` URL-safe, plus `{NL}` for a newline; the self-test refuses any other. A positive fits
+in 196 characters, so AC4's strings stay 200 long. The loader accepts a CRLF checkout of the table,
+refuses a lone CR and every other malformed row by name, and `scan_secrets` raises `TypeError` on
+anything that is not a `str`.
 
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
 | `tools/runlog/redaction.tsv` | data, `.tsv` is a declared lexicon extension | none |
-| `scan_secrets`, `render_redacted`, `load_rules` | functions | `py.function`, verb-led |
+| `scan_secrets`, `render_redacted`, `load_rules` | functions in `runlog_lib.py` | `py.function`, verb-led |
 | `Rule` | type | `py.type` |
 | `CLASS_IDS` | constant, the 17 ids of S2 | none |
 
@@ -156,11 +173,22 @@ none
   a three-shape grep), H9 (AC4's wall-clock floor becomes a count of regex searches against hint
   matches) and H5's scoping note (journal values are out of this unit's scope, since no producer writes
   free text).
+- rev-3 · 2026-09-14 · S1 S3 · §3 · §4 · the build pass, before its code. S1: the hint cell holds
+  several substrings joined by `|`, since `github-token` and `vendor-key` name prefixes that share no
+  substring, and one hint per rule would have to be empty for them. S3: the functions' module, and the
+  optional `rules` argument AC4 counts through. §3 and §10: the gate runner's `redact()` is named
+  without a line number, which had moved from 117 to 120 under units 3 and 4. §4: the `ssh://git@`
+  trap and the 16-character floor on colon-less userinfo, negatives that reach their own regex, the
+  two readings of "not matched again", the template grammar, the 196-character bound AC4 needs, and
+  the named results for a CRLF table, a lone CR and a non-string input. No criterion changed.
 
 ## 10. Reuse audit
 
 `tools/codebase-map/reuse_lookup.py "redact a credential from command text"` finds no redactor beyond
-`redact()` at `tools/run-gates/run-gates.sh:117`, which masks only `user:pass@`. No existing seam fits.
+`redact()` in `tools/run-gates/run-gates.sh`, which masks only `user:pass@`. No existing seam fits.
+Re-run at the build pass on 2026-09-14 with the same answer. The source disagreed with rev-2 in one
+place: the function sits at line 120, not 117, and the masking claim still holds, because its `sed`
+needs both halves of `user:pass`.
 The rule classes, their measured match counts and the false-positive traps come from the design
 research record and the security review summarized in it.
 

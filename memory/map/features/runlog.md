@@ -2,10 +2,11 @@
 
 ```toml
 feature = "runlog"
-title = "The line grammar the three run-log producers write, and the one reader every consumer parses them through"
+title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, and the one redaction table free text passes through"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4"]
+decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
+  "TOOL-dLoggedFlight-5"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line"]
@@ -60,6 +61,16 @@ a root that leaves the repository, because a later unit writes under it.
 and `subprocess.Popen` and counts zero of each over 100,000 lines, with a liveness probe proving the
 counters can move. Wall time is printed report-only, and the leg's budget row is the cost verdict.
 
+**Redaction is ONE table of data, applied once on read, and every row carries its own proof.** The
+consumers of transcript text print narration and classify command heads, and the only other redactor
+in `tools/` masks `user:pass@` alone. So `redaction.tsv` holds one row per class of a closed id list,
+each with a lowercase hint prefilter, a regex whose group `v` is the value, a positive and a near-miss
+negative. The positives are TEMPLATES expanded at test time, because this repository is public and
+push protection blocks a literal key; the self-test scans the kit's own tracked files with the table,
+so a literal credential committed anywhere in it reds. Each rule compiles alone, because one combined
+alternation was measured to change which rules match once inline flags go global. The prefilter's cost
+claim is a COUNT: over 50,000 strings, the wrapped patterns' searches equal the hint-matched pairs.
+
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
@@ -72,7 +83,10 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
   in this kit's fixtures, so a producer spec that changes its data model changes the golden line in
   the same pass and the self-test reds on any key the grammar would refuse.
 - The consumers — the extractor, the run model and the committed record, units 6, 8 and 9 — import
-  `runlog_lib` rather than re-parsing.
+  `runlog_lib` rather than re-parsing. The extractor, `TOOL-dLoggedFlight-6`, is specced to run
+  command heads and printed narration through `render_redacted` and to persist no free text at all.
+- The gate runner's own `redact()` stays separate: it masks leg output on write, under its own stated
+  scope, and this table does not replace it.
 - `.memory-tree.conf` — read, never written. The reader is a narrow copy of the sourced-conf grammar,
   not an import of another kit's parser, because kits are copied into adopters independently.
 
@@ -87,6 +101,9 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
   first and then cutting its run id, and `TOOL-dLoggedFlight-3`'s suite compares each the same way.
   So does the pre-push hook, dropping `ref.<i>` fields and then cutting the longest value, graded the
   same way by `TOOL-dLoggedFlight-4`'s suite. Nothing on a cut line says it was cut.
+- **Redaction misses what it has no shape for.** A class nobody listed, a bare value printed with no
+  key beside it, and a head truncated before a row's minimum length all pass through. The README lists
+  them, and a new class is one id, one row and its positive.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
@@ -101,3 +118,6 @@ the indexed-field convention (`<base>.<n>` drops into `<base>_more`), never a se
 
 seam: `runlog_lib.resolve_memory_root` — reuse for any shipped tool that must address the memory tree
 without spelling its root.
+
+seam: `runlog_lib.render_redacted` + `scan_secrets` — reuse for any free text a tool prints or
+classifies; extend via one row in `redaction.tsv` and its id in `CLASS_IDS`, never a second redactor.

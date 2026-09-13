@@ -48,5 +48,7 @@ none = """
 nothing is wired, so there is no wiring to check. A later unit that renders a Skill from this kit brings its adopter and its check together
 """
 
-# No [[lf_pin]]. The shipped files are Python modules and a README, which read the same with either
-# line ending. The byte-exact files are the fixtures, which are withheld, so their pin is gov's own.
+# No [[lf_pin]]. The shipped files are Python modules, a README and the redaction table, which read
+# the same with either line ending: the table's loader drops a CR that ends a line, and its self-test
+# loads a CRLF copy to prove it. The byte-exact files are the fixtures, which are withheld, so their
+# pin is gov's own, and so is the table's, which the kit's scan of itself reads as bytes.

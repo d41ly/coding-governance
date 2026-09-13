@@ -10,7 +10,12 @@ and stated once in this kit's README, which is also where the reader's limits ar
 restated in this docstring: a second prose copy of a grammar is the copy that rots. The self-test
 grades this implementation against a golden line copied from every producer's data model.
 
-Every path this module touches is passed in or resolved from git; it names nothing outside itself.
+The same module carries the kit's ONE redaction table reader, for the consumers that print or classify
+free text a transcript holds. The rules are DATA in the table beside this file, whose header states
+its columns; the README states what the table does not catch.
+
+Every path this module touches is passed in, resolved from git, or is the table beside this file; it
+names nothing outside itself.
 """
 from __future__ import annotations
 
@@ -378,3 +383,158 @@ def resolve_memory_root(root) -> str:
         raise ValueError(f"runlog: MEMORY_ROOT in {CONF_NAME} leaves the repository ({value!r}); a "
                          "root is a repo-relative path with no '..' segment, drive or backslash")
     return stripped
+
+
+# ---------------------------------------------------------------------------------- redaction
+
+# The CLOSED list of secret classes (TOOL-dLoggedFlight-5 S2). The table beside this file holds one
+# row per id, and the self-test asserts the two against each other in BOTH directions, so a class
+# cannot go missing from the table and a row cannot arrive without being declared here first.
+CLASS_IDS = ("url-userinfo", "auth-header", "github-token", "sk-key", "aws-key", "pem-block",
+             "env-assign", "env-table", "jwt", "cookie", "json-secret", "conn-password",
+             "azure-key", "vendor-key", "flag-secret", "lower-assign", "named-token")
+TABLE_NAME = "redaction.tsv"
+TABLE_COLUMNS = ("id", "hint", "pattern", "positive", "negative")
+# What a redacted value becomes is `<redacted:<id>>`. A value that already starts with this head is
+# never matched again, which is what keeps a rendered text clean under a second scan.
+PLACEHOLDER_HEAD = "<redacted:"
+_RULE_ID_RE = re.compile(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*")
+# The kit's own table, compiled once on first use and never at import: a consumer that never redacts
+# pays nothing, and the parse arm's zero-compile count is not disturbed by a table it does not read.
+_DEFAULT_RULES: tuple | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class Rule:
+    """One row of the redaction table, compiled.
+
+    `pattern` is the compiled regex, and the only method called on it is `finditer`. That is the seam
+    a caller counting regex searches wraps; nothing else about the object is assumed.
+    """
+    id: str
+    hints: tuple
+    pattern: object
+    positive: str
+    negative: str
+    lineno: int = 0
+
+
+def load_rules(path=None) -> tuple:
+    """Read and compile a redaction table: the kit's own by default. Raises ValueError naming the line.
+
+    Read as BYTES and split on LF. A CR ending a line is dropped, so a CRLF checkout reads the same
+    table; a CR anywhere else is refused. Every malformed row is refused by name rather than skipped,
+    because a skipped row is a secret class that silently stopped being redacted.
+    """
+    p = pathlib.Path(path) if path is not None else pathlib.Path(__file__).resolve().parent / TABLE_NAME
+    where = p.name
+    try:
+        raw = p.read_bytes()
+    except OSError as exc:
+        raise ValueError(f"runlog: the redaction table {where} could not be read: {exc}") from exc
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"runlog: the redaction table {where} is not UTF-8: {exc}") from exc
+    rules: list[Rule] = []
+    seen: set[str] = set()
+    header = False
+    for lineno, line in enumerate(text.split("\n"), 1):
+        if line.endswith("\r"):
+            line = line[:-1]
+        if "\r" in line:
+            raise ValueError(f"runlog: {where}:{lineno} carries a lone CR inside a row")
+        if not line or line.startswith("#"):
+            continue
+        cells = line.split("\t")
+        if not header:
+            if tuple(cells) != TABLE_COLUMNS:
+                raise ValueError(f"runlog: {where}:{lineno} is not the header row "
+                                 f"{' TAB '.join(TABLE_COLUMNS)}")
+            header = True
+            continue
+        if len(cells) != len(TABLE_COLUMNS):
+            raise ValueError(f"runlog: {where}:{lineno} has {len(cells)} columns, not "
+                             f"{len(TABLE_COLUMNS)}")
+        for name, cell in zip(TABLE_COLUMNS, cells):
+            if not cell.strip():
+                raise ValueError(f"runlog: {where}:{lineno} has an empty {name} cell")
+        rid, hint, source, positive, negative = cells
+        if _RULE_ID_RE.fullmatch(rid) is None:
+            raise ValueError(f"runlog: {where}:{lineno} has the id {rid[:40]!r}, outside the id "
+                             "grammar of lowercase words joined by '-'")
+        if rid in seen:
+            raise ValueError(f"runlog: {where}:{lineno} carries the id {rid!r} twice")
+        hints = tuple(hint.split("|"))
+        if any(not h or h != h.lower() for h in hints):
+            raise ValueError(f"runlog: {where}:{lineno} ({rid}) has a hint that is empty or not "
+                             "lowercase, and a hint is matched against lowercased text")
+        try:
+            compiled = re.compile(source)
+        except re.error as exc:
+            raise ValueError(f"runlog: {where}:{lineno} ({rid}) has a pattern that does not "
+                             f"compile: {exc}") from exc
+        if "v" not in compiled.groupindex:
+            raise ValueError(f"runlog: {where}:{lineno} ({rid}) has a pattern with no named group "
+                             "v, so it names no value to redact")
+        rules.append(Rule(id=rid, hints=hints, pattern=compiled, positive=positive,
+                          negative=negative, lineno=lineno))
+        seen.add(rid)
+    if not header:
+        raise ValueError(f"runlog: the redaction table {where} has no header row")
+    if not rules:
+        raise ValueError(f"runlog: the redaction table {where} has no rule row")
+    return tuple(rules)
+
+
+def _load_default_rules() -> tuple:
+    global _DEFAULT_RULES
+    if _DEFAULT_RULES is None:
+        _DEFAULT_RULES = load_rules()
+    return _DEFAULT_RULES
+
+
+def scan_secrets(text, rules=None) -> list:
+    """Every secret VALUE in `text`, as sorted `(start, end, rule_id)` spans. Values never leave it.
+
+    Rules run in table order. A rule's regex runs only when the lowercased text holds one of its
+    hints, and once per such rule, which is the count a wrapped pattern observes. A span overlapping
+    one an earlier rule took is dropped, and so is a value that already reads as a placeholder.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"scan_secrets reads a str, not {type(text).__name__}; decode it first")
+    if not text:
+        return []
+    table = _load_default_rules() if rules is None else rules
+    low = text.lower()
+    taken: list[tuple[int, int, str]] = []
+    for rule in table:
+        for hint in rule.hints:
+            if hint in low:
+                break
+        else:
+            continue
+        for match in rule.pattern.finditer(text):
+            start, end = match.span("v")
+            if start >= end or text.startswith(PLACEHOLDER_HEAD, start):
+                continue
+            if any(start < t_end and t_start < end for t_start, t_end, _ in taken):
+                continue
+            taken.append((start, end, rule.id))
+    taken.sort()
+    return taken
+
+
+def render_redacted(text, rules=None) -> str:
+    """`text` with every value `scan_secrets` finds replaced by `<redacted:<id>>`, keys kept."""
+    spans = scan_secrets(text, rules)
+    if not spans:
+        return text
+    out = []
+    pos = 0
+    for start, end, rid in spans:
+        out.append(text[pos:start])
+        out.append(f"{PLACEHOLDER_HEAD}{rid}>")
+        pos = end
+    out.append(text[pos:])
+    return "".join(out)

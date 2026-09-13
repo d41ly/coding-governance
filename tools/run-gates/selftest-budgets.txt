@@ -102,7 +102,7 @@ run-gates gov canary	60		worst of 11 readings 19s, x1.5
 run-gates run-log line	280		worst of 6 readings 186s on node d 2026-09-13 by direct invocation, the fastest 62s, x1.5. TOOL-dLoggedFlight-3, withheld from adopters
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
-runlog selftest	60		worst of 3 readings 2.4s on node d 2026-09-13 by direct invocation, x1.5 floored at this file 60s minimum
+runlog selftest	60		worst of 3 readings 3.6s on node d 2026-09-14 by direct invocation, after TOOL-dLoggedFlight-5 added the redaction arms (2.4s before them, 2026-09-13), x1.5 floored at this file 60s minimum
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5

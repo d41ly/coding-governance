@@ -11,17 +11,25 @@ variable scrubbed, so an arm run from inside a hook cannot reach the tree that h
 Refusals are graded with their NEAR MISSES beside them: a predicate that refused everything would
 pass every refusal arm, and only the accepted neighbour tells the two apart.
 
+The redaction arms (TOOL-dLoggedFlight-5) read the kit's own table and expand its positives here, at
+test time, from templates: no committed file carries a credential, and one arm scans the kit with the
+table to prove it. Each rule's pattern is also broken and widened in memory, so every positive and
+every negative arm is seen able to fail on every run, not only on the day it was written.
+
 Exit 0 = every arm passed and the assertion count met its floor · 1 = an arm failed or the count fell.
 """
+import dataclasses
 import json
 import os
 import pathlib
+import random
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
+import types
 
 HERE = pathlib.Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
@@ -32,7 +40,9 @@ import runlog_lib as rl  # noqa: E402
 
 # The count this suite executed when it landed. A block of arms stranded behind an early return
 # would still print "0 failed"; the floor is what makes that a red rather than a smaller green.
-ASSERTION_FLOOR = 183
+# RAISED 183 -> 368 by TOOL-dLoggedFlight-5: the redaction arms run per row of the table, so a row
+# deleted from it lowers the count as well as redding the class comparison.
+ASSERTION_FLOOR = 368
 
 PASS = []
 FAIL = []
@@ -572,6 +582,409 @@ def test_kit_declarations():
           sorted(owned), sorted(on_disk | {"selftest.py"}))
     check_true("AC1: no project-owned element carries a glob, which a list include would drop",
                not any(ch in s for s in owned for ch in "*?["), str(sorted(owned)))
+
+
+# ================================================================ TOOL-dLoggedFlight-5 — redaction
+# The ACn below are that unit's criteria, prefixed `redact` so they never read as the arms above.
+
+# The template classes the table's header documents. The expander lives HERE and nowhere shipped:
+# the kit never needs a credential-shaped string, only its self-test does.
+TEMPLATE_CLASSES = {
+    "A": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+    "U": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    "L": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+    "a": "abcdefghijklmnopqrstuvwxyz0123456789",
+    "D": "0123456789",
+    "H": "0123456789abcdef",
+    "B": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+    "S": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-",
+}
+TEMPLATE_TOKEN = re.compile(r"\{([A-Za-z]+)([0-9]*)\}")
+# A positive fits here once expanded, so AC4 can splice it into a 200-character string with a space
+# on each side. The table's header states the same bound for the author of a new row.
+POSITIVE_MAX = 196
+AC4_STRINGS = 50000
+AC4_LENGTH = 200
+AC4_PLANT_EVERY = 100
+# AC4's filler: ordinary command-head words, plus NEAR MISSES that hold a rule's hint and must still
+# match nothing. They are what put a real share of (string, rule) pairs on the regex path, so the
+# count equality below compares two numbers that are both far from zero and far from the maximum.
+AC4_WORDS = (
+    "git", "status", "diff", "--stat", "log", "--oneline", "-5", "commit", "-m", "fix", "the", "a",
+    "run", "python", "bash", "x.py", "gate.sh", "echo", "grep", "-n", "cat", "sed", "&&", "|",
+    "2>&1", "head", "node", "npm", "install", "pytest", "-q", "HEAD", "main", "origin", "fetch",
+    "merge", "--no-ff", "rev-parse", "worktree", "list", "memory", "build", "spec", "ledger", "ok",
+    "0", "42",
+    "task-42", "n_token=4", "MAX_TOKENS=64", "--token-file", "--password-stdin",
+    "https://example.com/a", "akia", "ghp_", "eyj", "xoxo", "npm_config_cache", "hf_hub",
+    "cookie", "authorization", "password", "private", "key", "sk-", "?design=x", "pin_key=7",
+    "AccountKey=unset", '"Cookie:"',
+)
+
+
+def render_template(template, rng):
+    """Expand one table template: `(text, pieces)`, the pieces being the random values it placed.
+
+    An unknown token is refused by name. Left literal, a typo would make a positive that proves
+    nothing, and it would pass every arm that reads it.
+    """
+    pieces = []
+
+    def render_token(m):
+        cls, count = m.group(1), m.group(2)
+        if cls == "NL" and not count:
+            return "\n"
+        alphabet = TEMPLATE_CLASSES.get(cls)
+        if alphabet is None or not count:
+            raise ValueError(f"an unknown template token {m.group(0)!r}")
+        piece = "".join(rng.choices(alphabet, k=int(count)))
+        pieces.append(piece)
+        return piece
+
+    return TEMPLATE_TOKEN.sub(render_token, template), pieces
+
+
+def build_counted_rules(rules, counts):
+    """The rules, each with its compiled pattern wrapped so every `finditer` call is counted."""
+    out = []
+    for rule in rules:
+        def run_search(text, _find=rule.pattern.finditer, _id=rule.id):
+            counts[_id] = counts.get(_id, 0) + 1
+            return _find(text)
+        out.append(dataclasses.replace(rule, pattern=types.SimpleNamespace(finditer=run_search)))
+    return tuple(out)
+
+
+def build_swapped_rules(rules, index, source):
+    """The rules with ONE pattern replaced, for the in-memory breaks the staged-RED arms apply."""
+    out = list(rules)
+    out[index] = dataclasses.replace(rules[index], pattern=re.compile(source))
+    return tuple(out)
+
+
+def resolve_class_drift(rules):
+    """AC5's comparison, both directions: `(declared ids with no row, row ids never declared)`."""
+    ids = [r.id for r in rules]
+    return ([c for c in rl.CLASS_IDS if c not in ids], [i for i in ids if i not in rl.CLASS_IDS])
+
+
+def resolve_drift_at(path):
+    """`resolve_class_drift` over the table at `path`, or the loader's refusal as a string.
+
+    A table the loader refuses must fail its arm BY NAME: raised here, it crashed the suite with a
+    traceback instead, which exits 1 and names nothing.
+    """
+    try:
+        return resolve_class_drift(rl.load_rules(path))
+    except ValueError as exc:
+        return "REFUSED: " + str(exc)
+
+
+def resolve_own_claim(rule, rules, rng):
+    """Expand `rule`'s positive and scan it with `rules`: (claimed by its own id, a value survived)."""
+    text, pieces = render_template(rule.positive, rng)
+    spans = rl.scan_secrets(text, rules)
+    out = rl.render_redacted(text, rules)
+    return any(s[2] == rule.id for s in spans), any(p in out for p in pieces)
+
+
+def build_scan_text(rel, data):
+    """A tracked file's text as AC3 scans it: the table with its positive column blanked, else whole."""
+    text = data.decode("utf-8", "replace")
+    if rel != rl.TABLE_NAME:
+        return text
+    col = rl.TABLE_COLUMNS.index("positive")
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        cells = line.split("\t")
+        if not line.startswith("#") and len(cells) == len(rl.TABLE_COLUMNS) and cells[0] != "id":
+            cells[col] = ""
+            lines[i] = "\t".join(cells)
+    return "\n".join(lines)
+
+
+def resolve_hits(rel, text):
+    """`<path>:<line> <rule id>` per span. The VALUE is never printed, which is the point of a hit."""
+    return [f"{rel}:{text.count(chr(10), 0, s) + 1} {rid}" for s, _e, rid in rl.scan_secrets(text)]
+
+
+def test_redact_ac1_rows():
+    rules = rl.load_rules()
+    rng = random.Random(20260914)
+    for rule in rules:
+        text, pieces = render_template(rule.positive, rng)
+        check_true(f"redact AC1 ({rule.id}): the positive places a random value and fits in "
+                   f"{POSITIVE_MAX} characters", bool(pieces) and len(text) <= POSITIVE_MAX,
+                   str(len(text)))
+        out = rl.render_redacted(text)
+        check(f"redact AC1 ({rule.id}): the render changes the positive and no value survives it",
+              (out != text, sum(1 for p in pieces if p in out)), (True, 0))
+        check(f"redact AC1 ({rule.id}): the first rule to claim the positive is its OWN",
+              sorted({s[2] for s in rl.scan_secrets(text)}), [rule.id])
+        check(f"redact AC1 ({rule.id}): a rendered positive scans clean and renders unchanged",
+              (rl.scan_secrets(out), rl.render_redacted(out)), ([], out))
+        neg, _ = render_template(rule.negative, rng)
+        check(f"redact AC1 ({rule.id}): the negative comes back unchanged under the whole table",
+              (rl.render_redacted(neg), rl.scan_secrets(neg)), (neg, []))
+        # A negative the prefilter keeps off the regex path grades the hint, never the pattern, and
+        # the pattern is what a widening breaks. So each negative must reach its own regex.
+        low = neg.lower()
+        check_true(f"redact AC1 ({rule.id}): the negative holds one of its own hints, so the "
+                   "PATTERN is what leaves it alone", any(h in low for h in rule.hints),
+                   str(rule.hints))
+
+
+def test_redact_ac1_staged_red():
+    """Every rule broken and widened in memory, on every run: each positive and negative arm CAN red."""
+    rules = rl.load_rules()
+    rng = random.Random(7)
+    for i, rule in enumerate(rules):
+        claimed, _ = resolve_own_claim(rule, build_swapped_rules(rules, i, r"(?P<v>(?!))"), rng)
+        check(f"redact AC1 staged RED ({rule.id}): a pattern that matches nothing loses its "
+              "positive's own claim", claimed, False)
+        neg, _ = render_template(rule.negative, rng)
+        wide = build_swapped_rules(rules, i, r"(?P<v>[\s\S]+)")
+        check(f"redact AC1 staged RED ({rule.id}): a pattern widened to everything changes its "
+              "negative", rl.render_redacted(neg, wide) != neg, True)
+    # The control: the unbroken table, through the same helper, keeps every claim.
+    check("redact AC1 staged RED control: the unbroken table claims every positive, no value left",
+          [resolve_own_claim(r, rules, rng) for r in rules], [(True, False)] * len(rules))
+
+
+def test_redact_ac2_prefix_kept():
+    rng = random.Random(11)
+    v1 = render_template("{S40}", rng)[0]
+    out = rl.render_redacted("Authorization: Bearer " + v1)
+    check("redact AC2: the header keeps `Authorization: Bearer ` and holds the placeholder there",
+          out, "Authorization: Bearer <redacted:auth-header>")
+    check_true("redact AC2: ...and the value is gone", v1 not in out)
+    v2 = render_template("{A40}", rng)[0]
+    out = rl.render_redacted("https://" + v2 + "@host/x")
+    check("redact AC2: colon-less userinfo keeps `https://` and the host", out,
+          "https://<redacted:url-userinfo>@host/x")
+    check_true("redact AC2: ...and the value is gone", v2 not in out)
+    v3 = render_template("{A24}", rng)[0]
+    out = rl.render_redacted("https://ci:" + v3 + "@host/x")
+    check("redact AC2: user and password go together, the scheme and host stay", out,
+          "https://<redacted:url-userinfo>@host/x")
+    # The near miss: a short colon-less user is a login name, not a token, and stays.
+    check("redact AC2 near miss: `ssh://git@host` is left alone", rl.render_redacted("ssh://git@host/x"),
+          "ssh://git@host/x")
+
+
+def test_redact_ac3_kit_scans_clean():
+    got = subprocess.run(["git", "ls-files", "-z"], cwd=str(HERE), capture_output=True)
+    files = sorted(f.decode("utf-8") for f in got.stdout.split(b"\0") if f)
+    check("redact AC3 setup: `git ls-files` ran in the kit dir", got.returncode, 0)
+    check_true("redact AC3 liveness: the tracked population holds the table, the reader and this suite",
+               {rl.TABLE_NAME, "runlog_lib.py", "selftest.py"} <= set(files), str(files))
+    hits = []
+    for rel in files:
+        path = HERE / rel
+        if path.is_file():
+            hits.extend(resolve_hits(rel, build_scan_text(rel, path.read_bytes())))
+    check("redact AC3: no tracked file under the kit carries text the table flags, outside the "
+          "positive column", hits, [])
+    # The exclusion is LOAD-BEARING and narrow: the raw positive column does hit, since several
+    # templates keep their key and a value class that admits a brace, and every such hit sits in that
+    # column and nowhere else. This comment once spelled one of them, and this arm redded on it.
+    raw = (HERE / rl.TABLE_NAME).read_bytes().decode("utf-8")
+    col = rl.TABLE_COLUMNS.index("positive")
+    cells_at = []
+    for s, _e, _rid in rl.scan_secrets(raw):
+        line_start = raw.rfind("\n", 0, s) + 1
+        cells_at.append(raw[line_start:s].count("\t"))
+    check_true("redact AC3 control: the unblanked table hits, and only in the positive column",
+               bool(cells_at) and set(cells_at) == {col}, str(cells_at))
+    # A planted, EXPANDED positive in a negative cell is found by the very function the arm runs.
+    rng = random.Random(3)
+    rules = rl.load_rules()
+    planted, _ = render_template(rules[0].positive, rng)
+    lines = raw.split("\n")
+    idx = next(i for i, ln in enumerate(lines) if ln.startswith(rules[0].id + "\t"))
+    cells = lines[idx].split("\t")
+    cells[rl.TABLE_COLUMNS.index("negative")] = planted
+    lines[idx] = "\t".join(cells)
+    seeded = "\n".join(lines).encode("utf-8")
+    check("redact AC3 liveness: a literal positive committed in the table is a hit",
+          resolve_hits(rl.TABLE_NAME, build_scan_text(rl.TABLE_NAME, seeded)),
+          [f"{rl.TABLE_NAME}:{idx + 1} {rules[0].id}"])
+    check_true("redact AC3 liveness: ...and so is one in any other file",
+               bool(resolve_hits("fixtures/x.txt", build_scan_text("fixtures/x.txt",
+                                                                   planted.encode("utf-8")))))
+
+
+def test_redact_ac4_prefilter_count():
+    rules = rl.load_rules()
+    rng = random.Random(4)
+    strings, planted = [], {}
+    for i in range(AC4_STRINGS):
+        words = rng.choices(AC4_WORDS, k=40)
+        while len(" ".join(words)) < AC4_LENGTH:
+            words.append(rng.choice(AC4_WORDS))
+        if i % AC4_PLANT_EVERY:
+            strings.append(" ".join(words)[:AC4_LENGTH])
+            continue
+        rule = rules[(i // AC4_PLANT_EVERY) % len(rules)]
+        pos, pieces = render_template(rule.positive, rng)
+        # The positive goes in at a WORD boundary and only the far end is trimmed. A near miss cut
+        # in two can be a real secret: splicing over characters cut the `n_` off one near miss,
+        # leaving a bare assignment the lower-assign row redacts, and cut another down to a flag
+        # standing in front of the positive. This arm redded on both before the splice moved.
+        room = AC4_LENGTH - len(pos) - 2
+        k = rng.choice([n for n in range(len(words) + 1) if len(" ".join(words[:n])) <= room])
+        left = " ".join(words[:k])
+        s = left + " " + pos + " " + " ".join(words[k:])
+        while len(s) < AC4_LENGTH:
+            s += " " + rng.choice(AC4_WORDS)
+        strings.append(s[:AC4_LENGTH])
+        planted[i] = (rule.id, pieces, len(left) + 1, len(left) + 1 + len(pos))
+    check("redact AC4 setup: every generated string is 200 characters",
+          {len(s) for s in strings}, {AC4_LENGTH})
+    check("redact AC4 setup: 1% of them carry a positive, and every rule is planted",
+          (len(planted), {v[0] for v in planted.values()} == set(rl.CLASS_IDS)),
+          (AC4_STRINGS // AC4_PLANT_EVERY, True))
+    counts = {}
+    counted = build_counted_rules(rules, counts)
+    t0 = time.perf_counter()
+    found = [rl.scan_secrets(s, counted) for s in strings]
+    wall = time.perf_counter() - t0
+    expected = 0
+    for s in strings:
+        low = s.lower()
+        expected += sum(1 for r in rules if any(h in low for h in r.hints))
+    searches = sum(counts.values())
+    total = len(strings) * len(rules)
+    check("redact AC4: regex searches equal the (string, rule) pairs whose hint matched",
+          searches, expected)
+    check_true("redact AC4 liveness: the prefilter kept pairs OFF the regex path", expected < total,
+               f"{expected} of {total}")
+    check_true("redact AC4 liveness: ...and let pairs ON it beyond the planted ones",
+               expected > len(planted), f"{expected}")
+    missed = [i for i, (rid, _p, a, b) in planted.items()
+              if not any(sp[2] == rid and sp[0] < b and a < sp[1] for sp in found[i])]
+    check("redact AC4: every planted secret is found, by its own rule", missed, [])
+    foreign = [i for i, (rid, _p, _a, _b) in planted.items() if any(sp[2] != rid for sp in found[i])]
+    check("redact AC4: ...and nothing else in a planted string is claimed", foreign, [])
+    leaked = [i for i, (_r, pieces, _a, _b) in planted.items()
+              if any(p in rl.render_redacted(strings[i]) for p in pieces)]
+    check("redact AC4: no planted value survives the render", leaked, [])
+    stray = [i for i in range(len(strings)) if i not in planted and found[i]]
+    check("redact AC4: no string without a plant yields a span, near misses included", stray[:5], [])
+    print("  info report-only: scanned %d strings in %.2fs; %d of %d (string, rule) pairs reached "
+          "a regex" % (len(strings), wall, expected, total))
+
+
+def test_redact_ac5_class_ids():
+    rules = rl.load_rules()
+    check("redact AC5: CLASS_IDS declares each id once", len(set(rl.CLASS_IDS)), len(rl.CLASS_IDS))
+    check("redact AC5: every class id has a row, and every row's id is a class id",
+          resolve_class_drift(rules), ([], []))
+    check_true("redact AC5: every row carries a positive and a negative",
+               all(r.positive.strip() and r.negative.strip() for r in rules))
+    # The comparison run over a deleted row and an undeclared one, through the same helper.
+    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-redact-"))
+    SCRATCH.append(base)
+    raw = (HERE / rl.TABLE_NAME).read_bytes().decode("utf-8")
+    lines = raw.split("\n")
+    gone = rules[-1].id
+    (base / "less.tsv").write_bytes("\n".join(ln for ln in lines
+                                              if not ln.startswith(gone + "\t")).encode("utf-8"))
+    check("redact AC5 staged RED: a deleted row is named as missing",
+          resolve_drift_at(base / "less.tsv"), ([gone], []))
+    rogue = "\t".join(("rogue-class", "rogue", r"rogue[ ](?P<v>[A-Za-z0-9]{20})", "rogue {A20}",
+                       "rogue"))
+    (base / "more.tsv").write_bytes((raw.rstrip("\n") + "\n" + rogue + "\n").encode("utf-8"))
+    check("redact AC5 staged RED: an undeclared row is named as extra",
+          resolve_drift_at(base / "more.tsv"), ([], ["rogue-class"]))
+
+
+def test_redact_edges():
+    check("redact: an empty string has no span", rl.scan_secrets(""), [])
+    check("redact: ...and renders as itself", rl.render_redacted(""), "")
+    for label, bad in (("bytes", b"plain text"), ("None", None)):
+        try:
+            rl.render_redacted(bad)
+            msg = ""
+        except TypeError as exc:
+            msg = str(exc)
+        check(f"redact: a non-string input ({label}) raises TypeError naming str", "str" in msg, True)
+    try:
+        render_template("{Q8}", random.Random(0))
+        msg = ""
+    except ValueError as exc:
+        msg = str(exc)
+    check("redact: an unknown template token is refused by name", "{Q8}" in msg, True)
+    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-table-"))
+    SCRATCH.append(base)
+    lf = (HERE / rl.TABLE_NAME).read_bytes()
+    (base / "crlf.tsv").write_bytes(lf.replace(b"\n", b"\r\n"))
+
+    def read_shape(path):
+        try:
+            rules = rl.load_rules(path)
+        except ValueError as exc:
+            return "REFUSED: " + str(exc)
+        return [(r.id, r.hints, r.pattern.pattern, r.positive, r.negative) for r in rules]
+
+    check("redact: a CRLF checkout of the table loads the same rules",
+          read_shape(base / "crlf.tsv"), read_shape(HERE / rl.TABLE_NAME))
+    # "Not matched again", within one call: a value two rules match goes to the EARLIER row once,
+    # and the later row's overlapping span is dropped rather than rendered over the first.
+    # The inputs are assembled from pieces, because spelled whole in this file they are exactly what
+    # the kit's own scan (redact AC3) exists to refuse.
+    v = render_template("{A36}", random.Random(9))[0]
+    key, header = "GH_" + "TOKEN", "Authorization: Bearer "
+    for text, want, rid in (
+            (key + "=ghp_" + v, key + "=ghp_<redacted:github-token>", "github-token"),
+            (header + "ghp_" + v, header + "<redacted:auth-header>", "auth-header")):
+        check(f"redact: a value two rules match is redacted once, by the earlier row ({rid})",
+              (rl.render_redacted(text), [s[2] for s in rl.scan_secrets(text)]), (want, [rid]))
+    head = "# a comment\n" + "\t".join(rl.TABLE_COLUMNS) + "\n"
+    row = "demo-rule\tdemo\t(?P<v>demo[0-9]+)\tdemo{D4}\tdemo only\n"
+    cases = [
+        ("no header row", row, "not the header row"),
+        ("four columns", head + "demo-rule\tdemo\t(?P<v>x)\tp\n", "4 columns"),
+        ("an empty negative cell", head + "demo-rule\tdemo\t(?P<v>x)\tp\t \n", "empty negative"),
+        ("an id outside the grammar", head + row.replace("demo-rule", "Demo_Rule"), "id grammar"),
+        ("a duplicate id", head + row + row, "twice"),
+        ("an uppercase hint", head + row.replace("\tdemo\t", "\tDemo\t", 1), "not lowercase"),
+        ("an empty hint alternative", head + row.replace("\tdemo\t", "\tdemo||x\t", 1),
+         "not lowercase"),
+        ("a pattern that does not compile", head + row.replace("(?P<v>demo[0-9]+)", "(?P<v>["),
+         "does not compile"),
+        ("a pattern with no group v", head + row.replace("(?P<v>demo[0-9]+)", "demo[0-9]+"),
+         "no named group"),
+        ("a lone CR inside a row", head + row.replace("demo only", "demo\ronly"), "lone CR"),
+        ("no rule row", head, "no rule row"),
+    ]
+    for label, text, needle in cases:
+        path = base / "bad.tsv"
+        path.write_bytes(text.encode("utf-8"))
+        try:
+            rl.load_rules(path)
+            msg = ""
+        except ValueError as exc:
+            msg = str(exc)
+        check(f"redact: a malformed table is refused by name ({label})", needle in msg, True)
+    (base / "bad.tsv").write_bytes(head.encode("utf-8") + b"demo-rule\t\xff\n")
+    try:
+        rl.load_rules(base / "bad.tsv")
+        msg = ""
+    except ValueError as exc:
+        msg = str(exc)
+    check("redact: a table that is not UTF-8 is refused by name", "not UTF-8" in msg, True)
+    try:
+        rl.load_rules(base / "absent.tsv")
+        msg = ""
+    except ValueError as exc:
+        msg = str(exc)
+    check("redact: an absent table is refused by name", "could not be read" in msg, True)
+    # The near miss beside the refusals: the smallest valid table loads, one rule with its group.
+    (base / "ok.tsv").write_bytes((head + row).encode("utf-8"))
+    ok = rl.load_rules(base / "ok.tsv")
+    check("redact: the smallest valid table loads one rule, its hint split and its group named",
+          [(r.id, r.hints, "v" in r.pattern.groupindex) for r in ok], [("demo-rule", ("demo",), True)])
 
 
 def main():

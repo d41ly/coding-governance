@@ -178,6 +178,11 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
+      "id": "Rule",
+      "kind": "class",
+      "file": "tools/runlog/runlog_lib.py"
+    },
+    {
       "id": "ScopeRefused",
       "kind": "class",
       "file": "tools/process-monitor/scope.py"
@@ -423,6 +428,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_counted_rules",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_cutoff",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -543,6 +553,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_scan_text",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_scope",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -571,6 +586,11 @@
       "id": "build_substitution",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "build_swapped_rules",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_tempdir",
@@ -2033,6 +2053,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "load_rules",
+      "kind": "function",
+      "file": "tools/runlog/runlog_lib.py"
+    },
+    {
       "id": "load_scenarios",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -3348,6 +3373,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "render_redacted",
+      "kind": "function",
+      "file": "tools/runlog/runlog_lib.py"
+    },
+    {
       "id": "render_region",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3391,6 +3421,11 @@
       "id": "render_symbols_json",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_template",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "repo_root",
@@ -3488,6 +3523,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_class_drift",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "resolve_declaration_paths",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3501,6 +3541,11 @@
       "id": "resolve_dests",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_drift_at",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "resolve_entry",
@@ -3533,6 +3578,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "resolve_hits",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "resolve_hook_path",
       "kind": "function",
       "file": "tools/settings-merge.py"
@@ -3561,6 +3611,11 @@
       "id": "resolve_memory_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "resolve_own_claim",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "resolve_pattern_sets",
@@ -3976,6 +4031,11 @@
       "id": "scan_routes",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_secrets",
+      "kind": "function",
+      "file": "tools/runlog/runlog_lib.py"
     },
     {
       "id": "scan_shell_tokens",
@@ -5086,6 +5146,41 @@
       "id": "test_recycled_parent_edge_is_dropped_and_counted",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_redact_ac1_rows",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_redact_ac1_staged_red",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_redact_ac2_prefix_kept",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_redact_ac3_kit_scans_clean",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_redact_ac4_prefilter_count",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_redact_ac5_class_ids",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_redact_edges",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_refusals_named",
