@@ -5,7 +5,7 @@ opened: 2026-09-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11 TOOL-aDeferredBar-12 TOOL-aDeferredBar-13 TOOL-aDeferredBar-14 TOOL-aDeferredBar-15 TOOL-aDeferredBar-16
+ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11 TOOL-aDeferredBar-12 TOOL-aDeferredBar-13 TOOL-aDeferredBar-14 TOOL-aDeferredBar-15 TOOL-aDeferredBar-16 TOOL-aDeferredBar-17 TOOL-aDeferredBar-18 TOOL-aDeferredBar-19 TOOL-aDeferredBar-20 TOOL-aDeferredBar-21
 ---
 
 # aDeferredBar — no merge bar and no self-test suite inside a build pass
@@ -48,22 +48,29 @@ than the bar, and nothing at the act that refuses. The trace and the corpus coun
 
 ## Parked decisions
 
-- None yet.
+- **No round 4 of the closing review.** Three rounds converged at zero blockers; rounds 2 and 3
+  each found the previous fold's own arms and a handful of spellings inside the hook's stated
+  ceiling. The round-3 fold ran every direct check and the scoped bar green; fold text is
+  unreviewed by construction. The question and the reason are on `RUN.md`.
+- **The parity bound is 300 s, not the 120 s the fold was told.** Six `--selftest` legs sit at
+  the manifest's default ceiling of 300; a 120 s bound reds all six as undeclared. Owner call
+  whether to lower their ceilings or declare them by name (`TOOL-aDeferredBar-12` carries the two
+  above the bound).
 
 <!-- roster:units -->
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aDeferredBar-1` | MISSING | the instruction: no bar and no suite inside a pass, stated at every carrier a build agent reads |
-| 2 | `TOOL-aDeferredBar-2` | MISSING | the spec gate: a bar or suite invocation as a §6 observation or §7 leg token is a refusal |
-| 3 | `TOOL-aDeferredBar-3` | MISSING | the act refusal: a PreToolUse hook denies a full bar or a suite while the run is before VERIFYING |
+| 1 | `TOOL-aDeferredBar-1` | CLOSED | the instruction: no bar and no suite inside a pass, stated at every carrier a build agent reads |
+| 2 | `TOOL-aDeferredBar-2` | CLOSED | the spec gate: a bar or suite invocation as a §6 observation or §7 leg token is a refusal |
+| 3 | `TOOL-aDeferredBar-3` | CLOSED | the act refusal: a PreToolUse hook denies a full bar or a suite while the run is before VERIFYING |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-09-13 · streams tooling
 ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11 TOOL-aDeferredBar-12 TOOL-aDeferredBar-13 TOOL-aDeferredBar-14
-ids TOOL-aDeferredBar-15 TOOL-aDeferredBar-16
+ids TOOL-aDeferredBar-15 TOOL-aDeferredBar-16 TOOL-aDeferredBar-17 TOOL-aDeferredBar-18 TOOL-aDeferredBar-19 TOOL-aDeferredBar-20 TOOL-aDeferredBar-21
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

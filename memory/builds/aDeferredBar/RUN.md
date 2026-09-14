@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 7e9bbeff788b0ba023e1da7857d0d06d90792d08
-phase: REVIEWING
+witness: 8f2f9002ba4c28a1d470d649164463c35c2ca176
+phase: VERIFYING
 branch-sha: b2a330be17b8e195981002f3a5aa4b07d2256bd8
 branch-ref: refs/heads/branch/unattended-build-gates-timing-4af880
 mode: prompt
@@ -40,3 +40,5 @@ base: b2a330be17b8e195981002f3a5aa4b07d2256bd8
 2026-09-14T00:17:40Z dispatch · item d59e7022 TOOL-aDeferredBar-3 · reason tools/unattended/gate-guard.js tools/unattended/gate-guard.fragment.json tools/unattended/gate-guard.test.sh .claude/settings.json tools/unattended/unattended.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/unattended.test.sh tools/unattended/adopt-unattended.test.sh tools/unattended/adopt-unattended.sh tools/unattended/kit.toml tools/run-gates/selftest-budgets.txt tools/install-prefix-carried.txt tools/unattended/README.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/VERBS.template.md tools/unattended/playbook.fixture.template.md tools/unattended/playbook.fixture.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/UNATTENDED-VERBS.md memory/map/features/unattended.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/guides/SESSION-KICKOFF.md memory/builds/aDeferredBar/spec/2026-09-13-spec-TOOL-aDeferredBar-3.md memory/builds/aDeferredBar/build/2026-09-14-build-TOOL-aDeferredBar-3-1-acceptance-ledger.md memory/builds/aDeferredBar/build/2026-09-14-build-TOOL-aDeferredBar-3-2-corpus-measurement.md memory/builds/aDeferredBar/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-14T02:09:46Z review · item aDeferredBar · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-14T06:59:18Z decision · item Open a round 4 of the closing diff review over the round-3 fold? · reason Refused. Options seen: (a) a round 4 over 28f830bd..8f2f9002; (b) stop at three rounds. The loop converged at 0 blockers in rounds 1, 2 and 3; round 2 found 17 findings of which 3 were the round-1 fold certifying itself, round 3 found 9 of which 5 were the round-2 fold's own arms or comments, and every round-3 finding sits inside the hook's stated ceiling (textual, fail-open). The round-3 fold observed each arm RED-first on stdin, ran every direct check green, and the scoped bar was 48/48 before it. Fold text is unreviewed surface by construction, so a round 4 would review a fold and owe a round 5. Took (b); the residual left-shifts are TOOL-aDeferredBar-17..21.
