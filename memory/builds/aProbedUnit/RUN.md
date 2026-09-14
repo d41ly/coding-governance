@@ -64,3 +64,7 @@ base: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 2026-09-14T13:35:33Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/ledger/2026-09.md
 
 2026-09-14T13:35:38Z brief · item TOOL-aProbedUnit-4 · reason 7a71fffc7608 memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-4-1-build-brief.md
+
+2026-09-14T13:55:23Z dispatch · item 5049e2ab TOOL-aProbedUnit-5 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md memory/map/generated/symbols.json memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-5.md memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-5-1-acceptance-ledger.md memory/builds/aProbedUnit/README.md
+
+2026-09-14T13:55:33Z brief · item TOOL-aProbedUnit-5 · reason 2b8b1dac6546 memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-5-1-build-brief.md
