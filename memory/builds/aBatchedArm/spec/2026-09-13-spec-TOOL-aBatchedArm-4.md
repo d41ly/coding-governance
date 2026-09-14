@@ -12,6 +12,7 @@
 | [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round3.md) | spec-audit | — |
 | [2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md) | diff-review | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-5 |
+| [2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round2.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round2.md) | diff-review | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-5 |
 
 <!-- /gen:spec-records -->
 

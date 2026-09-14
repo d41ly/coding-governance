@@ -98,3 +98,5 @@ closed vocabulary `measured <n>s on node a <date>, direct serial run …`, so `-
 2026-09-14T14:45:04Z dispatch · item 85a47ca3 TOOL-aBatchedArm-2 · reason tools/unattended/check-arms-groups.sh tools/unattended/check-arms-groups.test.sh tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/install-prefix-carried.txt tools/unattended/kit.toml tools/govkit/subject-pins.tsv memory/guides/SESSION-KICKOFF.md memory/builds/aBatchedArm/spec/2026-09-10-spec-TOOL-aBatchedArm-2.md memory/builds/aBatchedArm/build/2026-09-14-build-TOOL-aBatchedArm-2-1-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-14T16:04:55Z review · item TOOL-aBatchedArm-1 · reason verdict BLOCKED · blockers 4
+
+2026-09-14T17:45:59Z review · item TOOL-aBatchedArm-1 · reason verdict CLEAN · blockers 0 · CONVERGED
