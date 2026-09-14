@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-14T20:01:15+03:00 @ fdd754bf62d1833361350ab7cb0b0f393027d99a
+last-audit: 2026-09-14T20:05:02+03:00 @ fdd754bf62d1833361350ab7cb0b0f393027d99a
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: fdd754bf62d1833361350ab7cb0b0f393027d99a
+last-body-change: 37f879ff3181c2ae5b0679a43597fbaf3c250888
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -129,7 +129,7 @@ GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githo
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
-bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts; bare REFUSES. TOOL-aQuenchedHarness-4, TOOL-aBatchedArm-4
+bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts; bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
@@ -211,8 +211,6 @@ shortening never does) · `process-creation-is-the-suite-cost.md` ·
   across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
-- All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
-  `git diff --cached --check`.
 - The memory hygiene leg is MINUTES; a timeout sized in seconds fires. Read `gate-ledger.tsv`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
