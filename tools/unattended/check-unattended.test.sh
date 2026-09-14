@@ -827,11 +827,37 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
 D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
 D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
 
-# A FOLD-ONLY EXIT DEMANDS NOTHING, and the region does not grow. Under the old predicate this same
-# fixture redded, which is the whole defect: a run that folded correctly was graded as though it had
-# promoted.
+# A FOLD BESIDE A NON-ZERO BLOCKER COUNT IS A REFUSAL (closing review of aProbedUnit, cluster C).
+# This fixture used to be the green "a fold-only exit demands nothing" control, and that was the
+# hole: `review_state` returns CONVERGED for count 0, so a NON-CONVERGENT row stands on a blocker,
+# the severity rule promotes every blocker, and `blockers 2 · disposition fold` was two blockers left
+# standing under a field the clause read as demanding nothing. The driver refuses the row at write
+# time now; the leg reds the hand-written one. At base this fixture printed no check 2 line.
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was"
+
+# ...and a fold beside ZERO blockers still demands nothing: nothing above MEDIUM stood, so nothing
+# was owed a unit. Written by hand — the driver reaches CONVERGED at 0 and never NON-CONVERGENT —
+# which is exactly the population this clause grades.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+
+# A CONVERGED ROW RECORDING `promote` OWES AN ID (cluster C, id 12). The severity rule disposes the
+# HIGHS that stood at zero blockers, the driver records the promotion on the converged row, and
+# `needs` never read a CONVERGED row — so a promotion the harness performed was invisible to the bar
+# and a missing unit passed. At base the first fixture printed no check 2 line.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote\n'
+hit "$(run)" "1 subject(s) EXITED recording disposition promote and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+# ...its green control: the id present, the row passes.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+# ...and a CONVERGED row with NO field is still the ordinary converged round and demands nothing.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED\n'
 miss "$(run)" "check 2 FAILED"
 
 # ...and the GREEN CONTROL for it: the same fixture with the disposition stripped is a REFUSAL, not a
@@ -3198,8 +3224,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
 # ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
 # ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
-FLOOR_ASSERTIONS=402
+FLOOR_ASSERTIONS=406
 # ---- RAISED 400 -> 402 by TOOL-aProbedUnit-6: the two BOUNDED check-2 fixtures, both in region two.
+# ---- RAISED 402 -> 406 by the closing diff review of aProbedUnit (cluster C, id 12): the four
+# ---- check-2 disposition fixtures — fold beside a non-zero count, and the CONVERGED trio — which
+# ---- sit in the check-2 block INSIDE region one (the `if in_shard 1` at :279 to the `fi` at :1264),
+# ---- so FLOOR_SHARD_1 carries the same +4 and FLOOR_SHARD_2 is untouched.
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -3215,7 +3245,7 @@ FLOOR_ASSERTIONS=402
 # check asserting it, because the driver suite's own three constants cannot satisfy the same
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=83
+FLOOR_SHARD_1=87
 FLOOR_SHARD_2=319
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;

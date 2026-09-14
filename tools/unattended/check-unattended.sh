@@ -510,14 +510,24 @@ else
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
+        nf = split(rs, fld, " · ")
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
-          needs[it] = 1
-          nf = split(rs, fld, " · ")
+          needs[it] = 1; bl[it] = b
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
+        }
+        # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
+        # C). The severity rule disposes the HIGHS that stood at zero blockers, and the driver
+        # records `CONVERGED · disposition promote` when it did; a promotion this clause never
+        # counted was a promotion the bar could not see. Only under the graded path: the id-delta
+        # proxy predates the field and never read a converged row, and a converged subject is not
+        # one that "EXITED without converging".
+        else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
+          needs[it] = 1; bl[it] = b
+          disp[it] = substr(fld[nf], length("disposition ") + 1)
         }
       }
       END {
-        nneed = 0; nomiss = ""; illegal = ""
+        nneed = 0; nomiss = ""; illegal = ""; foldbad = ""
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
@@ -528,8 +538,10 @@ else
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
             else if (disp[it] == "promote") nneed++
-            # a subject recording `fold` demands NOTHING, which is the entire point of reading the
-            # field instead of inferring an answer from ids
+            else if (bl[it] > 0) foldbad = foldbad " " it "=" bl[it]
+            # a subject recording `fold` beside ZERO blockers demands NOTHING, which is the entire
+            # point of reading the field instead of inferring an answer from ids; beside a non-zero
+            # count it is a blocker left standing under a field that says nothing was
           }
         }
         if (graded == 1) {
@@ -537,11 +549,13 @@ else
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
           if (illegal != "")
             printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
+          if (foldbad != "")
+            printf "\n  %s (exited subject(s)%s record disposition fold beside a NON-ZERO blocker count, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was - the driver refuses this at write time, so the row reached this record by HAND)", f, foldbad
           if (nneed > 0) {
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker has no unit. A subject recording disposition fold demands nothing here)", f, nneed, newids + 0
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker or high has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nneed, newids + 0
           }
         }
         else {

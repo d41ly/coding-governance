@@ -375,10 +375,20 @@ function checkDriveRootLitter(resolved) {
  * purpose: a `/tmp` target that somehow escaped the `tmp` rule is still litter here, so the two
  * rules cannot disagree. Measured 2026-09-14 over 55,231 real Bash calls on node `a`: four targets,
  * `/mir` and `/xj` among them, every one agent throwaway.
+ *
+ * The set must be as wide as the roots it guards, and `private` and `volumes` put macOS in scope
+ * while `users`, `applications`, `library` and `system` — the other four names every macOS root
+ * carries — were missing, so `echo x > /Users/Shared/f` was denied as NEW top-level litter on a
+ * host where `/Users` is where every home lives (the drive set already lists `users`, and
+ * `resolveHomeRoots` mines `/users/<name>` homes). `nix` and `snap` are the same class on Linux:
+ * a package-manager root that is conventional on every host that has it. No registered node is
+ * macOS; the kit is copy-installed and project-agnostic, which is why the list is wider than the
+ * corpus that measured it. Closing diff review round 1, cluster J.
  */
 const POSIX_ROOT_CONVENTIONAL = new Set([
   'dev', 'proc', 'sys', 'usr', 'etc', 'var', 'opt', 'home', 'root', 'mnt', 'media', 'srv', 'bin',
   'sbin', 'lib', 'lib64', 'run', 'boot', 'private', 'volumes', 'cygdrive', 'workspace', 'workspaces',
+  'users', 'applications', 'library', 'system', 'nix', 'snap',
 ])
 
 /**

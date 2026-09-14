@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -30,7 +30,10 @@ other two terminal exits do, and lands the vocabulary in every carrier that spel
   read through `read_bound_key`, the defaulted-validated-announced reader `TOOL-aProbedUnit-3`
   hoists out of the `GATE_BOUND` block and lands first: default 1, the default ANNOUNCED on stderr,
   malformed or zero REFUSED with exit 2. One line of this unit's own, after `RUNAWAY_CEILING` is
-  defined, refuses a value above that ceiling. Observed by AC1 and AC2.
+  defined, refuses a value AT OR ABOVE that ceiling — `-lt`, because `review_state` tests the
+  ceiling first, so a bound equal to it is exactly the value the sentence refuses (rev-6; rev-5's
+  `-le` accepted it). The default is the constant `REVIEW_ROUNDS_DEFAULT=1` beside the other two,
+  interpolated into the NOTE (rev-6). Observed by AC1 and AC2.
 - **S2** — `review_state` takes an optional third argument, the bound, defaulting to
   `RUNAWAY_CEILING`, and returns `BOUNDED` when `n+1 >= bound` after the three existing tests and
   before `CONVERGING`. With the default bound the function is byte-for-byte today's behaviour,
@@ -38,9 +41,13 @@ other two terminal exits do, and lands the vocabulary in every carrier that spel
 - **S3** — `verb_review` passes `REVIEW_ROUNDS` as the bound when the subject is NOT the build
   slug and `RUNAWAY_CEILING` when it is; `BOUNDED` joins the terminal grep, the state gate's
   terminal case, the `note` case and the echo case with its own sentence. `--disposition` stays
-  REQUIRED at every terminal exit and REFUSED on any other round, by the 2026-09-01 owner ruling
-  section 8 cites; a `BOUNDED` exit without one is the existing `fail 37` refusal naming the state.
-  Observed by AC4, AC5 and AC6.
+  REQUIRED at every blocker-bearing exit (`NON-CONVERGENT`, `CEILING`, `BOUNDED`) and REFUSED on
+  a `CONVERGING` round, by the 2026-09-01 owner ruling section 8 cites; a `BOUNDED` exit without
+  one is the `fail 37` refusal naming the state. Rev-6 (closing review cluster C): at those three
+  exits `fold` is REFUSED by its own `fail 37`, because `review_state` returns `CONVERGED` for
+  count 0 so each of them stands on a blocker the severity rule promotes; at `CONVERGED` a
+  disposition is ACCEPTED and never required, written into the row, so the highs disposed at zero
+  blockers are recordable. Observed by AC4, AC5 and AC6 as re-targeted.
 - **S4** — `--close`'s `diff-reviewed` term admits `BOUNDED` in its terminal case, for vocabulary
   parity, with the header saying it is unreachable for the slug subject. Observed by AC7.
 - **S5** — `tools/unattended/check-unattended.sh` check 2: `BOUNDED` joins the `term` regex and
@@ -60,8 +67,8 @@ other two terminal exits do, and lands the vocabulary in every carrier that spel
   is re-made and the kickoff manifest's `last-audit` is re-stamped in the same commit. Observed by
   AC11.
 - **S9** — `tools/unattended/unattended.test.sh`: `mkconf` gains a SEVENTH positional,
-  `REVIEW_ROUNDS="${7-8}"`, defaulting to the ceiling so every existing sequence arm holds
-  unchanged — the sixth is `TOOL-aProbedUnit-3`'s, `UNIT_STALL_BOUND="${6-1800}"`, landed ahead
+  `REVIEW_ROUNDS="${7-7}"`, defaulting to one below the ceiling (rev-6; rev-5's `8` is refused at
+  startup now) so every existing sequence arm holds unchanged — the sixth is `TOOL-aProbedUnit-3`'s, `UNIT_STALL_BOUND="${6-1800}"`, landed ahead
   of this pass; the new arms section 6 names land beside the review-loop arms, the
   requires-disposition arm at `:4634` stands in this pass, and the floors rise by the arms added.
   Observed by AC12.
@@ -132,14 +139,20 @@ not a third copy. `REVIEW_ROUNDS=""` joins the preset line at `:292`. The call s
 that constant and a comparison written above its definition reads an empty string:
 
 ```bash
-read_bound_key REVIEW_ROUNDS 1 rounds "a spec-audit subject exits BOUNDED after the kit default of 1 round"
-[ "$REVIEW_ROUNDS" -le "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
+read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS_DEFAULT} round(s)"
+[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 ```
 
 The exact NOTE and REFUSING sentences the reader composes are spec 3's; this unit owns the NOTE
-clause it passes and the above-ceiling line, and section 6 asserts only those. The kit default is
-the literal `1` in the call rather than a `REVIEW_ROUNDS_DEFAULT` constant, because one reader
-exists and a constant read once is a second spelling of one fact. If the reader is not in the tree
+clause it passes and the at-or-above-ceiling line, and section 6 asserts only those. Rev-6: the
+kit default is `REVIEW_ROUNDS_DEFAULT=1`, a constant beside `GATE_BOUND_DEFAULT` and
+`UNIT_STALL_BOUND_DEFAULT`, interpolated into the NOTE exactly as its siblings are. Rev-5 argued
+for a literal `1` in the call "because one reader exists"; the closing review (cluster I) found
+the digit typed TWICE — the argument and the prose NOTE — so raising the argument left the
+sentence saying 1 and the arm green, which is the two-spellings fault the argument claimed to
+avoid. The comparison is `-lt` (cluster H): `review_state` tests the ceiling before the bound, so
+a bound EQUAL to the ceiling can never surface as `BOUNDED`, which is the condition the refusal
+sentence names. If the reader is not in the tree
 when this pass opens — unit 3 parked or re-ordered — the pass STOPS and says so rather than
 writing the inline copy back: the delegated decision was taken once, in spec 3's fold of the
 round-1 audit's cluster F and here, and a third copy is the thing it decided against.
@@ -194,7 +207,12 @@ records why the two must not share a subject. Four more edits in the verb:
   `M4 admits BOTH` comment above the gate at `:4101` to `:4103`, are unit 7's to reword to the
   severity rule, with the arm at `:4634` that quotes the clause; this unit widens the case and
   keeps the body's bytes.
-  The `*)` case keeps its refusal of an explicit disposition on a non-terminal round. Nothing here
+  The `*)` case keeps its refusal of an explicit disposition on a non-terminal round. Rev-6
+  (cluster C): the blocker-bearing case gains a second `fail 37` refusing `fold`, the
+  requires-disposition sentence names `promote` and the standing count, and `CONVERGED)` is its
+  own case accepting an optional disposition — the echo then carries `· disposition <d>` and
+  `review_exit_note`; check 2 counts a `CONVERGED · disposition promote` row into `nneed` and reds
+  `fold` beside a non-zero blocker count. Nothing here
   writes a default: the 2026-09-01 owner ruling in `memory/builds/dFoldedVerdict/README.md`,
   "a forced value is a constant, and a constant is not evidence for the clause that reads it — so
   the field stays evidence at every exit", is the reason `fail 37` exists, and a driver-written
@@ -203,8 +221,9 @@ records why the two must not share a subject. Four more edits in the verb:
 - The `note` case at `:4117` gains `BOUNDED) note=" · BOUNDED" ;;`, so the row reads
   `verdict <v> · blockers <n> · BOUNDED · disposition <d>` in the grammar check 2 already parses.
 - The echo case at `:4127` gains its own sentence: the declared round bound of `$REVIEW_ROUNDS`
-  is reached, the loop STOPS here, and every standing blocker is disposed by severity, followed by
-  `review_exit_note "$disposition"`. The `four states` comment above `review_state` at `:3971`
+  is reached, the loop STOPS here, and every CONFIRMED finding is DISPOSED BY SEVERITY (rev-6,
+  cluster G; rev-5 said "every standing blocker", the pre-severity-rule half left standing),
+  followed by `review_exit_note "$disposition"`. The `four states` comment above `review_state` at `:3971`
   becomes five.
 - Two comment blocks carry the withdrawn-cap ruling — `TOOL-aBoundedVerdict-1`, "the loop's
   engine was M4's missing BLOCKED disposition, not a missing count" — in the driver's own words
@@ -305,8 +324,8 @@ recorded high-water, and this pass only lowers it.
 
 `mkconf` at `tools/unattended/unattended.test.sh:108` writes `GATE_BOUND="${4-3600}"` from five
 positionals at base; `TOOL-aProbedUnit-3`, order 3, takes the SIXTH for
-`UNIT_STALL_BOUND="${6-1800}"`, so this unit takes the SEVENTH, `REVIEW_ROUNDS="${7-8}"`, the
-ceiling, and every existing review arm keeps its sequence. The new arms sit beside the
+`UNIT_STALL_BOUND="${6-1800}"`, so this unit takes the SEVENTH, `REVIEW_ROUNDS="${7-7}"`, one
+below the ceiling (rev-6), and every existing review arm keeps its sequence. The new arms sit beside the
 review-loop arms at `:4530` to `:4646`:
 
 - sliced `review_state` arms: `review_state '' 3 1` is `BOUNDED`; `review_state '3' 2 2` is
@@ -618,6 +637,7 @@ other default changes a two-argument call, and the one caller always passes it.
 - rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (ids 21, 8 — AC12 per-arm, AC9 to AC11 leg halves at `--close`), D (id 18 — AC11 against the parent commit), E (id 48 — `--disposition` stays required, the recorder retries with `promote`, F1), F (ids 23, 51 — `read_bound_key`, F2), H (id 7 — AC10's Skill oracles), O (id 31 — the ratchet leg), P (id 33 — the backlog flip is the close's).
 - rev-3 · 2026-09-14 · §3 · §4 · §8 F2 · the helper signature aligned to spec 3's four positionals, `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>` — the `<UNIT>` word is what makes the refusal sentence true for a key that counts rounds rather than seconds; the `<NOTE>` no longer repeats the "Declare one" clause the helper prints itself (sub-spec interface agreement, M2).
 - rev-5 · 2026-09-14 · AC12 · the base-red clause narrowed from "every verb arm" to the arms whose expectation moved: measured at the pass, 12 of the 19 added arms red against a frozen copy of the base kit and 7 hold against both — AC5's two slug-subject arms and the further-round refusal by design, the four sliced order arms as controls — so "every verb arm prints FAIL" was a sentence the spec's own AC5 contradicted (build pass, TOOL-aProbedUnit-6).
+- rev-6 · 2026-09-14 · S1 S3 S9 · §4 (the reader block, the state gate, the echo) · §The suite · folded the closing diff review round 1: cluster C (ids 20, 4 — the state gate refuses `fold` at `NON-CONVERGENT|CEILING|BOUNDED` with its own `fail 37` naming the severity rule, the requires-disposition sentence names `promote`, `CONVERGED` accepts an optional disposition written into the row; `review_exit_note`'s header and fold sentence say where fold is reachable; id 12 — check 2 counts `CONVERGED · disposition promote` into `nneed` and reds `fold` beside a non-zero blocker count), cluster G driver half (id 8 — the BOUNDED echo says every CONFIRMED finding is DISPOSED BY SEVERITY), cluster H (ids 7, 16 — `-lt`, `mkconf`'s seventh default 7, an arm refusing `REVIEW_ROUNDS=8` at exit 2), cluster I (id 23 — `REVIEW_ROUNDS_DEFAULT=1` beside the other two constants and interpolated into the NOTE; the NOTE arm reads the constant out of the driver and a `grep -cE '^read_bound_key [A-Z_]+ [0-9]'` arm pins literal-digit defaults at 0). The B2/D2 fold-at-exit arms and the `F1 (fork)` fixture re-targeted at the refusal; every new arm observed red against a frozen copy of the base kit and green at the tip, one block at a time with the preamble sourced. Floors: driver suite +17 of the fold's +19, leg suite +4.
 - rev-4 · 2026-09-14 · §3 · §4 · S9 · AC7 · AC12 · §10 · folded the round-2 spec audit: clusters A (ids 1, 10 — AC12's floors measured against the pass's parent commit on AC11's pattern, 706 and 510 kept as base-of-build figures spec 3 moves first), F (id 27 — the run-alone form sources `slice_fn` from `:3930`, which the preamble does not define), H (id 33 — the `WHY A PREDICATE AND NOT A COUNT` block at `:3966` to `:3969` and the `RUNAWAY_CEILING` header at `:457` to `:458` join the verb edits and Files touched; AC7's `moves the stall earlier` grep, 0 at the tip and 1 at base), K (id 15 — `mkconf`'s SEVENTH positional, `REVIEW_ROUNDS="${7-8}"`, unit 3 holding the sixth); and cluster G's correction (id 28, spec 7's) that the `:4634` arm stands in this pass and moves in unit 7's, where rev-3 said it stands unchanged.
 
 ## 10. Reuse audit

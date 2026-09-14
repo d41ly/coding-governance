@@ -146,8 +146,23 @@ function chunk(a, n) {
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
-//   round: <integer>                                // which audit round this invocation is
+//   round: <integer>,                               // which audit round this invocation is
+//   auditIds: [<unit id>],                          // AFTER A DISPOSAL: the `promotedIds` the previous
+//                                                   //   hand-out returned — the specs no spec-audit record
+//                                                   //   names yet; the audit is scoped to them
+//   subjectRound: <integer>                         // ON A FOLD RE-INVOKE: the round the current subject
+//                                                   //   set was first audited at, copied from the CONVERGING
+//                                                   //   return; keeps the driver's sequence on ONE subject
 // }
+//
+// THE REVIEW SUBJECT IS KEYED PER SPEC-SET GENERATION (closing review round 1, cluster B). It was the
+// literal `<slug>-spec-set`, so a unit the DISPOSAL stage promoted had no audit route: the subject
+// was terminal after its one round, `verb_review` refused a second, and the promoted spec was built
+// unaudited. The key is `<slug>-spec-set-r<N>` where N is the round the generation was FIRST audited
+// at — `subjectRound` when the caller carries it, this invocation's round otherwise. Keying on the
+// invocation round ALONE would reset the driver's sequence on every fold under `REVIEW_ROUNDS` > 1,
+// so BOUNDED and NON-CONVERGENT could never fire and the loop had no end; the CONVERGING return
+// carries `subjectRound` back so the caller copies it rather than derives it.
 //
 // `units` ARRIVES PRE-ORDERED and that is load-bearing. The caller runs `--plan`, which takes its set
 // and order from the generated units region, so the harness and the driver cannot disagree about what
@@ -214,6 +229,27 @@ if (!units.length) {
   )
 }
 const roundNo = Number.isInteger(a.round) && a.round > 0 ? a.round : 1
+const subjectRound = Number.isInteger(a.subjectRound) && a.subjectRound > 0 ? a.subjectRound : roundNo
+const subject = slug + '-spec-set-r' + subjectRound
+const auditIds = Array.isArray(a.auditIds) ? a.auditIds : []
+if (subjectRound > roundNo) {
+  throw new Error(
+    'unattended-build: `subjectRound` ' + subjectRound + ' is above `round` ' + roundNo + '. A subject ' +
+      'set cannot have been first audited at a round that has not happened; copy the value the ' +
+      'CONVERGING return handed back rather than composing one.',
+  )
+}
+const strayAudit = auditIds.filter(function (id) {
+  return !units.some(function (u) { return u.id === id })
+})
+if (strayAudit.length) {
+  throw new Error(
+    'unattended-build: `auditIds` names ' + strayAudit.join(', ') + ', which `units` does not carry. ' +
+      'The audit is scoped to those ids, so a promoted unit missing from the roster would be ' +
+      'silently dropped from the one audit it is owed; re-read `--plan <slug> --paths` and pass ' +
+      'every unit.',
+  )
+}
 
 // TOOL-aStagedLane-2 — the mode argument. What each mode buys and loses is in this file's
 // HEADER, above, because that is where a reader looking for the honesty statement goes.
@@ -263,7 +299,6 @@ function renderRoster(list, buildSlug, briefRoot) {
     })
     .join('\n')
 }
-const roster = renderRoster(ordered, slug, briefDir)
 
 // --- the stage return schemas -----------------------------------------------------------------
 // EVERY stage agent returns a schema-validated object, so a stage that cannot answer REFUSES rather
@@ -292,15 +327,20 @@ const SPEC_SCHEMA = {
 // cannot resolve one is likelier to answer with a plausible-looking placeholder than to omit the
 // entry, and a subject pinned at an invented blob audits nothing while looking pinned.
 // The recorder agent's return. `token` is the DRIVER's word, not the agent's opinion, which is why
-// the prompt says verbatim and the enum is re-checked on this side regardless.
+// the prompt says verbatim and the enum is re-checked on this side regardless. `terminalSubject` is
+// the ONE refusal that comes back as its own outcome rather than as stderr: the driver refusing a
+// round on a subject that already exited means the harness re-keyed nothing, and the throw must say
+// that, not "the round was not recorded" (closing review round 1, cluster B).
 const REVIEW_RECORD_SCHEMA = {
   type: 'object',
   properties: {
     token: { type: 'string' },
     exitCode: { type: 'integer' },
     stderr: { type: 'string' },
+    terminalSubject: { type: 'boolean' },
   },
-  required: ['token'],
+  // `token` is no longer REQUIRED by the schema, because the terminal-subject refusal has none to
+  // return; the check on this side refuses a missing token by name, so nothing is weaker.
 }
 
 const SUBJECTS_SCHEMA = {
@@ -334,18 +374,21 @@ const SUBJECTS_SCHEMA = {
 // The DISPOSAL stage's return follows the rule two paragraphs up: the list of what it did NOT do is
 // its own required field, never an absence. An empty `standing` with no key at all is
 // indistinguishable from a stage that disposed everything. `promoted` and `folded` are COUNTS OF
-// FINDINGS by report id, and the guard below reconciles the three against `confirmed`: a return
-// whose numbers do not add up is the `{disposed: true, standing: ['b1']}` contradiction with the
-// contradiction moved into two integers.
+// FINDINGS by report id, and the guard below reconciles the three against the confirmed and
+// unverified findings together, AND splits them by severity: a return whose numbers do not add up
+// is the `{disposed: true, standing: ['b1']}` contradiction with the contradiction moved into two
+// integers, and `minimum: 0` refuses a negative one at validation. `promotedIds` names the UNITS
+// the promotions became, so the caller can scope the next audit to them (cluster B).
 const DISPOSAL_SCHEMA = {
   type: 'object',
-  required: ['disposed', 'standing', 'promoted', 'folded', 'summary'],
+  required: ['disposed', 'standing', 'promoted', 'folded', 'promotedIds', 'summary'],
   additionalProperties: true,
   properties: {
     disposed: { type: 'boolean' },
     standing: { type: 'array', items: { type: 'string' } },
-    promoted: { type: 'integer' },
-    folded: { type: 'integer' },
+    promoted: { type: 'integer', minimum: 0 },
+    folded: { type: 'integer', minimum: 0 },
+    promotedIds: { type: 'array', items: { type: 'string' } },
     summary: { type: 'string' },
   },
 }
@@ -508,10 +551,11 @@ if (specRefused.length) log('spec stage: ' + specRefused.length + ' unit(s) REFU
 // ONE ROUND HERE, THE LOOP IN THE CALLER — see the header for why that split is forced.
 //
 // THE BLOCKER COUNT COMES FROM THE SYNTHESIS RETURN, which is the only site in `tier2-review.js`
-// that yields an INTEGER. Its degraded-path returns yield `blockers: null` BY DESIGN — null, never
-// 0, so a stated absence cannot be read as a clean bill — and `unattended.sh` emits CONVERGED only
-// on a count of 0 while refusing a non-integer. Routing this through a null-yielding site would make
-// the CONVERGED exit unreachable and every audit look degraded.
+// that yields an INTEGER. Its other returns yield `blockers: null` BY DESIGN — null, never 0, so a
+// stated absence cannot be read as a clean bill — and `unattended.sh` emits CONVERGED only on a
+// count of 0 while refusing a non-integer. Which of those null returns is a clean RESULT and which
+// a degraded run is decided below on the callee's own `lensesDead` and `unverified` fields, never
+// by reading the null as 0.
 phase('Audit')
 // ============================ TOOL-dRatifiedSeam-1 S1 — THE SPAWN MOVED TO WHERE THE TOOL IS ====
 // WHAT WAS WRONG. This stage used to spawn an AGENT whose prompt said: run the shipped harness as
@@ -547,11 +591,18 @@ phase('Audit')
 // blobs itself is authoritative and the resolver stage is skipped rather than run for a second
 // opinion about the same files.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
+// SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
+// reads the specs no spec-audit record names yet and not the whole set a terminal round already
+// closed; the subject key above is what lets the driver accept that round at all.
+const auditUnits = auditIds.length
+  ? ordered.filter(function (u) { return auditIds.indexOf(u.id) !== -1 })
+  : ordered
+if (auditIds.length) log('audit round ' + roundNo + ': scoped to ' + auditIds.length + ' promoted unit(s) — ' + auditIds.join(', ') + ' · subject ' + subject)
 if (!subjects) {
   const res = await agent(
     GROUND +
       'Resolve the blob of every spec in this build so an audit can be pinned at immutable bytes.\n' +
-      roster + '\n\n' +
+      renderRoster(auditUnits, slug, briefDir) + '\n\n' +
       'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` in ' + repo +
       ' and return one entry per spec. Return ONLY units whose spec exists and whose blob resolves; ' +
       'an unspecced unit is not a subject and must be omitted rather than given an invented blob. ' +
@@ -619,43 +670,70 @@ if (!auRaw || typeof auRaw !== 'object' ||
       'token is the only thing between this harness and building on an unreviewed spec set.',
   )
 }
+// THE CALLEE'S EARLY RETURNS CARRY `confirmed: []` AND `blockers: null`, and they are NOT all
+// degraded (closing review round 1, cluster F). `tier2-review.js` returns that pairing on four
+// paths: every lens dead; no lens raised a finding; every finding refuted; and, with `confirmed` an
+// INTEGER, a dead synthesis. Only the last three lines of that file's own `note` say which; its
+// FIELDS say it too, and those are what is read here. An empty confirmed ARRAY beside `lensesDead`
+// 0 and no unverified finding is the cleanest audit there is — a RESULT at 0 — and this harness
+// used to halt it as "a DEGRADED run". `unverified` is absent on the zero-findings path, because no
+// verify phase ran to leave one, and `0` on the all-refuted path; both are read, and nothing else
+// is. A dead lens beside the same pairing is the one degraded shape, and it keeps the throw below.
+const cleanRound = Array.isArray(auRaw.confirmed) && auRaw.confirmed.length === 0 &&
+  auRaw.blockers === null && auRaw.lensesDead === 0 &&
+  (auRaw.unverified === 0 || auRaw.unverified === undefined)
+if (cleanRound) {
+  log('audit round ' + roundNo + ': the callee confirmed nothing and no lens died — a clean round at 0' +
+    ', with no report written (' + (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + ')')
+}
 // THE BLOCKER COUNT MUST BE AN INTEGER, and `null` is the DEGRADED signal `tier2-review.js` yields
 // by design — null, never 0, so a stated absence cannot be read as a clean bill. Reading a null as
-// 0 would make every degraded audit look clean, since 0 is the only count that converges.
-if (!Number.isInteger(auRaw.blockers)) {
+// 0 would make every degraded audit look clean, since 0 is the only count that converges. The throw
+// names the lens and skeptic deaths the callee counted, so the operator reads WHY and not only THAT.
+if (!cleanRound && !Number.isInteger(auRaw.blockers)) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned a non-integer blocker count (' +
-      JSON.stringify(auRaw.blockers) + ') at round ' + roundNo + '. That is a DEGRADED run and it ' +
+      JSON.stringify(auRaw.blockers) + ') at round ' + roundNo + ' — lensesDead ' +
+      JSON.stringify(auRaw.lensesDead) + ', skepticsDead ' + JSON.stringify(auRaw.skepticsDead) +
+      ', note ' + JSON.stringify(auRaw.note) + '. That is a DEGRADED run and it ' +
       'is reported as one; it is never rounded to zero.',
   )
 }
 // THE COUNTS THE DISPOSAL STAGE DECIDES ON ARE READ, NOT ASSUMED. `tier2-review.js` returns
-// `confirmed` as the size of the skeptic-confirmed set and `blockers`/`highs` as the synthesis
-// pass's counts WITHIN it, so each is an integer and the two severities sum to at most the set. On
-// the callee's three degraded paths `confirmed` is `[]` beside `blockers: null`, which the refusal
-// above catches first; this one is written for the callee that CHANGES, because `undefined > 0` is
-// `false` and a `confirmed` key that quietly went missing would skip the stage on every round — the
-// false-clean shape this file refuses by name three times over. One refusal for three conditions,
-// because they have one remedy: the return cannot be read as the contract it declares.
-if (!Number.isInteger(auRaw.confirmed) || !Number.isInteger(auRaw.highs) ||
-    auRaw.blockers + auRaw.highs > auRaw.confirmed) {
+// `confirmed` as the size of the skeptic-confirmed set, `unverified` as the size of the set no
+// usable skeptic verdict came back for — OUTSTANDING, not cleared, in the callee's own words — and
+// `blockers`/`highs` as the synthesis pass's counts WITHIN the confirmed set, so each is an integer
+// and the two severities sum to at most the set. This is written for the callee that CHANGES,
+// because `undefined > 0` is `false` and a `confirmed` or `unverified` key that quietly went
+// missing would skip the stage on every round — the false-clean shape this file refuses by name
+// three times over. One refusal for four conditions, because they have one remedy: the return
+// cannot be read as the contract it declares.
+if (!cleanRound && (!Number.isInteger(auRaw.confirmed) || !Number.isInteger(auRaw.highs) ||
+    !Number.isInteger(auRaw.unverified) || auRaw.blockers + auRaw.highs > auRaw.confirmed)) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned confirmed ' + JSON.stringify(auRaw.confirmed) +
+      ', unverified ' + JSON.stringify(auRaw.unverified) +
       ', blockers ' + auRaw.blockers + ', highs ' + JSON.stringify(auRaw.highs) + ' at round ' +
       roundNo + '. `blockers` and `highs` count CONFIRMED findings, so each is an integer and their ' +
-      'sum is at most `confirmed`; a count that cannot be read is a DEGRADED run and is never ' +
-      'rounded to zero.',
+      'sum is at most `confirmed`, and `unverified` is the integer the callee counted; a count that ' +
+      'cannot be read is a DEGRADED run and is never rounded to zero.',
   )
 }
 const lastReport = auRaw.report || ''
 // `report`, NOT `reportPath` — the second name was mine and matched nothing, so `lastReport` was
-// always '' and every disposal instruction named an empty path.
-if (!lastReport) {
+// always '' and every disposal instruction named an empty path. A CLEAN round has none to name and
+// nothing to fold from, so it is the one shape that passes here with an empty path.
+if (!lastReport && !cleanRound) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned no report path at round ' + roundNo +
       '. The fold instruction the caller receives would name nothing to fold from.',
   )
 }
+// ONE SHAPE PAST THIS LINE. The clean round is folded into the integers every later line reads.
+const auBlockers = cleanRound ? 0 : auRaw.blockers
+const auConfirmed = cleanRound ? 0 : auRaw.confirmed
+const auHighs = cleanRound ? 0 : auRaw.highs
+const auUnverified = cleanRound ? 0 : auRaw.unverified
 
 // THE ROUND IS RECORDED BY THE DRIVER, and the driver's answer is the verdict. An agent runs it
 // because a workflow script has no shell; what the agent may NOT do is invent the token, so it is
@@ -674,23 +752,44 @@ if (!lastReport) {
 // The non-integer case is already refused above, in BOTH modes, and must stay so: `tier2-review.js`
 // yields `blockers: null` on its degraded paths BY DESIGN, and reading null as 0 would make every
 // degraded audit look clean.
+//
+// `--disposition promote` RIDES THE FIRST COMMAND AT A CONVERGED EXIT WITH HIGHS (closing review
+// round 1, cluster C). Zero blockers is CONVERGED unconditionally in the driver's `review_state`, so
+// the harness knows that exit before the driver names it; the severity rule promotes every HIGH
+// there, and the driver accepts the field on CONVERGED — never requires it — so the merge bar
+// demands the units the highs became instead of reading the promotion as nothing.
 const rv = attended
-  ? { token: auRaw.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
+  ? { token: auBlockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
   : await agent(
   GROUND +
     'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
-    'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + slug + '-spec-set' +
-    ' --verdict ' + (auRaw.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
-    ' --blockers ' + auRaw.blockers + '\n\n' +
+    'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + subject +
+    ' --verdict ' + (auBlockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
+    ' --blockers ' + auBlockers +
+    (auBlockers === 0 && auHighs > 0 ? ' --disposition promote' : '') + '\n\n' +
     'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
     'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
     'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
     'If the command REFUSES naming --disposition, this round is a terminal exit: run the SAME ' +
     'command once more with --disposition promote appended, and return THAT run\'s token and ' +
-    'exit code. If the command fails for any other reason, return its stderr rather than a token.',
+    'exit code. If the command REFUSES saying the subject already carries a terminal review ' +
+    'round, return terminalSubject: true with its stderr and no token — do not retry under another ' +
+    'subject. If the command fails for any other reason, return its stderr rather than a token.',
   { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
 )
 if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
+// THE TERMINAL-SUBJECT REFUSAL IS ITS OWN THROW. It used to surface as "the round was not
+// recorded", which names the symptom; the cause is a subject key that was not re-keyed after a
+// disposal, and the remedy is in the args block at the top of this file.
+if (rv && rv.terminalSubject === true) {
+  throw new Error(
+    'unattended-build: the driver refused round ' + roundNo + ' because the subject is terminal, ' +
+      're-key it: `' + subject + '` already carries a terminal review round. A re-invocation after ' +
+      'a disposal passes the hand-out\'s `promotedIds` as `auditIds` and no `subjectRound`, so the ' +
+      'promoted specs are audited under a fresh subject; a fold re-invoke passes the `subjectRound` ' +
+      'the CONVERGING return handed back (driver said: ' + JSON.stringify(rv.stderr) + ').',
+  )
+}
 if (!rv || typeof rv.token !== 'string') {
   throw new Error(
     'unattended-build: the round was not recorded at round ' + roundNo + ' (driver said: ' +
@@ -711,7 +810,7 @@ if (REVIEW_TOKENS.indexOf(rv.token) === -1) {
       'to DISPOSAL and the hand-out — refusing instead.',
   )
 }
-const au = { verdict: rv.token, blockers: auRaw.blockers, confirmed: auRaw.confirmed, highs: auRaw.highs, reportPath: lastReport }
+const au = { verdict: rv.token, blockers: auBlockers, confirmed: auConfirmed, highs: auHighs, unverified: auUnverified, reportPath: lastReport }
 // S3 — THE IMPOSSIBLE PAIRING IS A REFUSAL BY NAME. CONVERGING with zero blockers is this repo's
 // signature for a record no verb produced: a loop with nothing left to converge on has converged.
 // The dead stage returned exactly this pairing, and it was the tell.
@@ -723,7 +822,7 @@ if (au.verdict === 'CONVERGING' && au.blockers === 0) {
   )
 }
 const verdict = au.verdict
-log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers)
+log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers + ' · unverified ' + au.unverified)
 
 // THE GATE. `CONVERGING` means the review loop has not ended, so the ROSTER IS EMPTY and this
 // returns to the caller with what it needs to fold and come back. Every terminal state admits the
@@ -745,8 +844,13 @@ if (verdict === 'CONVERGING') {
     specRefused: specRefused,
     verdict: verdict,
     blockers: au.blockers,
+    unverified: au.unverified,
     lastReport: lastReport,
     skippedTerminal: [],
+    // THE SUBJECT KEY TRAVELS BACK, so the fold re-invoke lands on the SAME driver subject and the
+    // sequence keeps its predecessor to shrink against; `auditIds` rides with it for the same reason.
+    subjectRound: subjectRound,
+    auditIds: auditIds,
     // EVERY NON-THROWING EXIT CARRIES `roster`, so `roster.length === 0` is the caller's whole stop
     // condition. This return carried no such key at all, while the Skill bullet told the run that an
     // empty roster is the refusal — a caller reading `roster.length` read a property of `undefined`
@@ -754,7 +858,8 @@ if (verdict === 'CONVERGING') {
     roster: [],
     nextAction:
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
-      'then re-invoke this harness with round: ' + (roundNo + 1) + '. Do not build.',
+      'then re-invoke this harness with round: ' + (roundNo + 1) + ', subjectRound: ' + subjectRound +
+      (auditIds.length ? ', auditIds: ' + JSON.stringify(auditIds) : '') + '. Do not build.',
     note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
       (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
@@ -776,22 +881,29 @@ if (verdict === 'CONVERGING') {
 // recorded shape in the `aCollapsedScan` round-1 audit) disposed nothing and handed the roster out
 // over fifteen confirmed findings.
 //
-// THE STAGE RUNS ON ANY CONFIRMED FINDING AND DISPOSES BY SEVERITY (TOOL-aProbedUnit-7): a BLOCKER
-// or HIGH is PROMOTED to a unit, a MEDIUM or LOW is FOLDED into its spec. On a confirmed count of
-// zero it announces the skip. A skip that looks like a pass is indistinguishable from coverage, and
-// an absent `agent:dispose:` line alone would read the same over a stage that was never written.
+// THE STAGE RUNS ON ANY OUTSTANDING FINDING AND DISPOSES BY SEVERITY (TOOL-aProbedUnit-7): a BLOCKER
+// or HIGH is PROMOTED to a unit, a MEDIUM or LOW is FOLDED into its spec. OUTSTANDING is the
+// callee's word and it covers two populations: the CONFIRMED findings and the UNVERIFIED ones, which
+// came back with no usable skeptic verdict and are not cleared — a verify stage degraded by dead
+// skeptic batches used to read as clean here, because only `confirmed` was counted (closing review
+// round 1, cluster F). On a count of zero across both it announces the skip. A skip that looks like
+// a pass is indistinguishable from coverage, and an absent `agent:dispose:` line alone would read
+// the same over a stage that was never written.
 phase('Disposal')
 // WHAT STOOD IS HOISTED OUT OF THE STAGE so the hand-out can report it. It never reached the return
 // at all, which is `degradation-known-but-unreported` — the class this file names three times in
 // its own comments and then committed one screen below. `promoted` and `folded` ride the same
 // hoist: honest zeros on the skip path, the stage's own integers past it, `null` where the stage
-// returned no integer — a stated absence, never a zero, the audit adapter's own rule.
-let stood = [], promoted = 0, folded = 0
-if (au.confirmed === 0) {
-  log('disposal: skipped — round ' + roundNo + ' confirmed no finding, so nothing stands to dispose')
+// returned no integer — a stated absence, never a zero, the audit adapter's own rule. `promotedIds`
+// is the hoist's third rider: the units the promotions became, which the caller passes back as
+// `auditIds` so the next invocation audits them before anything builds them.
+let stood = [], promoted = 0, folded = 0, promotedIds = []
+const outstanding = au.confirmed + au.unverified
+if (outstanding === 0) {
+  log('disposal: skipped — round ' + roundNo + ' confirmed no finding and left none unverified, so nothing stands to dispose')
 } else {
-  log('disposal: ' + au.confirmed + ' confirmed finding(s) stand at a ' + verdict + ' exit · blockers ' +
-    au.blockers + ' · highs ' + au.highs + ' — disposing by severity' +
+  log('disposal: ' + au.confirmed + ' confirmed and ' + au.unverified + ' unverified finding(s) stand at a ' +
+    verdict + ' exit · blockers ' + au.blockers + ' · highs ' + au.highs + ' — disposing by severity' +
     (verdict === 'CONVERGED' ? ', on CONVERGED too' : ''))
   // MODE-AWARE IN ONE CLAUSE, on the same `attended` the file already branches GROUND on: `--rescope`
   // `fail 48`s without a run-state file, which is the state attended mode is DEFINED by, so the
@@ -799,10 +911,13 @@ if (au.confirmed === 0) {
   // was unreachable in that mode and the contradiction was never live.
   const d = await agent(
     GROUND +
-      'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every CONFIRMED finding in `' + lastReport +
-      '` — the audit exited ' + verdict + ' with ' + au.confirmed + ' confirmed, ' + au.blockers +
-      ' at BLOCKER and ' + au.highs + ' at HIGH. Open the report and take each confirmed finding at ' +
-      'the severity the report gives it. BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
+      'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every CONFIRMED and every UNVERIFIED finding in `' +
+      lastReport + '` — the audit exited ' + verdict + ' with ' + au.confirmed + ' confirmed, ' +
+      au.blockers + ' at BLOCKER and ' + au.highs + ' at HIGH, and ' + au.unverified +
+      ' unverified. Open the report and take each confirmed finding at the severity the report ' +
+      'gives it; an UNVERIFIED finding came back with no usable skeptic verdict and is OUTSTANDING, ' +
+      'not cleared — read the code yourself and take it at the severity you adjudicate. ' +
+      'BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
       'route. PROMOTE every BLOCKER and every HIGH: ' +
       (attended
         ? 'add its row to the build README\'s authored Units table, because the recording verbs are ' +
@@ -810,12 +925,13 @@ if (au.confirmed === 0) {
         : 'run `' + DRIVER + ' --rescope ' + slug + ' --act add --item <id> --reason <text>`, the ' +
           'reason being the report id and severity of the finding it closes, ') +
       'then author its spec at its tier with a mechanism that CLOSES the finding — the change to the ' +
-      'design and the artifact that proves it — so it is audited once as a spec and built like any ' +
-      'other. FOLD every MEDIUM and every LOW into the spec it belongs to, as a rev-N bump with its ' +
+      'design and the artifact that proves it — so the next invocation of this harness audits it ' +
+      'as a spec, under `auditIds`, before it is built like any other. FOLD every MEDIUM and every ' +
+      'LOW into the spec it belongs to, as a rev-N bump with its ' +
       'section 9 line. Never parked, never waived, never retired, never re-reviewed. Return ' +
       '`promoted` and `folded` as counts of FINDINGS by report id, each id counted exactly once ' +
-      'across the two and `standing`; name every promoted unit id in `summary`; and NAME in ' +
-      '`standing` every finding you did NOT dispose.',
+      'across the two and `standing`; name every promoted unit id in `promotedIds` and in ' +
+      '`summary`; and NAME in `standing` every finding you did NOT dispose.',
     { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
   )
   // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
@@ -830,26 +946,50 @@ if (au.confirmed === 0) {
   // third impossible pairing this file refuses by name; the other two are twelve lines above the
   // audit gate, and this guard simply did not get the pattern.
   //
-  // AND THE COUNTS MUST RECONCILE. Every confirmed finding is promoted, folded or named standing —
-  // the prompt says so — so a return whose three numbers do not add to `confirmed` is the same
-  // self-contradiction with the contradiction moved into two integers. The reason is chosen in the
-  // order the existing arms read it; the refusal keeps their shape, an empty roster and a note.
+  // AND THE COUNTS MUST RECONCILE, IN SUM AND IN SPLIT. Every outstanding finding is promoted,
+  // folded or named standing — the prompt says so — so a return whose three numbers do not add to
+  // confirmed + unverified is the same self-contradiction with the contradiction moved into two
+  // integers. The sum alone was `containment-tested-one-way` (closing review round 1, cluster D):
+  // `promoted 0, folded 10` reconciled against confirmed 10 with two blockers and three highs in
+  // it, and the roster went out over two blockers folded into prose. The severity rule implies the
+  // split: every BLOCKER and HIGH is promoted, so `promoted` is AT LEAST `blockers + highs` and
+  // `folded` AT LEAST the confirmed rest — equalities when nothing is unverified, floors when an
+  // unverified finding was adjudicated into either. The reason is chosen in the order the existing
+  // arms read it; the refusal keeps their shape, an empty roster and a note.
+  //
+  // AND A PROMOTION NAMES ITS UNIT. `promoted` above zero beside an empty `promotedIds` is a
+  // promotion the caller cannot route to an audit; a named unit beside `promoted` 0 is a unit no
+  // finding produced. Both refuse.
   stood = Array.isArray(d && d.standing) ? d.standing : []
   const counted = Number.isInteger(d && d.promoted) && Number.isInteger(d && d.folded)
   promoted = counted ? d.promoted : null
   folded = counted ? d.folded : null
+  promotedIds = Array.isArray(d && d.promotedIds) ? d.promotedIds : []
+  const mustPromote = au.blockers + au.highs
+  const mustFold = au.confirmed - mustPromote
   if (!d || d.disposed !== true || stood.length || !counted ||
-      d.promoted + d.folded + stood.length !== au.confirmed) {
+      d.promoted + d.folded + stood.length !== outstanding ||
+      d.promoted < mustPromote || d.folded < mustFold ||
+      (d.promoted > 0) !== (promotedIds.length > 0)) {
     const why = !d ? 'the disposal stage returned nothing at all'
       : stood.length ? stood.join(', ')
       : !counted ? 'the stage returned no integer promoted/folded counts'
       : d.disposed !== true ? 'the stage answered disposed:false with nothing standing'
-      : 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
-        ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed
+      : d.promoted + d.folded + stood.length !== outstanding
+        ? 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
+          ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed + ' + unverified ' +
+          au.unverified
+      : d.promoted < mustPromote || d.folded < mustFold
+        ? 'the counts do not split by severity — promoted ' + d.promoted + ' is below blockers ' +
+          au.blockers + ' + highs ' + au.highs + ', or folded ' + d.folded + ' is below the ' +
+          mustFold + ' confirmed at MEDIUM or LOW'
+      : 'promoted ' + d.promoted + ' beside promotedIds ' + JSON.stringify(promotedIds) +
+        ' — a promotion names the unit it became, and a unit names the finding that made it'
     log('disposal: NOT done — ' + why)
     return {
       slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
       specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
+      unverified: au.unverified,
       lastReport: lastReport, skippedTerminal: [],
       roster: [],
       // THE ONE PATH WHERE `stood` CAN BE NON-EMPTY, and it is the one the field was missing from.
@@ -861,11 +1001,13 @@ if (au.confirmed === 0) {
       standing: stood,
       promoted: promoted,
       folded: folded,
+      promotedIds: promotedIds,
       note: 'DEGRADED — findings were not disposed: ' + why + '. No roster is handed out: a ' +
         'roster minus the units a finding touches is a judgement this runtime cannot make.',
     }
   }
-  log('disposal: done — promoted ' + promoted + ' · folded ' + folded + ' — ' +
+  log('disposal: done — promoted ' + promoted + ' · folded ' + folded +
+    (promotedIds.length ? ' · units ' + promotedIds.join(', ') : '') + ' — ' +
     (typeof d.summary === 'string' ? d.summary : ''))
 }
 // ==================================================== THE HAND-OUT, and what is graded before it
@@ -947,6 +1089,7 @@ if (attended && !buildUnits.length) {
   return {
     slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
     specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
+    unverified: au.unverified,
     lastReport: lastReport, skippedTerminal: skippedDone, roster: [],
     // POST-DISPOSAL, so `stood` is in scope and the key belongs here for the same reason it belongs
     // on the DEGRADED return: every non-throwing exit past the stage says what stood, out loud —
@@ -954,6 +1097,7 @@ if (attended && !buildUnits.length) {
     standing: stood,
     promoted: promoted,
     folded: folded,
+    promotedIds: promotedIds,
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.
@@ -989,18 +1133,26 @@ return {
   specRefused: specRefused,
   verdict: verdict,
   blockers: au.blockers,
+  unverified: au.unverified,
   lastReport: lastReport,
   skippedTerminal: skippedDone,
   // WHAT STOOD, and it is REQUIRED rather than conditional. The guard above means this is always
   // empty by the time the hand-out is reached — that is the point: an empty list said out loud is a
   // different fact from a missing key, which is indistinguishable from a disposal stage that never
   // ran. Same rule DISPOSAL_SCHEMA applies to the stage's own return, applied to this one.
-  // `promoted` and `folded` are the stage's counts of findings by report id; the ids of promoted
-  // units live in the `rescope · add` rows and in the stage's summary, and the caller re-reads
-  // `--plan` for them rather than reading a second carrier of the same ids here.
+  // `promoted` and `folded` are the stage's counts of findings by report id; `promotedIds` are the
+  // UNITS those promotions became, carried here because the caller's next act depends on them: a
+  // promoted spec is audited by re-invoking this harness with them as `auditIds` BEFORE it is
+  // built, and a caller re-reading `--plan` for them would find them READY and build them unaudited.
   standing: stood,
   promoted: promoted,
   folded: folded,
+  promotedIds: promotedIds,
+  nextAction: promotedIds.length
+    ? 'AUDIT the promoted specs before any of them is dispatched: re-invoke this harness with round: ' +
+      (roundNo + 1) + ', auditIds: ' + JSON.stringify(promotedIds) + ' and no subjectRound, so ' +
+      'they take a fresh subject; dispatch the roster below for every unit that is not one of them.'
+    : 'dispatch the roster below, one main-loop Workflow call per unit',
   roster: buildUnits.map(function (u) {
     return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' }
   }),
@@ -1028,8 +1180,12 @@ return {
   // is the class where a pipeline computes how weak its own run was and then does not say so where a
   // reader looks. An attended run that returns a bare 'complete' has skipped five checks an
   // unattended one performs, and the caller cannot tell the two apart from this field.
+  // BOUNDED IS NOT A DEGRADATION (closing review round 1, cluster E): it is the routine spec-subject
+  // exit whenever a blocker is confirmed at round 1 under the kit default, and labelling it DEGRADED
+  // made a by-design exit unreadable from a dead writer. NON-CONVERGENT and CEILING stay: the
+  // driver's own CEILING line calls it a defect.
   note:
-    (specRefused.length || verdict !== 'CONVERGED'
+    (specRefused.length || (verdict !== 'CONVERGED' && verdict !== 'BOUNDED')
       ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused, verdict ' + verdict +
         (attended ? ' · ATTENDED, so no driver-side check ran' : '') + ' · '
       : attended

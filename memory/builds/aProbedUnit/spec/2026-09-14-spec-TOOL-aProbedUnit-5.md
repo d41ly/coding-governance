@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root
 
-**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -189,10 +189,17 @@ when the captured `<top>` is a single character (a drive spelled without its tra
 as `/c`, which is the drive rule's business), and otherwise returns whether `<top>` is absent from
 `POSIX_ROOT_CONVENTIONAL`, a new `Set` beside `DRIVE_ROOT_CONVENTIONAL` at `:290` holding, in
 lower case: `dev proc sys usr etc var opt home root mnt media srv bin sbin lib lib64 run boot
-private volumes cygdrive workspace workspaces`. Hand-listed for the reason the drive set's header
+private volumes cygdrive workspace workspaces users applications library system nix snap`.
+Hand-listed for the reason the drive set's header
 gives: this is a fact about how filesystems are conventionally laid out, not about this machine,
 so there is nothing to derive it from. `tmp` and `temp` are absent on purpose, so a `/tmp` target
-that somehow escaped rule 2 is still litter here, and the two rules cannot disagree.
+that somehow escaped rule 2 is still litter here, and the two rules cannot disagree. The set is
+as wide as the roots it guards: `private` and `volumes` put macOS in scope, so the other four
+names every macOS root carries — `users`, `applications`, `library`, `system` — are in it too, or
+`echo x > /Users/Shared/f` is denied as new top-level litter on the host where `/Users` holds
+every home (the drive set already lists `users` and `resolveHomeRoots` mines `/users/<name>`);
+`nix` and `snap` are the Linux package-manager roots of the same class. The list is wider than
+the corpus that measured it because no registered node is macOS and the kit is copy-installed.
 
 The measured population this rule exists for is four targets in 55,231 real Bash calls on node
 `a`, `/mir` and `/xj` among them, every one agent throwaway. That figure is PINNED, measured
@@ -387,10 +394,12 @@ and which are controls is read from the criteria themselves; no count of either 
   `startsWith('/tmp')`, which gives the second the `tmp` sentence; or rule 3 is missing, which
   gives the second exit 0.
 - **AC4** — When `mkdir -p /mir/x` is graded, the hook exits 2 and its stderr names
-  `POSIX_ROOT_CONVENTIONAL`; when `echo x > /dev/null`, `echo x > /c/projects/x` and
-  `mkdir -p /usr/local/x` are graded, each exits 0.
+  `POSIX_ROOT_CONVENTIONAL`; when `echo x > /dev/null`, `echo x > /c/projects/x`,
+  `mkdir -p /usr/local/x` and `echo x > /Users/Shared/f` are graded, each exits 0. The fourth
+  control is the macOS near-miss: it exited 2 with the `posix-root` sentence against the hook
+  before `users` joined the set, measured 2026-09-14 on node `a` by the round-1 fold.
   Red when: the base hook is used, which exits 0 on the first; or a conventional name is missing
-  from the set and one of the three controls is denied; or the single-character guard is missing
+  from the set and one of the four controls is denied; or the single-character guard is missing
   and a `/c` spelling is graded here instead of by the drive rule.
 - **AC5** — When `TMP=$(mktemp -d); echo x > $TMP/f` is graded with `TMP` unset through the
   prelude `delete process.env.TMP`, the hook exits 0; it exits 0 at base too, measured
@@ -409,14 +418,23 @@ and which are controls is read from the criteria themselves; no count of either 
   through `run()`'s fifth argument, so that `os.tmpdir()` derives `/tmp` inside the hook on this
   node, `echo x > /tmp/claude/x` exits 0 and `echo x > /tmp/other` exits 2 with the `tmp`
   sentence; and before either half is graded, `node -e` under that same prelude prints `/tmp` for
-  `os.tmpdir()`, else the arm prints `FAIL` naming the path it derived and grades nothing.
+  `os.tmpdir()`, else the arm prints `FAIL` naming the path it derived and grades nothing. A
+  third arm under that same prelude, `echo x > $TEMP/other`, exits 2 with the `tmp` sentence: it
+  is the one arm that can red S1's expansion half, because every other set temp variable the
+  suite uses is itself an allowed root, so `$TEMP/a.log` is allowed whether or not it expands.
+  Here TEMP's value is the one value that is NOT a root, and the target reaches rule 2 only
+  through the expansion — unexpanded it is an unresolved token no rule claims.
   Red when: the new root is absent and the derived arm is denied on a POSIX host; or the arm pins
   a path instead of deriving one, which makes it a fixture that grades a different machine; or,
   for the discriminating pair, the `<os.tmpdir()>/claude` root is removed, which denies the first
   by rule 2, or a `/tmp`-valued temp variable still joins the allowed roots, which allows the
   second by the skip at `tools/hooks/scratch-guard.js:328`; or the `/tmp` values are handed
   through the shell instead of the prelude, which on node `a` derives
-  `C:\Users\DAILY-~1\AppData\Local\Temp` and reds the liveness assertion by name. Removing the
+  `C:\Users\DAILY-~1\AppData\Local\Temp` and reds the liveness assertion by name; or, for the
+  third arm, the non-empty expansion in `buildResolvedTarget` is dropped (`env[t[1]] ||` removed
+  from its condition and its value), which exits 0 with no sentence — measured 2026-09-14 on node
+  `a` against a mutated copy, and the suite before this arm stayed green under that mutation.
+  Removing the
   root is the commit-local edit that reds the allow half; at base the second exits 0, measured
   2026-09-14 under that prelude, because `/tmp` from `TEMP` is a root.
   fixture: the derived arm reads the machine's own `os.tmpdir()` under the emptied prelude; on
@@ -504,6 +522,15 @@ exits 0 on every one of them · `FLOOR_ASSERTIONS` rises by the arms added.
   `TEMP=/tmp` and GNU `env` refuses `-u` after an assignment, both measured and recorded in §4.
   The derived-root arm has one environment, the emptied one, in §4 and AC7 alike; the pair
   carries the liveness assertion the audit's left-shift named.
+- rev-4 · 2026-09-14 · §4 rule 3 · AC4 · AC7 · folded closing diff review round 1, clusters J
+  (id 9) and K (id 21). J: `POSIX_ROOT_CONVENTIONAL` gains `users applications library system
+  nix snap`, with the reason in the hook's comment and in §4, and AC4 gains the
+  `echo x > /Users/Shared/f` control, which exited 2 against the hook before the fix. K: AC7's
+  discriminating pair gains the `TEMP=/tmp` `$TEMP/other` arm, the one arm that can red S1's
+  non-empty expansion, observed exit 0 against a copy of the hook with that expansion removed and
+  exit 2 with the `tmp` sentence at the tip. `FLOOR_ASSERTIONS` moved from 87 to 90, the three
+  assertions the two arms add. Both arms were observed one at a time with the suite preamble
+  sourced, never the suite whole; the whole suite stays `--close`'s.
 
 ## 10. Reuse audit
 

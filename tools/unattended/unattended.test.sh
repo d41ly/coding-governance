@@ -115,7 +115,7 @@ BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
 UNIT_STALL_BOUND="${6-1800}"
-REVIEW_ROUNDS="${7-8}"
+REVIEW_ROUNDS="${7-7}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -4596,8 +4596,8 @@ bcopen
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
 # The second call EXITS, so TOOL-dFoldedVerdict-1 makes --disposition mandatory here. This arm is
 # about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
-# than asserted on.
-run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition fold >/dev/null
+# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close.
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition promote >/dev/null
 hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 reset_tree
 
@@ -4620,6 +4620,20 @@ bcopen
 run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
 hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
+# ---- CONVERGED takes an OPTIONAL disposition (closing review of aProbedUnit, cluster C, id 12). The
+# ---- severity rule disposes the HIGHS that stood at zero blockers, and the harness promotes them;
+# ---- refusing the field here left that promotion unrecordable and invisible to the gate. Never
+# ---- required: the C1 round above recorded with no field and still does. Against the base driver
+# ---- the first call is refused as "not a terminal exit" and the row count reads 0.
+out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition promote)
+hit "$out" "CONVERGED · disposition promote — the loop is done for this subject, and"
+hit "$out" "PROMOTED"
+same "the optional promote is written into the converged round's reason" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+# ...and `fold` there is the value for nothing above MEDIUM — legal, redundant, and the one exit
+# `review_exit_note fold` is still reachable from.
+out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition fold)
+hit "$out" "CONVERGED · disposition fold"
+hit "$out" "FOLDED into the specs it belongs to"
 reset_tree
 
 # ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
@@ -4643,31 +4657,42 @@ hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --dispositi
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition 'fold|promote')" "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions"
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition promote)" "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state"
 run --review tRun --subject D1 --verdict BLOCKED --blockers 3 >/dev/null
-hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "and requires --disposition, because the severity rule decides which of fold and promote the exit records and a record naming neither leaves the gate inferring one from ids; legal dispositions"
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "blocker(s) standing and requires --disposition promote, because the severity rule promotes every blocker and a record naming no disposition leaves the gate inferring one from ids"
 reset_tree
 
-# ---- the FOLD exit: its own sentence, and the field written AFTER the state token so the substring
-# ---- the gate leg already reads is untouched. That placement is why S4 put it there.
+# ---- FOLD AT A BLOCKER-BEARING EXIT IS REFUSED (closing review of aProbedUnit, cluster C). This arm
+# ---- used to pin `NON-CONVERGENT · disposition fold` as LEGAL: `review_state` returns CONVERGED for
+# ---- count 0, so every NON-CONVERGENT, CEILING or BOUNDED exit stands on a blocker, and the severity
+# ---- rule promotes every blocker — `blockers 2 · disposition fold` was a row the gate read as
+# ---- demanding nothing while two blockers stood. The refusal writes NOTHING, so the subject is still
+# ---- open and the same round records with `promote`, the field AFTER the state token as before.
 bcopen
 run --review tRun --subject D2 --verdict BLOCKED --blockers 2 >/dev/null
 out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition fold)
-hit "$out" "NON-CONVERGENT · disposition fold"
-hit "$out" "FOLDED into the specs it belongs to"
-same "the fold disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold' memory/builds/tRun/RUN.md)" "1"
+hit "$out" "blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+hit "$out" "--review exits NON-CONVERGENT with 2 blocker(s) standing"
+same "a refused fold wrote nothing" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition promote)
+hit "$out" "NON-CONVERGENT · disposition promote"
+same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote' memory/builds/tRun/RUN.md)" "1"
 same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
 # ---- TOOL-aProbedUnit-6: A SPEC SUBJECT IS BOUNDED, THE SLUG SUBJECT IS NOT. The conf below declares
 # ---- REVIEW_ROUNDS=1 through mkconf's SEVENTH positional; every other review arm in this file runs at
-# ---- the default, the ceiling, which is why none of them moved. Against the base driver every arm
+# ---- the default, ONE BELOW the ceiling (a bound equal to it is refused at startup, cluster H of
+# ---- aProbedUnit's closing review), which is why none of them moved. Against the base driver every arm
 # ---- here reads CONVERGING where BOUNDED is expected and refuses the explicit disposition.
 bcopen
 mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
-hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED and requires --disposition"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED with 3 blocker(s) standing and requires --disposition promote"
 same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
 out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --disposition promote)
 hit "$out" "BOUNDED · disposition promote"
 hit "$out" "the declared round bound of 1 is reached"
+# the echo names the rule the exit applies — every CONFIRMED finding, by severity — and not the
+# pre-severity-rule "every standing blocker" (cluster G of the closing review, the driver half)
+hit "$out" "so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY:"
 same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition promote' memory/builds/tRun/RUN.md)" "1"
 hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
 # the SLUG subject keeps the ceiling: an explicit disposition on its first blocked round is refused as
@@ -4675,10 +4700,12 @@ hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this sub
 crdrop
 hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3 --disposition promote)" "not a terminal exit"
 hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3)" "CONVERGING"
-# ...and fold is as legal as promote at a BOUNDED exit: the field stays evidence, never a forced value.
+# ...and fold is REFUSED at a BOUNDED exit exactly as at NON-CONVERGENT: three blockers stand, the
+# severity rule promotes every one, and a row saying `fold` beside them is the hole the field was
+# added to close (cluster C). Nothing is written, so the subject stays open.
 out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --disposition fold)
-hit "$out" "BOUNDED · disposition fold"
-same "the fold disposition is written into the bounded round's reason" "$(grep -c 'review · item B2 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition fold' memory/builds/tRun/RUN.md)" "1"
+hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
+same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
@@ -5067,6 +5094,34 @@ git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
 out=$(run --audit tRun)
 hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
 miss "$out" "no unit is dispatched and open"
+# ---- SAME-ANCHOR ROWS ARE ONE PASS (closing review of aProbedUnit, cluster A, ids 19/1/6). Two
+# ---- one-path rows at one anchor — `--writes` is repeatable and the driver's own repair is "declare
+# ---- again" — and a pass commit inside the FIRST row's set. The last-row read asked whether the
+# ---- pass wrote its LAST path and graded a finished unit open; the union asks whether it wrote
+# ---- inside ANY of them, which is check 23's key. Against the base driver the unit's line prints.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/two.txt >/dev/null 2>&1
+same "two same-anchor rows for one unit" "$(grep -c 'dispatch · item [0-9a-f]* ARCH-tRun-1 · reason' memory/builds/tRun/RUN.md)" "2"
+mkdir -p work && printf 'x\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 build" --no-verify
+out=$(run --audit tRun)
+same "a pass commit inside the FIRST of two same-anchor rows closes the pass" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is the
+# ---- disjointness proof's and answers conservatively — a pass that declared a path it never wrote
+# ---- stays open under it forever — so a CLOSED unit read as STALLED and the keepalive was handed a
+# ---- kill-and-redispatch order for it, on this repo, for hours. `--plan` graded the same unit DONE.
+# ---- The status is resolved the way `--plan` resolves it. The closing commit here does NOT name the
+# ---- unit, so `check_pass_open` alone still says open; only the status guard closes it.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "fixture: the spec closes, the row stays" --no-verify
+out=$(run --audit tRun); rc=$?
+same "a CLOSED unit with an open row exits 0" "$rc" "0"
+same "a CLOSED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
 # AC4 — the bound is read through `read_bound_key`, GATE_BOUND's hoisted reader: junk and zero are
 # refusals at exit 2 before any verb runs, in GATE_BOUND's own sentence with the key name lifted out.
 reset_tree; mkconf "true" "true" "" "3600" "" "abc"
@@ -5353,7 +5408,14 @@ NOCONF
 out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
 hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
-hit "$out" "declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of 1 round"
+# THE DEFAULT IS READ OUT OF THE DRIVER, not retyped: the NOTE interpolates `REVIEW_ROUNDS_DEFAULT`
+# exactly as its two siblings interpolate theirs, so a raised argument cannot leave the sentence
+# saying 1 (cluster I of aProbedUnit's closing review). A literal-digit default in any
+# `read_bound_key` call is what that fold removed, and the count below pins it at zero.
+RR_DEF=$(sed -n 's/^REVIEW_ROUNDS_DEFAULT=\([0-9]*\).*/\1/p' "$SCRIPT" | head -1)
+n=$((n+1)); [ -n "$RR_DEF" ] || { echo "FAIL REVIEW_ROUNDS_DEFAULT could not be read out of the driver, so the NOTE arm below would assert an empty default"; st=1; }
+hit "$out" "declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of ${RR_DEF} round"
+same "no read_bound_key call types its default as a literal digit" "$(grep -cE '^read_bound_key [A-Z_]+ [0-9]' "$SCRIPT")" "0"
 reset_tree
 
 # ---- TOOL-aProbedUnit-6: REVIEW_ROUNDS above the runaway ceiling is a refusal, because the ceiling
@@ -5362,6 +5424,12 @@ reset_tree
 reset_tree; mkconf "true" "true" "" "3600" "" "1800" "9"
 out=$(run --status tRun)
 hit "$out" "above the runaway ceiling of 8"
+# ...and EQUAL to it (cluster H of the closing review): `review_state` tests the ceiling first, so a
+# bound of 8 is exactly the value the sentence refuses and `-le` let through; `-lt` closes it.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "8"
+out=$(run --status tRun); rc=$?
+same "a bound equal to the ceiling exits 2" "$rc" "2"
+hit "$out" "REFUSING - REVIEW_ROUNDS is 8, at or above the runaway ceiling of 8"
 reset_tree; mkconf "true" "true" "" "3600" "" "1800" "0"
 out=$(run --status tRun)
 hit "$out" "REFUSING - REVIEW_ROUNDS is declared as '0', which is not a positive integer"
@@ -5579,7 +5647,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=760
+FLOOR_ASSERTIONS=779
+# RAISED 760 -> 779 by the closing diff review of aProbedUnit: +25 `hit`/`same`/`miss` lines, one
+# `mutate` and one `n=$((n+1))` guard added, 8 assertion lines removed with the re-targeted fold
+# arms — net +19, every one in region two (clusters A, C, G, H, I), counted off the diff.
 # RAISED 741 -> 760 by TOOL-aProbedUnit-6, the +19 BOUNDED arms (6 sliced, 10 verb, 3 conf), each
 # run alone with the suite's preamble sourced and counted as the `hit`/`same` lines the diff adds.
 # RAISED 706 -> 741 by TOOL-aProbedUnit-3, the +35 `--audit` and bound arms, counted off a run of the
@@ -5610,7 +5681,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=564
+FLOOR_SHARD_2=583
+# +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.
 # +19 for the TOOL-aProbedUnit-6 BOUNDED arms, all in region two.
 # +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.
 case "$SH_I" in

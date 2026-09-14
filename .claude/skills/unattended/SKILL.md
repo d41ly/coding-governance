@@ -653,7 +653,10 @@ It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
 - **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
-  mediums and lows are still disposed, by the severity rule the next bullet states.
+  mediums and lows are still disposed, by the severity rule the next bullet states. Where a HIGH
+  stood, record `--disposition promote` on that round — ACCEPTED there, never required — so the
+  merge bar demands the unit the high became instead of reading the promotion as nothing; with
+  nothing above MEDIUM the row needs no field.
 - **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every CONFIRMED finding is
   DISPOSED BY SEVERITY — and that holds at `CONVERGED` too. A BLOCKER or HIGH is PROMOTED: it
   becomes a UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built,
@@ -662,14 +665,22 @@ It answers with one of five states, and the state is what you act on:
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
   reads new ids, and `build-complete`, which reads only that no row is non-terminal.
-  **Record which you took**, with `--disposition fold|promote` on the round that exits; the merge
-  bar reads that field, and a fold with nothing recorded is indistinguishable from a promotion that
-  never happened.
+  **Record it**, with `--disposition promote` on the round that exits: `promote` is the ONLY value a
+  terminal exit can record, because every exit that is not `CONVERGED` carries at least one BLOCKER
+  and the rule promotes every one of them, so `fold` at an exit with blockers is REFUSED rather than
+  written. The merge bar reads that field and demands the new unit ids it implies; a promotion with
+  nothing recorded is indistinguishable from one that never happened.
 - **BOUNDED** — the declared round bound, `REVIEW_ROUNDS` (kit default 1), is reached on a subject
-  that is not the build slug. **The loop STOPS**, exactly as at `NON-CONVERGENT`: every blocker still
-  standing is DISPOSED, and the round records which way with `--disposition fold|promote`. The owner
-  ruled on 2026-09-14 that a SPEC subject takes one round by default; the closing diff review keeps
-  its convergence loop, because its subject is the build slug, whose bound is the runaway ceiling.
+  that is not the build slug. **The loop STOPS**, and every CONFIRMED finding is DISPOSED BY
+  SEVERITY, exactly as at `NON-CONVERGENT`; the round records `--disposition promote`, the only
+  value a terminal exit can carry. The owner ruled on 2026-09-14 that a SPEC subject takes one round
+  by default; the closing diff review keeps its convergence loop, because its subject is the build
+  slug, whose bound is the runaway ceiling. **A promotion at this exit is NOT audited by the round
+  that produced it**: after `--rescope --act add` and the new spec, re-invoke the harness at round
+  N+1. It keys a fresh `--review` subject per invocation, so the subject that just ended is never
+  re-rounded, and it audits ONLY the promoted specs — the ones no tracked `spec-audit` record names
+  yet — under their own one-round bound. Skip that re-invocation and the promoted unit closes
+  un-audited, which `specs-audited` refuses at `--close`.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.

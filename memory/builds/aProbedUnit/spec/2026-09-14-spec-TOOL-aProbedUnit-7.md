@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding
 
-**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -297,6 +297,62 @@ under the rule the file states at lines 895-899: an empty list said out loud is 
 from a missing key. The `CONVERGING` return at line 676 precedes the stage and carries none of the
 three, as today. The `note` at lines 925-933 is unchanged: a `CONVERGED` exit that disposed is not
 degraded, and a `NON-CONVERGENT` one still is.
+
+### The closing review's fold (rev-4)
+
+Five clusters of the round-1 closing diff review moved the mechanism above, and the code quotes in
+the subsections before this one stand as rev-3 wrote them; this subsection states what rev-4
+changed in each, by the review's cluster letter.
+
+- **B (ids 10, 5) — a promoted unit has an audit route.** The record command's subject was the
+  literal `<slug>-spec-set`, terminal after its one round under the kit default, so `verb_review`
+  refused every later round and a promoted spec was built unaudited. The subject is now
+  `<slug>-spec-set-r<N>` where N is the round the current spec-set generation was FIRST audited at:
+  `subjectRound` when the caller carries it, this invocation's `round` otherwise. Keying on the
+  invocation round alone, as the review's fix spelled it, would reset the driver's sequence on every
+  fold under `REVIEW_ROUNDS` > 1 — each fold re-invoke would be a fresh subject's round 1, so
+  BOUNDED and NON-CONVERGENT could never fire and the loop had no end — which the tree proves
+  through `review_state`; so the CONVERGING return carries `subjectRound` and `auditIds` back and its
+  `nextAction` names them, and the caller copies rather than derives. `DISPOSAL_SCHEMA` gains a
+  required `promotedIds`, the units the promotions became; every return past the stage carries it;
+  the terminal hand-out's `nextAction` orders a re-invocation at `round + 1` with those ids as
+  `auditIds` and no `subjectRound` BEFORE any of them is dispatched, and the resolver stage is scoped
+  to `auditIds` when given, refusing an id `units` does not carry. `REVIEW_RECORD_SCHEMA` gains
+  `terminalSubject`, the one driver refusal that comes back as its own outcome, so the throw reads
+  "the subject is terminal, re-key it" and names the remedy. The prompt's "audited once as a spec"
+  clause now names the line that routes it: "so the next invocation of this harness audits it as a
+  spec, under `auditIds`, before it is built".
+- **C (harness end) — `--disposition promote` at a CONVERGED exit with highs.** Zero blockers is
+  CONVERGED unconditionally in `review_state`, so the harness knows the exit before the driver names
+  it; the record command appends the field whenever `blockers === 0 && highs > 0`, matching the
+  driver's optional acceptance on CONVERGED that cluster C's driver half adds.
+- **D (id 2) — the reconciliation splits by severity.** Beside the sum, the guard refuses
+  `promoted < blockers + highs` and `folded < confirmed - blockers - highs` — equalities when nothing
+  is unverified, floors when an unverified finding was adjudicated into either — and refuses a
+  `promoted` above zero beside an empty `promotedIds` or the reverse; `promoted` and `folded` carry
+  `minimum: 0` in the schema.
+- **E (id 11) — BOUNDED is not a degradation.** The hand-out note's predicate is
+  `verdict !== 'CONVERGED' && verdict !== 'BOUNDED'`; NON-CONVERGENT and CEILING stay DEGRADED.
+- **F (ids 14, 15) — the callee's return shapes are read on its own fields.** `unverified` is read
+  and REQUIRED beside `confirmed` on a synthesis return, the stage runs on `confirmed + unverified`,
+  the prompt hands the agent both populations, the reconciliation is against their sum, and
+  `unverified` travels out on every return. A `confirmed: []` beside `blockers: null`, `lensesDead`
+  0 and no unverified finding — the callee's all-refuted return, and its zero-findings return, which
+  carries no `unverified` key at all because no verify phase ran — is a clean round at 0: recorded
+  CLEAN, the disposal skip announced, the roster handed out, with an empty `lastReport` allowed on
+  that one shape. `blockers: null` beside `lensesDead` > 0 keeps the throw, which now names the lens
+  and skeptic deaths. The comment that called the all-refuted return one of "three degraded paths"
+  is rewritten to say which of the four null-blocker returns is degraded and how that is decided.
+
+Two arms were re-fixtured rather than added: `review_out` takes a fourth positional `unverified`
+and every inline audit double carries `"unverified":0`, because the harness now refuses a synthesis
+return without it; the default disposal double and V1's carry `promotedIds`. Every new arm was
+observed red against a frozen copy of the base render, one arm at a time with the preamble sourced:
+44 of the 55 red, the 11 that hold on both being the paired positives and the controls (the roster
+still handed out, the retry instruction kept, CEILING and NON-CONVERGENT still DEGRADED, the dead-lens
+throw kept). One fact the fold surfaces and does not close: on the clean-round shapes the callee
+writes no report, so no `**Serves:** spec-audit` record names the audited ids and `specs-audited`
+reds at `--close` for them — that is `tier2-review.js`'s and the DoD's, outside this unit's files.
 
 ### The comments that describe a shape the file no longer has
 
@@ -759,6 +815,7 @@ it belongs to` arms at 4597 and 4643 stand, their substrings kept; no arm is add
   refuses.
 - rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (id 22 — AC6 to AC8 reduced to their grep pairs, the six leg runs at `--close`), E (id 48 — the recorder as unit 6 leaves it, in §3), K (id 52 — the line-143 sentence and the `fail 37` message at `unattended.sh:4096` join the carriers, minus 13 bytes, `TOOL-aLeakedHandle-6` in §10, AC9), M (ids 15, 16 — AC4's RESULT keys and V7, AC8's `still disposed` and `severity rule` greps), S (id 46 — `meta.phases[2].detail`, AC6's retired-phrase grep), T (id 45 — `--reason` on the promotion command).
 - rev-3 · 2026-09-14 · §3 · §4 · §5 · §7 · S7 · S8 · AC9 · AC10 · folded the round-2 spec audit: clusters D (id 5 — AC10, the harness suite's own text by three greps in the pass and its whole run at `--close`, the row S8 and the §3 hands-off bullet lacked), G (id 28 — `review_exit_note`'s two sentences at `unattended.sh:4025` to `:4026` and the `:4107` clause with its `:4101` to `:4103` comment join S7 with severity-rule wording; AC9's zero-count greps over `blocker still standing`, base 3, and `admits BOTH`, base 2 in the driver and 1 in the suite — the audit wrote 1 for the driver and the tree says 2; the `:4634` arm moves with the clause, four arms not three, with spec 6 rev-4 corrected in the same fold).
+- rev-4 · 2026-09-14 · §4 · folded the round-1 closing diff review: clusters B (ids 10, 5 — the subject keyed per spec-set generation as `<slug>-spec-set-r<N>` with `subjectRound` carried back on CONVERGING, `promotedIds` in `DISPOSAL_SCHEMA` and on every return, `auditIds` scoping the resolver and the hand-out's `nextAction` ordering the re-invocation, `terminalSubject` as the recorder's distinct outcome; the per-invocation key the review spelled is departed from, §4 says why), C (harness end — `--disposition promote` appended at zero blockers with highs), D (id 2 — the severity split and the `promotedIds` pairing in the guard, `minimum: 0` on both counts), E (id 11 — BOUNDED excluded from the DEGRADED predicate), F (ids 14, 15 — `unverified`, `lensesDead` and `skepticsDead` read; the stage on `confirmed + unverified`; the clean-round shapes as CONVERGED at 0; the dead-lens throw kept). 55 arms added to `tools/workflows/unattended-build.test.sh`, 44 observed red against the frozen base render.
 
 ## 10. Reuse audit
 

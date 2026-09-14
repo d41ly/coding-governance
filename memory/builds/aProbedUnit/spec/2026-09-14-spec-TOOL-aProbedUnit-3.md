@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it
 
-**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -127,11 +127,17 @@ The body, in order:
    has no unit that can be dispatched and open, and a keepalive still firing over it should have
    been reaped. Neither reuses `refuse_if_terminal` at `:1610`: its message says the verb "would
    rewrite" the record, and this verb rewrites nothing, so the sentence would be false.
-2. The latest dispatch row per unit, by the `awk` shape `verb_status` already uses for brief rows
+2. The latest PASS per unit, by the `awk` shape `verb_status` already uses for brief rows
    at `:2865` to `:2867`: split on ` · `, keep rows whose first field ends ` dispatch`, take the
-   `item` field as `<grp> <unit>` and the `reason` field as the declared set, and keep the LAST row
-   seen per unit — `last[u]`. The row is written by `park()` at `:3911` with `date -u
-   +%Y-%m-%dT%H:%M:%SZ` as its first token, and the ISO is what `elapsed` is measured from.
+   `item` field as `<grp> <unit>` and the `reason` field as the declared set, and UNION every row
+   at the unit's newest anchor, a new anchor replacing — check 23's `(anchor, unit)` key
+   (rev-4; rev-3 kept the LAST row seen per unit, `last[u]`, which asked whether the pass wrote
+   its last path and graded a finished unit open). The row is written by `park()` at `:3911` with
+   `date -u +%Y-%m-%dT%H:%M:%SZ` as its first token, and the first row's ISO at that anchor is
+   what `elapsed` is measured from. Before the openness test, a unit whose spec status is
+   terminal (`CLOSED`/`WONTDO`) is dropped, the status resolved the way `--plan` resolves it —
+   `load_spec_facts` over the tracked spec set, `SPEC_PATH` then `SPEC_ST` — so `--plan` and
+   `--audit` cannot grade one unit DONE and STALLED.
 3. Openness, through `check_pass_open <grp> <unit> <rel> <declared>`, a new function that is the
    body of `verb_dispatch`'s sibling loop at `:4802` to `:4815` moved verbatim: `pass_commit`
    answers which commit named the unit after the anchor, and the pass is closed only when that
@@ -442,6 +448,7 @@ assignment at `:5403` is the shadowed one the file marks as inert.
 - rev-1 · 2026-09-14 · initial draft.
 - rev-2 · 2026-09-14 · §2 S3 S4 S5 · §3 · §4 · §5 · §6 AC3 AC4 AC6 AC7 AC8 AC9 · §7 · folded round-1 spec-audit clusters F (spec-3 half: this unit owns `read_bound_key`), I (id 9), M (ids 10, 11, 13) and N (id 12).
 - rev-3 · 2026-09-14 · §3 Edges · §4 · §6 AC1 AC4 AC6 · folded round-2 spec-audit clusters E (id 2: the VERBS half of AC6 greps the bullet's own form), I (id 7: AC6 pins `re-dispatch` in the keepalive section) and K (id 15: the fixture interface — `mkconf`'s sixth positional, the second `NOCONF` hit, unit 6 takes the seventh).
+- rev-4 · 2026-09-14 · §4 item 2 · folded the closing diff review round 1, cluster A (ids 19, 1, 6): `print_audit` unions a unit's same-anchor dispatch rows with a new anchor replacing, mirroring check 23's key, and skips a unit whose spec status is terminal the way `--plan` resolves it; the `verb_dispatch` sentence claiming the two verbs cannot disagree is rewritten to state the two populations (per row for the disjointness proof, the union for the stall clock); two red-first arms in `unattended.test.sh` beside AC3 — two same-anchor rows with a pass commit inside the first, and a CLOSED spec with an open row, both printing `no unit is dispatched and open` — observed red against a frozen copy of the base kit. Floors +2 of the +19 the fold adds.
 
 ## 10. Reuse audit
 

@@ -214,6 +214,17 @@ case "$sg_probe" in
     case "$(cat "$TMP/err")" in
       *"$SENT_TMP"*) echo "ok   /tmp/other under TEMP=/tmp carries the tmp sentence"; pass=$((pass+1)) ;;
       *) echo "FAIL /tmp/other under TEMP=/tmp was denied for a reason other than tmp"; fail=$((fail+1)) ;;
+    esac
+    # THE EXPANSION ARM. Every other set temp variable in this suite is itself an allowed root, so
+    # `$TEMP/a.log` is allowed whether or not the variable expands, and the expansion branch of
+    # `buildResolvedTarget` had no arm that could red it: dropping `env[t[1]] ||` from it left the
+    # suite green (closing diff review round 1, cluster K). Here TEMP is the one value that is NOT
+    # a root, so `$TEMP/other` is denied by the tmp rule only if the variable expanded to /tmp —
+    # unexpanded it is an unresolved token that no rule claims, and the arm reads exit 0.
+    run "TEMP=/tmp: \$TEMP/other expands and is denied (tmp)" 2 'echo x > $TEMP/other' Bash "$PRE_TMP"
+    case "$(cat "$TMP/err")" in
+      *"$SENT_TMP"*) echo "ok   \$TEMP/other under TEMP=/tmp expanded and carries the tmp sentence"; pass=$((pass+1)) ;;
+      *) echo "FAIL \$TEMP/other under TEMP=/tmp was denied for a reason other than tmp, or not expanded"; fail=$((fail+1)) ;;
     esac ;;
   *) echo "FAIL the prelude did not reach the hook: os.tmpdir() derived '$sg_probe', not /tmp, so the discriminating pair grades nothing"; fail=$((fail+1)) ;;
 esac
@@ -228,6 +239,10 @@ esac
 run "  near-miss: /dev/null -> allow"             0 'echo x > /dev/null'
 run "  near-miss: /c/projects/x is the drive rule's -> allow" 0 'echo x > /c/projects/x'
 run "  near-miss: /usr/local/x is conventional -> allow" 0 'mkdir -p /usr/local/x'
+# The macOS near-miss: `/Users` is where every macOS home lives, and the set held `private` and
+# `volumes` without it, so this write was denied as new top-level litter on every macOS host
+# (closing diff review round 1, cluster J). Red against the hook before `users` joined the set.
+run "  near-miss: /Users/Shared/f is a macOS root -> allow" 0 'echo x > /Users/Shared/f'
 
 # ---- the two views: a quoted operator is invisible, a quoted target still resolves ----------------
 # Without the blanking, the guard denies the commit message describing it — including this build's.
@@ -337,7 +352,7 @@ n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
 # reviewed diff or not at all.
-FLOOR_ASSERTIONS=87   # 60 + the 27 assertions TOOL-aProbedUnit-5 added (26 in its block, 1 from re-targeting the /tmp near-miss)
+FLOOR_ASSERTIONS=90   # 60 + the 27 assertions TOOL-aProbedUnit-5 added (26 in its block, 1 from re-targeting the /tmp near-miss) + the 3 its round-1 fold added (clusters J and K)
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

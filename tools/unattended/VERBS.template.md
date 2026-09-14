@@ -70,8 +70,8 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
-- `--audit` — one line per unit whose latest dispatch row is still open: how long the TREE has been
-  idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+- `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
+  open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
@@ -110,14 +110,19 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
   most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
   is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
-  always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS which
-  disposition the run took, `fold` or `promote`: `--disposition` is REQUIRED there and REFUSED on any
-  round that is not one. Which value the run records follows the severity rule the Skill's exit
-  bullet states: `promote` whenever a blocker or high stood at the exit, because that is the value
-  that demands new unit ids and a mixed exit takes the value that demands something, else `fold`;
-  a record naming neither leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a missing
-  subject or count, a terminal exit carrying no disposition, a disposition on a round that is not a
-  terminal exit, and a round on a subject whose loop has already ended.
+  always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS its
+  disposition, and `promote` is the ONLY value a terminal exit can record: every such exit carries at
+  least one BLOCKER by construction, since a zero count is `CONVERGED`, and the severity rule the
+  Skill's exit bullet states promotes every blocker, so `--disposition promote` is REQUIRED there and
+  `fold` beside a standing blocker is REFUSED rather than written. `fold` survives as the reading of
+  a record that exited with nothing above MEDIUM, which the driver reaches only at `CONVERGED` with
+  no high, and that row needs no field. On `CONVERGED` an optional `--disposition promote` is
+  ACCEPTED, never required, for the round whose highs stood: it is the value that demands new unit
+  ids, and a mixed exit takes the value that demands something, so the gate counts the unit a high
+  became instead of reading the promotion as nothing. A record naming no value where one is owed
+  leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
+  set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
+  exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

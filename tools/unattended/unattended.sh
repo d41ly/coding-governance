@@ -215,6 +215,10 @@ GATE_BOUND_DEFAULT=3600
 # 1800s: three keepalive cadences at this repo's ten-minute interval, so a `--audit` verdict of
 # STALLED is never one missed tick. The owner's figure, TOOL-aProbedUnit-3.
 UNIT_STALL_BOUND_DEFAULT=1800
+# 1 round: a spec-audit subject exits BOUNDED after its first blocked round (owner ruling
+# 2026-09-14, TOOL-aProbedUnit-6). ONE constant, interpolated into the NOTE the reader prints, so the
+# argument and the sentence cannot say two numbers — the closing review found them typed twice.
+REVIEW_ROUNDS_DEFAULT=1
 
 # LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
 # runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
@@ -483,8 +487,11 @@ RUNAWAY_CEILING="8"
 # here and not beside the other two because the one arm those keys lack — the upper bound — IS the
 # constant above, and a comparison written above its definition reads an empty string. A tracked conf
 # key rather than a constant because a conf leaves a diff behind, the property the header above wants.
-read_bound_key REVIEW_ROUNDS 1 rounds "a spec-audit subject exits BOUNDED after the kit default of 1 round"
-[ "$REVIEW_ROUNDS" -le "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
+read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS_DEFAULT} round(s)"
+# STRICTLY BELOW. `review_state` tests the ceiling BEFORE the bound, so a bound EQUAL to the ceiling
+# is the one value the sentence below refuses and `-le` accepted: at that value the loud CEILING
+# exit fires and the declared bound is never reached, exactly as the sentence says.
+[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 # THE REVIEW VERDICT VOCABULARY, closed and kit-owned. Its CANONICAL home is the memory-tree kit,
 # which enforces review-record grammar and renders the build method; a copy-installed kit cannot
 # import across that boundary, so this is a STATED duplication whose drift is armed by a row in that
@@ -2909,7 +2916,8 @@ BRIEFROWS
 }
 
 # --audit: THE DISPATCHED-UNIT STALL PROBE. TOOL-aProbedUnit-3. One line per unit whose LATEST
-# dispatch row is still open, with how long the TREE has been idle and a verdict against
+# pass — every dispatch row at its newest anchor, unioned the way check 23 unions them — is still
+# open and whose spec is not terminal, with how long the TREE has been idle and a verdict against
 # UNIT_STALL_BOUND. The keepalive that already fires every ten minutes runs this, so the turn that
 # used to do nothing has something to do with itself. Read-only: it writes no row and stages nothing.
 #
@@ -2930,7 +2938,7 @@ BRIEFROWS
 # refusals exit 1. `refuse_if_terminal` is not reused for the terminal case: its sentence says the
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug
-  local slug="$1" rel ph now lastc lastw dirty p m dead="" rows u iso g decl disp el wtxt verdict open=0
+  local slug="$1" rel ph now lastc lastw dirty p m dead="" rows u iso g decl disp el wtxt verdict open=0 sp st
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 51 "no run-state file, so there is no dispatched unit to audit for idleness: $rel"; return 1; }
@@ -2953,16 +2961,32 @@ print_audit() { # slug
     case "$m" in ""|*[!0-9]*) dead="stat -c %Y on $p"; break ;; esac
     if [ -z "$lastw" ] || [ "$m" -gt "$lastw" ]; then lastw=$m; fi
   done <<<"$dirty"
-  # THE LATEST DISPATCH ROW PER UNIT, by the awk shape `verb_status` uses for brief rows: split on
-  # the separator, keep rows whose first field ends ` dispatch`, take the ISO from that field, the
-  # group and unit from `item`, the declared set from `reason`, and the LAST row seen per unit.
-  # One awk pass and no back-reference, for the reason that function's comment records.
+  # THE LATEST PASS PER UNIT, by the awk shape `verb_status` uses for brief rows: split on the
+  # separator, keep rows whose first field ends ` dispatch`, take the ISO from that field, the group
+  # and unit from `item`, the declared set from `reason`. One awk pass and no back-reference, for the
+  # reason that function's comment records.
+  #
+  # SAME-ANCHOR ROWS ARE ONE PASS AND THEIR SETS ARE UNIONED; a NEW anchor replaces. This is check
+  # 23's key, `(anchor, unit)`, and not the LAST row per unit this first read: `--writes` is
+  # repeatable, the driver's published repair for a pass that needs more paths is "declare again",
+  # and this repo's own harness produced twelve one-path rows for one unit — so the last row alone
+  # asked whether the pass wrote its LAST path, reported a CLOSED unit open for hours, and handed
+  # the keepalive a kill order for it (closing review of aProbedUnit, cluster A).
   rows=$(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z dispatch$/ && $2 ~ /^item / && $3 ~ /^reason / {
        iso = $1; sub(/ dispatch$/, "", iso); it = substr($2, 6); g = it; sub(/ .*/, "", g); u = it; sub(/^[^ ]* /, "", u)
-       last[u] = iso "\t" g "\t" substr($3, 8)
-     } END { for (u in last) print u "\t" last[u] }' "$rel" 2>/dev/null | sort)
+       if (u in ga && ga[u] == g) dc[u] = dc[u] " " substr($3, 8)
+       else { ga[u] = g; ts[u] = iso; dc[u] = substr($3, 8) }
+     } END { for (u in ga) print u "\t" ts[u] "\t" ga[u] "\t" dc[u] }' "$rel" 2>/dev/null | sort)
+  # A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is a
+  # disjointness proof and answers conservatively — a pass that legitimately declared a path it never
+  # wrote stays open under it forever — which is the right answer for `--dispatch` and the wrong one
+  # for a stall clock that a keepalive ACTS on. The status is resolved the way `--plan` resolves it,
+  # from the same tracked spec set, so the two verbs cannot grade one unit CLOSED and STALLED.
+  load_spec_facts $(git ls-files "$M/builds/$slug/spec/*.md" 2>/dev/null | drop_working_specs) >/dev/null 2>&1 || true
   while IFS=$'\t' read -r u iso g decl; do
     [ -n "$u" ] || continue
+    st=""; sp="${SPEC_PATH[$u]:-}"; [ -z "$sp" ] || st="${SPEC_ST[$sp]:-}"
+    case "$st" in CLOSED|WONTDO) continue ;; esac
     check_pass_open "$g" "$u" "$rel" "$decl" || continue
     [ -n "$dead" ] && break
     disp=$(date -u -d "$iso" +%s 2>/dev/null) || disp=""
@@ -4129,14 +4153,18 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
     }' "$1"
 }
 
-# The sentence a TERMINAL round prints, per disposition. Defined once because two exits share it and
+# The sentence a TERMINAL round prints, per disposition. Defined once because four exits share it and
 # a second copy is a second thing to keep true. The promote wording deliberately keeps the word
 # PROMOTED: an existing suite arm asserts that literal, and rewording it would have made a passing
-# arm pass for a different reason. The final branch is UNREACHABLE — the state gate refuses an empty
-# disposition at every terminal exit — and it says so loudly rather than printing something reassuring.
+# arm pass for a different reason. `fold` is reachable from ONE exit, CONVERGED: every other exit
+# stands on at least one BLOCKER by `review_state`'s construction, and the severity rule promotes
+# every blocker, so the state gate refuses `fold` there (closing review of aProbedUnit, cluster C).
+# The final branch is UNREACHABLE — the state gate refuses an empty disposition at every
+# non-converged exit and CONVERGED calls this only with one — and it says so loudly rather than
+# printing something reassuring.
 review_exit_note() { # disposition -> the sentence
   case "$1" in
-    fold)    printf '%s' "every MEDIUM and LOW confirmed at this exit was FOLDED into the specs it belongs to, which is the recorded disposition; the severity rule never folds a BLOCKER or HIGH. Not parked, not waived" ;;
+    fold)    printf '%s' "every MEDIUM and LOW confirmed at this exit was FOLDED into the specs it belongs to, which is the recorded disposition; the severity rule never folds a BLOCKER or HIGH, so this value is legal only at CONVERGED, where none stood. Not parked, not waived" ;;
     promote) printf '%s' "every BLOCKER and HIGH confirmed at this exit is PROMOTED to a unit of this build, specced at its tier and built, and a MEDIUM or LOW is folded. Not parked, not waived, not re-reviewed" ;;
     *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
   esac
@@ -4220,12 +4248,25 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # SEVERITY and the field records which value the exit took, and check 2 could otherwise only ever
   # observe promotion — so a run that folded correctly had no way to say so and was graded as
   # though it had promoted. TOOL-dBriefedPass-9 measured that.
+  #
+  # THE FIELD'S LEGAL SET FOLLOWS THE SEVERITY RULE AT BOTH ENDS (closing review of aProbedUnit,
+  # cluster C). `review_state` returns CONVERGED for count 0 unconditionally, so every
+  # NON-CONVERGENT, CEILING or BOUNDED exit stands on at least one BLOCKER, and the severity rule
+  # promotes every blocker: `fold` cannot be that exit's disposition, and accepting it wrote
+  # `blockers 3 · disposition fold`, a row the gate read as demanding nothing. At CONVERGED the same
+  # rule disposes the HIGHS that stood at zero blockers, so a disposition is ACCEPTED there and
+  # never required — a converged round with nothing above MEDIUM needs no field.
   case "$state" in
     NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$disposition" ]; then
-        fail 37 "--review exits $state and requires --disposition, because the severity rule decides which of fold and promote the exit records and a record naming neither leaves the gate inferring one from ids; legal dispositions: $REVIEW_DISPOSITIONS"
+        fail 37 "--review exits $state with $blockers blocker(s) standing and requires --disposition promote, because the severity rule promotes every blocker and a record naming no disposition leaves the gate inferring one from ids"
+        return 1
+      fi
+      if [ "$disposition" = fold ]; then
+        fail 37 "--review exits $state with $blockers blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
         return 1
       fi ;;
+    CONVERGED) ;;
     *)
       if [ -n "$disposition" ]; then
         fail 37 "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state $state"
@@ -4245,10 +4286,14 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$disp"
   stage_or_fail "$rel" || return 1
   case "$state" in
-    CONVERGED)      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject" ;;
+    CONVERGED)      if [ -n "$disposition" ]; then
+                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED · disposition $disposition — the loop is done for this subject, and $(review_exit_note "$disposition")"
+                    else
+                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject"
+                    fi ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT · disposition $disposition — the count did not shrink, so the loop STOPS here and $(review_exit_note "$disposition")" ;;
     CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $(review_exit_note "$disposition"); record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every standing blocker is disposed by severity: $(review_exit_note "$disposition")" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY: $(review_exit_note "$disposition")" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
@@ -4940,7 +4985,11 @@ verb_dispatch() { # slug · unit · writes...
   # carries a pass's OWN declaration, so every pass closed the instant it was declared and this whole
   # proof ran over an empty set. A closing review reproduced that with two controls. The comment is
   # now a function call, which cannot be wrong about what the leg does — `check_pass_open`, shared
-  # with `--audit` so the two verbs cannot disagree about whether a pass is open.
+  # with `--audit`. The two verbs ask it over DIFFERENT row sets, on purpose: this loop asks per
+  # ROW, so a row whose set the pass never wrote keeps its paths reserved against a sibling (the
+  # conservative answer a disjointness proof wants); `--audit` asks over the UNION of a unit's
+  # same-anchor rows, because a pass that wrote inside ANY of them is not idle (the true answer a
+  # stall clock wants). One predicate, two populations — stated so nobody "fixes" either to match.
   sibrows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r _r; do
       [ -n "$_r" ] || continue
       _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
