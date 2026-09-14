@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip
 
-**Status:** OPEN · rev-4 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
+**Status:** OPEN · rev-5 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round2.md) | spec-audit | — |
+| [2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round3.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round3.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -17,11 +18,12 @@
 the pooled run still bounds every row at `budget x sweep-ceiling-factor` — the shape that killed 14
 of 58 suites in the full sweep of 2026-09-08 and that three records refused as a predictor. Replace
 that bound with the evidence RULE the tree already owns, in the runner's own evidence file, with a
-declared calibration mode that grades nothing; and land the DoD flip DARK, so the kit-work DoD moves
-from a serial self-test pass to a hang-bounded pooled one plus `--checks` only as the build's landing
-step, after the one gate pass has shown the pooled pass complete with every row's rc matching its
-calibrated rc. The serial pass stays available on demand, declared, as the cost pass — never as a
-DoD line.
+declared calibration mode that grades nothing; make the pooled VERDICT mean parity with the
+calibrated baseline, so a red-by-design suite that ran to its end is GREEN and a crash, a kill or an
+unrun row is RED; and land the DoD flip DARK, so the kit-work DoD moves from a serial self-test pass
+to that pooled one plus `--checks` only as the build's landing step, after the one gate pass has
+printed the pooled GREEN. The serial pass stays available on demand, declared, as the cost pass —
+never as a DoD line.
 
 ## 2. Scope (IN)
 
@@ -29,86 +31,106 @@ DoD line.
   budget: `max(<serial budget>, <worst reading>)` under this node and the runner's own condition
   token (`pooled@<outer>x<inner>` at the text `SWEEP_CONDITION=`), monotone, plus
   `tools/run-gates/ceiling-margin.txt`'s headroom of `max(<floor>, <fraction> x that)` READ from the
-  file beside the runner (`$HERE/ceiling-margin.txt`; the runner refuses when it is absent — the
-  refusal `derive-ceilings.py` makes, reused as a rule and not imported, because the runner is
-  bash). The serial-budget floor is the guard against a fast red: a pooled row cannot legitimately
-  need less than its serial budget, so a 0.3 s refusal recorded as a reading never bounds a repaired
-  suite below what it costs alone; the verdict prints which term won. **A row with NO reading under
-  (row, token, node) REFUSES the pooled run naming the row, the token and `--calibrate`, and executes
-  no suite — the whole population `--pooled` or `--sweep` reaches, not only the filtered one.** There
-  is no fallback: the `sweep-ceiling-factor:` header in `selftest-budgets.txt`, its refusal arm at
-  the text `declares no sweep-ceiling-factor`, and the `at its <budget x factor>s bound` verdict text
-  are RETIRED in the same commit, so no factor-derived bound survives to be fallen back on. **The
-  graded run's WALL** is derived from the evidence bounds by the shape the runner already uses for
-  the factor: `ceil(sum of bounds / OUTER)`, floored at the largest bound; `SELFTEST_WALL` still
-  overrides and the existing below-the-largest refusal compares against the largest evidence bound.
-  Every pooled verdict prints the reading, token, node and date it was bounded by, and the pooled
-  summary line counts `killed` rows and `rc-mismatched` rows SEPARATELY — a row whose rc differs
-  from the rc its evidence row recorded — so a landing can read completion off the summary without
-  re-deriving it from the rows. Observed by **AC1**, **AC2** and **AC7**.
+  file beside the runner (`$HERE/ceiling-margin.txt`; the runner REFUSES when it is absent, naming
+  the file — the refusal `derive-ceilings.py` makes, reused as a rule and not imported, because the
+  runner is bash). The serial-budget floor is the guard against a fast red: a pooled row cannot
+  legitimately need less than its serial budget, so a 0.3 s refusal recorded as a reading never
+  bounds a repaired suite below what it costs alone; the verdict prints which term won. **A row with
+  NO reading under (row, token, node) REFUSES the pooled run naming the row, the token and
+  `--calibrate`, and executes no suite — the whole population `--pooled` or `--sweep` reaches, not
+  only the filtered one.** There is no fallback: the `sweep-ceiling-factor:` header in
+  `selftest-budgets.txt`, its refusal arm at the text `declares no sweep-ceiling-factor`, and the
+  `at its <budget x factor>s bound` verdict text are RETIRED in the same commit. **The graded run's
+  WALL** is derived from the evidence bounds by the shape the runner already uses for the factor:
+  `ceil(sum of bounds / OUTER)`, floored at the largest bound; `SELFTEST_WALL` still overrides and
+  the existing below-the-largest refusal compares against the largest evidence bound. Every pooled
+  verdict prints the reading, token, node and date it was bounded by. Observed by **AC1**, **AC2**
+  and **AC7**.
 - **S2** — the bootstrap is DECLARED: `--pooled --calibrate` runs EVERY row the invocation selects
   (bare, or `--kit <dir>`), evidenced or not, under ONE wall, the SUM of the selected rows' serial
-  budgets, undivided — the population fully serialised, the largest backstop derivable with no typed
-  number; a pooled pass exceeding its own serial sum is a hang and not a cost — `SELFTEST_WALL`
-  tightening it only, the derived wall and which term won printed. No per-row bound. It withholds
-  every verdict and records a reading ONLY for a row that exited on its own: rc captured, not killed
-  by the wall. A row the wall killed writes NO reading, is named, and makes the calibrate run exit
-  RED. Readings are written AFTER the sweep's closing fingerprint (`FP_AFTER`, the text
+  budgets, undivided — the population fully serialised, the largest backstop derivable with no
+  typed number; a pooled pass exceeding its own serial sum is a hang and not a cost —
+  `SELFTEST_WALL` tightening it only, the derived wall and which term won printed. No per-row
+  bound. It withholds every verdict and records a reading ONLY for a row that exited on its own —
+  rc captured, not killed by the wall — together with the row's POSITIVE ARTIFACT, the count of
+  `^FAIL` lines in its filed output, because for a red-by-design row rc 1 is also what a crash at
+  0.3 s exits with, and the `ab-arm-never-did-the-work` class asks for an artifact of the work
+  beside the exit. A row the wall killed writes NO reading, is named, and makes the calibrate run
+  exit RED. Readings are written AFTER the sweep's closing fingerprint (`FP_AFTER`, the text
   `read_tree_fingerprint`), in one pass over the collected verdicts, because the evidence file is
   tracked and a write inside the fingerprinted window reds the runner's own run as UNSOUND. Every
-  reading raises its (row, token, node) row monotone — never lowers it — the `rc` column being the rc
-  of the reading that set the max; the summary line is `calibrated <n> row(s), <r> red, graded none`
-  on green and `calibrated <n> row(s), <r> red, <k> killed, graded none` on red, neither of which the
-  kit runner's `sweep GREEN` / `WITHHELD` parser can read as a verdict. `--calibrate` with any verb
-  or mode other than `--pooled` REFUSES naming the pair. Observed by **AC3** and **AC8**.
+  reading raises its (row, token, node) SECONDS monotone — never lowers them — while the `rc` and
+  `fails` columns are the LATEST completed reading's, so a repaired suite updates its baseline on the
+  next calibrate without a reset. `--reset <row>` on the same invocation lowers that row's seconds
+  and NARROWS the calibrate to the reset rows, since a reset row is uncalibrated by construction and
+  the refusal has nothing else to refuse; it prints the decision. The summary line is
+  `calibrated <n> row(s), <r> red, graded none` on green and `calibrated <n> row(s), <r> red,
+  <w> walled, graded none` on red — `walled` and not `killed`, because a calibrate has no per-row
+  bound and every kill there is the wall's — neither of which the kit runner's `sweep GREEN` /
+  `WITHHELD` parser can read as a verdict. `--calibrate` with any verb or mode other than `--pooled`
+  REFUSES naming the pair. Observed by **AC3**, **AC8** and **AC10**.
 - **S3** — pooled readings live in their OWN tracked file, `tools/run-gates/selftest-pooled-evidence.txt`,
-  one row per (row name, condition token, node): `<row>\t<condition>\t<node>\t<max seconds>\t<rc>\t<readings>\t<date>`.
-  The node is the charter's §2 registry TAG: `GOV_NODE` when set, else `USERNAME`/`USER` resolved
-  against the registry table the way `tools/drift-audit/drift_report.py`'s `_resolve_node_tag` does,
-  REFUSING by name when no row matches — never a hostname, which the registry does not know. The
-  file is written by `--pooled --calibrate` and lowered only by `--reset <row>` on the same
-  invocation, which is a decision somebody made and prints as one. Its SHAPE is graded by
-  `run-selftests.sh --check`, the unguarded bar leg: every non-comment line has seven tab fields,
-  seconds and readings parse, readings is at least one, the node is a registry tag, no (row, token,
-  node) key repeats, and every row names a row the budget file declares — a hand-edited, truncated
-  or orphaned row reds on the bar, and an orphan is the right red: a deleted budget row takes its
-  evidence with it or the file lies. It ships to no adopter: `tools/run-gates/kit.toml` gains a
-  `project-owned` rule for it beside the three it already carries for the same reason. NOT in
-  `ceiling-evidence.txt` and NOT in `selftest-budgets.txt`'s fourth column, so `--rank`'s refusal of
-  `pooled@` readings (`TOOL-aQuenchedHarness-6` S3a) is untouched and shard budgets stay serial.
-  Observed by **AC4** and **AC9**.
-- **S4** — the flip lands DARK, the population it grades is DERIVED, and the DoD it replaces is
-  named. The kit-work DoD today is `kit.toml:122-126`'s two pasted lines, and its second,
-  `--all --serial`, runs the self-tests serially AND the checks (`ONLY=""` at the text `--all)`), so a
-  flip that kept it would ADD a pooled pass to a serial one; after the flip the DoD is
-  `run-unattended-gates.sh --pooled` plus `run-unattended-gates.sh --checks`, the block's
-  `not done until` sentence re-worded to bind those two, and `--selftests --serial` is the declared
-  cost pass ON DEMAND, per the owner's 2026-08-23 standing instruction at
-  `memory/guides/SESSION-KICKOFF.md:169`, never a DoD line. The carrier set is the predicate `a line
-  spelling --selftests --serial, run-unattended-gates.sh --serial, or run-unattended-gates.sh --all
-  --serial`, which excludes the runner's own usage grammar at `:142`; it yields eight lines in six
-  files at this base, re-derived at build time and pasted in the ledger: `.githooks/gate-env.sh:27`,
-  `AGENTS.md:519`, `tools/unattended/kit.toml:125` and `:126`, `tools/unattended/README.md:66`,
-  `tools/unattended/run-unattended-gates.sh:27` and `:233`, `memory/guides/SESSION-KICKOFF.md:169`.
-  Inside this unit seven of them gain, beside `--serial`, the words `--pooled after calibration` —
-  `land dark`, unit 4 r2 B1's rule — and `AGENTS.md:519` takes NO dark spelling, because
-  `bash tools/check-template-size.sh AGENTS.md` measures it 9 bytes under its declared cap and the
-  flip there is `--serial` for `--pooled`, eight bytes for eight. **The flip itself is the BUILD's
-  landing step, not this unit's**, in this order on the MERGED tree (`TOOL-aLoosenedCeiling-3`: a
-  ceiling is re-derived on the merged tree, never carried): (1) `run-selftests.sh --kit
-  tools/unattended --pooled --calibrate` over the population `run-selftests.sh --kit
-  tools/unattended --list` resolves (fourteen rows at this base — the list's number); on a red, the
-  killed rows are named in the landing record, the build lands WITHOUT the flip, and AC3's real-row
-  half is ledgered amended naming them; (2) the evidence file is committed; (3)
-  `run-unattended-gates.sh --pooled` runs and its pooled summary is pasted — the witness is NOT the
-  driver's exit status, which folds the oracle's red into the verdict (unit 3 AC11: the eight shard
-  rows are RED by design, 21 `FAIL` lines, and `check-unattended.test.sh` exits 1 on any), but the
-  summary's `killed 0`, `rc-mismatched 0` and `fingerprint MATCHED`; (4) ONLY THEN the flip commit:
-  the seven dark lines drop `--serial`, `kit.toml:126` becomes `--checks`, the block's binding
-  sentence and `SESSION-KICKOFF.md:169` are re-worded, `AGENTS.md:519` swaps eight bytes, and
-  `last-audit` is re-stamped. On a red at step (3) the carriers stay as landed, AC5's landing half is
-  ledgered amended naming the red, and the build lands without the flip. Observed by **AC5** and
-  **AC6**.
+  one row per (row name, condition token, node), eight tab fields:
+  `<row>\t<condition>\t<node>\t<max seconds>\t<rc>\t<fails>\t<readings>\t<date>`, the header
+  stating that seconds are monotone and `rc`/`fails` are the latest reading's. The node is the
+  charter's §2 registry TAG: `GOV_NODE` when set, else `USERNAME`/`USER` resolved against the
+  registry table of `$ROOT/AGENTS.md`, then `$ROOT/CLAUDE.md` — the charter-file precedent at
+  `run-gates.gov.test.sh`, the text `CHARTER="$ROOT/AGENTS.md"` — with the row regex
+  `tools/drift-audit/drift_report.py`'s `_resolve_node_tag` uses, REFUSING by name when no row
+  matches; never a hostname, which the registry does not know. Its SHAPE is graded by
+  `run-selftests.sh --check`, the unguarded bar leg: every non-comment line has eight tab fields,
+  seconds, rc, fails and readings parse, readings is at least one, the node is a tag the registry
+  table carries, no (row, token, node) key repeats, and every row names a row the budget file
+  declares — a hand-edited, truncated or orphaned row reds on the bar, and an orphan is the right
+  red: a deleted budget row takes its evidence with it or the file lies. It ships to no adopter:
+  `tools/run-gates/kit.toml` gains a `project-owned` rule for it beside the `project-owned` rules it
+  already carries for the same reason. NOT in `ceiling-evidence.txt` and NOT in
+  `selftest-budgets.txt`'s fourth column, so `--rank`'s refusal of `pooled@` readings
+  (`TOOL-aQuenchedHarness-6` S3a) is untouched and shard budgets stay serial. Observed by **AC4**
+  and **AC9**.
+- **S4** — THE POOLED VERDICT IS PARITY. Under `--pooled` with evidence present, a row that exited
+  on its own whose (rc, fails) equals its evidence row's renders `ok (rc <n>, <f> FAIL matched)`;
+  one whose pair differs renders `MISMATCH` naming both pairs and the acceptance (`--calibrate` to
+  take the new baseline, `--reset <row>` to lower seconds); the pooled `st` derives from
+  `killed + walled + unrun + mismatched + soundness`, and the summary line prints all four counts by
+  name — `killed <a> · walled <b> · unrun <c> · mismatched <d>` — from the lists the runner already
+  keeps at the text `killed=0; walled=""; unrun=""`, `mismatched` computed over rows with a verdict
+  file only, which is why `unrun` needs its own word. So GREEN means: every row ran to its own end
+  under its bound and matched its baseline, and the tree is sound. `run-unattended-gates.sh`'s `st`
+  follows the runner's, so a perfect pass over the eight red-by-design rows prints GREEN; the
+  runner's usage sentence (`did any suite fail`) and its RED-ambiguity text at the text
+  `confirm with the serial` are re-worded to the parity question, since a parity red is not told to
+  confirm itself serially. Observed by **AC11** and **AC5**.
+- **S5** — the flip lands DARK, the carriers are CLASSIFIED, and the flip is the build's landing
+  step. The predicate `a line spelling --selftests --serial, run-unattended-gates.sh --serial, or
+  run-unattended-gates.sh --all --serial` yields eight lines at this base, re-derived at build time
+  and pasted in the ledger, in TWO classes by role: **DoD carriers** — lines stating the serial pass
+  as the criterion: `.githooks/gate-env.sh:27`, `tools/unattended/kit.toml:125` and `:126`,
+  `tools/unattended/run-unattended-gates.sh:27` — and **pointers** that already state the post-flip
+  fact and are BYTE-UNCHANGED at both steps: `AGENTS.md:519` (`On demand:`, measured 9 bytes under
+  its cap), `tools/unattended/README.md:66` (`ON DEMAND ONLY`), `run-unattended-gates.sh:233` (a
+  COST question, which `--pooled` withholds), and `memory/guides/SESSION-KICKOFF.md:169` (the
+  owner's dated correction entry, which no ruling licenses this run to edit, and whose manifest is
+  measured 10 bytes under `MAX_MANIFEST_BYTES`). Inside this unit the four DoD carriers gain,
+  beside `--serial`, the words `--pooled after calibration` — `land dark`, unit 4 r2 B1's rule.
+  **The flip is the BUILD's landing step, not this unit's**, in this order on the MERGED tree
+  (`TOOL-aLoosenedCeiling-3`): (1) `run-selftests.sh --kit tools/unattended --pooled --calibrate`
+  over the population `run-selftests.sh --kit tools/unattended --list` resolves (fourteen rows at
+  this base — the list's number); on a red, the walled rows are named in the landing record, the
+  build lands WITHOUT the flip, and AC3's real-row half is ledgered amended naming them; (2) the
+  evidence file is committed; (3) `run-unattended-gates.sh --pooled` runs and prints GREEN — parity
+  GREEN, S4's — pasted with its summary line; (4) ONLY THEN the flip commit, whose contents are the
+  DoD-phrase predicate's hits (`GREEN verdict|not done until|DoD path|DoD command|landed dark`)
+  re-worded to the pooled criterion, the four DoD carriers' argv spelled `--pooled` verbatim with
+  the dark marker removed, `kit.toml:126` spelled `--checks` (its `--all --serial` runs the
+  self-tests AND the checks — `ONLY=""` at the text `--all)` — so keeping it would add a pooled pass
+  to a serial one), `run-unattended-gates.sh`'s mode-refusal text at the text `the recorded DoD
+  path` and `kit.toml`'s `landed dark` comment each one line, one ADDED line in
+  `tools/unattended/README.md` naming the pooled DoD beside the on-demand serial line, and
+  `last-audit` re-stamped; both predicate hit lists pasted, and the DoD-phrase predicate re-run
+  after the commit returning zero lines naming `--serial` or `landed dark`, pasted. On a red at
+  step (3) the carriers stay as landed, AC5's landing half is ledgered amended naming the red, and
+  the build lands without the flip. Observed by **AC5** and **AC6**.
 
 ## 3. Non-goals (OUT)
 
@@ -124,16 +146,18 @@ DoD line.
   of those rows is the budget file's to report.
 - **Deciding the arity or the 20-minute question.** Unit 3's AC4 arm two is read at the same final
   pass; this unit's bound grades whatever that reading is.
-- **A per-row FAIL-set oracle in the runner.** The landing reads rc parity against the calibrated
-  rc; the FAIL-set equivalence unit 3 established is unit 3's, observed there, not re-derived by the
-  pooled pass.
+- **A per-row FAIL-SET oracle in the runner.** Parity is (rc, `^FAIL` count) against the calibrated
+  baseline, a cheap positive artifact; the FAIL-set equivalence unit 3 established is unit 3's AC6,
+  observed there, not re-derived by the pooled pass.
+- **Editing the owner's correction entry or the charter's on-demand sentence.** Both already state
+  the post-flip fact; neither is a DoD carrier; neither is this run's to re-word.
 
 ### Edges
 
 - **consumes-from** `TOOL-aBatchedArm-4` — the `--pooled` mode, the kit runner's pooled path, and
   the carriers it landed dark.
 - **consumes-from** `TOOL-aBatchedArm-3` — the eight shard rows, part of the population this unit's
-  S2 calibrates at the final pass.
+  S2 calibrates at the final pass, and the baseline oracle its AC6 established.
 - **hands-off** `none`
 
 ## 4. Design
@@ -148,8 +172,22 @@ rule: worst observed under the condition, monotone, floor-plus-fraction headroom
 with no evidence, `--reset` as the one lowering path. Its fifth part — readings from `ok` runs only,
 because "a leg that FAILED may have failed fast" — is DEPARTED from here, deliberately: the eight
 shard rows are red by design and exit 1 when complete, so an ok-only reader would refuse them
-forever. What replaces it is the serial-budget floor under the bound, which makes a fast red
-harmless without having to tell it from a slow one.
+forever. What replaces it is two things: the serial-budget floor under the bound, which makes a
+fast red harmless to the BOUND, and the `^FAIL` count beside the rc, which makes a fast red visible
+to the VERDICT — a shard that dies at 0.3 s on an unbound variable exits 1 with zero `FAIL` lines
+where its baseline carries three, and mismatches.
+
+### Why the pooled verdict is parity
+
+Unit 3's AC6 and the build README's rule — "the baseline is RED and is the oracle; equivalence is
+the `FAIL` line set plus the executed assertion count" — make GREEN-by-exit-code impossible for the
+population the DoD names: the driver exits 1 on a perfect pass over eight red-by-design rows,
+forever. `ceiling-margin.txt`'s header (`TOOL-dRetiredFork-40`) records a verdict that fires on a
+healthy run as strictly worse than a loose bound, and unit 4's AC7 reds a DoD command pointing at a
+refusal. So the verdict is re-based: GREEN means every row ran to its own end and matched the
+(rc, fails) it was calibrated at. That keeps `kit.toml`'s "not done until this prints GREEN"
+sentence true at the word, dissolves the question of what a landing reads instead of GREEN, and
+makes the landing's witness one word plus its summary line.
 
 ### Why the calibrate wall is the serial SUM and not a division
 
@@ -161,53 +199,62 @@ wall is a backstop against a HANG and not a prediction of cost, so it is the pop
 serialised: nothing pooled can honestly need longer than everything run one after another. It is
 derivable, prints itself, and puts no typed number in the DoD.
 
-### Why the bootstrap is a declared mode, and why it refuses in three places
+### Why the bootstrap is a declared mode, and why it refuses in four places
 
 The evidence shape cannot bound a row that has never been observed, and `--sweep`'s own S7 forbids
 an unbounded pooled row. So the first observation is taken under the serial-sum wall, in a mode that
-says it is calibrating and grades nothing. It refuses a killed row (a truncation is not a reading —
+says it is calibrating and grades nothing. It refuses a walled row (a truncation is not a reading —
 the `ab-arm` class), refuses any mode but `--pooled` (a `--serial --calibrate` that ran the serial
-loop and wrote nothing would be silent in a mode whose point is announcing itself), and refuses a
-file that does not parse.
+loop and wrote nothing would be silent in a mode whose point is announcing itself), refuses a file
+that does not parse, and refuses an absent margin file, because a silent zero-margin default is a
+bound nobody chose.
 
 ### Why the flip is the build's landing step and not this unit's
 
 `TOOL-aBatchedArm-4` landed `--pooled` dark because the bound it inherits killed five of the seven
 current unattended rows. Re-pointing the carriers is the act that makes the fast path the recorded
-DoD verdict, and it happens only after the bound that would grade it is the evidence one and has
-been seen to COMPLETE over every row the DoD command resolves — fourteen at this base, not the
-eight a draft of this spec typed — with each row's rc matching its calibrated rc. "GREEN" is not
-the criterion and cannot be: the oracle for eight of those rows is a red-by-design `FAIL` set, so
-the driver's exit is 1 on a perfect pass. Two owner rulings (2026-09-13, 2026-09-14) defer every
-gate run to one pass when every unit is built, so the observation that licenses the flip cannot
-happen inside this unit; landing the flip as text before it would record a DoD command with no
-completing run, which is the false-green shape one level up and what unit 4's AC7 reds by name.
-Hence dark: both spellings on every carrier but the one at its byte cap, the pooled one marked, and
-the flip commit ordered after the pasted summary.
+DoD verdict, and it happens only after the bound that would grade it is the evidence one and the
+parity GREEN has been printed over every row the DoD command resolves — fourteen at this base, not
+the eight a draft of this spec typed. Two owner rulings (2026-09-13, 2026-09-14) defer every gate
+run to one pass when every unit is built, so the observation that licenses the flip cannot happen
+inside this unit; landing the flip as text before it would record a DoD command with no completing
+run, which is the false-green shape one level up and what unit 4's AC7 reds by name. Hence dark on
+the four carriers that state the criterion, and byte-unchanged on the four pointers that already
+state the post-flip fact — round 3 found the earlier fold applying one edit to both classes, which
+would have re-worded the owner's own correction entry and redded the manifest ratchet by a measured
+17 bytes.
 
-### Why the node is the registry tag
+### Why the node is the registry tag, and how the fixture has one
 
 Unit 3 measured a checker invocation at 47 to 60 s on node `a` against the ~2 s another host
 records; a 2x headroom cannot absorb that spread, so the key carries the node. It carries the
 REGISTRY tag and not a hostname because `GOV_NODE` is set nowhere in the tree, so a hostname would
 be what every real invocation wrote — a name the charter's §2 table does not know and the sibling
-`ceiling-evidence.txt` does not use. `_resolve_node_tag` already maps this machine's user to `a`.
+`ceiling-evidence.txt` does not use. The runner resolves it from the charter file at the repo root,
+as `run-gates.gov.test.sh` already does. The self-test fixture is a bare `git init` with no charter,
+so `build_repo` writes a charter stub `AGENTS.md` carrying one registry row that maps the current
+user (`${USERNAME:-$USER}`) to a fixture tag, every seeded evidence row is keyed on that tag, and
+AC2's no-row clause is staged by deleting the row.
 
 ### Files touched (estimate)
 
 `tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` (the fixture rebuild:
-`build_repo` gains a fixture `ceiling-margin.txt` with a small floor and a seeded, TRACKED evidence
-file covering every token the arms produce — `pooled@2x1` by default, since `W` falls to 2 without
-`run-gates.sh`, and `pooled@1x2` under the arms that set `SELFTEST_OUTER_WIDTH=1` — and every row an
-arm appends at run time seeded in that arm's setup under the token it runs at; the readings seeded
-are sized so the `SELFTEST_WALL=10` kill arm and the `SELFTEST_WALL=5` below-largest arm stay
-reachable) · `tools/run-gates/selftest-pooled-evidence.txt` (new, tracked, names row NAMES and no
-path, so it takes no `install-prefix-carried.txt` row) · `tools/run-gates/kit.toml` (the
-`project-owned` rule) · `tools/run-gates/selftest-budgets.txt` (the retired factor header) · the
-seven dark carrier lines above · `tools/unattended/run-unattended-gates.sh` (the pooled summary's
-`killed` / `rc-mismatched` counts) · `memory/guides/SESSION-KICKOFF.md` (`run-selftests.sh` is on
-its `watch:` line, so `last-audit` is re-stamped in the same commit; `:169` is re-worded only at the
-flip) · this build's records.
+`build_repo` gains the charter stub with its registry row, a fixture `ceiling-margin.txt` with a
+small floor, and a seeded, TRACKED evidence file covering every token the arms produce —
+`pooled@2x1` by default, since `W` falls to 2 without `run-gates.sh`, and `pooled@1x2` under the
+arms that set `SELFTEST_OUTER_WIDTH=1` — every row an arm appends at run time seeded in that arm's
+setup under the token it runs at; the readings seeded are sized so the `SELFTEST_WALL=10` kill arm
+and the `SELFTEST_WALL=5` below-largest arm stay reachable; every new arm's sleep at most 3 s) ·
+`tools/gate-legs.json` and `tools/run-gates/selftest-budgets.txt`'s `run-selftests self-test` row
+(the leg is at `ceiling: 300` and its last ledger row is `300.333 fail`, exit 124 — killed at its
+own bound before this unit adds an arm; both are re-declared at the build's final gate pass from
+that pass's observed wall, pasted, since the ruling forbids the observing run now) ·
+`tools/run-gates/selftest-pooled-evidence.txt` (new, tracked, names row NAMES and no path, so it
+takes no `install-prefix-carried.txt` row) · `tools/run-gates/kit.toml` (the `project-owned` rule)
+· `tools/run-gates/selftest-budgets.txt` (the retired factor header) · the four dark DoD carriers ·
+`tools/unattended/run-unattended-gates.sh` (its `st` follows parity; the summary it prints) ·
+`memory/guides/SESSION-KICKOFF.md` (`run-selftests.sh` is on its `watch:` line, so `last-audit` is
+re-stamped in the same commit; no body edit) · this build's records.
 
 ## 5. Production-readiness checklist
 
@@ -215,78 +262,92 @@ flip) · this build's records.
 - perf / scale — the pooled path becomes the recorded kit-work DoD only at the build's landing; its
   wall clock is whatever the final pass measures, graded rather than hand-run from then on. The
   flip REMOVES the serial self-test pass from the DoD (`--all --serial` becomes `--checks`) rather
-  than adding a pooled one beside it.
+  than adding a pooled one beside it. The `run-selftests self-test` leg is already killed at its
+  300 s ceiling before this unit; its re-declaration is owed at the final pass, from that pass.
 - error / empty / loading states — a row with no evidence under this node and token REFUSES the
-  pooled run by name; a calibration run prints that it graded nothing and reds on a killed row; an
-  evidence file that will not parse refuses rather than defaulting; `--calibrate` off `--pooled`
-  refuses; a node with no registry row refuses; `--check` reds a malformed, duplicated or orphaned
-  evidence row.
+  pooled run by name; a calibration run prints that it graded nothing and reds on a walled row; an
+  evidence file that will not parse refuses rather than defaulting; an absent margin file refuses;
+  `--calibrate` off `--pooled` refuses; a node with no registry row refuses naming the user;
+  `--check` reds a malformed, duplicated or orphaned evidence row; a MISMATCH names both pairs and
+  the acceptance.
 - observability — every pooled verdict names the reading, token, node and date it was bounded by
-  and which term of the bound won; the pooled summary counts killed and rc-mismatched rows
-  separately; the calibrate prints its derived wall and which term won.
-- risks — the evidence is monotone over whatever was observed, so a calibration taken on a loaded
-  box sets a loose bound for that row until `--reset`; a first reading taken on a quiet box is
-  raised by the next `--calibrate`, which runs every row; a fast red cannot bound a row below its
-  serial budget. The direction NOT covered: a reading taken on a day slower than any later day is
-  never lowered except by `--reset`, and that is the monotone rule's price, stated.
+  and which term of the bound won; the pooled summary counts killed, walled, unrun and mismatched
+  rows separately; the calibrate prints its derived wall and which term won and counts walled rows.
+- risks — seconds are monotone over whatever was observed, so a calibration taken on a loaded box
+  sets a loose bound for that row until `--reset`; a first reading taken on a quiet box is raised
+  by the next `--calibrate`; a fast red cannot bound a row below its serial budget and cannot match
+  a baseline with a non-zero `fails`. The direction NOT covered: a reading taken on a day slower
+  than any later day is never lowered except by `--reset`, and that is the monotone rule's price,
+  stated. A mismatch after a genuine repair is one `--calibrate` away and says so.
 - testing — the runner's self-test gains arms for: the no-evidence refusal; the foreign-node
-  refusal; the calibrate mode grading nothing; a bound derived from a staged evidence row, with the
-  serial-budget floor taking over for a tiny reading; the killed-row RED with no reading written;
-  the monotone raise and the `--reset` lowering; `--calibrate` off `--pooled` refusing; the
-  unparseable file refusing; `--check` redding a duplicated key and an orphaned row; the wall
-  derived from evidence bounds and the below-largest refusal against it; a calibrate over a clean
-  fixture reporting `fingerprint MATCHED` with the file changed; the pooled summary counting a
-  killed row and an rc-mismatched row separately. Each observed RED first.
-- migration — the seven carriers gain the dark spelling in this unit, reversible by one line each;
+  refusal; the no-registry-row refusal; the absent-margin refusal; the calibrate mode grading
+  nothing; a bound derived from a staged evidence row, with the serial-budget floor taking over for
+  a tiny reading; the walled-row RED with no reading written; the monotone raise of seconds with
+  rc and fails following the latest reading; `--reset <row>` lowering exactly that row and
+  narrowing the calibrate; `--reset` off `--calibrate` and on an absent row refusing; `--calibrate`
+  off `--pooled` refusing; the unparseable file refusing; `--check` redding a duplicated key, a
+  seven-field row and an orphaned row; the wall derived from evidence bounds and the below-largest
+  refusal against it; a calibrate over a clean fixture reporting `fingerprint MATCHED` with the
+  file changed; the parity verdict — a red-by-design row with a matching (rc, fails) exits 0 under
+  `--pooled`, a mismatching one exits 1, a row exiting 1 in under a second with zero `FAIL` lines
+  against a baseline of three is `MISMATCH`; the summary counting a killed, a walled, an unrun and
+  a mismatched row each under its own word, with the landing predicate FALSE on each. Each observed
+  RED first.
+- migration — the four carriers gain the dark spelling in this unit, reversible by one line each;
   the flip is the build's landing step and reverts the same way.
-- user docs — the runner's `--help` names `--calibrate` and `--reset`; the kit runner's names the
-  dark spelling, the landing order, and that `--selftests --serial` is the cost pass on demand.
+- user docs — the runner's `--help` names `--calibrate` and `--reset` and the parity question; the
+  kit runner's names the dark spelling, the landing order, and that `--selftests --serial` is the
+  cost pass on demand.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When a fixture row has a reading in `selftest-pooled-evidence.txt` under the fixture's
-  condition token and node, `run-selftests.sh --pooled` bounds it at `max(serial budget, reading)`
+  condition token and tag, `run-selftests.sh --pooled` bounds it at `max(serial budget, reading)`
   plus the fixture `ceiling-margin.txt`'s headroom, prints the reading, token, node, date and which
   term won, and the run's wall line is `ceil(sum of bounds / OUTER)` floored at the largest bound;
-  and a fixture row whose seeded reading is far below its serial budget is bounded from the budget.
+  a fixture row whose seeded reading is far below its serial budget is bounded from the budget; and
+  with the margin file removed the run REFUSES naming it.
   `fixture:` the runner's own test fixture with staged evidence rows, run by
   `bash tools/run-gates/run-selftests.test.sh`; no real suite runs.
   Red when: the bound or the wall is the serial budget times any factor, the verdict names no
-  reading, or a tiny reading bounds a row below its serial budget.
-- **AC2** — When a fixture row has NO reading under this node and token, `run-selftests.sh --pooled`
+  reading, a tiny reading bounds a row below its serial budget, or a pooled run proceeds with the
+  margin file absent.
+- **AC2** — When a fixture row has NO reading under this tag and token, `run-selftests.sh --pooled`
   REFUSES naming the row, the token and `--calibrate`, and executes no suite; a row evidenced under
-  a FOREIGN node refuses the same way; and a node that resolves to no registry row refuses naming
-  the user.
+  a FOREIGN tag refuses the same way; and with the fixture charter's registry row deleted, the run
+  refuses naming the user.
   `fixture:` as AC1.
   Red when: it runs the row under any bound, which is a factor wearing a refusal's name.
 - **AC3** — When `run-selftests.sh --pooled --calibrate` runs over the fixture rows, each is bounded
   by the serial-sum wall only, no `OVER BUDGET` and no `TIMEOUT` verdict is printed, each completed
-  row's reading is written with its token, node and rc after `fingerprint MATCHED`, an existing row
-  is raised and never lowered, and the summary says `calibrated <n> row(s), <r> red, graded none`;
-  and when one fixture row sleeps past the wall, that row writes NO reading, is named, and the run
-  exits RED with `<k> killed` in its summary.
-  `fixture:` as AC1, inside this unit; the real population at the build's landing, step (1) of S4.
+  row's reading is written with its token, tag, rc and `fails` after `fingerprint MATCHED`, a second
+  calibrate with a lower reading and a different rc updates rc and `fails` and not seconds, and the
+  summary says `calibrated <n> row(s), <r> red, graded none`; and when one fixture row sleeps past
+  the wall, that row writes NO reading, is named, and the run exits RED with `<w> walled` in its
+  summary.
+  `fixture:` as AC1, inside this unit; the real population at the build's landing, step (1) of S5.
   `cost:` at the landing, one pooled pass of the population `--kit tools/unattended --list`
   resolves under the serial-sum wall, its longest row the floor of that pass.
-  Red when: a calibration prints a verdict, a killed row's seconds land in the file, a second
-  calibrate with a lower reading lowers a row, the write lands inside the fingerprinted window, or
-  the real pass kills a row and the landing has no record naming it.
+  Red when: a calibration prints a verdict, a walled row's seconds land in the file, a second
+  calibrate with a lower reading lowers seconds, the write lands inside the fingerprinted window,
+  or the real pass walls a row and the landing has no record naming it.
 - **AC4** — When `run-selftests.sh --rank` runs in the fixture after a calibrate, it exits 0; and on
   the real tree `grep -c pooled@ tools/run-gates/selftest-budgets.txt` is 0 before and after the
   unit, and `--rank`'s unbacked list is the same list before and after.
   `fixture:` as AC1 for the first half; a grep and a diff on the real tree for the second.
   Red when: a `pooled@` token appears in the budget file, or the unbacked list moved.
-- **AC5** — When the carrier lines the S4 predicate yields are read as text after this unit's
-  commit, seven name `--pooled after calibration` beside `--serial` and `AGENTS.md:519` is
-  unchanged; and at the build's landing, `bash tools/unattended/run-unattended-gates.sh --pooled` on
-  the merged tree over the population `--kit tools/unattended --list` resolves prints a pooled
-  summary with `killed 0`, `rc-mismatched 0` and `fingerprint MATCHED`, pasted, and the flip commit
-  follows it — that half owed until then, in the amended form.
-  `figure:` the carrier count is DERIVED by the S4 predicate at build time and pasted in the ledger.
+- **AC5** — When the lines the S5 predicate yields are read as text after this unit's commit, the
+  four DoD carriers name `--pooled after calibration` beside `--serial` and the four pointers are
+  byte-identical to BASE; and at the build's landing, `bash tools/unattended/run-unattended-gates.sh
+  --pooled` on the merged tree over the population `--kit tools/unattended --list` resolves prints
+  GREEN with a summary of `killed 0 · walled 0 · unrun 0 · mismatched 0` and `fingerprint MATCHED`,
+  pasted, and the flip commit follows it with both predicate hit lists and the post-commit
+  DoD-phrase re-run's empty result pasted — that half owed until then, in the amended form.
+  `figure:` both sets are DERIVED by the S5 predicates at build time and pasted in the ledger.
   `cost:` one real pooled pass on the merged tree, at the landing.
-  Red when: a DoD line names `--pooled` alone before the pasted summary, `AGENTS.md` moved, the
-  landing pass kills or rc-mismatches a row and the flip lands anyway, or after the flip
-  `kit.toml:126` still runs the self-tests.
+  Red when: a DoD line names `--pooled` alone before the pasted GREEN, any pointer moved, the
+  landing pass is not GREEN and the flip lands anyway, after the flip `kit.toml:126` still runs the
+  self-tests, or the post-commit DoD-phrase re-run names `--serial` or `landed dark`.
 - **AC6** — When the existing `--serial` arms of `run-selftests.test.sh` run after this unit, they
   are GREEN unchanged: the serial mode still issues `OVER BUDGET` cost verdicts, because this unit
   touched no serial path.
@@ -302,11 +363,26 @@ flip) · this build's records.
   `fixture:` as AC1.
   Red when: any of them runs a row or writes a reading.
 - **AC9** — When `run-selftests.sh --check` runs over an evidence file with a duplicated
-  (row, token, node) key, a six-field row, a row whose node is no registry tag, or a row naming no
-  declared budget row, it REDS naming the line; and `--pooled` over a file that will not parse
-  REFUSES naming the file.
+  (row, token, node) key, a seven-field row, a row whose node is no tag the registry carries, or a
+  row naming no declared budget row, it REDS naming the line; and `--pooled` over a file that will
+  not parse REFUSES naming the file.
   `fixture:` as AC1.
   Red when: `--check` is green over any of the four, or `--pooled` defaults past the parse.
+- **AC10** — When `run-selftests.sh --pooled --calibrate --reset <row>` runs in the fixture, exactly
+  that row's seconds are lowered to the new reading, the calibrate ran that row and no other, and
+  the decision is printed; `--reset` off `--calibrate`, and `--reset` naming a row the file lacks,
+  each REFUSE by name.
+  `fixture:` as AC1.
+  Red when: any other row moves, the calibrate runs the whole population, or the reset runs silently.
+- **AC11** — When `run-selftests.sh --pooled` runs in the fixture over a red-by-design row whose
+  (rc, `fails`) matches its evidence row, it renders `ok (rc 1, 3 FAIL matched)` and the run exits
+  0; over a row whose pair differs it renders `MISMATCH` naming both pairs and the acceptance, and
+  exits 1; a row exiting 1 in under a second with zero `FAIL` lines against a baseline of three is
+  `MISMATCH`; and the summary line prints `killed`, `walled`, `unrun` and `mismatched` each from
+  its own list, one fixture row staged into each class, the run RED on every one.
+  `fixture:` as AC1.
+  Red when: a red-by-design row with a matching pair exits 1, a mismatching pair exits 0, a fast
+  crash reads as matched, or any non-completion class is absent from the summary.
 
 ## 7. Gates
 
@@ -323,9 +399,14 @@ declared `GATE_CMD` (`bash tools/run-gates/run-gates.sh`, bare): `run-selftests 
 `run-gates adopter e2e`, `profile-bar selftest`, `push-main self-test`, `check-wiring self-test` —
 `chunk: selftests` or `subject: kit`, written `ondemand` by the bare bar since the owner's 2026-08-27
 ruling. `run-selftests self-test` is the ONLY leg that executes the fixture arms behind AC1, AC2,
-AC6, AC7, AC8, AC9 and the fixture halves of AC3 and AC4, so the build's final gate pass runs the
+AC6 through AC11 and the fixture halves of AC3 and AC4, so the build's final gate pass runs the
 kit-work DoD `AGENTS.md` names, `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
 and pastes its verdict beside `gates-green` in the landing record rather than assuming it inside.
+**That leg is already killed at its own 300 s ceiling** (its last ledger row, `300.333 fail`, exit
+124) before this unit adds an arm, so the final pass also pastes the leg's new ledger row and
+re-declares its ceiling in `gate-legs.json` and its budget row in `selftest-budgets.txt` from that
+observed wall, with the reason beside each — the observing run the re-declaration needs is the one
+the ruling defers, so it cannot be taken at the DoR.
 
 New arm: `tools/run-gates/run-selftests.test.sh` · the arms §5 testing lists, each staged RED then
 unstaged, over the rebuilt fixture · every pooled arm the factor arithmetic reached is RE-CUT to the
@@ -347,20 +428,45 @@ suite's own, up by the arms added and down by the one retired, both counts deriv
 - **F3 · Refuse or fall back for an uncalibrated row?** RESOLVED (agent, 2026-09-14, delegated):
   REFUSE, and retire the factor so nothing survives to fall back on. A fallback is the bound that
   killed 14 of 58, and a refusal names what to type.
-- **F4 · Where does the flip land?** RESOLVED (agent, 2026-09-14, delegated): dark in this unit,
-  flipped as the build's landing step after the pasted pooled summary on the merged tree. The
-  alternative — a DoD line naming a command with no completing run — is the shape unit 4 AC7 reds.
+- **F4 · Where does the flip land?** RESOLVED (agent, 2026-09-14, delegated): dark in this unit on
+  the four DoD carriers, flipped as the build's landing step after the pasted parity GREEN on the
+  merged tree. The alternative — a DoD line naming a command with no completing run — is the shape
+  unit 4 AC7 reds.
 - **F5 · Which wall bounds a calibration?** RESOLVED (agent, 2026-09-14, delegated): the SUM of the
   selected rows' serial budgets, undivided, `SELFTEST_WALL` tightening only. The divided form,
   `ceil(sum / OUTER)` floored at the largest budget, was rejected at round 2 because the tree's own
   sweep record kills it (3860 s against a 7722 s driver row at width 8); the profile row is the
   borrow `TOOL-aPooledSweep-1` rev-3 refused; a REQUIRED `SELFTEST_WALL` would put a typed number
   in the DoD.
-- **F6 · Is GREEN the landing criterion?** RESOLVED (agent, 2026-09-14, delegated): no — eight of
-  the fourteen rows are red by design (unit 3 AC11), so the driver exits 1 on a perfect pass. The
-  criterion is the pooled summary's `killed 0`, `rc-mismatched 0` and `fingerprint MATCHED`.
+- **F6 · Is GREEN the landing criterion?** RESOLVED (agent, 2026-09-14, delegated): YES, once the
+  pooled verdict means parity (S4). Round 2's answer — no, because eight rows are red by design and
+  the driver exits 1 on a perfect pass — was true of the exit code as it stood and would have left
+  the recorded DoD command printing RED on success forever; round 3 found the summary tokens that
+  replaced it counted one of the runner's three non-completion classes. Re-basing the exit on parity
+  answers both: GREEN is the word, and it is earned only when every row completed and matched.
 
 ## 9. Revision log
+
+- rev-5 · 2026-09-14 · §1 · §2 S1 through S5 · §3 · Edges · §4 · §5 · §6 AC1 through AC11 · §7 ·
+  F4 · F6 · §10 · folded spec-audit round 3 (BLOCKED, 1 blocker, 13 highs, 5 mediums, 1 low, 20
+  confirmed rows in 12 defects, precision 0.44, CONVERGING from 2). The lever: the pooled verdict
+  is now PARITY (new S4) — (rc, `^FAIL` count) against the calibrated baseline, the exit derived
+  from `killed + walled + unrun + mismatched + soundness`, all four counts on the summary from the
+  lists the runner already keeps — which makes GREEN the landing criterion again and dissolves the
+  summary-token witness that counted one of three non-completion classes (B1), the post-flip
+  carriers still promising a GREEN the old exit could not print (H2, M3), and the recorded DoD
+  command printing RED on success forever (H3). The `^FAIL` count is the positive artifact beside
+  rc, so a 0.3 s crash exiting 1 cannot match a baseline of three (H4); rc and fails follow the
+  LATEST reading while seconds stay monotone, a mismatch names its acceptance, and `--reset <row>`
+  narrows the calibrate and gets AC10 (H5, M1). The carrier predicate's eight lines are classified
+  by ROLE: four DoD carriers go dark and flip, four pointers are byte-unchanged at both steps — the
+  `SESSION-KICKOFF.md:169` re-wording and the `AGENTS.md:519` swap withdrawn, the manifest measured
+  10 under its cap (H1). The fixture gets a charter stub with one registry row so the tag resolves
+  there (H6, M4). The `run-selftests self-test` leg is named as already killed at its 300 s ceiling,
+  its re-declaration owed at the final pass from that pass, `gate-legs.json` and its budget row in
+  Files touched (H7). The absent-margin refusal gets its arm and AC1's red-when (M2); the oracle
+  cite is unit 3 AC6 and the README's rule, not AC11 (M5); the typed `three` is dropped (L1).
+
 
 - rev-4 · 2026-09-14 · §1 · §2 S1 through S4 · §3 · §4 · §5 · §6 AC1 through AC9 · §7 · F5 · F6 ·
   §10 · folded spec-audit round 2 (BLOCKED, 2 blockers, 15 highs, 7 mediums, 1 low, 25 confirmed
@@ -439,17 +545,23 @@ suite's own, up by the arms added and down by the one retired, both counts deriv
 - **The parts of that rule this spec now carries by name**, because round 1 found the reuse was
   the file's header and not the rule: `read_runs` counts completed runs only (`derive-ceilings.py`,
   the text `may have failed fast`); `--write` raises every measured row monotone; `--reset <leg>` is
-  the one lowering path; `GOV_NODE` is its node spelling, which the runner reuses with the hostname
-  as the fallback the script does not have (it defaults to `a`, which is wrong on every other node
-  and is not reused).
+  the one lowering path; `GOV_NODE` is its node spelling, which the runner reuses with the registry
+  table as the fallback the script does not have (it defaults to `a`, which is wrong on every other node
+  and is not reused; the runner's fallback is the registry table, never a hostname).
 - **The `ok`-only clause of that rule is DEPARTED from**, by name: unit 3's shard rows exit 1 when
   complete, so an ok-only reader refuses them forever; the replacement is the serial-budget floor
   under the bound, which makes a fast red harmless. Round 2 caught the paraphrase claiming the
   clause was reused; it is not.
 - **The node resolver is `tools/drift-audit/drift_report.py`'s `_resolve_node_tag`** — `USERNAME`
-  or `USER` against the charter's §2 registry table — whose rule S3 reuses; `TOOL-aCollapsedScan-9`
-  (OPEN) names the per-node reading as a candidate. `derive-ceilings.py`'s `GOV_NODE ... or "a"`
-  default is the same class and is a backlog follow-up, not this unit's.
+  or `USER` against the charter's §2 registry table, read from the charter file at the repo root
+  the way `run-gates.gov.test.sh` spells it — whose rule S3 reuses, refusing where it returns
+  nothing; `TOOL-aCollapsedScan-9` (OPEN) names the per-node reading as a candidate.
+  `derive-ceilings.py`'s `GOV_NODE ... or "a"` default is the same class and is a backlog follow-up,
+  not this unit's.
+- **The completion oracle is unit 3's AC6 and the build README's rule** — the `FAIL` line set plus
+  the executed count — and the `^FAIL` count S2 records is the cheap half of it; the
+  `ab-arm-never-did-the-work` gotcha is the class. The runner's three non-completion lists at the
+  text `killed=0; walled=""; unrun=""` are reused as the summary's counts rather than re-derived.
 - **The carrier-parity arm** round 1 asked for has its home in `govkit selfcheck`, the one reader of
   every `kit.toml`, or `tools/check-playbook-parity.sh`, whose job is retyped constants against the
   source that owns them — named here and not built by this unit. The `unattended skill wiring` leg
