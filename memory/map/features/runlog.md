@@ -2,11 +2,11 @@
 
 ```toml
 feature = "runlog"
-title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, and the one redaction table free text passes through"
+title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, and the extractor that turns a session's transcripts into structural events"
 status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
-  "TOOL-dLoggedFlight-5"]
+  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line"]
@@ -72,6 +72,18 @@ alternation was measured to change which rules match once inline flags go global
 claim is a COUNT: over a generated population, the wrapped patterns' searches equal the hint-matched
 pairs, and the wall time is printed report-only.
 
+**The extractor keeps STRUCTURE and no free text, and it streams.** Transcripts hold the rest of a
+run — every call, owner turn, compaction, limit and token — but only on the node that ran it, and the
+owner's split puts extracts under the user profile, where on node `d` a sandbox group can read them.
+So a command is classified in memory and dropped, labels survive only token-shaped, and the store
+lives outside every repository, keyed by the git common dir so all worktrees of a clone share one.
+The reader holds one parsed record per open file, which the self-test counts through the one parse
+seam over 20,000 generated records, with a hold-everything reader through the same counter as its
+liveness. A keepalive is JOINED to its `CronCreate` rather than matched by wording, because the
+wording drifted and a prefix missed fires the join found. The self-test's own `main` aims every
+ambient root at a decoy before any arm runs, since an arm that forgot one redirection would otherwise
+read or write the owner's real store.
+
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
@@ -84,8 +96,11 @@ pairs, and the wall time is printed report-only.
   in this kit's fixtures, so a producer spec that changes its data model changes the golden line in
   the same pass and the self-test reds on any key the grammar would refuse.
 - The consumers — the extractor, the run model and the committed record, units 6, 8 and 9 — import
-  `runlog_lib` rather than re-parsing. The extractor, `TOOL-dLoggedFlight-6`, is specced to run
-  command heads and printed narration through `render_redacted` and to persist no free text at all.
+  `runlog_lib` rather than re-parsing. The extractor, `TOOL-dLoggedFlight-6`, shipped first: it
+  reads session ids off the driver journal's `start` lines through `read_journal`, runs driver
+  command heads and printed narration through `render_redacted`, and persists no free text at all.
+  The run model, `TOOL-dLoggedFlight-8`, joins its events into a run's timeline, and the
+  question-answering skill, `TOOL-dLoggedFlight-12`, prints narration through its `narration` verb.
 - The gate runner's own `redact()` stays separate: it masks leg output on write, under its own stated
   scope, and this table does not replace it.
 - `.memory-tree.conf` — read, never written. The reader is a narrow copy of the sourced-conf grammar,
@@ -105,6 +120,10 @@ pairs, and the wall time is printed report-only.
 - **Redaction misses what it has no shape for.** A class nobody listed, a bare value printed with no
   key beside it, and a head truncated before a row's minimum length all pass through. The README lists
   them, and a new class is one id, one row and its positive.
+- **The transcript format is not a contract.** An unknown record type is counted by name, but a
+  renamed key reads as absent, and the fixtures are synthetic shapes written from key-and-count
+  measurements, never copied. The classifier is not a shell: `bash -c`, `eval` and a quoted `$(…)`
+  hide the call inside them. `--discover` is a heuristic and says so.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
@@ -122,3 +141,7 @@ without spelling its root.
 
 seam: `runlog_lib.render_redacted` + `scan_secrets` — reuse for any free text a tool prints or
 classifies; extend via one row in `redaction.tsv` and its id in `CLASS_IDS`, never a second redactor.
+
+seam: `extract.extract_session` + `read_records` — reuse for any consumer of a Claude Code session's
+transcripts; extend via a new member of `KINDS` or `CLASSES` with a fixture scenario producing it,
+which the self-test demands in both directions, never a second transcript reader.

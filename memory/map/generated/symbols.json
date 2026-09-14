@@ -188,6 +188,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "SessionTree",
+      "kind": "class",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "Shortlist",
       "kind": "class",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -206,6 +211,11 @@
       "id": "StructureDrift",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "TrackedRecord",
+      "kind": "class",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "addRoot",
@@ -393,6 +403,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_arm_env",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_backlog_rows_outliving_specs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -441,6 +456,11 @@
       "id": "build_data_dir",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "build_decoy",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_dense",
@@ -523,6 +543,16 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_planted",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_projects",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_ps_w_fixture",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -558,6 +588,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_scenario",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_scope",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -571,6 +606,11 @@
       "id": "build_self_chain",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "build_session_tree",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "build_source_cited_ids_with_no_record",
@@ -606,6 +646,11 @@
       "id": "build_ts_reader",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "build_usage",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "build_walk",
@@ -1053,6 +1098,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_extract",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "cmd_for_diff",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -1076,6 +1126,11 @@
       "id": "cmd_measure",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "cmd_narration",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "cmd_plan",
@@ -1473,6 +1528,11 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "derive_tool_class",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1658,6 +1718,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "extract_narration",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "extract_phrases",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -1676,6 +1741,16 @@
       "id": "extract_section",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_segments",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "extract_session",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "extract_text",
@@ -2438,6 +2513,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "measure_tree",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "measure_vocab_cells",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2643,6 +2723,11 @@
       "file": "tools/process-monitor/census.py"
     },
     {
+      "id": "parse_record",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "parse_registry",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2656,6 +2741,11 @@
       "id": "parse_spec",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "parse_time",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "parse_tokens",
@@ -2711,6 +2801,11 @@
       "id": "print_last",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "print_measure",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "print_populations",
@@ -2903,6 +2998,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_events",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_evidence",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -2973,6 +3073,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_leaves",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_legs",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -2981,6 +3086,11 @@
       "id": "read_lines",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "read_listing",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_live_census",
@@ -3008,6 +3118,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_records",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "read_registry",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -3028,6 +3143,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_session_ids",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -3046,6 +3166,11 @@
       "id": "read_stem",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_store_json",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_suggestion",
@@ -3073,9 +3198,19 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "read_tools",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_tracked",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_tree_text",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_ts_angle_end",
@@ -3373,6 +3508,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "render_quoted",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "render_redacted",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -3628,6 +3768,16 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "resolve_projects_root",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "resolve_repo_key",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "resolve_repo_root",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -3673,6 +3823,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "resolve_session_tree",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "resolve_shell_argv",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3691,6 +3846,11 @@
       "id": "resolve_source",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
+    },
+    {
+      "id": "resolve_state_dir",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "resolve_template_path",
@@ -3918,6 +4078,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "run_runlog",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -4013,9 +4178,29 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "scan_leaks",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "scan_module_constants",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_named",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_owner_turns",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "scan_preflights",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
     },
     {
       "id": "scan_processes",
@@ -4681,6 +4866,66 @@
       "id": "test_explicit_kill_still_obeys_membership",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_extract_ac10_members",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac1_session_ids",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac2_dedupe_order",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac3_owner_turns",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac4_background_end",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac5_repo_key",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac6_narration",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac7_discover",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac8_streaming",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_ac9_usage",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_decoy_catches_a_forgotten_root",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_extract_edges",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_extract_failure_refuses",
@@ -5568,9 +5813,19 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "write_session",
+      "kind": "function",
+      "file": "tools/runlog/extract.py"
+    },
+    {
       "id": "write_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "write_transcript_lines",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "zero_record_diagnosis",

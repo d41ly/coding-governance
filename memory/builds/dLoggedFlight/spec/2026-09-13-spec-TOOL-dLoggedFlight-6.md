@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md) | research | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
+| [2026-09-14-build-TOOL-dLoggedFlight-6-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-dLoggedFlight-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md) | journal | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
@@ -39,14 +40,16 @@ streamed, located through the session ids the driver recorded, and kept under th
   - the end of a background or async call, taken from the first record carrying its `<tool-use-id>`;
   - owner turns, as the union of human- or null-origin typed records, `queued_command` attachments of
     human origin, and interrupts, without the two `<local-command-…>` echoes;
-  - keepalive fires, joined to a same-session `CronCreate` prompt rather than matched by wording;
+  - keepalive fires, joined to the prompt of a `CronCreate` in the same session's main file rather
+    than matched by wording;
   - compactions, API errors, session limits, hook denials, workflow runs and agent spawns;
   - token usage, deduplicated by `requestId` and split into main loop, direct agents and workflow agents.
 - **S4** No free text is persisted: no command text, no narration, no owner-turn text, no tool output.
   A tool call keeps only its class and flags. The classes are driver verb (verb and slug), git
-  commit, merge or push, bar run, test, read, write, edit, workflow, agent, cron and ask. The flags
-  are destructive git and a piped driver call. Workflow and agent labels are kept only when they
-  match `^[A-Za-z0-9._:-]{1,64}$`. Observed by AC3 and AC10.
+  commit, merge or push, bar run, test, read, write, edit, workflow, agent, cron and ask, and the
+  residual `other` for a call none of them names. The flags are destructive git and a piped driver
+  call. Workflow and agent labels are kept only when they match `^[A-Za-z0-9._:-]{1,64}$`. Observed by
+  AC3 and AC10.
 - **S5** Output to the user-profile store: `%LOCALAPPDATA%\runlog\<repo-key>\sessions\<sid>.json` on
   Windows, `~/Library/Application Support/runlog/<repo-key>/` on macOS, and
   `${XDG_STATE_HOME:-~/.local/state}/runlog/<repo-key>/` elsewhere, with `RUNLOG_STATE_DIR` as an
@@ -98,11 +101,77 @@ glob by session id finds them, and a dir predicted from the repo path would not.
 
 ### Data model
 
-One JSON object per session: `{schema: 1, sid, tree_bytes, engine_versions, coverage: {records,
-unknown_types, dup_uuids}, events: [...]}`. An event is `{t, kind, ...}`, with `kind` one of `tool`,
-`tool_end`, `owner`, `keepalive`, `compact`, `api_error`, `limit`, `denial`, `workflow`, `agent` and
-`usage`. The self-test asserts that every listed `kind`, and every S4 class and flag, has a fixture
-producing it, so a new kind without a fixture reds.
+One JSON object per session: `{schema: 1, sid, attribution, slugs, tree_bytes, engine_versions,
+coverage, events: [...]}`. `attribution` is `driver`, `given` or `heuristic` (S1, a `--session`
+argument, S7), and `slugs` lists the slugs it was attributed to. `engine_versions` counts records per
+engine `version`. `coverage` counts `records`, `files`, `torn` lines, `dup_uuids`, `unknown_types` by
+name, `untimed` records that would have yielded an event, `wf_missing` workflow runs with no
+`wf_*.json`, `escaped` files outside the session dir, `unreadable` files and the `copies` the glob
+found, and names the `tree` state, `present` or `absent`. An event is `{t, kind, ...}`, with `kind` one
+of `tool`, `tool_end`, `owner`, `keepalive`, `compact`, `api_error`, `limit`, `denial`, `workflow`,
+`agent` and `usage`. `t` is epoch seconds. `src` names the split, `main`, `agent` or `workflow`. The
+self-test asserts that every listed `kind`, and every S4 class and flag, has a fixture producing it,
+so a new kind without a fixture reds. The fields per kind are:
+
+- `tool`: `src`, `call` (1-up per session), `tool`, `cls`, `flags`, `bg`, `end`, `dur`, `err`, `rc`,
+  and `verb` and `slug` for class `driver`. `rc` is the harness-visible status of a shell call, and
+  null on a background call, whose own status is its `tool_end`'s;
+- `tool_end`: `src`, `call`, `status`, `rc`;
+- `owner`: `via`, one of `typed`, `queued` and `interrupt`. `keepalive` carries nothing else;
+- `compact`: `src`, `trigger`, `pre_tokens`. `api_error`: `src`, `status`, `error`, `retry`. `limit`:
+  `src`, `limit_type`, `resets`;
+- `denial`: `src`, `call`, `reason`, and `hook`, true when the result leads with a hook's name;
+- `workflow`: `label`, `status`, `dur_ms`, `agents`, `tool_calls`, `tokens`. `agent`: `src`, `label`,
+  `depth`;
+- `usage`: `src`, `model`, `in`, `out`, `cache_read`, `cache_write`.
+
+### The rules the reader applies
+
+Measured on node `d` on 2026-09-14 over the local transcripts, by key and count only, with no text
+read into this record.
+
+- **Owner turns come from the main file only.** A `human` origin is a turn whatever its text. An absent
+  origin is a turn unless the record is meta, a compact summary, a `<local-command-…>` echo or a
+  `<task-notification>`, or is a keepalive fire. Every other origin, `task-notification`, `peer` and
+  `coordinator` among them, is not a turn. A sidechain agent's prompt carries no origin, which is why
+  the main-file rule exists.
+- **A keepalive fire is a null-origin record whose stripped text equals the prompt of an earlier
+  `CronCreate` call in the same session's main file.** The comparison is of hashes held in memory. A
+  fire lands in the main file, and reading only its calls keeps the extract, `scan_owner_turns` and
+  narration from disagreeing about one record.
+- **A background or async call** is one whose result carries `backgroundTaskId`, `isAsync` or
+  `async_launched`. Its end is the first record carrying its `<tool-use-id>`: a queue enqueue, an
+  absorbed attachment or a user record, whichever comes first. Its `rc` is the last `exit code N` in
+  the notification's summary, and its `status` the notification's own.
+- **A shell call's `rc`** is the `Exit code N` its result leads with, 0 on a result that is not an
+  error, and null otherwise.
+- **Usage keeps the largest value of each field across a `requestId`'s copies**, because later copies
+  carry a grown output count: 84,271 of 149,156 repeats grew. A request belongs to the split of its
+  first copy. A record in the main file marked `isSidechain` counts as a direct agent's.
+- **`limit` is an API error message carrying a quota whose status is `rejected`.** Every other API
+  error message, and a `system` record of subtype `api_error`, is `api_error`.
+- **A denial is a result whose record carries `toolDenialKind`, or whose text leads with
+  `PreToolUse:` or `PostToolUse:`.** Its `reason` is the denial kind.
+- **Classification reads a shell command after dropping heredoc bodies, splitting on unquoted
+  separators and keeping quoted text inside one word.** So a commit message naming `git push --force`
+  is not a push. An unquoted `(` or `)` separates like `;`, so a subshell's calls are seen, but a
+  `$(…)` inside quotes, `bash -c` and `eval` are not descended into. The class is the first of
+  driver, git push, git merge, git commit, bar and test that any segment RUNS: the word past its env
+  assignments, wrappers and interpreter, never a word it only names, so `grep` over the driver is not
+  a driver call. A command naming the driver is passed through `render_redacted` before its verb and
+  slug are read.
+- **Narration quotes every line under a gutter and prints a control character as its escape**, CRLF
+  folded first, so no transcript text can draw the frame's closing marker at column 0.
+- **Discovery reads the main files' shell calls only**, never a result or narration, and does not ask
+  which repository a session ran in.
+- **With no `RUNLOG_STATE_DIR`, no `LOCALAPPDATA` on Windows or no `HOME` elsewhere, the store refuses
+  by name.** A relative `RUNLOG_STATE_DIR` refuses too, since it would put extracts inside a tree git
+  can commit.
+- **The self-test's launcher is its own `main`.** It sets the five ambient roots to a decoy before any
+  arm runs and compares the decoy's listing across EVERY arm, not only the extractor's. After each arm
+  it also searches what the arm printed, and every file in the arm's own scratch by name and bytes,
+  for the canary's id. A liveness arm runs the command line against a second decoy with no
+  redirection, and sees the canary named, the listing change and the scratch search find the extract.
 
 ### Inventory
 
@@ -110,14 +179,18 @@ producing it, so a new kind without a fixture reds.
 |---|---|---|
 | `tools/runlog/extract.py` | module | none |
 | `resolve_session_tree`, `read_records`, `extract_session`, `build_usage`, `scan_owner_turns`, `extract_narration`, `resolve_state_dir`, `measure_tree` | functions | `py.function`, verb-led |
+| `resolve_projects_root`, `build_session_tree`, `parse_record`, `derive_tool_class`, `extract_segments`, `read_session_ids`, `scan_preflights`, `resolve_repo_key`, `write_session`, `parse_time` | functions | `py.function`, verb-led |
+| `SessionTree` | type | `py.type` |
 | `cmd_extract`, `cmd_narration` | CLI subcommands | reserved `cmd` |
+| `render_quoted`, `print_measure` | functions in `runlog.py` | `py.function`, verb-led |
 
 ### Files touched (estimate)
 
-`tools/runlog/{extract.py,runlog.py,selftest.py,README.md}`, and small synthetic transcript fixtures
-under `tools/runlog/fixtures/` with a `.json` or `.txt` extension, never `.jsonl`. Every planted
-credential in a fixture is a template expanded at test time, so the kit's own scan of
-`TOOL-dLoggedFlight-5` stays clean.
+`tools/runlog/{extract.py,runlog.py,selftest.py,README.md,kit.toml}`, and two synthetic fixtures,
+`fixtures/transcripts.json` holding one scenario per rule and `fixtures/tool-classes.json` holding
+one row per class and flag with its near misses, never `.jsonl`. The self-test writes each scenario's
+records into a scratch projects root as `.jsonl`. Every planted credential is a template expanded at
+test time, so the kit's own scan of `TOOL-dLoggedFlight-5` stays clean.
 
 ### Alternatives rejected
 
@@ -216,6 +289,18 @@ New arm: `tools/runlog/selftest.py` · each rule staged RED on its fixture · fl
 - rev-4 · 2026-09-13 · S8 · AC8 · folded round-3 spec audit M5 (a decoy tree the launcher aims the
   ambient roots at, graded by a whole-tree listing and a read canary, since a sentinel beside a write
   sees nothing).
+- rev-5 · 2026-09-14 · S4 · §4 · the build pass, before its code. S4: the closed class list gains the
+  residual `other`, since every call needs a class and observed tools such as `WebFetch` and
+  `ToolSearch` have none of the named ones. §4: the data model spells every coverage key §5 sends a failure to and every event's fields;
+  a new subsection states the reader's rules, measured by key and count over the local transcripts;
+  the inventory adds the helpers, and the fixtures are named. No criterion changed.
+- rev-6 · 2026-09-14 · S3 · §4 · the same build pass, resumed after a session limit, before its
+  remaining code. S3 and §4: the keepalive join reads the main file's `CronCreate` calls only, since
+  a join over agent files could call a record a keepalive in the extract and a turn in
+  `scan_owner_turns`. §4: the classification rule says what the code reads, the word a segment RUNS,
+  and that an unquoted `$(…)` splits like any separator where rev-5 said it was never descended into;
+  narration escapes control characters; the launcher also searches each arm's output and scratch for
+  the canary id; the inventory adds `render_quoted` and `print_measure`. No criterion changed.
 
 ## 10. Reuse audit
 

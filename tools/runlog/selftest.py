@@ -16,9 +16,17 @@ test time, from templates: no committed file carries a credential, and one arm s
 table to prove it. Each rule's pattern is also broken and widened in memory, so every positive and
 every negative arm is seen able to fail on every run, not only on the day it was written.
 
+The extractor arms (TOOL-dLoggedFlight-6) write synthetic transcripts from the fixtures into scratch
+projects roots and NEVER read or write a real store, in two layers. `main` aims the five ambient roots
+the extractor could fall back on at a DECOY tree holding a canary transcript, before any arm runs, and
+compares the decoy's whole listing across EVERY arm; each extractor arm then aims the roots it uses at
+its own scratch. An arm that forgets a redirection falls into the decoy, where the listing or the
+canary sees it, and one arm proves that by forgetting on purpose against a second decoy.
+
 Exit 0 = every arm passed and the assertion count met its floor · 1 = an arm failed or the count fell.
 """
 import dataclasses
+import hashlib
 import json
 import os
 import pathlib
@@ -30,23 +38,38 @@ import sys
 import tempfile
 import time
 import types
+import uuid
+import weakref
 
 HERE = pathlib.Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
 CLI = HERE / "runlog.py"
 sys.path.insert(0, str(HERE))
 
+import extract as rx  # noqa: E402
 import runlog_lib as rl  # noqa: E402
 
 # The count this suite executed when it landed. A block of arms stranded behind an early return
 # would still print "0 failed"; the floor is what makes that a red rather than a smaller green.
 # RAISED 183 -> 370 by TOOL-dLoggedFlight-5: the redaction arms run per row of the table, so a row
 # deleted from it lowers the count as well as redding the class comparison.
-ASSERTION_FLOOR = 370
+# RAISED 370 -> 591 by TOOL-dLoggedFlight-6: the extractor arms, and the three decoy checks `main`
+# runs after EVERY arm, so an arm function added or removed moves the count by four at least. Two of
+# them need a directory link, which every node makes: a symlink on POSIX and a junction on Windows.
+ASSERTION_FLOOR = 591
 
 PASS = []
 FAIL = []
 SCRATCH = []
+# What the extractor arms printed or wrote, collected so `main` can grade every arm against the decoy
+# canary without each arm remembering to.
+EMITTED = []
+DECOY = {"root": None, "sid": None}
+# The five ambient roots the extractor falls back on, and the decoy subdirectory each is aimed at.
+DECOY_VARS = (("HOME", "home"), ("USERPROFILE", "home"), ("LOCALAPPDATA", "local"),
+              ("XDG_STATE_HOME", "state"), ("CLAUDE_CONFIG_DIR", "claude"))
+TRANSCRIPTS = json.loads((FIXTURES / "transcripts.json").read_bytes())
+TOOL_CLASS_ROWS = json.loads((FIXTURES / "tool-classes.json").read_bytes())["rows"]
 
 # A hook runs this suite with GIT_DIR and GIT_INDEX_FILE pointing at the tree it guards. Every git
 # call below — the kit's own included — must see the SCRATCH tree instead, so the variables go.
@@ -1003,12 +1026,721 @@ def test_redact_edges():
           [(r.id, r.hints, "v" in r.pattern.groupindex) for r in ok], [("demo-rule", ("demo",), True)])
 
 
+# ================================================================ TOOL-dLoggedFlight-6 — the extractor
+# The ACn below are that unit's criteria, prefixed `extract` so they never read as the arms above.
+
+FIXTURE_PROJECT = "fixture-project"
+NARRATION_FROM, NARRATION_TO = "2026-09-13T10:00:30Z", "2026-09-13T10:02:00Z"
+# Typed here rather than imported from the CLI, so the frame arm compares against a second source.
+NARRATION_CLOSE = "==== END TRANSCRIPT TEXT ===="
+AC8_RECORDS = 20000
+AC8_SPLIT = (("main", 8000), ("agent", 6000), ("workflow", 6000))
+
+
+def write_transcript_lines(path, records):
+    """One record per line. A record given as a string is written VERBATIM, which plants a torn line."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [r if isinstance(r, str) else json.dumps(r) for r in records]
+    path.write_bytes(("\n".join(rows) + "\n").encode("utf-8"))
+
+
+def build_planted(value, plant):
+    """`value` with every marker in `plant` replaced, through every string leaf."""
+    if isinstance(value, str):
+        for marker, text in plant.items():
+            value = value.replace(marker, text)
+        return value
+    if isinstance(value, list):
+        return [build_planted(v, plant) for v in value]
+    if isinstance(value, dict):
+        return {k: build_planted(v, plant) for k, v in value.items()}
+    return value
+
+
+def build_scenario(projects, name, project=FIXTURE_PROJECT, drop=(), plant=None, sid=None):
+    """Write one fixture scenario as a session tree under `projects`; its session id comes back."""
+    scenario = TRANSCRIPTS["scenarios"][name]
+    if plant:
+        scenario = build_planted(scenario, plant)
+    sid = sid or str(uuid.uuid4())
+    home = pathlib.Path(projects) / project
+    keep = [r for r in scenario["main"] if isinstance(r, str) or r.get("uuid") not in drop]
+    write_transcript_lines(home / f"{sid}.jsonl", keep)
+    sdir = home / sid
+    for aid, agent in scenario.get("agents", {}).items():
+        write_transcript_lines(sdir / "subagents" / f"agent-{aid}.jsonl", agent["records"])
+        (sdir / "subagents" / f"agent-{aid}.meta.json").write_bytes(json.dumps(agent["meta"]).encode())
+    for key, agent in scenario.get("workflow_agents", {}).items():
+        run, aid = key.split("/")
+        write_transcript_lines(sdir / "subagents" / "workflows" / run / f"agent-{aid}.jsonl",
+                               agent["records"])
+        (sdir / "subagents" / "workflows" / run / f"agent-{aid}.meta.json").write_bytes(
+            json.dumps(agent["meta"]).encode())
+    for run, flow in scenario.get("workflows", {}).items():
+        (sdir / "workflows").mkdir(parents=True, exist_ok=True)
+        (sdir / "workflows" / f"{run}.json").write_bytes(json.dumps(flow).encode())
+    return sid
+
+
+def build_projects(prefix):
+    base = pathlib.Path(tempfile.mkdtemp(prefix=prefix))
+    SCRATCH.append(base)
+    projects = base / "projects"
+    projects.mkdir()
+    return base, projects
+
+
+def build_arm_env(base):
+    """The CLI's environment for one arm: EVERY root it resolves aimed under the arm's own scratch."""
+    env = dict(os.environ)
+    for var, sub in DECOY_VARS:
+        env[var] = str(base / "arm-roots" / sub)
+    env["RUNLOG_STATE_DIR"] = str(base / "store")
+    return env
+
+
+def run_runlog(args, cwd, env):
+    """The kit's CLI under `env`; what it printed is kept for the decoy canary check `main` runs."""
+    r = subprocess.run([sys.executable, str(CLI), *args], cwd=str(cwd), capture_output=True,
+                       text=True, encoding="utf-8", errors="replace", env=env)
+    EMITTED.extend((r.stdout, r.stderr))
+    return r
+
+
+def read_listing(root):
+    """Every path under `root` with its size and mtime: what an isolation check compares."""
+    root = pathlib.Path(root)
+    rows = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        for n in sorted(dirnames) + sorted(filenames):
+            p = pathlib.Path(dirpath) / n
+            try:
+                st = p.stat()
+            except OSError:
+                continue
+            rows.append((p.relative_to(root).as_posix(), st.st_size if p.is_file() else 0,
+                         st.st_mtime_ns))
+    return sorted(rows)
+
+
+def read_tree_text(root):
+    """Every file under `root`, decoded and joined — what a store is searched through."""
+    out = []
+    for p in sorted(pathlib.Path(root).rglob("*")):
+        if p.is_file():
+            out.append(p.read_bytes().decode("utf-8", "replace"))
+    EMITTED.extend(out)
+    return "\n".join(out)
+
+
+def build_decoy(root):
+    """A decoy tree for every ambient root, with a canary transcript whose session RUNS a preflight,
+    so a discovery pointed at it names the canary and an extract pointed at it writes into it."""
+    root = pathlib.Path(root)
+    for _var, sub in DECOY_VARS:
+        (root / sub).mkdir(parents=True, exist_ok=True)
+    sid = str(uuid.uuid4())
+    canary = TRANSCRIPTS["scenarios"]["discover-hit"]["main"]
+    canary = build_planted(canary, {"tFixture": "tDecoy"})
+    for projects in (root / "claude" / "projects", root / "home" / ".claude" / "projects"):
+        write_transcript_lines(projects / "decoy-project" / f"{sid}.jsonl", canary)
+    return sid
+
+
+def scan_named(roots, needle):
+    """The files under `roots` whose name or bytes hold `needle`. An extract is named for its session,
+    so a store that took the decoy's canary is found by its file name as well as by its contents."""
+    raw = needle.encode("ascii")
+    hits = []
+    for root in roots:
+        for dirpath, _dirnames, filenames in os.walk(root):
+            for n in filenames:
+                p = pathlib.Path(dirpath) / n
+                try:
+                    if needle in n or raw in p.read_bytes():
+                        hits.append(p.relative_to(root).as_posix())
+                except OSError:
+                    continue
+    return sorted(hits)
+
+
+def read_events(projects, name, **kw):
+    sid = build_scenario(projects, name, **kw)
+    tree = rx.resolve_session_tree(sid, projects)
+    return sid, tree, rx.extract_session(tree)
+
+
+def read_tools(session):
+    return {e["call"]: e for e in session["events"] if e["kind"] == "tool"}
+
+
+def read_leaves(value):
+    """Every string leaf holding whitespace: the free text a fixture carries."""
+    if isinstance(value, str):
+        return [value] if any(c.isspace() for c in value) else []
+    if isinstance(value, list):
+        return [s for v in value for s in read_leaves(v)]
+    if isinstance(value, dict):
+        return [s for v in value.values() for s in read_leaves(v)]
+    return []
+
+
+def scan_leaks(text, leaves):
+    """The leaves found in `text`, raw or JSON-escaped: one predicate for the arm AND its liveness."""
+    return [s for s in leaves if s in text or json.dumps(s)[1:-1] in text]
+
+
+def read_store_json(store, sid):
+    hits = list(pathlib.Path(store).rglob(f"{sid}.json"))
+    return json.loads(hits[0].read_bytes()) if hits else {}
+
+
+def test_extract_ac1_session_ids():
+    base, projects = build_projects("runlog-ac1-")
+    sid_a = build_scenario(projects, "order", project="a-dir-no-repo-path-predicts")
+    sid_b = build_scenario(projects, "discover-hit", project="another-dir")
+    sid_c = build_scenario(projects, "order", project="another-dir")
+    (base / "escape.jsonl").write_bytes(b'{"type": "user", "uuid": "escape-marker"}\n')
+    head = {"v": "1", "t": "1757770000.5", "p": "driver"}
+    lines = [
+        {**head, "ev": "start", "n": "1.1", "verb": "--status", "slug": "tFixture",
+         "sess.CLAUDE_CODE_SESSION_ID": sid_a},
+        {**head, "ev": "start", "n": "2.1", "verb": "--status", "slug": "tFixture",
+         "sess.ADOPTER_SESSION": sid_b},
+        {**head, "ev": "start", "n": "3.1", "verb": "--status", "slug": "tFixture",
+         "sess.CLAUDE_CODE_SESSION_ID": "../../escape"},
+        {**head, "ev": "start", "n": "4.1", "verb": "--status", "slug": "tFixture",
+         "sess.CLAUDE_CODE_SESSION_ID": sid_a.upper()},
+        {**head, "ev": "end", "n": "1.1", "verb": "--status", "slug": "tFixture",
+         "sess.CLAUDE_CODE_SESSION_ID": sid_c},
+        {**head, "ev": "start", "n": "5.1", "verb": "--status", "slug": "tOther",
+         "sess.CLAUDE_CODE_SESSION_ID": sid_c},
+    ]
+    clone_base, primary, _linked, made = build_scratch_clone()
+    check("extract AC1 setup: the scratch clone exists", made, 0)
+    root = rl.resolve_journal_root(primary)
+    root.mkdir(parents=True, exist_ok=True)
+    journal = root / "driver.log"
+    journal.write_bytes(("\n".join(rl.render_line(f) for f in lines) + "\n").encode("utf-8"))
+    sids, refused = rx.read_session_ids("tFixture", journal)
+    check("extract AC1: every UUID-shaped sess.* value of the slug's START lines is a candidate, "
+          "whatever the variable is called", sids, sorted([sid_a, sid_b]))
+    check("extract AC1: ...the traversal and the uppercase id are refused by shape and counted",
+          refused, 2)
+    check_true("extract AC1: ...an END line's id and another slug's id are not candidates",
+               sid_c not in sids)
+    try:
+        rx.resolve_session_tree("../../escape", projects)
+        msg = ""
+    except ValueError as exc:
+        msg = str(exc)
+    check("extract AC1: resolve_session_tree refuses an id holding ../ by its shape",
+          "not a session id" in msg, True)
+    tree = rx.resolve_session_tree(sid_a, projects)
+    check("extract AC1: a valid id finds its tree through the glob, under a dir no repo path names",
+          (tree.main.parent.name if tree.main else None, tree.copies),
+          ("a-dir-no-repo-path-predicts", 1))
+    before = read_listing(base)
+    env = build_arm_env(base)
+    r = run_runlog(["extract", "--slug", "tFixture", "--transcripts", str(projects)], primary, env)
+    rows = [json.loads(s) for s in r.stdout.splitlines() if s.strip()]
+    check("extract AC1: the CLI writes the two candidates and reports the refusals",
+          (r.returncode, sorted(x["sid"] for x in rows if x.get("state") == "written"),
+           "refused=2" in r.stderr), (0, sorted([sid_a, sid_b]), True))
+    after = [row for row in read_listing(base) if not row[0].startswith(("store", "arm-roots"))]
+    check("extract AC1: ...and writes nothing under the transcripts' scratch outside its store",
+          after, [row for row in before if not row[0].startswith(("store", "arm-roots"))])
+    stored = sorted(p.name for p in (base / "store").rglob("*.json"))
+    check("extract AC1: ...the store holds exactly the two extracts", stored,
+          sorted([f"{sid_a}.json", f"{sid_b}.json"]))
+    check_true("extract AC1: ...and nothing read from outside the root reached it",
+               "escape-marker" not in read_tree_text(base / "store"))
+    # Containment: a project dir that is a LINK out of the root. A symlink needs a privilege some
+    # nodes lack, so a junction is the fallback, and a node offering neither says so.
+    outside = base / "outside"
+    sid_e = build_scenario(outside, "order", project="linked-target")
+    link = projects / "linked"
+    made_link = ""
+    try:
+        os.symlink(outside / "linked-target", link, target_is_directory=True)
+        made_link = "symlink"
+    except (OSError, NotImplementedError):
+        try:
+            import _winapi
+            _winapi.CreateJunction(str(outside / "linked-target"), str(link))
+            made_link = "junction"
+        except (ImportError, OSError, AttributeError):
+            made_link = ""
+    if not made_link:
+        print("  skip extract AC1 containment: this node can make neither a symlink nor a junction, "
+              "so the escape arm is UNEXERCISED here")
+        return
+    try:
+        rx.resolve_session_tree(sid_e, projects)
+        msg = ""
+    except ValueError as exc:
+        msg = str(exc)
+    check(f"extract AC1: a valid id whose hit is a {made_link} out of the root is refused",
+          "outside the transcripts root" in msg, True)
+    # Among several sessions, the one refused for its location is COUNTED and the rest still land.
+    lines.append({**head, "ev": "start", "n": "6.1", "verb": "--status", "slug": "tFixture",
+                  "sess.CLAUDE_CODE_SESSION_ID": sid_e})
+    journal.write_bytes(("\n".join(rl.render_line(f) for f in lines) + "\n").encode("utf-8"))
+    r = run_runlog(["extract", "--slug", "tFixture", "--transcripts", str(projects)], primary, env)
+    rows = [json.loads(s) for s in r.stdout.splitlines() if s.strip()]
+    check(f"extract AC1: the CLI counts the {made_link}ed session as refused and still writes the two",
+          (r.returncode, sorted(x["sid"] for x in rows), "refused=3" in r.stderr,
+           "outside the transcripts root" in r.stderr), (0, sorted([sid_a, sid_b]), True, True))
+
+
+def test_extract_ac2_dedupe_order():
+    _base, projects = build_projects("runlog-ac2-")
+    _sid, _tree, session = read_events(projects, "order")
+    times = [e["t"] for e in session["events"]]
+    check("extract AC2: the events come out sorted by time", times, sorted(times))
+    tools = read_tools(session)
+    check("extract AC2: ...so the call written LAST in the file, and made first, is call 1",
+          (tools[1]["tool"], tools[2]["tool"]) if len(tools) == 2 else None, ("Read", "Bash"))
+    bash = tools.get(2, {})
+    check("extract AC2: the duplicated result keeps the FIRST copy's rc and error, not the empty "
+          "later copy's", (bash.get("rc"), bash.get("err"), bash.get("dur")), (3, True, 1.0))
+    check("extract AC2: ...and each later copy, the result's and the tool call's, is counted as a "
+          "duplicate and yields nothing", (session["coverage"]["dup_uuids"], len(tools)), (2, 2))
+
+
+def test_extract_ac3_owner_turns():
+    base, projects = build_projects("runlog-ac3-")
+    sid, tree, _session = read_events(projects, "owner")
+    turns = rx.scan_owner_turns(tree)
+    vias = sorted(e["via"] for e in turns if e["kind"] == "owner")
+    check("extract AC3: four owner turns: two typed, one absorbed, one interrupt", vias,
+          ["interrupt", "queued", "typed", "typed"])
+    check("extract AC3: ...and one keepalive, which is not a turn",
+          sum(1 for e in turns if e["kind"] == "keepalive"), 1)
+    # The near misses: the same fire with no CronCreate in its session is NOT a keepalive, so nothing
+    # matches the fire by its wording; and a CronCreate in ANOTHER session does not join.
+    alone = rx.resolve_session_tree(build_scenario(projects, "owner", drop=("w-a1", "w-u1")), projects)
+    got = rx.scan_owner_turns(alone)
+    check("extract AC3 near miss: with no CronCreate the fire is no keepalive, and still no turn",
+          (sum(1 for e in got if e["kind"] == "keepalive"), sum(1 for e in got if e["kind"] == "owner")),
+          (0, 4))
+    other = build_scenario(projects, "owner", drop=tuple(
+        r["uuid"] for r in TRANSCRIPTS["scenarios"]["owner"]["main"] if r["uuid"] not in ("w-a1", "w-u1")))
+    check_true("extract AC3 near miss: ...the CronCreate-only session exists beside it",
+               rx.resolve_session_tree(other, projects).main is not None)
+    check("extract AC3 near miss: a CronCreate in another session joins nothing",
+          sum(1 for e in rx.scan_owner_turns(alone) if e["kind"] == "keepalive"), 0)
+    clone_base, primary, _linked, made = build_scratch_clone()
+    env = build_arm_env(base)
+    r = run_runlog(["extract", "--session", sid, "--transcripts", str(projects)], primary, env)
+    check("extract AC3: the CLI writes the owner session's extract", r.returncode, 0)
+    written = read_tree_text(base / "store")
+    leaves = sorted(set(read_leaves(TRANSCRIPTS["scenarios"]["owner"]["main"])))
+    on_disk = (projects / FIXTURE_PROJECT / f"{sid}.jsonl").read_bytes().decode("utf-8")
+    check("extract AC3 liveness: the SAME predicate finds every free-text leaf in the transcript as "
+          "written, so an extract that kept one would be seen", (len(leaves) >= 8,
+                                                                  scan_leaks(on_disk, leaves)),
+          (True, leaves))
+    check("extract AC3: the written extract holds none of the fixture's free-text strings",
+          scan_leaks(written, leaves), [])
+    check_true("extract AC3: ...and it is the owner session's extract", sid in written and
+               '"keepalive"' in written, written[:120])
+
+
+def test_extract_ac4_background_end():
+    _base, projects = build_projects("runlog-ac4-")
+    _sid, _tree, session = read_events(projects, "background")
+    tools = read_tools(session)
+    ends = [e for e in session["events"] if e["kind"] == "tool_end"]
+    one = tools.get(1, {})
+    check("extract AC4: a background call ends at the FIRST record carrying its tool-use-id, the "
+          "queue enqueue, not at its launch acknowledgement", (one.get("bg"), one.get("dur")),
+          (True, 60.0))
+    check("extract AC4: ...its own rc is null, and its tool_end carries the notification's",
+          (one.get("rc"), [(e["call"], e["status"], e["rc"]) for e in ends if e["call"] == 1]),
+          (None, [(1, "completed", 0)]))
+    check("extract AC4: an absorbed attachment is a first carrier too, with a failed status and rc",
+          (tools.get(3, {}).get("dur"), [(e["status"], e["rc"]) for e in ends if e["call"] == 3]),
+          (90.0, [("failed", 1)]))
+    check("extract AC4: an async agent ends at its notification, which carries no exit code",
+          (tools.get(4, {}).get("dur"), [(e["status"], e["rc"]) for e in ends if e["call"] == 4]),
+          (140.0, [("completed", None)]))
+    check("extract AC4 near miss: a foreground call ends at its result, and a notification naming "
+          "it or an unknown id ends nothing", (tools.get(2, {}).get("dur"), tools.get(2, {}).get("rc"),
+                                               sorted(e["call"] for e in ends)), (0.5, 0, [1, 3, 4]))
+
+
+def test_extract_ac5_repo_key():
+    base, projects = build_projects("runlog-ac5-")
+    sid = build_scenario(projects, "order")
+    _b1, primary, linked, made = build_scratch_clone()
+    _b2, second, _l2, made2 = build_scratch_clone()
+    check("extract AC5 setup: two scratch clones, the first with a linked worktree", (made, made2),
+          (0, 0))
+    env = build_arm_env(base)
+    keys = {}
+    for label, tree in (("primary", primary), ("linked", linked), ("second clone", second)):
+        r = run_runlog(["extract", "--session", sid, "--transcripts", str(projects)], tree, env)
+        rows = [json.loads(s) for s in r.stdout.splitlines() if s.strip()]
+        path = pathlib.Path(rows[0]["path"]) if rows and rows[0].get("path") else None
+        keys[label] = path.parent.parent.name if path else None
+        check(f"extract AC5 ({label}): exit 0 and one extract written", (r.returncode, len(rows)),
+              (0, 1))
+    check("extract AC5: two worktrees of one clone write under ONE repo key",
+          keys["linked"], keys["primary"])
+    check_true("extract AC5 liveness: another clone gets another key, so the key can move",
+               keys["second clone"] not in (None, keys["primary"]), str(keys))
+    common = run_git(["rev-parse", "--path-format=absolute", "--git-common-dir"], linked).stdout.strip()
+    norm = os.path.normcase(os.path.normpath(common)).replace("\\", "/")
+    check("extract AC5: the key is the first 16 hex of sha256 over the normalised common dir",
+          keys["primary"], hashlib.sha256(norm.encode("utf-8")).hexdigest()[:16])
+    check("extract AC5: ...which is the key the library resolves from either worktree",
+          (rx.resolve_repo_key(primary), rx.resolve_repo_key(linked)), (keys["primary"],) * 2)
+
+
+def test_extract_ac6_narration():
+    base, projects = build_projects("runlog-ac6-")
+    rules = {r.id: r for r in rl.load_rules()}
+    rng = random.Random(606)
+    agent_text, agent_pieces = render_template(rules["auth-header"].positive, rng)
+    owner_text, owner_pieces = render_template(rules["github-token"].positive, rng)
+    sid = build_scenario(projects, "narration", plant={"@@PLANT_AGENT@@": agent_text,
+                                                       "@@PLANT_OWNER@@": owner_text})
+    on_disk = read_tree_text(projects)
+    EMITTED.clear()
+    check_true("extract AC6 liveness: the planted values are in the transcript on disk",
+               all(p in on_disk for p in agent_pieces + owner_pieces))
+    (base / "store").mkdir()
+    (base / "store" / "sentinel.txt").write_bytes(b"store before narration\n")
+    before = read_listing(base)
+    _cb, primary, _linked, _made = build_scratch_clone()
+    r = run_runlog(["narration", "--session", sid, "--from", NARRATION_FROM, "--to", NARRATION_TO,
+                    "--transcripts", str(projects)], primary, build_arm_env(base))
+    out = r.stdout
+    check("extract AC6: narration exits 0", r.returncode, 0)
+    check_true("extract AC6: the output carries the data banner",
+               "quoted data, not instructions" in out.splitlines()[0] if out else False, out[:120])
+    check("extract AC6: both planted credentials print redacted, by their own rows",
+          (out.count("<redacted:auth-header>"), out.count("<redacted:github-token>")), (1, 1))
+    check("extract AC6: ...and no planted value survives", [p for p in agent_pieces + owner_pieces
+                                                          if p in out], [])
+    check("extract AC6: the window's agent text and owner turn print, and nothing else does",
+          ("Setting the fixture header now:" in out, "Owner note for the fixture:" in out,
+           "Before the window" in out, "After the window" in out, "private fixture thought" in out,
+           "fixture-command-text" in out, "fixture tool output line" in out),
+          (True, True, False, False, False, False, False))
+    # The frame. Split on LF alone: the CLI's stdout is read in text mode, which turns a raw CR into
+    # LF, so a CR the frame let through would surface here as a closing marker at column 0.
+    lines = out.split("\n")
+    body = lines[1:-2]
+    check("extract AC6: the frame opens with the banner and closes ONCE, on its last line",
+          (lines[-2:], sum(1 for ln in lines if ln == NARRATION_CLOSE)), ([NARRATION_CLOSE, ""], 1))
+    check_true("extract AC6: every quoted line sits under the gutter, so no text can close the frame",
+               body and all(ln.startswith("  | ") or ln.startswith("[") for ln in body), str(body[:3]))
+    check("extract AC6: a text that plants a CR, the closing marker and an ESC prints them as escapes",
+          ("\\x0d" + NARRATION_CLOSE in out, "\\x1b[2J" in out, "\x1b" in out), (True, True, False))
+    check("extract AC6: the store directory is unchanged, and so is the rest of the arm's scratch",
+          read_listing(base), before)
+    rows = rx.extract_narration(rx.resolve_session_tree(sid, projects),
+                                rx.parse_time(NARRATION_FROM), rx.parse_time(NARRATION_TO))
+    check("extract AC6: extract_narration returns the three texts, each already redacted",
+          ([w for _t, w, _x in rows], [p for p in agent_pieces + owner_pieces
+                                        if any(p in x for _t, _w, x in rows)]),
+          (["agent", "agent", "owner"], []))
+
+
+def test_extract_ac7_discover():
+    base, projects = build_projects("runlog-ac7-")
+    hit = build_scenario(projects, "discover-hit")
+    miss = build_scenario(projects, "discover-miss")
+    check("extract AC7: discovery attributes the session whose shell call RUNS the preflight",
+          rx.scan_preflights(projects), [(hit, "tFixture")])
+    check("extract AC7 near miss: a slug named only in tool output, narration or grep's argument "
+          "is attributed nowhere", rx.scan_preflights(projects, "tOther"), [])
+    _cb, primary, _linked, _made = build_scratch_clone()
+    r = run_runlog(["extract", "--discover", "--transcripts", str(projects)], primary,
+                   build_arm_env(base))
+    rows = [json.loads(s) for s in r.stdout.splitlines() if s.strip()]
+    check("extract AC7: the CLI writes one extract, attribution heuristic, slug tFixture",
+          (r.returncode, [(x["sid"], x["attribution"], x["slugs"], x["state"]) for x in rows]),
+          (0, [(hit, "heuristic", ["tFixture"], "written")]))
+    written = read_store_json(base / "store", hit)
+    check("extract AC7: ...and the extract itself says so", (written.get("attribution"),
+                                                             written.get("slugs")),
+          ("heuristic", ["tFixture"]))
+    check_true("extract AC7: ...and the missed session was never extracted",
+               not list((base / "store").rglob(f"{miss}.json")))
+
+
+class TrackedRecord(dict):
+    """A parsed record the AC8 arm counts while it lives. A dict is unhashable, so no WeakSet can hold
+    one; a dict SUBCLASS takes a weak reference, so each record carries a finalizer instead, which
+    CPython runs the moment the last reference to it drops."""
+
+
+def test_extract_ac8_streaming():
+    base, projects = build_projects("runlog-ac8-")
+    sid = str(uuid.uuid4())
+    home = projects / FIXTURE_PROJECT
+    stamp = 1789293600.0
+    n = 0
+    for src, count in AC8_SPLIT:
+        path = (home / f"{sid}.jsonl" if src == "main" else
+                home / sid / "subagents" / (f"agent-{src}.jsonl" if src == "agent" else
+                                             "workflows/wf_ac8/agent-w.jsonl"))
+        rows = []
+        for i in range(count // 2):
+            n += 1
+            t = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(stamp + n)) + ".000Z"
+            tid = f"toolu_ac8_{n}"
+            rows.append({"type": "assistant", "uuid": f"a{n}", "timestamp": t, "requestId": f"r{n}",
+                         "message": {"content": [{"type": "tool_use", "id": tid, "name": "Read",
+                                                  "input": {"file_path": "x"}}],
+                                     "usage": {"input_tokens": 1, "output_tokens": 1}}})
+            rows.append({"type": "user", "uuid": f"u{n}", "timestamp": t,
+                         "message": {"content": [{"type": "tool_result", "tool_use_id": tid,
+                                                  "content": "ok"}]}})
+        write_transcript_lines(path, rows)
+    tree = rx.resolve_session_tree(sid, projects)
+    # `live` is the count of parsed records not yet freed. `held_at_parse` is its high-water at the
+    # moment a NEW record is parsed, which is what a reader holding more than one record raises.
+    live = {"n": 0}
+    counts = {"parsed": 0, "held_at_parse": 0}
+    real = rx.parse_record
+
+    def remove_one():
+        live["n"] -= 1
+
+    def parse_counted(raw):
+        rec = TrackedRecord(real(raw))
+        counts["held_at_parse"] = max(counts["held_at_parse"], live["n"])
+        live["n"] += 1
+        weakref.finalize(rec, remove_one)
+        counts["parsed"] += 1
+        return rec
+
+    rx.parse_record = parse_counted
+    try:
+        high = seen = 0
+        for _src, _no, _line, rec in rx.read_records(tree):
+            seen += 1
+            high = max(high, live["n"])
+        del rec
+        read_high = high
+        counts["held_at_parse"] = 0
+        session = rx.extract_session(tree)
+        extract_held = counts["held_at_parse"]
+        held = list(rx.read_records(tree))
+        hoard = live["n"]
+        del held
+    finally:
+        rx.parse_record = real
+    check("extract AC8: the generated tree holds 20,000 records across three files",
+          (seen, len(rx._build_file_list(tree))), (AC8_RECORDS, 3))
+    check("extract AC8: read_records holds ONE record at a time, one per open file", read_high, 1)
+    check("extract AC8: extract_session never holds more than the one record before the next parse",
+          extract_held <= 1, True)
+    check("extract AC8: ...and still extracts every call", sum(1 for e in session["events"]
+                                                            if e["kind"] == "tool"), AC8_RECORDS // 2)
+    check("extract AC8 liveness: a hold-everything reader through the same counter holds them all",
+          hoard, AC8_RECORDS)
+    r = run_runlog(["extract", "--measure", str(projects)], base, build_arm_env(base))
+    check("extract AC8: extract --measure exits 0, prints a rate and a peak, and grades neither",
+          (r.returncode, "report-only" in r.stdout, "rate_mb_s=" in r.stdout, "peak_mb=" in r.stdout,
+           "sessions=1" in r.stdout), (0, True, True, True, True))
+    check_true("extract AC8: ...and writes nothing", not (base / "store").exists())
+
+
+def test_extract_ac9_usage():
+    _base, projects = build_projects("runlog-ac9-")
+    _sid, _tree, session = read_events(projects, "usage")
+    check("extract AC9: a request repeated across three records counts ONCE, with its largest "
+          "counts, and the totals split three ways", rx.build_usage(session["events"]),
+          {"main": {"requests": 3, "in": 108, "out": 36, "cache_read": 1000, "cache_write": 50},
+           "agent": {"requests": 1, "in": 11, "out": 12, "cache_read": 13, "cache_write": 14},
+           "workflow": {"requests": 1, "in": 21, "out": 22, "cache_read": 23, "cache_write": 24}})
+    agents = sorted((e["src"], e["label"], e["depth"]) for e in session["events"] if e["kind"] == "agent")
+    check("extract AC9: each agent file is one spawn, labelled from its meta, in its own split",
+          agents, [("agent", "fixture-lens", 1), ("workflow", "general-purpose", 1)])
+    flows = [(e["label"], e["status"], e["dur_ms"], e["agents"], e["tool_calls"], e["tokens"])
+             for e in session["events"] if e["kind"] == "workflow"]
+    check("extract AC9: the workflow run comes from its file, and the run with none is counted",
+          (flows, session["coverage"]["wf_missing"]),
+          ([("fixture-review", "completed", 42000, 1, 3, 999)], 1))
+
+
+def test_extract_ac10_members():
+    for row in TOOL_CLASS_ROWS:
+        got = rx.derive_tool_class(row["tool"], row["input"])
+        check(f"extract AC10 ({row['why']}): {row['tool']} is {row['cls']} {row['flags']}", got,
+              (row["cls"], tuple(row["flags"]), row.get("verb"), row.get("slug")))
+    check("extract AC10: the class rows produce every class, and nothing else",
+          sorted({r["cls"] for r in TOOL_CLASS_ROWS}), sorted(rx.CLASSES))
+    check("extract AC10: ...and every flag, and nothing else",
+          sorted({f for r in TOOL_CLASS_ROWS for f in r["flags"]}), sorted(rx.FLAGS))
+    named = {r["input"].get("command"): r["flags"] for r in TOOL_CLASS_ROWS}
+    check("extract AC10: `git reset --hard` is flagged destructive, and a driver call piped to "
+          "tail is flagged piped", (named.get("git reset --hard HEAD~1"),
+                                    named.get("bash unattended.sh --status tFixture 2>&1 | tail -5")),
+          (["destructive"], ["piped"]))
+    # The same rows THROUGH the extractor, as one transcript: the class survives the whole pipeline.
+    _base, projects = build_projects("runlog-ac10-")
+    sid = str(uuid.uuid4())
+    records = []
+    for i, row in enumerate(TOOL_CLASS_ROWS):
+        t = f"2026-09-13T11:{i // 60:02d}:{i % 60:02d}.000Z"
+        records.append({"type": "assistant", "uuid": f"c{i}", "timestamp": t, "message": {
+            "content": [{"type": "tool_use", "id": f"toolu_c{i}", "name": row["tool"],
+                         "input": row["input"]}]}})
+    write_transcript_lines(projects / FIXTURE_PROJECT / f"{sid}.jsonl", records)
+    session = rx.extract_session(rx.resolve_session_tree(sid, projects))
+    got = [(e["cls"], e["flags"]) for e in session["events"] if e["kind"] == "tool"]
+    check("extract AC10: every class row, extracted from a transcript, keeps its class and flags",
+          got, [(r["cls"], r["flags"]) for r in TOOL_CLASS_ROWS])
+    kinds, srcs, vias = set(), set(), set()
+    for name in TRANSCRIPTS["scenarios"]:
+        _sid, _tree, s = read_events(projects, name)
+        for e in s["events"]:
+            kinds.add(e["kind"])
+            srcs.add(e.get("src", "main"))
+            if e["kind"] == "owner":
+                vias.add(e["via"])
+    check("extract AC10: the scenarios produce every event kind, and nothing else", sorted(kinds),
+          sorted(rx.KINDS))
+    check("extract AC10: ...every split and every owner source", (sorted(srcs), sorted(vias)),
+          (sorted(rx.SOURCES), sorted(rx.OWNER_VIA)))
+
+
+def test_extract_edges():
+    base, projects = build_projects("runlog-edges-")
+    events_sid, _tree, s = read_events(projects, "events")
+    cov = s["coverage"]
+    check("extract edges: a torn line and a non-object line are counted, an unknown type is counted "
+          "by name, and a record with no time is counted", (cov["torn"], cov["unknown_types"],
+                                                            cov["untimed"]),
+          (2, {"fixture-unknown-kind": 1}, 1))
+    by = {}
+    for e in s["events"]:
+        by.setdefault(e["kind"], []).append(e)
+    check("extract edges: a compaction keeps its trigger and size",
+          [(e["trigger"], e["pre_tokens"]) for e in by.get("compact", [])], [("auto", 150000)])
+    check("extract edges: an API error from a message and a retry notice from a system record",
+          [(e["status"], e["error"], e["retry"]) for e in by.get("api_error", [])],
+          [(529, "server_error", None), (529, None, 2)])
+    check("extract edges: a rejected quota is a limit, with its window and reset",
+          [(e["limit_type"], e["resets"]) for e in by.get("limit", [])], [("five_hour", 1789000000)])
+    check("extract edges: a hook denial and a user rejection, each joined to its call",
+          [(e["call"], e["reason"], e["hook"]) for e in by.get("denial", [])],
+          [(1, "permission-rule", True), (2, "user-rejected", False)])
+    check("extract edges: a main-file record marked isSidechain counts as a direct agent's usage",
+          [e["src"] for e in by.get("usage", []) if e["in"] == 6], ["agent"])
+    absent = rx.resolve_session_tree(str(uuid.uuid4()), projects)
+    got = rx.extract_session(absent)
+    check("extract edges: a missing session tree is a coverage state, never an exception",
+          (absent.main, got["coverage"]["tree"], got["events"]), (None, "absent", []))
+    _cb, primary, _linked, _made = build_scratch_clone()
+    env = build_arm_env(base)
+    r = run_runlog(["extract", "--session", absent.sid, "--transcripts", str(projects)], primary, env)
+    check("extract edges: the CLI reports an absent tree and writes nothing for it",
+          (r.returncode, '"state": "absent"' in r.stdout, list((base / "store").rglob("*.json"))),
+          (0, True, []))
+    r = run_runlog(["extract", "--session", "../x", "--transcripts", str(projects)], primary, env)
+    check("extract edges: a malformed --session exits 2 naming the shape",
+          (r.returncode, "not a session id" in r.stderr), (2, True))
+    blocked = base / "store-is-a-file"
+    blocked.write_bytes(b"not a directory\n")
+    r = run_runlog(["extract", "--session", events_sid, "--transcripts", str(projects)], primary,
+                   {**env, "RUNLOG_STATE_DIR": str(blocked)})
+    check("extract edges: a store that cannot be written exits 2, says so, and marks the row failed",
+          (r.returncode, "was not written" in r.stderr, '"state": "failed"' in r.stdout,
+           blocked.read_bytes()), (2, True, True, b"not a directory\n"))
+    try:
+        rx.write_session({"sid": "../x"}, base / "store")
+        msg = ""
+    except ValueError as exc:
+        msg = str(exc)
+    check("extract edges: write_session refuses a sid that is not one", "not a session id" in msg,
+          True)
+    home, local, xdg = str(base / "h"), str(base / "l"), str(base / "x")
+    cases = [
+        ({"LOCALAPPDATA": local}, "win32", pathlib.Path(local) / "runlog"),
+        ({"HOME": home}, "darwin", pathlib.Path(home) / "Library" / "Application Support" / "runlog"),
+        ({"HOME": home, "XDG_STATE_HOME": xdg}, "linux", pathlib.Path(xdg) / "runlog"),
+        ({"HOME": home}, "linux", pathlib.Path(home) / ".local" / "state" / "runlog"),
+        ({"RUNLOG_STATE_DIR": str(base / "o"), "LOCALAPPDATA": local}, "win32", base / "o"),
+    ]
+    for env_in, plat, want in cases:
+        check(f"extract edges: the store on {plat} with {sorted(env_in)}",
+              rx.resolve_state_dir(env_in, plat), want)
+    for env_in, plat, needle in (({}, "win32", "LOCALAPPDATA"), ({}, "linux", "HOME"),
+                                 ({"RUNLOG_STATE_DIR": "rel/dir"}, "linux", "relative")):
+        try:
+            rx.resolve_state_dir(env_in, plat)
+            msg = ""
+        except ValueError as exc:
+            msg = str(exc)
+        check(f"extract edges: the store refuses by name on {plat} with {sorted(env_in)}",
+              needle in msg, True)
+    check("extract edges: the transcripts root follows CLAUDE_CONFIG_DIR, then the profile",
+          (rx.resolve_projects_root({"CLAUDE_CONFIG_DIR": home}, "linux"),
+           rx.resolve_projects_root({"USERPROFILE": home}, "win32"),
+           rx.resolve_projects_root({"HOME": home}, "linux"),
+           rx.resolve_projects_root({}, "linux", override=local)),
+          (pathlib.Path(home) / "projects", pathlib.Path(home) / ".claude" / "projects",
+           pathlib.Path(home) / ".claude" / "projects", pathlib.Path(local)))
+    check("extract edges: times parse from ISO, epoch text and epoch milliseconds",
+          (rx.parse_time("2026-09-13T10:00:00Z"), rx.parse_time("1789293600.5"),
+           rx.parse_time(1789293600500), rx.parse_time("not a time")),
+          (1789293600.0, 1789293600.5, 1789293600.5, None))
+
+
+def test_extract_decoy_catches_a_forgotten_root():
+    """The decoy's own liveness: a run that redirects NOTHING reads a decoy's canary and writes into
+    the decoy, where the listing and the canary see it. A second decoy, so the suite's stays whole."""
+    mini = pathlib.Path(tempfile.mkdtemp(prefix="runlog-decoy2-"))
+    SCRATCH.append(mini)
+    canary = build_decoy(mini)
+    before = read_listing(mini)
+    env = dict(os.environ)
+    for var, sub in DECOY_VARS:
+        env[var] = str(mini / sub)
+    env.pop("RUNLOG_STATE_DIR", None)
+    _cb, primary, _linked, _made = build_scratch_clone()
+    r = subprocess.run([sys.executable, str(CLI), "extract", "--discover"], cwd=str(primary),
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
+    check_true("extract decoy liveness: a discovery that redirects nothing names the decoy's canary",
+               canary in r.stdout, r.stdout[:200] + r.stderr[:200])
+    check_true("extract decoy liveness: ...and its extract lands in the decoy, changing its listing",
+               read_listing(mini) != before and any(p.name == f"{canary}.json"
+                                                    for p in mini.rglob("*.json")))
+    check_true("extract decoy liveness: ...and the scratch scan `main` runs after every arm names "
+               "that extract", any(h.endswith(f"/sessions/{canary}.json")
+                                   for h in scan_named([mini], canary)), str(scan_named([mini], canary)))
+
+
 def main():
     print("runlog: arms")
+    # THE LAUNCHER. Every ambient root the extractor falls back on points at a decoy BEFORE any arm
+    # runs, and an ambient store override is dropped, since it would bypass the decoy entirely.
+    decoy = pathlib.Path(tempfile.mkdtemp(prefix="runlog-decoy-"))
+    SCRATCH.append(decoy)
+    DECOY["root"], DECOY["sid"] = decoy, build_decoy(decoy)
+    for var, sub in DECOY_VARS:
+        os.environ[var] = str(decoy / sub)
+    os.environ.pop("RUNLOG_STATE_DIR", None)
     try:
         for name, fn in sorted(globals().items()):
             if name.startswith("test_") and callable(fn):
+                before = read_listing(decoy)
+                made_before = len(SCRATCH)
+                EMITTED.clear()
                 fn()
+                check(f"decoy: {name} left the decoy tree's listing unchanged", read_listing(decoy),
+                      before)
+                check(f"decoy: nothing {name} printed or stored names the decoy's session",
+                      [s[:80] for s in EMITTED if DECOY["sid"] in s], [])
+                check(f"decoy: no file {name} left in its own scratch is named for or holds the "
+                      "decoy's session", scan_named(SCRATCH[made_before:], DECOY["sid"]), [])
     finally:
         for d in SCRATCH:
             shutil.rmtree(d, ignore_errors=True)

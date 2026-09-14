@@ -35,13 +35,13 @@ role = "project-owned"
 # reds there instead of shipping.
 [[files]]
 include = ["fixtures/driver-torn.txt", "fixtures/golden-lines.txt", "fixtures/invocations.txt",
-           "fixtures/journal-mixed.txt"]
+           "fixtures/journal-mixed.txt", "fixtures/tool-classes.json", "fixtures/transcripts.json"]
 role = "project-owned"
 
 [adopt]
 argv = []
 mutates_index = false
-why_no_adopter = "the kit is a reader and a CLI with no configuration of its own: it resolves the journal from git and the memory root from the memory-tree conf, so there is nothing to seed and nothing to wire"
+why_no_adopter = "the kit is a reader and a CLI with no configuration of its own: it resolves the journal from git, the memory root from the memory-tree conf, and the transcript and store roots from the environment, so there is nothing to seed and nothing to wire"
 
 [check]
 none = """

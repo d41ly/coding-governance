@@ -5,8 +5,10 @@
 Three producers append one line per act to a machine-local journal: the unattended driver, the gate
 runner and the pre-push hook. Several consumers read those lines. This kit gives all of them ONE
 grammar, stated here and implemented once in `runlog_lib.py`, so no producer invents a format and no
-consumer re-parses one. The kit writes nothing; it is the reader and the reference writer. It also
-carries the ONE redaction table that every consumer printing or classifying free text applies.
+consumer re-parses one. The kit writes no journal; it is the reader and the reference writer. It also
+carries the ONE redaction table that every consumer printing or classifying free text applies, and
+the transcript extractor, which writes structural extracts to a store under the user profile and
+never into a repository.
 
 ## The grammar
 
@@ -108,6 +110,68 @@ Each positive is a template that only the self-test expands, and no committed fi
 text the table flags outside that column. The self-test scans the kit's tracked files with the table
 to prove it, which is the property push protection needs in a public repository.
 
+## The transcript extractor
+
+The journals cover a small share of a run's calls. Everything else — every tool call, owner turn,
+compaction, limit and token — is recorded only in Claude Code's session transcripts on the machine
+that ran the build. `extract.py` is the Claude Code adapter that reads them. It keeps a STRUCTURAL
+event list and no free text: no command, no narration, no owner-turn text and no tool output.
+
+```bash
+python <this kit>/runlog.py extract --slug <slug>            # the sessions the driver journal names
+python <this kit>/runlog.py extract --session <sid>          # one session, attributed as given
+python <this kit>/runlog.py extract --discover [--slug <s>]  # runs with no journal: a heuristic
+python <this kit>/runlog.py extract --measure <projects dir>  # rate and peak memory, writes nothing
+python <this kit>/runlog.py narration --session <sid> --from <t> --to <t>
+```
+
+**Where it reads.** A session id is any UUID-shaped `sess.*` value on the slug's `start` lines,
+whatever the adopter called the variable. Nothing else reaches a path: an id is shape-checked first,
+and it becomes a session when one glob of `<projects root>/*/<sid>.jsonl` finds it. The projects root
+is `$CLAUDE_CONFIG_DIR/projects`, else the profile's `.claude/projects`, and `--transcripts` overrides
+both. The tree beside the main file is its `subagents/**/agent-*.jsonl` with their `.meta.json`, and
+its `workflows/wf_*.json`. A path resolving outside its root is refused or counted, never read.
+
+**Where it writes.** One JSON object per session, at `<store>/<repo key>/sessions/<sid>.json`. The
+store is `RUNLOG_STATE_DIR`, else `%LOCALAPPDATA%\runlog` on Windows,
+`~/Library/Application Support/runlog` on macOS and `${XDG_STATE_HOME:-~/.local/state}/runlog`
+elsewhere. A missing root
+refuses by name, and so does a relative `RUNLOG_STATE_DIR`, which would put extracts inside a tree
+git can commit. The repo key is the first 16 hex of the sha256 of the normalised git common dir, so
+every worktree of one clone shares one store.
+
+**How it reads.** Streamed, one file at a time and one parsed record per open file, holding only
+compact tuples between records. A duplicated `uuid` keeps its FIRST copy, since later copies carry
+empty output, and events sort by time with the file position as tiebreak. The data model, each
+event kind's fields and every rule with its evidence are the unit's spec
+(`TOOL-dLoggedFlight-6`, section 4). The rules a reader most needs:
+
+- **Owner turns come from the main file only.** A `human` origin is a turn whatever its text. An absent
+  origin is a turn unless the record is meta, a compact summary, a `<local-command-…>` echo, a task
+  notification or a keepalive fire. Absorbed `queued_command` prompts of human origin and interrupts
+  are turns too.
+- **A keepalive fire is joined, never matched by wording**: a null-origin record whose text hashes to
+  the prompt of an EARLIER main-file `CronCreate`.
+- **A background or async call ends at the first record carrying its tool-use id**, not at its launch
+  acknowledgement. Its own `rc` is null, and its `tool_end` event carries the notification's status
+  and the last exit code its summary names.
+- **Usage counts a `requestId` once**, with the largest value of each field across its copies, in the
+  split of its first copy: `main`, `agent` or `workflow`.
+- **A command is classified in memory, then dropped.** The classifier drops heredoc bodies, splits on
+  unquoted separators, and reads the word each segment RUNS, so a commit message naming a forced push
+  is not a push and `grep` over the driver is not a driver call. A command naming the driver passes
+  through `render_redacted` before its verb and slug are read.
+
+**Narration** prints the agent's text blocks and the owner's turns in a window, main file only, each
+through `render_redacted`, inside a frame that says the text is data. Every quoted line sits under a
+gutter, and a control character prints as its escape, so no text can draw the closing marker. Nothing
+is written to disk.
+
+**The self-test never reads or writes a real store.** Its `main` aims `HOME`, `USERPROFILE`,
+`LOCALAPPDATA`, `XDG_STATE_HOME` and `CLAUDE_CONFIG_DIR` at a decoy tree holding a canary transcript
+before any arm runs, and after EVERY arm compares the decoy's listing and searches the arm's output
+and scratch for the canary's id. Each extractor arm then aims the roots it uses at its own scratch.
+
 ## What this kit does NOT check
 
 - **Whether a value means anything.** `rc=banana` parses. Each producer's own suite grades its values.
@@ -130,6 +194,14 @@ to prove it, which is the property push protection needs in a public repository.
 - **That a positive is realistic.** Each row is proven against its own template and a near miss, both
   written by its author. A real credential in a shape no positive covers is a miss the suite cannot
   see.
+- **That the transcript format still holds.** It is not a contract. An unknown record type is counted
+  by name in the extract's coverage block, but a renamed KEY reads as absent and yields nothing, and
+  the suite's fixtures are synthetic, written from measured shapes rather than copied.
+- **A call the classifier cannot see.** It is not a shell: `bash -c`, `eval`, a `$(…)` inside quotes,
+  an alias and a shell function are not descended into, so a call nested in one is `other`.
+- **Which repository a discovered session ran in.** `--discover` attributes a session to a slug
+  because one of its shell calls ran the driver's preflight for it, and says `heuristic`.
+- **That a background call ended.** One whose notification never arrived keeps a null end.
 
 ## Running the self-test
 
@@ -137,7 +209,8 @@ to prove it, which is the property push protection needs in a public repository.
 python <this kit>/selftest.py
 ```
 
-It builds scratch git trees under the system temp dir and never reads this repository's own journal.
+It builds scratch git trees under the system temp dir and never reads this repository's own journal,
+nor any real transcript or store.
 Its redaction arms find the kit's files through `git ls-files`, so a new file is scanned once it is
 staged and not before.
 It and its fixtures are withheld from `govkit apply`: its subject is this directory's code, which an
