@@ -162,7 +162,8 @@ index lists the new public functions. No carried-prefix row moves (S3).
   no run record and no `.unattended.conf` is NOT ASKED (S4).
 - observability — the detail rows, which print the witness-to-base relation.
 - risks — none beyond the report being ignored; it is visible in the table on every run.
-- testing — one fixture per table row, one `no-progress` record and one unjudgeable record, each
+- testing — one fixture per table row and per alternative in it, one record with its witness equal
+  to its base and one with its witness behind it, and one record per other unjudgeable reason, each
   staged, plus the kit's existing meta-tests that every signal can move and none hard-codes `live`.
   One more arm holds every version carrier the kit owns to the engine's constant (S6).
 - migration — none.
@@ -230,7 +231,8 @@ none
   from the records it returns. S1 names the rotated archives and every unjudgeable reason. S3 holds
   the terminal set to the driver too, and reaches the driver by a derived path, so no carried row is
   owed. S4 adds NOT ASKED for a repo with no runs and no conf. §4 pins the measured 5 and spells the
-  unjudgeable row. §7's suite had no floor to raise.
+  unjudgeable row. §5's testing line still said `no-progress`, rev-3's name for what rev-4 made
+  `unjudgeable`, and now names each fixture by reason. §7's suite had no floor to raise.
 
 ## 10. Reuse audit
 
