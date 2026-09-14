@@ -36,11 +36,21 @@ LEGS='tools/gate-legs.json'
 # neither adds a carried literal (the install-prefix ban pins this file's count).
 E='tools/run-gates/selftest-pooled-evidence.txt'
 RC=${R#bash }
+# THE NO-BASELINE SENTINEL, READ FROM THE RUNNER rather than retyped. The phrase is the unattended
+# suite's own; the runner pins it verbatim; and this file's fixture was a THIRD spelling that no
+# gate joined to either, so a reword of the owner would make `nobase` never fire while every D3
+# arm below stayed green on its own copy (aBatchedArm closing review round 2, R2). The first arm
+# grades the pair, and the sentinel fixture below derives its line from this same value. The owner
+# is the REAL suite under `$ROOT`, not a fixture copy — a prefixed path, which the install-prefix
+# leg reads as derived, so this file's carried count does not move.
+NOBASE_RX=$(sed -n "s/^SWEEP_NOBASELINE_RX='\(.*\)'$/\1/p" "$RUNNER")
+NOBASE_OWNER="$ROOT/tools/unattended/check-unattended.test.sh"
 
 # THE FLOOR, RE-DERIVED at TOOL-aBatchedArm-5: 55 at BASE, minus the retired factor-absent arm,
 # plus the arms that unit added — both counts are in that unit's acceptance ledger. Raised again
-# at the aBatchedArm closing fix by the arms it added; that ledger carries the count.
-SELFTEST_FLOOR=108
+# at the aBatchedArm closing fix by the arms it added, and at its round 2 by four more; the
+# closing-fix ledger carries both counts.
+SELFTEST_FLOOR=112
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -82,8 +92,9 @@ build_repo() {
   # ---- the NO-BASELINE SENTINEL shape (aBatchedArm closing D3): a batched group whose expected
   # ---- set is still unwritten prints the refusal, its observed set indented, and the shard's
   # ---- trailer all the same — so by (rc, FAIL, executed) alone it reads as a red-by-design row.
+  # ---- The phrase is DERIVED from the runner's pin (R2), never retyped here.
   { printf '#!/usr/bin/env bash\n'
-    printf 'echo "FAIL check_emitted: expected set not yet observed — owed at the final pass · call at line 946"\n'
+    printf 'echo "FAIL check_emitted: %s — owed at the final pass · call at line 946"\n' "$NOBASE_RX"
     printf 'echo "    observed: UNATTENDED check 3 FAILED a-signature"\n'
     printf 'echo "  (81 assertions executed in shard 1/8 against a floor of 78)"\n'
     printf 'exit 1\n'
@@ -92,6 +103,10 @@ build_repo() {
   # ---- worker's `timeout -k 5` KILLs it after the grace and it exits 137 — a kill with a
   # ---- WALL_BREACHED flag and an rc the WALL branch does not key on.
   printf '#!/usr/bin/env bash\ntrap "" TERM\nfor _ in 1 2 3 4 5 6 7 8 9 10; do sleep 2; done\nexit 0\n' > tools/suite-stubborn.sh
+  # ---- a suite that ECHOES A CREDENTIAL (aBatchedArm closing R1): the exact line a git call under
+  # ---- an operator's global config prints; the kept per-row copy must mask the userinfo and keep
+  # ---- the host, the way the sibling runner's durable leg logs already do.
+  printf '#!/usr/bin/env bash\necho "fatal: unable to access '"'"'https://u:p@example.com/x'"'"'"\nexit 1\n' > tools/suite-secret.sh
 
   # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's §2
   # node TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
@@ -192,6 +207,18 @@ build_repo() {
 }
 build_fixture build_repo || exit 2
 
+# ---------------------------------------------------------------- the sentinel pair, round 2 R2
+# The runner's `SWEEP_NOBASELINE_RX` is a prose pin of a phrase the unattended suite owns, and
+# nothing joined them: a one-word reword of the owner's refusal makes `nobase` never fire, the next
+# calibrate READS a refusing group as a baseline, and D3 returns silently while every D3 arm below
+# stays green on the fixture's copy. This arm reads BOTH real files — the pin extracted at the top
+# of this file, the owner's `echo "FAIL check_emitted: …"` line grepped for it verbatim — so a
+# reword of either side reds here in seconds. Observed RED on a scratch copy of the owner with one
+# word changed.
+arm "the runner's no-baseline sentinel is non-empty and the unattended suite's FAIL check_emitted line carries it verbatim" 0 \
+    "sentinel pinned: " \
+    'true' \
+    "[ -n '$NOBASE_RX' ] && grep -qF -- 'echo \"FAIL check_emitted: $NOBASE_RX' '$NOBASE_OWNER' && echo 'sentinel pinned: $NOBASE_RX'"
 
 # ---------------------------------------------------------------- --check, both directions
 arm "control · a clean declaration passes --check" 0 "declaration clean" \
@@ -720,6 +747,14 @@ arm "--check --calibrate REFUSES naming the pair" 2 \
     "--calibrate modifies --pooled and nothing else, and was given with '--check'" \
     'true' "$R --check --calibrate"
 
+# --check takes no --kit either (round 2 R4): its trailer arm iterated the FILTERED population
+# against the whole-file pooled-kit declaration, so `--check --kit <dir outside it>` redded with
+# `selects NO row` — a false red on a manual invocation. Refused by name, rc 2, never 1.
+arm "--check --kit REFUSES by name with rc 2, never a false red for a filter that selects no pooled-kit row" 2 \
+    "--check grades the WHOLE declaration and takes no --kit, and was given '--kit tools/suite-ok'" \
+    "printf '# pooled-kit: tools/elsewhere/\n' >> $E && git add -A" \
+    "$R --check --kit tools/suite-ok"
+
 arm "a bare --calibrate REFUSES naming the pair" 2 \
     "--calibrate modifies --pooled and nothing else, and was given with 'no mode'" \
     'true' "$R --calibrate"
@@ -828,6 +863,15 @@ arm "a calibrate keeps each row's output under gate-logs/selftests and names the
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-sentinel.sh|' $B && git add -A" \
     "( $R --pooled --calibrate; rc=\$?; f=\$(git rev-parse --git-dir)/gate-logs/selftests/free_one.out; [ -s \"\$f\" ] || exit 99; grep -q '^    observed: ' \"\$f\" || exit 98; exit \$rc )"
 
+# AND THE KEPT COPY IS MASKED (round 2 R1), the shape of the sibling runner's redaction arm: a
+# suite that echoes `https://u:p@example.com` leaves a kept file that lacks the userinfo and keeps
+# the host. rc 99 if the file is absent, 98 if the credential survived, 97 if the host did not.
+# Observed RED against the runner whose copy was a bare `cp`.
+arm "a calibrate's kept per-row output masks URL userinfo and keeps the host, like the sibling runner's durable leg logs" 0 \
+    "MASKED userinfo, host kept" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-secret.sh|' $B && git add -A" \
+    "( $R --pooled --calibrate > /dev/null; f=\$(git rev-parse --git-dir)/gate-logs/selftests/free_one.out; [ -s \"\$f\" ] || exit 99; grep -q 'u:p@' \"\$f\" && exit 98; grep -q 'example.com' \"\$f\" || exit 97; grep -q '\\*\\*\\*:\\*\\*\\*@example.com' \"\$f\" && echo 'MASKED userinfo, host kept' )"
+
 # ---------------------------------------------------------------- an unsound calibrate, D7
 # The inverse of the `fingerprint MATCHED` arm: a suite that writes into a tracked file makes the
 # run UNSOUND, and an unsound calibrate writes NOTHING — the other row's clean reading included.
@@ -838,12 +882,15 @@ arm "an UNSOUND calibrate writes no reading at all and says so, leaving the evid
 
 # ---------------------------------------------------------------- a kill is not a completion, D8
 # A DECLARED trailer-less row that outlives the 3 s wall's TERM is KILLed by the worker's grace
-# and exits 137: the WALL branch keys on 143, and the declared-nt clause took any rc as a reading.
-# Its seed is removed first so the file's silence about it is the observation (rc 99 otherwise).
-arm "a declared trailer-less row killed at rc 137 is KILLED, not read: no reading written, the row named" 1 \
-    "is a kill, not a completion — NO reading written" \
+# and exits 137: the declared-nt clause took any rc as a reading (D8), and the WALL branch then
+# keyed on 143 alone, so the wall's own escalated kill was counted `killed` and the summary named
+# a bound the row never hit (round 2 R3). The row is WALL, `walled` counts it, and the
+# `run wall killed:` line names it (rc 98 otherwise); its seed is removed first so the file's
+# silence about it is the observation (rc 99 otherwise).
+arm "a declared trailer-less row the wall KILLs at rc 137 is WALL, not read or killed: no reading written, the row named on the wall line" 1 \
+    "(killed by the 3s calibrate wall — NO reading written)" \
     "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-stubborn.sh|' $B && git add -A" \
-    "( SELFTEST_WALL=3 $R --pooled --calibrate; rc=\$?; grep -q '^free one' $E && exit 99; exit \$rc )"
+    "( out=\$(SELFTEST_WALL=3 $R --pooled --calibrate); rc=\$?; printf '%s\n' \"\$out\"; grep -q '^free one' $E && exit 99; printf '%s\n' \"\$out\" | grep -q 'run wall killed: free one' || exit 98; exit \$rc )"
 
 # ---------------------------------------------------------------- GOV_NODE is a registry tag, D11
 # The write path trusted GOV_NODE verbatim while --check refused the row it wrote; both now read
@@ -852,6 +899,15 @@ arm "GOV_NODE naming no registry tag is REFUSED by the calibrate, naming the tab
     "GOV_NODE is 'zz', which is no tag the charter's" \
     'true' \
     "( GOV_NODE=zz $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
+
+# AND THE COMPARISON IS ANCHORED (round 2 R5): the validator was a substring match over the
+# space-joined tag list, so two ADJACENT registered tags passed as a node and were written. The
+# setup registers a second tag `u` beside `t`, because the fixture's one tag cannot stage the
+# adjacency the substring match accepted. Refused by name, rc 2, the file unchanged (rc 99).
+arm "GOV_NODE spelling two adjacent registered tags with a space between is REFUSED — the tag match is anchored, not a substring" 2 \
+    "GOV_NODE is 't u', which is no tag the charter's" \
+    "printf '| \`u\` | someone-else | fixture |\n' >> AGENTS.md" \
+    "( GOV_NODE='t u' $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
 
 arm "--pooled over an evidence file that will not parse REFUSES naming the file, rather than defaulting past the row" 2 \
     "will not parse" \

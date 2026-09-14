@@ -125,7 +125,7 @@ usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--
               row's script prints its trailer OUTSIDE a `[ "$st" = 0 ] &&` guard
               unless declared `# no-trailer:`, because a green-only trailer is
               UNTRAILED under --pooled the moment the suite reds; run nothing;
-              takes no mode
+              takes no mode and no --kit
   --list      print the population and the derived total, run nothing; no mode
   --rank      rank the population by its RECORDED seconds and mark the set that
               carries the declared majority share; REFUSES if any row's reading
@@ -174,6 +174,17 @@ if [ "${#RESETS[@]}" -gt 0 ] && [ "$CALIBRATE" != 1 ]; then
   echo "run-selftests: Spell it: bash $SELF --pooled --calibrate --reset <row>" >&2
   exit 2
 fi
+# --check TAKES NO --kit, and the usage line says so. Its trailer arm iterates the population
+# against a whole-file `# pooled-kit:` declaration, so a filter outside that kit made the gate red
+# by selecting nothing — a false red on a manual invocation (aBatchedArm closing review R4).
+# Refused by name here, beside the two refusals above, rather than filtered inside the arm.
+if [ "$MODE" = check ] && [ -n "$FILTER" ]; then
+  echo "run-selftests: --check grades the WHOLE declaration and takes no --kit, and was given '--kit $FILTER'." >&2
+  echo "run-selftests: A filtered gate would red its trailer arm for selecting nothing outside the declared" >&2
+  echo "run-selftests: pooled kit, or pass a filtered declaration off as the whole. Nothing was run." >&2
+  echo "run-selftests: Spell it: bash $SELF --check" >&2
+  exit 2
+fi
 
 [ -f "$BUDGETS" ] || { echo "run-selftests: no declaration at $BUDGETS"; exit 2; }
 
@@ -220,7 +231,10 @@ resolve_node_tag() {
     # GOV_NODE used to reach the evidence file verbatim, and the unguarded --check leg then redded
     # every bar on every node until the tracked file was hand-edited (aBatchedArm closing D11).
     # Refused by name, and the refusal is the caller's: return 2 is "set but not a tag".
-    case " $(read_registry_tags | tr '\n' ' ')" in *" $GOV_NODE "*) printf '%s' "$GOV_NODE"; return 0 ;; esac
+    # ANCHORED, one tag per line: the space-joined `case` this replaced was a substring match,
+    # so `GOV_NODE='a b'` — two adjacent registered tags — was accepted and written as a node
+    # (aBatchedArm closing review R5, the `id-matched-as-a-substring` class).
+    if read_registry_tags | grep -qxF -- "$GOV_NODE"; then printf '%s' "$GOV_NODE"; return 0; fi
     return 2
   fi
   local user=${USERNAME:-${USER:-}} f line tok
@@ -613,7 +627,7 @@ EOF
   # ---- red: the file ships to no adopter, and --pooled refuses every row until --calibrate
   # ---- writes one, which is the announced-unarmed state.
   if [ -f "$EVIDENCE" ]; then
-    ev_tags=" $(read_registry_tags | tr '\n' ' ')"
+    ev_tags=$(read_registry_tags)
     ev_rows=0; ev_faults=""; ev_nt="|"; ev_kits=""
     while IFS=$'\t' read -r kind a b c _rest; do
       [ -n "${kind:-}" ] || continue
@@ -624,9 +638,10 @@ EOF
         DUP) ev_faults="$ev_faults"$'\n'"  line $a — the (row, token, node) key repeats" ;;
         ROW)
           ev_rows=$((ev_rows + 1))
-          case "$ev_tags" in *" $c "*) : ;;
-            *) ev_faults="$ev_faults"$'\n'"  row '$a' under $b names node '$c', which is no tag the charter's registry table carries" ;;
-          esac
+          # ANCHORED, the same comparison `resolve_node_tag` makes on the write path (R5).
+          if ! printf '%s\n' "$ev_tags" | grep -qxF -- "$c"; then
+            ev_faults="$ev_faults"$'\n'"  row '$a' under $b names node '$c', which is no tag the charter's registry table carries"
+          fi
           # AGAINST THE WHOLE DECLARATION, not the --kit-filtered population: a row outside a
           # filter is declared all the same, and reading it as an orphan would red a true file.
           if ! awk -F'\t' -v n="$a" '/^[[:space:]]*#/ { next } NF >= 2 && $1 == n { hit = 1 } END { exit hit ? 0 : 1 }' "$BUDGETS"; then
@@ -1100,7 +1115,9 @@ EOF
   # SOUNDNESS IS ITS OWN BIT, cleared by the three post-loop checks (pool wider than OUTER,
   # fingerprint not taken, fingerprint changed): the calibrate's writer used to key on CALIBRATE
   # alone, so a run that had just said "every reading above is suspect" wrote those readings as the
-  # monotone bound and the parity baseline anyway (aBatchedArm closing review D7).
+  # monotone bound and the parity baseline anyway (aBatchedArm closing review D7). The cause
+  # ACCUMULATES across the three checks rather than being overwritten, so a run that oversubscribed
+  # the box AND saw the tree change names both on the one line an operator greps (R6).
   sound=1; unsound_why=""
   outlog=""
   print_outlog() { [ -n "$outlog" ] && printf '        output: %s\n' "$outlog"; return 0; }
@@ -1113,10 +1130,16 @@ EOF
       j=$((j + 1)); continue
     fi
     # THE OUTPUT IS KEPT BEFORE ANY VERDICT IS READ, a killed row's partial capture included.
+    # MASKED AND MODE 600 on the way, the sibling runner's `redact()` inlined (a kit file sources no
+    # sibling): a suite can echo an operator-exported credential — `fatal: unable to access
+    # 'https://user:token@host/…'` from a git call under the operator's global config — and a
+    # durable copy that skips the masking its sibling applies is a credential leak the old
+    # scratch-dir lifetime was merely hiding (aBatchedArm closing review R1). Every grep below
+    # still reads `$d/out`, so no verdict changes.
     outlog=""
     if [ -n "$SWEEP_LOGDIR" ] && [ -f "$d/out" ]; then
       outlog="$SWEEP_LOGDIR/$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_').out"
-      cp "$d/out" "$outlog" 2>/dev/null || outlog=""
+      sed -E 's#://[^/@[:space:]]+:[^/@[:space:]]+@#://***:***@#g' "$d/out" > "$outlog" 2>/dev/null && chmod 600 "$outlog" 2>/dev/null || outlog=""
     fi
     if [ ! -r "$d/v" ]; then
       st=1
@@ -1157,7 +1180,12 @@ EOF
       # THE CALIBRATE WITHHOLDS EVERY VERDICT and records a reading ONLY for a row that exited on
       # its own AND left its trailer — or is DECLARED trailer-less in the file's header, in which
       # case the reading is rc-plus-FAIL and the gap is printed rather than silent.
-      if [ "$WALL_BREACHED" = 1 ] && [ "$rc" = 143 ]; then
+      # THE WALL'S WHOLE SIGNAL PATH: its TERM (143) and that TERM escalated to KILL by the
+      # worker's `timeout -k` grace (137) are both the wall. Keyed on 143 alone, a suite that
+      # ignored TERM under the wall was counted `killed`, `walled` stayed 0, and the summary named
+      # a bound the row never hit (aBatchedArm closing review R3). 124 is the row's own bound and
+      # stays KILLED below.
+      if [ "$WALL_BREACHED" = 1 ] && { [ "$rc" = 143 ] || [ "$rc" = 137 ]; }; then
         st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s %5ss  (killed by the %ss calibrate wall — NO reading written)\n' "$name" "$took" "$SWEEP_WALL"
         print_outlog
@@ -1199,9 +1227,10 @@ EOF
     # seconds and nothing else would be a budget silently not graded, which is the green-by-absence
     # class; printing `ok` for the cost would be a verdict taken from a clock this run contended.
     withheld=$((withheld + 1))
-    if [ "$WALL_BREACHED" = 1 ] && [ "$rc" = 143 ]; then
+    if [ "$WALL_BREACHED" = 1 ] && { [ "$rc" = 143 ] || [ "$rc" = 137 ]; }; then
       # KILLED BY THE WALL, not by its own bound, and the two are different facts. `timeout` exits
-      # 124 when ITS bound expires; the watchdog sends TERM, so the worker exits 143. Rendering both
+      # 124 when ITS bound expires; the watchdog sends TERM, so the worker exits 143 — or 137 when
+      # the suite ignored TERM and the `-k` grace escalated the wall's own signal (R3). Rendering both
       # as one lost the distinction, and the WALL branch below -- which only fires on a MISSING
       # verdict -- was unreachable, because a TERMed worker still writes its verdict file. Observed
       # by running it: a 12s wall over an 18s run rendered the killed suite as an ordinary FAIL.
@@ -1275,7 +1304,7 @@ EOF
   # width; a pool that ran wider than its own outer bound has broken it, and the printed pair cannot
   # notice because the pair is what the pool was ASKED for.
   if [ "$SWEEP_PEAK" -gt "$OUTER" ]; then
-    st=1; sound=0; unsound_why="the pool ran wider than its outer bound (peak $SWEEP_PEAK of $OUTER)"
+    st=1; sound=0; unsound_why="${unsound_why:+$unsound_why; }the pool ran wider than its outer bound (peak $SWEEP_PEAK of $OUTER)"
     echo "run-selftests: THE POOL RAN WIDER THAN ITS BOUND — peak $SWEEP_PEAK against an outer width"
     echo "run-selftests: of $OUTER. The composite invariant (outer x inner <= the declared width) is"
     echo "run-selftests: broken, so this run oversubscribed the box and every reading above is suspect."
@@ -1288,12 +1317,12 @@ EOF
   # verdict for a reason that never happened -- and on a clean tree compares equal and reports a
   # match the probe never made.
   if ! FP_AFTER=$(read_tree_fingerprint); then
-    st=1; sound=0; unsound_why="the closing tree fingerprint could not be taken"
+    st=1; sound=0; unsound_why="${unsound_why:+$unsound_why; }the closing tree fingerprint could not be taken"
     echo "run-selftests: the closing tree fingerprint could not be TAKEN, so this sweep is UNGRADED"
     echo "run-selftests: for pool safety. That is not the same as a clean tree and is not reported"
     echo "run-selftests: as one."
   elif [ "$FP_BEFORE" != "$FP_AFTER" ]; then
-    st=1; sound=0; unsound_why="the tracked working tree changed while the pool ran"
+    st=1; sound=0; unsound_why="${unsound_why:+$unsound_why; }the tracked working tree changed while the pool ran"
     echo "run-selftests: THE SWEEP IS UNSOUND — the tracked working tree changed while it ran, so a"
     echo "run-selftests: suite wrote outside its own scratch. This cannot name which one: a whole-run"
     echo "run-selftests: fingerprint has no way to attribute, and guessing would be worse than saying"
@@ -1378,7 +1407,7 @@ PY
       # THE RED SUMMARY NAMES ITS ACTUAL CAUSE. An unsound run has written nothing at all; only a
       # sound one is red for the rows that took no reading.
       echo "calibrated $calibrated row(s), $cal_red red, ${walled_n:-0} walled, $untrailed untrailed, graded none"
-      [ "$killed" -gt 0 ] && echo "run-selftests: and $killed row(s) KILLED — exit 124, 137 or 143 under a bound rather than the wall — wrote NO reading either."
+      [ "$killed" -gt 0 ] && echo "run-selftests: and $killed row(s) KILLED — exit 124, 137 or 143, killed by a signal or its own bound — wrote NO reading either."
       if [ "$sound" != 1 ]; then
         echo "run-selftests: NO reading was written for ANY row: $unsound_why. Fix that and calibrate again."
       else
