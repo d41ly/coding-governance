@@ -90,3 +90,5 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-14T05:30:22Z dispatch · item 7db05de4 TOOL-dLoggedFlight-13 · reason tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/selftest.py tools/drift-audit/README.md tools/drift-audit/adopt-drift-audit.sh tools/workflows/drift-audit-code.js tools/workflows/drift-audit-state.js tools/install-prefix-carried.txt memory/gotchas memory/map/generated memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md memory/builds/dLoggedFlight/build/2026-09-14-build-TOOL-dLoggedFlight-13-1-acceptance-ledger.md memory/builds/dLoggedFlight/prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-14T05:30:26Z brief · item TOOL-dLoggedFlight-13 · reason ab4c282e51a0 memory/builds/dLoggedFlight/prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md
+
+2026-09-14T07:59:08Z review · item dLoggedFlight-closing-diff · reason verdict BLOCKED · blockers 1
