@@ -128,7 +128,7 @@ tools/unattended/kit.toml	3	codebase-map,unattended	a kit descriptor that gained
 tools/unattended/lib-unattended.sh	1	unattended	one literal, a pointer to `memory/gotchas/empty-field-collapses-unless-it-is-last.md` beside the `read` whose field order that class governs. Gov prose in a gov file. TOOL-aQuenchedHarness-7.
 tools/unattended/run-unattended-gates.sh	4	(loose),unattended	the kit runner now delegates to `tools/run-gates/run-selftests.sh` and says so in the budget block that re-declares `BUDGET_kit_gate` against a gov-side reading. TOOL-aQuenchedHarness-4 and -7.
 tools/unattended/unattended.sh	7	memory-tree,workflows
-tools/unattended/unattended.test.sh	3	memory-recall,memory-tree,unattended
+tools/unattended/unattended.test.sh	8	(loose),memory-recall,memory-tree,unattended	RAISED 3 -> 8 BY HAND at aDeferredBar's closing review F3: the SPEC_TOKENS_CLI dispatch arms copy the real checker INTO the scratch fixture at `tools/check-spec-tokens.py`, write the fixture's own `tools/gate-legs.json`, declare that path in the fixture's conf and name a missing `tools/gone.py`. FIXTURE-INTERNAL PATHS, the class the check-pass-order and check-brief-recorded rows record: the fixture tree is built by the suite and the driver under test reads the declaration from that tree, so `tools/` is the fixture's own layout and is correct at every prefix.
 tools/workflows/README.md	4	workflows
 tools/workflows/check-protocol-parity.test.sh	3	memory-tree,workflows
 tools/workflows/check-review-join.sh	4	(loose),hooks,workflows

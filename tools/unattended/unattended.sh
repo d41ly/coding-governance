@@ -288,7 +288,7 @@ CONF="$ROOT/.unattended.conf"
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 GATE_BOUND=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -4699,6 +4699,34 @@ verb_dispatch() { # slug · unit · writes...
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac
+  # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
+  # THE SPEC-TOKEN CHECKER, RUN OVER THE LIVE TREE BEFORE THE DISPATCH IS ADMITTED. The memory
+  # kit's `bar` join grades LIVE specs, and under this harness every unit spec is CLOSED in its own
+  # build commit, so by the first bar that could grade it the population that join was built for is
+  # empty by construction. This verb is the one point that sees every live spec before its unit
+  # builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
+  # never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
+  # BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
+  # The launcher is resolved beside this kit when the resolver ships there; an adopter laid out
+  # without it falls back to the name, the same last resort the kit's own suites take.
+  if [ -n "${SPEC_TOKENS_CLI:-}" ]; then
+    [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
+    local _stpy _strc
+    if [ -f "$KIT_DIR/../lib/resolve-python.sh" ]; then
+      # shellcheck source=/dev/null
+      . "$KIT_DIR/../lib/resolve-python.sh"
+      _stpy=$(resolve_python) || { fail 49 "--dispatch: no usable python launcher resolves beside this kit, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
+    else
+      _stpy=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+    fi
+    run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+    if [ "$_strc" != 0 ]; then
+      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')"
+      return 1
+    fi
+  else
+    echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
+  fi
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block

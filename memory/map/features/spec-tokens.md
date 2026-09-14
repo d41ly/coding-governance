@@ -50,9 +50,14 @@ every run. The fourth join, `bar`, reads the legs and paths populations rather t
 
 **A bar or a suite is not an acceptance observation (TOOL-aDeferredBar-2).** The `bar` join reds a
 live spec dated at or after `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`, blank = off) whose acceptance
-bullet or §7 leg line backticks a merge-bar or self-test-suite INVOCATION: the runner or a
-`*.test.sh` at command position, past optional `VAR=value` prefixes, `timeout` and a `bash`/`sh`
-launcher, or a non-empty `GATE_FULL=`/`GATE_SELFTESTS=` assignment. The research record under
+bullet or §7 leg line backticks a merge-bar or self-test-suite INVOCATION: the runner, a
+`*.test.sh` or a whole-suite `selftest.py` at command position, past optional `VAR=value` prefixes,
+`timeout` and a `bash`/`sh`/`python` launcher, or a non-empty `GATE_FULL=`/`GATE_SELFTESTS=`
+assignment (the quoted empty one is OFF, as the hook reads it). The suite population is DERIVED:
+a parity arm feeds every `chunk = selftests` argv of `tools/gate-legs.json` without a `--selftest`
+flag to `BAR`. The unattended driver's `--dispatch` runs the checker, declared as `SPEC_TOKENS_CLI`
+in `.unattended.conf`, over the live tree before admitting a pass, because that harness closes each
+unit spec in its build commit and no bar ever grades one. The research record under
 `memory/builds/aDeferredBar/build/` traced one unit's 68-minute stall to exactly such a token in its
 AC8; the substitute the refusal names is the direct check — the checker on a staged break, a
 `--selftest` flag, a fixture — with the suite declared under `New arm:`. The test runs FIRST in each

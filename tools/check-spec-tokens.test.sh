@@ -13,7 +13,10 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=32
+FLOOR_ASSERTIONS=38
+# RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
+# added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
+# the requoted-cutoff arm and the non-ISO cutoff refusal.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 PY=${PY:-python}
 pass=0; fail=0
@@ -202,7 +205,7 @@ arm "a manifest that does not parse REFUSES" 1 "$d" "REFUSING"
 #      so the bar line carries `relation unchecked` and a cutoff dated before the commit day is never
 #      refused. AC17 alone commits, because the refusal it observes reads the value's commit date.
 d=$base/bar; scratch "$d"
-mkdir -p "$d/tools/run-gates"; : > "$d/tools/run-gates/run-gates.sh"
+mkdir -p "$d/tools/run-gates" "$d/tools/govkit"; : > "$d/tools/run-gates/run-gates.sh"; : > "$d/tools/govkit/selftest.py"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm runner --no-verify
 clean=$(git -C "$d" rev-parse HEAD)
 spec="$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
@@ -295,12 +298,37 @@ git -C "$d" add -A >/dev/null
 arm "the same flag assignment with a value REDS" 1 "$d" '[bar] `GATE_FULL=1 cat tools/gate-legs.json`'
 git -C "$d" reset -q --hard "$clean"
 
+# closing review F9 — the QUOTED empty assignment is the OFF spelling too. rev-3's `\S` read the
+# quote as a value and disagreed with the hook, which unquotes it; observed RED-first on that regex.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_FULL="" cat tools/gate-legs.json` prints|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the QUOTED empty flag assignment is the OFF spelling and is no hit" 0 "$d" "2 token(s) examined in 1 live spec(s) at/after SPEC_DIRECT_CUTOFF 2026-09-01"
+git -C "$d" reset -q --hard "$clean"
+
+# closing review F2 — a whole-suite `selftest.py` FILE is a suite invocation, the same rule as a
+# `.test.sh`; the fixture tracks the file so the paths join stays green and the one hit is the bar's.
+# A `--selftest` FLAG on another file is the direct check the child prompt admits and is not a hit.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`python tools/govkit/selftest.py` is green|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff §6 bullet naming a whole-suite selftest.py REDS as [bar]" 1 "$d" '[bar] `python tools/govkit/selftest.py`'
+git -C "$d" reset -q --hard "$clean"
+
 # AC17 — a COMMITTED cutoff not strictly past its own commit day is REFUSED before grading, naming
 #        the key, the value and the day it compared against. Today's checker grades this tree clean.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm cutoff --no-verify
 day=$(git -C "$d" log -1 --format=%cs)
 arm "a committed cutoff not strictly past its own commit day is REFUSED before grading" 1 "$d" "REFUSING — SPEC_DIRECT_CUTOFF 2026-09-02 is not strictly past $day"
+git -C "$d" reset -q --hard "$clean"
+
+# closing review F10 — a cutoff that is not an ISO date is REFUSED, never armed. rev-3's checker
+# graded this fixture at exit 0 with `0 live spec(s) at/after SPEC_DIRECT_CUTOFF 2026-9-15`: set,
+# and permanently off. Observed RED-first on that checker.
+printf 'SPEC_DIRECT_CUTOFF="2026-9-15"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a non-ISO cutoff is REFUSED rather than reported as set while grading nothing" 1 "$d" "REFUSING — SPEC_DIRECT_CUTOFF 2026-9-15 is not an ISO date"
 git -C "$d" reset -q --hard "$clean"
 
 # The WAIVER family: its committed clean state IS the AC1 fixture, and the commit is dated the day
@@ -324,6 +352,48 @@ printf 'GATE_FULL=1 bash tools/run-gates/run-gates.sh\t[bar] no spec names this\
 git -C "$d" add -A >/dev/null
 arm "a [bar] waiver row nothing produces REDS as stale" 1 "$d" "STALE WAIVER"
 git -C "$d" reset -q --hard "$clean"
+
+# closing review F4 — a LATER commit that requotes the cutoff line (quoted to bare) is not the
+# setting commit. `git log -G` matched the removed and the added line and re-dated the value to
+# 2026-09-20, so the gate refused a cutoff nobody re-set; `--pickaxe-regex -S` reads the occurrence
+# count, which a requote or a move leaves at one. The waiver row keeps the graded run at exit 0, so
+# the two outcomes differ in rc and not only in text. Observed RED-first on the `-G` checker.
+printf 'GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+sed -i 's|^SPEC_DIRECT_CUTOFF="2026-09-01"$|SPEC_DIRECT_CUTOFF=2026-09-01|' "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+GIT_COMMITTER_DATE=2026-09-20T12:00:00 git -C "$d" commit -qm requote --no-verify
+arm "a later commit that requotes the cutoff line does not re-date the setting commit" 0 "$d" "1 waiver(s)"
+git -C "$d" reset -q --hard "$clean"
+
+# ---- closing review F2, the PARITY arm: the suite population is DERIVED from the gate manifest and
+#      never restated here. Every `chunk = selftests` leg whose argv carries no `--selftest` flag is
+#      a whole-suite run, and `BAR` must match its argv as a command string; a suite convention that
+#      drifts out of the predicate reds here rather than walking past it, which is how six python
+#      legs did. ONE assertion over the population, so the floor does not move with the manifest,
+#      plus one that the population is non-empty. The exemption is DECLARED and ANNOUNCED with its
+#      reason, and a stale name reds: test_recall_floor.py is the pytest `test_*.py` convention,
+#      gov-only and 12 s to 34 s in the ledger; a `test_*.py` shape would hit an adopter's
+#      single-file pytest run, which is exactly the direct check a spec may name.
+LEGS="$(dirname "$LINT")/gate-legs.json"
+# `-c`, not `python -` with a heredoc: the Windows python launcher reads the first argument after
+# `-` as a script and runs its shebang, which is how a probe of this arm ran bash instead.
+parity=$("$PY" -c 'import importlib.util, json, sys
+spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+exempt = set(sys.argv[3].split())
+pop = [" ".join(l["argv"]) for l in json.load(open(sys.argv[2], encoding="utf-8"))
+       if l.get("chunk") == "selftests" and "--selftest" not in l["argv"]]
+seen = {c.rsplit("/", 1)[-1] for c in pop} & exempt
+skipped = [c for c in pop if c.rsplit("/", 1)[-1] in exempt]
+bad = [c for c in pop if c not in skipped and not m.BAR.search(c)]
+bad += ["(stale exemption: " + x + ")" for x in exempt - seen]
+print(len(pop)); print(len(skipped)); print("\n".join(bad))' "$LINT" "$LEGS" "test_recall_floor.py")
+popn=$(printf '%s\n' "$parity" | sed -n 1p | tr -d '\r'); skipn=$(printf '%s\n' "$parity" | sed -n 2p | tr -d '\r')
+unmatched=$(printf '%s\n' "$parity" | sed -n '3,$p' | tr -d '\r' | grep -c .)
+if [ "${popn:-0}" -gt 0 ] 2>/dev/null; then echo "arm ok    parity: the manifest holds $popn whole-suite selftests leg(s), $skipn declared exempt"; pass=$((pass+1))
+else echo "arm FAIL  parity: the manifest holds no whole-suite selftests leg, so parity would be certified over nothing"; fail=$((fail+1)); fi
+if [ "$unmatched" = 0 ]; then echo "arm ok    parity: BAR matches every whole-suite selftests argv of the manifest"; pass=$((pass+1))
+else echo "arm FAIL  parity: a manifest suite invocation BAR does not match:"; printf '%s\n' "$parity" | sed -n '3,$p' | sed 's/^/          /'; fail=$((fail+1)); fi
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

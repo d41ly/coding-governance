@@ -63,11 +63,13 @@ asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its
 the graph remembers ORDER, which is why the second exists. The first parent and not the pinned BASE:
 the method REQUIRES a run to author a missing spec, so what this refuses is authoring it AFTERWARDS.
 `PASS_ORDER_CUTOFF` grandfathers earlier builds, and the leg's liveness line names all three
-populations it walks rather than only the two it grades.
+populations it walks rather than only the two it grades. `--dispatch` also runs the spec-token
+checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
+in its build commit, so no bar ever grades one (aDeferredBar F3).
 
 **The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
 pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the
-ref could not move without a push. That was false — `git update-ref` moves it offline — and it was
+ref could not move without a push. False — `git update-ref` moves it offline — and it was
 reproduced end to end: preflight printed OK over a base the run had authored, the leg agreed silently,
 and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
 and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert rather than
@@ -97,12 +99,10 @@ spends the `--close` override budget.
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
 the leg READ them; a phase token or a DoD item spelled into a script is a defect. `AUTH_PARAM` lives
 in the same file and is read by NEITHER: it is consumed once, by `adopt-unattended.sh`, at render
-time, and its value reaches an agent only through the rendered Skill. Grouping it with the rest was
-round 1 L3 of `TOOL-aNamedGesture-1` — a prose claim about who reads a key, on a page whose own
-affordance section already said otherwise. The kit owns the
+time, and its value reaches an agent only through the rendered Skill. The kit owns the
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
 without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
-and the fleet already has a recorded case of a pin RAISE being indistinguishable from a drain.
+and the fleet has a recorded case of a pin RAISE indistinguishable from a drain.
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on

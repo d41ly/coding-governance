@@ -50,7 +50,8 @@ THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
 one the tree now tracks, refuses — a stale exception cannot hide a live hit. A cutoff the tree's own
-history dates at or after itself refuses.
+history dates at or after itself refuses, and so does one that is not an ISO date: the comparisons
+are string comparisons, and a malformed value would report the join as set while it graded nothing.
 
   python tools/check-spec-tokens.py            # assert; exit 1 on an unwaived hit
   python tools/check-spec-tokens.py --list     # every hit and near-miss, authoring aid, exit 0
@@ -103,14 +104,19 @@ DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 # a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth.
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
-# or a chain separator, past optional VAR=value prefixes, `timeout N` and a bash/sh launcher — or a
-# GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the token. A
+# or a chain separator, past optional VAR=value prefixes, `timeout N` and a bash/sh/python
+# launcher — or a GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
+# token. A suite is a `.test.sh` file OR a whole-suite `selftest.py` file (closing review F2: six
+# manifest legs are the latter and both readers had spelled "suite" as the shell convention); a
+# `--selftest` FLAG on some other file is the seconds-long direct check and is not a run. A
 # `path:line` citation fails the trailing lookahead and stays the cites join's; a grep over a suite
-# FILE has grep at command position and is not a run; the empty assignment is the OFF spelling.
+# FILE has grep at command position and is not a run; the empty assignment is the OFF spelling, and
+# so is the QUOTED empty one, `GATE_FULL=""` — the quote is not a value (closing review F9, where
+# `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF).
 BAR = re.compile(
-    r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+\S+\s+)?(?:bash\s+|sh\s+)?(?:\S*/)?"
-    r"(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh(?=\s|$)"
-    r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=\S")
+    r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+\S+\s+)?(?:bash\s+|sh\s+|python3?\s+)?(?:\S*/)?"
+    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|selftest\.py)(?=\s|$)"
+    r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
@@ -251,6 +257,15 @@ def main(argv):
     legline_cut = read_conf_key(root, LEGLINE_KEY)
     direct_cut = read_conf_key(root, DIRECT_KEY)
     relation = ""
+    if direct_cut and not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", direct_cut):
+        # A cutoff that is not an ISO date is REFUSED, never armed (closing review F10): the Date
+        # gate and the arming test below are string comparisons, and `2026-9-15` satisfies neither
+        # — the join then reports as set while grading nothing, the announced-zero the register
+        # comment says this key avoids.
+        print(f"spec-tokens: REFUSING — {DIRECT_KEY} {direct_cut} is not an ISO date (YYYY-MM-DD), so "
+              "neither the relation nor the arming comparison can read it and the join would report "
+              "as set while grading nothing")
+        return 1
     if direct_cut:
         # THE RELATION, ASSERTED (TOOL-aDeferredBar-2, Date gate). The register's rule puts a new
         # cutoff strictly past the day it is set, so a value the tree's own history dates at or after
@@ -258,8 +273,12 @@ def main(argv):
         # SETTING COMMIT's date and not to the newest spec date on the tree: from the day after
         # landing, that comparison refuses exactly the population the join exists to grade. A value
         # not yet in history cannot be checked and is announced, never refused or passed.
-        q = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs",
-                            f'-G^{DIRECT_KEY}="?{direct_cut}"?$', "--", ".memory-tree.conf"],
+        # PICKAXE `-S`, NOT `-G` (closing review F4): `-G` matches any hunk that adds OR removes the
+        # line, so a block move, a requote or a whitespace cleanup re-dated the "setting commit" to
+        # that later day and the gate refused a value nobody re-set. `-S` matches a change in the
+        # line's OCCURRENCE COUNT, which a move or a requote leaves at one.
+        q = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs", "--pickaxe-regex",
+                            f'-S^{DIRECT_KEY}="?{direct_cut}"?$', "--", ".memory-tree.conf"],
                            capture_output=True, text=True)
         if q.returncode:
             # A delegate whose status is discarded reads a query that never ran as "not yet
