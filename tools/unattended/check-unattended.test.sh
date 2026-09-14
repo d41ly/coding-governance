@@ -936,22 +936,23 @@ same "a project DoD EXTENSION is green" "$(run)" ""
 # ---- ...and the floor itself must be DECLARED. Omitting the key is the quietest way to disarm a
 # ---- shrink-only pin, so the omission is its own refusal rather than a skipped check.
 reset_tree; sed -i '/^CORE_FLOOR=/d' .unattended.conf
-hit "$(run)" "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a deleted core member is indistinguishable from a set that never had one"
-
 # ---- check 2/3's empty-set branches. Reached by declaring the CORE set as whitespace, which parses
 # ---- to a readable-but-empty value — distinct from the unreadable case armed above.
-reset_tree; sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=" "/' $KIT_REL/unattended.sh
-hit "$(run)" "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
+sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=" "/' $KIT_REL/unattended.sh
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a deleted core member is indistinguishable from a set that never had one"
+hit "$out" "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
 reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' $KIT_REL/unattended.sh
-hit "$(run)" "the effective Definition-of-Done set is empty, so --close would block on nothing"
-
 # ---- check 4 branch 1: THE POPULATION GUARD, both states. A run-state file under the memory root
 # ---- but NOT at the selected path is the mis-segmentation. A tree with none anywhere is a YOUNG
 # ---- tree and must be SILENT — the arm whose absence made the equivalent guard red every freshly
 # ---- scaffolded repo, which is recorded in this fleet's own gotcha catalogue.
-reset_tree; mkdir -p memory/elsewhere && git mv memory/builds/tRun/RUN.md memory/elsewhere/RUN.md
+mkdir -p memory/elsewhere && git mv memory/builds/tRun/RUN.md memory/elsewhere/RUN.md
 git commit -q -am moved --no-verify
-out=$(run)
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "the effective Definition-of-Done set is empty, so --close would block on nothing"
 hit "$out" "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason"
 
 reset_tree; git rm -q memory/builds/tRun/RUN.md && git commit -q -m young --no-verify
