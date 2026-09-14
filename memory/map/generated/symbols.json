@@ -413,6 +413,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_aggregate",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "build_anomaly_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "build_arm_env",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -438,6 +448,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_big_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -448,9 +463,19 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_class_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_clusters",
       "kind": "function",
       "file": "tools/lexicon/canon.py"
+    },
+    {
+      "id": "build_conformance_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "build_corpus",
@@ -461,6 +486,11 @@
       "id": "build_counted_rules",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_coverage_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "build_cutoff",
@@ -486,6 +516,11 @@
       "id": "build_edges",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "build_entry_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "build_filtered",
@@ -546,6 +581,11 @@
       "id": "build_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_matchers",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "build_measured",
@@ -618,6 +658,21 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_record_doc",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "build_record_parts",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "build_record_rotation",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_reference_index",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -631,6 +686,11 @@
       "id": "build_report",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "build_round_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "build_row",
@@ -703,6 +763,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_summary_facts",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "build_swapped_rules",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -713,6 +778,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "build_timeline_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "build_tree_rows",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -721,6 +791,11 @@
       "id": "build_ts_reader",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "build_unit_rows",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "build_usage",
@@ -868,6 +943,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "check_commitment",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "check_conformance",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -959,6 +1039,11 @@
     },
     {
       "id": "check_producer_keys",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_projection",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -1248,6 +1333,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "cmd_record",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "cmd_report",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -1311,6 +1401,11 @@
       "id": "cmd_update",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "cmd_verify",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
     },
     {
       "id": "cmd_write",
@@ -1523,6 +1618,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_count",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_default_branch",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1536,6 +1636,11 @@
       "id": "derive_fact",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_fact_templates",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "derive_gate_runner",
@@ -1678,6 +1783,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_runkey",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_runner_verbs",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -1686,6 +1796,16 @@
       "id": "derive_scope",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "derive_serves",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_short_sha",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "derive_source_paths",
@@ -1698,14 +1818,29 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_table",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_targets",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "derive_timeline_values",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_tool_class",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "derive_unit_key",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "derive_unsatisfied_requires",
@@ -1718,6 +1853,11 @@
       "file": "tools/process-monitor/classify.py"
     },
     {
+      "id": "derive_view",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_width",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -1726,6 +1866,11 @@
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_yes_no",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "describe_write_lock",
@@ -2633,6 +2778,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "measure_commitment",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "measure_conventions",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2921,6 +3071,16 @@
       "id": "parse_record",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "parse_record",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "parse_record_markdown",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "parse_registry",
@@ -3338,6 +3498,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_record_cells",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_records",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -3376,6 +3541,11 @@
       "id": "read_runs",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "read_serves_ids",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_session_ids",
@@ -3688,6 +3858,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_cell",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "render_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
@@ -3708,9 +3883,19 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "render_fact",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "render_gate_line",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_id_run",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "render_inventories_json",
@@ -3748,6 +3933,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_markdown",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "render_model_json",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -3783,6 +3973,11 @@
       "file": "tools/runlog/runlog.py"
     },
     {
+      "id": "render_record",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "render_redacted",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -3806,6 +4001,11 @@
       "id": "render_rows",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
+    },
+    {
+      "id": "render_serves",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "render_shards",
@@ -3836,6 +4036,11 @@
       "id": "render_template",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_twin",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "repo_root",
@@ -4008,6 +4213,11 @@
       "file": "tools/codebase-map/map_imports.py"
     },
     {
+      "id": "resolve_index_command",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "resolve_journal_root",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -4028,6 +4238,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "resolve_model_sources",
+      "kind": "function",
+      "file": "tools/runlog/runlog.py"
+    },
+    {
       "id": "resolve_own_claim",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4046,6 +4261,11 @@
       "id": "resolve_projects_root",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "resolve_record_path",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "resolve_repo_key",
@@ -4521,6 +4741,11 @@
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_record_rows",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "scan_routes",
@@ -5783,6 +6008,51 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_record_ac1_names",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac2_serves",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac3_shape",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac4_classes",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac5_verify",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac6_cap",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac7_cli",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac8_cost",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_model_fields",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_recycled_parent_edge_is_dropped_and_counted",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -6221,6 +6491,11 @@
       "id": "write_receipt_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "write_record",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "write_session",

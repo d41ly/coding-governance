@@ -164,6 +164,10 @@ class RunModel:
     usage: dict
     attribution: dict
     coverage: dict
+    # The line numbers, per producer file, of every journal line this model attributed to the run. The
+    # committed record hashes those lines (TOOL-dLoggedFlight-9 S5), so this model is the ONE owner of
+    # which lines are the run's, and the record never re-joins them.
+    journal_lines: dict = field(default_factory=dict)
     method: dict = field(default_factory=lambda: dict(METHOD))
     cost: dict = field(default_factory=dict)
     schema: int = MODEL_SCHEMA
@@ -487,7 +491,8 @@ def derive_invocation(inv) -> dict:
             "rc": e.get("rc"), "exit": e.get("exit"), "checks": checks,
             "phase_from": s.get("phase_from"), "phase_to": e.get("phase_to"),
             "unit": e.get("unit") or None, "oob": s.get("oob") == "1", "wt": s.get("wt"),
-            "sids": sids}
+            "sids": sids,
+            "lines": [ln.lineno for ln in (inv.start, inv.end) if ln is not None and ln.lineno]}
 
 
 def check_record_creating(inv) -> bool:
@@ -879,7 +884,9 @@ def derive_merged_subclass(model) -> tuple:
 
 
 def scan_anomalies(model) -> list:
-    """The anomaly set (spec S6): each kind of `ANOMALY_KINDS` with its trigger's evidence."""
+    """The anomaly set (spec S6): each kind of `ANOMALY_KINDS` with its trigger's evidence, and `t`, the
+    time of the event that triggered it: the last own commit for `nonterminal-merged`, and None for
+    `no-progress` and `multi-run-session`, which are decided over the run as a whole."""
     out = []
     w = model["window"]
     tl = model.get("timeline", [])
@@ -887,38 +894,40 @@ def scan_anomalies(model) -> list:
     own = model.get("own_commits") or []
     if not terminal and own and model.get("merged"):
         sub, why = derive_merged_subclass(model)
-        out.append({"kind": "nonterminal-merged", "subclass": sub,
+        out.append({"kind": "nonterminal-merged", "subclass": sub, "t": float(own[-1]["t"]),
                     "evidence": f"phase {model['phase']}; last own commit {model['last_own'][:8]} is on "
                                 f"the default branch; {why}"})
     if not terminal and not own:
-        out.append({"kind": "no-progress",
+        out.append({"kind": "no-progress", "t": None,
                     "evidence": f"no own commit after start {model['start_commit'][:8]}; window ends "
                                 f"{derive_iso(w['end'])}"})
     verbs = [e for e in tl if e["kind"] == "verb"]
     for e in verbs:
         if e.get("oob"):
-            out.append({"kind": "out-of-band-edit",
+            out.append({"kind": "out-of-band-edit", "t": e["t"],
                         "evidence": f"{e['verb']} START at {derive_iso(e['t'])} carried oob=1"})
-    loops = Counter()
+    loops, first = Counter(), {}
     for e in verbs:
         if e.get("rc") not in (None, "0") and e.get("exit") == "clean":
             for c in e["checks"]:
                 loops[(e["verb"], c)] += 1
+                first.setdefault((e["verb"], c), e["t"])
     for (verb, check), n in sorted(loops.items()):
         if n >= REFUSAL_LOOP_MIN:
-            out.append({"kind": "refusal-loop", "evidence": f"{verb} refused {n} times on check {check}"})
+            out.append({"kind": "refusal-loop", "t": first[(verb, check)],
+                        "evidence": f"{verb} refused {n} times on check {check}"})
     for e in verbs:
         if e["state"] == "killed-or-running":
-            out.append({"kind": "killed-verb",
+            out.append({"kind": "killed-verb", "t": e["t"],
                         "evidence": f"{e['verb']} START at {derive_iso(e['t'])} has no END"})
         elif e.get("exit") == "unclean":
-            out.append({"kind": "killed-verb",
+            out.append({"kind": "killed-verb", "t": e["end"],
                         "evidence": f"{e['verb']} END at {derive_iso(e['end'])} reads exit=unclean"})
     default_name = model.get("coverage", {}).get("default_branch")
     for e in tl:
         if e["kind"] == "push" and e.get("lander") == "0" and default_name and any(
                 (r.split() + ["", "", ""])[2] == f"refs/heads/{default_name}" for r in e.get("refs", [])):
-            out.append({"kind": "push-outside-lander",
+            out.append({"kind": "push-outside-lander", "t": e["t"],
                         "evidence": f"a push at {derive_iso(e['t'])} to refs/heads/{default_name} with "
                                     "lander=0"})
     gates = [e for e in tl if e["kind"] == "gate"]
@@ -926,31 +935,31 @@ def scan_anomalies(model) -> list:
         if call.get("cls") == "bar" and call.get("bg") and call.get("rc") == 0 and call.get("end"):
             red = [g for g in gates if g.get("verdict") == "RED" and call["t"] <= g["t"] <= call["end"]]
             if red:
-                out.append({"kind": "red-behind-zero",
+                out.append({"kind": "red-behind-zero", "t": call["t"],
                             "evidence": f"a background bar at {derive_iso(call['t'])} notified rc 0 "
                                         f"and its gate line at {derive_iso(red[0]['t'])} reads RED"})
         if "destructive" in (call.get("flags") or []):
-            out.append({"kind": "destructive-git",
+            out.append({"kind": "destructive-git", "t": call["t"],
                         "evidence": f"a {call.get('cls')} call at {derive_iso(call['t'])} flagged "
                                     "destructive"})
     for row in model.get("record_rows") or []:
         if (row["kind"] == "review" and derive_review_verdict(row["reason"]) == "BLOCKED"
                 and derive_review_exit(row["reason"]) == "CONVERGED"):
-            out.append({"kind": "converged-on-blocked",
+            out.append({"kind": "converged-on-blocked", "t": row["t"],
                         "evidence": f"review of {row['item']} at line {row['line']}: BLOCKED and "
                                     "CONVERGED"})
     for e in tl:
         if e["kind"] == "idle":
-            out.append({"kind": "idle-gap", "evidence": f"{int(e['dur'])} s with no event from "
+            out.append({"kind": "idle-gap", "t": e["t"], "evidence": f"{int(e['dur'])} s with no event from "
                                                         f"{derive_iso(e['t'])}"})
     for other in model.get("shared_sessions", []):
-        out.append({"kind": "multi-run-session",
+        out.append({"kind": "multi-run-session", "t": None,
                     "evidence": f"a session of this run also started {other['starts']} verb(s) of "
                                 f"{other['slug']}"})
     heads = sorted([c["t"] for c in own] + [c["t"] for c in model.get("record_commits", [])])
     for streak in scan_heartbeat_streaks(verbs, heads):
         if len(streak) >= STALL_HEARTBEATS:
-            out.append({"kind": "stalled",
+            out.append({"kind": "stalled", "t": streak[0]["t"],
                         "evidence": f"{len(streak)} --status calls in a row from "
                                     f"{derive_iso(streak[0]['t'])} to {derive_iso(streak[-1]['end'])} "
                                     f"with phase {streak[0]['phase_to']} and no commit; the rule is "
@@ -1214,6 +1223,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     pushes = journals["pushes"]["journal"]
     push_invs = rl.build_invocations(pushes.lines)
     pinned = set()
+    push_nums, gate_nums = set(), set()
     for inv in push_invs:
         s = inv.start.fields if inv.start else {}
         e = inv.end.fields if inv.end else {}
@@ -1232,6 +1242,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                     via = "pushed-sha"
         if via is None:
             continue
+        push_nums.update(ln.lineno for ln in (inv.start, inv.end) if ln is not None and ln.lineno)
         if e.get("gate_run"):
             pinned.add(e["gate_run"])
         timeline.append({"t": t, "source": "pushes", "kind": "push", "via": via,
@@ -1242,6 +1253,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         f = line.fields
         t = parse_float(f.get("t"))
         if f.get("ev") == "once" and check_in_window(t) and derive_path_key(f.get("wt")) in worktrees:
+            push_nums.add(line.lineno)
             timeline.append({"t": t, "source": "pushes", "kind": "push-refused",
                              "decision": f.get("decision"), "lander": f.get("lander")})
     for line in journals["gates"]["journal"].lines:
@@ -1253,6 +1265,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         elif check_in_window(t) and derive_path_key(f.get("wt")) in worktrees:
             via = "worktree"
         if via:
+            gate_nums.add(line.lineno)
             timeline.append({"t": t, "source": "gates", "kind": "gate", "via": via, "run": f.get("run"),
                              "verdict": f.get("verdict"), "head": f.get("head"), "rc": f.get("rc"),
                              "failed": f.get("failed")})
@@ -1275,6 +1288,11 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             if kind in ("owner", "compact", "limit") and check_in_window(t):
                 timeline.append({"t": t, "source": "transcripts", "kind": kind,
                                  **({"via": ev.get("via")} if kind == "owner" else {})})
+            # A workflow run with its label: the extractor keeps a label only token-shaped and clean
+            # under the redaction table, and the committed record admits it only in its own class.
+            if kind == "workflow" and check_in_window(t):
+                timeline.append({"t": t, "source": "transcripts", "kind": "workflow",
+                                 "label": ev.get("label")})
             if kind == "tool" and check_in_window(t):
                 note = ends.get(ev.get("call")) if ev.get("bg") else None
                 tools.append({"t": t, "end": ev.get("end"), "cls": ev.get("cls"), "bg": ev.get("bg"),
@@ -1382,7 +1400,9 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         last_own=last_own, merged=merged, close=close, timeline=timeline, tools=tools,
         record_rows=rows, record_commits=[{"sha": c["sha"], "t": c["t"]} for c in record_commits],
         shared_sessions=shared_sessions, units=units, ledger=ledger, conformance=[], anomalies=[],
-        owner_positions=owner_positions, usage=usage, attribution=attribution, coverage=coverage)
+        owner_positions=owner_positions, usage=usage, attribution=attribution, coverage=coverage,
+        journal_lines={"driver": sorted({n for i in seg for n in i["lines"]}),
+                       "gates": sorted(gate_nums), "pushes": sorted(push_nums)})
     view = asdict(model)
     model.conformance = check_conformance(view)
     model.anomalies = scan_anomalies(view)

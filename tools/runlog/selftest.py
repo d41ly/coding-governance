@@ -48,6 +48,7 @@ sys.path.insert(0, str(HERE))
 
 import extract as rx  # noqa: E402
 import model as rl_model  # noqa: E402
+import record as rl_record  # noqa: E402
 import runlog_lib as rl  # noqa: E402
 from collections import Counter  # noqa: E402
 
@@ -62,7 +63,10 @@ from collections import Counter  # noqa: E402
 # checks alone move it by forty-two. Two of them read this tree, AC7 over a tracked run record and the
 # decision-log report, and a third reads the driver's source; each announces a skip where its subject
 # is absent, and a skip lowers the count, which is this floor's job to see.
-ASSERTION_FLOOR = 774
+# RAISED 774 -> 902 by TOOL-dLoggedFlight-9: the committed-record arms, nine functions and the two
+# checks the driver-sets arm gained for the record's owed ledger sources, so the decoy checks alone move
+# it by twenty-seven.
+ASSERTION_FLOOR = 902
 
 PASS = []
 FAIL = []
@@ -2866,6 +2870,634 @@ def test_model_driver_sets():
             keys.update(re.sub(r"^sess\..*", "sess.", t.strip('"')) for t in toks[0::2])
         check(f"model driver sets: the driver's {ev.upper()} writer and PRODUCER_KEYS name the same keys",
               sorted(keys), sorted(PRODUCER_KEYS[("driver", ev)]))
+    # THE RECORD'S FIRST SIX LEDGER SOURCES (TOOL-dLoggedFlight-9 AC4) are the driver's owed kinds and,
+    # prefixed `rescope-`, its owed acts, read off the same source and compared both directions.
+    owed = re.findall(r'^PARK_KINDS_OWED="([^"]*)"', text, re.M)
+    acts = re.findall(r'^PARK_ACTS_OWED="([^"]*)"', text, re.M)
+    want = sorted((owed[0].split() if owed else []) + [f"rescope-{a}" for a in (acts[0].split() if acts else [])])
+    check("record driver sets: the record's first six ledger sources are the driver's owed kinds and acts",
+          sorted(rl_record.RECORD_SCHEMA["vocab"]["ledger-source"][:6]), want)
+    check_true("record driver sets liveness: the driver's owed sets were read, so the comparison has a side",
+               len(want) == 6, str(want))
+
+
+# ================================================================ the committed record (TOOL-dLoggedFlight-9)
+#
+# The record arms render REAL models: each fixture model is `build_run_model` over a scratch history,
+# or one such model with its lists lengthened by copying its own entries, so no arm grades a model
+# shape the model never returns. The graders below are typed from the documents that own each rule,
+# never taken from the renderer: the recording-name grammar and the Serves projection from the memory
+# tree's hygiene doc, and the four id-anchor shapes from the recall kit's extractor. Two operands from
+# one generator would assert nothing.
+
+HYGIENE_FAMILIES = ("X",)
+CHECK5_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-((" + "|".join(HYGIENE_FAMILIES) + r")-)?"
+                       r"[A-Za-z0-9]+-[0-9]+(-[a-z0-9][a-z0-9-]*)?\.md")
+ANCHOR_ID = r"[A-Z]+-[A-Za-z0-9]+-[0-9]+"
+ANCHOR_RES = (re.compile(r"^#{2,6}\s+[`*]*(" + ANCHOR_ID + r")\b"),
+              re.compile(r"^\s*[-*]\s+[`*]*(" + ANCHOR_ID + r")\b[`*]*\s*[-—:·]"),
+              re.compile(r"^\|\s*[`*]*(" + ANCHOR_ID + r")\b[^|]*\|"),
+              re.compile(r"^\s*[-*]\s+[`*]*(" + ANCHOR_ID + r")\b[`*]*\s*[·|]"))
+FIRST_CELL_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z|[0-9]+")
+RECORD_DATE = "2026-09-14"
+
+
+def read_serves_ids(text):
+    """The ids a record's head binds, read as check 21 reads them: the first `**Serves:**` line among
+    the first 12 lines, its kind token dropped, and each `N..M` expanded."""
+    for line in text.split("\n")[:12]:
+        m = re.match(r"\*\*Serves:\*\* (\S+) (.*)$", line)
+        if not m:
+            continue
+        ids = []
+        for tok in m.group(2).split():
+            r = re.fullmatch(r"([A-Z]+-[A-Za-z0-9]+)-([0-9]+)\.\.([0-9]+)", tok)
+            if r:
+                ids += [f"{r.group(1)}-{n}" for n in range(int(r.group(2)), int(r.group(3)) + 1)]
+            else:
+                ids.append(tok)
+        return m.group(1), ids
+    return None, []
+
+
+def check_projection(name, ids):
+    """Check 21's branch 4: the family, slug and ordinal in the name after its date and kind are one of
+    the ids the head serves. A name with no family carries no id at all."""
+    rest = re.sub(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}-[^-]*-", "", name)
+    m = re.match(r"(" + "|".join(HYGIENE_FAMILIES) + r")-[A-Za-z0-9]+-[0-9]+", rest)
+    return bool(m) and m.group(0) in ids
+
+
+def parse_record_markdown(text):
+    """`{section: {"facts": {label: value}, "tables": [{"header": [...], "rows": [[...]]}]}}` read off
+    the markdown by line shape alone, independently of the renderer, for the twin to be compared with."""
+    out, cur, table = {}, None, None
+    for line in text.split("\n"):
+        if line.startswith("## "):
+            cur = line[3:]
+            out[cur] = {"facts": {}, "tables": []}
+            table = None
+            continue
+        if cur is None or cur == "Data":
+            continue
+        if line.startswith("- ") and ": " in line:
+            label, _, value = line[2:].partition(": ")
+            out[cur]["facts"][label] = value
+            table = None
+        elif line.startswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if table is None:
+                table = {"header": cells, "rows": [], "sep": False}
+                out[cur]["tables"].append(table)
+            elif not table["sep"]:
+                table["sep"] = True        # the line right under a header is its separator, whatever it holds
+            else:
+                table["rows"].append(cells)
+        else:
+            table = None
+    for sec in out.values():
+        for tb in sec["tables"]:
+            tb.pop("sep", None)
+    return out
+
+
+def read_record_cells(text):
+    """Every table cell and every fact token of a record: where a class value is looked for."""
+    doc = parse_record_markdown(text)
+    cells = set()
+    for sec in doc.values():
+        for value in sec["facts"].values():
+            cells.add(value)
+            cells.update(re.split(r" · | of | to | joined of | named · |\s", value))
+        for tb in sec["tables"]:
+            for row in tb["rows"]:
+                cells.update(row)
+    return cells
+
+
+def scan_record_rows(text):
+    """Every table data row, as its cells: the population the first-cell rule grades."""
+    rows = []
+    for tb in [tb for sec in parse_record_markdown(text).values() for tb in sec["tables"]]:
+        rows += tb["rows"]
+    return rows
+
+
+def build_record_rotation(mr="memory"):
+    """A build rotated the way the driver rotates, whose first run dispatched unit 1 and aborted with no
+    journal line, and whose live run dispatched unit 2 under a driver journal of its own."""
+    bd = f"{mr}/builds/{FX_SLUG}"
+    rm = f"{bd}/RUN.md"
+    files = build_base_files(mr=mr, units=(FX_UNIT1, FX_UNIT2))
+    if mr != "memory":
+        files[".memory-tree.conf"] = f"MEMORY_ROOT={mr}\n"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files}])
+    base = s0[1]
+    pre1 = build_preflight_state(FX_SLUG, base, base)
+    run1 = add_runstate_row(pre1, derive_minute(6), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    aborted = add_runstate_row(set_runstate_fact(set_runstate_fact(run1, "phase", "ABORTED"), "witness", base),
+                               derive_minute(15), "abort", "the fixture stops", "code 3")
+    arch = f"{bd}/{derive_archive_name(aborted)}"
+    pre2 = build_preflight_state(FX_SLUG, base, base, kid="k0000002")
+    run2 = add_runstate_row(pre2, derive_minute(22), "dispatch", f"{base[:8]} {FX_UNIT2}", "tools/a.txt")
+    repo, shas = build_history([
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: pre1}},
+        {"t": derive_minute(7), "subject": f"records({FX_SLUG}): the dispatch", "files": {rm: run1}},
+        {"t": derive_minute(10), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — run one's work",
+         "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(15), "subject": f"records({FX_SLUG}): --abort", "files": {rm: aborted}},
+        {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, the finished record retired",
+         "files": {arch: aborted, rm: pre2}},
+        {"t": derive_minute(23), "subject": f"records({FX_SLUG}): the dispatch", "files": {rm: run2}},
+        {"t": derive_minute(25), "subject": f"feat({FX_SLUG}): {FX_UNIT2} — run two's work",
+         "files": {"tools/a.txt": "2\n"}},
+        {"t": derive_minute(30), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(run2, "phase", "BUILDING")}},
+    ], repo=first)
+    driver = (render_driver_lines(19.5, "--preflight", phase_from="ABORTED", phase_to="RUNNING")
+              + render_driver_lines(22, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT2)
+              + render_driver_lines(28, "--status", phase_from="RUNNING", phase_to="RUNNING"))
+    j = write_journals(repo.parent, driver=driver)
+    return {"repo": repo, "shas": shas, "journals": j, "record": rm, "folder": repo / bd / "build"}
+
+
+def test_record_ac1_names():
+    """AC1: two runs of one rotated build, one with journals and one with none, rendered on one date,
+    are two files told apart by the run key each took from `derive_run_starts`; a later re-render keeps
+    its file; a never-committed record refuses; and a declared memory root is where the record lands."""
+    fx = build_record_rotation()
+    repo, j = fx["repo"], fx["journals"]
+    starts = rl_model.derive_run_starts(repo, "memory", [FX_SLUG]).get(FX_SLUG, [])
+    m1, m2 = build_model(repo, journals=j, run=1), build_model(repo, journals=j, run=2)
+    p1 = rl_record.write_record(repo, m1, journal_root=j, date=RECORD_DATE)
+    p2 = rl_record.write_record(repo, m2, journal_root=j, date=RECORD_DATE)
+    names = [p.name if p else None for p in (p1, p2)]
+    check("record AC1: both runs wrote a record", [p is not None for p in (p1, p2)], [True, True])
+    if p1 is None or p2 is None:
+        return
+    check("record AC1: each name ends in the run key derive_run_starts gave that run",
+          [n[-len("xxxxxxxx.md"):-3] for n in names], [r["runkey"] for r in starts])
+    check_true("record AC1: ...so the two names differ in their run key", starts[0]["runkey"] != starts[1]["runkey"]
+               and names[0] != names[1], str(names))
+    check("record AC1: one run carries journal lines and one none, and the journal-less commits none",
+          [bool(m1.journal_lines["driver"]), bool(m2.journal_lines["driver"])], [False, True])
+    for n in names:
+        text = (fx["folder"] / n).read_bytes().decode("utf-8")
+        kind, ids = read_serves_ids(text)
+        check(f"record AC1: {n[:40]} passes check 5's recording-name grammar", bool(CHECK5_RE.fullmatch(n)), True)
+        check(f"record AC1: {n[:40]} projects an id its own Serves line lists", check_projection(n, ids), True)
+        check(f"record AC1: {n[:40]} binds as a journal", kind, "journal")
+    # THE GRADERS' OWN NEAR MISSES, so each is seen able to fail: a name with no family projects no id,
+    # one naming an id its head does not serve fails the projection, and a free name fails check 5.
+    check("record AC1 liveness: a name dropping the family fails the projection",
+          check_projection(f"{RECORD_DATE}-build-{FX_SLUG}-1-runlog-{starts[0]['runkey']}.md", [FX_UNIT1]), False)
+    check("record AC1 liveness: a name claiming an id the head does not serve fails it",
+          check_projection(names[0], [FX_UNIT2]), False)
+    check("record AC1 liveness: a free name fails check 5", bool(CHECK5_RE.fullmatch("run-record.md")), False)
+    check_true("record AC1: each name carries -runlog-<key>, so dropping the key reads as a different file",
+               all(n.endswith(f"-runlog-{r['runkey']}.md") for n, r in zip(names, starts)), str(names))
+    # A later render date rewrites the SAME file: garble it, re-render, and count the folder.
+    p1.write_bytes(b"garbled\n")
+    again = rl_record.write_record(repo, m1, journal_root=j, date="2026-09-20")
+    check("record AC1: a re-render on a later date writes the existing file", again, p1)
+    check("record AC1: ...whose bytes are a record again", p1.read_bytes()[:len(rl_record.TITLE)],
+          rl_record.TITLE.encode())
+    check("record AC1: ...and the folder still holds exactly two run records",
+          sorted(p.name for p in fx["folder"].glob("*-runlog-*.md")), sorted(names))
+    # A run-state file that was never committed has no start commit, so the command refuses by name.
+    uncommitted = repo / "memory" / "builds" / "xNeverCommitted"
+    (uncommitted / "spec").mkdir(parents=True)
+    (uncommitted / "RUN.md").write_bytes(build_preflight_state("xNeverCommitted", "0" * 40, "0" * 40).encode())
+    env = build_arm_env(repo.parent)
+    r = run_runlog(["record", "xNeverCommitted", "--write", "--journals", str(j)], repo, env)
+    check("record AC1: a never-committed run-state file refuses, exit 2", r.returncode, 2)
+    check_true("record AC1: ...with a named line", "ever committed" in r.stderr, r.stderr[-300:])
+    shutil.rmtree(uncommitted, ignore_errors=True)
+    # The declared memory root is where the record lands, two segments deep.
+    fx2 = build_record_rotation(mr="docs/mem")
+    m = rl_model.build_run_model(fx2["repo"], FX_SLUG, run=2, journal_root=fx2["journals"])
+    p = rl_record.write_record(fx2["repo"], m, journal_root=fx2["journals"], date=RECORD_DATE)
+    rel = p.relative_to(fx2["repo"]).as_posix() if p else ""
+    check_true("record AC1: with MEMORY_ROOT=docs/mem the record lands under docs/mem/builds/",
+               rel.startswith(f"docs/mem/builds/{FX_SLUG}/build/"), rel)
+    check("record AC1: ...and nothing lands under the default root",
+          sorted((fx2["repo"] / "memory").rglob("*-runlog-*.md")) if (fx2["repo"] / "memory").exists() else [], [])
+
+
+def test_record_ac2_serves():
+    """AC2: a run that dispatched units 2, 3 and 5 of a build whose specs define 1 to 5 serves
+    `…-2..3 …-5`; an undefined id is never served; a closed unit its own commits name is; and a run that
+    served no spec-defined id writes nothing and says so."""
+    units = tuple(f"X-{FX_SLUG}-{i}" for i in range(1, 6))
+    bd = f"memory/builds/{FX_SLUG}"
+    rm = f"{bd}/RUN.md"
+    files = build_base_files(units=units)
+    files.update(build_base_files(slug="xUnboundRun", units=("X-xUnboundRun-1",)))
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files}])
+    base = s0[1]
+    st = build_preflight_state(FX_SLUG, base, base)
+    for m, uid in ((3, units[1]), (4, units[2]), (5, units[4]), (6, f"X-{FX_SLUG}-9")):
+        st = add_runstate_row(st, derive_minute(m), "dispatch", f"{base[:8]} {uid}", "tools/a.txt")
+    ub = build_preflight_state("xUnboundRun", base, base)
+    ub = add_runstate_row(ub, derive_minute(4), "dispatch", f"{base[:8]} X-xUnboundRun-9", "tools/a.txt")
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(3), "subject": "records(xUnboundRun): preflight",
+         "files": {"memory/builds/xUnboundRun/RUN.md": ub}},
+        {"t": derive_minute(8), "subject": f"feat({FX_SLUG}): {units[1]} — work", "files": {"tools/a.txt": "1\n"}},
+    ], repo=first)
+    model = build_model(repo)
+    check("record AC2: the run serves the dispatched units a spec defines, and not the undefined one",
+          rl_record.derive_serves(model), [units[1], units[2], units[4]])
+    check("record AC2: ...written as a range where contiguous",
+          rl_record.render_serves(rl_record.derive_serves(model)), f"X-{FX_SLUG}-2..3 X-{FX_SLUG}-5")
+    text = rl_record.render_record(model)
+    kind, ids = read_serves_ids(text)
+    check("record AC2: the record's head binds exactly those ids, read as check 21 reads them",
+          (kind, ids), ("journal", [units[1], units[2], units[4]]))
+    check_true("record AC2: the undefined id reaches the head nowhere", f"X-{FX_SLUG}-9" not in text.split("\n")[2],
+               text.split("\n")[2])
+    # CLOSED and named by an own commit is served; CLOSED and named by none is not.
+    closed = {f"{bd}/spec/2026-09-13-spec-{uid}.md": build_spec_text(uid, "a unit", status="CLOSED")
+              for uid in (units[0], units[3])}
+    repo2, _ = build_history([{"t": derive_minute(9), "subject": f"feat({FX_SLUG}): {units[0]} — closed here",
+                               "files": dict(closed, **{"tools/a.txt": "2\n"})}], repo=repo)
+    model2 = build_model(repo2)
+    check("record AC2: a unit closed and named by the run's own commit is served; one closed elsewhere is not",
+          rl_record.render_serves(rl_record.derive_serves(model2)), f"X-{FX_SLUG}-1..3 X-{FX_SLUG}-5")
+    # The unbound run: its one dispatched id is defined by no spec, so no record, exit 0, and a line.
+    env = build_arm_env(repo.parent)
+    r = run_runlog(["record", "xUnboundRun", "--write"], repo, env)
+    check("record AC2: a run with no spec-defined unit exits 0", r.returncode, 0)
+    check_true("record AC2: ...with a `no spec-defined unit` line", "no spec-defined unit" in r.stdout,
+               (r.stdout + r.stderr)[-300:])
+    check("record AC2: ...and writes nothing, never a `none` record",
+          sorted(p.name for p in (repo / "memory" / "builds" / "xUnboundRun").rglob("*runlog*")), [])
+
+
+def test_record_ac3_shape():
+    """AC3: the headings of S3 in order, every table row led by a timestamp or an ordinal, no line that
+    anchors an id, and a Data twin equal to the markdown read back by line shape."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j))
+    check("record AC3: the headings are S3's, in S3's order",
+          [ln[3:] for ln in text.split("\n") if ln.startswith("## ")],
+          ["Summary", "Timeline", "Units", "Decisions", "Conformance", "Anomalies", "Coverage", "Data"])
+    rows = scan_record_rows(text)
+    bad = [r[0] for r in rows if not FIRST_CELL_RE.fullmatch(r[0])]
+    check("record AC3: every table row's first cell is a timestamp or an ordinal", bad, [])
+    check_true("record AC3: ...over a population that has rows of both kinds",
+               any(r[0].endswith("Z") for r in rows) and any(r[0].isdigit() for r in rows), str(len(rows)))
+    anchored = [ln for ln in text.split("\n") if any(rx_.match(ln) for rx_ in ANCHOR_RES)]
+    check("record AC3: no line of the record anchors an id, so it defines none for checks 13 and 14", anchored, [])
+    check_true("record AC3 liveness: a row led by a unit id fails both graders",
+               not FIRST_CELL_RE.fullmatch(FX_UNIT1)
+               and any(rx_.match(f"| {FX_UNIT1} | CLOSED |") for rx_ in ANCHOR_RES))
+    twin = rl_record.parse_record(text)["sections"]
+    md = parse_record_markdown(text)
+    check("record AC3: the twin's sections are the markdown's, in order", list(twin), list(md)[:-1])
+    check("record AC3: the twin's facts are the markdown's", {k: v["facts"] for k, v in twin.items()},
+          {k: md[k]["facts"] for k in twin})
+    check("record AC3: the twin's tables are the markdown's, header and rows",
+          {k: [(t["header"], t["rows"]) for t in v["tables"]] for k, v in twin.items()},
+          {k: [(t["header"], t["rows"]) for t in md[k]["tables"]] for k in twin})
+    check("record AC3: the record's first line is its title and its Serves line is in its head",
+          (text.split("\n")[0], read_serves_ids(text)[0]), (rl_record.TITLE, "journal"))
+
+
+def build_class_model():
+    """A REAL model, from the landed fixture, given one value of every class the schema declares and
+    every member of every closed vocabulary a table carries, plus four intruders in fields the renderer
+    reads and more in fields it never reads."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    real = build_model(fx["repo"], journals=j)
+    m = dataclasses.asdict(real)
+    t = float(derive_minute(12))
+    tl = m["timeline"]
+    for i, d in enumerate(rl_record.PUSH_DECISIONS):
+        tl.append({"t": t + i, "source": "pushes", "kind": "push", "decision": d, "rc": "0",
+                   "lander": "1" if i % 2 else "0"})
+    tl.append({"t": t + 10, "source": "pushes", "kind": "push-refused", "decision": "refuse-default-branch",
+               "lander": "0"})
+    for i, v in enumerate(rl_record.GATE_VERDICTS):
+        tl.append({"t": t + 20 + i, "source": "gates", "kind": "gate", "verdict": v, "head": "a" * 40, "rc": "1"})
+    tl += [{"t": t + 30, "source": "model", "kind": "idle", "dur": 960.0},
+           {"t": t + 31, "source": "transcripts", "kind": "workflow", "label": "tier2-review"},
+           {"t": t + 32, "source": "transcripts", "kind": "compact"},
+           {"t": t + 33, "source": "transcripts", "kind": "limit"},
+           {"t": t + 34, "source": "driver", "kind": "verb", "verb": "--landed", "state": "ended", "rc": "1",
+            "checks": ["34", "7"], "phase_from": "LANDING", "phase_to": "LANDING"},
+           {"t": float(MODEL_T0 + 11 * 60 + 30), "source": "transcripts", "kind": "owner", "via": "typed"}]
+    intruders = {"command": "git push --force origin main", "session": FX_SID,
+                 "absolute path": f"/home/someone/repo/memory/builds/{FX_SLUG}/RUN.md:3",
+                 "free text": "the run skipped the bar because it was late"}
+    tl += [{"t": t + 40, "source": "driver", "kind": "verb", "verb": intruders["command"], "state": "ended",
+            "rc": "0", "checks": [], "phase_to": "BUILDING"},
+           {"t": t + 41, "source": "run-state", "kind": "dispatch", "unit": intruders["session"]},
+           {"t": t + 42, "source": "transcripts", "kind": "workflow", "label": intruders["free text"]}]
+    tl.sort(key=lambda e: e["t"])
+    for i, status in enumerate(rl_record.UNIT_STATUSES, 2):
+        m["units"].append({"id": f"X-{FX_SLUG}-{i}", "status": status, "order": i, "spec": "s",
+                           "briefs": [], "dispatches": [], "build_commit": None, "build_t": None})
+    rm = m["record"]
+    led = m["ledger"]
+    led["entries"] = [{"source": s, "ref": f"{rm}:{12 + i}" if i % 2 else "b" * 40}
+                      for i, s in enumerate(rl_model.LEDGER_SOURCES)]
+    led["entries"] += [{"source": "review", "ref": f"memory/builds/{FX_SLUG}/reviews/r{i}.md:3", "verdict": v}
+                       for i, v in enumerate(rl_record.REVIEW_VERDICTS)]
+    led["entries"].append({"source": "decision", "ref": intruders["absolute path"]})
+    led["counts"] = dict(Counter(e["source"] for e in led["entries"]))
+    for i, (verdict, exit_) in enumerate((("CLEAN", "CONVERGED"), ("BLOCKED", "NON-CONVERGENT"),
+                                          ("CLEAN WITH FIXES", "CEILING"), ("BLOCKED", None))):
+        m["record_rows"].append({"t": t + 50 + i, "kind": "review", "item": "a-subject", "step": None,
+                                 "reason": f"verdict {verdict} · blockers {i}" + (f" · {exit_}" if exit_ else ""),
+                                 "line": 90 + i})
+    m["conformance"] = [{"item": item, "unit": FX_UNIT1 if item == "brief-before-build" else None, "state": s,
+                         "evidence": intruders["free text"]}
+                        for item in rl_model.CONFORMANCE_ITEMS for s in rl_model.CONFORMANCE_STATES]
+    m["anomalies"] = [{"kind": k, "t": t + 60 + i, "evidence": intruders["free text"]}
+                      for i, k in enumerate(rl_model.ANOMALY_KINDS)]
+    m["anomalies"] += [{"kind": "nonterminal-merged", "subclass": s, "t": None, "evidence": "x"}
+                       for s in rl_model.MERGED_SUBCLASSES]
+    for name, state in zip(("gates", "pushes", "driver"), ("dead", "absent", "partial")):
+        m["coverage"][name]["state"] = state
+    m["merged"] = False
+    m["sessions"] = [FX_SID]
+    m["worktrees"] = [intruders["absolute path"]]
+    m["facts"]["note"] = intruders["free text"]
+    return m, intruders, j
+
+
+def test_record_ac4_classes():
+    """AC4: one value of every class reaches the file and every member of every closed vocabulary a
+    table carries does; the four intruders in fields the renderer reads are withheld and counted, and
+    none of them, nor anything from a field it never reads, reaches the file."""
+    m, intruders, j = build_class_model()
+    text = rl_record.render_record(m, "memory", rl_record.measure_commitment(m, j))
+    cells = read_record_cells(text)
+    sch = rl_record.RECORD_SCHEMA
+    for name in ("event", "source", "coverage-state", "ledger-source", "gate-verdict", "push-decision",
+                 "conformance-item", "conformance-state", "anomaly-kind", "merged-subclass", "review-verdict",
+                 "review-exit", "unit-status", "yes-no", "owner-position"):
+        missing = [v for v in sch["vocab"][name] if v not in cells]
+        check(f"record AC4: every member of the {name} vocabulary reaches the file", missing, [])
+    shaped = {"utc": rl_model.derive_iso(float(derive_minute(12))), "int": "15", "duration": "960s",
+              "sha": "a" * 12, "digest": rl_record.measure_commitment(m, j)["sha256"], "verb": "--landed",
+              "phase": "LANDING", "checks": "34,7", "label": "tier2-review", "unit": FX_UNIT1, "units": FX_UNIT1,
+              "path": m["record"], "ref": f"{m['record']}:13"}
+    check("record AC4: the fixture names one value of every shaped class", sorted(shaped), sorted(sch["shaped"]))
+    check("record AC4: one value of every shaped class reaches the file",
+          [c for c, v in shaped.items() if v not in cells], [])
+    for label, value in (("window opened by", "git"), ("window closed by", "terminal-write"),
+                         ("window closed by", "last-activity")):
+        other = dict(m, window=dict(m["window"], **{"start_from" if "opened" in label else "end_from": value}))
+        check(f"record AC4: {label} {value} reaches the file", f"- {label}: {value}" in rl_record.render_record(other),
+              True)
+    leaked = [k for k, v in intruders.items() if v in text or json.dumps(v)[1:-1] in text]
+    check("record AC4: none of the four intruders reaches the file", leaked, [])
+    check_true("record AC4 liveness: each intruder IS in the model the renderer was handed",
+               all(v in json.dumps(m) for v in intruders.values()))
+    check("record AC4: the four intruders in read fields are counted as withheld",
+          "- values withheld: 4" in text, True)
+    owner_at = rl_model.derive_iso(float(MODEL_T0 + 11 * 60 + 30))
+    check("record AC4: an owner turn's clock time reaches the file nowhere", owner_at in text, False)
+    check_true("record AC4: ...though the model's timeline carried it",
+               any(e.get("kind") == "owner" for e in m["timeline"]))
+    # A closed vocabulary missing a member refuses its value: the arm above must be able to fail.
+    keep = sch["vocab"]["push-decision"]
+    sch["vocab"]["push-decision"] = keep[:-1]
+    try:
+        dropped = rl_record.render_record(m, "memory")
+    finally:
+        sch["vocab"]["push-decision"] = keep
+    check("record AC4 liveness: a vocabulary short one member withholds that value",
+          (keep[-1] in read_record_cells(dropped), "- values withheld: 5" in dropped), (False, True))
+
+
+def build_big_model(n_timeline=500, n_units=60, n_anomalies=200, n_entries=300, wide=False):
+    """The landed fixture's REAL model with every list lengthened by copying its own entries, so the
+    shapes are the model's own. `wide` makes every value its class's widest."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    m = dataclasses.asdict(build_model(fx["repo"], journals=j))
+    seed = [e for e in m["timeline"] if e["kind"] != "owner"]
+    t0 = float(derive_minute(0))
+    tl = []
+    for i in range(n_timeline):
+        e = dict(seed[i % len(seed)], t=t0 + i * 7)
+        if wide and e["kind"] == "verb":
+            e["verb"] = "--" + "x" * 20
+        tl.append(e)
+    if wide:
+        tl += [{"t": t0 + n_timeline * 7 + i, "source": "transcripts", "kind": "workflow", "label": "w" * 40}
+               for i in range(5)]
+    m["timeline"] = tl
+    unit0 = m["units"][0]
+    m["units"] = [dict(unit0, id=f"X-{FX_SLUG}-{i}", order=i,
+                       status=rl_record.UNIT_STATUSES[i % len(rl_record.UNIT_STATUSES)])
+                  for i in range(1, n_units + 1)]
+    m["anomalies"] = [{"kind": rl_model.ANOMALY_KINDS[i % len(rl_model.ANOMALY_KINDS)], "t": t0 + i,
+                       "subclass": (rl_model.MERGED_SUBCLASSES[i % len(rl_model.MERGED_SUBCLASSES)]
+                                    if rl_model.ANOMALY_KINDS[i % len(rl_model.ANOMALY_KINDS)] == "nonterminal-merged"
+                                    else None), "evidence": "e"} for i in range(n_anomalies)]
+    long_name = "2026-09-14-build-" + "y" * 180 + ".md"
+    m["ledger"]["entries"] = [{"source": rl_model.LEDGER_SOURCES[i % len(rl_model.LEDGER_SOURCES)],
+                               "ref": (f"memory/builds/{FX_SLUG}/build/{long_name}:{1000000 + i}" if wide
+                                       else f"memory/builds/{FX_SLUG}/RUN.md:{i}")}
+                              for i in range(n_entries)]
+    m["ledger"]["counts"] = dict(Counter(e["source"] for e in m["ledger"]["entries"]))
+    if wide:
+        m["conformance"] = [{"item": "brief-before-build", "unit": u["id"], "state": "MET"} for u in m["units"]]
+        m["record_rows"] = [{"t": t0 + i, "kind": "review", "item": "s", "step": None, "line": i,
+                             "reason": "verdict CLEAN WITH FIXES · blockers 123456 · NON-CONVERGENT"}
+                            for i in range(n_units)]
+    return m
+
+
+def test_record_ac6_cap():
+    """AC6: 500 timeline rows, 60 units, 200 anomalies and 300 ledger entries stay under the cap, every
+    elision and aggregation stated, every anomaly kind kept, and the twin carrying the same counts and no
+    row the markdown elided. A model whose every list sits at its bound with its widest values fits
+    through the halving step, which that model is seen to need."""
+    m = build_big_model()
+    text = rl_record.render_record(m)
+    size = len(text.encode("utf-8"))
+    check_true(f"record AC6: the record is under the cap ({size} bytes)", size <= rl_record.RECORD_CAP_BYTES,
+               str(size))
+    md = parse_record_markdown(text)
+    check("record AC6: every elision and aggregation is stated",
+          (md["Timeline"]["facts"].get("events"), md["Units"]["facts"].get("units"),
+           md["Anomalies"]["facts"].get("anomalies"), md["Decisions"]["facts"].get("entries")),
+          ("500 · shown 60 · elided 440", "60 · shown 0 · aggregated yes", "200 · shown 0 · aggregated yes",
+           "300 · shown 0 · aggregated yes"))
+    kinds = {r[1] for tb in md["Anomalies"]["tables"] for r in tb["rows"]}
+    check("record AC6: every anomaly kind that occurred is kept", sorted(kinds), sorted(rl_model.ANOMALY_KINDS))
+    check("record AC6: ...with its count", sum(int(r[3]) for tb in md["Anomalies"]["tables"] for r in tb["rows"]),
+          200)
+    twin = rl_record.parse_record(text)["sections"]
+    check("record AC6: the twin carries the same counts", {k: v["facts"] for k, v in twin.items()},
+          {k: md[k]["facts"] for k in twin})
+    check("record AC6: the twin carries the same rows, and so no row the markdown elided",
+          [len(t["rows"]) for t in twin["Timeline"]["tables"]], [len(t["rows"]) for t in md["Timeline"]["tables"]])
+    elided = rl_model.derive_iso(float(derive_minute(0)) + 250 * 7)
+    check("record AC6: a row from the elided middle is in neither copy", elided in text, False)
+    check_true("record AC6 liveness: that row IS in the model",
+               any(rl_model.derive_iso(e["t"]) == elided for e in m["timeline"]))
+    # The widest record: nominal bounds overflow, and the halving step brings it under.
+    wide = build_big_model(n_timeline=500, n_units=20, n_anomalies=20, n_entries=20, wide=True)
+    parts = rl_record.build_record_parts(wide)
+    nominal = len(rl_record.render_markdown(rl_record.build_record_doc(parts, rl_record.TIMELINE_EDGE,
+                                                                       rl_record.LIST_BOUND),
+                                            parts["serves"]).encode("utf-8"))
+    check_true(f"record AC6 liveness: at the nominal bounds the widest record overflows ({nominal} bytes)",
+               nominal > rl_record.RECORD_CAP_BYTES, str(nominal))
+    text = rl_record.render_record(wide)
+    size = len(text.encode("utf-8"))
+    check_true(f"record AC6: the widest record fits after halving ({size} bytes)", size <= rl_record.RECORD_CAP_BYTES,
+               str(size))
+    shown = parse_record_markdown(text)["Timeline"]["facts"]["events"]
+    check_true("record AC6: ...and says how many rows it now shows", re.fullmatch(r"505 · shown ([0-9]+) · elided "
+                                                                               r"[0-9]+", shown) is not None
+               and int(shown.split("shown ")[1].split(" ")[0]) < 2 * rl_record.TIMELINE_EDGE, shown)
+
+
+def test_record_ac5_verify():
+    """AC5: `verify` exits 0 on the untouched journal and on a line the run appended after the render,
+    1 naming the mismatch on an edited one, 0 with its nothing-to-verify line on a journal-less record,
+    and 2 on a machine that holds no journal of the run."""
+    fx = build_record_rotation()
+    repo, j = fx["repo"], fx["journals"]
+    p1 = rl_record.write_record(repo, build_model(repo, journals=j, run=1), journal_root=j, date=RECORD_DATE)
+    p2 = rl_record.write_record(repo, build_model(repo, journals=j, run=2), journal_root=j, date=RECORD_DATE)
+    env = build_arm_env(repo.parent)
+    text = p2.read_bytes().decode("utf-8")
+    check_true("record AC5: the live run's record commits its six journal lines, never nothing",
+               re.search(r"^- commitment: sha256 [0-9a-f]{64} · lines 6 · ", text, re.M) is not None,
+               [ln for ln in text.split("\n") if "commitment" in ln][:1])
+    r = run_runlog(["verify", str(p2), "--journals", str(j)], repo, env)
+    check("record AC5: verify on the untouched journal exits 0", (r.returncode, "match" in r.stdout), (0, True))
+    log = j / rl.PRODUCER_FILES["driver"]
+    added = render_driver_lines(40, "--status", phase_from="BUILDING", phase_to="BUILDING")
+    MODEL_LINES.extend(added)
+    log.write_bytes(log.read_bytes() + "".join(rl.render_line(f) + "\n" for f in added).encode("utf-8"))
+    r = run_runlog(["verify", str(p2), "--journals", str(j)], repo, env)
+    check("record AC5: a line the run appended after the render is not an edit, exit 0", r.returncode, 0)
+    now = rl_record.measure_commitment(build_model(repo, journals=j, run=2), j)
+    check("record AC5 liveness: the appended lines ARE the run's, so only the committed count kept it green",
+          now["lines"] if now else None, 8)
+    raw = log.read_bytes()
+    edited = raw.replace(b"verb=--dispatch\tslug=" + FX_SLUG.encode() + b"\tunit=" + FX_UNIT2.encode()
+                         + b"\trc=0", b"verb=--dispatch\tslug=" + FX_SLUG.encode() + b"\tunit=" + FX_UNIT2.encode()
+                         + b"\trc=7", 1)
+    check_true("record AC5 liveness: the edit changed the journal", edited != raw)
+    log.write_bytes(edited)
+    r = run_runlog(["verify", str(p2), "--journals", str(j)], repo, env)
+    check("record AC5: verify on a journal edited after the render exits 1", r.returncode, 1)
+    check_true("record AC5: ...naming the mismatch", "mismatch" in r.stdout and "sha256" in r.stdout,
+               (r.stdout + r.stderr)[-300:])
+    r = run_runlog(["verify", str(p1), "--journals", str(j)], repo, env)
+    check("record AC5: the journal-less record reads commitment=none and exits 0",
+          (r.returncode, "commitment=none" in r.stdout, "nothing to verify" in r.stdout), (0, True, True))
+    empty = pathlib.Path(tempfile.mkdtemp(prefix="runlog-nojournal-", dir=repo.parent))
+    r = run_runlog(["verify", str(p2), "--journals", str(empty)], repo, env)
+    check("record AC5: a machine holding no journal of the run refuses, exit 2, never a mismatch",
+          (r.returncode, "no journal" in r.stderr), (2, True))
+
+
+def test_record_ac7_cli():
+    """AC7: `record --write` writes the record and prints, on stdout, the index re-render command and a
+    commit subject naming the slug and no unit id; without `--write` it prints the record and writes
+    nothing."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    env = build_arm_env(fx["repo"].parent)
+    folder = fx["repo"] / "memory" / "builds" / FX_SLUG / "build"
+    r = run_runlog(["record", FX_SLUG, "--journals", str(j)], fx["repo"], env)
+    check("record AC7: without --write it prints the record and exits 0",
+          (r.returncode, r.stdout.split("\n", 1)[0]), (0, rl_record.TITLE))
+    check("record AC7: ...and writes nothing", sorted(folder.glob("*-runlog-*.md")) if folder.is_dir() else [], [])
+    r = run_runlog(["record", FX_SLUG, "--write", "--journals", str(j)], fx["repo"], env)
+    check("record AC7: record --write exits 0", r.returncode, 0)
+    written = sorted(folder.glob("*-runlog-*.md")) if folder.is_dir() else []
+    check("record AC7: ...and writes one record", len(written), 1)
+    check_true("record AC7: stdout names the index re-render command",
+               re.search(r"gen_build_index\.py --write", r.stdout) is not None, r.stdout[-400:])
+    subject = re.search(r"`(records\([^`]*)`", r.stdout)
+    check_true("record AC7: stdout names a commit subject naming the slug",
+               subject is not None and FX_SLUG in subject.group(1), r.stdout[-400:])
+    check_true("record AC7: ...and no unit id", subject is not None
+               and re.search(ANCHOR_ID, subject.group(1)) is None, subject.group(1) if subject else "")
+    check_true("record AC7: its wall time is printed, report-only", "report-only" in r.stdout, r.stdout[-300:])
+
+
+def test_record_model_fields():
+    """The three model fields the record reads (spec §4), each through `build_run_model` rather than
+    injected: the journal lines it attributed, the workflow runs on its timeline, and the anomaly times.
+    The expected line numbers are read off the journal files by bytes, not from the model."""
+    fx = build_landed_fixture()
+    wf_t = float(derive_minute(9))
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=fx["repo"].parent))
+    write_extract(store, FX_SID, [{"t": wf_t, "kind": "workflow", "label": "tier2-review", "status": "completed",
+                                   "dur_ms": 1000, "agents": 3, "tool_calls": 10, "tokens": 100},
+                                  {"t": float(derive_minute(40)), "kind": "workflow", "label": "outside-window",
+                                   "status": "completed", "dur_ms": 1, "agents": 0, "tool_calls": 0, "tokens": 0}])
+    oob = render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING", oob=True)
+    foreign = render_driver_lines(11, "--status", slug=FX_OTHER, sid=FX_SID_B, phase_from="RUNNING",
+                                  phase_to="RUNNING")
+    gates = fx["gates"][:1] + [render_gate_line(20.2, "20260913T101930Z-8001", fx["head_at_close"],
+                                                wt=FX_WT_OTHER)] + fx["gates"][1:]
+    j = write_journals(fx["repo"].parent, driver=fx["driver"] + oob + foreign, gates=gates, pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j, store=store)
+    want = {}
+    for producer in ("driver", "gates", "pushes"):
+        lines = (j / rl.PRODUCER_FILES[producer]).read_bytes().split(b"\n")
+        want[producer] = [i for i, ln in enumerate(lines, 1)
+                          if ln and (producer != "driver" or b"\tslug=" + FX_SLUG.encode() + b"\t" in ln)
+                          and b"\twt=" + FX_WT_OTHER.encode() not in ln]
+    check("record fields: journal_lines are exactly the run's lines, the foreign slug's and the other "
+          "worktree's bar left out", model.journal_lines, want)
+    check_true("record fields liveness: the journals hold lines that are not the run's",
+               sum(len((j / rl.PRODUCER_FILES[p]).read_bytes().split(b"\n")) - 1 for p in want)
+               > sum(len(v) for v in want.values()))
+    check("record fields: the workflow run inside the window is on the timeline, with its label, and the "
+          "one outside it is not", [(e["t"], e["label"]) for e in model.timeline if e["kind"] == "workflow"],
+          [(wf_t, "tier2-review")])
+    oob_t = float(MODEL_T0 + 10 * 60)
+    check("record fields: an anomaly carries the time of the event that triggered it",
+          [(a["kind"], a.get("t")) for a in model.anomalies], [("out-of-band-edit", oob_t)])
+    text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j))
+    rows = scan_record_rows(text)
+    check("record fields: the record shows the workflow row and the anomaly's time",
+          ([r[3] for r in rows if len(r) == 7 and r[2] == "workflow"],
+           [r[1] for r in rows if len(r) == 4 and r[2] == "out-of-band-edit"]),
+          (["tier2-review"], [rl_model.derive_iso(oob_t)]))
+
+
+def test_record_ac8_cost():
+    """AC8: rendering the 500-row model makes no subprocess call at all, counted by patching
+    `subprocess.Popen`, and its wall time is printed without being graded."""
+    m = build_big_model()
+    real, seen = subprocess.Popen, []
+
+    def arm_popen(args, *a, **kw):
+        seen.append(args)
+        return real(args, *a, **kw)
+
+    subprocess.Popen = arm_popen
+    try:
+        t0 = time.perf_counter()
+        rl_record.render_record(m)
+        wall = time.perf_counter() - t0
+        rendered = len(seen)
+        rl_model.run_git(HERE, ["rev-parse", "--git-dir"])
+    finally:
+        subprocess.Popen = real
+    check("record AC8: rendering the 500-row model makes no subprocess call", rendered, 0)
+    check("record AC8 liveness: the patched counter sees a git call made under it", len(seen), 1)
+    print(f"  report (grades nothing): record render over 500 timeline rows {wall:.3f}s")
 
 
 def read_shell_function(text, name):

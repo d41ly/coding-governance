@@ -7,6 +7,15 @@
     python <this kit>/runlog.py extract --measure <projects dir>
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
+    python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
+    python <this kit>/runlog.py verify <record> [--journals <dir>]
+
+`record` renders one run's closed-schema record from its model and, with `--write`, writes it into the
+build folder and prints the two follow-ups it cannot run: re-render the build index, and commit under a
+subject naming the slug and no unit id. Without `--write` it prints the record and writes nothing. A run
+that served no spec-defined unit gets a `no spec-defined unit` line, no file, and exit 0. `verify`
+recomputes a record's journal commitment on this machine: exit 0 when it matches or the record commits
+`none`, 1 when the journal changed after the render, 2 when the record or its journals cannot be read.
 
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
 object per session on stdout; `--measure` writes nothing and prints a report. `narration` prints a
@@ -35,6 +44,7 @@ run log is evidence, never an input, and no caller may branch on this status to 
 import argparse
 import json
 import os
+import pathlib
 import re
 import sys
 import time
@@ -44,6 +54,7 @@ sys.path.insert(0, HERE)
 
 import extract as ex  # noqa: E402
 import model as mdl  # noqa: E402
+import record as rec  # noqa: E402
 import runlog_lib as rl  # noqa: E402
 
 # How many refusal reasons are printed under the count. The COUNT is never capped; only the list is,
@@ -182,15 +193,11 @@ def cmd_narration(args) -> int:
     return 0
 
 
-def cmd_model(args) -> int:
-    # The journals, the store and the transcripts each resolve on their own, and a source that does
-    # not is a coverage state in the model rather than a refusal here: most runs have no journal.
-    try:
-        root = mdl.resolve_repo_root()
-    except ValueError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
-    journals = args.journals
+def resolve_model_sources(args, root) -> tuple:
+    """`(journals, store, projects)` for a command that builds a model. Each resolves on its own, and a
+    source that does not is a coverage state in the model rather than a refusal: most runs have no
+    journal."""
+    journals = getattr(args, "journals", None)
     if journals is None:
         try:
             journals = rl.resolve_journal_root(root)
@@ -202,9 +209,34 @@ def cmd_model(args) -> int:
     except ValueError as exc:
         print(f"{exc}; no local copy is written and no extract is read", file=sys.stderr)
     try:
-        projects = ex.resolve_projects_root(override=args.transcripts)
+        projects = ex.resolve_projects_root(override=getattr(args, "transcripts", None))
     except ValueError as exc:
         print(f"{exc}; the transcripts read not-local", file=sys.stderr)
+    return journals, store, projects
+
+
+def resolve_index_command(root) -> str:
+    """How to re-render the build index here. The memory tree's generator is FOUND beside this kit by its
+    file name, never spelled by path, since a kit names no sibling by literal; printed repo-relative
+    when it sits inside the repository."""
+    found = sorted(p for p in pathlib.Path(HERE).resolve().parent.glob("*/gen_build_index.py") if p.is_file())
+    if not found:
+        return ("the memory tree's gen_build_index.py --write, which is not installed beside this kit, so "
+                "run it from wherever it is")
+    try:
+        shown = found[0].resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
+    except ValueError:
+        shown = found[0].as_posix()
+    return f"python {shown} --write"
+
+
+def cmd_model(args) -> int:
+    try:
+        root = mdl.resolve_repo_root()
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    journals, store, projects = resolve_model_sources(args, root)
     try:
         model = mdl.build_run_model(root, args.slug, run=args.run, journal_root=journals, store=store,
                                     projects=projects)
@@ -222,6 +254,74 @@ def cmd_model(args) -> int:
     print(f"runlog: model git_calls={model.cost['git_calls']} wall={model.cost['wall_s']}s "
           "(report-only, grades nothing)", file=sys.stderr)
     return 0
+
+
+def cmd_record(args) -> int:
+    # Every follow-up goes to STDOUT, because the step that runs this reads stdout for what to do next,
+    # and a record written with its index left stale is the failure check 9 would find at the push.
+    try:
+        root = mdl.resolve_repo_root()
+        mr = rl.resolve_memory_root(root)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    journals, store, projects = resolve_model_sources(args, root)
+    try:
+        model = mdl.build_run_model(root, args.slug, run=args.run, journal_root=journals, store=store,
+                                    projects=projects)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    t0 = time.perf_counter()
+    unbound = (f"runlog: record {model.slug} run {model.run}: no spec-defined unit was dispatched or "
+               "closed, so no tracked record is written; an unbound record would move a shrink-only pin")
+    try:
+        if not args.write:
+            if not rec.derive_serves(model):
+                print(unbound)
+                return 0
+            sys.stdout.write(rec.render_record(model, mr, rec.measure_commitment(model, journals)))
+            print("runlog: record not written; pass --write to write it into the build folder",
+                  file=sys.stderr)
+            return 0
+        path = rec.write_record(root, model, journal_root=journals, memory_root=mr)
+    except (OSError, ValueError) as exc:
+        print(f"runlog: the record was not written: {exc}", file=sys.stderr)
+        return 2
+    wall = round(time.perf_counter() - t0, 3)
+    if path is None:
+        print(unbound)
+        return 0
+    rel = path.resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
+    print(f"runlog: record written {rel} ({path.stat().st_size} bytes, cap {rec.RECORD_CAP_BYTES})")
+    print(f"runlog: next, re-render the build index and stage what it rewrote: {resolve_index_command(root)}")
+    print(f"runlog: next, commit it with a subject naming the slug and no unit id, such as "
+          f"`records({model.slug}): the run record`, since a subject naming a unit id reads as that "
+          "unit's own commit")
+    print(f"runlog: record render wall={wall}s git_calls={model.cost['git_calls']} "
+          "(report-only, grades nothing)")
+    return 0
+
+
+def cmd_verify(args) -> int:
+    try:
+        root = mdl.resolve_repo_root()
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    journals = args.journals
+    if journals is None:
+        try:
+            journals = rl.resolve_journal_root(root)
+        except ValueError:
+            journals = None
+    try:
+        state, detail = rec.check_commitment(root, args.record, journals)
+    except (OSError, ValueError) as exc:
+        print(f"runlog: verify {args.record}: {exc}", file=sys.stderr)
+        return 2
+    print(f"runlog: verify {args.record}: {state} — {detail}")
+    return 1 if state == "mismatch" else 0
 
 
 def main(argv=None) -> int:
@@ -254,9 +354,22 @@ def main(argv=None) -> int:
     pm.add_argument("--json", action="store_true", help="print the whole model as JSON")
     pm.add_argument("--journals", help="the journal directory to read instead of this clone's own")
     pm.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
+    pr = sub.add_parser("record", help="render one run's closed-schema record, and write it with --write")
+    pr.add_argument("slug")
+    pr.add_argument("--run", type=int, help="the 1-up run of the build, oldest first; default the last")
+    pr.add_argument("--write", action="store_true", help="write the record into the build folder")
+    pr.add_argument("--journals", help="the journal directory to read instead of this clone's own")
+    pr.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
+    pv = sub.add_parser("verify", help="recompute a record's journal commitment on this machine")
+    pv.add_argument("record")
+    pv.add_argument("--journals", help="the journal directory to read instead of this clone's own")
     args = ap.parse_args(argv)
     if args.cmd == "model":
         return cmd_model(args)
+    if args.cmd == "record":
+        return cmd_record(args)
+    if args.cmd == "verify":
+        return cmd_verify(args)
     if args.cmd == "extract":
         modes = sum((bool(args.session), args.discover, bool(args.measure)))
         if modes > 1 or (args.slug and (args.session or args.measure)):

@@ -8,8 +8,8 @@ grammar, stated here and implemented once in `runlog_lib.py`, so no producer inv
 consumer re-parses one. The kit writes no journal; it is the reader and the reference writer. It also
 carries the ONE redaction table that every consumer printing or classifying free text applies, and
 the transcript extractor, which writes structural extracts to a store under the user profile and
-never into a repository, and the run model, which joins every one of those sources into one account
-of one run.
+never into a repository, the run model, which joins every one of those sources into one account
+of one run, and the committed record, the one file of that account a repository tracks.
 
 ## The grammar
 
@@ -205,6 +205,55 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
 - **Every inferred answer is named** in the model's `method` field.
 - **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
   10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
+- **The model names what the record reads.** `journal_lines` lists, per producer, the line numbers
+  of every journal line it attributed to the run; the extractor's workflow runs inside the window sit
+  on the timeline with their labels; and every anomaly carries `t`, the time of the event behind it.
+
+## The committed record
+
+A run's model is machine-local. `record.py` renders it into ONE tracked file in the build folder,
+under the declared memory root, that any node can read. The repository is public, so the record is
+structural only: every value in it comes from `RECORD_SCHEMA`, and nothing else reaches the file.
+
+```bash
+python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
+python <this kit>/runlog.py verify <record> [--journals <dir>]
+```
+
+**Where it goes.** `<memory root>/builds/<slug>/build/<date>-build-<lowest unit id>-runlog-<key>.md`,
+where the key is the first 8 hex of the commit that started the run, read from the model and never
+re-derived. A re-render finds the run's existing file by that key, whatever its date, so a run has one
+record. The head is `**Serves:** journal <ids>`: the units the run dispatched, or closed with a commit
+naming them, among those a spec in the build defines, in ranges where contiguous. A run that served no
+such unit gets a `no spec-defined unit` line and no file, because an unbound record moves a pin.
+
+**What it holds.** Eight sections in a fixed order: Summary, Timeline, Units, Decisions, Conformance,
+Anomalies, Coverage and Data. Each carries only the fact lines and tables `RECORD_SCHEMA` declares
+for it. A timeline row leads with its UTC time and every other row with its order or a 1-up ordinal,
+so no row leads with an id and the record defines none. Owner turns are counts per position and never
+clock times, so the timeline carries none. The `Data` block is the markdown re-encoded as JSON, every
+fact and every shown row, one row per line.
+
+**The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
+duration, a sha, a sha256 digest, a verb token, a phase token, a list of check numbers, a workflow
+label, one of the build's own unit ids, and a path under the build's own folder. The vocabularies are
+closed lists, the model's own wherever it owns one. A value outside its class is written `-`, the
+same as an absent one, and the summary's `values withheld` line counts them. The schema leg of
+`TOOL-dLoggedFlight-10` validates committed bytes against the same data.
+
+**The cap is 24 KB for every input.** The timeline shows its first and last 30 events, and every other
+list aggregates by kind past 20 rows, each elision stated where it happens. A record still over the cap
+halves the timeline's rows and then the lists' bound, in turn, until it fits.
+
+**The commitment** is the sha256, count and first and last times of the journal lines the model
+attributed to the run, each hashed as its producer, a TAB and its raw bytes. `verify` rebuilds the
+model and hashes that many of its lines from the committed first time on: 0 when they match or the
+record commits `none`, 1 when the journal changed after the render, 2 when the record cannot be read or
+no journal of the run is on this machine. A line the run appended after the render is not an edit.
+
+**`record --write` prints what it cannot do itself**, on stdout: the build-index re-render, with the
+memory tree's `gen_build_index.py` found beside this kit by its file name, and a commit subject naming
+the slug and no unit id. Rendering makes no git call; the model's are the whole cost.
 
 ## What this kit does NOT check
 
@@ -243,6 +292,17 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
 - **A run whose record never reached HEAD's history.** The run starts are read from HEAD, so a run on
   a branch this tree has not merged is invisible from here.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by worktree alone.
+- **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
+  can be wrong and still be an integer.
+- **When an idle gap ended.** The gap's start and length are in the record, so its end is an event's
+  time, and that event may be an owner turn the record otherwise keeps to a count.
+- **A line inserted before the committed first time.** `verify` hashes from that time on, so it
+  cannot see one. The model attributes no line of a run before its window opens, except a bar a joined
+  push pinned, so this misses a line the model would rarely have counted.
+- **A record verified on another node.** The commitment is checkable only where the journal is, and
+  `verify` elsewhere refuses rather than guessing.
+- **The spec status tokens.** They are a copy of the memory tree's list, not held to it; a status
+  outside the copy is withheld, never rendered.
 
 ## Running the self-test
 
@@ -253,8 +313,10 @@ python <this kit>/selftest.py
 It builds scratch git trees under the system temp dir and never reads this repository's own journal,
 nor any real transcript or store. Three model arms read this tree, never write it: one models a
 tracked run record through the CLI, one reports the owner spellings over the tracked decision log,
-and one holds the model's copies of the driver's sets to the driver's source. Each announces a skip
-where its subject is absent.
+and one holds the model's copies of the driver's sets, and the record's owed ledger sources, to the
+driver's source. Each announces a skip where its subject is absent. The record arms render real
+models, lengthened by copying their own entries where a big one is needed, and grade names and
+anchors with copies typed from the documents that own those rules, never from the renderer.
 Its redaction arms find the kit's files through `git ls-files`, so a new file is scanned once it is
 staged and not before.
 It and its fixtures are withheld from `govkit apply`: its subject is this directory's code, which an

@@ -2,11 +2,11 @@
 
 ```toml
 feature = "runlog"
-title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, and the run model that joins every source into one account of one run"
+title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, the run model that joins every source into one account of one run, and the closed-schema record that puts that account in a tracked file"
 status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
-  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8"]
+  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line"]
@@ -92,6 +92,17 @@ terminal phase, and the arm modeling a real landed record against a journal date
 window end three days late, on a `--status` that read LANDED on both lines. Its git cost is constant
 and counted, because a model per run over a corpus of runs must not grow with a run's commits.
 
+**The committed record admits a value only through a CLASS, because the repository is public.**
+`RECORD_SCHEMA` is data: shaped regexes and closed lists, the model's own lists by reference, with
+each section's fact templates and table columns declared, so the schema leg of `TOOL-dLoggedFlight-10`
+grades committed bytes against the same data rather than trusting the renderer. A value outside its
+class becomes `-` and is counted, so a model that grew a value the schema lacks says so in its record.
+Owner turns stay counts, never clock times. The spec's first bounds, 60 timeline rows each side and 40
+per list, measured over the 24 KB cap once the JSON twin doubles every row, so they fell to 30 and 20
+with a halving step for unusually wide cells. The journal commitment hashes the lines the MODEL
+attributed, and verify takes the committed count from the committed first time, so a line the run
+appends after the render is not an edit.
+
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
@@ -108,9 +119,14 @@ and counted, because a model per run over a corpus of runs must not grow with a 
   reads session ids off the driver journal's `start` lines through `read_journal`, runs driver
   command heads and printed narration through `render_redacted`, and persists no free text at all.
   The run model, `TOOL-dLoggedFlight-8`, shipped next: it joins the journals, the extracts, git and
-  the run-state file into one run, and the committed record of `TOOL-dLoggedFlight-9` renders from it
-  and reads its run starts rather than re-deriving them. The question-answering skill,
+  the run-state file into one run. The committed record, `TOOL-dLoggedFlight-9`, shipped after it: it
+  renders from the model and reads its run key, its attributed journal lines, its workflow runs and its
+  anomaly times rather than re-deriving any of them. The question-answering skill,
   `TOOL-dLoggedFlight-12`, prints narration through its `narration` verb.
+- `RECORD_SCHEMA` is shared as data with the record schema leg, `TOOL-dLoggedFlight-10`, and the
+  unattended Skill's render step, `TOOL-dLoggedFlight-11`, runs `record --write` and the index
+  re-render it prints. The record's first six ledger sources are held to the driver's owed sets by the
+  same withheld arm that holds the model's copies.
 - The unattended driver's parked-kind, owed and terminal-phase sets are COPIED into the model, and
   the withheld self-test holds each copy to the driver's source, with the fixture scaffold and the
   driver's writer key sets beside them.
@@ -141,6 +157,9 @@ and counted, because a model per run over a corpus of runs must not grow with a 
   decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
   named in its `method` field. It reads only history reachable from HEAD, and a git-only run's sparse
   sources read as idle gaps.
+- **The record proves shapes, not truth.** A count can be wrong and still be an integer. Its spec
+  status tokens are a copy the self-test does not hold to the memory tree's list, and its commitment is
+  checkable only on the node that holds the journal.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
@@ -166,3 +185,7 @@ which the self-test demands in both directions, never a second transcript reader
 seam: `model.build_run_model` + `derive_run_starts` — reuse for any surface that reports on a run, and
 the run starts for anything keyed on one; extend via a new member of `ANOMALY_KINDS`,
 `CONFORMANCE_ITEMS` or `LEDGER_SOURCES` with the fixture that produces it, never a second joiner.
+
+seam: `record.render_record` + `RECORD_SCHEMA` — reuse for anything a public tracked file says about a
+run, and `parse_record` for reading one back; extend via a declared class, fact template or table in
+the schema, which the renderer and the schema leg both read, never a value rendered around it.
