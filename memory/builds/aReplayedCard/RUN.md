@@ -58,3 +58,5 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-13T23:14:38Z dispatch · item b0d7ffd4 KICK-aReplayedCard-1 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh skills/session-kickoff/MANIFEST-TEMPLATE.md memory/guides/SESSION-KICKOFF.md WIRE-INTO-PROJECT.md memory/builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-1.md memory/builds/aReplayedCard/build/2026-09-14-build-KICK-aReplayedCard-1-1-acceptance-ledger.md memory/builds/aReplayedCard/prompts/2026-09-14-prompt-KICK-aReplayedCard-1-brief.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger memory/map
 
 2026-09-13T23:15:00Z brief · item KICK-aReplayedCard-1 · reason 352f2d8be34b memory/builds/aReplayedCard/prompts/2026-09-14-prompt-KICK-aReplayedCard-1-brief.md
+
+2026-09-14T00:41:34Z dispatch · item 097d3c1b KICK-aReplayedCard-1 · reason memory/project/trace-waiver.txt
