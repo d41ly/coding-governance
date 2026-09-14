@@ -576,6 +576,10 @@ definition, so the absence is a decision and not an oversight.
   once, after every finding is fixed — and to verify with the one check that exercises its change,
   and to bound every command it runs: a non-code command that does not return within its bound is
   skipped and named in its return.
+  **The harness call carries `scratch: <your session scratchpad, absolute>`** — the path your own
+  system prompt names, never `$TMPDIR` — and refuses without it; every agent it spawns is told that
+  is where temporary files go, and the child receives it in `dispatch.args` and refuses too, both
+  without the key and with a `ground` that does not name it.
 
   Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
   trusting a list you are holding, and branch on all four shapes it prints:

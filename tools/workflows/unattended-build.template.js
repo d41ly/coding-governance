@@ -135,6 +135,7 @@ function chunk(a, n) {
 // --- inputs (via Workflow `args`) --------------------------------------------------------------
 // { repo: "/abs/path/to/worktree",                 // REQUIRED
 //   slug: "<build slug>",                           // REQUIRED
+//   scratch: "<absolute session scratchpad>",       // REQUIRED — the path the caller's OWN system prompt names
 //   base: "<immutable sha>",                        // the review anchor, for the record
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
@@ -181,6 +182,20 @@ if (!cfg.slug) {
       'and a harness that guessed one would record a run against a build nobody asked about.',
   )
 }
+// TOOL-aProbedUnit-4 — the session scratchpad is in the CALLER's system prompt and nowhere a
+// workflow script can read, so it arrives as an argument and is refused by SHAPE: absolute means
+// `/` or a drive letter and a separator, which is the only test a runtime with no filesystem can
+// make. Folded to forward slashes ONCE, here, because the value crosses into a bash-quoted prompt
+// and a hand-out JSON object and a backslash survives neither reliably; every carrier below reads
+// the folded const.
+if (typeof cfg.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(cfg.scratch)) {
+  throw new Error(
+    'unattended-build: args must carry an explicit `scratch`, an ABSOLUTE path to the session ' +
+      'scratchpad — the one the caller\'s own system prompt names. Got ' + JSON.stringify(cfg.scratch) +
+      '. Refusing to default it: a defaulted scratch root is the floating temp dir this argument exists to end.',
+  )
+}
+const scratch = cfg.scratch.replace(/\\/g, '/')
 const a = cfg
 const repo = a.repo
 const slug = a.slug
@@ -337,6 +352,17 @@ const GROUND =
   'repository at ' + repo + '. ' +
   'Read `memory/guides/BUILD-METHOD.md` WHOLE before acting; it is the procedure you are bound by. ' +
   'The build is `' + slug + '` and its record is `memory/builds/' + slug + '/`. ' +
+  // TOOL-aProbedUnit-4 — ONE sentence, in GROUND so it reaches every agent this file spawns and
+  // every child it dispatches through `cfg.ground`. OTHER is load-bearing: the scratchpad is itself
+  // outside the repository, so without it the last clause forbids the destination the first names.
+  // The exception is unit 3's discovery: a clone under a ~170-character scratchpad exceeds MAX_PATH
+  // on Windows whatever git's long-path setting says, and the fallback it took was an untracked dir INSIDE
+  // the worktree, which a stray `git add -A` commits.
+  'Every temporary file, backup, probe or log this run makes goes under ' + scratch +
+  ', spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp, a bare mktemp, or any OTHER path outside the repository. ' +
+  'The ONE exception is a git clone or a fixture repository, which needs a SHORT path on Windows because ' +
+  'that scratchpad path is long enough that a clone under it fails with Filename too long: it goes under ' +
+  '%TEMP%/<short-name>, never inside the worktree and never at a drive root. ' +
   (attended
     ? 'There is an OWNER in the loop: this run holds no mandate, and the driver\'s recording verbs ' +
       'are unavailable because there is no run-state file to record against. '
@@ -919,7 +945,9 @@ return {
     // forward to prevent, one layer down. `GROUND` already tells an attended child those verbs are
     // unavailable, so without this key the child received two contradictory instructions in one
     // prompt.
-    args: { repo: repo, slug: slug, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST },
+    // `scratch` travels for the same reason: the child refuses without it AND refuses a `ground`
+    // that does not name it, so a caller copying this object hands the pair the child joins.
+    args: { repo: repo, slug: slug, scratch: scratch, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST },
     perUnit: ['unitId', 'specPath', 'briefPath'],
     resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',
   },

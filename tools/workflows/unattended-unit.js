@@ -80,6 +80,19 @@ check('briefPath', 'The brief is the only carrier the driver hashes; nothing has
 check('driver', 'The driver invocation is the caller\'s to spell, because this file spells no install path.')
 check('ground', 'The grounding preamble is the parent\'s; the child does not re-derive it.')
 check('checklist', 'The per-pass bug-class command is owed after every commit, and a sidechain agent does not inherit the unattended Skill.')
+// TOOL-aProbedUnit-4 — `scratch` is not a dead key: the join below is what it is for. The child's
+// PROMPT opens with `cfg.ground`, so the sentence the parent built with this same path is the first
+// paragraph the unit agent reads and no second copy is spelled here; a hand-composed dispatch that
+// drops either key, or hands a child a different path from the one its ground names, meets a
+// refusal naming the other. Compared unfolded: the parent hands out the folded string in both.
+check('scratch', 'Every temporary file this unit makes goes there, and a child that guessed a root would guess the empty $TMPDIR the parent exists to replace.')
+if (String(cfg.ground).indexOf(cfg.scratch) === -1) {
+  throw new Error(
+    'unattended-unit: the `ground` text names no `' + cfg.scratch + '`, so the scratch root this child was ' +
+      'handed is not the one its grounding sentence tells the agent to use. The parent hands out both in ' +
+      'dispatch.args; pass them together.',
+  )
+}
 
 // `mode` IS NOT A `check()` CALL, and the closed set is the reason. `check` asserts truthiness, and
 // truthiness is satisfied by `"atttended"` — which would then select the UNATTENDED text by falling

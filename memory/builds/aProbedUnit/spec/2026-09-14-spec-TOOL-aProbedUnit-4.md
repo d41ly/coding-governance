@@ -1,11 +1,12 @@
 # TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 4 · ratified 2026-09-14
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 4 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aProbedUnit-4-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aProbedUnit-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-4-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-4-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
@@ -34,9 +35,11 @@ guessed from an environment that is empty.
   refuses without an argument its own contract does not list is the missing-carrier class. Observed
   by AC1 and AC2; the row by AC6.
 - **S2** — `GROUND` carries one sentence naming that path as where every temporary file, backup,
-  probe, log or throwaway clone goes, what is never used instead, and the one clone spelling that
-  works there on Windows. Every parent-side agent — spec writers, the audit recorder, the disposal
-  agent — is prefixed by `GROUND`, so one sentence reaches all of them. Observed by AC3.
+  probe or log goes, what is never used instead, and the ONE exception with its reason: a git clone
+  or a fixture repository, which needs a short path on Windows, goes under `%TEMP%/<short-name>`,
+  never inside the worktree and never at a drive root. Every parent-side agent — spec writers, the
+  audit recorder, the disposal agent — is prefixed by `GROUND`, so one sentence reaches all of them.
+  Observed by AC3.
 - **S3** — `dispatch.args` in the roster hand-out carries `scratch`, the folded path, beside
   `repo`, `slug`, `mode`, `driver`, `ground` and `checklist`. Observed by AC4.
 - **S4** — `tools/workflows/unattended-unit.js` adds `check('scratch', …)` and one agreement
@@ -125,26 +128,33 @@ names it the top breaker. Every carrier below reads `scratch`, the folded const.
 `GROUND` at `:335` gains, after the record sentence and before the mode ternary:
 
 ```
-'Every temporary file, backup, probe, log or throwaway clone this run makes goes under ' + scratch +
+'Every temporary file, backup, probe or log this run makes goes under ' + scratch +
 ', spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp, a bare mktemp, or any OTHER path outside the repository. ' +
-'A clone there is made with `git -c core.longpaths=true clone`, because that path is long enough that a plain clone fails on Windows with Filename too long. '
+'The ONE exception is a git clone or a fixture repository, which needs a SHORT path on Windows because that scratchpad path is long enough that a clone under it fails with Filename too long: it goes under %TEMP%/<short-name>, never inside the worktree and never at a drive root. '
 ```
 
 OTHER is load-bearing: the scratchpad is itself outside the repository — section 8 F1 clones into
 it under `%TEMP%` — so without the word the last clause forbids the destination the first names,
-and AC3 pins the corrected bytes.
+and AC3 pins the corrected bytes. The exception is the brief's, from unit 3's pass (rev-4): the
+short root is spelled as the brief spells it for this node, because a workflow script has no `os`
+and cannot derive `%TEMP%` from `scratch`; the `<os.tmpdir()>/claude/<short-name>` base is unit
+5's to allow, and this sentence is re-spelled when that lands.
 
 The inputs block at `tools/workflows/unattended-build.template.js:135-146` — the header comment a
 caller reads the contract from — gains one row beside `slug`,
 `scratch: "<absolute session scratchpad>", // REQUIRED`, because a script that refuses without an
 argument its own contract does not list is the missing-carrier class S5 fixes for the Skill.
 
-The clone clause is not decoration. Measured 2026-09-14 on node `a`, with this worktree as the
+The exception is not decoration. Measured 2026-09-14 on node `a`, with this worktree as the
 source and this session's 170-character scratchpad as the destination: `git clone --local
---no-checkout` exits 128 with `fatal: failed to unlink … Filename too long`, and `git -c
-core.longpaths=true clone --local --no-checkout` exits 0 and leaves a pack. Without the clause the
-sentence forbids the one workaround an agent knows — a short root under `/tmp` — and offers nothing
-that works, which is how the next backup ends up outside the scratchpad again.
+--no-checkout` exits 128 with `fatal: failed to unlink … Filename too long`. rev-3 answered that
+with a `core.longpaths=true` clause, measured to exit 0 for that `--no-checkout` shape; unit 3's
+pass then needed a bare fixture origin the driver runs against, found the object writes exceed
+MAX_PATH under the scratchpad, and fell back to an untracked `.gov-scratch/` inside the worktree —
+a path a stray `git add -A` commits. So the sentence names a short root that works for every clone
+shape instead of a flag that works for one, and forbids the worktree fallback by name. Without it
+the sentence forbids the one workaround an agent knows and offers nothing that works, which is how
+the next backup ends up outside the scratchpad again.
 
 `dispatch.args` at `:917` gains `scratch: scratch`. `perUnit` and `resolvePathsWith` are unchanged.
 
@@ -234,7 +244,8 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
   carries `scratch`, and a child fixture reds a second time until its `ground` names the path; that
   is the required-argument change doing its job, and AC7's whole-suite run at the close is what sees
   every one of them, because the pass's single arms see only the fixtures they name. The clone
-  clause rests on one measurement on one node; a POSIX host ignores `core.longpaths` harmlessly.
+  exception spells `%TEMP%`, this node's short root; a POSIX host has no such variable and no
+  MAX_PATH either, so the exception is inert there and the first clause governs.
 - testing — section 6, one arm at a time against the sourced preamble; the whole suite is AC7's
   `--close` half, and no pass runs it.
 - migration — every existing caller of the harness must add `scratch`; the Skill is the only
@@ -271,8 +282,9 @@ assertion; the observation is the named trace line, never an exit status.
   Red when: a backslash reaches either carrier.
 - **AC3** — When `run_wf "$UNITS" "$(returns CONVERGED 0)"` runs, every traced `prompt:spec:tB:`
   line and the `prompt:audit:record:r1:` line carry `goes under /tmp/s`, `a bare mktemp, or any
-  OTHER path outside the repository` and `core.longpaths=true`, and none carries `any path outside`,
-  the pre-fold bytes; and when `run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":false,"standing":["b1"],"summary":"x"}')"`
+  OTHER path outside the repository` and `goes under %TEMP%/<short-name>, never inside the worktree`,
+  and none carries `any path outside`, the pre-fold bytes, nor `core.longpaths`, the rev-3 clause
+  the exception replaced; and when `run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":false,"standing":["b1"],"summary":"x"}')"`
   runs — the fixture that spawns the disposal agent, which `CONVERGED` skips — the
   `prompt:dispose:tB:` line carries the same three. The `audit:subjects:` prompt is not traced under
   `UNITS`, which supplies `subjects`; it opens with `GROUND` like the other three, and that is read
@@ -282,6 +294,7 @@ assertion; the observation is the named trace line, never an exit status.
   at --close.
   Red when: any traced prompt lacks the sentence, which means it was placed in a stage text rather
   than in `GROUND`; or `any path outside` reappears, the clause that forbade its own destination; or
+  the exception is absent, so the sentence forbids the worktree fallback's only alternative; or
   the two files disagree, which the parity leg reds at the close.
 - **AC4** — When the `RESULT` line of the `CONVERGED 0` run in AC3 is read, its `dispatch.args`
   carries `"scratch":"/tmp/s"` beside `repo`, `slug`, `mode`, `driver`, `ground` and `checklist`.
@@ -405,6 +418,14 @@ floor exists in this suite, so none moves.
   S1 names the row). While verifying: the two inline child fixtures sit at `:577` and `:580`, not
   the audit's `:571` and `:573`; `S3` at `:385` and `S7` at `:404` reach past the `slug` refusal and
   were unlisted; `:124` runs `$UNITS` and is no fixture line, so the set is sixteen, not thirteen.
+- rev-4 · 2026-09-14 · S2 · §4 · §5 · §6 AC3 · M2 AMEND from unit 3's pass, carried by this unit's
+  build brief: the `core.longpaths=true` clone clause becomes the ONE exception — a git clone or a
+  fixture repository goes under `%TEMP%/<short-name>`, never inside the worktree and never at a
+  drive root — because F1's measurement covered a `--no-checkout` clone alone and unit 3's bare
+  fixture origin exceeded MAX_PATH under the scratchpad regardless, falling back to an untracked
+  dir inside the worktree. `throwaway clone` leaves the first clause's list, since the exception
+  now owns clones. AC3's third token is the exception's bytes; `core.longpaths` joins its
+  must-not list. F1 stays RESOLVED: its observation is unchanged, its consequence moved.
 
 ## 10. Reuse audit
 

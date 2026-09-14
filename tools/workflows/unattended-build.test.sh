@@ -82,7 +82,7 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
   ' "${3:-$F}" "$1" "$2" 2>&1
 }
 
-UNITS='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
+UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
 # TOOL-aHoistedPass-6 - the BUILD double is gone with the stage. What a terminal verdict now
 # reaches is the DISPOSAL stage, and past it the roster hand-out, which is a return rather than an
@@ -115,7 +115,7 @@ o=$(run_wf '{"slug":"tB","units":[{"id":"A-tB-1"}]}' '{}')
 has "args: an object with no repo is REFUSED" "$o" "must carry an explicit \`repo\`"
 o=$(run_wf '{"repo":"/tmp/r","units":[{"id":"A-tB-1"}]}' '{}')
 has "args: an object with no slug is REFUSED" "$o" "must carry an explicit \`slug\`"
-o=$(run_wf '{"repo":"/tmp/r","slug":"tB","units":[]}' '{}')
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","units":[]}' '{}')
 has "args: an empty unit set is REFUSED rather than reported clean" "$o" "carries no \`units\`"
 # AC14 - and the refusal names the MODE that can supply a spec path. The bare `--plan` it used to
 # name resolves each unit's path internally and discards it, so a caller following the message
@@ -123,6 +123,43 @@ has "args: an empty unit set is REFUSED rather than reported clean" "$o" "carrie
 has "args: the empty-set refusal names --plan <slug> --paths" "$o" "--plan <slug> --paths"
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "args: a VALID object is accepted — the passing case" "$o" "RESULT"
+
+# ---- TOOL-aProbedUnit-4: `scratch` IS REQUIRED, refused by SHAPE, folded ONCE, and carried to every
+# ---- prompt and to the hand-out. The absent and relative fixtures are `$UNITS` with the key deleted
+# ---- or rewritten, so the one landed fixture is the source of all three and cannot drift from it.
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"scratch":"/tmp/s",##')" "$(returns CONVERGED 0)")
+has "scratch: the parent REFUSES args with no scratch" "$o" "THROW"
+has "scratch: ...and the refusal names the key" "$o" "must carry an explicit \`scratch\`"
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"scratch":"/tmp/s"#"scratch":"tmp/s"#')" "$(returns CONVERGED 0)")
+has "scratch: the parent REFUSES a relative scratch" "$o" "must carry an explicit \`scratch\`"
+# TWO backslashes each in the JSON, ONE each once parsed. `hasnt_` hunts the two spellings an
+# unfolded value takes: bare in a prompt line, JSON-escaped in the RESULT.
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"scratch":"/tmp/s"#"scratch":"C:\\\\tmp\\\\s"#')" "$(returns CONVERGED 0)")
+p=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:')
+has    "scratch: a backslash scratch is folded before it reaches a prompt" "$p" "goes under C:/tmp/s"
+hasnt_ "scratch: no backslash spelling reaches a prompt" "$p" 'C:\tmp'
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has    "scratch: the folded path is what dispatch.args carries" "$d" '"scratch":"C:/tmp/s"'
+hasnt_ "scratch: no backslash spelling reaches the hand-out" "$d" 'C:\\tmp'
+# THE SENTENCE IS IN GROUND, so every parent-side prompt carries it: each spec writer, the audit
+# recorder, and — on the verdict that spawns it — the disposal agent. OTHER is the load-bearing
+# word: the scratchpad is itself outside the repository. The rev-3 `core.longpaths` clause is armed
+# ABSENT, because the exception replaced it and two clone instructions in one sentence disagree.
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+for lbl in 'prompt:spec:tB:g0:' 'prompt:spec:tB:g1:' 'prompt:audit:record:r1:'; do
+  p=$(printf '%s\n' "$o" | grep "^$lbl")
+  has    "scratch: $lbl names the scratch root" "$p" "goes under /tmp/s"
+  has    "scratch: $lbl forbids any OTHER path outside the repository" "$p" "a bare mktemp, or any OTHER path outside the repository"
+  has    "scratch: $lbl carries the clone exception" "$p" 'goes under %TEMP%/<short-name>, never inside the worktree'
+  hasnt_ "scratch: $lbl does not forbid its own destination" "$p" "any path outside"
+  hasnt_ "scratch: $lbl carries no longpaths clause" "$p" "core.longpaths"
+done
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has "scratch: dispatch.args carries the scratch root" "$d" '"scratch":"/tmp/s"'
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":false,"standing":["b1"],"summary":"x"}')")
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')
+has "scratch: the disposal prompt names the scratch root" "$p" "goes under /tmp/s"
+has "scratch: the disposal prompt carries the clone exception" "$p" 'goes under %TEMP%/<short-name>, never inside the worktree'
 
 # ---- AC3: THE STAGE ORDER, asserted on the emitted sequence. A reordering reds this.
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
@@ -251,7 +288,7 @@ has  "default mode: the return names the child the caller dispatches" "$o" '"scr
 has  "default mode: hands out a roster" "$o" '"roster":[{'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
-A_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
+A_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
 o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has   "attended: hands out a roster" "$o" '"roster":[{'
 hasnt_ "attended: no round is recorded through the driver" "$o" "agent:audit:record"
@@ -290,7 +327,7 @@ has  "attended, null blockers: names the degraded return" "$o" "DEGRADED"
 # ---- AC4: a FORKED unit refuses, and the message names both the id and the state. The bare token is
 # ---- supplied directly: --plan rewrites a terminal unit's grade to `DONE (FORKED)`, so a bare FORKED
 # ---- and a real closed build's roster are jointly unsatisfiable.
-F_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"FORKED"}]}'
+F_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"FORKED"}]}'
 o=$(run_wf "$F_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, FORKED unit: refuses" "$o" "THROW"
 has  "attended, FORKED unit: names the id" "$o" "A-tB-1"
@@ -299,7 +336,7 @@ has  "attended, FORKED unit: names the state" "$o" "FORKED"
 # ---- AC11: the terminal-unit SKIP, with the vocabulary --plan actually emits. `DONE (FORKED)` is
 # ---- what a closed build reports for a unit whose underlying grade was not READY, and a five-token
 # ---- allow-list halts on it — round-1's halt-at-unit-one, for the third time.
-D_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
+D_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
 o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 1 terminal unit"
 has  "attended, terminal units: still hands out a roster" "$o" '"roster":[{'
@@ -316,14 +353,14 @@ has   "AC25: the skipped unit is still reported in skippedTerminal" "$o" '"skipp
 
 # ---- AC13: a state outside every arm refuses BY NAME. Neither building nor skipping an unknown state
 # ---- is safe, and this vocabulary has been mis-transcribed twice already.
-X_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"WOBBLE"}]}'
+X_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"WOBBLE"}]}'
 o=$(run_wf "$X_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, unknown state: refuses" "$o" "THROW"
 has  "attended, unknown state: names the value it did not recognise" "$o" "WOBBLE"
 
 # ---- AC12: a missing planState refuses rather than defaulting. A defaulted state puts the refusal
 # ---- predicate to work on a value nobody supplied.
-M_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1"}]}'
+M_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1"}]}'
 o=$(run_wf "$M_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, no planState: refuses" "$o" "THROW"
 has  "attended, no planState: names the field" "$o" "planState"
@@ -331,7 +368,7 @@ has  "attended, no planState: names the field" "$o" "planState"
 # ---- AC14: the FRESH-BUILD path. A unit stage 1 authors reports MISSING at entry — there is no point
 # ---- between the stages at which a caller could re-run --plan — so the entry-time value is stale by
 # ---- construction and the stage must not refuse the build it just specced.
-N_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
+N_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
 o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, unit AUTHORED this invocation: rostered despite entry-time MISSING" "$o" '"roster":[{'
 # and the control: the same MISSING state, NOT specced by stage 1, must still refuse.
@@ -345,7 +382,7 @@ has  "attended, MISSING but only alreadyPresent: still refuses" "$o" "THROW"
 
 # ---- S1: the mode is a CLOSED pair. A typo must not fall back to a default that hands the caller
 # ---- fewer checks than they asked for.
-B_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attnded","units":[{"id":"A-tB-1","order":1}]}'
+B_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attnded","units":[{"id":"A-tB-1","order":1}]}'
 o=$(run_wf "$B_UNITS" '{}')
 has  "bad mode: refuses rather than defaulting" "$o" "THROW"
 has  "bad mode: names the closed set" "$o" "unattended, attended"
@@ -353,7 +390,7 @@ has  "bad mode: names the closed set" "$o" "unattended, attended"
 # ---- S7: the warning depends on a CALLER-SUPPLIED fact, because this script has no filesystem. A
 # ---- caller that supplies nothing gets no warning, which is a hole the header names rather than one
 # ---- a reader has to infer.
-W_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
+W_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
 o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended + run-state file: WARNS" "$o" "WARNING: attended mode was requested"
 has  "attended + run-state file: names the slug" "$o" "tB"
@@ -382,7 +419,7 @@ has "header: says the S7 warning is caller-supplied, not detected" "$HDR" "DEPEN
 
 # ---- AC1: three slices at a cap of five chunk to groups of ONE, so three writers spawn and the
 # ---- total never exceeds the cap.
-S3='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+S3='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1","specBriefPath":"bf1"},
   {"id":"A-tB-2","order":2,"specPath":"s2","specBriefPath":"bf2"},
   {"id":"A-tB-3","order":3,"specPath":"s3","specBriefPath":"bf3"}]}'
@@ -401,7 +438,7 @@ hasnt_ "brief: writer 0 is NOT handed a third group's brief" "$o0" "bf3"
 # ---- writer legitimately holds MORE THAN ONE slice. AC1's three-slice case never leaves the regime
 # ---- where "one writer per slice" and "one writer per group" agree, so without this arm the shape
 # ---- that actually runs at the build sizes motivating the unit is untested.
-S7='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+S7='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1"},{"id":"A-tB-2","order":2,"specPath":"s2"},
   {"id":"A-tB-3","order":3,"specPath":"s3"},{"id":"A-tB-4","order":4,"specPath":"s4"},
   {"id":"A-tB-5","order":5,"specPath":"s5"},{"id":"A-tB-6","order":6,"specPath":"s6"},
@@ -489,7 +526,7 @@ has "AC5b dead disposal stage: it says the stage returned nothing" "$o" "returne
 # ---- `roster.length` would have read a property of `undefined` and thrown.
 o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "AC6 the CONVERGING exit carries an empty roster" "$o" '"roster":[]'
-T_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
+T_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
 o=$(run_wf "$T_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has "AC6 the attended every-unit-terminal exit carries an empty roster" "$o" '"roster":[]'
 has "R2F1 the attended every-unit-terminal exit says what stood" "$o" '"standing":'
@@ -548,7 +585,7 @@ has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
 # `--<verb> <slug>` and never the bare word: the attended text NAMES three of these verbs in the
 # sentence explaining that they are unavailable, and an arm aimed at the word would fail on the
 # explanation. That trap is already recorded against the attended preamble arm above.
-CHILD_ARGS='{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK","mode":"%s"}'
+CHILD_ARGS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","mode":"%s"}'
 childU=$(run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C")
 childA=$(run_wf "$(printf "$CHILD_ARGS" attended)" '{}' "$C")
 norun_verbs=''
@@ -576,11 +613,20 @@ for verb in $norun_verbs; do
 done
 # AND THE MODE IS A CLOSED SET IN THE CHILD TOO. A typo silently selecting the unattended text by
 # default is this same defect wearing a different hat, so the child refuses rather than defaults.
-o=$(run_wf '{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK","mode":"atttended"}' '{}' "$C")
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK","mode":"atttended"}' '{}' "$C")
 has "F2 the child REFUSES a mode outside the closed set" "$o" "THROW"
 has "F2 ...and names the value it was given" "$o" '"atttended"'
-o=$(run_wf '{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK"}' '{}' "$C")
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. goes under /tmp/s. ","checklist":"CK"}' '{}' "$C")
 has "F2 the child REFUSES an absent mode rather than defaulting one" "$o" "THROW"
+# TOOL-aProbedUnit-4 — the child refuses without `scratch`, and refuses a `ground` that does not
+# NAME the scratch it was handed: the sentence reaches the unit agent through the parent's ground
+# text, so a hand-composed dispatch that drops or swaps either key meets a refusal naming the other.
+# Both fixtures derive from CHILD_ARGS, so they cannot drift from the landed one.
+o=$(run_wf "$(printf "$CHILD_ARGS" unattended | sed 's#"scratch":"/tmp/s",##')" '{}' "$C")
+has "scratch: the child REFUSES args with no scratch" "$o" "must carry an explicit \`scratch\`"
+o=$(run_wf "$(printf "$CHILD_ARGS" unattended | sed 's#"ground":"G. goes under /tmp/s. "#"ground":"G. "#')" '{}' "$C")
+has "scratch: the child REFUSES a ground that names no scratch" "$o" "names no \`/tmp/s\`"
+has "scratch: the child prompt opens with the ground that names it" "$childU" "prompt:unit:A-tB-1:G. goes under /tmp/s. "
 
 # ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
 # `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested

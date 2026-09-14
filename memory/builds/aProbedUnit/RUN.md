@@ -38,3 +38,29 @@ base: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 2026-09-14T12:54:38Z dispatch · item 0f129179 TOOL-aProbedUnit-3 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/PROTOCOL.template.md tools/unattended/kit.toml tools/unattended/.unattended.conf.example .claude/skills/unattended/SKILL.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .unattended.conf memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-3.md memory/builds/aProbedUnit/README.md memory/LIVE.md memory/ledger/2026-09.md memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-3-1-acceptance-ledger.md
 
 2026-09-14T12:54:44Z brief · item TOOL-aProbedUnit-3 · reason 2eca58a01da8 memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-3-1-build-brief.md
+
+2026-09-14T13:34:02Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason tools/workflows/unattended-build.template.js
+
+2026-09-14T13:34:09Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason tools/workflows/unattended-build.js
+
+2026-09-14T13:34:16Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason tools/workflows/unattended-unit.js
+
+2026-09-14T13:34:23Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason tools/workflows/unattended-build.test.sh
+
+2026-09-14T13:34:30Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason tools/unattended/SKILL.template.md
+
+2026-09-14T13:34:38Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason .claude/skills/unattended/SKILL.md
+
+2026-09-14T13:34:45Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/map/features/review-harnesses.md
+
+2026-09-14T13:34:54Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-4.md
+
+2026-09-14T13:35:03Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-4-1-acceptance-ledger.md
+
+2026-09-14T13:35:12Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/builds/aProbedUnit/README.md
+
+2026-09-14T13:35:22Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/LIVE.md
+
+2026-09-14T13:35:33Z dispatch · item b7250a7f TOOL-aProbedUnit-4 · reason memory/ledger/2026-09.md
+
+2026-09-14T13:35:38Z brief · item TOOL-aProbedUnit-4 · reason 7a71fffc7608 memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-4-1-build-brief.md

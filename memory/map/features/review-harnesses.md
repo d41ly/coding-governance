@@ -78,6 +78,17 @@ another prefix naming files that adopter did not have. The third token is PROBED
 tree rather than derived from the prefix, because an adopter may install that kit flat. The harness
 is claimed by the unattended dossier and its template here, because this kit renders it.
 
+**The build harness REQUIRES a `scratch` argument, and it is the one path that cannot be rendered.**
+The session scratchpad is in the caller's system prompt and nowhere a workflow script can read, and
+it changes with every session, so `args` is its only carrier. The parent refuses without it and
+refuses one that is not absolute by shape, folds backslashes to `/` once, spells it in `GROUND` —
+the preamble every agent it spawns reads — and hands it to every child in `dispatch.args` beside
+`repo`, `slug`, `mode`, `driver`, `ground` and `checklist`. `unattended-unit.js` refuses without it
+and refuses a `ground` that does not name it, so a hand-composed dispatch cannot hand a child a
+different root from the one its grounding sentence tells the agent to use (`TOOL-aProbedUnit-4`).
+`tier2-review.js` and the drift-audit siblings still tell their agents nothing about temporary
+files.
+
 ## Gaps
 
 - **The pipeline is still implemented three times, but the three now carry the same accounting.**
