@@ -54,12 +54,10 @@ clone's journal in two.
 ## The memory root
 
 `resolve_memory_root(root)` reads `MEMORY_ROOT` from `.memory-tree.conf` at the repository root, the
-way bash sourcing reads it, and strips its slashes. A quoted value is the text up to its matching
-quote, whatever follows it, and an unquoted one ends at a `#` that begins a word. That is the
-memory-tree engine's own order, copied rather than imported because kits install independently, and
-the self-test holds the copy to that engine's reader and both to bash over a table of spellings. A
-leading BOM is stripped, which bash would not do. An absent key, or an absent conf, is the kit
-default `memory`. A value naming no directory refuses by name, and so does one that would leave the
+way bash sourcing reads it, and strips its slashes. The reader is a copy of the memory-tree engine's
+own line reader, in its order, because kits install independently; its docstring states the rules,
+and the self-test holds the copy to that engine's reader and both to bash over a table of
+spellings. An absent key, or an absent conf, is the kit default `memory`. A value naming no directory refuses by name, and so does one that would leave the
 repository: a `..` segment, a drive colon or a backslash. Every consumer that addresses the memory
 tree goes through it, because an adopter's root need not be `memory`.
 
