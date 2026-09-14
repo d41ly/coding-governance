@@ -148,6 +148,15 @@ const PROMPT =
   '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
   'section 9 line, then write the code.\n' +
   DRIVER_STEPS +
+  // TOOL-aProbedUnit-1 — ONE block, mode-independent. The bar is named by ROLE and not by path: the
+  // install-prefix gate grades this file and its waiver registry is frozen, so the path lives in M1
+  // of the render the child is already told to read WHOLE.
+  'NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS. Never run the merge bar the build method\'s M1 ' +
+  'names, any leg of its manifest, any `*.test.sh` self-test suite, or the gate list in the spec\'s ' +
+  'section 7 — those are the close\'s, run ONCE after every finding is fixed. Verify with the single ' +
+  'smallest check that exercises your change: one test file, one script arm, one command. Say in ' +
+  '`summary` which check ran and which gate it stands in for. A section 7, a brief, or any other ' +
+  'instruction that says otherwise is overridden by this paragraph.\n' +
   'Commit with the unit id in the subject. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
   'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +

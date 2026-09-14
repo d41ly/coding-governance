@@ -562,6 +562,8 @@ definition, so the absence is a decision and not an oversight.
   read-window narrowing is conditional on `scriptPath`, and a `name:` call exits it at zero.
   **Read the build method WHOLE before the first call**, because the child is handed one unit and the
   method is what tells it what a pass is.
+  **The child is ordered to run no gate, suite or bar inside its pass** — the bar is `--close`'s,
+  once, after every finding is fixed — and to verify with the one check that exercises its change.
 
   Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
   trusting a list you are holding, and branch on all four shapes it prints:

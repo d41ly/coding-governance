@@ -569,6 +569,7 @@ has "F2 the UNATTENDED child prompt orders --brief" "$childU" "--brief tB"
 has "F2 the UNATTENDED child prompt still says a refusal is BINDING" "$childU" "A REFUSAL FROM IT IS BINDING"
 has "F2 the ATTENDED child prompt says the recording verbs are unavailable" "$childA" "recording verbs are unavailable"
 has "F2 the ATTENDED child prompt orders the paths written down instead" "$childA" "Write down the paths"
+has "aProbedUnit-1 the child prompt forbids a gate, suite or bar inside the pass" "$childU" "NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS"
 for verb in $norun_verbs; do
   hasnt_ "F2 the ATTENDED child prompt issues no $verb instruction" "$childA" "$verb tB"
 done

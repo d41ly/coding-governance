@@ -52,7 +52,7 @@ record under `prompts/`.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aProbedUnit-1` | PLANNED | no gate, suite or bar runs inside a unit pass; the bar runs once at close |
+| 1 | `TOOL-aProbedUnit-1` | CLOSED | no gate, suite or bar runs inside a unit pass; the bar runs once at close |
 | 2 | `TOOL-aProbedUnit-2` | PLANNED | every command a unit runs is bounded; a stalled non-code command is skipped and named |
 | 3 | `TOOL-aProbedUnit-3` | PLANNED | `--audit`: the dispatched-unit stall probe, and the keepalive that runs it |
 | 4 | `TOOL-aProbedUnit-4` | PLANNED | every harness agent is handed the session scratchpad path and told to use it |
@@ -69,7 +69,7 @@ ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close](spec/2026-09-14-spec-TOOL-aProbedUnit-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close](spec/2026-09-14-spec-TOOL-aProbedUnit-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-14 |
 | [TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named](spec/2026-09-14-spec-TOOL-aProbedUnit-2.md) | 2 | 1 | SPECCED | rev-2 | 2026-09-14 |
 | [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-14 |
 | [TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument](spec/2026-09-14-spec-TOOL-aProbedUnit-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-14 |
@@ -78,7 +78,7 @@ ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 
 | [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | SPECCED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 3 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

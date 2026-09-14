@@ -1,11 +1,12 @@
 # TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aProbedUnit-1-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aProbedUnit-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-0-run-mandate.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-0-run-mandate.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-2-build-brief.md) | journal | — |

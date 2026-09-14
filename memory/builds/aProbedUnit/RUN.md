@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 79174865d6c558db6665a35244fc728b120b2c86
-phase: REVIEWING
+witness: 23e302e4508e5956b38bed115ba921fdd670d041
+phase: BUILDING
 branch-sha: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 branch-ref: refs/heads/branch/unattended-build-stalls-6d0f2b
 mode: prompt
@@ -26,3 +26,7 @@ base: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 2026-09-14T11:15:30Z review · item aProbedUnit-spec-set · reason verdict BLOCKED · blockers 3
 
 2026-09-14T12:22:33Z review · item aProbedUnit-spec-set · reason verdict CLEAN · blockers 0 · CONVERGED
+
+2026-09-14T12:40:59Z dispatch · item 23e302e4 TOOL-aProbedUnit-1 · reason tools/workflows/unattended-unit.js tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/workflows/unattended-build.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-1.md memory/builds/aProbedUnit/README.md memory/LIVE.md memory/ledger/2026-09.md memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-1-1-acceptance-ledger.md
+
+2026-09-14T12:41:06Z brief · item TOOL-aProbedUnit-1 · reason 21e8b7ee8d3b memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-2-build-brief.md

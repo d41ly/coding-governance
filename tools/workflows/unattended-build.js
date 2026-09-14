@@ -340,7 +340,12 @@ const GROUND =
   (attended
     ? 'There is an OWNER in the loop: this run holds no mandate, and the driver\'s recording verbs ' +
       'are unavailable because there is no run-state file to record against. '
-    : 'Speak only in your return value: nobody reads a transcript under a mandate. ')
+    : 'Speak only in your return value: nobody reads a transcript under a mandate. ') +
+  // TOOL-aProbedUnit-1 — mode-independent, and it reaches the SPEC writers, who write section 7 and
+  // are not children. No path: this travels in `dispatch.args`, which arm (v) scans.
+  'No gate, suite or bar runs inside a unit pass: the merge bar runs ONCE, at the close, so a ' +
+  'spec\'s section 7 lists what the close runs, and a pass verifies with the one check that ' +
+  'exercises its change. '
 
 // ============================================================== STAGE 1 — SPEC
 // TOOL-aStagedLane-3 — A FAN OVER GROUPS OF SLICES, not one agent holding every unit.
