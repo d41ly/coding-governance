@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 63 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 65 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -203,6 +203,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 �
 | `fold-text-is-unreviewed-surface.md` | build-method |
 | `format-derived-from-arity.md` | run-gates |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
+| `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
@@ -230,6 +231,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 �
 | `status-set-in-a-subshell.md` | unattended |
 | `structured-record-split-on-whitespace.md` | unattended |
 | `subprocess-resolves-a-different-shell.md` | baseline |
+| `suite-edited-while-bash-executes-it.md` | memory-tree-hygiene |
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |

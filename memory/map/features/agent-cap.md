@@ -24,7 +24,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = [
+gotcha-classes = ["git-rm-cached-refuses-a-diverged-index-blob.md",
   "trailing-comma-counted-as-an-element.md",
   "allowlist-narrower-than-the-root-it-guards.md",
   "a-pair-exists-and-it-is-the-wrong-one.md",
