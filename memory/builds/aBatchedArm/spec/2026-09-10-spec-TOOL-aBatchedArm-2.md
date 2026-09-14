@@ -21,9 +21,10 @@ over a branch that was never evaluated.
 
 ## 2. Scope (IN)
 
-- **S1** — a linter that parses each `reset_tree`-delimited group in the suite and reds on rule A:
-  a group carrying a `miss` or `same` assertion against a check number the group's `emitted` set does
-  not name. Observed by **AC1**.
+- **S1** — a linter that parses each tree-reset-delimited group in the suite and reds on rule A:
+  a batched group — one carrying an `emitted` call — that carries a `miss` or a `same` assertion at
+  all (rev-3; the rev-2 wording still named the linkage form the rules table withdrew). Observed by
+  **AC1**.
 - **S2** — rule B: a group carrying more than one arm whose assertion TEXT is identical, so one break
   cannot satisfy two assertions. Observed by **AC2**.
 - **S3** — rule C: a group carrying a `run` capture assigned to anything other than that group's own
@@ -138,22 +139,24 @@ often enough that a new one arrives with the assertion attached.
 
 ## 5. Production-readiness checklist
 
-- security — N/A. It reads two tracked files and writes nothing.
+- security — N/A. It reads one tracked file and writes nothing.
 - perf / scale — seconds. It is a single pass over one file with no subprocess per group.
-- error / empty / loading states — a zero group count REFUSES; an unresolvable assertion text is
-  reported, never skipped.
+- error / empty / loading states — a zero group count, a zero arm count or an empty delimiter set
+  REFUSES with exit 2 and never prints a clean verdict (rev-3: no text is resolved any more).
 - observability — every red names the group's first line number, the offending arm and the rule.
-- risks — rule A's text-to-check join is the only inference in the unit. A wrong join is a false red,
-  which is loud; a missing join is reported rather than silent, which is the direction that matters.
+- risks — the delimiter resolution is the only inference in the unit: a missed boundary merges two
+  groups and manufactures rule-B and rule-C reds, which is loud, never a silent green; the boundary
+  count is printed on every run so a merge is visible in the number.
 - testing — the sibling `.test.sh`, with a staged failing case per rule per AC.
 - migration — none.
 - user docs — N/A. Developer-facing; the header carries the contract.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a `miss` arm is moved into a neighbouring group whose `emitted` set does not name its
-  check, `check-arms-groups.sh` REDS naming that arm, that group and rule A. Staged and observed RED
-  before the linter is wired, per `AGENTS.md` §7.
+- **AC1** — When a `miss` arm is moved into a neighbouring BATCHED group (one carrying an `emitted`
+  call, whatever its set names), `check-arms-groups.sh` REDS naming that arm, that group and rule A;
+  the same `miss` inside a solo group is not rule A's business. Staged and observed RED before the
+  linter is wired, per `AGENTS.md` §7.
   Red when: the move runs green, which is round 1's blocker surviving its own gate.
 - **AC2** — When two arms carrying an identical assertion text are placed in one group,
   `check-arms-groups.sh` REDS naming both line numbers and rule B.
@@ -194,7 +197,8 @@ RED then unstaged · floor to move: none, the suite is new and declares its own.
 
 ## 9. Revision log
 
-- rev-3 · 2026-09-14 · header base · §4 delimiter · §4 rule A · §6 AC6 · the build brief's facts,
+- rev-3 · 2026-09-14 · header base · §2 S1 · §4 delimiter · §4 rule A · §5 · §6 AC1 · §6 AC6 · the
+  build brief's facts,
   recorded before the first edit, under the owner rulings of 2026-09-13 (no self-test per step) and
   2026-09-14 (no gate until every unit is built). Base moved `e9ed269b` → `e8da0a54`: every line
   number rev-1 and rev-2 typed is stale and every anchor is re-derived by text. (1) `emitted` exists
