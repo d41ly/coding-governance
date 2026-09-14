@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-2 — the structural group linter over the batched self-test
 
-**Status:** OPEN · rev-2 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-09-14 · node a · Tier-2 · base e8da0a54 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -59,9 +59,13 @@ grep, and rev-1 said it was.** Round 2 measured 24 group boundaries that a bare 
 `reset_tree` is called from inside `anchor_break`, `anchor_restore` and `seed_ros`, plus `wreset` at
 `check-unattended.test.sh:1582` and the two `in_shard` region seams. A linter that misses a boundary
 merges two real groups into one and then grades the merged thing, which manufactures rule-B and
-rule-C reds on correct code and hides real ones. So the delimiter is the CALL SET — `reset_tree` and
-every helper that calls it, resolved once from the file and asserted non-empty — and the boundary
-count it found is printed on every run beside the group count.
+rule-C reds on correct code and hides real ones. So the delimiter is the CALL SET — every helper
+whose body performs a hard reset (`git reset --hard`) or calls one that does, transitively, which is
+`reset_tree` and every helper that calls it PLUS `wreset`, which resets to its own `$WP` without
+calling `reset_tree` (rev-3) — resolved once from the file and asserted non-empty, plus the
+`if in_shard k` region seams and each region's closing `fi`; the boundary count it found is printed
+on every run beside the group count. Recognition is a non-comment call site outside a function body,
+at the head of the line or of a `;`/`&&`/`||`-separated command on it.
 
 Within a group the linter extracts: the `emitted` argument if present, each `hit`/`miss`/`same` call
 with its helper name and its literal text, and each `$(run` capture with its assignment target.
@@ -85,6 +89,16 @@ stronger thing `TOOL-dScriptedRepeat-15` S3 always said — a control is not bat
 borrowed from `check-arms.py`; round 2 measured that join resolving 5 of 101 `miss` arms and 0 of 27
 `same` arms, so it could not have worked. Rule A now reads the helper name alone, which is a token on
 the line. F1 is answered by deletion rather than by a decision.
+
+**"A group of more than one arm" is a group carrying an `emitted` call** (rev-3). An arm count is not
+a textual property — a solo block asserts several times against one tree — and `emitted` is the token
+`TOOL-aBatchedArm-1` defines as marking a tree shared by more than one arm. Rules B and C grade every
+group, batched or solo. The sentinel `emitted "?" "$out"` that every converted group carries until the
+build's final pass is COUNTED on the liveness line and never graded: the set is not rule A's business.
+
+*The two paragraphs below are rev-1's join, kept for the record and WITHDRAWN by the table above
+(rev-3): rule A reads no check number, resolves no text, and the linter does not invoke
+`check-arms.py`.*
 
 **Rule A needs the check number of a `miss`, and the arm does not carry one.** The text does. The
 linter resolves text to check number by the same join `check-arms.py` uses — the interpolation-stripped
@@ -180,6 +194,34 @@ RED then unstaged · floor to move: none, the suite is new and declares its own.
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-14 · header base · §4 delimiter · §4 rule A · §6 AC6 · the build brief's facts,
+  recorded before the first edit, under the owner rulings of 2026-09-13 (no self-test per step) and
+  2026-09-14 (no gate until every unit is built). Base moved `e9ed269b` → `e8da0a54`: every line
+  number rev-1 and rev-2 typed is stale and every anchor is re-derived by text. (1) `emitted` exists
+  (`TOOL-aBatchedArm-1`, CLOSED at rev-7) as `emitted "<sig>|<sig>" "$out"`, and each of the FOURTEEN
+  converted groups carries the sentinel `emitted "?" "$out"` until the build's final pass pastes the
+  observed sets; rule A reads the helper names `miss`/`same` and never the set, so the sentinel is
+  counted, not graded. (2) The delimiter is RESOLVED, not typed, and rev-2's derivation was too
+  narrow for its own list: `wreset` resets to `$WP` without calling `reset_tree`, so the root is the
+  hard reset and the closure is over callers; at `e8da0a54` that is `reset_tree anchor_break
+  anchor_restore seed_ros wreset`, plus the eight `if in_shard k` seams and their closing `fi`.
+  `replay_landed_main` performs no reset and is not a boundary; it sits on the line after the
+  region-4 seam, which is one. (3) Fourteen groups, not nineteen — the unit-1 pass-2 ledger has the
+  ranges and the refusals. Every starting figure is DERIVED by the linter's first run over the
+  tracked file and pasted into the acceptance ledger, including the pre-existing rule-C hit on
+  `_f1_clean=$(run)`, the equality baseline in a solo block: reported, never waived, per §3.
+  (4) `check-arms.py` is not invoked: rule A needs no text-to-check join, so F1 resolves by deletion
+  and §4's two join paragraphs are marked withdrawn. (5) "A group of more than one arm" is a group
+  carrying an `emitted` call; rules B and C grade every group. (6) AC6 AMENDED: observed at the
+  build's final gate pass by `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The
+  leg is the `.test.sh` (`chunk = selftests`, `subject = kit`, budgeted with an argv-empty row so the
+  budget file gains no path literal), so the bar grades the LINTER; the tracked suite's own verdict
+  is printed by that leg and never taken as its own, because the starting figures make the tracked
+  run exit 1 and §3 forbids waiving that — a leg that adopted the tracked verdict would be red by
+  design on its first day (spec-audit round 2, D5). The row also needs a `[[gate_leg]]` claim in the
+  kit descriptor and a row in `tools/govkit/subject-pins.tsv`, which govkit's selfcheck requires of
+  every manifest leg, and the manifest is a watched file, so the kickoff manifest is re-stamped in
+  the same commit.
 - rev-2 · 2026-09-10 · §4 rules table · §4 delimiter · order · folded spec-audit round 2 (BLOCKED,
   NON-CONVERGENT, disposition FOLD, so this is the loop's exit and this spec is not re-reviewed).
   Round 2 called this unit unimplementable as written and was right on both counts. **Rule A's

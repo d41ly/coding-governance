@@ -95,7 +95,7 @@ ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 
 | [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 2 | 2 | CLOSED | rev-8 | 2026-09-14 |
 | [TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip](spec/2026-09-13-spec-TOOL-aBatchedArm-5.md) | 3 | 2 | CLOSED | rev-7 | 2026-09-14 |
 | [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 4 | 2 | CLOSED | rev-7 | 2026-09-14 |
-| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 5 | 2 | OPEN | rev-2 | 2026-09-10 |
+| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 5 | 2 | OPEN | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
 Records: 26 bound to this build, across 4 record folder(s).
