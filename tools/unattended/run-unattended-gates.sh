@@ -24,7 +24,7 @@
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
 # nothing runs the self-tests automatically. A change under this directory that guts a check lands
 # green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `tools/unattended/` is a GREEN verdict from `run-unattended-gates.sh --selftests --serial` pasted
+# `tools/unattended/` is a GREEN verdict from `run-unattended-gates.sh --selftests --serial` (--pooled after calibration) pasted
 # into the landing report. The mode is DECLARED (TOOL-aBatchedArm-4): --serial grades each suite
 # against its budget, --pooled runs them through the runner's pool and withholds every cost verdict,
 # and a route that reaches the self-test half with neither REFUSES rather than defaulting.
@@ -145,6 +145,11 @@ case "$_arg" in
     echo "               It REFUSES without a mode: --serial runs each suite alone and grades it"
     echo "               against its budget; --pooled runs them through the runner's bounded pool"
     echo "               and WITHHOLDS every cost verdict, saying how many on the summary line."
+    echo "               Its GREEN is PARITY (TOOL-aBatchedArm-5): every row ran to its own end and"
+    echo "               matched the (rc, FAIL, executed) baseline run-selftests.sh --pooled --calibrate"
+    echo "               took for it; a row with no baseline refuses the run by name. Landing order:"
+    echo "               calibrate, commit the evidence, --pooled GREEN, then the flip. --pooled after"
+    echo "               calibration is the fast path; the serial mode stays the cost pass, on demand."
     # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
     # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
     # the source that owns it, broken inside the file that owns it. The sum below is the declarations.
@@ -297,6 +302,11 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
   # the same stream is ALSO captured to a file, because the summary line below states how many
   # cost verdicts the pool withheld and that number is the runner's own, parsed from its
   # `cost verdict(s) WITHHELD` line rather than typed here. TOOL-aBatchedArm-4 S4/S5.
+  # `st` FOLLOWS THE RUNNER'S EXIT, WHICH UNDER --pooled MEANS PARITY (TOOL-aBatchedArm-5 S4): a
+  # red-by-design row that ran to its own end and matched its calibrated (rc, FAIL, executed)
+  # baseline is green, so a perfect pass over the eight shard rows prints GREEN here; a crash, a
+  # kill, a wall, an unrun, an unstarted or a mismatched row is red. The `WITHHELD` line the parse
+  # below reads survives parity — the cost verdict stays withheld — so the parse is unchanged.
   if [ "$MODE" = pooled ]; then
     _pf=$(mktemp) || { echo "run-unattended-gates: cannot create a scratch file for the pooled withheld count" >&2; exit 2; }
     bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --pooled | tee "$_pf"

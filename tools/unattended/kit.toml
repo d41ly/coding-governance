@@ -122,8 +122,8 @@ means = "render-failed-half-stamped"
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
 # `tools/unattended/` is not done until this prints GREEN and the verdict is in the landing report:
 #
-#     bash tools/unattended/run-unattended-gates.sh --serial        # the self-tests, each graded
-#     bash tools/unattended/run-unattended-gates.sh --all --serial  # and the legs beside them
+#     bash tools/unattended/run-unattended-gates.sh --serial        # the self-tests, each graded; --pooled after calibration
+#     bash tools/unattended/run-unattended-gates.sh --all --serial  # and the legs beside them; --pooled after calibration
 #
 # The mode is DECLARED and never defaulted (TOOL-aBatchedArm-4): a route reaching the self-tests
 # with neither `--serial` nor `--pooled` refuses. `--pooled` runs them through the shared runner's

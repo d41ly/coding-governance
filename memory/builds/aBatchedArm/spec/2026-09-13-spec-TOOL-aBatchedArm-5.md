@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip
 
-**Status:** OPEN · rev-7 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
+**Status:** CLOSED · rev-7 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -523,7 +523,15 @@ build time.
   quote. Under the owner rulings of 2026-09-13 and 2026-09-14 this unit ran NO suite, fixture,
   self-test leg or bar: every one of AC1 through AC11 is ledgered in the AMENDED form naming the
   command the build's final gate pass observes it by, and every new arm is written with its red case
-  stated in its comment and marked `NOT YET OBSERVED RED`.
+  stated in its comment and marked `NOT YET OBSERVED RED`. Built and CLOSED as it stands, two commits:
+  45 arms added and one retired (the factor-absent refusal), `SELFTEST_FLOOR` 55 to 99; the manifest
+  re-stamp rode in the S1 through S4 commit because `run-selftests.sh` is on the `watch:` line and
+  the ratchet grades the staging commit, not the S5 one the brief paired it with; the kit runner's
+  `--help` gained five lines naming the parity verdict, the landing order and the serial cost pass
+  (§5 user docs), so its `:187` and `:233` lines are byte-identical at `:192` and `:238`; the dark
+  spelling on the four carriers is `--pooled after calibration` and contains none of the phrase
+  predicate's words, so the flip's yield is still the six lines. The two trailer-less rows are
+  declared in the evidence header as `# no-trailer: <row>` lines, which the runner reads.
 - rev-6 · 2026-09-14 · §2 S2 · S3 · S4 · S5 · §3 · §4 Files touched · §5 · §6 AC3 · AC5 · AC6 ·
   AC11 · §7 · §10 · folded spec-audit round 4 (BLOCKED, 2 blocker rows in one defect, 6 highs, 2
   mediums, 10 confirmed rows in 4 defects, precision 0.43 — NOT strictly smaller than round 3's one

@@ -54,6 +54,32 @@ The parity-reached arms, every `--pooled`/`--sweep` arm the file carried at BASE
   is not a number of seconds`, `peak concurrency 1 of outer 1`, and the three `--rank` arms whose
   `roundtrip.sh` sweep runs green over the seeds.
 
+## The two S5 predicates, run at build time
+
+Both were run over the tree BEFORE the first edit (at `e82d4053`, whose `tools/` is byte-identical
+to BASE `1c736fd9`) and again after the S5 commit. The carrier predicate,
+`git grep -nE -- '--selftests --serial|run-unattended-gates\.sh --serial|run-unattended-gates\.sh --all --serial' -- .githooks/gate-env.sh AGENTS.md memory/guides/SESSION-KICKOFF.md tools/unattended/`,
+yielded eight lines before, the spec's eight — DoD carriers `.githooks/gate-env.sh:27`,
+`tools/unattended/kit.toml:125`, `:126`, `tools/unattended/run-unattended-gates.sh:27`; pointers
+`AGENTS.md:519`, `memory/guides/SESSION-KICKOFF.md:169`, `tools/unattended/README.md:66`,
+`run-unattended-gates.sh:233` — and after the S5 commit the same eight, the four carriers each now
+ending in `--pooled after calibration` beside their `--serial`, and the four pointers byte-identical
+to BASE (`git diff 1c736fd9 -- AGENTS.md tools/unattended/README.md` empty; the
+`SESSION-KICKOFF.md` diff is the `last-audit` line and nothing else; the kit runner's `:233` line is
+byte-identical and now sits at `:238`, because five usage lines this unit added above it name the
+parity verdict, the landing order and the serial cost pass — §5 user docs). The phrase predicate,
+`git grep -nE 'GREEN verdict|not done until|DoD path|DoD command|landed dark' -- .githooks/gate-env.sh tools/unattended/ tools/run-gates/run-selftests.sh`,
+yielded SIX lines before, not rev-6's "eight" (rev-7 corrects the word; the enumeration was
+right): `.githooks/gate-env.sh:26`, `tools/run-gates/run-selftests.sh:15`, `tools/unattended/kit.toml:123`,
+`:130`, `tools/unattended/run-unattended-gates.sh:27` and `:187` — and the same six after, `:27`
+carrying the dark spelling and `:187` byte-identical at `:192`. The dark spelling deliberately
+contains none of the phrase predicate's words, so the flip's yield is still those six lines.
+
+The manifest re-stamp rode in the S1–S4 commit `50d95523`, not the S5 one the brief paired it
+with: `run-selftests.sh` is on the manifest's `watch:` line and `manifest-check.sh --staged` grades
+the commit that stages the watched change, as unit 3's checkpoint `cbf8ebce` shows; the S5 commit
+touches no watched file.
+
 ## Fixture changes (`build_repo`)
 
 The charter stub `AGENTS.md` with one registry row mapping `${USERNAME:-$USER}` to tag `t`; the
@@ -111,6 +137,17 @@ at once, no FAIL line, no trailer) and `suite-quiet.sh` (exit 0, prints nothing)
   tools/run-gates/selftest-budgets.txt` is 0 before and after the unit (the retired header carried
   no such token either), and `--rank`'s unbacked list is untouched because this unit wrote no
   fourth-column reading — the budget file's only edit is the deleted `sweep-ceiling-factor` block.
+- AC5 — amended rev-7 — the read-as-text half OBSERVED now, since it is a grep and runs nothing:
+  after the S5 commit the carrier predicate returns the four DoD carriers each spelling
+  `--pooled after calibration` beside `--serial` — `.githooks/gate-env.sh:27`,
+  `tools/unattended/kit.toml:125`, `:126`, `tools/unattended/run-unattended-gates.sh:27` — and
+  the four pointers byte-identical to BASE, pasted above. The landing half is owed at the build's
+  landing on the merged tree, in S5's order: `bash tools/unattended/run-unattended-gates.sh
+  --pooled` over the population `--kit tools/unattended --list` resolves must print GREEN with
+  `killed 0 · walled 0 · unrun 0 · unstarted 0 · mismatched 0` and `fingerprint MATCHED`, pasted;
+  only then the flip commit, with both predicate hit lists and the post-commit phrase re-run's
+  empty result pasted; on a red at step (3) the carriers stay as they are here and the build lands
+  without the flip.
 - AC6 — amended rev-7 — NOT OBSERVED under the 2026-09-14 ruling; owed at the build's final gate
   pass by `bash tools/run-gates/run-selftests.test.sh`: every pre-existing `--serial` arm is
   byte-unchanged in the file and touches no line this unit edited (the serial loop is untouched;
