@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-13
 streams: kickoff+tooling
 roster: KICK+TOOL
-ids: KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8
+ids: KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8 TOOL-aReplayedCard-9
 authorized-by: prompt
 ---
 
@@ -75,7 +75,7 @@ None yet.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 8 unit(s) · node a · opened 2026-09-13 · streams kickoff+tooling
-ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8
+ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8 TOOL-aReplayedCard-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -90,7 +90,7 @@ ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplaye
 | [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
