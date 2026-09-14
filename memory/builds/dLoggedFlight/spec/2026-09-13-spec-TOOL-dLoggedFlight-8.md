@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -78,8 +78,8 @@ sources actually support. Every later surface renders from this model rather tha
   - gate lines, joined exactly by `run=` where a joined push line pinned `gate_run`, and otherwise by
     the run's worktree inside the window;
   - unit dispatches and briefs;
-  - from the extractor where local: owner turns, compactions, limits and idle gaps of 15 minutes or
-    more.
+  - from the extractor where local: owner turns, compactions and limits;
+  - the model's idle gaps, which S6 judges over every source, never over this timeline alone.
 - **S4** The decision ledger. Observed by AC3 and AC11. Each entry points at its source, a file and
   line or a sha. It holds:
   - the run-state rows whose kind is in the driver's `PARK_KINDS_OWED`, and the `rescope` rows whose
@@ -138,7 +138,16 @@ sources actually support. Every later surface renders from this model rather tha
     a `gates.log` line with `verdict=RED`.
   - `destructive-git`: an extractor tool call flagged destructive.
   - `converged-on-blocked`: a review row whose verdict is `BLOCKED` and whose exit is `CONVERGED`.
-  - `idle-gap`: fifteen minutes or more with no event of any source.
+  - `idle-gap`: fifteen minutes or more that no event of any source covers. The events are the
+    timeline's, every event the run's session extracts hold, and each tool call over its whole span,
+    from its start to its end, so a long bar or a stretch of workflow calls is busy and never idle.
+    Owner turns are not among them, since a turn is the owner's act and not the run's. A stretch runs
+    between two events inside the window, never from a window edge. It is judged only when the
+    transcripts read `present`, because only then is every tool call seen and every owner turn known.
+    Otherwise none fires, and the coverage block says idleness was not judged. A stretch with an owner
+    turn inside it, or within fifteen minutes of either end, is kept out and counted. Its endpoints
+    would place that turn to within the reply's latency, and owner turns are counts with no clock
+    time (`TOOL-dLoggedFlight-9` S4).
   - `multi-run-session`: one session id appearing in the START lines of two slugs' runs.
   - `stalled`: six heartbeat `--status` calls in a row with no head or phase change, one hour at the
     declared cadence.
@@ -155,7 +164,9 @@ sources actually support. Every later surface renders from this model rather tha
   - `not-local`: no named session has an extract or a transcript on this machine, or the journal names
     no session and the store holds no extract attributed to the slug.
 
-  The run-state file, git and the build folder read `present` or `absent`.
+  The run-state file, git and the build folder read `present` or `absent`. The block also carries
+  `idle`: whether idle gaps were judged (S6), how many fired, and how many were kept out near an
+  owner turn, with a note naming the transcripts' state when they were not judged.
 - **S8** Attribution, within one session. An event takes the unit of the most recent unit-bearing END,
   from `--brief`, `--dispatch`, `--rescope` or `--review`, and the phase of the most recent END's
   `phase_to`. A START with no END contributes its `phase_from` and no unit. `--status`, `--resume` and
@@ -398,6 +409,16 @@ command.
   call made and that commit's runkey, and the first run's window comes from git alone. A START whose
   commit is not in the fixture's history is named in the coverage block and starts no run.
   Red when: a START joins a run by position, or an unmatched START starts a run.
+- **AC19** — When `build_run_model` reads a fixture run whose session transcript, extracted by the
+  extractor, holds twenty minutes of short tool calls between two timeline events and one
+  26-minute foreground call, neither stretch yields an `idle-gap`. A nineteen-minute silence more
+  than fifteen minutes from every owner turn yields one. An owner turn closing a silence, one
+  opening a silence, and one inside a silence a limit opened keep those three stretches out, and
+  the coverage block counts three. With no local transcript the same run yields no `idle-gap`, and
+  its coverage reads not judged. Across every model the self-test builds, no idle gap holds a tool
+  call's start or overlaps its span.
+  Red when: a busy stretch reads idle, a stretch next to an owner turn fires, a git-only run reports
+  an idle gap, or an idle gap holds a tool call.
 
 ## 7. Gates
 
@@ -445,6 +466,15 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   proof is named per journal, since rev-4 left a live source with no lines and no proof in no state.
   S11 gains `--journals` and `--transcripts`, and S12 counts its six processes. §4's figures are
   re-measured.
+- rev-6 · 2026-09-14 · S3 S6 S7 · AC19 · folded the closing diff review's round-1 B1 and H1. H1: an
+  idle gap is judged over every source, with a tool call covering its whole span, and only where the
+  transcripts read `present`. Rev-5 judged gaps over the timeline alone, which read every busy
+  stretch of this run as idle. B1: owner turns are not events of a gap, and a stretch within fifteen
+  minutes of one is kept out and counted. A gap's start or end had placed an owner turn to the
+  second, and dropping the turn alone would still place it to within the reply's latency. The
+  review also proposed judging where the driver journal reads `present` or `partial`. Its verbs are
+  already timeline events and it knows no owner turn, and a `partial` transcript hides a session's
+  calls, so neither is enough to judge by.
 
 ## 10. Reuse audit
 

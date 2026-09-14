@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -51,9 +51,10 @@ leg can prove nothing else got in.
 
   No row leads with an id, because a leading id DEFINES it for checks 13 and 14. A section holds only
   the fact lines and tables `RECORD_SCHEMA` declares for it, and every other table's first cell is a
-  1-up ordinal. The timeline carries no owner turn: S4 keeps owner turns to counts. The `Data` twin is
-  the markdown re-encoded, every fact and every shown row of every section, so the two cannot
-  disagree.
+  1-up ordinal. The timeline carries no owner turn: S4 keeps owner turns to counts. `## Coverage`
+  also says whether idle gaps were judged and how many were kept out near an owner turn, the model's
+  `idle` entry of `TOOL-dLoggedFlight-8` S7. The `Data` twin is the markdown re-encoded, every fact
+  and every shown row of every section, so the two cannot disagree.
 - **S4** The closed schema, `RECORD_SCHEMA`, as value classes. Observed by AC4. The record carries only:
   - shaped values: verb tokens matching `^--[a-z-]{2,20}$`, phase tokens matching `^[A-Z]{3,12}$`,
     check numbers, shas, this build's own unit ids, integers, durations, UTC timestamps,
@@ -78,7 +79,13 @@ leg can prove nothing else got in.
   build's own folder in the declared memory root, the only paths the record carries. There is no free
   text, no absolute path, no session id, no host id and no command. A model value outside its field's
   class is written `-`, which also stands for an absent value, and the summary's `values withheld`
-  line counts them. Owner turns appear as counts per position, with no clock time.
+  line counts them. Owner turns appear as counts per position, with no clock time, and no rendered
+  value may recover one. Before anything is written, the render compares every UTC the record would
+  carry with the second of every owner turn the model holds, and each idle row's end too: its UTC
+  plus its duration, and the second after, since both are truncated. On a match it refuses the whole
+  record, naming where the time sits and never the time. The model already keeps an idle gap near an
+  owner turn out (`TOOL-dLoggedFlight-8` S6). This check is the renderer's own, so a model that
+  regressed still cannot publish one.
 - **S5** The integrity commitment: the sha256, line count and first and last timestamps of the journal
   lines attributed to this run, so an edit to the journal made after the render is detectable on the
   producing node. `runlog.py verify <record>` recomputes them. A run with no journal lines records
@@ -171,6 +178,8 @@ by the self-test at run time, from real models where a model is needed, so no fi
 - A runkey from the run-state path's creation commit: rejected, since all six rotated builds resolve
   their archive and their live record to one such commit.
 - Owner-turn clock times: rejected as new public data about when the owner was at the keyboard.
+- An idle row beside an owner turn: rejected with them, since its start or its end is the same datum,
+  derived.
 
 ## 5. Production-readiness checklist
 
@@ -232,6 +241,14 @@ command.
 - **AC8** — When `render_record` renders the 500-row fixture with `subprocess` patched to count, it
   makes zero calls, and it prints its wall time without grading it.
   Red when: the render reaches git per row.
+- **AC9** — When `render_record` renders a model whose idle row starts in an owner turn's second,
+  one whose idle row ends in one, and one whose idle row's truncated end falls the second before
+  one, each refuses with a line naming no time, and `write_record` writes nothing. The same three
+  with the owner turn three seconds further away render. A real model built from a transcript with
+  an owner turn at a silence's start, one at its end and one inside it renders a record in which no
+  UTC, and no UTC plus a duration, falls in any owner turn's second.
+  Red when: a time in an owner turn's second reaches the text, a refusal names the time, or a near
+  miss refuses.
 
 ## 7. Gates
 
@@ -266,6 +283,11 @@ none
   and 20, with a halving step. S7 finds the index generator rather than spelling a sibling kit's path.
   §4 lists the three additive model fields. AC1's hygiene clause is typed from `memory/HYGIENE.md`,
   with the gate's own verdict owed, because this pass runs no gate. AC6 gains the widest-cell fixture.
+- rev-6 · 2026-09-14 · S3 S4 · §4 · AC9 · folded the closing diff review's round-1 B1. An idle row's
+  start or end was an owner turn's time to the second, and the kit README accepted the end as
+  residue, a narrowing of S4 no owner ruled. S4 now refuses a record carrying any time in an owner
+  turn's second, an idle row's end included, and §4 rejects an idle row beside an owner turn with the
+  clock times. S3's Coverage says whether idle gaps were judged. The README's residue line is struck.
 
 ## 10. Reuse audit
 
