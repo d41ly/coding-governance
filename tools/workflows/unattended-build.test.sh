@@ -825,7 +825,15 @@ has    "F all-refuted: unverified travels out as a stated 0" "$o" '"unverified":
 # return so the caller can take it. Attended mode keeps the hand-out: an owner is in the loop.
 has    "D all-refuted, unattended: the roster is WITHHELD" "$o" '"roster":[]'
 has    "D ...and nextAction demands the record BEFORE any dispatch" "$o" "WRITE the spec-audit record this clean round left unwritten, BEFORE any unit is dispatched"
-has    "D ...naming the ids the binding line must carry" "$o" '**Serves:** spec-audit A-tB-1 A-tB-2 A-tB-3'
+# ROUND 3, CLUSTER B (ids 1, 6): OWED is what the callee READ — the units whose spec path is among the
+# subjects it was handed — never the roster. `s3` is no subject in UNITS, so A-tB-3 is NOT named on
+# the demanded line and is called out as uncovered instead.
+has    "D ...naming the ids the binding line must carry — the AUDITED set" "$o" '**Serves:** spec-audit A-tB-1 A-tB-2`'
+hasnt_ "D ...and never a unit no subject covered" "$o" 'spec-audit A-tB-1 A-tB-2 A-tB-3'
+has    "D ...and the uncovered unit is named as owing a later audit" "$o" 'NOT covered by this round and NOT to be named on that line: A-tB-3'
+# ROUND 3, CLUSTER C (id 10): the record hygiene check 22 reads needs a `## Verdict:` heading, and the
+# hand-out prescribes the callee's own opening order so the file it demands is one the bar accepts.
+has    "D ...and the demanded record carries the Verdict heading check 22 reads" "$o" '## Verdict: CLEAN'
 has    "D ...and the record path at the subject round" "$o" 'memory/builds/tB/reviews/<date>-review-A-tB-1-spec-audit-round1.md'
 has    "D ...and the resume route" "$o" 'dispatch every unit `bash tools/unattended/unattended.sh --plan tB --paths` lists as READY'
 has    "D ...and the note opens HELD" "$o" '"note":"HELD AT HAND-OUT — a clean round with no tracked spec-audit record'

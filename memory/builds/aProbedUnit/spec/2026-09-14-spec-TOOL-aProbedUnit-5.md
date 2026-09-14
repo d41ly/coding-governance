@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root
 
-**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-aProbedUnit-5-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-5-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round1.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round2.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round2.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
+| [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round3.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round3.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 
@@ -90,9 +91,10 @@ and states in the hooks README what the guard still cannot see.
 
 ### Edges
 
-- **hands-off** `TOOL-aProbedUnit-4` — this guard denies the wrong destinations; it cannot supply
-  the right one. Handing every harness agent its session scratchpad path, absolute, is that unit's,
-  and the deny message here names the scratchpad only as a place, never as a path.
+- **consumes-from** `TOOL-aProbedUnit-4` — that unit hands every harness agent its session
+  scratchpad path, absolute; this guard denies the wrong destinations and cannot supply the right
+  one, so the deny message here names the scratchpad only as a place, never as a path. (Was
+  spelled `hands-off`, which hygiene check 12 reads as an edge pointing at an EARLIER unit.)
 - **consumes-from** external — the CLI's scratchpad layout, `<os.tmpdir()>/claude/<project>/<session>/scratchpad`,
   verified 2026-09-14 on node `a` against this session's own scratchpad path, which sits at
   `C:\Users\DAILY-~1\AppData\Local\Temp\claude\...\scratchpad`. If the CLI moved its base, S2's
@@ -532,6 +534,7 @@ exits 0 on every one of them · `FLOOR_ASSERTIONS` rises by the arms added.
   exit 2 with the `tmp` sentence at the tip. `FLOOR_ASSERTIONS` moved from 87 to 90, the three
   assertions the two arms add. Both arms were observed one at a time with the suite preamble
   sourced, never the suite whole; the whole suite stays `--close`'s.
+- rev-5 · 2026-09-14 · §3 Edges · the edge to `TOOL-aProbedUnit-4` is a `consumes-from`, not a `hands-off` — check 12's order rule and its mirror in spec 4's `hands-off` `TOOL-aProbedUnit-5` (closing review round 3, observed outside its range).
 
 ## 10. Reuse audit
 

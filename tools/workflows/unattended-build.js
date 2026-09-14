@@ -1297,16 +1297,45 @@ const handOut = {
 // prescribes, which is why `dispatch` stays on this return. Unattended only: an attended run has an
 // owner in the loop and no DoD term reading it.
 if (cleanRound && !attended) {
-  const owed = auditUnits.filter(function (u) { return specRefused.indexOf(u.id) === -1 }).map(function (u) { return u.id })
+  // OWED IS WHAT THE CALLEE READ, never the roster. `subjects` is what `tier2-review.js` was handed
+  // — caller-supplied, or resolver-returned only for units whose spec path resolves at HEAD — and a
+  // unit the spec stage just authored has no `specPath` yet (its own comment above the hand-out
+  // says so), so the roster minus the refused set names units no audit opened. A binding line over
+  // those would certify an audit that never read them. Round-3 cluster B of aProbedUnit.
+  const owed = auditUnits
+    .filter(function (u) {
+      return specRefused.indexOf(u.id) === -1 && u.specPath &&
+        subjects.some(function (s) { return s.path === u.specPath })
+    })
+    .map(function (u) { return u.id })
+  if (!owed.length) {
+    throw new Error(
+      'unattended-build: the clean round at ' + roundNo + ' covered NO unit — none of the audit ' +
+        'units has a spec path among the subjects the callee was handed — so there is nothing a ' +
+        'spec-audit record could bind. Commit the authored specs and re-invoke; a clean round ' +
+        'over nothing certifies nothing.',
+    )
+  }
+  const uncovered = auditUnits
+    .filter(function (u) { return specRefused.indexOf(u.id) === -1 && owed.indexOf(u.id) === -1 })
+    .map(function (u) { return u.id })
+  const subjectLines = subjects.map(function (s) { return s.path + '@' + s.blob }).join(', ')
   handOut.roster = []
   handOut.nextAction =
     'WRITE the spec-audit record this clean round left unwritten, BEFORE any unit is dispatched: the ' +
     'callee wrote no report, so no tracked record carries `**Serves:** spec-audit ' + owed.join(' ') +
     '` and `specs-audited` refuses every one of those units at --close. Author `' + reviewDir +
-    '/<date>-review-' + (owed[0] || '<id>') + '-spec-audit-round' + (roundNo - subjectRound + 1) +
-    '.md` whose first line is exactly `**Serves:** spec-audit ' + owed.join(' ') + '` and whose body ' +
-    'records the clean round (the callee said: ' + (typeof auRaw.note === 'string' ? auRaw.note : 'no note') +
-    '), commit it, then dispatch every unit `' + DRIVER + ' --plan ' + slug + ' --paths` lists as READY, ' +
+    '/<date>-review-' + owed[0] + '-spec-audit-round' + (roundNo - subjectRound + 1) +
+    '.md` in this order, which is the order the callee\'s own synthesis writes and hygiene check 22 ' +
+    'reads: line 1 exactly `**Serves:** spec-audit ' + owed.join(' ') + '`; a title line; a line naming ' +
+    'the reviewed subjects `' + subjectLines + '` and the round; then a heading that is exactly ' +
+    '`## Verdict: CLEAN`; then the body quoting the callee (it said: ' +
+    (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + '). ' +
+    (uncovered.length
+      ? 'NOT covered by this round and NOT to be named on that line: ' + uncovered.join(', ') +
+        ' — each owes a later audit once its spec is committed. '
+      : '') +
+    'Commit the record, then dispatch every unit `' + DRIVER + ' --plan ' + slug + ' --paths` lists as READY, ' +
     'one main-loop Workflow call each, with `dispatch` below. No roster is handed out here: a roster ' +
     'over an unrecorded audit is the build `specs-audited` cannot close.'
   handOut.note = 'HELD AT HAND-OUT — a clean round with no tracked spec-audit record; the roster is ' +

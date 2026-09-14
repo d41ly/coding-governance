@@ -5398,6 +5398,16 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "writeRound",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "writeRound",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "writeStamp",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
