@@ -838,7 +838,7 @@ D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
 # time now; the leg reds one first-committed AT OR AFTER the driver's FOLD_CUTOFF, so the record is
 # committed at that date. At base this fixture printed no check 2 line.
 reset_tree; dispconf 2000-01-01
-DISPDATE="2026-09-14T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
 hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was"
 
 # ...AND THE RULE HAS ITS OWN CUTOFF (closing review of aProbedUnit, round 2, cluster A — the
@@ -851,7 +851,7 @@ reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
 miss "$(run)" "check 2 FAILED"
 reset_tree; dispconf 2000-01-01
-DISPDATE="2026-09-14T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
 hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF"
 
 # ...and a FOLD_CUTOFF the leg cannot read is named, not defaulted: empty sorts before every date
@@ -859,7 +859,7 @@ hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a recor
 # inside check 2's own failure rather than at a `fail` site of its own, because the pinned check-2
 # ordinals in memory/project/unarmed-branches.txt sit below the read.
 reset_tree; mkconf
-mutate $KIT_REL/unattended.sh 's|^FOLD_CUTOFF=.*|FOLD_CUTOFF=2026-09-14|'
+mutate $KIT_REL/unattended.sh 's|^FOLD_CUTOFF=.*|FOLD_CUTOFF=2026-09-15|'
 hit "$(run)" "the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none"
 
 # ...and a fold beside ZERO blockers still demands nothing: nothing above MEDIUM stood, so nothing

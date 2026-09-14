@@ -40,7 +40,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.22   # gov:kit unattended@1.22 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.24   # gov:kit unattended@1.24 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -198,6 +198,45 @@ run_bounded() { # argv...
   return "$_rc"
 }
 
+# THE PYTHON RESOLVER, INLINE (aDeferredBar closing round 2, R2 and R8). --dispatch runs the
+# spec-token checker the conf DECLARES, and the launcher it runs it with is resolved here and
+# nowhere else: this kit is copy-installed as a standalone directory, so `../lib/` does not exist
+# in an adopting repo, and the bare `python3` the first cut fell back to there is the MS-Store
+# stub that answers `command -v` and exits 9009 without running anything. The block is
+# byte-identical to the canonical copy and its parity gate reds if it drifts; the driver suite
+# asserts the resolved variable is the only launcher spelling outside it.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+
 # The bound itself. DEFAULTED rather than required, and ANNOUNCED rather than silent.
 #
 # A required key would make --preflight refuse every adopter whose .unattended.conf predates it, so
@@ -296,7 +335,7 @@ CONF="$ROOT/.unattended.conf"
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -508,7 +547,11 @@ REVIEW_DISPOSITIONS="fold|promote"
 # driver's contract moved, not when an adopter declared anything — and DISPOSITION_CUTOFF alone dated
 # the FIELD, not every later rule about the field's value: sixteen tracked records this repo's own
 # driver wrote redded the bar the day the rule landed without its own cutoff.
-FOLD_CUTOFF="2026-09-14"
+# 2026-09-15, not the day the rule landed: `aReplayedCard` recorded `disposition fold` beside one
+# blocker on 2026-09-14 through the 1.23 driver, which still accepted it, and a cutoff set to the
+# landing day redded that record at the merge. The idiom every cutoff in this repo follows is
+# "strictly past the newest record any branch can still write under the old contract".
+FOLD_CUTOFF="2026-09-15"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
@@ -2769,6 +2812,16 @@ verb_preflight() { # slug · keepalive-id
   # re-preflight — the base stayed pinned while the anchor evidence beside it moved to whatever
   # the remote said today, so the record described two different observations as one.
   [ -n "$(fact "$rel" anchor-kind)" ] || set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
+  # TOOL-aDeferredBar-3 - the run's LOCAL branch ref, protocol fact 13, written on BOTH anchors and
+  # pinned once like the kind above it. `branch-ref` (fact 10) is NOT this: it is written only where
+  # the second anchor fired, so 17 of 44 anchored records in this tree — every default-branch one —
+  # carried no branch fact at all, and the gate-guard hook keyed on `branch-ref` alone read as wired
+  # and never fired on any of them. Written only when HEAD is a branch: a detached preflight writes
+  # nothing here and the hook keys nothing there, which is the fail-open that spec lists.
+  _rb=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
+  if [ -n "$_rb" ] && [ -z "$(fact "$rel" run-branch)" ]; then
+    set_fact "$rel" run-branch "$_rb" || return 1
+  fi
   # TOOL-aPromptedMandate-1 - the authorization mode, PINNED ONCE for the reason anchor-kind is:
   # written unconditionally it would drift on a re-preflight while the base it is evidence for
   # stayed pinned. `slug` is the fallback because an unreachable check_authorization leaves the
@@ -4895,6 +4948,36 @@ verb_dispatch() { # slug · unit · writes...
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac
+  # ------------------------------------------------- aDeferredBar closing review F3 (unit 2)
+  # THE SPEC-TOKEN CHECKER, RUN OVER THE LIVE TREE BEFORE THE DISPATCH IS ADMITTED. The memory
+  # kit's `bar` join grades LIVE specs, and under this harness every unit spec is CLOSED in its own
+  # build commit, so by the first bar that could grade it the population that join was built for is
+  # empty by construction. This verb is the one point that sees every live spec before its unit
+  # builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
+  # never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
+  # BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
+  # The launcher is the inline resolver's answer and nothing else (closing round 2, R2 and R8):
+  # the first cut EXECUTED a bare `python3` on the adopter layout, which on Windows is the stub the
+  # resolver exists to refuse, and every --dispatch there was then refused with a diagnosis
+  # blaming the tree. `resolve_python` cannot be made to fail from the driver suite's fixture
+  # without hiding every launcher from PATH, so that branch is pinned rather than armed.
+  if [ -n "${SPEC_TOKENS_CLI:-}" ]; then
+    [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
+    local _stpy _strc _sttail
+    _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
+    run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
+    if [ "$_strc" != 0 ]; then
+      # A checker that GRADED leaves `spec-tokens:` lines; one that never ran leaves none, and the
+      # tail then names the rc and the first line it did print, so a launcher or import failure is
+      # not read as a spec that reds.
+      _sttail=$(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')
+      [ -n "$_sttail" ] || _sttail="the checker printed no spec-tokens: line, so it did not grade — first line: $(printf '%s\n' "$RB_OUT" | head -1)"
+      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $_sttail"
+      return 1
+    fi
+  else
+    echo "unattended: dispatch — SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"
+  fi
   # ------------------------------------------------------------------------------ THE ORDER GATE
   # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
   # nor already dispatched. Units sharing an `order` value are the parallel group and do not block

@@ -29,7 +29,7 @@ role = "engine"
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "unattended.test.sh"]
 role = "project-owned"
 
 # `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
@@ -89,7 +89,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]

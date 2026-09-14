@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.22 -->
+<!-- gov:kit unattended@1.24 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -220,10 +220,16 @@ belonging here:
     before recording. A single `ABORTED` terminal says a run stopped and never why; the parked reason
     is prose for the owner, and this is the field the status line, the resume path and the gate leg
     join on. Present only on an aborted record, under facts 10 and 11's reading.
+13. **The run's local branch ref**, the value of `git symbolic-ref HEAD` at preflight, recorded by
+    `--preflight` on BOTH anchors and pinned once. Fact 10 is not this: it is the ref the REMOTE
+    advertised and is absent on a default-branch run, so a reader keying on it alone sees no branch
+    for the protocol's primary anchor. This is the fact the `gate-guard` hook keys a live run to the
+    branch a tool call is made on; a record written before it existed is keyed by fact 10 instead.
 
 Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
 default-branch run for the first two, a run that did not abort for the third. That is legal: the
-"nothing else" clause bounds what may appear, not what must. Fact 9 is always written.
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, and fact 13
+whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there.
 
 **A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
 none could plus what independently verifies the value. A hand-reconstructed fact carrying no such
@@ -475,6 +481,7 @@ where this document says it may:
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. A DECLARATION rather than a path in the driver, because a kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the carried-prefix ratchet reds on exactly that |
 | `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. A DECLARATION rather than a path in the driver, for the same reason its sibling is one. Until it existed the map log was a write-only surface: the unit that specced this reader shipped the logger and not the reader, and its acceptance ledger recorded a gate accepting a declaration that was nowhere in the product |
+| `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. The checker gov declares is gov-internal, at its tool root, and no kit ships it; the key is filled only where a project carries its own. Declared because the checker's own bar leg grades LIVE specs and an unattended build closes every unit spec in its build commit, so the dispatch is the one point that sees a spec while it can still change (aDeferredBar closing review F3) |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |

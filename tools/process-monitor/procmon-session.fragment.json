@@ -1,0 +1,7 @@
+{
+  "name": "procmon-session",
+  "event": "SessionStart",
+  "matcher": "startup|resume|clear",
+  "marker": "procmon-hook.js",
+  "hook_path": "{kit}/process-monitor/procmon-hook.js"
+}

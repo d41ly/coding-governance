@@ -129,6 +129,16 @@ BASE_RESOLVE_CUTOFF=""
 # repo's conf leaves an adopter a dead arm reading as armed.
 SPEC_LEGLINE_CUTOFF=""
 
+# Bar-invocation ratchet, read by the spec-tokens checker rather than by the hygiene engine: from
+# this date a LIVE spec whose acceptance bullet or §7 leg line backticks a merge-bar or self-test
+# suite invocation is red — a bar or a suite is not an acceptance observation; observe the checker
+# on a staged break, a --selftest flag or a fixture, and name the suite under `New arm:`. Set it to
+# the day AFTER the later of your newest spec filename date on any ref and the setting commit's own
+# date; the checker refuses a value not strictly past the day it was committed. Blank = never
+# required, and the report line then counts the live specs carrying such a token. Declared here by
+# hand for the same reason as the row above: the example-parity arm cannot see this key.
+SPEC_DIRECT_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

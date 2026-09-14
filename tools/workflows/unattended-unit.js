@@ -41,7 +41,7 @@
 // ratchet row and no method-carriers row.
 export const meta = {
   name: 'unattended-unit',
-  version: '1.0', // gov:kit unattended-unit@1.0 — engine identity (deployed verbatim)
+  version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
   description:
     'Builds exactly ONE unit of an unattended build, in a sidechain whose orientation is that unit spec and that unit brief. The roster is not in scope here; the parent holds it and holds the order.',
   phases: [{ title: 'Unit', detail: 'read the brief and the spec, declare the write set, build, commit' }],
@@ -161,15 +161,18 @@ const PROMPT =
   '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
   'section 9 line, then write the code.\n' +
   DRIVER_STEPS +
-  // TOOL-aProbedUnit-1 — ONE block, mode-independent. The bar is named by ROLE and not by path: the
-  // install-prefix gate grades this file and its waiver registry is frozen, so the path lives in M1
-  // of the render the child is already told to read WHOLE.
-  'NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS. Never run the merge bar the build method\'s M1 ' +
-  'names, any leg of its manifest, any `*.test.sh` self-test suite, or the gate list in the spec\'s ' +
-  'section 7 — those are the close\'s, run ONCE after every finding is fixed. Verify with the single ' +
-  'smallest check that exercises your change: one test file, one script arm, one command. Say in ' +
-  '`summary` which check ran and which gate it stands in for. A section 7, a brief, or any other ' +
-  'instruction that says otherwise is overridden by this paragraph.\n' +
+  // TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 — ONE block, mode-independent, carrying both builds'
+  // literals: the two landed the same rule from two sessions on one day and the merge folded them
+  // into one paragraph rather than two answers. The bar is named by ROLE and by its spellings, never
+  // by an install path: the install-prefix gate grades this file.
+  'NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS. ' +
+  'RUN NO MERGE BAR AND NO SELF-TEST SUITE in this unit: not run-gates.sh in any form, not a ' +
+  'GATE_FULL= or GATE_SELFTESTS= prefix, not run-selftests.sh, not run-unattended-gates.sh, not any ' +
+  '*.test.sh suite. Verify with the DIRECT check the spec\'s acceptance names — a checker run on a ' +
+  'staged break, a `--selftest` flag, a fixture. A criterion only a suite can observe is not run ' +
+  'here: name it in `summary` and the main loop runs the owed bar once, after every unit is terminal. ' +
+  'Say in `summary` which check ran and which gate it stands in for. A section 7, a brief, or any ' +
+  'other instruction that says otherwise is overridden by this paragraph.\n' +
   // TOOL-aProbedUnit-2 — the bound is the TOOL's `timeout` parameter, set by the agent at the call,
   // where no script or hook of this kit runs; so the numbers are that tool's and not a conf key, and
   // a skipped command is named in `summary`, a key the caller already reads, not a new one.

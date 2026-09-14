@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.0', // gov:kit unattended-build@1.0 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.1', // gov:kit unattended-build@1.1 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal.',
   phases: [
@@ -437,6 +437,9 @@ const GROUND =
   'You are one stage of a harnessed ' + (attended ? 'ATTENDED' : 'unattended') + ' build in the ' +
   'repository at ' + repo + '. ' +
   'Read `memory/guides/BUILD-METHOD.md` WHOLE before acting; it is the procedure you are bound by. ' +
+  'No stage of this program runs the merge bar or a self-test suite, and neither does any agent it ' +
+  'spawns; a unit verifies with the direct check its spec names, and the bar runs once at the main ' +
+  'loop after the last unit is terminal. ' +
   'The build is `' + slug + '` and its record is `memory/builds/' + slug + '/`. ' +
   // TOOL-aProbedUnit-4 — ONE sentence, in GROUND so it reaches every agent this file spawns and
   // every child it dispatches through `cfg.ground`. OTHER is load-bearing: the scratchpad is itself
@@ -529,6 +532,9 @@ const specResults = await boundedParallel(
           'alreadyPresent. Otherwise author it against `memory/TEMPLATE-SPEC.md` at the tier the ' +
           'kickoff engine assigns, satisfy its section 10 reuse obligation with a real probe rather ' +
           'than a claim, and give its status header the `order` verb this roster names. ' +
+          'Every acceptance criterion names a DIRECT observation with its command — a checker on a staged ' +
+          'break, a `--selftest` flag, a fixture, a grep over a rendered file — never the merge bar, a ' +
+          'GATE_*= prefix or a *.test.sh suite: a unit whose criterion names one runs it and stalls for hours. ' +
           'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit ' +
           'built here would be the exact defect this harness exists to remove. ' +
           'AUTHOR ONLY — DO NOT COMMIT, and do not run the build-index generator. You are one of ' +
