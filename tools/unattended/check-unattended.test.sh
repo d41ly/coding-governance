@@ -1884,7 +1884,7 @@ mutate $KIT_REL/SKILL.template.md '/unattended.sh --preflight/d'
 mutate memory/builds/tRun/README.md '/gen:build-units/d'
 mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated|a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py|a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it|the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 4/8 at 72f54937 (aBatchedArm landing step 0)
+check_emitted "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated|a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close|a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it|the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 4/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
 hit "$out" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
 # ---- AND THIS IS THE ARM THAT EXERCISES THE CANARY. TOOL-aQuenchedHarness-10 gave check 30 a
@@ -3397,19 +3397,25 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- fixtures, seven, and its closing review's fixture F, one), which landed in the old region two
 # ---- and now sit in whichever of the eight regions the merge placed them; every floor below is a
 # ---- MINIMUM the counts rose past, and all nine are re-read at the build's final gate pass.
-FLOOR_ASSERTIONS=538
+# ---- RE-READ at the build's final pass, 2026-09-15, node a, from the eight direct shard runs on a
+# ---- frozen clone at 72f54937 and their pasted-set re-runs at 7549981a: shards 83 · 59 · 40 · 78 ·
+# ---- 64 · 78 · 95 · 80 (sum 577 = unit 3's 555 + the fourteen check_emitted calls + main's eight
+# ---- merged arms), every floor below ~3 % under its reading, FLOOR_SHARD_8 now a READING and not
+# ---- a derivation. The unsharded floor is the sum's discount; no unsharded run was taken at this
+# ---- pass, and the eight-shard partition is the pooled route's own reading.
+FLOOR_ASSERTIONS=559
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=78
-FLOOR_SHARD_2=56
-FLOOR_SHARD_3=36
-FLOOR_SHARD_4=74
+FLOOR_SHARD_1=80
+FLOOR_SHARD_2=57
+FLOOR_SHARD_3=38
+FLOOR_SHARD_4=75
 FLOOR_SHARD_5=62
-FLOOR_SHARD_6=72
-FLOOR_SHARD_7=90
-FLOOR_SHARD_8=66
+FLOOR_SHARD_6=75
+FLOOR_SHARD_7=92
+FLOOR_SHARD_8=77
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
