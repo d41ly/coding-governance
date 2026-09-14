@@ -62,12 +62,10 @@ fi
 # A LINE RECORDS AN ATTEMPT, never a landing. Git fires this hook for a `--dry-run` and for a push the
 # remote later rejects, and whether anything landed is git's answer. A `--no-verify` push runs no hook.
 #
-# THE URL IS NEVER WRITTEN, because it can carry credentials, and nor is any value that can hold one.
-# `remote=<name>` is written only when $1 has a remote name's shape AND differs from $2. A push to a
-# bare URL passes the URL as both, and under an `insteadOf` or `pushInsteadOf` rewrite of a URL typed
-# on the command line git passes the TYPED URL as $1 and the rewritten one as $2, so a difference
-# alone proves nothing. Anything else writes `remote_unnamed=1`, and `url_userinfo=1` records a `user@`
-# part in either argument.
+# THE URL IS NEVER WRITTEN, because it can carry credentials, and nor is any value that can hold one:
+# a line carries `remote=<name>` or `remote_unnamed=1`, and `url_userinfo=1` where a URL held a
+# `user@` part. `render_push_remote` below is the one place that decides which, and its comment states
+# the rule, an `insteadOf` rewrite's typed URL included.
 #
 # EVIDENCE, NEVER AN INPUT. Nothing below branches on a line, and no gating decision, refusal or
 # signal behaviour moved. A failed append prints ONE `pre-push: run log` line on stderr and changes
