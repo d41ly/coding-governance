@@ -8,7 +8,8 @@ grammar, stated here and implemented once in `runlog_lib.py`, so no producer inv
 consumer re-parses one. The kit writes no journal; it is the reader and the reference writer. It also
 carries the ONE redaction table that every consumer printing or classifying free text applies, and
 the transcript extractor, which writes structural extracts to a store under the user profile and
-never into a repository.
+never into a repository, and the run model, which joins every one of those sources into one account
+of one run.
 
 ## The grammar
 
@@ -172,6 +173,38 @@ is written to disk.
 before any arm runs, and after EVERY arm compares the decoy's listing and searches the arm's output
 and scratch for the canary's id. Each extractor arm then aims the roots it uses at its own scratch.
 
+## The run model
+
+`model.py` joins every source of ONE unattended run into one model: the run-state file, the three
+journals, git, the build folder and, where they are local, the session extracts. Every later surface
+renders from it rather than re-deriving it.
+
+```bash
+python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
+```
+
+It prints a summary, or the whole model with `--json`, and writes a copy to `<store>/models/` beside
+the extracts. `--run` counts a build's runs oldest first and defaults to the last. It exits 2 when the
+build has no committed run-state file or the number names no run. A missing source is a coverage state
+in the model, never an error, because most runs predate the journals. The rules, each with its
+measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader most needs:
+
+- **A run is keyed on the commit that STARTED it.** `derive_run_starts` reads the commits that added
+  each run-state path, with renames off, in one git call for one build or for all of them. The driver
+  rotates a finished record with `git mv -f` in its successor's preflight commit, so that commit adds
+  the archive and only modifies `RUN.md`. An archive takes the entry before the commit that added it,
+  and the live record takes the last. Only history reachable from HEAD is read.
+- **A window is half-open, bounded to the run's era.** It opens at the run's own preflight START,
+  joined to its start commit by a named key, or at the start commit when there is none. It closes at
+  the END that moved the phase into a terminal one, else at the first terminal write in the era, else
+  one second after the later of the last journal line and the last record commit.
+- **A run's own commits** are the era's commits that descend from its start and name one of its unit
+  ids in the subject. A push joins from the run's worktree, or by pushing the default branch to a
+  descendant of the run's last own commit, which is how the landing push from the primary tree joins.
+  A gate line joins through the `gate_run` a joined push pinned, or from the run's worktree.
+- **Every inferred answer is named** in the model's `method` field.
+- **Git cost is constant**: six processes whatever the run's size, which the self-test counts.
+
 ## What this kit does NOT check
 
 - **Whether a value means anything.** `rc=banana` parses. Each producer's own suite grades its values.
@@ -202,6 +235,13 @@ and scratch for the canary's id. Each extractor arm then aims the roots it uses 
 - **Which repository a discovered session ran in.** `--discover` attributes a session to a slug
   because one of its shell calls ran the driver's preflight for it, and says `heuristic`.
 - **That a background call ended.** One whose notification never arrived keeps a null end.
+- **Whether the model's inferences are right.** The build commit, the owner's decision-log rows, an
+  unmet acceptance line, a close's head and a session's attribution are heuristics, and `method` says
+  so. A git-only run reads its sparse sources as `idle-gap`, because nothing else is there to fill the
+  gaps.
+- **A run whose record never reached HEAD's history.** The run starts are read from HEAD, so a run on
+  a branch this tree has not merged is invisible from here.
+- **Who ran a bar at the same minute.** A gate line with no pinned id joins by worktree alone.
 
 ## Running the self-test
 
@@ -210,7 +250,10 @@ python <this kit>/selftest.py
 ```
 
 It builds scratch git trees under the system temp dir and never reads this repository's own journal,
-nor any real transcript or store.
+nor any real transcript or store. Three model arms read this tree, never write it: one models a
+tracked run record through the CLI, one reports the owner spellings over the tracked decision log,
+and one holds the model's copies of the driver's sets to the driver's source. Each announces a skip
+where its subject is absent.
 Its redaction arms find the kit's files through `git ls-files`, so a new file is scanned once it is
 staged and not before.
 It and its fixtures are withheld from `govkit apply`: its subject is this directory's code, which an

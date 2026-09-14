@@ -58,11 +58,11 @@ from collections import Counter  # noqa: E402
 # RAISED 370 -> 591 by TOOL-dLoggedFlight-6: the extractor arms, and the three decoy checks `main`
 # runs after EVERY arm, so an arm function added or removed moves the count by four at least. Two of
 # them need a directory link, which every node makes: a symlink on POSIX and a junction on Windows.
-# RAISED 591 -> 769 by TOOL-dLoggedFlight-8: the run-model arms, fourteen functions, so the decoy
+# RAISED 591 -> 774 by TOOL-dLoggedFlight-8: the run-model arms, fourteen functions, so the decoy
 # checks alone move it by forty-two. Two of them read this tree, AC7 over a tracked run record and the
 # decision-log report, and a third reads the driver's source; each announces a skip where its subject
 # is absent, and a skip lowers the count, which is this floor's job to see.
-ASSERTION_FLOOR = 769
+ASSERTION_FLOOR = 774
 
 PASS = []
 FAIL = []
@@ -2843,6 +2843,35 @@ def test_model_driver_sets():
         check(f"model driver sets: {name} is declared once in the driver", len(rows), 1)
         check(f"model driver sets: the model's {name} equals the driver's, both directions",
               sorted(rows[0].split()) if rows else None, sorted(getattr(rl_model, name)))
+    # THE FIXTURES' WRITERS ARE COPIES TOO, so they are held to the same source. The scaffold is the
+    # driver's printf formats rendered with its own marker constants, and a parked row is park()'s
+    # format; each is compared byte for byte with what the fixture builders above produce.
+    body = read_shell_function(text, "scaffold_runmd")
+    marks = [re.search(rf"(?:^|;\s*){k}='([^']*)'", text, re.M) for k in ("GEN_OPEN", "GEN_CLOSE")]
+    check("model driver sets: both run-state markers are declared in the driver", all(marks), True)
+    fills = iter([FX_SLUG] + [m.group(1) if m else "?" for m in marks])
+    rendered = "".join(re.sub(r"%s", lambda _m: next(fills, "?"), f.replace("\\n", "\n"))
+                       for f in re.findall(r"printf '([^']*)'", body))
+    check("model driver sets: the fixture scaffold is the driver's scaffold_runmd, byte for byte",
+          rendered, build_runstate(FX_SLUG))
+    park = re.findall(r"printf '(\\n%s %s · item %s%s · reason %s\\n)'", read_shell_function(text, "park"))
+    check("model driver sets: park() still writes the row format the fixture's rows copy",
+          park, ["\\n%s %s · item %s%s · reason %s\\n"])
+    # The driver's two writers, as key/value arrays: every even token of an `f=(...)` or `f+=(...)`
+    # is a key. A `sess.<NAME>` key is the `sess.` family.
+    for fn, ev in (("write_runlog_start", "start"), ("write_runlog_end", "end")):
+        keys = set()
+        for arr in re.findall(r"\bf\+?=\((.*?)\)", read_shell_function(text, fn), re.S):
+            toks = re.findall(r'"[^"]*"|\S+', arr)
+            keys.update(re.sub(r"^sess\..*", "sess.", t.strip('"')) for t in toks[0::2])
+        check(f"model driver sets: the driver's {ev.upper()} writer and PRODUCER_KEYS name the same keys",
+              sorted(keys), sorted(PRODUCER_KEYS[("driver", ev)]))
+
+
+def read_shell_function(text, name):
+    """A shell function's body, from its `name() {` line to the first `}` alone at column 0."""
+    m = re.search(rf"^{re.escape(name)}\(\) \{{.*?^\}}$", text, re.M | re.S)
+    return m.group(0) if m else ""
 
 
 def main():

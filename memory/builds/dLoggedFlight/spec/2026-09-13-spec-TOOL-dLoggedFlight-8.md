@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** SPECCED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -45,10 +45,13 @@ sources actually support. Every later surface renders from this model rather tha
   archive's era, since its bytes lived there until rotation. A window starts at the run's preflight
   START in `driver.log`, or at its start commit when there is none. It ends at the first of these that
   applies:
-  - the run's terminal END in `driver.log`;
+  - the run's terminal END in `driver.log`: the END of the verb that moved the phase INTO a terminal
+    one, its START having read a phase that was not terminal. A `--status` after a landing reads the
+    terminal phase on both of its lines and ends nothing;
   - for a terminal record, the first commit in its era that wrote a terminal `phase:`;
-  - for a non-terminal record, the later of its last journal line and the last commit in its era that
-    touched `RUN.md`.
+  - for a non-terminal record, one second after the later of its last journal line and the last commit
+    in its era that touched `RUN.md`. The second is a commit time's resolution, and it puts the run's
+    last event inside its own half-open window.
 
   Journal STARTs join git's runs by a named key, never by position. A successful record-creating
   `--preflight` START, paired with an END of `rc=0`, belongs to the start commit its own call made: the
@@ -85,7 +88,8 @@ sources actually support. Every later surface renders from this model rather tha
     where that file is present and compares both directions, and announces its skip where it is not.
     A replicated policy value is extracted from the file that owns it (`tools/hooks/README.md:150`),
     and the arm's path literal takes a carried row with its reason;
-  - review rounds with their verdict path;
+  - review rounds with their verdict path: each review record the run's era commits added under the
+    build's `reviews/`, with the line of its `## Verdict:` where it has one;
   - `Decided:` trailers from the run's commits (`TOOL-dLoggedFlight-7`), plus a near-miss count of body
     lines beginning `Decided:` that git did not parse as trailers;
   - spec section 8 marks split by resolver, owner or agent, and by whether the commit that introduced
@@ -94,15 +98,25 @@ sources actually support. Every later surface renders from this model rather tha
     `(owner` followed by `)`, `,` or `:`, or the phrase "owner ruling" or "owner call" in any case. The
     classification is named `heuristic` in the model's `method` field. A report-only arm prints its
     hits per spelling and its near-misses over the tracked decision log;
-  - acceptance-ledger lines that are not met.
+  - acceptance-ledger lines that are not met: in the ledgers the run's own commits touched, an
+    acceptance line saying owed, not met or unmet. The test is named `heuristic` in `method`.
 - **S5** The conformance block. Each item is MET, UNMET or UNJUDGEABLE, and each names its evidence.
   Observed by AC4 and AC12. The items and their rules are:
-  - `brief-before-build`: per unit, a brief row and a dispatch row older than its build commit;
-  - `phases-walked`: the driver's phase moves include BUILDING before LANDING, or the run aborted;
-  - `green-at-close`: a `gates.log` line with `verdict=GREEN` and `head` equal to the head `--close`
-    ran at, older than the `--close` END. UNJUDGEABLE when no gate line exists in the window;
-  - `keepalive-reaped`: the run-state fact `keepalive-reaped` is present and affirmative;
-  - `review-exited`: every review subject's last row carries an exit token.
+  - `brief-before-build`: per unit, a brief row and a dispatch row older than its build commit. The
+    build commit is the unit's first own non-merge commit touching a path outside the memory root, so a
+    spec commit that re-renders a generated index is not a build; the rule is named `heuristic` in
+    `method`. UNJUDGEABLE when no unit has one;
+  - `phases-walked`: the driver's phase moves include BUILDING before LANDING, or the run aborted.
+    UNJUDGEABLE until the run reaches LANDING;
+  - `green-at-close`: judged at the last successful `--close` END. A joined `gates.log` line with
+    `verdict=GREEN` and `head` equal to the head `--close` ran at, older than that END. That head is the
+    first parent of the commit recording the close's LANDING write, or HEAD while that write is
+    uncommitted. UNJUDGEABLE when the journal holds no successful `--close` or no gate line exists in
+    the window;
+  - `keepalive-reaped`: the run-state fact `keepalive-reaped` is present and affirmative. UNJUDGEABLE
+    before LANDING;
+  - `review-exited`: every review subject's last row carries an exit token. UNJUDGEABLE with no review
+    row, and before LANDING while a subject is still open.
 - **S6** The anomaly set, a closed list of kinds, each with its trigger and evidence. Observed by AC5.
   - `nonterminal-merged`: the phase is not terminal and the run's last own commit (S3) is an ancestor
     of the default branch. The witness is not the test. It is HEAD at the last verb that writes one,
@@ -130,10 +144,16 @@ sources actually support. Every later surface renders from this model rather tha
   `COVERAGE_STATES`, and each journal an EPOCH, the time of its producer file's first line:
   - `absent`: the file does not exist, or the window ends before its epoch;
   - `partial`: the window contains the epoch;
-  - `present`: the window starts after the epoch and the source holds lines for the run;
+  - `present`: the window starts after the epoch, and the source holds lines for the run or nothing the
+    run's own rows prove required one;
   - `dead`: the window starts after the epoch and the source holds none while the run's own rows prove
-    activity;
-  - `not-local`: the transcripts are not on this machine.
+    activity. The proof is named per journal: for `driver` a parked row in the window, since every row
+    is a driver verb's write; for `gates` a LANDING write in it, which `--close` makes only after its
+    bar; and for `pushes` a LANDED write, which `--landed` makes only after the push;
+  - `not-local`: no named session has an extract or a transcript on this machine, or the journal names
+    no session and the store holds no extract attributed to the slug.
+
+  The run-state file, git and the build folder read `present` or `absent`.
 - **S8** Attribution, within one session. An event takes the unit of the most recent unit-bearing END,
   from `--brief`, `--dispatch`, `--rescope` or `--review`, and the phase of the most recent END's
   `phase_to`. A START with no END contributes its `phase_from` and no unit. `--status`, `--resume` and
@@ -150,12 +170,15 @@ sources actually support. Every later surface renders from this model rather tha
 - **S10** Cost: extractor usage totals for the window, split into main loop, direct agents and workflow
   agents. Observed by AC14.
 - **S11** The CLI `runlog.py model <slug> [--run <n>] --json` prints the model, and a local copy is
-  written beside the extracts. Observed by AC7.
+  written beside the extracts. `--journals <dir>` and `--transcripts <dir>` read another directory's
+  journals or transcripts. A session is read from its extract where one was written, and extracted in
+  memory where only its transcript is local. Observed by AC7.
 - **S12** Git cost: the model reads git in a number of calls that does not grow with the run's commit
-  or record count. One log over the own-commit range (S3) carries bodies and trailers, one log over
-  the build's run-state paths carries name-status, and one `rev-list` of the descendants of the run's
-  last own commit gives the push join its second key. One `cat-file --batch` carries blobs. The wall
-  time is printed report-only. Observed by AC8.
+  or record count. There are six: the run starts' one log (S1) and one ref listing, then one log over
+  the own-commit range (S3) carrying bodies and trailers, one log over the build's run-state paths
+  carrying name-status, and one `rev-list` of the descendants of the run's last own commit, which gives
+  the push join its second key. One `cat-file --batch` carries blobs. A detached HEAD costs one more.
+  The wall time is printed report-only. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -197,26 +220,32 @@ epoch. A bar run in another worktree at the same minute is never attributed.
 ### Real-population measurements
 
 Measured on this tree on 2026-09-13 when rev-4 was written, so each rule above is stated with its output
-over the population it names. The build pass re-measures them.
+over the population it names. The build pass re-measured them on 2026-09-14 with the model itself, and
+each bullet says where the figure moved.
 
 - Rotated builds: 6. Under S1 all six give distinct keys for the archive and the live record, where a
   path's creation commit gives one key for both. Under S2's era rule, each archive's window ends at its
   own terminal write before the rotation, and each live window starts at the rotation. The rev-3 rule,
   which took the first terminal write anywhere in `RUN.md`'s history, ended all six live windows
-  before their starts.
+  before their starts. Re-measured unchanged: six rotated builds of 51 with runs, each pair disjoint.
 - Non-terminal records at HEAD: 7. Six have own commits on `origin/main` after their start commits and
   read `nonterminal-merged`: aClosedDocket 4, aCollapsedScan 8, aUnblockedFleet 5, dRatifiedSeam 3,
   dRetiredFork 52 and dSealedTally 8. dRatifiedSeam's witness equals its base because its run went from
   preflight to `--close`, which writes no witness. The seventh is this run, unmerged, whose own commits
-  are on its branch, so it reads neither kind.
+  are on its branch, so it reads neither kind. Re-measured unchanged, with the sub-classes
+  retired-unit, other, surfaced-park, other, surfaced-park and surfaced-park in that order.
 - Parked rows over the tracked run-state files: review 217, decision 139, dispatch 119, rescope 85
   (add 74, retire 10 and supersede 1), brief 79, override 22 and abort 14. The ledger admits 186 and
-  keeps out 489.
+  keeps out 489. Re-measured over 57 files: dispatch 132 and brief 87, so 510 are kept out. The growth
+  is this build's own dispatch and brief rows, which the ledger excludes; the admitted 186 did not move.
 - Decision-log spellings: bare `(owner)` 8, `(owner, ` 7 and `(owner:` 1, with "owner ruling" 10 and
-  "owner call" 1 in any case. Near-misses of the `(owner<letter>` shape: 0.
+  "owner call" 1 in any case. Near-misses of the `(owner<letter>` shape: 0. Re-measured unchanged by
+  the report-only arm.
 - Journal runs: none on this node yet, since the writers land with this build. So the join from START to
-  start commit is exercised by AC18's fixture alone, and the build pass re-measures it once unit 2
-  lands.
+  start commit is exercised by AC18's fixture alone. Re-measured after unit 2: this node's driver
+  journal holds 44 of this run's lines and no record-creating preflight, because this run's preflight
+  predates its writer. The run therefore models from git with `driver` reading `partial`, and `gates`
+  reads `absent` until the post-build gate run writes its first line.
 
 ### Inventory
 
@@ -224,14 +253,20 @@ over the population it names. The build pass re-measures them.
 |---|---|---|
 | `tools/runlog/model.py` | module | none |
 | `build_run_model`, `derive_run_starts`, `derive_run_eras`, `read_run_state`, `read_git_range`, `scan_decisions`, `check_conformance`, `scan_anomalies`, `measure_coverage`, `build_owner_positions`, `build_run_usage`, `derive_attribution` | functions | `py.function`, verb-led |
+| `run_git`, `read_refs`, `read_blobs`, `read_journals`, `resolve_run_sessions`, `resolve_repo_root`, `scan_owner_spellings`, `render_model_json`, `render_model_summary`, `write_model_copy` and the private helpers | functions | `py.function`, verb-led |
 | `RunModel` | type | `py.type` |
-| `ANOMALY_KINDS`, `CONFORMANCE_ITEMS`, `COVERAGE_STATES`, `MERGED_SUBCLASSES`, `OWNER_POSITIONS` | closed constants | none |
+| `ANOMALY_KINDS`, `CONFORMANCE_ITEMS`, `CONFORMANCE_STATES`, `COVERAGE_STATES`, `MERGED_SUBCLASSES`, `OWNER_POSITIONS`, `SOURCE_NAMES`, `LEDGER_SOURCES` | closed constants | none |
 | `cmd_model` | CLI subcommand | reserved `cmd` |
+
+`SOURCE_NAMES` and `LEDGER_SOURCES` are the vocabularies `TOOL-dLoggedFlight-9` S4 names, spelled here
+first so the record renders from the model's own names.
 
 ### Files touched (estimate)
 
-`tools/runlog/{model.py,runlog.py,selftest.py,README.md}`, fixtures under `tools/runlog/fixtures/`,
-and the carried row in `tools/install-prefix-carried.txt` for the arm that reads the driver's source.
+`tools/runlog/{model.py,runlog.py,selftest.py,README.md}`, the golden lines in
+`tools/runlog/fixtures/golden-lines.txt`, the carried row in `tools/install-prefix-carried.txt` for the
+arm that reads the driver's source, and the self-test's budget row. The model's fixtures are built by
+the self-test at run time, so no new fixture file is tracked.
 
 ### Alternatives rejected
 
@@ -397,6 +432,17 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   attribution reads END. M4, M8, M9, L1 and L2: the unstaged side of each rule gains a fixture. M11: the
   owed sets are held to the driver's source. M12: the memory root is resolved. L3: the population form
   of `derive_run_starts`.
+- rev-5 · 2026-09-14 · S2 S4 S5 S7 S11 S12 · §4 · the build pass. S2: the terminal END is the verb
+  that moved the phase INTO a terminal one, because a `--status` after a landing reads LANDED on both
+  of its lines, and the AC7 arm saw it end aLeakedHandle's window three days late. A non-terminal
+  window closes one second past its last event, so that event is inside it. S4: the review source is
+  the review records the era added, each with its verdict line, and an unmet ledger line is a
+  heuristic. S5: each item names its UNJUDGEABLE condition, and the build commit and the close's head
+  are derived as stated; a build commit keyed on the build folder read every spec commit that
+  re-renders the index as a build. S7: `present` covers a live source nothing was owed to, and dead's
+  proof is named per journal, since rev-4 left a live source with no lines and no proof in no state.
+  S11 gains `--journals` and `--transcripts`, and S12 counts its six processes. §4's figures are
+  re-measured.
 
 ## 10. Reuse audit
 
