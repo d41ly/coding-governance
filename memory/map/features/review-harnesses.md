@@ -122,7 +122,7 @@ is claimed by the unattended dossier and its template here, because this kit ren
   spawn OUTSIDE the loop because the hook admits one marked loop per script. It carries no lens, no
   skeptic and no synthesis, so none of the trust accounting above applies to it; what it shares
   with its siblings is the `args` parse-then-refuse guard and the returns-a-record-writes-nothing
-  shape. Its agent definition ships beside it as `orient.agent.template.md`, which the inventory
+  shape. Its agent definition ships beside it as `orient.agent.md`, which the inventory
   does not key — a template the runner copies to `.claude/agents/` by hand is not a workflow script.
 
 ## Reuse affordance

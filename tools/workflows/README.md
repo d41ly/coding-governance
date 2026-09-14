@@ -137,7 +137,7 @@ them apart. `engine` is optional and exists for an agent type that holds no Skil
 Reads the engine's text instead of invoking the Skill; without it, it reports `refused-step` naming
 `Skill`.
 
-**Installing the `orient` arm.** `orient.agent.template.md` is the custom agent definition — tools
+**Installing the `orient` arm.** `orient.agent.md` is the custom agent definition — tools
 Read, Grep, Glob and Bash, no Write, no Edit, no Agent, no worktree isolation. Nothing wires it.
 For a run: copy it to `.claude/agents/orient.md`, make the calls, remove it. Invoked with no
 definition in place, the record reads `arm unavailable: orient` and the spawn's own refusal; that is
