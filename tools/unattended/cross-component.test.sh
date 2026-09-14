@@ -65,8 +65,14 @@ if grep -qE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md; then
   grep -oE '\{\{[A-Z_]+\}\}' .claude/skills/unattended/SKILL.md | sort -u | sed 's/^/    /'
   exit 1
 fi
+# SPEC_TOKENS_CLI BLANK, for KICKOFF_ENGINE's reason: the real conf declares the memory kit's
+# spec-token checker and this tree does not host it, so every `--dispatch` below would refuse on
+# the declared-but-absent file before reaching the driver/leg seam these arms exist to cross. The
+# announced skip is what the driver prints for a blank key; the checker itself is armed in the
+# driver suite's F3 block, over a fixture that copies it in. (aDeferredBar closing fold, F3.)
 sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CMD="true"|' \
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
+    -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
     "$HERE/../../.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main
