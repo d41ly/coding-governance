@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 4 · ratified 2026-09-14
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 4 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -44,8 +44,9 @@ guessed from an environment that is empty.
   `.claude/skills/unattended/SKILL.md` and `tools/workflows/unattended-build.js` are re-made in the
   same commit. Observed by AC6.
 - **S6** — `tools/workflows/unattended-build.test.sh` gains the arms in section 6 and every
-  existing fixture that expects a `RESULT` gains a `scratch`, because a required argument reds every
-  fixture that lacks it and that is the point. Observed by AC1 to AC5.
+  existing fixture that reaches past the `slug` refusal gains a `scratch`, because a required
+  argument reds every fixture that lacks it and that is the point. The arms are observed by AC1 to
+  AC5, one at a time; the fixture reds are seen by the close's whole-suite run, section 7.
 - **S7** — The dossier `memory/map/features/review-harnesses.md` names `scratch` beside the args
   contract it already describes. Observed by AC6.
 
@@ -110,9 +111,18 @@ names it the top breaker. Every carrier below reads `scratch`, the folded const.
 
 ```
 'Every temporary file, backup, probe, log or throwaway clone this run makes goes under ' + scratch +
-', spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp, a bare mktemp, or any path outside the repository. ' +
+', spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp, a bare mktemp, or any OTHER path outside the repository. ' +
 'A clone there is made with `git -c core.longpaths=true clone`, because that path is long enough that a plain clone fails on Windows with Filename too long. '
 ```
+
+OTHER is load-bearing: the scratchpad is itself outside the repository — section 8 F1 clones into
+it under `%TEMP%` — so without the word the last clause forbids the destination the first names,
+and AC3 pins the corrected bytes.
+
+The inputs block at `tools/workflows/unattended-build.template.js:135-146` — the header comment a
+caller reads the contract from — gains one row beside `slug`,
+`scratch: "<absolute session scratchpad>", // REQUIRED`, because a script that refuses without an
+argument its own contract does not list is the missing-carrier class S5 fixes for the Skill.
 
 The clone clause is not decoration. Measured 2026-09-14 on node `a`, with this worktree as the
 source and this session's 170-character scratchpad as the destination: `git clone --local
@@ -167,11 +177,13 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
 ### Files touched (estimate)
 
 - `tools/workflows/unattended-build.template.js` and its render — the refusal, the fold, the
-  sentence, the hand-out key. About twenty lines.
+  sentence, the hand-out key, and the `scratch: "<absolute session scratchpad>" // REQUIRED` row in
+  the inputs block at `:135` to `:146`. About twenty lines.
 - `tools/workflows/unattended-unit.js` — two refusals. About ten lines.
 - `tools/workflows/unattended-build.test.sh` — the arms, and `scratch` added to `UNITS`, the nine
-  `*_UNITS` fixtures at `:254` to `:492`, `CHILD_ARGS` at `:551`, and the inline passing fixtures at
-  `:114` to `:118` that expect a result rather than a refusal.
+  `*_UNITS` fixtures at `:254` to `:492`, `CHILD_ARGS` at `:551`, and the two inline fixtures that
+  reach past the `slug` refusal: `:118`, which expects the `units` refusal that now sits behind the
+  `scratch` one, and `:124`, the passing case.
 - `tools/unattended/SKILL.template.md` and its render; `memory/map/features/review-harnesses.md`.
 
 ### Alternatives rejected
@@ -198,10 +210,13 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
   its own check, so the agreement test runs only over a present one.
 - observability — the refusal messages name the missing or mismatched value; the sentence in every
   prompt names the path, so a transcript shows what the agent was told.
-- risks — every fixture in the test double that expects `RESULT` reds until it carries `scratch`;
-  that is the required-argument change doing its job, and section 6 counts it. The clone clause
-  rests on one measurement on one node; a POSIX host ignores `core.longpaths` harmlessly.
-- testing — section 6; the suite is on no bar leg and runs directly.
+- risks — every fixture in the test double that reaches past the `slug` refusal reds until it
+  carries `scratch`; that is the required-argument change doing its job, and the close's whole-suite
+  run is what sees every one of them, because the pass's single arms see only the fixtures they
+  name. The clone clause rests on one measurement on one node; a POSIX host ignores
+  `core.longpaths` harmlessly.
+- testing — section 6, one arm at a time against the sourced preamble; the whole suite is the
+  close's run, section 7, and no pass runs it.
 - migration — every existing caller of the harness must add `scratch`; the Skill is the only
   documented caller, and it is edited here. A caller following an older Skill meets the refusal,
   which names the argument.
@@ -209,58 +224,97 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
 
 ## 6. Acceptance criteria
 
-The suite `tools/workflows/unattended-build.test.sh` evaluates the scripts as their runtime does,
-with stub hooks that trace every prompt, and is on no bar leg, so each criterion is observed by
-running it directly. `has` and `hasnt_` print `ok` or `FAIL` per assertion and the suite exits 1 on
-any `FAIL`; the observation is the named line, not the exit alone.
+`tools/workflows/unattended-build.test.sh` evaluates the scripts as their runtime does, with stub
+hooks that trace every prompt. The PASS never runs it whole — the build-level rule — and it is on no
+bar leg either, so the whole-suite run is the close's compensating check, section 7. A pass observes
+ONE ARM AT A TIME: from a shell whose working directory is `tools/workflows`, source the suite's
+preamble, `sed -n '1,/^# ---- AC2: THE ARGS GUARD/p' unattended-build.test.sh` — lines 1 to 105 at
+base, which define `run_wf`, `has`, `hasnt_`, `UNITS`, `returns`, `$C` and every other helper and
+run no arm; `CHILD_ARGS` sits at `:551`, past the marker, so AC5 pastes that one literal into the
+shell itself — then `run_wf` the named fixture and read the trace it prints. The working
+directory matters: sourced, `$0` is the shell, so `HERE` resolves from the cwd, and from anywhere
+else the preamble's own `exit 2` guard closes the shell. `has` and `hasnt_` print `ok` or `FAIL` per
+assertion; the observation is the named trace line, never an exit status.
 
-- **AC1** — When `run_wf` is given the `UNITS` fixture without a `scratch` key, the trace ends in
-  `THROW` and carries the words `must carry an explicit` followed by the key name; given `scratch`
-  as a relative path such as `tmp/s`, the same refusal; given the fixture with `scratch` set to an
-  absolute path, the trace ends in `RESULT`.
+- **AC1** — When `run_wf` is given a copy of `UNITS` with its `scratch` key deleted, paired with
+  `"$(returns CONVERGED 0)"`, the trace ends in `THROW` and the line carries `must carry an explicit`
+  followed by `scratch`; given the copy with `"scratch":"tmp/s"`, a relative path, the same `THROW`;
+  given `UNITS` as landed, with `"scratch":"/tmp/s"`, the trace ends in `RESULT`.
   Red when: the absent case yields `RESULT`, which means the refusal was written after a fixture
   gained the key and never observed red; or the relative case passes, which means the shape test
   is a truthiness test.
-- **AC2** — When `scratch` is given with backslashes, the traced `prompt:spec:` line spells the
-  path with forward slashes and no backslash survives in the `dispatch.args` of the `RESULT`.
+- **AC2** — When `run_wf` is given the copy with `"scratch":"C:\\tmp\\s"` — two backslashes each in
+  the JSON, one each once parsed — the traced `prompt:spec:tB:` line spells `goes under C:/tmp/s`
+  and the `RESULT` line's `dispatch.args` carries `"scratch":"C:/tmp/s"`, and `hasnt_` finds neither
+  `C:\tmp` on a `prompt:` line nor `C:\\tmp` in the `RESULT`, the spellings an unfolded value takes
+  in each carrier.
   Red when: a backslash reaches either carrier.
-- **AC3** — When `run_wf` runs the valid fixture, every traced `prompt:` line — the spec writers,
-  `audit:record` and `dispose:` — carries `goes under /tmp/s` and `a bare mktemp, or any path
-  outside the repository` and `core.longpaths=true`, so `grep -c` of `a bare mktemp` over
-  `tools/workflows/unattended-build.template.js` and over `tools/workflows/unattended-build.js` is 1
-  each.
+- **AC3** — When `run_wf "$UNITS" "$(returns CONVERGED 0)"` runs, every traced `prompt:spec:tB:`
+  line and the `prompt:audit:record:r1:` line carry `goes under /tmp/s`, `a bare mktemp, or any
+  OTHER path outside the repository` and `core.longpaths=true`, and none carries `any path outside`,
+  the pre-fold bytes; and when `run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":false,"standing":["b1"],"summary":"x"}')"`
+  runs — the fixture that spawns the disposal agent, which `CONVERGED` skips — the
+  `prompt:dispose:tB:` line carries the same three. The `audit:subjects:` prompt is not traced under
+  `UNITS`, which supplies `subjects`; it opens with `GROUND` like the other three, and that is read
+  in the source rather than the trace. `grep -c 'any OTHER path outside the repository'` over
+  `tools/workflows/unattended-build.template.js` and over `tools/workflows/unattended-build.js`
+  prints 1 each; the byte parity of the pair is `review-protocol parity (kit vs dogfood)`, observed
+  at --close.
   Red when: any traced prompt lacks the sentence, which means it was placed in a stage text rather
-  than in `GROUND`; or the two files disagree, which `review-protocol parity (kit vs dogfood)` reds
-  at the close.
-- **AC4** — When the valid fixture's `RESULT` is read, its `dispatch.args` carries
-  `"scratch":"/tmp/s"` beside the six existing keys.
+  than in `GROUND`; or `any path outside` reappears, the clause that forbade its own destination; or
+  the two files disagree, which the parity leg reds at the close.
+- **AC4** — When the `RESULT` line of the `CONVERGED 0` run in AC3 is read, its `dispatch.args`
+  carries `"scratch":"/tmp/s"` beside `repo`, `slug`, `mode`, `driver`, `ground` and `checklist`.
   Red when: the key is absent from the hand-out, so a caller copying `dispatch.args` to the child
   meets the child's refusal on every unit.
-- **AC5** — When `run_wf` runs `unattended-unit.js` with `CHILD_ARGS` lacking `scratch`, the trace
-  ends in `THROW` naming `scratch`; with `scratch` present but a `ground` that does not contain it,
-  `THROW` carrying `names no`; with both agreeing, `RESULT`, and the traced `prompt:unit:` line
-  opens with the ground text. `grep -c 'function '` over `tools/workflows/unattended-unit.js` stays 1.
+- **AC5** — When `run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C"` runs with the `CHILD_ARGS`
+  literal from `:551` pasted in as it stands at base, lacking `scratch`, the trace ends in `THROW` carrying `must carry an explicit`
+  followed by `scratch`; with `"scratch":"/tmp/s"` added and `"ground":"G. "` unchanged, so the ground
+  names no such path, `THROW` carrying `names no`; with `"ground":"G. goes under /tmp/s. "` and
+  `"scratch":"/tmp/s"` together, `RESULT`, and the traced `prompt:unit:A-tB-1:` line opens with that
+  ground text. `grep -cE '^(async )?function ' tools/workflows/unattended-unit.js` stays 1 — the
+  anchored form, the definition scan the codebase-map JS layer performs, because the unanchored
+  `grep -c 'function '` prints 2 at base, line 4 being a comment, and would red the correct file.
   Red when: a mismatched pair passes, which means the join is absent and `scratch` is a dead key;
-  or a second top-level definition appears, which `codebase-map coverage + freshness` counts.
-- **AC6** — When `bash tools/unattended/adopt-unattended.sh --check` and `bash
-  tools/workflows/check-protocol-parity.test.sh` run after the renders, both exit 0; `grep -c
-  scratch` over `tools/unattended/SKILL.template.md` is at least 1 in the harness bullet, and over
-  `memory/map/features/review-harnesses.md` at least 1. `node tools/workflows/check-workflow-syntax.js`
-  exits 0 over both edited scripts.
-  Red when: either render drifted, or a script no longer parses in the AsyncFunction dialect.
+  or the anchored count moves, a second top-level definition, which `codebase-map coverage +
+  freshness` also counts, observed at --close.
+- **AC6** — When `grep -c scratch` runs over `tools/unattended/SKILL.template.md`, over
+  `.claude/skills/unattended/SKILL.md`, over `memory/map/features/review-harnesses.md`, over
+  `tools/workflows/unattended-build.template.js` and over `tools/workflows/unattended-build.js`, each
+  prints at least 1, and the Skill's hit sits in its "Drive the build as ONE program" bullet; every
+  one of the five prints 0 at base, measured 2026-09-14 on node `a`, which is the staged red. The
+  leg halves — `bash tools/unattended/adopt-unattended.sh --check`,
+  `bash tools/workflows/check-protocol-parity.test.sh` and `node tools/workflows/check-workflow-syntax.js`
+  exiting 0 after the renders — are the argv of `unattended skill wiring`,
+  `review-protocol parity (kit vs dogfood)` and `workflow script syntax` verbatim, so each is
+  observed at --close and never by the pass.
+  Red when: a count prints 0, which means a carrier was skipped; or, at the close, either render
+  drifted, or a script no longer parses in the AsyncFunction dialect.
 
 ## 7. Gates
 
 `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `unattended skill wiring` · `verifier fan-out` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)`
 
-These are what `--close` runs, once. The pass runs none of them: it verifies with
-`bash tools/workflows/unattended-build.test.sh`, which is on no leg, and reads the arms section 6
-names. `verifier fan-out` is listed because it reads every `export const meta` script and the
+These are what `--close` runs, once, over the whole build. The PASS runs none of them and no
+suite: it observes the single-arm runs AC1 to AC5 describe against the sourced preamble, and the
+grep halves of AC3, AC5 and AC6. The leg halves — AC3's byte parity, AC5's definition count under
+the map leg, AC6's three commands — are the close's, and their ledger rows read `observed at
+--close`. `verifier fan-out` is listed because it reads every `export const meta` script and the
 child's shape is what keeps it out of that gate's deny set.
 
+`tools/workflows/unattended-build.test.sh` is on NO bar leg: no row in `tools/gate-legs.json`
+names it, read 2026-09-14, so neither `GATE_FULL=1` nor `GATE_SELFTESTS=1` reaches it, and the
+build-level rule forbids a pass running it whole. The compensating check is one direct run at the
+close, whole, redirected to a file and never read through `tail`; `TOOL-aProbedUnit-7` measured
+it at 237 arms and 335 s at `270611cd` on node `a`, and the suite's own `--- <n> arms` line is the
+figure once this unit's arms are in. That run is what sees every fixture this unit's required
+argument reds — the nine `*_UNITS` fixtures, `CHILD_ARGS` and the two inline ones — because the
+pass's single arms see only the fixtures they name.
+
 New arm: `tools/workflows/unattended-build.test.sh` · the absent, relative and mismatched cases of
-AC1 and AC5 run against the scripts at base, where every one of them yields `RESULT`, before the
-refusals land · no assertion floor exists in this suite, so none moves.
+AC1 and AC5, and the backslash case of AC2, each run as one arm against the scripts at base, where
+the first three yield `RESULT` and the fourth spells a backslash, before the refusals and the fold
+land · no assertion floor exists in this suite, so none moves.
 
 ## 8. Open questions
 
@@ -287,6 +341,11 @@ refusals land · no assertion floor exists in this suite, so none moves.
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · S6 · §4 · §5 · §6 · §7 · AC1 AC2 AC3 AC4 AC5 AC6 · folded round-1 clusters
+  A (ids 1, 20: the per-arm observation form, the whole-suite run made the close's), J (id 25:
+  `any OTHER path outside the repository`, AC3's token), R (id 42: the anchored definition grep),
+  S (id 44: the inputs-block row); corrected the inline-fixture lines in Files touched to `:118`
+  and `:124` while verifying them.
 
 ## 10. Reuse audit
 

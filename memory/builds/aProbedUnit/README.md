@@ -41,6 +41,7 @@ record under `prompts/`.
 - **Owner answers, 2026-09-14, one turn.** PROMOTE keeps M4's meaning: a blocker or high becomes a UNIT. The one-round bound covers SPEC subjects only; the closing diff review keeps its convergence loop. `UNIT_STALL_BOUND` defaults to 1800 s. The scratch-guard denies `/tmp` writes too, and allows the CLI's scratch base under the temp root.
 - **No self-test suite runs inside a pass of THIS build either.** Unit 6 stages its own red case by running the single arm, never `unattended.test.sh` whole. The compensating `run-unattended-gates.sh` run is the closing pass's, once, on a frozen clone.
 - **Vocabulary changes land in every carrier in one commit**: driver, leg, harness, tests, VERBS, SKILL, protocol, and the build method where a rule moves — a paraphrase left behind is the two-answers class.
+- **A pass observes the grep or the single arm; the leg or suite half of any criterion is the close's.** Its ledger row reads `observed at --close`, never OBSERVED by a pass that did not run it. (Round-1 audit, cluster A.)
 - **Classification at open**: all seven MISSING; specced by the harness's SPEC stage.
 
 ## Parked decisions
@@ -68,13 +69,13 @@ ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close](spec/2026-09-14-spec-TOOL-aProbedUnit-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-14 |
-| [TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named](spec/2026-09-14-spec-TOOL-aProbedUnit-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-09-14 |
-| [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-14 |
-| [TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument](spec/2026-09-14-spec-TOOL-aProbedUnit-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-14 |
-| [TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root](spec/2026-09-14-spec-TOOL-aProbedUnit-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-14 |
-| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-14 |
-| [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close](spec/2026-09-14-spec-TOOL-aProbedUnit-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named](spec/2026-09-14-spec-TOOL-aProbedUnit-2.md) | 2 | 1 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument](spec/2026-09-14-spec-TOOL-aProbedUnit-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root](spec/2026-09-14-spec-TOOL-aProbedUnit-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-14 |
+| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-14 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).

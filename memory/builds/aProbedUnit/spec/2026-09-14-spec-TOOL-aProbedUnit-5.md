@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -32,8 +32,11 @@ and states in the hooks README what the guard still cannot see.
 - **S2** — Rule `tmp`. A target whose comparable form is `/tmp` or sits under it is denied,
   naming the session scratchpad as the destination, UNLESS it sits under an allowed root. The
   allowed roots grow by one: the CLI's scratchpad base, `<os.tmpdir()>/claude`, so a POSIX host
-  whose scratchpad sits under `/tmp` keeps the one destination the owner wants. Observed by AC3,
-  AC6 and AC7.
+  whose scratchpad sits under `/tmp` keeps the one destination the owner wants. A temp variable
+  whose comparable value is exactly `/tmp` contributes NO allowed root, because the ruling denies
+  the spelling and a variable is one more way to spell it; without this clause `TEMP=/tmp` would
+  re-open every `/tmp` write the rule closes, and the rule would have no observable failing case
+  on a Windows node. Observed by AC3, AC6 and AC7.
 - **S3** — Rule `posix-root`. A target `/<top>/...` with no drive letter after
   `buildComparablePath`, whose `<top>` is more than one character and is not in a hand-listed
   POSIX conventional set, is litter and is denied. `tmp` and `temp` are deliberately absent from
@@ -109,7 +112,14 @@ loop, in this order, after the allowed-root skip and before the home test:
 
 The kinds are disjoint by construction: a target is graded by the first rule that claims it, and
 `renderDeny`'s per-kind sentence is chosen by the kinds present in `bad`, exactly as the two
-existing kinds are today.
+existing kinds are today. Adjacent rules are therefore told apart by the deny KIND in stderr,
+never by exit status: every denial exits 2, so a `/tmpx/hyg` target denied by rule 3 and a
+`/tmp/hyg` target denied by rule 2 are indistinguishable to `$?` and distinct only in which
+sentence the message carries. An arm that proves a boundary between two rules asserts the sentence
+it expects AND the absence of the neighbour's, which is why AC3's near-miss is a denial with a
+kind and not an exit-0 control: rule 3 claims `/tmpx` (four characters, absent from
+`POSIX_ROOT_CONVENTIONAL`) whatever rule 2 does, so an exit-0 assertion there would be red at a
+correct tip.
 
 ### Rule 1 — `empty-var`
 
@@ -152,6 +162,18 @@ this root would deny the one place unit 4 tells every agent to write.
 
 The whole of `os.tmpdir()` is NOT added as a root. That would allow every `/tmp` write on a POSIX
 host with no `TMPDIR`, which is exactly the population the ruling denies.
+
+The same loop at `:132` adds `env.TMPDIR`, `env.TEMP` and `env.TMP` as roots today, so a variable
+set to `/tmp` would put `/tmp` itself in `allowed` and the skip at `:328` would fire before rule 2
+ever saw the target. `addRoot` therefore skips a value whose comparable form is exactly `/tmp`,
+S2's clause: the ruling denies the spelling, and a host that spells its temp variable `/tmp` is
+the POSIX default the ruling is aimed at, not an exemption from it. `/tmp/sub` as a variable
+value still joins the roots, because a configured subdirectory is a deliberate destination and
+not the habit. This is also what makes rule 2 observable on node `a`: with `TEMP=/tmp` and
+`TMP=/tmp` handed to the hook, `os.tmpdir()` derives `/tmp` on Windows, the new root is
+`/tmp/claude`, no other root covers `/tmp`, and `/tmp/other` reaches rule 2. Without the clause
+that arm cannot exist on any registered node, and an allow root with no observable failing case
+is the class `AGENTS.md` §7's first bullet on new gates names.
 
 ### Rule 3 — `posix-root`
 
@@ -206,6 +228,15 @@ unset; the arm SAYS so in its label rather than passing quietly. Its discriminat
 `/tmp/claude/x` target under the fixture environment, where the derived tmpdir is NOT `/tmp`: that
 one is denied, which proves the exception is keyed on `os.tmpdir()` and not on the literal `/tmp`.
 
+Neither of those can fail on a registered node, because every row of `AGENTS.md` §2 is Windows
+and the derived tmpdir there is never `/tmp`. The arm that CAN fail hands `TEMP=/tmp TMP=/tmp`
+through the fifth argument, so `env` overrides the fixture values and `os.tmpdir()` derives `/tmp`
+on Windows too, then grades `echo x > /tmp/claude/x` as allowed and `echo x > /tmp/other` as
+denied with the `tmp` sentence. The pair discriminates on this node: the allow half reds when the
+`<os.tmpdir()>/claude` root is removed, the deny half reds when `/tmp` from the variable still
+joins the roots or rule 2 is missing. `TMPDIR` stays empty under that arm, which on a POSIX host
+makes `os.tmpdir()` fall through to `TMP`, so the same words derive `/tmp` on both platforms.
+
 Two existing arms flip under the ruling and are re-targeted, not deleted, because each guards a
 behaviour that still matters. `near-miss: /tmp is a real root -> allow` at `:110` becomes the rule
 2 denial and its near-miss moves to a target under the fixture TEMP. `cp home-rooted SOURCE ->
@@ -224,8 +255,8 @@ repo-relative path so they keep proving that a home-rooted SOURCE is a read.
 
 ### Files touched (estimate)
 
-- `tools/hooks/scratch-guard.js` — the three predicates, the root, the expansion, the sentences,
-  the header's WHAT IT DENIES paragraph.
+- `tools/hooks/scratch-guard.js` — the three predicates, the root, the `/tmp`-valued variable
+  exclusion in `addRoot`, the expansion, the sentences, the header's WHAT IT DENIES paragraph.
 - `tools/hooks/scratch-guard.test.sh` — the arms in section 6, the `run()` fifth argument, the two
   re-targeted arms, `FLOOR_ASSERTIONS`.
 - `tools/hooks/README.md` — the `scratch-guard` section.
@@ -254,10 +285,12 @@ repo-relative path so they keep proving that a home-rooted SOURCE is a read.
   exists for.
 - observability — every denial names its kind in its own sentence, and the resolved-roots list
   now shows the scratchpad base, so a denied agent can see the destination the hook accepts.
-- risks — a POSIX host whose `/tmp` habit is legitimate is denied by ruling; a same-command shell
-  assignment is exempted textually and stated. Both are in the README section.
-- testing — section 6: eight red-first denials, seven allow controls, three message assertions,
-  the floor raised by the arms added.
+- risks — a POSIX host whose `/tmp` habit is legitimate is denied by ruling, even where a temp
+  variable spells `/tmp`, because such a variable contributes no allowed root (S2); a same-command
+  shell assignment is exempted textually and stated. Both are in the README section.
+- testing — section 6: a red-first denial arm or an allow control per criterion AC1 to AC8, the
+  message assertions of AC9, and the floor raised by the count AC10 derives from the suite's own
+  passed line. No arm count is written here; AC10's `figure:` line is where it is derived.
 - migration — N/A. No record shape or wiring changes; the hook's stdin protocol is unchanged.
 - user docs — `tools/hooks/README.md` gains the section S6 names; the agent-cap dossier under the
   map already claims `tools/hooks/*` and is not edited for a rule its README states.
@@ -269,8 +302,12 @@ suite: the JSON payload built by the same Python one-liner, piped into `node too
 under the fixture environment `HOME=/c/Users/fixtureuser`, `USERPROFILE`, `TEMP` and `TMP` at the
 fixture values and `TMPDIR` empty, with the exit status read. The whole suite is `--close`'s. The
 RED-first observation for each denial is the same invocation against the hook at base
-`1b000d1a`, where every command below exits 0; measured 2026-09-14 on node `a` for all six shapes
-named in AC1 to AC4, and quoted in the acceptance ledger.
+`1b000d1a`, where every command below exits 0; measured 2026-09-14 on node `a` for the denial
+shapes AC1, AC2, AC3's `/tmp/hyg`, AC4, AC6 and AC8 name, and quoted in the acceptance ledger.
+The two denial shapes rev-2 added, AC3's `/tmpx/hyg` and AC7's `/tmp/other`, are NOT in that
+measurement: the pass observes each against the base hook before its fix lands, by the same
+invocation, and the ledger quotes the base exit beside the tip exit. Which criteria are denials
+and which are controls is read from the criteria themselves; no count of either is written here.
 
 - **AC1** — When the fixture command `cp x $TMPDIR/y` is graded with `TMPDIR` empty, the hook
   exits 2 and its stderr names `TMPDIR` and says the write lands at the filesystem root; the same
@@ -284,10 +321,16 @@ named in AC1 to AC4, and quoted in the acceptance ledger.
   exits 0 because the expansion resolves under the TEMP root.
   Red when: the braced spelling is not matched, or `$TEMP` is not expanded and the set case is
   denied.
-- **AC3** — When `echo x > /tmp/hyg` is graded, the hook exits 2 and its stderr names the
-  scratchpad as the destination; when `echo x > /tmpx/hyg` is graded, it exits 0.
-  Red when: the base hook is used, which exits 0 on the first; or the prefix test is a bare
-  `startsWith('/tmp')`, which denies the second.
+- **AC3** — When `echo x > /tmp/hyg` is graded, the hook exits 2 and its stderr carries the
+  `tmp` sentence naming the scratchpad as the destination; when `echo x > /tmpx/hyg` is graded,
+  the hook exits 2 and its stderr carries the `posix-root` sentence naming
+  `POSIX_ROOT_CONVENTIONAL` and does NOT carry the `tmp` sentence, because `tmpx` is four
+  characters, absent from that set, and not `/tmp`. The second half is the `/tmp` boundary proof:
+  exit status cannot tell rule 2 from rule 3, so the arm asserts the kind sentence and the absence
+  of its neighbour's, section 4's rule.
+  Red when: the base hook is used, which exits 0 on both; or the prefix test is a bare
+  `startsWith('/tmp')`, which gives the second the `tmp` sentence; or rule 3 is missing, which
+  gives the second exit 0.
 - **AC4** — When `mkdir -p /mir/x` is graded, the hook exits 2 and its stderr names
   `POSIX_ROOT_CONVENTIONAL`; when `echo x > /dev/null`, `echo x > /c/projects/x` and
   `mkdir -p /usr/local/x` are graded, each exits 0.
@@ -305,11 +348,20 @@ named in AC1 to AC4, and quoted in the acceptance ledger.
 - **AC7** — When the suite derives `os.tmpdir()` under the fixture environment with all three
   temp variables unset and grades `echo x > <that>/claude/x` under that same environment, the hook
   exits 0, and the arm's label states that it discriminates only where the derived path is `/tmp`.
-  Red when: the new root is absent and the arm is denied on a POSIX host; or the arm pins a path
-  instead of deriving one, which makes it a fixture that grades a different machine.
-  fixture: the machine's own `os.tmpdir()` under an emptied environment; on node `a` that is
-  `C:\Windows\temp`, which is under a conventional drive root and allowed by the existing rule,
-  so on this node the arm is a control and not a proof. It is named as such in its label.
+  The discriminating arm: when `TEMP=/tmp TMP=/tmp` is handed through `run()`'s fifth argument,
+  so that `os.tmpdir()` derives `/tmp` on this node, `echo x > /tmp/claude/x` exits 0 and
+  `echo x > /tmp/other` exits 2 with the `tmp` sentence.
+  Red when: the new root is absent and the derived arm is denied on a POSIX host; or the arm pins
+  a path instead of deriving one, which makes it a fixture that grades a different machine; or,
+  for the discriminating pair, the `<os.tmpdir()>/claude` root is removed, which denies the first
+  by rule 2, or a `/tmp`-valued temp variable still joins the allowed roots, which allows the
+  second by the skip at `tools/hooks/scratch-guard.js:328`. Removing the root is the commit-local
+  edit that reds the allow half; at base the second exits 0 because `/tmp` from `TEMP` is a root.
+  fixture: the derived arm reads the machine's own `os.tmpdir()` under an emptied environment; on
+  node `a` that is `C:\Windows\temp`, which is under a conventional drive root and allowed by the
+  existing rule, so on this node that arm is a control and not a proof and is named as such in
+  its label. The discriminating pair needs no fixture beyond the environment words, and it is the
+  half of this criterion that can fail on every registered node.
 - **AC8** — When `echo x > ${TMPDIR:-/tmp}/y` is graded with `TMPDIR` empty, the hook exits 2
   with the `tmp` sentence, because the default expanded and rule 2 read the result.
   Red when: the default form is left unexpanded and no rule claims it.
@@ -320,8 +372,8 @@ named in AC1 to AC4, and quoted in the acceptance ledger.
 - **AC10** — When `bash tools/hooks/scratch-guard.test.sh` runs at the landed tip, it prints
   `PASS` and no `FAIL` line, and `FLOOR_ASSERTIONS` at `tools/hooks/scratch-guard.test.sh:239`
   stands exactly the number of added arms above its base value of 60; at base the same suite
-  prints `FAIL` for every arm AC1 to AC4, AC6 and AC8 add, which is the red-first observation of
-  the arms themselves.
+  prints `FAIL` for every denial arm AC1 to AC4 and AC6 to AC8 add, AC7's `/tmp/other` included,
+  which is the red-first observation of the arms themselves.
   Red when: any arm prints `FAIL` at the tip; or the floor did not move, so a stranded arm is
   invisible; or the two re-targeted arms still write under /tmp, in which case the suite is red
   at the tip on arms this unit did not intend to fail.
@@ -376,6 +428,13 @@ exits 0 on every one of them · `FLOOR_ASSERTIONS` rises by the arms added.
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · S2 · §4 · §5 · AC3 · AC7 · AC10 · folded spec-audit round 1, clusters C
+  (ids 17, 38), G (id 6) and Q (id 35). C: AC3's `/tmpx/hyg` is a rule-3 denial asserting the
+  `posix-root` sentence and the absence of the `tmp` one, and §4 states that adjacent rules are
+  told apart by the deny kind, never by exit status. G: AC7 gains the `TEMP=/tmp TMP=/tmp`
+  discriminating pair; for `/tmp/other` to reach rule 2 under that environment, S2 and §4 now
+  exclude a `/tmp`-valued temp variable from the allowed roots, which the audit's fix implies and
+  did not spell. Q: the arm counts left §5 and the §6 preamble; AC10 derives the figure.
 
 ## 10. Reuse audit
 

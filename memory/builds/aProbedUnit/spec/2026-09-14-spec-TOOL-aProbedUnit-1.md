@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -107,16 +107,38 @@ change, and the bar is `--close`'s.
 
 ### Four carriers, one rule, and which text binds
 
-A sidechain child holds neither the Skill nor the charter. What it reads is `cfg.ground`, its own
-`PROMPT`, and — because `GROUND` orders it — `memory/guides/BUILD-METHOD.md`. So the rule has to be
-in the prompt to reach the agent at all, in the method to be the rule for every pass attended or
-not, and in `GROUND` to reach the SPEC writers, who write section 7 and are not children. The Skill
-sentence is the fourth carrier, for the main-loop session that dispatches children and reads the
-Skill: it POINTS at what the child is ordered to do rather than restating the rule's content.
+A sidechain child holds `AGENTS.md` and the hooks; it does not hold the unattended Skill. That is
+MEASURED, not assumed: `memory/guides/REVIEW-PROTOCOL.md:228-231` records the 2026-08-15 probe whose
+first message carried `CLAUDE.md` and the whole of `AGENTS.md` before it read anything, with a
+`SubagentStart` hook fired and obeyed, and the charter's own §8 says "It DOES inherit the governing
+doc". The Skill is loaded by the main-loop session that invokes `/unattended`; a child invokes
+nothing. So what a child reads is the charter, `cfg.ground`, its own `PROMPT`, and — because
+`GROUND` orders it — `memory/guides/BUILD-METHOD.md`. The rule has to be in the prompt to bind the
+agent where a section 7 list would otherwise outrank it, in the method to be the rule for every pass
+attended or not, and in `GROUND` to reach the SPEC writers, who write section 7 and are not
+children. The Skill sentence is the fourth carrier, for the main-loop session that dispatches
+children and reads the Skill: it POINTS at what the child is ordered to do rather than restating the
+rule's content.
+
+The fifth text the child measurably reads is the charter's §1 Definition of Done line, "Gates green
+(§7); the change verified by a check that exercises it (§8), not asserted" — `AGENTS.md:120`,
+rendered from `coding-governance-agents.template.md:44`. It is DELIBERATELY NOT EDITED, and it is
+named here so the next vocabulary move re-decides that rather than skipping it. The reconciliation:
+the charter's DoD is a WORK-UNIT's, the unit that lands on `main`; under the method a pass is finer
+than that unit, and the unit's gates-green is met by the bar at the close, once, before the lander.
+The charter is the product template, shipped to adopters that may have no build method and no
+unattended kit, so a sentence about passes belongs in the document that defines a pass, which is S3;
+its §8 "a check that exercises THIS change" is already the rule the pass follows. Editing it would
+also owe the `template size <=48KiB` and `charter size` legs against their recorded high-waters, the
+`playbook render wiring` leg for the `AGENTS.md` render, and a second manifest re-stamp, because
+`coding-governance-agents.template.md` is on the kickoff manifest's `watch` line — four gates for a
+sentence the method already carries.
 
 The build README's rules slot already names the class: a vocabulary change lands in every carrier
 in one commit, because a paraphrase left behind is `memory/gotchas/two-answers-to-one-question.md`.
-The mitigation is the inventory below, which names all four so the next change moves all four.
+The mitigation is the inventory this section is — S1 to S4 below, each a carrier this unit moves,
+plus the fifth above that it reads and leaves — so the next change moves all four and re-decides the
+fifth.
 
 ### The child paragraph (S1)
 
@@ -221,10 +243,8 @@ Why the diff-scoped clause goes rather than shrinks. The owner's rule is "gates 
 orientation records that this prompt tightens it: not even diff-scoped. A sentence that kept a
 diff-scoped run beside "no gate runs" would be two answers in one paragraph.
 
-What the child paragraph and M6 do not contradict. Template §1's Definition of Done says "gates
-green" of a WORK-UNIT that lands on `main`; under the method a pass is finer than that unit and the
-build's DoD is met by the bar at the close, once, before the lander. Template §8's "a check that
-exercises THIS change" is the verification rule the pass now follows rather than a second one.
+What the child paragraph and M6 do not contradict is the charter's §1 Definition of Done, reconciled
+once above under the carriers and not restated here.
 
 ### The Skill sentence (S4)
 
@@ -276,8 +296,11 @@ a spec header moves; and its acceptance ledger under the build folder, declared 
 
 The pass is SEQUENTIAL with unit 2, which writes three of the same files, and the roster's `order`
 values already sequence them; nothing here derives an order. The one check the pass verifies with
-is AC6's double, seconds, and nothing else runs inside it: not the parity legs, which are `--close`'s
-and AC2, AC4 and AC7 name them for the close; not the harness suite whole.
+is AC6's double, seconds, and nothing else runs inside it: not the three parity legs, which AC3, AC4
+and AC7 name for the close; not the leg halves of AC1, AC5 and AC8; not the harness suite whole.
+Every leg-shaped half in section 6 is marked observed at `--close`, and the ledger row the pass
+writes for such a criterion carries the token of the grep the pass DID run and says so for the leg
+half, per the build README's rule.
 
 Landing owes no data step. A run-state file, a spec or a brief written before this unit reads
 identically after it; the only reader of the new text is an agent.
@@ -343,9 +366,14 @@ identically after it; the only reader of the new text is an agent.
 
 ## 6. Acceptance criteria
 
+Every criterion below that names a leg has two halves, per the build README's rule: the grep, which
+the pass observes and whose token is its ledger row's OBSERVED token, and the leg, which the pass
+never runs and which is observed at `--close`; the same ledger row says `observed at --close` for
+that half. AC2 and AC6 have no leg half.
+
 - **AC1** — When `grep -cF "NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS" tools/workflows/unattended-unit.js`
-  runs at the landed tip, it prints `1`, and `bash tools/check-install-prefix.sh` exits 0 with no
-  hit naming that file.
+  runs at the landed tip, it prints `1`. Leg half, observed at `--close`:
+  `bash tools/check-install-prefix.sh` exits 0 with no hit naming that file.
   Red when: the count is `0`, or `2` because the phrase was duplicated into a comment; or the
   install-prefix leg names `unattended-unit.js`, which means the paragraph spelled a kit path.
 - **AC2** — When `grep -cF "No gate, suite or bar runs inside a unit pass" tools/workflows/unattended-build.template.js`
@@ -353,25 +381,32 @@ identically after it; the only reader of the new text is an agent.
   `1`.
   Red when: either prints `0`; the render at `0` with the template at `1` is the render-only or
   template-only edit the parity leg reds.
-- **AC3** — When `bash tools/workflows/check-protocol-parity.test.sh` runs at the landed tip, it
-  prints `protocol-parity: in parity — 2 rendered pair(s) match their templates` and exits 0.
-  Red when: it prints a drift line naming `unattended-build.js`, which is a template edit without
-  `--render` or a render edited by hand.
+- **AC3** — When `git show --name-only --format= HEAD` runs on the pass commit, it lists both
+  `tools/workflows/unattended-build.template.js` and `tools/workflows/unattended-build.js`, which is
+  the template and its render moving in ONE commit. Leg half, observed at `--close`:
+  `bash tools/workflows/check-protocol-parity.test.sh` prints
+  `protocol-parity: in parity — 2 rendered pair(s) match their templates` and exits 0.
+  Red when: the commit lists only one of the two, which is a template edit without `--render` or a
+  render edited by hand; or the leg prints a drift line naming `unattended-build.js`, the same
+  defect seen from the close.
   figure: the pair count is DERIVED by the leg from its `PAIRS` line; `2` is what it printed at base
   on 2026-09-14.
 - **AC4** — When `grep -cF "No gate, suite or bar runs" memory/guides/BUILD-METHOD.md` and the same
-  grep over `tools/memory-tree/BUILD-METHOD.template.md` run at the landed tip, each prints `1`,
-  `grep -cF "Then the diff-scoped" memory/guides/BUILD-METHOD.md` prints `0`, and
-  `bash tools/memory-tree/kit-dogfood-parity.test.sh` prints `shipped and installed docs agree`.
+  grep over `tools/memory-tree/BUILD-METHOD.template.md` run at the landed tip, each prints `1`, and
+  `grep -cF "Then the diff-scoped" memory/guides/BUILD-METHOD.md` prints `0`. Leg half, observed at
+  `--close`: `bash tools/memory-tree/kit-dogfood-parity.test.sh` prints
+  `shipped and installed docs agree`.
   Red when: the new phrase counts `0` in either file; the old phrase survives, which is two answers
   in one section; or the parity leg prints `DRIFT`, whose printed fix erases a render-only edit.
-- **AC5** — When `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` runs at the
-  landed tip, it prints `template-size OK` with a byte figure at or below 27648 and prints no
-  `TEMPLATE-SIZE WARN` line, and `wc -l < memory/guides/BUILD-METHOD.md` prints at most 350.
-  Red when: the render passes 27648, which is `fail 2`; passes 26941, which prints the WARN this
-  spec says is not owed; or the line count passes 350, which only this criterion reads.
-  figure: both bounds are DERIVED at observation from `tools/template-size-limits.txt` and
-  `tools/template-size-highwater.txt`; the 26846 and 341 in section 4 are PINNED from the staged
+- **AC5** — When `wc -c < memory/guides/BUILD-METHOD.md` runs at the landed tip, it prints at most
+  26941, and `wc -l < memory/guides/BUILD-METHOD.md` prints at most 350. Leg half, observed at
+  `--close`: `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` prints
+  `template-size OK` with a byte figure at or below 27648 and prints no `TEMPLATE-SIZE WARN` line.
+  Red when: the byte count passes 26941, which is the WARN this spec says is not owed, or 27648,
+  which is the leg's `fail 2`; or the line count passes 350, which only this criterion reads.
+  figure: 26941 and 27648 are read at observation from `tools/template-size-highwater.txt` and
+  `tools/template-size-limits.txt`, whose rows for this file carried those values on 2026-09-14, and
+  350 from M1 of the render itself; the 26846 and 341 in section 4 are PINNED from the staged
   measurement of 2026-09-14.
 - **AC6** — When the child is run through the `run_wf` double of
   `tools/workflows/unattended-build.test.sh` with its `CHILD_ARGS` fixture in `unattended` mode and
@@ -386,25 +421,29 @@ identically after it; the only reader of the new text is an agent.
   definition and `CHILD_ARGS` into a shell, or by copying the `node -e` body, which is what the
   section 10 probe did at base. Never the suite whole inside the pass.
 - **AC7** — When `grep -cF "ordered to run no gate, suite or bar inside its pass" tools/unattended/SKILL.template.md`
-  and the same grep over `.claude/skills/unattended/SKILL.md` run at the landed tip, each prints `1`,
-  and `bash tools/unattended/adopt-unattended.sh --check` prints `unattended: in sync` and exits 0.
+  and the same grep over `.claude/skills/unattended/SKILL.md` run at the landed tip, each prints `1`.
+  Leg half, observed at `--close`: `bash tools/unattended/adopt-unattended.sh --check` prints
+  `unattended: in sync` and exits 0.
   Red when: either count is `0`; or the wiring leg reports drift, which is the template edited
   without `bash tools/unattended/adopt-unattended.sh` re-rendering, or the reverse.
-- **AC8** — When `bash skills/session-kickoff/manifest-check.sh` runs at the landed tip, its check 5
-  reports no watched file changed since `last-audit`, because the commit that edits
-  `memory/guides/BUILD-METHOD.md` re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` in the
-  same commit with a delta line in its message; and `git grep -lE '^\*\*Status:\*\* CLOSED' -- memory/builds/aProbedUnit/spec/`
-  lists this spec.
-  Red when: check 5 names `memory/guides/BUILD-METHOD.md` as changed after the stamp, which is the
-  render landing without the bundle; or the spec header still reads `SPECCED`, which leaves the
-  driver's `--plan` naming this unit again.
+- **AC8** — When `git show --name-only --format= HEAD` runs on the pass commit, it lists both
+  `memory/guides/BUILD-METHOD.md` and `memory/guides/SESSION-KICKOFF.md`, and
+  `git show HEAD -- memory/guides/SESSION-KICKOFF.md | grep -c '^+last-audit:'` prints `1`, which is
+  the re-stamp riding the watched change in one commit with a delta line in its message; and
+  `git grep -lE '^\*\*Status:\*\* CLOSED' -- memory/builds/aProbedUnit/spec/` lists this spec. Leg
+  half, observed at `--close`: `bash skills/session-kickoff/manifest-check.sh` check 5 reports no
+  watched file changed since `last-audit`.
+  Red when: the commit lists the render without the manifest, or the `+last-audit:` count is `0`,
+  which is the render landing without the bundle and is what check 5 names at the close; or the
+  spec header still reads `SPECCED`, which leaves the driver's `--plan` naming this unit again.
 
 ## 7. Gates
 
 `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `unattended skill wiring` · `kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `install-prefix (shipped surface)` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 These are `--close`'s. The pass runs NONE of them: it verifies with AC6's double alone, which is the
-rule this unit writes, and the bar runs once at the close after every unit has landed. Chunks read
+rule this unit writes, and the bar runs once at the close after every unit has landed; the leg halves
+of AC1, AC3, AC4, AC5, AC7 and AC8 are the close's observations of those criteria. Chunks read
 from `tools/gate-legs.json` on 2026-09-14: the two parity legs, `method carriers`, `codebase-map
 coverage + freshness` and `spec tokens` are `chunk: declarations`; `workflow script syntax` and
 `unattended skill wiring` are `chunk: wiring`; `build-method size` and `install-prefix` are
@@ -435,6 +474,11 @@ prompt holds the phrase zero times · no floor moves.
 - rev-1 · 2026-09-14 · initial draft, from the brief in
   `memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md` and
   the mandate's orientation.
+- rev-2 · 2026-09-14 · §4 · §6 · §7 · AC1 · AC3 · AC4 · AC5 · AC7 · AC8 · folded round-1 clusters A
+  (id 19: every leg-shaped criterion split into the grep the pass observes and the leg half marked
+  observed at `--close`; the Rollout's parity criteria renumbered AC3, AC4, AC7) and L (id 54: the
+  carriers paragraph rewritten to the measured fact that a child holds `AGENTS.md` and the hooks,
+  the charter's §1 DoD line named as the fifth carrier and deliberately not edited, with why).
 
 ## 10. Reuse audit
 

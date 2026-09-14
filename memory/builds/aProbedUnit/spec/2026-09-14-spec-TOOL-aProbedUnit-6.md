@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -17,32 +17,35 @@
 blocker count is above zero, so every spec audit that confirms one blocker costs a second lens
 fan. The owner ruled on 2026-09-14 that a SPEC subject takes one round by default and that the
 closing DIFF review keeps its convergence loop. This unit gives the driver a conf key
-`REVIEW_ROUNDS`, a fifth state `BOUNDED` that is terminal, a default disposition at every terminal
-exit, and lands the vocabulary in every carrier that spells the state set.
+`REVIEW_ROUNDS`, a fifth state `BOUNDED` that is terminal and owes a `--disposition` exactly as the
+other two terminal exits do, and lands the vocabulary in every carrier that spells the state set.
 
 ## 2. Scope (IN)
 
-- **S1** — A conf key `REVIEW_ROUNDS`, preset beside `GATE_BOUND=""` before the conf is sourced,
-  validated after `RUNAWAY_CEILING` is defined as a positive integer not above that ceiling,
-  defaulting to 1 with the default ANNOUNCED on stderr the way `GATE_BOUND`'s is, and REFUSED with
-  exit 2 when malformed, zero, or above the ceiling. Observed by AC1 and AC2.
+- **S1** — A conf key `REVIEW_ROUNDS`, preset beside `GATE_BOUND=""` before the conf is sourced and
+  read through `read_bound_key`, the defaulted-validated-announced reader `TOOL-aProbedUnit-3`
+  hoists out of the `GATE_BOUND` block and lands first: default 1, the default ANNOUNCED on stderr,
+  malformed or zero REFUSED with exit 2. One line of this unit's own, after `RUNAWAY_CEILING` is
+  defined, refuses a value above that ceiling. Observed by AC1 and AC2.
 - **S2** — `review_state` takes an optional third argument, the bound, defaulting to
   `RUNAWAY_CEILING`, and returns `BOUNDED` when `n+1 >= bound` after the three existing tests and
   before `CONVERGING`. With the default bound the function is byte-for-byte today's behaviour,
   because `CEILING` fires at equality first. Observed by AC3.
 - **S3** — `verb_review` passes `REVIEW_ROUNDS` as the bound when the subject is NOT the build
-  slug and `RUNAWAY_CEILING` when it is; `BOUNDED` joins the terminal grep, the `note` case and
-  the echo case with its own sentence; `--disposition` at a terminal exit becomes OPTIONAL and
-  DEFAULTS to `promote`, the `fail 37` branch that required it is DELETED, and an explicit
-  `--disposition` on a non-terminal round stays refused. Observed by AC4, AC5 and AC6.
+  slug and `RUNAWAY_CEILING` when it is; `BOUNDED` joins the terminal grep, the state gate's
+  terminal case, the `note` case and the echo case with its own sentence. `--disposition` stays
+  REQUIRED at every terminal exit and REFUSED on any other round, by the 2026-09-01 owner ruling
+  section 8 cites; a `BOUNDED` exit without one is the existing `fail 37` refusal naming the state.
+  Observed by AC4, AC5 and AC6.
 - **S4** — `--close`'s `diff-reviewed` term admits `BOUNDED` in its terminal case, for vocabulary
   parity, with the header saying it is unreachable for the slug subject. Observed by AC7.
 - **S5** — `tools/unattended/check-unattended.sh` check 2: `BOUNDED` joins the `term` regex and
   the `needs` regex, so a `BOUNDED` exit owes a disposition and a promote owes an id exactly as
   `NON-CONVERGENT` does. Observed by AC8.
 - **S6** — `tools/workflows/unattended-build.template.js` and its render: `REVIEW_TOKENS` gains
-  `BOUNDED` and the recorder prompt names five tokens; the harness suite's terminal loop gains
-  `BOUNDED`. Observed by AC9.
+  `BOUNDED`; the recorder prompt names five tokens and tells the recorder to run the verb once
+  without `--disposition` and, when the driver refuses naming `--disposition`, once more with
+  `--disposition promote`; the harness suite's terminal loop gains `BOUNDED`. Observed by AC9.
 - **S7** — The prose carriers land in the same commit: `VERBS.template.md`'s `--review` bullet,
   `SKILL.template.md`'s "Record each review round" section, `PROTOCOL.template.md` section 8's
   key table and its `closing-review-recorded` row, `kit.toml`'s `optional_keys`,
@@ -54,9 +57,8 @@ exit, and lands the vocabulary in every carrier that spells the state set.
   AC11.
 - **S9** — `tools/unattended/unattended.test.sh`: `mkconf` gains a sixth positional
   `REVIEW_ROUNDS` defaulting to the ceiling so every existing sequence arm holds unchanged, the
-  new arms section 6 names land beside the review-loop arms, the deleted refusal's arm is
-  rewritten to assert the default is written, and the floors rise by the arms added. Observed by
-  AC12.
+  new arms section 6 names land beside the review-loop arms, the requires-disposition arm at
+  `:4634` stands, and the floors rise by the arms added. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -66,17 +68,22 @@ exit, and lands the vocabulary in every carrier that spells the state set.
   the way `NON-CONVERGENT` does today and nothing more.
 - **The closing diff review is unchanged in behaviour.** Its subject is the build slug, its bound
   is the ceiling, and no round it records can read `BOUNDED`. `TOOL-aProvenReuse-3`'s question,
-  what a promoted SPEC blocker is, is answered by unit 7's ruling and that backlog row is unit 7's
-  to close.
+  what a promoted SPEC blocker is, is answered by unit 7's ruling; the row's status flip is the
+  CLOSING pass's, as spec 7's Edge says, because `memory/backlog` is a `SHARED_RECORDS` member and
+  no dispatched pass may declare it.
 - **`RUNAWAY_CEILING` stays a file constant** at `tools/unattended/unattended.sh:464`, for the
   reason its header gives. `REVIEW_ROUNDS` is a conf key because a tracked conf leaves a diff
   behind, which is the property that header wants.
-- **`fold` stays legal at a terminal exit** when spelled explicitly; only the REQUIREMENT goes.
-  The closed set `REVIEW_DISPOSITIONS` and its two refusals are unchanged.
-- **No new verb, no new `fail` branch.** The malformed-key refusal is an `echo` and `exit 2` at
-  conf-read time, exactly as `GATE_BOUND`'s at `:305` to `:311`, so `harness arms` gains nothing to
-  arm; the driver's branch floor in `ARMS_FLOORS` is 104 against 194 measured on 2026-09-14, so
-  deleting one branch moves no floor.
+- **`--disposition` stays REQUIRED at a terminal exit and both values stay legal.** The `fail 37`
+  branch at `:4107` keeps its requirement and gains `BOUNDED` in the case it guards; the closed
+  set `REVIEW_DISPOSITIONS` and its two refusals are unchanged. The driver writes no default:
+  section 8 records the fork and the 2026-09-01 ruling that settles it.
+- **No new verb, no new `fail` branch, no new function.** The key's reader is `read_bound_key`,
+  which `TOOL-aProbedUnit-3` lands ahead of this unit; it is an `echo` and `exit 2` at conf-read
+  time with no `fail N` branch, exactly as the `GATE_BOUND` block at `:305` to `:311` it was
+  hoisted from, so `harness arms` gains nothing to arm, and the above-ceiling line this unit adds
+  is the same shape. No branch leaves either, so the driver's branch floor in `ARMS_FLOORS`, 104
+  against 194 measured on 2026-09-14, does not move.
 - **No kit version bump inside this unit.** Unattended `1.21` to `1.22` and memory-tree `2.75` to
   `2.76` are the closing pass's, once each, across every carrier the build README names.
 - **Not parallel with unit 3 or unit 7.** Unit 3 edits `unattended.sh`, `kit.toml`'s
@@ -86,9 +93,16 @@ exit, and lands the vocabulary in every carrier that spells the state set.
 
 ### Edges
 
-- **hands-off** `TOOL-aProbedUnit-7` — the disposal sentence in M4 and the harness's disposal
-  stage. This unit writes the round-bound sentence beside it and the `BOUNDED` token into
-  `REVIEW_TOKENS`; unit 7 decides what happens to the blockers a `BOUNDED` exit leaves standing.
+- **hands-off** `TOOL-aProbedUnit-7` — the disposal sentence in M4, the harness's disposal
+  stage, and the disposal clause of the terminal-round `fail 37` message at
+  `tools/unattended/unattended.sh:4096`, which still says `fold or promote`. This unit writes the
+  round-bound sentence beside M4's, the `BOUNDED` token into `REVIEW_TOKENS` and into the grep
+  above that message, and leaves the message's own words to unit 7, which rewrites every carrier
+  of the disposal rule in one commit.
+- **consumes-from** `TOOL-aProbedUnit-3` — `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>`, the reader
+  that unit hoists out of the `GATE_BOUND` block for `UNIT_STALL_BOUND` and that this unit's key
+  routes through. The decision spec 3 delegated here is taken: the three keys share one reader,
+  and the one arm the others lack, the above-ceiling refusal, is one line after the call.
 - **consumes-from** external — the owner's ruling of 2026-09-14 in the run mandate's owner-turn
   table: one round for SPECS ONLY, the diff review keeps its loop. Without it the bound would be
   a run's own choice, which M3 forbids.
@@ -99,24 +113,27 @@ exit, and lands the vocabulary in every carrier that spells the state set.
 ### The key
 
 `GATE_BOUND` is preset at `tools/unattended/unattended.sh:292`, the conf is sourced at `:294`, and
-the value is defaulted, validated and announced at `:305` to `:312`. `REVIEW_ROUNDS=""` joins the
-preset line. Its validation block sits directly after `RUNAWAY_CEILING="8"` at `:464`, because
-the upper bound IS that constant and a comparison written above its definition reads an empty
-string:
+at base the value is defaulted, validated and announced by the inline `case` at `:305` to `:312`.
+`TOOL-aProbedUnit-3`, order 3, hoists that `case` into `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>` —
+blank takes the default and prints the NOTE on stderr, `*[!0-9]*|0` prints `REFUSING - <NAME> is
+declared as '<value>', which is not a positive integer` and exits 2, an integer stands — and
+routes `GATE_BOUND` and `UNIT_STALL_BOUND` through it. This is the third key, and it is a CALL,
+not a third copy. `REVIEW_ROUNDS=""` joins the preset line at `:292`. The call sits directly after
+`RUNAWAY_CEILING="8"` at `:464`, because the one arm the other two keys lack, the upper bound, IS
+that constant and a comparison written above its definition reads an empty string:
 
 ```bash
-case "${REVIEW_ROUNDS:-}" in
-  "") REVIEW_ROUNDS=1
-      echo "unattended: NOTE - this project declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of ${REVIEW_ROUNDS} round(s). Declare one in $CONF to change it." >&2 ;;
-  *[!0-9]*|0)
-      echo "unattended: REFUSING - REVIEW_ROUNDS is declared as '$REVIEW_ROUNDS', which is not a positive integer of rounds. A bound that cannot be parsed is a bound nobody set, and 0 would end every loop before its first round." >&2
-      exit 2 ;;
-esac
+read_bound_key REVIEW_ROUNDS 1 rounds "a spec-audit subject exits BOUNDED after the kit default of 1 round"
 [ "$REVIEW_ROUNDS" -le "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 ```
 
-The kit default is the literal `1` in that block rather than a `REVIEW_ROUNDS_DEFAULT` constant,
-because one reader exists and a constant read once is a second spelling of one fact.
+The exact NOTE and REFUSING sentences the reader composes are spec 3's; this unit owns the NOTE
+clause it passes and the above-ceiling line, and section 6 asserts only those. The kit default is
+the literal `1` in the call rather than a `REVIEW_ROUNDS_DEFAULT` constant, because one reader
+exists and a constant read once is a second spelling of one fact. If the reader is not in the tree
+when this pass opens — unit 3 parked or re-ordered — the pass STOPS and says so rather than
+writing the inline copy back: the delegated decision was taken once, in spec 3's fold of the
+round-1 audit's cluster F and here, and a third copy is the thing it decided against.
 
 ### The predicate
 
@@ -157,16 +174,19 @@ The subject test is the same equality `review_last_reason` makes and the `--clos
 records why the two must not share a subject. Four more edits in the verb:
 
 - The terminal grep at `:4095` gains `BOUNDED` in its alternation, so a bounded subject refuses a
-  further round with the existing `fail 37` message, which already says a later blocker is
-  DISPOSED and never re-rounded.
+  further round with the existing `fail 37` message at `:4096`, which already says a later blocker
+  is DISPOSED and never re-rounded. That message's `fold or promote` clause is unit 7's to
+  rewrite to the severity rule, with the three suite arms that quote it; this unit changes the
+  grep and not the words.
 - The state gate at `:4104` to `:4116`: the first case becomes `NON-CONVERGENT|CEILING|BOUNDED)`
-  with body `[ -n "$disposition" ] || disposition=promote`; the `fail 37 "--review exits $state
-  and requires --disposition ..."` branch at `:4107` is deleted. The `*)` case keeps its refusal
-  of an explicit disposition on a non-terminal round. The default is `promote` because the
-  severity rule the owner set makes `promote` the demanded value whenever a blocker stands, a
-  standing blocker is the only way a non-`CONVERGED` exit is reached, and the gotcha
-  `one-value-field-records-a-mixed-outcome` already rules that a one-value field records the
-  value that demands something. `review_exit_note`'s `*)` arm stays unreachable and keeps saying so.
+  and KEEPS its body, the `fail 37 "--review exits $state and requires --disposition ..."` at
+  `:4107`, so a `BOUNDED` exit without a disposition is refused with a message naming `BOUNDED`.
+  The `*)` case keeps its refusal of an explicit disposition on a non-terminal round. Nothing here
+  writes a default: the 2026-09-01 owner ruling in `memory/builds/dFoldedVerdict/README.md`,
+  "a forced value is a constant, and a constant is not evidence for the clause that reads it — so
+  the field stays evidence at every exit", is the reason `fail 37` exists, and a driver-written
+  `promote` is exactly the constant it refused. `review_exit_note`'s `*)` arm stays unreachable
+  and keeps saying so.
 - The `note` case at `:4117` gains `BOUNDED) note=" · BOUNDED" ;;`, so the row reads
   `verdict <v> · blockers <n> · BOUNDED · disposition <d>` in the grammar check 2 already parses.
 - The echo case at `:4127` gains its own sentence: the declared round bound of `$REVIEW_ROUNDS`
@@ -191,21 +211,32 @@ one; it lands for parity and section 6 says how it is observed.
 ### The harness and its carriers
 
 `REVIEW_TOKENS` at `tools/workflows/unattended-build.template.js:647` gains `'BOUNDED'`, and the
-recorder prompt at `:628` to `:629` names five tokens. Nothing else in the template moves: the
-`verdict === 'CONVERGING'` hand-back at `:674` and the `verdict === 'CONVERGED'` skip at `:725`
-both let `BOUNDED` fall through to the disposal stage exactly as `NON-CONVERGENT` does. The
-render `tools/workflows/unattended-build.js` is re-made by the parity leg's `--render` mode, and
-the harness suite's loop at `tools/workflows/unattended-build.test.sh:138` becomes
+recorder prompt at `:621` to `:631` names five tokens. That prompt runs the verb with no
+`--disposition`, because the recorder cannot know before the driver answers whether this round is
+terminal — the state is a property of the SEQUENCE, which only the driver sees — and an explicit
+disposition on a non-terminal round is refused. Today a terminal exit therefore fails there with
+`fail 37` and the agent returns stderr. The prompt gains one instruction: if the command REFUSES
+naming `--disposition`, run the same command again with `--disposition promote` appended and
+return THAT run's token and exit code. `promote` is the value the severity rule demands at every
+exit the refusal can be reached from: `NON-CONVERGENT`, `CEILING` and `BOUNDED` are reached only
+with blockers standing, and the owner's rule promotes every blocker. The value is the CALLER's,
+derived from the count it holds, which is what the 2026-09-01 ruling asks of the field. Nothing
+else in the template moves: the `verdict === 'CONVERGING'` hand-back at `:674` and the
+`verdict === 'CONVERGED'` skip at `:725` both let `BOUNDED` fall through to the disposal stage
+exactly as `NON-CONVERGENT` does. The render `tools/workflows/unattended-build.js` is re-made by
+the parity leg's `--render` mode, and the harness suite's loop at
+`tools/workflows/unattended-build.test.sh:138` becomes
 `for v in CONVERGED NON-CONVERGENT CEILING BOUNDED`.
 
 `VERBS.template.md:102` to `:112` describes four states and says `--disposition` is REQUIRED at a
-terminal exit; it names five, says the exit RECORDS a disposition that defaults to `promote` and
-may be spelled `fold`, and keeps every refusal it lists except the terminal-without-disposition
-one. `SKILL.template.md:615` to `:648`: the section's opening paragraph, which argues that a
-round cap only moves the stall earlier, gains the reconciling sentence that a SPEC subject's
-bound ends in a disposition rather than a stall; "one of four states" at `:630` becomes five; a
-`BOUNDED` bullet joins the list; and the "Record which you took" sentence at `:642` says the
-default. `PROTOCOL.template.md:452`'s table gains a `REVIEW_ROUNDS` row beside `GATE_BOUND`, and
+terminal exit; it names five, `BOUNDED` among the terminal ones, and keeps every refusal it lists,
+the terminal-without-disposition one included. `SKILL.template.md:615` to `:648`: the section's
+opening paragraph, which argues that a round cap only moves the stall earlier, gains the
+reconciling sentence that a SPEC subject's bound ends in a disposition rather than a stall; "one
+of four states" at `:630` becomes five, so that phrase prints ZERO times at the tip; and a
+`BOUNDED` bullet joins the list, opening `**BOUNDED** — the declared round bound`, a phrase the
+file does not carry at base. The "Record which you took" sentence at `:642` stands as written,
+since the requirement it states stands. `PROTOCOL.template.md:452`'s table gains a `REVIEW_ROUNDS` row beside `GATE_BOUND`, and
 the `closing-review-recorded` row at `:334` stops counting "three declared exits" and says "a
 declared exit", because the driver owns that count. `kit.toml:92`'s `optional_keys` gains the key.
 `.unattended.conf:32`'s `GATE_BOUND` block gains a `REVIEW_ROUNDS="1"` block beneath it carrying
@@ -234,6 +265,15 @@ is re-made by `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`, and 
 file is one the kickoff manifest WATCHES, `memory/guides/SESSION-KICKOFF.md`'s `last-audit` is
 re-stamped in the same commit with a delta line in the commit message.
 
+The whole-file figure is NOT this unit's to pin. The render measured 26743 bytes at base
+`1b000d1a`, and unit 1, order 1, lands its own edit on the same file before this pass opens, so a
+criterion holding the tip at or below 26743 reds against a correct build of both specs. What this
+unit can assert is its own delta: the render at this pass's commit is exactly 13 bytes smaller
+than the render at the pass's parent commit, read with
+`git show HEAD~1:memory/guides/BUILD-METHOD.md | wc -c` against `wc -c` at HEAD. The cap itself,
+27648, is the `build-method size` leg's, and it holds because the file never crossed 26941, the
+recorded high-water, and this pass only lowers it.
+
 ### The suite
 
 `mkconf` at `tools/unattended/unattended.test.sh:108` writes `GATE_BOUND="${4-3600}"`; it gains
@@ -244,15 +284,27 @@ arms sit beside the review-loop arms at `:4530` to `:4646`:
   `BOUNDED`; `review_state '' 3 8` is `CONVERGING`; `review_state '9 8 7 6 5 4 3' 2 8` is still
   `CEILING`; `review_state '' 0 1` is `CONVERGED`; `review_state '2' 2 1` is `NON-CONVERGENT`.
 - verb arms under a conf written with the sixth positional at 1: a spec subject's first round with
-  3 blockers prints `BOUNDED · disposition promote` and the row carries the same; a second round
-  on that subject hits the terminal refusal; the slug subject's first round with 3 blockers prints
-  `CONVERGING`; an explicit `--disposition fold` on a bounded round writes `fold`.
-- the rewritten arm at `:4634`: `run --review tRun --subject D1 --verdict BLOCKED --blockers 3`
-  after a first round of 3 prints `NON-CONVERGENT · disposition promote`, where it asserted the
-  deleted refusal.
+  3 blockers and no `--disposition` is refused with `--review exits BOUNDED and requires
+  --disposition` and writes no row; the same round with `--disposition promote` prints
+  `BOUNDED · disposition promote` and the row carries the same; a second round on that subject
+  hits the terminal refusal; the slug subject's first round with 3 blockers prints `CONVERGING`,
+  and with `--disposition promote` is refused as `not a terminal exit`; an explicit
+  `--disposition fold` on a bounded round writes `fold`.
+- the arm at `:4634`, which asserts the requires-disposition refusal on a `NON-CONVERGENT`
+  second round, stands unchanged: the refusal it observes stands.
 - the `NOCONF` conf at `:5206`, which declares no `GATE_BOUND`, also declares no `REVIEW_ROUNDS`,
   so the arm at `:5219` gains a second `hit` on the new NOTE; a conf declaring `REVIEW_ROUNDS="9"`
-  hits the above-ceiling refusal and one declaring `0` hits the not-positive refusal.
+  hits the above-ceiling refusal and one declaring `0` hits the reader's not-positive refusal
+  naming `REVIEW_ROUNDS`.
+
+**How one arm is run alone**, because the README's rule three forbids the suite whole inside a
+pass. The suite's preamble, `sed -n '1,/^# ---- REGION ONE/p' unattended.test.sh`, sourced in a
+shell whose working directory is `tools/unattended` so `HERE` and `SCRIPT` resolve, defines every
+helper, builds the fixture repository under its own `mktemp -d` and runs the prologue arms only,
+which are seconds. `bcsetup` then builds the epoch the review-loop arms open with `bcopen`, which
+is what shard 2 itself does at `:1679`; `slice_fn review_state` is the sliced arms' one
+precondition. Each arm is then its own `same` or `hit` line, and a `same` or `hit` prints only on
+FAIL, so a silent line is the observation.
 
 ### Inventory
 
@@ -283,10 +335,15 @@ No new function or verb, so the lexicon and check 26 populations are unchanged.
 - **A file constant instead of a conf key.** `RUNAWAY_CEILING`'s header argues against an
   environment override because it leaves no diff; a tracked conf key leaves one, and the owner
   named the key.
-- **Keep `--disposition` required and have the harness's recorder pass `promote`.** The recorder
-  prompt at `:624` runs the verb without the flag, so today a terminal exit fails there with
-  `fail 37` and the agent returns stderr; a default in the driver fixes the harness and every
-  hand-run alike, where a prompt edit fixes one caller.
+- **Default `--disposition` to `promote` in the driver at every terminal exit.** Rev-1 took this,
+  because a default fixes the harness and every hand-run alike where a prompt edit fixes one
+  caller. It reverses the 2026-09-01 owner ruling without a fork (section 8), and check 2's
+  clause 3 would then read a driver-written constant, which is the false evidence that ruling
+  named. The recorder is the one caller that reaches the refusal unattended, and it holds the
+  count the rule decides on; so the prompt is fixed and the driver keeps refusing.
+- **Have the recorder pass `--disposition promote` on every call.** Refused on every non-terminal
+  round by the `*)` case at `:4110`, and the recorder cannot tell a terminal round from the count
+  it holds; hence the two-step form, refusal first, then the flag.
 - **Make `BOUNDED` re-arm nothing but not be terminal.** A state that is neither terminal nor
   re-arming is the abandoned loop `diff-reviewed`'s second term was built to refuse.
 
@@ -305,8 +362,9 @@ No new function or verb, so the lexicon and check 26 populations are unchanged.
   stalled-loop clause once `term` admits it, which is the same latitude `NON-CONVERGENT` has
   today and is stated in section 4; the M4 edit and the manifest re-stamp are two carriers that
   must land in one commit.
-- testing — section 6: six sliced arms, five verb arms, three conf arms, one check-2 fixture pair,
-  one harness loop member, and the byte measurement.
+- testing — section 6: the sliced arms, the verb arms and the conf arms it lists, each run alone
+  by the form section 4's suite paragraph gives; one check-2 fixture pair; one harness loop
+  member; and the parent-commit byte delta. The suites whole and every leg are the close's.
 - migration — N/A. Landed run-state records carry no `BOUNDED` row and nothing rewrites them; a
   record written by the new driver parses under the old check 2 as a round with no exit token,
   which is why the two ship in one commit.
@@ -318,17 +376,21 @@ The driver suite `tools/unattended/unattended.test.sh` and the leg suite
 `tools/unattended/check-unattended.test.sh` are on no bar leg, by the 2026-08-23 ruling their
 `kit.toml` records, and `TOOL-aHoistedPass-38` records the leg suite red in both shards for causes
 that predate this build. So no criterion below reads a suite's exit status; each reads the arm's
-own line. The pass observes each criterion by the single command it names, and the suites whole
-are the closing pass's compensating run.
+own line. The pass observes each criterion by the grep or the single arm it names, run by the
+form section 4's suite paragraph gives; every leg and every suite whole is the close's, and a
+ledger row for that half reads `observed at --close`, per the build README's rules.
 
 - **AC1** — When `bash tools/unattended/unattended.sh --status <slug>` runs in a fixture tree whose
-  conf declares no `REVIEW_ROUNDS`, its stderr carries `declares no REVIEW_ROUNDS, so a spec-audit
-  subject exits BOUNDED after the kit default of 1 round`.
+  conf declares no `REVIEW_ROUNDS`, its stderr carries `REVIEW_ROUNDS` and `so a spec-audit
+  subject exits BOUNDED after the kit default of 1 round` on one line.
   Red when: the default is silent, or the key is read before the conf is sourced so a declared
   value is overwritten by the default.
-- **AC2** — When the same verb runs with `REVIEW_ROUNDS="9"` declared, the driver exits 2 naming
-  the runaway ceiling of 8; with `REVIEW_ROUNDS="0"` it exits 2 naming a positive integer of
-  rounds.
+  fixture: the reader is `read_bound_key`, landed by `TOOL-aProbedUnit-3` ahead of this pass; the
+  words around the NOTE clause are that reader's, and this criterion asserts only the clause this
+  unit passes.
+- **AC2** — When the same verb runs with `REVIEW_ROUNDS="9"` declared, the driver exits 2 and its
+  stderr carries `above the runaway ceiling of 8`; with `REVIEW_ROUNDS="0"` it exits 2 and its
+  stderr carries `REFUSING - REVIEW_ROUNDS` and `not a positive integer` on one line.
   Red when: a value above the ceiling is accepted, which makes the bound unreachable, or zero is
   accepted, which ends every loop before it starts.
 - **AC3** — When `review_state` is sliced out of the driver by the suite's `slice_fn` and called,
@@ -341,27 +403,33 @@ are the closing pass's compensating run.
   arms move.
 - **AC4** — When a fixture run under a conf written with `REVIEW_ROUNDS` at 1 records
   `--review tRun --subject B1 --verdict BLOCKED --blockers 3` with no `--disposition`, the verb
-  prints `BOUNDED · disposition promote` and the run-state file gains one row whose reason is
-  `verdict BLOCKED · blockers 3 · BOUNDED · disposition promote`; a second round on `B1` is refused
-  with the existing terminal-round message.
-  Red when: the base driver is used, which prints `CONVERGING` and arms the loop; or the default
-  is announced and not written, so the row carries no disposition and check 2 refuses it.
+  prints `--review exits BOUNDED and requires --disposition` and the fixture's run-state file
+  holds no `review · item B1` row, the suite's own "a refused round wrote nothing" shape; the
+  same command with
+  `--disposition promote` prints `BOUNDED · disposition promote` and the run-state file gains
+  one row whose reason is `verdict BLOCKED · blockers 3 · BOUNDED · disposition promote`; a
+  further round on `B1` is refused with the existing terminal-round message.
+  Red when: the base driver is used, which prints `CONVERGING` for the first command and refuses
+  the second as `not a terminal exit`; or the requirement was dropped, so the first command
+  writes a row with no disposition, which check 2 refuses.
 - **AC5** — When the same fixture records `--review tRun --subject tRun --verdict BLOCKED
-  --blockers 3`, the verb prints `CONVERGING`, because the slug subject's bound is the ceiling.
-  Red when: the bound is applied to every subject and the closing diff review ends at round 1.
-- **AC6** — When a fixture under the ceiling-bound conf records two rounds of 3 blockers on `D1`
-  with no `--disposition`, the second prints `NON-CONVERGENT · disposition promote` and the row
-  carries it, where at base the second round is refused with `and requires --disposition`; an
-  explicit `--disposition promote` on the first round is still refused with `not a terminal exit`.
-  Red when: the deleted refusal still fires, or the non-terminal refusal went with it.
+  --blockers 3`, the verb prints `CONVERGING`, because the slug subject's bound is the ceiling;
+  with `--disposition promote` appended it is refused with `not a terminal exit`.
+  Red when: the bound is applied to every subject and the closing diff review ends at round 1,
+  or the non-terminal refusal went.
+- **AC6** — When the AC4 fixture records `--review tRun --subject B2 --verdict BLOCKED --blockers 3
+  --disposition fold`, the verb prints `BOUNDED · disposition fold` and the row carries it.
+  Red when: `fold` is refused at a `BOUNDED` exit, which would be the forced value the
+  2026-09-01 ruling refused, spelled as a refusal instead of a default.
 - **AC7** — When `grep -n 'CONVERGED\*|\*NON-CONVERGENT\*|\*CEILING\*|\*BOUNDED\*' tools/unattended/unattended.sh`
   runs at the landed tip, it prints one line inside the `diff-reviewed` term, and the comment
   block above it says the token is unreachable there.
   Red when: the case was left at three tokens, or it was widened without saying why a fourth
   token that cannot occur is listed.
-- **AC8** — When `bash tools/unattended/check-unattended.sh` runs over a fixture record under
-  a graded `DISPOSITION_CUTOFF` whose only review row is `blockers 2 · BOUNDED` with no
-  disposition, it prints the `record NO disposition` refusal for check 2; the same row with
+- **AC8** — When `bash tools/unattended/check-unattended.sh` is run by hand as one arm of the
+  leg suite, over a fixture record under a graded `DISPOSITION_CUTOFF` whose only review row is
+  `blockers 2 · BOUNDED` with no disposition, it prints the `record NO disposition` refusal for
+  check 2; the same row with
   `· disposition promote` and one new unit id in the README's units region prints no `check 2`
   line. At base the first fixture prints nothing, which is the red-first observation. The `term`
   membership is observed by `grep -c 'CONVERGED|NON-CONVERGENT|CEILING|BOUNDED'` over the leg
@@ -370,59 +438,82 @@ are the closing pass's compensating run.
   green-by-absence.
   fixture: the leg suite's `mkdisp` and `dispconf` helpers at `tools/unattended/check-unattended.test.sh:826`
   to `:851` are the shape; `DISPOSITION_CUTOFF` is the one key the fixture conf arms.
-- **AC9** — When `node tools/workflows/check-workflow-syntax.js` runs at the landed tip it exits 0,
-  `grep -c "'BOUNDED'" tools/workflows/unattended-build.template.js` and the same over the render
-  each print 1, and the harness suite's terminal loop, run with the test double returning
-  `BOUNDED` and zero blockers, prints `BOUNDED: hands out a roster`.
+- **AC9** — When `grep -c "'BOUNDED'" tools/workflows/unattended-build.template.js` and the same
+  over the render run at the landed tip, each prints 1; `grep -c -- '--disposition promote'`
+  over both prints 1 each, where at base it prints 0; and the harness suite's terminal loop
+  member, run alone with the test double returning `BOUNDED` and zero blockers by the preamble
+  form spec 7 AC1 gives, prints `BOUNDED: hands out a roster`. The `workflow script syntax` and
+  `review-protocol parity` legs over the pair are observed at `--close`.
   Red when: the token is in one of template and render only, which the parity leg reds; or the
-  double's `BOUNDED` falls into the "not one of" throw.
-- **AC10** — When `bash tools/unattended/adopt-unattended.sh --check` runs at the landed tip it
-  exits 0, `grep -c 'REVIEW_ROUNDS' tools/unattended/PROTOCOL.template.md tools/unattended/kit.toml
-  .unattended.conf tools/unattended/.unattended.conf.example` prints 1 or more for each, and
-  `grep -c 'BOUNDED' tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md` prints
-  1 or more for each. `bash tools/unattended/check-unattended.sh` prints no `check 22` line.
+  double's `BOUNDED` falls into the "not one of" throw; or the recorder prompt still runs the
+  verb once and returns stderr at a terminal exit.
+- **AC10** — When `grep -c 'REVIEW_ROUNDS'` runs at the landed tip over
+  `tools/unattended/PROTOCOL.template.md`, `tools/unattended/kit.toml`, `.unattended.conf` and
+  `tools/unattended/.unattended.conf.example`, it prints 1 or more for each;
+  `grep -c 'BOUNDED' tools/unattended/VERBS.template.md` prints 1 or more, where
+  at base it prints 0; `grep -c 'declared round bound' tools/unattended/SKILL.template.md` prints
+  1, where at base it prints 0; and `grep -c 'one of four states' tools/unattended/SKILL.template.md`
+  prints 0, where at base it prints 1. The `unattended skill wiring` leg, which is
+  `bash tools/unattended/adopt-unattended.sh --check`, and check 22 of the `unattended kit gate`
+  leg are observed at `--close`.
   Red when: a render is stale; or a carrier is missing the key, which check 22 reports as
-  undocumented, documented-but-in-no-example, or set-by-this-project-and-undocumented.
-- **AC11** — When `wc -c memory/guides/BUILD-METHOD.md` runs at the landed tip it prints a
-  number at or below the figure at base, `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md`
-  exits 0, `bash tools/memory-tree/kit-dogfood-parity.test.sh` prints no `FAIL` line for the
-  method pair, and `bash skills/session-kickoff/manifest-check.sh` exits 0 on the commit that
-  moved the render.
-  Red when: the swap added bytes; or the render was not re-made; or the manifest's `last-audit`
-  was not re-stamped for a watched file.
-  figure: the base byte count is DERIVED by the same `wc -c` at base, 26743 measured 2026-09-14;
-  the 287-to-274 sentence delta in section 4 is PINNED from that measurement.
-- **AC12** — When `bash tools/unattended/unattended.test.sh --shard 2/2` runs at the landed tip,
-  it prints no `FAIL` line naming any arm section 4's suite paragraph adds, no `FAIL executed`
-  line, and `FLOOR_ASSERTIONS` at `tools/unattended/unattended.test.sh:5434` and `FLOOR_SHARD_2`
-  at `:5461` stand exactly the added arms' executed assertions above their base values of 706 and
-  510; at base, the same shard prints `FAIL` for every added arm.
-  Red when: an added arm is stranded past a floor exit, so the floors did not move; or an existing
-  sequence arm moved because `mkconf`'s default bound is not the ceiling.
-  cost: minutes; the shard is on no bar leg and is `--close`'s compensating run via
-  `bash tools/unattended/run-unattended-gates.sh` on a frozen clone.
-  figure: the added-arm count is DERIVED from the suite's floor-breach line with the floor
-  over-pinned, the method `TOOL-aRatifiedRulings-2` AC6 records; the floors are then PINNED.
+  undocumented, documented-but-in-no-example, or set-by-this-project-and-undocumented; or the
+  Skill still describes four states, which `grep -c 'BOUNDED'` alone cannot see because the file
+  carries that word once at base, at `:694`, about the bar.
+- **AC11** — When `wc -c memory/guides/BUILD-METHOD.md` runs at this pass's commit and again
+  over the same path as `git show` reads it from the pass's parent commit, the first prints
+  exactly 13 less than the second, and `grep -c 'exits BOUNDED' tools/memory-tree/BUILD-METHOD.template.md`
+  and the same over the render each print 1, where at base each prints 0. The `build-method size`,
+  `kit/dogfood doc parity` and `kickoff-manifest ratchet` legs are observed at `--close`.
+  Red when: the swap added bytes or moved more than the one sentence; or the render was not
+  re-made; or the manifest's `last-audit` was not re-stamped for a watched file, which the
+  ratchet leg names at the close.
+  figure: the 287-to-274 sentence delta in section 4 is PINNED from a 2026-09-14 measurement at
+  base `1b000d1a`; the parent-commit figure is DERIVED at observation, because unit 1 edits the
+  same file ahead of this pass and its delta is its own.
+- **AC12** — When each arm section 4's suite paragraph adds is run alone by the form that
+  paragraph gives — the preamble sourced, `bcsetup`, `slice_fn review_state`, then the arm's own
+  `same` or `hit` line — every line is silent against the landed driver, and against the driver
+  at base every verb arm prints `FAIL`, the sliced `BOUNDED` arms print `FAIL` with
+  `CONVERGING` in the got-column, and the existing two-argument sliced arms at
+  `tools/unattended/unattended.test.sh:4546` to `:4557` stay silent against both.
+  `FLOOR_ASSERTIONS` at `:5434` and `FLOOR_SHARD_2` at `:5461` each stand exactly the added
+  assertion count above their base values of 706 and 510.
+  Red when: an added arm reads `CONVERGING` where `BOUNDED` is expected; or an existing
+  sequence arm moved because `mkconf`'s default bound is not the ceiling; or a floor did not
+  move.
+  figure: the added assertion count is DERIVED as the number of `hit`, `same` and `miss` lines
+  this pass's diff adds to the suite, which is the count each such line adds to `n`; the two
+  floors are then PINNED to base plus that count. Whether the pinned `FLOOR_ASSERTIONS` is met by
+  the executed count is the close's: `bash tools/unattended/run-unattended-gates.sh` runs the
+  suite UNSHARDED on a frozen clone and a `FAIL executed` line there is the red. NO scheduled
+  run grades `FLOOR_SHARD_2`, because that compensating run is unsharded by its own help text;
+  the pin rises so a future `--shard 2/2` run is not under-pinned, and this line is the skip
+  announcing itself.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `kit/dogfood doc parity` · `build-method size` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `kit/dogfood doc parity` · `build-method size` · `kickoff-manifest ratchet` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-These are the legs `--close` runs, not what the pass runs: the pass verifies with the one command
-each criterion in section 6 names and nothing else. From `tools/gate-legs.json` at base:
+These are the legs `--close` runs, not what the pass runs: the pass verifies with the grep or
+the single arm each criterion in section 6 names and nothing else, and the leg half of AC9, AC10
+and AC11 is ledgered `observed at --close`. From `tools/gate-legs.json` at base:
 `unattended kit gate` is chunk `declarations`, unguarded, and carries check 2 and check 22;
 `unattended skill wiring` is chunk `wiring`, unguarded, and is AC10's render check; `harness arms`
-is chunk `declarations`, unguarded, and holds because one branch leaves and none arrives;
+is chunk `declarations`, unguarded, and holds because no branch leaves and none arrives;
 `review-protocol parity` is chunk `declarations`, unguarded, and byte-compares the harness
 template against its render; `workflow script syntax` is chunk `wiring`; `kit/dogfood doc parity`
 is chunk `declarations`, guarded on the method render among others, and compares
 `BUILD-METHOD.template.md` with `memory/guides/BUILD-METHOD.md`; `build-method size` is chunk
-`product`, unguarded, and is AC11's cap. `memory hygiene` and `spec tokens` grade this file. The
-three self-test suites section 6 names are on no leg and are the close's compensating run.
+`product`, unguarded, and is the cap AC11 leaves to it; `kickoff-manifest ratchet` is chunk
+`records`, unguarded, and is what reds a moved `memory/guides/BUILD-METHOD.md` or
+`.unattended.conf` — both on the manifest's watch line, both edited here — without the
+same-commit `last-audit` re-stamp. `memory hygiene` and `spec tokens` grade this file. The three
+self-test suites section 6 names are on no leg and are the close's compensating run.
 
 New arm: `tools/unattended/unattended.test.sh` · every verb arm against the driver at base, which
-prints `CONVERGING` where `BOUNDED` is expected and refuses the terminal round that now defaults ·
-`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed assertions.
+prints `CONVERGING` where `BOUNDED` is expected and refuses the explicit disposition as
+non-terminal · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed assertions.
 New arm: `tools/unattended/check-unattended.test.sh` · the `BOUNDED`-without-disposition fixture
 against the leg at base, which prints nothing · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by two.
 New arm: `tools/workflows/unattended-build.test.sh` · the loop member `BOUNDED` against the render
@@ -430,18 +521,42 @@ at base, which throws on an unknown token · none.
 
 ## 8. Open questions
 
-none
+- **F1 — may the driver write a disposition the run did not state?** Rev-1 defaulted
+  `--disposition` to `promote` at every terminal exit and deleted the `fail 37` that required
+  it, calling that a consequence of the severity rule rather than a choice. The round-1 audit's
+  cluster E found it reverses a recorded owner ruling: `memory/builds/dFoldedVerdict/README.md`,
+  build-level rules, 2026-09-01 — "a forced value is a constant, and a constant is not evidence
+  for the clause that reads it — so the field stays evidence at every exit" — with the same
+  reasoning in `TOOL-dFoldedVerdict-1` section 4. Option A, raise it as a fork for the owner
+  with that ruling quoted, and park. Option B, keep the flag REQUIRED at every terminal exit and
+  fix the one caller that reaches the refusal unattended: the harness recorder runs the verb
+  once, and on a refusal naming `--disposition` runs it again with `--disposition promote`,
+  because every exit that refusal is reached from stands with blockers and the owner's severity
+  rule promotes every blocker. RESOLVED (agent, 2026-09-14, delegated): B. The 2026-09-14 owner
+  turn covers severity and the round count, not the field's optionality, so the 2026-09-01
+  ruling stands and B needs no owner; the value the recorder passes is the CALLER's, read from
+  the count it holds, which is what that ruling asks of the field. Veto 2 is not tripped: the
+  driver's surface narrows back to what it is at base.
+- **F2 — the bound reader, delegated here by spec 3.** Spec 3 named `UNIT_STALL_BOUND` as
+  instance two of the `GATE_BOUND` conf-read shape and handed the instance-two extraction call
+  to this unit; rev-1 wrote a third inline copy and took no call. RESOLVED (agent, 2026-09-14,
+  delegated): extract. Spec 3's fold of the same audit hoists `read_bound_key <NAME> <DEFAULT>
+  <UNIT> <NOTE>` and routes its own key and `GATE_BOUND` through it; this unit's key is a third CALL.
+  Legal without a floor move because the block is `echo` and `exit 2` with no `fail N` branch,
+  so `harness arms` sees nothing leave or arrive. The one arm the others lack, the ceiling
+  comparison, stays one line after the call rather than a parameter of the reader, because a
+  parameter one of three callers uses is the reader growing a case for one key.
 
-Three choices were made without a fork and each is a consequence rather than a preference: the
-default disposition is `promote` because the owner's severity rule and the recorded gotcha both
-demand the value that owes something; the bound is a conf key because the owner named it and the
-ceiling's own header rejects only an environment override; and `review_state`'s third argument
-defaults to the ceiling because any other default changes a two-argument call, and the one
-caller always passes it.
+Two choices were made without a fork and each is a consequence rather than a preference: the
+bound is a conf key because the owner named it and the ceiling's own header rejects only an
+environment override; and `review_state`'s third argument defaults to the ceiling because any
+other default changes a two-argument call, and the one caller always passes it.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (ids 21, 8 — AC12 per-arm, AC9 to AC11 leg halves at `--close`), D (id 18 — AC11 against the parent commit), E (id 48 — `--disposition` stays required, the recorder retries with `promote`, F1), F (ids 23, 51 — `read_bound_key`, F2), H (id 7 — AC10's Skill oracles), O (id 31 — the ratchet leg), P (id 33 — the backlog flip is the close's).
+- rev-3 · 2026-09-14 · §3 · §4 · §8 F2 · the helper signature aligned to spec 3's four positionals, `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>` — the `<UNIT>` word is what makes the refusal sentence true for a key that counts rounds rather than seconds; the `<NOTE>` no longer repeats the "Declare one" clause the helper prints itself (sub-spec interface agreement, M2).
 
 ## 10. Reuse audit
 
@@ -452,15 +567,18 @@ affordance seam; every file this unit's mechanism lives in is `.sh`, so the map 
 the subject and the seam was found by reading the source. It exists: `review_state` at
 `tools/unattended/unattended.sh:3974` is the predicate and takes the bound as one more argument;
 `verb_review` at `:4030` already holds `subj` and `slug` and makes the equality the bound keys on;
-the `GATE_BOUND` block at `:305` to `:312` is the conf-read shape the key copies verbatim; check
+the `GATE_BOUND` block at `:305` to `:312` is the conf-read shape, which `TOOL-aProbedUnit-3`
+hoists into `read_bound_key` ahead of this unit and this key calls rather than copies; check
 2's awk at `tools/unattended/check-unattended.sh:512` to `:513` is the reader whose two regexes
 gain a token. The recall query returned `TOOL-dCarriedReceipt-1`, which records that
 `review_state` reads only the rows a run can see; `TOOL-dHonouredPark-8`, which records why a spec
 audit and the closing review must not share a subject; `TOOL-aBoundedVerdict-1`'s convergence
 predicate, the origin of the four states; `TOOL-dFoldedVerdict-1`'s build record, which pins the
-refusal this unit deletes; `TOOL-aProvenReuse-3`, the open row that asked what a promoted spec
+refusal this unit KEEPS and whose 2026-09-01 owner ruling section 8 F1 cites as the reason no
+driver default is written; `TOOL-aProvenReuse-3`, the open row that asked what a promoted spec
 blocker is; and `TOOL-aLeakedHandle-6`, the ruling that a converged subject is disposed and never
-re-rounded, which the terminal grep's `BOUNDED` member extends. Where a hit was stale:
+re-rounded, which the terminal grep's `BOUNDED` member extends and whose check-37 sentence unit 7
+rewrites to the severity rule. Where a hit was stale:
 `TOOL-aBoundedVerdict-1` says a first round always re-arms when blockers are above zero, and the
 Skill's opening paragraph says a round cap only moves the stall earlier; both are superseded by
 the 2026-09-14 ruling for SPEC subjects, and the Skill paragraph is rewritten so the two answers

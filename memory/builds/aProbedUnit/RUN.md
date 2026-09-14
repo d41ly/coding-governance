@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 270611cd7e928f4db59d069815d3701e404681ce
-phase: SPECCING
+witness: 2bdd0b0feedf4b9ba7d7c540dbd3c68f417e0927
+phase: FOLDING
 branch-sha: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 branch-ref: refs/heads/branch/unattended-build-stalls-6d0f2b
 mode: prompt

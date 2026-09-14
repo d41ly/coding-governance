@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -44,21 +44,30 @@ becomes a UNIT.
 - **S4** — `DISPOSAL_SCHEMA` at lines 320-329 requires `promoted` and `folded` integers, and the
   guard at line 752 refuses a return whose `promoted + folded + standing.length` is not
   `confirmed`, with the same empty roster and a note naming the mismatch. Every non-throwing exit
-  past the stage carries `promoted` and `folded` beside `standing`. Observed by AC1 and AC5.
+  past the stage carries `promoted` and `folded` beside `standing`, the attended every-unit-terminal
+  return included. Observed by AC1, AC4 and AC5.
 - **S5** — The file's own header stops saying the disposal clause is unreachable in attended mode
-  (lines 55-58), and the two comment blocks that restate the verdict predicate (lines 613-615 and
-  704-719) say the confirmed-count one. The render `tools/workflows/unattended-build.js` is re-made
-  by `bash tools/workflows/check-protocol-parity.test.sh --render` in the same commit. Observed by
-  AC6.
-- **S6** — M4 of `tools/memory-tree/BUILD-METHOD.template.md`, line 140: the disposal sentence
-  becomes the severity rule, sized in section 4 against M1's byte cap; the render
-  `memory/guides/BUILD-METHOD.md` is re-made by
+  (lines 55-58), the two comment blocks that restate the verdict predicate (lines 613-615 and
+  704-719) say the confirmed-count one, and the exported `meta.phases[2].detail` at line 9, which
+  every `meta`-scanning reader sees, says the stage disposes every confirmed finding by severity
+  rather than `every blocker still standing`. The render `tools/workflows/unattended-build.js` is
+  re-made by `bash tools/workflows/check-protocol-parity.test.sh --render` in the same commit.
+  Observed by AC6.
+- **S6** — M4 of `tools/memory-tree/BUILD-METHOD.template.md`, two sentences: the disposal
+  sentence at line 140 becomes the severity rule, and the late-blocker sentence at line 143, which
+  says a blocker confirmed after `CONVERGED` "takes the exit's own disposition, FOLD or PROMOTE",
+  says it takes the severity rule's disposition, because under this rule a `CONVERGED` exit records
+  no disposition and a blocker is never folded, so "the exit's own" has no referent. Both are sized
+  in section 4 against M1's byte cap; the render `memory/guides/BUILD-METHOD.md` is re-made by
   `bash tools/memory-tree/kit-dogfood-parity.test.sh --render` and the kickoff manifest `last-audit`
   is re-stamped in the same commit, because that render is on its watch line. Observed by AC7.
-- **S7** — The unattended kit's two prose carriers say the rule once each and point rather than
+- **S7** — The unattended kit's prose carriers say the rule once each and point rather than
   paraphrase: the `CONVERGED` and `NON-CONVERGENT` bullets of `tools/unattended/SKILL.template.md`
   and the `--review` bullet of `tools/unattended/VERBS.template.md`, re-rendered by
-  `bash tools/unattended/adopt-unattended.sh`. Observed by AC8.
+  `bash tools/unattended/adopt-unattended.sh`; and the driver's own refusal for a round on an
+  ended subject, the `fail 37` message at `tools/unattended/unattended.sh:4096`, whose
+  `fold or promote` clause becomes the severity rule's, with the three suite arms that quote it
+  moved to the new words. Observed by AC8 and AC9.
 - **S8** — `tools/workflows/unattended-build.test.sh`: the fixtures carry the callee's real keys
   (`confirmed`, `highs`), the default disposal double reconciles with the count it is paired with,
   the two arms quoting `blockers were not disposed` and the header arm at line 376 move to the new
@@ -71,10 +80,16 @@ becomes a UNIT.
   check 2 of `tools/unattended/check-unattended.sh` reads the field only on a `NON-CONVERGENT` or
   `CEILING` exit (lines 512-517). A `CONVERGED` round that this unit disposes therefore leaves no
   disposition in the run-state file; section 5 states the cost. Whether the driver should accept one
-  there is `TOOL-aProbedUnit-6`'s seam and is left as an edge.
+  there is `TOOL-aProbedUnit-6`'s seam and is left as an edge. At every OTHER terminal exit the
+  field stays REQUIRED, by the 2026-09-01 ruling spec 6 section 8 F1 cites, and the harness
+  recorder as unit 6 leaves it retries a refused terminal exit with `--disposition promote`; so
+  `CONVERGED` is the one exit this stage disposes with nothing in the record, and the only one.
+  The one driver edit here is the WORDS of the `fail 37` message at
+  `tools/unattended/unattended.sh:4096`, never its grammar, its branch count or its trigger.
 - **No convergence rule moves.** `review_state`, the round bound and the `BOUNDED` exit are
   `TOOL-aProbedUnit-6`; the sentence in M4 that states them is that unit's, and this unit edits
-  only the disposal sentence beside it.
+  the disposal sentence beside it and the late-blocker sentence three lines down, both of which
+  state disposal and neither of which states convergence.
 - **The promoted unit's audit is not run by this stage.** A sidechain agent holds no `Workflow`
   tool, so the disposal agent cannot audit the spec it authors. The existing rule stands: a promoted
   unit is audited as a SPEC, its own `--subject <id>` loop, by the caller before dispatch, and
@@ -92,10 +107,11 @@ becomes a UNIT.
 ### Edges
 
 No sibling edge. This unit shares files with the round-bound unit ahead of it — M4's paragraph,
-the Skill's review-state list, the VERBS `--review` bullet, the harness template — and reads each
-as that unit leaves it, but none of its criteria rests on anything that unit builds: every edit
-here lands the same with or without it. That is SEQUENCE, which the `order` verb already declares,
-and the Rollout sub-head states the overlap.
+the Skill's review-state list, the VERBS `--review` bullet, the harness template, and the driver
+line whose grep unit 6 widens and whose words this unit rewrites — and reads each as that unit
+leaves it, but none of its criteria rests on anything that unit builds: every edit here lands the
+same with or without it. That is SEQUENCE, which the `order` verb already declares, and the
+Rollout sub-head states the overlap.
 
 - **consumes-from** external — the return contract of `tools/workflows/tier2-review.js`: `confirmed`
   is an integer on the synthesis path (line 610) and `[]` on the three paths that also yield
@@ -186,7 +202,8 @@ BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every CONFIRMED finding in `<lastRepor
 exited <verdict> with <confirmed> confirmed, <blockers> at BLOCKER and <highs> at HIGH. Open the
 report and take each confirmed finding at the severity the report gives it. BUILD-METHOD M4 disposes
 BY SEVERITY and admits no third route. PROMOTE every BLOCKER and every HIGH:
-  [unattended] run `<DRIVER> --rescope <slug> --act add --item <id>`,
+  [unattended] run `<DRIVER> --rescope <slug> --act add --item <id> --reason <text>`, the reason
+               being the report id and severity of the finding it closes,
   [attended]   add its row to the build README's authored Units table, because the recording verbs
                are unavailable with no run-state file,
 then author its spec at its tier with a mechanism that CLOSES the finding — the change to the design
@@ -198,7 +215,11 @@ every promoted unit id in `summary`; and NAME in `standing` every finding you di
 ```
 
 The old prompt reported `au.blockers` as "confirmed", which was the wrong integer under the same
-name; the new one reports all three under their own. The attended clause exists because
+name; the new one reports all three under their own. The old prompt also spelled the promotion
+command without `--reason`, which `verb_rescope` refuses with `fail 48` and the driver's own
+header at `tools/unattended/unattended.sh:14` lists as required, so the disposal agent's first
+promotion as spelled was refused; the flag is spelled now, and V1 asserts the longer substring.
+The attended clause exists because
 `--rescope` `fail 48`s without a run-state file, which the file's own comments at lines 909-916
 record as the mode-blind defect one layer down, and until this unit the stage was unreachable in
 that mode so the contradiction was never live.
@@ -264,14 +285,21 @@ degraded, and a `NON-CONVERGENT` one still is.
 
 ### The comments that describe a shape the file no longer has
 
-Three blocks restate the verdict predicate and would describe a stage that no longer exists, which
-is the drift class the file names at lines 100-101 about itself:
+Four blocks restate the verdict predicate and would describe a stage that no longer exists, which
+is the drift class the file names at lines 100-101 about itself. The first is not a comment: it
+is the exported `meta`, the one description every reader that scans workflow metadata sees
+without opening the body.
 
 | Lines | Today | After |
 |---|---|---|
+| 9 | `meta.phases[2].detail`: `dispose every blocker still standing over the whole spec set, then hand out the roster` | `dispose every confirmed finding by severity over the whole spec set, then hand out the roster` |
 | 55-58 | `M4's BLOCKER-DISPOSAL CLAUSE IS UNREACHABLE HERE` — attended mode reaches the hand-out only at zero blockers, the `CONVERGED` one | the clause is `REACHABLE HERE SINCE TOOL-aProbedUnit-7`: the stage runs on the confirmed count, so attended mode reaches it at zero blockers with highs, mediums or lows standing; what it loses there is the `--rescope` row, a promotion being a README roster row and a spec with no amendment record |
 | 613-615 | `so a run needing M4's blocker disposal cannot get one here` | a run needing M4's disposal reaches it through the confirmed count and not through the verdict |
 | 704-719 | the stage runs on `NON-CONVERGENT` and `CEILING`, the two states that guarantee standing blockers; `ON CONVERGED THE STAGE ANNOUNCES ITS SKIP` | the stage runs on any confirmed finding and disposes by severity; on a confirmed count of zero it announces the skip |
+
+With line 9 and the prompt at line 730 both moved, `blocker still standing` prints zero times in
+the template and the render, which is the retired-phrase grep AC6 carries: a phrase retired once
+should not be findable in any carrier.
 
 The header arm at `unattended-build.test.sh:376` greps `UNREACHABLE HERE` and re-points to
 `REACHABLE HERE SINCE`; a header left saying the old thing would keep that arm green and the file
@@ -298,42 +326,81 @@ becomes, at 303 bytes:
 ```
 
 Plus 75 bytes, no line moves: the paragraph is one wrapped line in both files and the sentence
-sits inside it. Staged into a copy of both files on 2026-09-14 by byte replacement: template 26843,
-render 26818, 340 lines each, so 830 bytes under the cap and 123 under the high-water — PINNED, and
-AC7 derives the live figures, because units 1 and 6 edit the same file ahead of this one and their
-deltas are theirs to state. The sentence carries no decision id and no path, for the reason
+sits inside it. The sentence carries no decision id and no path, for the reason
 `TOOL-aRatifiedRulings-1` §4 gives: the template ships to adopters where an id names nothing.
 `retired` joins the never-list because the Skill's bullet already carries it and the method did
 not, which was two answers.
 
+The second carrier is three lines down, at line 143, inside the sentence `TOOL-aLeakedHandle-6`
+landed on 2026-09-13 for a blocker confirmed after `CONVERGED`. Its clause, PINNED at 74 bytes:
+
+```
+takes the exit's own disposition, FOLD or PROMOTE, and never another round
+```
+
+becomes, at 61 bytes:
+
+```
+takes the severity rule's disposition and never another round
+```
+
+Minus 13, no line moves. Under the severity rule "the exit's own disposition" has no referent: a
+`CONVERGED` exit records none, and a blocker is never folded. The rest of that sentence — never
+another round, `--review` refuses and names the route — is the ruling's and stands; this unit
+narrows what the disposition IS, not when it happens, and section 10 names the ruling.
+
+Net plus 62 bytes for the file. Measured on 2026-09-14 by staging the line-140 swap into a copy
+of both files: template 26843, render 26818, 340 lines each; the line-143 swap is 13 bytes on
+the same wrapped-line shape and is computed rather than re-staged, so template 26830, render
+26805, 843 bytes under the cap and 136 under the high-water — PINNED at base `1b000d1a`, and AC7
+derives the live figures, because units 1 and 6 edit the same file ahead of this one and their
+deltas are theirs to state.
+
 ### The Skill and VERBS
 
-`tools/unattended/SKILL.template.md`, the four-state list at lines 630-647 as unit 6 leaves it. The
-`CONVERGED` bullet gains one clause: the loop is done for that subject, and its confirmed highs,
-mediums and lows are still disposed by the severity rule the next bullet states. The
-`NON-CONVERGENT` bullet's disposal sentences — from `every blocker still standing is DISPOSED` to
-`a promoted unit is audited as a SPEC` — become: every CONFIRMED finding is DISPOSED BY SEVERITY,
-and that holds at `CONVERGED` too; a BLOCKER or HIGH is PROMOTED, becoming a UNIT whose mechanism
-CLOSES the finding, specced at its tier, audited as a SPEC, built, closed; a MEDIUM or LOW is
-FOLDED into the spec it belongs to as a `rev-N` bump with its §9 line. The `never RETIRED` sentence
-and the `--disposition` recording sentence stay as unit 6 leaves them.
+`tools/unattended/SKILL.template.md`, the state list at lines 630-647 as unit 6 leaves it. The
+`CONVERGED` bullet gains one clause, spelled so its own words are greppable: the loop is done for
+that subject, and its confirmed highs, mediums and lows are `still disposed` by the severity rule
+the next bullet states — `still disposed` is a phrase the file does not carry at base and AC8
+counts it. The `NON-CONVERGENT` bullet's disposal sentences — from `every blocker still standing
+is DISPOSED` to `a promoted unit is audited as a SPEC` — become: every CONFIRMED finding is
+DISPOSED BY SEVERITY, and that holds at `CONVERGED` too; a BLOCKER or HIGH is PROMOTED, becoming a
+UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built, closed; a
+MEDIUM or LOW is FOLDED into the spec it belongs to as a `rev-N` bump with its §9 line. The
+`never RETIRED` sentence and the `--disposition` recording sentence stay as unit 6 leaves them.
 
 `tools/unattended/VERBS.template.md`, the `--review` bullet at lines 102-113: the clause `Both
 values are legal, because the method admits folding a blocker back into the specs it belongs to as
 readily as promoting it to a unit` is false under the severity rule, since a blocker is never
-folded. It becomes a pointer: which value the run records follows the severity rule the Skill's exit
-bullet states, and a record naming neither leaves the gate inferring one from ids. One statement in
-the Skill, one pointer here, the rule itself in M4 — the shape the carriers already have.
+folded. It becomes a pointer, spelled with the words `severity rule`, which the file does not
+carry at base: which value the run records follows the severity rule the Skill's exit bullet
+states, and a record naming neither leaves the gate inferring one from ids. One statement in the
+Skill, one pointer here, the rule itself in M4 — the shape the carriers already have.
 
 Both renders, `.claude/skills/unattended/SKILL.md` and `memory/guides/UNATTENDED-VERBS.md`, are
 re-made by `bash tools/unattended/adopt-unattended.sh` in the same commit, and the
 `unattended skill wiring` leg diffs them.
 
+### The driver's own words
+
+`tools/unattended/unattended.sh:4096`, the `fail 37` for a round on a subject whose loop already
+ended, says a blocker confirmed on it now is `DISPOSED under the build method's M4, fold or
+promote, and never re-rounded`. That message is the check-37 half of `TOOL-aLeakedHandle-6`'s
+ruling and points at the M4 sentence this unit rewrites, so left alone it is the driver's own
+refusal pointing at the old rule. The clause becomes `DISPOSED under the build method's M4 by the
+severity rule, and never re-rounded`; the branch, its number, its trigger and its grep — which
+unit 6 widens to `BOUNDED` on the line above — do not move. The three suite arms that quote the
+message, at `tools/unattended/unattended.test.sh:4589`, `:4601` and `:4609`, move to the new
+words, so `harness arms` still finds the branch armed. `fold or promote` then prints zero times
+in the driver and in its suite; the one other carrier of those words, check 2's refusal in
+`tools/unattended/check-unattended.sh:537`, speaks of the FIELD's two legal values and not of the
+rule, and stays.
+
 ### The suite
 
 `tools/workflows/unattended-build.test.sh` evaluates the RENDER (`$F` at line 18 is
 `unattended-build.js`) with stub hooks, so the pass edits the template, renders, then observes.
-Four fixture moves and six arms:
+Four fixture moves and seven arms, V7 being one `has` line added to an arm that exists:
 
 - `review_out` at line 95 takes `<blockers> [confirmed] [highs]`, `confirmed` defaulting to the
   blocker count and `highs` to 0, and emits both keys. The comment above it says the double returns
@@ -354,18 +421,19 @@ The arms, in the suite's own `has`/`hasnt_`/`same` style, all reading the trace 
 
 | Arm | Fixture | Asserts |
 |---|---|---|
-| V1 | `CONVERGED`, `review_out 0 4 1`, disposal `{disposed:true, standing:[], promoted:1, folded:3, summary:"d"}` | `agent:dispose:tB` in the trace; the log carries `disposing by severity, on CONVERGED too`; the prompt line carries `1 at HIGH` and `--rescope tB --act add`; RESULT carries `"promoted":1,"folded":3` and `"roster":[{` |
+| V1 | `CONVERGED`, `review_out 0 4 1`, disposal `{disposed:true, standing:[], promoted:1, folded:3, summary:"d"}` | `agent:dispose:tB` in the trace; the log carries `disposing by severity, on CONVERGED too`; the prompt line carries `1 at HIGH` and `--rescope tB --act add --item <id> --reason`; RESULT carries `"promoted":1,"folded":3` and `"roster":[{` |
 | V2 | `CONVERGED`, `review_out 0` | `disposal: skipped`; no `agent:dispose:`; RESULT carries `"promoted":0,"folded":0` (the AC4 arm, extended) |
 | V3 | `CONVERGED`, `review_out 0 3 0`, disposal `{disposed:true, standing:[], promoted:1, folded:1, summary:"x"}` | `"roster":[]`; the note carries `do not reconcile`; RESULT carries `"promoted":1,"folded":1`; `disposal: done` absent |
 | V4 | workflow `{"blockers":0,"report":"r.md"}` with no `confirmed`; and `{"blockers":2,"confirmed":1,"highs":0,"report":"r.md"}` | each THROWs; the message names `confirmed`; `phase:Disposal` absent |
-| V5 | `A_UNITS`, workflow `{"blockers":0,"confirmed":2,"highs":0,…}`, disposal `{promoted:0, folded:2, …}` | `agent:dispose:tB` in the trace; the prompt line carries `authored Units table` and NOT `--rescope tB` |
+| V5 | `A_UNITS`, workflow `{"blockers":0,"confirmed":2,"highs":0,…}`, disposal `{promoted:0, folded:2, …}` | `agent:dispose:tB` in the trace; the prompt line carries `authored Units table` and NOT `--rescope tB`; RESULT carries `"promoted":0,"folded":2` — the attended MAIN return, since `A_UNITS` is `READY`, carrying the counts the stage returned rather than the default double's |
+| V7 | `T_UNITS`, the existing arm at line 493 | RESULT carries `"promoted":0,"folded":0` beside the `"standing":` it already asserts — the attended every-unit-terminal return at line 851, the one return no other arm reaches, carrying both keys as stated zeros rather than omitting them |
 | V6 | the header slice `$HDR` | carries `REACHABLE HERE SINCE` (the moved arm at line 376) |
 
 The failing case is observed before the harness edit: with the fixtures and arms staged and the
 render UNCHANGED, V1 lacks `agent:dispose:`, V3 hands out a full roster, V4's first invocation
-returns a RESULT, V5 spawns nothing and V6 greps the old literal — five reds, V2 excepted, because
-the old skip line shares the prefix. That run is not the suite whole: section 7 says how one arm is
-run alone.
+returns a RESULT, V5 spawns nothing, V6 greps the old literal and V7's RESULT carries neither key
+— six reds, V2 excepted, because the old skip line shares the prefix. That run is not the suite
+whole: section 7 says how one arm is run alone.
 
 ### Inventory
 
@@ -379,11 +447,13 @@ The pass writes `tools/workflows/unattended-build.template.js`, `tools/workflows
 by `--render`, `tools/workflows/unattended-build.test.sh`,
 `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md` by `--render`,
 `tools/unattended/SKILL.template.md`, `tools/unattended/VERBS.template.md`, their two renders by the
-adopter, `memory/guides/SESSION-KICKOFF.md` (the `last-audit` line only), its own spec header, the
+adopter, `tools/unattended/unattended.sh` (one message's words) and
+`tools/unattended/unattended.test.sh` (the three `hit` literals quoting it),
+`memory/guides/SESSION-KICKOFF.md` (the `last-audit` line only), its own spec header, the
 build README and the two generated indexes every pass re-renders, and its acceptance ledger under
 the build's `build/` folder, declared by file. It is sequenced last by its `order` verb and after
-unit 6 in particular, which edits the same M4 paragraph, Skill list, VERBS bullet and harness
-template; every carrier is read as unit 6 leaves it. Landing owes no data step: `DISPOSAL_SCHEMA`
+unit 6 in particular, which edits the same M4 paragraph, Skill list, VERBS bullet, harness
+template and driver line; every carrier is read as unit 6 leaves it. Landing owes no data step: `DISPOSAL_SCHEMA`
 binds an agent return inside one program run, a run-state file written before this unit reads
 identically after it, and the hand-out's two new keys are additive.
 
@@ -391,14 +461,16 @@ identically after it, and the hand-out's two new keys are additive.
 
 | File | Change |
 |---|---|
-| `tools/workflows/unattended-build.template.js` | one refusal added; `au` gains two fields; the stage's predicate, log lines, prompt, schema, guard and three returns; three comment blocks |
+| `tools/workflows/unattended-build.template.js` | one refusal added; `au` gains two fields; the stage's predicate, log lines, prompt, schema, guard and three returns; `meta.phases[2].detail` and three comment blocks |
 | `tools/workflows/unattended-build.js` | re-rendered |
-| `tools/workflows/unattended-build.test.sh` | `review_out`, `returns`, `DISPOSE_OK`, 18 fixtures, three literals moved, one label, six arms |
-| `tools/memory-tree/BUILD-METHOD.template.md` | one sentence replaced in M4 |
+| `tools/workflows/unattended-build.test.sh` | `review_out`, `returns`, `DISPOSE_OK`, 18 fixtures, three literals moved, one label, six arms and one `has` line on a seventh |
+| `tools/memory-tree/BUILD-METHOD.template.md` | two sentences replaced in M4, at lines 140 and 143 |
 | `memory/guides/BUILD-METHOD.md` | re-rendered |
 | `tools/unattended/SKILL.template.md` | two bullets in the review-state list |
 | `tools/unattended/VERBS.template.md` | one clause in the `--review` bullet |
 | `.claude/skills/unattended/SKILL.md`, `memory/guides/UNATTENDED-VERBS.md` | re-rendered |
+| `tools/unattended/unattended.sh` | the words of one `fail 37` message, line 4096 |
+| `tools/unattended/unattended.test.sh` | the three `hit` literals quoting that message, lines 4589, 4601 and 4609 |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamped |
 
 ### Alternatives rejected
@@ -423,7 +495,7 @@ identically after it, and the hand-out's two new keys are additive.
 - security — N/A. Three prompt sentences, one refusal, one schema and one guard inside a sidechain
   program; no write path opens.
 - perf / scale — one more agent spawn on every round that confirms a finding at `CONVERGED`, which
-  used to be free; that spawn is the owner's rule. The method grows by 75 bytes against M7's
+  used to be free; that spawn is the owner's rule. The method grows by 62 bytes net against M7's
   whole-file re-read.
 - error / empty / loading states — a count that cannot be read throws; a return that does not
   reconcile hands out no roster and says why; a zero count skips and says so. Each is an arm.
@@ -437,18 +509,24 @@ identically after it, and the hand-out's two new keys are additive.
   more than `confirmed`, never fewer, since a synthesis that classified a confirmed finding as
   medium is a judgement and not a contradiction. The disposal agent reads the report's own severity
   table, so the harness's integers steer the announcement and the reconciliation, not the split.
-- testing — six arms, five observed RED against the unchanged render one at a time; the suite whole
-  is on no bar and section 7 prices its one direct run.
+- testing — the harness arms section 4 tables, each observed RED against the unchanged render one
+  at a time, V2 excepted; one driver-suite arm run alone; the grep pairs of AC6 to AC9. The suites
+  whole and every leg are the close's, and section 7 prices the one direct harness-suite run.
 - migration — N/A. No record grammar, conf key or file format changes; two additive JSON keys.
 - user docs — the method and the Skill are the documents and both move here; VERBS points.
 
 ## 6. Acceptance criteria
 
+The pass observes each criterion by the single arm or the grep it names; every leg and every
+suite whole is the close's, and a ledger row for that half reads `observed at --close`, per the
+build README's rules.
+
 - **AC1** — When one arm is run alone against the landed render — from `tools/workflows`, with the
   suite's preamble sourced up to its first arm, `run_wf "$UNITS" "$(returns CONVERGED 0 '<V1 disposal>')"`
   after `review_out` is redefined to emit `confirmed 4` and `highs 1` — the trace holds
   `agent:dispose:tB`, the log line `disposing by severity, on CONVERGED too`, a prompt line carrying
-  `--rescope tB --act add`, and a RESULT line carrying `"promoted":1,"folded":3` and `"roster":[{`.
+  `--rescope tB --act add --item` and `--reason`, and a RESULT line carrying `"promoted":1,"folded":3`
+  and `"roster":[{`.
   Red when: the trace lacks `agent:dispose:` — the predicate is still the verdict — or the RESULT
   lacks either key, or the prompt line names no `--rescope`.
   fixture: the preamble is `sed -n '1,/^# ---- AC2: THE ARGS GUARD/p' unattended-build.test.sh`,
@@ -467,10 +545,14 @@ identically after it, and the hand-out's two new keys are additive.
   a number and the stage decided on it.
 - **AC4** — When the single-arm run uses `A_UNITS` with a workflow return of
   `{"blockers":0,"confirmed":2,"highs":0,"report":"r.md"}` and a disposal double returning
-  `promoted 0, folded 2`, the trace holds `agent:dispose:tB` and its prompt line carries
-  `authored Units table` and does not carry `--rescope tB`.
+  `promoted 0, folded 2`, the trace holds `agent:dispose:tB`, its prompt line carries
+  `authored Units table` and does not carry `--rescope tB`, and the RESULT line carries
+  `"promoted":0,"folded":2`; and when the existing `T_UNITS` arm is run alone, its RESULT line
+  carries `"promoted":0,"folded":0` beside the `"standing":` it already asserts.
   Red when: the attended prompt orders `--rescope`, which `fail 48`s with no run-state file, or no
-  agent is spawned at all, which is the header's old claim still true.
+  agent is spawned at all, which is the header's old claim still true; or either attended return
+  omits the two keys, which the file's own rule at lines 895-899 refuses as a missing key standing
+  in for a stated zero.
 - **AC5** — When the single-arm run pairs `CONVERGED` and `review_out 0 3 0` with a disposal
   double returning `{"disposed":true,"standing":[],"promoted":1,"folded":1,"summary":"x"}`, the
   RESULT carries `"roster":[]` and `"promoted":1,"folded":1`, the note carries `do not reconcile`,
@@ -478,49 +560,82 @@ identically after it, and the hand-out's two new keys are additive.
   Red when: a full roster is handed out over a return whose counts leave one confirmed finding
   unaccounted for, the shape the F4 arm at `tools/workflows/unattended-build.test.sh:588` already
   refuses for a named standing blocker.
-- **AC6** — When `node tools/workflows/check-workflow-syntax.js` and
-  `bash tools/workflows/check-protocol-parity.test.sh` run at the landed tip, both exit 0 —
-  the parity run printing no `DRIFT` — and
-  `grep -c 'REACHABLE HERE SINCE' tools/workflows/unattended-build.template.js` and the same grep
-  over `tools/workflows/unattended-build.js` each print `1`, while `grep -c 'UNREACHABLE HERE'`
-  over both prints `0`.
+- **AC6** — When `grep -c 'REACHABLE HERE SINCE' tools/workflows/unattended-build.template.js`
+  and the same grep over `tools/workflows/unattended-build.js` run at the landed tip, each prints
+  `1`; `grep -c 'UNREACHABLE HERE'` over both prints `0`; and `grep -c 'blocker still standing'`
+  over both prints `0`, where at base it prints `2`, lines 9 and 730. The `workflow script
+  syntax` leg, `node tools/workflows/check-workflow-syntax.js`, and the `review-protocol parity`
+  leg, `bash tools/workflows/check-protocol-parity.test.sh`, are observed at `--close`, the
+  second printing no `DRIFT`.
   Red when: the render disagrees with the template, which a template-only edit without `--render`
-  produces; or the header still says the clause is unreachable, which keeps the old arm at line 376
-  green over a false comment; or the syntax leg refuses the file, which is what an unbalanced
-  ternary inside the prompt string looks like.
-- **AC7** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` and
-  `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` run at the landed tip, the first
-  prints `shipped and installed docs agree`, the second prints `template-size OK` with a byte figure
-  at or below the 27648 in `tools/template-size-limits.txt`, and
-  `grep -cF 'DISPOSED BY SEVERITY' memory/guides/BUILD-METHOD.md` and the same grep over
-  `tools/memory-tree/BUILD-METHOD.template.md` each print `1`, with `wc -l` over the render
-  printing at most 350; and `bash skills/session-kickoff/manifest-check.sh` reports no watched file
-  changed since `last-audit`.
-  Red when: the parity leg prints `DRIFT`; or the render passes 27648, which is `fail 2`; or a
-  count prints `0`; or the manifest ratchet names `memory/guides/BUILD-METHOD.md` as changed after
-  the stamp, meaning the render landed without the same-commit re-stamp.
-  figure: the cap is DERIVED at observation from `tools/template-size-limits.txt`; 26818 bytes in
-  section 4 is PINNED at base `1b000d1a` before units 1 and 6 landed their edits, so a
+  produces and the parity leg names at the close; or the header still says the clause is
+  unreachable, which keeps the old arm at line 376 green over a false comment; or the exported
+  `meta` still describes disposal by nature; or the syntax leg refuses the file, which is what an
+  unbalanced ternary inside the prompt string looks like.
+- **AC7** — When `grep -cF 'DISPOSED BY SEVERITY' memory/guides/BUILD-METHOD.md` and the same
+  grep over `tools/memory-tree/BUILD-METHOD.template.md` run at the landed tip, each prints `1`;
+  `grep -cF "takes the severity rule's disposition"` over both prints `1` and
+  `grep -cF 'FOLD or PROMOTE'` over both prints `0`, where at base it prints `1`; `wc -l` over the
+  render prints at most 350; and `wc -c` over the render prints exactly 62 more than the same
+  path read by `git show` from the pass's parent commit. The `kit/dogfood doc parity` leg,
+  `bash tools/memory-tree/kit-dogfood-parity.test.sh` printing `shipped and installed docs
+  agree`; the `build-method size` leg, `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md`
+  printing `template-size OK` with a figure at or below the 27648 in
+  `tools/template-size-limits.txt`; and the `kickoff-manifest ratchet` leg,
+  `bash skills/session-kickoff/manifest-check.sh` reporting no watched file changed since
+  `last-audit`, are observed at `--close`.
+  Red when: a count prints `0` where `1` is expected, or `1` where `0` is; or the delta is not
+  62, meaning a swap moved more than its sentence; or, at the close, the parity leg prints
+  `DRIFT`, the render passes 27648, which is `fail 2`, or the ratchet names
+  `memory/guides/BUILD-METHOD.md` as changed after the stamp, meaning the render landed without
+  the same-commit re-stamp.
+  figure: the cap is DERIVED at observation from `tools/template-size-limits.txt`; the 62-byte
+  delta is PINNED from the two sentence measurements in section 4 at base `1b000d1a`; the
+  whole-file figures there are PINNED before units 1 and 6 landed their edits, so a
   `TEMPLATE-SIZE WARN` past 26941 is advisory and is reported, not red.
-- **AC8** — When `bash tools/unattended/adopt-unattended.sh --check` runs at the landed tip, it
-  exits 0, and `grep -c 'DISPOSED BY SEVERITY' tools/unattended/SKILL.template.md` and the same grep
-  over `.claude/skills/unattended/SKILL.md` each print `1`, while
-  `grep -c 'as readily as promoting' tools/unattended/VERBS.template.md` prints `0`.
-  Red when: `--check` reports drift, which a template edit without the adopter run produces; or
-  the Skill still disposes by nature; or VERBS still says a blocker may be folded.
+- **AC8** — When `grep -c 'DISPOSED BY SEVERITY' tools/unattended/SKILL.template.md` and the
+  same grep over `.claude/skills/unattended/SKILL.md` run at the landed tip, each prints `1`;
+  `grep -c 'still disposed'` over both prints `1`, where at base it prints `0`;
+  `grep -c 'severity rule' tools/unattended/VERBS.template.md` and the same over
+  `memory/guides/UNATTENDED-VERBS.md` each print `1`, where at base each prints `0`; and
+  `grep -c 'as readily as promoting' tools/unattended/VERBS.template.md` prints `0`. The
+  `unattended skill wiring` leg, `bash tools/unattended/adopt-unattended.sh --check`, is observed
+  at `--close`.
+  Red when: `--check` reports drift at the close, which a template edit without the adopter run
+  produces; or the Skill still disposes by nature; or the `CONVERGED` bullet was left saying
+  nothing about disposal, which the `NON-CONVERGENT` grep alone cannot see; or VERBS lost its
+  false clause without gaining the pointer, which the absence grep alone cannot see; or VERBS
+  still says a blocker may be folded.
+- **AC9** — When `grep -c 'fold or promote' tools/unattended/unattended.sh` runs at the landed
+  tip it prints `0`, where at base it prints `1`; the same grep over
+  `tools/unattended/unattended.test.sh` prints `0`, where at base it prints `3`;
+  `grep -c 'by the severity rule, and never re-rounded' tools/unattended/unattended.sh` prints
+  `1`; and one of the three arms quoting the message, run alone by the form spec 6 section 4's
+  suite paragraph gives — the preamble sourced, `bcsetup`, then the arm's `bcopen` block through
+  its `hit` line — is silent, where against the driver at base it prints `FAIL missing`. The
+  `harness arms` leg is observed at `--close`.
+  Red when: the driver's refusal still points at the old rule; or an arm still quotes the old
+  words, which reds the message and the arm together; or the branch reads as unarmed at the
+  close because the arm's literal and the message drifted apart.
 
 ## 7. Gates
 
-`workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `build-method size` · `kickoff-manifest ratchet` · `unattended skill wiring` · `method carriers (every pointer declared)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `build-method size` · `kickoff-manifest ratchet` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `method carriers (every pointer declared)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 These are what `--close` runs, once, over the whole build. The PASS does not run them, nor any
-suite: it verifies with the single-arm runs AC1 through AC5 describe, against the render, then the
-four grep pairs of AC6 through AC8. Chunks and guards, read from `tools/gate-legs.json` on
-2026-09-14: `workflow script syntax` is `wiring`, unguarded; `review-protocol parity`,
-`method carriers`, `spec tokens` and `kit/dogfood doc parity` are `declarations`, the last guarded
-on six paths that this pass's diff cannot miss because `--render` rewrites
-`memory/guides/BUILD-METHOD.md`; `build-method size` is `product`; `kickoff-manifest ratchet` and
-`memory hygiene` are `records`; `unattended skill wiring` is `wiring`. None is `selftests`.
+suite: it verifies with the single-arm runs AC1 through AC5 describe, against the render, then
+the grep pairs of AC6 through AC9 and AC9's one driver-suite arm run alone. Where a criterion
+also names a leg — the syntax and parity legs in AC6, the three method legs in AC7, the wiring
+leg in AC8, `harness arms` in AC9 — that half is the close's observation of the same criterion,
+and its ledger row reads `observed at --close`. Chunks and guards, read from
+`tools/gate-legs.json` on 2026-09-14: `workflow script syntax` is `wiring`, unguarded;
+`review-protocol parity`, `harness arms`, `method carriers`, `spec tokens` and
+`kit/dogfood doc parity` are `declarations`, the last guarded on six paths that this pass's diff
+cannot miss because `--render` rewrites `memory/guides/BUILD-METHOD.md`; `build-method size` is
+`product`; `kickoff-manifest ratchet` and `memory hygiene` are `records`; `unattended skill
+wiring` is `wiring`. `harness arms` joins the list because this pass now rewrites the words of a
+`fail 37` message and the three arms that quote it, and that leg is what reads the pair. None
+is `selftests`.
 
 `tools/workflows/unattended-build.test.sh` is on NO bar: no row in `tools/gate-legs.json` names it
 and no budget row exists for it, so neither `GATE_FULL=1` nor `GATE_SELFTESTS=1` reaches it. The
@@ -533,7 +648,12 @@ New arm: `tools/workflows/unattended-build.test.sh` · V1, V3, V4, V5 and V6 eac
 against the unchanged render, one arm at a time · no floor exists in this suite.
 
 Moved arm: `tools/workflows/unattended-build.test.sh` · lines 376, 471 and 590 quote the new
-literals; the AC4 arm at 457-463 is re-labelled and extended into V2 · no floor.
+literals; the AC4 arm at 457-463 is re-labelled and extended into V2; the `T_UNITS` arm at 493
+gains V7's one `has` line · no floor.
+
+Moved arm: `tools/unattended/unattended.test.sh` · the three `hit` literals at 4589, 4601 and
+4609 quote the rewritten `fail 37` message; no arm is added or removed · `FLOOR_ASSERTIONS` and
+`FLOOR_SHARD_2` do not move, because the executed count does not.
 
 ## 8. Open questions
 
@@ -560,6 +680,7 @@ literals; the AC4 arm at 457-463 is re-labelled and extended into V2 · no floor
   closing pass's, because `fail 49` refuses the declaration; and the stage prompt is mode-aware,
   because the brief's predicate makes the stage reachable in attended mode where `--rescope`
   refuses.
+- rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (id 22 — AC6 to AC8 reduced to their grep pairs, the six leg runs at `--close`), E (id 48 — the recorder as unit 6 leaves it, in §3), K (id 52 — the line-143 sentence and the `fail 37` message at `unattended.sh:4096` join the carriers, minus 13 bytes, `TOOL-aLeakedHandle-6` in §10, AC9), M (ids 15, 16 — AC4's RESULT keys and V7, AC8's `still disposed` and `severity rule` greps), S (id 46 — `meta.phases[2].detail`, AC6's retired-phrase grep), T (id 45 — `--reason` on the promotion command).
 
 ## 10. Reuse audit
 
@@ -582,7 +703,13 @@ build that wrote the stage, `TOOL-aHoistedPass-6`, whose spec cites the skip as 
 disposal clause and cites it at `unattended-build.js:473`, STALE against source where the skip sits
 at line 725; and `TOOL-aProvenReuse-3` as the open row this ruling answers. The
 `aCollapsedScan-4` round-1 record was the hit that put a real number on the defect: zero blockers,
-eight highs, six mediums, one low, `CONVERGED`.
+eight highs, six mediums, one low, `CONVERGED`. The round-1 audit added a ruling the probe had
+missed: `TOOL-aLeakedHandle-6`, the owner's ruling of 2026-09-13 in `memory/DECISIONS.md` that a
+blocker found on a CONVERGED subject is disposed under M4 and never re-rounded, which landed the
+line-143 sentence and the `fail 37` message this unit rewrites. This unit NARROWS that ruling:
+"never re-rounded" and the driver's refusal stand untouched, and only what the disposition IS —
+"the exit's own, FOLD or PROMOTE" — becomes the severity rule's, because under that rule a
+`CONVERGED` exit has no disposition of its own to take. It does not supersede it.
 
 Recall terms used: `python tools/memory-recall/query.py "what disposes a confirmed review finding
 at a spec-audit exit, and why does the disposal stage skip on CONVERGED" --terms "disposal fold

@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -33,17 +33,18 @@ something to do with itself.
   copied. Observed by AC1, AC2 and AC3.
 - **S3** — `STALLED` when BOTH the newest write in the tree and the newest commit are older than
   `UNIT_STALL_BOUND` seconds; `PROGRESSING` otherwise; a clean tree has no newest write and reads as
-  older than any bound. A `STALLED` line is followed by one remedy line. Observed by AC1 and AC2.
-- **S4** — `UNIT_STALL_BOUND` is read beside `GATE_BOUND` in the driver's conf block, with the same
-  three outcomes: absent takes the kit default of 1800 and says so on stderr, a non-integer or zero
-  is a refusal at exit 2, a positive integer is the bound. It is declared in `.unattended.conf` and
-  `tools/unattended/.unattended.conf.example` with the reason beside it, documented in
-  `tools/unattended/PROTOCOL.template.md` section 8's key table, and listed in `tools/unattended/kit.toml`
-  `optional_keys`. Observed by AC4 and AC5.
+  older than any bound. A listed path deleted from disk is skipped, not a dead probe. A `STALLED`
+  line is followed by one remedy line. Observed by AC1, AC2 and AC8.
+- **S4** — `UNIT_STALL_BOUND` is read through `read_bound_key`, the `GATE_BOUND` conf read hoisted
+  into a function this unit owns, with the same three outcomes: absent takes the kit default of 1800
+  and says so on stderr, a non-integer or zero is a refusal at exit 2, a positive integer is the
+  bound. It is declared in `.unattended.conf` and `tools/unattended/.unattended.conf.example` with
+  the reason beside it, documented in `tools/unattended/PROTOCOL.template.md` section 8's key table,
+  and listed in `tools/unattended/kit.toml` `optional_keys`. Observed by AC4 and AC6.
 - **S5** — Three refusals under check 51, each a `fail` branch with an arm in
   `tools/unattended/unattended.test.sh`: no run-state file; a terminal record; a node whose clock or
-  mtime probe cannot answer. With no open dispatched unit the verb prints one line and exits 0.
-  Observed by AC3 and AC5.
+  mtime probe cannot answer. With no open dispatched unit the verb prints one line and exits 0. The
+  suite's own assertion floors rise by the arms this unit adds. Observed by AC3, AC5 and AC9.
 - **S6** — The Skill's keepalive section names the prompt the agent schedules — the audit verb, once
   the run has a slug — and what the main session does with each verdict; the Skill's render
   `.claude/skills/unattended/SKILL.md`, the protocol's and the verb carrier's renders under
@@ -69,15 +70,18 @@ something to do with itself.
 - **No stop, no re-dispatch, no park written by the verb.** It reads and prints. The remedy line
   tells the main session what to do; the acts are the session's, through `TaskStop`, `--park` or a
   brief, and nothing here claims an effect a script cannot produce.
-- **No shared bound reader.** This is the second instance of the defaulted-validated-announced conf
-  read `GATE_BOUND` established at `tools/unattended/unattended.sh:305`, and the third is
-  `TOOL-aProbedUnit-6`'s `REVIEW_ROUNDS`. Section 12's instance-two rule says extract now; the
-  Edges hand that call to unit 6, which sees all three and lands after this one.
+- **No per-key bound reader.** `UNIT_STALL_BOUND` is the second instance of the
+  defaulted-validated-announced conf read `GATE_BOUND` established at
+  `tools/unattended/unattended.sh:305`, and the charter's section 12 extracts at the second instance.
+  This unit lands first, so the extraction is this unit's: the block becomes `read_bound_key`
+  (section 4, "The bound") with two callers here, and `TOOL-aProbedUnit-6`'s `REVIEW_ROUNDS` is its
+  third CALLER, never a third copy. Nothing about that helper is left for unit 6 to decide.
 - **No kit version bump, no `ARMS_FLOORS` raise.** The closing pass bumps unattended 1.21 to 1.22
   once. The driver's arms floor in `.memory-tree.conf` reads `104:101` against a measured
   `branches 194 · armed 188` from `python3 tools/memory-tree/check-arms.py --report` on 2026-09-14,
   so three more branches move nothing a floor already ninety slack would catch, and the file is on
-  the manifest's watch line.
+  the manifest's watch line. That is the BRANCH floor; the suite's own executed-assertion floors are
+  a different pin and do move, AC9.
 - **The suite is not run whole inside the pass.** Build-level rule three: the arms are observed by
   running the driver over the fixture directly, and `tools/unattended/unattended.test.sh` runs at
   the close under `bash tools/unattended/run-unattended-gates.sh` on a frozen clone.
@@ -88,10 +92,11 @@ something to do with itself.
   overlap test at `tools/unattended/unattended.sh:4802` to `:4815`, which together are what
   "open" means to `--dispatch`. If either changed what a pass commit is, the audit's population
   would change with it, which is the point of sharing them rather than a defect.
-- **hands-off** `TOOL-aProbedUnit-6` — the third instance of the `GATE_BOUND` conf-read shape, and
-  with it the decision whether three inline `case` blocks earn one function. Unit 6 edits the same
-  block, the same section 8 table, the same `optional_keys` list and the same two conf files,
-  after this unit; it adds its rows beside these and moves none of them.
+- **hands-off** `TOOL-aProbedUnit-6` — one call, `read_bound_key REVIEW_ROUNDS <default> rounds
+  <note>`, placed after this unit's two calls; the helper, its signature and its two sentences are
+  decided in section 4, "The bound", and unit 6 writes no reader of its own. Unit 6 also edits the
+  same section 8 table, the same `optional_keys` list and the same two conf files, after this
+  unit; it adds its rows beside these and moves none of them.
 - **hands-off** external — the kit version bump across every carrier
   `bash tools/check-kit-versions.sh` names, the closing pass's, once.
 
@@ -162,15 +167,31 @@ in spirit: what the verb does not check is said where the verb is read.
 
 ### The bound
 
-Read where `GATE_BOUND` is, immediately after the `case` at `:305` to `:311`, as its own `case` of
-the same three arms: blank takes `UNIT_STALL_BOUND_DEFAULT=1800`, a constant beside
-`GATE_BOUND_DEFAULT` at `:213`, and prints `unattended: NOTE - this project declares no
-UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s with no write and
-no commit. Declare one in $CONF to change it.` on stderr; `*[!0-9]*|0` prints the `REFUSING` sentence
-and exits 2; an integer stands. `UNIT_STALL_BOUND=""` joins the initialiser line at `:292`, which is
-where a conf-sourced key must be seeded under `set -u`. 1800 is the owner's figure from the build
-README's rules: three keepalive cadences at this repo's ten-minute interval, so a verdict is never
-one missed tick.
+Read where `GATE_BOUND` is, through one function this unit hoists from the `case` at `:305` to
+`:311`: `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>`. Its three arms are that block's bytes with
+the key name lifted out. Blank writes `<DEFAULT>` into `<NAME>` by `printf -v` and prints
+`unattended: NOTE - this project declares no <NAME>, so <NOTE>. Declare one in $CONF to change it.`
+on stderr; `*[!0-9]*|0` prints `unattended: REFUSING - <NAME> is declared as '<value>', which is
+not a positive integer of <UNIT>. A bound that cannot be parsed is a bound nobody set, and 0 means
+no bound at all.` and exits 2; a positive integer stands. Two calls replace the block, `GATE_BOUND`
+first with `seconds` and its present note, so the sentences the suite already asserts at
+`tools/unattended/unattended.test.sh:5197`, `:5201` and `:5219` are the same bytes after the hoist;
+then `UNIT_STALL_BOUND` with `seconds` and the note `a dispatched unit reads STALLED after the kit
+default of 1800s with no write and no commit`. `<UNIT>` is an argument because the third caller
+counts rounds, and a refusal that says `seconds` about a round count is a false sentence.
+
+The hoist is the charter's section 12 instance-two rule, taken here because this unit lands before
+`TOOL-aProbedUnit-6`, whose `REVIEW_ROUNDS` becomes the third call and not a third `case`. It is
+legal under `python3 tools/memory-tree/check-arms.py`: the block refuses with `echo` and `exit 2`
+and carries no `fail <n>` branch, so the meta-gate counts nothing inside it before or after the
+move. `read` is the declared verb for "pull bytes or records from a named source", and the source
+here is the conf; `python tools/lexicon/lexicon.py --suggest read_bound_key --as sh.function`
+answers OK.
+
+`UNIT_STALL_BOUND_DEFAULT=1800` sits beside `GATE_BOUND_DEFAULT` at `:213`. `UNIT_STALL_BOUND=""`
+joins the initialiser line at `:292`, which is where a conf-sourced key must be seeded under
+`set -u`. 1800 is the owner's figure from the build README's rules: three keepalive cadences at
+this repo's ten-minute interval, so a verdict is never one missed tick.
 
 ### The carriers
 
@@ -191,15 +212,16 @@ and `:560`, and the keepalive prompt follows the driver's spelling.
 
 ### Inventory
 
-Two shell functions minted, both leading with a declared verb: `print_audit` and `check_pass_open`,
-plus `scan_dirty_paths`, three in all. One conf key, `UNIT_STALL_BOUND`, and one constant,
-`UNIT_STALL_BOUND_DEFAULT`. One check number, 51, with three branches. One verb, `--audit`. No gate
-leg, no kit, no workflow script, no guide, so no codebase-map inventory key moves.
+Four shell functions minted, each leading with a declared verb: `print_audit`, and three hoists of
+bytes the driver already runs, `check_pass_open`, `scan_dirty_paths` and `read_bound_key`. One conf
+key, `UNIT_STALL_BOUND`, and one constant, `UNIT_STALL_BOUND_DEFAULT`. One check number, 51, with
+three branches. One verb, `--audit`. No gate leg, no kit, no workflow script, no guide, so no
+codebase-map inventory key moves.
 
 ### Files touched (estimate)
 
-- `tools/unattended/unattended.sh` — the verb, two hoisted helpers, the bound read, the header line,
-  the dispatch arm. About a hundred lines, forty of them comment.
+- `tools/unattended/unattended.sh` — the verb, three hoisted helpers, the two bound calls, the
+  header line, the dispatch arm. About a hundred lines, forty of them comment.
 - `tools/unattended/unattended.test.sh` — the arms in section 6, beside the `--dispatch` arms.
 - `tools/unattended/SKILL.template.md`, `VERBS.template.md`, `PROTOCOL.template.md`, `kit.toml`,
   `.unattended.conf.example`, and the three renders under `memory/guides/` and `.claude/skills/unattended/`.
@@ -213,6 +235,9 @@ leg, no kit, no workflow script, no guide, so no codebase-map inventory key move
   misreads on a linked worktree; sharing its listing costs one hoist and no second answer.
 - **A copy of the openness test.** Two definitions of "open" between `--dispatch` and `--audit` is
   the two-answers class; the hoist is the same bytes with a name.
+- **A second inline `case` for `UNIT_STALL_BOUND`, leaving the hoist to unit 6.** The decision was
+  delegated in rev-1 and taken nowhere, so the third copy would have landed with no recorded
+  reason. The unit that lands first owns the extraction; the one that lands last owns a call.
 - **Exit 1 on `STALLED`.** A verdict is not a refusal, and the keepalive reads the token, not the
   status; a non-zero exit would make a stalled unit look like a broken verb to any shell caller.
 
@@ -229,9 +254,11 @@ leg, no kit, no workflow script, no guide, so no codebase-map inventory key move
   can re-derive the token; the defaulted bound announces itself on stderr.
 - risks — `stat -c` and `date -d` are GNU spellings, live on every registered node and on this one
   measured 2026-09-14; a BSD node hits the liveness refusal rather than a wrong verdict.
-  `check_pass_open` and `scan_dirty_paths` move bytes `--dispatch` and `--preflight` depend on;
-  the move is verbatim and the existing `--dispatch` collision arms and `check_clean` arms stand.
-- testing — section 6; every arm observes the driver over a fixture, never the suite whole.
+  `check_pass_open`, `scan_dirty_paths` and `read_bound_key` move bytes `--dispatch`, `--preflight`
+  and every verb's conf read depend on; each move is verbatim and the existing `--dispatch`
+  collision arms, `check_clean` arms and `GATE_BOUND` sentence arms stand.
+- testing — section 6; every arm observes the driver over a fixture, never the suite whole. The
+  one criterion that IS a suite run, AC9, is the close's.
 - migration — N/A. No record shape changes; an existing run-state file audits as it is.
 - user docs — the verb carrier, the protocol's key table and the Skill are the docs, all edited
   here and byte-compared to their renders by the kit gate.
@@ -241,7 +268,9 @@ leg, no kit, no workflow script, no guide, so no codebase-map inventory key move
 The suite that carries the arms is on no bar leg — `tools/unattended/kit.toml` records the 2026-08-23
 ruling — and build-level rule three keeps it out of the pass. So each criterion below is observed by
 running the driver over a fixture in a scratch clone, exactly as the arm does, and the arms exist so
-`harness arms (fail branches armed or pinned)` counts them at the close. The fixture is the suite's
+`harness arms (fail branches armed or pinned)` counts them at the close. AC9 is the exception the
+build's own rule names: its observation is the suite, so the pass observes the grep half and the
+suite half is `--close`'s, and its ledger row reads `observed at --close`. The fixture is the suite's
 `tRun` build: `reset_tree`, `run --preflight tRun --keepalive-id k1`, a spec that grades READY, and
 `run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt`.
 
@@ -262,14 +291,25 @@ running the driver over a fixture in a scratch clone, exactly as the arm does, a
 - **AC3** — When the fixture holds no dispatch row, or its one row's unit has a later commit
   naming the unit and touching a declared path, `run --audit tRun` prints exactly
   `unattended-audit: no unit is dispatched and open` and exits 0; when the commit names the unit
-  but touches only the run-state file, the unit still prints as open.
+  but touches only the run-state file, the unit still prints as open. And the openness test is
+  shared, not copied: `grep -c 'check_pass_open' tools/unattended/unattended.sh` prints at least 3
+  — one definition, one call in `verb_dispatch`, one in `print_audit` — and
+  `grep -c 'scan_dirty_paths' tools/unattended/unattended.sh` prints at least 3, with `check_clean`
+  as its second caller; both print 0 at base.
   Red when: a declaration commit closes the pass, which is the overlap refinement missing; or the
-  no-unit line is absent and the verb exits 0 over nothing.
+  no-unit line is absent and the verb exits 0 over nothing; or either count is 2, which means the
+  block was copied into the verb and the sibling kept its own.
 - **AC4** — When the fixture conf declares no `UNIT_STALL_BOUND`, stderr carries `declares no
   UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s`; when it
   declares `UNIT_STALL_BOUND="abc"` or `"0"`, the driver prints `REFUSING - UNIT_STALL_BOUND is
-  declared as` and exits 2 before any verb runs.
-  Red when: a blank is silent, or junk is coerced to a number and the verb runs.
+  declared as` and `which is not a positive integer of seconds` and exits 2 before any verb runs.
+  Both keys read through one function: `grep -c 'read_bound_key' tools/unattended/unattended.sh`
+  prints at least 3 — the definition and two calls — and prints 0 at base; and with the fixture
+  conf declaring `GATE_BOUND="abc"`, the driver still prints `which is not a positive integer of
+  seconds`, which is the sentence the existing arm at `tools/unattended/unattended.test.sh:5197`
+  asserts.
+  Red when: a blank is silent, or junk is coerced to a number and the verb runs; or the count is 1
+  or 2, which means a key kept its own `case`; or `GATE_BOUND`'s sentence changed bytes.
 - **AC5** — When `run --audit tNoRun` runs with no run-state file, when the fixture's phase is
   rewritten to `LANDED`, and when `stat` is shadowed on `PATH` by a stub that exits 1 with a dirty
   tree, each prints its own `UNATTENDED check 51 FAILED` sentence and exits 1, and each sentence is
@@ -284,15 +324,45 @@ running the driver over a fixture in a scratch clone, exactly as the arm does, a
   `tools/unattended/VERBS.template.md` finds the verb's bullet; the section 8 table of
   `tools/unattended/PROTOCOL.template.md` carries a `UNIT_STALL_BOUND` row, and the key is in
   `tools/unattended/.unattended.conf.example`, which is the pair check 22 of the kit gate joins.
+  The fourth carrier check 22 does not join is grepped directly:
+  `grep -c UNIT_STALL_BOUND tools/unattended/kit.toml` prints 1 — the `optional_keys` line and no
+  other — and prints 0 at base.
   Red when: `--check` reports a drifted render; or check 26's three carriers or check 22's two
-  disagree, observed at the close by `unattended kit gate`.
+  disagree, observed at the close by `unattended kit gate`; or the `kit.toml` count is 0, which
+  means the key is documented and declared but not listed, and no gate would say so.
 - **AC7** — When `git show --stat HEAD` of the pass commit is read, it lists `.unattended.conf`
   together with `memory/guides/SESSION-KICKOFF.md`, and `wc -c` of `memory/map/features/unattended.md`
-  is at most 20480, the `DOSSIER_CAP_BYTES` in `.memory-tree.conf`.
+  is at most 20480, the `DOSSIER_CAP_BYTES` in `.memory-tree.conf`, while
+  `grep -c -- '--audit' memory/map/features/unattended.md` prints at least 1 and prints 0 at base.
   Red when: the conf moved without the stamp, which `kickoff-manifest ratchet` reds at the close;
-  or the dossier grew past its cap, which `memory hygiene` reds.
+  or the dossier grew past its cap, which `memory hygiene` reds; or the `--audit` count is 0, which
+  means the dossier was left untouched and its cap was satisfied by saying nothing.
   figure: the cap is DERIVED from `.memory-tree.conf` at observation; the dossier measured 20470
   bytes at base, PINNED here so the ten-byte headroom is not a surprise.
+- **AC8** — When AC2's fixture — the untracked `touch` under the declared `work` directory — also
+  has a tracked file removed from disk with `rm`, the `memory/guides/BUILD-METHOD.md` stub the
+  fixture's base commit tracks and only `--preflight`'s `check_method` at
+  `tools/unattended/unattended.sh:1149` reads, `run --audit tRun` prints the same unit's line ending
+  ` · PROGRESSING` with a numeric `last-write`, exits 0, and prints no `UNATTENDED check 51 FAILED`
+  sentence. `git rm --cached` is not this fixture: it leaves the file on disk, so `stat` answers
+  and the branch under test is never reached.
+  Red when: the liveness refusal prints, which means a `stat` failing on a listed path was read as a
+  dead probe instead of a deletion; or the line reads `STALLED` with `last-write none`, which means
+  the skip discarded the whole set rather than the one path.
+- **AC9** — When `bash tools/unattended/unattended.test.sh` runs unsharded and as `--shard 2/2` at
+  the landed tip, neither prints a `FAIL executed` line, and `FLOOR_ASSERTIONS` at
+  `tools/unattended/unattended.test.sh:5434` and `FLOOR_SHARD_2` at `:5461` each stand exactly this
+  unit's arms' executed assertions above their base values of 706 and 510, while `FLOOR_SHARD_1` at
+  `:5458` and the shadowed 675 at `:5403` are unchanged, because the arms sit in region two beside
+  the `--dispatch` arms. Observed at `--close`; its ledger row reads `observed at --close`.
+  Red when: a floor did not move, so a stranded or unreachable check-51 arm is invisible and unit
+  6's "exactly the added arms above 706" measures against a base already carrying these; or a floor
+  moved by more than the arms added, which means the count was read off the file and not off a run.
+  figure: the added-arm count is DERIVED from the suite's floor-breach line with the floor
+  over-pinned, the method `TOOL-aRatifiedRulings-2` AC6 records and `TOOL-aProbedUnit-6` AC12
+  cites; the floors are then PINNED. 706, 510, 208 and 675 are PINNED, read at base on 2026-09-14.
+  cost: minutes; the suite is on no bar leg and is `--close`'s compensating run via
+  `bash tools/unattended/run-unattended-gates.sh` on a frozen clone.
 
 ## 7. Gates
 
@@ -305,8 +375,10 @@ mode and not its leg. Under `unattended kit gate`, checks 22 and 26 are the join
 
 New arm: `tools/unattended/unattended.test.sh` · the three check-51 refusals, each observed by the
 fixture in AC5 against the driver before the branch exists — a missing file, a `LANDED` phase, a
-shadowed `stat` — plus the STALLED, PROGRESSING and no-unit fixtures of AC1 to AC3 and the two
-bound arms of AC4 · no assertion floor exists in this suite, so none moves.
+shadowed `stat` — plus the STALLED, PROGRESSING, no-unit and deletion fixtures of AC1 to AC3 and
+AC8 and the two bound arms of AC4 · `FLOOR_ASSERTIONS` at `:5434` and `FLOOR_SHARD_2` at `:5461`
+rise by the arms' executed assertions, AC9; `FLOOR_SHARD_1` at `:5458` does not move, and the
+assignment at `:5403` is the shadowed one the file marks as inert.
 
 ## 8. Open questions
 
@@ -327,6 +399,7 @@ bound arms of AC4 · no assertion floor exists in this suite, so none moves.
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · §2 S3 S4 S5 · §3 · §4 · §5 · §6 AC3 AC4 AC6 AC7 AC8 AC9 · §7 · folded round-1 spec-audit clusters F (spec-3 half: this unit owns `read_bound_key`), I (id 9), M (ids 10, 11, 13) and N (id 12).
 
 ## 10. Reuse audit
 

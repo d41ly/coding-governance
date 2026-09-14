@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node a · Tier-1 · base 1b000d1a · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-1 · base 1b000d1a · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -211,8 +211,10 @@ Landing owes no data step.
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -cF "YOUR PRIMARY OBJECTIVE IS CODE WRITTEN AND COMMITTED" tools/workflows/unattended-unit.js`
-  runs at the landed tip, it prints `1`, and `node tools/workflows/check-workflow-syntax.js` prints
-  `workflow script(s) parsed clean` and exits 0.
+  runs at the landed tip, it prints `1`. Leg half, observed at `--close` per the build README's
+  rule: `node tools/workflows/check-workflow-syntax.js` prints `workflow script(s) parsed clean` and
+  exits 0; the pass sees the same break through AC2's double, which fails to evaluate a child whose
+  concatenation is broken.
   Red when: the count is `0`; or the syntax gate names `unattended-unit.js`, which is a quote or
   concatenation broken by the paragraph's own `'`.
 - **AC2** — When the child is run through the `run_wf` double of
@@ -220,28 +222,39 @@ Landing owes no data step.
   the output is piped through `grep -c "YOUR PRIMARY OBJECTIVE IS CODE WRITTEN AND COMMITTED"`, it
   prints `1` at the landed tip and `0` against the base child, and the traced prompt carries this
   phrase AFTER `NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS` and before `Commit with the unit id`.
-  This is the ONE check the pass verifies with.
+  This is the ONE check the pass verifies with. And when
+  `grep -cF 'YOUR PRIMARY OBJECTIVE IS CODE WRITTEN AND COMMITTED' tools/workflows/unattended-build.test.sh`
+  runs, it prints `1` at the landed tip and `0` at base, which is the S3 arm existing at all.
   Red when: the landed count is `0`, meaning the text is in the file and not in the prompt; the base
-  count is not `0`, meaning the arm cannot fail; or the order is wrong, meaning the paragraph was
-  placed outside the two anchors and the commit sentence no longer follows the verification rules.
+  count is not `0`, meaning the arm cannot fail; the order is wrong, meaning the paragraph was
+  placed outside the two anchors and the commit sentence no longer follows the verification rules;
+  or the suite grep prints `0` at the tip, meaning the paragraph landed and the reader for "the
+  child lost the rule" did not, or `2`, meaning the phrase was duplicated into a second arm or a
+  comment.
   cost: seconds — one `node -e` evaluation with stub hooks, no agent spawned.
   fixture: the double inside the suite, run alone as unit 1's AC6 describes; never the suite whole.
 - **AC3** — When `grep -cF "bound every command it runs" tools/unattended/SKILL.template.md` and
-  the same grep over `.claude/skills/unattended/SKILL.md` run at the landed tip, each prints `1`,
-  and `bash tools/unattended/adopt-unattended.sh --check` prints `unattended: in sync` and exits 0.
+  the same grep over `.claude/skills/unattended/SKILL.md` run at the landed tip, each prints `1`.
+  Leg half, observed at `--close`: `bash tools/unattended/adopt-unattended.sh --check` prints
+  `unattended: in sync` and exits 0.
   Red when: either count is `0`; or the wiring leg reports drift, which is a template edit without
   the re-render, or the reverse.
-- **AC4** — When `bash skills/session-kickoff/manifest-check.sh` runs at the landed tip, its check 5
-  reports no watched file changed since `last-audit`, because none of the four files this unit
-  writes is on the manifest's `watch` line; and the status header of this spec reads `CLOSED`.
-  Red when: check 5 names a file, which means this pass touched something outside its declared
-  set; or the header still reads `SPECCED`.
+- **AC4** — When `git show --name-only --format= HEAD` runs on the pass commit, it lists none of
+  the ten paths on the `watch` line of `memory/guides/SESSION-KICKOFF.md`, and
+  `git grep -lE '^\*\*Status:\*\* CLOSED' -- memory/builds/aProbedUnit/spec/` lists this spec. Leg
+  half, observed at `--close`: `bash skills/session-kickoff/manifest-check.sh` check 5 reports no
+  watched file changed since `last-audit`.
+  Red when: the commit lists a watched path, which means this pass touched something outside its
+  declared set; or the header still reads `SPECCED`.
+  figure: ten is what the `watch` line held on 2026-09-14; the observation reads the line, not
+  this number.
 
 ## 7. Gates
 
 `workflow script syntax` · `unattended skill wiring` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-These are `--close`'s. The pass runs none of them; it verifies with AC2's double alone. Chunks read
+These are `--close`'s. The pass runs none of them; it verifies with AC2's double alone, and the leg
+halves of AC1, AC3 and AC4 are the close's observations of those criteria. Chunks read
 from `tools/gate-legs.json` on 2026-09-14: `workflow script syntax` and `unattended skill wiring`
 are `chunk: wiring`, `install-prefix` is `chunk: product`, the other three `chunk: declarations` or
 `chunk: records`; none is `chunk: selftests`.
@@ -258,6 +271,10 @@ none
 - rev-1 · 2026-09-14 · initial draft, from the brief in
   `memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md` and
   the mandate's HIGH item.
+- rev-2 · 2026-09-14 · §6 · §7 · AC1 · AC2 · AC3 · AC4 · folded round-1 cluster M id 3 (AC2 gains
+  the grep over the suite file for the S3 arm, `1` at the tip and `0` at base); and, under the build
+  README's rule from cluster A, the leg half of AC1, AC3 and AC4 marked observed at `--close`, with
+  AC4 given the pass-cheap half it lacked.
 
 ## 10. Reuse audit
 
