@@ -943,7 +943,7 @@ reset_tree; sed -i '/^CORE_FLOOR=/d' .unattended.conf
 # ---- to a readable-but-empty value — distinct from the unreadable case armed above.
 sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=" "/' $KIT_REL/unattended.sh
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a deleted core member is indistinguishable from a set that never had one|the effective phase vocabulary is empty, which makes every phase check below vacuously true|a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it|a run-state file declares a phase outside the effective vocabulary|the protocol's run-order list names a phase the driver does not carry, so the contract promises a position no run can ever occupy|a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 1/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a deleted core member is indistinguishable from a set that never had one"
 hit "$out" "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
 reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' $KIT_REL/unattended.sh
@@ -954,7 +954,7 @@ reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' $KIT_REL/unattended.sh
 mkdir -p memory/elsewhere && git mv memory/builds/tRun/RUN.md memory/elsewhere/RUN.md
 git commit -q -am moved --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "the effective Definition-of-Done set is empty, so --close would block on nothing|the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it|a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason|the protocol's Definition-of-Done table names an item the driver does not carry, so the contract publishes a gate nothing evaluates|the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 1/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the effective Definition-of-Done set is empty, so --close would block on nothing"
 hit "$out" "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason"
 
@@ -1272,7 +1272,7 @@ reset_tree; printf '\nparked: considered --no-verify to get past the hook\n' >> 
 # ---- keeps a parity check with one file from reading as a passing parity check.
 printf '\ndrifted line\n' >> memory/guides/UNATTENDED-PROTOCOL.md
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on|the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 2/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on"
 hit "$out" "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
@@ -1288,7 +1288,7 @@ reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
 # ---- its own two arms is a pair nothing watches, and the check would still report green.
 printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail|the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 3/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
 hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
@@ -1354,7 +1354,7 @@ reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="six:six"/' .unattended.conf
 # ---- BASE assertion on the bar.
 sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon|a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 3/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
 hit "$out" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
 
@@ -1884,7 +1884,7 @@ mutate $KIT_REL/SKILL.template.md '/unattended.sh --preflight/d'
 mutate memory/builds/tRun/README.md '/gen:build-units/d'
 mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated|a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py|a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it|the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 4/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
 hit "$out" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
 # ---- AND THIS IS THE ARM THAT EXERCISES THE CANARY. TOOL-aQuenchedHarness-10 gave check 30 a
@@ -2551,7 +2551,7 @@ reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="h
 # - both sides would agree on the same wrong token, which is the two-derived-values class.
 mutate $KIT_REL/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "a directive is declared in the registry and absent from the Skill's table, so the agent that reads the table is bound by a set it was never shown|a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name|a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy|the driver publishes a phase as a build-method pass kind and the protocol does not list it, so the contract understates which positions the method names|the protocol lists a phase as a build-method pass kind that the driver does not publish as one, so the contract claims the method names a position it does not" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name:"
 hit "$out" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
@@ -2566,7 +2566,7 @@ reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
 mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks|a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 hit "$out" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
 
@@ -2577,7 +2577,7 @@ hit "$out" "a declared verb has no entry in the verb carrier, so the contract a 
 reset_tree; rm -f $KIT_REL/VERBS.template.md
 mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail|the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence|a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
 hit "$out" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"
 
@@ -2767,7 +2767,7 @@ reset_tree; rm -f $KIT_REL/check-playbook.sh
 DISC='does not act on its exit status'
 mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined|a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow|the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it|a key exemption names a reader whose signature is no longer in that file, so the key is unread by any parser AND unaccounted for by the exemption that excused it - key, file and missing literal follow|every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim|the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow|the declared-list parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 7/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined"
 hit "$out" "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
 reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || return 0; if false; then@'
@@ -2809,7 +2809,7 @@ mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
 # ---- record's real spacing while pointing its key at one the template does not declare.
 mutate $KIT_REL/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them|the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it|the extracted declared-list parser does not REFUSE an array left open at the end of its line, so a legal multi-line declaration parses to the declared null and every piece carrying no verdict grades verified - specimen, exit status and answer follow: [" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 7/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
 hit "$out" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
 
@@ -2844,7 +2844,7 @@ reset_tree; mutate $KIT_REL/lib-unattended.sh 's|^GIT_PIN_REPLACE=.*|GIT_PIN_REP
 # ...a bare unpinned read on a verb the first widening did not carry.
 mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows|a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 8/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
 hit "$out" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 
@@ -2861,7 +2861,7 @@ reset_tree; mutate $KIT_REL/check-playbook.sh 's@^GITSHOW() { git -c core.useRep
 # ---- cut reported a clean nothing for two of them.
 mutate $KIT_REL/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them|every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 8/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
 hit "$out" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
 
@@ -2870,7 +2870,7 @@ reset_tree; gut_parser declared_scalar '  ((this is not shell'
 # ---- and the shipped template's own LIST declaration being refused by the parser that reads it.
 mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "?" "$out"
+check_emitted "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: [|the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow|the extracted declared-scalar parser could not be executed over the shipped template's own line, and an unexecutable parser returns the empty string every assertion here reads as clean - key and exit status follow|the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 8/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 hit "$out" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
 
