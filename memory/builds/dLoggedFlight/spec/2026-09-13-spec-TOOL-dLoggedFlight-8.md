@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -51,9 +51,14 @@ sources actually support. Every later surface renders from this model rather tha
     one, its START having read a phase that was not terminal. A `--status` after a landing reads the
     terminal phase on both of its lines and ends nothing;
   - for a terminal record, the first commit in its era that wrote a terminal `phase:`;
-  - for a non-terminal record, one second after the later of its last journal line and the last commit
-    in its era that touched `RUN.md`. The second is a commit time's resolution, and it puts the run's
-    last event inside its own half-open window.
+  - for a non-terminal record, one second after its last event. Its events here are its journal
+    lines, the commits in its era that touched `RUN.md`, the commits and merges its timeline lists
+    (S3), and the gate and push lines made from a tree it holds (S3) before the next run's journal
+    lines begin. The second is a commit time's resolution, and it puts the run's last event inside its
+    own half-open window. Two sources never move it. A transcript event does not, because the run's session keeps
+    working after the run and renders the record itself, so an end taken from the session would end
+    at the render and move with every re-render. A push joined only by what it pushed does not,
+    because every later push of the default branch carries the run's commits.
 
   Journal STARTs join git's runs by a named key, never by position. A successful record-creating
   `--preflight` START, paired with an END of `rc=0`, belongs to the start commit its own call made: the
@@ -61,8 +66,8 @@ sources actually support. Every later surface renders from this model rather tha
   the next such START. A START that joins no start commit, as when its commit never reached this clone,
   is named in the coverage block and starts no run, and a refused preflight starts no run. No bound is
   taken from a commit that merely names the slug: commits keep naming a slug after its run ends.
-  Observed by AC1, AC9, AC15, AC16 and AC18.
-- **S3** The timeline. Observed by AC2 and AC10. It holds:
+  Observed by AC1, AC9, AC15, AC16, AC18 and AC21.
+- **S3** The timeline. Observed by AC2, AC10 and AC20. It holds:
   - phase moves with their time and witness;
   - every driver verb with its rc, `exit` and checks;
   - the run's own commits: commits inside its era that descend from its start commit and name one of
@@ -70,16 +75,25 @@ sources actually support. Every later surface renders from this model rather tha
     raw base-to-witness range was measured to be 82% other work, and the witness can be stale (S6), so
     neither bounds them;
   - merges naming the slug;
-  - push lines, joined by where they were pushed from OR by what they pushed. A line made from the
-    run's worktree inside the window joins, and so does one inside the window that pushes the default
+  - push lines, joined by where they were pushed from OR by what they pushed. A line made inside the
+    window from a tree the run holds joins, and so does one inside the window that pushes the default
     branch's ref to a local sha with the run's last own commit in its history. The second key is how
     the landing push joins: the protocol's lander pushes from the primary tree
     (`TOOL-dLoggedFlight-11` S6), so a run spans its own worktree and that landing;
   - gate lines, joined exactly by `run=` where a joined push line pinned `gate_run`, and otherwise by
-    the run's worktree inside the window;
+    a tree the run holds inside the window;
   - unit dispatches and briefs;
   - from the extractor where local: owner turns, compactions and limits;
   - the model's idle gaps, which S6 judges over every source, never over this timeline alone.
+
+  The trees a run HOLDS key the two joins by tree above and S2's window end. A driver call CLAIMS the
+  tree it ran in when it is a preflight, or when its verb is none of `--status`, `--resume` and
+  `--landed` and its START read a phase before the close. `--status` and `--resume` only read the
+  record, so they run from any tree. `--landed`, and any verb run once the run has closed, belong to
+  the landing, which runs in the primary tree every run lands from. The run holds each tree its own
+  calls claimed, from its first claim there to the first claim there by another run's call after its
+  own last one. So neither the owner's `--status` nor the run's own `--landed` makes the primary tree
+  the run's, and a worktree a later run reuses stops being this run's at that run's first claim.
 - **S4** The decision ledger. Observed by AC3 and AC11. Each entry points at its source, a file and
   line or a sha. It holds:
   - the run-state rows whose kind is in the driver's `PARK_KINDS_OWED`, and the `rescope` rows whose
@@ -228,7 +242,9 @@ since this node's first push line is the landing push itself.
 Push lines join by where they were pushed from or by what they pushed (S3). So the landing push, made
 from the primary tree, joins the run it lands, and the landing bar's gate line joins through that push's
 pinned `gate_run`. After landing, `pushes` reads `present` for a run whose window starts after the
-epoch. A bar run in another worktree at the same minute is never attributed.
+epoch. A bar run in another worktree at the same minute is never attributed. Nor is a bar or a push
+another run makes in the primary tree while this run is open: the run's `--landed` and any `--status`
+there claim nothing (S3), so only a pre-close verb of the run's own puts that tree in its key.
 
 ### Real-population measurements
 
@@ -419,6 +435,23 @@ command.
   call's start or overlaps its span.
   Red when: a busy stretch reads idle, a stretch next to an owner turn fires, a git-only run reports
   an idle gap, or an idle gap holds a tool call.
+- **AC20** — When `build_run_model` joins the landed fixture with its `--landed` and a mid-window
+  `--status` run from the primary tree, the way `TOOL-dLoggedFlight-11` S6 lands, three foreign lines
+  made in the primary tree inside the window join nothing: a bar, a raw push refused with `lander=0`,
+  and an `ev=once` refusal. The timeline and `journal_lines` hold none of them, and
+  `push-outside-lander` does not fire. The landing push still joins by what it pushed, and its
+  pinned bar by its id. When another run's preflight then runs in the run's own worktree, a bar made
+  there before it joins and one made after it does not.
+  Red when: a line joins through a tree that only a `--status` or a `--landed` put in the key, or a
+  reused worktree's later bar joins.
+- **AC21** — When `build_run_model` reads a non-terminal fixture run whose own commit, bar and branch
+  push, the last two made in its own worktree, come twenty minutes after its last driver line, the
+  window closes one second past the push's END. All three lie inside it, the bar and the push join by
+  tree, and the gates source counts the bar. None of these moves that end: a later bar made in the
+  primary tree, a bar made in the run's worktree after another run's preflight there, and a later tool
+  call in the run's session. With no journal, the window closes one second past the own commit.
+  Red when: the window closes at the last driver line, or a line from a tree the run does not hold,
+  or a transcript event, moves it.
 
 ## 7. Gates
 
@@ -475,6 +508,21 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   review also proposed judging where the driver journal reads `present` or `partial`. Its verbs are
   already timeline events and it knows no owner turn, and a `partial` transcript hides a session's
   calls, so neither is enough to judge by.
+- rev-7 · 2026-09-14 · S2 S3 · §4 · AC20 AC21 · folded the closing diff review's round-1 H2 and M5.
+  H2: the join key by tree is the trees a run HOLDS. A tree is held from the run's first call there
+  that claims it, which no `--status`, `--resume` or `--landed` does, and neither does any verb run
+  after the close. It stops being held at another run's first claim there after the run's last one.
+  Rev-6 keyed on every tree any of the run's calls ran in, so a `--landed` or an owner's `--status`
+  in the primary tree made every bar and push there the run's for its whole window. M5: a
+  non-terminal window closes one second past the run's last event over every source it owns: its
+  journal lines, its record commits, the commits and merges its timeline lists, and the lines of the
+  trees it holds. Rev-5 read the first two alone, so this run's later commits and both of its bars
+  fell outside its own window. The review also proposed bounding a tree that has to stay in the key
+  to the span between its first and last pre-close verb. A hold ending at the last verb would put the
+  run's bars after that verb outside the window, which is the M5 defect, so the hold ends at the next
+  run's claim instead. That bound still covers the tree the review meant, since the primary tree
+  stays in the key only where the run's own pre-close verbs ran there. Transcript events are not a
+  source of the end, because the session renders the record itself.
 
 ## 10. Reuse audit
 
