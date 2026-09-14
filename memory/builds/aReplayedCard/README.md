@@ -22,7 +22,7 @@ replay, and the commit-time deny the design record specifies, without the subage
 ## Expected improvements
 
 - A session's orientation lives on disk and is replayed verbatim after compaction and resume.
-- A commit-shaped command without a READY line is refused with the remedy in the reason.
+- A `git commit` on a session whose startup-written card still holds the sentinel is refused, with the remedy in the reason.
 - The two existing SessionStart entries stop running on every compaction.
 - Path-bearing traps move where `gotchas.py --for-paths` selects them by area.
 - A runnable harness measures the stage-2 subagent matrix before anyone builds it.
@@ -30,7 +30,7 @@ replay, and the commit-time deny the design record specifies, without the subage
 ## Detriments if this is not built
 
 - Every compaction silently drops the orientation, and the next pass rebuilds it or skips it.
-- Orientation stays a request, so a session that skips it is indistinguishable from one that ran it.
+- Orientation stays a request, so a session that skipped its kickoff is indistinguishable from one that ran it.
 - The 35–81 s wiring check keeps running at every compaction for 753 B of rows.
 - Stage 2 gets built on an occupancy argument nobody has measured.
 
@@ -56,13 +56,17 @@ replay, and the commit-time deny the design record specifies, without the subage
 
 ## Parked decisions
 
-None yet.
+Two, both observations only a session started after landing can make, recorded in `RUN.md` and
+filed as `KICK-aReplayedCard-4` and `TOOL-aReplayedCard-18`: the wiring's forced compaction
+(`TOOL-aReplayedCard-2` AC9), and the engine's first real kickoff and resume
+(`KICK-aReplayedCard-3` AC1/AC2, `TOOL-aReplayedCard-3` AC2). The installed engine on every node
+is a junction to the primary tree, so the build that changed it could not run it.
 
 <!-- roster:units -->
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aReplayedCard-4` | 1 | 22 path-bearing manifest trap bullets become `memory/gotchas/` records |
+| 1 | `TOOL-aReplayedCard-4` | 1 | the manifest's anchored trap bullets become `memory/gotchas/` records, joined by class |
 | 2 | `KICK-aReplayedCard-1` | 2 | `manifest-check.sh --card` writes and replays the session card |
 | 2 | `TOOL-aReplayedCard-5` | 1 | `orient-counterfactual.js` measures one stage-2 arm per call |
 | 3 | `KICK-aReplayedCard-2` | 2 | `--card --append` and `--card --check` run the batched citation check |
