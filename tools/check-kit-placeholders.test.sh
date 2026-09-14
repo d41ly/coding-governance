@@ -17,7 +17,10 @@ set -u
 # between them, because a pin nothing reads is the same nothing as no pin.
 FLOOR_ASSERTIONS=9
 GATE="$(cd "$(dirname "$0")" && pwd)/check-kit-placeholders.py"
-PY=${PY:-python}
+# The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
+# default here was the parameter-default shape the resolver ban now catches.
+if [ -z "${PY:-}" ] && [ -f "${GATE%/*}/lib/resolve-python.sh" ]; then . "${GATE%/*}/lib/resolve-python.sh"; PY=$(resolve_python) || exit 2; fi
+PY=${PY:-python}   # gov:literal-python — last-resort fallback when lib/ is absent (adopter layout)
 pass=0; fail=0
 
 arm() {              # $1 = what it asserts, $2 = expected rc, $3 = actual rc, $4 = haystack, $5 = needle

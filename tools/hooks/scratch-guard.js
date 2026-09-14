@@ -34,11 +34,35 @@
  * rule, not a containment boundary; a security control would have to fail the other way.
  *
  * Protocol: deny = stderr text + exit 2. Allow = print nothing, exit 0. Matches agent-cap.js, which
- * records the choice as version-robust and free of any JSON-schema dependency.
+ * records the choice as version-robust and free of any JSON-schema dependency — with ONE departure,
+ * stated next: the orientation check below writes a WITNESS line on some exit-0 paths.
+ *
+ * THE SECOND CHECK: ORIENTATION (TOOL-aReplayedCard-1). After the scratch verdict, a `git commit`
+ * issued by the main loop is refused while this session's orientation card — written by the kickoff
+ * kit's `manifest-check.sh --card --write` at session start, under `<git-common-dir>/orientation/`
+ * — still holds the writer's sentinel `READY — none yet`, or names a different tree than the one
+ * the commit targets. The remedy is in the reason: `/session-kickoff`, from the target tree when the
+ * trees differ. `checkOriented` is the predicate and its comment is the ONE evaluation order.
+ *
+ * WHAT ESCAPES IT, so nobody reads this as containment: a commit made by a script, a heredoc, a
+ * non-git tool, a `$(git commit)` (the token must be followed by whitespace or the end); a deleted
+ * card, a hand-written card, a card the writer refused to write, a `cd`/`-C` target that is not a
+ * literal path or does not exist (the last `cd <dir>` before the git token IS read, F3), and a
+ * session that started before the wiring and never restarted — an ABSENT card and a card the replay
+ * wrote fresh (`--card --replay` in its header) both ALLOW, because a session the writer never ran
+ * for cannot run the remedy. The guard stops forgetting, not evasion. A READY line's PRESENCE is
+ * asserted, never its correctness. `--git-dir` or `--work-tree` pointing outside the resolved tree
+ * is compared as the resolved tree. The drive fold lowercases, so on a case-SENSITIVE filesystem the
+ * walk finds no `.git` and allows with the witness line — every registered node is Windows.
+ *
+ * THE WITNESS LINES depart from "Allow = print nothing" above: an absent card, a replay-written
+ * card, an unwalkable target and the README exemption each write one line to stderr and exit 0.
+ * The harness discards stderr on exit 0, so those lines reach the debug log and the self-test and
+ * NOBODY ELSE; a present `--write` card that passes prints nothing. Nothing here claims more.
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.0' // gov:kit agent-cap@1.14 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.1' // gov:kit agent-cap@1.14 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -364,6 +388,203 @@ function renderDeny(bad, allowed) {
   )
 }
 
+// ---- the orientation check ---------------------------------------------------------------------
+
+/** The seven git global options that take the NEXT token as their value unless written `--x=v`. */
+const GIT_VALUE_FLAGS = ['-C', '-c', '--git-dir', '--work-tree', '--namespace', '--exec-path', '--config-env']
+/**
+ * A token of the string-blanked VIEW: a quoted run whose bytes were blanked (so a space inside it is
+ * not a boundary) or a run of bare characters, in any mix. `git -C "C:/p q" commit` is four tokens.
+ */
+const VIEW_TOKEN = `(?:"[^"]*"|'[^']*'|[^\\s"'])+`
+const VALUE_FLAG = `(?:${GIT_VALUE_FLAGS.join('|')})`
+/**
+ * The argv token `git`, then any number of dash-prefixed tokens — each value flag taking its one
+ * value token, and REFUSED as a bare dash token so `git -C commit -m y` is a directory named
+ * `commit` and not a commit — then the whole token `commit` followed by whitespace or the end.
+ * `merge-base`, `commit-tree`, `log --grep commit` and a quoted `commit` never match; `merge` and
+ * `push` are deliberately outside the set (the engine's own fast-forward is a `merge --ff-only`).
+ */
+const COMMIT_SHAPED = new RegExp(
+  `(?:^|[\\s;&|(])git(?:\\s+(?:${VALUE_FLAG}\\s+${VIEW_TOKEN}|(?!${VALUE_FLAG}(?:\\s|$))-${VIEW_TOKEN}))*\\s+commit(?=\\s|$)`
+)
+/** The `authorized-by:` values that exempt a NEW build README — the unattended driver's own set. */
+const ANCHOR_MODES = ['prompt', 'recipe']
+const SENTINEL = 'READY — none yet'
+
+/**
+ * The directories the commit's tree resolves through, in order: the LAST `cd <dir>` before the git
+ * token (`cd <tree> && git commit` is the compound shape a session that opens at the worktrees'
+ * parent writes — it was judged against the payload cwd, a wrong deny in one direction and a silent
+ * cross-tree allow in the other; the aReplayedCard closing review, F3), then every `-C` value inside
+ * the matched span. Each is read from the ORIGINAL at the offset the view located.
+ */
+function extractCommitTarget(cmd, view, from, to) {
+  const out = []
+  const cdRx = /(?:^|[\s;&|(])cd\s+/g
+  const before = view.slice(0, from)
+  let m
+  let cd = null
+  while ((m = cdRx.exec(before)) !== null) cd = readTokenAt(cmd, m.index + m[0].length)
+  if (cd !== null) out.push(cd)
+  const rx = /(?:^|\s)-C\s+/g
+  const span = view.slice(from, to)
+  while ((m = rx.exec(span)) !== null) out.push(readTokenAt(cmd, from + m.index + m[0].length))
+  return out
+}
+
+/**
+ * A target the walk must not resolve: empty (`cd &&`), `-` (OLDPWD), or one the shell would expand
+ * (`$ROOT`, `~/x`, `${X}`, a backtick) — `path.resolve` then names a directory that does not exist
+ * and the walk lands on the nearest ancestor's `.git`, which in a `.claude/worktrees/` layout is the
+ * PRIMARY tree (F4). Such a target, like one absent from disk, is a witness, never a verdict.
+ */
+function checkUnwalkableTarget(tok) {
+  return tok === '' || tok === '-' || /^[$~]|\$\{|`/.test(tok)
+}
+
+/** Walk up from a drive-folded start to the directory holding `.git` — the toplevel — or null. */
+function resolveToplevel(start) {
+  const fs = require('fs')
+  const path = require('path')
+  let dir = path.resolve(start)
+  for (let i = 0; i < 64; i++) {
+    const g = path.join(dir, '.git')
+    let st = null
+    try { st = fs.statSync(g) } catch { st = null }
+    if (st) return { toplevel: dir, gitPath: g, isFile: st.isFile() }
+    const up = path.dirname(dir)
+    if (up === dir) return null
+    dir = up
+  }
+  return null
+}
+
+/**
+ * The common dir: the `.git` directory itself, or — in a linked worktree, where `.git` is a FILE —
+ * its `gitdir:` target's `commondir`, relative paths resolved against each. The same walk as
+ * agent-cap.js makes for its slot ledger, and the branch every real session in this repo takes.
+ */
+function resolveCommonDir(hit) {
+  const fs = require('fs')
+  const path = require('path')
+  if (!hit.isFile) return hit.gitPath
+  const m = /gitdir:\s*(.+)/.exec(fs.readFileSync(hit.gitPath, 'utf8'))
+  if (!m) return null
+  const gd = path.resolve(hit.toplevel, m[1].trim())
+  try {
+    return path.resolve(gd, fs.readFileSync(path.join(gd, 'commondir'), 'utf8').trim())
+  } catch {
+    return gd
+  }
+}
+
+/** The card's bytes, or `text: null` when none exists, with `shown` its one comparable spelling; a non-id-shaped session id is never joined into a path. */
+function readCard(commonDir, sessionId) {
+  const fs = require('fs')
+  const path = require('path')
+  const sid = String(sessionId)
+  const card = { path: path.join(commonDir, 'orientation', sid + '.md'), text: null }
+  card.shown = buildComparablePath(card.path)
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(sid)) return card
+  try { card.text = fs.readFileSync(card.path, 'utf8') } catch { /* absent */ }
+  return card
+}
+
+/**
+ * S4's exemption: the commit that CREATES the authorization. A `README.md` directly under a
+ * `builds/<one>/` segment, NEW — staged as added, or untracked (the single-call `git add … &&
+ * git commit` form has an empty index at PreToolUse) — whose bytes carry `authorized-by:` with a
+ * value in ANCHOR_MODES. Git runs at the resolved toplevel; the pathspec is a coarse filter and the
+ * regex is the rule, so `rebuilds/z/`, `builds/a/b/` and `docs/` never exempt. The staged BLOB is
+ * read for a staged file, never the worktree copy. A folder already in HEAD exempts nothing.
+ */
+function checkAuthorizedReadme(toplevel) {
+  const fs = require('fs')
+  const path = require('path')
+  const { spawnSync } = require('child_process')
+  const runGit = (args) => spawnSync('git', args, { cwd: toplevel, encoding: 'utf8' })
+  const readPaths = (args) => {
+    const r = runGit(args)
+    return r.status === 0 ? r.stdout.split(/\r?\n/).filter((p) => /(^|\/)builds\/[^/]+\/README\.md$/.test(p)) : []
+  }
+  // FRONT MATTER ONLY — the slice between the opening `---` on line 1 and the next `---` line, the
+  // scope the unattended driver reads the key in. Matching the whole file exempted a README whose
+  // BODY carried the key in a fenced example while the driver authorized nothing (F10).
+  const readMode = (bytes) => {
+    const fm = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(bytes || '')
+    const m = fm && /^authorized-by:[ \t]*(\S+)[ \t]*$/m.exec(fm[1])
+    return m && ANCHOR_MODES.includes(m[1]) ? m[1] : null
+  }
+  for (const p of readPaths(['diff', '--cached', '--name-only', '--diff-filter=A', '--', '*builds/*/README.md'])) {
+    const r = runGit(['show', ':' + p])
+    const mode = r.status === 0 ? readMode(r.stdout) : null
+    if (mode) return { path: p, mode }
+  }
+  for (const p of readPaths(['ls-files', '--others', '--exclude-standard', '--', '*builds/*/README.md'])) {
+    let bytes = ''
+    try { bytes = fs.readFileSync(path.join(toplevel, p), 'utf8') } catch { continue }
+    const mode = readMode(bytes)
+    if (mode) return { path: p, mode }
+  }
+  return null
+}
+
+function renderOrientationDeny(card, condition, cardTree, here) {
+  const remedy = buildComparablePath(cardTree) === here ? '/session-kickoff' : `cd ${here} && /session-kickoff`
+  const what = condition === 'sentinel'
+    ? `holds the writer's sentinel \`${SENTINEL}\` and no real READY line — this session has not kicked off`
+    : `names tree ${cardTree || '(none)'} and this commit targets ${here} — the card was written in another tree`
+  return (
+    `BLOCKED by scratch-guard: orientation card ${card.shown} ${what}.\n\n` +
+    `Run ${remedy} before this session's first commit: the kickoff's --card --append writes the READY ` +
+    'line and rewrites the card\'s tree cell to the tree it runs in. A subagent, a session with no card, ' +
+    `and a commit that CREATES a build README declaring authorized-by: ${ANCHOR_MODES.join(' or ')} are not gated.\n`
+  )
+}
+
+/**
+ * THE ONE EVALUATION ORDER, each step allowing on its own condition. Returns null to print nothing,
+ * `{ witness }` to allow with one stderr line, `{ deny }` to refuse.
+ *  1. not a `git commit` by COMMIT_SHAPED → null
+ *  2. `agent_id` present → null (a subagent's shell calls are never gated)
+ *  3. `session_id` or `cwd` missing → null, silently; `tool_use_id` is not read
+ *  4. a `cd`/`-C` target that is not a literal path, does not exist, or — drive-folded — walks to
+ *     no `.git` → witness (a walk from a missing start would land on an ancestor's `.git`)
+ *  5. no card for this session, or a replay-written one → witness
+ *  6. a real READY line AND the card's tree equals the resolved toplevel → null
+ *  7. a NEW authorized README (checkAuthorizedReadme — the only step that spawns) → witness; else deny
+ */
+function checkOriented(cmd, data) {
+  const path = require('path')
+  const view = buildCommandView(cmd)
+  const m = COMMIT_SHAPED.exec(view)
+  if (!m) return null
+  if (data.agent_id) return null
+  if (!data.session_id || !data.cwd) return null
+  const targets = extractCommitTarget(cmd, view, m.index, m.index + m[0].length)
+  const unwalkable = targets.find(checkUnwalkableTarget)
+  if (unwalkable !== undefined) return { witness: `orientation not checked — target ${unwalkable || '(empty)'} is not a literal path; git will refuse the commit itself, or resolve it where this hook cannot` }
+  const start = path.resolve(buildComparablePath(data.cwd), ...targets.map(buildComparablePath))
+  if (!require('fs').existsSync(start)) return { witness: `orientation not checked — target ${buildComparablePath(start)} does not exist; git will refuse the commit itself` }
+  const hit = resolveToplevel(start)
+  if (!hit) return { witness: `orientation not checked — no .git above ${buildComparablePath(start)}, git will refuse the commit itself` }
+  const common = resolveCommonDir(hit)
+  if (!common) return { witness: `orientation not checked — ${hit.gitPath} names no gitdir` }
+  const card = readCard(common, data.session_id)
+  if (card.text === null) return { witness: `orientation card absent — ${card.shown}; the session started before the writer was wired, or is not a kickoff-kit session` }
+  const lines = card.text.split(/\r?\n/)
+  if (/--card --replay(\s|$)/.test(lines[0])) return { witness: `orientation card replay-written — ${card.shown}; the session started before the writer was wired` }
+  const ready = lines.some((l) => l.startsWith('READY — ') && l.trim() !== SENTINEL)
+  const treeLine = lines.find((l) => l.startsWith('tree — '))
+  const cardTree = treeLine ? treeLine.slice('tree — '.length).split(' · ')[0] : ''
+  const here = buildComparablePath(hit.toplevel)
+  if (ready && buildComparablePath(cardTree) === here) return null
+  const auth = checkAuthorizedReadme(hit.toplevel)
+  if (auth) return { witness: `orientation exempt — ${auth.path} creates a build authorized-by: ${auth.mode}` }
+  return { deny: renderOrientationDeny(card, ready ? 'tree' : 'sentinel', cardTree, here) }
+}
+
 function main() {
   let data
   try {
@@ -385,10 +606,24 @@ function main() {
   } catch {
     process.exit(0)
   }
-  if (verdict.bad.length === 0) process.exit(0)
-  process.stderr.write(renderDeny(verdict.bad, verdict.allowed))
-  process.exit(2)
+  if (verdict.bad.length > 0) {
+    process.stderr.write(renderDeny(verdict.bad, verdict.allowed))
+    process.exit(2)
+  }
+  // The orientation check, AFTER the scratch verdict and under the same fail-open wrap.
+  let orient = null
+  try {
+    orient = checkOriented(cmd, data)
+  } catch {
+    process.exit(0)
+  }
+  if (orient && orient.deny) {
+    process.stderr.write(orient.deny)
+    process.exit(2)
+  }
+  if (orient && orient.witness) process.stderr.write(`scratch-guard: ${orient.witness}\n`)
+  process.exit(0)
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, resolveAllowedRoots, KIT_SCRATCH_GUARD_VERSION }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION }

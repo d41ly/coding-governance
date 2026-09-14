@@ -338,6 +338,11 @@
       "file": "tools/workflows/unattended-build.js"
     },
     {
+      "id": "boundedParallel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -376,6 +381,11 @@
       "id": "buildHeredocView",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "buildOpts",
+      "kind": "function",
+      "file": "tools/workflows/orient-counterfactual.js"
     },
     {
       "id": "buildResolvedTarget",
@@ -678,6 +688,11 @@
       "file": "tools/workflows/unattended-unit.js"
     },
     {
+      "id": "checkAuthorizedReadme",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -698,6 +713,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkOriented",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkSeqMarker",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -709,6 +729,11 @@
     },
     {
       "id": "checkUnderRoot",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
@@ -766,6 +791,11 @@
       "id": "check_msys_addressable",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "check_ours",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "check_packing",
@@ -926,6 +956,11 @@
       "id": "chunk",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "claimant_index",
@@ -1388,6 +1423,11 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "derive_marker_coupling",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1601,6 +1641,11 @@
       "id": "extract",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extractCommitTarget",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "extract_acceptance",
@@ -2363,6 +2408,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "measureRun",
+      "kind": "function",
+      "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
       "id": "measure_conventions",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2455,12 +2505,22 @@
     {
       "id": "meta",
       "kind": "const-export",
+      "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
       "file": "tools/workflows/tier2-review.js"
     },
     {
       "id": "meta",
       "kind": "const-export",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "meta",
@@ -2693,6 +2753,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "print_defined_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "print_last",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2793,6 +2858,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "readCard",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readFact",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -2816,6 +2886,16 @@
       "id": "readMemoryRoot",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readMode",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readPaths",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "readQuotedSubstitutions",
@@ -3318,14 +3398,29 @@
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
+      "id": "renderOrientationDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderPerLineBlanked",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "renderPrompt",
+      "kind": "function",
+      "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderRoster",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "renderShippedBlanks",
@@ -3361,6 +3456,11 @@
       "id": "render_baseline",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "render_command",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "render_convention",
@@ -3508,6 +3608,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveCommonDir",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveFileRow",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -3546,6 +3651,11 @@
       "id": "resolveStamp",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "resolveToplevel",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "resolve_adopter",
@@ -3848,6 +3958,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "runGit",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "run_bounded",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -4141,6 +4256,11 @@
       "id": "selfcheck",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "set_group",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "settings_merge_src",

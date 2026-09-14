@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.1', // gov:kit unattended-build@1.1 — engine identity (deployed verbatim)
+  version: '1.1', // gov:kit unattended-build@1.1 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal.',
   phases: [
@@ -73,7 +73,7 @@ export const meta = {
 //
 // ---------------------------------------------------------------------------------------------
 // TWO SHAPES HERE ARE FORCED RATHER THAN CHOSEN, and both come from one denial.
-// `tools/hooks/agent-cap.js` refused an `agent()` inside ANY loop body when this file was written,
+// The `agent-cap.js` hook refused an `agent()` inside ANY loop body when this file was written,
 // with a closed whitelist naming no marker for the case. `TOOL-dFoldedVerdict-4` has since added
 // `gov:sequential-agents(<K>)`, so a bounded sequential loop over a proven-bounded identifier is now
 // admissible and these are no longer the only shapes. Both are KEPT because both remain correct:
@@ -225,7 +225,7 @@ if (attended && a.runStateExists === true) {
 const DRIVER = 'bash tools/unattended/unattended.sh'
 // THE BUG-CLASS CHECKLIST TRAVELS IN `dispatch.args`. It used to be spelled inside the BUILD prompt
 // this unit deletes, and the child cannot carry it: a shipped kit file names nothing outside itself
-// by literal, so the parent that already spells `tools/` paths is where it lives.
+// by literal, so it lives in the parent, whose install paths are filled in when it is rendered.
 const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9

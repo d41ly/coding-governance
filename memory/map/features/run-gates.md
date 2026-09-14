@@ -24,7 +24,9 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "empty-field-collapses-unless-it-is-last.md",
   "suite-invalidated-by-a-commit-under-it.md",
   "fixture-removes-the-path-under-test.md",
-  "format-derived-from-arity.md"]
+  "format-derived-from-arity.md",
+  "worktree-crlf-outside-the-gated-population.md",
+  "a-new-leg-trips-a-growing-set-of-meta-gates.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

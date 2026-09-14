@@ -26,15 +26,30 @@
     ],
     "SessionStart": [
       {
+        "matcher": "startup|clear",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PROJECT_DIR}/tools/check-wiring.sh\" --session"
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/skills/session-kickoff/manifest-check.sh\" --card --write"
           }
         ]
       },
       {
+        "matcher": "resume|compact",
         "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/skills/session-kickoff/manifest-check.sh\" --card --replay"
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/tools/check-wiring.sh\" --session"
+          },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/tools/process-monitor/procmon-hook.js\""

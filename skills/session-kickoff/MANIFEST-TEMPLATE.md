@@ -1,12 +1,13 @@
 # Session kickoff manifest — {{PROJECT_NAME}}
 
-<!-- kickoff-manifest: v1.3 · instantiated from coding-governance skills/session-kickoff/MANIFEST-TEMPLATE.md -->
+<!-- kickoff-manifest: v1.4 · instantiated from coding-governance skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
 last-audit: {{AUDIT_DATETIME}} @ {{AUDIT_SHA}}
 watch: {{WATCH_PATHSPECS}}
 verify-paths: {{VERIFY_PATHS}}
 last-body-change: {{BODY_CHANGE_SHA}}
 check-script: tools/manifest-check.sh
+registry: {{REGISTRY_PATH}}
 -->
 
 The project layer read by the generic `/session-kickoff` skill (the engine). Precedence on
@@ -131,6 +132,11 @@ with `grep -nE '\{\{[A-Z]'` — no placeholder may survive):*
   is what clears that check: it is an assertion that §B has been re-read and is still true.
 - `{{VERIFY_PATHS}}` — `;`-separated, the 2–3 highest-value tracked anchors (the playbook + top
   governing doc/dir). NOT a mirror of the pointer map.
+- `{{REGISTRY_PATH}}` — repo-relative path of the file whose FIRST table under a `## Node registry`
+  heading names this project's nodes (the governance charter, where the playbook is adopted). The
+  checker's `--card` verbs resolve the session's `node —` cell from its Machine/user column, by
+  equality with the user name or the prefix `<user> @`; a project with no registry writes a file
+  holding that heading and one row, or every card reads `node — UNKNOWN`.
 - `{{LAYOUT}}` — e.g. "single checkout at repo root" | "worktrees as siblings under `<root>/`,
   primary tree (default branch) at `<root>/main`".
 - `{{REMOTE}}` / `{{DEFAULT_BRANCH}}` — from `git remote` / `git symbolic-ref`.

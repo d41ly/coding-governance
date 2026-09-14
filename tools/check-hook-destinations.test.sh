@@ -82,10 +82,69 @@ b=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" >/dev/null 2>&1; echo 
                               || bad "the gate does not discriminate (clean=$a broken=$b)"
 rm -rf "$d"
 
+# ---- ARM 6: a {here} fragment in a directory NO flat descriptor homes REFUSES (AC6) --------------
+# TOOL-aReplayedCard-2. `{here}` means "beside a flat kit's engine"; a fragment carrying it under a
+# directory-shaped kit's home ships from nowhere, and the leg must say which directory rather than
+# pass because the flat-kit rule found nothing to compare.
+d=$(scratch)
+printf '{"name": "orphan", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
+  > "$d/$KIT_REL/hooks/orphan.fragment.json"
+( cd "$d" && git add -A && git commit -q -m orphan --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" != 0 ] && ok "a {here} fragment under a non-flat home REDS (rc=$rc)" \
+               || bad "a {here} fragment under a non-flat home was accepted"
+case "$out" in *"orphan.fragment.json"*"'$KIT_REL/hooks' is the home of NO kind=flat"*)
+  ok "and the refusal names the directory and the flat-kit rule" ;;
+  *) bad "the refusal does not name the directory: $(printf '%s' "$out" | grep orphan | head -2)" ;; esac
+rm -rf "$d"
+
+# ---- ARM 7: a {here} fragment under a SHARED flat home is judged at its adopter path (AC6) --------
+# `tools/` is the home of several flat descriptors at once. That is not undecidable: the rule is "at
+# least one flat descriptor homes the directory", and `{prefix}/<file>` is then compared against the
+# WHOLE declared set. The fixture names a file a flat kit ships beside the fragment.
+d=$(scratch)
+printf '{"name": "shared", "event": "E", "matcher": "M", "marker": "settings-merge.py", "hook_path": "{here}/settings-merge.py"}\n' \
+  > "$d/$KIT_REL/shared-home.fragment.json"
+( cd "$d" && git add -A && git commit -q -m shared --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" = 0 ] && ok "a {here} fragment under a shared flat home passes (rc=$rc)" \
+              || bad "a {here} fragment under a shared flat home was refused: $(printf '%s' "$out" | grep -E 'FAIL|REFUS' | head -2)"
+case "$out" in *"shared-home.fragment.json -> $KIT_REL/settings-merge.py in the tree, ships as"*)
+  ok "and the ok line prints both spellings" ;;
+  *) bad "the ok line does not print both spellings: $(printf '%s' "$out" | grep shared-home | head -1)" ;; esac
+# ...and the SAME shape naming a file the flat kits do NOT ship reds, both spellings printed: the
+# flat-home test alone must not be enough.
+printf '{"name": "unshipped", "event": "E", "matcher": "M", "marker": "nobody.sh", "hook_path": "{here}/nobody.sh"}\n' \
+  > "$d/$KIT_REL/unshipped.fragment.json"
+( cd "$d" && git add -A && git commit -q -m unshipped --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" != 0 ] && ok "a {here} fragment naming an unshipped file under a flat home REDS (rc=$rc)" \
+               || bad "a {here} fragment naming an unshipped file was accepted"
+case "$out" in *"unshipped.fragment.json"*"'$KIT_REL/nobody.sh' in the tree, which would ship as"*"'$KIT_REL/nobody.sh'"*)
+  ok "and the refusal prints the in-tree and the adopter spelling" ;;
+  *) bad "the refusal does not print both spellings: $(printf '%s' "$out" | grep unshipped | head -2)" ;; esac
+rm -rf "$d"
+
+# ---- ARM 8: the PARITY arm fires when the two readers disagree ----------------------------------
+# The gate reads `{kit}`/`{here}` from `check-wiring.sh --resolve-fragment` and from
+# `settings-merge.py --resolve-fragment` and refuses on a mismatch. Staged by breaking the shell
+# reader's `{here}` expansion in a COPY of the tree, so the two answers differ on every {here}
+# fragment and agree on every {kit} one.
+d=$(scratch)
+sed -i 's#{here}/|${here:+$here/}|g#{here}/|elsewhere/|g#' "$d/$KIT_REL/check-wiring.sh"
+grep -q 'elsewhere/' "$d/$KIT_REL/check-wiring.sh" || bad "the parity fixture did not stage its break (the resolver's {here} line moved)"
+( cd "$d" && git add -A && git commit -q -m parity --no-verify ) >/dev/null 2>&1
+out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+[ "$rc" != 0 ] && ok "two readers disagreeing on a token REDS (rc=$rc)" \
+               || bad "the gate accepted two readers that disagree"
+case "$out" in *"the two readers DISAGREE"*"elsewhere/"*) ok "and the refusal prints both readers' answers" ;;
+  *) bad "the refusal does not name the disagreement: $(printf '%s' "$out" | grep -E 'FAIL' | head -2)" ;; esac
+rm -rf "$d"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not the written one. An arm stranded
 # past an early exit disappears silently; the floor is what turns that into a failure instead of a
 # smaller green number nobody reads.
-FLOOR_ASSERTIONS=8
+FLOOR_ASSERTIONS=16
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # The AGREED shape, anchored: check-testsuite-counts.sh matches this line to prove the count is
 # actually printed rather than merely computed.

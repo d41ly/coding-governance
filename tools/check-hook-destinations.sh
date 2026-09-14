@@ -15,6 +15,22 @@
 # FIRES, or that an adopter's installed copy matches gov's. `check-wiring.sh` owns the first, the
 # hook's own suite the second, and the parity arms the third. This gate answers one question: does
 # every declared hook path name something a descriptor ships.
+#
+# HOW A PATH IS RESOLVED, and by whom. This gate does NOT expand `{kit}` or `{here}` itself. It asks
+# the two readers that decide the value — `check-wiring.sh --resolve-fragment` and
+# `settings-merge.py --resolve-fragment` — and REFUSES when they disagree, so the writer cannot wire
+# a path the checker cannot find. A third derivation here would be a third answer to one question,
+# and it is exactly what this file used to carry. TOOL-aReplayedCard-2.
+#
+# A `{here}` FRAGMENT IS JUDGED AT ITS ADOPTER PATH. `{here}` is the fragment's own directory, and
+# it exists for a `kind = "flat"` kit: its engine ships to `{prefix}/<file>`, so the in-tree path
+# (`skills/session-kickoff/manifest-check.sh`) and the shipped path (`tools/manifest-check.sh` under
+# the canonical prefix) DIFFER BY DESIGN, and comparing the in-tree spelling against the declared
+# set would red every correct flat-kit fragment. So the fragment's directory must be the `home` of
+# at least one flat descriptor — else the fragment ships from nowhere and the gate refuses naming
+# the directory — and `{prefix}/<path relative to that directory>` is compared against the WHOLE
+# declared destination set, both spellings printed. A `{kit}` fragment is compared at its in-tree
+# resolution as before, because a directory-shaped kit ships its tree under `{kit}` unchanged.
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "hook-dest: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -60,9 +76,40 @@ PYEOF
 
 [ -n "$DESTS" ] || { echo "hook-dest: REFUSING — the descriptors resolved NO destinations at all"; exit 1; }
 
-echo "hook-dest: $n fragment(s) against $(printf '%s\n' "$DESTS" | grep -c .) declared destination(s)"
+# The canonical prefix the destinations above were resolved under, and every `kind = "flat"` home
+# — both from the deployer, never typed here. The flat-home set is what decides whether a `{here}`
+# fragment ships from anywhere at all.
+FLAT=$("$PY" - <<'PYEOF'
+import pathlib, sys
+sys.path.insert(0, "tools/govkit")
+import govkit
+root = pathlib.Path(".").resolve()
+reg = govkit.load_toml(root / "tools" / "govkit" / "registry.toml")
+print(govkit.canonical_ctx("hook-dest")["prefix"])
+homes = set()
+for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
+    if d.get("kind") == "flat" and d.get("home"):
+        homes.add(d["home"].rstrip("/"))
+print("\n".join(sorted(homes)))
+PYEOF
+) || { echo "hook-dest: could not read the flat-kit homes — refusing"; exit 2; }
+PFX=$(printf '%s\n' "$FLAT" | head -1)
+FLAT_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | grep . || true)
+[ -n "$PFX" ] || { echo "hook-dest: REFUSING — the deployer names no canonical prefix"; exit 1; }
+# A ZERO here is a broken selector, not a tree with no flat kits: this repo's own kickoff engine is
+# one, and the arm below would otherwise refuse every `{here}` fragment for a reason that is false.
+[ -n "$FLAT_HOMES" ] || { echo "hook-dest: REFUSING — the descriptors declare NO kind=flat home, so no {here} fragment could be judged"; exit 1; }
+
+echo "hook-dest: $n fragment(s) against $(printf '%s\n' "$DESTS" | grep -c .) declared destination(s), $(printf '%s\n' "$FLAT_HOMES" | grep -c .) flat home(s), prefix $PFX"
+
+# The two readers whose value this gate asserts. Both are asked per fragment, below.
+CW="tools/check-wiring.sh"; SM="tools/settings-merge.py"
+for r in "$CW" "$SM"; do
+  [ -f "$r" ] || { echo "hook-dest: REFUSING — $r is not here, and this gate reads its answer rather than deriving one"; exit 2; }
+done
 
 # ---- arm 1: every fragment's hook_path resolves to a declared destination -------------------------
+# ---- and the two readers agree on what it resolves to (the parity arm) ---------------------------
 for f in $FRAGS; do
   hp=$("$PY" -c 'import json,sys;print(json.load(open(sys.argv[1],encoding="utf-8")).get("hook_path",""))' "$f" 2>/dev/null)
   if [ -z "$hp" ]; then
@@ -70,20 +117,53 @@ for f in $FRAGS; do
     st=1
     continue
   fi
-  # `{kit}` expands against THE FRAGMENT'S OWN LOCATION, two directories up, which is the same rule
-  # settings-merge.py and check-wiring.sh use. Three readers of one token have to agree or the
-  # writer wires a path the checkers cannot find.
-  kitpfx=$(dirname "$(dirname "$f")"); [ "$kitpfx" = "." ] && kitpfx=""
-  resolved=$(printf '%s' "$hp" | sed "s|{kit}/|${kitpfx:+$kitpfx/}|g")
-  if printf '%s\n' "$DESTS" | grep -qxF -- "$resolved"; then
-    echo "hook-dest: ok   $f -> $resolved"
-  else
-    echo "hook-dest: FAIL $f declares hook_path '$hp' -> '$resolved', which NO kit.toml rule ships."
-    echo "           A fragment naming a path no descriptor delivers is a wiring hole: the merge"
-    echo "           writes the command, the file never arrives, and every matching tool call runs"
-    echo "           node against nothing."
+  a=$(bash "$CW" --resolve-fragment "$f" 2>&1); ra=$?
+  b=$("$PY" "$SM" --resolve-fragment "$f" 2>&1); rb=$?
+  if [ "$ra" != 0 ] || [ "$rb" != 0 ]; then
+    echo "hook-dest: FAIL $f — a reader refused it: check-wiring rc=$ra ($a) · settings-merge rc=$rb ($b)"
     st=1
+    continue
   fi
+  if [ "$a" != "$b" ]; then
+    echo "hook-dest: FAIL $f — the two readers DISAGREE: check-wiring resolves '$a', settings-merge '$b'."
+    echo "           The writer would wire one path and the checker look for another; a fragment"
+    echo "           token has one meaning or the wiring check cannot see what the merge wrote."
+    st=1
+    continue
+  fi
+  resolved=$a
+  case "$hp" in
+    *"{here}"*)
+      dir=$(dirname "$f")
+      if ! printf '%s\n' "$FLAT_HOMES" | grep -qxF -- "$dir"; then
+        echo "hook-dest: FAIL $f is {here}-shaped but its directory '$dir' is the home of NO kind=flat descriptor,"
+        echo "           so nothing ships it beside its engine and '$resolved' arrives nowhere. A {here}"
+        echo "           fragment belongs beside the flat kit's engine (flat homes: $(printf '%s\n' "$FLAT_HOMES" | paste -sd, -))."
+        st=1
+        continue
+      fi
+      adopter="$PFX/${resolved#"$dir"/}"
+      if printf '%s\n' "$DESTS" | grep -qxF -- "$adopter"; then
+        echo "hook-dest: ok   $f -> $resolved in the tree, ships as $adopter"
+      else
+        echo "hook-dest: FAIL $f declares hook_path '$hp' -> '$resolved' in the tree, which would ship as"
+        echo "           '$adopter' — and NO kit.toml rule delivers that. A flat kit's fragment is judged at"
+        echo "           its adopter path, and this one names a file the kit does not ship beside it."
+        st=1
+      fi
+      ;;
+    *)
+      if printf '%s\n' "$DESTS" | grep -qxF -- "$resolved"; then
+        echo "hook-dest: ok   $f -> $resolved"
+      else
+        echo "hook-dest: FAIL $f declares hook_path '$hp' -> '$resolved', which NO kit.toml rule ships."
+        echo "           A fragment naming a path no descriptor delivers is a wiring hole: the merge"
+        echo "           writes the command, the file never arrives, and every matching tool call runs"
+        echo "           the interpreter against nothing."
+        st=1
+      fi
+      ;;
+  esac
 done
 
 # ---- arm 2: no adopter script installs a hook into a destination nothing declares -----------------

@@ -63,3 +63,25 @@ half-fixed.
 `multi-site-fix-parity` leg reading a review record's site list against the commit that claims to
 resolve it; it is unbuilt, its failing case has not been observed, and a gate nobody has seen go red
 is an assertion about nothing. Tracked as `TOOL-aScannedThrottle-9`.
+
+## The prose form — a Skill that names a hook's behaviour
+
+A rendered Skill or a template says what a hook DOES ("the deny refuses a resumed session's first
+commit"), and the hook's own evaluation-order comment says the opposite (an absent card and a
+replay-written one both ALLOW). Two answers again, and the prose copy is the one that rots, because
+nothing byte-compares a sentence against a predicate. Hit on `tools/unattended/SKILL.template.md`
+by the aReplayedCard closing review (F11): the Resume section claimed a backstop the shipped
+`tools/hooks/scratch-guard.js` had resolved AWAY in its own spec.
+
+**The documented check, since no gate fits a sentence:** a template or Skill that names a hook's
+behaviour is graded by reading that hook's evaluation-order comment beside it, in the same review,
+and the prose is rewritten to the contract the comment states — or the backstop is built as a
+predicate change and the sentence follows the code, never the other way round.
+
+**A live instance, retired by a pointer.** Round 3 of build `dPolishedVitrine`'s closing review
+found the `brief-recorded` population stated three times, and one copy,
+`tools/unattended/.unattended.conf.example`, had dropped the condition that HEAD must still bear
+the finished claim out. The fold replaced that copy with a pointer to the protocol's
+`BRIEF_RECORDED_CUTOFF` row, so it cannot be half-fixed again. The leg's header in
+`tools/unattended/check-brief-recorded.sh` still states the predicate, because a gate's header says
+what it checks; the row and the header are the two carriers left.

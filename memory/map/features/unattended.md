@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
-gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
+gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mode-read-eats-a-bare-cr.md",
   "assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
   "bounded-through-a-pipe-is-unbounded.md",
@@ -119,7 +119,11 @@ in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 conver
 the charter, so they now live in the charter's `kit:unattended` conditional block in §1 — dropped by
 the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
 body, both written to stay true for a non-adopting re-puller. A new universal-core section for an
-opt-in kit was rejected on both counts.
+opt-in kit was rejected on both counts. The Skill's `## Resume` section invokes `/session-kickoff`
+after the reap and the re-schedule (`TOOL-aReplayedCard-3`), so a session resumed after process
+death re-orients and its first commit is not denied on an un-oriented card; `check-unattended.sh`
+check 18 keeps the template's FIRST kickoff mention below its first `--preflight`, and the resume
+mention sits far under both.
 
 **A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
 driver's `DIRECTIVES_CORE` and in nothing else here, because this sentence has already been wrong
@@ -224,12 +228,6 @@ core sets are not editable from the project layer.
 *Re-derived 2026-08-20 against the tree, not carried forward. Dossier prose is ungated and rots
 silently; re-derive this section whenever the feature is touched.*
 
-- **A run has been driven end to end, and it exposed two defects rather than confirming the
-  design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.
-  It then could not be CLOSED, and its record sat non-terminal for three days. Both causes are
-  fixed in `cFinalBerth`: no verb produced a terminal phase at all, and `--close` refused every run
-  whose HEAD was already published. What a live run proved was that the pieces refusing correctly
-  in fixtures did not add up to a lifecycle.
 - **The junction arm of the adopter e2e is SKIPPED on node `a`**, which lacks the privilege to
   create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
   actually installs with is therefore unexercised here and needs a run on a node that can link.
