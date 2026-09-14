@@ -93,9 +93,9 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 emitted() { # signatures · output
   local _s _l _num _ok _exp _miss="" _extra="" _dark="" _nums=" " _skips
   n=$((n+1))
+  out=$(grep -v '^unattended-report: ' <<<"$2" || true)   # every path below leaves `out` stripped
   if [ "$1" = "?" ]; then
-    echo "FAIL emitted: expected set not yet observed — owed at the final pass"; st=1
-    out=$(grep -v '^unattended-report: ' <<<"$2" || true); return
+    echo "FAIL emitted: expected set not yet observed — owed at the final pass"; st=1; return
   fi
   _exp=$(printf '%s\n' "$1" | tr '|' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' || true)
   [ -n "$_exp" ] || { echo "FAIL emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
@@ -119,7 +119,6 @@ emitted() { # signatures · output
   done <<<"$_skips"
   [ -z "$_miss$_extra$_dark" ] \
     || { echo "FAIL emitted: expected [$(printf '%s' "$_exp" | tr '\n' '|')] · missing:$_miss · unexplained:$_extra · dark:$_dark · skips: $_skips"; st=1; }
-  out=$(grep -v '^unattended-report: ' <<<"$2" || true)
 }
 
 cd "$TMP" || exit 2
