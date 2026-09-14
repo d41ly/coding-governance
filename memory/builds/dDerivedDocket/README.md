@@ -43,6 +43,8 @@ recorded stop causes.
   this feature by owner ruling; unit 5 records it as a DECISIONS row.
 - **Unit passes run no gates.** Unattended self-tests run only in units 1, 3, 4, 5, 16, 17, 18, 22,
   24, 27, 28 and 30 (D12-h, D12-i8), each suite once at the unit's end.
+- **Spec audits run per topic group**, five sequential spec-audit reviews each recording its own
+  round subject: 827 KB of specs is past what one lens reads whole, and the harness audits one set.
 
 ## Parked decisions
 
