@@ -393,8 +393,10 @@ floor exists in this suite, so none moves.
   short enough to prove nothing.
   RESOLVED (agent, 2026-09-14, delegated): the plain clone exits 128 with the recorded message and
   the `core.longpaths` clone exits 0 and leaves `pack-049c2549….idx`, measured on node `a` against
-  the 170-character scratchpad. The sentence carries the working spelling; the short-root
-  workaround is what unit 5 removes.
+  the 170-character scratchpad. At rev-3 the sentence carried that spelling; rev-4 moved the
+  consequence, not the observation — that flag proved out for a `--no-checkout` clone alone, unit
+  3's fixture origin failed under the scratchpad regardless, so the sentence now carries the
+  short-root exception the brief pinned, and the `%TEMP%` spelling is what unit 5's guard allows.
 - **F2 — who bumps `unattended-build@1.0` and `unattended-unit@1.0`?** The build README gives every
   version bump to the closing pass and the brief lists unattended, memory-tree and agent-cap; the
   two `meta` versions are not on the list, and a required argument is a contract change. Options:
