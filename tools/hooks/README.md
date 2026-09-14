@@ -134,6 +134,50 @@ out behind it. The slot budget is LIFETIME-PER-PROMPT, so it is the TOTAL and no
 bound, and a total is the wrong instrument for a dispatch sequence whose count is a function of the
 roster size. Count what carries no script; parse what does.
 
+## scratch-guard's second check: a `git commit` on an un-oriented card
+
+`scratch-guard.js` is the other hook in this home, on the `Bash|PowerShell` matcher, and after its
+scratch verdict it runs ONE more check, `checkOriented` (`TOOL-aReplayedCard-1`). A `git commit`
+issued by the main loop is refused, exit 2, while the session's orientation card — the file the
+kickoff kit's `manifest-check.sh --card --write` writes at session start under
+`<git-common-dir>/orientation/<session_id>.md` — still holds the writer's sentinel `READY — none yet`,
+or names a different tree than the commit targets. The deny names the card path, the condition and
+the remedy: `/session-kickoff`, or `cd <target-tree> && /session-kickoff` when the trees differ,
+because the kickoff's `--card --append` rewrites the card's `tree —` cell to the tree it runs in.
+
+**The grammar.** The command's string-blanked view must hold the argv token `git`, then any number of
+dash-prefixed tokens — `-C`, `-c`, `--git-dir`, `--work-tree`, `--namespace`, `--exec-path` and
+`--config-env` each take the one value token after them unless written `--x=v`, and a quoted value
+is one token — and then the whole token `commit` followed by whitespace or the end. So
+`git -C "C:/p q" commit -m y` and `git -c a=b commit` match; `git merge-base`, `git commit-tree`,
+`git log --grep commit`, a quoted `commit`, `merge` and `push` never do — the kickoff engine's own
+Step 1 is a `git merge --ff-only`, and a deny on it would refuse its own remedy. The toplevel is the
+`-C` target when there is one, else the payload `cwd`, both drive-folded through
+`buildComparablePath` BEFORE the walk up to the directory holding `.git`, and the card's tree cell
+is compared through the same fold — the writer prints `C:/…`, the harness hands `C:\…`, and the
+nodes type `/c/…`.
+
+**What ALLOWS, and what it prints.** A payload carrying `agent_id` (a subagent), or lacking
+`session_id` or `cwd`, allows silently. An unwalkable target, an ABSENT card, and a card whose
+header names `--card --replay` as its writer — one the replay wrote fresh for a session that started
+before the writer was wired — allow with ONE witness line on stderr. That line departs from the
+print-nothing protocol both hooks otherwise keep, and it reaches the debug log and the self-test
+only: the harness discards stderr on exit 0, so nothing reaches the session. A present `--write` card
+that passes prints nothing.
+
+**The exemption.** The commit that CREATES a build's authorization: a `README.md` directly under a
+`builds/<one>/` segment, NEW — staged as added, or untracked, which covers the single-call
+`git add … && git commit` form whose index is empty at PreToolUse — whose bytes carry
+`authorized-by:` with a value in the unattended driver's `SECOND_ANCHOR_MODES` (`prompt` or
+`recipe`, pinned by a parity arm rather than restated). The staged BLOB is read for a staged file.
+A folder already in HEAD exempts nothing, or every commit after a landed prompt-path build would be
+exempt forever. This is the only step that spawns git, so the common path pays no spawn.
+
+**The ceiling.** A commit made by a script, a heredoc or a non-git tool; a deleted, hand-written or
+refused card; an unwalkable `-C` target; a session that started before the wiring and never
+restarted — all escape. The guard stops forgetting, not evasion. A READY line's PRESENCE is
+asserted, never its correctness, and there is no waiver.
+
 ## The authoring rule for kit files
 
 *Here because the charter template had no room for it: it sits within a few hundred bytes of its

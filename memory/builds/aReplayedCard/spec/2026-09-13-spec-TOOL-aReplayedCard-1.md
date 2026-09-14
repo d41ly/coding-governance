@@ -1,13 +1,15 @@
 # TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` on an un-oriented card
 
-**Status:** SPECCED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 3 · ratified 2026-09-13
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 3 · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-build-TOOL-aReplayedCard-1-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aReplayedCard-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-prompt-TOOL-aReplayedCard-1-brief.md](../prompts/2026-09-14-prompt-TOOL-aReplayedCard-1-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
@@ -46,10 +48,12 @@ through the normaliser that process already ships.
   paths in the `/c/` spelling node cannot walk; the common dir comes from that `.git` file's
   `gitdir` and `commondir` lines or from the directory itself. A walk that finds no `.git` allows
   with one witness line naming the start directory, because git itself will refuse a commit there.
-  The check reads `<git-common-dir>/orientation/<session_id>.md` and requires a header line naming
-  `--card --write` as the writer, a line starting `READY —` whose tail is not the writer's sentinel
-  `none yet`, and a `tree —` cell whose toplevel, passed through `buildComparablePath`, equals the
-  resolved toplevel passed through the same function. Observed by AC2, AC3, AC9 and AC10.
+  The check reads `<git-common-dir>/orientation/<session_id>.md`, tests its header line for
+  `--card --replay` (S5) and nothing else — a header naming neither writer is S6's hand-written
+  card and proceeds to the READY test rather than earning a third branch — and requires a line
+  starting `READY —` whose tail is not the writer's sentinel `none yet`, and a `tree —` cell whose
+  toplevel, passed through `buildComparablePath`, equals the resolved toplevel passed through the
+  same function. Observed by AC2, AC3, AC9 and AC10.
 - **S3** The deny is exit 2 with stderr naming the card path, the condition that failed, and the
   remedy: `/session-kickoff` for the sentinel; `cd <target-tree> && /session-kickoff` for a tree
   mismatch, because `KICK-aReplayedCard-2`'s append rewrites the `tree —` cell to the append's
@@ -434,6 +438,13 @@ which the push boundary treats as forcing a total run.
   `skills/session-kickoff/` (M7); one evaluation order, absence before the exemption (M8); the
   card path is asserted in AC2, a no-`cwd` payload in AC7, and `git log --grep commit` plus
   `git commit-tree` in AC9 (L1, L2, L3).
+- rev-5 · 2026-09-14 · S2 · the build pass. The header is tested for `--card --replay` only: a
+  card whose header names neither writer proceeds to the READY test, because a third branch for a
+  hand-written card would decide nothing S6 does not already concede, and `--card --write` as a
+  REQUIRED spelling buys nothing a hand-written card cannot forge in one line. Every `-C` value in
+  the matched span is resolved in order, the superset of "the `-C` target". The deny and the
+  witness lines print the card path in `buildComparablePath`'s form, the one spelling the self-test
+  can compute from the hook's own export. Status CLOSED.
 
 ## 10. Reuse audit
 

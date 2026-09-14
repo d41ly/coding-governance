@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: c95fe32a6a572ae95a07931d0f1bbb09daa077ad
+witness: e4325047aab4b25f0f4b7da4f610c13e62569923
 phase: BUILDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
@@ -72,3 +72,11 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-14T03:01:09Z dispatch · item c95fe32a KICK-aReplayedCard-2 · reason tools/install-prefix-waivers.txt
 
 2026-09-14T03:04:27Z dispatch · item c95fe32a KICK-aReplayedCard-2 · reason tools/install-prefix-carried.txt
+
+2026-09-14T04:14:03Z dispatch · item e4325047 TOOL-aReplayedCard-1 · reason tools/hooks/scratch-guard.js tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/gate-legs.json memory/map/features/agent-cap.md memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md memory/builds/aReplayedCard/build/2026-09-14-build-TOOL-aReplayedCard-1-1-acceptance-ledger.md memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-1-brief.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-14T04:14:09Z brief · item TOOL-aReplayedCard-1 · reason ff2200e56b60 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-1-brief.md
+
+2026-09-14T04:19:54Z dispatch · item e4325047 TOOL-aReplayedCard-1 · reason memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md
+
+2026-09-14T05:19:34Z dispatch · item e4325047 TOOL-aReplayedCard-1 · reason memory/guides/SESSION-KICKOFF.md

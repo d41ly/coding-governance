@@ -112,6 +112,21 @@ learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entr
 `agent-cap` and versions the whole home: `version_from` is entry-level and single-valued, so a
 second constant would be invisible to govkit rather than gated by it.
 
+**`scratch-guard.js` carries a SECOND check, and it rides the process that already spawns.**
+`TOOL-aReplayedCard-1`: after the scratch verdict, `checkOriented` refuses a main-loop `git commit`
+while the session's orientation card under `<git-common-dir>/orientation/` still holds the kickoff
+writer's sentinel `READY — none yet`, or names another tree than the commit targets. It is inside
+this file and not a third hook because a node spawn was measured at 0.8–1.1 s on node `a`, so a
+second file on the `Bash|PowerShell` matcher doubles every shell call. The predicate has ONE
+evaluation order, written above the function: shape, `agent_id`, missing fields, an unwalkable
+target, an absent or replay-written card, then the sentinel-or-mismatch test, and only then the
+exemption — the commit that CREATES a build README carrying `authorized-by:` with a value in the
+unattended driver's `SECOND_ANCHOR_MODES`, pinned by a parity arm. An ABSENT card and a
+replay-written one ALLOW, with a witness line that reaches the debug log and the self-test only:
+a deny on either refused this build's own landing run, with a remedy it could not run. The drive
+fold is `buildComparablePath`'s own step, applied to the `-C` target and `cwd` BEFORE the walk and
+to both toplevels before the compare; there is no second normaliser.
+
 ## Shared seams
 
 **Every declared hook path is asserted to SHIP, in both directions.** A fragment names a
@@ -159,6 +174,12 @@ turns the cap rules off with no diff.
 
 ## Gaps
 
+- **The orientation deny stops forgetting, not evasion.** A commit made by a script, a heredoc or a
+  non-git tool, a deleted or hand-written card, an unwalkable `-C` target, and a session that
+  started before the wiring and never restarted all escape; a READY line's presence is asserted,
+  never its correctness. The drive fold lowercases, so on a case-sensitive filesystem the walk
+  finds no `.git` and allows with the witness line — every registered node is Windows. Stated in
+  the hook's header and in `tools/hooks/README.md`, with no waiver clause by owner decision.
 - **The join rule reads a blanked view, and a regex literal survives it.** So a file holding the ban
   table matches its own rule, and `check-review-join.sh` carries a self-exclusion row for the hook.
   The exclusion is measured rather than defensive, and it is the kind of row that silently widens if

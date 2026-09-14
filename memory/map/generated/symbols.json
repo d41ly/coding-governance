@@ -668,6 +668,11 @@
       "file": "tools/workflows/unattended-unit.js"
     },
     {
+      "id": "checkAuthorizedReadme",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -681,6 +686,11 @@
       "id": "checkLiteralOpen",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkOriented",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "checkSeqMarker",
@@ -1576,6 +1586,11 @@
       "id": "extract",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extractCommitTarget",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "extract_bound_names",
@@ -2763,9 +2778,24 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "readCard",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readInput",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "readMode",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readPaths",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "readStdin",
@@ -3208,6 +3238,11 @@
       "file": "tools/workflows/drift-audit-state.js"
     },
     {
+      "id": "renderOrientationDeny",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "renderPerLineBlanked",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -3403,6 +3438,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveCommonDir",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "resolveHomeRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3426,6 +3466,11 @@
       "id": "resolveStamp",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "resolveToplevel",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "resolve_adopter",
@@ -3726,6 +3771,11 @@
       "id": "runBothViews",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "runGit",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
     },
     {
       "id": "run_bounded",
