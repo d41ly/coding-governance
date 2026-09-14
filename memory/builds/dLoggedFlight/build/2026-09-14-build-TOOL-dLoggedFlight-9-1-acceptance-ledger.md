@@ -84,9 +84,10 @@ line below that fold observed.
   Coverage read `judged yes · near an owner turn 3`. Idle rows added to that model starting in an owner
   turn's second, ending in one, and ending the second before one under truncation each refused, with
   a line naming no time. Each moved three seconds further away rendered. With either list of owner
-  turns removed the other still refused, and `write_record` refused and wrote nothing. RED seen with
-  the refusal switched off, and with the second-after comparison dropped, which lets the truncated
-  end through.
+  turns removed the other still refused, and `write_record` refused and wrote nothing. An idle row
+  ending on a turn was found in the markdown copy alone and in the Data twin's alone. RED seen with the
+  refusal switched off, with the second-after comparison dropped, which lets the truncated end
+  through, and with either copy's row reader dropped.
 
 ## What else the pass carried
 

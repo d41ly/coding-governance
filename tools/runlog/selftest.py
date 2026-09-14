@@ -80,11 +80,11 @@ from collections import Counter  # noqa: E402
 # copy of an owner's name its own check. All five announce a skip where no bash that shares this
 # filesystem is on PATH, and a skip puts the count under this floor, which is how a node that cannot
 # run the adopter reds rather than passes.
-# RAISED 1084 -> 1128 by the closing review's round-1 fold of B1 and H1: model AC19, the idle rule,
+# RAISED 1084 -> 1130 by the closing review's round-1 fold of B1 and H1: model AC19, the idle rule,
 # with its git-only half inside AC10's arm; record AC9, the owner-time refusal; and the invariant arm
 # that sorts last and grades every model the arms built. Three new functions, so the decoy checks alone
 # move it by nine. Every idle fixture's session is made by the REAL extractor from a transcript.
-ASSERTION_FLOOR = 1128
+ASSERTION_FLOOR = 1130
 
 PASS = []
 FAIL = []
@@ -3826,6 +3826,14 @@ def test_record_ac9_owner_times():
               read_refusal(build_variant(t - 3, dur)), None)
     check("record AC9: the truncated case's rendered end is the second BEFORE the turn, so only the "
           "second-after comparison catches it", int(o - 1200.3) + int(1200.3), int(o) - 1)
+    # EACH COPY ON ITS OWN: one idle row ending on the turn, as the markdown table writes it and as the
+    # Data twin writes it, with no UTC of its own in an owner turn's second, so only the end can match.
+    cells = [rl_model.derive_iso(o - 1200), "-", "idle", "1200s", "-", "-", "-"]
+    for copy_name, line in (("markdown", "| " + " | ".join(cells) + " |"),
+                            ("Data twin", json.dumps(cells, separators=(",", ":")) + ",")):
+        check(f"record AC9: an idle row ending on an owner turn is found in the {copy_name} copy alone",
+              [what for _ln, what in rl_record.scan_owner_times(m, line)],
+              ["an idle row's end, its time plus its duration"])
     check("record AC9: with the timeline's owner rows gone, the owner positions still refuse",
           bool(read_refusal(build_variant(o + 0.4, 1200.0, drop="timeline"))), True)
     check("record AC9: with the owner positions gone, the timeline's owner rows still refuse",

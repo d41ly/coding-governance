@@ -43,7 +43,7 @@ share a start or whose windows overlap. What it does not check is stated at `che
 
 WHAT THIS DOES NOT DO. Rendering makes no git call: the model's calls are the whole cost, and rendering
 is a pure function of the model. It does not judge whether a value is TRUE, only that it is in its
-class. It does not choose when a record is rendered; the unattended Skill's step does. And it names
+class and, for a time, outside every owner turn's second. It does not choose when a record is rendered; the unattended Skill's step does. And it names
 nothing outside this kit by literal: the memory root is resolved, and the build-index generator is found
 beside this kit by its file name.
 """
@@ -297,11 +297,11 @@ RECORD_SCHEMA = {
     },
 }
 # THE OWNER-TIME REFUSAL reads the RENDERED text, never the model's own gaps, so what it grades is what
-# would be written (spec S4, rev-6). A UTC token anywhere, and an idle row in either copy: the markdown
-# table row and the Data twin's JSON row, each with its UTC and its duration.
+# would be written (spec S4, rev-6): a UTC token anywhere, and an idle row in either copy, the markdown
+# table row and the Data twin's JSON row. Both shapes are the schema's own, read from it rather than
+# spelled here, so a timeline whose columns move cannot leave the idle half of the check reading none.
 UTC_TOKEN_RE = re.compile(RECORD_SCHEMA["shaped"]["utc"])
-IDLE_ROW_RES = (re.compile(r"^\| (" + RECORD_SCHEMA["shaped"]["utc"] + r") \| [^|]* \| idle \| ([0-9]{1,12})s \|"),
-                re.compile(r'^\["(' + RECORD_SCHEMA["shaped"]["utc"] + r')","[^"]*","idle","([0-9]{1,12})s"'))
+TWIN_ROW_RE = re.compile(r'\["[^\]]*\]')
 
 
 # ---------------------------------------------------------------------------------- small helpers
@@ -825,16 +825,31 @@ def scan_owner_times(model, text) -> list:
     hits = []
     if not owners:
         return hits
+    table = derive_table("Timeline", "events")
+    cols = table["rows"]["idle"]
+    at_utc, at_dur = cols.index("utc"), cols.index("duration")
+    dur_rx = re.compile(RECORD_SCHEMA["shaped"]["duration"])
     for ln, line in enumerate(text.split("\n"), 1):
         for tok in UTC_TOKEN_RE.findall(line):
             sec = mdl.parse_iso(tok)
             if sec is not None and int(sec) in owners:
                 hits.append((ln, "a time"))
-        for rx in IDLE_ROW_RES:
-            row = rx.match(line)
-            start = mdl.parse_iso(row.group(1)) if row else None
-            if start is not None and {int(start) + int(row.group(2)), int(start) + int(row.group(2)) + 1} & owners:
-                hits.append((ln, "an idle row's end, its time plus its duration"))
+        row = None
+        if line.startswith("| ") and line.endswith(" |"):
+            row = line[2:-2].split(" | ")
+        elif TWIN_ROW_RE.match(line):
+            try:
+                row = json.loads(TWIN_ROW_RE.match(line).group(0))
+            except ValueError:
+                row = None
+        if not (isinstance(row, list) and len(row) == len(cols) and row[table["key"]] == "idle"):
+            continue
+        start = mdl.parse_iso(row[at_utc])
+        if start is None or not dur_rx.fullmatch(str(row[at_dur])):
+            continue
+        end = int(start) + int(row[at_dur][:-1])
+        if {end, end + 1} & owners:
+            hits.append((ln, "an idle row's end, its time plus its duration"))
     return hits
 
 
