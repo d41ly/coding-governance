@@ -287,5 +287,9 @@ hit "$out" "SKILL.template.md is missing from the kit"
 same "arm 6 refuses" "$rc" "1"
 absent "$G/.claude/skills/unattended/SKILL.md" "arm 6 wrote despite a missing template"
 
+# THE TRAILER IS UNCONDITIONAL. `run-selftests.sh --pooled` reads a completed run by its trailer
+# (SWEEP_TRAILER_RX); a red-but-complete run that prints only a green-gated `PASS (` is UNTRAILED
+# there, writes no calibrate reading, and refuses every later pooled run (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

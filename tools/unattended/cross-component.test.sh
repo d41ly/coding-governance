@@ -235,7 +235,8 @@ hit "$(leg)" "a run-state file records an authorization mode the build README at
 
 FLOOR_ASSERTIONS=19
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+# THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
+# reads it as untrailed and writes no reading (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
-
-
 exit "$st"

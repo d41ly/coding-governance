@@ -123,5 +123,8 @@ check_same "DELIM the wrapper's call opens a new group, so the control after it 
 # every arm above ran, and a block stranded past an exit would lower it.
 FLOOR_ASSERTIONS=35
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
+# THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
+# reads it as untrailed and writes no reading (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

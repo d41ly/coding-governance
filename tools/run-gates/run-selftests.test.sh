@@ -33,8 +33,9 @@ E='tools/run-gates/selftest-pooled-evidence.txt'
 RC=${R#bash }
 
 # THE FLOOR, RE-DERIVED at TOOL-aBatchedArm-5: 55 at BASE, minus the retired factor-absent arm,
-# plus the arms that unit added — both counts are in that unit's acceptance ledger.
-SELFTEST_FLOOR=99
+# plus the arms that unit added — both counts are in that unit's acceptance ledger. Raised again
+# at the aBatchedArm closing fix by the arms it added; that ledger carries the count.
+SELFTEST_FLOOR=102
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -767,6 +768,25 @@ arm "--check reds an ORPHAN evidence row naming no declared budget row" 1 \
 
 arm "--check over a well-formed evidence file is green and counts its rows" 0 \
     "4 pooled evidence row(s) well-formed" \
+    'true' "$R --check"
+
+# ---------------------------------------------------------------- the trailer rule, statically
+# aBatchedArm closing review D4: a suite whose only trailer sits behind `[ "$st" = 0 ] &&` is
+# UNTRAILED under --pooled the moment it reds, and the calibrate then writes no reading for it.
+# --check holds the rule over the rows under each `# pooled-kit:` the evidence header declares.
+# Observed RED first on a clone carrying the five kit suites the review named.
+arm "--check reds a pooled-kit row whose script prints its trailer only under [ \$st = 0 ], naming the row and the script" 1 \
+    "row 'free one': tools/suite-greenonly.sh prints no trailer outside a" \
+    "printf '#!/usr/bin/env bash\nst=1\n[ \"\$st\" = 0 ] && echo \"PASS (1 assertions)\"\nexit \$st\n' > tools/suite-greenonly.sh && printf '# pooled-kit: tools/\n' >> $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-greenonly.sh|' $B && git add -A" \
+    "$R --check"
+
+arm "--check skips a pooled-kit row declared no-trailer and counts what it graded" 0 \
+    "trailer arm graded 1 row(s) under pooled-kit tools/ (1 declared no-trailer)" \
+    "printf '#!/usr/bin/env bash\nst=1\n[ \"\$st\" = 0 ] && echo \"PASS (1 assertions)\"\nexit \$st\n' > tools/suite-greenonly.sh && printf '# pooled-kit: tools/\n# no-trailer: free one\n' >> $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-greenonly.sh|' $B && git add -A" \
+    "$R --check"
+
+arm "--check with no pooled-kit declared says the trailer arm graded NOTHING rather than passing silently" 0 \
+    "no pooled-kit declared so the trailer arm graded NOTHING" \
     'true' "$R --check"
 
 arm "--pooled over an evidence file that will not parse REFUSES naming the file, rather than defaulting past the row" 2 \

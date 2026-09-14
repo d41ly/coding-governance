@@ -22,6 +22,13 @@
 # no-trailer: unattended brief-recorded selftest
 # no-trailer: unattended pass-order selftest
 #
+# THE POOLED POPULATION, DECLARED, so `--check` can hold the trailer rule over it statically
+# before a calibrate pays for it: every row whose argv lies under a `pooled-kit:` dir must print
+# its trailer unconditionally — a `PASS (` behind `[ "$st" = 0 ] &&` is the same class as no
+# trailer, since the run that most needs a reading is the red one — or be declared `no-trailer:`
+# above. The closing review of TOOL-aBatchedArm found five such green-only trailers in this kit.
+# pooled-kit: tools/unattended
+#
 # NO ROW YET, and that is the announced-unarmed state: `--pooled` over any population refuses every
 # uncalibrated row by name until `--pooled --calibrate` has run it to its end. The build's landing
 # step calibrates the population `--kit tools/unattended --list` resolves and commits the rows.

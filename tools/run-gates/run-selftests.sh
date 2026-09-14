@@ -115,7 +115,12 @@ usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--
               nothing is a REFUSAL, because an unknown filter and a clean sweep
               are indistinguishable from outside
   --check     the gate: assert the declaration against tools/gate-legs.json in
-              BOTH directions, run nothing; takes no mode
+              BOTH directions, the pooled evidence's shape, and — over the rows
+              under each `# pooled-kit:` the evidence header declares — that a
+              row's script prints its trailer OUTSIDE a `[ "$st" = 0 ] &&` guard
+              unless declared `# no-trailer:`, because a green-only trailer is
+              UNTRAILED under --pooled the moment the suite reds; run nothing;
+              takes no mode
   --list      print the population and the derived total, run nothing; no mode
   --rank      rank the population by its RECORDED seconds and mark the set that
               carries the declared majority share; REFUSES if any row's reading
@@ -241,9 +246,10 @@ read_margin() {
 # row: name, condition token, node, max seconds, rc, fails, executed, readings, date. Emits
 # `ROW<TAB>...` for a well-formed row, `BAD<TAB><line>:<why>` for one that does not parse (which
 # `--check` reds by line and `--pooled` REFUSES on, naming the file), `DUP<TAB><line>:<key>` for a
-# repeated (row, token, node) key, and `NOTRAILER<TAB><row>` for each row the header declares as
-# printing no trailer. An ABSENT file emits nothing: that is the bootstrap state --calibrate fills
-# and --pooled refuses row by row.
+# repeated (row, token, node) key, `NOTRAILER<TAB><row>` for each row the header declares as
+# printing no trailer, and `POOLEDKIT<TAB><dir>` for each `# pooled-kit:` the header declares —
+# the population --check's static trailer arm grades. An ABSENT file emits nothing: that is the
+# bootstrap state --calibrate fills and --pooled refuses row by row.
 read_evidence() {
   [ -f "$EVIDENCE" ] || return 0
   "$PYBIN" - "$EVIDENCE" <<'PY'
@@ -259,6 +265,9 @@ for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
         m = re.match(r"#\s*no-trailer:\s*(.+?)\s*$", s)
         if m:
             print("NOTRAILER\t" + m.group(1))
+        m = re.match(r"#\s*pooled-kit:\s*(.+?)\s*$", s)
+        if m:
+            print("POOLEDKIT\t" + m.group(1))
         continue
     f = line.split("\t")
     if len(f) != 9:
@@ -586,11 +595,12 @@ EOF
   # ---- writes one, which is the announced-unarmed state.
   if [ -f "$EVIDENCE" ]; then
     ev_tags=" $(read_registry_tags | tr '\n' ' ')"
-    ev_rows=0; ev_faults=""
+    ev_rows=0; ev_faults=""; ev_nt="|"; ev_kits=""
     while IFS=$'\t' read -r kind a b c _rest; do
       [ -n "${kind:-}" ] || continue
       case "$kind" in
-        NOTRAILER) continue ;;
+        NOTRAILER) ev_nt="$ev_nt$a|"; continue ;;
+        POOLEDKIT) ev_kits="$ev_kits $a"; continue ;;
         BAD) ev_faults="$ev_faults"$'\n'"  line $a" ;;
         DUP) ev_faults="$ev_faults"$'\n'"  line $a — the (row, token, node) key repeats" ;;
         ROW)
@@ -613,6 +623,45 @@ EOF
       fails=1
     fi
     ev_note=", $ev_rows pooled evidence row(s) well-formed"
+    # ---- THE TRAILER RULE, STATICALLY, before anyone pays for a calibrate. aBatchedArm closing
+    # ---- review D4: five of the seven non-shard kit rows printed their only trailer under
+    # ---- `[ "$st" = 0 ] &&`, three of them red by design, so the calibrate would have rendered
+    # ---- them UNTRAILED, written no reading, and every later --pooled would have refused the whole
+    # ---- population — a 5.7 h serial-sum wall declared over rows that could never reach parity.
+    # ---- SCOPED to the rows under each `# pooled-kit:` the evidence header declares: run as a
+    # ---- candidate over the WHOLE declaration first, it named 34 of 69 rows that print no trailer
+    # ---- at all because they are not on the pooled route, and a gate that reds innocent rows is
+    # ---- not a gate. A row declared `# no-trailer:` is skipped. WHAT IT DOES NOT CHECK: a trailer
+    # ---- behind any guard other than the `st` one, a trailer printed by a file the script sources,
+    # ---- or that the print is reached — the calibrate's UNTRAILED verdict is the runtime half.
+    # ---- No pooled-kit declared is ANNOUNCED, never a silent skip.
+    if [ -n "$ev_kits" ]; then
+      tr_graded=0; tr_skipped=0; tr_faults=""
+      while IFS=$'\t' read -r state name budget argv; do
+        [ "${state:-}" = ok ] || continue
+        tr_in=0; for kd in $ev_kits; do case "$argv" in *"$kd"*) tr_in=1 ;; esac; done
+        [ "$tr_in" = 1 ] || continue
+        case "$ev_nt" in *"|$name|"*) tr_skipped=$((tr_skipped + 1)); continue ;; esac
+        tr_script=""; for tok in $argv; do case "$tok" in *.sh|*.py) tr_script=$tok; break ;; esac; done
+        tr_graded=$((tr_graded + 1))
+        if [ -z "$tr_script" ] || [ ! -f "$tr_script" ]; then
+          tr_faults="$tr_faults"$'\n'"  row '$name' names no script this arm can read, so its trailer is unknown"
+        elif ! grep -vE '^[[:space:]]*#' "$tr_script" | grep -E "$SWEEP_TRAILER_RX" | grep -qvE '^[[:space:]]*\[ "\$st" = 0 \] &&'; then
+          tr_faults="$tr_faults"$'\n'"  row '$name': $tr_script prints no trailer outside a [ \"\$st\" = 0 ] && guard, so a red-but-complete run is UNTRAILED under --pooled and writes no reading"
+        fi
+      done <<EOF
+$POP
+EOF
+      if [ -n "$tr_faults" ]; then
+        echo "run-selftests: the trailer rule fails under pooled-kit$ev_kits — every row's script must print a trailer ($SWEEP_TRAILER_RX) unconditionally, or be declared no-trailer in $EVIDENCE:" >&2
+        printf '%s\n' "$tr_faults" | grep . >&2
+        fails=1
+      fi
+      [ "$tr_graded" -gt 0 ] || { echo "run-selftests: pooled-kit$ev_kits selects NO row, so the trailer arm graded nothing" >&2; fails=1; }
+      ev_note="$ev_note, trailer arm graded $tr_graded row(s) under pooled-kit$ev_kits ($tr_skipped declared no-trailer)"
+    else
+      ev_note="$ev_note, no pooled-kit declared so the trailer arm graded NOTHING"
+    fi
   else
     echo "run-selftests: no pooled evidence at $EVIDENCE, so the evidence-shape arm graded NOTHING — --pooled refuses every row until --pooled --calibrate writes one"
     ev_note=", no pooled evidence file"

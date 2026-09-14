@@ -790,5 +790,8 @@ cp "$KEEP" "$F"
 # same absolute headroom as the pin it replaces. RE-MEASURED again at the round-4 fold: 86 executed, and at the round-5 fold: 90.
 FLOOR_ASSERTIONS=82
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+# THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
+# reads it as untrailed and writes no reading (aBatchedArm closing D4).
+echo "  ($n assertions executed)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"
