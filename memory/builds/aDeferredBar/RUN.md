@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 witness: 8f2f9002ba4c28a1d470d649164463c35c2ca176
-phase: VERIFYING
+phase: LANDING
 branch-sha: b2a330be17b8e195981002f3a5aa4b07d2256bd8
 branch-ref: refs/heads/branch/unattended-build-gates-timing-4af880
 mode: prompt
