@@ -1264,12 +1264,12 @@ hit "$(run)" "a recorded BASE does not resolve to a commit in this history, and 
 
 # ---- check 11: the bypass flag, checked where the record is.
 reset_tree; printf '\nparked: considered --no-verify to get past the hook\n' >> memory/builds/tRun/RUN.md
-hit "$(run)" "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on"
-
 # ---- check 10, both branches: the pair DRIFTED, and one half missing. The second is the arm that
 # ---- keeps a parity check with one file from reading as a passing parity check.
-reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-PROTOCOL.md
-out=$(run)
+printf '\ndrifted line\n' >> memory/guides/UNATTENDED-PROTOCOL.md
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on"
 hit "$out" "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
 
