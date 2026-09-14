@@ -2379,8 +2379,10 @@ user_skills = "/tmp/gk-fake-skills"
             # govkit has no kind meaning "in the kit dir, deliberately not in the payload", so the
             # ORDER row tells an adopter to supply a file gov does not want them to have. Recorded as
             # TOOL-aWalkedCorpus-6 rather than papered over here.
+            # 27 -> 28, TOOL-dLoggedFlight-3: run-gates withheld `run-gates.runlog.test.sh` by the same
+            # mechanism, the only row that build added to the default selection.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 27,
+                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 28,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))

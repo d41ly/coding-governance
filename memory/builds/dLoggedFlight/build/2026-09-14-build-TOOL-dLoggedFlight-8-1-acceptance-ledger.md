@@ -61,7 +61,7 @@ arm.
   terminal write ignored. The arm's first run found a defect: a `--status` reading LANDED on both of
   its lines was taken for the terminal END and ended the window three days late. S2 now names the
   terminal END as the verb that moved the phase into a terminal one, and AC16 pins it on a fixture.
-- AC8 — `subprocess.Popen` patched (`test_model_ac8_git_calls`) — runs of 10 and 100 own commits,
+- AC8 — `build_run_model` with `subprocess.Popen` patched (`test_model_ac8_git_calls`) — runs of 10 and 100 own commits,
   each commit touching the record and the decision log, both modeled every own commit, and each cost
   6 git processes. RED seen with blobs read one call each, which printed 38 and 308.
 - AC9 — `build_run_model` (`test_model_ac9_no_start`) — a run with no preflight START and no parked
