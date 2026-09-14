@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-6 · 2026-09-14 · node a · Tier-2 · base 97abf7e1 · streams tooling · order 4
+**Status:** OPEN · rev-7 · 2026-09-14 · node a · Tier-2 · base 97abf7e1 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -46,7 +46,13 @@ without deleting an assertion.
   the set is per group, derived from one run and pasted beside the group with the run it came from
   named, never hand-typed), and the rev-5 pass proved why nothing weaker works: three of the
   nineteen fire branches their arms never name, so a set derived from the arms reds `emitted` by
-  design. Observed by **AC3** and **AC8**.
+  design. **The rev-6 pass converted fourteen of the nineteen** (rev-7): a group is converted only
+  where the checker's own control flow keeps every block's branch reachable with its group-mates
+  applied — a sibling that empties the loop, or takes the `if` arm, a branch lives in changes that
+  arm's verdict, which the rollout rule below reverts. Five are not converted and four are reduced
+  to two blocks; each carries its proof, a checker line, in the pass-2 acceptance ledger. The
+  group's invocation is `out=$(GOV_UNATTENDED_REPORT=1 run)`, S1's channel, so `emitted` can see
+  the skip lines it strips. Observed by **AC3** and **AC8**.
 - **S3** — leave un-batched, each on its own tree, every arm whose break can truncate the run,
   relocate it, or leave a control without a witness. The list, and it is the unit's load-bearing
   declaration: the three check-1 branches that `exit` at `check-unattended.sh:114`, `:198` and
@@ -278,6 +284,30 @@ under S4.
 
 ## 9. Revision log
 
+- rev-7 · 2026-09-14 · §2 S2 · the rev-6 build pass, still under the two rulings (no self-test per
+  step, no gate until every unit is built), so it ran NO suite, NO shard, NO bar. **Fourteen of the
+  nineteen groups are converted, not nineteen**, and the reason is read from the checker's source,
+  not chosen. Three of the nineteen (the rev-5 ledger's region-4 ranges 1592–1625, 1634–1645 and
+  1646–1655 at 46b12b93) sit INSIDE the counted block that rev-5's own fact (2) says stays exactly
+  as it is — `reset_tree` increments `MUT` and the closing `same` asserts 13 — so the rev-5
+  enumeration contradicted its own line and the block is untouched. Two more are refused whole and
+  four are cut from three blocks to two, because a group-mate's break makes the other arm's branch
+  UNREACHABLE — the same verdict change the rollout rule reverts, caught by reading rather than by
+  the run the ruling forbids: check 10's `_c10_cmp` returns 2 for a missing half BEFORE the drift
+  compare, so `rm VERBS.template.md` beside a drifted `UNATTENDED-VERBS.md` fires only "missing";
+  check 26 takes the `nverbs -lt 10` arm on `VERBS_SLUG=""` and never reaches the carrier or Skill
+  joins; check 28b's key loop is fed by the template's fence, so the indented fence that arms its
+  liveness leaves the ad-hoc-pipeline branch no key to fire on (refused whole); check 28c counts a
+  bare `git cat-file -p "$1"` as a graded candidate, so the arm that adds one beside the "graded
+  nothing" arm keeps that branch silent; check 28's template parse lives in the `else` of the
+  declared-list pair check, so `rm check-playbook.sh` empties `dl_b` and the "declared null" branch
+  is never reached (refused whole); check 30 counts a build only at `--plan` rc 0, so the README
+  break that arms its liveness refuses `tPlanOk` and the NOT-A-UNIT verdict cannot follow. Every
+  survivor's two branches were read to be in independent arms of the checker. The invocation is
+  `out=$(GOV_UNATTENDED_REPORT=1 run)` — S1's channel and the helper's own header — where the pass-2
+  brief typed `out=$(run)` as shorthand; the helper strips the skip lines before the `hit` lines
+  read `$out`. The helper gains the `"?"` refusal by name. Blank lines between grouped blocks are
+  dropped and each block's comment stays ahead of its mutation; nothing else in the file moves.
 - rev-6 · 2026-09-14 · §2 S2 · §6 AC8 · base · REOPENED by owner ruling on the decision the rev-5
   pass parked. The owner chose: allow the one token change `hit "$(run)"` → `hit "$out"`, convert
   the nineteen groups the rev-5 classification enumerated, and write each group's expected set from
