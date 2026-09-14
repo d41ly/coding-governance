@@ -133,7 +133,7 @@ METHOD = {
     "run-starts": "read: the commits that added each run-state path, with renames off; a run whose start "
                   "added the live record and an archive together is marked joint_add",
     "journal-local": "inferred: a journal the window starts after, holding none of the run's lines, is "
-                     "not-local when no line of this node's driver journal names the build",
+                     "not-local when this node's driver journal holds none of the run's own segment",
     "journal-join": "read: a record-creating preflight START joins the first start commit at or "
                     "after its END, the latest such START winning a commit",
     "own-commits": "inferred: an era commit inside the window descending from the start commit whose "
@@ -736,7 +736,7 @@ def resolve_run_sessions(sids, slug, store=None, projects=None) -> tuple:
 
 # ---------------------------------------------------------------------------------- the blocks
 
-def measure_coverage(journals, slug, window, lines, activity, transcripts, record_state="present",
+def measure_coverage(journals, own_driver_lines, window, lines, activity, transcripts, record_state="present",
                      build_state="present") -> dict:
     """Each source's state from `COVERAGE_STATES`, with each journal's epoch.
 
@@ -745,17 +745,18 @@ def measure_coverage(journals, slug, window, lines, activity, transcripts, recor
     lines for the run or nothing the run's own rows prove required one, else `dead`. `activity` names,
     per journal, the run's own proof that its producer should have written.
 
-    Both of those last two say a writer was live for the run on THIS node, and only a driver line
-    naming `slug` places the build here: journals never leave their clone, and no other producer's
-    line names a slug. So a journal the window opens after, holding none of the run's lines, reads
-    `not-local` when no line of the driver journal names the build at all. A run made on another node
-    had read `dead` there (L2 of the closing review, round 1). A writer broken for the whole of a run
-    made here reads the same, since nothing tells the two apart.
+    Both of those last two say a writer was live for the run on THIS node, and only the run's own
+    driver lines place it here: journals never leave their clone, and no other producer's line names
+    a run. `own_driver_lines` counts them over the run's whole journal segment, from its start to the
+    next run's, inside its window or after it. With none, a journal the window opens after, holding
+    none of the run's lines, reads `not-local`: a run made on another node had read `dead` there (L2
+    of the closing review, round 1). The count is the run's own and not any line naming its build,
+    since an earlier run of the build made here would otherwise place a later one made elsewhere. A
+    writer broken for the whole of a run made here reads the same, since nothing tells the two apart.
     """
     start, end = window["start"], window["end"]
     out = {"run-state": {"state": record_state}, "git": {"state": "present"},
            "build-folder": {"state": build_state}}
-    named = any(ln.fields.get("slug") == slug for ln in journals["driver"]["journal"].lines)
     for name in JOURNALS:
         info = journals[name]
         j, epoch = info["journal"], info["epoch"]
@@ -771,9 +772,10 @@ def measure_coverage(journals, slug, window, lines, activity, transcripts, recor
             row["state"] = "partial"
         elif n:
             row["state"] = "present"
-        elif not named:
+        elif not own_driver_lines:
             row["state"] = "not-local"
-            row["note"] = f"no line of this node's driver journal names {slug}, so nothing places the run here"
+            row["note"] = ("the driver journal here holds none of the run's own lines, so nothing places the "
+                           "run on this node")
         elif activity.get(name):
             row["state"] = "dead"
             row["proof"] = activity[name]
@@ -1679,7 +1681,10 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     transcripts = {"state": tr_state, "sessions": len(sids), "extracts": len(extracts)}
     if tr_note:
         transcripts["note"] = tr_note
-    coverage = measure_coverage(journals, slug, window, lines, activity, transcripts, record_state,
+    # L2 (closing review, round 1): the run's own driver lines over its whole segment place it on this
+    # node; none, and a journal holding none of its lines is not-local rather than dead.
+    own_driver = sum(len(i["lines"]) for i in seg)
+    coverage = measure_coverage(journals, own_driver, window, lines, activity, transcripts, record_state,
                                 "present" if (root / build).is_dir() else "absent")
     attribution = derive_attribution(all_invs, extracts, window, run=seg_in)
     coverage["attribution"] = {k2: attribution[k2] for k2 in ("calls", "attributed", "share_calls",

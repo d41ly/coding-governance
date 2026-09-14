@@ -106,7 +106,9 @@ from collections import Counter  # noqa: E402
 # rotation; the slug grammar graded by the driver's own function run by bash; and a range of unit ids
 # read to its end, and bounded. No new function, so the decoy checks do not move. The slug arm skips
 # where no bash shares this filesystem, and that skip lowers the count.
-ASSERTION_FLOOR = 1288
+# RAISED 1288 -> 1289 when the bug-class checklist moved L2's key to the run's own journal segment: a
+# rotated build whose first run alone was driven here reads its second run's driver not-local.
+ASSERTION_FLOOR = 1289
 
 PASS = []
 FAIL = []
@@ -2895,40 +2897,39 @@ def test_model_ac12_rc_reads_exit():
 def test_model_ac6_coverage():
     """AC6: every coverage state from its own fixture, the epoch rule on both sides, and a journal
     holding only other runs' lines telling a dead writer from one that predates the run, and from a
-    run this node never saw (L2 of the closing review, round 1)."""
+    run this node never saw (L2 of the closing review, round 1). `measure_coverage` is handed the count
+    of the run's own driver lines over its whole segment, which the model derives and the arm below
+    this one grades through it."""
     base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-ac6-"))
     SCRATCH.append(base)
     other = render_driver_lines(30, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING")
-    # A line of the run's OWN build that is none of its lines: a preflight refused on a dirty tree, which
-    # the driver writes as rc=1 with its check, made before the run. It places the build on this node.
-    own = render_driver_lines(30.5, "--preflight", rc=1, checks="2", pid=4343)
-    by_node = {"here": rl_model.read_journals(write_journals(base, driver=other + own)),
-               "elsewhere": rl_model.read_journals(write_journals(base, driver=other))}
-    epoch = by_node["here"]["driver"]["epoch"]
-    check("model AC6: the epoch is the producer file's first line, in both journals",
-          (epoch, by_node["elsewhere"]["driver"]["epoch"]), (float(MODEL_T0 + 1800),) * 2)
+    j = write_journals(base, driver=other)
+    journals = rl_model.read_journals(j)
+    epoch = journals["driver"]["epoch"]
+    check("model AC6: the epoch is the producer file's first line", epoch, float(MODEL_T0 + 1800))
     transcripts = {"state": "not-local"}
     seen, notes = {}, {}
 
-    def run_state(name, start, end, lines, activity, node="here"):
-        cov = rl_model.measure_coverage(by_node[node], FX_SLUG, {"start": start, "end": end}, {"driver": lines},
+    def run_state(name, start, end, lines, activity, own=2):
+        cov = rl_model.measure_coverage(journals, own, {"start": start, "end": end}, {"driver": lines},
                                         {"driver": activity}, transcripts)
         seen[name] = cov["driver"]["state"]
         notes[name] = cov["driver"].get("note", "")
         return cov
 
+    # `own` is the run's own driver lines over its segment: two, a `--status` pair after its window,
+    # where the run has none inside it, and none at all for a run made on another node.
     run_state("before the epoch", epoch - 900, epoch - 60, 0, "12 parked row(s) in the window")
     run_state("after it, with twelve parked rows and none of its lines", epoch + 60, epoch + 900, 0,
               "12 parked row(s) in the window")
     run_state("holding it, with none of its lines", epoch - 60, epoch + 60, 0, "12 parked row(s)")
-    run_state("holding it, with lines of its own", epoch - 60, epoch + 60, 4, "12 parked row(s)")
-    run_state("after it, with lines of its own", epoch + 60, epoch + 900, 4, "12 parked row(s)")
+    run_state("holding it, with lines of its own", epoch - 60, epoch + 60, 4, "12 parked row(s)", own=4)
+    run_state("after it, with lines of its own", epoch + 60, epoch + 900, 4, "12 parked row(s)", own=4)
     run_state("after it, with no line and nothing proving one was owed", epoch + 60, epoch + 900, 0, None)
     run_state("another node's run, after it, with twelve parked rows", epoch + 60, epoch + 900, 0,
-              "12 parked row(s) in the window", node="elsewhere")
-    run_state("another node's run, after it, with nothing owed", epoch + 60, epoch + 900, 0, None,
-              node="elsewhere")
-    run_state("another node's run, holding it", epoch - 60, epoch + 60, 0, "12 parked row(s)", node="elsewhere")
+              "12 parked row(s) in the window", own=0)
+    run_state("another node's run, after it, with nothing owed", epoch + 60, epoch + 900, 0, None, own=0)
+    run_state("another node's run, holding it", epoch - 60, epoch + 60, 0, "12 parked row(s)", own=0)
     check("model AC6: each window against the epoch", seen,
           {"before the epoch": "absent", "after it, with twelve parked rows and none of its lines": "dead",
            "holding it, with none of its lines": "partial", "holding it, with lines of its own": "partial",
@@ -2938,10 +2939,9 @@ def test_model_ac6_coverage():
            "another node's run, after it, with nothing owed": "not-local",
            "another node's run, holding it": "partial"})
     local_less = [k for k in seen if seen[k] == "not-local"]
-    check_true("model AC6: each not-local journal, two of them, says why, naming the build no driver line "
-               "here names", len(local_less) == 2
-               and all(FX_SLUG in notes[k] and "driver journal" in notes[k] for k in local_less), str(notes))
-    absent = rl_model.measure_coverage(rl_model.read_journals(None), FX_SLUG, {"start": 0, "end": 1}, {}, {},
+    check_true("model AC6: each not-local journal, two of them, says why", len(local_less) == 2
+               and all("none of the run's own lines" in notes[k] for k in local_less), str(notes))
+    absent = rl_model.measure_coverage(rl_model.read_journals(None), 0, {"start": 0, "end": 1}, {}, {},
                                        transcripts)
     seen["no journal file"] = absent["pushes"]["state"]
     check("model AC6: a missing journal file reads absent", absent["pushes"]["state"], "absent")
@@ -2959,14 +2959,16 @@ def test_model_ac6_dead_through_model():
     """AC6 through `build_run_model`, for each journal (M2 of the closing review, round 1): the landed
     fixture, staged with a journal older than the run and none of the run's own lines, reads that
     journal `dead` and names its proof. `pushes` is staged twice: with the driver journal, whose
-    terminal END closes the window, and without it, where the terminal write does. Its proof is the
-    move into LANDED that closed the window, which lies at the end and never inside it, so looked for
-    among the window's moves it could not fire. The arms before this fold observed only `present`.
+    terminal END closes the window, and without the run's own verbs, where the terminal write does.
+    Its proof is the move into LANDED that closed the window, which lies at the end and never inside
+    it, so looked for among the window's moves it could not fire. The arms before this fold observed
+    only `present`.
 
-    Every dead case holds a line of the run's own build that is none of its lines, a preflight refused
-    before the run, since a dead writer is one on THIS node (L2 of the closing review, round 1). With
-    driver lines that all name another build, the same fixture is a run made elsewhere, and reads
-    `not-local` for every journal."""
+    A dead writer is one on THIS node, which only the run's own driver lines show (L2 of the closing
+    review, round 1). Every dead case with none of the run's verbs therefore holds the owner's
+    `--status` after the landing, a line of the run's segment that is outside its window. Without it
+    the same journals are a run made elsewhere, and read `not-local`. So is the second run of a build
+    whose first run was driven here: its build's lines are on this node, and none of its own are."""
     fx = build_landed_fixture()
     repo = fx["repo"]
     older_push = render_push_lines(-30, "1" * 40, lander="1", wt=FX_WT_OTHER, decision="skip-nondefault",
@@ -2974,15 +2976,15 @@ def test_model_ac6_dead_through_model():
     older_bar = [render_gate_line(-20, "20260913T090000Z-6001", "1" * 40, wt=FX_WT_OTHER)]
     older_verb = render_driver_lines(-25, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING",
                                      wt=FX_WT_OTHER, sid=FX_SID_B, pid=4343)
-    older_own = render_driver_lines(-26, "--preflight", rc=1, checks="2", pid=4344)
+    after = render_driver_lines(40, "--status", phase_from="LANDED", phase_to="LANDED", wt=FX_WT_PRIMARY,
+                                pid=4344)
     cases = (
         ("pushes, with the terminal END closing the window", "pushes",
-         dict(driver=older_own + fx["driver"], gates=fx["gates"], pushes=older_push), "terminal-end"),
+         dict(driver=fx["driver"], gates=fx["gates"], pushes=older_push), "terminal-end"),
         ("pushes, with the terminal write closing it", "pushes",
-         dict(driver=older_own, gates=fx["gates"], pushes=older_push), "terminal-write"),
-        ("gates", "gates", dict(driver=older_own + fx["driver"], gates=older_bar, pushes=fx["pushes"]),
-         "terminal-end"),
-        ("driver", "driver", dict(driver=older_own + older_verb, gates=fx["gates"], pushes=fx["pushes"]),
+         dict(driver=older_verb + after, gates=fx["gates"], pushes=older_push), "terminal-write"),
+        ("gates", "gates", dict(driver=fx["driver"], gates=older_bar, pushes=fx["pushes"]), "terminal-end"),
+        ("driver", "driver", dict(driver=older_verb + after, gates=fx["gates"], pushes=fx["pushes"]),
          "terminal-write"),
     )
     for name, source, journals, end_from in cases:
@@ -2998,16 +3000,30 @@ def test_model_ac6_dead_through_model():
           "journal reads present", [near.coverage[s]["state"] for s in rl_model.JOURNALS], ["present"] * 3)
     elsewhere = build_model(repo, journals=write_journals(repo.parent, driver=older_verb, gates=older_bar,
                                                             pushes=older_push))
-    check("model AC6 through the model: the same run made on another node, every driver line here naming "
-          "another build, reads not-local for each journal, with none of its lines and no proof",
+    check("model AC6 through the model: the same run made on another node, every driver line here another "
+          "build's, reads not-local for each journal, with none of its lines and no proof",
           [(elsewhere.coverage[s]["state"], elsewhere.coverage[s]["lines"], "proof" in elsewhere.coverage[s])
            for s in rl_model.JOURNALS], [("not-local", 0, False)] * 3)
-    here = build_model(repo, journals=write_journals(repo.parent, driver=older_own + older_verb,
-                                                       gates=older_bar, pushes=older_push))
-    check("model AC6 through the model near miss: the same journals with the refused preflight of the "
-          "run's own build beside them read dead for each, so that one line is all that differs",
+    here = build_model(repo, journals=write_journals(repo.parent, driver=older_verb + after, gates=older_bar,
+                                                       pushes=older_push))
+    check("model AC6 through the model near miss: the same journals with the owner's --status after the "
+          "landing beside them read dead for each, so that one line of the run's own is all that differs",
           [(here.coverage[s]["state"], here.coverage[s]["lines"], "proof" in here.coverage[s])
            for s in rl_model.JOURNALS], [("dead", 0, True)] * 3)
+    # THE SHARED KEY. A build's first run driven here and its second run made elsewhere: this journal
+    # names the build, and holds none of the second run's lines. Keyed on any line naming the build, the
+    # second run's parked row in its window read its driver `dead`.
+    rot = build_record_rotation()
+    first_run = (render_driver_lines(4.5, "--preflight", phase_to="RUNNING")
+                 + render_driver_lines(6, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+                 + render_driver_lines(15, "--abort", phase_from="RUNNING", phase_to="ABORTED"))
+    j = write_journals(rot["repo"].parent, driver=first_run)
+    m1, m2 = build_model(rot["repo"], journals=j, run=1), build_model(rot["repo"], journals=j, run=2)
+    check("model AC6 through the model: a build's first run driven here reads its driver present, and its "
+          "second, made elsewhere with a parked row in its window, reads not-local",
+          (m1.coverage["driver"]["state"], m2.coverage["driver"]["state"],
+           any(rl_model.check_in_window(r["t"], m2.window) for r in m2.record_rows)),
+          ("present", "not-local", True))
 
 
 def test_model_ac7_real_tree():

@@ -68,8 +68,8 @@ a hand-edited copy reds the adopter's `--check` arm.
 - **No committed record.** Answer from the model, and say the record was never rendered.
 - **No journals.** The run predates them, and the model marks them `absent`. Or it ran on another
   node: journals never leave their clone, so a journal kept through the run that holds none of its
-  lines reads `not-local` when no line of this node's driver journal names the build. Either way the
-  model answers from git and the run-state file alone.
+  lines reads `not-local` when this node's driver journal holds none of the run's own lines either.
+  Either way the model answers from git and the run-state file alone.
 - **No local transcript.** The model marks the transcripts `not-local`. Its `usage`, its owner-turn
   counts and its attributed calls then read zero, and zero here means UNKNOWN: never free, and never
   a run that asked nothing. The committed record writes each of them as `-`. There is no narration

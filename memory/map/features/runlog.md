@@ -210,8 +210,8 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   named in its `method` field. It reads only history reachable from HEAD. It judges idle gaps only
   where every session's transcript is local, and keeps out any gap beside an owner turn. Two runs
   that claim one tree in the same stretch both hold it, so a bar made there joins both. The spec-mark
-  split still reads each spec at the era's end, not the window's. A journal no driver line here names
-  the build for reads `not-local`.
+  split still reads each spec at the era's end, not the window's. With none of a run's own driver
+  lines here, its empty journals read `not-local`.
 - **A moved memory root reds the schema leg.** The move adds every record, so a rotated build's runs
   share its start; the leg names that shape, and nothing clears it.
 - **No rendered time falls in an owner turn's second.** Owner turns are counts, and a gap endpoint

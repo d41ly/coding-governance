@@ -76,17 +76,22 @@ AC5.
   with the driver journal, the window closed by the terminal END, and without it, closed by the
   terminal write; the gates; and the driver. With the run's own lines beside the older ones, each
   journal read `present`. RED seen with the pushes proof looked for among the window's moves, on both
-  pushes rows. Before this fold no landed run's `pushes` could read `dead`. The fold of L2 added a
-  second journal whose lines all name another build. Windows after its epoch read `not-local`, with
-  twelve parked rows and with none, each with a note naming the build, while the journal that also
-  holds a preflight of the run's own build, refused before the run, kept `dead` and `present`.
-  Through the model, every dead case now stages that refused preflight, and the landed fixture with
+  pushes rows. Before this fold no landed run's `pushes` could read `dead`. The fold of L2 hands
+  `measure_coverage` the run's own driver lines over its whole segment. With none, windows after the
+  epoch read `not-local`, with twelve parked rows and with none, each with a note, while lines of the
+  run's own after its window kept `dead` and `present`. Through the model, each dead case with none
+  of the run's verbs stages the owner's `--status` after the landing, and the landed fixture with
   older journals whose driver lines all name another build read `not-local` for all three. The same
-  journals with the refused preflight beside them read `dead` for all three, so one line is the whole
-  difference. RED seen in place, restored by checksum: the not-local branch removed, and any driver
-  line taken as naming the build, each redding the unit arm and the through-the-model arm. The first
-  cut of the note check passed with the branch removed, since it quantified over no not-local state;
-  it now requires the two it expects.
+  journals with that `--status` beside them read `dead` for all three, so one line of the run's own
+  is the whole difference. A rotated build whose first run alone was driven here read its first
+  run's driver `present` and its second's `not-local`, with a parked row in the second's window. RED
+  seen in place, restored by checksum, three ways: the not-local branch removed; the key of the
+  fold's first cut, any driver line naming the build, which read the second run `dead`; and the count
+  taken inside the window alone, which read the post-landing `--status` cases `not-local`. That first
+  cut keyed on any line naming the build, as the review proposed. The bug-class checklist over its
+  commit named `join-key-widened-by-a-shared-location`, since an earlier run of the build is a
+  location every later run of it shares. An early cut of the note check passed with the branch
+  removed, since it quantified over no not-local state, and it now requires the two it expects.
 - AC7 — `python tools/runlog/runlog.py model aLeakedHandle --json` (`test_model_ac7_real_tree`) — on
   this tree, with its journals aimed at a scratch directory whose first line is dated three days
   after the run and its store and transcripts at scratch, the CLI exited 0. The parked-row counts
@@ -359,8 +364,8 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   sessions, which AC23 observes. One that calls `--status` inside the window still joins, and its
   calls after that `--status` END are attributed to the run, so the park stands.
 - The fold of L2 leaves a writer broken for the whole of a run made here reading `not-local`, the
-  same as a run made on another node. The model has no node identity, and only a driver line naming
-  the build places it here. The kit README names it among what the kit does not check.
+  same as a run made on another node. The model has no node identity, and only the run's own driver
+  lines place it here. The kit README names it among what the kit does not check.
 - The fold of L5 reads a range the way the memory-tree grammar reads one. A subject that continues
   an id with bare numbers, as two of this build's own spec-audit folds spell `-1..4, 6, 8..13`,
   names units 1 to 4 alone; the grammar reads it the same, and `scan_unit_ids` says so.

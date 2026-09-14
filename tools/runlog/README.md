@@ -239,9 +239,10 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   for the driver, a LANDING write for the gates, and for the pushes the move into LANDED. That last
   move is what closes a landed run's window, so it lies at the window's end and is read there, since
   the half-open window never holds it.
-- **And only where this node saw the build.** Journals never leave their clone, and only the driver's
-  lines name a slug. So a journal the window starts after, holding none of the run's lines, reads
-  `not-local` when no line of this node's driver journal names the build: a run made on another node.
+- **And only where this node saw the run.** Journals never leave their clone. So a journal the window
+  starts after, holding none of the run's lines, reads `not-local` when this node's driver journal
+  holds none of the run's own lines either, over its whole segment: a run made on another node. The
+  key is the run's own lines, never any line naming its build, which an earlier run driven here holds.
 - **Every inferred answer is named** in the model's `method` field.
 - **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
   10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
@@ -418,8 +419,8 @@ prefix and root, and hold the render to an independent one.
   shape, on every bar from then on; `verify` looks for the pre-move key, and `record --write` writes
   a second file. Nothing follows the path back past the move, and no waiver clears the refusal: the
   unit's acceptance ledger parks that question.
-- **A writer broken for the whole of a run made here.** With no driver line naming the build, the
-  model cannot tell that from a run made on another node, and reads the journals `not-local`.
+- **A writer broken for the whole of a run made here.** With none of the run's own driver lines on
+  this node, the model cannot tell that from a run made on another node, and reads `not-local`.
 - **A list that continues a unit id with bare numbers.** `X-<slug>-1..4, 6` names units 1 to 4, as the
   memory-tree grammar reads it, and not unit 6.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in
