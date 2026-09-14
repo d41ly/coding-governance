@@ -421,6 +421,8 @@ prefix and root, and hold the render to an independent one.
   unit's acceptance ledger parks that question.
 - **A writer broken for the whole of a run made here.** With none of the run's own driver lines on
   this node, the model cannot tell that from a run made on another node, and reads `not-local`.
+  The reverse holds too: a `--status` made here inside another node's run is one of that run's
+  journal lines, and places it here.
 - **A list that continues a unit id with bare numbers.** `X-<slug>-1..4, 6` names units 1 to 4, as the
   memory-tree grammar reads it, and not unit 6.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in

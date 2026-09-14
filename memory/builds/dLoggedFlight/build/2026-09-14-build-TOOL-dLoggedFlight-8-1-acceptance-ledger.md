@@ -365,7 +365,12 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   calls after that `--status` END are attributed to the run, so the park stands.
 - The fold of L2 leaves a writer broken for the whole of a run made here reading `not-local`, the
   same as a run made on another node. The model has no node identity, and only the run's own driver
-  lines place it here. The kit README names it among what the kit does not check.
+  lines place it here. The kit README names it among what the kit does not check. The run's own
+  lines are its journal segment as S2 reads it, so a `--status` made here inside another node's run
+  is one of them and places that run here. The checklist over the key's commit named
+  `join-key-widened-by-a-shared-location` for it: a `--status` is a visit and claims nothing. It is
+  the parked session key's visit, below, met through the segment rather than the session, and it is
+  left with that park rather than changing S2's segment inside a low's fold.
 - The fold of L5 reads a range the way the memory-tree grammar reads one. A subject that continues
   an id with bare numbers, as two of this build's own spec-audit folds spell `-1..4, 6, 8..13`,
   names units 1 to 4 alone; the grammar reads it the same, and `scan_unit_ids` says so.
