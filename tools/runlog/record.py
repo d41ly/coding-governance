@@ -986,16 +986,6 @@ def read_index_entries(root, memory_root) -> list:
     return out
 
 
-def derive_spec_id(text, slug) -> str | None:
-    """The unit id a spec defines: the first id of the build's slug on its `# ` title line, the rule the
-    model's `read_units` applies to the working tree, applied here to staged bytes."""
-    first = (text or "").split("\n", 1)[0]
-    if not first.startswith("# "):
-        return None
-    m = re.search(r"\b[A-Z]+-" + re.escape(slug) + r"-[0-9]+\b", first)
-    return m.group(0) if m else None
-
-
 def build_record_checks(slug, memory_root, own_ids) -> dict:
     """Every class of `RECORD_SCHEMA` as `(regex source, predicate)`, bound to ONE build.
 
@@ -1127,23 +1117,23 @@ def check_record_data(json_lines, fence_ln, checks) -> list:
         ln = json_lines[n - 1][0] if n and 0 < n <= len(json_lines) else fence_ln
         return [(ln, "data", f"the Data block is not JSON the schema admits: {getattr(exc, 'msg', exc)}")]
 
-    def locate(needle) -> int:
+    def resolve_line(needle) -> int:
         return next((n for n, text in json_lines if needle in text), fence_ln)
 
     if not isinstance(doc, dict) or list(doc) != ["schema", "sections"]:
         return [(fence_ln, "data", "the top level carries keys other than `schema` and `sections`, in order")]
     out = []
     if doc["schema"] != RECORD_SCHEMA["schema"]:
-        out.append((locate('"schema"'), "data", f"schema is not {RECORD_SCHEMA['schema']}"))
+        out.append((resolve_line('"schema"'), "data", f"schema is not {RECORD_SCHEMA['schema']}"))
     secs = doc["sections"]
     want = [h for h in RECORD_SCHEMA["headings"] if h != "Data"]
     if not isinstance(secs, dict) or list(secs) != want:
-        out.append((locate('"sections"'), "data", "the sections are not the schema's set and order"))
+        out.append((resolve_line('"sections"'), "data", "the sections are not the schema's set and order"))
     for name, sec in (secs.items() if isinstance(secs, dict) else ()):
         spec = RECORD_SCHEMA["sections"].get(name)
         if spec is None or name == "Data":
             continue
-        at = locate(json.dumps(name) + ":")
+        at = resolve_line(json.dumps(name) + ":")
         if not isinstance(sec, dict) or list(sec) != ["facts", "tables"]:
             out.append((at, "data", f"section `{name}` carries keys other than `facts` and `tables`"))
             continue
@@ -1165,7 +1155,7 @@ def check_record_data(json_lines, fence_ln, checks) -> list:
                 out.append((at, "data", f"a table in section `{name}` is not a declared name, header and rows"))
                 continue
             if tb["header"] != list(decl["header"]):
-                out.append((locate(json.dumps(tb["name"])), "data", f"table `{decl['name']}`'s header is not "
+                out.append((resolve_line(json.dumps(tb["name"])), "data", f"table `{decl['name']}`'s header is not "
                                                                     "the declared one"))
             if not isinstance(tb["rows"], list):
                 out.append((at, "data", f"table `{decl['name']}`'s rows are not a list"))
@@ -1174,7 +1164,7 @@ def check_record_data(json_lines, fence_ln, checks) -> list:
                 if not isinstance(row, list) or not all(isinstance(c, str) for c in row):
                     out.append((at, "data", f"a row of table `{decl['name']}` is not a list of strings"))
                     continue
-                out += check_table_row(locate(json.dumps(row, ensure_ascii=False, separators=(",", ":"))),
+                out += check_table_row(resolve_line(json.dumps(row, ensure_ascii=False, separators=(",", ":"))),
                                        row, decl, checks)
     return out
 
@@ -1403,9 +1393,12 @@ def check_records(root, memory_root=None) -> dict:
     wanted += [e["obj"] for slug in with_records for e in specs.get(slug, []) if e["stage"] == 0]
     wanted += [e["obj"] for e in run_files.values() if e["stage"] == 0]
     blobs = mdl.read_blobs(root, wanted, decode=False)
-    own = {slug: {i for i in (derive_spec_id((blobs.get(e["obj"]) or b"").decode("utf-8", "replace"), slug)
-                              for e in specs.get(slug, [])) if i}
-           for slug in with_records}
+    own = {}
+    for slug in with_records:
+        id_re = mdl.build_unit_id_re(slug)
+        units = (mdl.derive_spec_unit((blobs.get(e["obj"]) or b"").decode("utf-8", "replace"), id_re)
+                 for e in specs.get(slug, []))
+        own[slug] = {u["id"] for u in units if u}
     for rel, (slug, es) in sorted(records.items()):
         out["records"].append(rel)
         e = es[0]

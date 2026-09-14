@@ -1046,6 +1046,29 @@ def extract_open_questions(text) -> str:
     return "\n".join(out)
 
 
+def build_unit_id_re(slug) -> re.Pattern:
+    """A unit id of ONE build, as a word: `<FAMILY>-<slug>-<n>`."""
+    return re.compile(r"\b[A-Z]+-" + re.escape(slug) + r"-[0-9]+\b")
+
+
+def derive_spec_unit(text, id_re) -> dict | None:
+    """The unit a spec's text defines: the first of the build's ids on its `# ` title line, with the
+    status and order its status header carries. None when the text defines no unit. `read_units` reads
+    the working tree through this and the schema leg (TOOL-dLoggedFlight-10) reads staged bytes through
+    it, so the two cannot disagree about which unit a spec defines."""
+    first = (text or "").split("\n", 1)[0]
+    m = id_re.search(first)
+    if not first.startswith("# ") or not m:
+        return None
+    status = order = None
+    for line in text.split("\n")[:12]:
+        if line.startswith("**Status:**"):
+            status = line[len("**Status:**"):].split("·")[0].strip()
+            om = re.search(r"·\s*order\s+([0-9]+)", line)
+            order = int(om.group(1)) if om else None
+    return {"id": m.group(0), "status": status, "order": order}
+
+
 def read_units(root, build, id_re) -> list:
     """The build's units from its specs' status headers: id, status, order and path. A build with no
     specs has an empty unit table."""
@@ -1056,18 +1079,9 @@ def read_units(root, build, id_re) -> list:
             text = p.read_bytes().decode("utf-8", "replace")
         except OSError:
             continue
-        first = text.split("\n", 1)[0]
-        m = id_re.search(first)
-        if not first.startswith("# ") or not m:
-            continue
-        status = order = None
-        for line in text.split("\n")[:12]:
-            if line.startswith("**Status:**"):
-                status = line[len("**Status:**"):].split("·")[0].strip()
-                om = re.search(r"·\s*order\s+([0-9]+)", line)
-                order = int(om.group(1)) if om else None
-        units.append({"id": m.group(0), "status": status, "order": order,
-                      "spec": p.relative_to(root).as_posix()})
+        unit = derive_spec_unit(text, id_re)
+        if unit is not None:
+            units.append(dict(unit, spec=p.relative_to(root).as_posix()))
     return units
 
 
@@ -1125,7 +1139,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     root = pathlib.Path(root)
     mr = rl.resolve_memory_root(root)
     build = f"{mr}/builds/{slug}"
-    id_re = re.compile(r"\b[A-Z]+-" + re.escape(slug) + r"-[0-9]+\b")
+    id_re = build_unit_id_re(slug)
     slug_re = re.compile(r"\b" + re.escape(slug) + r"\b")
 
     runs = derive_run_starts(root, mr, [slug]).get(slug, [])                          # git 1

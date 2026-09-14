@@ -92,6 +92,7 @@
       "run-gates turnstile",
       "run-gates wiring",
       "run-selftests self-test",
+      "runlog record schema",
       "runlog selftest",
       "scratch-guard self-test",
       "selftest harness self-test",

@@ -48,6 +48,18 @@ none = """
 nothing is wired, so there is no wiring to check. A later unit that renders a Skill from this kit brings its adopter and its check together
 """
 
+# THE SCHEMA LEG SHIPS (TOOL-dLoggedFlight-10). Its subject is the target's own committed run records
+# and run-state history, which go stale with nobody editing this kit, so a failure means the
+# REPOSITORY is wrong, not the kit. `history_depth = "full"` because the run starts are the commits
+# that ADDED each run-state path, and a shallow clone's boundary commit adds every one of them at
+# once, which would give every run of a build one start and red the leg on a history it cannot see.
+[[gate_leg]]
+name = "runlog record schema"
+subject = "repo"
+argv = ["python", "{kit}/runlog.py", "check-records"]
+guard = []
+history_depth = "full"
+
 # No [[lf_pin]]. The shipped files are Python modules, a README and the redaction table, which read
 # the same with either line ending: the table's loader drops a CR that ends a line, and its self-test
 # loads a CRLF copy to prove it. The byte-exact files are the fixtures, which are withheld, so their

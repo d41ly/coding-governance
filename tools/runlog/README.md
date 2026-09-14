@@ -238,8 +238,10 @@ fact and every shown row, one row per line.
 duration, a sha, a sha256 digest, a verb token, a phase token, a list of check numbers, a workflow
 label, one of the build's own unit ids, and a path under the build's own folder. The vocabularies are
 closed lists, the model's own wherever it owns one. A value outside its class is written `-`, the
-same as an absent one, and the summary's `values withheld` line counts them. The schema leg of
-`TOOL-dLoggedFlight-10` validates committed bytes against the same data.
+same as an absent one, and the summary's `values withheld` line counts them. So is a value carrying a
+shape `RECORD_SCHEMA["forbidden"]` lists, an absolute path or a UUID, whatever class it passed: the
+`label` class admits a lowercase UUID. The schema leg below validates committed bytes against the same
+data.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
 `TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision
@@ -255,6 +257,33 @@ no journal of the run is on this machine. A line the run appended after the rend
 **`record --write` prints what it cannot do itself**, on stdout: the build-index re-render, with the
 memory tree's `gen_build_index.py` found beside this kit by its file name, and a commit subject naming
 the slug and no unit id. Rendering makes no git call; the model's are the whole cost.
+
+## The schema leg
+
+```bash
+python <this kit>/runlog.py check-records
+```
+
+The record's second enforcement point, `TOOL-dLoggedFlight-10`, on the bar as `runlog record schema`. A
+renderer that honours the schema proves nothing about a record edited afterwards, so this reads every
+tracked `<memory root>/builds/*/build/*-runlog-*.md` from the INDEX and grades its bytes against
+`RECORD_SCHEMA`, compiling the schema's data itself rather than calling the renderer. It checks the fixed
+head and its `**Serves:**` ids, the eight headings in order, each section's declared facts against
+their templates and its declared tables against their column classes, and the Data twin's keys and
+values. A forbidden shape refuses the record wherever it sits. Each refusal names the record, the line
+and one rule from `RECORD_RULES`.
+
+It also derives every tracked run's start with `derive_run_starts`, and its window through the model's
+own `derive_record_commits` and `derive_window`, from git alone. It refuses a build whose runs share a
+start, or whose windows end before they start or overlap, and prints each rotated build's starts and
+windows.
+
+**Liveness.** It prints the population it graded, `0 records (none committed yet)` included. It reds
+rather than reporting zero when the declared root holds no tracked file, or when its glob does not
+admit the path the renderer's `derive_record_relpath` builds. **Cost** is five git calls whatever the
+population: one `ls-files`, one `cat-file --batch`, the run starts' log, one log over the run-state paths
+and one batch read. The self-test counts them. Exit 0 when nothing is refused, 1 on any refusal, and 2
+when it cannot run.
 
 ## What this kit does NOT check
 
@@ -307,6 +336,10 @@ the slug and no unit id. Rendering makes no git call; the model's are the whole 
   withheld self-test, where the files are present. A value outside a copy is withheld, never rendered.
 - **Whether a path the record names is tracked.** The renderer checks each path's shape and makes no
   git call; the model reads its paths from git.
+- **Whether a record's two copies agree.** The schema leg grades the markdown and the Data twin each on
+  its own, for shapes, and never compares them.
+- **A window a clock skew moved.** The leg compares windows in commit time, so two nodes' clocks that
+  put a predecessor's terminal write after its successor's start move a window without redding it.
 
 ## Running the self-test
 
@@ -320,7 +353,9 @@ tracked run record through the CLI, one reports the owner spellings over the tra
 and one holds the model's copies of the driver's sets, and the record's owed ledger sources, to the
 driver's source. Each announces a skip where its subject is absent. The record arms render real
 models, lengthened by copying their own entries where a big one is needed, and grade names and
-anchors with copies typed from the documents that own those rules, never from the renderer.
+anchors with copies typed from the documents that own those rules, never from the renderer. The
+schema-leg arms stage each refusal on a copy of a record the renderer produced, in a fixture index,
+and one of them runs the leg over this tree, read-only, for its rotated builds' starts and windows.
 Its redaction arms find the kit's files through `git ls-files`, so a new file is scanned once it is
 staged and not before.
 It and its fixtures are withheld from `govkit apply`: its subject is this directory's code, which an

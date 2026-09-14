@@ -99,6 +99,7 @@ run-gates run-log line	kit	selftests
 run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
 run-selftests self-test	kit	selftests
+runlog record schema	repo	declarations
 runlog selftest	kit	selftests
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests

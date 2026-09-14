@@ -2,14 +2,15 @@
 
 ```toml
 feature = "runlog"
-title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, the run model that joins every source into one account of one run, and the closed-schema record that puts that account in a tracked file"
+title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, the run model that joins every source into one account of one run, the closed-schema record that puts that account in a tracked file, and the schema leg that grades every committed record's bytes"
 status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
-  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9"]
+  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9",
+  "TOOL-dLoggedFlight-10"]
 
 [claims]
-gate-legs = ["runlog selftest", "pre-push run-log line"]
+gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema"]
 kits = ["runlog"]
 git-hooks = []
 workflow-scripts = []
@@ -104,6 +105,17 @@ unusually wide cells; the figures live in those constants. The journal commitmen
 MODEL attributed, and verify takes the committed count from the committed first time, so a line the
 run appends after the render is not an edit.
 
+**The schema leg reads the INDEX and the schema's DATA, never the renderer.** A record edited by hand,
+by a merge or by a later renderer is exactly what a renderer's own discipline cannot vouch for, so
+`check_records` compiles `RECORD_SCHEMA` itself and grades staged bytes, in a number of git calls the
+self-test holds constant over the population. Its clean fixture is rendered, never typed. Which unit a
+spec defines is read through the model's `derive_spec_unit`, so the leg and the model share that rule. Building that arm found a real disagreement:
+the `label` class admits a lowercase UUID, so the absolute-path and UUID shapes became schema data the
+renderer withholds by and the leg refuses on. The leg also re-derives every run's start and window
+from git alone, reading the model's own `derive_record_commits` and `derive_window` rather than a
+copy. Staged against this tree, the naive key and the unbounded era each red every rotated build it
+tracks, the two defects the round-2 and round-3 audits named.
+
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
@@ -124,9 +136,10 @@ run appends after the render is not an edit.
   renders from the model and reads its run key, its attributed journal lines, its workflow runs and its
   anomaly times rather than re-deriving any of them. The question-answering skill,
   `TOOL-dLoggedFlight-12`, prints narration through its `narration` verb.
-- `RECORD_SCHEMA` is shared as data with the record schema leg, `TOOL-dLoggedFlight-10`, and the
+- `RECORD_SCHEMA` is shared as data with the record schema leg, `TOOL-dLoggedFlight-10`, which shipped
+  after the record and holds its glob to the renderer's `derive_record_relpath` at run time. The
   unattended Skill's render step, `TOOL-dLoggedFlight-11`, runs `record --write` and the index
-  re-render it prints. The record's first six ledger sources are held to the driver's owed sets by the
+  re-render it prints, and grades the run's own record under the leg before it lands. The record's first six ledger sources are held to the driver's owed sets by the
   same withheld arm that holds the model's copies.
 - The unattended driver's parked-kind, owed and terminal-phase sets are COPIED into the model, and
   the withheld self-test holds each copy to the driver's source, with the fixture scaffold and the
@@ -163,6 +176,9 @@ run appends after the render is not an edit.
 - **The record proves shapes, not truth.** A count can be wrong and still be an integer. The lists it
   copies from the pre-push hook, the spec template and the hygiene doc are held to them only by the
   withheld self-test, and its commitment is checkable only on the node that holds the journal.
+- **The schema leg compares windows in commit time.** A clock skew between two nodes that puts a
+  predecessor's terminal write after its successor's start moves a window without redding it, and the
+  leg never compares a record's two copies with each other.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
@@ -192,3 +208,7 @@ the run starts for anything keyed on one; extend via a new member of `ANOMALY_KI
 seam: `record.render_record` + `RECORD_SCHEMA` — reuse for anything a public tracked file says about a
 run, and `parse_record` for reading one back; extend via a declared class, fact template or table in
 the schema, which the renderer and the schema leg both read, never a value rendered around it.
+
+seam: `record.check_records` + `RECORD_RULES` — reuse for grading any committed run record, or every
+tracked run's start and window, over the index; extend via a new rule id with the staged fixture that
+produces it, which the self-test demands in both directions, never a second grader.

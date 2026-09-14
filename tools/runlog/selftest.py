@@ -66,7 +66,10 @@ from collections import Counter  # noqa: E402
 # RAISED 774 -> 908 by TOOL-dLoggedFlight-9: the committed-record arms, ten functions and the two
 # checks the driver-sets arm gained for the record's owed ledger sources, so the decoy checks alone move
 # it by thirty. One of the ten holds three copied lists to their owners in this tree, each with a skip.
-ASSERTION_FLOOR = 908
+# RAISED 908 -> 1000 by TOOL-dLoggedFlight-10: the schema-leg arms, five functions, one check per staged
+# refusal and its line, so a variant dropped from the refusal list lowers the count as well as redding
+# the both-directions rule check. One reads this tree through the leg and announces a skip without it.
+ASSERTION_FLOOR = 1000
 
 PASS = []
 FAIL = []
@@ -3560,12 +3563,17 @@ H2_BUILDS = ("aPacedTurnstile", "dUnstalledConvoy")
 
 def build_schema_fixture():
     """The class model's record, written by the renderer into its own fixture repo beside a spec for
-    every unit it names, and staged. Built once; an arm that stages a variant restores the clean one."""
+    every unit it names, and staged. Built once; an arm that stages a variant restores the clean one.
+    None, after a failed check naming why, when the renderer wrote nothing: every arm then stops."""
     if SCHEMA_FX:
         return SCHEMA_FX
     m, _intruders, j, fx = build_class_model()
     repo = fx["repo"]
     path = rl_record.write_record(repo, m, journal_root=j, date=RECORD_DATE)
+    check_true("schema fixture: the renderer wrote the class model's record", path is not None,
+               "write_record wrote nothing, so the run served no spec-defined unit")
+    if path is None:
+        return None
     for u in m["units"]:
         spec = repo / "memory" / "builds" / FX_SLUG / "spec" / f"2026-09-13-spec-{u['id']}.md"
         if not spec.exists():
@@ -3627,6 +3635,8 @@ def test_schema_ac1_render_then_grade():
     admits, is withheld by the renderer, and a renderer that stops withholding it writes a record the
     leg refuses: the disagreement this arm exists to red on."""
     fx = build_schema_fixture()
+    if fx is None:
+        return
     r = run_cli(["check-records"], fx["repo"])
     check("schema AC1: check-records over the rendered record exits 0", r.returncode, 0)
     check_true("schema AC1: ...printing `1 record`", re.search(r"check-records 1 record under ", r.stdout) is not None,
@@ -3668,6 +3678,8 @@ def test_schema_ac2_refusals():
     record: exit 1 naming the rule and the line, every rule of `RECORD_RULES` staged and no other rule
     printed. Near misses the leg accepts stand beside them."""
     fx = build_schema_fixture()
+    if fx is None:
+        return
     repo, rel, raw = fx["repo"], fx["rel"], fx["clean"]
     clean = raw.decode("utf-8")
     home = "/".join(("", "home", "someone", "RUN.md"))
@@ -3802,6 +3814,8 @@ def test_schema_ac4_cost_and_index():
     """AC4: fixture indexes of 1 and 100 records, and of 1 and 50 builds carrying run-state files, cost
     the same git calls, the five S4 and S6 name; and the leg grades the index, not the working tree."""
     fx = build_schema_fixture()
+    if fx is None:
+        return
     repo, rel = fx["repo"], fx["rel"]
     folder = rel.rsplit("/", 1)[0]
     copies = [f"{folder}/{RECORD_DATE}-build-{FX_UNIT1}-runlog-{i:08x}.md" for i in range(1, 100)]
@@ -3819,7 +3833,8 @@ def test_schema_ac4_cost_and_index():
     for c in copies:
         (repo / c).unlink()
     check("schema AC4: 1 and 100 records cost the same git calls", counts[100], counts[1])
-    check("schema AC4: ...the five S4 and S6 name, in order", counts[1], ["ls-files", "cat-file", "log", "log", "cat-file"])
+    check("schema AC4: ...the five S4 and S6 name, in order", counts[1],
+          ["ls-files", "cat-file", "log", "log", "cat-file"])
     builds = {}
     for n in (1, 50):
         base, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": {"memory/README.md": "m\n"}}])
@@ -3882,7 +3897,8 @@ def test_schema_ac5_runs():
         print("  SKIP schema AC5 real tree: this tree does not track the rotated builds round-3 H2 names")
     else:
         r = run_cli(["check-records"], top)
-        per = {m.group(1): m.group(0) for m in re.finditer(r"run-state (\S+) · [0-9]+ runs · starts [^\n]*", r.stdout)}
+        per = {m.group(1): m.group(0)
+               for m in re.finditer(r"run-state (\S+) · [0-9]+ runs · starts [^\n]*", r.stdout)}
         check("schema AC5: the leg reports every rotated build this tree tracks, by ls-files", sorted(per), rotated)
         check("schema AC5: ...each with distinct starts, windows ending at or after their starts, disjoint",
               [s for s, ln in per.items() if not ("· distinct ·" in ln and "each ends at or after its start" in ln
@@ -3910,7 +3926,8 @@ def test_schema_ac5_runs():
         for runs in out.values():
             for run in runs:
                 if not run["record"].endswith("/RUN.md"):
-                    added = run_git(["log", "--diff-filter=A", "--format=%H %ct", "--", run["record"]], root).stdout.split()
+                    added = run_git(["log", "--diff-filter=A", "--format=%H %ct", "--", run["record"]],
+                                    root).stdout.split()
                     run.update(start=added[-2], t=int(added[-1]))
         return out
 

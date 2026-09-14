@@ -805,6 +805,17 @@
     "ceiling": 180
   },
   {
+    "name": "runlog record schema",
+    "argv": [
+      "python",
+      "tools/runlog/runlog.py",
+      "check-records"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 60
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",
