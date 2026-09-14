@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5
 
-**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 5
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 5
 
 <!-- gen:spec-records -->
 
@@ -96,10 +96,12 @@ No identifier is minted; the change is engine prose.
 
 On this node the installed `/session-kickoff` is a junction to the PRIMARY tree's
 `skills/session-kickoff/`, on `main`, so a session on this branch invokes the OLD engine until the
-landing merge fast-forwards the primary. AC1 and AC2 are therefore observed by a fixture session
-that re-points the junction to this worktree's copy for the observation and restores it after,
-recording both acts and `tools/check-wiring.sh --session`'s tracked-versus-installed line in the
-ledger; an adopter's copy elsewhere is reported by that same line at the next start.
+landing merge fast-forwards the primary. AC1 and AC2 are therefore observed at the first kickoff
+of a session started after the landing, when the junction's target carries this engine — or earlier
+by a fixture session that re-points the junction to this worktree's copy for the observation and
+restores it after, recording both acts. Either way the ledger records the session id and
+`tools/check-wiring.sh --session`'s tracked-versus-installed line; an adopter's copy elsewhere is
+reported by that same line at the next start.
 
 ### Rollout
 
@@ -199,6 +201,10 @@ none
   Step 5's field list into the six sections and compressing rationale in Steps 1 and 5b with every
   rule kept, landing at 18369 B; §4 gains the high-water bump and the ledger; §10 names the
   ratchet spec's §4 as the text S3 reorders.
+- rev-5 · 2026-09-14 · §4 · Migration names the first post-landing kickoff as the observation
+  route for AC1 and AC2, beside the re-pointed fixture: no session inside this unattended run can
+  re-point the junction, so the ledger records both as owed there, and the bug-class checklist's
+  `amendment-leaves-its-other-half-standing` read the two routes as two answers.
 
 ## 10. Reuse audit
 

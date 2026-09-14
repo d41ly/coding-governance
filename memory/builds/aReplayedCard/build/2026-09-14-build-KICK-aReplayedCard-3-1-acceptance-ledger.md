@@ -35,7 +35,8 @@ and why.
   re-stamping.
 - `memory/map/features/session-kickoff.md`: one paragraph in the card seam saying Step 1 consumes
   and Step 5 appends before the repair commit.
-- The spec: rev-4, status CLOSED, S5 and §4 and §10 amended before the code.
+- The spec: status CLOSED; rev-4 amended S5, §4 and §10 before the code, and rev-5 aligned §4
+  Migration's observation route after the bug-class checklist named the two routes as two answers.
 
 ## RED before it landed
 
@@ -62,4 +63,4 @@ branch lands and the junction's target moves. Not chased.
 - AC2 — `bash skills/session-kickoff/manifest-check.sh --card --check` — OWED TO THE ORCHESTRATOR, NOT OBSERVED HERE, same session as AC1: when that kickoff reaches Step 5, the card on disk ends with the READY line the transcript printed, and the check over it with that session's id exits 0. Red as written: the READY line is printed and never appended, so the next commit is denied.
 - AC3 — `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` — at the tip: `template-size OK — SKILL.md: 18369 / 18432 bytes (63 under, 99.7%)`, exit 0, no high-water WARN after the bump. Red at 19191 B before the trims, as staged above.
 - AC4 — `bash skills/session-kickoff/manifest-check.sh` — plain: exit 0 at the tip; `--staged` with `SKILL.md` and the re-stamped manifest staged: exit 0; the commit carries `manifest-audit: delta none · watch-commits-since-stamp: 4`. Red before the re-stamp, as staged above.
-- AC5 — `skills/session-kickoff/SKILL.md` — read at the tip: Step 5 says "Commit Step 2b's staged repair AFTER that append, THEN hand control back", Step 5b says "commit the staged repair after that append, and continue without halting", and `awk '/^## Step 0/{f=1} /^## Step 5/{f=0} f' | grep -o '\`[^\`]*git commit[^\`]*\`'` over the file prints nothing (exit 1); the nine inline `git` spans between Step 0 and Step 5 are `rev-parse --show-toplevel`, `remote`, `symbolic-ref`, `-C`, `branch --show-current`, `worktree list`, two `merge-base` forms and `rev-list --count`, none a commit.
+- AC5 — `skills/session-kickoff/SKILL.md` — read at the tip: Step 5 says "Commit Step 2b's staged repair AFTER that append, THEN hand control back", Step 5b says "commit the staged repair after that append, and continue without halting", and `grep -n 'git commit'` over the inline code spans of Steps 0 through 4 prints nothing (exit 1); the nine inline `git` spans between Step 0 and Step 5, as `scratch-guard.test.sh` AC9 extracts them, are `rev-parse --show-toplevel`, `remote`, `symbolic-ref`, `-C`, `branch --show-current`, `worktree list`, two `merge-base` forms and `rev-list --count`, none a commit.
