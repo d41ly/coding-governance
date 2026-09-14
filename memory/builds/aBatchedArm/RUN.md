@@ -52,3 +52,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-13T19:40:19Z brief · item TOOL-aBatchedArm-3 · reason de469904de2f memory/builds/aBatchedArm/prompts/2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md
 
 2026-09-13T19:42:22Z dispatch · item 77f3946f TOOL-aBatchedArm-3 · reason tools/unattended/check-unattended.test.sh tools/run-gates/selftest-budgets.txt tools/install-prefix-carried.txt tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/unattended/run-unattended-gates.sh memory/guides/SESSION-KICKOFF.md memory/builds/aBatchedArm/spec/2026-09-10-spec-TOOL-aBatchedArm-3.md memory/builds/aBatchedArm/build/2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-14T08:24:27Z review · item TOOL-aBatchedArm-5 · reason verdict BLOCKED · blockers 3
