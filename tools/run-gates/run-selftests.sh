@@ -103,8 +103,13 @@ usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--
               of their serial budgets, grade NOTHING, and write each completed
               row's reading (worst seconds, monotone; rc, FAIL and executed
               counts, latest) to selftest-pooled-evidence.txt. A row the wall
-              killed or whose output carries no trailer writes NO reading and reds
-              the calibrate. Off --pooled it REFUSES.
+              killed, whose output carries no trailer, or whose output carries
+              the no-baseline sentinel (a batched group with no expected set yet)
+              writes NO reading and reds the calibrate; an UNSOUND run (pool over
+              its bound, fingerprint not taken or changed) writes NOTHING and
+              says so. Every row's output is kept under
+              <git-dir>/gate-logs/selftests/ and the path printed on each row
+              that is not ok. Off --pooled it REFUSES.
   --reset <row>  with --pooled --calibrate ONLY: drop that row's reading, run
               ONLY the reset rows, and write the new seconds even when lower — the
               one path that lowers a bound. Off --calibrate, or naming a row the
@@ -185,6 +190,13 @@ MARGIN="$HERE/ceiling-margin.txt"
 # does after 1300 s of work, and TOOL-aBatchedArm-3 AC4's ratified rule asks for an artifact of the
 # work beside the exit (the `ab-arm-never-did-the-work` class).
 SWEEP_TRAILER_RX='PASS \(|assertions executed|this leg ran shard'
+# THE NO-BASELINE SENTINEL. A batched group whose expected signature set is still `"?"` prints
+# `FAIL check_emitted: expected set not yet observed` and its observed set beneath, and the shard
+# still prints its trailer — so a calibrate would fold those refusals into `fails` and the next
+# --pooled would print parity GREEN over a suite that refused by name in every such group
+# (aBatchedArm closing review D3). A hit is UNTRAILED at calibrate and MISMATCH under --pooled,
+# so the landing order can never matter again. The phrase is the suite's own, verbatim.
+SWEEP_NOBASELINE_RX='expected set not yet observed'
 
 # THE NODE IS THE CHARTER'S §2 REGISTRY TAG, never a hostname, which the registry does not know:
 # GOV_NODE when set, else USERNAME/USER matched against the registry table of the charter at the
@@ -911,6 +923,20 @@ EOF
 
   SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   trap 'rm -rf "$SWEEP_ROOT" 2>/dev/null' EXIT
+  # EACH ROW'S OUTPUT OUTLIVES THE TRAP. The render loop copies `$d/out` to
+  # `<git-dir>/gate-logs/selftests/<row>.out` — the per-leg pattern `run-gates.sh` already keeps —
+  # and prints that path on every row that is not `ok`, because a calibrate's READ row prints none
+  # of the suite's output, the two render paths that do print it cap at four un-indented lines, and
+  # the trap deletes the rest: the `observed:` lines a batched group's expected set is pasted from
+  # were unobtainable from a calibrate (aBatchedArm closing review D3). Resolved ONCE and never
+  # composed from an empty git dir; capture OFF is announced, not silent.
+  SWEEP_LOGDIR=""
+  _gd=$(git rev-parse --git-dir 2>/dev/null) || _gd=""
+  if [ -n "$_gd" ] && mkdir -p "$_gd/gate-logs/selftests" 2>/dev/null; then
+    SWEEP_LOGDIR="$_gd/gate-logs/selftests"; chmod 700 "$SWEEP_LOGDIR" 2>/dev/null || true
+  else
+    echo "run-selftests: per-row output capture OFF (no usable git dir) — a row's output dies with the scratch this run" >&2
+  fi
 
   # ---- POOL SAFETY IS OBSERVED, NOT ASSUMED. TOOL-aPooledSweep-3 -------------------------------
   # Running 59 suites together is sound only if each confines its writes to its own scratch. The
@@ -1058,6 +1084,13 @@ EOF
   # the ONLY change is that a completed, trailed, MATCHED row no longer sets it.
   st=0; ran=0; killed=0; walled=""; unrun=""; withheld=0
   unstarted=0; mismatched=0; untrailed=0; calibrated=0; cal_red=0; cal_rows=""; walled_n=0; unrun_n=0
+  # SOUNDNESS IS ITS OWN BIT, cleared by the three post-loop checks (pool wider than OUTER,
+  # fingerprint not taken, fingerprint changed): the calibrate's writer used to key on CALIBRATE
+  # alone, so a run that had just said "every reading above is suspect" wrote those readings as the
+  # monotone bound and the parity baseline anyway (aBatchedArm closing review D7).
+  sound=1; unsound_why=""
+  outlog=""
+  say_out() { [ -n "$outlog" ] && printf '        output: %s\n' "$outlog"; return 0; }
   j=1
   while [ "$j" -le "$SW_N" ]; do
     name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"; key=${SW_KEY[$((j - 1))]}
@@ -1065,6 +1098,12 @@ EOF
       st=1; unstarted=$((unstarted + 1))
       printf 'FAIL  %-46s        (%s: this row could not be resolved into a runnable suite)\n' "$name" "$state"
       j=$((j + 1)); continue
+    fi
+    # THE OUTPUT IS KEPT BEFORE ANY VERDICT IS READ, a killed row's partial capture included.
+    outlog=""
+    if [ -n "$SWEEP_LOGDIR" ] && [ -f "$d/out" ]; then
+      outlog="$SWEEP_LOGDIR/$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_').out"
+      cp "$d/out" "$outlog" 2>/dev/null || outlog=""
     fi
     if [ ! -r "$d/v" ]; then
       st=1
@@ -1077,9 +1116,11 @@ EOF
       elif [ "$WALL_BREACHED" = 1 ]; then
         ran=$((ran + 1)); walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s        (killed by the %ss run wall before it finished)\n' "$name" "$SWEEP_WALL"
+        say_out
       else
         ran=$((ran + 1)); unstarted=$((unstarted + 1))
         printf 'FAIL  %-46s        (no verdict was written, so this suite could not start)\n' "$name"
+        say_out
       fi
       j=$((j + 1)); continue
     fi
@@ -1087,9 +1128,11 @@ EOF
     IFS=$'\t' read -r rc s e < "$d/v"
     took=$(( (e - s) / 1000 ))
     # THE ARTIFACT OF THE WORK, read beside the exit: the `^FAIL` count, whether the trailer is in
-    # the filed output, and the executed count where the trailer is the executed-count line.
+    # the filed output, the executed count where the trailer is the executed-count line, and
+    # whether the no-baseline sentinel is in it.
     fails=$(grep -c '^FAIL' "$d/out" 2>/dev/null || true); case "$fails" in ''|*[!0-9]*) fails=0 ;; esac
     trailer=0; grep -qE "$SWEEP_TRAILER_RX" "$d/out" 2>/dev/null && trailer=1
+    nobase=0; grep -qE "$SWEEP_NOBASELINE_RX" "$d/out" 2>/dev/null && nobase=1
     executed="-"
     if [ "$trailer" = 1 ]; then
       executed=$(grep -oE '\(([0-9]+) assertions executed' "$d/out" 2>/dev/null | head -1 | tr -dc '0-9')
@@ -1104,6 +1147,14 @@ EOF
       if [ "$WALL_BREACHED" = 1 ] && [ "$rc" = 143 ]; then
         st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s %5ss  (killed by the %ss calibrate wall — NO reading written)\n' "$name" "$took" "$SWEEP_WALL"
+        say_out
+      elif [ "$nobase" = 1 ]; then
+        # THE SENTINEL IS NOT A BASELINE. The trailer is there and the exit is the suite's own, but
+        # a group that says its expected set is unwritten has refused by name, and a reading taken
+        # over it would make the next --pooled GREEN over that refusal.
+        st=1; untrailed=$((untrailed + 1))
+        printf 'UNTRAILED %-42s %5ss  (exit %s, %s FAIL, and its output carries "%s" — a group with no expected set is a refusal, not a reading; paste the observed sets first)\n' "$name" "$took" "$rc" "$fails" "$SWEEP_NOBASELINE_RX"
+        say_out
       elif [ "$trailer" = 1 ] || [ "$declared_nt" = 1 ]; then
         calibrated=$((calibrated + 1)); [ "$rc" = 0 ] || cal_red=$((cal_red + 1))
         cal_rows="$cal_rows"$'\n'"$name"$'\t'"$took"$'\t'"$rc"$'\t'"$fails"$'\t'"$executed"
@@ -1112,10 +1163,12 @@ EOF
         else
           printf 'READ  %-46s %5ss  rc %s, %s FAIL, %s executed  (verdict withheld)\n' "$name" "$took" "$rc" "$fails" "$executed"
         fi
+        say_out
       else
         st=1; untrailed=$((untrailed + 1))
         printf 'UNTRAILED %-42s %5ss  (exit %s, %s FAIL, and NO trailer in its output — a completed exit is not a reading)\n' "$name" "$took" "$rc" "$fails"
         grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+        say_out
       fi
       j=$((j + 1)); continue
     fi
@@ -1133,10 +1186,12 @@ EOF
       st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
       printf 'WALL  %-46s %5ss  cost withheld  (killed by the %ss run wall, not by its own bound)
 '         "$name" "$took" "$SWEEP_WALL"
+      say_out
     elif [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
       st=1; killed=$((killed + 1))
       printf 'TIMEOUT %-44s %5ss  (killed at its %ss evidence bound — it did not fail, it did not finish)\n' \
         "$name" "$took" "${SW_BOUND[$((j - 1))]}"
+      say_out
     else
       # THE POOLED VERDICT IS PARITY. GREEN-by-exit-code is impossible for a population whose
       # baseline is RED by design (unit 3's shard rows exit 1 when complete), so the verdict is
@@ -1148,13 +1203,17 @@ EOF
       got="rc $rc, $fails FAIL, $executed executed"
       base_triple="rc ${EV_RC[$key]}, ${EV_FAILS[$key]} FAIL, ${EV_EXEC[$key]} executed"
       trailer_ok=$trailer; [ "$declared_nt" = 1 ] && trailer_ok=1
-      if [ "$trailer_ok" = 1 ] && [ "$rc" = "${EV_RC[$key]}" ] && [ "$fails" = "${EV_FAILS[$key]}" ] && [ "$executed" = "${EV_EXEC[$key]}" ]; then
+      # THE SENTINEL MISMATCHES WHATEVER THE TRIPLE SAYS: a group with no expected set has refused,
+      # and a baseline that happened to be taken over the same refusal must not read as parity.
+      if [ "$trailer_ok" = 1 ] && [ "$nobase" = 0 ] && [ "$rc" = "${EV_RC[$key]}" ] && [ "$fails" = "${EV_FAILS[$key]}" ] && [ "$executed" = "${EV_EXEC[$key]}" ]; then
         printf 'ok    %-46s %5ss  cost withheld  ok (%s matched)\n' "$name" "$took" "$got"
       else
         st=1; mismatched=$((mismatched + 1))
-        printf 'MISMATCH %-43s %5ss  cost withheld  (%s) against baseline (%s)%s; --calibrate to take the new baseline, --reset <row> to lower seconds\n' \
-          "$name" "$took" "$got" "$base_triple" "$( [ "$trailer_ok" = 1 ] || printf ', and NO trailer in its output' )"
+        printf 'MISMATCH %-43s %5ss  cost withheld  (%s) against baseline (%s)%s%s; --calibrate to take the new baseline, --reset <row> to lower seconds\n' \
+          "$name" "$took" "$got" "$base_triple" "$( [ "$trailer_ok" = 1 ] || printf ', and NO trailer in its output' )" \
+          "$( [ "$nobase" = 0 ] || printf ', and its output carries "%s" — a group with no expected set is a refusal, never parity' "$SWEEP_NOBASELINE_RX" )"
         grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+        say_out
       fi
     fi
     # EVERY POOLED VERDICT NAMES THE READING IT WAS BOUNDED BY — seconds, readings, token, node,
@@ -1194,7 +1253,7 @@ EOF
   # width; a pool that ran wider than its own outer bound has broken it, and the printed pair cannot
   # notice because the pair is what the pool was ASKED for.
   if [ "$SWEEP_PEAK" -gt "$OUTER" ]; then
-    st=1
+    st=1; sound=0; unsound_why="the pool ran wider than its outer bound (peak $SWEEP_PEAK of $OUTER)"
     echo "run-selftests: THE POOL RAN WIDER THAN ITS BOUND — peak $SWEEP_PEAK against an outer width"
     echo "run-selftests: of $OUTER. The composite invariant (outer x inner <= the declared width) is"
     echo "run-selftests: broken, so this run oversubscribed the box and every reading above is suspect."
@@ -1207,12 +1266,12 @@ EOF
   # verdict for a reason that never happened -- and on a clean tree compares equal and reports a
   # match the probe never made.
   if ! FP_AFTER=$(read_tree_fingerprint); then
-    st=1
+    st=1; sound=0; unsound_why="the closing tree fingerprint could not be taken"
     echo "run-selftests: the closing tree fingerprint could not be TAKEN, so this sweep is UNGRADED"
     echo "run-selftests: for pool safety. That is not the same as a clean tree and is not reported"
     echo "run-selftests: as one."
   elif [ "$FP_BEFORE" != "$FP_AFTER" ]; then
-    st=1
+    st=1; sound=0; unsound_why="the tracked working tree changed while the pool ran"
     echo "run-selftests: THE SWEEP IS UNSOUND — the tracked working tree changed while it ran, so a"
     echo "run-selftests: suite wrote outside its own scratch. This cannot name which one: a whole-run"
     echo "run-selftests: fingerprint has no way to attribute, and guessing would be worse than saying"
@@ -1233,7 +1292,13 @@ EOF
     _rs_resets=""; [ "${#RESETS[@]}" -gt 0 ] && _rs_resets=$(printf '%s\n' "${RESETS[@]}")
     # THE READINGS GO THROUGH A FILE, not the pipe: the heredoc below IS the interpreter's stdin.
     printf '%s\n' "$cal_rows" | grep . > "$SWEEP_ROOT/readings" || true
-    if ! "$PYBIN" - "$EVIDENCE" "$SWEEP_CONDITION" "$SWEEP_NODE" "$(date +%Y-%m-%d)" "$_rs_resets" "$SWEEP_ROOT/readings" <<'PY'
+    # AND ONLY A SOUND RUN WRITES THEM. An unsound calibrate's seconds would become the monotone
+    # bound only --reset lowers and its triples the parity baseline every later --pooled is graded
+    # against, while the summary blamed walled and untrailed rows at 0 and 0.
+    if [ "$sound" != 1 ]; then
+      st=1
+      echo "run-selftests: readings NOT written: this calibrate was unsound — $unsound_why — so every reading above is suspect and $EVIDENCE is byte-unchanged"
+    elif ! "$PYBIN" - "$EVIDENCE" "$SWEEP_CONDITION" "$SWEEP_NODE" "$(date +%Y-%m-%d)" "$_rs_resets" "$SWEEP_ROOT/readings" <<'PY'
 import sys
 path, cond, node, today, resets, readings = sys.argv[1:7]
 resets = set(r for r in resets.split("\n") if r)
@@ -1288,8 +1353,14 @@ PY
     if [ "$st" -eq 0 ]; then
       echo "calibrated $calibrated row(s), $cal_red red, graded none"
     else
+      # THE RED SUMMARY NAMES ITS ACTUAL CAUSE. An unsound run has written nothing at all; only a
+      # sound one is red for the rows that took no reading.
       echo "calibrated $calibrated row(s), $cal_red red, ${walled_n:-0} walled, $untrailed untrailed, graded none"
-      echo "run-selftests: a walled or untrailed row wrote NO reading and stays uncalibrated; the next --pooled refuses it by name."
+      if [ "$sound" != 1 ]; then
+        echo "run-selftests: NO reading was written for ANY row: $unsound_why. Fix that and calibrate again."
+      else
+        [ "$((${walled_n:-0} + untrailed))" -gt 0 ] && echo "run-selftests: a walled or untrailed row wrote NO reading and stays uncalibrated; the next --pooled refuses it by name."
+      fi
       [ "${unrun_n:-0}" -gt 0 ] && echo "run-selftests: and ${unrun_n} row(s) were never dispatched under the wall, so they took no reading either."
     fi
     exit "$st"

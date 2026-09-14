@@ -35,7 +35,7 @@ RC=${R#bash }
 # THE FLOOR, RE-DERIVED at TOOL-aBatchedArm-5: 55 at BASE, minus the retired factor-absent arm,
 # plus the arms that unit added — both counts are in that unit's acceptance ledger. Raised again
 # at the aBatchedArm closing fix by the arms it added; that ledger carries the count.
-SELFTEST_FLOOR=102
+SELFTEST_FLOOR=106
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -74,6 +74,15 @@ build_repo() {
   } > tools/suite-shard.sh
   printf '#!/usr/bin/env bash\nset -u\necho "$THIS_IS_UNBOUND"\nexit 0\n' > tools/suite-crash.sh
   printf '#!/usr/bin/env bash\nexit 0\n' > tools/suite-quiet.sh
+  # ---- the NO-BASELINE SENTINEL shape (aBatchedArm closing D3): a batched group whose expected
+  # ---- set is still unwritten prints the refusal, its observed set indented, and the shard's
+  # ---- trailer all the same — so by (rc, FAIL, executed) alone it reads as a red-by-design row.
+  { printf '#!/usr/bin/env bash\n'
+    printf 'echo "FAIL check_emitted: expected set not yet observed — owed at the final pass · call at line 946"\n'
+    printf 'echo "    observed: UNATTENDED check 3 FAILED a-signature"\n'
+    printf 'echo "  (81 assertions executed in shard 1/8 against a floor of 78)"\n'
+    printf 'exit 1\n'
+  } > tools/suite-sentinel.sh
 
   # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's §2
   # node TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
@@ -788,6 +797,35 @@ arm "--check skips a pooled-kit row declared no-trailer and counts what it grade
 arm "--check with no pooled-kit declared says the trailer arm graded NOTHING rather than passing silently" 0 \
     "no pooled-kit declared so the trailer arm graded NOTHING" \
     'true' "$R --check"
+
+# ---------------------------------------------------------------- the no-baseline sentinel, D3
+# A row printing `expected set not yet observed` has its trailer and its own exit, and is still
+# NOT a reading: both rows are made sentinels so a byte-unchanged evidence file is the whole
+# assertion (rc 99 otherwise), and the seeded MISMATCH below is the same refusal under --pooled.
+arm "--pooled --calibrate reds a row whose output carries the no-baseline sentinel as UNTRAILED and writes no reading" 1 \
+    "a group with no expected set is a refusal, not a reading" \
+    "sed -i 's|tools/suite-ok.sh|tools/suite-sentinel.sh|g' $B $LEGS && git add -A" \
+    "( $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
+
+arm "--pooled renders a sentinel-carrying row MISMATCH even when its (rc, fails, executed) equals the baseline" 1 \
+    "a group with no expected set is a refusal, never parity" \
+    "bash tools/seed.sh 'free one' pooled@2x1 1 1 1 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-sentinel.sh|' $B" \
+    "$R --pooled"
+
+# The row's output outlives the scratch: the `observed:` line the paste is taken from is in the
+# kept file, and the row names it. rc 98 if the file lacks it, 99 if the file is absent.
+arm "a calibrate keeps each row's output under gate-logs/selftests and names the path on a row that is not ok" 1 \
+    "output: " \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-sentinel.sh|' $B && git add -A" \
+    "( $R --pooled --calibrate; rc=\$?; f=\$(git rev-parse --git-dir)/gate-logs/selftests/free_one.out; [ -s \"\$f\" ] || exit 99; grep -q '^    observed: ' \"\$f\" || exit 98; exit \$rc )"
+
+# ---------------------------------------------------------------- an unsound calibrate, D7
+# The inverse of the `fingerprint MATCHED` arm: a suite that writes into a tracked file makes the
+# run UNSOUND, and an unsound calibrate writes NOTHING — the other row's clean reading included.
+arm "an UNSOUND calibrate writes no reading at all and says so, leaving the evidence file byte-unchanged" 1 \
+    "readings NOT written: this calibrate was unsound" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B && git add -A" \
+    "( $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
 
 arm "--pooled over an evidence file that will not parse REFUSES naming the file, rather than defaulting past the row" 2 \
     "will not parse" \
