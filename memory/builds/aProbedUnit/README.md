@@ -4,7 +4,6 @@ node: a
 opened: 2026-09-14
 streams: tooling
 roster: TOOL
-status: OPEN
 parents: aRatifiedRulings
 authorized-by: prompt
 ids: TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7
@@ -63,14 +62,22 @@ record under `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-14 · streams tooling
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-09-14 · streams tooling
 ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close](spec/2026-09-14-spec-TOOL-aProbedUnit-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named](spec/2026-09-14-spec-TOOL-aProbedUnit-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument](spec/2026-09-14-spec-TOOL-aProbedUnit-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root](spec/2026-09-14-spec-TOOL-aProbedUnit-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-14 |
+| [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -79,7 +86,15 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aProbedUnit-1` | no |
+| 2 | `TOOL-aProbedUnit-2` | no |
+| 3 | `TOOL-aProbedUnit-3` | no |
+| 4 | `TOOL-aProbedUnit-4` | no |
+| 5 | `TOOL-aProbedUnit-5` | no |
+| 6 | `TOOL-aProbedUnit-6` | no |
+| 7 | `TOOL-aProbedUnit-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
