@@ -32,10 +32,11 @@
  * second, `> "$HOME/.x"` is missed. The sibling hook draws the same distinction (agent-cap.js
  * `stripStrings`), for the same reason.
  *
- * ponytail: the predicate is TEXTUAL. It does not resolve a variable, follow a `cd`, or read inside a
- * heredoc'd python script — `cd ~ && echo x > y` walks straight past it. It catches the literal shapes
- * that produced every one of the observed files, which is the job. The upgrade path, if that stops
- * being enough, is a real tokenizer rather than more regexes.
+ * ponytail: the predicate is TEXTUAL. It resolves no variable beyond `~`, `$HOME` and the three temp
+ * spellings, follows no `cd`, and reads nothing inside a heredoc'd python script — `cd ~ && echo x > y`
+ * walks straight past it. It catches the literal shapes that produced every one of the observed
+ * files, which is the job. The upgrade path, if that stops being enough, is a real tokenizer rather
+ * than more regexes.
  *
  * FAILS OPEN. Unparseable stdin, an unknown tool, or a missing command all exit 0. This is a hygiene
  * rule, not a containment boundary; a security control would have to fail the other way.
