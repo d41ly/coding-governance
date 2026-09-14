@@ -185,6 +185,11 @@ clean against `main`'s edits to the unattended kit. NicoCares took this change a
 1.20, and so did inCMS core; their pull to 1.21 is `TOOL-dPolishedVitrine-16`. Spec section 9's
 rev-4 line logs the move.
 
+The full bar at `340d0679`, self-tests included, was green on 105 of 106 legs, `brief-recorded`
+and the unattended kit gate among them. Its one red was the process-monitor census arm that counts
+this node's processes by kind, which passed 66 of 66 run alone; `TOOL-dPolishedVitrine-1`'s journal
+carries the detail.
+
 ## Acceptance ledger
 
 **Evidences:** TOOL-dPolishedVitrine-14

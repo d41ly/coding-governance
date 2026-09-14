@@ -698,6 +698,21 @@ them stands.
   `run-gates.evidence.test.sh:643`, `DC_PY=python`, and passed 55 assertions at `9ce37fcc` and at
   the merged tip. `main` fixed that line in `8e4cae26`.
 
+## The full bar after the second merge
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` ran at `340d0679`, from 06:59 to
+07:15 UTC, after 186 s queued behind another session's bar on the repository turnstile. 105 of 106
+legs were green. The one red was `process-monitor census selftest`, on its arm
+`test_native_is_the_majority_on_this_node`, at 435 native against 468 msys while the bar's own
+shells ran. That is the load arm the two bars above also met, and this merge touches no
+process-monitor file. Run alone after the bar it passed 66 of 66. A first alone run, with that
+bar's disowned turnstile tickers and fixture runners still alive, failed two arms, which is the same
+dependence on what else the node is running. The python resolver passed inside the bar.
+
+The ordinary bar a default-branch push forces here, `GATE_FULL=1 bash tools/run-gates/run-gates.sh`
+without the self-tests, was run at this record's own commit after it was written. Its result is in
+the lander's hand-off rather than here, because a record of it would move the tip it describes.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -734,6 +749,9 @@ them stands.
   round 3, the bar at `728a59a4` was green on 105 of 106, its one red that python resolver line.
   After the consumer runs, the bar at `f981fe2f` was green on 104 of 106: that python resolver line,
   and the census self-test's process-majority arm, which passed when run alone.
+  After the second merge, the bar at `340d0679` was green on 105 of 106, its one red that census
+  arm again, which passed 66 of 66 alone. The python resolver line is green since `main`'s
+  `8e4cae26`.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
