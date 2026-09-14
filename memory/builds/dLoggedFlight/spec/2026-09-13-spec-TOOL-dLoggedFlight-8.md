@@ -203,10 +203,11 @@ sources actually support. Every later surface renders from this model rather tha
   - `absent`: the file does not exist, or the window ends before its epoch;
   - `partial`: the window contains the epoch;
   - `present`: the window starts after the epoch, and the source holds lines for the run, or holds
-    none while nothing the run's own rows prove required one and this node's driver journal names
-    the build;
+    none while nothing the run's own rows prove required one and this node's driver journal holds
+    some of the run's own lines;
   - `dead`: the window starts after the epoch and the source holds none while the run's own rows prove
-    activity and this node's driver journal names the build. The proof is named per journal: for `driver` a parked row in the window, since every row
+    activity and this node's driver journal holds some of the run's own lines. The proof is named per
+    journal: for `driver` a parked row in the window, since every row
     is a driver verb's write; for `gates` a LANDING write in it, which `--close` makes only after its
     bar; and for `pushes` the move into LANDED, which `--landed` makes only after the push. That move
     is the one that closes a landed run's window (S2), so it lies AT the window's end and never inside
@@ -215,11 +216,13 @@ sources actually support. Every later surface renders from this model rather tha
     that write did;
   - `not-local`: for the transcripts, no named session has an extract or a transcript on this machine,
     or the journal names no session and the store holds no extract attributed to the slug. For a
-    journal, the window starts after its epoch, it holds none of the run's lines, and no line of
-    this node's driver journal names the build at all. Journals never leave their clone and only the
-    driver's lines name a slug, so nothing then places the run on this node, and neither `present`
-    nor `dead` can be said of a writer for a run it never saw. A writer broken for the whole of a run
-    made here reads the same, since the model has no node identity to tell the two apart.
+    journal, the window starts after its epoch, it holds none of the run's lines, and this node's
+    driver journal holds none of the run's own lines either, over its whole journal segment (S2),
+    inside the window or after it. Journals never leave their clone, so nothing then places the run
+    on this node, and neither `present` nor `dead` can be said of a writer for a run it never saw.
+    The key is the run's own lines and never a line naming its build, since a build's earlier run
+    driven here would place a later one made elsewhere. A writer broken for the whole of a run made
+    here reads the same, since the model has no node identity to tell the two apart.
 
   The run-state file, git and the build folder read `present` or `absent`. The block also carries
   `idle`: whether idle gaps were judged (S6), how many fired, and how many were kept out near an
@@ -408,10 +411,10 @@ command.
   member has a fixture, and every fixture's kind is a member.
   Red when: any kind fires on the clean fixture, fails to fire on its own, has no fixture, a stale
   witness hides merged own commits, or the table wins over a refused `--landed`.
-- **AC6** — When a fixture journal holds only other runs' lines, one of them a line of the run's own
-  build, a run whose window ends before the journal's epoch reads `absent`, one whose window starts
-  after it with twelve parked rows reads `dead`, and one whose window contains it reads `partial`.
-  When every line names another build, a window starting after the epoch reads `not-local`, with
+- **AC6** — When a fixture journal holds only other runs' lines, a run whose window ends before the
+  journal's epoch reads `absent`, one whose window starts after it with twelve parked rows and lines
+  of its own after the window reads `dead`, and one whose window contains it reads `partial`. With no
+  line of its own anywhere in its segment, a window starting after the epoch reads `not-local`, with
   twelve parked rows or with none. When the run has lines of its own, a window containing the epoch
   still reads `partial`, which is this run's own case, and a window starting after it reads
   `present`. A fixture with no local transcript reads `not-local`. Every member of `COVERAGE_STATES`
@@ -420,9 +423,10 @@ command.
   the run's own lines reads `dead` for that journal, naming its proof: the driver's by the run's
   parked rows, the gates' with no bar of the run's, and the pushes' with no landing push, both with
   the run's driver lines, where the terminal END closes the window, and without them, where the
-  terminal write does. In every one of those cases the driver journal holds a refused preflight of
-  the run's own build, made before the run. The same fixture staged with older journals whose driver
-  lines all name another build reads `not-local` for all three.
+  terminal write does. Each case with none of the run's verbs holds the owner's `--status` after the
+  landing, a line of the run's segment outside its window. The same fixture staged with older
+  journals whose driver lines all name another build reads `not-local` for all three, and so does
+  the driver of a rotated build's second run when only its first run was driven here.
   Red when: a dead writer reads as a run that predates it, a window holding the epoch reads `present`
   because the run has lines, any state has no fixture, a landed run whose pre-push writer wrote
   nothing for its landing push reads `present` because its proof sat at the window's end, or a run
@@ -665,15 +669,18 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   and L5. L2: a run made on another node read `dead` for its driver, and for its gates and pushes
   once it had closed or landed. Journals never leave their clone, so its lines are nowhere here,
   and the model has no node identity. S7 now reads `present` and `dead` only where this node's
-  driver journal names the build, and `not-local` otherwise, and the runlog Skill says so where it
-  had said such journals read `absent`. The review also offered changing the Skill's text alone,
-  and a `dead` that cannot be told from another node's run misleads whatever the Skill says. L3: a
-  memory root moved in one commit adds the live record and every archive at once, so every run of
-  a rotated build started at the move. S1 marks a run whose start added both, and the schema leg's
-  refusal names the shape (`TOOL-dLoggedFlight-10` rev-7). Following the pre-move path was not
-  taken. Every read the model makes is keyed on a path under the current root, the run-state
-  history, its blobs, the specs, the ledgers and the decision log among them, so following the
-  starts alone would turn a loud refusal into windows that are quietly wrong. L5:
+  driver journal holds some of the run's own lines, over its whole segment, and `not-local`
+  otherwise, and the runlog Skill says so where it had said such journals read `absent`. The review
+  proposed keying on any line naming the build. The fold's bug-class checklist named that key's
+  shape, a location every run of the build shares: a build's earlier run driven here would place a
+  later one made elsewhere, so the key is the run's own segment. The review also offered changing
+  the Skill's text alone, and a `dead` that cannot be told from another node's run misleads whatever
+  the Skill says. L3: a memory root moved in one commit adds the live record and every archive at
+  once, so every run of a rotated build started at the move. S1 marks a run whose start added both,
+  and the schema leg's refusal names the shape (`TOOL-dLoggedFlight-10` rev-7). Following the
+  pre-move path was not taken. Every read the model makes is keyed on a path under the current root,
+  the run-state history, its blobs, the specs, the ledgers and the decision log among them, so
+  following the starts alone would turn a loud refusal into windows that are quietly wrong. L5:
   `TOOL-dLoggedFlight-1..13` read as unit 1 alone, which credited eight whole-set commits of this
   build to unit 1 on the timeline. S3 reads a range the way the index generator does, bounded by
   `UNIT_RANGE_MAX`, a bound the generator does without because an author types its Serves line.
