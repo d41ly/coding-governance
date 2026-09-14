@@ -94,6 +94,11 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
   reader can check whether the call carries it. The obligation is still the method's least
   instrumented step, because nothing yet asserts that a spec audit HAPPENED.
+- **The `Decided:` trailer M10 routes a choice to is ungated, by design.** Whether a choice was made
+  is not observable, so nothing refuses a run that left none. M10's own example went through git's
+  trailer parser once, in the pass that wrote it (`TOOL-dLoggedFlight-7` AC3), and nothing grades a
+  later edit to it. The run model's harvest is specced to count a `Decided:` line git did not parse
+  as a near-miss (`TOOL-dLoggedFlight-8`), which reports and never refuses.
 
 ## Reuse affordance
 
