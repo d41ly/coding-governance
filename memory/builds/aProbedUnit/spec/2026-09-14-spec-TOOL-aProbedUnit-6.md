@@ -569,9 +569,10 @@ is chunk `declarations`, guarded on the method render among others, and compares
 same-commit `last-audit` re-stamp. `memory hygiene` and `spec tokens` grade this file. The three
 self-test suites section 6 names are on no leg and are the close's compensating run.
 
-New arm: `tools/unattended/unattended.test.sh` · every verb arm against the driver at base, which
-prints `CONVERGING` where `BOUNDED` is expected and refuses the explicit disposition as
-non-terminal · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed assertions.
+New arm: `tools/unattended/unattended.test.sh` · the verb arms whose expectation carries `BOUNDED`
+against the driver at base, which prints `CONVERGING` where `BOUNDED` is expected and refuses the
+explicit disposition as non-terminal; AC5's slug-subject arms hold against both by design (AC12) ·
+`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed assertions.
 New arm: `tools/unattended/check-unattended.test.sh` · the `BOUNDED`-without-disposition fixture
 against the leg at base, which prints nothing · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by two.
 New arm: `tools/workflows/unattended-build.test.sh` · the loop member `BOUNDED` against the render

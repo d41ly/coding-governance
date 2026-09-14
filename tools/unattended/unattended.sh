@@ -4133,7 +4133,7 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
 # a second copy is a second thing to keep true. The promote wording deliberately keeps the word
 # PROMOTED: an existing suite arm asserts that literal, and rewording it would have made a passing
 # arm pass for a different reason. The final branch is UNREACHABLE — the state gate refuses an empty
-# disposition at both exits — and it says so loudly rather than printing something reassuring.
+# disposition at every terminal exit — and it says so loudly rather than printing something reassuring.
 review_exit_note() { # disposition -> the sentence
   case "$1" in
     fold)    printf '%s' "every blocker still standing was FOLDED into the specs it belongs to, which is the recorded disposition. Not promoted, not parked, not waived" ;;
