@@ -5,6 +5,9 @@
 #   check-wiring.sh            # --check (default): report; exit 1 if any installed tool is unwired
 #   check-wiring.sh --fix      # wire the safe cases (core.hooksPath when unset); exit reflects remainder
 #   check-wiring.sh --session  # like --fix but ALWAYS exit 0 — the SessionStart hook mode
+#   check-wiring.sh --resolve-fragment <f.fragment.json>   # print the fragment's hook path with
+#                              # {kit}/{here} expanded — the value the arms below decide on, twinned
+#                              # on settings-merge.py so the hook-destinations gate can assert parity
 #
 # SEVERITY IS A VOCABULARY, and only `UNWIRED` gates. `ok` / `skip` / `fixed` / `note` do not. `note`
 # is for a condition that is TRUE and worth printing but is not dormant wiring — today only the eol
@@ -17,7 +20,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.2   # gov:kit check-wiring@1.2 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.3   # gov:kit check-wiring@1.3 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -107,17 +110,58 @@ check_settings_scope() {
 }
 
 
-MODE=check
+# ---- the fragment reader, ONE for every arm ------------------------------------------------------
+json_str() {  # value of a top-level "key": "..." in a small flat JSON file
+  sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
+}
+# `{kit}` and `{here}` ARE EXPANDED HERE, at the one place the value is read. A fragment ships
+# verbatim, so it names its kit symbolically rather than spelling a prefix that is only correct in
+# gov; leaving a token unexpanded makes an arm test for a file literally called `{kit}/...` and
+# report a missing hook that is present. TOOL-dRetiredFork-14.
+# Both resolve against THE FRAGMENT WE FOUND, never against this script's own KIT_REL. Those differ
+# whenever the checker is run against a tree other than its own -- which is exactly what its
+# self-test does -- and gov's prefix applied to a foreign layout names a file nobody has. `{kit}` is
+# two dirnames up (a fragment sits at <kit>/<dir>/x.fragment.json), empty for a kit installed at
+# the repo root; `{here}` is the fragment's OWN directory, which is what a `kind = "flat"` kit needs
+# because its engine ships to `{prefix}/` and `{kit}` would name the prefix's PARENT there.
+# TOOL-aReplayedCard-2: this used to be two inline copies, one per arm, and a third reader in the
+# hook-destinations gate; it is one function now, printable through `--resolve-fragment`, so that
+# gate reads the value the arms decide on rather than deriving a fourth beside them.
+resolve_fragment_hook() { # fragment path -> its hook_path, tokens expanded; rc 1 + a reason on stderr when it declares none
+  local frag="$1" hp here kitpfx
+  # ONE spelling, repo-relative, whichever way the caller spelled the root: git's (`C:/…`) or the
+  # shell's own after the cd (`/c/…` under MSYS). Both readers must print the same bytes.
+  case "$frag" in
+    "${ROOT:-/nonexistent}"/*) frag=${frag#"$ROOT"/} ;;
+    "$PWD"/*)                  frag=${frag#"$PWD"/} ;;
+  esac
+  [ -f "$frag" ] || { echo "check-wiring: $frag is not a file" >&2; return 1; }
+  hp=$(json_str "$frag" hook_path)
+  [ -n "$hp" ] || { echo "check-wiring: $frag declares no hook_path" >&2; return 1; }
+  here=$(dirname "$frag"); [ "$here" = . ] && here=""
+  kitpfx=$(dirname "${here:-.}"); [ "$kitpfx" = . ] && kitpfx=""
+  printf '%s\n' "$hp" | sed -e "s|{kit}/|${kitpfx:+$kitpfx/}|g" -e "s|{here}/|${here:+$here/}|g"
+}
+
+MODE=check; FRAG_ARG=""
 case "${1:-}" in
   ""|--check) MODE=check ;;
   --fix)      MODE=fix ;;
   --session)  MODE=session ;;
-  *) echo "usage: $(basename "$0") [--check|--fix|--session]" >&2; exit 2 ;;
+  --resolve-fragment) MODE=resolve; FRAG_ARG=${2:-}
+    [ -n "$FRAG_ARG" ] || { echo "usage: $(basename "$0") --resolve-fragment <fragment.json>" >&2; exit 2; } ;;
+  *) echo "usage: $(basename "$0") [--check|--fix|--session|--resolve-fragment <fragment.json>]" >&2; exit 2 ;;
 esac
 
 # Not a git repo → nothing to wire; never an error (and never break session start).
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "skip     — not a git repo"; exit 0; }
 cd "$ROOT" || { [ "$MODE" = session ] && exit 0; exit 0; }
+
+# The print verb answers and leaves BEFORE the settings resolver and the arms run: it is a reader
+# of one fragment, and its output is compared byte-for-byte against settings-merge.py's.
+if [ "$MODE" = resolve ]; then
+  resolve_fragment_hook "$FRAG_ARG"; exit $?
+fi
 
 DO_FIX=0; case "$MODE" in fix|session) DO_FIX=1 ;; esac
 unwired=0
@@ -154,19 +198,28 @@ first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 # EVERY matcher whose group carries the marker, one per line — not just the first. A settings.json
 # may legitimately hold several groups, and `settings-merge.py` ADDS the widened group rather than
 # migrating a stale one, so "the first group mentioning the hook" is the wrong question to ask.
-matchers_of() { # marker -> the matcher of each group carrying it (empty if the marker is absent)
+matchers_of() { # marker [hook-basename] -> the matcher of each group carrying BOTH (empty if absent)
   # A REFUSAL PROPAGATES. The retired form tested the settings path with `|| return 0`, so a
   # missing file was indistinguishable from a present file with no matching group — which is the
   # whole defect. Returning 2 keeps them apart even though `wired` treats both as not-wired.
   local _sj; _sj=$(settings_json 2>/dev/null) || return 2
+  # `-e` BEFORE THE MARKER. The card markers are `--write` and `--replay`, dash-leading by design
+  # (they are the verb's own arguments), and a bare `grep -F "$1"` reads one as an OPTION: grep
+  # exits 2, the pipeline yields nothing, and every card check prints UNWIRED over a correctly
+  # merged file forever. TOOL-aReplayedCard-2.
+  # THE SECOND KEY, `$2`, is the hook's BASENAME, which the stripped view keeps intact: a bare-flag
+  # marker (`--write`) alone took an adopter's own `--write-log` hook for the card writer, in this
+  # reader and in the merger's (the aReplayedCard closing review, F5). Absent, it defaults to the
+  # marker itself, so a one-key caller filters twice on one key and reads exactly as before.
   tr -d ' \t\r\n' < "$_sj" \
     | sed 's/{"matcher":/\n{"matcher":/g' \
     | sed 's/\].*$//' \
-    | grep -F "$1" \
+    | grep -F -e "$1" \
+    | grep -F -e "${2:-$1}" \
     | sed -n 's/^{"matcher":"\([^"]*\)".*/\1/p'
 }
-wired() { # marker · the matcher the fragment declares
-  [ -n "$2" ] && matchers_of "$1" | grep -qxF "$2"
+wired() { # marker · the matcher the fragment declares · [hook-basename]
+  [ -n "$2" ] && matchers_of "$1" "${3:-}" | grep -qxF "$2"
 }
 
 # The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
@@ -295,8 +348,11 @@ rm -f "$_sj_err"
 # value found rather than reported as a generic miss — an operator who is told "unwired" about a
 # hook that is plainly in the file will conclude the checker is broken.
 AGENTCAP_MATCHER='Workflow|Agent'
+# The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
+# resolve it each; one spelling is one fewer carried literal per arm that names it.
+SMERGE=$(first_of tools/settings-merge.py settings-merge.py)
 check_agentcap() {
-  local smerge found shipped; smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  local smerge found shipped; smerge=$SMERGE
   # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
   # `.claude/hooks/agent-cap.js` and said so on purpose: the hook path "is not declared anywhere this
   # script can read". That reason stopped being true at TOOL-dRetiredFork-14, which moved `hook_path`
@@ -388,19 +444,9 @@ check_scratch_guard() {
     echo "skip     scratch   — hooks kit does not ship scratch-guard.fragment.json here"
     return
   fi
-  smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  smerge=$SMERGE
   marker=$(json_str "$frag" marker)
-  # `{kit}` IS EXPANDED HERE, at the one place the value is read. A fragment ships verbatim, so it
-  # names the kit symbolically rather than spelling a prefix that is only correct in gov; leaving
-  # the token unexpanded makes this arm test for a file literally called `{kit}/...` and report a
-  # missing hook that is present. TOOL-dRetiredFork-14.
-  # `{kit}` resolves against THE FRAGMENT WE FOUND, not against this script's own KIT_REL. Those
-  # differ whenever the checker is run against a tree other than its own -- which is exactly what
-  # its self-test does -- and gov's prefix applied to a foreign layout names a file nobody has. The
-  # fragment sits at <kit>/<dir>/x.fragment.json, so two dirnames up IS the kit prefix, and it is
-  # empty for a kit installed at the repo root.
-  _kitpfx=$(dirname "$(dirname "$frag")"); [ "$_kitpfx" = "." ] && _kitpfx=""
-  hookjs=$(json_str "$frag" hook_path | sed "s|{kit}/|${_kitpfx:+$_kitpfx/}|g")
+  hookjs=$(resolve_fragment_hook "$frag" 2>/dev/null)
   smatcher=$(json_str "$frag" matcher)
   if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ]; then
     echo "UNWIRED  scratch   — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
@@ -439,9 +485,6 @@ check_scratch_guard() {
 # to ignore the wiring verifier. Both halves — the marker and the script path — are read from the
 # fragment, so this arm asserts nothing the shipped kit does not itself declare.
 # Advisory like every other arm: no mode rewrites settings.json.
-json_str() {  # value of a top-level "key": "..." in a small flat JSON file
-  sed -n 's|.*"'"$2"'"[[:space:]]*:[[:space:]]*"\([^"]*\)".*|\1|p' "$1" | head -1
-}
 check_recall_opened() {
   local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
@@ -451,19 +494,9 @@ check_recall_opened() {
     echo "skip     recall    — memory-recall kit not adopted (no recall-opened.fragment.json)"
     return
   fi
-  smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  smerge=$SMERGE
   marker=$(json_str "$frag" marker)
-  # `{kit}` IS EXPANDED HERE, at the one place the value is read. A fragment ships verbatim, so it
-  # names the kit symbolically rather than spelling a prefix that is only correct in gov; leaving
-  # the token unexpanded makes this arm test for a file literally called `{kit}/...` and report a
-  # missing hook that is present. TOOL-dRetiredFork-14.
-  # `{kit}` resolves against THE FRAGMENT WE FOUND, not against this script's own KIT_REL. Those
-  # differ whenever the checker is run against a tree other than its own -- which is exactly what
-  # its self-test does -- and gov's prefix applied to a foreign layout names a file nobody has. The
-  # fragment sits at <kit>/<dir>/x.fragment.json, so two dirnames up IS the kit prefix, and it is
-  # empty for a kit installed at the repo root.
-  _kitpfx=$(dirname "$(dirname "$frag")"); [ "$_kitpfx" = "." ] && _kitpfx=""
-  hookjs=$(json_str "$frag" hook_path | sed "s|{kit}/|${_kitpfx:+$_kitpfx/}|g")
+  hookjs=$(resolve_fragment_hook "$frag" 2>/dev/null)
   # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
   # not itself declare — the same rule the marker already followed, applied to the half that decides
   # whether the hook fires at all.
@@ -488,6 +521,69 @@ check_recall_opened() {
     echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
     unwired=$((unwired+1))
   fi
+}
+
+# --- Check C: the orientation card's two SessionStart entries (kickoff-manifest kit) --------------
+# TOOL-aReplayedCard-2. Two fragments beside the kickoff engine, each one verb of `manifest-check.sh
+# --card`: the WRITER at `startup|clear`, the REPLAY at `resume|compact`. Their matchers are the
+# whole point — a SessionStart entry with no matcher runs on every compaction, and a matcher that
+# is misspelled or narrowed never fires at all while looking exactly like one that is wired. So
+# this arm asserts the LITERAL matcher each fragment declares, the way the scratch arm does, and
+# names the value it found instead. Both fragments must be present, and both wired, for `ok`: a
+# writer with no replay is a card every compaction drops, and a replay with no writer replays a
+# card nothing wrote.
+#
+# The fragments sit at the kit's HOME in this repo and at `{prefix}/` in an adopter — the kit is
+# `kind = "flat"`, so the engine and its two fragments ship side by side — and their `{here}` token
+# resolves to whichever of those the fragment was found at. Advisory like every other arm.
+#
+# WHAT THIS DOES NOT CHECK: any other SessionStart entry. The `check-wiring.sh --session` entry and
+# the process-monitor session entry ship fragments too, and NO arm here reads their matchers — the
+# merger re-matches them on apply, and a hand edit or a later narrowing to `startup` passes green
+# (the aReplayedCard closing review, F12). The two card fragments are graded; the count is two.
+check_card() {
+  local name frag marker hooksh cmatcher found nfound=0 nok=0 line=""
+  for name in orientation-card orientation-replay; do
+    frag=$(first_of "skills/session-kickoff/$name.fragment.json" "${KIT_REL:+$KIT_REL/}$name.fragment.json" "$name.fragment.json")
+    if [ -z "$frag" ]; then
+      echo "skip     card      — kickoff-manifest kit does not ship $name.fragment.json here"
+      return
+    fi
+    nfound=$((nfound+1))
+    marker=$(json_str "$frag" marker)
+    hooksh=$(resolve_fragment_hook "$frag" 2>/dev/null)
+    cmatcher=$(json_str "$frag" matcher)
+    if [ -z "$marker" ] || [ -z "$hooksh" ] || [ -z "$cmatcher" ]; then
+      echo "UNWIRED  card      — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
+      unwired=$((unwired+1))
+      return
+    fi
+    if [ ! -f "$hooksh" ]; then
+      if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
+        echo "UNWIRED  card      — settings.json dispatches $marker but $hooksh is missing; every session start runs bash against nothing. Fix: re-copy the kickoff-manifest kit beside $frag"
+        unwired=$((unwired+1))
+      else
+        echo "skip     card      — not adopted ($hooksh absent)"
+      fi
+      return
+    fi
+    if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
+      nok=$((nok+1)); line="$line${line:+, }$marker at '$cmatcher'"
+      continue
+    fi
+    # Name the value FOUND rather than a generic miss, and the matcher EXPECTED beside it: the
+    # replay wired under `resume` alone is the exact state this arm exists to catch — it looks
+    # wired, and the card is gone after the first compaction.
+    found=$(matchers_of "$marker" "$(basename "$hooksh")" | paste -sd, - 2>/dev/null || matchers_of "$marker" "$(basename "$hooksh")" | tr '\n' ',')
+    if [ -n "$found" ]; then
+      echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
+    else
+      echo "UNWIRED  card      — $hooksh present but the $name entry ($marker) is not in settings.json. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
+    fi
+    unwired=$((unwired+1))
+  done
+  [ "$nok" = "$nfound" ] && [ "$nfound" = 2 ] \
+    && echo "ok       card      — SessionStart card entries wired in $(render_settings_path) ($line)"
 }
 
 
@@ -852,6 +948,7 @@ check_hooks
 check_agentcap
 check_scratch_guard
 check_recall_opened
+check_card
 check_merge_rows
 check_eol
 check_skill_install

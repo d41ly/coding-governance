@@ -20,12 +20,13 @@ workflow-scripts = [
   "check-workflow-syntax.js",
   "drift-audit-code.js",
   "drift-audit-state.js",
+  "orient-counterfactual.js",
   "tier2-review.js",
   "unattended-build.template.js",
 ]
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["degradation-known-but-unreported.md"]
+gotcha-classes = ["degradation-known-but-unreported.md", "node-check-is-not-a-syntax-gate.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -112,6 +113,17 @@ is claimed by the unattended dossier and its template here, because this kit ren
   back to the current directory — the wrong-repository defect `tier2-review.js` was hardened against
   and neither sibling was. Deliberately out of scope for the port, and tracked as
   `TOOL-dTieredTribunal-4`.
+
+- **`orient-counterfactual.js` is a MEASUREMENT harness, not a review one, and it is the FIRST
+  file here to put the sequential-loop marker on a loop header.** `TOOL-aReplayedCard-5` shipped it: one stage-2
+  orientation arm per call, two kickoffs under `for (const i of RUNS)` with `gov:sequential-agents(2)`
+  over a marked two-element literal, tokens as `budget.spent()` deltas and wall as the agent's own
+  `date` readings, every run under a closed four-value `outcome`, and a single default-type fallback
+  spawn OUTSIDE the loop because the hook admits one marked loop per script. It carries no lens, no
+  skeptic and no synthesis, so none of the trust accounting above applies to it; what it shares
+  with its siblings is the `args` parse-then-refuse guard and the returns-a-record-writes-nothing
+  shape. Its agent definition ships beside it as `orient.agent.md`, which the inventory
+  does not key — a template the runner copies to `.claude/agents/` by hand is not a workflow script.
 
 ## Reuse affordance
 

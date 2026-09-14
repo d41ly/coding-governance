@@ -188,23 +188,39 @@ _roots_n=0; for _r in $PROCMON_ROOTS; do _roots_n=$((_roots_n + 1)); done
 # ---------------------------------------------------------------- 6b. is the hook actually wired?
 # The leg is named "process-monitor wiring" and until now it graded the CONF and nothing else, while
 # printing "wiring ok". A leg whose name overstates what it checks is worse than no leg.
-_hook_n=0
-if [ -f "$ROOT/.claude/settings.json" ]; then
-  _hook_n=$(grep -c 'procmon-hook' "$ROOT/.claude/settings.json" 2>/dev/null || true)
-fi
-case "$_hook_n" in ''|*[!0-9]*) _hook_n=0 ;; esac
+#
+# PER EVENT, since TOOL-aReplayedCard-2. The hook is wired twice — the PostToolUse report and the
+# SessionStart one — by two fragments, and a file-wide count of `procmon-hook` reads 2 for the
+# right wiring AND for one event wired twice, so it could not tell an adopter which fragment they
+# had not applied. Read without a JSON parser (this runs where no python may be): flattened, every
+# `"<Key>":[` opens an event or a group's `hooks` array, so each line below is one array and the
+# event it belongs to is the last non-`hooks` key seen.
+measure_hook_entries() { # event -> how many procmon-hook commands sit under that event
+  [ -f "$ROOT/.claude/settings.json" ] || { echo 0; return; }
+  tr -d ' \t\r\n' < "$ROOT/.claude/settings.json" \
+    | sed 's/"\([A-Za-z]*\)":\[/\n\1 /g' \
+    | awk -v ev="$1" '$1 != "hooks" { cur = $1 } cur == ev { n += gsub(/procmon-hook/, "") } END { print n + 0 }'
+}
+_hook_post=$(measure_hook_entries PostToolUse); _hook_start=$(measure_hook_entries SessionStart)
+case "$_hook_post" in ''|*[!0-9]*) _hook_post=0 ;; esac
+case "$_hook_start" in ''|*[!0-9]*) _hook_start=0 ;; esac
+_hook_n=$((_hook_post + _hook_start))
 
 if [ "$MODE" = "--check" ]; then
   # IT DECIDES, it does not merely report. The first fold printed this and exited 0, which is the
   # could-not-fail shape on a leg whose NAME is "process-monitor wiring": an unwired kit reports
   # nothing to any session, and a green leg over that is worse than no leg. The file's own exit
-  # contract at the top says 1 = unwired.
-  if [ "$_hook_n" -eq 0 ]; then
-    add_problem "the engine is configured but the HOOK IS NOT WIRED — nothing will report a hung process to a session. Wire it: $PY $ROOT/tools/settings-merge.py --fragment $KIT_REL/procmon-hook.fragment.json"
-    print_note "wiring NOT ok — the hook is absent from .claude/settings.json"
+  # contract at the top says 1 = unwired. Each event is decided on its own, and the remedy names
+  # the fragment for the event that is missing — the merger takes one fragment per run.
+  if [ "$_hook_post" -eq 0 ] || [ "$_hook_start" -eq 0 ]; then
+    _missing=""
+    [ "$_hook_post" -eq 0 ] && _missing="$_missing PostToolUse (--fragment $KIT_REL/procmon-hook.fragment.json)"
+    [ "$_hook_start" -eq 0 ] && _missing="$_missing SessionStart (--fragment $KIT_REL/procmon-session.fragment.json)"
+    add_problem "the engine is configured but the HOOK IS NOT WIRED for:$_missing — nothing will report a hung process on that event. Wire each with: $PY $ROOT/tools/settings-merge.py <that --fragment>"
+    print_note "wiring NOT ok — the hook is absent from .claude/settings.json for:$_missing"
     exit 1
   fi
-  print_note "declaration ok — conf at .process-monitor.conf, $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries $_hook_n"
+  print_note "declaration ok — conf at .process-monitor.conf, $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries PostToolUse $_hook_post, SessionStart $_hook_start"
   # ONE DECLARATION, ONE READER. This script SOURCES the conf; the engine parses it literally. Two
   # readers of one file is the class this repo gates against everywhere else, so the roots question
   # is delegated to the engine's own reader, which also gives `--check-conf` its first caller.
@@ -220,6 +236,6 @@ if [ "$MODE" = "--check" ]; then
   fi
   exit 0
 fi
-print_note "adopted — $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries $_hook_n"
+print_note "adopted — $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries $_hook_n (PostToolUse $_hook_post, SessionStart $_hook_start)"
 print_note "next: $KIT_REL/adopt-process-monitor.sh --check"
 exit 0

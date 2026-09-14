@@ -676,7 +676,7 @@ back, and say what it returned. Assume a surviving job, not a dead one; the fail
 dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
 
 Then schedule the new one. This is the only exception to "read the record first": read it, reap,
-schedule, and then do the work.
+schedule, kick off, and then do the work.
 
 **The record cannot be corrected in place, and you must know that rather than discover it.**
 `--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
@@ -684,6 +684,16 @@ new id. The `keepalive` fact keeps naming the old job, so your `keepalive-reaped
 covers BOTH — the one you deleted here and the one you scheduled — and the wrap-up says so, with what
 the delete returned. Re-preflighting to record the new id is NOT the remedy: it refuses on a dirty
 tree and re-pins the anchor, which costs more than the stale field does.
+
+**Then, if this project ships `/session-kickoff`, invoke it — after the reap and the re-schedule,
+before the first pass.** Its unattended hand-back fires because the run-state file exists in a
+non-terminal phase: it emits the READY card, appends it to this session's orientation card, and
+continues at the phase the record names, halting nowhere. It is owed because a resumed session
+starts with no card, or a replay-written one — two states the card-reading commit deny does NOT
+reach (both allow, with a witness line: a session the writer never ran for cannot run the remedy)
+— so nothing else will orient it, and its first commit would otherwise be the first durable act
+nobody oriented. A backstop that refuses it would be a predicate change in the hook, not a
+sentence here. Skip it silently if the project has no such skill, as the start path does.
 
 ## Close
 

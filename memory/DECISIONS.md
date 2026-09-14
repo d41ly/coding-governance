@@ -11,7 +11,9 @@
 
 ## KICK — kickoff
 
-*(none yet)*
+- **KICK-aReplayedCard-1** — **manifest v1.4 adds `registry:`; the session card lives in the git common dir**: `--card --write|--replay` derive and re-inject it, no fetch, no flag; detail `builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-1.md` §4 §8.
+- **KICK-aReplayedCard-2** — **the id grammar rides the reader, not the checker**: `corpus_ids.py --print-defined-ids` prints the ERE first and the defined set after; the append joins against it and spells none. Detail `builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-2.md` §4.
+- **KICK-aReplayedCard-3** — **the manifest repair COMMITS after the card append**: repair and re-stamp still at kickoff; Step 5 commits after `--card --append` so the deny sees a READY line. Supersedes the moment `builds/aRatchetForge/spec/manifest-ratchet-spec.md` §4 set.
 
 ## TOOL — tooling
 
@@ -106,6 +108,8 @@
 - TOOL-aLeakedHandle-7 · OWNER RULING (2026-09-13): check 23 EXCLUDES the path a `brief · item <unit>` row names, since `--brief` stages it and the pass never had a write to declare. Clears 30 corpus lines; the class still fires elsewhere. Owes one staged-red arm. builds/aLeakedHandle/RUN.md.
 - TOOL-aLeakedHandle-8 · OWNER RULING (2026-09-13): the memory-hygiene self-test ceiling breach is answered by making the SUITE CHEAPER, not by re-declaring 900 s. pk_rc/pk_out re-run the whole checker per arm; one run must serve several. Tier-2 unit. Measurement: aJoinedCanon's 2026-09-07 park.
 - TOOL-aLeakedHandle-9 · OWNER RULING (2026-09-13): BUILD the no-ceiling rc=137 branch of report_one, `(killed after <secs>s)`, from backlog row TOOL-aLeakedHandle-5. Every leg declares a ceiling today, so its red case is fixture-only; ratified anyway. Tier-1, one branch plus one arm.
+- **TOOL-aReplayedCard-1** — **the commit deny binds sessions started under the wiring**: `git commit` alone; a NEW `authorized-by: prompt|recipe` README exempts; an absent or replay-written card allows. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md` §8.
+- **TOOL-aReplayedCard-2** — **fragments carry `interpreter`/`args`; `{here}` serves a flat kit**: the merger renders unquoted, re-matches by marker and event; three readers resolve `{here}` with a parity refusal. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-2.md` §4.
 
 ## DEPL — deployer
 
