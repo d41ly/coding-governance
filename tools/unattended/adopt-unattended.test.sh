@@ -95,6 +95,10 @@ same "arm 1 --check agrees with what --render just wrote" "$?" "0"
 # ---- file refused there too, but a marker parked under PostToolUse or under matcher `Bash` alone
 # ---- passed, an out-of-tree settings file declared through GOV_SETTINGS_JSON was reported UNWIRED,
 # ---- and a deleted fragment fell through to `in sync`.
+# The adopter honours GOV_SETTINGS_JSON (F5), so this arm reads the FIXTURE's file only because the
+# variable is clear here (closing round 2, R15): the node F5 exists for exports a real one, and
+# every expectation below would then grade the ambient path. The one arm that wants it sets it.
+unset GOV_SETTINGS_JSON
 mv "$A/.claude/settings.json" "$A/.claude/settings.json.aside"
 out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
 same "arm 1a --check refuses with the settings file gone" "$rc" "1"
@@ -108,10 +112,31 @@ sed 's/PostToolUse/PreToolUse/; s/Bash|PowerShell/Bash/' "$A/.claude/settings.js
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1a a marker under another matcher is UNWIRED" "$?" "1"
 sed 's/"Bash"/"Bash|PowerShell"/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+# The marker under SessionStart BEHIND A MATCHERLESS GROUP — the repo's own settings shape (closing
+# round 2, R9). The resolver kept only the last key of the previous flattened line and left the
+# event alone when that key was `hooks`, so the group after a matcherless one inherited PreToolUse
+# and the adopter at 4d177329 printed `in sync` over it.
+cp "$A/.claude/settings.json" "$TMP/settings.wired.json"
+GG_HOOK=$(sed -n 's/.*"hooks":\[\({[^]]*}\)\].*/\1/p' "$TMP/settings.wired.json" | head -1)
+printf '{"hooks":{"PreToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node x/other.js"}]}],"SessionStart":[{"hooks":[{"type":"command","command":"bash x/session.sh"}]},{"matcher":"Bash|PowerShell","hooks":[%s]}]}}\n' "$GG_HOOK" > "$A/.claude/settings.json"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a marker under SessionStart behind a matcherless group is UNWIRED" "$rc" "1"
+hit "$out" "gate-guard hook is UNWIRED"
+cp "$TMP/settings.wired.json" "$A/.claude/settings.json"
 # An OUT-OF-TREE settings file, declared the way check-wiring.sh resolves it, is wired.
 mv "$A/.claude/settings.json" "$TMP/settings.out-of-tree.json"
 ( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.out-of-tree.json" bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1a an out-of-tree settings file declared via GOV_SETTINGS_JSON is wired" "$?" "0"
+# ...and an UNWIRED out-of-tree file gets a remedy naming THAT file (closing round 2, R10): the
+# bare remedy writes the in-tree decoy while --check keeps reading the declared path.
+sed 's/PreToolUse/PostToolUse/' "$TMP/settings.out-of-tree.json" > "$TMP/settings.oot-unwired.json"
+out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.oot-unwired.json" bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a an unwired out-of-tree settings file is UNWIRED" "$rc" "1"
+hit "$out" "--fragment $KIT_REL/gate-guard.fragment.json $TMP/settings.oot-unwired.json"
+# ...and a DECLARED path that is not a file is REFUSED in check-wiring's words, never UNWIRED (R10).
+out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/no-such-settings.json" bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a declared GOV_SETTINGS_JSON that is not a file is REFUSED" "$rc" "1"
+hit "$out" "REFUSED — GOV_SETTINGS_JSON names $TMP/no-such-settings.json, which is not a file"
 mv "$TMP/settings.out-of-tree.json" "$A/.claude/settings.json"
 # The fragment is shipped surface: absent is a refusal naming the file, never a silent pass.
 mv "$A/$KIT_REL/gate-guard.fragment.json" "$TMP/fragment.aside"

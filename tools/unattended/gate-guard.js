@@ -18,15 +18,18 @@
  *
  * WHAT IT DENIES, at COMMAND POSITION in a string-blanked view of the command — the head word after
  * any of `env`, `export`, `time`, `nohup`, `NAME=value` words, `timeout` with its options and
- * duration, `stdbuf`/`nice`/`ionice` with their options, and a launcher with one short option:
+ * duration with `-k`/`-s`/`--kill-after`/`--signal` values, `stdbuf`/`nice`/`ionice` with their
+ * options, and a launcher with one short option:
  *   D1  `GATE_FULL=<value>` or `GATE_SELFTESTS=<value>` with a NON-EMPTY value, bare or after
- *       `export`, and the PowerShell-native `$env:GATE_FULL=<value>` too (closing review F8);
- *       the empty assignment, bare or quoted, is the OFF spelling the runner's own `-n` test
- *       reads, so it is the plain bar and is not a hit.
+ *       `export`, and the PowerShell-native spellings too — `$env:`/`$Env:`/`$ENV:` and
+ *       `${env:NAME}`, glued or with spaces around the `=` (closing review F8; round 2 R4); the
+ *       empty assignment, bare or quoted, is the OFF spelling the runner's own `-n` test reads,
+ *       so it is the plain bar and is not a hit.
  *   D2  a word ending `run-selftests.sh`           — every declared self-test
  *   D3  a word ending `run-unattended-gates.sh`    — this kit's own suites
  *   D4  a word ending `.test.sh` or `selftest.py`  — any one suite, other kits' included; the
- *       launcher in front may be `bash`, `sh`, `python` or `python3`. A bare `--selftest` FLAG on
+ *       launcher in front may be `bash`, `sh`, `python`, `python3`, a versioned `python3.x` or
+ *       `py` (round 2 R12: the resolver's own third candidate). A bare `--selftest` FLAG on
  *       some other file (`gotchas.py --selftest`) is the seconds-long direct check the child prompt
  *       names and is NOT a hit; the whole-suite `selftest.py` FILE is (closing review F2 — six of
  *       the manifest's `chunk = selftests` legs are that file, govkit's at 3445 s among them).
@@ -34,15 +37,18 @@
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
  * The rows are measured against the manifest rather than restated beside it: the suite's parity arm
- * feeds every `chunk = selftests` argv that carries no `--selftest` flag to this predicate.
+ * feeds every `chunk = selftests` argv to this predicate, exempting a `--selftest` flag form only
+ * by its declared ceiling and printing each exemption (round 2 R3) — the flag form is textual and
+ * this hook does not read a ceiling, so a flag-form suite above the bound is declared there by name.
  *
  * WHAT IT NEVER DENIES. The plain bar — `run-gates.sh` with neither flag — is the scoped form the
  * owner allows at the main loop, and this hook cannot tell a child from the main loop; the child
  * prompt forbids it there by instruction. A quoted MENTION of any of the shapes — a commit
  * message, a `grep` argument, a heredoc body — is invisible by construction of the view, with one
- * exception the view keeps on purpose: a `$( … )` inside DOUBLE quotes is a command (closing
- * review F7), so `printf '%s' "$(bash <suite>)"` is the run it is, while the same span in single
- * quotes stays content.
+ * exception read on purpose: a `$( … )` or backtick span inside DOUBLE quotes is a command
+ * (closing review F7; round 2 R5 R6 R13), scanned as one of its own the way row D5 scans a
+ * `bash -c` body, so `printf '%s' "$(bash <suite>)"` is the run it is, a grep argument or a
+ * string tail beside the span stays content, and the same span in single quotes stays content.
  *
  * THE KEY. The predicate runs first, and the filesystem is read only on a hit: the overwhelming
  * majority of tool calls carry no deny shape and cost one scan of one string. On a hit the hook
@@ -106,11 +112,10 @@ function readStdin() {
  * a sibling kit's file is a literal the install-prefix ban refuses, and an adopter may not hold
  * that kit at all.
  */
-function buildCommandView(cmd) {
+function buildHeredocView(cmd) {
   const buildBlankedRun = (s, from, to) =>
     to <= from ? s : s.slice(0, from) + ' '.repeat(to - from) + s.slice(to)
   let view = cmd
-
   const here = /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/g
   let hm
   while ((hm = here.exec(view)) !== null) {
@@ -122,6 +127,14 @@ function buildCommandView(cmd) {
     view = buildBlankedRun(view, bodyStart + 1, bodyEnd)
     here.lastIndex = bodyEnd
   }
+  return view
+}
+
+function buildCommandView(cmd) {
+  // Heredoc bodies first, in their own helper because readQuotedSubstitutions needs the same
+  // half: a body can hold anything, backticks in prose included, and a walker that read the
+  // original text found a "run" inside a commit message this fold itself was writing.
+  const view = buildHeredocView(cmd)
 
   let out = ''
   let i = 0
@@ -129,35 +142,75 @@ function buildCommandView(cmd) {
     const ch = view[i]
     if (ch === "'" || ch === '"') {
       let j = i + 1
-      // ONE DEPARTURE from the scratch-guard copy (closing review F7): inside a DOUBLE-quoted
-      // string a `$( … )` span is a command, not content — `printf '%s' "$(bash <suite>)"` runs the
-      // suite — so it is kept unblanked, paren depth tracked, and scanSegments reads it through the
-      // `(` and `)` separators it already honours. Single quotes stay content.
-      let keep = ''
       while (j < view.length && view[j] !== ch) {
-        if (ch === '"' && view[j] === '\\') { keep += '  '; j += 2; continue }
-        if (ch === '"' && view[j] === '$' && view[j + 1] === '(') {
-          let depth = 0
-          const start = j
-          j++   // past the `$`; the loop below opens on the `(`
-          do {
-            if (view[j] === '(') depth++
-            else if (view[j] === ')') depth--
-            j++
-          } while (j < view.length && depth > 0)
-          keep += view.slice(start, j)
-          continue
-        }
-        keep += ' '
+        if (ch === '"' && view[j] === '\\') j++
         j++
       }
       const close = j < view.length ? j : view.length
-      out += ch + keep.slice(0, Math.max(0, close - i - 1)) + (j < view.length ? ch : '')
+      out += ch + ' '.repeat(Math.max(0, close - i - 1)) + (j < view.length ? ch : '')
       i = close + 1
     } else {
       out += ch
       i++
     }
+  }
+  return out
+}
+
+/**
+ * The bodies of every `$( … )` and `` ` … ` `` span inside a DOUBLE-quoted string, read from the
+ * original text. Bash runs those as commands — `printf '%s' "$(bash <suite>)"` runs the suite — and
+ * the view above blanks them as content, which is right for the string and wrong for the span.
+ * Closing review F7 kept the span unblanked IN the view instead; round 2 (R5, R6, R13) found that
+ * a quoted argument inside the span was then read as a command, the string's tail after the span
+ * became a segment of its own, and the backtick spelling stayed content. So each body is handed
+ * back to scanDenyHits as a command of its own, the way row D5 hands back a `bash -c` body:
+ * blanked, segmented and scanned by the same code, one level down. Parens inside the span count
+ * toward its depth only outside quotes, so `grep -c 'foo(' <file>` does not open one and
+ * `: ')'` does not close one. Single-quoted strings stay content throughout.
+ */
+function readQuotedSubstitutions(text) {
+  const cmd = buildHeredocView(text)   // a heredoc body is content, whatever it spells
+  const readSpanEnd = (from) => {   // index of the `)` that closes a `$(` opened just before `from`
+    let depth = 1
+    let q = ''
+    let i = from
+    while (i < cmd.length) {
+      const c = cmd[i]
+      if (q) {
+        if (c === '\\' && q === '"') i++
+        else if (c === q) q = ''
+      } else if (c === "'" || c === '"') q = c
+      else if (c === '\\') i++
+      else if (c === '(') depth++
+      else if (c === ')' && --depth === 0) return i
+      i++
+    }
+    return cmd.length
+  }
+  const out = []
+  let q = ''
+  let i = 0
+  while (i < cmd.length) {
+    const c = cmd[i]
+    if (q === "'") {
+      if (c === "'") q = ''
+    } else if (q === '"') {
+      if (c === '\\') i++
+      else if (c === '"') q = ''
+      else if (c === '$' && cmd[i + 1] === '(') {
+        const end = readSpanEnd(i + 2)
+        out.push(cmd.slice(i + 2, end))
+        i = end
+      } else if (c === '`') {
+        const end = cmd.indexOf('`', i + 1)
+        const stop = end === -1 ? cmd.length : end
+        out.push(cmd.slice(i + 1, stop))
+        i = stop
+      }
+    } else if (c === "'" || c === '"') q = c
+    else if (c === '\\') i++
+    i++
   }
   return out
 }
@@ -168,6 +221,7 @@ function readTokenAt(cmd, from, stop) {
   while (i < stop && /\s/.test(cmd[i])) i++
   let out = ''
   let quote = ''
+  let brace = false   // inside a `${…}` — its braces are the token's, not grouping (round 2, R4)
   while (i < stop) {
     const ch = cmd[i]
     if (quote) {
@@ -175,6 +229,12 @@ function readTokenAt(cmd, from, stop) {
       else out += ch
     } else if (ch === "'" || ch === '"') {
       quote = ch
+    } else if (ch === '{' && cmd[i - 1] === '$') {
+      brace = true
+      out += ch
+    } else if (ch === '}' && brace) {
+      brace = false
+      out += ch
     } else if (/[\s;|&(){}`]/.test(ch)) {
       break
     } else {
@@ -212,7 +272,10 @@ function scanSegments(cmd, view) {
     while (toks.length && /^(then|do|else)$/.test(toks[0])) toks.shift()
     if (toks.length) out.push(toks)
   }
+  let brace = false   // `${…}` is one word, not a group (round 2, R4); readTokenAt agrees
   for (let i = 0; i < view.length; i++) {
+    if (view[i] === '{' && view[i - 1] === '$') { brace = true; continue }
+    if (view[i] === '}' && brace) { brace = false; continue }
     if (/[;|&(){}`\n]/.test(view[i])) {
       readSegment(i)
       s = i + 1
@@ -222,10 +285,14 @@ function scanSegments(cmd, view) {
   return out
 }
 
-// The PowerShell-native spelling too (closing review F8): under the second tool this hook is wired
-// on, `NAME=value cmd` is not valid syntax and the one spelling that runs the flagged bar there is
-// `$env:GATE_SELFTESTS=1; bash …`. readTokenAt already unquotes, so `$env:GATE_FULL=""` is OFF.
-const FLAG_RE = /^(?:\$env:)?(GATE_FULL|GATE_SELFTESTS)=(.*)$/
+// The PowerShell-native spellings too (closing review F8; round 2 R4): under the second tool this
+// hook is wired on, `NAME=value cmd` is not valid syntax and the assignment that runs the flagged
+// bar there is `$env:GATE_SELFTESTS=1; bash …` — with the drive name in any case, in the
+// `${env:NAME}` brace form, and with spaces around the `=` (`$Env:NAME = value` is the documented
+// spelling). F8 read the lowercase glued form only. readTokenAt already unquotes, so
+// `$env:GATE_FULL=""` is OFF; the spaced form is read in scanDenyHits from three tokens.
+const FLAG_RE = /^(?:\$\{?[Ee][Nn][Vv]:)?(GATE_FULL|GATE_SELFTESTS)\}?=(.*)$/
+const PS_FLAG_NAME_RE = /^\$\{?[Ee][Nn][Vv]:(GATE_FULL|GATE_SELFTESTS)\}?$/
 const ASSIGN_RE = /^[A-Za-z_][A-Za-z0-9_]*=/
 const DURATION_RE = /^\d+[smhd]?$/
 const SHORT_OPT_RE = /^-[A-Za-z]+$/
@@ -256,6 +323,21 @@ function scanDenyHits(cmd, view, depth) {
       if (flag && flag[2] !== '') {
         hits.push({ row: 'D1', what: 'flag', shape: 'the flagged merge bar', token: t })
         k++
+      } else if (PS_FLAG_NAME_RE.test(t)) {
+        // The SPACED PowerShell assignment (round 2, R4): `$Env:GATE_FULL = 1` arrives as three
+        // tokens and `$Env:GATE_FULL =1` as two. A value token that is present and non-empty is
+        // the flagged bar; `$Env:GATE_FULL = ""` reads its quoted empty token and is OFF like the
+        // glued form, and a glued `NAME=` with nothing after it is the OFF spelling above, never
+        // read forward. The bash spelling never splits at `=`, so this branch is PowerShell's only.
+        let v = k + 1
+        let value = ''
+        if (v < toks.length && toks[v] === '=') { v++; value = v < toks.length ? toks[v] : '' }   // `NAME = value`
+        else if (v < toks.length && /^=/.test(toks[v])) value = toks[v].slice(1)         // `NAME =value`
+        else { k++; continue }                                                           // a bare name, no assignment
+        if (value !== '') {
+          hits.push({ row: 'D1', what: 'flag', shape: 'the flagged merge bar', token: t + '=' + value })
+        }
+        k = v + 1
       } else if (t === 'env' || t === 'export' || t === 'nohup' || ASSIGN_RE.test(t)) {
         k++
       } else if (t === 'stdbuf' || t === 'nice' || t === 'ionice' || t === 'time' || /\/time$/.test(t)) {
@@ -271,17 +353,23 @@ function scanDenyHits(cmd, view, depth) {
       } else if (t === 'timeout' && k + 1 < toks.length && (DURATION_RE.test(toks[k + 1]) || /^-/.test(toks[k + 1]))) {
         // `timeout [-k DURATION] [-s SIG] [--foreground] DURATION cmd` (closing review F7): the
         // options and their values are skipped before the duration, so `-k` no longer makes
-        // `timeout` the head and `timeout -k 5 120 bash <suite>` is the run it is.
+        // `timeout` the head and `timeout -k 5 120 bash <suite>` is the run it is. The long
+        // spellings `--kill-after N` and `--signal SIG` take a value too (round 2, R14); every
+        // other option GNU timeout has — `--foreground`, `--preserve-status`, `-v`, `--x=y` —
+        // is a bare word the `-` test skips.
         k++
         while (k < toks.length && /^-/.test(toks[k])) {
-          if (/^-[ks]$/.test(toks[k]) && k + 1 < toks.length) k++
+          if (/^(-[ks]|--kill-after|--signal)$/.test(toks[k]) && k + 1 < toks.length) k++
           k++
         }
         if (k < toks.length && DURATION_RE.test(toks[k])) k++
-      } else if (t === 'python' || t === 'python3') {
-        // The launcher of a `selftest.py` suite (closing review F2). One short option is skipped
-        // the way bash's is; `-c` and `-m` carry code or a module and never a suite file, so the
-        // segment is left alone rather than read as shell — python code is not this predicate's.
+      } else if (t === 'python' || t === 'py' || /^python3(\.\d+)?$/.test(t)) {
+        // The launcher of a `selftest.py` suite (closing review F2), `py` and a versioned `python3.x`
+        // among them (round 2, R12): `py` is the third candidate the kit's own resolver falls to, the
+        // Windows launcher a node meets when the MS-Store `python3` stub shadows the real one. One
+        // short option is skipped the way bash's is; `-c` and `-m` carry code or a module and never
+        // a suite file, so the segment is left alone rather than read as shell — python code is not
+        // this predicate's.
         k++
         if (k < toks.length && SHORT_OPT_RE.test(toks[k])) {
           if (toks[k] === '-c' || toks[k] === '-m') { head = null; break }
@@ -313,6 +401,12 @@ function scanDenyHits(cmd, view, depth) {
     if (head === null) continue
     const cls = resolveFileRow(head)
     if (cls && !readOnly) hits.push(Object.assign({ token: head }, cls))
+  }
+  // A `$( … )` or backtick span inside a double-quoted string is a command of its own (round 2,
+  // R5 R6 R13), scanned the way row D5 scans a `bash -c` body and keeping the row it finds. Each
+  // body is strictly shorter than the text holding it, so the recursion needs no cap of its own.
+  for (const body of readQuotedSubstitutions(cmd)) {
+    for (const h of scanDenyHits(body, buildCommandView(body), depth + 1)) hits.push(h)
   }
   return hits
 }
@@ -455,7 +549,8 @@ function main() {
 
 if (require.main === module) main()
 module.exports = {
-  readStdin, buildCommandView, scanSegments, scanDenyHits, resolveRepoRoot, readHeadRef, readMemoryRoot,
+  readStdin, buildHeredocView, buildCommandView, readQuotedSubstitutions, scanSegments, scanDenyHits,
+  resolveRepoRoot, readHeadRef, readMemoryRoot,
   resolveRunPhase, checkCommand, renderDeny, main,
   PHASES_ALLOW, READ_ONLY_VERBS, TOOLS, KIT_GATE_GUARD_VERSION,
 }

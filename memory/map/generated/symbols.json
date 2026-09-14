@@ -373,6 +373,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildHeredocView",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "buildResolvedTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2788,7 +2793,17 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readQuotedSubstitutions",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "readSegment",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readSpanEnd",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
     },

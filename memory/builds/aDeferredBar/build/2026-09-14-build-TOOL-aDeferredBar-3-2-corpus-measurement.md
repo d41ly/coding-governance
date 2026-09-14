@@ -116,7 +116,15 @@ predicate had, and invisible to Reading 2 because its token set was the `.test.s
 carries a python launcher in front of a `selftest.py` token in the blanked view — every one is a
 mention, `grep`/`sed`/`cat`/`git diff` over the file, its name inside a heredoc or a quoted
 string. (The `--selftest` FLAG form is not in this row at all: its token is `--selftest`, not
-`selftest.py`, and the parity arms are where that admission is asserted.) **F7**: the 67 `.test.sh` commands, 3 `run-selftests.sh` commands and 1
+`selftest.py`, and the hook admits it at BUILDING because the flag is textual. What the parity
+arms assert about it, amended at closing round 2 R3 — the round-1 sentence here said they assert
+its admission, and they asserted nothing about it, having dropped the flag form by rule: every
+`chunk = selftests` leg of the manifest is in the population; a `--selftest` leg whose ceiling is
+at or under the arms' declared 300 s bound is printed as the exempt direct check it is; a
+`--selftest` leg above the bound is declared by name with its ceiling — `corpus_ids.py` at 2690 s
+and `gen_build_index.py` at 350 s today — or reds; and graded plus printed exemptions must equal
+the manifest's count. The hook still admits those two; the arms now say so instead of hiding
+them.) **F7**: the 67 `.test.sh` commands, 3 `run-selftests.sh` commands and 1
 `run-unattended-gates.sh` command that joined the hit columns are the three shapes the review named
 — a suite inside a double-quoted `$( … )`, `timeout` with options before its duration, and
 `stdbuf`/`nice`/`ionice` in front of the launcher — plus a fourth the re-walk surfaced, `time` by
@@ -139,6 +147,25 @@ ceiling spec §3 states and the header's `ponytail:` line owns. Every other clas
 offers — 132 `&&`-led, 75 `PY`-led, 16 `PYEOF`-led — is a token inside a heredoc body or a quoted
 string, a mention, and the walk over the raw text that produced those figures is the
 over-inclusive one this correction retires.
+
+## Reading 4 — closing round 2, the substitution scan, an A/B over one corpus
+
+Taken 2026-09-14 on node `a` at the round-2 fold of R5, R6 and R13, by the Reading 3 probe
+unchanged, both hooks over one store in one sitting — the rev-6 hook as `4d177329` holds it and the
+fold. 3172 files, 106 161 commands, 81 080 sidechain. The fold reads a double-quoted `$( … )` or
+backtick span as a command of its own instead of keeping it in the view, and every row moves the
+way that predicts: rev-6 → fold, D2 47 → 44, D3 22 → 23, D4 `.test.sh` 1383 → 1318, D4
+`selftest.py` 782 → 766, the plain bar 435 → 424, D1 unmoved at 253 and 53; the near-miss columns
+rise by exactly what the hit columns lose. A diff probe over the same store listed every command
+the two predicates classify differently: 84 distinct commands rev-6 denied and the fold reads as
+mentions — every one a `sed -n "$(grep -n … <suite>),+Np" <suite>`, `echo "… $(grep -c … <suite>)"`
+or a string tail after a substitution, the false-deny class R5 and R6 named, and one of them the
+`sed -n` read this very fold typed and was denied on — and ONE the fold denies that rev-6 admitted:
+a `python -c "…"` whose double-quoted source carries the prose `` `run-unattended-gates.sh` `` in
+backticks. Bash runs that span before python sees it, so the deny is the truth about the command
+as typed; the author got an empty substitution in the source either way. The near-miss walk of
+Reading 3 stands: the two shell-function `"$@"` cases are the only run-shaped near-misses, and the
+84 retired hits joined the mentions rather than the runs.
 
 ## The probe, verbatim (Reading 3 form — the `D4 selftest.py` key is its one addition over Reading 2)
 
