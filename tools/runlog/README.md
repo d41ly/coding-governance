@@ -54,7 +54,11 @@ clone's journal in two.
 ## The memory root
 
 `resolve_memory_root(root)` reads `MEMORY_ROOT` from `.memory-tree.conf` at the repository root, the
-way bash sourcing reads it, and strips its slashes. An absent key, or an absent conf, is the kit
+way bash sourcing reads it, and strips its slashes. A quoted value is the text up to its matching
+quote, whatever follows it, and an unquoted one ends at a `#` that begins a word. That is the
+memory-tree engine's own order, copied rather than imported because kits install independently, and
+the self-test holds the copy to that engine's reader and both to bash over a table of spellings. A
+leading BOM is stripped, which bash would not do. An absent key, or an absent conf, is the kit
 default `memory`. A value naming no directory refuses by name, and so does one that would leave the
 repository: a `..` segment, a drive colon or a backslash. Every consumer that addresses the memory
 tree goes through it, because an adopter's root need not be `memory`.
@@ -223,6 +227,14 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   from the primary tree. The hold ends at another run's first claim there after the run's last one,
   since a worktree outlives its run and is reused. So neither an owner's `--status` nor the run's own
   `--landed` makes another run's bar in the primary tree this run's.
+- **A close is an END reading `rc=0` and `exit=clean`.** An unclean END's `rc` is whatever `$?` its
+  EXIT trap saw, often 0, so a `--close` killed mid-bar is no close. `green-at-close` is not judged at
+  it, and it splits no owner turns. Every rule that decides on an END's `rc` reads its `exit` beside
+  it, and a source arm of the self-test holds the model to that.
+- **A journal reads `dead` only on the run's own proof** that its producer owed a line: a parked row
+  for the driver, a LANDING write for the gates, and for the pushes the move into LANDED. That last
+  move is what closes a landed run's window, so it lies at the window's end and is read there, since
+  the half-open window never holds it.
 - **Every inferred answer is named** in the model's `method` field.
 - **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
   10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
@@ -278,6 +290,12 @@ same as an absent one, and the summary's `values withheld` line counts them. So 
 shape `RECORD_SCHEMA["forbidden"]` lists, an absolute path or a UUID, whatever class it passed: the
 `label` class admits a lowercase UUID. The schema leg below validates committed bytes against the same
 data.
+
+**An unknown value is `-`, never the zero that reads clean.** The owner turns, the usage lines and
+the attributed calls come from the transcripts, so each is `-` unless those read `present` or
+`partial`. The model counts zero of what it never read, and an `in-window 0` would say the run never
+asked. A Timeline `rc` is written only beside an END that reads `exit=clean`, since a killed verb's
+`rc` is its EXIT trap's `$?`.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
 `TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision

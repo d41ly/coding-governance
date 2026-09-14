@@ -31,8 +31,10 @@ heading, a model field, a coverage state or a CLI verb and its flags, is held to
 
 Exit 0 = every arm passed and the assertion count met its floor · 1 = an arm failed or the count fell.
 """
+import ast
 import dataclasses
 import hashlib
+import importlib.util
 import json
 import os
 import pathlib
@@ -93,7 +95,12 @@ from collections import Counter  # noqa: E402
 # window bounding every set; and the window-invariant arm that sorts last and grades every model the
 # arms built, naming the arm behind each violation. Three new functions, so the decoy checks alone move
 # it by nine. AC17 gained a liveness check, and AC7 and AC21 gained checks of the window invariant.
-ASSERTION_FLOOR = 1186
+# RAISED 1186 -> 1253 by the same review's round-1 fold of M2, M3, M6 and M7: the conf table graded by
+# bash and held to the memory-tree engine's reader, one check per spelling per reader; the dead state
+# of each journal through the model; the killed close and its source arm over every rc comparison;
+# and record AC10, the unknown counts and a killed verb's rc. Five new functions, so the decoy checks
+# alone move it by fifteen. The conf arm skips a reader it cannot reach, and that skip lowers the count.
+ASSERTION_FLOOR = 1253
 
 PASS = []
 FAIL = []
@@ -612,6 +619,95 @@ def test_ac10_memory_root():
             ("dotted-name", "MEMORY_ROOT=docs/.mem..x\n", "docs/.mem..x")):
         check(f"AC10: the conf grammar reads ({name})",
               resolve_or_refusal(build_tree(name, conf)), want)
+
+
+# THE SPELLINGS BASH ACCEPTS, each setting MEMORY_ROOT (TOOL-dLoggedFlight-1 AC10). The first two
+# rows past the plain three are M7 of the closing review, round 1: a quoted value with a comment after
+# it kept its quotes. Two spellings are deliberately absent, a leading BOM and a CRLF line: the kit's
+# reader strips both and bash strips neither, which the reader's docstring names, and AC10's own rows
+# above grade them.
+CONF_SPELLINGS = (
+    ("bare", "MEMORY_ROOT=docs/p1\n"),
+    ("double-quoted", 'MEMORY_ROOT="docs/p2"\n'),
+    ("single-quoted", "MEMORY_ROOT='docs/p3'\n"),
+    ("double-quoted, then a comment", 'MEMORY_ROOT="docs/p4"  # a note\n'),
+    ("single-quoted, then a comment", "MEMORY_ROOT='docs/p5' # a note\n"),
+    ("bare, then a comment", "MEMORY_ROOT=docs/p6  # a note\n"),
+    ("bare, then a tab and a comment", "MEMORY_ROOT=docs/p7\t# a note\n"),
+    ("export and a tab", 'export\tMEMORY_ROOT="docs/p8"  # a note\n'),
+    ("a # inside quotes", 'MEMORY_ROOT="docs/a # b"\n'),
+    ("a # inside a word", "MEMORY_ROOT=docs/p#10\n"),
+    ("a comment where the value would be", "MEMORY_ROOT=   # only a note\n"),
+    ("an empty quote, then a comment", 'MEMORY_ROOT=""  # a note\n'),
+    ("set twice", 'MEMORY_ROOT=first\nMEMORY_ROOT="second"  # a note\n'),
+    ("indented, under a commented-out one", "# MEMORY_ROOT=nope\n  MEMORY_ROOT='yes'\n"),
+)
+
+
+def read_bash_conf_values(paths):
+    """`(values, framed)`: what bash sourcing each conf binds MEMORY_ROOT to, `<unset>` where it binds
+    nothing, or None where no bash shares this filesystem. ONE bash for the whole table, each file
+    sourced in its own subshell and each answer NUL-terminated. The reply's framing is asserted
+    before an answer is trusted, so a batch that misaligns reds by name rather than filling its slots
+    with a value some check reads as clean."""
+    bash = resolve_bash()
+    if bash is None:
+        return None
+    script = ('for f; do ( unset MEMORY_ROOT; set -a; . "$f" >/dev/null 2>&1; '
+              'printf "%s\\0" "${MEMORY_ROOT-<unset>}" ); done')
+    got = subprocess.run([bash, "-c", script, "_", *(p.as_posix() for p in paths)], capture_output=True)
+    fields = got.stdout.split(b"\0")
+    framed = got.returncode == 0 and len(fields) == len(paths) + 1 and fields[-1] == b""
+    return [f.decode("utf-8", "replace") for f in fields[:len(paths)]], framed
+
+
+def read_engine_conf_reader():
+    """The memory-tree engine's own conf reader, loaded from its source where it sits beside this kit,
+    else None. The literal below is this withheld arm's second carried path: the reader the kit's copy
+    is held to is its subject, not a reference that would reach an adopter."""
+    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
+    src = top / "tools/memory-tree/corpus_ids.py"
+    if not src.is_file():
+        return None
+    spec = importlib.util.spec_from_file_location("runlog_selftest_engine_conf", src)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_ac10_conf_readers():
+    """AC10's table: the kit's conf reader, graded by bash sourcing the same file and held to the
+    memory-tree engine's `parse_conf_line`, the reader it copies, over every spelling in
+    `CONF_SPELLINGS`. Bash grades it, so a copy and its original sharing one mistake still red."""
+    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-conf-"))
+    SCRATCH.append(base)
+    paths = []
+    for i, (_name, conf) in enumerate(CONF_SPELLINGS):
+        d = base / f"s{i}"
+        d.mkdir()
+        (d / rl.CONF_NAME).write_bytes(conf.encode("utf-8"))
+        paths.append(d / rl.CONF_NAME)
+    kit = [rl._read_conf_key(p, "MEMORY_ROOT") for p in paths]
+    check_true("AC10 conf liveness: the table holds both spellings the closing review named",
+               any('"  #' in c for _n, c in CONF_SPELLINGS) and any("' #" in c for _n, c in CONF_SPELLINGS))
+    bashed = read_bash_conf_values(paths)
+    if bashed is None:
+        print("  SKIP AC10 conf against bash: no bash that shares this filesystem is on PATH")
+    else:
+        values, framed = bashed
+        check("AC10 conf: bash's reply is one NUL-terminated answer per spelling, and it exited 0",
+              framed, True)
+        check_true("AC10 conf liveness: bash bound MEMORY_ROOT in every spelling, so each was read",
+                   "<unset>" not in values, str(values))
+        for (name, _conf), mine, theirs in zip(CONF_SPELLINGS, kit, values):
+            check(f"AC10 conf: the kit's reader reads as bash sourcing does ({name})", mine, theirs)
+    engine = read_engine_conf_reader()
+    if engine is None:
+        print("  SKIP AC10 conf against the engine: the memory-tree engine is not beside this kit")
+        return
+    for (name, _conf), mine, p in zip(CONF_SPELLINGS, kit, paths):
+        theirs = engine.parse_conf(engine.read(str(p)), {}).get("MEMORY_ROOT")
+        check(f"AC10 conf: the kit's reader and the engine's parse_conf_line agree ({name})", mine, theirs)
 
 
 # ================================================================ the kit's own declarations
@@ -2627,6 +2723,131 @@ def test_model_ac4_ac12_conformance():
           model.close["head"], fx["head_at_close"])
 
 
+def build_killed_close_fixture(exit_):
+    """A run whose `--close` ran its bar and ended `rc=0` with `exit_`. With `unclean` it is written
+    the way the driver's EXIT trap writes a verb killed mid-bar: the END reads the phase it found,
+    BUILDING, since no LANDING was ever written, and its `rc` is the trap's `$?`, 0. With `clean` it
+    is a close that wrote LANDING and has not been committed yet. A GREEN bar at the head it ran at
+    comes first, and a heartbeat `--status` keeps the window open past the END. The session, made by
+    the real extractor, ran each verb in a tool call and holds an owner turn between the close and the
+    heartbeat. The run's branch is checked out, as in its own worktree, so HEAD is the head it ran at.
+    Returns `(repo, journals, store)`."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = shas0[1]
+    st = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
+    s1 = st
+    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    st = add_runstate_row(st, derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
+    s2 = st
+    s3 = set_runstate_fact(set_runstate_fact(st, "phase", "BUILDING"), "witness", base)
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "ref": "refs/heads/run",
+         "files": {rm: s1}},
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): the dispatch and the brief",
+         "ref": "refs/heads/run", "files": {rm: s2}},
+        {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
+         "ref": "refs/heads/run", "files": {rm: s3, "tools/a.txt": "b\n"}},
+    ], repo=first)
+    run_git(["-c", "core.autocrlf=false", "checkout", "-q", "run"], repo)
+    after = "BUILDING" if exit_ == "unclean" else "LANDING"
+    driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
+              + render_driver_lines(3, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + render_driver_lines(4, "--brief", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + render_driver_lines(6, "--phase", phase_from="RUNNING", phase_to="BUILDING")
+              + render_driver_lines(21, "--close", phase_from="BUILDING", phase_to=after, exit_=exit_)
+              + render_driver_lines(30, "--status", phase_from=after, phase_to=after))
+    j = write_journals(repo.parent, driver=driver, gates=[render_gate_line(20, "20260913T101930Z-7001", shas[3])])
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    acts = [("call", derive_minute(m) - 1, derive_minute(m) + 1) for m in (1, 3, 4, 6, 21, 30)]
+    write_extract(store, FX_SID, build_session_events(acts + [("owner", float(derive_minute(25)))]))
+    return repo, j, store
+
+
+def test_model_ac12_killed_close():
+    """AC12 and AC13 (M3 of the closing review, round 1): a `--close` END reading `rc=0` and
+    `exit=unclean` is no close. `green-at-close` is UNJUDGEABLE though a GREEN bar at the head came
+    first, and an owner turn after that END, inside the window, is `in-window`. The same END reading
+    `exit=clean` closes the run, meets the item, and makes the turn `post-close`."""
+    got = {}
+    for exit_ in ("unclean", "clean"):
+        repo, j, store = build_killed_close_fixture(exit_)
+        model = build_model(repo, journals=j, store=store)
+        got[exit_] = (model.close["t"] is None,
+                      [c["state"] for c in model.conformance if c["item"] == "green-at-close"],
+                      [t["position"] for t in model.owner_positions["turns"]])
+        if exit_ == "unclean":
+            check_true("model AC12 killed close liveness: the model holds the --close END with rc 0 and "
+                       "exit unclean, the GREEN bar, and the owner turn, all inside the window",
+                       any(e["kind"] == "verb" and e["verb"] == "--close" and e["rc"] == "0"
+                           and e["exit"] == "unclean" for e in model.timeline)
+                       and any(e["kind"] == "gate" and e["verdict"] == "GREEN" for e in model.timeline)
+                       and model.coverage["transcripts"]["state"] == "present"
+                       and len(model.owner_positions["turns"]) == 1, str(model.coverage["transcripts"]))
+    check("model AC12: a --close END reading rc=0 and exit=unclean is no close, and green-at-close reads "
+          "UNJUDGEABLE", got["unclean"][:2], (True, ["UNJUDGEABLE"]))
+    check("model AC13: an owner turn after a killed --close END, inside the window, reads in-window",
+          got["unclean"][2], ["in-window"])
+    check("model AC12 near miss: the same END reading exit=clean closes the run and meets green-at-close, "
+          "and the turn after it reads post-close", got["clean"], (False, ["MET"], ["post-close"]))
+
+
+# The ONE receiver whose `rc` a comparison in the model may read without its `exit`: a transcript tool
+# call, whose rc is the harness's background notification and which carries no `exit` at all.
+RC_WITHOUT_EXIT = {"call": "a transcript tool call; the harness notification carries an rc and no exit"}
+
+
+def scan_rc_reads(source):
+    """Every comparison in `source` that reads a key `rc`, as `(line, receiver, paired)`. A read is
+    `X["rc"]` or `X.get("rc")`, its receiver `X`'s source text, and `paired` says the `and` condition
+    holding the comparison reads `X`'s `exit` too. Parsed, never grepped, so a comment or a docstring
+    naming both keys pairs nothing."""
+    tree = ast.parse(source)
+    parents = {child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
+
+    def read_key(node, key):
+        if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and node.slice.value == key:
+            return ast.unparse(node.value)
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "get"
+                and node.args and isinstance(node.args[0], ast.Constant) and node.args[0].value == key):
+            return ast.unparse(node.func.value)
+        return None
+
+    out = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Compare):
+            continue
+        for operand in (node.left, *node.comparators):
+            recv = read_key(operand, "rc")
+            if recv is None:
+                continue
+            cond = parents.get(node)
+            while cond is not None and not (isinstance(cond, ast.BoolOp) and isinstance(cond.op, ast.And)):
+                cond = None if isinstance(cond, (ast.stmt, ast.comprehension)) else parents.get(cond)
+            paired = cond is not None and any(read_key(n, "exit") == recv for n in ast.walk(cond))
+            out.append((node.lineno, recv, paired))
+    return sorted(out)
+
+
+def test_model_ac12_rc_reads_exit():
+    """AC12's source arm (M3 of the closing review, round 1): every comparison on an END's `rc` in
+    the model reads that END's `exit` in the same condition, since an unclean END's `rc` is whatever
+    its EXIT trap saw. The one exempt receiver must still name a comparison, or the exemption reds."""
+    reads = scan_rc_reads((HERE / "model.py").read_text(encoding="utf-8"))
+    unpaired = [(ln, recv) for ln, recv, paired in reads if not paired and recv not in RC_WITHOUT_EXIT]
+    check("model AC12 source: every comparison on an END's rc in model.py reads its exit beside it",
+          unpaired, [])
+    check("model AC12 source: each exempt receiver still names an unpaired rc comparison, so no exemption "
+          "is stale", sorted({recv for _ln, recv, paired in reads if not paired} & set(RC_WITHOUT_EXIT)),
+          sorted(RC_WITHOUT_EXIT))
+    check_true("model AC12 source liveness: the scan found paired comparisons, so it can see a pairing",
+               sum(1 for *_x, paired in reads if paired) >= 2, str(reads))
+    check("model AC12 source liveness: a comparison with no exit beside it is caught, and one in the same "
+          "condition as its exit is not", [(recv, paired) for _ln, recv, paired in scan_rc_reads(
+              'a = [i for i in s if i["rc"] == "0"]\nb = [i for i in s if i["rc"] == "0" and i["exit"] == "clean"]\n'
+              'if e.get("rc") == "0":\n    pass\n')], [("i", False), ("i", True), ("e", False)])
+
+
 def test_model_ac6_coverage():
     """AC6: every coverage state from its own fixture, the epoch rule on both sides, and a journal
     holding only other runs' lines telling a dead writer from one that predates the run."""
@@ -2669,6 +2890,41 @@ def test_model_ac6_coverage():
           state, "not-local")
     check("model AC6: every member of COVERAGE_STATES has a fixture, and every fixture's state is a "
           "member", sorted(set(seen.values())), sorted(rl_model.COVERAGE_STATES))
+
+
+def test_model_ac6_dead_through_model():
+    """AC6 through `build_run_model`, for each journal (M2 of the closing review, round 1): the landed
+    fixture, staged with a journal older than the run and none of the run's own lines, reads that
+    journal `dead` and names its proof. `pushes` is staged twice: with the driver journal, whose
+    terminal END closes the window, and without it, where the terminal write does. Its proof is the
+    move into LANDED that closed the window, which lies at the end and never inside it, so looked for
+    among the window's moves it could not fire. The arms before this fold observed only `present`."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    older_push = render_push_lines(-30, "1" * 40, lander="1", wt=FX_WT_OTHER, decision="skip-nondefault",
+                                   remote_ref="refs/heads/side", pid=6161)
+    older_bar = [render_gate_line(-20, "20260913T090000Z-6001", "1" * 40, wt=FX_WT_OTHER)]
+    older_verb = render_driver_lines(-25, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING",
+                                     wt=FX_WT_OTHER, sid=FX_SID_B, pid=4343)
+    cases = (
+        ("pushes, with the terminal END closing the window", "pushes",
+         dict(driver=fx["driver"], gates=fx["gates"], pushes=older_push), "terminal-end"),
+        ("pushes, with the terminal write closing it", "pushes", dict(gates=fx["gates"], pushes=older_push),
+         "terminal-write"),
+        ("gates", "gates", dict(driver=fx["driver"], gates=older_bar, pushes=fx["pushes"]), "terminal-end"),
+        ("driver", "driver", dict(driver=older_verb, gates=fx["gates"], pushes=fx["pushes"]), "terminal-write"),
+    )
+    for name, source, journals, end_from in cases:
+        model = build_model(repo, journals=write_journals(repo.parent, **journals))
+        row = model.coverage[source]
+        check(f"model AC6 through the model: the landed run's {name} reads dead, naming its proof",
+              (row["state"], row["lines"], bool(row.get("proof")), model.window["end_from"]),
+              ("dead", 0, True, end_from))
+    near = build_model(repo, journals=write_journals(repo.parent, driver=older_verb + fx["driver"],
+                                                       gates=older_bar + fx["gates"],
+                                                       pushes=older_push + fx["pushes"]))
+    check("model AC6 through the model near miss: with the run's own lines beside the older ones, each "
+          "journal reads present", [near.coverage[s]["state"] for s in rl_model.JOURNALS], ["present"] * 3)
 
 
 def test_model_ac7_real_tree():
@@ -3830,8 +4086,10 @@ def build_class_model():
     m = dataclasses.asdict(real)
     t = float(derive_minute(12))
     tl = m["timeline"]
+    # Every END-bearing event carries the `exit` the model copies from its END, since a Timeline `rc` is
+    # written only beside `exit=clean` (TOOL-dLoggedFlight-9 S4).
     for i, d in enumerate(rl_record.PUSH_DECISIONS):
-        tl.append({"t": t + i, "source": "pushes", "kind": "push", "decision": d, "rc": "0",
+        tl.append({"t": t + i, "source": "pushes", "kind": "push", "decision": d, "rc": "0", "exit": "clean",
                    "lander": "1" if i % 2 else "0"})
     tl.append({"t": t + 10, "source": "pushes", "kind": "push-refused", "decision": "refuse-default-branch",
                "lander": "0"})
@@ -3842,7 +4100,7 @@ def build_class_model():
            {"t": t + 32, "source": "transcripts", "kind": "compact"},
            {"t": t + 33, "source": "transcripts", "kind": "limit"},
            {"t": t + 34, "source": "driver", "kind": "verb", "verb": "--landed", "state": "ended", "rc": "1",
-            "checks": ["34", "7"], "phase_from": "LANDING", "phase_to": "LANDING"},
+            "exit": "clean", "checks": ["34", "7"], "phase_from": "LANDING", "phase_to": "LANDING"},
            {"t": float(MODEL_T0 + 11 * 60 + 30), "source": "transcripts", "kind": "owner", "via": "typed"}]
     # The absolute path is ASSEMBLED here, as the redaction arms expand their positives, so no tracked
     # line of this repository carries the shape this intruder exists to prove the record refuses.
@@ -3850,7 +4108,7 @@ def build_class_model():
                  "absolute path": "/".join(("", "home", "someone", "repo", "memory", "builds", FX_SLUG, "RUN.md:3")),
                  "free text": "the run skipped the bar because it was late"}
     tl += [{"t": t + 40, "source": "driver", "kind": "verb", "verb": intruders["command"], "state": "ended",
-            "rc": "0", "checks": [], "phase_to": "BUILDING"},
+            "rc": "0", "exit": "clean", "checks": [], "phase_to": "BUILDING"},
            {"t": t + 41, "source": "run-state", "kind": "dispatch", "unit": intruders["session"]},
            {"t": t + 42, "source": "transcripts", "kind": "workflow", "label": intruders["free text"]}]
     tl.sort(key=lambda e: e["t"])
@@ -4273,6 +4531,69 @@ def test_record_ac9_owner_times():
         wrote = "refused"
     check("record AC9: write_record refuses the regressed model and writes nothing",
           (wrote, sorted(p.name for p in folder.glob("*-runlog-*.md")) if folder.is_dir() else []), ("refused", []))
+
+
+# The Summary facts whose counts the model derives from the transcripts (TOOL-dLoggedFlight-9 S4).
+TRANSCRIPT_FACTS = ("owner turns", "usage main", "usage agent", "usage workflow", "attributed calls")
+
+
+def read_fact_counts(text, label):
+    """The count slots of one Summary fact, read by the shape S4 gives them: pieces joined by ` · ` or
+    ` of `, each ending in its count. Typed here, not taken from the renderer's templates."""
+    value = parse_record_markdown(text).get("Summary", {}).get("facts", {}).get(label, "")
+    return [piece.split(" ")[-1] for piece in re.split(r" · | of ", value)] if value else []
+
+
+def test_record_ac10_unknown_counts():
+    """AC10 (M6, and the render half of M3, of the closing review, round 1). With no transcript on the
+    machine the landed run's owner-turn, usage and attributed-calls counts render `-`, never the zero
+    the model holds for what it never read; with its session's extract, made by the real extractor,
+    they render as integers, and so they do with a second session named and not local, `partial`. A
+    `--close` END reading `exit=unclean` renders `-` in its Timeline row's `rc`, and `exit=clean` its 0."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    # An owner's heartbeat from a second session, in the primary tree, names a session with no extract.
+    other_session = render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING",
+                                        wt=FX_WT_PRIMARY, sid=FX_SID_B, pid=4747)
+    j = write_journals(repo.parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    j_two = write_journals(repo.parent, driver=fx["driver"] + other_session, gates=fx["gates"], pushes=fx["pushes"])
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    acts = [("call", derive_minute(m) - 1, derive_minute(m) + 1) for m in (1, 3, 4, 6, 21, 27)]
+    write_extract(store, FX_SID, build_session_events(acts + [("owner", float(derive_minute(12)) + 30)]))
+    got = {}
+    for name, journals, st in (("not-local", j, None), ("present", j, store), ("partial", j_two, store)):
+        model = build_model(repo, journals=journals, store=st)
+        text = rl_record.render_record(model, "memory")
+        got[name] = (model, {label: read_fact_counts(text, label) for label in TRANSCRIPT_FACTS})
+    bare, counts = got["not-local"]
+    check("record AC10: with the transcripts not-local, every owner-turn, usage and attributed-calls count "
+          "renders -", {label: sorted(set(v)) for label, v in counts.items()},
+          {label: ["-"] for label in TRANSCRIPT_FACTS})
+    check_true("record AC10 liveness: the model behind it read not-local and holds zeros for those counts, so "
+               "the - is the renderer's decision", bare.coverage["transcripts"]["state"] == "not-local"
+               and not any(bare.owner_positions["counts"].values()) and bare.attribution["calls"] == 0,
+               str(bare.coverage["transcripts"]))
+    for name in ("present", "partial"):
+        model, counts = got[name]
+        check(f"record AC10 near miss: with the transcripts {name}, every one of those counts renders as an "
+              "integer", (model.coverage["transcripts"]["state"],
+                          [label for label, v in counts.items() if not v or not all(c.isdigit() for c in v)]),
+              (name, []))
+    model, counts = got["present"]
+    check("record AC10: ...and the known counts are the model's own, the owner turns by position and the "
+          "attributed calls", (counts["owner turns"], counts["attributed calls"]),
+          ([str(model.owner_positions["counts"][p]) for p in rl_model.OWNER_POSITIONS],
+           [str(model.attribution["attributed"]), str(model.attribution["calls"])]))
+    check_true("record AC10 liveness: the known render holds a non-zero owner turn and non-zero calls, so a "
+               "- in their place would differ", model.owner_positions["counts"]["in-window"] == 1
+               and model.attribution["calls"] > 0, str((model.owner_positions["counts"], model.attribution["calls"])))
+    for exit_, want in (("unclean", "-"), ("clean", "0")):
+        krepo, kj, kstore = build_killed_close_fixture(exit_)
+        rows = [r for r in scan_record_rows(rl_record.render_record(build_model(krepo, journals=kj, store=kstore),
+                                                                    "memory"))
+                if len(r) == 7 and r[2] == "verb" and r[3] == "--close"]
+        check(f"record AC10: a --close END reading rc=0 and exit={exit_} renders rc {want} on the Timeline",
+              [r[5] for r in rows], [want])
 
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)

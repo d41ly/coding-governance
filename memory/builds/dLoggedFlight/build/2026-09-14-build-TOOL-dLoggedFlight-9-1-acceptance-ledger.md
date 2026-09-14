@@ -13,7 +13,8 @@ in 26.7 s. No gate leg was run, per the owner's instruction of 2026-09-13, and n
 through one `git fast-import`, and every journal, extract and store is scratch. Every fixture model is
 a real `build_run_model` over a scratch history, or one such model lengthened by copying its own
 entries. The closing diff review's round-1 fold of B1 bumped the spec to rev-6 and added AC9, whose
-line below that fold observed.
+line below that fold observed. Its fold of M6 and M3's render half bumped the spec to rev-7 and
+added AC10, whose line below that fold observed.
 
 ## The criteria
 
@@ -88,6 +89,17 @@ line below that fold observed.
   ending on a turn was found in the markdown copy alone and in the Data twin's alone. RED seen with the
   refusal switched off, with the second-after comparison dropped, which lets the truncated end
   through, and with either copy's row reader dropped.
+- AC10 — `render_record` (`test_record_ac10_unknown_counts`) — added at rev-7 by the closing diff
+  review's round-1 fold of M6 and M3's render half, and observed by that fold. The landed run with
+  no transcript on the machine read `not-local`, its model holding zeros, and every owner-turn, usage
+  and attributed-calls count in its record read `-`. With its session's extract, made by the real
+  extractor, those counts read as the model's own integers, one in-window owner turn among them, and
+  with a second session named and not local they read as integers under `partial`. A `--close` END
+  reading `rc=0` and `exit=unclean` rendered `-` in its Timeline `rc` cell, and `0` when it read
+  `exit=clean`. RED seen with the counts rendered whatever the transcripts read, with `partial` taken
+  as unknown, and with the Timeline `rc` rendered whatever the exit. The class model behind AC4 gave
+  its added push and verb events the `exit` the model copies from each END, so their `rc` cells still
+  exercise the `int` class.
 
 ## What else the pass carried
 
@@ -115,7 +127,9 @@ cache made one break fail a neighbour's check; that trap is now a gotcha record.
 dropping `derive_serves`'s intersection with the defined ids, stayed green: the model's unit list holds
 only spec-defined ids, so the intersection cannot change the answer. It was replaced by the break that
 reads dispatched ids off the parked rows, which serves the undefined id and turned the arm red. The
-breaks are named per criterion above.
+breaks are named per criterion above. The fold of M6 and M3's render half staged three more breaks
+of `record.py` the same way, with the cache cleared before each, each run against
+`test_record_ac10_unknown_counts`, and each redded its check.
 
 ## The checklist over the build commit
 
@@ -163,5 +177,9 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   turn out, and the render refuses any time in an owner turn's second.
 - `verify` cannot see a line inserted before the committed first time. The model attributes none there
   except a bar a joined push pinned, and the kit README names it.
+- The schema leg does not grade a transcript-derived count against the same record's Coverage row,
+  the left-shift the closing review preferred for M6. `TOOL-dLoggedFlight-10` §3 keeps content truth
+  out of the leg, and spec 9's rev-7 line says so, so a zero hand-edited into a committed record
+  passes the leg. The renderer is where the rule binds, and AC10 grades it.
 - The runlog kit stays at 1.0, as the brief sets it, and no leg, fixture file or pin moved. The budget
   row reads 27 s, still under the 60 s floor.

@@ -588,6 +588,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_killed_close_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_kit_copy",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -1811,6 +1816,11 @@
       "id": "derive_ci_file",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_clean_rc",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "derive_count",
@@ -3548,6 +3558,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_bash_conf_values",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3618,6 +3633,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_engine_conf_reader",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3631,6 +3651,11 @@
       "id": "read_expand_rows",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_fact_counts",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_fixture",
@@ -5088,6 +5113,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "scan_rc_reads",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "scan_record_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5386,6 +5416,11 @@
       "id": "test_absent_pin_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_ac10_conf_readers",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_ac10_memory_root",
@@ -6093,6 +6128,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_model_ac12_killed_close",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac12_rc_reads_exit",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_model_ac13_ac14_positions_usage",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6159,6 +6204,11 @@
     },
     {
       "id": "test_model_ac6_coverage",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac6_dead_through_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -6406,6 +6456,11 @@
       "id": "test_readme_mechanism_drift",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_record_ac10_unknown_counts",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_record_ac1_names",

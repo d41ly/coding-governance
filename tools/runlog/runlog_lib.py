@@ -337,10 +337,15 @@ def resolve_journal_root(start=None) -> pathlib.Path:
 def _read_conf_key(path: pathlib.Path, key: str) -> str | None:
     """One key of a sourced `KEY=VALUE` conf, read the way bash sourcing reads it. None when absent.
 
-    A narrow COPY of the grammar the memory-tree conf documents, not an import of another kit's
-    reader: kits are copied into adopters independently. The rules kept are the ones that change a
-    value — an `export ` prefix, a leading BOM, quotes keeping their contents, an unquoted value ending
-    at whitespace so an inline comment cannot leak in, and the LAST assignment winning.
+    A COPY of the memory-tree engine's own line reader, `parse_conf_line`, in its order, not an import
+    of it: kits are copied into adopters independently. The withheld self-test holds this copy to that
+    reader, and both to bash sourcing the same file, over a table of spellings (TOOL-dLoggedFlight-1
+    AC10). The rules that change a value: an `export` prefix, a QUOTED value being the text up to its
+    matching quote whatever follows it, an unquoted value ending at a `#` that begins a word, and the
+    LAST assignment winning. The first cut told quoted from unquoted by whether the value's first and
+    last characters matched, so `KEY="v"  # note` failed that test and kept its quotes (M7 of the
+    closing review, round 1). The one deliberate departure from the engine and from bash is the leading
+    BOM strip: a BOM-led conf is a real Windows artifact, and bash reads that first line as a command.
     """
     try:
         raw = path.read_bytes()
@@ -354,14 +359,23 @@ def _read_conf_key(path: pathlib.Path, key: str) -> str | None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, _, v = line.partition("=")
-        if k.strip().removeprefix("export ").strip() != key:
+        k = k.strip()
+        if k.startswith(("export ", "export\t")):
+            k = k[len("export"):].strip()
+        if k != key:
             continue
         v = v.strip()
-        if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
-            v = v[1:-1]
-        else:
-            v = v.split()[0] if v.split() else ""
-        found = v
+        if v[:1] in ("'", '"'):
+            close = v.find(v[0], 1)
+            if close >= 0:
+                found = v[1:close]
+                continue
+        # Unquoted, or a quote never closed, which bash itself refuses: a `#` that begins a word,
+        # position 0 included, starts a comment, and a `#` inside a word is data.
+        cut = next((i for i, ch in enumerate(v) if ch == "#" and (i == 0 or v[i - 1].isspace())), None)
+        if cut is not None:
+            v = v[:cut].strip()
+        found = v.strip('"').strip("'")
     return found
 
 

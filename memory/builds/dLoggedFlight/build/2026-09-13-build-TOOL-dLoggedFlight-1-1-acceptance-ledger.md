@@ -4,6 +4,8 @@
 
 Tier-2 · node d · 2026-09-13 · the build pass of the runlog kit, against spec rev-5. Every line is
 OBSERVED. Where a criterion was answered by something other than what it names, the line says so.
+The closing diff review's round-1 fold of M7 bumped the spec to rev-7 and widened AC10, and the
+AC10 line below records what that fold observed, with its suite run directly and no gate leg run.
 
 ## The criteria
 
@@ -59,6 +61,13 @@ OBSERVED. Where a criterion was answered by something other than what it names, 
   unset key or an absent conf reads as `memory`. `/`, an empty value, `""`, `../x`, `docs/../../x`,
   `C:/x` and a backslash each refuse with a line naming `MEMORY_ROOT`. RED seen five ways: a literal
   `memory`, an empty root accepted, `..` accepted, a drive accepted, and two of the sourcing rules.
+  Widened at rev-7 by the closing diff review's round-1 fold of M7, and observed by it in
+  `test_ac10_conf_readers`. Fourteen spellings that each set `MEMORY_ROOT`, the two the review named
+  among them, read through the kit's reader exactly as bash sourcing the same file bound them, and
+  exactly as the memory-tree engine's `parse_conf_line` read them. Bash ran once for the whole table,
+  with its NUL framing asserted and every spelling bound. RED seen with the first cut's quote test
+  restored, on six spellings against each of the two readers, and with an `export` followed by a tab
+  not taken as a prefix.
 
 ## Staged RED
 
@@ -69,6 +78,10 @@ still exits 1. A second byte-cap test that sat inside `read_journal`'s loop was 
 sweep rather than graded: `parse_line` owns the cap, so no arm could have turned that copy red, and a
 branch nothing can arm reads as coverage.
 
+The fold of M7 staged its two breaks differently: each rewrote `runlog_lib.py` in place from a
+harness kept outside the tree, cleared the bytecode cache, ran the arms it aimed at and restored the
+bytes, which a checksum confirmed after the last. Both turned their rows red.
+
 ## Residue
 
 - The brief's one-line leg runner resolves `bash` through Python's `subprocess` on this node. That
@@ -76,3 +89,7 @@ branch nothing can arm reads as coverage.
   run directly under Git Bash instead, and all were green.
 - `playbook parity` reds on a kit directory neither the charter template nor the runbook names. That
   was confirmed by running it with the new waiver row removed, and the row is why it is green.
+- drift-audit's own conf reader keeps the quotes of `MEMORY_ROOT="docs/memory"  # note` too, which
+  the fold of M7 measured against bash beside the kit's reader. Rev-6's S7 had named it as the kit's
+  model. It is another kit's reader, outside this build's diff and its version, so it is reported to
+  the owner and not changed here.

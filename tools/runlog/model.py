@@ -1369,9 +1369,10 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     w_from = "driver" if start_st else "git"
     # The terminal END is the verb that MOVED the phase into a terminal one: its START read a phase
     # that was not terminal. A `--status` after landing reads LANDED on both lines and ends nothing.
-    term_end = next((i["end"] for i in seg if i["state"] == "ended" and i["end"] is not None
+    term_inv = next((i for i in seg if i["state"] == "ended" and i["end"] is not None
                      and (i["phase_to"] or "") in PHASES_TERMINAL
                      and (i["phase_from"] or "") not in PHASES_TERMINAL), None)
+    term_end = term_inv["end"] if term_inv else None
     phases_at = [(c, derive_phase(blobs.get(f"{c['sha']}:{live_path}"))) for c in record_commits]
     pushes = journals["pushes"]["journal"]
     push_invs = rl.build_invocations(pushes.lines)
@@ -1398,6 +1399,16 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                      default=None)
     window = derive_window(w_start, w_from, phases_at, terminal, term_end, last_event)
     w_end = window["end"]
+    # The phase of the move that CLOSED the window: the terminal END's where one closed it, else the
+    # first terminal write's. That move lies AT the end, which the half-open window never holds, so a
+    # proof that IS that move is read here and not among the window's moves (spec S7). M2 of the
+    # closing review, round 1: the pushes proof, a LANDED move, was looked for inside the window of a
+    # landed run, which ends at exactly that move, so `pushes` could never read `dead`.
+    end_phase = None
+    if window["end_from"] == "terminal-end":
+        end_phase = term_inv["phase_to"]
+    elif window["end_from"] == "terminal-write":
+        end_phase = next((ph for _c, ph in phases_at if ph in PHASES_TERMINAL), None)
 
     # ---- the window bounds every timed set from here on (spec S2, rev-8), through `check_in_window`
     # and nothing wider. M4 of the closing review, round 1: own commits were bounded by the era, open
@@ -1538,8 +1549,12 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                         f"the transcripts read {tr_state}")
     timeline.sort(key=lambda e: (e["t"], e["source"], e["kind"]))
 
-    # ---- the close, and the head it ran at
-    closes = [i for i in seg_in if i["verb"] == "--close" and i["state"] == "ended" and i["rc"] == "0"]
+    # ---- the close, and the head it ran at. A close is an END reading rc=0 AND exit=clean (spec S5).
+    # M3 of the closing review, round 1: an unclean END's rc is whatever `$?` its EXIT trap saw, often
+    # 0, so a `--close` killed mid-bar read as the close, judged `green-at-close` against an earlier
+    # GREEN, and split in-window owner turns from post-close ones at a close that never happened.
+    closes = [i for i in seg_in if i["verb"] == "--close" and i["state"] == "ended" and i["rc"] == "0"
+              and i["exit"] == "clean"]
     close = {"t": None, "head": None}
     if closes:
         close["t"] = closes[-1]["end"]
@@ -1605,8 +1620,8 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     activity = {"driver": f"{len(in_rows)} parked row(s) in the window" if in_rows else None,
                 "gates": ("a LANDING write in the window, which --close makes only after its bar"
                           if any(m["phase"] in PHASES_CLOSED for m in moves) else None),
-                "pushes": ("a LANDED write in the window, which --landed makes only after the push"
-                           if any(m["phase"] == "LANDED" for m in moves) else None)}
+                "pushes": ("the move into LANDED that closed the window, which --landed makes only after "
+                           "the push" if end_phase == "LANDED" else None)}
     transcripts = {"state": tr_state, "sessions": len(sids), "extracts": len(extracts)}
     if tr_note:
         transcripts["note"] = tr_note

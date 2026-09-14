@@ -8,7 +8,9 @@ a closed set of value classes. Some are shaped, such as a UTC timestamp, a verb 
 are closed vocabularies, such as the coverage states. No free text, absolute path, session id, host id
 or command can reach the file, because nothing reaches it except through a class. A model value outside
 its field's class is written `-`, which also stands for an absent value, and the summary's `values
-withheld` line counts every one, so a model that grew a value the schema does not admit says so.
+withheld` line counts every one, so a model that grew a value the schema does not admit says so. An
+UNKNOWN value is absent too: a count from a source the model never read, and the rc of an END that did
+not exit clean, are `-` rather than the zero that reads clean.
 
 THE SCHEMA IS DATA, SHARED. The renderer builds the record from `RECORD_SCHEMA`, and the schema leg
 (TOOL-dLoggedFlight-10) re-validates the committed bytes against the same data rather than trusting this
@@ -102,6 +104,9 @@ TIMELINE_EVENTS = ("phase", "verb", "commit", "merge", "push", "push-refused", "
                    "brief", "compact", "limit", "idle", "workflow")
 EXCLUDED_KINDS = tuple(k for k in mdl.PARK_KINDS if k not in mdl.PARK_KINDS_OWED)
 USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
+# The transcripts' coverage states under which a count the model derives from them is KNOWN (spec S4).
+# `partial` is a lower bound and says so in Coverage; under any other state the count is `-`.
+COUNTED_STATES = ("present", "partial")
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 RECORD_NAME_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-[A-Za-z0-9]+-[0-9]+)-"
                             + RECORD_TAG + r"-([0-9a-f]{8})\.md")
@@ -480,6 +485,13 @@ def resolve_record_path(root, model, serves, date=None, memory_root=None) -> tup
 
 # ---------------------------------------------------------------------------------- the rows
 
+def derive_clean_rc(e) -> str | None:
+    """An END's `rc` where that END reads `exit=clean`, else None, which renders `-` (spec S4). An
+    unclean END's `rc` is whatever `$?` its EXIT trap saw, often 0, so a killed verb or push shown with
+    it would read as one that succeeded. M3 of the closing review, round 1."""
+    return e.get("rc") if e.get("exit") == "clean" else None
+
+
 def derive_timeline_values(e) -> tuple:
     """One timeline event as the seven raw column values its kind declares; `render_cell` classes them."""
     kind = e.get("kind")
@@ -488,12 +500,12 @@ def derive_timeline_values(e) -> tuple:
         return head + (derive_short_sha(e.get("witness")), e.get("phase"), None, None)
     if kind == "verb":
         # The phase the verb left, or, for a verb with no END, the phase it found.
-        return head + (e.get("verb"), e.get("phase_to") or e.get("phase_from"), e.get("rc"),
+        return head + (e.get("verb"), e.get("phase_to") or e.get("phase_from"), derive_clean_rc(e),
                        ",".join(e.get("checks") or []))
     if kind in ("commit", "merge"):
         return head + (derive_short_sha(e.get("sha")), None, None, " ".join(e.get("units") or []))
     if kind == "push":
-        return head + (e.get("decision"), None, e.get("rc"), derive_yes_no(e.get("lander")))
+        return head + (e.get("decision"), None, derive_clean_rc(e), derive_yes_no(e.get("lander")))
     if kind == "push-refused":
         return head + (e.get("decision"), None, None, derive_yes_no(e.get("lander")))
     if kind == "gate":
@@ -612,6 +624,16 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
     dur = f"{int(end - start)}s" if isinstance(start, (int, float)) and isinstance(end, (int, float)) \
         and end >= start else None
     present = sum(1 for s in mdl.SOURCE_NAMES if (cov.get(s) or {}).get("state") == "present")
+    # AN UNKNOWN COUNT IS `-`, never the zero that reads clean (spec S4). The owner turns, the usage
+    # lines and the attributed calls come from the transcripts, and the model counts zero of what it
+    # never read. M6 of the closing review, round 1: with the transcripts `not-local` the record said
+    # `in-window 0`, a run that never asked, which is what the runlog Skill reads to answer "what did
+    # it decide without asking".
+    known = (cov.get("transcripts") or {}).get("state") in COUNTED_STATES
+
+    def derive_known(value):
+        return derive_count(value) if known else None
+
     values = {
         "run-state": (m.get("record"),),
         "run": (derive_count(m.get("run")), derive_count(m.get("runs"))),
@@ -627,11 +649,11 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
         "merged": (derive_yes_no(m.get("merged")),),
         "units served": (str(len(serves)),),
         "sources present": (str(present), str(len(mdl.SOURCE_NAMES))),
-        "owner turns": tuple(derive_count(pos.get(p, 0)) for p in mdl.OWNER_POSITIONS),
-        "attributed calls": (derive_count(att.get("attributed", 0)), derive_count(att.get("calls", 0))),
+        "owner turns": tuple(derive_known(pos.get(p, 0)) for p in mdl.OWNER_POSITIONS),
+        "attributed calls": (derive_known(att.get("attributed", 0)), derive_known(att.get("calls", 0))),
     }
     for split in ex.SOURCES:
-        values[f"usage {split}"] = tuple(derive_count((usage.get(split) or {}).get(f, 0)) for f in USAGE_FIELDS)
+        values[f"usage {split}"] = tuple(derive_known((usage.get(split) or {}).get(f, 0)) for f in USAGE_FIELDS)
     facts = []
     for label, templates in RECORD_SCHEMA["sections"]["Summary"]["facts"]:
         if label == "values withheld":

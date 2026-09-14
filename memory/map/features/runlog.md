@@ -183,8 +183,9 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   a stale-bytecode trap, claimed here as `staged-break-runs-stale-bytecode.md`.
 - The gate runner's own `redact()` stays separate: it masks leg output on write, under its own stated
   scope, and this table does not replace it.
-- `.memory-tree.conf` — read, never written. The reader is a narrow copy of the sourced-conf grammar,
-  not an import of another kit's parser, because kits are copied into adopters independently.
+- `.memory-tree.conf` — read, never written. The reader copies the memory-tree engine's line reader
+  rather than importing it, since kits install independently; the self-test holds the copy to it and
+  to bash.
 
 ## Gaps
 
@@ -216,7 +217,8 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   shares such a second by coincidence is refused too, since text cannot tell the two apart.
 - **The record proves shapes, not truth.** A count can be wrong and still be an integer. The lists it
   copies from the pre-push hook, the spec template and the hygiene doc are held to them only by the
-  withheld self-test, and its commitment is checkable only on the node that holds the journal.
+  withheld self-test, and its commitment is checkable only on the node that holds the journal. An
+  unknown count is `-` by the renderer alone; the leg grades none against its Coverage row.
 - **The schema leg compares windows in commit time.** A clock skew between two nodes that puts a
   predecessor's terminal write after its successor's start moves a window without redding it, and the
   leg never compares a record's two copies with each other.

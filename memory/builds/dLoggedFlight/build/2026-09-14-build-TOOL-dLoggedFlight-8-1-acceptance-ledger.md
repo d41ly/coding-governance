@@ -14,7 +14,9 @@ arms that read this tree and never write it: AC7, the decision-log report and th
 arm. The closing diff review's round-1 fold of B1 and H1 bumped the spec to rev-6 and added AC19,
 whose line below that fold observed. Its fold of H2 and M5 bumped the spec to rev-7 and added AC20
 and AC21, whose lines below that fold observed. Its fold of M1, M4 and M5's timeline bound bumped the
-spec to rev-8, widened AC17 and added AC22 and AC23, whose lines below that fold observed.
+spec to rev-8, widened AC17 and added AC22 and AC23, whose lines below that fold observed. Its fold
+of M2 and M3 bumped the spec to rev-9 and widened AC6, AC12 and AC13, whose lines below record what
+that fold observed.
 
 ## The criteria
 
@@ -58,7 +60,13 @@ spec to rev-8, widened AC17 and added AC22 and AC23, whose lines below that fold
   without lines of its own. A window after it read `present` with its own lines, and also with no
   line and no proof one was owed. A missing file read `absent`, and a missing transcript read
   `not-local`. All five states were produced. RED seen with a dead writer read as absent, and with
-  lines checked before the epoch.
+  lines checked before the epoch. Widened at rev-9 by the fold of M2, and observed by it in
+  `test_model_ac6_dead_through_model`. Through the model, the landed fixture staged with a journal
+  older than the run and none of its own lines read that journal `dead`, naming its proof: the pushes
+  with the driver journal, the window closed by the terminal END, and without it, closed by the
+  terminal write; the gates; and the driver. With the run's own lines beside the older ones, each
+  journal read `present`. RED seen with the pushes proof looked for among the window's moves, on both
+  pushes rows. Before this fold no landed run's `pushes` could read `dead`.
 - AC7 — `python tools/runlog/runlog.py model aLeakedHandle --json` (`test_model_ac7_real_tree`) — on
   this tree, with its journals aimed at a scratch directory whose first line is dated three days
   after the run and its store and transcripts at scratch, the CLI exited 0. The parked-row counts
@@ -97,13 +105,23 @@ spec to rev-8, widened AC17 and added AC22 and AC23, whose lines below that fold
   gate line in its window read UNJUDGEABLE. The clean landed run, end to end, met
   `brief-before-build`, `phases-walked`, `green-at-close` and `keepalive-reaped`, and read
   `review-exited` UNJUDGEABLE with no review row. Its close head was the LANDING commit's parent.
-  RED seen with the no-gate case reading MET.
+  RED seen with the no-gate case reading MET. Widened at rev-9 by the fold of M3, and observed by it
+  in `test_model_ac12_killed_close` and `test_model_ac12_rc_reads_exit`. A run whose `--close` END
+  read `rc=0` and `exit=unclean`, as the driver's EXIT trap writes a verb killed mid-bar, after a
+  GREEN bar at its head, had no close and read `green-at-close` UNJUDGEABLE. The same END reading
+  `exit=clean` closed the run and read MET. The source arm parsed `model.py` and found every
+  comparison on an END's `rc` in a condition that also reads its `exit`, a transcript call being its
+  one exempt receiver. RED seen with the close taken on `rc=0` alone, which the behaviour arm and the
+  source arm both caught, and with a stale exemption added to the arm's own table.
 - AC13 — `build_owner_positions` (`test_model_ac13_ac14_positions_usage`) — turns classed `launch`,
   `pre-run`, `in-window` and `post-close`. A turn at the start reads in-window and one at the close
   reads post-close. With no close, a turn after the terminal END reads post-close. With no START, a
   model over a scratch repository put a turn before its start commit in `launch`, one inside the
   window in `in-window`, and one after the window end in `post-close`. RED seen with the close
-  inclusive.
+  inclusive. Widened at rev-9 by the fold of M3, and observed by it in
+  `test_model_ac12_killed_close`: in the killed-close run, its session made by the real extractor, an
+  owner turn after the END and inside the window read `in-window`, and `post-close` once that END read
+  `exit=clean`. RED seen with the close taken on `rc=0` alone.
 - AC14 — `build_run_usage` (`test_model_ac13_ac14_positions_usage`) — usage before the window and at
   its end stayed out, and one request per split counted. RED seen with the window filter dropped.
   Since the rev-8 fold the filter is `check_in_window`, and it was seen RED again with that call
@@ -251,7 +269,11 @@ own-commit logic as one combined break, each by rewriting `model.py` in place fr
 outside the tree, clearing the bytecode cache, running the suite and restoring the bytes, which a
 checksum confirmed after the last. Fifteen redded their arms. The sixteenth, the pinned bar's bound,
 had no arm to red, which AC23's line explains. The suite then ran green three times directly, at
-1186 of 1186 assertions, in 53.1 to 53.8 s each, under its 69 s budget row.
+1186 of 1186 assertions, in 53.1 to 53.8 s each, under its 69 s budget row. The fold of M2 and M3
+staged two more breaks of `model.py` the same way, running only the arms each aims at, and one of
+the source arm's own exemption table: the pushes proof among the window's moves, the close on
+`rc=0` alone, and a stale exemption. Each redded its arms, and the restored bytes matched their
+checksums.
 
 ## The checklist over the slice commits
 
