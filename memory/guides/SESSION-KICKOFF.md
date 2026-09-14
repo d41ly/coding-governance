@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-14T20:47:29+03:00 @ 6074d521d6ae3fa8274a493f3b7a9be6b1274109
+last-audit: 2026-09-14T23:03:55+03:00 @ 6074d521d6ae3fa8274a493f3b7a9be6b1274109
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2661b66b0d82063dcccadfc527e4c5525c129d28
+last-body-change: 6074d521d6ae3fa8274a493f3b7a9be6b1274109
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -218,10 +218,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
   is NOT restated here — `tools/hooks/README.md` owns it, and the copy here rotted. The bound is a
   FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Rules: `memory/guides/REVIEW-PROTOCOL.md`;
   harness `tools/workflows/tier2-review.js`; concurrency `concurrency-is-not-a-budget.md`.
-- `scratch-guard` is the second hook, wired on `Bash|PowerShell`: it DENIES a shell command that
-  writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
-  `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
-  scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
+- `scratch-guard` (hook on `Bash|PowerShell`) DENIES a write under home outside the derived roots,
+  an EMPTY `$TMPDIR`/`$TMP`/`$TEMP` at a target's head (`TMPDIR` IS empty here), any `/tmp`, and
+  root litter. Rules: `tools/hooks/README.md`. Write to the session scratchpad; a git clone goes
+  under `%TEMP%/<short>` (MAX_PATH).
 - **A `PreToolUse` hook FIRES inside a `Workflow` sidechain**, measured 2026-09-12 by `scratch-guard`
   itself. A sidechain holds neither `Agent` nor `Workflow`, so it cannot fan out — that is the reason,
   never "hooks stop at the boundary". `TOOL-cRefutedPremise-1`.

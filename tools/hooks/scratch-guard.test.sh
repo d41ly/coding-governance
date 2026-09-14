@@ -352,7 +352,10 @@ n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
 # reviewed diff or not at all.
-FLOOR_ASSERTIONS=90   # 60 + the 27 assertions TOOL-aProbedUnit-5 added (26 in its block, 1 from re-targeting the /tmp near-miss) + the 3 its round-1 fold added (clusters J and K)
+# 90 = 60 + the 27 assertions TOOL-aProbedUnit-5 added (26 in its block, 1 from re-targeting the /tmp
+# near-miss) + the 3 its round-1 fold added (clusters J and K). The pin sits alone on its line because
+# the testsuite-counts leg reads it anchored, `^FLOOR_ASSERTIONS=[0-9]+$`.
+FLOOR_ASSERTIONS=90
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
