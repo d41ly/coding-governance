@@ -1,11 +1,12 @@
 # TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-1 · base 1b000d1a · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-1 · base 1b000d1a · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aProbedUnit-2-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aProbedUnit-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-1 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-2-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-2-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
@@ -41,7 +42,10 @@ The ten sections are kept anyway, so the audit has the same surface as its sibli
   asserting the traced unattended child prompt carries this paragraph's opening phrase. Observed by
   AC2.
 - **S4** — The same-commit obligations: this spec's status header goes to CLOSED in the pass commit.
-  No watched file moves and no ledger is owed at this tier. Observed by AC4.
+  No watched file moves. The acceptance ledger at
+  `memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-2-1-acceptance-ledger.md`
+  carries one row per criterion, the leg halves reading `observed at --close`, per the build
+  README's rule five and the build brief. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -156,8 +160,8 @@ No identifier is minted.
 
 The pass declares, through `--dispatch --writes`: `tools/workflows/unattended-unit.js`,
 `tools/unattended/SKILL.template.md`, `.claude/skills/unattended/SKILL.md`,
-`tools/workflows/unattended-build.test.sh`, this spec, the build README, and the generated
-`memory/LIVE.md` and `memory/ledger/2026-09.md`. Three of those are unit 1's too, which is why the
+`tools/workflows/unattended-build.test.sh`, this spec, the build README, the acceptance ledger S4
+names, and the generated `memory/LIVE.md` and `memory/ledger/2026-09.md`. Three of those are unit 1's too, which is why the
 roster sequences this unit second; the pass does not begin until unit 1's commit is in `HEAD`.
 
 The one check the pass verifies with is AC2's double. Nothing else runs inside it.
@@ -277,6 +281,10 @@ none
   the grep over the suite file for the S3 arm, `1` at the tip and `0` at base); and, under the build
   README's rule from cluster A, the leg half of AC1, AC3 and AC4 marked observed at `--close`, with
   AC4 given the pass-cheap half it lacked.
+- rev-3 · 2026-09-14 · §2 S4 · §4 Rollout · the build pass. S4 said no ledger was owed at this
+  tier, and the build brief and the README's rule five both name one row per criterion in a tracked
+  ledger; the ledger path is now declared in S4 and in the dispatch set. Status to CLOSED in the
+  same commit; the code is what section 4 pins, unchanged.
 
 ## 10. Reuse audit
 

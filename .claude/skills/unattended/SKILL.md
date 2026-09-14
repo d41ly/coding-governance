@@ -563,7 +563,9 @@ definition, so the absence is a decision and not an oversight.
   **Read the build method WHOLE before the first call**, because the child is handed one unit and the
   method is what tells it what a pass is.
   **The child is ordered to run no gate, suite or bar inside its pass** — the bar is `--close`'s,
-  once, after every finding is fixed — and to verify with the one check that exercises its change.
+  once, after every finding is fixed — and to verify with the one check that exercises its change,
+  and to bound every command it runs: a non-code command that does not return within its bound is
+  skipped and named in its return.
 
   Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
   trusting a list you are holding, and branch on all four shapes it prints:

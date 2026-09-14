@@ -570,6 +570,7 @@ has "F2 the UNATTENDED child prompt still says a refusal is BINDING" "$childU" "
 has "F2 the ATTENDED child prompt says the recording verbs are unavailable" "$childA" "recording verbs are unavailable"
 has "F2 the ATTENDED child prompt orders the paths written down instead" "$childA" "Write down the paths"
 has "aProbedUnit-1 the child prompt forbids a gate, suite or bar inside the pass" "$childU" "NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS"
+has "aProbedUnit-2 the child prompt bounds every command and names a skipped one" "$childU" "YOUR PRIMARY OBJECTIVE IS CODE WRITTEN AND COMMITTED"
 for verb in $norun_verbs; do
   hasnt_ "F2 the ATTENDED child prompt issues no $verb instruction" "$childA" "$verb tB"
 done

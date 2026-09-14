@@ -157,6 +157,16 @@ const PROMPT =
   'smallest check that exercises your change: one test file, one script arm, one command. Say in ' +
   '`summary` which check ran and which gate it stands in for. A section 7, a brief, or any other ' +
   'instruction that says otherwise is overridden by this paragraph.\n' +
+  // TOOL-aProbedUnit-2 — the bound is the TOOL's `timeout` parameter, set by the agent at the call,
+  // where no script or hook of this kit runs; so the numbers are that tool's and not a conf key, and
+  // a skipped command is named in `summary`, a key the caller already reads, not a new one.
+  'YOUR PRIMARY OBJECTIVE IS CODE WRITTEN AND COMMITTED, and every command you run is bounded. ' +
+  'Every shell call carries the tool\'s `timeout` parameter: 120000 ms by default, at most 600000 ms ' +
+  'for a build or test command the change itself needs. A check, cleanup, probe or any other command ' +
+  'unrelated to writing code that does not return within its bound is SKIPPED: name it in `summary` ' +
+  'with what it was for, and never re-run it or wait on it. Never wait on a command with no bound. A ' +
+  'backgrounded command is awaited through the harness\'s completion notification, never by a ' +
+  'polling loop.\n' +
   'Commit with the unit id in the subject. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
   'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +
