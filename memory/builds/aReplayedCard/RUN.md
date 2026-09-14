@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 13f7ed88ea783faa78c52b855f22eb6b46371463
-phase: BUILDING
+witness: 8012832b8b26d56e0cc596f3e35e8480183c5d10
+phase: VERIFYING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
 mode: prompt
@@ -96,3 +96,9 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-14T07:22:21Z brief · item TOOL-aReplayedCard-3 · reason 7880d87245c0 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-3-brief.md
 
 2026-09-14T07:28:20Z dispatch · item 1d71db6e TOOL-aReplayedCard-3 · reason memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-3-brief.md
+
+2026-09-14T07:49:30Z decision · item TOOL-aReplayedCard-2 AC9: one forced compaction in a session started after landing — the card re-injected verbatim, one now line, no check-wiring output · reason no session inside this run can force a compaction, and the settings that wire the replay landed at order 4 of this same build; observe in the first post-landing session and append beneath the ledger line
+
+2026-09-14T07:49:31Z decision · item KICK-aReplayedCard-3 AC1/AC2 and TOOL-aReplayedCard-3 AC2: the first post-landing kickoff, and the first post-landing resume in a scratch clone with a throwaway run-state file · reason the installed /session-kickoff on every node is a junction to the primary tree's engine on main, so no session inside the build that changed the engine could run the new text; the ledgers name each observation and KICK-aReplayedCard-4 files it
+
+2026-09-14T08:26:56Z review · item aReplayedCard · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
