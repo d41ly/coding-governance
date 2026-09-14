@@ -17,6 +17,16 @@ include = ["MANIFEST-TEMPLATE.md"]
 role = "seed"
 to = "{manifest_path}"
 
+# The two SessionStart fragments for the card verb — the WRITER at `startup|clear`, the REPLAY at
+# `resume|compact` — ship BESIDE the engine, because their hook path is `{here}`-relative: a flat
+# kit's engine lands at `{prefix}/manifest-check.sh` and `{kit}` (two directories up) would name
+# the prefix's parent there. `check-hook-destinations.sh` judges them at this adopter path.
+# TOOL-aReplayedCard-2.
+[[files]]
+include = ["orientation-card.fragment.json", "orientation-replay.fragment.json"]
+role = "engine"
+to = "{prefix}/{relpath}"
+
 # Machine-scoped: the engine installs ONCE PER MACHINE as a junction outside the target repo, so
 # `apply` writes nothing for it and emits an order instead.
 [[files]]

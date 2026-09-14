@@ -95,6 +95,7 @@ run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed r
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
+shell-hygiene selftest	60		measured 0.3s on node a 2026-09-10 by direct invocation, x1.5 floored at this file 60s minimum
 spec-tokens self-test	130		worst of 6 readings 80s, x1.5
 template size gate selftest	290		worst of 11 readings 190s, x1.5
 testsuite counts self-test	170		worst of 11 readings 109s, x1.5
@@ -112,6 +113,7 @@ unattended gate selftest shard 5/8	1700	bash tools/unattended/check-unattended.t
 unattended gate selftest shard 6/8	1590	bash tools/unattended/check-unattended.test.sh --shard 6/8	measured 1059s on node a 2026-09-14, direct serial run on a frozen clone beside a two-shard BASE pair (TOOL-aBatchedArm-3 Phase B first candidate; this region did not move in the re-cut), x1.5
 unattended gate selftest shard 7/8	2320	bash tools/unattended/check-unattended.test.sh --shard 7/8	measured 1546s on node a 2026-09-14, the instrumented profile run of the re-cut region beside a two-shard BASE pair (TOOL-aBatchedArm-3 prof-s7), x1.5
 unattended gate selftest shard 8/8	1890	bash tools/unattended/check-unattended.test.sh --shard 8/8	DERIVED, not measured: the first candidate's region-8 wall 893s scaled by 69/49 assertions after the re-cut, node a 2026-09-14 (TOOL-aBatchedArm-3); the build was landed by owner ruling before this shard's direct run, so it is re-measured at the build's final gate pass, x1.5
+unattended gate-guard selftest	220	bash tools/unattended/gate-guard.test.sh	sized from one arm measured direct on node a 2026-09-14: 718 ms per payload fed to the hook, 100 arms, doubled by the meta-arm, 144 s, x1.5 — the pass that wrote the suite may not run it, so the main loop's first VERIFYING reading is the one this row is re-derived from
 unattended pass-order selftest	170	bash tools/unattended/check-pass-order.test.sh	measured 111s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
 unattended playbook selftest	630	bash tools/unattended/check-playbook.test.sh	measured 418s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
 verdict-epoch self-test	390		worst of 9 readings 257s, x1.5

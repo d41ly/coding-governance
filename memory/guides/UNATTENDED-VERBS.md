@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.18 -->
+<!-- gov:kit unattended@1.23 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -98,7 +98,11 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   distinguishes them by OVERLAP: a narrowing is a strict subset and always overlaps, so it stays
   refused; a disjoint set is a new pass. One that PARTLY overlaps is read as
   a narrowing and refused, which is the conservative direction and is stated here rather than
-  discovered.
+  discovered. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
+  an unattended build closes each unit spec in its own build commit, and this verb is the one point
+  that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
+  never a silent pass.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
   `CONVERGING`, `CONVERGED`, `NON-CONVERGENT` or `CEILING`. The round is an append-only `review` line
   in the parked region, a `history` kind, so it never inflates the count of decisions the owner must

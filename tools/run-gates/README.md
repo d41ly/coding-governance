@@ -1,6 +1,6 @@
 # run-gates kit
 
-`gov:kit run-gates@1.6` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`gov:kit run-gates@1.7` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
 `run-gates.sh` and asserted EQUAL by `tools/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
@@ -128,6 +128,16 @@ file's name true, and an implementation that forgets one passes every arm writte
 is KILLED and reported `GATE FAIL <leg> (timed out after Ns)` — never skipped, never green. That is
 the one way a knob here may change a verdict: it converts an unbounded hang into a RED naming its
 leg. Before it existed, one leg that never returned wedged the whole bar and named nothing.
+
+**A KILLED leg names the seconds it RAN and its ceiling separately.** `timeout` exits 124 when its
+own TERM fires and 137 when a SIGKILL ends the leg — its `-k` escalation, an operator, an OOM killer
+and a CI cancel all arrive as 137 and cannot be told apart. So that tail reads
+`GATE FAIL <leg>  (killed after Ns, ceiling Ms)`: N is the elapsed value the runner measured, byte
+for byte the same figure `gate-ledger.tsv` carries for that leg, and M is the bound it may never have
+reached. Neither is passed off as the other, and the verb does not claim a timeout it cannot observe.
+With NO bound in play — no ceiling declared, no profile timeout, or a host with no runnable
+`timeout` — the tail is `(killed after Ns)` alone: the absence of the ceiling clause is the
+information, and N is still the ledger's own figure.
 
 **A leg that declares no ceiling runs UNBOUNDED, and is COUNTED rather than refused.** The runner
 prints `N of M legs declare no ceiling and run unbounded this run` on stderr and carries on. It

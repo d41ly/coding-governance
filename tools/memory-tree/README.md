@@ -18,7 +18,7 @@ ARCH-bOrderlyAtlas-1.)
 | `check-memory-hygiene.sh` | the gate — 23 checks (1-12, 21, 22 and 23 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. |
 | `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
-| `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. |
+| `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. |
 | `kit-dogfood-parity.test.sh` | the two docs this kit SHIPS must equal the two an adopting repo RUNS ON, modulo the tool-root install prefix (`--check` / `--render`). |
@@ -54,7 +54,7 @@ put the KA tag in each discipline's `README.md`, not in the folder name.
 ## Adopt — new project (scaffold)
 
 ```bash
-cp memory-tree/.memory-tree.conf.example .memory-tree.conf   # then edit
+cp <kit>/.memory-tree.conf.example .memory-tree.conf   # then edit
 bash tools/memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
 bash tools/memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
 git add memory/ .memory-tree.conf && git commit
@@ -124,6 +124,29 @@ Measured — that is what the previously published mixed-prefix literal did. Two
 section honest rather than merely correct today: `check-wiring.sh` RUNS the configured command on a
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
+
+## Upgrading to 2.73 — check 20's population widened, and your bar may red on arrival
+
+Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
+so **every rotated BACKLOG shard went unscanned**. From 2.73 an archive is recognised by the name of
+the document it ROTATED — `DECISIONS` or a value declared in `FAMILIES`, plus a date and an optional
+same-day disambiguator such as the `b` in `TOOL.2026-08-17b.md`.
+
+**Your `ROW_DUPLICATE_PIN` may red on the first upgraded bar, with no change of your own.** A
+duplicate id that has always been sitting in a rotated shard becomes visible, and the pin is an
+EQUALITY: too high reds as well as too low.
+
+**The remedy is the duplicate, not the pin.** Raising a shrink-only pin to absorb a defect our upgrade
+made visible is a weakening move caused by us, and it is permanent slack nobody will drain. Run
+`python <kit>/row_grammar.py --report`, read the named ids and lines, fix the rows, then re-run
+`--emit-pin` and take the number it prints.
+
+Two smaller changes ride along. Check 10 now resolves a rotated archive's live index by BASENAME
+anywhere under the memory root instead of at `<MEMORY_ROOT>/<stem>.md` — if your backlog shards live
+one level down, which the shipped layout does, that check has never graded them and may now have
+something to say. And `ROTATION_MODE` is a new `.memory-tree.conf` key (`cut` or `snapshot`): leaving
+it undeclared changes nothing and reds nothing, an unrecognised value aborts the engine at exit 2,
+and **no check grades the declared mode** — it is validated and then read by nobody.
 
 ## Notes
 

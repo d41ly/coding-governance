@@ -79,6 +79,16 @@ RECALL_CLI=""
 # skip only when NEITHER CLI is declared.
 MAP_CLI=""
 
+# OPTIONAL, the same shape again. The spec-token checker `--dispatch` runs over the live tree
+# BEFORE it admits a build pass, refusing the dispatch when the checker exits non-zero — a live
+# spec naming a merge bar or a self-test suite as an acceptance observation, or a token that does
+# not resolve. BLANK means no such checker is carried, and the verb ANNOUNCES the skip on stdout
+# rather than passing silently. The checker this repo declares is gov-internal, at its tool root,
+# and no kit ships it: fill the key only where the project carries its own spec-token checker. Declared here because the bar's own run of the
+# checker grades LIVE specs and an unattended build closes every unit spec in its build commit,
+# so the dispatch is the one point that sees a spec while it can still be changed.
+SPEC_TOKENS_CLI=""
+
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
 # interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,
@@ -223,6 +233,13 @@ LANDED_ANCHOR_CUTOFF=""
 # knows nothing about. Blank turns the term OFF and the leg announces that it did.
 PASS_ORDER_CUTOFF=""
 
+# PASS_ORDER_WAIVER - where the pass-order leg's waiver registry lives, repo-relative
+# (TOOL-dMuffledSentinel-2). One row per waived unit, `<unit-id><TAB><reason>`, read from the graded
+# commit. BLANK keeps `<MEMORY_ROOT>/project/pass-order-waiver.txt`, where an absent file is an empty
+# waiver set. Declare it when your memory tree has no `project/` directory. A DECLARED path must be
+# tracked at HEAD or the leg refuses, because a mistyped one would otherwise waive nothing in silence.
+PASS_ORDER_WAIVER=""
+
 # DISPOSITION_CUTOFF - the date from which check 2 clause 3 reads a review exit's recorded
 # disposition instead of inferring one from new unit ids. Graded on the run-state record's own
 # first-commit date. A record before it keeps the id-delta proxy verbatim — except one with no
@@ -239,7 +256,9 @@ DISPOSITION_CUTOFF=""
 # whether its BUILD COMMIT carries a `brief · item <id>` row whose hash still joins to a tracked file
 # at that commit. Graded on the build README's `opened:` date. The anchor is the build commit itself
 # and not its first parent, unlike PASS_ORDER_CUTOFF above: `--brief` STAGES its row, so the row
-# lands in the same commit as the pass it describes.
+# lands in the same commit as the pass it describes. Which units the leg grades, and which it only
+# announces, is stated once, in the protocol's `BRIEF_RECORDED_CUTOFF` row at
+# <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md, and not restated here.
 #
 # BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
 # per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole

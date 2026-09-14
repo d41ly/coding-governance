@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.9` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.10` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -93,7 +93,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `RATCHET_LOOKBACK` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |

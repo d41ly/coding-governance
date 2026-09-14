@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.6   # gov:kit run-gates@1.6
+KIT_RUN_GATES_VERSION=1.7   # gov:kit run-gates@1.7
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -1468,16 +1468,35 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   else fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1))
        # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
        # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
-       # exit code. Both stay behind the PROF_TIMEOUT guard, so a leg that chooses either for its own
-       # reasons is still reported as the code it chose.
+       # exit code. 124 stays behind the bound guard, so a leg that chooses it for its own reasons is
+       # still reported as the code it chose; 137 has no such case to protect, because bash reports
+       # 128+9 for a SIGKILLed child and a leg that "chose" 137 is indistinguishable from one killed.
        # THE BOUND THAT ACTUALLY FIRED, read from what runleg recorded rather than re-derived. The
        # old spelling read `PROF_TIMEOUT` for both the guard and the number, so once a leg carried
        # its own ceiling and PROF_TIMEOUT stayed 0 -- which is every shipped profile row -- a killed
        # leg reported a bare `(exit 124)` naming nothing. TOOL-aBoundedCeiling-1.
        local fired; fired=$(cat "$WORK/$i.bound" 2>/dev/null || printf 0)
+       # THE SECONDS THE LEG ACTUALLY RAN, from the file that already holds them. `runleg` writes
+       # `.sec` before it writes `.rc`, and the ledger block below reads that same file as its field
+       # 2 -- so this is a THIRD READER of one value, never a second source. Read VERBATIM, decimals
+       # and all, because byte-equality with the ledger row is the property; a `?` when it is
+       # unreadable, because any numeric fallback would be a second wrong answer. TOOL-aLeakedHandle-3.
+       local secs; secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
        ftail="(exit $rc)"
+       # 124 KEEPS THE CEILING DELIBERATELY, and the asymmetry with 137 below is a decision rather
+       # than an oversight. rc=124 means `timeout` fired its own TERM, so the ceiling is the CAUSE of
+       # the verdict and true by construction, while the elapsed value on that path is the ceiling
+       # plus kill-path overhead -- measured at 12 s against a 2 s bound under load, which would send
+       # a reader hunting for a bound nobody declared. rc=137 is the opposite case: SIGKILL says
+       # nothing about who sent it, and `timeout -k`, an operator, an OOM killer and a CI cancel all
+       # arrive here identically, so the verb states the kill and the two numbers stay apart.
        { [ "$rc" = 124 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s)"
-       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s, killed)"
+       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s, ceiling ${fired}s)"
+       # NO BOUND IN PLAY, and the leg was still killed: an operator, an OOM killer, a CI cancel, or
+       # any leg on a host with no runnable `timeout`. The guard is the line above NEGATED so the two
+       # PARTITION rc=137 and nothing falls between; the seconds are the same `.sec` read, verbatim,
+       # and there is no ceiling clause because the absence IS the information. TOOL-aLeakedHandle-9.
+       { [ "$rc" = 137 ] && ! [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s)"
        printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY

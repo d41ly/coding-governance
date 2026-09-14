@@ -100,6 +100,8 @@ run-selftests self-test	kit	selftests
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shell hygiene (a loop fed by a command substitution)	repo	product
+shell-hygiene selftest	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests
 template size <=48KiB	repo	product

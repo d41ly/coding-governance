@@ -6,7 +6,9 @@
 #
 # MONOTONE. A row only ever rises. `gate-run` retains a handful of runs, so a quiet window
 # would otherwise lower the evidenced maximum and with it the floor every ceiling is held
-# above. `--reset <leg>` lowers one, and that is a decision somebody made.
+# above. `--write --reset <leg>` lowers one by DELETING that leg's killed readings from the
+# untracked run record, so no later write can hand the value back — which is what a
+# decision somebody made has to mean here.
 #
 # <leg>	<max seconds>	<readings>	<node>	<date>
 agent-cap restatement	27.0	1	a	2026-09-06

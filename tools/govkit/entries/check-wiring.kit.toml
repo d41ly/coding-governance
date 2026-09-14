@@ -7,11 +7,18 @@ home = "tools"
 version_from = { file = "check-wiring.sh", pattern = "^KIT_CHECK_WIRING_VERSION=" }
 requires = []
 
+# The fragment is what makes the SessionStart entry RE-MATCHABLE by the merger: `check-wiring.sh
+# --session` used to be wired by hand with no matcher, so it ran on every compaction. It is NOT
+# graded: `check-wiring.sh`'s `check_card` reads only the two card fragments' matchers, and no arm
+# reads this entry's — a hand narrowing to `startup` passes green until the next merge re-matches
+# it (the aReplayedCard closing review, F12). It is `{here}`-relative because this kit is flat. It
+# is in the include list AND in `claims`, because rule 4b reds a rule whose resolved destination is
+# not among its own claims. TOOL-aReplayedCard-2.
 [[files]]
-include = ["check-wiring.sh", "check-wiring.test.sh"]
+include = ["check-wiring.sh", "check-wiring.test.sh", "check-wiring.fragment.json"]
 role = "engine"
 to = "{prefix}/{relpath}"
-claims = ["tools/check-wiring.sh", "tools/check-wiring.test.sh"]
+claims = ["tools/check-wiring.sh", "tools/check-wiring.test.sh", "tools/check-wiring.fragment.json"]
 
 [adopt]
 argv = []

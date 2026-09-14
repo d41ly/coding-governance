@@ -122,7 +122,7 @@ usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled [--calibrate [--
   --check     the gate: assert the declaration against tools/gate-legs.json in
               BOTH directions, the pooled evidence's shape, and — over the rows
               under each `# pooled-kit:` the evidence header declares — that a
-              row's script prints its trailer OUTSIDE a `[ "$st" = 0 ] &&` guard
+              row's script prints its trailer OUTSIDE a `[ "$<var>" = 0 ] &&` guard
               unless declared `# no-trailer:`, because a green-only trailer is
               UNTRAILED under --pooled the moment the suite reds; run nothing;
               takes no mode and no --kit
@@ -666,7 +666,7 @@ EOF
     # ---- candidate over the WHOLE declaration first, it named 34 of 69 rows that print no trailer
     # ---- at all because they are not on the pooled route, and a gate that reds innocent rows is
     # ---- not a gate. A row declared `# no-trailer:` is skipped. WHAT IT DOES NOT CHECK: a trailer
-    # ---- behind any guard other than the `st` one, a trailer printed by a file the script sources,
+    # ---- behind a guard that is not a `[ "$<var>" = 0 ] &&` prefix, a trailer printed by a file the script sources,
     # ---- or that the print is reached — the calibrate's UNTRAILED verdict is the runtime half.
     # ---- No pooled-kit declared is ANNOUNCED, never a silent skip.
     if [ -n "$ev_kits" ]; then
@@ -680,8 +680,8 @@ EOF
         tr_graded=$((tr_graded + 1))
         if [ -z "$tr_script" ] || [ ! -f "$tr_script" ]; then
           tr_faults="$tr_faults"$'\n'"  row '$name' names no script this arm can read, so its trailer is unknown"
-        elif ! grep -vE '^[[:space:]]*#' "$tr_script" | grep -E "$SWEEP_TRAILER_RX" | grep -qvE '^[[:space:]]*\[ "\$st" = 0 \] &&'; then
-          tr_faults="$tr_faults"$'\n'"  row '$name': $tr_script prints no trailer outside a [ \"\$st\" = 0 ] && guard, so a red-but-complete run is UNTRAILED under --pooled and writes no reading"
+        elif ! grep -vE '^[[:space:]]*#' "$tr_script" | grep -E "$SWEEP_TRAILER_RX" | grep -qvE '^[[:space:]]*\[ "\$[A-Za-z_]+" = 0 \] &&'; then
+          tr_faults="$tr_faults"$'\n'"  row '$name': $tr_script prints no trailer outside a [ \"\$<var>\" = 0 ] && guard, so a red-but-complete run is UNTRAILED under --pooled and writes no reading"
         fi
       done <<EOF
 $POP

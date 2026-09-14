@@ -7,14 +7,11 @@
 # states), one carrying a .codebase-map.conf (the only place check 7's MAP_SUB branch is reachable),
 # and one built by adopt-memory-tree.sh --scaffold itself, so the scaffolder is asserted against the
 # GATE rather than against a second description of the scaffolder.
-#   bash memory-tree/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
+#   bash <kit>/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
 #
 # The tree is FLAT (kit 1.5): builds/<slug>/, backlog/<FAMILY>.md, one root DECISIONS.md. The
 # discipline is a value in the spec status header, not a directory.
 set -u
-KIT_REL="${KIT_REL:-tools/memory-tree}"   # TOOL-dRetiredFork-15: this suite had no functional
-                                          # site when the KIT_REL sweep ran, so it carried no
-                                          # default; the project-key arms below are its first.
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/check-memory-hygiene.sh"
 TMP=$(mktemp -d)
@@ -531,12 +528,13 @@ printf 'x\n' > memory/guides/kickoff-prompt.md                   # loose in the 
 # ---- two directories would break the green arm for a reason that has nothing to do with check 2.
 printf '# links\n\n[alive](kickoff-prompt.md)\n[dead](no-such-file.md)\n' > memory/guides/links.md
 
-# ---- CHECK 10: a rotated archive is announced in lines 1-3 of the index it was cut from. Two
+# ---- CHECK 10: a rotated archive is announced in the PREAMBLE of the index it was cut from —
+# ---- everything above that index's first row, and never fewer than its first three lines. Two
 # ---- archives, one index, one mention — the referenced one is the control.
 mkdir -p memory/archive
 printf '# Decisions\n\nRotated: DECISIONS.2026-08-02.md\n\n- ARCH-tFixture-1 · a decision\n' > memory/DECISIONS.md
 printf '# rotated\n' > memory/archive/DECISIONS.2026-08-01.md    # unreferenced   -> RED
-printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the head -> silent
+printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the preamble -> silent
 
 # ---- CHECK 6: the index byte/line cap. `guides/*.md` is in INDEX_SET — a guide is mandatory reading
 # ---- the charter points a session at, and check 16 refuses a charter-cited file nothing caps — and
@@ -982,9 +980,16 @@ miss 'tFixture-42.md ('
 c5block() { awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$1"; }
 # ...and the same slice for any check number. Attribution is not optional: checks 1, 2, 5, 9 and 12
 # all print bare paths, so an unattributed `hit '<path>'` is satisfied by the wrong check's finding.
+# A `memory-hygiene: ` REPORT line closes the window too. `fail` is not the only thing this engine
+# prints, and a report emitted after the last `fail` of a run left the window open to EOF, swallowing
+# every report line into that check's block. Measured at TOOL-cGradedDebt-1: the curation-debt per-row
+# report follows its own `fail 6` inside one `if`, and a report line NAMES a path — so a `cnot 6
+# '<path>'` was satisfied by the report rather than by the finding, and fired against a correct gate.
+# All 15 call sites route through here, so the close belongs here and nowhere else.
 cblock() { awk -v n="$2" '
-    index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }
+    index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }   # gov:one-extractor
     g && index($0, "HYGIENE check") == 1 && index($0, "HYGIENE check " n " FAILED") != 1 { g = 0 }
+    g && index($0, "memory-hygiene: ") == 1 { g = 0 }
     g' <<<"$1"; }
 chit()  { n=$((n+1)); cblock "$out" "$1" | grep -qF "$2" || { echo "FAIL check $1 did not report: $2"; st=1; }; }
 cnot()  { n=$((n+1)); cblock "$out" "$1" | grep -qF "$2" && { echo "FAIL check $1 reported: $2"; st=1; }; }
@@ -1179,7 +1184,7 @@ cnot 8 'memory/builds/tRunBig/RUN.md'
 # check 9's green half is the freshly-scaffolded tree at the bottom of this file, which renders the
 # index and then asserts the WHOLE gate exits 0. This tree never renders it, so it drifts.
 hit  'generated build index differs from a fresh render'
-hit  'rotated archives not referenced from their live index (lines 1-3)'
+hit  'rotated archives not referenced from their live index preamble'
 chit 10 'memory/archive/DECISIONS.2026-08-01.md'
 cnot 10 'DECISIONS.2026-08-02.md'
 hit  '/ is the only sanctioned memory root'
@@ -1297,6 +1302,25 @@ n=$((n+1))
 grep -qE '^[[:space:]]*_c7env=""' "$SCRIPT" \
   && echo "ok   check 7 locale switch defaults to empty" \
   || { echo "FAIL check 7 locale switch has no empty default — every adopter would be re-decided"; st=1; }
+# 5. THIS SUITE HAS EXACTLY ONE BLOCK EXTRACTOR, and every copy of it is a future copy of one bug.
+#    `cblock()` closes a check's block on the next `HYGIENE check` header AND on a `memory-hygiene: `
+#    report line. Two inline re-spellings carried only the first close, so a report emitted after the
+#    LAST `fail` of a run left the window open to EOF — and a report line NAMES a path, which
+#    satisfied a `grep -qF '<path>'` that was asserting the finding ABSENT. Measured: that fired a
+#    FAIL against a correct gate, and the same latent hole sat at every one of the helper's call
+#    sites. TOOL-cGradedDebt-4, from the round-1 review of TOOL-cGradedDebt-1, finding B2.
+#
+#    The predicate is the extractor's own SHAPE rather than a count, so it cannot go slack as the
+#    suite grows, and the one legitimate instance carries `gov:one-extractor` inside cblock's awk
+#    program. Whitespace-tolerant because the two re-spellings differed from the definition only in
+#    spacing, which is precisely how a copy escapes a literal search.
+n=$((n+1))
+respell=$(grep -nE 'index\(\$0, ?"HYGIENE check " ?n ?" FAILED"\) ?== ?1' \
+            "$HERE/check-memory-hygiene.test.sh" | grep -v 'gov:one-extractor' || true)
+[ -z "$respell" ] \
+  && echo "ok   one block extractor, no re-spelling" \
+  || { echo "FAIL a block extractor is re-spelled outside cblock() — route it through the helper, which is the only copy that closes on a report line:
+$respell"; st=1; }
 # 5. Check 7's exemption expression keeps ONE spelling of the guides/ alternative. The MAP_SUB branch
 #    used to REBUILD the whole expression, and the rebuild silently omitted `guides/` — so on any repo
 #    carrying a .codebase-map.conf every guide entered the entry-budget population and no assertion
@@ -1452,9 +1476,71 @@ grep -qF 'memory/project/also-gone.md' <<<"$outst" \
 # branch 1 must now stay silent about it. That is the grandfather working and the guard not
 # over-firing, in one assertion.
 n=$((n+1))
-awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outst" \
+cblock "$outst" 6 \
   | grep -qF 'memory/backlog/ARCH.md (' \
   && { echo "FAIL a curation-debt-listed file was still capped by check 6"; st=1; }
+# ---- the curation-debt STALE-ENTRY guard (TOOL-cGradedDebt-1), which is a DIFFERENT question from
+# ---- the stale-LINE guard above: that one asks whether the path still exists, this one whether the
+# ---- row still hides anything.
+# ---- TWO subjects, because a guard with only a positive is indistinguishable from "the registry is
+# ---- non-empty". `tRunOk/README.md` is tracked, in the index set, and compliant on all three, so
+# ---- listing it buys nothing and must RED. `tRunBig/RUN.md` is the file check 6 already names three
+# ---- hundred lines up (`chit 6`), so listing it buys a real silence and must NOT be named.
+# ---- NEITHER subject is `ARCH.md`, deliberately: the assertion above it grades that check 6 stays
+# ---- SILENT on a listed ARCH.md, which is equally true of a file earning nothing, so resting this
+# ---- arm on it would rest it on a property that arm never established. Measured: it earns none.
+n=$((n+1))
+printf '# debt\nmemory/builds/tRunBig/RUN.md\nmemory/builds/tRunOk/README.md\n' > memory/project/curation-debt.txt
+git add -A >/dev/null 2>&1; git commit -q -m stalerow --no-verify
+outsr=$(bash "$SCRIPT" 2>/dev/null)
+# THE WHOLE LITERAL SIGNATURE, not a readable prefix. `check-arms.py` reads a branch's signature up
+# to its first interpolation, and a prefix leaves the branch UNARMED — which reds the `harness arms`
+# leg rather than this suite, so the suite would have looked fine while the bar did not.
+grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived, so the row hides nothing and the registry has stopped shrinking — delete the row rather than re-justifying it:' <<<"$outsr" \
+  || { echo "FAIL the curation-debt stale-ENTRY guard did not fire on a row that hides nothing"; st=1; }
+n=$((n+1))
+cblock "$outsr" 6 | grep -qF 'memory/builds/tRunOk/README.md' \
+  || { echo "FAIL the curation-debt stale-ENTRY guard did not name the row that hides nothing"; st=1; }
+n=$((n+1))
+cblock "$outsr" 6 | grep -qF 'memory/builds/tRunBig/RUN.md' \
+  && { echo "FAIL the stale-ENTRY guard named a row that is still earning its listing"; st=1; }
+# the PER-ROW report names what the EARNING row earns, which is the half that makes an over-wide
+# waiver visible: this row is waived from three checks and buys one.
+n=$((n+1))
+# BOTH HALVES, and the denominator is the half that shipped wrong. `RUN.md` is in check 6's
+# population, exempt from 7 by `ex7`, and structurally outside 8 — so its applicable set is `6`
+# ALONE, and this row's waiver is exactly as wide as its fault. A constant `6 7 8` denominator
+# reported it as two checks over-wide, which inverts the signal the report exists to send.
+grep -qF 'memory-hygiene: curation-debt.txt — memory/builds/tRunBig/RUN.md earns check(s) 6 of the 6 it is waived from' <<<"$outsr" \
+  || { echo "FAIL the curation-debt per-row report did not name what the earning row earns, over its APPLICABLE checks"; st=1
+       printf '%s\n' "$outsr" | grep -F 'memory-hygiene: curation-debt.txt' | sed 's/^/     DUMP /'; }
+# the GRADED-ROW population of check 8. `pop_guard` counts shard FILES, so a waiver over most of the
+# rows reported green and printed no number at all; this is the liveness half.
+n=$((n+1))
+grep -qE '^memory-hygiene: check 8 graded [1-9][0-9]* backlog row\(s\) across [1-9][0-9]* shard\(s\)$' <<<"$outsr" \
+  || { echo "FAIL check 8 did not report its graded-row population"; st=1; }
+n=$((n+1))
+grep -qF '#rows ' <<<"$outsr" \
+  && { echo "FAIL check 8's row-count sentinel leaked into the findings"; st=1; }
+# ---- TWO ABSENCES, AND NEITHER IS THE STALE-ENTRY GUARD'S QUESTION (TOOL-cGradedDebt-5, from the
+# ---- round-1 review's L1). A path still in the INDEX but gone from the WORKTREE records nothing —
+# ---- `index_set` and `files8` both end on `[ -f "$f" ]` — so without the worktree test it reads as
+# ---- compliant and the guard prints "delete the row" at a waiver that is still load-bearing the
+# ---- moment the file returns. This pair is the ONLY thing separating "the row hides nothing" from
+# ---- "the file is not there to hide anything", which is the whole distinction the guard rests on.
+# ---- The stale-LINE guard must stay silent too: the path IS still tracked, so neither guard owns
+# ---- this state and a run that names it under either one is naming the wrong defect.
+n=$((n+1))
+printf '# debt\nmemory/builds/tRunBig/RUN.md\n' > memory/project/curation-debt.txt
+git add -A >/dev/null 2>&1; git commit -q -m debtworktree --no-verify
+rm memory/builds/tRunBig/RUN.md                      # NOT `git rm` — still in the index
+outwt=$(bash "$SCRIPT" 2>/dev/null)
+grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived' <<<"$outwt" \
+  && { echo "FAIL the stale-ENTRY guard fired on a listed path that is merely ABSENT from the worktree, so its remedy would drain a load-bearing row"; st=1; }
+n=$((n+1))
+grep -qF 'curation-debt.txt lists paths that no longer exist' <<<"$outwt" \
+  && { echo "FAIL the stale-LINE guard fired on a listed path git still tracks"; st=1; }
+git checkout -q -- memory/builds/tRunBig/RUN.md
 printf '# legacy\n' > memory/project/legacy-files.txt
 printf '# debt\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify
@@ -1647,14 +1733,32 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
 A=$TMP/rotarchive
 mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$A/memory/project"
 ( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  # DEPL is declared and has NO live shard, deliberately: the archive below is named for it, so its
+  # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
+  # for every backlog archive, and until this fixture existed it shipped unobserved.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
   printf -- '---\nslug: tRot\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRot-1\n---\n\n# tRot\n' > memory/builds/tRot/README.md
   printf '# ARCH-tRot-1 — the owning unit\n\nIt cites ARCH-tMoved-1 in prose, so the moved id is CITED from outside the archive.\n' > memory/builds/tRot/spec/2026-08-01-spec-tRot-1.md
   # The live shard AFTER the rotation: the moved row is gone from here in both states below.
-  printf '# ARCH backlog\n\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
+  # THE ROTATION NOTE SITS ON LINE 4, DELIBERATELY. A `head -3` window cannot see it, so the green
+  # control below can only be satisfied by the widened preamble window — which is the whole of what
+  # this build changed about that window, and was previously asserted by nothing. The dogfood shard
+  # carries its own notes on lines 4 and 5 for the same reason: two rotations plus a preamble line.
+  printf '# ARCH backlog\n\n> Mutable. Each row leads with one status token.\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n> Rotated 2026-08-02 to [../archive/ARCH.2026-08-02b.md](../archive/ARCH.2026-08-02b.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
   printf '# rotated\n\n- ARCH-tMoved-1 · CLOSED · the moved row, which DEFINES its own id on this line\n' > memory/archive/ARCH.2026-08-01.md
+  # CHECK 10 rides this tree, because it is the only fixture with a rotated BACKLOG shard — the case
+  # the shipped check could not reach at all. ARCH.2026-08-01.md is named in the shard's preamble
+  # (line 3) and is the GREEN control; this second archive is named nowhere and is the RED. Before
+  # the basename resolution both were invisible: the stem projected onto memory/ARCH.md, which does
+  # not exist, and the `[ -f ]` guard skipped them. The RED arm is what fails without the fix; the
+  # green control is what fails if the fix over-reaches and reds a shard that DID announce its cut.
+  printf '# rotated, and announced by nobody\n' > memory/archive/ARCH.2026-08-03.md
+  # A SAME-DAY DISAMBIGUATED name, announced on line 5. Without it the `[a-z0-9]*` in both readers'
+  # patterns is dead weight that can be deleted with every arm still green.
+  printf '# rotated, second of its day\n' > memory/archive/ARCH.2026-08-02b.md
+  printf '# rotated from a family with no live shard\n' > memory/archive/DEPL.2026-08-04.md
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
   git commit -q -m rotated --no-verify )
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
@@ -1664,6 +1768,24 @@ n=$((n+1))
 # BOTH arms would pass by finding nothing. Measured before trusting either direction.
 grep -qF 'ARCH-tMoved-1' <<<"$outa" \
   && { echo "FAIL check 14 called a rotated-and-STAGED id an orphan — rotation between two tracked paths cannot orphan anything, so this is the arithmetic going wrong"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-03.md' <<<"$outa" \
+  || { echo "FAIL check 10 did not reach a rotated BACKLOG archive — its live index is memory/backlog/ARCH.md, one level below the memory root, and resolving the stem at the root skips it in silence"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$outa" \
+  && { echo "FAIL check 10 red an archive its shard DOES announce — memory/backlog/ARCH.md names it on LINE 4, which only the widened preamble window reaches; a head -3 window or an over-reaching resolution fails here"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-02b.md' <<<"$outa" \
+  && { echo "FAIL check 10 red a SAME-DAY DISAMBIGUATED archive its shard announces on line 5 — either the [a-z0-9]* suffix left the filename anchor or the preamble window is short"; st=1; }
+# ---- the ZERO-RESOLUTION branch, which is the one whose `continue` made this check inert. An
+# ---- archive whose stem names no live index must be NAMED, and the message must say how many it
+# ---- resolved to, because "skipped in silence" and "referenced" printed the same nothing before.
+n=$((n+1))
+grep -qF "resolves to 0 live index(es)" <<<"$outa" \
+  || { echo "FAIL check 10 SKIPPED an archive whose stem resolves to no live index instead of naming it — that silent \`continue\` is exactly how this check graded 1 of 4 archives for a month"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/DEPL.2026-08-04.md' <<<"$outa" \
+  || { echo "FAIL check 10's zero-resolution finding does not name the archive it is about"; st=1; }
 # ---- ...and now the SAME rotation with the archive unstaged. This is the state cSteadyMetronome saw.
 n=$((n+1))
 ( cd "$A" && git rm -q --cached memory/archive/ARCH.2026-08-01.md >/dev/null 2>&1 \
@@ -1817,10 +1939,27 @@ chit 21 'records carrying the unbound Serves form outnumber their pin — bind t
 chit 21 'record filenames whose family, slug and ordinal name an id their own Serves line does not list'
 cblock "$out" 21 | grep -qF '2026-08-01-review-ARCH-tOne-1-f.md' \
   && { echo "FAIL check 21 flagged a CROSS-BUILD record correctly named for the id it serves"; st=1; }
+# the parse-refusal branch is SILENT while the real generator answers — its green control.
+cnot 21 'the bindings parse did not complete'
 # branch 3 — the pin UNDECLARED is a refusal, not a disabled check.
 ( cd "$K" && printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf )
 out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
 chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus'
+# branch 0 — the PARSE itself did not answer (TOOL-dMuffledSentinel-1). Reproduced as an adopter
+# meets it: a COPY of the kit whose sibling generator lacks the mode, run over the fixture above,
+# which still holds the no-Serves record branch 1 names. Two stubs, because the two ways a delegate
+# fails to answer take different exits: a generator that refuses the flag (exit 2, the measured
+# adopter case) and one that reads an unknown flag as its default and exits 0 having graded nothing.
+# The fixture record must stay UNNAMED in both, since naming it would mean the stub was not reached.
+KC=$TMP/kit21
+mkdir -p "$KC" && cp "$HERE"/*.sh "$HERE"/*.py "$KC"/
+for _stub in 'import sys; print("usage: gen_build_index.py [--check|--write]", file=sys.stderr); sys.exit(2)' \
+             'print("build-index: 2 builds, 2 views current")'; do
+  printf '%s\n' "$_stub" > "$KC/gen_build_index.py"
+  out=$(cd "$K" && bash "$KC/check-memory-hygiene.sh" 2>/dev/null)
+  chit 21 'the bindings parse did not complete, so no record was graded and every branch below would read as a clean corpus — gen_build_index.py --print-bindings exited'
+  cnot 21 '2026-08-01-review-ARCH-tOne-1-a.md'
+done
 
 # ---- CHECK 6 — the per-class caps are DECLARATIONS (TOOL-aLoosenedCeiling-2).
 # ---- Every arm runs BOTH DIRECTIONS OVER ONE FIXTURE: the same file is silent at a loose cap and
@@ -2157,12 +2296,20 @@ n=$((n+1))
 # ---- so the retirement had no notification channel at all. The class generalises: a delegated
 # ---- checker gained a channel that is meaningful at exit 0, and every arm called the callee.
 _b1=$(mktemp -d)
+# THIS TREE IS ALSO THE PROJECT-KEY FIXTURE (TOOL-aRatifiedRulings-3), so its conf is written by the
+# one helper the project-key arms rewrite it with: the four base lines plus the retired
+# READ_PATH_CEILING that provokes the notice, then the arm's one key line.
+pk_set() {   # $1 = a conf line, or empty for the fixture's base conf
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > "$_b1/.memory-tree.conf"
+  printf 'READ_PATH_CEILING="135677"\n' >> "$_b1/.memory-tree.conf"
+  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$_b1/.memory-tree.conf"
+  return 0
+}
 (
   cd "$_b1" || exit 1
   git init -q .; git config user.email t@t.test; git config user.name t
   mkdir -p memory/guides memory/builds/tOne/spec memory/project
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
-  printf 'READ_PATH_CEILING="135677"\n' >> .memory-tree.conf
+  pk_set ""
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
@@ -2186,59 +2333,49 @@ case "$_b1out" in
   *"READ_PATH_CEILING is declared"*) : ;;
   *) echo "FAIL the gate exited 0 and said nothing about a conf that still declares the retired READ_PATH_CEILING; corpus_ids.py prints that notice at exit 0 and this wrapper is the only caller an adopter ever runs"; st=1 ;;
 esac
-rm -rf "$_b1"
-
-# THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
-# 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
-# shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
-# rule is shrink-only upward, so the tighter surviving pin wins over recomputing from scratch.
-FLOOR_ASSERTIONS=235
-[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
 # case is the only one that matters here. BUILD_SLUG_RE and RECORD_SERVES_CUTOFF NARROW what is
 # graded, so a bad value does not red: it silently grades nothing and reports green. These arms are
 # what stop that reaching an adopter.
-GOVROOT=$(git -C "$HERE" rev-parse --show-toplevel)
-# ONE FIXTURE, REUSED. The first cut built a fresh scratch tree per arm -- `git archive` of the whole
-# repo plus a `git init` and a commit, fourteen times -- and the suite TIMED OUT at ten minutes.
-# Nothing about these arms needs a fresh tree: they vary ONE CONF LINE and re-read the same corpus,
-# so the tree is built once and the conf is rewritten between runs. Section 7 is explicit that cost
-# is a verdict, and a suite nobody can afford to run is a suite nobody runs.
-PKD=$(mktemp -d)
-( cd "$GOVROOT" && git archive HEAD ) | tar -x -C "$PKD" 2>/dev/null
-# THE WORKING CHECKER, OVERLAID. `git archive HEAD` hands the fixture the COMMITTED script, so every
-# arm below would grade the pre-change code and report that a new key does not work. Measured: all
-# six invalid-value arms passed against HEAD and proved nothing.
-cp "$GOVROOT/$KIT_REL/check-memory-hygiene.sh" "$PKD/$KIT_REL/" 2>/dev/null
-cp "$GOVROOT/.memory-tree.conf" "$PKD/.memory-tree.conf.base" 2>/dev/null
-( cd "$PKD" && git init -q . && git config user.email t@t && git config user.name t \
-    && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
-pk_set() {   # $1 = a conf line, or empty for the shipped default
-  cp "$PKD/.memory-tree.conf.base" "$PKD/.memory-tree.conf"
-  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$PKD/.memory-tree.conf"
-  return 0
-}
-pk_rc()  { ( cd "$PKD" && bash "$KIT_REL/check-memory-hygiene.sh" >/dev/null 2>&1; echo $? ); }
-pk_out() { ( cd "$PKD" && bash "$KIT_REL/check-memory-hygiene.sh" 2>&1 ); }
+#
+# ONE FIXTURE, REUSED, AND IT IS THE CHECK-16 NOTE TREE ABOVE (TOOL-aRatifiedRulings-3). The second
+# cut ran every arm over a `git archive` of this whole repository: 1902 tracked files at 28 s a
+# run, seven proceeding runs plus the archive build, 37% of the suite's wall clock -- and its
+# control arm was red whenever the live corpus was, mid-build included, so every arm beneath it
+# graded a red no key owned. The arms vary ONE CONF LINE. The check-16 fixture tree above is
+# already asserted clean at rc 0 and already provokes a notice, which is the positive artifact the
+# control needs; 8 s a run. Its size is `git ls-files | wc -l` in that tree, not a number typed here. One run per arm, and every arm that grades a RED asserts the finding's TEXT,
+# never an rc alone -- the rc-only violated-slug arm printed `ok` on that unowned red.
+#
+# THE ONE RUNNER: stdout and stderr on stdout, the checker's rc as its own. `pk_rc` is gone -- an
+# abort arm used to run the checker twice over the same conf, once for rc and once for text.
+pk_out() { ( cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1 ); }
 
 # BUILD_SLUG_RE
-pk_set ""; pk_base=$(pk_rc)
-n=$((n+1)); [ "$pk_base" = 0 ] && echo "ok   project keys: the fixture is clean with no key set" \
-  || { echo "FAIL project keys: the fixture is not clean unset (rc=$pk_base) — every arm below is meaningless"; st=1; }
+# THE CONTROL READS THE CLEAN RUN ABOVE, not a run of its own: rc 0 AND the notice, so a clean
+# verdict carries proof that run reached check 16 rather than exiting 0 on nothing.
+n=$((n+1))
+case "$_b1rc:$_b1out" in
+  0:*"READ_PATH_CEILING is declared"*) echo "ok   project keys: the fixture is clean with no key set" ;;
+  *) echo "FAIL project keys: the fixture is not clean unset (rc=$_b1rc), or its clean run never reached check 16 — every arm below is meaningless"; st=1 ;;
+esac
 
-pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; r=$(pk_rc)
+pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(pk_out); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   BUILD_SLUG_RE: a pattern gov's own slugs satisfy still passes" \
   || { echo "FAIL BUILD_SLUG_RE: a satisfiable pattern redded (rc=$r)"; st=1; }
 
-pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; r=$(pk_rc)
-n=$((n+1)); [ "$r" != 0 ] && echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" \
-  || { echo "FAIL BUILD_SLUG_RE: a violated pattern passed — the key is not reaching check 4"; st=1; }
+pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(pk_out); r=$?
+n=$((n+1))
+case "$o" in
+  *"HYGIENE check 4 FAILED"*"memory/builds/tOne (bad folder name"*) echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" ;;
+  *) echo "FAIL BUILD_SLUG_RE: a violated pattern did not red check 4 naming memory/builds/tOne (rc=$r) — the key is not reaching check 4"; st=1 ;;
+esac
 
 # THE INVALID CASES. Each of these would otherwise grade nothing and report clean.
 for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
-  pk_set "BUILD_SLUG_RE=\"$bad_re\""; r=$(pk_rc); o=$(pk_out)
+  pk_set "BUILD_SLUG_RE=\"$bad_re\""; o=$(pk_out); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*BUILD_SLUG_RE*) echo "ok   BUILD_SLUG_RE='$bad_re' ABORTS naming the key" ;;
@@ -2247,12 +2384,12 @@ for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
 done
 
 # RECORD_SERVES_CUTOFF
-pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; r=$(pk_rc)
+pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(pk_out); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   RECORD_SERVES_CUTOFF: a past cutoff is accepted" \
   || { echo "FAIL RECORD_SERVES_CUTOFF: a past cutoff redded (rc=$r)"; st=1; }
 
 for bad_cut in '2099-01-01' 'yesterday'; do
-  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; r=$(pk_rc); o=$(pk_out)
+  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; o=$(pk_out); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*RECORD_SERVES_CUTOFF*) echo "ok   RECORD_SERVES_CUTOFF='$bad_cut' ABORTS naming the key" ;;
@@ -2262,29 +2399,66 @@ done
 
 # ENTRY_CAP_UNIT
 for unit in chars bytes; do
-  pk_set "ENTRY_CAP_UNIT=\"$unit\""; r=$(pk_rc)
+  pk_set "ENTRY_CAP_UNIT=\"$unit\""; o=$(pk_out); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ENTRY_CAP_UNIT=$unit is accepted" \
     || { echo "FAIL ENTRY_CAP_UNIT=$unit redded (rc=$r)"; st=1; }
 done
-pk_set 'ENTRY_CAP_UNIT="glyphs"'; r=$(pk_rc); o=$(pk_out)
+pk_set 'ENTRY_CAP_UNIT="glyphs"'; o=$(pk_out); r=$?
 n=$((n+1))
 case "$r:$o" in
   2:*ENTRY_CAP_UNIT*) echo "ok   ENTRY_CAP_UNIT='glyphs' ABORTS naming the key" ;;
   *) echo "FAIL ENTRY_CAP_UNIT='glyphs' did not abort (rc=$r)"; st=1 ;;
 esac
 
+# ROTATION_MODE — a CLOSED set whose BLANK is a different answer from an invalid one, which is the
+# whole reason it is validated rather than merely read. The blank arm is the load-bearing one: an
+# adopter conf predating the key must not red on a kit upgrade, so a missing key has to pass, and an
+# arm that only tested the abort would leave that free to regress silently. TOOL-cSpliceWarden-1.
+for rmode in cut snapshot; do
+  pk_set "ROTATION_MODE=\"$rmode\""; o=$(pk_out); r=$?
+  n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE=$rmode is accepted"     || { echo "FAIL ROTATION_MODE=$rmode redded (rc=$r)"; st=1; }
+done
+pk_set 'ROTATION_MODE=""'; o=$(pk_out); r=$?
+n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE blank is UNDECLARED and passes"   || { echo "FAIL ROTATION_MODE blank redded (rc=$r) — an adopter conf predating the key would red on upgrade"; st=1; }
+# Case matters, and the near-miss is the arm worth having: `Cut` is the typo a human makes.
+for rbad in Cut rotate; do
+  pk_set "ROTATION_MODE=\"$rbad\""; o=$(pk_out); r=$?
+  n=$((n+1))
+  case "$r:$o" in
+    2:*ROTATION_MODE*) echo "ok   ROTATION_MODE='$rbad' ABORTS naming the key" ;;
+    *) echo "FAIL ROTATION_MODE='$rbad' did not abort (rc=$r)"; st=1 ;;
+  esac
+done
+
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of
-# them, accepting any file under project/ and disabling the check while reporting clean.
+# them, accepting any file under project/ and disabling the check while reporting clean. BOTH
+# files are committed: the registry the key names must be absent from check 3's list and the
+# probe it does not name must be in it, and a `*unlisted-probe*` match alone could not tell the
+# key widening from check 3 listing everything.
 pk_set 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
-printf 'x\n' > "$PKD/memory/project/unlisted-probe.txt"
-( cd "$PKD" && git add -A && git commit -q -m probe --no-verify ) >/dev/null 2>&1
+printf 'x\n' > "$_b1/memory/project/my-registry.txt"
+printf 'x\n' > "$_b1/memory/project/unlisted-probe.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m probe --no-verify ) >/dev/null 2>&1
 o=$(pk_out)
-( cd "$PKD" && git rm -q memory/project/unlisted-probe.txt && git commit -q -m unprobe --no-verify ) >/dev/null 2>&1
-rm -rf "$PKD"
+rm -rf "$_b1"
 n=$((n+1))
-case "$o" in *unlisted-probe*) echo "ok   PROJECT_REGISTRY_EXTRA widens only what it names" ;;
-  *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;; esac
+case "$o" in
+  *"memory/project/my-registry.txt"*) echo "FAIL PROJECT_REGISTRY_EXTRA: check 3 named the registry the key admits — the key is not reaching check 3"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/unlisted-probe.txt"*) echo "ok   PROJECT_REGISTRY_EXTRA widens only what it names" ;;
+  *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;;
+esac
+
+# THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
+# 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
+# shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
+# rule is shrink-only upward, so the tighter surviving pin wins over recomputing from scratch.
+# RAISED TO THE PRINTED COUNT and HOISTED to sit immediately above the PASS line
+# (TOOL-aRatifiedRulings-3): it used to be graded BEFORE the project-key section, so it read `n`
+# thirteen short of what the PASS line prints, and a pin read off that line would have redded
+# the suite on its first run. The pinned number is now the printed number, exactly.
+FLOOR_ASSERTIONS=374
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

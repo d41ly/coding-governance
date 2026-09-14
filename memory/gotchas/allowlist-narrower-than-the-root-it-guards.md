@@ -58,3 +58,12 @@ its result is recorded in `memory/builds/aTetheredScratch/`.
 
 Before writing "deny under X except Y", check whether Y is under X on the platform you are on, and
 whether X has more than one spelling. Both questions are cheap and both were skipped here.
+
+## What a denial from this hook means to a session
+
+`tools/hooks/scratch-guard.js` is the second `PreToolUse` guard the hooks kit ships, wired on
+`Bash|PowerShell`: it DENIES a shell command that writes under the home directory outside the roots
+it derives from `TMPDIR`, `TEMP` and `TMP` plus the one fixed `.claude` subtree. A blocked command is
+a real refusal and not a harness glitch — put the write in the session scratchpad. `%TEMP%` is
+INSIDE `$HOME` on Windows, which is the whole reason the allowlist is derived rather than authored,
+as the sections above record.

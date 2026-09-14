@@ -3170,6 +3170,82 @@ mkdir -p work/sub && printf 'a\n' > work/sub/x.txt && printf 'b\n' > work/elsewh
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "unattended: check 23 — a dispatched pass committed a path outside"
 
+# ---- THE BRIEF ROW'S PATH LEAVES THE POPULATION (TOOL-aLeakedHandle-7, TOOL-aRatifiedRulings-2).
+# ---- `--brief` stages only the run-state file and the brief is already tracked, so the pass's one
+# ---- commit carries a file the pass never wrote and never declared. Five fixtures, one shape: the
+# ---- dispatch row through `drow`, the brief file and a conforming `brief · item` row written
+# ---- inline — a real twelve-hex `hash-object` prefix, though check 23 never reads the hash — and
+# ---- the pass commit carrying all of it. A is the exclusion; B is the control that keeps A from
+# ---- passing by finding nothing, one stray file apart; C pins the tree at the PASS COMMIT, a row
+# ---- appended after it excludes nothing; D pins the PATH and not its directory; E pins `normpath`,
+# ---- for the reason the `covers` arm above was written. A, B and E were RED against the checker at
+# ---- base; C and D are controls the base checker already passes, each redded once by a staged
+# ---- break named in the unit's acceptance ledger.
+BRIEF=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+# A: the brief is in the pass commit and its row names it — silent by default, announced on the
+# report channel, which is the positive artifact that the exclusion branch ran on that path.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "unattended: check 23 —"
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "check 23 excluded $BRIEF for ARCH-tRun-1 in memory/builds/tRun/RUN.md"
+# B: ...and a stray file beside it still reports, minus the brief. The exclusion is the one path.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt \
+  && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+miss "$out" "build-brief.md"
+# C: POST HOC. The row lands in a second commit touching only the run-state file, so the pass
+# commit's tree holds no row and the brief stays reported — a row written afterwards hides nothing.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+printf '2026-08-21T00:00:02Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "run-state bookkeeping" --no-verify
+hit "$(run)" "wrote $BRIEF"
+# D: DIRECTORY. A row naming `prompts` excludes nothing under it, so both files still report.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF" \
+  && printf 'other\n' > memory/builds/tRun/prompts/other.md
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s memory/builds/tRun/prompts\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "memory/builds/tRun/prompts/other.md"
+# E: SPELLING. A row naming the brief as `./memory/...` is the same path once normalised.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s ./%s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+miss "$(run)" "unattended: check 23 —"
+# F: THE BOOKKEEPING COMMIT IS NOT THE PASS COMMIT (closing diff review, finding 7). The ordinary
+# shape: `--brief` requires the brief tracked and stages the run-state file, so the run commits
+# `{brief, brief row}` first, naming the unit, and the pass's real commit follows. With the brief
+# forgiven only in this check, `pass_commit` SELECTED that bookkeeping commit, the exclusion emptied
+# it, and the stray in the commit that followed was never graded — silent where B reports. Now the
+# library subtracts the same set before selecting, so the walk reaches the commit with the stray.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 brief handed" --no-verify
+printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+
 # ---- THE COMPARISON NEVER FAILS THE LEG (spec 23 S1 / AC9). Both halves, because a check that is
 # ---- silent AND exits 0 is indistinguishable from one that is working, and that is the shape this
 # ---- whole mechanism spent four rounds in. The fixture is the one that produced a finding above.
@@ -3317,6 +3393,10 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- DERIVED as 162 - 93 from the first candidate's regions 7 + 8 — the one figure below with no
 # ---- direct run behind it. The build was landed by owner ruling before its closing runs, so
 # ---- FLOOR_SHARD_8 is re-read at the build's final gate pass and corrected there if it moved.
+# ---- MERGED 2026-09-14 with main's +8 assertions (TOOL-aRatifiedRulings-2's five check-23 brief
+# ---- fixtures, seven, and its closing review's fixture F, one), which landed in the old region two
+# ---- and now sit in whichever of the eight regions the merge placed them; every floor below is a
+# ---- MINIMUM the counts rose past, and all nine are re-read at the build's final gate pass.
 FLOOR_ASSERTIONS=538
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
