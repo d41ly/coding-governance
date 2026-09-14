@@ -5,7 +5,7 @@ opened: 2026-09-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11
+ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11 TOOL-aDeferredBar-12 TOOL-aDeferredBar-13 TOOL-aDeferredBar-14 TOOL-aDeferredBar-15 TOOL-aDeferredBar-16
 ---
 
 # aDeferredBar — no merge bar and no self-test suite inside a build pass
@@ -62,7 +62,8 @@ than the bar, and nothing at the act that refuses. The trace and the corpus coun
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-09-13 · streams tooling
-ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11
+ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBar-4 TOOL-aDeferredBar-5 TOOL-aDeferredBar-6 TOOL-aDeferredBar-7 TOOL-aDeferredBar-8 TOOL-aDeferredBar-9 TOOL-aDeferredBar-10 TOOL-aDeferredBar-11 TOOL-aDeferredBar-12 TOOL-aDeferredBar-13 TOOL-aDeferredBar-14
+ids TOOL-aDeferredBar-15 TOOL-aDeferredBar-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
