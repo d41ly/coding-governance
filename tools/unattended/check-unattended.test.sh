@@ -95,7 +95,10 @@ emitted() { # signatures · output
   n=$((n+1))
   out=$(grep -v '^unattended-report: ' <<<"$2" || true)   # every path below leaves `out` stripped
   if [ "$1" = "?" ]; then
-    echo "FAIL emitted: expected set not yet observed — owed at the final pass"; st=1; return
+    # ---- the OBSERVED set follows the refusal, indented so `grep '^FAIL'` does not count it: the
+    # ---- final pass pastes a group's set from these lines, and the caller's line is the join.
+    echo "FAIL emitted: expected set not yet observed — owed at the final pass · call at line ${BASH_LINENO[0]}"; st=1
+    grep '^UNATTENDED check [0-9]* FAILED ' <<<"$2" | sed 's/^/    observed: /'; return
   fi
   _exp=$(printf '%s\n' "$1" | tr '|' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' || true)
   [ -n "$_exp" ] || { echo "FAIL emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
