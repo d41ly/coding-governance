@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses
 
-**Status:** CLOSED · rev-6 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
+**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -49,11 +49,16 @@ producer invents a format and no consumer re-parses one.
 - **S6** The kit self-test `tools/runlog/selftest.py`, a new held leg `runlog selftest`, and its
   budget row. Observed by AC6.
 - **S7** The memory root. `resolve_memory_root` reads `MEMORY_ROOT` from `.memory-tree.conf` at the
-  repository root, strips its slashes, and returns the kit default `memory` when the key is absent, as
-  drift-audit's reader does. An absent conf is an absent key. A key set to nothing refuses with a
-  named line, and so does a value that would leave the repository: a `..` segment, a drive colon or a
-  backslash, because unit 9 WRITES under this root. Every later unit addresses the memory tree through
-  it, since the kit ships and `docs/mem` is a real adopter value. Observed by AC10.
+  repository root, strips its slashes, and returns the kit default `memory` when the key is absent. It
+  reads a line in the order the memory-tree engine's own reader, `parse_conf_line`, does: a value
+  opening with a quote is the text up to the matching quote, whatever follows it, and an unquoted
+  value ends at a `#` that begins a word. That is bash's reading of every spelling AC10 tables. The
+  reader is a copy, because kits are copied into adopters independently, and the withheld self-test
+  holds it to the engine's reader and to bash. An absent conf is an absent key. A key set to nothing
+  refuses with a named line, and so does a value that would leave the repository: a `..` segment, a
+  drive colon or a backslash, because unit 9 WRITES under this root. Every later unit addresses the
+  memory tree through it, since the kit ships and `docs/mem` is a real adopter value. Observed by
+  AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -208,9 +213,15 @@ because the spec-tokens leg joins every path a live spec's criteria name against
   Red when: `journal` prints nothing, drops a key, or omits the count.
 - **AC10** — When `resolve_memory_root` reads scratch trees whose conf sets `MEMORY_ROOT=docs/mem/`,
   sets nothing, and sets `MEMORY_ROOT=/`, it returns `docs/mem`, returns `memory`, and refuses with a
-  named line. A conf setting `MEMORY_ROOT=../x` refuses with a named line too.
-  Red when: a literal `memory` is returned for a conf naming another root, or an empty root or one
-  leaving the repository is accepted.
+  named line. A conf setting `MEMORY_ROOT=../x` refuses with a named line too. Over a table of
+  spellings that each set `MEMORY_ROOT`, among them `MEMORY_ROOT="v"  # c` and `MEMORY_ROOT='v' # c`,
+  a `#` inside quotes, a `#` inside a word, a comment where the value would be, an `export` followed
+  by a tab, and a key set twice, the kit's reader returns what bash returns from sourcing the same
+  file, and what the memory-tree engine's `parse_conf_line` returns where that engine sits beside the
+  kit. Where no bash shares the filesystem, or the engine is absent, the arm prints its skip.
+  Red when: a literal `memory` is returned for a conf naming another root, an empty root or one
+  leaving the repository is accepted, a legal spelling reads with its quotes or its comment kept, or
+  the kit's reader and the engine's disagree on one.
 
 ## 7. Gates
 
@@ -250,6 +261,15 @@ none
   AC1 amendment in this log and left AC1's own text claiming selfcheck sees the self-test's role;
   AC1 now names the observation that does. AC8 names `render_line`, which rev-5 added to the
   inventory.
+- rev-7 · 2026-09-14 · S7 · AC10 · folded the closing diff review's round-1 M7.
+  `MEMORY_ROOT="docs/memory"  # note` read as `"docs/memory"`, quotes kept: the quote strip needed
+  the value's first and last characters to match, a trailing comment broke that, and the fallback
+  took the first word whole. The schema leg then found no tracked file under the quoted root and
+  redded every bar at an adopter using that legal spelling. S7 now reads in the memory-tree engine's
+  order, and AC10 grades the reader by bash over a table of spellings and holds it to the engine's
+  reader, whose path is the arm's one new carried literal. Rev-6's S7 named drift-audit's reader as
+  its model; that reader keeps the same quotes on the same line, and it is another kit's, so it is
+  reported and not changed here.
 
 ## 10. Reuse audit
 

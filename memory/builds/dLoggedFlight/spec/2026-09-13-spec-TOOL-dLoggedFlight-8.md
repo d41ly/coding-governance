@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-8 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-9 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -141,11 +141,14 @@ sources actually support. Every later surface renders from this model rather tha
   - `phases-walked`: the driver's phase moves include BUILDING before LANDING, or the run aborted. A
     terminal run's phase counts among them at its window's end, since the write that closed the
     window is not a timeline event (S2). UNJUDGEABLE until the run reaches LANDING;
-  - `green-at-close`: judged at the last successful `--close` END. A joined `gates.log` line with
-    `verdict=GREEN` and `head` equal to the head `--close` ran at, older than that END. That head is the
-    first parent of the commit recording the close's LANDING write, or HEAD while that write is
-    uncommitted. UNJUDGEABLE when the journal holds no successful `--close` or no gate line exists in
-    the window;
+  - `green-at-close`: judged at the last successful `--close` END, one reading `rc=0` and
+    `exit=clean`. An unclean END's `rc` is whatever `$?` its EXIT trap saw, often 0, so a `--close`
+    killed mid-bar is no close. A joined `gates.log` line with `verdict=GREEN` and `head` equal to the
+    head `--close` ran at, older than that END. That head is the first parent of the commit recording
+    the close's LANDING write, or HEAD while that write is uncommitted. UNJUDGEABLE when the journal
+    holds no successful `--close` or no gate line exists in the window. Every rule in this spec that
+    decides on an END's `rc` reads its `exit` beside it, and a source arm of the self-test holds
+    `model.py` to that;
   - `keepalive-reaped`: the run-state fact `keepalive-reaped` is present and affirmative. UNJUDGEABLE
     before LANDING;
   - `review-exited`: every review subject's last row carries an exit token. UNJUDGEABLE with no review
@@ -192,7 +195,11 @@ sources actually support. Every later surface renders from this model rather tha
   - `dead`: the window starts after the epoch and the source holds none while the run's own rows prove
     activity. The proof is named per journal: for `driver` a parked row in the window, since every row
     is a driver verb's write; for `gates` a LANDING write in it, which `--close` makes only after its
-    bar; and for `pushes` a LANDED write, which `--landed` makes only after the push;
+    bar; and for `pushes` the move into LANDED, which `--landed` makes only after the push. That move
+    is the one that closes a landed run's window (S2), so it lies AT the window's end and never inside
+    the half-open window. The pushes proof is therefore read at the end: from the terminal END's
+    `phase_to` where a terminal END closed the window, and from the first terminal write's phase where
+    that write did;
   - `not-local`: no named session has an extract or a transcript on this machine, or the journal names
     no session and the store holds no extract attributed to the slug.
 
@@ -212,8 +219,9 @@ sources actually support. Every later surface renders from this model rather tha
 - **S9** Owner turns by position, each extractor owner turn classed by boundary events. Observed by AC13.
   - `launch`: the session's first owner turn, when it precedes the run's preflight START.
   - `pre-run`: any other turn before that START.
-  - `in-window`: from the START to the `--close` END.
-  - `post-close`: after the `--close` END, or after the terminal END when the run has no close.
+  - `in-window`: from the START to the successful `--close` END of S5.
+  - `post-close`: after that END, or after the terminal END when the run has no successful close, or
+    after the window's end when it has neither. A killed `--close` is no boundary.
 
   For a run with no START, its start commit (S1) stands in.
 - **S10** Cost: extractor usage totals for the window, split into main loop, direct agents and workflow
@@ -384,8 +392,14 @@ command.
   containing the epoch still reads `partial`, which is this run's own case, and a window starting after
   it reads `present`. A fixture with no local transcript reads `not-local`. Every member of
   `COVERAGE_STATES` has a fixture, and every fixture's state is a member.
+  Through `build_run_model`, the landed fixture staged with a journal older than the run and none of
+  the run's own lines reads `dead` for that journal, naming its proof: the driver's by the run's
+  parked rows, the gates' with no bar of the run's, and the pushes' with no landing push, both with
+  the driver journal, where the terminal END closes the window, and without it, where the terminal
+  write does.
   Red when: a dead writer reads as a run that predates it, a window holding the epoch reads `present`
-  because the run has lines, or any state has no fixture.
+  because the run has lines, any state has no fixture, or a landed run whose pre-push writer wrote
+  nothing for its landing push reads `present` because its proof sat at the window's end.
 - **AC7** — When `python <kit>/runlog.py model aLeakedHandle --json` runs on this tree, it prints a
   model whose parked-row counts by kind match the run-state file, whose window ends at the commit that
   first wrote `phase: LANDED`, and whose journal sources read `absent`.
@@ -414,14 +428,23 @@ command.
   Red when: a source is dropped, an excluded row enters, an owner spelling reads as the run's, the
   near-miss counts, or the report-only arm prints nothing.
 - **AC12** — When `check_conformance` reads fixtures for each member of `CONFORMANCE_ITEMS` in each
-  state it can take, including a close with no gate line in its window, it returns that state.
-  Red when: an item has no rule, or the no-gate case reads MET.
+  state it can take, including a close with no gate line in its window, it returns that state. When
+  `build_run_model` reads a run whose `--close` END reads `rc=0` and `exit=unclean`, written the way
+  the driver's EXIT trap writes a verb killed mid-bar, after a GREEN bar at the head it ran at, the
+  run has no close and `green-at-close` reads UNJUDGEABLE. The same END reading `exit=clean` closes
+  the run and reads MET. A source arm finds every comparison on an END's `rc` in `model.py` joined, in
+  the same condition, to a read of that END's `exit`. A transcript call's `rc`, which no `exit`
+  accompanies, is its one exempt receiver, and the exemption reds once it names no comparison.
+  Red when: an item has no rule, the no-gate case reads MET, a killed `--close` closes the run, or a
+  comparison on an END's `rc` reads no `exit`.
 - **AC13** — When `build_owner_positions` reads a fixture with the session's first turn before the
   preflight, a second turn before it, one inside the window, one after the close, and a run with no
   close whose last turn follows its terminal END, each is classed as S9 states. In a run with no START,
   a turn before its start commit reads `launch`, one between the start commit and the window end reads
-  `in-window`, and one after the window end reads `post-close`.
-  Red when: a turn lands in the class across one of its boundaries, the stand-in included.
+  `in-window`, and one after the window end reads `post-close`. In AC12's run with a killed `--close`,
+  a turn after that END and inside the window reads `in-window`.
+  Red when: a turn lands in the class across one of its boundaries, the stand-in included, or a
+  killed `--close` END is taken as the close.
 - **AC14** — When `build_run_usage` reads extractor usage spanning the window's edges, only usage inside
   the window counts, split three ways.
   Red when: usage outside the window is summed, or the split is lost.
@@ -596,6 +619,21 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   commit it followed at no extra call. Not folded: S4's spec-mark split still reads each spec at the
   era's end, not the window's. That end needs the one blob read that places a terminal write, so
   bounding the split changes S12's calls, and it is left to round 2.
+- rev-9 · 2026-09-14 · S5 S7 S9 · AC6 AC12 AC13 · folded the closing diff review's round-1 M2 and M3.
+  M2: `pushes` could never read `dead`. Its proof was a LANDED move inside the window, and the window
+  of a landed run ends at exactly that move, at its terminal END or its first terminal write, which a
+  half-open window excludes. S7 now reads the pushes proof at the window's end, from the move that
+  closed it. The `gates` proof is a LANDING write, which lies inside the window, so it stands. AC6
+  gains a dead state staged through the model for each journal, since only the passing side was
+  observed. M3: a `--close` END reading `rc=0` and `exit=unclean` counted as the close, so
+  `green-at-close` could read MET with no LANDING ever written, and the END split in-window from
+  post-close owner turns. The driver documents that an unclean END's `rc` is whatever its EXIT trap
+  saw, and every other rule reading an `rc` already read `exit` beside it. S5 defines a successful
+  close as `rc=0` with `exit=clean`, S9 takes its boundary from that close alone, and AC12 and AC13
+  observe both, with a source arm over every comparison on an END's `rc`. The review also offered a
+  close that moved the phase into LANDING as the test. A killed `--close` whose END read LANDING had
+  written the phase and not finished, so the clean exit is the one test, as it is for every other
+  rule here.
 
 ## 10. Reuse audit
 

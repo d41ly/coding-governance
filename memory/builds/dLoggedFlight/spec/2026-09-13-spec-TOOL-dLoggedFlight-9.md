@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -79,13 +79,18 @@ leg can prove nothing else got in.
   build's own folder in the declared memory root, the only paths the record carries. There is no free
   text, no absolute path, no session id, no host id and no command. A model value outside its field's
   class is written `-`, which also stands for an absent value, and the summary's `values withheld`
-  line counts them. Owner turns appear as counts per position, with no clock time, and no rendered
-  value may recover one. Before anything is written, the render compares every UTC the record would
-  carry with the second of every owner turn the model holds, and each idle row's end too: its UTC
-  plus its duration, and the second after, since both are truncated. On a match it refuses the whole
-  record, naming where the time sits and never the time. The model already keeps an idle gap near an
-  owner turn out (`TOOL-dLoggedFlight-8` S6). This check is the renderer's own, so a model that
-  regressed still cannot publish one.
+  line counts them. An UNKNOWN value is absent too, never the value that reads clean. The summary's
+  counts derived from the transcripts, the owner turns per position, the three usage lines and the
+  attributed calls, are `-` wherever the transcripts' coverage reads neither `present` nor `partial`,
+  since the model counts zero of what it never read. A timeline `rc` is written beside a verb or a
+  push only when its END reads `exit=clean`, and is `-` otherwise, because an unclean END's `rc` is
+  whatever `$?` its EXIT trap saw (`TOOL-dLoggedFlight-8` S5). Observed by AC10. Owner turns appear
+  as counts per position, with no clock time, and no rendered value may recover one. Before anything
+  is written, the render compares every UTC the record would carry with the second of every owner
+  turn the model holds, and each idle row's end too: its UTC plus its duration, and the second after,
+  since both are truncated. On a match it refuses the whole record, naming where the time sits and
+  never the time. The model already keeps an idle gap near an owner turn out (`TOOL-dLoggedFlight-8`
+  S6). This check is the renderer's own, so a model that regressed still cannot publish one.
 - **S5** The integrity commitment: the sha256, line count and first and last timestamps of the journal
   lines attributed to this run, so an edit to the journal made after the render is detectable on the
   producing node. `runlog.py verify <record>` recomputes them. A run with no journal lines records
@@ -249,6 +254,14 @@ command.
   UTC, and no UTC plus a duration, falls in any owner turn's second.
   Red when: a time in an owner turn's second reaches the text, a refusal names the time, or a near
   miss refuses.
+- **AC10** — When `render_record` renders the landed fixture's model with no transcript on the
+  machine, so its transcripts read `not-local`, every count the owner-turn, usage and
+  attributed-calls facts carry is `-`. The same run with its session's extract, made by the real
+  extractor, renders those counts as integers. A run whose `--close` END reads `rc=0` and
+  `exit=unclean`, as the driver's EXIT trap writes a verb killed mid-bar, renders `-` in that
+  Timeline row's `rc` cell, and the same END reading `exit=clean` renders its `0`.
+  Red when: a count from a source the model never read renders as a zero, a known count renders as
+  `-`, or a killed verb's `rc` reaches the Timeline.
 
 ## 7. Gates
 
@@ -288,6 +301,17 @@ none
   residue, a narrowing of S4 no owner ruled. S4 now refuses a record carrying any time in an owner
   turn's second, an idle row's end included, and §4 rejects an idle row beside an owner turn with the
   clock times. S3's Coverage says whether idle gaps were judged. The README's residue line is struck.
+- rev-7 · 2026-09-14 · S4 · AC10 · folded the closing diff review's round-1 M6 and the render half of
+  M3. M6: with the transcripts `not-local`, the owner turns, the usage lines and the attributed calls
+  rendered as zeros. An `in-window 0` reads as a run that never asked, which is the answer the runlog
+  Skill routes "what did it decide without asking" to, and every adopter on the shipped default names
+  no session. S4 now writes each such count as `-` unless the transcripts read `present` or
+  `partial`, and the Skill's missing-transcript warning names those counts beside the usage it named
+  already. The review preferred a schema-leg rule grading each count against the record's own
+  Coverage row. `TOOL-dLoggedFlight-10` §3 keeps content truth out of that leg, and a count graded
+  against a coverage state is content, so AC10 grades the renderer instead. M3's render half: the
+  Timeline showed a killed verb's `rc`, which is its EXIT trap's `$?` and often 0, so S4 writes an
+  `rc` only beside `exit=clean`.
 
 ## 10. Reuse audit
 
