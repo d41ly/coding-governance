@@ -156,7 +156,7 @@ producer. `tools/install-prefix-carried.txt` does not move (S7).
 
 ## 5. Production-readiness checklist
 
-- security — no URL, so no credential, on both the named-remote and the bare-URL form (AC2). Ref names
+- security — no URL, so no credential, on the named-remote, the bare-URL and the rewritten form (AC2). Ref names
   and shas are what the push publishes anyway.
 - perf / scale — zero added spawns in a hook that then runs a bar of minutes (AC7).
 - error / empty / loading states — an empty stdin writes a START with no refs and an END with

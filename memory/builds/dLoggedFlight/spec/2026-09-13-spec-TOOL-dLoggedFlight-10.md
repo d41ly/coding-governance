@@ -82,13 +82,11 @@ schema, independently of the renderer.
   lines of the trees it holds (`TOOL-dLoggedFlight-8` S2), which the leg does not read, so the model's
   end is at or after the leg's. Neither refusal turns on the difference. A preflight rotates only a
   terminal record, so a non-terminal run is the last of its build and its end meets no later window,
-  and a later end cannot put a window's end before its start. When the shared start is a commit
-  that ADDED the build's live record and one of its archives together, which `derive_run_starts`
-  marks `joint_add`, the `run-start` refusal names that shape: a squashed history leaves it, and so
-  does a memory root or a build folder moved in one commit, and the leg follows no path back past
-  it. It stays a refusal, because one log cannot tell a move from a squash and AC5 requires the
-  squash to red. No waiver clears it; the unit's acceptance ledger parks that question. Observed by
-  AC4 and AC5.
+  and a later end cannot put a window's end before its start. When the shared start is one
+  `derive_run_starts` marks `joint_add`, the shape and its causes being `TOOL-dLoggedFlight-8` S1's,
+  the `run-start` refusal names that shape, and the leg follows no path back past it. It stays a
+  refusal, because one log cannot tell a move from a squash and AC5 requires the squash to red. No
+  waiver clears it; the unit's acceptance ledger parks that question. Observed by AC4 and AC5.
 
 ## 3. Non-goals (OUT)
 
