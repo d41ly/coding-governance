@@ -76,3 +76,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-14T13:58:00Z dispatch · item 7ab53fac TOOL-aBatchedArm-1 · reason tools/unattended/check-unattended.test.sh memory/builds/aBatchedArm/spec/2026-09-10-spec-TOOL-aBatchedArm-1.md memory/builds/aBatchedArm/build/2026-09-14-build-TOOL-aBatchedArm-1-2-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-14T14:28:38Z dispatch · item 4792ad4c TOOL-aBatchedArm-1 · reason tools/unattended/check-unattended.test.sh memory/builds/aBatchedArm/spec/2026-09-10-spec-TOOL-aBatchedArm-1.md memory/builds/aBatchedArm/build/2026-09-14-build-TOOL-aBatchedArm-1-2-acceptance-ledger.md memory/builds/aBatchedArm/build/2026-09-14-build-TOOL-aBatchedArm-1-1-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-14T14:33:04Z brief · item TOOL-aBatchedArm-2 · reason 13c75edc8465 memory/builds/aBatchedArm/prompts/2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md
