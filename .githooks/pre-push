@@ -62,9 +62,12 @@ fi
 # A LINE RECORDS AN ATTEMPT, never a landing. Git fires this hook for a `--dry-run` and for a push the
 # remote later rejects, and whether anything landed is git's answer. A `--no-verify` push runs no hook.
 #
-# THE URL IS NEVER WRITTEN, because it can carry credentials. `remote=<name>` is written only when git
-# passed a name, which it shows by making $1 differ from $2; a push to a bare URL passes the URL as
-# both and writes `remote_unnamed=1`. Either way `url_userinfo=1` records a `user@` part in the URL.
+# THE URL IS NEVER WRITTEN, because it can carry credentials, and nor is any value that can hold one.
+# `remote=<name>` is written only when $1 has a remote name's shape AND differs from $2. A push to a
+# bare URL passes the URL as both, and under an `insteadOf` or `pushInsteadOf` rewrite of a URL typed
+# on the command line git passes the TYPED URL as $1 and the rewritten one as $2, so a difference
+# alone proves nothing. Anything else writes `remote_unnamed=1`, and `url_userinfo=1` records a `user@`
+# part in either argument.
 #
 # EVIDENCE, NEVER AN INPUT. Nothing below branches on a line, and no gating decision, refusal or
 # signal behaviour moved. A failed append prints ONE `pre-push: run log` line on stderr and changes
@@ -137,19 +140,33 @@ resolve_push_dirs() { # work tree -> sets RUNLOG_GITDIR and RUNLOG_DIR; rc 1 whe
 }
 
 # S3's fields, rendered ONCE for both lines that carry them, so the refusal line cannot carry a weaker
-# guard than START. The URL never leaves this function; only two facts about it do. Its authority is
-# the part after `://` up to the next `/`, or for scp-like `user@host:path` the part before the colon;
-# a plain path, a drive-letter one included, has neither and so holds no userinfo.
+# guard than START. The URL never leaves this function; only two facts about it do.
+#
+# A NAME HOLDS NONE OF `/`, `\`, `:` OR `@`, and every URL form git takes holds one of them, the
+# scp-like `user@host:path` and a drive-letter path included, save a bare directory name in the
+# current directory. The shape test is what keeps a typed URL out: under an `insteadOf` rewrite $1 is
+# that URL and differs from $2, which the first cut read as a name and wrote whole, userinfo and all
+# (L1 of the closing diff review, round 1). The difference test stays for that bare directory name,
+# which git passes as both. Builtin tests only, so the hook's exec count does not move.
+#
+# USERINFO IS READ OFF BOTH ARGUMENTS, since the rewrite that puts a typed URL in $1 leaves $2 a plain
+# path. An authority is the part after `://` up to the next `/`, or for scp-like `user@host:path` the
+# part before the colon; a plain path, a drive-letter one included, has neither and holds no userinfo.
 render_push_remote() { # remote name · url -> sets RUNLOG_REMOTE to its key/value pairs
-  local a="" u="${2-}"
+  local a="" u n="${1-}"
   RUNLOG_REMOTE=()
-  if [ -n "${1-}" ] && [ "${1-}" != "$u" ]; then RUNLOG_REMOTE+=(remote "$1")
-  else RUNLOG_REMOTE+=(remote_unnamed 1); fi
-  case "$u" in
-    *://*) a=${u#*://}; a=${a%%/*} ;;
-    *:*)   a=${u%%:*}; case "$a" in */*) a="" ;; esac ;;
+  case "$n" in
+    ""|*[/\\:@]*) RUNLOG_REMOTE+=(remote_unnamed 1) ;;
+    *) if [ "$n" != "${2-}" ]; then RUNLOG_REMOTE+=(remote "$n"); else RUNLOG_REMOTE+=(remote_unnamed 1); fi ;;
   esac
-  case "$a" in *@*) RUNLOG_REMOTE+=(url_userinfo 1) ;; esac
+  for u in "$n" "${2-}"; do
+    a=""
+    case "$u" in
+      *://*) a=${u#*://}; a=${a%%/*} ;;
+      *:*)   a=${u%%:*}; case "$a" in */*) a="" ;; esac ;;
+    esac
+    case "$a" in *@*) RUNLOG_REMOTE+=(url_userinfo 1); break ;; esac
+  done
   return 0
 }
 

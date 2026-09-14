@@ -9,7 +9,9 @@ OBSERVED except AC8's verdict half, which is written as owed. `<suite>` is
 Its three full runs at the build commit printed `PASS (226 assertions)` in 32 to 39 s, and its run
 after the fold printed `PASS (228 assertions)` against a floor of 228, in 33 s. No gate leg was run,
 per the owner's instruction of 2026-09-13, and no suite that existed under `tools/unattended/` before
-this build ran.
+this build ran. The closing diff review's round-1 fold of L1 bumped the spec to rev-6 and widened
+AC2, whose line below records what that fold observed; its full run printed `PASS (240 assertions)`
+against a floor of 240, in 28 s.
 
 ## The criteria
 
@@ -29,7 +31,12 @@ this build ran.
   a refusal before the loop to that URL wrote an `ev=once` line with `remote_unnamed=1`,
   `url_userinfo=1` and `lander=0`. `grep -c pass` over the whole journal read 0 after every arm. RED
   seen with the URL added to the named fields, with `remote` written whenever `$1` is set, and with
-  the once line writing `$1` itself instead of calling the shared renderer.
+  the once line writing `$1` itself instead of calling the shared renderer. The fold of L1 added a
+  typed `https://user:pass@` URL that an `insteadOf` rule rewrites to the origin's own path, pushed
+  and then refused before the loop. Both wrote `remote_unnamed=1` and `url_userinfo=1` with no
+  `remote`, and no line of either held `://` or `@`. RED seen with `remote` written on the
+  difference from `$2` alone, which wrote the typed URL whole and put `pass` on two lines, and with
+  userinfo read off `$2` alone. AC7's exec counts read 3 and 10, as before the fold.
 - AC3 — `kill -TERM` (`check_ac3_term`) read `exit=unclean` — sent to the hook only after the stub
   bar wrote its ready file and was checked alive, TERM ended the hook while the stub was still
   running. END kept `decision=full` and named the bar's `gate_run`. RED seen with

@@ -20,8 +20,8 @@
 # ONE ARM PER ACCEPTANCE CRITERION of the unit's spec, named by it:
 #   AC1   a feature push, a marked green default-branch push and an unmarked one: three START and END
 #         pairs with their decisions, rc, lander and refs; a refusal before the loop writes one line
-#   AC2   a credentialed URL through a named remote, bare, and refused before the loop: the remote
-#         fields S3 names, and no password on any line
+#   AC2   a credentialed URL through a named remote, bare, typed and rewritten by `insteadOf`, and
+#         refused before the loop: the remote fields S3 names, and no password on any line
 #   AC3   TERM while the bar runs ends the hook with exit=unclean while the bar is still running
 #   AC4   a stub bar sees GATE_RUN_ID equal to END's gate_run; a real runner copy writes run= that id,
 #         and a leg of that bar sees no GATE_RUN_ID at all
@@ -48,7 +48,7 @@ SRC="$(cd "$HERE/.." && pwd)"
 # Where this repository keeps its kits, the hook's own default. The suite never ships, so only gov's
 # layout and a caller's override are ever asked for.
 KIT_REL="${KIT_REL:-tools}"
-FLOOR_ASSERTIONS=228
+FLOOR_ASSERTIONS=240
 n=0; st=0
 SEEN=" "; WRITER_FNS=""
 
@@ -344,6 +344,41 @@ EOF
   check "AC2 refused: the userinfo is flagged" "$(read_field $l url_userinfo)" 1
   check "AC2 refused: lander is written" "$(read_field $l lander)" 0
   check "AC2 refused: no remote field" "$(read_field $l remote)" "<absent>"
+  # A TYPED URL THROUGH A REWRITE, L1 of the closing diff review, round 1. Under `url.<base>.insteadOf`
+  # git hands the hook the URL as TYPED in $1 and the rewritten one in $2, so $1 differs from $2 and is
+  # still no name. The rule rewrites a credentialed URL to the origin's own, so the push is a real one
+  # that reaches the remote, and $2 holds no userinfo for a guard reading $2 alone to find.
+  local base typed
+  base=$(git config --get remote.origin.url)
+  typed="https://user:pass@rewrite.invalid/typed.git"
+  git config "url.$base.insteadOf" "$typed"
+  git checkout -q -b cred-c main && git commit -q --allow-empty -m cc
+  l0=$(measure_lines)
+  run_push -- "$typed" cred-c
+  check "AC2 rewritten: the typed credentialed URL reaches the remote through insteadOf" "$PUSH_RC" 0
+  l=$((l0 + 1))
+  check "AC2 rewritten: a START and an END" "$(( $(measure_lines) - l0 ))" 2
+  check "AC2 rewritten: no remote field, since \$1 is the typed URL" "$(read_field $l remote)" "<absent>"
+  check "AC2 rewritten: remote_unnamed" "$(read_field $l remote_unnamed)" 1
+  check "AC2 rewritten: the typed URL's userinfo is flagged, though \$2 holds none" \
+    "$(read_field $l url_userinfo)" 1
+  check "AC2 rewritten: neither line of the pair holds :// or @" \
+    "$(sed -n "${l},$((l + 1))p" "$JOURNAL" | grep -c -e '://' -e '@')" 0
+  # ...and refused before the loop through the same rewrite, which is the once line's writer.
+  git checkout -q main && git commit -q --allow-empty -m c4
+  l0=$(measure_lines)
+  run_push GOV_DEFAULT_BRANCH=nosuchthing -- "$typed" main
+  check "AC2 rewritten and refused: a misconfigured default refuses before the loop" "$PUSH_RC" 1
+  l=$(measure_lines)
+  check "AC2 rewritten and refused: one line" "$((l - l0))" 1
+  check "AC2 rewritten and refused: it is the once line" "$(read_field $l ev)|$(read_field $l decision)" \
+    "once|refuse-default-branch"
+  check "AC2 rewritten and refused: remote_unnamed, and no remote field" \
+    "$(read_field $l remote_unnamed)|$(read_field $l remote)" "1|<absent>"
+  check "AC2 rewritten and refused: the userinfo is flagged" "$(read_field $l url_userinfo)" 1
+  check "AC2 rewritten and refused: the line holds neither :// nor @" \
+    "$(sed -n "${l}p" "$JOURNAL" | grep -c -e '://' -e '@')" 0
+  git config --unset "url.$base.insteadOf"
   check_journal AC2
 }
 
