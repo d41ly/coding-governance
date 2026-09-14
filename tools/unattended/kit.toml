@@ -29,7 +29,7 @@ role = "engine"
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-arms-groups.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "unattended.test.sh"]
 role = "project-owned"
 
 [[files]]
@@ -178,6 +178,17 @@ subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
 guard = []
 red_after_land = true
+
+# the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
+# bar like every `subject = kit` row, and the one self-test this kit declares as a leg: its subject
+# is the linter, a static seconds-long scan, and the ruling above withheld suites that RUN a checker.
+# The test file is project-owned (the include list above), so `silenced_legs` reports this leg to an
+# adopter rather than shipping it; the linter itself ships as engine.
+[[gate_leg]]
+name = "unattended arms-groups selftest"
+subject = "kit"
+argv = ["bash", "{kit}/check-arms-groups.test.sh"]
+guard = ["{kit}/"]
 
 [[hole]]
 id = "keepalive-tool-names"

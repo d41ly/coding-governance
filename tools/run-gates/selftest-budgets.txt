@@ -100,6 +100,7 @@ template size gate selftest	290		worst of 11 readings 190s, x1.5
 testsuite counts self-test	170		worst of 11 readings 109s, x1.5
 tier2-review self-test	60		worst of 8 readings 8s, x1.5
 unattended adopter e2e	60	bash tools/unattended/adopt-unattended.test.sh	measured 38s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended arms-groups selftest	60		measured 11s wall (2s user) on node a 2026-09-14, direct run in the branch worktree while another session held the box; x1.5 is 17s, floored at 60
 unattended brief-recorded selftest	600	bash tools/unattended/check-brief-recorded.test.sh	measured 115s IDLE and 177s under load on node a 2026-09-05, carried from run-unattended-gates.sh BUDGET_brief_recorded_selftest at the merge that delegated it, x1.5
 unattended cross-component	510	bash tools/unattended/cross-component.test.sh	measured 339s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
 unattended driver selftest	3860	bash tools/unattended/unattended.test.sh	measured 2569s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5

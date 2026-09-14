@@ -1,11 +1,12 @@
 # TOOL-aBatchedArm-2 — the structural group linter over the batched self-test
 
-**Status:** OPEN · rev-3 · 2026-09-14 · node a · Tier-2 · base e8da0a54 · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-2 · base e8da0a54 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aBatchedArm-2-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md) | spec-audit | TOOL-aBatchedArm-1 |
 

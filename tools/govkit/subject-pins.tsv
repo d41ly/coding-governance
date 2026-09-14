@@ -107,6 +107,7 @@ template size gate selftest	kit	selftests
 testsuite counts (every bar self-test prints one)	repo	declarations
 testsuite counts self-test	kit	selftests
 tier2-review self-test	kit	selftests
+unattended arms-groups selftest	kit	selftests
 unattended kit gate	repo	declarations
 unattended skill wiring	repo	wiring
 verdict epoch (kit version dates the engine)	repo	declarations
