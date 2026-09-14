@@ -26,7 +26,7 @@ tools/check-placeholders.sh	2	(loose)
 tools/check-placeholders.test.sh	1	(loose)
 tools/check-testsuite-counts.sh	5	(loose),lib	the counts gate names the harness a suite may source, `tools/lib/lib-selftest.sh`, because the second accepted spelling is defined by that path. TOOL-aQuenchedHarness-6.
 tools/check-testsuite-counts.test.sh	3	(loose),lib	its arms build fixtures that source the harness by path, which is what the new spelling requires them to grade. TOOL-aQuenchedHarness-6.
-tools/check-wiring.sh	5	(loose),lib
+tools/check-wiring.sh	3	(loose),lib
 tools/check-wiring.test.sh	11	(loose),lib,memory-tree
 tools/codebase-map/adopt-codebase-map.sh	3	lib
 tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map,lib

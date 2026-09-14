@@ -3293,6 +3293,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_command",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
+    },
+    {
       "id": "render_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
@@ -4061,6 +4066,11 @@
       "id": "selfcheck",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "set_group",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "settings_merge_src",

@@ -56,17 +56,32 @@ run_against() {
   cp "$ADOPT" "$repo/tools/process-monitor/"
   [ "$conf_body" = "__ABSENT__" ] || printf '%s\n' "$conf_body" > "$repo/.process-monitor.conf"
   # A COMPLETE adoption, because --check now refuses an unwired hook: a fixture that omitted the
-  # settings entry would pin the permissive exit the closing review flagged.
+  # settings entry would pin the permissive exit the closing review flagged. BOTH events since
+  # TOOL-aReplayedCard-2: the count is per event, and a PostToolUse-only file is the half-wired
+  # state the adopter must refuse.
   mkdir -p "$repo/.claude"
-  printf '%s\n' '{"hooks":{"PostToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node procmon-hook.js"}]}]}}' > "$repo/.claude/settings.json"
+  printf '%s\n' "${SETTINGS_BODY:-$SETTINGS_BOTH}" > "$repo/.claude/settings.json"
   ( cd "$repo" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >"$WORK/out" 2>&1
   echo $?
 }
+SETTINGS_BOTH='{"hooks":{"PostToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node procmon-hook.js"}]}],"SessionStart":[{"matcher":"startup|resume|clear","hooks":[{"type":"command","command":"node procmon-hook.js"}]}]}}'
+SETTINGS_POST_ONLY='{"hooks":{"PostToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node procmon-hook.js"}]}]}}'
 
 echo "adopt-process-monitor: refusals"
 
 # --- the happy path, so every refusal below is a CONTRAST and not the only thing observed
 check_equal "test_valid_conf_is_accepted" "$(run_against "$(build_base_conf)")" 0
+
+# --- TOOL-aReplayedCard-2: the wiring count is PER EVENT. A file wired on PostToolUse alone — the
+# state every tree adopted before the SessionStart fragment existed — is refused naming the event
+# and the fragment that wires it, not counted as "2 entries" and passed.
+check_equal "test_post_only_wiring_refuses" \
+    "$(SETTINGS_BODY="$SETTINGS_POST_ONLY" run_against "$(build_base_conf)")" 1
+grep -q "SessionStart (--fragment $KIT_REL/procmon-session.fragment.json)" "$WORK/out" \
+  && add_pass "test_post_only_wiring_names_the_missing_event_and_fragment" \
+  || add_fail "test_post_only_wiring_names_the_missing_event_and_fragment ($(grep -m1 'NOT WIRED' "$WORK/out"))"
+grep -q "hook entries PostToolUse 1, SessionStart 1" "$WORK/out" \
+  && add_fail "test_post_only_wiring_does_not_print_ok" || add_pass "test_post_only_wiring_does_not_print_ok"
 
 # --- AC2: a blank roots list is a refusal, not an empty set
 check_equal "test_blank_roots_refuses" \

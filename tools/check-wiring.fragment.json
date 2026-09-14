@@ -1,0 +1,9 @@
+{
+  "name": "check-wiring",
+  "event": "SessionStart",
+  "matcher": "startup|resume|clear",
+  "marker": "check-wiring.sh",
+  "hook_path": "{here}/check-wiring.sh",
+  "interpreter": "bash",
+  "args": ["--session"]
+}

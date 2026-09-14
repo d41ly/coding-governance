@@ -154,9 +154,12 @@ builds a payload and feeds each committed harness through `tools/hooks/agent-cap
 two entry points. A bash re-implementation of a node predicate would not disagree loudly — it would
 drift the day either side is tightened.
 
-`tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path) and
+`tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
+optional interpreter and args `TOOL-aReplayedCard-2` added for the bash-scripted card verb) and
 `tools/check-wiring.sh` joins on it, asserting the matcher VALUE rather than merely that the file
-mentions `agent-cap.js`.
+mentions `agent-cap.js`. The merger re-matches an entry it finds under the wrong matcher, and both
+readers expand a fragment's `{kit}` or `{here}` token identically — `check-hook-destinations.sh`
+asks each through `--resolve-fragment` and refuses when they disagree.
 
 `tools/workflows/check-protocol-parity.test.sh` keeps the shipped
 `tools/workflows/REVIEW-PROTOCOL.template.md` equal to the live `memory/guides/REVIEW-PROTOCOL.md`

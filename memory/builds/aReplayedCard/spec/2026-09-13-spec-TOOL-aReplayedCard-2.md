@@ -1,13 +1,15 @@
 # TOOL-aReplayedCard-2 — SessionStart matchers, two card fragments, a rematching merge, a wiring arm
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-build-TOOL-aReplayedCard-2-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aReplayedCard-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-prompt-TOOL-aReplayedCard-2-brief.md](../prompts/2026-09-14-prompt-TOOL-aReplayedCard-2-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
@@ -57,7 +59,9 @@ SessionStart matcher that never fires looks exactly like one that is wired.
   sibling of that kit's PostToolUse fragment with `hook_path: {kit}/process-monitor/procmon-hook.js`,
   marker `procmon-hook.js` — the second fragment aReapedSpinner's closing review R8 asked for and
   the fold there left unbuilt. `tools/process-monitor/adopt-process-monitor.sh`'s remediation line
-  names both fragments and its wiring count is per event. Observed by AC4.
+  names both fragments and its wiring count is per event: `--check` DECIDES per event, refusing a
+  file wired on one event alone and naming the fragment for the missing one, and its own
+  self-test's fixture carries both events, with a post-only arm that must refuse. Observed by AC4.
 - **S5** A `{here}` token, resolved by all three fragment readers — `settings-merge.py`,
   `check-wiring.sh` and `check-hook-destinations.sh` — as the fragment's OWN directory, beside the
   `{kit}` token each already resolves two directories up. The destinations leg checks a `{here}`
@@ -69,11 +73,14 @@ SessionStart matcher that never fires looks exactly like one that is wired.
   copies at its lines 403 and 466 — and gains a `--resolve-fragment <path>` print verb, twinned on
   `settings-merge.py`, and the parity arm compares those two verbs' output over every tracked
   fragment, so it reads the value the arms decide on rather than a third derivation beside them.
-  Observed by AC5 and AC6.
+  `{here}` resolves ONLY against a fragment file: with none there is no "here", and both readers
+  refuse rather than guess a prefix. Observed by AC5 and AC6.
 - **S6** A `card` arm in `tools/check-wiring.sh` on the recall arm's pattern: fragment absent →
   `skip`; fragment present and either SessionStart entry absent, or present under a matcher that
   is not the fragment's → `UNWIRED` naming the entry and the matcher it expected; both present →
-  `ok`. `matchers_of` at its line 157 gains `-e` before the marker, because a dash-leading marker
+  `ok`. The two engine-absent states the scratch arm has apply too: engine missing and unwired →
+  `skip` (not adopted); engine missing and wired → `UNWIRED` (dispatches a missing script).
+  `matchers_of` at its line 157 gains `-e` before the marker, because a dash-leading marker
   is otherwise parsed by `grep -F` as an option and every card check would print `UNWIRED`
   forever. Observed by AC7.
 - **S7** The descriptors claim the new files so adopters receive them and `govkit selfcheck` stays
@@ -140,7 +147,10 @@ there too.
 | `render_command` | python function | `settings-merge.py` | leads with `render`, replaces `_command` |
 | `set_group` | python function | `settings-merge.py` | leads with `set`, the re-match step if extracted |
 | `resolve_fragment_hook` | shell function | `check-wiring.sh` | leads with `resolve`, the one token resolver its three arms share |
+| `check_card` | shell function | `check-wiring.sh` | leads with `check`, like every arm |
 | `--resolve-fragment` | print verb | `check-wiring.sh` and `settings-merge.py` | the parity arm's two inputs |
+| `measure_hook_entries` | shell function | `adopt-process-monitor.sh` | leads with `measure`: counts one event's entries, decides nothing |
+| `resolve_bash` | python function | `settings-merge.py` self-test | leads with `resolve`; the bash that shares this filesystem, RUN to prove it |
 
 ### Migration
 
@@ -165,12 +175,16 @@ Live at the commit. The first SessionStart after it writes the card; the first c
 | `tools/check-wiring.sh` | `resolve_fragment_hook` replacing two inline resolvers; `{here}`; `--resolve-fragment`; `matchers_of -e`; the `card` arm |
 | `tools/check-wiring.test.sh` | arms for S6 |
 | `tools/check-hook-destinations.sh` | `{here}` resolution with the flat-kit adopter rule; the parity arm through the two print verbs; header |
+| `tools/check-hook-destinations.test.sh` | arms 6–8 for AC6 and the parity refusal |
 | `tools/govkit/entries/kickoff-manifest.kit.toml` | the fragments' shipping rule |
 | `tools/govkit/entries/check-wiring.kit.toml` | the fragment in the include list and the rule's `claims` |
 | `tools/process-monitor/adopt-process-monitor.sh` | the remediation line names both fragments; the wiring count is per event |
+| `tools/process-monitor/adopt-process-monitor.test.sh` | the fixture carries both events; a post-only arm refuses |
 | `.claude/settings.json` | four matchers, two new entries, produced by the merger |
 | `WIRE-INTO-PROJECT.md` | lines 610–612 replaced by the fragment step |
 | `tools/hooks/README.md` | the fragment schema's two new keys beside the deny section |
+| `memory/map/features/agent-cap.md` | the dossier's fragment paragraph, refreshed on touch |
+| `tools/install-prefix-waivers.txt`, `tools/install-prefix-carried.txt` | line-keyed waivers re-keyed; the carried count lowered where a remedy path was hoisted |
 
 ### Alternatives rejected
 
@@ -192,8 +206,10 @@ literal the adopter must edit. The manifest is the project layer.
 
 ## 5. Production-readiness checklist
 
-- security — N/A. Settings edits through the existing merger; `args` are rendered as separate
-  quoted tokens, never joined into a shell string.
+- security — settings edits through the existing merger. `args` render as UNQUOTED tokens (S2), so
+  the loader admits each one only from a closed character class — no whitespace, quote or shell
+  metacharacter — and `interpreter` only from the closed pair, because both land inside a command
+  Claude Code runs. Refused by name, never defaulted over.
 - perf / scale — two fewer hook runs per compaction; the card run replaces neither.
 - error / empty / loading states — a fragment missing a required field is refused by the merger and
   reported UNWIRED by the arm, as today for scratch-guard; an `interpreter` outside the pair is
@@ -305,6 +321,17 @@ none
   descriptor homes the directory" against the whole set, one shared resolver and two print verbs
   feed the parity arm (M11); the check-wiring rule's `claims` gain the fragment (L5); the runbook's
   by-hand instruction is replaced, not appended to (L6).
+- rev-4 · 2026-09-14 · §2 · §4 · §5 · S2 · S4 · S5 · S6 · changed BEFORE the code where the build
+  had to diverge. §5's security line said `args` render as QUOTED tokens while S2 and AC1 say
+  unquoted; S2 wins, and the loader's closed character class for `args` and closed pair for
+  `interpreter` are now stated as the control that makes unquoted safe. S4 states that the
+  adopter's per-event count DECIDES (a post-only file is refused naming the missing fragment), so
+  its self-test's fixture carries both events. S5 states that `{here}` with no fragment file
+  refuses. S6 gains the two engine-absent states the scratch arm has. §4's files table gains the
+  two self-tests, the dossier and the two install-prefix registries; the inventory gains
+  `check_card`, `measure_hook_entries` and the self-test's `resolve_bash` (the merger's arm 17 runs
+  the checker's real `matchers_of` under bash, and the bare name resolves to the WSL launcher on a
+  Windows python — the gotcha class `subprocess-resolves-a-different-shell`).
 
 ## 10. Reuse audit
 

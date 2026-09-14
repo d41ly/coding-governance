@@ -45,6 +45,22 @@ Nothing deletes an adopter's second copy. `govkit update --write-withdrawals` do
 and `check-wiring.sh` REPORTS a legacy copy rather than redding so that a half-migrated tree is told
 rather than blocked.
 
+**The fragment schema.** Five keys are required — `name`, `event`, `matcher`, `marker`,
+`hook_path` — and two are optional, added by `TOOL-aReplayedCard-2`: `interpreter` (`node` or
+`bash`, default `node`; a closed pair, because it is the first word of a command Claude Code runs)
+and `args` (a list of tokens, default empty, rendered UNQUOTED after the quoted path and held to a
+closed character class for that reason). A fragment carrying neither renders exactly as before. The
+`hook_path` names its script through one of two tokens: `{kit}`, two directories up from the
+fragment, for a kit that ships its directory; and `{here}`, the fragment's own directory, for a
+`kind = "flat"` kit whose engine and fragments ship side by side at `{prefix}/`. Both readers and
+the hook-destinations gate expand them identically, and the gate refuses when they do not. The
+`marker` must be a substring of the rendered command under the merger's plain view AND under
+`check-wiring.sh`'s whitespace-stripped view — space-free, therefore — and it may lead with a dash:
+the card fragments use `--write` and `--replay`. A SessionStart fragment ALWAYS declares a matcher
+from `startup|resume|clear|compact`; the merger re-matches an entry it finds under the wrong one,
+and `check-wiring.sh` reds on an entry under a matcher that is not the fragment's, because a
+SessionStart hook that never fires looks exactly like one that is wired.
+
 ## What the hook DENIES, and how to satisfy it
 
 - A raw `parallel(` / `pipeline(` primitive. Route through a bounded helper instead —

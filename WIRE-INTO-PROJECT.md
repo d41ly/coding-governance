@@ -614,10 +614,25 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   coding-governance tools installed-but-unwired — chiefly `core.hooksPath` not resolving to `.githooks`,
   which leaves every pre-commit gate (incl. the branch guard) dormant on a fresh clone — and prints the
   fix. `--fix` wires the zero-risk hooks case; `--session` does the same but always exits 0.
-- Add a SessionStart hook to `.claude/settings.json` running
-  `bash "${CLAUDE_PROJECT_DIR}/tools/check-wiring.sh" --session` (`settings-merge.py` handles only the
-  agent-cap block — add SessionStart by hand). It auto-sets an unset `core.hooksPath` and NEVER
-  overwrites a deliberate value (e.g. the out-of-tree copy above), so a fresh clone self-heals.
+- Wire the SessionStart hooks through the merger, never by hand — each is a fragment beside the
+  script it runs, and every one carries a MATCHER, because an entry without one runs on every
+  compaction (measured 35–81 s per compaction for the wiring check alone):
+
+  ```bash
+  python "$KIT/settings-merge.py" --fragment "$KIT/check-wiring.fragment.json"          # startup|resume|clear
+  python "$KIT/settings-merge.py" --fragment "$KIT/process-monitor/procmon-session.fragment.json"   # same, if adopted
+  python "$KIT/settings-merge.py" --fragment "$KIT/orientation-card.fragment.json"      # startup|clear — writes the card
+  python "$KIT/settings-merge.py" --fragment "$KIT/orientation-replay.fragment.json"    # resume|compact — replays it
+  bash "$KIT/check-wiring.sh" --check                                                   # `ok card`, or which half is missing
+  ```
+
+  The merger RE-MATCHES: an entry already in the file under no matcher, or under a different one,
+  is moved under the fragment's matcher rather than duplicated, so a tree wired by hand before this
+  step migrates by running the same four commands. `check-wiring.sh --session` auto-sets an unset
+  `core.hooksPath` and NEVER overwrites a deliberate value (e.g. the out-of-tree copy above), so a
+  fresh clone self-heals. The two `orientation-*` fragments ship with the kickoff-manifest kit
+  (beside `manifest-check.sh`), and the card they write is what `scratch-guard.js` reads before it
+  lets a `git commit` through — read that deny's ceiling in the hooks README before relying on it.
 - Add `bash tools/check-wiring.test.sh` as a gate-runner leg. Do NOT run `check-wiring.sh --check` itself
   as a merge-bar leg — it would false-fail in CI, where `core.hooksPath` is correctly never set.
 - **Land the default branch via `tools/push-main.sh`** (TOOL-aLeasedGauntlet-1): it fetch-reconciles

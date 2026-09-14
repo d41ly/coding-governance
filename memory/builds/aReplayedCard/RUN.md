@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e4325047aab4b25f0f4b7da4f610c13e62569923
+witness: 72ff919ef6fda873f8ee3ae425d0683183c3988b
 phase: BUILDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
@@ -80,3 +80,9 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-14T04:19:54Z dispatch · item e4325047 TOOL-aReplayedCard-1 · reason memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md
 
 2026-09-14T05:19:34Z dispatch · item e4325047 TOOL-aReplayedCard-1 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-14T05:36:41Z dispatch · item 72ff919e TOOL-aReplayedCard-2 · reason skills/session-kickoff/orientation-card.fragment.json skills/session-kickoff/orientation-replay.fragment.json tools/check-wiring.fragment.json tools/process-monitor/procmon-session.fragment.json tools/settings-merge.py tools/check-wiring.sh tools/check-wiring.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/govkit/entries/kickoff-manifest.kit.toml tools/govkit/entries/check-wiring.kit.toml tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/adopt-process-monitor.test.sh .claude/settings.json WIRE-INTO-PROJECT.md tools/hooks/README.md tools/install-prefix-waivers.txt tools/install-prefix-carried.txt memory/map/features/agent-cap.md memory/map/generated memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-2.md memory/builds/aReplayedCard/build/2026-09-14-build-TOOL-aReplayedCard-2-1-acceptance-ledger.md memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-2-brief.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger
+
+2026-09-14T05:36:46Z brief · item TOOL-aReplayedCard-2 · reason 55e80724035f memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-2-brief.md
+
+2026-09-14T06:26:48Z dispatch · item 72ff919e TOOL-aReplayedCard-2 · reason .lexicon.conf
