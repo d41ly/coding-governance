@@ -45,6 +45,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [inline-fence-swallows-the-rest-of-the-file](inline-fence-swallows-the-rest-of-the-file.md) | class | 1 | yes | a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view |
 | [inline-marker-breaks-a-line-continuation](inline-marker-breaks-a-line-continuation.md) | class | 5 |  | appending a per-line annotation to the lines a gate selected breaks any of them that ended in a backslash, and the result is valid shell that silently drops the rest of the command |
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 2 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
+| [join-key-widened-by-a-shared-location](join-key-widened-by-a-shared-location.md) | class | 2 |  | a join keyed on WHERE something happened takes every place the subject ever touched, and one of those places is shared by every subject, so the key admits everyone's lines |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 5 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
 | [nt-against-a-missing-file-is-true](nt-against-a-missing-file-is-true.md) | class | 2 |  | a -nt b is TRUE when b does not exist, so a has-it-changed test against a stamp nobody wrote yet reports a change on the very first call |
@@ -72,6 +73,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 | [withheld-value-recovered-from-a-derived-one](withheld-value-recovered-from-a-derived-one.md) | class | 2 |  | a schema withholds a value by name and still publishes one derived from it, so a reader recovers the withheld value from the rendered one by arithmetic |
 
-57 record(s): 57 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+58 record(s): 58 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

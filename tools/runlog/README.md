@@ -198,11 +198,20 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
 - **A window is half-open, bounded to the run's era.** It opens at the run's own preflight START,
   joined to its start commit by a named key, or at the start commit when there is none. It closes at
   the END that moved the phase into a terminal one, else at the first terminal write in the era, else
-  one second after the later of the last journal line and the last record commit.
+  one second past the run's last event: its last journal line, record commit or own commit, or the
+  last bar or push made from a tree it holds. A transcript event does not move that end, since the
+  session keeps working after the run and renders the record itself. Nor does a merge naming only the
+  slug, or a push joined only by what it pushed.
 - **A run's own commits** are the era's commits that descend from its start and name one of its unit
-  ids in the subject. A push joins from the run's worktree, or by pushing the default branch to a
+  ids in the subject. A push joins from a tree the run holds, or by pushing the default branch to a
   descendant of the run's last own commit, which is how the landing push from the primary tree joins.
-  A gate line joins through the `gate_run` a joined push pinned, or from the run's worktree.
+  A gate line joins through the `gate_run` a joined push pinned, or from a tree the run holds.
+- **A run holds a tree from its first call there that claims it.** A preflight claims its tree, and
+  so does any other verb its START read before the close, except `--status`, `--resume` and
+  `--landed`. Those three can run from any tree, the primary tree included, and every run lands
+  from the primary tree. The hold ends at another run's first claim there after the run's last one,
+  since a worktree outlives its run and is reused. So neither an owner's `--status` nor the run's own
+  `--landed` makes another run's bar in the primary tree this run's.
 - **Every inferred answer is named** in the model's `method` field.
 - **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
   10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
@@ -367,7 +376,11 @@ prefix and root, and hold the render to an independent one.
   The render's own check stops only a time in the turn's own second.
 - **A run whose record never reached HEAD's history.** The run starts are read from HEAD, so a run on
   a branch this tree has not merged is invisible from here.
-- **Who ran a bar at the same minute.** A gate line with no pinned id joins by worktree alone.
+- **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in
+  alone. Two runs that claim one tree in the same stretch both hold it, so a bar there joins both.
+- **A tree the run worked in without claiming it.** A run whose only calls in a tree are
+  `--status`, `--resume` or `--landed`, or ones made after its close, holds no tree there, so a bar
+  it ran there joins only through a push that pinned it.
 - **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
   can be wrong and still be an integer.
 - **A line inserted before the committed first time.** `verify` hashes from that time on, so it

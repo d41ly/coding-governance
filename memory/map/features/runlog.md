@@ -19,7 +19,8 @@ skill-engines = []
 rendered-skills = ["runlog"]
 gotcha-classes = ["nt-against-a-missing-file-is-true.md",
   "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md",
-  "staged-break-runs-stale-bytecode.md", "withheld-value-recovered-from-a-derived-one.md"]
+  "staged-break-runs-stale-bytecode.md", "withheld-value-recovered-from-a-derived-one.md",
+  "join-key-widened-by-a-shared-location.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -93,8 +94,20 @@ commit gives an archive its successor's start; with renames off, the commits tha
 path are the starts, one per run. A window ends at the END that moved the phase INTO a terminal one,
 never at a mention of the slug, which later commits keep making. Its first cut took any END reading a
 terminal phase, and the arm modeling a real landed record against a journal dated after it saw that
-window end three days late, on a `--status` that read LANDED on both lines. Its git cost is constant
-and counted, because a model per run over a corpus of runs must not grow with a run's commits.
+window end three days late, on a `--status` that read LANDED on both lines. A non-terminal window
+ends one second past the run's last event over every source it owns, its own commits and the bars
+of the trees it holds included. The closing review's round 1 found it read only the driver and the
+record commits, which left this build's own later commits and both of its bars outside its window.
+Its git cost is constant and counted, because a model per run over a corpus of runs must not grow
+with a run's commits.
+
+**A tree joins a line to a run only while the run HOLDS it.** The first key was every tree any of
+the run's calls ran in. The run's `--landed` runs in the primary tree, and an owner's `--status` can
+too, so every run's bar and push there became this run's for its whole window. The closing review's
+round 1 confirmed it as a HIGH. A tree is now held from the run's first call there that claims it,
+which no `--status`, `--resume` or `--landed` does and no call after the close does. The hold ends at
+another run's first claim there, because a worktree outlives its run and gets reused. The class is
+claimed here as `join-key-widened-by-a-shared-location.md`.
 
 **The committed record admits a value only through a CLASS, because the repository is public.**
 `RECORD_SCHEMA` is data: shaped regexes and closed lists, the model's own lists by reference, with
@@ -115,8 +128,11 @@ spec defines is read through the model's `derive_spec_unit`, so the leg and the 
 the `label` class admits a lowercase UUID, so the absolute-path and UUID shapes became schema data the
 renderer withholds by and the leg refuses on. The leg also re-derives every run's start and window
 from git alone, reading the model's own `derive_record_commits` and `derive_window` rather than a
-copy. Staged against this tree, the naive key and the unbounded era each red every rotated build it
-tracks, the two defects the round-2 and round-3 audits named.
+copy. It hands `derive_window` its record commits and nothing else, so a non-terminal run's end in the
+leg is at or before the model's, which also reads the run's own commits and journals. No refusal of the
+leg reads that end, because a non-terminal run is always the last of its build. Staged against this
+tree, the naive key and the unbounded era each red every rotated build it tracks, the two defects the
+round-2 and round-3 audits named.
 
 **The Skill is rendered, and its CLI stays offline.** The owner asks questions and reads no timeline,
 so `TOOL-dLoggedFlight-12` ships instructions to the agent that holds them rather than a model call:
@@ -185,7 +201,8 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
 - **The run model infers, and says which answers are inferred.** The build commit, the owner's
   decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
   named in its `method` field. It reads only history reachable from HEAD. It judges idle gaps only
-  where every session's transcript is local, and keeps out any gap beside an owner turn.
+  where every session's transcript is local, and keeps out any gap beside an owner turn. Two runs
+  that claim one tree in the same stretch both hold it, so a bar made there joins both.
 - **No rendered time falls in an owner turn's second.** Owner turns are counts, and a gap endpoint
   derived from one is the same datum, so the renderer refuses a record whose text carries a time in
   an owner turn's second, an idle row's start plus its duration included. A public commit time that

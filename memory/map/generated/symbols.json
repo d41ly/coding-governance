@@ -613,6 +613,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_live_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_matchers",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1078,6 +1083,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_in_hold",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
+    },
+    {
       "id": "check_is_root",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -1236,6 +1246,11 @@
       "id": "check_token_under",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "check_tree_claim",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "check_true",
@@ -2021,6 +2036,11 @@
       "id": "derive_tool_class",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "derive_tree_holds",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "derive_unit_key",
@@ -3648,6 +3668,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "read_journal_linenos",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_journals",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -4229,6 +4254,11 @@
     },
     {
       "id": "render_push_lines",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_push_once",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -6059,6 +6089,16 @@
     },
     {
       "id": "test_model_ac1_ac16_rotation",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac20_tree_holds",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac21_nonterminal_end",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

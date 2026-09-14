@@ -84,7 +84,10 @@ from collections import Counter  # noqa: E402
 # with its git-only half inside AC10's arm; record AC9, the owner-time refusal; and the invariant arm
 # that sorts last and grades every model the arms built. Three new functions, so the decoy checks alone
 # move it by nine. Every idle fixture's session is made by the REAL extractor from a transcript.
-ASSERTION_FLOOR = 1130
+# RAISED 1130 -> 1153 by the same review's round-1 fold of H2 and M5: model AC20, the trees a run
+# holds, and AC21, a non-terminal end over every source the run owns. Two new functions, so the decoy
+# checks alone move it by six. The landed fixture now lands from the primary tree.
+ASSERTION_FLOOR = 1153
 
 PASS = []
 FAIL = []
@@ -1952,17 +1955,24 @@ def render_gate_line(m, run, head, verdict="GREEN", wt=FX_WT_RUN, rc=None):
 
 
 def render_push_lines(m, local_sha, lander="1", wt=FX_WT_PRIMARY, decision="full", gate_run=None, rc=0,
-                      remote_ref="refs/heads/main", pid=5151):
+                      remote_ref="refs/heads/main", pid=5151, local_ref="refs/heads/main"):
     t = MODEL_T0 + m * 60
     t0 = f"{t:.6f}"
     n = f"{pid}.{t0.replace('.', '')}"
     start = {"v": "1", "t": t0, "p": "pushes", "ev": "start", "n": n, "remote": "origin", "lander": lander,
-             "wt": wt, "ref.1": f"refs/heads/main {local_sha} {remote_ref} {'0' * 40}"}
+             "wt": wt, "ref.1": f"{local_ref} {local_sha} {remote_ref} {'0' * 40}"}
     end = {"v": "1", "t": f"{t + 0.5:.6f}", "p": "pushes", "ev": "end", "n": n, "rc": str(rc),
            "exit": "clean", "decision": decision}
     if gate_run:
         end["gate_run"] = gate_run
     return [start, end]
+
+
+def render_push_once(m, wt=FX_WT_PRIMARY, decision="refuse-default-branch"):
+    """The hook's `write_push_once`: one unpaired line for a default-branch refusal made before its ref
+    loop, in the writer's key order, with no lander marker since the lander never reaches it."""
+    return [{"v": "1", "t": f"{MODEL_T0 + m * 60:.6f}", "p": "pushes", "ev": "once", "decision": decision,
+             "remote": "origin", "lander": "0", "wt": wt}]
 
 
 def write_journals(base, driver=(), gates=(), pushes=()):
@@ -2033,7 +2043,8 @@ def build_session_events(acts, sid=FX_SID):
 def build_landed_fixture():
     """The CLEAN run: preflighted, dispatched and briefed, built on a branch, gated green at its head,
     closed, merged, pushed through the lander with the bar pinned, and landed. No event is more than
-    eight minutes from its neighbour, so nothing in it is an anomaly."""
+    eight minutes from its neighbour, so nothing in it is an anomaly. It lands the way
+    TOOL-dLoggedFlight-11 S6 lands: the merge, the push and `--landed` all in the primary tree."""
     rm = f"memory/builds/{FX_SLUG}/RUN.md"
     first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
     base = shas0[1]
@@ -2067,7 +2078,7 @@ def build_landed_fixture():
               + render_driver_lines(4, "--brief", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
               + render_driver_lines(6, "--phase", phase_from="RUNNING", phase_to="BUILDING")
               + render_driver_lines(21, "--close", phase_from="BUILDING", phase_to="LANDING")
-              + render_driver_lines(27, "--landed", phase_from="LANDING", phase_to="LANDED"))
+              + render_driver_lines(27, "--landed", phase_from="LANDING", phase_to="LANDED", wt=FX_WT_PRIMARY))
     gates = [render_gate_line(20, "20260913T101930Z-7001", head_at_close),
              render_gate_line(26, "push-1789295160000000-5151", merge, wt=FX_WT_PRIMARY)]
     pushes = render_push_lines(25, merge, gate_run="push-1789295160000000-5151")
@@ -3043,6 +3054,185 @@ def test_model_ac19_idle():
     check("model AC19: with no local transcript the same run yields no idle-gap, and says it was not judged",
           ([e for e in bare.timeline if e["kind"] == "idle"], bare.coverage["idle"]["judged"],
            bare.coverage["idle"]["near_owner"]), ([], False, None))
+
+
+def read_journal_linenos(journal_root, producer, needles):
+    """The 1-up line numbers of the producer file's lines holding any of `needles`, read by bytes, so the
+    expected side of a join assertion never comes from the model under test."""
+    lines = (pathlib.Path(journal_root) / rl.PRODUCER_FILES[producer]).read_bytes().split(b"\n")
+    return sorted(n for n, ln in enumerate(lines, 1) if any(x.encode() in ln for x in needles))
+
+
+def test_model_ac20_tree_holds():
+    """AC20: the trees a run holds (H2 of the closing review, round 1). The landed fixture's `--landed`
+    and an owner's `--status` run in the primary tree, and three lines another run made there inside
+    the window join nothing. Another build's preflight in the run's worktree ends the run's hold there,
+    and a second worktree the run first claims mid-window is held from that claim and not before."""
+    fx = build_landed_fixture()
+    pinned = "push-1789295160000000-5151"
+    # The run's calls in the primary tree, each of a kind that claims nothing, and each the first to
+    # claim it should its own rule go: a premature `--landed`, refused before the close; the owner's
+    # `--status` and `--resume`, from a plain terminal that names no session; a `--park` of the landing
+    # after the close; and the fixture's own `--landed`, at minute 27.
+    primary = (render_driver_lines(8, "--landed", rc=1, checks="34", phase_from="BUILDING", phase_to="BUILDING",
+                                   wt=FX_WT_PRIMARY)
+               + render_driver_lines(9, "--status", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
+                                     sid=None)
+               + render_driver_lines(13, "--resume", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
+                                     sid=None)
+               + render_driver_lines(24.5, "--park", phase_from="LANDING", phase_to="LANDING", wt=FX_WT_PRIMARY))
+    # The run moves to a second worktree and makes its first call there, a refused --phase.
+    moved = render_driver_lines(16, "--phase", rc=1, checks="19", phase_from="BUILDING", phase_to="BUILDING",
+                                wt=FX_WT_OTHER)
+    # Another build's run preflights in this run's worktree after this run's last call there, the --close.
+    reuse = render_driver_lines(23, "--preflight", slug=FX_OTHER, sid=FX_SID_B, phase_to="RUNNING")
+    foreign = {"primary": "20260913T101200Z-9001", "pre-claim": "20260913T101500Z-9003",
+               "reused": "20260913T102400Z-9002", "landing-time": "20260913T102530Z-9004"}
+    held = {"claimed": "20260913T101700Z-7004", "pre-reuse": "20260913T102230Z-7003"}
+    gates = fx["gates"] + [render_gate_line(12, foreign["primary"], "e" * 40, wt=FX_WT_PRIMARY),
+                           render_gate_line(15, foreign["pre-claim"], "e" * 40, wt=FX_WT_OTHER),
+                           render_gate_line(17, held["claimed"], fx["head_at_close"], wt=FX_WT_OTHER),
+                           render_gate_line(22.5, held["pre-reuse"], fx["head_at_close"]),
+                           render_gate_line(24, foreign["reused"], "e" * 40),
+                           render_gate_line(25.5, foreign["landing-time"], "e" * 40, wt=FX_WT_PRIMARY)]
+    raw = render_push_lines(10, "d" * 40, lander="0", wt=FX_WT_PRIMARY, decision="refuse-raw", rc=1, pid=7171)
+    j = write_journals(fx["repo"].parent, driver=fx["driver"] + primary + moved + reuse, gates=gates,
+                       pushes=fx["pushes"] + raw + render_push_once(11))
+    model = build_model(fx["repo"], journals=j)
+    check("model AC20: the run holds its own worktree and the one it moved to, never the primary tree",
+          model.worktrees, sorted([FX_WT_OTHER, FX_WT_RUN]))
+    check("model AC20: of eight bars, the run's own three and the pinned one join, and none another run made",
+          sorted((e["run"], e["via"]) for e in model.timeline if e["kind"] == "gate"),
+          sorted([("20260913T101930Z-7001", "worktree"), (held["claimed"], "worktree"),
+                  (held["pre-reuse"], "worktree"), (pinned, "gate_run")]))
+    check("model AC20: the landing push still joins by what it pushed, and no refusal in the primary tree joins",
+          [(e["kind"], e.get("via"), e.get("gate_run")) for e in model.timeline if e["kind"].startswith("push")],
+          [("push", "pushed-sha", pinned)])
+    check("model AC20: ...so push-outside-lander does not fire, and the run stays clean", read_kinds(model), [])
+    out = {"gates": read_journal_linenos(j, "gates", [f"run={r}\t" for r in foreign.values()]),
+           "pushes": read_journal_linenos(j, "pushes", ["\tn=7171.", "\tev=once\t"])}
+    check("model AC20: journal_lines hold none of the foreign lines",
+          {p: sorted(set(ns) & set(model.journal_lines[p])) for p, ns in out.items()}, {"gates": [], "pushes": []})
+    check_true("model AC20 liveness: the byte search found every foreign line, and the held bars' lines joined",
+               len(out["gates"]) == 4 and len(out["pushes"]) == 3 and set(read_journal_linenos(
+                   j, "gates", [f"run={r}\t" for r in held.values()])) <= set(model.journal_lines["gates"]), str(out))
+    w = model.window
+    check_true("model AC20 liveness: every foreign line lies inside the window, so the hold keeps them out",
+               all(w["start"] <= MODEL_T0 + m * 60 < w["end"] for m in (10, 11, 12, 15, 24, 25.5)), str(w))
+    # LIVENESS through the key itself: with no verb blind, the owner's --status claims the primary tree
+    # the way rev-6's key took it, and the same foreign lines join and fire the anomaly.
+    keep = rl_model.TREE_BLIND_VERBS
+    rl_model.TREE_BLIND_VERBS = ()
+    try:
+        wide = build_model(fx["repo"], journals=j)
+    finally:
+        rl_model.TREE_BLIND_VERBS = keep
+    check("model AC20 liveness: keyed on the owner's --status, the primary tree's bar joins and "
+          "push-outside-lander fires", (foreign["primary"] in {e.get("run") for e in wide.timeline},
+                                        "push-outside-lander" in read_kinds(wide)), (True, True))
+
+
+def build_live_fixture():
+    """A run left BUILDING, its record on a branch, for the non-terminal end (spec S2, rev-7). Its last
+    driver line is the --phase at minute 6. Twenty minutes later it commits its unit's work, bars it in
+    its own worktree and pushes its branch from there, its session busy throughout. Then come a bar in
+    the primary tree, another build's preflight in the run's worktree and a bar there, a merge naming
+    only the slug, and one more tool call in the run's session: none of them an event of the run's own."""
+    def derive_time(m):
+        return float(MODEL_T0 + m * 60)
+
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = s0[1]
+    s1 = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
+    s2 = add_runstate_row(add_runstate_row(s1, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt"),
+                          derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
+    s3 = set_runstate_fact(set_runstate_fact(s2, "phase", "BUILDING"), "witness", base)
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "ref": "refs/heads/run",
+         "files": {rm: s1}},
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): the dispatch and the brief",
+         "ref": "refs/heads/run", "files": {rm: s2}},
+        {"t": derive_minute(7), "subject": f"records({FX_SLUG}): phase BUILDING", "ref": "refs/heads/run",
+         "files": {rm: s3}},
+        {"t": derive_minute(27), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work", "ref": "refs/heads/run",
+         "files": {"tools/a.txt": "b\n"}},
+        {"t": derive_minute(32), "subject": f"feat: X-{FX_OTHER}-1 — another build's", "files": {"tools/b.txt": "1\n"}},
+        # fast-import gives a merge its FIRST parent's tree, so the merged file is carried by hand.
+        {"t": derive_minute(33), "subject": f"merge: origin/main into the {FX_SLUG} branch", "ref": "refs/heads/run",
+         "merge": [5], "files": {"tools/b.txt": "1\n"}},
+    ], repo=first)
+    # The model runs where the run does, on its branch, since its record reaches main only when it lands.
+    run_git(["-c", "core.autocrlf=false", "checkout", "-q", "run"], repo)
+    own = shas[4]
+    bar_run = "20260913T102800Z-7101"
+    driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
+              + render_driver_lines(3, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + render_driver_lines(4, "--brief", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + render_driver_lines(6, "--phase", phase_from="RUNNING", phase_to="BUILDING")
+              + render_driver_lines(30, "--preflight", slug=FX_OTHER, sid=FX_SID_B, phase_to="RUNNING"))
+    gates = [render_gate_line(-30, "20260913T092930Z-6001", "f" * 40, wt=FX_WT_OTHER),
+             render_gate_line(28, bar_run, own),
+             render_gate_line(29.5, "20260913T102930Z-9101", "e" * 40, wt=FX_WT_PRIMARY),
+             render_gate_line(31, "20260913T103100Z-9102", "e" * 40)]
+    pushes = (render_push_lines(-30, "1" * 40, lander="0", wt=FX_WT_OTHER, decision="skip-nondefault",
+                                remote_ref="refs/heads/side", local_ref="refs/heads/side", pid=6161)
+              + render_push_lines(28.5, own, lander="0", wt=FX_WT_RUN, decision="skip-nondefault",
+                                  remote_ref="refs/heads/run", local_ref="refs/heads/run", pid=5252))
+    j = write_journals(repo.parent, driver=driver, gates=gates, pushes=pushes)
+    acts = [("call", derive_time(m) - 1, derive_time(m) + 1) for m in (1, 3, 4, 6)]
+    acts.append(("call", derive_time(28.2) - 1, derive_time(28.2) + 1))
+    acts += [("call", derive_time(m) - 6, derive_time(m) + 1) for m in (2, 5, 7, 27, 33)]
+    acts += [("call", derive_time(m), derive_time(m) + 1) for m in range(8, 27, 2)]
+    acts += [("call", derive_time(26.5), derive_time(28)), ("call", derive_time(28.5) - 1, derive_time(28.5) + 1),
+             ("call", derive_time(40), derive_time(40) + 5)]
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(store, FX_SID, build_session_events(sorted(acts, key=lambda a: a[1])))
+    return {"repo": repo, "journals": j, "store": store, "own": own, "own_t": derive_time(27),
+            "driver": driver, "gates": gates, "pushes": pushes,
+            "bar_run": bar_run, "bar_t": derive_time(28), "push_t": derive_time(28.5),
+            "push_end": derive_time(28.5) + 0.5, "merge_t": derive_time(33), "late_call_t": derive_time(40)}
+
+
+def test_model_ac21_nonterminal_end():
+    """AC21: a non-terminal window closes one second past the run's last event over every source it
+    owns (M5 of the closing review, round 1): its own commit, bar and branch push twenty minutes after
+    its last driver line are inside it, and nothing that is not the run's own moves its end."""
+    fx = build_live_fixture()
+    model = build_model(fx["repo"], journals=fx["journals"], store=fx["store"])
+    w = model.window
+    check("model AC21: the window closes one second past the branch push's END, by last activity",
+          (w["end"], w["end_from"]), (fx["push_end"] + 1.0, "last-activity"))
+    check("model AC21: the own commit, the bar and the push lie inside it",
+          [w["start"] <= t < w["end"] for t in (fx["own_t"], fx["bar_t"], fx["push_t"])], [True, True, True])
+    check("model AC21: the bar and the push join by tree, and nothing else does",
+          (sorted((e["run"], e["via"]) for e in model.timeline if e["kind"] == "gate"),
+           [e["via"] for e in model.timeline if e["kind"] == "push"]), ([(fx["bar_run"], "worktree")], ["worktree"]))
+    check("model AC21: the gates source counts the bar", (model.coverage["gates"]["state"],
+                                                          model.coverage["gates"]["lines"]), ("present", 1))
+    last_verb = max(e["end"] or e["t"] for e in model.timeline if e["kind"] == "verb")
+    check_true("model AC21 liveness: the run's last driver line is over fifteen minutes before its own commit, "
+               "so an end read from the driver alone leaves all three out", last_verb + 900 < fx["own_t"],
+               str(last_verb))
+    check_true("model AC21 liveness: the model saw the later merge and the session's later call, and took "
+               "neither", any(e["kind"] == "merge" and e["t"] == fx["merge_t"] for e in model.timeline)
+               and model.coverage["transcripts"]["state"] == "present" and len(model.tools) > 10
+               and fx["late_call_t"] > w["end"], str(w))
+    # A record-creating preflight of the same slug, made in another tree between the bar and the push,
+    # whose commit never reached this clone: it starts no run but ends this one's journal lines, so the
+    # push after it in the run's own tree is not an event of this run's (spec S2).
+    cut = render_driver_lines(28.2, "--preflight", phase_to="RUNNING", wt=FX_WT_OTHER, pid=4545)
+    j2 = write_journals(fx["repo"].parent, driver=fx["driver"] + cut, gates=fx["gates"], pushes=fx["pushes"])
+    split = build_model(fx["repo"], journals=j2, store=fx["store"])
+    check("model AC21: a START that joins no commit ends the lines that count, so the window closes one "
+          "second past the bar", (split.window["end"], len(split.coverage["unjoined_starts"])),
+          (fx["bar_t"] + 1.0, 1))
+    bare = build_model(fx["repo"])
+    check("model AC21 git-only: with no journal the window closes one second past the own commit, and the "
+          "later merge moves nothing", (bare.window["end"], bare.window["end_from"]),
+          (fx["own_t"] + 1.0, "last-activity"))
+    check_true("model AC21 git-only liveness: its last record commit is twenty minutes before the own commit",
+               bare.record_commits[-1]["t"] + 900 < fx["own_t"], str(bare.record_commits))
 
 
 def test_zz_model_idle_invariant():

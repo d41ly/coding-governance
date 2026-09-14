@@ -12,7 +12,8 @@ gate leg was run, per the owner's instruction of 2026-09-13, and no suite that e
 through one `git fast-import`, and every journal and extract is scratch. The exceptions are three
 arms that read this tree and never write it: AC7, the decision-log report and the driver-source
 arm. The closing diff review's round-1 fold of B1 and H1 bumped the spec to rev-6 and added AC19,
-whose line below that fold observed.
+whose line below that fold observed. Its fold of H2 and M5 bumped the spec to rev-7 and added AC20
+and AC21, whose lines below that fold observed.
 
 ## The criteria
 
@@ -131,6 +132,35 @@ whose line below that fold observed.
   said so. No gap of any model the arms built held a tool call. RED seen with the gaps read over the
   timeline alone, with the owner guard dropped, with owner turns put back among the events, and with
   idleness judged whatever the transcripts read.
+- AC20 — `build_run_model` (`test_model_ac20_tree_holds`) — added at rev-7 by the closing diff
+  review's round-1 fold of H2 and M5, and observed by that fold. The landed fixture now lands from
+  the primary tree, its `--landed` there. The arm adds four more of the run's calls in that tree: a
+  `--landed` refused before the close, an owner's `--status` and `--resume`, and a `--park` after
+  the close. The run held its own worktree and a second one it first claimed mid-window, never the
+  primary tree. Of eight bars, the run's three and the pinned one joined. These stayed out: two bars
+  another run made in the primary tree, a raw push refused there with `lander=0`, and an `ev=once`
+  refusal there. So did a bar made in the second worktree before the run's claim, and one made in
+  the run's worktree after another build's preflight there. `journal_lines` held none of those
+  lines, `push-outside-lander` did not fire, and the landing push still joined by `pushed-sha`, its
+  pinned bar by `gate_run`. With no verb blind, the owner's `--status` claimed the primary tree, and
+  the same lines joined and fired the anomaly. RED seen with the key taken from every tree any call
+  ran in, as rev-6 took it; with each of `--status`, `--resume` and `--landed` in turn made a claim;
+  with the phase test dropped; with the hold never ending; and with the hold starting at the window
+  start.
+- AC21 — `build_run_model` (`test_model_ac21_nonterminal_end`) — added at rev-7 by the same fold, and
+  observed by it. A run left BUILDING, its record on its branch and its last driver line the
+  `--phase` at minute 6, committed its unit's work twenty minutes later, then barred it and pushed
+  its branch from its own worktree, its session busy throughout and extracted by the real extractor.
+  The window closed one second past the push's END, by last activity. The own commit, the bar and
+  the push lay inside it, the bar and the push joined by tree, and `gates` read `present` with one
+  line. None of these moved the end: a later bar in the primary tree, a bar in the run's worktree
+  after another build's preflight there, a merge naming only the slug, and a later tool call in the
+  run's session. A record-creating START that joined no commit, made between the bar and the push,
+  ended the run's journal lines, and the window then closed one second past the bar. With no journal
+  it closed one second past the own commit. RED seen with the tree lines dropped from the end, with
+  the own commits dropped, with the end read the rev-5 way, with the merges naming the slug taken,
+  with the session's events taken, and with the segment's end dropped. The session break also moved
+  AC13's stand-in owner turn from `post-close` into the window.
 
 ## What else the pass carried
 
@@ -195,3 +225,9 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   session's transcript is local, and its coverage says when it did not judge.
 - The runlog kit stays at 1.0, as the brief sets it, and no leg, fixture file or pin moved. The
   budget row now reads 19 s in the ranker's integer spelling, still under the 60 s floor.
+- The H2 and M5 fold leaves three things standing, each on purpose. The timeline still lists a merge
+  naming only the slug that falls after a non-terminal window's end, and a terminal run's own
+  commits after its window. Bounding every derived set by the window is the fold's next slice, with
+  M1 and M4. Two runs that claim one tree in the same stretch both hold it, so a bar made there
+  joins both. The schema leg's non-terminal end reads the record commits alone, which spec 10's S6
+  now says.

@@ -1371,7 +1371,11 @@ def check_run_states(root, memory_root, tracked, texts) -> dict:
     `tracked` is the index's path set and `texts` each tracked run-state file's staged text. Three git
     calls whatever the number of builds: `derive_run_starts`'s one log over the population, one log
     over the run-state paths, and one batch read of the terminal runs' record writes. The window is the
-    model's own derivation, read through `derive_record_commits` and `derive_window`, never a copy.
+    model's own derivation, read through `derive_record_commits` and `derive_window`, never a copy. It
+    hands `derive_window` the record commits alone, so a non-terminal end here is at or before the
+    model's, which also reads the run's own commits and journals (TOOL-dLoggedFlight-10 S6). Neither
+    refusal reads that end: a non-terminal run is its build's last, since a preflight rotates only a
+    terminal record.
     """
     runs_by = mdl.derive_run_starts(root, memory_root, None, tracked=tracked)
     live = {f"{memory_root}/builds/{slug}/RUN.md" for slug in runs_by}

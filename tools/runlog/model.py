@@ -77,6 +77,11 @@ REVIEW_EXITS = ("CONVERGED", "NON-CONVERGENT", "CEILING")
 # The verbs whose END carries a unit, which is what attribution reads. Every other verb leaves the unit
 # where it was, so a heartbeat `--status` between a `--brief` and an event does not reset it.
 UNIT_VERBS = ("--brief", "--dispatch", "--rescope", "--review")
+# The verbs whose call never makes its tree the run's (spec S3, H2 of the closing review, round 1).
+# `--status` and `--resume` only read the record, so the owner or any session runs them from any tree;
+# `--landed` runs after the close in the primary tree, which every run lands from. Keyed on every tree
+# any call ran in, one owner's `--status` there made every other run's bar and push the run's.
+TREE_BLIND_VERBS = ("--status", "--resume", "--landed")
 IDLE_GAP_S = 900
 # B1 (closing review, round 1): a stretch with an owner turn inside it, or within this many seconds of
 # either end, is kept out of the idle gaps and counted. Dropping the turn from the gap sequence is not
@@ -121,9 +126,14 @@ METHOD = {
                    "unit id of the build",
     "build-commit": "heuristic: a unit's first own non-merge commit touching a path outside the memory "
                     "root, so a spec commit that re-renders a generated index is not a build",
-    "push-join": "inferred: a push from the run's worktree inside the window, or one inside it "
+    "push-join": "inferred: a push from a tree the run holds inside the window, or one inside it "
                  "pushing the default branch to a descendant of the run's last own commit",
-    "gate-join": "read where a joined push pinned gate_run, inferred from the worktree otherwise",
+    "gate-join": "read where a joined push pinned gate_run, inferred from a tree the run holds otherwise",
+    "trees": "inferred: a tree is held from the run's first call there that claims it, a preflight or "
+             "any verb but --status, --resume and --landed read before the close, to another run's "
+             "first claim there after the run's last",
+    "window-end": "inferred for a non-terminal run: one second past its last journal line, record "
+                  "commit, own commit, or line of a tree it holds",
     "close-head": "inferred: the first parent of the commit recording the LANDING write, else HEAD",
     "attribution": "inferred: the most recent END of the same session",
     "decision-log-owner": "heuristic: (owner followed by ), , or :, or owner ruling or owner call in "
@@ -326,15 +336,17 @@ def derive_record_commits(history, era, live_path) -> list:
                    and any(p == live_path and s in "AM" for s, p in c["files"])), key=lambda c: c["t"])
 
 
-def derive_window(start, start_from, phases_at, terminal, term_end=None, last_line=None) -> dict:
+def derive_window(start, start_from, phases_at, terminal, term_end=None, last_event=None) -> dict:
     """A run's half-open window (spec S2 of TOOL-dLoggedFlight-8), from what the caller read.
 
     `phases_at` is `[(record commit, phase)]`, oldest first, over `derive_record_commits`. The window
     closes at the END that moved the phase into a terminal one, else, for a terminal run, at its first
-    terminal write, else one second after the later of the last journal line and the last record
-    commit, the resolution of a commit time, so the run's last event is inside its own window. A caller
-    with no journal, such as a fresh clone, passes no `term_end` and no `last_line`, and gets the window
-    git alone gives.
+    terminal write, else one second after the later of `last_event` and the last record commit, the
+    resolution of a commit time, so the run's last event is inside its own window. `last_event` is
+    the latest event of every other source the caller owns for the run: the model passes its journal
+    lines, its own commits and the lines of the trees it holds (M5 of the closing review, round 1).
+    The schema leg passes none, so its non-terminal end is the record commits' alone and is at or
+    before the model's; spec S6 of TOOL-dLoggedFlight-10 says why none of its refusals reads it.
     """
     term_write = next((c for c, ph in phases_at if ph in PHASES_TERMINAL), None)
     if term_end is not None:
@@ -343,9 +355,41 @@ def derive_window(start, start_from, phases_at, terminal, term_end=None, last_li
         end, end_from = float(term_write["t"]), "terminal-write"
     else:
         last_rec = phases_at[-1][0]["t"] if phases_at else None
-        latest = max((v for v in (last_line, last_rec) if v is not None), default=start)
+        latest = max((v for v in (last_event, last_rec) if v is not None), default=start)
         end, end_from = float(latest) + 1.0, "last-activity"
     return {"start": start, "end": end, "start_from": start_from, "end_from": end_from}
+
+
+def check_tree_claim(inv) -> bool:
+    """Whether a driver call makes the tree it ran in its run's (spec S3): a preflight always does, and
+    any other call does unless its verb is in `TREE_BLIND_VERBS` or its START read a phase at or past
+    the close, since a call made once the run has closed is the landing's, in the shared tree."""
+    if not inv.get("wt") or inv.get("verb") in TREE_BLIND_VERBS:
+        return False
+    return inv.get("verb") == "--preflight" or (inv.get("phase_from") or "") not in PHASES_CLOSED
+
+
+def derive_tree_holds(own_calls, other_calls) -> dict:
+    """`{tree: (from, until)}`: each tree the run's own calls claimed, held from its first claim there
+    to the first claim there by any other run's call after its own last one, `until` None while none
+    has come. A worktree outlives its run and is reused, so a tree the run once held is not the run's
+    for ever; and a tree it claims only mid-window was someone else's before that claim."""
+    own, other = {}, {}
+    for calls, into in ((own_calls, own), (other_calls, other)):
+        for i in calls:
+            if i.get("t") is not None and check_tree_claim(i):
+                into.setdefault(derive_path_key(i["wt"]), []).append(i["t"])
+    holds = {}
+    for tree, ts in own.items():
+        after = [t for t in other.get(tree, ()) if t > max(ts)]
+        holds[tree] = (min(ts), min(after) if after else None)
+    return holds
+
+
+def check_in_hold(holds, wt, t) -> bool:
+    """Whether a line made in tree `wt` at `t` falls inside the run's hold on that tree."""
+    hold = holds.get(derive_path_key(wt)) if wt else None
+    return hold is not None and t is not None and hold[0] <= t and (hold[1] is None or t < hold[1])
 
 
 # ---------------------------------------------------------------------------------- the run-state file
@@ -1262,6 +1306,13 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             seg_end = u["t"]
             break
     seg = [i for i in invs if i["t"] >= seg_start and (seg_end is None or i["t"] < seg_end)]
+    # ---- the trees the run holds (spec S3, rev-7). H2 of the closing review, round 1: the key was
+    # every tree any of the run's calls ran in, so a `--landed` or an owner's `--status` in the primary
+    # tree made every other run's bar and push there this run's for its whole window.
+    seg_ids = {id(i) for i in seg}
+    holds = derive_tree_holds(seg, [i for i in all_invs if id(i) not in seg_ids])
+    worktrees = sorted(holds)
+    sids = sorted({s for i in seg for s in i["sids"]})
 
     # ---- the window (spec S2)
     start_st = joined.get(k)
@@ -1273,15 +1324,33 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                      and (i["phase_to"] or "") in PHASES_TERMINAL
                      and (i["phase_from"] or "") not in PHASES_TERMINAL), None)
     phases_at = [(c, derive_phase(blobs.get(f"{c['sha']}:{live_path}"))) for c in record_commits]
-    window = derive_window(w_start, w_from, phases_at, terminal, term_end,
-                           max((i["end"] or i["t"] for i in seg), default=None))
+    pushes = journals["pushes"]["journal"]
+    push_invs = rl.build_invocations(pushes.lines)
+
+    def check_tree_line(wt, t) -> bool:
+        return (t is not None and t >= w_start and (seg_end is None or t < seg_end)
+                and check_in_hold(holds, wt, t))
+
+    # M5 of the closing review, round 1: a non-terminal end reads every source the run owns. It read
+    # the driver and the record commits alone, so this run's later commits and both of its bars fell
+    # outside its own window. No transcript event and no push joined only by what it pushed moves it,
+    # and neither does a merge naming only the slug (spec S2).
+    tree_ts = []
+    for line in journals["gates"]["journal"].lines + [ln for ln in pushes.lines if ln.fields.get("ev") == "once"]:
+        t = parse_float(line.fields.get("t"))
+        if check_tree_line(line.fields.get("wt"), t):
+            tree_ts.append(t)
+    for inv in push_invs:
+        s = inv.start.fields if inv.start else {}
+        t = parse_float(s.get("t"))
+        if check_tree_line(s.get("wt"), t):
+            tree_ts += [v for v in (t, parse_float((inv.end.fields if inv.end else {}).get("t"))) if v is not None]
+    last_event = max([i["end"] or i["t"] for i in seg] + [float(c["t"]) for c in own] + tree_ts, default=None)
+    window = derive_window(w_start, w_from, phases_at, terminal, term_end, last_event)
     w_end = window["end"]
 
     def check_in_window(t) -> bool:
         return t is not None and w_start <= t < w_end
-
-    worktrees = sorted({derive_path_key(i["wt"]) for i in seg if i["wt"]})
-    sids = sorted({s for i in seg for s in i["sids"]})
 
     # ---- timeline
     timeline = []
@@ -1303,8 +1372,6 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             timeline.append({"t": float(c["t"]), "source": "git", "kind": "merge" if is_merge else "commit",
                              "sha": c["sha"], "units": sorted(set(id_re.findall(c["subject"]))),
                              "own": c["sha"] in own_shas})
-    pushes = journals["pushes"]["journal"]
-    push_invs = rl.build_invocations(pushes.lines)
     pinned = set()
     push_nums, gate_nums = set(), set()
     for inv in push_invs:
@@ -1315,7 +1382,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             continue
         refs_pushed = [v for key, v in s.items() if key.startswith("ref.")]
         via = None
-        if derive_path_key(s.get("wt")) in worktrees:
+        if check_in_hold(holds, s.get("wt"), t):
             via = "worktree"
         elif last_own and default_name:
             for r in refs_pushed:
@@ -1335,7 +1402,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     for line in pushes.lines:
         f = line.fields
         t = parse_float(f.get("t"))
-        if f.get("ev") == "once" and check_in_window(t) and derive_path_key(f.get("wt")) in worktrees:
+        if f.get("ev") == "once" and check_in_window(t) and check_in_hold(holds, f.get("wt"), t):
             push_nums.add(line.lineno)
             timeline.append({"t": t, "source": "pushes", "kind": "push-refused",
                              "decision": f.get("decision"), "lander": f.get("lander")})
@@ -1345,7 +1412,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         via = None
         if f.get("run") and f["run"] in pinned:
             via = "gate_run"
-        elif check_in_window(t) and derive_path_key(f.get("wt")) in worktrees:
+        elif check_in_window(t) and check_in_hold(holds, f.get("wt"), t):
             via = "worktree"
         if via:
             gate_nums.add(line.lineno)
