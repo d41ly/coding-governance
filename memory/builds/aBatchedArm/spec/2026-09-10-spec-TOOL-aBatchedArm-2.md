@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md) | spec-audit | TOOL-aBatchedArm-1 |
 
 <!-- /gen:spec-records -->
