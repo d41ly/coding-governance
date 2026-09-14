@@ -437,25 +437,29 @@ command.
   call's start or overlaps its span.
   Red when: a busy stretch reads idle, a stretch next to an owner turn fires, a git-only run reports
   an idle gap, or an idle gap holds a tool call.
-- **AC20** — When `build_run_model` joins the landed fixture with its `--landed` and a mid-window
-  `--status` run from the primary tree, the way `TOOL-dLoggedFlight-11` S6 lands, three foreign lines
-  made in the primary tree inside the window join nothing: a bar, a raw push refused with `lander=0`,
-  and an `ev=once` refusal. The timeline and `journal_lines` hold none of them, and
-  `push-outside-lander` does not fire. The landing push still joins by what it pushed, and its
-  pinned bar by its id. When another run's preflight then runs in the run's own worktree, a bar made
-  there before it joins and one made after it does not. When the run's own call first claims a
+- **AC20** — When `build_run_model` joins the landed fixture, which lands the way
+  `TOOL-dLoggedFlight-11` S6 lands, the run's calls in the primary tree are its `--landed`, a
+  `--landed` refused before the close, an owner's `--status` and `--resume`, and a `--park` after
+  the close. Four foreign lines made there inside the window then join nothing: two bars, a raw push
+  refused with `lander=0`, and an `ev=once` refusal. The timeline and `journal_lines` hold none of
+  them, and `push-outside-lander` does not fire. The landing push still joins by what it pushed, and
+  its pinned bar by its id. When another run's preflight then runs in the run's own worktree, a bar
+  made there before it joins and one made after it does not. When the run's own call first claims a
   second worktree mid-window, a bar made there after that call joins and one made before it does not.
-  Red when: a line joins through a tree that only a `--status` or a `--landed` put in the key, a
-  reused worktree's later bar joins, or a tree's bar from before the run claimed it joins.
+  Red when: a line joins through a tree that only one of those calls in the primary tree put in the
+  key, a reused worktree's later bar joins, or a tree's bar from before the run claimed it joins.
 - **AC21** — When `build_run_model` reads a non-terminal fixture run whose own commit, bar and branch
   push, the last two made in its own worktree, come twenty minutes after its last driver line, the
   window closes one second past the push's END. All three lie inside it, the bar and the push join by
   tree, and the gates source counts the bar. None of these moves that end: a later bar made in the
   primary tree, a bar made in the run's worktree after another run's preflight there, a later merge
-  naming only the slug, and a later tool call in the run's session. With no journal, the window
-  closes one second past the own commit, and the merge still moves nothing.
+  naming only the slug, and a later tool call in the run's session. A record-creating START that
+  joins no commit, made between the bar and the push, ends the run's journal lines, so the window
+  then closes one second past the bar. With no journal, the window closes one second past the own
+  commit, and the merge still moves nothing.
   Red when: the window closes at the last driver line, or a line from a tree the run does not hold,
-  a merge naming only the slug, or a transcript event moves it.
+  a line after the run's journal lines end, a merge naming only the slug, or a transcript event moves
+  it.
 
 ## 7. Gates
 
