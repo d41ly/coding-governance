@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """memory-recall kit self-test — the kit's own contract, stdlib only.
 
-    python memory-recall/selftest.py        # exit 0 = the kit's contract holds
+    python <kit>/selftest.py                       # exit 0 = the kit's contract holds
 
 What this gates is the KIT CONTRACT, not a recall floor. No adopter has a graded fixture, and a
 floor re-derived from the run it grades cannot fail, so there is no honest threshold to pin. What

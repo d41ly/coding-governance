@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-14T08:03:24+03:00 @ 9fac2b53b625032b93be6a09c0bf99f912ae35dd
+last-audit: 2026-09-14T02:04:59+03:00 @ b6bbfa7b38604c005d7bbb446e94a971c920a8a7
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 094a1ce93ae5142e866e1d82695968b3fa3f5332
+last-body-change: 2661b66b0d82063dcccadfc527e4c5525c129d28
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -98,11 +98,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
   `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
 
-- **Before starting work inside a kit, check whether another node is already rewriting
-  it.** `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command.
-  Two builds rewrote `tools/unattended/` concurrently on 2026-08-21 and neither noticed
-  until the landing; the conflict count is in those build records. §3's rule is
-  own STREAMS not files, and a kit is the unit that rule is about.
+- **Before starting work inside a kit, check whether another node is already rewriting it.**
+  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
+  `tools/unattended/` on 2026-08-21, and `check-memory-hygiene.sh` on 2026-09-13 by two sessions
+  sharing node tag `c`, for 13 conflicts at the landing. Neither time did anyone run it. §3's rule
+  is own STREAMS not files, and a kit is the unit that rule is about.
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
@@ -163,8 +163,7 @@ re-renders them from build front matter); there is no authored ledger to update.
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
-  `--selftests` only when they ask. The cost is process creation, not logic:
-  `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
+  `--selftests` only when they ask · prune when a bar runs them automatically.
 
 
 ### Environment traps worth front-loading
@@ -198,10 +197,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   inherited — what git exports to a merge driver in a LINKED WORKTREE. That made the row driver
   conflict every merge there until `repo_root()` walked up for the conf (`TOOL-aCollapsedScan-7`).
   Worktree merges are CLEAN now, re-verified 2026-09-04.
-- Two branches can BOTH rotate `memory/backlog/<FAMILY>.md` to archive independently. The row
-  driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
-  verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
-  0 unaccounted is the check — then union the rows and carry BOTH rotation notes.
+- Two branches can BOTH rotate `memory/backlog/<FAMILY>.md`; the row driver reports the other
+  side's rotation as DELETES and conflicts. Union the rows, carry BOTH rotation notes, and check
+  that every id absent from the union sits in some `memory/archive/<FAMILY>.*.md` — 0 is the check.
 - A `git checkout -- <conf>` run for an unrelated reason silently reverts an UNCOMMITTED floor bump,
   and a floor goes SLACK rather than red when it does. Commit a floor in the pass that earns it.
   `TOOL-aPromptedMandate-4`.
@@ -224,6 +222,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
   `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
   scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
+- **A `PreToolUse` hook FIRES inside a `Workflow` sidechain**, measured 2026-09-12 by `scratch-guard`
+  itself. A sidechain holds neither `Agent` nor `Workflow`, so it cannot fan out — that is the reason,
+  never "hooks stop at the boundary". `TOOL-cRefutedPremise-1`.
 - A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
   matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
   zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.
@@ -247,8 +248,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `memory/map/features/build-readme-surface.md`.
 - `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
   adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
-- Check 8's population is the backlog shards ALONE: `memory/builds/*/STATUS.md` was retired at
-  kit 2.17 and the dead-path gate keeps it gone.
+- Check 8's population is the backlog shards ALONE and it PRINTS
+  its graded-row count. A `memory/project/curation-debt.txt` row that would pass unwaived REDS, and
+  the run names what each earns over the checks it is IN: list only a measured fault.
+  `TOOL-cGradedDebt-1`.
 - A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
   reservation range and a planned unit cannot be added to it by hand; the next render removes it.
 - A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a

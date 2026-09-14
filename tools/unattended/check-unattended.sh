@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.20   # gov:kit unattended@1.20 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.21   # gov:kit unattended@1.21 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2237,6 +2237,25 @@ done
 # ---- THE WINDOW is the FIRST commit after the group anchor naming the unit, and nothing later. A
 # ---- pass's own review fold or spec bump lands after its group has ended and is outside it by
 # ---- construction; grading those would red an ordinary sequential fold with no in-band repair.
+# ----
+# ---- THE BRIEF LEAVES THE POPULATION (TOOL-aLeakedHandle-7). `--brief` records the brief a pass was
+# ---- handed and stages only the run-state file; the brief is already tracked, so the pass's one
+# ---- commit carries it, and the pass never declared it because the pass never wrote it. Two
+# ---- boundaries, both load-bearing: the PATH the row names and not its directory — a row naming
+# ---- `prompts/` excludes nothing under it, or a pass could hide any write there — and the rows in the
+# ---- PASS COMMIT'S TREE and not the working copy, so a row appended after the commit hides nothing.
+# ---- THE SET IS THE LIBRARY'S (`read_brief_paths`), AND `pass_commit` SUBTRACTS IT FIRST. When only
+# ---- this check forgave the brief, a `{run-state, brief}` bookkeeping commit naming the unit was
+# ---- selected as the pass commit, graded clean, and the real pass commit was never read — silent on
+# ---- the ordinary shape. Now that commit is skipped as bookkeeping and the walk reaches the commit
+# ---- that wrote something; the exclusion stays here because that commit still carries the brief
+# ---- when the run makes one commit (arm A), and forgiving it there is this check's job.
+# ---- What that does NOT buy: a run that writes the brief row and a stray file into the same pass
+# ---- commit still hides the stray file — both artifacts are the run's, the limit stated above for
+# ---- dispatch rows — and a row naming a path no brief was handed at is excluded here and joined by
+# ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
+# ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
+# ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -2341,10 +2360,23 @@ DSSIBS
       printf 'unattended: check 23 — one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this comparison rests on is not available: %s and %s in %s\n' "$dsunit" "$dsother" "$f"
       continue
     fi
+    # THE EXCLUSION SET: every path a ` brief · item <unit> · reason ` row names for THIS unit, read
+    # from the run-state file AT THE PASS COMMIT by the kit library — the same `read_brief_paths`
+    # that `pass_commit` subtracted before it selected `$dshit`, so the selector and this grader
+    # cannot forgive different paths. Only the row's side is normalised: `diff-tree` already prints
+    # git's canonical spelling. Newline-delimited with a newline at both ends, so the membership test
+    # below is an exact match and never a prefix or a containment.
+    dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
     dsout=""
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
+      # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
+      # directory would then hide everything under it.
+      case "$dsbrief" in *"$dsnl$dsq$dsnl"*)
+        report "check 23 excluded $dsq for $dsunit in $f — the path its brief row names, staged by --brief rather than written by the pass"
+        continue ;;
+      esac
       dsok=0
       for dsp in $dsdecl; do
         # THROUGH THE LIBRARY, which normalises. A bare `case` graded the recorded spelling as a

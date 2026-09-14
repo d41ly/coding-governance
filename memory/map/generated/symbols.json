@@ -718,6 +718,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_rotated_re",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "build_round_rows",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1163,6 +1168,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "check_rotation",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_run_states",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1233,6 +1243,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_ts_generic_close",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "check_ts_generic_fn_type",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -1246,6 +1261,11 @@
       "id": "check_ts_reading",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "check_ts_returned",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "check_ts_tag_start",
@@ -1376,6 +1396,11 @@
       "id": "cmd_check_records",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "cmd_check_rotation",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_contribute",
@@ -1751,6 +1776,11 @@
       "id": "derive_fact_templates",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_families",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_gate_runner",
@@ -2171,6 +2201,11 @@
       "id": "extract_heredoc_body",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "extract_jsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "extract_narration",
@@ -3258,6 +3293,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "parse_ts_source",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "parse_tsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3803,7 +3843,17 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_ts_arrow_body",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_ts_block_kind",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_ts_body_start",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
@@ -3813,9 +3863,19 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_ts_expr_end",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_ts_fixtures",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ts_jsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_ts_mode",

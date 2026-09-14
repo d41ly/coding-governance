@@ -1305,8 +1305,8 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
 # --------------------------------------------------------------------------------------------
 # Signal 9 — live backlog rows per shard (TOOL-aRelaxedShard-4)
 #
-# The bound that actually moves. Rotation carries forward every non-terminal row, so a shard's FLOOR
-# is its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the
+# The bound that actually moves. Non-terminal rows survive a rotation under either declared
+# ROTATION_MODE, so a shard's FLOOR is its live set: when nothing terminal is left, rotating is a no-op and the next row breaches the
 # byte cap. That is how `TOOL-cSettledDocket-16` and `TOOL-aRelaxedShard-1` happened, twice, and
 # neither the byte cap nor the map ratchet can see it coming.
 #
