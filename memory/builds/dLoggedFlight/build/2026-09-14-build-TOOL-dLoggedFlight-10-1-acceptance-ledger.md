@@ -68,7 +68,15 @@ never typed.
   before its start, and the leg exited 1 naming the build. With the naive key, each archive keyed on its
   own creation commit, it exited 1 under `run-start`. Staged on the shared derivation itself and run
   over this tree, dropping the era bound turned all six rotated builds red under `run-window`, and the
-  naive key turned all six red under `run-start` and `run-window`.
+  naive key turned all six red under `run-start` and `run-window`. The closing diff review's round-1
+  fold of L3 bumped the spec to rev-7 and widened this criterion. The squashed history's `run-start`
+  refusal now names the joint add it saw. The LANDED-after-LANDED build, with its memory root then
+  moved to `mem2` in one commit that deletes every path under `memory/` and adds it under `mem2/`,
+  as a `git mv` commit records it, with the conf naming the new root, exited 1 refusing the build's
+  shared start once, and that refusal names the joint add too. Both of its runs started at the move
+  and carried `joint_add`, where before the move they had two starts and neither mark. RED seen in
+  place, restored by checksum: the refusal's naming removed, which redded both naming checks, and no
+  start marked, which redded those and the mark check.
 
 ## What else the pass carried
 
@@ -146,3 +154,21 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `runlog selftest`, the leg that runs `<suite>`, and `runlog record schema`, the leg this unit adds,
   both first graded on the bar there; and `every held leg is budgeted, every budget row resolves`,
   whose row this pass re-measured.
+
+## Residue
+
+- **Parked by the fold of L3: a waiver route for a moved memory root.** The closing diff review's
+  L3 asked, at minimum, that the leg's list of what it does not check name the moved root, and that
+  the refusal have a waiver route. The list names it, and the refusal names the shape. The question
+  left is how an adopter whose root moved clears a leg that reds on every bar from then on. The
+  options seen were four. Follow the pre-move path, as the review's first option asked: the model
+  keys every read on a path under the current root, the run-state history, its blobs, the specs,
+  the ledgers and the decision log among them, so following the starts alone would turn a loud
+  refusal into windows quietly wrong, and following every read is a redesign of the model, not a
+  low's fold. Fall back to the run key a committed record carries: only runs rendered after this
+  build have one. Treat a joint add as a relocation and grade it clean: one log cannot tell a move
+  from a squash, and AC5 requires the squash to red. Declare the moved build in a waiver registry
+  the leg reads: a new surface an adopter authors, which the build method's second veto leaves to
+  the owner. None was taken. Until one is, the only route back to green is retiring the moved
+  archives from the index, and no run from before the move models correctly under the new root
+  with them or without them.

@@ -9,6 +9,8 @@ through the gate runner. Its three timed runs at the build commit printed
 `368 passed, 0 failed (368 assertions, floor 368)` in 3.4 to 3.6 s, and its runs after the fold
 printed `370 passed, 0 failed (370 assertions, floor 370)`. No gate leg was run, per the owner's
 instruction of 2026-09-13, and no suite that existed under `tools/unattended/` before this build ran.
+The closing diff review's round-1 fold of observation O1 bumped the spec to rev-4 and added two rows,
+`bearer-token` and `aws-sts-key`; the AC lines below say what that fold observed of them.
 
 ## The criteria
 
@@ -22,7 +24,11 @@ instruction of 2026-09-13, and no suite that existed under `tools/unattended/` b
   widens each rule in memory (`test_redact_ac1_staged_red`): a never-matching pattern lost its
   positive's own claim, and an everything pattern changed its negative, for every row. RED seen on
   mirrors three ways: the `aws-key` pattern broken (5 arms), the `sk-key` lookbehind dropped so a
-  `task-` id matched, and `env-assign` widened to a spaced `=` so `PIN_KEY =` matched.
+  `task-` id matched, and `env-assign` widened to a spaced `=` so `PIN_KEY =` matched. The fold of O1
+  saw both new rows pass every per-row check, and the `auth-header` positive and the two-rule overlap
+  arm stayed that row's, since it runs before `bearer-token`. RED seen in place, restored by checksum: the
+  `bearer-token` value's 20-character floor dropped, which redacted its `Bearer realm=` near miss,
+  and the `aws-sts-key` pattern keyed on `AKIA`, which lost its own positive.
 - AC2 — `render_redacted` (`test_redact_ac2_prefix_kept`) — a generated value after
   `Authorization: Bearer ` rendered as exactly `Authorization: Bearer <redacted:auth-header>`. A
   generated 40-character token in `https://<value>@host/x` rendered as
@@ -45,7 +51,8 @@ instruction of 2026-09-13, and no suite that existed under `tools/unattended/` b
   planted value survived the render, and no unplanted string yielded a span, near misses included. The
   scan's wall time, 1.3 to 1.9 s across runs, is printed report-only. RED seen three ways: the
   prefilter removed (850,000 searches), hints matched against the raw text instead of the lowercased
-  text (33 arms), and the `aws-key` pattern broken, which missed every planted AWS string.
+  text (33 arms), and the `aws-key` pattern broken, which missed every planted AWS string. With the
+  fold of O1's two rows the searches numbered 341,644 of 950,000 pairs, every row still planted.
 - AC5 — `CLASS_IDS` (`test_redact_ac5_class_ids`) — the declared ids are distinct, every one has a
   row, every row's id is declared, and each row carries a positive and a negative. The same comparison
   run over a scratch table missing its last row named that id as missing, and over one with an
@@ -117,3 +124,7 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - The budget row's evidence now reads the post-unit worst of three direct readings, 3.6 s against 2.4
   s before the redaction arms. Its figure stays at the file's 60 s floor, and the leg's ceiling of
   180 s did not move.
+- The fold of O1 took the two misses of the review's probe that sit beside a row the table has. The
+  SendGrid, DigitalOcean, Shopify, Stripe restricted and Twilio shapes it also found stay in the
+  documented residue of a class with no row. A `Bearer` value under 20 characters is not redacted
+  outside the `Authorization` header, the price of leaving prose such as `Bearer realm=` alone.

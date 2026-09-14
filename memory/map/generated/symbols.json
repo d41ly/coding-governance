@@ -643,6 +643,11 @@
       "file": "tools/codebase-map/map_imports.py"
     },
     {
+      "id": "build_moved_root",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_negatives",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -5196,6 +5201,11 @@
       "id": "scan_unarmed_slots",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_unit_ids",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "scan_verdicts",

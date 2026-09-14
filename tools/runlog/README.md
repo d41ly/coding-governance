@@ -164,7 +164,9 @@ event kind's fields and every rule with its evidence are the unit's spec
 - **A command is classified in memory, then dropped.** The classifier drops heredoc bodies, splits on
   unquoted separators, and reads the word each segment RUNS, so a commit message naming a forced push
   is not a push and `grep` over the driver is not a driver call. A command naming the driver passes
-  through `render_redacted` before its verb and slug are read.
+  through `render_redacted` before its verb and slug are read. The slug is read by `SLUG_RE` in
+  `runlog_lib.py`, the kit's one slug grammar and the driver's own spelling, which the self-test holds
+  to the driver's `check_slug_shape`.
 
 **Narration** prints the agent's text blocks and the owner's turns in a window, main file only, each
 through `render_redacted`, inside a frame that says the text is data. Every quoted line sits under a
@@ -196,7 +198,9 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   each run-state path, with renames off, in one git call for one build or for all of them. The driver
   rotates a finished record with `git mv -f` in its successor's preflight commit, so that commit adds
   the archive and only modifies `RUN.md`. An archive takes the entry before the commit that added it,
-  and the live record takes the last. Only history reachable from HEAD is read.
+  and the live record takes the last. Only history reachable from HEAD is read. A run whose start
+  added the live record and an archive together carries `joint_add`: its runs share that start, which
+  the schema leg refuses by name.
 - **A window is half-open, bounded to the run's era.** It opens at the run's own preflight START,
   joined to its start commit by a named key, or at the start commit when there is none. It closes at
   the END that moved the phase into a terminal one, else at the first terminal write in the era, else
@@ -214,7 +218,9 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   must never become a landed run's last own commit. A push joins from a tree the run holds, or by
   pushing the default branch to a sha carrying the last own commit made at or before the push's
   START, which is how the landing push from the primary tree joins. A gate line joins through the
-  `gate_run` a joined push pinned, or from a tree the run holds, inside the window either way.
+  `gate_run` a joined push pinned, or from a tree the run holds, inside the window either way. A
+  subject names every id of a range it spells, `X-<slug>-1..13` naming all thirteen, the way the
+  memory-tree index generator reads a Serves range; `scan_unit_ids` is the one reader.
 - **Attribution reads every run's ENDs in a session.** A call inside the window takes the phase of
   its session's most recent END and the unit of its most recent unit-bearing one. When that END is
   another run's, of this build or another, the call is that run's work and is unattributed, and a unit
@@ -233,6 +239,9 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   for the driver, a LANDING write for the gates, and for the pushes the move into LANDED. That last
   move is what closes a landed run's window, so it lies at the window's end and is read there, since
   the half-open window never holds it.
+- **And only where this node saw the build.** Journals never leave their clone, and only the driver's
+  lines name a slug. So a journal the window starts after, holding none of the run's lines, reads
+  `not-local` when no line of this node's driver journal names the build: a run made on another node.
 - **Every inferred answer is named** in the model's `method` field.
 - **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
   10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
@@ -328,7 +337,7 @@ and one rule from `RECORD_RULES`.
 It also derives every tracked run's start with `derive_run_starts`, and its window through the model's
 own `derive_record_commits` and `derive_window`, from git alone. It refuses a build whose runs share a
 start, or whose windows end before they start or overlap, and prints each rotated build's starts and
-windows.
+windows. A shared start marked `joint_add` is refused naming that shape.
 
 **Liveness.** It prints the population it graded, `0 records (none committed yet)` included. It reds
 rather than reporting zero when the declared root holds no tracked file, or when its glob does not
@@ -403,6 +412,16 @@ prefix and root, and hold the render to an independent one.
   The render's own check stops only a time in the turn's own second.
 - **A run whose record never reached HEAD's history.** The run starts are read from HEAD, so a run on
   a branch this tree has not merged is invisible from here.
+- **A run history moved with its memory root or a build folder.** The starts are read under the
+  current root with renames off, so a move in one commit ADDS every record it carries, and a rotated
+  build's runs all start at it. The schema leg refuses that build under `run-start`, naming the
+  shape, on every bar from then on; `verify` looks for the pre-move key, and `record --write` writes
+  a second file. Nothing follows the path back past the move, and no waiver clears the refusal: the
+  unit's acceptance ledger parks that question.
+- **A writer broken for the whole of a run made here.** With no driver line naming the build, the
+  model cannot tell that from a run made on another node, and reads the journals `not-local`.
+- **A list that continues a unit id with bare numbers.** `X-<slug>-1..4, 6` names units 1 to 4, as the
+  memory-tree grammar reads it, and not unit 6.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in
   alone. Two runs that claim one tree in the same stretch both hold it, so a bar there joins both.
 - **A tree the run worked in without claiming it.** A run whose only calls in a tree are

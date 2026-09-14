@@ -99,6 +99,11 @@ IDLE_OWNER_GUARD_S = IDLE_GAP_S
 HEARTBEAT_CADENCE_S = 600
 STALL_HEARTBEATS = 6
 REFUSAL_LOOP_MIN = 3
+# L5 (closing review, round 1): a commit subject names every id of a contiguous range it spells
+# `<id>..<m>`, as the memory-tree index generator expands one in a Serves line. A range of more ids
+# than this is no build's unit set, and anyone committing types a subject, so a longer one names its
+# first id alone rather than make the model's cost grow with what was typed.
+UNIT_RANGE_MAX = 1000
 JOURNALS = ("driver", "gates", "pushes")
 MODELS_DIR = "models"
 DECISION_LOG = "DECISIONS.md"
@@ -117,6 +122,7 @@ ISO_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 ROW_RE = re.compile(r"([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z) ([a-z][a-z-]*) · item (.*)")
 FACT_RE = re.compile(r"([a-z][a-z0-9-]*): ?(.*)")
 ARCHIVE_RE = re.compile(r"RUN\.([A-Z]+)\.([0-9a-f]{8})\.md")
+UNIT_RANGE_TAIL_RE = re.compile(r"\.\.([0-9]+)\b")
 MARK_RE = re.compile(r"RESOLVED \((owner|agent), ([0-9]{4}-[0-9]{2}-[0-9]{2})(, delegated)?\)")
 VERDICT_RE = re.compile(r"## Verdict: *(.*)")
 SHA_RE = re.compile(r"[0-9a-f]{40}")
@@ -124,7 +130,10 @@ SHA_RE = re.compile(r"[0-9a-f]{40}")
 # Every inferred answer, named. A reader of the model learns here which answers are read and which
 # are the join's own inference, so a heuristic never passes for a measurement.
 METHOD = {
-    "run-starts": "read: the commits that added each run-state path, with renames off",
+    "run-starts": "read: the commits that added each run-state path, with renames off; a run whose start "
+                  "added the live record and an archive together is marked joint_add",
+    "journal-local": "inferred: a journal the window starts after, holding none of the run's lines, is "
+                     "not-local when no line of this node's driver journal names the build",
     "journal-join": "read: a record-creating preflight START joins the first start commit at or "
                     "after its END, the latest such START winning a commit",
     "own-commits": "inferred: an era commit inside the window descending from the start commit whose "
@@ -270,6 +279,13 @@ def derive_run_starts(root, memory_root=None, slugs=None, tracked=None) -> dict:
 
     `tracked`, a set of repo-relative paths, answers which run-state files exist instead of the working
     tree, so a caller grading the INDEX (the schema leg, TOOL-dLoggedFlight-10) gets the index's runs.
+
+    A commit that ADDS a build's live `RUN.md` and one of its archives together leaves every run it
+    holds on one start, since no earlier entry under the path names the archive's. A squashed history
+    leaves that shape, and so does a memory root or build folder moved in one commit, which with
+    renames off adds every record it moves. Nothing here follows a path back past it: each run whose
+    start is such a commit carries `joint_add`, and the schema leg names the shape when it refuses
+    the shared start (L3 of the closing review, round 1).
     """
     root = pathlib.Path(root)
     mr = memory_root if memory_root is not None else rl.resolve_memory_root(root)
@@ -287,12 +303,14 @@ def derive_run_starts(root, memory_root=None, slugs=None, tracked=None) -> dict:
                          "--format=%x1e%H %ct", "--", *specs]).decode("utf-8", "replace")
     prefix = f"{mr}/builds/"
     entries: dict = {}
+    joint: dict = {}
     for chunk in raw.split("\x1e")[1:]:
         lines = [ln.strip() for ln in chunk.split("\n")]
         head = lines[0].split()
         if len(head) != 2 or SHA_RE.fullmatch(head[0]) is None:
             continue
         sha, ct = head[0], int(head[1])
+        added: dict = {}
         # Within one commit the live path sorts before an archive, so a squashed history that adds
         # both at once still gives the archive the earlier of the two entries.
         for path in sorted((p for p in lines[1:] if p.startswith(prefix)),
@@ -301,6 +319,10 @@ def derive_run_starts(root, memory_root=None, slugs=None, tracked=None) -> dict:
             if "/" in name or not (name == "RUN.md" or ARCHIVE_RE.fullmatch(name)):
                 continue
             entries.setdefault(slug, []).append({"sha": sha, "t": ct, "path": path, "name": name})
+            added.setdefault(slug, set()).add(name == "RUN.md")
+        for slug, kinds in added.items():
+            if kinds == {True, False}:
+                joint.setdefault(slug, set()).add(sha)
     out = {}
     for slug, found in entries.items():
         found.reverse()
@@ -313,7 +335,7 @@ def derive_run_starts(root, memory_root=None, slugs=None, tracked=None) -> dict:
         if check_present(live):
             runs.append({"record": live, "start": found[-1]["sha"], "t": found[-1]["t"]})
         for k, run in enumerate(runs, 1):
-            run.update(k=k, runkey=run["start"][:8])
+            run.update(k=k, runkey=run["start"][:8], joint_add=run["start"] in joint.get(slug, ()))
         if runs:
             out[slug] = runs
     return out
@@ -714,7 +736,7 @@ def resolve_run_sessions(sids, slug, store=None, projects=None) -> tuple:
 
 # ---------------------------------------------------------------------------------- the blocks
 
-def measure_coverage(journals, window, lines, activity, transcripts, record_state="present",
+def measure_coverage(journals, slug, window, lines, activity, transcripts, record_state="present",
                      build_state="present") -> dict:
     """Each source's state from `COVERAGE_STATES`, with each journal's epoch.
 
@@ -722,10 +744,18 @@ def measure_coverage(journals, window, lines, activity, transcripts, record_stat
     when the window holds the epoch; and, when the window opens at or after it, `present` if it holds
     lines for the run or nothing the run's own rows prove required one, else `dead`. `activity` names,
     per journal, the run's own proof that its producer should have written.
+
+    Both of those last two say a writer was live for the run on THIS node, and only a driver line
+    naming `slug` places the build here: journals never leave their clone, and no other producer's
+    line names a slug. So a journal the window opens after, holding none of the run's lines, reads
+    `not-local` when no line of the driver journal names the build at all. A run made on another node
+    had read `dead` there (L2 of the closing review, round 1). A writer broken for the whole of a run
+    made here reads the same, since nothing tells the two apart.
     """
     start, end = window["start"], window["end"]
     out = {"run-state": {"state": record_state}, "git": {"state": "present"},
            "build-folder": {"state": build_state}}
+    named = any(ln.fields.get("slug") == slug for ln in journals["driver"]["journal"].lines)
     for name in JOURNALS:
         info = journals[name]
         j, epoch = info["journal"], info["epoch"]
@@ -741,6 +771,9 @@ def measure_coverage(journals, window, lines, activity, transcripts, record_stat
             row["state"] = "partial"
         elif n:
             row["state"] = "present"
+        elif not named:
+            row["state"] = "not-local"
+            row["note"] = f"no line of this node's driver journal names {slug}, so nothing places the run here"
         elif activity.get(name):
             row["state"] = "dead"
             row["proof"] = activity[name]
@@ -1179,8 +1212,29 @@ def extract_open_questions(text) -> str:
 
 
 def build_unit_id_re(slug) -> re.Pattern:
-    """A unit id of ONE build, as a word: `<FAMILY>-<slug>-<n>`."""
+    """A unit id of ONE build, as a word: `<FAMILY>-<slug>-<n>`. It finds a range's first id alone, so
+    a commit subject is read through `scan_unit_ids` and never through this directly."""
     return re.compile(r"\b[A-Z]+-" + re.escape(slug) + r"-[0-9]+\b")
+
+
+def scan_unit_ids(id_re, text) -> list:
+    """Every unit id of the build that `text` names, in order: each id `id_re` finds, and for a
+    contiguous range spelled `<id>..<m>` each id after it up to `<m>`, as the memory-tree index
+    generator expands a Serves range. The ONE reader of a commit subject's ids, so no use of it credits
+    a whole-set commit to its first unit alone (L5 of the closing review, round 1). A range ending
+    below its start, or naming more than `UNIT_RANGE_MAX` ids, names its first id alone. A list that
+    continues an id with bare numbers, `-1..4, 6`, reads its first range alone, as that grammar does."""
+    text = text or ""
+    out = []
+    for m in id_re.finditer(text):
+        out.append(m.group(0))
+        tail = UNIT_RANGE_TAIL_RE.match(text, m.end())
+        if tail:
+            stem, _, lo = m.group(0).rpartition("-")
+            hi = int(tail.group(1))
+            if int(lo) < hi <= int(lo) + UNIT_RANGE_MAX - 1:
+                out += [f"{stem}-{n}" for n in range(int(lo) + 1, hi + 1)]
+    return out
 
 
 def derive_spec_unit(text, id_re) -> dict | None:
@@ -1314,7 +1368,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     era_commits = sorted((c for c in span if check_in_era(c["t"], era)), key=lambda c: c["t"])
     # The era's candidates only: the window, once known, bounds them (spec S3, rev-8). A non-terminal
     # end is taken past every one of them, and a terminal one drops those made after the run.
-    own_era = [c for c in era_commits if id_re.search(c["subject"])]
+    own_era = [c for c in era_commits if scan_unit_ids(id_re, c["subject"])]
     # The start's descendants with their parents, ONE listing the push join and the merged flag both
     # walk, so each push is tested against the own commit it followed rather than the last one.
     graph: dict = {}
@@ -1446,7 +1500,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         if check_in_window(float(c["t"]), window) and (
                 c["sha"] in own_shas or (is_merge and slug_re.search(c["subject"]))):
             timeline.append({"t": float(c["t"]), "source": "git", "kind": "merge" if is_merge else "commit",
-                             "sha": c["sha"], "units": sorted(set(id_re.findall(c["subject"]))),
+                             "sha": c["sha"], "units": sorted(set(scan_unit_ids(id_re, c["subject"]))),
                              "own": c["sha"] in own_shas})
     pinned = set()
     push_nums, gate_nums = set(), set()
@@ -1567,7 +1621,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         uid = u["id"]
         u["briefs"] = [r["t"] for r in rows if r["kind"] == "brief" and r["item"].strip() == uid]
         u["dispatches"] = [r["t"] for r in rows if r["kind"] == "dispatch" and uid in r["item"].split()]
-        bc = next((c for c in own if len(c["parents"]) == 1 and uid in id_re.findall(c["subject"])
+        bc = next((c for c in own if len(c["parents"]) == 1 and uid in scan_unit_ids(id_re, c["subject"])
                    and any(not p.startswith(mr + "/") for _, p in c["files"])), None)
         u["build_commit"] = bc["sha"] if bc else None
         u["build_t"] = float(bc["t"]) if bc else None
@@ -1625,7 +1679,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     transcripts = {"state": tr_state, "sessions": len(sids), "extracts": len(extracts)}
     if tr_note:
         transcripts["note"] = tr_note
-    coverage = measure_coverage(journals, window, lines, activity, transcripts, record_state,
+    coverage = measure_coverage(journals, slug, window, lines, activity, transcripts, record_state,
                                 "present" if (root / build).is_dir() else "absent")
     attribution = derive_attribution(all_invs, extracts, window, run=seg_in)
     coverage["attribution"] = {k2: attribution[k2] for k2 in ("calls", "attributed", "share_calls",
@@ -1645,7 +1699,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         slug=slug, run=k, runs=len(runs), runkey=pick["runkey"], record=pick["record"],
         start_commit=pick["start"], era=era, window=window, phase=phase, terminal=terminal,
         facts=facts, repairs=record["repairs"], worktrees=worktrees, sessions=sids,
-        own_commits=[{"sha": c["sha"], "t": c["t"], "units": sorted(set(id_re.findall(c["subject"]))),
+        own_commits=[{"sha": c["sha"], "t": c["t"], "units": sorted(set(scan_unit_ids(id_re, c["subject"]))),
                       "merge": len(c["parents"]) > 1, "subject": c["subject"]} for c in own],
         last_own=last_own, merged=merged, close=close, timeline=timeline, tools=tools,
         record_rows=rows, record_commits=[{"sha": c["sha"], "t": c["t"]} for c in record_commits],

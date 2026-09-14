@@ -44,6 +44,12 @@ MEMORY_ROOT_DEFAULT = "memory"
 # The invocation states `build_invocations` assigns. A start with no end is NOT called "killed": a
 # verb still running when the journal is read looks exactly the same, and the name says so.
 INVOCATION_STATES = ("ended", "killed-or-running", "orphan-end")
+# THE SLUG GRAMMAR, the unattended driver's own: its `check_slug_shape`, and hygiene check 4's default
+# beside it, admit a letter, then letters, digits or dashes. One constant, so no reader in this kit
+# refuses a build folder the driver accepts; the extractor kept a copy that refused dashed and
+# single-letter slugs (L4 of the closing review, round 1). Read it with `fullmatch`. The withheld
+# self-test holds it to that function, run by bash from the driver's source.
+SLUG_RE = re.compile(r"[A-Za-z][A-Za-z0-9-]*")
 
 # Compiled ONCE, at import. The parser calls only these objects' methods, so reading a journal of any
 # length compiles nothing per line — the self-test counts that by patching `re.compile`.
@@ -404,9 +410,9 @@ def resolve_memory_root(root) -> str:
 # The CLOSED list of secret classes (TOOL-dLoggedFlight-5 S2). The table beside this file holds one
 # row per id, and the self-test asserts the two against each other in BOTH directions, so a class
 # cannot go missing from the table and a row cannot arrive without being declared here first.
-CLASS_IDS = ("url-userinfo", "auth-header", "github-token", "sk-key", "aws-key", "pem-block",
-             "env-assign", "env-table", "jwt", "cookie", "json-secret", "conn-password",
-             "azure-key", "vendor-key", "flag-secret", "lower-assign", "named-token")
+CLASS_IDS = ("url-userinfo", "auth-header", "bearer-token", "github-token", "sk-key", "aws-key",
+             "aws-sts-key", "pem-block", "env-assign", "env-table", "jwt", "cookie", "json-secret",
+             "conn-password", "azure-key", "vendor-key", "flag-secret", "lower-assign", "named-token")
 TABLE_NAME = "redaction.tsv"
 TABLE_COLUMNS = ("id", "hint", "pattern", "positive", "negative")
 # What a redacted value becomes is `<redacted:<id>>`. A value that already starts with this head is

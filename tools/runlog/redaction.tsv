@@ -22,9 +22,11 @@
 id	hint	pattern	positive	negative
 url-userinfo	://	(?i)\b[a-z][a-z0-9+.-]*://(?P<v>[^\s/?#@:'"<>]+:[^\s/?#@'"<>]*|[^\s/?#@:'"<>]{16,})@	git push https://oauth2:{A40}@example.com/o/r.git	git clone ssh://git@github.com/o/r.git && open https://example.com/a/@b
 auth-header	authorization	(?i)\bauthorization["']?[ \t]*[:=][ \t]*["']?(?:bearer|basic|token)[ \t]+(?P<v>[A-Za-z0-9._~+/=-]+)	curl -H "Authorization: Bearer {S40}" https://api.example.com/v1	grep -c "Authorization: Bearer" access.log
+bearer-token	bearer	(?i)(?<![A-Za-z0-9_-])bearer[ \t]+(?P<v>[A-Za-z0-9._~+/=-]{20,})	curl -H "X-Upstream-Auth: Bearer {S40}" https://api.example.com/v1	WWW-Authenticate: Bearer realm="example", error="invalid_token" and curl -H "X-Auth: Bearer $TOKEN"
 github-token	ghp_|gho_|ghu_|ghs_|ghr_|github_pat_	(?<![A-Za-z0-9_])(?:gh[pousr]_|github_pat_)(?P<v>[A-Za-z0-9_]{20,})	echo ghp_{A36} | gh auth login --with-token	sighs_{a30} and ghp_short
 sk-key	sk-	(?<![A-Za-z0-9_-])(?:sk-ant-|sk-)(?P<v>[A-Za-z0-9_-]{20,})	curl -H "x-api-key: sk-ant-api03-{S40}" https://api.example.com/v1	ran task-{a24} and sk-short
 aws-key	akia	(?<![A-Za-z0-9])AKIA(?P<v>[A-Z0-9]{16})(?![A-Za-z0-9])	aws configure set aws_access_key_id AKIA{U16}	the AKIAEXAMPLE prefix, and akia{U16} in lowercase
+aws-sts-key	asia	(?<![A-Za-z0-9])ASIA(?P<v>[A-Z0-9]{16})(?![A-Za-z0-9])	aws configure set aws_access_key_id ASIA{U16}	the ASIAEXAMPLE prefix, and asia{U16} in lowercase
 pem-block	private key	-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----(?P<v>[\s\S]+?)(?:-----END (?:[A-Z0-9]+ )*PRIVATE KEY-----|\Z)	-----BEGIN RSA PRIVATE KEY-----{NL}{B64}{NL}{B40}={NL}-----END RSA PRIVATE KEY-----	-----BEGIN PUBLIC KEY-----{NL}{B64}{NL}-----END PUBLIC KEY-----{NL}grep -l "BEGIN RSA PRIVATE KEY" keys/id_rsa
 env-assign	_token=|_secret=|_key=|_password=	(?<![A-Za-z0-9_])[A-Z][A-Z0-9_]*_(?:TOKEN|SECRET|KEY|PASSWORD)=(?P<q>["'])?(?P<v>(?(q)[^"'\r\n]+|[^\s"'`;&|<>]+))	export DEPLOY_KEY="{A24} {A12}"; GH_TOKEN={A40} gh pr list	PIN_KEY = {D6}; pin_key={D6}; unset NOT_A_TOKEN; MAX_TOKENS=4096
 env-table	token|secret|key|password	(?m)^[ \t]*(?:[A-Z0-9_]*_)?(?:TOKEN|SECRET|KEY|PASSWORD)[ \t]{2,}(?P<v>\S[^\r\n]*?)[ \t]*\r?$	Name                           Value{NL}DEPLOY_TOKEN                   {A40}	OS                             Windows_NT{NL}TURNKEY                        {a12}{NL}echo DEPLOY_TOKEN is set

@@ -1428,8 +1428,15 @@ def check_run_states(root, memory_root, tracked, texts) -> dict:
             by_start.setdefault(run["start"], []).append(run["k"])
         shared = {s: ks for s, ks in by_start.items() if len(ks) > 1}
         for s, ks in sorted(shared.items()):
-            refusals.append((slug, "run-start", f"runs {', '.join(map(str, ks))} share the start commit {s[:8]}, "
-                                                "so their keys and windows collapse into one"))
+            why = (f"runs {', '.join(map(str, ks))} share the start commit {s[:8]}, so their keys and windows "
+                   "collapse into one")
+            # The shape a squashed history or a moved memory root leaves, named so the refusal says
+            # what it saw (L3 of the closing review, round 1); spec 8's S1 owns the shape.
+            if any(run.get("joint_add") for run, _w in pairs if run["start"] == s):
+                why += (f"; {s[:8]} added the live record and an archive together, the shape a squashed "
+                        "history or a memory root or build folder moved in one commit leaves, and nothing "
+                        "here follows a path back past it")
+            refusals.append((slug, "run-start", why))
         backwards = [(run, w) for run, w in pairs if w["end"] < w["start"]]
         for run, w in backwards:
             refusals.append((slug, "run-window", f"run {run['k']}'s window ends at {mdl.derive_iso(w['end'])}, "
@@ -1461,7 +1468,10 @@ def check_records(root, memory_root=None) -> dict:
     run's start. Records in any other folder or under any other name, which the glob never reads. A run
     on a branch HEAD has not merged, since the starts are read from HEAD. A window's END against the
     commit graph: windows are compared in commit time, so a clock skew between two nodes that puts a
-    predecessor's terminal write after its successor's start moves a window without redding it.
+    predecessor's terminal write after its successor's start moves a window without redding it. A
+    history that moved its memory root or a build folder: the starts are read under the current root
+    with renames off, so the move ADDS every record it carries and a rotated build's runs all start at
+    it. The `run-start` refusal names that shape and no waiver clears it; nothing follows the path back.
 
     Raises ValueError when the memory root refuses or git cannot be run, which the command makes exit 2.
     """

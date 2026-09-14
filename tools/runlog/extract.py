@@ -61,7 +61,7 @@ KNOWN_TYPES = frozenset({"user", "assistant", "attachment", "system", "queue-ope
 SID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
 # A value persisted from a transcript's structured fields — a label, a model, a status, a type name.
 LABEL_RE = re.compile(r"[A-Za-z0-9._:-]{1,64}")
-SLUG_RE = re.compile(r"[A-Za-z][A-Za-z0-9]{1,63}")
+# A driver call's slug is read by the kit's ONE slug grammar, `rl.SLUG_RE`, the driver's own spelling.
 VERB_RE = re.compile(r"--[a-z][a-z-]{1,30}")
 ENV_ASSIGN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*", re.S)
 HEREDOC_RE = re.compile(r"<<-?[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
@@ -511,7 +511,7 @@ def _derive_segment(words: list) -> tuple:
         for j in range(k + 1, len(words)):
             if VERB_RE.fullmatch(words[j]):
                 verb = words[j]
-                if j + 1 < len(words) and SLUG_RE.fullmatch(words[j + 1]):
+                if j + 1 < len(words) and rl.SLUG_RE.fullmatch(words[j + 1]):
                     slug = words[j + 1]
                 break
         return "driver", False, verb, slug

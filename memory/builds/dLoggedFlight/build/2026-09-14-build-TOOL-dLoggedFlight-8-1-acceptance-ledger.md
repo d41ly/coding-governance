@@ -16,7 +16,9 @@ whose line below that fold observed. Its fold of H2 and M5 bumped the spec to re
 and AC21, whose lines below that fold observed. Its fold of M1, M4 and M5's timeline bound bumped the
 spec to rev-8, widened AC17 and added AC22 and AC23, whose lines below that fold observed. Its fold
 of M2 and M3 bumped the spec to rev-9 and widened AC6, AC12 and AC13, whose lines below record what
-that fold observed.
+that fold observed. Its fold of L2, L3 and L5 bumped the spec to rev-10 and widened AC1, AC2 and
+AC6, whose lines below record what that fold observed; L3's refusal is observed under unit 10's
+AC5.
 
 ## The criteria
 
@@ -28,11 +30,19 @@ that fold observed.
   rotation commit, so the two keys differ. The archive's own creation commit is the live run's start,
   which the liveness check asserts, so the naive key would resolve both records to one commit. The
   population form gave the same runs in one call. The half-open windows were disjoint, and the live
-  timeline held only its own commit. RED seen with the archive keyed on its creation commit.
+  timeline held only its own commit. RED seen with the archive keyed on its creation commit. The
+  fold of L3 found neither run marked `joint_add`, a rotation adding the archive and only modifying
+  `RUN.md`. RED seen in place, restored by checksum, with every start marked.
 - AC2 — `build_run_model` (`test_model_ac2_own_commits`) — commits naming the run's units were
   interleaved with two of another build, one of which names the slug without a unit. The timeline
   carried the two own commits and the two phase moves in time order, and the last own commit was the
-  run's. RED seen with every era commit admitted.
+  run's. RED seen with every era commit admitted. The fold of L5 added a whole-set commit spelling
+  its units `X-xFixtureRun-1..2`, after unit 1's own build commit and before unit 2's. Its own-commit
+  and timeline entries named both units, and it was unit 2's build commit while unit 1's stayed its
+  own. `scan_unit_ids` ran a range to its end, named the first id alone for a backward range and for
+  one past `UNIT_RANGE_MAX`, and ran a range of exactly that many to its end. RED seen in place,
+  restored by checksum, five ways: the range tail ignored, which redded all five checks; each of the
+  three uses back on the single-id pattern, each redding its own check; and the bound removed.
 - AC3 — `scan_decisions` (`test_model_ac3_ac11_ledger`) — the two `Decided:` trailers in the final
   block came back with the sha of their commit. The mid-body line counted as one near-miss. The
   marks read `owner-before` 1 and `agent-inside` 1, the agent's mark wrapping across two lines. RED
@@ -66,7 +76,17 @@ that fold observed.
   with the driver journal, the window closed by the terminal END, and without it, closed by the
   terminal write; the gates; and the driver. With the run's own lines beside the older ones, each
   journal read `present`. RED seen with the pushes proof looked for among the window's moves, on both
-  pushes rows. Before this fold no landed run's `pushes` could read `dead`.
+  pushes rows. Before this fold no landed run's `pushes` could read `dead`. The fold of L2 added a
+  second journal whose lines all name another build. Windows after its epoch read `not-local`, with
+  twelve parked rows and with none, each with a note naming the build, while the journal that also
+  holds a preflight of the run's own build, refused before the run, kept `dead` and `present`.
+  Through the model, every dead case now stages that refused preflight, and the landed fixture with
+  older journals whose driver lines all name another build read `not-local` for all three. The same
+  journals with the refused preflight beside them read `dead` for all three, so one line is the whole
+  difference. RED seen in place, restored by checksum: the not-local branch removed, and any driver
+  line taken as naming the build, each redding the unit arm and the through-the-model arm. The first
+  cut of the note check passed with the branch removed, since it quantified over no not-local state;
+  it now requires the two it expects.
 - AC7 — `python tools/runlog/runlog.py model aLeakedHandle --json` (`test_model_ac7_real_tree`) — on
   this tree, with its journals aimed at a scratch directory whose first line is dated three days
   after the run and its store and transcripts at scratch, the CLI exited 0. The parked-row counts
@@ -338,3 +358,9 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   further. A session whose only call on the run comes after the run's end is no longer one of its
   sessions, which AC23 observes. One that calls `--status` inside the window still joins, and its
   calls after that `--status` END are attributed to the run, so the park stands.
+- The fold of L2 leaves a writer broken for the whole of a run made here reading `not-local`, the
+  same as a run made on another node. The model has no node identity, and only a driver line naming
+  the build places it here. The kit README names it among what the kit does not check.
+- The fold of L5 reads a range the way the memory-tree grammar reads one. A subject that continues
+  an id with bare numbers, as two of this build's own spec-audit folds spell `-1..4, 6, 8..13`,
+  names units 1 to 4 alone; the grammar reads it the same, and `scan_unit_ids` says so.

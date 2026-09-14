@@ -94,11 +94,12 @@ sources actually support. Every later surface renders from this model rather tha
     keep naming a unit id after the run has landed, and one such commit would otherwise become a
     terminal run's last own commit. A non-terminal window's end is taken past every one of them (S2),
     so the bound removes only commits made after a terminal run's end. A subject names every unit
-    id it spells, and a contiguous run spelled `<id>..<m>` names each id from `<id>` to `<m>`, the
+    id it spells, and a contiguous range spelled `<id>..<m>` names each id from `<id>` to `<m>`, the
     range the memory-tree index generator expands in a Serves line. One reader, `scan_unit_ids`,
     serves the own commits, the units each commit carries and S5's build commit, so no use of it
-    credits a whole-set commit to its first unit alone. A run naming more than `UNIT_RANGE_MAX`
-    ids names its first alone, so no subject can make the model's cost grow with its range;
+    credits a whole-set commit to its first unit alone. A range ending below its start, or naming
+    more than `UNIT_RANGE_MAX` ids, names its first id alone, so no subject can make the model's
+    cost grow with what it spells;
   - merges naming the slug, inside the window;
   - push lines, joined by where they were pushed from OR by what they pushed. A line made inside the
     window from a tree the run holds joins, and so does one inside the window that pushes the default

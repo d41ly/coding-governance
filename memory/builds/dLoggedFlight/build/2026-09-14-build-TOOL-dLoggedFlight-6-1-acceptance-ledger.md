@@ -70,6 +70,13 @@ real transcript or a real store.
   `attribution=heuristic`, on stdout and in its written extract. A session naming `tOther`'s preflight
   only in a tool's output, in narration and as `grep`'s argument was attributed nowhere and never
   extracted. RED seen with a byte regex over the raw line: the tool-output session was attributed.
+  The closing diff review's round-1 fold of L4 bumped the spec to rev-7, and its arm
+  (`test_model_driver_sets`) reads `check_slug_shape` from the driver's source and runs it with bash
+  over twelve names, the empty one, dashed, single-letter, digit-first and dash-first among them.
+  `SLUG_RE`, now one constant in `runlog_lib`, accepted exactly the names the driver accepted, and
+  `derive_tool_class` over `bash unattended.sh --preflight <name> --mode prompt` read the slug for
+  exactly those. RED seen in place, restored by checksum: the old `[A-Za-z][A-Za-z0-9]{1,63}` spelling
+  of the constant redded both checks, and the classifier back on a copy of its own redded the second.
 - AC8 — `read_records` (`test_extract_ac8_streaming`) — over a generated scratch tree of 20,000
   records in three files, counted through the one parse seam with a finalizer per record, the
   high-water of records alive was 1 while iterating, `extract_session` never held more than one when

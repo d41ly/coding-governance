@@ -100,7 +100,13 @@ from collections import Counter  # noqa: E402
 # of each journal through the model; the killed close and its source arm over every rc comparison;
 # and record AC10, the unknown counts and a killed verb's rc. Five new functions, so the decoy checks
 # alone move it by fifteen. The conf arm skips a reader it cannot reach, and that skip lowers the count.
-ASSERTION_FLOOR = 1253
+# RAISED 1253 -> 1288 by the same review's round-1 fold of L2, L3, L4, L5 and O1: two redaction rows at
+# eight checks each; a journal read not-local, in AC6 and through the model beside the dead case it
+# differs from by one line; the joint add, refused by name at a moved memory root and marked by no
+# rotation; the slug grammar graded by the driver's own function run by bash; and a range of unit ids
+# read to its end, and bounded. No new function, so the decoy checks do not move. The slug arm skips
+# where no bash shares this filesystem, and that skip lowers the count.
+ASSERTION_FLOOR = 1288
 
 PASS = []
 FAIL = []
@@ -2286,6 +2292,10 @@ def test_model_ac1_ac16_rotation():
     check("model AC1: the archive keys on its own preflight, the live record on the rotation",
           [r["start"] for r in starts], [shas[1], shas[4]])
     check_true("model AC1: ...which are two distinct commits", len({r["start"] for r in starts}) == 2)
+    # The near miss of L3's shape (closing review, round 1): a rotation ADDS the archive and only
+    # modifies RUN.md, so no start here added both, which the schema-leg arm stages the other side of.
+    check("model AC1: a rotation the driver makes marks neither run joint_add",
+          [r["joint_add"] for r in starts], [False, False])
     # THE NAIVE KEY, graded so this arm is seen able to fail: a path's own creation commit gives the
     # archive the rotation commit, which is the live run's start, so both records resolve to one.
     naive = run_git(["log", "--diff-filter=A", "--format=%H", "--", arch], repo).stdout.split()
@@ -2375,6 +2385,40 @@ def test_model_ac2_own_commits():
           model.last_own, shas[6])
     check_true("model AC2: the foreign commits exist in the range, so the filter had work to do",
                len(run_git(["rev-list", f"{shas[1]}..main"], repo).stdout.split()) == 5)
+    # L5 of the closing review, round 1: a whole-set commit spells its units as a RANGE, the way this
+    # repository's own subjects spell `TOOL-dLoggedFlight-1..13`. Unit 1 has an earlier build commit
+    # of its own, so only unit 2's build commit can be the range's, and it is when both are read.
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base",
+                                   "files": build_base_files(units=(FX_UNIT1, FX_UNIT2))}])
+    base = shas0[1]
+    st = build_preflight_state(FX_SLUG, base, base)
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(4), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — unit one alone",
+         "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(6), "subject": f"fold({FX_SLUG}): {FX_UNIT1}..2 — the whole set at once",
+         "files": {"tools/a.txt": "2\n"}},
+        {"t": derive_minute(8), "subject": f"fix({FX_SLUG}): {FX_UNIT2} — unit two alone",
+         "files": {"tools/a.txt": "3\n"}},
+    ], repo=first)
+    model = build_model(repo)
+    whole = next((c for c in model.own_commits if c["sha"] == shas[3]), {})
+    check("model AC2 range: the whole-set commit's own-commit entry names both units", whole.get("units"),
+          [FX_UNIT1, FX_UNIT2])
+    check("model AC2 range: ...and so does its timeline entry",
+          [e.get("units") for e in model.timeline if e["kind"] == "commit" and e.get("sha") == shas[3]],
+          [[FX_UNIT1, FX_UNIT2]])
+    check("model AC2 range: unit 2's build commit is the range, its first own commit outside the memory "
+          "root, and unit 1's stays its own earlier one", {u["id"]: u.get("build_commit") for u in model.units},
+          {FX_UNIT1: shas[2], FX_UNIT2: shas[3]})
+    id_re = rl_model.build_unit_id_re(FX_SLUG)
+    check("model AC2 range: a range runs to its end, a backward one and one past UNIT_RANGE_MAX name their "
+          "first id alone", [rl_model.scan_unit_ids(id_re, f"{FX_UNIT1}..3"),
+                             rl_model.scan_unit_ids(id_re, f"X-{FX_SLUG}-3..1"),
+                             rl_model.scan_unit_ids(id_re, f"{FX_UNIT1}..{rl_model.UNIT_RANGE_MAX + 1}")],
+          [[FX_UNIT1, FX_UNIT2, f"X-{FX_SLUG}-3"], [f"X-{FX_SLUG}-3"], [FX_UNIT1]])
+    check("model AC2 range: ...and a range of exactly UNIT_RANGE_MAX ids runs to its end",
+          len(rl_model.scan_unit_ids(id_re, f"{FX_UNIT1}..{rl_model.UNIT_RANGE_MAX}")), rl_model.UNIT_RANGE_MAX)
 
 
 def test_model_ac3_ac11_ledger():
@@ -2850,21 +2894,27 @@ def test_model_ac12_rc_reads_exit():
 
 def test_model_ac6_coverage():
     """AC6: every coverage state from its own fixture, the epoch rule on both sides, and a journal
-    holding only other runs' lines telling a dead writer from one that predates the run."""
+    holding only other runs' lines telling a dead writer from one that predates the run, and from a
+    run this node never saw (L2 of the closing review, round 1)."""
     base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-ac6-"))
     SCRATCH.append(base)
     other = render_driver_lines(30, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING")
-    j = write_journals(base, driver=other)
-    journals = rl_model.read_journals(j)
-    epoch = journals["driver"]["epoch"]
-    check("model AC6: the epoch is the producer file's first line", epoch, float(MODEL_T0 + 1800))
+    # A line of the run's OWN build that is none of its lines: a preflight refused on a dirty tree, which
+    # the driver writes as rc=1 with its check, made before the run. It places the build on this node.
+    own = render_driver_lines(30.5, "--preflight", rc=1, checks="2", pid=4343)
+    by_node = {"here": rl_model.read_journals(write_journals(base, driver=other + own)),
+               "elsewhere": rl_model.read_journals(write_journals(base, driver=other))}
+    epoch = by_node["here"]["driver"]["epoch"]
+    check("model AC6: the epoch is the producer file's first line, in both journals",
+          (epoch, by_node["elsewhere"]["driver"]["epoch"]), (float(MODEL_T0 + 1800),) * 2)
     transcripts = {"state": "not-local"}
-    seen = {}
+    seen, notes = {}, {}
 
-    def run_state(name, start, end, lines, activity):
-        cov = rl_model.measure_coverage(journals, {"start": start, "end": end}, {"driver": lines},
+    def run_state(name, start, end, lines, activity, node="here"):
+        cov = rl_model.measure_coverage(by_node[node], FX_SLUG, {"start": start, "end": end}, {"driver": lines},
                                         {"driver": activity}, transcripts)
         seen[name] = cov["driver"]["state"]
+        notes[name] = cov["driver"].get("note", "")
         return cov
 
     run_state("before the epoch", epoch - 900, epoch - 60, 0, "12 parked row(s) in the window")
@@ -2874,12 +2924,25 @@ def test_model_ac6_coverage():
     run_state("holding it, with lines of its own", epoch - 60, epoch + 60, 4, "12 parked row(s)")
     run_state("after it, with lines of its own", epoch + 60, epoch + 900, 4, "12 parked row(s)")
     run_state("after it, with no line and nothing proving one was owed", epoch + 60, epoch + 900, 0, None)
+    run_state("another node's run, after it, with twelve parked rows", epoch + 60, epoch + 900, 0,
+              "12 parked row(s) in the window", node="elsewhere")
+    run_state("another node's run, after it, with nothing owed", epoch + 60, epoch + 900, 0, None,
+              node="elsewhere")
+    run_state("another node's run, holding it", epoch - 60, epoch + 60, 0, "12 parked row(s)", node="elsewhere")
     check("model AC6: each window against the epoch", seen,
           {"before the epoch": "absent", "after it, with twelve parked rows and none of its lines": "dead",
            "holding it, with none of its lines": "partial", "holding it, with lines of its own": "partial",
            "after it, with lines of its own": "present",
-           "after it, with no line and nothing proving one was owed": "present"})
-    absent = rl_model.measure_coverage(rl_model.read_journals(None), {"start": 0, "end": 1}, {}, {}, transcripts)
+           "after it, with no line and nothing proving one was owed": "present",
+           "another node's run, after it, with twelve parked rows": "not-local",
+           "another node's run, after it, with nothing owed": "not-local",
+           "another node's run, holding it": "partial"})
+    local_less = [k for k in seen if seen[k] == "not-local"]
+    check_true("model AC6: each not-local journal, two of them, says why, naming the build no driver line "
+               "here names", len(local_less) == 2
+               and all(FX_SLUG in notes[k] and "driver journal" in notes[k] for k in local_less), str(notes))
+    absent = rl_model.measure_coverage(rl_model.read_journals(None), FX_SLUG, {"start": 0, "end": 1}, {}, {},
+                                       transcripts)
     seen["no journal file"] = absent["pushes"]["state"]
     check("model AC6: a missing journal file reads absent", absent["pushes"]["state"], "absent")
     check("model AC6: a fixture with no local transcript reads not-local",
@@ -2898,7 +2961,12 @@ def test_model_ac6_dead_through_model():
     journal `dead` and names its proof. `pushes` is staged twice: with the driver journal, whose
     terminal END closes the window, and without it, where the terminal write does. Its proof is the
     move into LANDED that closed the window, which lies at the end and never inside it, so looked for
-    among the window's moves it could not fire. The arms before this fold observed only `present`."""
+    among the window's moves it could not fire. The arms before this fold observed only `present`.
+
+    Every dead case holds a line of the run's own build that is none of its lines, a preflight refused
+    before the run, since a dead writer is one on THIS node (L2 of the closing review, round 1). With
+    driver lines that all name another build, the same fixture is a run made elsewhere, and reads
+    `not-local` for every journal."""
     fx = build_landed_fixture()
     repo = fx["repo"]
     older_push = render_push_lines(-30, "1" * 40, lander="1", wt=FX_WT_OTHER, decision="skip-nondefault",
@@ -2906,13 +2974,16 @@ def test_model_ac6_dead_through_model():
     older_bar = [render_gate_line(-20, "20260913T090000Z-6001", "1" * 40, wt=FX_WT_OTHER)]
     older_verb = render_driver_lines(-25, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING",
                                      wt=FX_WT_OTHER, sid=FX_SID_B, pid=4343)
+    older_own = render_driver_lines(-26, "--preflight", rc=1, checks="2", pid=4344)
     cases = (
         ("pushes, with the terminal END closing the window", "pushes",
-         dict(driver=fx["driver"], gates=fx["gates"], pushes=older_push), "terminal-end"),
-        ("pushes, with the terminal write closing it", "pushes", dict(gates=fx["gates"], pushes=older_push),
+         dict(driver=older_own + fx["driver"], gates=fx["gates"], pushes=older_push), "terminal-end"),
+        ("pushes, with the terminal write closing it", "pushes",
+         dict(driver=older_own, gates=fx["gates"], pushes=older_push), "terminal-write"),
+        ("gates", "gates", dict(driver=older_own + fx["driver"], gates=older_bar, pushes=fx["pushes"]),
+         "terminal-end"),
+        ("driver", "driver", dict(driver=older_own + older_verb, gates=fx["gates"], pushes=fx["pushes"]),
          "terminal-write"),
-        ("gates", "gates", dict(driver=fx["driver"], gates=older_bar, pushes=fx["pushes"]), "terminal-end"),
-        ("driver", "driver", dict(driver=older_verb, gates=fx["gates"], pushes=fx["pushes"]), "terminal-write"),
     )
     for name, source, journals, end_from in cases:
         model = build_model(repo, journals=write_journals(repo.parent, **journals))
@@ -2925,6 +2996,18 @@ def test_model_ac6_dead_through_model():
                                                        pushes=older_push + fx["pushes"]))
     check("model AC6 through the model near miss: with the run's own lines beside the older ones, each "
           "journal reads present", [near.coverage[s]["state"] for s in rl_model.JOURNALS], ["present"] * 3)
+    elsewhere = build_model(repo, journals=write_journals(repo.parent, driver=older_verb, gates=older_bar,
+                                                            pushes=older_push))
+    check("model AC6 through the model: the same run made on another node, every driver line here naming "
+          "another build, reads not-local for each journal, with none of its lines and no proof",
+          [(elsewhere.coverage[s]["state"], elsewhere.coverage[s]["lines"], "proof" in elsewhere.coverage[s])
+           for s in rl_model.JOURNALS], [("not-local", 0, False)] * 3)
+    here = build_model(repo, journals=write_journals(repo.parent, driver=older_own + older_verb,
+                                                       gates=older_bar, pushes=older_push))
+    check("model AC6 through the model near miss: the same journals with the refused preflight of the "
+          "run's own build beside them read dead for each, so that one line is all that differs",
+          [(here.coverage[s]["state"], here.coverage[s]["lines"], "proof" in here.coverage[s])
+           for s in rl_model.JOURNALS], [("dead", 0, True)] * 3)
 
 
 def test_model_ac7_real_tree():
@@ -3788,6 +3871,35 @@ def test_model_driver_sets():
           sorted(rl_record.RECORD_SCHEMA["vocab"]["ledger-source"][:6]), want)
     check_true("record driver sets liveness: the driver's owed sets were read, so the comparison has a side",
                len(want) == 6, str(want))
+    # THE SLUG GRAMMAR (TOOL-dLoggedFlight-6 AC7, L4 of the closing review, round 1): the kit's one
+    # `SLUG_RE` against the driver's `check_slug_shape`, run by bash from the driver's own source over a
+    # table of names, so the driver grades the copy rather than a second copy of its expectation. The
+    # extractor reads a preflight call's slug through that constant, so each name the driver accepts
+    # must come back from the classifier, and each name it refuses must not.
+    shape = read_shell_function(text, "check_slug_shape")
+    check_true("extract slug grammar: the driver declares check_slug_shape", bool(shape))
+    bash = resolve_bash()
+    if bash is None or not shape:
+        print("  SKIP extract slug grammar: no bash that shares this filesystem is on PATH, or no function "
+              "to run, so the driver cannot grade the kit's grammar here")
+        return
+    names = ("dLoggedFlight", "my-build", "a", "Z9", "trailing-", "a--b", "9lives", "-lead", "", "a_b", "a.b",
+             "ab/c")
+    script = shape + '\nfor s; do if check_slug_shape "$s"; then printf 1; else printf 0; fi; printf "\\0"; done'
+    got = subprocess.run([bash, "-c", script, "_", *names], capture_output=True)
+    fields = got.stdout.split(b"\0")
+    check("extract slug grammar: bash answered once per name, NUL-framed, and exited 0",
+          (got.returncode, len(fields), fields[-1:]), (0, len(names) + 1, [b""]))
+    driver_ok = [f == b"1" for f in fields[:len(names)]]
+    check_true("extract slug grammar liveness: the driver accepts a dashed and a single-letter name, and "
+               "refuses a digit-first one, so the table has both sides", driver_ok[1:3] == [True, True]
+               and driver_ok[6] is False, str(driver_ok))
+    check("extract slug grammar: SLUG_RE accepts exactly the names check_slug_shape accepts",
+          [bool(rl.SLUG_RE.fullmatch(s)) for s in names], driver_ok)
+    read = [rx.derive_tool_class("Bash", {"command": f"bash unattended.sh --preflight {s} --mode prompt",
+                                          "description": "preflight the run"})[3] for s in names if s]
+    check("extract slug grammar: a preflight call's slug is read exactly when the driver accepts it",
+          read, [s if ok else None for s, ok in zip(names, driver_ok) if s])
 
 
 # ================================================================ the committed record (TOOL-dLoggedFlight-9)
@@ -4935,6 +5047,27 @@ def build_h2_fixture():
     return repo
 
 
+# What the run-start refusal says when the shared start added the live record and an archive together.
+# Typed from TOOL-dLoggedFlight-10 S6, which says the refusal names that shape, never read off the leg.
+JOINT_ADD_NAMED = "added the live record and an archive together"
+
+
+def build_moved_root(repo, new_root, t=None):
+    """`repo` with its whole memory root moved to `new_root` in ONE commit, the conf naming the new
+    root. Git stores trees, never moves, so a `git mv` commit records exactly this: every tracked path
+    under the old root deleted, and added under the new; a rename is only inferred when a diff is read,
+    and the run starts are read with renames off."""
+    old = rl.resolve_memory_root(repo)
+    files = {}
+    for p in filter(None, run_git(["ls-files", "-z", "--", old], repo).stdout.split("\0")):
+        files[p] = None
+        files[new_root + p[len(old):]] = (repo / p).read_bytes().decode("utf-8")
+    files[rl.CONF_NAME] = f"MEMORY_ROOT={new_root}\n"
+    moved, _ = build_history([{"t": t if t is not None else derive_minute(40),
+                               "subject": f"chore: the memory root moves to {new_root}", "files": files}], repo=repo)
+    return moved
+
+
 def test_schema_ac5_runs():
     """AC5: over this tree, every rotated build's starts are distinct and its windows ordered and
     disjoint. A squashed history, the naive key and the unbounded era each red, naming the build."""
@@ -4964,6 +5097,25 @@ def test_schema_ac5_runs():
     check("schema AC5: ...naming the build under both run rules",
           sorted(set(re.findall(rf"run-state {FX_SLUG} refused — (run-[a-z]+) — ", r.stdout))),
           ["run-start", "run-window"])
+    check_true("schema AC5: ...and its run-start refusal names the joint add it saw",
+               any(JOINT_ADD_NAMED in ln for ln in r.stdout.split("\n")
+                   if f"run-state {FX_SLUG} refused — run-start — " in ln), r.stdout[-600:])
+    # L3 of the closing review, round 1: the H2 build, graded clean below, whose memory root then MOVES
+    # in one commit. Its runs share the move as their start, and the refusal must say which shape it saw.
+    moved = build_moved_root(build_h2_fixture(), "mem2")
+    lines, rc = rl_record.render_check_report(rl_record.check_records(moved))
+    refused = [ln for ln in lines if f"run-state {FX_SLUG} refused — run-start — " in ln]
+    check("schema AC5 moved root: the leg exits 1, refusing the build's shared start once", (rc, len(refused)),
+          (1, 1))
+    check_true("schema AC5 moved root: ...and that refusal names the joint add it saw",
+               bool(refused) and JOINT_ADD_NAMED in refused[0], str(lines[-6:]))
+    starts = rl_model.derive_run_starts(moved, "mem2", [FX_SLUG]).get(FX_SLUG, [])
+    check("schema AC5 moved root: both runs start at the move, and both are marked joint_add",
+          [(r_["start"] == starts[-1]["start"], r_["joint_add"]) for r_ in starts], [(True, True)] * 2)
+    before = rl_model.derive_run_starts(build_h2_fixture(), "memory", [FX_SLUG]).get(FX_SLUG, [])
+    check("schema AC5 moved root near miss: before the move, the same build's runs have two starts and "
+          "neither is marked joint_add", (len({r_["start"] for r_ in before}), [r_["joint_add"] for r_ in before]),
+          (2, [False, False]))
     rot = build_record_rotation()["repo"]
     clean_runs = rl_record.check_records(rot)["run_state"]
     check("schema AC5 near miss: a build rotated the way the driver rotates is graded clean",
