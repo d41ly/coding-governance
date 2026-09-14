@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards
 
-**Status:** OPEN · rev-7 · 2026-09-13 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
+**Status:** CLOSED · rev-8 · 2026-09-14 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -288,6 +288,28 @@ move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
 
 ## 9. Revision log
 
+- rev-8 · 2026-09-14 · §4 Rollout · §6 AC1 · AC4 · AC6 · AC8 · AC12 · CLOSED by owner ruling, as it
+  stands. Two owner rulings govern this revision. 2026-09-13: build agents run no self-test on every
+  step — build first, one verification pass when the build is complete; §4 Rollout's per-commit
+  grading is superseded and AC12's "own commit" reading is satisfied by the final unsharded `FAIL`
+  set at HEAD equalling BASE's. 2026-09-14: land the unit as it stands and run no gate until every
+  unit of the build is built; the verification pass was stopped after its repeat's fourth shard.
+  OBSERVED (the acceptance ledger has every run, wall and witness): AC1 — the eight floor-graded
+  counts sum to the unsharded 555 exactly, `PROLOGUE_ARMS` 0; AC6 — the eight `FAIL` sets union to
+  the unsharded 21 and are identical to BASE's 21, the count 555 against 554 being the one `same`
+  S6 adds; AC8's positive half — seven boundary captures byte-identical to the unsharded run's,
+  boundary 4 carrying `unit<main=yes` after the replay and the other six a fresh start; AC12 both
+  halves; AC3, AC5 and AC7 in Phase A; AC4 arm one — the two-shard longest at BASE is 6656 s,
+  taken beside this build's own shard run; the balance verdict OUTSIDE 1.35 on the first cut and
+  the one permitted re-cut taken, whose repeat read 1301 · 1147 · 925 · 1407 s for shards 1..4
+  before the stop. NOT OBSERVED, owed at the build's final gate pass: AC2, AC9, AC10, AC11 (the
+  staged breaks), AC4 arm two (the pooled reading, the 20-minute verdict and the arity ratio — F2
+  stays at eight until it is read), AC8's negative half, and shard 8's direct count and wall, so
+  `FLOOR_SHARD_8` and its budget are DERIVED and say so beside themselves. One host fact this
+  build measured that the record did not carry: a checker invocation on node `a` costs 47 to 60 s
+  on an otherwise idle box, so the unsharded suite is ~5.8 hours there whatever the load, and the
+  `~2 s` bound `TOOL-aTracedSpawn-2` records is another host's; the 20-minute target is a node `d`
+  question, or a spawn-path question, and this unit did not answer it.
 - rev-7 · 2026-09-13 · §2 S5 · §4 Rollout · §6 AC4 · AC8 · AC12 · §10 · folded spec-audit round 5
   (BLOCKED, 12 blocker rows in 3 defects, NON-CONVERGENT by rows against round 4's 4, precision
   0.75, disposition FOLD — the loop's exit; this spec is not re-reviewed). The oracle rev-6 reused

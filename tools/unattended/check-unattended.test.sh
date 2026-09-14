@@ -3240,19 +3240,26 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- and is an epilogue constant only the PASS line carries. The floors are not asserted to sum to
 # ---- FLOOR_ASSERTIONS: with one discount over a clean partition they nearly do, and that is a
 # ---- coincidence of the numbers, not an invariant.
-FLOOR_ASSERTIONS=392
+# ---- READINGS, 2026-09-14, node a, TOOL-aBatchedArm-3's Phase B (its acceptance ledger has the runs):
+# ---- unsharded at HEAD 555 (BASE 554 + the one `same` S6 adds); shards on the landed cut 81 · 58 ·
+# ---- 38 · 77 · 64 · 75 · 93 · 69, of which 1..4 are the repeat's direct runs, 5 and 6 the first
+# ---- candidate's (their regions did not move), 7 the profiled run of the re-cut region, and 8 is
+# ---- DERIVED as 162 - 93 from the first candidate's regions 7 + 8 — the one figure below with no
+# ---- direct run behind it. The build was landed by owner ruling before its closing runs, so
+# ---- FLOOR_SHARD_8 is re-read at the build's final gate pass and corrected there if it moved.
+FLOOR_ASSERTIONS=538
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=1
-FLOOR_SHARD_2=1
-FLOOR_SHARD_3=1
-FLOOR_SHARD_4=1
-FLOOR_SHARD_5=1
-FLOOR_SHARD_6=1
-FLOOR_SHARD_7=1
-FLOOR_SHARD_8=1
+FLOOR_SHARD_1=78
+FLOOR_SHARD_2=56
+FLOOR_SHARD_3=36
+FLOOR_SHARD_4=74
+FLOOR_SHARD_5=62
+FLOOR_SHARD_6=72
+FLOOR_SHARD_7=90
+FLOOR_SHARD_8=66
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

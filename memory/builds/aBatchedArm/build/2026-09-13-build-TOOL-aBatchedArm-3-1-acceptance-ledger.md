@@ -44,28 +44,60 @@ the commit-one blob) and the arm lines it leaves are byte-identical to commit on
 `same` S6 adds.
 
 **Evidences:** TOOL-aBatchedArm-3
-- AC5 — the ported join, exercised first as bare awk over crafted rows (every direction: complete
-  1..8 clean; index 5 deleted names `no row for index 5`; index 3 twice; index 9 of 8; two arities
-  8 and 2; a malformed `x/y`; a whole-called row alone clean), then as arms of
-  `bash tools/run-gates/run-selftests.test.sh`: `a deleted shard row reds the join NAMING the
-  missing index, rather than seven green rows` (rc 1, `no row for index 5`) and `a suite that
-  declares SHARD_ARITY and is called WHOLE is not graded by the join` (rc 0, `declaration clean`),
-  with the existing ratio arm now staging the COMPLETE set of eight so it stays green under the
-  join. `PASS (55 arms, width 1)`, floor moved 53 to 55. RED observed: with `shard_faults=""`
-  staged after the awk, the suite reported exactly `FAIL (1 of 55 arms)` — the deleted-row arm
-  got rc 0 and `declaration clean — 9 row(s)`; unstaged, 55 of 55 again. The real-tree half of
-  this criterion (`--check` green with the eight rows and the driver row) is read at commit three.
-- AC12 — the head sets, with the SHIPPED function bodies: a fixture built the way the prologue
-  builds it (bare origin with a HEAD symref, `main` pushed, `unit` branched, `ANCHOR0` and
-  `PRISTINE` set), the two leaks planted exactly as the arms plant them (`git push -q -f origin
-  "$ahead:refs/heads/ahead"`; `git branch -f trunk main` then `git push -q origin trunk`), then
-  `reset_tree` taken by `sed -n '/^reset_tree() {/,/^}/p'` from the commit-one blob and `eval`'d.
-  Planted: origin `[ahead main trunk]`, local `[main trunk unit]`. After commit one's `reset_tree`:
-  origin `[refs/heads/main]`, local `[refs/heads/main refs/heads/unit]` — the fresh set in both
-  stores. The failing case, same fixture, BASE's body `eval`'d the same way: after its
-  `reset_tree` the origin still carries `[ahead main trunk]` and the clone `[main trunk unit]` —
-  all three leaks survive, which is what the delete exists to stop. The `FAIL`-set half of this
-  criterion is `s2base` against `s3c1` and is written below them when both end.
+- AC1 — `check-unattended.test.sh` at all eight shard indices (Phase B run 2, direct, serial) and
+  unsharded (run 2u): floor-graded counts 81 · 58 · 38 · 77 · 64 · 75 · 113 · 49, sum 555, and the
+  unsharded 555 — EQUAL, `PROLOGUE_ARMS` 0; the running sums 81, 139, 177, 254, 318, 393, 506 are
+  the unsharded run's own `topo-at` stamps. Regions 1..4 re-read identically on the re-cut (81 · 58
+  · 38 · 77); the re-cut's 7 and 8 are 93 (profiled) and 69 (derived), same sum.
+- AC2 — amended rev-8 — NOT OBSERVED: the mis-cut region was never staged. Landed as it stands by
+  owner ruling 2026-09-14; the staged break against `check-unattended.test.sh --shard <i>/8` is owed
+  at the build's final gate pass, and rev-8's §9 line says so.
+- AC3 — `run-selftests.sh --kit tools/unattended/check-unattended.test.sh --list` names exactly the
+  eight rows (`declared total 108800s` at the placeholders), and `--check` exits 0 with them present
+  (`declaration clean — 68 row(s)`). Phase A, 2026-09-13 22:45, seconds each.
+- AC4 — amended rev-8 — arm two NOT OBSERVED: the pooled run, the 20-minute verdict and the arity
+  ratio were never taken, so F2 stays at eight unmeasured; owed at the build's final gate pass. Arm
+  one OBSERVED: `check-unattended.test.sh --shard 1/2` 4193 s and `--shard 2/2` 6656 s, concurrent
+  direct invocations on the BASE clone, both with the trailer, `ps before: 7` — this build's own
+  serial shard and its children, no other session's process; the two-shard longest is 6656 s.
+- AC5 — `bash tools/run-gates/run-selftests.test.sh`, two arms: the deleted-row arm reds the join
+  NAMING the missing index (rc 1, `no row for index 5`), and the whole-called arm over
+  `unattended.test.sh`, which declares an arity and is called whole, is not graded by the join
+  (rc 0, `declaration clean`); `PASS (55 arms, width 1)`, floor 53 to 55; RED observed with
+  `shard_faults=""` staged (`FAIL (1 of 55 arms)`), unstaged 55 of 55. First exercised as bare awk
+  over crafted rows in every direction (complete, deleted, duplicated, out of range, two arities,
+  malformed, whole-called). The real-tree half is AC3's `--check`.
+- AC6 — the union of the eight shards' `FAIL` sets is 21 lines and IDENTICAL as a sorted set to
+  run 2u's 21 (per region 3 · 1 · 0 · 0 · 6 · 0 · 11 · 0 in both); the unsharded count 555 against
+  the pre-split 554 is the one `same` S6 adds, so no `in_shard k` region went green by absence.
+- AC7 — `bash tools/check-install-prefix.sh` on the staged Phase A tree: RED first
+  (`ROSE tools/run-gates/selftest-budgets.txt 14 -> 21`, the brief's predicted red), then clean after
+  the hand raise with the fourth-column reason naming the eight literals.
+- AC8 — amended rev-8 — the negative half NOT OBSERVED: the planted/absent pairs at boundaries 4..8
+  and the skip lines at 2 and 3 were never run; owed at the build's final gate pass. The positive
+  half OBSERVED: every shard's opening capture (`git ls-remote --heads "$ORIGIN"` names,
+  `git for-each-ref --format='%(refname)' refs/heads` names, `git merge-base --is-ancestor`
+  verdicts) is byte-identical to run 2u's line at that boundary — 2, 3, 5, 6, 7, 8 fresh
+  (`unit<main=no`), 4 `unit<main=yes unit<origin-main=yes` after `replay_landed_main`. Seven MATCH.
+- AC9 — amended rev-8 — the separated-control break NOT OBSERVED; owed at the build's final gate
+  pass. The other half OBSERVED: the unsharded run at HEAD stays GREEN on the `same` over `$MUT`
+  against `$MUT_EXPECTED` (13, block-declared) — it is the 555th assertion and not among the 21
+  `FAIL` lines.
+- AC10 — amended rev-8 — NOT OBSERVED: no helper was un-hoisted and run from another shard; owed
+  at the build's final gate pass. The hoist itself is derived (27 definitions, `awk` over the file
+  between the first `in_shard` line and the floor line; 0 remain inside any region) and every
+  `check-unattended.test.sh --shard <i>/8` run above found every helper.
+- AC11 — amended rev-8 — the stranded-block break NOT OBSERVED; owed at the build's final gate
+  pass. The floors ARE set: every `FLOOR_SHARD_i` ~3 % under its reading (78 · 56 · 36 · 74 · 62 ·
+  72 · 90 · 66 against 81 · 58 · 38 · 77 · 64 · 75 · 93 · 69), `FLOOR_ASSERTIONS` 538 against 555,
+  both figures beside each constant; shard 8's reading is DERIVED and its constant says so.
+- AC12 — `reset_tree` with the SHIPPED body, `eval`'d from the commit-one blob over a fixture built
+  as the prologue builds it with both leaks planted as the arms plant them (`git push -q -f origin
+  "$ahead:refs/heads/ahead"`; `git branch -f trunk main` then `git push -q origin trunk`): after it,
+  origin `[refs/heads/main]` and local `[refs/heads/main refs/heads/unit]` — the fresh set in both
+  stores; BASE's body over the same fixture leaves all three leaks. And the `FAIL` set: run 1a at
+  BASE (21 lines) is byte-identical to run 2u at HEAD (21 lines), so the delete moved no unsharded
+  verdict.
 
 ## The second pass — under the 2026-09-13 owner ruling
 
@@ -231,6 +263,24 @@ inside 1.35. Region 7 carries no `push`, `branch -f`, `checkout main` or `anchor
 topology at the new edge is boundary 7's; the variable scan re-run on the re-cut file reports 0
 crossings on both readings, and `check-arms.py --check` is green.
 
+## The repeat, stopped
+
+Run 2's repeat on the re-cut (`r2-s1..4`, direct, serial, TOPO=1, beside this pass's third
+unsharded run `r2-unsharded` from 08:59 and a third tree's `run-unattended-gates.sh --all` from
+10:22): shard 1 1301 s · 81 · 3 FAIL; shard 2 1147 s · 58 · 1; shard 3 925 s · 38 · 0; shard 4
+1407 s · 77 · 0 — counts and FAIL sets identical to the first candidate's, as regions 1..4 did not
+move. Shard 5 was 15 minutes in and the unsharded repeat 1 h 35 min in when the owner ruled
+(2026-09-14 10:33): land the unit as it stands, no gate until every unit is built. Both were
+stopped; no reading. The constants landed from what exists: floors ~3 % under the counts above,
+5 and 6 from the first candidate, 7 from `prof-s7`, 8 DERIVED as 162 - 93; budgets from the walls
+above x1.5, shard 8's DERIVED from the first candidate's 893 s scaled by 69/49. Each derived figure
+says so beside itself.
+
 ## What this ledger does not evidence
 
-Pending Phase B's repeat.
+Owed at the build's final gate pass, by the 2026-09-14 ruling: AC2, AC9, AC10, AC11 — the five
+staged breaks, never staged; AC4 arm two — the pooled eight-shard reading, so neither the
+20-minute verdict nor the arity ratio was read and F2 stays at eight unmeasured; AC8's negative
+half — the planted/absent pairs at boundaries 4..8 and the skip lines at 2 and 3, never run;
+shard 8's direct count and wall on the landed cut; and the balance verdict on the repeat, four of
+eight shards read.
