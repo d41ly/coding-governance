@@ -63,10 +63,10 @@ from collections import Counter  # noqa: E402
 # checks alone move it by forty-two. Two of them read this tree, AC7 over a tracked run record and the
 # decision-log report, and a third reads the driver's source; each announces a skip where its subject
 # is absent, and a skip lowers the count, which is this floor's job to see.
-# RAISED 774 -> 902 by TOOL-dLoggedFlight-9: the committed-record arms, nine functions and the two
+# RAISED 774 -> 908 by TOOL-dLoggedFlight-9: the committed-record arms, ten functions and the two
 # checks the driver-sets arm gained for the record's owed ledger sources, so the decoy checks alone move
-# it by twenty-seven.
-ASSERTION_FLOOR = 902
+# it by thirty. One of the ten holds three copied lists to their owners in this tree, each with a skip.
+ASSERTION_FLOOR = 908
 
 PASS = []
 FAIL = []
@@ -3474,6 +3474,49 @@ def test_record_model_fields():
           ([r[3] for r in rows if len(r) == 7 and r[2] == "workflow"],
            [r[1] for r in rows if len(r) == 4 and r[2] == "out-of-band-edit"]),
           (["tier2-review"], [rl_model.derive_iso(oob_t)]))
+
+
+def test_record_copied_sets():
+    """The record's copies of three lists another file owns, each held to its owner in both directions
+    where the owner is present: the pre-push hook's decisions, the spec status tokens of the spec
+    template, and the review verdicts of the hygiene doc's check 22. Each announces its skip."""
+    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
+    try:
+        mr = rl.resolve_memory_root(top)
+    except ValueError:
+        mr = None
+    hook = top / ".githooks" / "pre-push"
+    if hook.is_file():
+        text = hook.read_bytes().decode("utf-8", "replace")
+        found = set(re.findall(r"\bRUNLOG_DECISION=([a-z][a-z-]*)", text)) | set(
+            re.findall(r"^\s*write_push_once ([a-z][a-z-]*)", text, re.M))
+        check("record sets: the hook's decisions are the record's push decisions, both directions",
+              sorted(found), sorted(rl_record.PUSH_DECISIONS))
+    else:
+        print("  SKIP record sets: no pre-push hook beside this kit, so its decisions cannot be compared")
+    spec_template = top / mr / "TEMPLATE-SPEC.md" if mr else None
+    if spec_template is not None and spec_template.is_file():
+        lines = spec_template.read_bytes().decode("utf-8", "replace").split("\n")
+        at = next((i for i, ln in enumerate(lines) if "`TOKEN` is the shared status vocabulary" in ln), None)
+        block = []
+        for ln in lines[at:] if at is not None else []:
+            if block and not ln.startswith("  "):
+                break
+            block.append(ln)
+        tokens = set(re.findall(r"`([A-Z]{3,12})`", " ".join(block))) - {"TOKEN"}
+        check("record sets: the spec template's status tokens are the record's unit statuses, both directions",
+              sorted(tokens), sorted(rl_record.UNIT_STATUSES))
+    else:
+        print("  SKIP record sets: no spec template at the memory root, so its status tokens cannot be compared")
+    hygiene = top / mr / "HYGIENE.md" if mr else None
+    if hygiene is not None and hygiene.is_file():
+        text = " ".join(hygiene.read_bytes().decode("utf-8", "replace").split())
+        m = re.search(r"closed set ((?:`[A-Z][A-Z ]*`(?: / )?)+)", text)
+        verdicts = re.findall(r"`([A-Z][A-Z ]*)`", m.group(1)) if m else []
+        check("record sets: check 22's closed verdict set is the record's review verdicts, both directions",
+              sorted(verdicts), sorted(rl_record.REVIEW_VERDICTS))
+    else:
+        print("  SKIP record sets: no hygiene doc at the memory root, so check 22's verdicts cannot be compared")
 
 
 def test_record_ac8_cost():

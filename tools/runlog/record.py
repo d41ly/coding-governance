@@ -69,14 +69,18 @@ INTRO = ("Rendered from the run model by the runlog kit's `record` command. Ever
 DATA_OPEN = "```json"
 DATA_CLOSE = "```"
 
-# THE SPEC STATUS TOKENS, COPIED from the memory tree's index generator, because a kit reads no sibling
-# kit at run time. A status outside them is withheld like any other value, never guessed at.
+# THREE LISTS ANOTHER FILE OWNS, COPIED, because a kit reads no sibling at run time. The withheld
+# self-test holds each to its owner in both directions where the owner is present: the spec status
+# tokens to the spec template, the push decisions to the pre-push hook, whose three pre-loop refusals
+# and seven END decisions they are, and the review verdicts to the hygiene doc's check 22. A value
+# outside a copy is withheld like any other, never guessed at.
 UNIT_STATUSES = ("OPEN", "SPECCED", "INPROGRESS", "BLOCKED", "DEFERRED", "CLOSED", "WONTDO")
-# The pre-push hook's decisions: its three pre-loop refusals and the seven its END line carries.
 PUSH_DECISIONS = ("refuse-default-branch", "skip-nondefault", "skip-delete", "refuse-manifest",
                   "refuse-raw", "refuse-head", "full", "scoped")
-GATE_VERDICTS = ("GREEN", "RED", "REFUSED", "NONE")
 REVIEW_VERDICTS = ("CLEAN", "CLEAN WITH FIXES", "BLOCKED")
+# The gate verdicts are the spec's own list (S4): the runner writes GREEN, RED and NONE, and REFUSED is
+# declared for a refusal line; a verdict outside it is withheld and counted.
+GATE_VERDICTS = ("GREEN", "RED", "REFUSED", "NONE")
 # The timeline's event kinds. `owner` is deliberately absent: owner turns are counts per position and
 # never clock times, so the renderer drops them from the timeline before a row is built.
 TIMELINE_EVENTS = ("phase", "verb", "commit", "merge", "push", "push-refused", "gate", "dispatch",

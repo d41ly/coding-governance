@@ -16,7 +16,8 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["nt-against-a-missing-file-is-true.md",
-  "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md"]
+  "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md",
+  "staged-break-runs-stale-bytecode.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -97,11 +98,11 @@ and counted, because a model per run over a corpus of runs must not grow with a 
 each section's fact templates and table columns declared, so the schema leg of `TOOL-dLoggedFlight-10`
 grades committed bytes against the same data rather than trusting the renderer. A value outside its
 class becomes `-` and is counted, so a model that grew a value the schema lacks says so in its record.
-Owner turns stay counts, never clock times. The spec's first bounds, 60 timeline rows each side and 40
-per list, measured over the 24 KB cap once the JSON twin doubles every row, so they fell to 30 and 20
-with a halving step for unusually wide cells. The journal commitment hashes the lines the MODEL
-attributed, and verify takes the committed count from the committed first time, so a line the run
-appends after the render is not an edit.
+Owner turns stay counts, never clock times. The spec's first bounds measured over the cap once the
+JSON twin doubles every row, so `TIMELINE_EDGE` and `LIST_BOUND` fell, with a halving step for
+unusually wide cells; the figures live in those constants. The journal commitment hashes the lines the
+MODEL attributed, and verify takes the committed count from the committed first time, so a line the
+run appends after the render is not an edit.
 
 ## Shared seams
 
@@ -129,7 +130,9 @@ appends after the render is not an edit.
   same withheld arm that holds the model's copies.
 - The unattended driver's parked-kind, owed and terminal-phase sets are COPIED into the model, and
   the withheld self-test holds each copy to the driver's source, with the fixture scaffold and the
-  driver's writer key sets beside them.
+  driver's writer key sets beside them. The record's copies of the pre-push hook's decisions, the
+  spec template's status tokens and check 22's verdicts are held the same way. Its staging harness met
+  a stale-bytecode trap, claimed here as `staged-break-runs-stale-bytecode.md`.
 - The gate runner's own `redact()` stays separate: it masks leg output on write, under its own stated
   scope, and this table does not replace it.
 - `.memory-tree.conf` — read, never written. The reader is a narrow copy of the sourced-conf grammar,
@@ -157,9 +160,9 @@ appends after the render is not an edit.
   decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
   named in its `method` field. It reads only history reachable from HEAD, and a git-only run's sparse
   sources read as idle gaps.
-- **The record proves shapes, not truth.** A count can be wrong and still be an integer. Its spec
-  status tokens are a copy the self-test does not hold to the memory tree's list, and its commitment is
-  checkable only on the node that holds the journal.
+- **The record proves shapes, not truth.** A count can be wrong and still be an integer. The lists it
+  copies from the pre-push hook, the spec template and the hygiene doc are held to them only by the
+  withheld self-test, and its commitment is checkable only on the node that holds the journal.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.

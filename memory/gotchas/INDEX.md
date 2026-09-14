@@ -54,6 +54,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
 | [signal-trap-runs-the-exit-handler-twice](signal-trap-runs-the-exit-handler-twice.md) | class | 2 |  | a signal trap that calls the exit handler and then exits runs that handler twice, because the exit fires the EXIT trap too, so anything the handler appends is appended twice |
 | [spec-names-code-its-base-lacks](spec-names-code-its-base-lacks.md) | class | 1 |  | a spec written from review records instead of from the code names machinery a commit ancestral to its own base already deleted |
+| [staged-break-runs-stale-bytecode](staged-break-runs-stale-bytecode.md) | class | 2 |  | a harness that edits a Python module and re-runs its arm can execute the previous edit's cached bytecode, because two same-size edits inside one second pass the cache's check |
 | [staged-break-substitutes-a-synthetic-value](staged-break-substitutes-a-synthetic-value.md) | class | 1 | yes | an arm that proves a mechanism by replacing the shipped value with a simpler one proves the mechanism for the simpler value |
 | [status-set-in-a-subshell](status-set-in-a-subshell.md) | class | 2 |  | a gate that prints FAILED from inside a pipeline sets a status the parent never sees, so it reports the violation and exits 0 |
 | [structured-record-split-on-whitespace](structured-record-split-on-whitespace.md) | class | 1 |  | a multi-field record iterated with an unquoted shell expansion degenerates into its first field, and every assertion built on the later fields becomes unfalsifiable |
@@ -69,6 +70,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-54 record(s): 54 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+55 record(s): 55 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

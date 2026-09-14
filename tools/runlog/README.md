@@ -241,9 +241,10 @@ closed lists, the model's own wherever it owns one. A value outside its class is
 same as an absent one, and the summary's `values withheld` line counts them. The schema leg of
 `TOOL-dLoggedFlight-10` validates committed bytes against the same data.
 
-**The cap is 24 KB for every input.** The timeline shows its first and last 30 events, and every other
-list aggregates by kind past 20 rows, each elision stated where it happens. A record still over the cap
-halves the timeline's rows and then the lists' bound, in turn, until it fits.
+**The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
+`TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision
+stated where it happens. A record still over the cap halves the timeline's rows and then the lists'
+bound, in turn, until it fits. The figures are the constants' own, in `record.py`, and not restated.
 
 **The commitment** is the sha256, count and first and last times of the journal lines the model
 attributed to the run, each hashed as its producer, a TAB and its raw bytes. `verify` rebuilds the
@@ -301,8 +302,11 @@ the slug and no unit id. Rendering makes no git call; the model's are the whole 
   push pinned, so this misses a line the model would rarely have counted.
 - **A record verified on another node.** The commitment is checkable only where the journal is, and
   `verify` elsewhere refuses rather than guessing.
-- **The spec status tokens.** They are a copy of the memory tree's list, not held to it; a status
-  outside the copy is withheld, never rendered.
+- **The lists the record copies, in a tree without their owners.** The pre-push hook's decisions, the
+  spec template's status tokens and check 22's review verdicts are held to those files by the
+  withheld self-test, where the files are present. A value outside a copy is withheld, never rendered.
+- **Whether a path the record names is tracked.** The renderer checks each path's shape and makes no
+  git call; the model reads its paths from git.
 
 ## Running the self-test
 

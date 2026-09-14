@@ -6,8 +6,9 @@ Tier-2 · node d · 2026-09-14 · the build pass of the committed record, agains
 bumped the spec from rev-4 to rev-5 in its own commit before any code, and its section 9 line names
 each change. Every criterion line is OBSERVED, and what a gate leg observes is written as owed.
 `<suite>` is `tools/runlog/selftest.py`, run directly and never through the gate runner. Its three
-timed runs at the closing commit printed `902 passed, 0 failed (902 assertions, floor 902)` in 26.5 to
-26.6 s. No gate leg was run, per the owner's instruction of 2026-09-13, and no suite that existed under
+timed runs at the build commit printed `902 passed, 0 failed (902 assertions, floor 902)` in 26.5 to
+26.6 s, and after the checklist's fold it printed `908 passed, 0 failed (908 assertions, floor 908)`
+in 26.7 s. No gate leg was run, per the owner's instruction of 2026-09-13, and no suite that existed under
 `tools/unattended/` before this build ran. Every history an arm reads is a scratch repository built
 through one `git fast-import`, and every journal, extract and store is scratch. Every fixture model is
 a real `build_run_model` over a scratch history, or one such model lengthened by copying its own
@@ -87,15 +88,46 @@ entries.
   off.
 - **The CLI's source resolution** moved out of `cmd_model` into `resolve_model_sources`, which `record`
   shares, so the two commands resolve journals, store and transcripts one way.
+- **Three copied lists held to their owners** (`test_record_copied_sets`), added by the checklist's
+  fold: the pre-push hook's decisions, the spec template's status tokens and check 22's review
+  verdicts, each compared both ways and each read without a carried path literal. RED seen with one
+  member dropped from each copy.
 
 ## Staged RED
 
-Twenty-seven breaks, each an edit applied to the file by a harness kept outside the tree, run against
-the arm that owns it and restored byte for byte. Each turned its arm red and the restored file passed.
-One more break, dropping `derive_serves`'s intersection with the defined ids, stayed green: the
-model's unit list holds only spec-defined ids, so the intersection cannot change the answer. It was
-replaced by the break that reads dispatched ids off the parked rows, which serves the undefined id and
-turned the arm red. The breaks are named per criterion above.
+Thirty breaks, each an edit applied to the file by a harness kept outside the tree, run against the
+arm that owns it and restored byte for byte. Each turned red on the very check it aims at, matched by
+that check's text and not by the exit status, and the restored file passed. The whole set was run a
+second time with the module's bytecode cache cleared before each run and none written, after a stale
+cache made one break fail a neighbour's check; that trap is now a gotcha record. One further break,
+dropping `derive_serves`'s intersection with the defined ids, stayed green: the model's unit list holds
+only spec-defined ids, so the intersection cannot change the answer. It was replaced by the break that
+reads dispatched ids off the parked rows, which serves the undefined id and turned the arm red. The
+breaks are named per criterion above.
+
+## The checklist over the build commit
+
+`gotchas.py --for-diff HEAD~1..HEAD` named ten classes after the build commit.
+
+- `two-answers-to-one-question` was violated, and the fold fixes it. The kit README and the dossier
+  restated the bounds and the cap that `record.py` owns, and now name the constants. The record's
+  copies of three lists another file owns are now held to those files.
+- `staged-break-substitutes-a-synthetic-value`: each break edits the code, and the one arm that edits a
+  constant drops a real member from the real list.
+- `fixture-passes-by-finding-nothing`: every arm carries a liveness check its fixture must trip, and
+  the staged-RED match is on each break's own check, which is how the stale-bytecode trap surfaced.
+- `heredoc-escape-reaches-the-regex` hit the first staging harness, whose two join patterns lost an
+  escape level and matched nothing. Both breaks were rewritten from a file and seen red; no tracked
+  file was written through a heredoc.
+- `naming-leg-grades-what-python-named`: every new function, nested helpers included, was asked of
+  the lexicon, and a nested `dump` was renamed `render_json`. The map was regenerated in each commit.
+- `fold-text-is-unreviewed-surface`: rev-5 and this fold are text no review has read. The closing diff
+  review of the build reads them.
+- `amendment-leaves-its-other-half-standing`: AC1's hygiene clause and S6's bounds were amended, and
+  their neighbours, the gates, the scope joins and the sibling specs' references, were re-read.
+- `inline-fence-swallows-the-rest-of-the-file`, `empty-field-collapses-unless-it-is-last` and
+  `suite-invalidated-by-a-commit-under-it`: the record's one fence is on lines of its own, no shell was
+  written, and no commit ran under a timed suite.
 
 ## Owed to the post-build gate run
 
@@ -109,8 +141,10 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 
 ## Residue
 
-- The spec status tokens are a copy of the memory tree's list, and nothing holds them to it, since that
-  arm would need a second carried path literal. A status outside the copy is withheld, not rendered.
+- The gate verdicts are the spec's own list. The runner writes GREEN, RED and NONE and never REFUSED,
+  so they are held to no source, and a verdict outside the list is withheld and counted.
+- The build commit's second `Decided:` trailer, that the status tokens go unheld for want of a carried
+  literal, was reversed by the fold, which reads them through the declared memory root instead.
 - The record's timeline carries idle gaps, whose end is an event's time, and that event can be an owner
   turn. The kit README names it.
 - `verify` cannot see a line inserted before the committed first time. The model attributes none there

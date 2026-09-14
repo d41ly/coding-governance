@@ -6048,6 +6048,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_record_copied_sets",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_record_model_fields",
       "kind": "function",
       "file": "tools/runlog/selftest.py"

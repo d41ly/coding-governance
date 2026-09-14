@@ -196,6 +196,7 @@
       "second-implementation-is-not-a-second-opinion.md",
       "signal-trap-runs-the-exit-handler-twice.md",
       "spec-names-code-its-base-lacks.md",
+      "staged-break-runs-stale-bytecode.md",
       "staged-break-substitutes-a-synthetic-value.md",
       "status-set-in-a-subshell.md",
       "structured-record-split-on-whitespace.md",
