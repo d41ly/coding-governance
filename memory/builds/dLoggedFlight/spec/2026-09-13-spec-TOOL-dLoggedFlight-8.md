@@ -52,13 +52,15 @@ sources actually support. Every later surface renders from this model rather tha
     terminal phase on both of its lines and ends nothing;
   - for a terminal record, the first commit in its era that wrote a terminal `phase:`;
   - for a non-terminal record, one second after its last event. Its events here are its journal
-    lines, the commits in its era that touched `RUN.md`, the commits and merges its timeline lists
-    (S3), and the gate and push lines made from a tree it holds (S3) before the next run's journal
-    lines begin. The second is a commit time's resolution, and it puts the run's last event inside its
-    own half-open window. Two sources never move it. A transcript event does not, because the run's session keeps
-    working after the run and renders the record itself, so an end taken from the session would end
-    at the render and move with every re-render. A push joined only by what it pushed does not,
-    because every later push of the default branch carries the run's commits.
+    lines, the commits in its era that touched `RUN.md`, its own commits (S3), a merge naming one of
+    its unit ids among them, and the gate and push lines made from a tree it holds (S3) before the
+    next run's journal lines begin. The second is a commit time's resolution, and it puts the run's
+    last event inside its own half-open window. Three sources never move it. A merge naming only the
+    slug does not, under the rule below for a commit that merely names it. A transcript event does
+    not, because the run's session keeps working after the run and renders the record itself, so an
+    end taken from the session would end at the render and move with every re-render. A push joined
+    only by what it pushed does not, because every later push of the default branch carries the run's
+    commits.
 
   Journal STARTs join git's runs by a named key, never by position. A successful record-creating
   `--preflight` START, paired with an END of `rc=0`, belongs to the start commit its own call made: the
@@ -441,17 +443,19 @@ command.
   and an `ev=once` refusal. The timeline and `journal_lines` hold none of them, and
   `push-outside-lander` does not fire. The landing push still joins by what it pushed, and its
   pinned bar by its id. When another run's preflight then runs in the run's own worktree, a bar made
-  there before it joins and one made after it does not.
-  Red when: a line joins through a tree that only a `--status` or a `--landed` put in the key, or a
-  reused worktree's later bar joins.
+  there before it joins and one made after it does not. When the run's own call first claims a
+  second worktree mid-window, a bar made there after that call joins and one made before it does not.
+  Red when: a line joins through a tree that only a `--status` or a `--landed` put in the key, a
+  reused worktree's later bar joins, or a tree's bar from before the run claimed it joins.
 - **AC21** — When `build_run_model` reads a non-terminal fixture run whose own commit, bar and branch
   push, the last two made in its own worktree, come twenty minutes after its last driver line, the
   window closes one second past the push's END. All three lie inside it, the bar and the push join by
   tree, and the gates source counts the bar. None of these moves that end: a later bar made in the
-  primary tree, a bar made in the run's worktree after another run's preflight there, and a later tool
-  call in the run's session. With no journal, the window closes one second past the own commit.
+  primary tree, a bar made in the run's worktree after another run's preflight there, a later merge
+  naming only the slug, and a later tool call in the run's session. With no journal, the window
+  closes one second past the own commit, and the merge still moves nothing.
   Red when: the window closes at the last driver line, or a line from a tree the run does not hold,
-  or a transcript event, moves it.
+  a merge naming only the slug, or a transcript event moves it.
 
 ## 7. Gates
 
@@ -515,9 +519,11 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   Rev-6 keyed on every tree any of the run's calls ran in, so a `--landed` or an owner's `--status`
   in the primary tree made every bar and push there the run's for its whole window. M5: a
   non-terminal window closes one second past the run's last event over every source it owns: its
-  journal lines, its record commits, the commits and merges its timeline lists, and the lines of the
-  trees it holds. Rev-5 read the first two alone, so this run's later commits and both of its bars
-  fell outside its own window. The review also proposed bounding a tree that has to stay in the key
+  journal lines, its record commits, its own commits, and the lines of the trees it holds. Rev-5
+  read the first two alone, so this run's later commits and both of its bars fell outside its own
+  window. The review also listed the merges naming the slug. S2 already takes no bound from a commit
+  that merely names the slug, and such a merge is one, so only an own commit moves the end, a merge
+  naming a unit id included. The review also proposed bounding a tree that has to stay in the key
   to the span between its first and last pre-close verb. A hold ending at the last verb would put the
   run's bars after that verb outside the window, which is the M5 defect, so the hold ends at the next
   run's claim instead. That bound still covers the tree the review meant, since the primary tree
