@@ -203,7 +203,8 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   descendant of the run's last own commit, which is how the landing push from the primary tree joins.
   A gate line joins through the `gate_run` a joined push pinned, or from the run's worktree.
 - **Every inferred answer is named** in the model's `method` field.
-- **Git cost is constant**: six processes whatever the run's size, which the self-test counts.
+- **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
+  10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
 
 ## What this kit does NOT check
 

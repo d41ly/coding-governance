@@ -2,11 +2,11 @@
 
 ```toml
 feature = "runlog"
-title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, and the extractor that turns a session's transcripts into structural events"
+title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, and the run model that joins every source into one account of one run"
 status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
-  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6"]
+  "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line"]
@@ -83,6 +83,15 @@ wording drifted and a prefix missed fires the join found. The self-test's own `m
 ambient root at a decoy before any arm runs, since an arm that forgot one redirection would otherwise
 read or write the owner's real store.
 
+**The run model keys a run on the commit that STARTED it, and bounds every read to that run's era.**
+The driver rotates a finished record in its successor's preflight commit, so a path's own creation
+commit gives an archive its successor's start; with renames off, the commits that ADDED a run-state
+path are the starts, one per run. A window ends at the END that moved the phase INTO a terminal one,
+never at a mention of the slug, which later commits keep making. Its first cut took any END reading a
+terminal phase, and the arm modeling a real landed record against a journal dated after it saw that
+window end three days late, on a `--status` that read LANDED on both lines. Its git cost is constant
+and counted, because a model per run over a corpus of runs must not grow with a run's commits.
+
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
@@ -98,8 +107,13 @@ read or write the owner's real store.
   `runlog_lib` rather than re-parsing. The extractor, `TOOL-dLoggedFlight-6`, shipped first: it
   reads session ids off the driver journal's `start` lines through `read_journal`, runs driver
   command heads and printed narration through `render_redacted`, and persists no free text at all.
-  The run model, `TOOL-dLoggedFlight-8`, joins its events into a run's timeline, and the
-  question-answering skill, `TOOL-dLoggedFlight-12`, prints narration through its `narration` verb.
+  The run model, `TOOL-dLoggedFlight-8`, shipped next: it joins the journals, the extracts, git and
+  the run-state file into one run, and the committed record of `TOOL-dLoggedFlight-9` renders from it
+  and reads its run starts rather than re-deriving them. The question-answering skill,
+  `TOOL-dLoggedFlight-12`, prints narration through its `narration` verb.
+- The unattended driver's parked-kind, owed and terminal-phase sets are COPIED into the model, and
+  the withheld self-test holds each copy to the driver's source, with the fixture scaffold and the
+  driver's writer key sets beside them.
 - The gate runner's own `redact()` stays separate: it masks leg output on write, under its own stated
   scope, and this table does not replace it.
 - `.memory-tree.conf` — read, never written. The reader is a narrow copy of the sourced-conf grammar,
@@ -123,6 +137,10 @@ read or write the owner's real store.
   renamed key reads as absent, and the fixtures are synthetic shapes written from key-and-count
   measurements, never copied. The classifier is not a shell: `bash -c`, `eval` and a quoted `$(…)`
   hide the call inside them. `--discover` is a heuristic and says so.
+- **The run model infers, and says which answers are inferred.** The build commit, the owner's
+  decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
+  named in its `method` field. It reads only history reachable from HEAD, and a git-only run's sparse
+  sources read as idle gaps.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
@@ -144,3 +162,7 @@ classifies; extend via one row in `redaction.tsv` and its id in `CLASS_IDS`, nev
 seam: `extract.extract_session` + `read_records` — reuse for any consumer of a Claude Code session's
 transcripts; extend via a new member of `KINDS` or `CLASSES` with a fixture scenario producing it,
 which the self-test demands in both directions, never a second transcript reader.
+
+seam: `model.build_run_model` + `derive_run_starts` — reuse for any surface that reports on a run, and
+the run starts for anything keyed on one; extend via a new member of `ANOMALY_KINDS`,
+`CONFORMANCE_ITEMS` or `LEDGER_SOURCES` with the fixture that produces it, never a second joiner.
