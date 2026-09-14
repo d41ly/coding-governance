@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** SPECCED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -35,9 +35,10 @@ leg can prove nothing else got in.
   run-state file that was never committed has no start commit, and the command refuses with a named
   line. Observed by AC1.
 - **S2** The head carries `**Serves:** journal <ids>`, listing the unit ids the run dispatched or
-  closed, as ranges where contiguous, and only ids a spec H1 in this build defines. A run with no
-  spec-defined id writes no tracked record and says so, since an unbound record moves a shrink-only
-  pin. Observed by AC2.
+  closed, as ranges where contiguous, and only ids a spec H1 in this build defines. A unit was
+  dispatched when a `dispatch` row of the run's own record names it, and closed when its spec status
+  reads CLOSED and one of the run's own commits names it. A run with no spec-defined id writes no
+  tracked record and says so, since an unbound record moves a shrink-only pin. Observed by AC2.
 - **S3** The markdown has fixed headings in a fixed order. Observed by AC3. They are:
   - `## Summary`, one fixed template per line;
   - `## Timeline`, a table whose every row's first cell is a UTC timestamp;
@@ -46,7 +47,11 @@ leg can prove nothing else got in.
   - `## Conformance`, `## Anomalies` and `## Coverage`;
   - `## Data`, holding one fenced `json` block with the structural twin.
 
-  No row leads with an id, because a leading id DEFINES it for checks 13 and 14.
+  No row leads with an id, because a leading id DEFINES it for checks 13 and 14. A section holds only
+  the fact lines and tables `RECORD_SCHEMA` declares for it, and every other table's first cell is a
+  1-up ordinal. The timeline carries no owner turn: S4 keeps owner turns to counts. The `Data` twin is
+  the markdown re-encoded, every fact and every shown row of every section, so the two cannot
+  disagree.
 - **S4** The closed schema, `RECORD_SCHEMA`, as value classes. Observed by AC4. The record carries only:
   - shaped values: verb tokens matching `^--[a-z-]{2,20}$`, phase tokens matching `^[A-Z]{3,12}$`,
     check numbers, shas, this build's own unit ids, integers, durations, UTC timestamps,
@@ -63,26 +68,37 @@ leg can prove nothing else got in.
     - the push decisions of `TOOL-dLoggedFlight-4`;
     - the conformance items, conformance states, anomaly kinds and merged sub-classes of
       `TOOL-dLoggedFlight-8`, with `no-progress` among the anomaly kinds;
-    - review verdicts and exits.
+    - review verdicts and exits;
+    - the timeline's event kinds, the spec status tokens, what opened and closed the window, and
+      `yes` and `no`.
 
-  There is no free text, no absolute path, no session id, no host id and no command. Owner turns
-  appear as counts per position, with no clock time.
+  The shaped values add a sha256 digest, which S5 commits. A repo-relative path is one under the
+  build's own folder in the declared memory root, the only paths the record carries. There is no free
+  text, no absolute path, no session id, no host id and no command. A model value outside its field's
+  class is written `-`, which also stands for an absent value, and the summary's `values withheld`
+  line counts them. Owner turns appear as counts per position, with no clock time.
 - **S5** The integrity commitment: the sha256, line count and first and last timestamps of the journal
   lines attributed to this run, so an edit to the journal made after the render is detectable on the
   producing node. `runlog.py verify <record>` recomputes them. A run with no journal lines records
   `commitment=none`, and `verify` on it exits 0 with a line saying there is nothing to verify.
-  Observed by AC5.
+  The model names the lines it attributed, by producer and line number, as `journal_lines`. `verify`
+  rebuilds the model and hashes the committed number of those lines from the committed first
+  timestamp on, so a line the run appends after the render is not an edit. A machine holding no
+  journal of the run refuses, exit 2, rather than reporting a mismatch. Observed by AC5.
 - **S6** A size cap of 24 KB, kept reachable for every input by a bound on every section that grows:
-  - the timeline is elided beyond its first and last 60 rows, with the elided count stated;
-  - anomalies and conformance aggregate by kind with counts past 40 rows each;
-  - units aggregate by status with counts past 40 rows;
-  - decisions aggregate by ledger source with counts past 40 entries.
+  - the timeline is elided beyond its first and last 30 rows, with the elided count stated;
+  - anomalies and conformance aggregate by kind with counts past 20 rows each;
+  - units aggregate by status with counts past 20 rows;
+  - decisions aggregate by ledger source with counts past 20 entries, and review rounds past 20.
 
-  The summary is never elided. The `Data` twin is elided and aggregated by the same rules and carries
-  the same counts, so it can never exceed what the markdown shows. Observed by AC6.
+  When a record still exceeds the cap, the shown rows halve, the timeline's first, until it fits, and
+  every elision is stated. The summary is never elided. The `Data` twin is elided and aggregated by
+  the same rules and carries the same counts, so it can never exceed what the markdown shows.
+  Observed by AC6.
 - **S7** The command renders from the model, writes the file, and prints the one follow-up it cannot
   run itself: re-render the build index, which the render step of `TOOL-dLoggedFlight-11` runs and
-  stages. It also prints that the commit subject names the slug, never a unit id. Observed by AC7.
+  stages. The generator is found beside this kit by its file name, never spelled by path. It also
+  prints that the commit subject names the slug, never a unit id. Observed by AC7.
 - **S8** The render makes no git call per row, and no git call at all beyond the model's own. Its wall
   time is printed report-only. Observed by AC8.
 
@@ -111,18 +127,39 @@ A record serving N ids re-renders each served spec's records region and the READ
 That is why the index re-render is part of the commit, and why the command says so rather than
 leaving a stale index for check 9 to find at the push.
 
+The model gains three things this record needs and could not otherwise render without re-deriving
+them. Each is additive, and none changes an answer unit 8's arms grade:
+
+- `journal_lines`, the line numbers per producer of every journal line it attributed to the run, which
+  S5 hashes;
+- the extractor's workflow runs inside the window, each with its label, on the timeline, since S4
+  admits workflow labels and the model carried none;
+- a time on every anomaly that has one, so the anomalies table can say when.
+
+`RECORD_SCHEMA` holds the vocabularies BY REFERENCE to the model's own closed lists wherever the model
+owns one, so the record and the model cannot name two different sets. It declares each section's fact
+lines as templates and each table's columns as classes, with the timeline's columns classed per event
+kind. That is the data `TOOL-dLoggedFlight-10`'s leg validates the committed bytes against.
+
+The rev-4 bounds did not fit the cap. They put 120 timeline rows in the markdown and the same 120 in
+the twin, and a row pair measures about 140 bytes, so the timeline alone reached 17 KB before any
+other section. The rev-5 bounds leave room for the rest, and the halving step keeps the cap for a
+record whose cells are unusually wide, since a path's width has no bound of its own.
+
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
 | `tools/runlog/record.py` | module | none |
 | `render_record`, `write_record`, `derive_runkey`, `derive_serves`, `measure_commitment`, `check_commitment`, `resolve_record_path` | functions | `py.function`, verb-led |
+| `render_serves`, `build_record_doc`, `render_markdown`, `render_twin`, `render_cell`, `parse_record` and the other private helpers | functions | `py.function`, verb-led |
 | `RECORD_SCHEMA` | constant | none |
 | `cmd_record`, `cmd_verify` | CLI subcommands | reserved `cmd` |
 
 ### Files touched (estimate)
 
-`tools/runlog/{record.py,runlog.py,selftest.py,README.md}` and fixtures.
+`tools/runlog/{record.py,model.py,runlog.py,selftest.py,README.md}`. The record's fixtures are built
+by the self-test at run time, from real models where a model is needed, so no fixture file is added.
 
 ### Alternatives rejected
 
@@ -154,13 +191,15 @@ leaving a stale index for check 9 to find at the push.
 `<kit>` below is `tools/runlog`. Every criterion runs `python <kit>/selftest.py` unless it names another
 command.
 
-- **AC1** — When `render_record` renders the two runs of a fixture build rotated the way the driver
+- **AC1** — When `write_record` renders the two runs of a fixture build rotated the way the driver
   rotates, one run with journals and one with none, on one date, their file names differ in
-  `<runkey>`. Each key equals that run's `derive_run_starts` value, and each passes check 5's name
-  grammar and check 21's projection in `bash tools/memory-tree/check-memory-hygiene.sh` over a scratch
-  tree. Re-rendering the first run on a later date rewrites its existing file. A never-committed
-  run-state file refuses with a named line. With `MEMORY_ROOT=docs/mem` in the scratch tree's conf, the
-  record is written under `docs/mem/builds/`.
+  `<runkey>`. Each key equals that run's `derive_run_starts` value. Each name passes check 5's name
+  grammar and check 21's projection, both typed into the self-test from `memory/HYGIENE.md` rather
+  than taken from the renderer. The real gate's verdict over a committed record is owed to the
+  `memory hygiene` leg of the bar that grades this run's own record (`TOOL-dLoggedFlight-11` S5),
+  since this pass runs no gate. Re-rendering the first run on a later date rewrites its existing
+  file. A never-committed run-state file refuses with a named line. With `MEMORY_ROOT=docs/mem` in the
+  scratch tree's conf, the record is written under `docs/mem/builds/`.
   Red when: the two runs share a key, the name drops the family or the runkey, a re-render makes a
   second file, or the record lands outside the declared root.
 - **AC2** — When `derive_serves` reads a fixture run that dispatched units 2, 3 and 5 of a build whose
@@ -182,7 +221,8 @@ command.
   Red when: the commitment is computed over nothing and always matches, or `commitment=none` fails.
 - **AC6** — When `render_record` renders a fixture run with 500 timeline rows, 60 units, 200 anomalies
   and 300 ledger entries, the record stays under 24 KB. It states every elided and aggregated count,
-  keeps every anomaly kind that occurred, and its `Data` twin carries the same counts.
+  keeps every anomaly kind that occurred, and its `Data` twin carries the same counts. A fixture
+  whose every section sits at its bound with its widest values still fits, through the halving step.
   Red when: the cap is passed, an anomaly kind disappears, or the twin carries rows the markdown elided.
 - **AC7** — When `record --write` runs, stdout names the index re-render command and the slug-only
   commit subject.
@@ -215,6 +255,15 @@ none
 - rev-4 · 2026-09-13 · S1 S4 · AC1 AC4 · folded round-3 spec audit M11 (the owed ledger sources are held
   to the driver's source) and M12 (the record's root is the declared memory root, with a two-segment
   fixture).
+- rev-5 · 2026-09-14 · S2 S3 S4 S5 S6 S7 · §4 · AC1 AC6 · the build pass, before its code. S2 defines
+  dispatched and closed. S3 names the declared facts and tables, the ordinal first cells, the timeline
+  with no owner turn, and the twin as the markdown re-encoded. S4 adds the vocabularies the sections
+  need, the digest S5 commits, the `-` a withheld value becomes and the path class. S5 reads the
+  model's `journal_lines`, and `verify` hashes from the committed first line so an appended line is
+  no edit. S6's rev-4 bounds measured over the cap once the twin doubles each row, so they fall to 30
+  and 20, with a halving step. S7 finds the index generator rather than spelling a sibling kit's path.
+  §4 lists the three additive model fields. AC1's hygiene clause is typed from `memory/HYGIENE.md`,
+  with the gate's own verdict owed, because this pass runs no gate. AC6 gains the widest-cell fixture.
 
 ## 10. Reuse audit
 
