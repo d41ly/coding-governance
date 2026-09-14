@@ -1329,7 +1329,7 @@ if (cleanRound && !attended) {
     '.md` in this order, which is the order the callee\'s own synthesis writes and hygiene check 22 ' +
     'reads: line 1 exactly `**Serves:** spec-audit ' + owed.join(' ') + '`; a title line; a line naming ' +
     'the reviewed subjects `' + subjectLines + '` and the round; then a heading that is exactly ' +
-    '`## Verdict: CLEAN`; then the body quoting the callee (it said: ' +
+    '`## Verdict: CLEAN`; then the body quoting the callee (the callee said: ' +
     (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + '). ' +
     (uncovered.length
       ? 'NOT covered by this round and NOT to be named on that line: ' + uncovered.join(', ') +
