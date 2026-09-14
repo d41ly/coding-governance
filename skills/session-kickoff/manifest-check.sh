@@ -17,13 +17,22 @@
 #   manifest-check.sh --card --write [--session <sid>]    # write the session's orientation card
 #   manifest-check.sh --card --replay [--session <sid>]   # print it back, plus one `now —` line
 #   manifest-check.sh --card --path [--session <sid>]     # print where it lives, touch nothing
+#   manifest-check.sh --card --append --session <sid>     # stdin = the kickoff's body: check every
+#                                         # cited path, range and id for EXISTENCE in two spawns,
+#                                         # annotate each miss `UNVERIFIED — <token>`, store it
+#   manifest-check.sh --card --check --session <sid>      # the same check over the stored card
 #     The card verbs run NO manifest check: the session id comes from the SessionStart hook's JSON
-#     on stdin, else --session; the card lives at <git-common-dir>/orientation/<sid>.md, shared by
-#     every worktree; the `node —` cell resolves through the manifest audit block's `registry:` key.
+#     on stdin, else --session (--append: --session alone, stdin is the body); the card lives at
+#     <git-common-dir>/orientation/<sid>.md, shared by every worktree; the `node —` cell resolves
+#     through the manifest audit block's `registry:` key. The append and the check do NOT judge
+#     relevance, scope, tier, or the truth of a claim at the line it cites — existence only.
 #
-# Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed.
+# Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed — for
+#          the card verbs: a body or card with nothing to check (DEAD PROBE), a --check miss, or a
+#          real READY line with no `## task` beneath it.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo / a card
-#          verb with no session id, a path-shaped one, or a startup card over its byte cap).
+#          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
+#          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
 KIT_MANIFEST_VERSION="1.4"   # gov:kit kickoff-manifest@1.4 — the registry id
 
@@ -85,7 +94,7 @@ for _a in "$@"; do
   if [ "$_want_sid" = 1 ]; then CARD_SID="$_a"; _want_sid=0; continue; fi
   case "$CARD$_a" in
     1--card) ;;
-    1--write|1--replay|1--path) CARD_VERB="${_a#--}" ;;
+    1--write|1--replay|1--path|1--append|1--check) CARD_VERB="${_a#--}" ;;
     1--session) _want_sid=1 ;;
     1--session=*) CARD_SID="${_a#--session=}" ;;
     *) _rest+=("$_a") ;;
@@ -93,7 +102,7 @@ for _a in "$@"; do
 done
 set -- ${_rest[@]+"${_rest[@]}"}
 if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
-  echo "MANIFEST env ERROR — --card needs one of --write, --replay or --path"; exit 2
+  echo "MANIFEST env ERROR — --card needs one of --write, --replay, --path, --append or --check"; exit 2
 fi
 
 CALLER_PWD=$PWD
@@ -112,11 +121,15 @@ CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 
 # The session id: the SessionStart hook hands `{"session_id": …}` on stdin; a hand invocation passes
 # --session. Neither is a refusal naming both, never a card under a guessed id; a separator, `..` or
-# any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path.
+# any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path. `--append` never
+# reads stdin here — stdin is the body it stores — so it takes `--session` alone.
 read_session_id() {
   local sid=""
-  [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  [ "$CARD_VERB" = append ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
   [ -n "$sid" ] || sid="$CARD_SID"
+  if [ -z "$sid" ] && [ "$CARD_VERB" = append ]; then
+    echo "MANIFEST env ERROR — --card --append has no session id: stdin is the body, so pass --session <sid>"; exit 2
+  fi
   [ -n "$sid" ] || { echo "MANIFEST env ERROR — --card --$CARD_VERB has no session id: none in the JSON on stdin (the SessionStart hook's channel) and no --session <sid> given"; exit 2; }
   case "$sid" in
     *..*) echo "MANIFEST env ERROR — session id '$sid' carries '..' and is not joined into a path"; exit 2 ;;
@@ -219,9 +232,8 @@ derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the 
   if [ "$n" -eq 0 ]; then HEAD_DIRTY=clean; else HEAD_DIRTY="dirty $n"; fi
 }
 render_card() {
-  local verb="$1" registry="" kind memroot live conf
+  local verb="$1" registry="" memroot live conf
   [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); registry=$(getval 'registry'); }
-  if [ -f "$ROOT/.git" ]; then kind=worktree; else kind=primary; fi
   derive_head_state
   conf="$ROOT/.memory-tree.conf"
   if [ ! -f "$conf" ]; then
@@ -238,7 +250,7 @@ render_card() {
   fi
   printf 'orientation — %s · written %s · by %s --card --%s\n' "$CARD_SID" "$(date +%Y-%m-%dT%H:%M:%S%z)" "${0##*/}" "$verb"
   derive_node_tag "$registry"
-  printf 'tree — %s · %s · branch %s · BASE %s · %s\n' "$TOPLEVEL" "$kind" "$HEAD_BRANCH" "$HEAD_SHA" "$HEAD_DIRTY"
+  render_tree_cell
   printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
   printf '%s\n' "$live"
   printf 'recent —\n'
@@ -270,10 +282,206 @@ print_replay() {
   printf 'now — HEAD %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY"
 }
 
+# ---- the append and the citation check (KICK-aReplayedCard-2) -------------------------------------
+# WHAT THESE DO NOT CHECK, stated here because a structural check reads as a semantic one to
+# everybody who did not write it: relevance, scope correctness, tier, and the truth of a claim at
+# the line it cites. They resolve EXISTENCE — a cited path is tracked, a cited range is inside the
+# file, a cited id is DEFINED by a spec H1, a backlog row or a decision row — and nothing else. An
+# untracked record is invisible to both probes and reports as a miss. Two spawns per run, never one
+# per token: one `git ls-files -- …` over every path and basename cited, and one
+# `corpus_ids.py --print-defined-ids`, the memory-tree kit's reader, which owns the id grammar and
+# prints it on its first line as a POSIX ERE — this script spells no id grammar of its own.
+CARD_ID_ERE_KEY='# id-ere: '
+CARD_ID_ERE=""; CARD_TOKENS=0; CARD_TMP=""
+
+# The one spelling of the `tree —` line. `render_card` writes it at session start and `add_card_body`
+# re-renders it in the tree the append runs in, so the deny that compares the cell to the commit's
+# toplevel sees the tree the kickoff ran in. Callers run `derive_head_state` first.
+render_tree_cell() {
+  local kind
+  if [ -f "$ROOT/.git" ]; then kind=worktree; else kind=primary; fi
+  printf 'tree — %s · %s · branch %s · BASE %s · %s\n' "$TOPLEVEL" "$kind" "$HEAD_BRANCH" "$HEAD_SHA" "$HEAD_DIRTY"
+}
+
+# The memory-tree kit's id reader, by the engine's own <MEMORY_TREE_KIT> rule: whichever of
+# `tools/memory-tree/` or `memory-tree/` holds it. Empty when neither does; the caller says so.
+resolve_id_reader() {
+  local d
+  for d in tools/memory-tree memory-tree; do
+    [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
+  done
+  return 0
+}
+
+# One token per line, `<line>\t<kind>\t<token>\t<range>`, kinds `path` (a slash and an extension —
+# the rule the spec-token lint applies to a spec's acceptance bullets), `base` (a basename
+# with an extension and a `:<line>` tail, the house style `run-gates.sh:407`) and `id` (the reader's
+# grammar). Not a token: a glob, a `{{placeholder}}`, a `$var`, a `<slot>`, a `GATE_` knob, a URL,
+# and an absolute path — the `tree —` cell carries one, and a checkout location is not a claim
+# about the tree. Backticks, brackets and quotes separate; trailing sentence punctuation is dropped.
+# A line that is itself an annotation is BLANKED, not deleted, so line numbers still address the
+# rows they belong to — which is what lets `--check` re-run over a card it annotated.
+extract_card_tokens() {
+  local filtered="$CARD_TMP/filtered"
+  awk '/^UNVERIFIED — /{print ""; next} {print}' "$1" | tr -d '\r' > "$filtered"
+  awk -v q="'" '
+    { ln=$0; gsub(/`/, " ", ln); gsub(/[()]/, " ", ln); gsub(/\[/, " ", ln); gsub(/\]/, " ", ln)
+      gsub(/"/, " ", ln); gsub(q, " ", ln)
+      n=split(ln, w, /[ \t]+/)
+      for (i=1; i<=n; i++) {
+        t=w[i]; sub(/[,.;:]+$/, "", t)
+        if (t=="" || index(t,"://") || t ~ /[*?]/ || t ~ /\/$/) continue
+        c=substr(t,1,1)
+        if (c=="/" || c==":" || c=="$" || c=="~" || c=="<" || substr(t,1,2)=="{{" || substr(t,1,5)=="GATE_") continue
+        if (t ~ /^[A-Za-z]:/) continue
+        r=""
+        if (match(t, /:[0-9]+(-[0-9]+)?$/)) { r=substr(t, RSTART+1); t=substr(t, 1, RSTART-1) }
+        if (t ~ /[\/.]$/) continue
+        k=split(t, seg, "/"); base=seg[k]
+        if (index(base, ".")==0) continue
+        if (k>1) print NR "\tpath\t" t "\t" r
+        else if (r!="") print NR "\tbase\t" t "\t" r
+      } }' "$filtered"
+  [ -n "$CARD_ID_ERE" ] && grep -noE "\\b($CARD_ID_ERE)\\b" "$filtered" | awk -F: '{print $1 "\tid\t" $2 "\t"}'
+  return 0
+}
+
+# The check over one file: the two spawns, then a verdict per token. Misses land in
+# `$CARD_TMP/misses` as `<line>\t<annotation>`; `CARD_TOKENS` says how many tokens were judged, so
+# a caller can tell "clean" from "nothing to check". Every refusal here is a reader that could not
+# answer — a set that could not be read is UNKNOWN, never empty.
+check_card_citations() {
+  local f="$1" reader py st ln kind tok rng hit n note count hi
+  local -a paths=() globs=()
+  CARD_ID_ERE=""; : > "$CARD_TMP/ids"
+  reader=$(resolve_id_reader)
+  if [ -z "$reader" ]; then
+    echo "NOTE: id citations unchecked — no corpus_ids.py under tools/memory-tree/ or memory-tree/ in this tree, so only paths are judged"
+  else
+    py=${GOV_PYTHON:-python}
+    "$py" "$reader" --print-defined-ids > "$CARD_TMP/idout" 2>&1; st=$?
+    if [ "$st" != 0 ]; then
+      echo "MANIFEST env ERROR — the id reader exited $st, so the defined-id set is unknown rather than empty: $py $reader --print-defined-ids — $(tr -d '\r' < "$CARD_TMP/idout" | head -c 300)"; exit 2
+    fi
+    CARD_ID_ERE=$(sed -n "1s/^$CARD_ID_ERE_KEY//p" "$CARD_TMP/idout" | tr -d '\r')
+    [ -n "$CARD_ID_ERE" ] || { echo "MANIFEST env ERROR — the id reader's first line is not the id grammar ('${CARD_ID_ERE_KEY}…'), so no id token can be recognised: $(head -1 "$CARD_TMP/idout" | tr -d '\r')"; exit 2; }
+    sed '1d' "$CARD_TMP/idout" | tr -d '\r' > "$CARD_TMP/ids"
+  fi
+  extract_card_tokens "$f" | sort -u | sort -t "$(printf '\t')" -k1,1n -s > "$CARD_TMP/tokens"
+  CARD_TOKENS=$(grep -c . "$CARD_TMP/tokens"); CARD_TOKENS=${CARD_TOKENS:-0}
+  while IFS=$'\t' read -r ln kind tok rng; do
+    case "$kind" in
+      path) paths+=("$tok") ;;
+      base) globs+=("$tok" "*/$tok") ;;
+    esac
+  done < "$CARD_TMP/tokens"
+  : > "$CARD_TMP/tracked"
+  if [ ${#paths[@]} -gt 0 ] || [ ${#globs[@]} -gt 0 ]; then
+    git ls-files -- ${paths[@]+"${paths[@]}"} ${globs[@]+"${globs[@]}"} > "$CARD_TMP/tracked" 2> "$CARD_TMP/git.err" \
+      || { echo "MANIFEST env ERROR — git ls-files failed over the cited paths, so the tracked set is unknown: $(tr -d '\r' < "$CARD_TMP/git.err" | head -c 300)"; exit 2; }
+  fi
+  : > "$CARD_TMP/misses"
+  while IFS=$'\t' read -r ln kind tok rng; do
+    hit=""; note=""
+    case "$kind" in
+      id)   grep -qxF -- "$tok" "$CARD_TMP/ids" && continue ;;
+      path) grep -qxF -- "$tok" "$CARD_TMP/tracked" && hit="$tok" ;;
+      base) n=$(awk -v b="$tok" '{k=split($0,s,"/"); if (s[k]==b) c++} END{print c+0}' "$CARD_TMP/tracked")
+            if [ "$n" = 1 ]; then hit=$(awk -v b="$tok" '{k=split($0,s,"/"); if (s[k]==b) print}' "$CARD_TMP/tracked")
+            elif [ "$n" -gt 1 ]; then note=" (ambiguous: $n matches)"; fi ;;
+    esac
+    if [ -n "$hit" ] && [ -n "$rng" ]; then
+      hi=${rng##*-}; count=$(awk 'END{print NR}' "$ROOT/$hit" 2>/dev/null); count=${count:-0}
+      if [ "$hi" -le "$count" ]; then continue; fi
+      note=" (past end: $count lines)"
+    elif [ -n "$hit" ]; then
+      continue
+    fi
+    printf '%s\tUNVERIFIED — %s%s\n' "$ln" "$tok${rng:+:$rng}" "$note" >> "$CARD_TMP/misses"
+  done < "$CARD_TMP/tokens"
+  return 0
+}
+
+# A stored card is STARTUP + TAIL: the header through the `recent —` line and the run of
+# `<sha> <subject>` lines beneath it, then everything after, which holds the card's one READY line
+# last. Written to two scratch files, CR-stripped.
+extract_card_parts() {
+  awk -v want=startup "$CARD_PARTS_AWK" "$1" > "$CARD_TMP/startup"
+  awk -v want=tail "$CARD_PARTS_AWK" "$1" > "$CARD_TMP/tail"
+}
+CARD_PARTS_AWK='{ ln=$0; sub(/\r$/, "", ln)
+  if (!intail) { if (ln ~ /^recent —/) inlog=1; else if (inlog && ln !~ /^[0-9a-f]{7,40} /) intail=1 }
+  if ((want=="tail") == (intail==1)) print ln }'
+
+# `--card --append`: the body on stdin, checked, annotated, and stored — or refused with the file
+# byte-identical. Order: the body's READY-line count, the citation check (its refusals come from a
+# reader that could not answer), DEAD PROBE on zero tokens, the stale-BASE refusal, the card's own
+# shape, the cap. A real-READY body replaces the whole TAIL and re-renders the `tree —` cell; a body
+# without one goes in before the TAIL's READY line, so the card always ends with its one READY line.
+add_card_body() {
+  local body="$CARD_TMP/body" nready ready sha tree bytes l
+  [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID before appending to it"; exit 2; }
+  tr -d '\r' > "$body"
+  grep -v '^READY — none yet$' "$body" > "$body.x"; mv "$body.x" "$body"
+  nready=$(grep -c '^READY — ' "$body"); nready=${nready:-0}
+  [ "$nready" -le 1 ] || { echo "MANIFEST env ERROR — the body carries $nready READY lines; one card holds one kickoff, so exactly one is accepted and nothing was appended"; exit 2; }
+  check_card_citations "$body"
+  [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended"; exit 1; }
+  derive_head_state
+  if [ "$nready" = 1 ]; then
+    ready=$(grep -m1 '^READY — ' "$body")
+    sha=$(printf '%s\n' "$ready" | sed -n 's/.*[ ·]base \([0-9a-f]\{7,40\}\)\([ ·].*\)\{0,1\}$/\1/p')
+    case "$HEAD_SHA" in "$sha"*) [ -n "$sha" ] ;; *) false ;; esac \
+      || { echo "MANIFEST env ERROR — the READY line's base ${sha:-<none>} is not HEAD $HEAD_SHA at append time; a kickoff pinned to a stale BASE does not land on the card — kick off again, and nothing was appended"; exit 2; }
+  fi
+  extract_card_parts "$CARD_FILE"
+  [ "$(grep -c '^READY — ' "$CARD_TMP/tail")" = 1 ] \
+    || { echo "MANIFEST env ERROR — $CARD_FILE holds $(grep -c '^READY — ' "$CARD_TMP/tail") READY lines after its startup lines, not one; rewrite it with --card --write --session $CARD_SID, and nothing was appended"; exit 2; }
+  awk -F '\t' -v m="$CARD_TMP/misses" 'BEGIN { while ((getline l < m) > 0) { split(l, p, "\t"); a[p[1]] = a[p[1]] p[2] "\n" } }
+    { print; if (FNR in a) printf "%s", a[FNR] }' "$body" > "$CARD_TMP/annotated"
+  if [ "$nready" = 1 ]; then
+    tree=$(render_tree_cell)
+    { while IFS= read -r l; do case "$l" in "tree — "*) printf '%s\n' "$tree" ;; *) printf '%s\n' "$l" ;; esac; done < "$CARD_TMP/startup"
+      cat "$CARD_TMP/annotated"; } > "$CARD_TMP/new"
+  else
+    { cat "$CARD_TMP/startup"; grep -v '^READY — ' "$CARD_TMP/tail"; cat "$CARD_TMP/annotated"; grep '^READY — ' "$CARD_TMP/tail"; } > "$CARD_TMP/new"
+  fi
+  bytes=$(wc -c < "$CARD_TMP/new" | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    echo "MANIFEST env ERROR — the card would be $bytes bytes, $((bytes - CARD_CAP_BYTES)) over the $CARD_CAP_BYTES-byte cap (CARD_CAP_BYTES), so nothing was appended"; exit 2
+  fi
+  cat "$CARD_TMP/new" > "$CARD_FILE" || { echo "MANIFEST env ERROR — cannot write $CARD_FILE"; exit 2; }
+  cut -f2 "$CARD_TMP/misses"
+  printf 'appended — %s · %s tokens · %s unverified · %s/%s bytes\n' "$CARD_FILE" "$CARD_TOKENS" "$(grep -c . "$CARD_TMP/misses")" "$bytes" "$CARD_CAP_BYTES"
+}
+
+# `--card --check`: the same check over the whole stored card, its own annotations skipped, one line
+# per miss and exit 1 on any; exit 1 too for a real READY line with no `## task` beneath it (a
+# kickoff ran and left no scope on disk) and for a card with nothing to check. Writes nothing.
+check_card() {
+  local real
+  [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID"; exit 2; }
+  real=$(grep '^READY — ' "$CARD_FILE" | grep -vc '^READY — none yet'); real=${real:-0}
+  if [ "$real" -gt 0 ] && ! grep -q '^## task' "$CARD_FILE"; then
+    echo "MANIFEST env ERROR — $CARD_FILE carries a real READY line and no '## task' section: a kickoff ran and left no scope on disk"; exit 1
+  fi
+  check_card_citations "$CARD_FILE"
+  [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — $CARD_FILE carries no path-shaped and no id-shaped token"; exit 1; }
+  if [ -s "$CARD_TMP/misses" ]; then
+    awk -F '\t' '{print $2 " · line " $1}' "$CARD_TMP/misses"
+    exit 1
+  fi
+  exit 0
+}
+
 if [ -n "$CARD" ]; then
   case "$CARD_VERB" in
     write)  write_card write ;;
     replay) print_replay ;;
+    append|check)
+      CARD_TMP=$(mktemp -d "${TMPDIR:-/tmp}/mfcard.XXXXXX") || { echo "MANIFEST env ERROR — cannot create a scratch dir under ${TMPDIR:-/tmp}"; exit 2; }
+      trap 'rm -rf "$CARD_TMP"' EXIT
+      if [ "$CARD_VERB" = append ]; then add_card_body; else check_card; fi ;;
   esac
   exit 0
 fi

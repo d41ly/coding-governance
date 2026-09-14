@@ -1,13 +1,15 @@
 # KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check
 
-**Status:** SPECCED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-1 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-build-KICK-aReplayedCard-2-1-acceptance-ledger.md](../build/2026-09-14-build-KICK-aReplayedCard-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-1 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-prompt-KICK-aReplayedCard-2-brief.md](../prompts/2026-09-14-prompt-KICK-aReplayedCard-2-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
@@ -30,11 +32,20 @@ line stays with the charter's verify-before-act rule.
   on the reader that already owns the id grammar and hygiene check 14, set-differenced against the
   id tokens. A path token carrying `:lo-hi` is a miss when `hi` exceeds the file's line count. A
   basename citation, the house style `run-gates.sh:407`, is resolved against `git ls-files` when
-  exactly one tracked file has that basename and is a miss when none or several do. Observed by
-  AC1, AC2, AC3 and AC9.
+  exactly one tracked file has that basename and is a miss when none or several do. The verb's
+  FIRST line is the id grammar as a POSIX ERE, `# id-ere: <ere>`, and the defined set follows one
+  per line: the shell extracts id tokens with that line and spells no grammar of its own, which is
+  how the non-goal below and the one-spawn budget hold at once. The reader is
+  `corpus_ids.py` under whichever of `tools/memory-tree/` or `memory-tree/` holds it — the engine's
+  own `<MEMORY_TREE_KIT>` rule — launched as `${GOV_PYTHON:-python}`; a tree with neither announces
+  the id half skipped on one `NOTE:` line and checks paths alone, and a reader that exits non-zero
+  or whose first line is not the grammar is a refusal, exit 2, because a set that could not be read
+  is not an empty set. The body arrives on stdin, so `--append` takes its session id from
+  `--session` alone. Observed by AC1, AC2, AC3 and AC9.
 - **S2** A miss is never dropped. The row stays and one `UNVERIFIED — <token>` line is added beneath
-  it, with `(ambiguous: <n> matches)` on a basename that resolved to several files, so an absent
-  citation is visible and a present one is not mistaken for a vetted one. Observed by AC2 and AC9.
+  it, with `(ambiguous: <n> matches)` on a basename that resolved to several files and
+  `(past end: <n> lines)` on a range whose `hi` exceeds the count, so an absent citation is visible
+  and a present one is not mistaken for a vetted one. Observed by AC2 and AC9.
 - **S3** Zero extractable tokens in the body is `DEAD PROBE: nothing to check`, exit 1, and nothing
   is appended. A probe that cannot move says so. Observed by AC3.
 - **S4** An append whose result would exceed `CARD_CAP_BYTES`, the constant `KICK-aReplayedCard-1`
@@ -45,13 +56,17 @@ line stays with the charter's verify-before-act rule.
   READY line, REPLACES the previous READY line and the six sections beneath the startup lines, so
   the card holds one body — the latest kickoff's — and the cap is never consumed twice; a session
   that kicks off again, in a sibling worktree say, is never refused for a body it no longer needs.
-  Observed by AC5 and AC10.
+  A body with no real READY line goes in BEFORE the card's READY line, sentinel or real, so the
+  card always ends with its one READY line — the shape `KICK-aReplayedCard-3` AC2 reads; a body's
+  own `READY — none yet` line is dropped, never stored; a body carrying two real READY lines is
+  refused, exit 2, because one card holds one kickoff. Observed by AC5 and AC10.
 - **S6** A body whose READY line carries a `base <sha>` that is not `git rev-parse HEAD` at append
   time is refused with exit 2 naming both shas, so a BASE stale by a commit, a compaction or a
   resume cannot land on the card whatever engine text produced it. Observed by AC8.
 - **S7** `--card --check --session <sid>` re-runs S1's check over the whole stored card, skipping
   the `UNVERIFIED —` annotation lines themselves, prints each miss, and exits 1 on any. It writes
-  nothing. Observed by AC6.
+  nothing. A card with no extractable token is S3's `DEAD PROBE`, exit 1, for the same reason.
+  Observed by AC6.
 - **S8** The verb's header states what it does NOT check: relevance, scope correctness, tier, and
   the truth of a claim at the line it cites. NOT OBSERVED by a criterion: prose, read at review.
 - **S9** Every refusal uses the script's `MANIFEST env ERROR — …` shape with its exit code, not the
@@ -103,10 +118,21 @@ READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <l
 
 Token extraction: a path token is a backticked or bare token with a slash and an extension, the
 same rule `tools/check-spec-tokens.py` uses at its line 142, plus a basename-with-extension token
-followed by `:<line>`, which that lint counts and skips and this verb resolves when unique; an id
-token matches the families the conf declares, extracted by the same regex `corpus_ids.py` exposes.
-Paths go to one `git ls-files -- …` call; ids are joined against the defined set one python spawn
-prints. Line ranges are checked against `wc -l` of the resolved file.
+followed by `:<line>`, which that lint counts and skips and this verb resolves when unique; that
+lint's exclusions carry over — a glob, a `{{placeholder}}`, a `$var`, a `<slot>` — and two more
+that only a card meets: an absolute path (`/x/…`, `C:/…`), because the `tree —` cell carries one
+and it is a checkout location rather than a claim about the tree, and a URL. An id token matches
+the families the conf declares, extracted by the same regex `corpus_ids.py` exposes on the first
+line of its `--print-defined-ids` output, translated to POSIX ERE (`(?:` to `(`, `\d` to `[0-9]`,
+the only two constructs the grammar builder uses). Paths go to one `git ls-files -- …` call, with
+`<basename>` and `*/<basename>` pathspecs for the basename citations; ids are joined against the
+defined set the same python spawn prints. Line ranges are checked against the line count of the
+resolved file.
+
+The card after an append is STARTUP + TAIL. STARTUP is the header through the `recent —` line and
+the run of `<sha> <subject>` lines beneath it; TAIL is everything after, and holds exactly one
+`READY —` line, last. A real-READY body replaces the whole TAIL and re-renders the `tree —` cell; a
+body without one is inserted before the TAIL's READY line.
 
 ### Inventory
 
@@ -115,6 +141,9 @@ prints. Line ranges are checked against `wc -l` of the resolved file.
 | `extract_card_tokens` | shell function | `manifest-check.sh` | leads with `extract`, a declared shape out of text |
 | `check_card_citations` | shell function | `manifest-check.sh` | leads with `check`, a verdict |
 | `add_card_body` | shell function | `manifest-check.sh` | leads with `add`, membership in the file |
+| `check_card` | shell function | `manifest-check.sh` | the `--check` verb: S7 and S11 over the stored card |
+| `render_tree_cell` | shell function | `manifest-check.sh` | the one spelling of the `tree —` line, lifted out of `render_card` so the append re-renders it identically |
+| `split_card` | shell function | `manifest-check.sh` | STARTUP and TAIL of a stored card into two scratch files |
 | `--print-defined-ids` | verb | `corpus_ids.py` | a print-only verb beside `--report` and `--measure` |
 | `print_defined_ids` | python function | `corpus_ids.py` | leads with `print`, stdout for a caller |
 
@@ -133,7 +162,11 @@ Callable by hand from the commit that lands it; the engine pipes into it from
 |---|---|
 | `skills/session-kickoff/manifest-check.sh` | three functions, the two verbs, the miss annotation, the BASE refusal |
 | `skills/session-kickoff/manifest-check.test.sh` | arms for S2, S3, S4, S5, S6, S7, S9; `FLOOR_ASSERTIONS` |
-| `tools/memory-tree/corpus_ids.py` | the `--print-defined-ids` verb |
+| `tools/memory-tree/corpus_ids.py` | the `--print-defined-ids` verb, one selftest arm |
+| `tools/memory-tree/README.md` | the verb in `corpus_ids.py`'s row |
+| `memory/map/features/session-kickoff.md` | the append and check in the card paragraph |
+| `tools/install-prefix-waivers.txt` | two line-keyed rows re-keyed: the verb's lines land above the selftest fixture they waive |
+| `tools/install-prefix-carried.txt` | `corpus_ids.py`'s carried count falls 8 to 4: the docstring's usage lines derive the kit path, so the new verb's line adds no literal |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
 ### Alternatives rejected
@@ -252,6 +285,18 @@ none
 - rev-4 · 2026-09-14 · §2 · §6 · S5 · AC10 · folded the round-3 spec audit's exit: a second real
   READY append replaces the previous READY line and body, so a re-kickoff never stacks bodies
   against the cap (round-3 M5).
+- rev-5 · 2026-09-14 · §2 · §4 · S1 · S2 · S5 · S7 · the build pass's divergences, changed here
+  before the code. The shell cannot extract id-shaped tokens without the grammar and the non-goal
+  bans spelling it, so the ONE python spawn carries the grammar on its first line as a POSIX ERE
+  (S1, §4); the reader is located by the engine's `<MEMORY_TREE_KIT>` rule and a tree without it
+  announces the skip; a reader that fails is a refusal, not an empty set. `--append` takes its
+  session id from `--session` alone, because stdin is the body. Absolute paths and URLs are not
+  path tokens: the `tree —` cell carries one. A range miss says `(past end: <n> lines)` (S2). The
+  STARTUP/TAIL model is written down (§4): a no-READY body goes before the READY line so the card
+  always ends with it, which `KICK-aReplayedCard-3` AC2 reads; a body's sentinel line is dropped;
+  two real READY lines refuse (S5). `--check` over a token-free card is DEAD PROBE (S7). Three
+  helpers join the inventory; the kit README's verb row and the dossier's card paragraph join the
+  files touched.
 
 ## 10. Reuse audit
 

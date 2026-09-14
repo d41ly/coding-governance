@@ -675,11 +675,23 @@ run "C11 does not police bullets outside the traps section" "$R" 0 -
 # worktree on the node shares, and a fixture card left there is one a sibling session trips on. The
 # last arm lists this repository's real common dir and asserts the suite left nothing in it.
 # Session ids carry a per-run nonce so that listing can tell the suite's cards from anyone else's.
+# One fixture commit in the clone, before the worktrees exist (KICK-aReplayedCard-2): the WORKING
+# TREE's `corpus_ids.py`, so the reader the append spawns is the one under test like the checker
+# is, and a spec whose H1 defines `TOOL-zCardFixture-10` while its prose cites
+# `TOOL-zCardFixture-11` — the id a mention-grep would pass. Two linked worktrees: the sibling-tree
+# arms append from the second.
 NONCE="mfc$$"
 GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
-CCLONE="$TMP/card-clone"; CWT="$TMP/card-wt"
-git clone -q --local "$GOVROOT" "$CCLONE" && git -C "$CCLONE" worktree add -q "$CWT" -b card-wt \
-  || { echo "FAIL card fixture: cannot clone $GOVROOT and add a worktree under $TMP"; fail=$((fail+1)); }
+CCLONE="$TMP/card-clone"; CWT="$TMP/card-wt"; CWT2="$TMP/card-wt2"
+git clone -q --local "$GOVROOT" "$CCLONE" \
+  && git -C "$CCLONE" config user.email t@test && git -C "$CCLONE" config user.name t && git -C "$CCLONE" config commit.gpgsign false \
+  && cp "$GOVROOT/tools/memory-tree/corpus_ids.py" "$CCLONE/tools/memory-tree/corpus_ids.py" \
+  && mkdir -p "$CCLONE/memory/builds/zCardFixture/spec" \
+  && printf '# TOOL-zCardFixture-10 — a fixture unit, defined by this H1 alone\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node z · Tier-1\n\nThis prose CITES TOOL-zCardFixture-11 and nothing defines it.\n' \
+       > "$CCLONE/memory/builds/zCardFixture/spec/2026-09-14-spec-TOOL-zCardFixture-10.md" \
+  && git -C "$CCLONE" add -A && git -C "$CCLONE" commit -q --no-verify -m "fixture: the reader under test and TOOL-zCardFixture-10" \
+  && git -C "$CCLONE" worktree add -q "$CWT" -b card-wt && git -C "$CCLONE" worktree add -q "$CWT2" -b card-wt2 \
+  || { echo "FAIL card fixture: cannot clone $GOVROOT, commit the fixture and add two worktrees under $TMP"; fail=$((fail+1)); }
 CARD_HOME="$CCLONE/.git/orientation"
 CUSER="${USERNAME:-${USER:-}}"
 
@@ -848,7 +860,7 @@ grep -qE '^CARD_CAP_BYTES=\$\{CARD_CAP_BYTES:-8192\}$' "$CHECK" \
 
 # The dispatch itself: --card with no verb refuses; --write WITHOUT --card still reaches the manifest
 # catch-all exactly as before this verb family existed.
-run_card "--card with no verb → exit 2" "$CWT" 2 "--card needs one of --write, --replay or --path" --card --session "$NONCE-t8"
+run_card "--card with no verb → exit 2" "$CWT" 2 "--card needs one of --write, --replay, --path, --append or --check" --card --session "$NONCE-t8"
 run_card "--write without --card is still a manifest path argument" "$CWT" 2 "'--write' not found" --write
 
 # AC9 — no fetch and no ref move: a remote one commit ahead, refs identical after, no FETCH_HEAD.
@@ -867,6 +879,187 @@ check_eq "AC9 a primary tree's card says primary" "tree — $(git -C "$TMP/ahead
 mkrepo noconf; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 run_card "AC10 --card --write with no .memory-tree.conf exits 0" "$R" 0 "live — skipped: no .memory-tree.conf in this tree" --card --write --session "$NONCE-t10"
 
+# ---- KICK-aReplayedCard-2: --card --append and --card --check ------------------------------------
+# Every arm runs in the clone's linked worktrees, whose common dir holds the cards. The reader the
+# append spawns is the clone's `tools/memory-tree/corpus_ids.py`, which the fixture commit above
+# made the working tree's; `TOOL-zCardFixture-10` is defined there by a spec H1 alone and
+# `TOOL-zCardFixture-11` is cited by its prose and defined nowhere.
+K2A="$NONCE-k2a"; K2CARD="$CARD_HOME/$K2A.md"
+run_card "K2 setup: a card for the append arms" "$CWT" 0 - --card --write --session "$K2A"
+render_ready_line() { printf 'READY — aTest · node a · card-wt · base %s · Tier-2 · gates x' "$1"; }   # $1=base sha
+
+# AC1 — a clean body: appended, no annotation, ONE ls-files and ONE reader spawn from the checker.
+# The counters are SHIMS on PATH, logging their argv: the reader's own hygiene probe is a bash
+# grandchild that spawns `git ls-files memory/` on its own account, and the checker's is the one
+# spelled `ls-files -- …`, so the argv shape tells them apart. Python's own subprocess spawns never
+# reach a shim (CreateProcess wants an .exe), which is fine — they are not the checker's.
+export SPAWN_LOG="$TMP/spawns" REAL_GIT="$(command -v git)" REAL_PY="$(command -v python)"; : > "$SPAWN_LOG"
+SHIM="$TMP/shim"; mkdir -p "$SHIM"
+cat > "$SHIM/git" <<'SHIM_GIT'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$SPAWN_LOG"
+exec "$REAL_GIT" "$@"
+SHIM_GIT
+cat > "$SHIM/python" <<'SHIM_PY'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$SPAWN_LOG"
+exec "$REAL_PY" "$@"
+SHIM_PY
+chmod +x "$SHIM/git" "$SHIM/python"
+printf '## task\n- **Title:** t\n## read\n- `skills/session-kickoff/SKILL.md:47-60` — the skeleton\n## records\n- TOOL-cBriefedPilot-11 — one clause — memory/backlog/TOOL.md:455\n%s\n' "$(render_ready_line "$wt_head")" \
+  | (cd "$CWT" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && grep -q '^- TOOL-cBriefedPilot-11 — one clause' "$K2CARD" && ! grep -q 'UNVERIFIED' "$K2CARD" \
+  && { echo "ok   K2 AC1 a clean body is appended with no UNVERIFIED line"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 AC1 a clean body is appended with no UNVERIFIED line (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_eq "K2 AC1 the checker spawned git ls-files exactly once" "1" "$(grep -c '^ls-files -- ' "$SPAWN_LOG")"
+check_eq "K2 AC1 the checker spawned the id reader exactly once" "1" "$(grep -c 'corpus_ids.py --print-defined-ids$' "$SPAWN_LOG")"
+check_eq "K2 AC1 the card ends with the body's READY line" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2CARD")"
+# AC6, clean half — before the misses arrive.
+run_card "K2 AC6 --card --check over a clean card exits 0" "$CWT" 0 - --card --check --session "$K2A"
+check_eq "K2 AC6 --card --check over a clean card prints nothing" "0" "$(grep -c . "$CARD_OUT")"
+
+# AC2 — four misses, each annotated beneath its own row; the defined id and the tracked range pass.
+printf '## task\n- **Title:** t\n## read\n- `nope/missing.md:1-2` — untracked\n- `skills/session-kickoff/SKILL.md:1-99999` — past the end\n- `skills/session-kickoff/SKILL.md:1-3` — inside\n## records\n- TOOL-zCardFixture-11 — cited by a record, defined by none\n- TOOL-zCardFixture-1 — a substring of the defined -10\n- TOOL-zCardFixture-10 — defined\n%s\n' "$(render_ready_line "$wt_head")" \
+  | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 AC2 the append with misses exits 0" "0" "$got"
+read_next_line() { awk -v r="$1" 'f{print; exit} index($0,r)==1{f=1}' "$K2CARD"; }   # the line after the row that starts with $1
+skill_lines=$(awk 'END{print NR}' "$CWT/skills/session-kickoff/SKILL.md")
+check_eq "K2 AC2 an untracked path is annotated beneath its row" "UNVERIFIED — nope/missing.md:1-2" "$(read_next_line '- `nope/missing.md:1-2`')"
+check_eq "K2 AC2 a range past the end is annotated with the count" "UNVERIFIED — skills/session-kickoff/SKILL.md:1-99999 (past end: $skill_lines lines)" "$(read_next_line '- `skills/session-kickoff/SKILL.md:1-99999`')"
+check_eq "K2 AC2 a range inside the file is not annotated" "## records" "$(read_next_line '- `skills/session-kickoff/SKILL.md:1-3`')"
+check_eq "K2 AC2 a cited-but-undefined id is annotated" "UNVERIFIED — TOOL-zCardFixture-11" "$(read_next_line '- TOOL-zCardFixture-11')"
+check_eq "K2 AC2 X-1 does not pass on the defined X-10" "UNVERIFIED — TOOL-zCardFixture-1" "$(read_next_line '- TOOL-zCardFixture-1 ')"
+check_eq "K2 AC2 the defined id is not annotated" "$(render_ready_line "$wt_head")" "$(read_next_line '- TOOL-zCardFixture-10')"
+check_eq "K2 AC2 the stdout names every miss" "4" "$(grep -c '^UNVERIFIED — ' "$CARD_OUT")"
+# AC6, the miss half: the stored annotations are skipped, the four misses are found again.
+run_card "K2 AC6 --card --check over an annotated card prints the misses and exits 1" "$CWT" 1 "UNVERIFIED — TOOL-zCardFixture-1 · line" --card --check --session "$K2A"
+check_eq "K2 AC6 --card --check reports each miss once, never its own annotation lines" "4" "$(grep -c '^UNVERIFIED — ' "$CARD_OUT")"
+
+# The refusals: each leaves the card byte-identical. `run_card` feeds /dev/null, so every body
+# goes through the pipe form.
+cp "$K2CARD" "$TMP/k2.before"
+check_card_unchanged() { cmp -s "$TMP/k2.before" "$K2CARD" && { echo "ok   $1"; pass=$((pass+1)); } || { echo "FAIL $1"; fail=$((fail+1)); }; }
+# AC3 — no token at all.
+printf 'nothing here\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 1 ] && grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 AC3 a token-free body is DEAD PROBE, exit 1"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 AC3 a token-free body is DEAD PROBE, exit 1 (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_card_unchanged "K2 AC3 the card is byte-identical after DEAD PROBE"
+# AC4 — the cap, forced to the card's own size plus a few bytes so any body that grows the card
+# overflows it; a no-READY body, because a real one replaces the tail and can shrink the card.
+k2cap=$(( $(wc -c < "$K2CARD" | tr -d '[:space:]') + 8 ))
+printf '## open\n- `AGENTS.md:1`\n' | (cd "$CWT" && CARD_CAP_BYTES=$k2cap bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -qE "the card would be [0-9]+ bytes, [0-9]+ over the $k2cap-byte cap" "$CARD_OUT" \
+  && { echo "ok   K2 AC4 a body past CARD_CAP_BYTES is refused with exit 2 naming the overage"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 AC4 a body past CARD_CAP_BYTES is refused with exit 2 naming the overage (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_card_unchanged "K2 AC4 the card is byte-identical after the cap refusal"
+# AC8 — a READY line eight commits behind HEAD.
+stale=$(git -C "$CWT" rev-parse HEAD~8)
+printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$stale")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q "base $stale is not HEAD $wt_head" "$CARD_OUT" \
+  && { echo "ok   K2 AC8 a stale base is refused with exit 2 naming both shas"; pass=$((pass+1))
+ } || { echo "FAIL K2 AC8 a stale base is refused with exit 2 naming both shas (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_card_unchanged "K2 AC8 the card is byte-identical after the stale-base refusal"
+# S5 — two real READY lines in one body.
+printf '## task\n- `AGENTS.md:1`\n%s\n%s\n' "$(render_ready_line "$wt_head")" "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q 'the body carries 2 READY lines' "$CARD_OUT" && { echo "ok   K2 S5 a body with two READY lines is refused"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 S5 a body with two READY lines is refused (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+# S1 — the reader could not answer: a launcher that exits non-zero, then one whose first line is
+# not the grammar (`echo` prints the argv), then a git that fails on ls-files.
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && GOV_PYTHON=false bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q 'the id reader exited 1, so the defined-id set is unknown rather than empty' "$CARD_OUT" \
+  && { echo "ok   K2 S1 a failing id reader is a refusal, not an empty set"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 S1 a failing id reader is a refusal, not an empty set (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && GOV_PYTHON=echo bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q "the id reader's first line is not the id grammar" "$CARD_OUT" \
+  && { echo "ok   K2 S1 a reader whose first line is not the grammar is a refusal"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 S1 a reader whose first line is not the grammar is a refusal (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+SHIMFAIL="$TMP/shimfail"; mkdir -p "$SHIMFAIL"
+cat > "$SHIMFAIL/git" <<'SHIM_FAIL'
+#!/usr/bin/env bash
+case "$1 $2" in "ls-files --") echo "fatal: staged failure" >&2; exit 128 ;; esac
+exec "$REAL_GIT" "$@"
+SHIM_FAIL
+chmod +x "$SHIMFAIL/git"
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && PATH="$SHIMFAIL:$PATH" bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q 'git ls-files failed over the cited paths, so the tracked set is unknown' "$CARD_OUT" \
+  && { echo "ok   K2 S1 a failing git ls-files is a refusal, not an empty set"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 S1 a failing git ls-files is a refusal, not an empty set (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_card_unchanged "K2 S1 the card is byte-identical after the reader refusals"
+# The dispatch: no card, no session, a corrupt card.
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && bash "$CHECK" --card --append --session "$NONCE-k2none" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q "no card for session $NONCE-k2none .* write one with --card --write --session $NONCE-k2none" "$CARD_OUT" \
+  && { echo "ok   K2 an append with no card is refused naming --card --write"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 an append with no card is refused naming --card --write (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+run_card "K2 a check with no card is refused naming --card --write" "$CWT" 2 "write one with --card --write --session $NONCE-k2none" --card --check --session "$NONCE-k2none"
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && bash "$CHECK" --card --append > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q 'stdin is the body, so pass --session <sid>' "$CARD_OUT" && { echo "ok   K2 --append with no --session is refused: stdin is the body"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 --append with no --session is refused: stdin is the body (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+printf 'READY — a second one\n' >> "$K2CARD"
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q 'holds 2 READY lines after its startup lines, not one' "$CARD_OUT" && { echo "ok   K2 a card holding two READY lines is refused, not stacked"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 a card holding two READY lines is refused, not stacked (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+cp "$TMP/k2.before" "$K2CARD"
+
+# AC9 — a unique basename resolves; an ambiguous one is annotated with the tracked count.
+n_readme=$(git -C "$CWT" ls-files | awk -F/ '$NF=="README.md"' | wc -l | tr -d '[:space:]')
+printf '## task\n- `manifest-check.sh:60` — unique\n- `README.md:1` — many\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 AC9 the basename append exits 0" "0" "$got"
+check_eq "K2 AC9 a unique basename citation resolves and is not annotated" '- `README.md:1` — many' "$(read_next_line '- `manifest-check.sh:60`')"
+check_eq "K2 AC9 an ambiguous basename is annotated with the tracked count" "UNVERIFIED — README.md:1 (ambiguous: $n_readme matches)" "$(read_next_line '- `README.md:1`')"
+
+# AC5 — the sentinel: a body whose only READY line is the sentinel leaves it; a real one replaces
+# it; a body without one goes in before it and leaves it.
+K2B="$NONCE-k2b"; K2BCARD="$CARD_HOME/$K2B.md"
+run_card "K2 AC5 setup: a fresh card with the sentinel" "$CWT" 0 - --card --write --session "$K2B"
+printf '## open\n- `AGENTS.md:1`\nREADY — none yet\n' | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2B" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 AC5 a body whose only READY line is the sentinel exits 0" "0" "$got"
+check_eq "K2 AC5 ...and the card holds exactly one READY line" "1" "$(grep -c '^READY — ' "$K2BCARD")"
+check_eq "K2 AC5 ...which is the sentinel, last" "READY — none yet" "$(tail -1 "$K2BCARD")"
+printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2B" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 AC5 a real READY line replaces the sentinel: one READY line" "1" "$(grep -c '^READY — ' "$K2BCARD")"
+check_eq "K2 AC5 ...and it is the body's" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2BCARD")"
+check_eq "K2 AC5 ...and the earlier no-READY body went with the tail" "0" "$(grep -c '^## open' "$K2BCARD")"
+printf '## open\n- parked: `AGENTS.md:2`\n' | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2B" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 AC5 a second append without a READY line leaves the real one, last" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2BCARD")"
+check_eq "K2 AC5 ...before which the new body sits" '- parked: `AGENTS.md:2`' "$(tail -2 "$K2BCARD" | head -1)"
+check_eq "K2 AC5 ...and the card still holds one READY line and one task section" "1 1" "$(grep -c '^READY — ' "$K2BCARD") $(grep -c '^## task' "$K2BCARD")"
+
+# AC11 — a real READY line with no `## task` beneath it.
+sed -i 's/^## task$/## tsk/' "$K2BCARD"
+run_card "K2 AC11 --card --check refuses a real READY line with no ## task section" "$CWT" 1 "carries a real READY line and no '## task' section" --card --check --session "$K2B"
+sed -i 's/^## tsk$/## task/' "$K2BCARD"
+run_card "K2 AC11 --card --check over a card holding both exits 0" "$CWT" 0 - --card --check --session "$K2B"
+
+# AC10 — written in worktree A, appended from sibling worktree B: B's tree cell, the other startup
+# lines byte-identical; a second full body from B replaces the first under a cap two would breach.
+K2C="$NONCE-k2c"; K2CCARD="$CARD_HOME/$K2C.md"
+run_card "K2 AC10 setup: a card written in worktree A" "$CWT" 0 - --card --write --session "$K2C"
+cp "$K2CCARD" "$TMP/k2c.before"
+k2c_startup=$(( $(wc -l < "$TMP/k2c.before" | tr -d '[:space:]') - 1 ))   # a fresh card is STARTUP + the sentinel
+b_head=$(git -C "$CWT2" rev-parse HEAD)
+render_big_body() { printf '## task\n- **Title:** %s\n## read\n' "$1"; awk 'BEGIN{for(i=0;i<60;i++) print "- `AGENTS.md:1` — padding row " i}'; printf 'READY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$b_head"; }
+k2c_cap=$(( $(wc -c < "$K2CCARD" | tr -d '[:space:]') + $(render_big_body one | wc -c | tr -d '[:space:]') * 3 / 2 ))
+render_big_body one | (cd "$CWT2" && CARD_CAP_BYTES=$k2c_cap bash "$CHECK" --card --append --session "$K2C" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 AC10 the append from worktree B exits 0" "0" "$got"
+check_eq "K2 AC10 the tree cell names B's toplevel, kind, branch, BASE and dirty count" \
+  "tree — $(git -C "$CWT2" rev-parse --show-toplevel) · worktree · branch card-wt2 · BASE $b_head · $(n=$(git -C "$CWT2" status --porcelain | wc -l | tr -d '[:space:]'); [ "$n" = 0 ] && echo clean || echo "dirty $n")" \
+  "$(grep -m1 '^tree — ' "$K2CCARD")"
+check_eq "K2 AC10 the other startup lines are byte-identical" \
+  "$(head -n "$k2c_startup" "$TMP/k2c.before" | grep -v '^tree — ')" "$(head -n "$k2c_startup" "$K2CCARD" | grep -v '^tree — ')"
+render_big_body two | (cd "$CWT2" && CARD_CAP_BYTES=$k2c_cap bash "$CHECK" --card --append --session "$K2C" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && { echo "ok   K2 AC10 a second full body from B lands under a cap two bodies would breach"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 AC10 a second full body from B lands under a cap two bodies would breach (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_eq "K2 AC10 ...and the card holds one READY line, one task section, the second title" "1 1 1 0" \
+  "$(grep -c '^READY — ' "$K2CCARD") $(grep -c '^## task' "$K2CCARD") $(grep -c 'Title:\*\* two' "$K2CCARD") $(grep -c 'Title:\*\* one' "$K2CCARD")"
+
+# S1 — a tree without the memory-tree kit: the id half announces its skip, and a startup card with
+# no path citation is DEAD PROBE on --check.
+mkrepo noreader; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+run_card "K2 S1 setup: a card in a tree with no id reader" "$R" 0 - --card --write --session "$NONCE-k2d"
+run_card "K2 S1 --card --check with no reader announces the skip and is DEAD PROBE on a token-free card" "$R" 1 "NOTE: id citations unchecked" --card --check --session "$NONCE-k2d"
+grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a token-free card is DEAD PROBE"; pass=$((pass+1)); } \
+  || { echo "FAIL K2 S7 --card --check over a token-free card is DEAD PROBE"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+
 # AC11 — this repository's REAL common dir holds no card the suite wrote.
 real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
 leaked=$(ls "$real_common/orientation" 2>/dev/null | grep -c "^$NONCE-" || true)
@@ -875,11 +1068,12 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # TOOL-cSettledDocket-5 — the agreed shape, so one leg can read every suite's count. This file
 # ALREADY counted; the spec that proposed adding a counter here had grepped for another suite's
 # spelling and reported a missing capability after measuring a missing convention.
-# 109 = every arm that runs on EVERY node. The card section holds one arm more on node a alone (the
+# 165 = every arm that runs on EVERY node. The card section holds one arm more on node a alone (the
 # exact tag against the real AGENTS.md, which the spec words as "on this node"); it announces its
 # skip elsewhere, and a floor that counted it would red the suite on b, c and d for an arm that is
-# not theirs to reach. KICK-aReplayedCard-1.
-FLOOR_ASSERTIONS=109
+# not theirs to reach. KICK-aReplayedCard-1 (109), then the 56 append and check arms of
+# KICK-aReplayedCard-2.
+FLOOR_ASSERTIONS=165
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

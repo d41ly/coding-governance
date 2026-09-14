@@ -61,6 +61,15 @@ every startup cell is derived, the `node —` cell through the manifest's own `r
 kit spells no charter path. The verbs run no manifest check and no fetch: those stay in the engine's
 Steps 1 and 2b, where each costs a kickoff rather than every session start.
 
+The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
+checks every cited path, line range and record id for EXISTENCE in two spawns — one
+`git ls-files -- …` and one `corpus_ids.py --print-defined-ids`, the memory-tree reader that owns
+the id grammar and prints it on its first line, so this kit spells none — annotates each miss
+`UNVERIFIED — <token>` beneath its row, and refuses a body with nothing to check, one over the cap,
+or a READY line whose BASE is not HEAD. A real READY line replaces the sentinel and the previous
+body, and re-renders the `tree —` cell in the tree the append runs in. `--card --check` re-runs the
+same check over the stored card. Neither judges relevance, scope, tier, or truth at the cited line.
+
 ## Gaps
 
 - **The third manifest location cannot be gated, by construction.** The engine honours a manifest at

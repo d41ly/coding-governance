@@ -2658,6 +2658,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "print_defined_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "print_last",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"

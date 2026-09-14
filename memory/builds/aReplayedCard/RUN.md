@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d62c9092e514182637a9033b006934a97da860d0
+witness: c95fe32a6a572ae95a07931d0f1bbb09daa077ad
 phase: BUILDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
@@ -64,3 +64,11 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-14T00:54:55Z dispatch · item d62c9092 TOOL-aReplayedCard-5 · reason tools/workflows/orient-counterfactual.js tools/workflows/orient.agent.template.md tools/workflows/README.md memory/map memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-5.md memory/builds/aReplayedCard/build/2026-09-14-build-TOOL-aReplayedCard-5-1-acceptance-ledger.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger tools/install-prefix-carried.txt
 
 2026-09-14T00:55:13Z brief · item TOOL-aReplayedCard-5 · reason f1e353552bf4 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-5-brief.md
+
+2026-09-14T02:09:49Z dispatch · item c95fe32a KICK-aReplayedCard-2 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh tools/memory-tree/corpus_ids.py tools/memory-tree/README.md memory/guides/SESSION-KICKOFF.md memory/builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-2.md memory/builds/aReplayedCard/build/2026-09-14-build-KICK-aReplayedCard-2-1-acceptance-ledger.md memory/builds/aReplayedCard/prompts/2026-09-14-prompt-KICK-aReplayedCard-2-brief.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger memory/map
+
+2026-09-14T02:10:07Z brief · item KICK-aReplayedCard-2 · reason c82d74c59ddd memory/builds/aReplayedCard/prompts/2026-09-14-prompt-KICK-aReplayedCard-2-brief.md
+
+2026-09-14T03:01:09Z dispatch · item c95fe32a KICK-aReplayedCard-2 · reason tools/install-prefix-waivers.txt
+
+2026-09-14T03:04:27Z dispatch · item c95fe32a KICK-aReplayedCard-2 · reason tools/install-prefix-carried.txt

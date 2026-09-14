@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """corpus_ids.py — the corpus's id and path classifier: one grammar, one walk, every consumer.
 
-    python tools/memory-tree/corpus_ids.py --report              # the derived numbers
-    python tools/memory-tree/corpus_ids.py --check               # checks 13-16 as a gate
-    python tools/memory-tree/corpus_ids.py --measure             # print the pins to set in the conf
-    python tools/memory-tree/corpus_ids.py --selftest            # fixtures
+    python <kit>/corpus_ids.py --report             # the derived numbers
+    python <kit>/corpus_ids.py --check              # checks 13-16 as a gate
+    python <kit>/corpus_ids.py --measure            # print the pins to set in the conf
+    python <kit>/corpus_ids.py --print-defined-ids  # the id grammar, then every defined id
+    python <kit>/corpus_ids.py --selftest           # fixtures
 
 Every number a gate here quotes is DERIVED from one walk rather than written into a document. A
 classifier that lives in prose is a classifier nobody can check.
@@ -720,6 +721,35 @@ def cmd_measure(root: str, conf: dict) -> int:
     return 0
 
 
+def _render_defined_ids(root: str, conf: dict) -> list:
+    """The `--print-defined-ids` output as a list, so the selftest can assert it (the `_measure_lines`
+    split, for the same reason). Line 0 is the id grammar as a POSIX ERE behind `# id-ere: `; every
+    line after is one DEFINED id — anchored by a spec H1, a backlog row or a decision row — sorted.
+
+    KICK-aReplayedCard-2. The kickoff checker's `--card --append` joins the ids a card cites against
+    this set in ONE spawn, and it cannot extract id-shaped tokens from the card without the grammar;
+    spelling the grammar in shell is the second-predicate class `TOOL-cSpliceWarden-6` closed, so the
+    one spawn carries it. The translation covers exactly the two Python-only constructs the grammar
+    builder in the memory-recall kit uses — `(?:` and `\\d` — and refuses if either survives, because
+    an ERE that `grep -E` reads differently from the reader would let the shell and the reader
+    disagree about what an id is, silently.
+    """
+    w = walk(root, conf)
+    ere = grammar(root).ID.replace("(?:", "(").replace(r"\d", "[0-9]")
+    if "(?" in ere or "\\d" in ere:
+        raise Problem("corpus_ids: the id grammar carries a construct this verb cannot translate to "
+                      "POSIX ERE: %s" % ere)
+    return ["# id-ere: " + ere] + sorted(w["defs"])
+
+
+def print_defined_ids(root: str, conf: dict) -> int:
+    """Print the id grammar, then every id this corpus DEFINES, one per line. Read-only; the pins do
+    not gate it — it is a set for a caller, not a check."""
+    for line in _render_defined_ids(root, conf):
+        print(line)
+    return 0
+
+
 # ----------------------------------------------------------------------------------------- selftest
 def _scratch(tmp: str, *, pins=True, extra=None):
     run("git", "init", "-q", ".", cwd=tmp)
@@ -806,6 +836,12 @@ def cmd_selftest() -> int:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
         arm("a clean corpus produces no finding", None, lambda: checks(walk(t, c)))
+        # KICK-aReplayedCard-2: the grammar line is a POSIX ERE that still recognises a defined id
+        # (it is valid Python too, which is what lets this arm run it), and the set follows it.
+        arm("--print-defined-ids leads with the grammar as an ERE and lists the defined id", "ok",
+            lambda: (lambda ls: "ok" if ls[0].startswith("# id-ere: ") and "(?" not in ls[0]
+                     and r"\d" not in ls[0] and re.fullmatch(ls[0][len("# id-ere: "):], "ARCH-tOne-1")
+                     and ls[1:] == ["ARCH-tOne-1"] else repr(ls))(_render_defined_ids(t, c)))
 
         # ---- TOOL-aWeldedTribunal-5: the conf parser, graded against BASH rather than asserted.
         # ---- bash is the reference because bash is what the format IS; the python half is the copy,
@@ -1173,8 +1209,10 @@ def main(argv: list) -> int:
             return cmd_report(root, conf)
         if mode == "--measure":
             return cmd_measure(root, conf)
+        if mode == "--print-defined-ids":
+            return print_defined_ids(root, conf)
         if mode != "--check":
-            print("usage: corpus_ids.py [--check|--report|--measure|--selftest]")
+            print("usage: corpus_ids.py [--check|--report|--measure|--print-defined-ids|--selftest]")
             return 2
         # Check 16 runs ALWAYS. Checks 13-15 stay behind the pins, and the grammar stays unloaded
         # when they are blank — the cross-kit dependency is still conditional.

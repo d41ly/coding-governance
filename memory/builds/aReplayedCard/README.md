@@ -83,14 +83,14 @@ ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplaye
 | [TOOL-aReplayedCard-4 — path-bearing manifest trap bullets become `memory/gotchas/` records](spec/2026-09-13-spec-TOOL-aReplayedCard-4.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-14 |
 | [KICK-aReplayedCard-1 — `manifest-check.sh --card` writes and replays the session's orientation card](spec/2026-09-13-spec-KICK-aReplayedCard-1.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-14 |
 | [TOOL-aReplayedCard-5 — `orient-counterfactual.js` measures one stage-2 arm per call](spec/2026-09-13-spec-TOOL-aReplayedCard-5.md) | 2 | 1 | CLOSED | rev-3 | 2026-09-14 |
-| [KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check](spec/2026-09-13-spec-KICK-aReplayedCard-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-14 |
+| [KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check](spec/2026-09-13-spec-KICK-aReplayedCard-2.md) | 3 | 2 | CLOSED | rev-5 | 2026-09-14 |
 | [TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` on an un-oriented card](spec/2026-09-13-spec-TOOL-aReplayedCard-1.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-14 |
 | [TOOL-aReplayedCard-2 — SessionStart matchers, two card fragments, a rematching merge, a wiring arm](spec/2026-09-13-spec-TOOL-aReplayedCard-2.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-14 |
 | [KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5](spec/2026-09-13-spec-KICK-aReplayedCard-3.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-14 |
 | [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

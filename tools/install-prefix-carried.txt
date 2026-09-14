@@ -75,7 +75,7 @@ tools/memory-tree/check-memory-hygiene.test.sh	4	lib,memory-tree
 tools/memory-tree/check-method-carriers.sh	1	memory-tree
 tools/memory-tree/check-method-carriers.test.sh	1	memory-tree
 tools/memory-tree/check-verdict-epoch.sh	10	memory-recall,memory-tree
-tools/memory-tree/corpus_ids.py	8	lib,memory-tree
+tools/memory-tree/corpus_ids.py	4	lib,memory-tree
 tools/memory-tree/gen_build_index.py	6	memory-tree,unattended
 tools/memory-tree/gotchas.py	11	memory-tree
 tools/memory-tree/hygiene-parity.test.sh	2	memory-tree
