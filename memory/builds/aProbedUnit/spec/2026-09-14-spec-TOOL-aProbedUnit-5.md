@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 5 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -37,7 +37,9 @@ and states in the hooks README what the guard still cannot see.
   whose comparable value is exactly `/tmp` contributes NO allowed root, because the ruling denies
   the spelling and a variable is one more way to spell it; without this clause `TEMP=/tmp` would
   re-open every `/tmp` write the rule closes, and the rule would have no observable failing case
-  on a Windows node. Observed by AC3, AC6 and AC7.
+  on a Windows node — observable there only when the `/tmp` values reach the hook from inside
+  node, section 4's self-test rule, because the MSYS runtime rewrites them on the way out of a
+  shell. Observed by AC3, AC6 and AC7.
 - **S3** — Rule `posix-root`. A target `/<top>/...` with no drive letter after
   `buildComparablePath`, whose `<top>` is more than one character and is not in a hand-listed
   POSIX conventional set, is litter and is denied. `tmp` and `temp` are deliberately absent from
@@ -171,7 +173,8 @@ S2's clause: the ruling denies the spelling, and a host that spells its temp var
 the POSIX default the ruling is aimed at, not an exemption from it. `/tmp/sub` as a variable
 value still joins the roots, because a configured subdirectory is a deliberate destination and
 not the habit. This is also what makes rule 2 observable on node `a`: with `TEMP=/tmp` and
-`TMP=/tmp` handed to the hook, `os.tmpdir()` derives `/tmp` on Windows, the new root is
+`TMP=/tmp` handed to the hook from INSIDE node — the self-test subsection below says why a shell
+on this host cannot hand them — `os.tmpdir()` derives `/tmp` on Windows, the new root is
 `/tmp/claude`, no other root covers `/tmp`, and `/tmp/other` reaches rule 2. Without the clause
 that arm cannot exist on any registered node, and an allow root with no observable failing case
 is the class `AGENTS.md` §7's first bullet on new gates names.
@@ -214,29 +217,72 @@ unchanged, so the three existing message arms in the suite hold.
 ### The self-test
 
 `run()` at `tools/hooks/scratch-guard.test.sh:35` pins `TMPDIR=` empty and `TEMP`/`TMP` to the
-fixture path for every arm, so a `$TMPDIR` arm already runs with the variable empty and a `$TEMP`
-arm already runs with it set. The ALLOW side of rule 1 needs a non-empty `TMPDIR`, and the
-`$TEMP`-empty denial needs `TEMP` unset, so `run()` gains one optional fifth argument: words
-handed to `env` between the fixed assignments and `node`, such as `-u TEMP` or
-`TMPDIR=C:/Users/FIXTUR~1/AppData/Local/Temp`. No new shell function, so the lexicon leg's
-`sh.function` population is unchanged.
+fixture path for every arm, through the shell-prefix assignments at
+`tools/hooks/scratch-guard.test.sh:44-45`, so a `$TMPDIR` arm already runs with the variable
+empty and a `$TEMP` arm already runs with it set. The ALLOW side of rule 1 needs a non-empty
+`TMPDIR`, the `$TEMP`-empty denial needs `TEMP` unset, and the discriminating pair below needs
+`TEMP` and `TMP` to read `/tmp` INSIDE the hook. None of the three can be handed through the
+shell on this host, and rev-2 said they could. Measured 2026-09-14 on node `a` (Git-Bash,
+MINGW64 3.6.7, node v22.22.3): `TEMP=/tmp TMP=/tmp TMPDIR= node -e 'console.log(require("os").tmpdir())'`
+prints `C:\Users\DAILY-~1\AppData\Local\Temp`, and the `env TEMP=/tmp TMP=/tmp TMPDIR= node …`
+form prints the same, because the MSYS runtime rewrites a POSIX-shaped variable value for a
+native `node.exe` and `/tmp` is the `usertemp` mount onto TEMP; the round-2 audit's skeptic stage
+reports that `MSYS2_ENV_CONV_EXCL=TEMP:TMP`, `MSYS2_ENV_CONV_EXCL='*'` and `MSYS_NO_PATHCONV=1`
+do not stop it. Nor can `env` unset after it assigns: `env A=1 -u A sh -c 'echo ok'` prints
+`env: '-u': No such file or directory` and exits 127 here (coreutils 8.32), because GNU `env`
+stops option parsing at the first assignment, and a `-u` placed before the fixed assignments is
+re-set by them.
 
-The `<os.tmpdir()>/claude` arm DERIVES its path rather than pinning one: the suite reads
-`node -e` `os.tmpdir()` under the same fixture environment and writes to `<that>/claude/x`. Under
-`run()`'s fixed `TEMP`, that resolves to the fixture TEMP on every host, so the arm proves the new
-root only where the derived tmpdir is `/tmp`, which is a POSIX host with the three variables
-unset; the arm SAYS so in its label rather than passing quietly. Its discriminating twin is a
-`/tmp/claude/x` target under the fixture environment, where the derived tmpdir is NOT `/tmp`: that
-one is denied, which proves the exception is keyed on `os.tmpdir()` and not on the literal `/tmp`.
+So the environment is handed to the hook from INSIDE node, where MSYS cannot reach it. `run()`
+gains one optional fifth argument, `pre`, and it is JavaScript, never `env` words: the payload
+is piped not into `node "$HOOK"` but into
+`node -e "$pre;const r=require('child_process').spawnSync(process.execPath,[process.argv[1]],{stdio:'inherit'});process.exit(r.status??1)" "$HOOK"`.
+The prelude mutates `process.env`; the hook then runs as a native child of that node with the
+pipe, stdout and stderr inherited, so `main()`, the stdin parse and `renderDeny` all run and
+every sentence assertion in section 6 still reads the hook's own stderr; the child's status is
+the arm's exit. The `?? 1` is there because `process.exit(null)` exits 0 on node 22, measured, and
+a signal-killed hook must not read as an allow. An absent fifth argument is an empty prelude, so
+the existing arms grade the same bytes through one more process; measured at base with the empty
+prelude, `echo x > ~/.litter` still exits 2 carrying the `BLOCKED by scratch-guard` sentence. No
+new shell function, so the lexicon leg's `sh.function` population is unchanged, and no `-u`
+spelling anywhere: every override is an assignment or a `delete` on `process.env` —
+`process.env.TMPDIR="C:/Users/FIXTUR~1/AppData/Local/Temp"` for rule 1's allow side,
+`delete process.env.TEMP` and `delete process.env.TMP` for the two unset cases. Measured
+2026-09-14 on node `a` with the prelude `process.env.TEMP="/tmp";process.env.TMP="/tmp";delete process.env.TMPDIR`:
+`os.tmpdir()` prints `/tmp`, and the base hook run as that node's child lists `/tmp` first among
+the resolved roots in its deny message. The audit's own probe — that prelude followed by
+`const g=require(HOOK);process.exit(g.checkCommand(CMD,process.env).bad.length?2:0)` against the
+`checkCommand` that `tools/hooks/scratch-guard.js:394` exports — measures the same `/tmp` and the
+same exits at base; the suite takes the child form only because `renderDeny` is not exported and
+the kind sentence is what the arms assert.
 
-Neither of those can fail on a registered node, because every row of `AGENTS.md` §2 is Windows
-and the derived tmpdir there is never `/tmp`. The arm that CAN fail hands `TEMP=/tmp TMP=/tmp`
-through the fifth argument, so `env` overrides the fixture values and `os.tmpdir()` derives `/tmp`
-on Windows too, then grades `echo x > /tmp/claude/x` as allowed and `echo x > /tmp/other` as
-denied with the `tmp` sentence. The pair discriminates on this node: the allow half reds when the
-`<os.tmpdir()>/claude` root is removed, the deny half reds when `/tmp` from the variable still
-joins the roots or rule 2 is missing. `TMPDIR` stays empty under that arm, which on a POSIX host
-makes `os.tmpdir()` fall through to `TMP`, so the same words derive `/tmp` on both platforms.
+The `<os.tmpdir()>/claude` arm DERIVES its path rather than pinning one, under ONE environment,
+the emptied one: the suite reads
+`node -e 'delete process.env.TMPDIR;delete process.env.TMP;delete process.env.TEMP;console.log(require("os").tmpdir())'`
+and grades `echo x > <that>/claude/x` with those same three deletions as its prelude. On a POSIX
+host that derives `/tmp` and the arm proves the new root. On node `a` it derives
+`C:\Windows\temp`, measured 2026-09-14, whose comparable form sits under `windows` in
+`DRIVE_ROOT_CONVENTIONAL` and is allowed by the existing drive rule with no temp root in play, so
+on every registered node the arm is a control and SAYS so in its label rather than passing
+quietly. Its twin is a `/tmp/claude/x` target under the fixture environment with no prelude,
+where the derived tmpdir is the fixture TEMP and NOT `/tmp`: that one is denied, which proves the
+exception is keyed on `os.tmpdir()` and not on the literal `/tmp`.
+
+Neither of those can fail on a registered node, because every row of `AGENTS.md` §2 is Windows.
+The pair that CAN fail is the discriminating one: under the prelude
+`process.env.TEMP="/tmp";process.env.TMP="/tmp";delete process.env.TMPDIR`, `os.tmpdir()` derives
+`/tmp` on Windows and POSIX alike, the new root is `/tmp/claude`, no other root covers `/tmp`
+because S2's clause keeps the `/tmp`-valued variables out, and `echo x > /tmp/claude/x` is allowed
+while `echo x > /tmp/other` is denied with the `tmp` sentence. The allow half reds when the
+`<os.tmpdir()>/claude` root is removed; the deny half reds when `/tmp` from the variable still
+joins the roots or rule 2 is missing, and at base it exits 0, measured under that prelude,
+because `/tmp` from `TEMP` is a root. The pair carries its own liveness assertion, `AGENTS.md`
+§7's rule for any probe: before either half is graded, the arm runs `node -e` with that same
+prelude and `console.log(require("os").tmpdir())`, and prints a `FAIL` naming the derived path
+when it is not `/tmp` — a `case` beside the message arms, not a new function — so a runtime
+that rewrites the value reports itself instead of a deny for the wrong reason. Its red is staged
+by running that probe through the shell-prefix form instead, which on this node prints the TEMP
+path.
 
 Two existing arms flip under the ruling and are re-targeted, not deleted, because each guards a
 behaviour that still matters. `near-miss: /tmp is a real root -> allow` at `:110` becomes the rule
@@ -258,8 +304,8 @@ repo-relative path so they keep proving that a home-rooted SOURCE is a read.
 
 - `tools/hooks/scratch-guard.js` — the three predicates, the root, the `/tmp`-valued variable
   exclusion in `addRoot`, the expansion, the sentences, the header's WHAT IT DENIES paragraph.
-- `tools/hooks/scratch-guard.test.sh` — the arms in section 6, the `run()` fifth argument, the two
-  re-targeted arms, `FLOOR_ASSERTIONS`.
+- `tools/hooks/scratch-guard.test.sh` — the arms in section 6, the `run()` JavaScript prelude and
+  its child-spawn pipe, the pair's liveness `case`, the two re-targeted arms, `FLOOR_ASSERTIONS`.
 - `tools/hooks/README.md` — the `scratch-guard` section.
 - `memory/map/generated/symbols.json` — re-rendered by `python tools/codebase-map/gen_map.py --write`.
 
@@ -301,7 +347,10 @@ repo-relative path so they keep proving that a home-rooted SOURCE is a read.
 The observation for AC1 to AC9 is one hook invocation each, the body of `run()` lifted out of the
 suite: the JSON payload built by the same Python one-liner, piped into `node tools/hooks/scratch-guard.js`
 under the fixture environment `HOME=/c/Users/fixtureuser`, `USERPROFILE`, `TEMP` and `TMP` at the
-fixture values and `TMPDIR` empty, with the exit status read. The whole suite is `--close`'s. The
+fixture values and `TMPDIR` empty, with the exit status read. Where a criterion overrides that
+environment, the override is the JavaScript prelude `run()`'s fifth argument carries, run inside
+node before the hook is spawned as its child, section 4's rule; never shell words, which the MSYS
+runtime rewrites on this host. The whole suite is `--close`'s. The
 RED-first observation for each denial is the same invocation against the hook at base
 `1b000d1a`, where every command below exits 0; measured 2026-09-14 on node `a` for the denial
 shapes AC1, AC2, AC3's `/tmp/hyg`, AC4, AC6 and AC8 name, and quoted in the acceptance ledger.
@@ -312,14 +361,16 @@ and which are controls is read from the criteria themselves; no count of either 
 
 - **AC1** — When the fixture command `cp x $TMPDIR/y` is graded with `TMPDIR` empty, the hook
   exits 2 and its stderr names `TMPDIR` and says the write lands at the filesystem root; the same
-  command with `TMPDIR` set to the fixture TEMP through `run()`'s fifth argument exits 0.
+  command with `TMPDIR` set to the fixture TEMP through the prelude
+  `process.env.TMPDIR="C:/Users/FIXTUR~1/AppData/Local/Temp"` in `run()`'s fifth argument exits 0.
   Red when: the base hook is used, which exits 0 on both; or the expansion half is missing, so the
   non-empty case is denied as an unresolved token by no rule and passes for the wrong reason,
   which the paired allow arm cannot tell apart from a correct expansion unless its target is under
   a root — so the allow arm's target is under the fixture TEMP by construction.
-- **AC2** — When `echo x > ${TEMP}/y` is graded with `TEMP` unset through `-u TEMP`, the hook
-  exits 2 naming `TEMP`; when `echo x > $TEMP/a.log` is graded with the fixture `TEMP` set, it
-  exits 0 because the expansion resolves under the TEMP root.
+- **AC2** — When `echo x > ${TEMP}/y` is graded with `TEMP` unset through the prelude
+  `delete process.env.TEMP`, the hook exits 2 naming `TEMP`; when `echo x > $TEMP/a.log` is
+  graded with the fixture `TEMP` set and no prelude, it exits 0 because the expansion resolves
+  under the TEMP root.
   Red when: the braced spelling is not matched, or `$TEMP` is not expanded and the set case is
   denied.
 - **AC3** — When `echo x > /tmp/hyg` is graded, the hook exits 2 and its stderr carries the
@@ -338,31 +389,38 @@ and which are controls is read from the criteria themselves; no count of either 
   Red when: the base hook is used, which exits 0 on the first; or a conventional name is missing
   from the set and one of the three controls is denied; or the single-character guard is missing
   and a `/c` spelling is graded here instead of by the drive rule.
-- **AC5** — When `TMP=$(mktemp -d); echo x > $TMP/f` is graded with `TMP` unset through `-u TMP`,
-  the hook exits 0.
+- **AC5** — When `TMP=$(mktemp -d); echo x > $TMP/f` is graded with `TMP` unset through the
+  prelude `delete process.env.TMP`, the hook exits 0; it exits 0 at base too, measured
+  2026-09-14 under that prelude, so this is a control that the tip must keep, not a red-first arm.
   Red when: rule 1 ignores the same-command assignment and denies a shell-local variable the
   hook's environment cannot see.
 - **AC6** — When `echo x > /tmp/claude/x` is graded under the fixture environment, whose derived
   tmpdir is the fixture TEMP and not `/tmp`, the hook exits 2 with the `tmp` sentence.
   Red when: the exception is keyed on the literal `/tmp/claude` rather than on `os.tmpdir()`, so
   this passes.
-- **AC7** — When the suite derives `os.tmpdir()` under the fixture environment with all three
-  temp variables unset and grades `echo x > <that>/claude/x` under that same environment, the hook
-  exits 0, and the arm's label states that it discriminates only where the derived path is `/tmp`.
-  The discriminating arm: when `TEMP=/tmp TMP=/tmp` is handed through `run()`'s fifth argument,
-  so that `os.tmpdir()` derives `/tmp` on this node, `echo x > /tmp/claude/x` exits 0 and
-  `echo x > /tmp/other` exits 2 with the `tmp` sentence.
+- **AC7** — When the suite derives `os.tmpdir()` under the emptied environment, the prelude
+  `delete process.env.TMPDIR;delete process.env.TMP;delete process.env.TEMP`, and grades
+  `echo x > <that>/claude/x` under that same prelude, the hook exits 0, and the arm's label states
+  that it discriminates only where the derived path is `/tmp`. The discriminating pair: when the
+  prelude `process.env.TEMP="/tmp";process.env.TMP="/tmp";delete process.env.TMPDIR` is handed
+  through `run()`'s fifth argument, so that `os.tmpdir()` derives `/tmp` inside the hook on this
+  node, `echo x > /tmp/claude/x` exits 0 and `echo x > /tmp/other` exits 2 with the `tmp`
+  sentence; and before either half is graded, `node -e` under that same prelude prints `/tmp` for
+  `os.tmpdir()`, else the arm prints `FAIL` naming the path it derived and grades nothing.
   Red when: the new root is absent and the derived arm is denied on a POSIX host; or the arm pins
   a path instead of deriving one, which makes it a fixture that grades a different machine; or,
   for the discriminating pair, the `<os.tmpdir()>/claude` root is removed, which denies the first
   by rule 2, or a `/tmp`-valued temp variable still joins the allowed roots, which allows the
-  second by the skip at `tools/hooks/scratch-guard.js:328`. Removing the root is the commit-local
-  edit that reds the allow half; at base the second exits 0 because `/tmp` from `TEMP` is a root.
-  fixture: the derived arm reads the machine's own `os.tmpdir()` under an emptied environment; on
-  node `a` that is `C:\Windows\temp`, which is under a conventional drive root and allowed by the
-  existing rule, so on this node that arm is a control and not a proof and is named as such in
-  its label. The discriminating pair needs no fixture beyond the environment words, and it is the
-  half of this criterion that can fail on every registered node.
+  second by the skip at `tools/hooks/scratch-guard.js:328`; or the `/tmp` values are handed
+  through the shell instead of the prelude, which on node `a` derives
+  `C:\Users\DAILY-~1\AppData\Local\Temp` and reds the liveness assertion by name. Removing the
+  root is the commit-local edit that reds the allow half; at base the second exits 0, measured
+  2026-09-14 under that prelude, because `/tmp` from `TEMP` is a root.
+  fixture: the derived arm reads the machine's own `os.tmpdir()` under the emptied prelude; on
+  node `a` that is `C:\Windows\temp`, measured 2026-09-14, which is under a conventional drive
+  root and allowed by the existing rule, so on this node that arm is a control and not a proof
+  and is named as such in its label. The discriminating pair needs no fixture beyond its prelude,
+  and it is the half of this criterion that can fail on every registered node.
 - **AC8** — When `echo x > ${TMPDIR:-/tmp}/y` is graded with `TMPDIR` empty, the hook exits 2
   with the `tmp` sentence, because the default expanded and rule 2 read the result.
   Red when: the default form is left unexpanded and no rule claims it.
@@ -436,6 +494,13 @@ exits 0 on every one of them · `FLOOR_ASSERTIONS` rises by the arms added.
   discriminating pair; for `/tmp/other` to reach rule 2 under that environment, S2 and §4 now
   exclude a `/tmp`-valued temp variable from the allowed roots, which the audit's fix implies and
   did not spell. Q: the arm counts left §5 and the §6 preamble; AC10 derives the figure.
+- rev-3 · 2026-09-14 · S2 · §4 · §6 preamble · AC1 · AC2 · AC5 · AC7 · folded spec-audit round 2,
+  cluster B (ids 24, 12, 17). The environment is handed to the hook from inside node: `run()`'s
+  fifth argument is a JavaScript prelude on `process.env`, the hook runs as node's own child, and
+  every `-u` spelling is gone, because on node `a` the MSYS runtime rewrites a shell-handed
+  `TEMP=/tmp` and GNU `env` refuses `-u` after an assignment, both measured and recorded in §4.
+  The derived-root arm has one environment, the emptied one, in §4 and AC7 alike; the pair
+  carries the liveness assertion the audit's left-shift named.
 
 ## 10. Reuse audit
 

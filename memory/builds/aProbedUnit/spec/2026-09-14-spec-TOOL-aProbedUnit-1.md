@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -108,13 +108,18 @@ change, and the bar is `--close`'s.
 
 ### Four carriers, one rule, and which text binds
 
-A sidechain child holds `AGENTS.md` and the hooks; it does not hold the unattended Skill. That is
-MEASURED, not assumed: `memory/guides/REVIEW-PROTOCOL.md:228-231` records the 2026-08-15 probe whose
-first message carried `CLAUDE.md` and the whole of `AGENTS.md` before it read anything, with a
-`SubagentStart` hook fired and obeyed, and the charter's own §8 says "It DOES inherit the governing
-doc". The Skill is loaded by the main-loop session that invokes `/unattended`; a child invokes
-nothing. So what a child reads is the charter, `cfg.ground`, its own `PROMPT`, and — because
-`GROUND` orders it — `memory/guides/BUILD-METHOD.md`. The rule has to be in the prompt to bind the
+A sidechain child holds `AGENTS.md` and the hooks. That half is MEASURED:
+`memory/guides/REVIEW-PROTOCOL.md:228-234` records the 2026-08-15 probe whose first message carried
+`CLAUDE.md` and the whole of `AGENTS.md` before it read anything, with a `SubagentStart` hook fired
+and obeyed, and the 2026-09-12 probe on node `d` where `PreToolUse` denied a command inside a
+sidechain; the charter's own §8 says "It DOES inherit the governing doc". The child does not hold
+the unattended Skill. That half is INFERRED, not measured, and the record above says nothing about
+Skills: the inference is the Skill's loading path — a Skill's body reaches a session only when that
+session invokes it, the main loop invokes `/unattended`, and the child's `PROMPT` invokes nothing —
+while the child's own tool listing does name the Skill as invokable, so no probe has yet listed
+what a child holds and this spec does not claim one has. So what a child reads is the charter,
+`cfg.ground`, its own `PROMPT`, and — because `GROUND` orders it — `memory/guides/BUILD-METHOD.md`,
+with the Skill's absence marked inferred. The rule has to be in the prompt to bind the
 agent where a section 7 list would otherwise outrank it, in the method to be the rule for every pass
 attended or not, and in `GROUND` to reach the SPEC writers, who write section 7 and are not
 children. The Skill sentence is the fourth carrier, for the main-loop session that dispatches
@@ -412,12 +417,16 @@ that half. AC2 and AC6 have no leg half.
 - **AC6** — When the child is run through the `run_wf` double of
   `tools/workflows/unattended-build.test.sh` with its `CHILD_ARGS` fixture in `unattended` mode and
   the output is piped through `grep -c "NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS"`, it prints `1`
-  at the landed tip and `0` against the base child; and the new `has` arm reads `ok` on the landed
-  child. This is the ONE check the pass verifies with.
+  at the landed tip and `0` against the base child; the new `has` arm reads `ok` on the landed
+  child; and `grep -cF "NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS" tools/workflows/unattended-build.test.sh`
+  prints `1` at the landed tip and `0` at base, which is the S5 arm existing in the suite at all.
+  This is the ONE check the pass verifies with.
   Red when: the landed count is `0`, meaning the paragraph is in the file but not in the prompt the
   agent receives — a comment, or a string term outside `PROMPT`; or the base count is not `0`,
-  meaning the arm cannot fail.
-  cost: seconds — one `node -e` evaluation with stub hooks, no agent spawned.
+  meaning the arm cannot fail; or the suite grep prints `0` at the tip, which is the `has` line
+  pasted into a shell and never landed in the file, or `2`, which is the phrase duplicated into a
+  comment beside the arm.
+  cost: seconds — one `node -e` evaluation with stub hooks, no agent spawned, plus one grep.
   fixture: the double is a function inside the suite; run it by sourcing the suite's `run_wf`
   definition and `CHILD_ARGS` into a shell, or by copying the `node -e` body, which is what the
   section 10 probe did at base. Never the suite whole inside the pass.
@@ -480,6 +489,11 @@ prompt holds the phrase zero times · no floor moves.
   observed at `--close`; the Rollout's parity criteria renumbered AC3, AC4, AC7) and L (id 54: the
   carriers paragraph rewritten to the measured fact that a child holds `AGENTS.md` and the hooks,
   the charter's §1 DoD line named as the fifth carrier and deliberately not edited, with why).
+- rev-3 · 2026-09-14 · §4 · AC6 · folded round-2 clusters D (id 3: AC6 gains the `grep -cF` over
+  `tools/workflows/unattended-build.test.sh`, `1` at the tip and `0` at base, red at `0` or `2`, so
+  the S5 arm's existence in the suite has an observed token) and L (id 37: the carriers paragraph
+  split — the charter and hooks MEASURED per `memory/guides/REVIEW-PROTOCOL.md:228-234`, the
+  Skill's absence INFERRED from its loading path and marked so).
 
 ## 10. Reuse audit
 

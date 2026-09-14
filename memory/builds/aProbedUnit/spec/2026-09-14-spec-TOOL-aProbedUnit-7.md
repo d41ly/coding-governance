@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -65,14 +65,21 @@ becomes a UNIT.
 - **S7** — The unattended kit's prose carriers say the rule once each and point rather than
   paraphrase: the `CONVERGED` and `NON-CONVERGENT` bullets of `tools/unattended/SKILL.template.md`
   and the `--review` bullet of `tools/unattended/VERBS.template.md`, re-rendered by
-  `bash tools/unattended/adopt-unattended.sh`; and the driver's own refusal for a round on an
-  ended subject, the `fail 37` message at `tools/unattended/unattended.sh:4096`, whose
-  `fold or promote` clause becomes the severity rule's, with the three suite arms that quote it
-  moved to the new words. Observed by AC8 and AC9.
+  `bash tools/unattended/adopt-unattended.sh`; and the driver's own by-nature disposal prose,
+  four places: the `fail 37` for a round on an ended subject at
+  `tools/unattended/unattended.sh:4096`, whose `fold or promote` clause becomes the severity
+  rule's; `review_exit_note`'s two sentences at `:4025` to `:4026`, which open `every blocker
+  still standing was FOLDED` and `every blocker still standing is PROMOTED` and print on every
+  terminal echo, the `BOUNDED` one unit 6 adds included, so each names the severity rule's half
+  it records instead; and the requires-disposition `fail 37` at `:4107`, whose `because the
+  method admits BOTH fold and promote at the exit` clause and its `M4 admits BOTH` comment at
+  `:4101` to `:4103` say the severity rule decides which value the exit records. The four suite
+  arms that quote those messages move to the new words. Observed by AC8 and AC9.
 - **S8** — `tools/workflows/unattended-build.test.sh`: the fixtures carry the callee's real keys
   (`confirmed`, `highs`), the default disposal double reconciles with the count it is paired with,
   the two arms quoting `blockers were not disposed` and the header arm at line 376 move to the new
-  text, and the arms section 4 lists observe S1-S5. Observed by AC1 through AC6.
+  text, and the arms section 4 lists observe S1-S5. Observed by AC1 through AC6 for the arms,
+  and by AC10 for the suite's own text and its whole run.
 
 ## 3. Non-goals (OUT)
 
@@ -85,8 +92,11 @@ becomes a UNIT.
   field stays REQUIRED, by the 2026-09-01 ruling spec 6 section 8 F1 cites, and the harness
   recorder as unit 6 leaves it retries a refused terminal exit with `--disposition promote`; so
   `CONVERGED` is the one exit this stage disposes with nothing in the record, and the only one.
-  The one driver edit here is the WORDS of the `fail 37` message at
-  `tools/unattended/unattended.sh:4096`, never its grammar, its branch count or its trigger.
+  The driver edits here are WORDS only — the two `fail 37` messages at
+  `tools/unattended/unattended.sh:4096` and `:4107`, the comment above the second, and
+  `review_exit_note`'s two sentences at `:4025` to `:4026` — never a grammar, a branch count, a
+  trigger or a case: the `BOUNDED` member of the state gate is unit 6's and is read as it leaves
+  it.
 - **No convergence rule moves.** `review_state`, the round bound and the `BOUNDED` exit are
   `TOOL-aProbedUnit-6`; the sentence in M4 that states them is that unit's, and this unit edits
   the disposal sentence beside it and the late-blocker sentence three lines down, both of which
@@ -129,7 +139,8 @@ Rollout sub-head states the overlap.
   check 2's awk; nothing here demands it.
 - **hands-off** external — the direct run of `bash tools/workflows/unattended-build.test.sh` at the
   close, whole, once: the suite is on no bar and no `tools/gate-legs.json` row names it, so nothing
-  at `--close` or the push boundary runs it. Section 7 states the cost.
+  at `--close` or the push boundary runs it. AC10's suite half is the criterion that owns that
+  run, ledgered `observed at --close`; section 7 states the cost.
 - **hands-off** external — whether the workflows kit's own version moves for this edit. Its
   `version_from` is `tier2-review.js` (`tools/workflows/kit.toml:6`), which this unit does not
   touch, and the harness's `unattended-build@1.0` marker on line 3 is paired by no leg. The
@@ -397,6 +408,34 @@ in the driver and in its suite; the one other carrier of those words, check 2's 
 `tools/unattended/check-unattended.sh:537`, speaks of the FIELD's two legal values and not of the
 rule, and stays.
 
+That message is not the driver's only by-nature disposal prose. Verified at base,
+`grep -c 'blocker still standing' tools/unattended/unattended.sh` prints 3 — `:3969`, inside the
+comment block unit 6 rewrites ahead of this pass, and `:4025` and `:4026`, the two sentences of
+`review_exit_note`, which every terminal echo prints, unit 6's `BOUNDED` echo included. After the
+M4 swap a `--disposition fold` at a `NON-CONVERGENT`, `CEILING` or `BOUNDED` exit would make the
+driver assert "every blocker still standing was FOLDED into the specs it belongs to", which M4
+then forbids — one echo line carrying two answers. The two sentences become the severity rule's
+halves: `fold` prints that every MEDIUM and LOW confirmed at this exit was `FOLDED into the specs
+it belongs to`, which is the recorded disposition, and that the severity rule never folds a
+BLOCKER or HIGH; `promote` prints that every BLOCKER and HIGH confirmed at this exit is
+`PROMOTED` to a unit of this build, specced at its tier and built, and that a MEDIUM or LOW is
+folded. The two substrings the suite already reads — `PROMOTED` at `unattended.test.sh:4597`
+and `FOLDED into the specs it belongs to` at `:4643` — are kept verbatim inside the new
+sentences, so those two arms stand and pass for the reason they were written; the function's
+`*)` arm and the header above it at `:4020` to `:4022` are untouched.
+
+The fourth carrier is the requires-disposition `fail 37` at `:4107`, whose clause `because the
+method admits BOTH fold and promote at the exit` cites a rule M4 no longer states, and the
+comment at `:4101` to `:4103` above the state gate, `M4 admits BOTH`. The clause becomes
+`because the severity rule decides which of fold and promote the exit records`, keeping the
+`and a record naming neither leaves the gate inferring one from ids` half and the legal-values
+tail; the comment says M4 disposes by severity and the field records which value the exit took.
+The case that guards it — `NON-CONVERGENT|CEILING|BOUNDED)` as unit 6 leaves it — does not
+move. The arm at `unattended.test.sh:4634` quotes the old clause and MOVES with it, so four
+suite arms move in this pass, not three; spec 6 rev-4 corrects its own "stands unchanged" for
+that arm. `admits BOTH` then prints zero times in the driver, where at base it prints 2, and
+zero in the suite, where at base it prints 1.
+
 ### The suite
 
 `tools/workflows/unattended-build.test.sh` evaluates the RENDER (`$F` at line 18 is
@@ -448,8 +487,9 @@ The pass writes `tools/workflows/unattended-build.template.js`, `tools/workflows
 by `--render`, `tools/workflows/unattended-build.test.sh`,
 `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md` by `--render`,
 `tools/unattended/SKILL.template.md`, `tools/unattended/VERBS.template.md`, their two renders by the
-adopter, `tools/unattended/unattended.sh` (one message's words) and
-`tools/unattended/unattended.test.sh` (the three `hit` literals quoting it),
+adopter, `tools/unattended/unattended.sh` (the words of two messages, two exit-note sentences
+and one comment) and `tools/unattended/unattended.test.sh` (the four `hit` literals quoting
+them),
 `memory/guides/SESSION-KICKOFF.md` (the `last-audit` line only), its own spec header, the
 build README and the two generated indexes every pass re-renders, and its acceptance ledger under
 the build's `build/` folder, declared by file. It is sequenced last by its `order` verb and after
@@ -470,8 +510,8 @@ identically after it, and the hand-out's two new keys are additive.
 | `tools/unattended/SKILL.template.md` | two bullets in the review-state list |
 | `tools/unattended/VERBS.template.md` | one clause in the `--review` bullet |
 | `.claude/skills/unattended/SKILL.md`, `memory/guides/UNATTENDED-VERBS.md` | re-rendered |
-| `tools/unattended/unattended.sh` | the words of one `fail 37` message, line 4096 |
-| `tools/unattended/unattended.test.sh` | the three `hit` literals quoting that message, lines 4589, 4601 and 4609 |
+| `tools/unattended/unattended.sh` | words only: the `fail 37` messages at lines 4096 and 4107, the comment at 4101-4103, and `review_exit_note`'s two sentences at 4025-4026 |
+| `tools/unattended/unattended.test.sh` | the four `hit` literals quoting those messages, lines 4589, 4601, 4609 and 4634; the `PROMOTED` and `FOLDED into the specs it belongs to` arms at 4597 and 4643 stand |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamped |
 
 ### Alternatives rejected
@@ -511,8 +551,9 @@ identically after it, and the hand-out's two new keys are additive.
   medium is a judgement and not a contradiction. The disposal agent reads the report's own severity
   table, so the harness's integers steer the announcement and the reconciliation, not the split.
 - testing — the harness arms section 4 tables, each observed RED against the unchanged render one
-  at a time, V2 excepted; one driver-suite arm run alone; the grep pairs of AC6 to AC9. The suites
-  whole and every leg are the close's, and section 7 prices the one direct harness-suite run.
+  at a time, V2 excepted; one driver-suite arm run alone; the grep pairs of AC6 to AC10. The suites
+  whole and every leg are the close's; AC10 owns the one direct harness-suite run, and section 7
+  prices it.
 - migration — N/A. No record grammar, conf key or file format changes; two additive JSON keys.
 - user docs — the method and the Skill are the documents and both move here; VERBS points.
 
@@ -610,14 +651,43 @@ build README's rules.
 - **AC9** — When `grep -c 'fold or promote' tools/unattended/unattended.sh` runs at the landed
   tip it prints `0`, where at base it prints `1`; the same grep over
   `tools/unattended/unattended.test.sh` prints `0`, where at base it prints `3`;
+  `grep -c 'blocker still standing' tools/unattended/unattended.sh` prints `0`, where at base it
+  prints `3` at `:3969`, `:4025` and `:4026` — the first sits in the comment block unit 6
+  rewrites ahead of this pass, so the count when this pass opens is 2 or 3 and the tip is `0`
+  either way; `grep -c 'admits BOTH' tools/unattended/unattended.sh` prints `0`, where at base it
+  prints `2` at `:4101` and `:4107`, and the same grep over `tools/unattended/unattended.test.sh`
+  prints `0`, where at base it prints `1` at `:4634`;
   `grep -c 'by the severity rule, and never re-rounded' tools/unattended/unattended.sh` prints
-  `1`; and one of the three arms quoting the message, run alone by the form spec 6 section 4's
-  suite paragraph gives — the preamble sourced, `bcsetup`, then the arm's `bcopen` block through
-  its `hit` line — is silent, where against the driver at base it prints `FAIL missing`. The
-  `harness arms` leg is observed at `--close`.
-  Red when: the driver's refusal still points at the old rule; or an arm still quotes the old
-  words, which reds the message and the arm together; or the branch reads as unarmed at the
-  close because the arm's literal and the message drifted apart.
+  `1`; `grep -c 'PROMOTED to a unit of this build' tools/unattended/unattended.sh` and
+  `grep -c 'FOLDED into the specs it belongs to' tools/unattended/unattended.sh` each print `1`,
+  as at base — the substrings the standing arms at `:4597` and `:4643` read, kept inside the
+  rewritten sentences; and one of the
+  four arms quoting a rewritten message, run alone by the form spec 6 section 4's suite paragraph
+  gives — the preamble sourced, `bcsetup`, then the arm's `bcopen` block through its `hit` line —
+  is silent, where against the driver at base it prints `FAIL missing`. The `harness arms` leg is
+  observed at `--close`.
+  Red when: the driver's refusal still points at the old rule; or an exit note still asserts that
+  standing blockers were folded, which the `blocker still standing` grep alone sees; or the
+  requires-disposition refusal still cites a rule M4 no longer states; or an arm still quotes the
+  old words, which reds the message and the arm together; or a rewritten sentence dropped a
+  substring a standing arm reads, so an arm this unit did not touch reds; or the branch reads as
+  unarmed at the close because an arm's literal and its message drifted apart.
+- **AC10** — When `grep -c 'blockers were not disposed' tools/workflows/unattended-build.test.sh`
+  runs at the landed tip it prints `0`, where at base it prints `2`, lines 471 and 590;
+  `grep -c 'UNREACHABLE HERE'` over the same file prints `0`, where at base it prints `1`, line
+  376; and `grep -c 'REACHABLE HERE SINCE'` over it prints `1`, where at base it prints `0`. The
+  suite whole — `bash tools/workflows/unattended-build.test.sh` redirected to a file and never
+  read through `tail` — prints no `FAIL` line and its `--- <n> arms` line, the suite's own at
+  line 902, reads 237 plus the assertion lines this unit adds; that half is observed at
+  `--close`, and it is the one run that loads every fixture S8 moves, where the pass's single
+  arms paste their own.
+  Red when: a literal at 471, 590 or 376 still quotes the old noun or the old header claim, so
+  an arm passes over a message the render no longer prints, or a header arm stays green over a
+  false comment; or, at the close, a `FAIL` line, or an arms figure below 237 plus the
+  additions, which is an arm de-collected rather than one that passed.
+  figure: 237 is PINNED from the 2026-09-14 run at `270611cd` section 7 records; the additions
+  are DERIVED as the `has`, `hasnt_` and `same` lines this pass's diff adds, each of which
+  increments the suite's `n`.
 
 ## 7. Gates
 
@@ -625,10 +695,11 @@ build README's rules.
 
 These are what `--close` runs, once, over the whole build. The PASS does not run them, nor any
 suite: it verifies with the single-arm runs AC1 through AC5 describe, against the render, then
-the grep pairs of AC6 through AC9 and AC9's one driver-suite arm run alone. Where a criterion
-also names a leg — the syntax and parity legs in AC6, the three method legs in AC7, the wiring
-leg in AC8, `harness arms` in AC9 — that half is the close's observation of the same criterion,
-and its ledger row reads `observed at --close`. Chunks and guards, read from
+the grep pairs of AC6 through AC10 and AC9's one driver-suite arm run alone. Where a criterion
+also names a leg or a suite whole — the syntax and parity legs in AC6, the three method legs in
+AC7, the wiring leg in AC8, `harness arms` in AC9, the harness suite whole in AC10 — that half
+is the close's observation of the same criterion, and its ledger row reads `observed at
+--close`. Chunks and guards, read from
 `tools/gate-legs.json` on 2026-09-14: `workflow script syntax` is `wiring`, unguarded;
 `review-protocol parity`, `harness arms`, `method carriers`, `spec tokens` and
 `kit/dogfood doc parity` are `declarations`, the last guarded on six paths that this pass's diff
@@ -643,7 +714,8 @@ and no budget row exists for it, so neither `GATE_FULL=1` nor `GATE_SELFTESTS=1`
 compensating check is one direct run at the close, whole, redirected to a file and never read
 through `tail`: measured on node `a` on 2026-09-14 at `270611cd`, 237 arms, exit 0, 335 s. After
 this unit the arm count is 237 plus the additions and the suite's own `--- <n> arms` line is the
-figure. The per-arm form the pass uses is AC1's preamble source.
+figure; AC10's suite half is the criterion that owns the run and the row that reads
+`observed at --close`. The per-arm form the pass uses is AC1's preamble source.
 
 New arm: `tools/workflows/unattended-build.test.sh` · V1, V3, V4, V5 and V6 each stage their red
 against the unchanged render, one arm at a time · no floor exists in this suite.
@@ -652,9 +724,10 @@ Moved arm: `tools/workflows/unattended-build.test.sh` · lines 376, 471 and 590 
 literals; the AC4 arm at 457-463 is re-labelled and extended into V2; the `T_UNITS` arm at 493
 gains V7's one `has` line · no floor.
 
-Moved arm: `tools/unattended/unattended.test.sh` · the three `hit` literals at 4589, 4601 and
-4609 quote the rewritten `fail 37` message; no arm is added or removed · `FLOOR_ASSERTIONS` and
-`FLOOR_SHARD_2` do not move, because the executed count does not.
+Moved arm: `tools/unattended/unattended.test.sh` · the four `hit` literals at 4589, 4601, 4609
+and 4634 quote the two rewritten `fail 37` messages; the `PROMOTED` and `FOLDED into the specs
+it belongs to` arms at 4597 and 4643 stand, their substrings kept; no arm is added or removed ·
+`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` do not move, because the executed count does not.
 
 ## 8. Open questions
 
@@ -682,6 +755,7 @@ Moved arm: `tools/unattended/unattended.test.sh` · the three `hit` literals at 
   because the brief's predicate makes the stage reachable in attended mode where `--rescope`
   refuses.
 - rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (id 22 — AC6 to AC8 reduced to their grep pairs, the six leg runs at `--close`), E (id 48 — the recorder as unit 6 leaves it, in §3), K (id 52 — the line-143 sentence and the `fail 37` message at `unattended.sh:4096` join the carriers, minus 13 bytes, `TOOL-aLeakedHandle-6` in §10, AC9), M (ids 15, 16 — AC4's RESULT keys and V7, AC8's `still disposed` and `severity rule` greps), S (id 46 — `meta.phases[2].detail`, AC6's retired-phrase grep), T (id 45 — `--reason` on the promotion command).
+- rev-3 · 2026-09-14 · §3 · §4 · §5 · §7 · S7 · S8 · AC9 · AC10 · folded the round-2 spec audit: clusters D (id 5 — AC10, the harness suite's own text by three greps in the pass and its whole run at `--close`, the row S8 and the §3 hands-off bullet lacked), G (id 28 — `review_exit_note`'s two sentences at `unattended.sh:4025` to `:4026` and the `:4107` clause with its `:4101` to `:4103` comment join S7 with severity-rule wording; AC9's zero-count greps over `blocker still standing`, base 3, and `admits BOTH`, base 2 in the driver and 1 in the suite — the audit wrote 1 for the driver and the tree says 2; the `:4634` arm moves with the clause, four arms not three, with spec 6 rev-4 corrected in the same fold).
 
 ## 10. Reuse audit
 

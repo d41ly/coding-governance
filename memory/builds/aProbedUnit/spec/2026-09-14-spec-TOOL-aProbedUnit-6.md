@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -56,10 +56,12 @@ other two terminal exits do, and lands the vocabulary in every carrier that spel
   round-bound rule, byte-neutral or better, leaving the disposal sentence to unit 7; the render
   is re-made and the kickoff manifest's `last-audit` is re-stamped in the same commit. Observed by
   AC11.
-- **S9** — `tools/unattended/unattended.test.sh`: `mkconf` gains a sixth positional
-  `REVIEW_ROUNDS` defaulting to the ceiling so every existing sequence arm holds unchanged, the
-  new arms section 6 names land beside the review-loop arms, the requires-disposition arm at
-  `:4634` stands, and the floors rise by the arms added. Observed by AC12.
+- **S9** — `tools/unattended/unattended.test.sh`: `mkconf` gains a SEVENTH positional,
+  `REVIEW_ROUNDS="${7-8}"`, defaulting to the ceiling so every existing sequence arm holds
+  unchanged — the sixth is `TOOL-aProbedUnit-3`'s, `UNIT_STALL_BOUND="${6-1800}"`, landed ahead
+  of this pass; the new arms section 6 names land beside the review-loop arms, the
+  requires-disposition arm at `:4634` stands in this pass, and the floors rise by the arms added.
+  Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -95,11 +97,14 @@ other two terminal exits do, and lands the vocabulary in every carrier that spel
 ### Edges
 
 - **hands-off** `TOOL-aProbedUnit-7` — the disposal sentence in M4, the harness's disposal
-  stage, and the disposal clause of the terminal-round `fail 37` message at
-  `tools/unattended/unattended.sh:4096`, which still says `fold or promote`. This unit writes the
-  round-bound sentence beside M4's, the `BOUNDED` token into `REVIEW_TOKENS` and into the grep
-  above that message, and leaves the message's own words to unit 7, which rewrites every carrier
-  of the disposal rule in one commit.
+  stage, the disposal clause of the terminal-round `fail 37` message at
+  `tools/unattended/unattended.sh:4096`, which still says `fold or promote`, the `admits BOTH`
+  clause of the requires-disposition `fail 37` at `:4107` with its comment at `:4101` to
+  `:4103`, and `review_exit_note`'s two sentences at `:4025` to `:4026`, which open `every
+  blocker still standing`. This unit writes the round-bound sentence beside M4's, the `BOUNDED`
+  token into `REVIEW_TOKENS`, into the grep above the `:4096` message and into the case that
+  guards the `:4107` one, and leaves every one of those messages' own words to unit 7, which
+  rewrites every carrier of the disposal rule in one commit.
 - **consumes-from** `TOOL-aProbedUnit-3` — `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>`, the reader
   that unit hoists out of the `GATE_BOUND` block for `UNIT_STALL_BOUND` and that this unit's key
   routes through. The decision spec 3 delegated here is taken: the three keys share one reader,
@@ -182,6 +187,10 @@ records why the two must not share a subject. Four more edits in the verb:
 - The state gate at `:4104` to `:4116`: the first case becomes `NON-CONVERGENT|CEILING|BOUNDED)`
   and KEEPS its body, the `fail 37 "--review exits $state and requires --disposition ..."` at
   `:4107`, so a `BOUNDED` exit without a disposition is refused with a message naming `BOUNDED`.
+  That message's `because the method admits BOTH fold and promote at the exit` clause, and the
+  `M4 admits BOTH` comment above the gate at `:4101` to `:4103`, are unit 7's to reword to the
+  severity rule, with the arm at `:4634` that quotes the clause; this unit widens the case and
+  keeps the body's bytes.
   The `*)` case keeps its refusal of an explicit disposition on a non-terminal round. Nothing here
   writes a default: the 2026-09-01 owner ruling in `memory/builds/dFoldedVerdict/README.md`,
   "a forced value is a constant, and a constant is not evidence for the clause that reads it — so
@@ -194,6 +203,20 @@ records why the two must not share a subject. Four more edits in the verb:
   is reached, the loop STOPS here, and every standing blocker is disposed by severity, followed by
   `review_exit_note "$disposition"`. The `four states` comment above `review_state` at `:3971`
   becomes five.
+- Two comment blocks carry the withdrawn-cap ruling — `TOOL-aBoundedVerdict-1`, "the loop's
+  engine was M4's missing BLOCKED disposition, not a missing count" — in the driver's own words
+  and are rewritten, because after this pass `review_state` exits `BOUNDED` on a count
+  for spec subjects and a paragraph above it saying a count is the wrong variable is the
+  two-answers class the README's rule four names. `WHY A PREDICATE AND NOT A COUNT` at `:3966`
+  to `:3969`, directly above `review_state`, says "a round cap does not give a loop an exit; it
+  moves the stall earlier" and ends by restating the disposal rule; the `RUNAWAY_CEILING` header
+  at `:457` to `:458` says the loop is "bounded by a CONVERGENCE PREDICATE, not by a count". Both
+  become the one statement: a SPEC subject is bounded by `REVIEW_ROUNDS` and exits in a
+  disposition, the DIFF review by convergence, and the ceiling backstops both. The rewritten
+  `:3966` block carries no disposal words — the rule lives in M4 and the Skill, unit 7's carriers,
+  and a comment paraphrasing it is the copy that rots — so `blocker still standing` at `:3969`
+  goes with the rewrite and `moves the stall earlier` prints zero times in the driver at the tip.
+  No parity or method-carriers leg reads comment prose, which is why AC7 greps for it.
 
 ### The readers
 
@@ -277,14 +300,16 @@ recorded high-water, and this pass only lowers it.
 
 ### The suite
 
-`mkconf` at `tools/unattended/unattended.test.sh:108` writes `GATE_BOUND="${4-3600}"`; it gains
-`REVIEW_ROUNDS="${6-8}"`, the ceiling, so every existing review arm keeps its sequence. The new
-arms sit beside the review-loop arms at `:4530` to `:4646`:
+`mkconf` at `tools/unattended/unattended.test.sh:108` writes `GATE_BOUND="${4-3600}"` from five
+positionals at base; `TOOL-aProbedUnit-3`, order 3, takes the SIXTH for
+`UNIT_STALL_BOUND="${6-1800}"`, so this unit takes the SEVENTH, `REVIEW_ROUNDS="${7-8}"`, the
+ceiling, and every existing review arm keeps its sequence. The new arms sit beside the
+review-loop arms at `:4530` to `:4646`:
 
 - sliced `review_state` arms: `review_state '' 3 1` is `BOUNDED`; `review_state '3' 2 2` is
   `BOUNDED`; `review_state '' 3 8` is `CONVERGING`; `review_state '9 8 7 6 5 4 3' 2 8` is still
   `CEILING`; `review_state '' 0 1` is `CONVERGED`; `review_state '2' 2 1` is `NON-CONVERGENT`.
-- verb arms under a conf written with the sixth positional at 1: a spec subject's first round with
+- verb arms under a conf written with the seventh positional at 1: a spec subject's first round with
   3 blockers and no `--disposition` is refused with `--review exits BOUNDED and requires
   --disposition` and writes no row; the same round with `--disposition promote` prints
   `BOUNDED · disposition promote` and the row carries the same; a second round on that subject
@@ -292,20 +317,29 @@ arms sit beside the review-loop arms at `:4530` to `:4646`:
   and with `--disposition promote` is refused as `not a terminal exit`; an explicit
   `--disposition fold` on a bounded round writes `fold`.
 - the arm at `:4634`, which asserts the requires-disposition refusal on a `NON-CONVERGENT`
-  second round, stands unchanged: the refusal it observes stands.
+  second round, stands in THIS pass: the refusal it observes stands, and this unit changes the
+  case that guards it and not the message. It MOVES in unit 7's pass, because the literal it
+  quotes — `because the method admits BOTH fold and promote at the exit` — is the `:4107`
+  clause spec 7 S7 rewrites to the severity rule; rev-3 said it stands unchanged across the
+  build, and that was wrong.
 - the `NOCONF` conf at `:5206`, which declares no `GATE_BOUND`, also declares no `REVIEW_ROUNDS`,
-  so the arm at `:5219` gains a second `hit` on the new NOTE; a conf declaring `REVIEW_ROUNDS="9"`
-  hits the above-ceiling refusal and one declaring `0` hits the reader's not-positive refusal
-  naming `REVIEW_ROUNDS`.
+  so the arm at `:5219` gains a further `hit` on the new NOTE, beside the one unit 3 adds there
+  for `UNIT_STALL_BOUND`; a conf declaring `REVIEW_ROUNDS="9"` hits the above-ceiling refusal
+  and one declaring `0` hits the reader's not-positive refusal naming `REVIEW_ROUNDS`.
 
 **How one arm is run alone**, because the README's rule three forbids the suite whole inside a
-pass. The suite's preamble, `sed -n '1,/^# ---- REGION ONE/p' unattended.test.sh`, sourced in a
-shell whose working directory is `tools/unattended` so `HERE` and `SCRIPT` resolve, defines every
-helper, builds the fixture repository under its own `mktemp -d` and runs the prologue arms only,
-which are seconds. `bcsetup` then builds the epoch the review-loop arms open with `bcopen`, which
-is what shard 2 itself does at `:1679`; `slice_fn review_state` is the sliced arms' one
-precondition. Each arm is then its own `same` or `hit` line, and a `same` or `hit` prints only on
-FAIL, so a silent line is the observation.
+pass. The suite's preamble, `sed -n '1,/^# ---- REGION ONE/p' unattended.test.sh`, lines 1 to
+445, sourced in a shell whose working directory is `tools/unattended` so `HERE` and `SCRIPT`
+resolve, defines `hit`, `miss` and `same` at `:69` to `:71`, `reset_tree` and `run` at `:355`
+and `:357`, `bcsetup` at `:410` and `bcopen` at `:428`, builds the fixture repository under its
+own `mktemp -d` and runs the prologue arms only, which are seconds. It does NOT define
+`slice_fn`: that helper's only definition is at `:3930`, inside region two, so the form sources
+it too, before use — `eval "$(sed -n '/^slice_fn()/,/^}/p' tools/unattended/unattended.test.sh)"`
+— or `slice_fn review_state` is `command not found` and the sliced arms grade nothing. `bcsetup`
+then builds the epoch the review-loop arms open with `bcopen`, which is what shard 2 itself does
+at `:1679`; `slice_fn review_state` is the sliced arms' one precondition. Each arm is then its
+own `same` or `hit` line, and a `same` or `hit` prints only on FAIL, so a silent line is the
+observation.
 
 ### Inventory
 
@@ -319,7 +353,10 @@ No new function or verb, so the lexicon and check 26 populations are unchanged.
 
 ### Files touched (estimate)
 
-- the driver and its suite: `tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`
+- the driver and its suite: `tools/unattended/unattended.sh` — the preset and the key's call,
+  `review_state`, `verb_review`, the `diff-reviewed` term, and the two comment blocks at `:457`
+  to `:458` and `:3966` to `:3969`; `tools/unattended/unattended.test.sh` — `mkconf`'s seventh
+  positional, the new arms, the `NOCONF` hit, the two floors
 - the leg and its suite: `tools/unattended/check-unattended.sh`, `tools/unattended/check-unattended.test.sh`
 - the kit's prose templates: `tools/unattended/VERBS.template.md`, `tools/unattended/SKILL.template.md`,
   `tools/unattended/PROTOCOL.template.md`, with their renders under `memory/guides/` and
@@ -424,9 +461,13 @@ ledger row for that half reads `observed at --close`, per the build README's rul
   2026-09-01 ruling refused, spelled as a refusal instead of a default.
 - **AC7** — When `grep -n 'CONVERGED\*|\*NON-CONVERGENT\*|\*CEILING\*|\*BOUNDED\*' tools/unattended/unattended.sh`
   runs at the landed tip, it prints one line inside the `diff-reviewed` term, and the comment
-  block above it says the token is unreachable there.
+  block above it says the token is unreachable there; and
+  `grep -c 'moves the stall earlier' tools/unattended/unattended.sh` prints `0`, where at base
+  it prints `1`, at `:3968`.
   Red when: the case was left at three tokens, or it was widened without saying why a fourth
-  token that cannot occur is listed.
+  token that cannot occur is listed; or the driver's own comment prose still says a round cap
+  moves the stall earlier above a predicate that now exits `BOUNDED` on one, which no parity leg
+  can see because none reads a comment.
 - **AC8** — When `bash tools/unattended/check-unattended.sh` is run by hand as one arm of the
   leg suite, over a fixture record under a graded `DISPOSITION_CUTOFF` whose only review row is
   `blockers 2 · BOUNDED` with no disposition, it prints the `record NO disposition` refusal for
@@ -473,24 +514,32 @@ ledger row for that half reads `observed at --close`, per the build README's rul
   base `1b000d1a`; the parent-commit figure is DERIVED at observation, because unit 1 edits the
   same file ahead of this pass and its delta is its own.
 - **AC12** — When each arm section 4's suite paragraph adds is run alone by the form that
-  paragraph gives — the preamble sourced, `bcsetup`, `slice_fn review_state`, then the arm's own
-  `same` or `hit` line — every line is silent against the landed driver, and against the driver
-  at base every verb arm prints `FAIL`, the sliced `BOUNDED` arms print `FAIL` with
-  `CONVERGING` in the got-column, and the existing two-argument sliced arms at
-  `tools/unattended/unattended.test.sh:4546` to `:4557` stay silent against both.
-  `FLOOR_ASSERTIONS` at `:5434` and `FLOOR_SHARD_2` at `:5461` each stand exactly the added
-  assertion count above their base values of 706 and 510.
+  paragraph gives — the preamble sourced, `slice_fn`'s definition sourced from `:3930`,
+  `bcsetup`, `slice_fn review_state`, then the arm's own `same` or `hit` line — every line is
+  silent against the landed driver, and against the driver at base every verb arm prints
+  `FAIL`, the sliced `BOUNDED` arms print `FAIL` with `CONVERGING` in the got-column, and the
+  existing two-argument sliced arms at `tools/unattended/unattended.test.sh:4546` to `:4557`
+  stay silent against both. `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` at HEAD each stand exactly
+  this pass's added assertion count above the values the pass's PARENT commit carries, read with
+  `git show 'HEAD~1:tools/unattended/unattended.test.sh' | grep '^FLOOR_'`, which prints four
+  lines: the pins are the LAST `FLOOR_ASSERTIONS` — the first, at `:5403`, is annotated
+  `SHADOWED` and a bump there does nothing — and `FLOOR_SHARD_2`.
   Red when: an added arm reads `CONVERGING` where `BOUNDED` is expected; or an existing
   sequence arm moved because `mkconf`'s default bound is not the ceiling; or a floor did not
-  move.
+  move; or a floor was set to the build base plus this pass's count, which LOWERS a shrink-only
+  floor below the value unit 3 landed and hides a stranded block again, the failure the pin's
+  own header at `:5422` exists to catch.
   figure: the added assertion count is DERIVED as the number of `hit`, `same` and `miss` lines
-  this pass's diff adds to the suite, which is the count each such line adds to `n`; the two
-  floors are then PINNED to base plus that count. Whether the pinned `FLOOR_ASSERTIONS` is met by
-  the executed count is the close's: `bash tools/unattended/run-unattended-gates.sh` runs the
-  suite UNSHARDED on a frozen clone and a `FAIL executed` line there is the red. NO scheduled
-  run grades `FLOOR_SHARD_2`, because that compensating run is unsharded by its own help text;
-  the pin rises so a future `--shard 2/2` run is not under-pinned, and this line is the skip
-  announcing itself.
+  this pass's diff adds to the suite, which is the count each such line adds to `n`; the
+  parent-commit floors are DERIVED at observation, on AC11's pattern, because
+  `TOOL-aProbedUnit-3`, order 3, raises both constants by its own arms before this pass opens
+  and its AC9 says so. The 706 at `:5434` and 510 at `:5461` are base-of-build figures PINNED
+  from a 2026-09-14 measurement at `1b000d1a`; spec 3 moves them first and they are never the
+  oracle here. Whether the pinned `FLOOR_ASSERTIONS` is met by the executed count is the
+  close's: `bash tools/unattended/run-unattended-gates.sh` runs the suite UNSHARDED on a frozen
+  clone and a `FAIL executed` line there is the red. NO scheduled run grades `FLOOR_SHARD_2`,
+  because that compensating run is unsharded by its own help text; the pin rises so a future
+  `--shard 2/2` run is not under-pinned, and this line is the skip announcing itself.
 
 ## 7. Gates
 
@@ -558,6 +607,7 @@ other default changes a two-argument call, and the one caller always passes it.
 - rev-1 · 2026-09-14 · initial draft.
 - rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (ids 21, 8 — AC12 per-arm, AC9 to AC11 leg halves at `--close`), D (id 18 — AC11 against the parent commit), E (id 48 — `--disposition` stays required, the recorder retries with `promote`, F1), F (ids 23, 51 — `read_bound_key`, F2), H (id 7 — AC10's Skill oracles), O (id 31 — the ratchet leg), P (id 33 — the backlog flip is the close's).
 - rev-3 · 2026-09-14 · §3 · §4 · §8 F2 · the helper signature aligned to spec 3's four positionals, `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>` — the `<UNIT>` word is what makes the refusal sentence true for a key that counts rounds rather than seconds; the `<NOTE>` no longer repeats the "Declare one" clause the helper prints itself (sub-spec interface agreement, M2).
+- rev-4 · 2026-09-14 · §3 · §4 · S9 · AC7 · AC12 · §10 · folded the round-2 spec audit: clusters A (ids 1, 10 — AC12's floors measured against the pass's parent commit on AC11's pattern, 706 and 510 kept as base-of-build figures spec 3 moves first), F (id 27 — the run-alone form sources `slice_fn` from `:3930`, which the preamble does not define), H (id 33 — the `WHY A PREDICATE AND NOT A COUNT` block at `:3966` to `:3969` and the `RUNAWAY_CEILING` header at `:457` to `:458` join the verb edits and Files touched; AC7's `moves the stall earlier` grep, 0 at the tip and 1 at base), K (id 15 — `mkconf`'s SEVENTH positional, `REVIEW_ROUNDS="${7-8}"`, unit 3 holding the sixth); and cluster G's correction (id 28, spec 7's) that the `:4634` arm stands in this pass and moves in unit 7's, where rev-3 said it stands unchanged.
 
 ## 10. Reuse audit
 
@@ -583,6 +633,8 @@ rewrites to the severity rule. Where a hit was stale:
 `TOOL-aBoundedVerdict-1` says a first round always re-arms when blockers are above zero, and the
 Skill's opening paragraph says a round cap only moves the stall earlier; both are superseded by
 the 2026-09-14 ruling for SPEC subjects, and the Skill paragraph is rewritten so the two answers
-agree.
+agree. The driver carries the same sentence twice in comment prose, at
+`tools/unattended/unattended.sh:3968` and, as "not by a count", at `:457` to `:458`; section 4
+rewrites both, because a comment is the one carrier no parity leg reads.
 
 Recall terms used: `review round convergence CONVERGING NON-CONVERGENT disposition fold promote blockers ceiling spec-audit tier2 bound one round`

@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 4 · ratified 2026-09-14
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 4 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -28,7 +28,10 @@ guessed from an environment that is empty.
   and refuses a `scratch` that is not absolute by shape — not beginning `/` or a drive letter and a
   separator — because a workflow script has no filesystem and shape is the only test it can make.
   Backslashes are folded to `/` once, in the parent, and the folded string is what every carrier
-  below spells. Observed by AC1 and AC2.
+  below spells. The inputs block in the header comment, the contract a caller reads, gains the row
+  `scratch: "<absolute session scratchpad>", // REQUIRED` beside `slug`, because a script that
+  refuses without an argument its own contract does not list is the missing-carrier class. Observed
+  by AC1 and AC2; the row by AC6.
 - **S2** — `GROUND` carries one sentence naming that path as where every temporary file, backup,
   probe, log or throwaway clone goes, what is never used instead, and the one clone spelling that
   works there on Windows. Every parent-side agent — spec writers, the audit recorder, the disposal
@@ -46,8 +49,18 @@ guessed from an environment that is empty.
   same commit. Observed by AC6.
 - **S6** — `tools/workflows/unattended-build.test.sh` gains the arms in section 6 and every
   existing fixture that reaches past the `slug` refusal gains a `scratch`, because a required
-  argument reds every fixture that lacks it and that is the point. The arms are observed by AC1 to
-  AC5, one at a time; the fixture reds are seen by the close's whole-suite run, section 7.
+  argument reds every fixture that lacks it and that is the point. A fixture that reaches the CHILD
+  gains two things, not one: `"scratch":"/tmp/s"` AND a `ground` that names it, `"G. goes under
+  /tmp/s. "`, because the child's join refuses a pair that disagrees, not a pair that is merely
+  incomplete — `"scratch":"/tmp/s"` beside the base `"ground":"G. "` is exactly AC5's `names no`
+  THROW. Three fixtures reach the child, and the four `run_wf … "$C"` calls at `:552`, `:553`, `:577`
+  and `:580` are every call that does: `CHILD_ARGS` at `:551`, which `childU` and `childA` are
+  computed from and every `F2` child-prompt `has` arm reads, and the two inline fixtures at `:577`
+  and `:580`, which exist to red a misspelt and an absent `mode` and would otherwise red on
+  `scratch` first, because `check('scratch', …)` sits ahead of the `mode` test. The thirteen parent
+  fixtures gain the key alone; the parent builds its own `GROUND`. The arms are observed by AC1 to
+  AC5, one at a time; the fixture set is observed by AC7 — its grep half by the pass, its
+  whole-suite half at `--close`.
 - **S7** — The dossier `memory/map/features/review-harnesses.md` names `scratch` beside the args
   contract it already describes. Observed by AC6.
 
@@ -181,10 +194,15 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
   sentence, the hand-out key, and the `scratch: "<absolute session scratchpad>" // REQUIRED` row in
   the inputs block at `:135` to `:146`. About twenty lines.
 - `tools/workflows/unattended-unit.js` — two refusals. About ten lines.
-- `tools/workflows/unattended-build.test.sh` — the arms, and `scratch` added to `UNITS`, the nine
-  `*_UNITS` fixtures at `:254` to `:492`, `CHILD_ARGS` at `:551`, and the two inline fixtures that
-  reach past the `slug` refusal: `:118`, which expects the `units` refusal that now sits behind the
-  `scratch` one, and `:124`, the passing case.
+- `tools/workflows/unattended-build.test.sh` — the arms, and `scratch` added to sixteen fixture
+  lines. Thirteen reach the parent and gain `"scratch":"/tmp/s"` alone: `UNITS` at `:85`, the nine
+  `*_UNITS` fixtures at `:254` to `:492`, `S3` at `:385` and `S7` at `:404` — the two multi-line
+  spec-stage fixtures — and the inline fixture at `:118`, which expects the `units` refusal that now
+  sits behind the `scratch` one. Three reach the child and gain BOTH `"scratch":"/tmp/s"` and
+  `"ground":"G. goes under /tmp/s. "` in place of `"ground":"G. "`: `CHILD_ARGS` at `:551`, and the
+  two inline fixtures at `:577` and `:580`. The passing case at `:124` runs `$UNITS` and is not a
+  fixture line of its own. Every line number is the file at base; `grep -c scratch` over it prints
+  0 there, which is why AC7's floor of 16 is a floor and never a coincidence.
 - `tools/unattended/SKILL.template.md` and its render; `memory/map/features/review-harnesses.md`.
 
 ### Alternatives rejected
@@ -212,12 +230,12 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
 - observability — the refusal messages name the missing or mismatched value; the sentence in every
   prompt names the path, so a transcript shows what the agent was told.
 - risks — every fixture in the test double that reaches past the `slug` refusal reds until it
-  carries `scratch`; that is the required-argument change doing its job, and the close's whole-suite
-  run is what sees every one of them, because the pass's single arms see only the fixtures they
-  name. The clone clause rests on one measurement on one node; a POSIX host ignores
-  `core.longpaths` harmlessly.
-- testing — section 6, one arm at a time against the sourced preamble; the whole suite is the
-  close's run, section 7, and no pass runs it.
+  carries `scratch`, and a child fixture reds a second time until its `ground` names the path; that
+  is the required-argument change doing its job, and AC7's whole-suite run at the close is what sees
+  every one of them, because the pass's single arms see only the fixtures they name. The clone
+  clause rests on one measurement on one node; a POSIX host ignores `core.longpaths` harmlessly.
+- testing — section 6, one arm at a time against the sourced preamble; the whole suite is AC7's
+  `--close` half, and no pass runs it.
 - migration — every existing caller of the harness must add `scratch`; the Skill is the only
   documented caller, and it is edited here. A caller following an older Skill meets the refusal,
   which names the argument.
@@ -227,7 +245,7 @@ verb, no conf key, no gate leg, no inventory key of any codebase-map layer, so
 
 `tools/workflows/unattended-build.test.sh` evaluates the scripts as their runtime does, with stub
 hooks that trace every prompt. The PASS never runs it whole — the build-level rule — and it is on no
-bar leg either, so the whole-suite run is the close's compensating check, section 7. A pass observes
+bar leg either, so the whole-suite run is the close's compensating check, owned by AC7. A pass observes
 ONE ARM AT A TIME: from a shell whose working directory is `tools/workflows`, source the suite's
 preamble, `sed -n '1,/^# ---- AC2: THE ARGS GUARD/p' unattended-build.test.sh` — lines 1 to 105 at
 base, which define `run_wf`, `has`, `hasnt_`, `UNITS`, `returns`, `$C` and every other helper and
@@ -283,14 +301,44 @@ assertion; the observation is the named trace line, never an exit status.
   `.claude/skills/unattended/SKILL.md`, over `memory/map/features/review-harnesses.md`, over
   `tools/workflows/unattended-build.template.js` and over `tools/workflows/unattended-build.js`, each
   prints at least 1, and the Skill's hit sits in its "Drive the build as ONE program" bullet; every
-  one of the five prints 0 at base, measured 2026-09-14 on node `a`, which is the staged red. The
+  one of the five prints 0 at base, measured 2026-09-14 on node `a`, which is the staged red. And
+  when `grep -cF 'scratch: "<absolute session scratchpad>"'` runs over
+  `tools/workflows/unattended-build.template.js` and over `tools/workflows/unattended-build.js`, each
+  prints exactly 1 — the inputs-block row S1 names, at `:135` to `:146` at base — and 0 at base,
+  re-measured 2026-09-14 on node `a`; the plain `grep -c scratch` cannot see this row, because the
+  refusal line alone takes that count from 0 to 1. The
   leg halves — `bash tools/unattended/adopt-unattended.sh --check`,
   `bash tools/workflows/check-protocol-parity.test.sh` and `node tools/workflows/check-workflow-syntax.js`
   exiting 0 after the renders — are the argv of `unattended skill wiring`,
   `review-protocol parity (kit vs dogfood)` and `workflow script syntax` verbatim, so each is
   observed at --close and never by the pass.
-  Red when: a count prints 0, which means a carrier was skipped; or, at the close, either render
-  drifted, or a script no longer parses in the AsyncFunction dialect.
+  Red when: a count prints 0, which means a carrier was skipped; or the fixed-string count prints 0
+  with the refusal landed, which is the contract row omitted with every other carrier green; or it
+  prints 2, the row duplicated; or, at the close, either render drifted, or a script no longer
+  parses in the AsyncFunction dialect.
+- **AC7** — When `grep -c scratch tools/workflows/unattended-build.test.sh` runs at the landed tip,
+  it prints 16 or more — the sixteen fixture lines Files touched enumerates, 0 at base, measured
+  2026-09-14 on node `a` — and each of `grep -cF 'scratch: the parent REFUSES args with no scratch'`,
+  `grep -cF 'scratch: the parent REFUSES a relative scratch'`,
+  `grep -cF 'scratch: a backslash scratch is folded before it reaches a prompt'` and
+  `grep -cF 'scratch: the child REFUSES a ground that names no scratch'` over the same file prints
+  at least 1, the labels of the four staged-red arms section 7 names, each 0 at base because the
+  word itself is. That is the pass's half. And when `bash tools/workflows/unattended-build.test.sh`
+  runs whole at the landed tip, redirected to a file and never read through `tail`, the file holds
+  no `FAIL` line and its `--- <n> arms` line reads 237 plus the arms added — this unit's, and the
+  arms units 1, 2, 6 and 7 land in the same file before the close. Observed at `--close`; its
+  ledger row reads `observed at --close`.
+  Red when: the count is below 16, which is a fixture left without the key and a whole-suite red the
+  pass cannot see; or a label count prints 0, which means the arm was pasted into a shell and never
+  landed in the file; or, at the close, a `FAIL` line — a fixture without `scratch`, a child fixture
+  whose `ground` names no `/tmp/s`, or an inline `mode` fixture now refusing on the wrong key; or
+  the arms line reads 237, which means no arm landed and the count was read off this spec.
+  figure: 16 is PINNED, counted at base on 2026-09-14; the arm count is DERIVED from the suite's
+  own `--- <n> arms` line at the close, and 237 is `TOOL-aProbedUnit-7`'s measurement at
+  `270611cd`, PINNED as the base.
+  cost: 335 s at that measurement; the suite is on no bar leg and is `--close`'s one direct run.
+  permission: the whole-suite half is forbidden to a pass by the build-level rule; the close runs it
+  once, and the pass observes the greps alone.
 
 ## 7. Gates
 
@@ -298,24 +346,27 @@ assertion; the observation is the named trace line, never an exit status.
 
 These are what `--close` runs, once, over the whole build. The PASS runs none of them and no
 suite: it observes the single-arm runs AC1 to AC5 describe against the sourced preamble, and the
-grep halves of AC3, AC5 and AC6. The leg halves — AC3's byte parity, AC5's definition count under
-the map leg, AC6's three commands — are the close's, and their ledger rows read `observed at
---close`. `verifier fan-out` is listed because it reads every `export const meta` script and the
-child's shape is what keeps it out of that gate's deny set.
+grep halves of AC3, AC5, AC6 and AC7. The leg halves — AC3's byte parity, AC5's definition count
+under the map leg, AC6's three commands, AC7's whole-suite run — are the close's, and their ledger
+rows read `observed at --close`. `verifier fan-out` is listed because it reads every `export const
+meta` script and the child's shape is what keeps it out of that gate's deny set.
 
 `tools/workflows/unattended-build.test.sh` is on NO bar leg: no row in `tools/gate-legs.json`
 names it, read 2026-09-14, so neither `GATE_FULL=1` nor `GATE_SELFTESTS=1` reaches it, and the
 build-level rule forbids a pass running it whole. The compensating check is one direct run at the
-close, whole, redirected to a file and never read through `tail`; `TOOL-aProbedUnit-7` measured
-it at 237 arms and 335 s at `270611cd` on node `a`, and the suite's own `--- <n> arms` line is the
-figure once this unit's arms are in. That run is what sees every fixture this unit's required
-argument reds — the nine `*_UNITS` fixtures, `CHILD_ARGS` and the two inline ones — because the
-pass's single arms see only the fixtures they name.
+close, whole, redirected to a file and never read through `tail`, and AC7 is the criterion that
+owns it, so the ledger has a row to mark; `TOOL-aProbedUnit-7` measured it at 237 arms and 335 s
+at `270611cd` on node `a`, and the suite's own `--- <n> arms` line is the figure once this unit's
+arms are in. That run is what sees every fixture this unit's required argument reds — the thirteen
+parent fixtures and the three child ones Files touched enumerates — because the pass's single arms
+see only the fixtures they name, and a child fixture with the key but the base `ground` reds there
+on the join, which no pass arm loads.
 
 New arm: `tools/workflows/unattended-build.test.sh` · the absent, relative and mismatched cases of
 AC1 and AC5, and the backslash case of AC2, each run as one arm against the scripts at base, where
 the first three yield `RESULT` and the fourth spells a backslash, before the refusals and the fold
-land · no assertion floor exists in this suite, so none moves.
+land; their labels are the four fixed strings AC7 greps, each opening `scratch:` · no assertion
+floor exists in this suite, so none moves.
 
 ## 8. Open questions
 
@@ -347,6 +398,12 @@ land · no assertion floor exists in this suite, so none moves.
   `any OTHER path outside the repository`, AC3's token), R (id 42: the anchored definition grep),
   S (id 44: the inputs-block row); corrected the inline-fixture lines in Files touched to `:118`
   and `:124` while verifying them.
+- rev-3 · 2026-09-14 · S1 · S6 · §4 Files touched · §5 · §6 · §7 · AC6 AC7 · folded round-2
+  clusters C (ids 11, 26: a child fixture gains `scratch` AND a `ground` naming it), D (id 4: AC7,
+  the suite's whole run given its own row), J (id 8: the inputs-block row's fixed-string grep, and
+  S1 names the row). While verifying: the two inline child fixtures sit at `:577` and `:580`, not
+  the audit's `:571` and `:573`; `S3` at `:385` and `S7` at `:404` reach past the `slug` refusal and
+  were unlisted; `:124` runs `$UNITS` and is no fixture line, so the set is sixteen, not thirteen.
 
 ## 10. Reuse audit
 

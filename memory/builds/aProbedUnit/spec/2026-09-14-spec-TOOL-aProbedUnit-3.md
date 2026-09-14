@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -97,7 +97,10 @@ something to do with itself.
   <note>`, placed after this unit's two calls; the helper, its signature and its two sentences are
   decided in section 4, "The bound", and unit 6 writes no reader of its own. Unit 6 also edits the
   same section 8 table, the same `optional_keys` list and the same two conf files, after this
-  unit; it adds its rows beside these and moves none of them.
+  unit; it adds its rows beside these and moves none of them. The suite's fixture is one more
+  shared slot: this unit takes the SIXTH positional of `mkconf` for `UNIT_STALL_BOUND` (section 4,
+  "The fixture"), so unit 6 takes the SEVENTH for `REVIEW_ROUNDS`, and neither renumbers the
+  other's.
 - **hands-off** external — the kit version bump across every carrier
   `bash tools/check-kit-versions.sh` names, the closing pass's, once.
 
@@ -194,18 +197,34 @@ joins the initialiser line at `:292`, which is where a conf-sourced key must be 
 `set -u`. 1800 is the owner's figure from the build README's rules: three keepalive cadences at
 this repo's ten-minute interval, so a verdict is never one missed tick.
 
+### The fixture
+
+`mkconf` at `tools/unattended/unattended.test.sh:108` writes the suite's conf from five positionals,
+`${1-true}` to `${5-}`, and every fixture routes through it via `reset_tree`. Leaving it alone is not
+neutral: `run` merges stderr, so a conf with no `UNIT_STALL_BOUND` would put the new key's NOTE line
+ahead of every verb's output and red any arm that compares a whole line. So `mkconf` gains
+`UNIT_STALL_BOUND="${6-1800}"` as its SIXTH positional, on the file's own `${4-3600}` convention,
+written after the `GATE_BOUND` line; every existing fixture then declares the key at the kit default
+and announces nothing. AC1 and AC4 set the slot explicitly — `mkconf "true" "true" "" "3600" "" "60"`
+for the bound AC1 measures against, `"abc"` and `"0"` for AC4's refusals. The one fixture that WANTS
+the NOTE is the `NOCONF` heredoc at `:5206` to `:5217`, which omits `GATE_BOUND` by hand and now omits
+`UNIT_STALL_BOUND` the same way; its arm gains a second `hit` beside the one at `:5219`, on this
+key's NOTE sentence. `TOOL-aProbedUnit-6` takes the SEVENTH positional for `REVIEW_ROUNDS`, after
+this one lands (section 3, Edges).
+
 ### The carriers
 
 | Carrier | Edit |
 |---|---|
 | `tools/unattended/VERBS.template.md` | one `- `--audit` — ` bullet in the verb list, after `--status` |
-| `tools/unattended/SKILL.template.md` keepalive section, `:19` to `:46` | the scheduled prompt is `bash {{KIT_DIR}}/unattended.sh --audit <slug>`; before `--preflight` no slug exists, so the prompt reads "once the run has a slug, run …"; on `STALLED` the main session stops the unit's task, records a `--park` or a brief note, and re-dispatches that unit with a brief naming the stalled command as skipped; on `PROGRESSING` it does nothing |
+| `tools/unattended/SKILL.template.md` keepalive section, `:19` to `:46` | the scheduled prompt is `bash {{KIT_DIR}}/unattended.sh --audit <slug>`; before `--preflight` no slug exists, so the prompt reads "once the run has a slug, run …"; on `STALLED` the main session stops the unit's task, records a `--park` or a brief note, and re-dispatches that unit with a brief naming the stalled command as skipped — `re-dispatch` is the phrase AC6 pins, and the Skill carries it nowhere else at base; on `PROGRESSING` it does nothing |
 | `tools/unattended/SKILL.template.md` | the `--audit` invocation line check 26 requires, in the "Check yourself" bullet at `:594` beside `--status` |
 | `tools/unattended/PROTOCOL.template.md` section 8 | one table row for `UNIT_STALL_BOUND`, OPTIONAL, on `GATE_BOUND`'s pattern |
 | `tools/unattended/kit.toml` | `UNIT_STALL_BOUND` appended to `optional_keys` at `:92` |
 | `.unattended.conf` and `tools/unattended/.unattended.conf.example` | `UNIT_STALL_BOUND="1800"` with the reason beside it, after `GATE_BOUND` |
 | `memory/map/features/unattended.md` | the keepalive paragraph at `:90` names `--audit` as what the keepalive runs, within the cap |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamped |
+| `tools/unattended/unattended.test.sh` | `mkconf` at `:108` gains `UNIT_STALL_BOUND="${6-1800}"` as its sixth positional; the `NOCONF` arm gains a second `hit` beside `:5219` on this key's NOTE; the section 6 arms sit in region two beside the `--dispatch` arms |
 
 The driver spells the token `{{KIT_DIR}}` for itself throughout the Skill, at `:175`, `:546` and
 `:594`; the brief's `{{TOOL_ROOT}}` is the token the Skill uses for the workflow scripts at `:558`
@@ -223,7 +242,8 @@ codebase-map inventory key moves.
 
 - `tools/unattended/unattended.sh` — the verb, three hoisted helpers, the two bound calls, the
   header line, the dispatch arm. About a hundred lines, forty of them comment.
-- `tools/unattended/unattended.test.sh` — the arms in section 6, beside the `--dispatch` arms.
+- `tools/unattended/unattended.test.sh` — `mkconf`'s sixth positional, the second `hit` in the
+  `NOCONF` arm, and the arms in section 6, beside the `--dispatch` arms.
 - `tools/unattended/SKILL.template.md`, `VERBS.template.md`, `PROTOCOL.template.md`, `kit.toml`,
   `.unattended.conf.example`, and the three renders under `memory/guides/` and `.claude/skills/unattended/`.
 - `.unattended.conf`, `memory/guides/SESSION-KICKOFF.md`, `memory/map/features/unattended.md`.
@@ -277,7 +297,8 @@ suite half is `--close`'s, and its ledger row reads `observed at --close`. The f
 
 - **AC1** — When the fixture's dispatch row is rewritten with a timestamp an hour old, the fixture
   commit is made with `GIT_COMMITTER_DATE` an hour old, the tree is clean, and the fixture conf
-  carries `UNIT_STALL_BOUND=60`, `run --audit tRun` prints a line beginning `unattended-audit:
+  carries `UNIT_STALL_BOUND=60` through `mkconf`'s sixth positional — `mkconf "true" "true" ""
+  "3600" "" "60"` — `run --audit tRun` prints a line beginning `unattended-audit:
   ARCH-tRun-1 · dispatched` and ending ` · STALLED`, carrying `last-write none`, followed by the
   `unattended-audit: remedy —` line, and exits 0.
   Red when: the verdict reads `PROGRESSING`, which means `last-write none` was read as "now" or
@@ -300,17 +321,23 @@ suite half is `--close`'s, and its ledger row reads `observed at --close`. The f
   Red when: a declaration commit closes the pass, which is the overlap refinement missing; or the
   no-unit line is absent and the verb exits 0 over nothing; or either count is 2, which means the
   block was copied into the verb and the sibling kept its own.
-- **AC4** — When the fixture conf declares no `UNIT_STALL_BOUND`, stderr carries `declares no
-  UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s`; when it
-  declares `UNIT_STALL_BOUND="abc"` or `"0"`, the driver prints `REFUSING - UNIT_STALL_BOUND is
-  declared as` and `which is not a positive integer of seconds` and exits 2 before any verb runs.
-  Both keys read through one function: `grep -c 'read_bound_key' tools/unattended/unattended.sh`
-  prints at least 3 — the definition and two calls — and prints 0 at base; and with the fixture
-  conf declaring `GATE_BOUND="abc"`, the driver still prints `which is not a positive integer of
-  seconds`, which is the sentence the existing arm at `tools/unattended/unattended.test.sh:5197`
-  asserts.
+- **AC4** — When the fixture conf declares no `UNIT_STALL_BOUND` — the `NOCONF` heredoc, which
+  omits the key by hand exactly as it omits `GATE_BOUND` — stderr carries `declares no
+  UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s`, asserted by
+  a second `hit` in that arm beside the `GATE_BOUND` one at `tools/unattended/unattended.test.sh:5219`;
+  when it declares `UNIT_STALL_BOUND="abc"` or `"0"` — `mkconf`'s sixth positional set to `"abc"`
+  or `"0"` — the driver prints `REFUSING - UNIT_STALL_BOUND is declared as` and `which is not a
+  positive integer of seconds` and exits 2 before any verb runs. Every other fixture declares the
+  key at the kit default through the positional's `${6-1800}`, so no existing arm sees a NOTE it
+  did not see at base. Both keys read through one function: `grep -c 'read_bound_key'
+  tools/unattended/unattended.sh` prints at least 3 — the definition and two calls — and prints 0
+  at base; and with the fixture conf declaring `GATE_BOUND="abc"`, the driver still prints `which
+  is not a positive integer of seconds`, which is the sentence the existing arm at
+  `tools/unattended/unattended.test.sh:5197` asserts.
   Red when: a blank is silent, or junk is coerced to a number and the verb runs; or the count is 1
-  or 2, which means a key kept its own `case`; or `GATE_BOUND`'s sentence changed bytes.
+  or 2, which means a key kept its own `case`; or `GATE_BOUND`'s sentence changed bytes; or an arm
+  comparing a whole `--status` line by `same` reds, which means a fixture was left with no
+  `UNIT_STALL_BOUND` and the NOTE landed ahead of the verb's output.
 - **AC5** — When `run --audit tNoRun` runs with no run-state file, when the fixture's phase is
   rewritten to `LANDED`, and when `stat` is shadowed on `PATH` by a stub that exits 1 with a dirty
   tree, each prints its own `UNATTENDED check 51 FAILED` sentence and exits 1, and each sentence is
@@ -321,16 +348,26 @@ suite half is `--close`'s, and its ledger row reads `observed at --close`. The f
   branch unarmed, which means an arm quotes the wrong sentence.
 - **AC6** — When `bash tools/unattended/adopt-unattended.sh --check` runs after the render, it
   exits 0, and `grep -c 'unattended.sh --audit'` over `tools/unattended/SKILL.template.md` is at
-  least 2 — the keepalive prompt and the check-yourself line — while `grep -c` of the same over
-  `tools/unattended/VERBS.template.md` finds the verb's bullet; the section 8 table of
-  `tools/unattended/PROTOCOL.template.md` carries a `UNIT_STALL_BOUND` row, and the key is in
-  `tools/unattended/.unattended.conf.example`, which is the pair check 22 of the kit gate joins.
+  least 2 — the keepalive prompt and the check-yourself line — and prints 0 at base; that grep is
+  the Skill's only, because VERBS bullets carry no `unattended.sh`. The verb carrier is grepped in
+  its own form: `grep -cP '^- \x60--audit\x60' tools/unattended/VERBS.template.md` — `\x60` is
+  the backtick, spelled so the pattern holds none — prints 1 at the tip and 0 at base, which is the
+  backticked-verb bullet shape check 26 joins and the `--status` bullet at
+  `tools/unattended/VERBS.template.md:72` already has; the same grep for `--status` prints 1 at
+  base on this node. The keepalive section's remedy prose is
+  grepped for one pinned phrase: `grep -c 're-dispatch' tools/unattended/SKILL.template.md` prints
+  1 at the tip and 0 at base, and the one hit sits in the keepalive section, `:19` to `:46` at
+  base, so a Skill that names the prompt and says nothing about verdicts cannot pass. The section 8
+  table of `tools/unattended/PROTOCOL.template.md` carries a `UNIT_STALL_BOUND` row, and the key is
+  in `tools/unattended/.unattended.conf.example`, which is the pair check 22 of the kit gate joins.
   The fourth carrier check 22 does not join is grepped directly:
   `grep -c UNIT_STALL_BOUND tools/unattended/kit.toml` prints 1 — the `optional_keys` line and no
   other — and prints 0 at base.
   Red when: `--check` reports a drifted render; or check 26's three carriers or check 22's two
-  disagree, observed at the close by `unattended kit gate`; or the `kit.toml` count is 0, which
-  means the key is documented and declared but not listed, and no gate would say so.
+  disagree, observed at the close by `unattended kit gate`; or the VERBS count is 0, which means
+  the bullet was spelled to some other grep and not to the carrier's form; or the `re-dispatch`
+  count is 0, which means the keepalive got a probe and no remedy; or the `kit.toml` count is 0,
+  which means the key is documented and declared but not listed, and no gate would say so.
 - **AC7** — When `git show --stat HEAD` of the pass commit is read, it lists `.unattended.conf`
   together with `memory/guides/SESSION-KICKOFF.md`, and `wc -c` of `memory/map/features/unattended.md`
   is at most 20480, the `DOSSIER_CAP_BYTES` in `.memory-tree.conf`, while
@@ -401,6 +438,7 @@ assignment at `:5403` is the shadowed one the file marks as inert.
 
 - rev-1 · 2026-09-14 · initial draft.
 - rev-2 · 2026-09-14 · §2 S3 S4 S5 · §3 · §4 · §5 · §6 AC3 AC4 AC6 AC7 AC8 AC9 · §7 · folded round-1 spec-audit clusters F (spec-3 half: this unit owns `read_bound_key`), I (id 9), M (ids 10, 11, 13) and N (id 12).
+- rev-3 · 2026-09-14 · §3 Edges · §4 · §6 AC1 AC4 AC6 · folded round-2 spec-audit clusters E (id 2: the VERBS half of AC6 greps the bullet's own form), I (id 7: AC6 pins `re-dispatch` in the keepalive section) and K (id 15: the fixture interface — `mkconf`'s sixth positional, the second `NOCONF` hit, unit 6 takes the seventh).
 
 ## 10. Reuse audit
 
