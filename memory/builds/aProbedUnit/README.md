@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aRatifiedRulings
 authorized-by: prompt
-ids: TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 TOOL-aProbedUnit-8 TOOL-aProbedUnit-9 TOOL-aProbedUnit-10 TOOL-aProbedUnit-11 TOOL-aProbedUnit-12 TOOL-aProbedUnit-13 TOOL-aProbedUnit-14 TOOL-aProbedUnit-15 TOOL-aProbedUnit-16
+ids: TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 TOOL-aProbedUnit-8 TOOL-aProbedUnit-9 TOOL-aProbedUnit-10 TOOL-aProbedUnit-11 TOOL-aProbedUnit-12 TOOL-aProbedUnit-13 TOOL-aProbedUnit-14 TOOL-aProbedUnit-15 TOOL-aProbedUnit-16 TOOL-aProbedUnit-17
 ---
 
 # aProbedUnit — unattended units stop stalling: no bar in a pass, bounded commands, an audit probe, a fixed scratch root, one audit round
@@ -66,7 +66,7 @@ record under `prompts/`.
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-09-14 · streams tooling
 ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 TOOL-aProbedUnit-8 TOOL-aProbedUnit-9 TOOL-aProbedUnit-10 TOOL-aProbedUnit-11 TOOL-aProbedUnit-12 TOOL-aProbedUnit-13 TOOL-aProbedUnit-14 TOOL-aProbedUnit-15
-ids TOOL-aProbedUnit-16
+ids TOOL-aProbedUnit-16 TOOL-aProbedUnit-17
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
