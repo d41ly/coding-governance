@@ -46,7 +46,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.0' // gov:kit agent-cap@1.14 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.0' // gov:kit agent-cap@1.15 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
