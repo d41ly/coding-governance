@@ -107,8 +107,11 @@ change goes into the spec first, as a rev bump with its section 9 line.
 - **8, 9 and 10, the model, the record and the schema leg.** Unit 8 landed at 34ce844a, 85e89503 and
   e655a71c: `tools/runlog/model.py`, whose `build_run_model` and `derive_run_starts` units 9 and 10
   read rather than re-derive, and the `model` verb. It corrected the golden lines against the real
-  producers. The self-test now takes about 18 s, so run one arm at a time while iterating where the
-  suite allows it. Build on the fixtures of the units before. Unit 8's real-population figures are re-measured, not copied from the spec. Unit 1's golden
+  producers. Unit 9 landed at d2f2c59d, 33b25e3f, f197e27b and b52c48a5: `tools/runlog/record.py`
+  with `RECORD_SCHEMA`, which unit 10's leg validates against, and the `record` and `verify` verbs. The
+  self-test now takes about 27 s, so run one arm at a time while iterating where the suite allows it.
+  Clear `__pycache__` before a staged break, since a stale `.pyc` can fail a neighbouring arm. Build
+  on the fixtures of the units before. Unit 8's real-population figures are re-measured, not copied from the spec. Unit 1's golden
   lines in `tools/runlog/fixtures/golden-lines.txt` were typed from the specs before any producer
   existed. So unit 8 first re-derives each one from its producer's real output, in the suites of units
   2, 3 and 4, and corrects the fixture in its own pass. Unit 3 found the gates line wrong: the runner
