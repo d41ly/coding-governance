@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3
+unpushed-at-landing: 0
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
-witness: 8f2f9002ba4c28a1d470d649164463c35c2ca176
-phase: LANDING
+witness: 1afd26c95dbe532be9f2bd371e3fe5a386824e7c
+phase: LANDED
 branch-sha: b2a330be17b8e195981002f3a5aa4b07d2256bd8
 branch-ref: refs/heads/branch/unattended-build-gates-timing-4af880
 mode: prompt
