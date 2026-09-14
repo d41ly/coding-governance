@@ -2832,11 +2832,12 @@ topo_capture 8
 # so a break aimed at the old literal no-ops - and it is the constant that check 28c now follows, so
 # breaking it is both the reachable mutation and the one that exercises the indirection.
 reset_tree; mutate $KIT_REL/lib-unattended.sh 's|^GIT_PIN_REPLACE=.*|GIT_PIN_REPLACE=core.useReplaceRefs=true|'
-hit "$(run)" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
-
 # ...a bare unpinned read on a verb the first widening did not carry.
-reset_tree; mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
-hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
+mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
+hit "$out" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 
 # ...and the same read with a trailing comment mentioning the WRAPPER, which is round 6's MEDIUM 2:
 # classifying the whole LINE as wrapper-routed let prose excuse the code beside it.
@@ -2846,21 +2847,23 @@ hit "$(run)" "a sha is dereferenced without the replace-ref pin, so a replace re
 # ...and the raw arm reaching NO graded candidate, which must not look like a pass. Routing the kit's
 # last bare dereference through the wrapper leaves only exempt candidates behind.
 reset_tree; mutate $KIT_REL/check-playbook.sh 's@^GITSHOW() { git -c core.useReplaceRefs=false -c advice.graftFileDeprecated=false show@GITSHOW() { GIT show@'
-hit "$(run)" "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
-
 # ---- 28c's three liveness statements. The wrapper DEFINITION going missing, the bare spelling going
 # ---- missing, and the wrapped spelling going missing are three different blindnesses, and round 5's
 # ---- cut reported a clean nothing for two of them.
-reset_tree; mutate $KIT_REL/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
-hit "$(run)" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
+mutate $KIT_REL/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
+hit "$out" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
 
 # ---- the scalar SPECIMEN loop's exec branch, a different branch from the template loop's.
 reset_tree; gut_parser declared_scalar '  ((this is not shell'
-hit "$(run)" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
-
 # ---- and the shipped template's own LIST declaration being refused by the parser that reads it.
-reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
-hit "$(run)" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
+mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
+hit "$out" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
 
 reset_tree
 
