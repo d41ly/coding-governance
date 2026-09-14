@@ -38,3 +38,13 @@ staged.
 No machine gate: a control byte in a source file is legal, and banning one class of byte across every
 file would cost more than it catches. The remedy is the writing habit and the `repr()` check, both
 recorded in the kickoff manifest's environment traps.
+
+## The file-writing tool is not immune to a `\u` escape
+
+Measured on `TOOL-dLoggedFlight-6`, 2026-09-14. The agent's string-replacement edit tool wrote a
+`\u` escape typed in its replacement text as the CHARACTER it names, while leaving `\x`, `\r` and
+`\n` escapes as typed. It bit twice in one unit. A JSON fixture received a raw ESC and failed to
+load, which is loud. A raw-string regex received a literal U+2028 and U+2029 inside a character
+class, which still matched, so every arm stayed green; only a census of the file's non-ASCII
+characters found it, after the commit. So the check after writing ANY escape is that census, not a
+passing test: count characters above U+007E per file, and expect only the ones you meant.

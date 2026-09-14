@@ -78,8 +78,7 @@ owner's split puts extracts under the user profile, where on node `d` a sandbox 
 So a command is classified in memory and dropped, labels survive only token-shaped, and the store
 lives outside every repository, keyed by the git common dir so all worktrees of a clone share one.
 The reader holds one parsed record per open file, which the self-test counts through the one parse
-seam over 20,000 generated records, with a hold-everything reader through the same counter as its
-liveness. A keepalive is JOINED to its `CronCreate` rather than matched by wording, because the
+seam over a generated tree, with a hold-everything reader through the same counter as its liveness. A keepalive is JOINED to its `CronCreate` rather than matched by wording, because the
 wording drifted and a prefix missed fires the join found. The self-test's own `main` aims every
 ambient root at a decoy before any arm runs, since an arm that forgot one redirection would otherwise
 read or write the owner's real store.

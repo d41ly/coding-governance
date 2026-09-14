@@ -10,6 +10,11 @@
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
 object per session on stdout; `--measure` writes nothing and prints a report. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
+Both exit 2 on a refusal: a store, repo key, transcripts root or `--from`/`--to` time does not
+resolve, the ONE session named with `--session` is malformed or resolves outside its root, or an
+extract could not be written. Among
+several sessions, one refused for its shape or location is counted on stderr and changes no status,
+and a session with no transcript on this machine is the state `absent`, not a failure.
 
 `journal` prints one producer file's parsed lines to stdout, one JSON object per line whose keys are
 exactly the line's keys, and puts everything a human reads on stderr: the resolved path, the line
@@ -48,7 +53,7 @@ NARRATION_GUTTER = "  | "
 # What quoted text may not carry raw: a C0 control other than TAB and LF, DEL, the C1 range and the
 # two Unicode line separators. A raw CR returns a terminal to column 0 and an ESC starts a control
 # sequence, so either could draw the closing marker over the gutter; each prints as its escape.
-CONTROL_RE = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f  ]")
+CONTROL_RE = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\u2028\u2029]")
 
 
 def cmd_journal(args) -> int:

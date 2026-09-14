@@ -118,6 +118,29 @@ that `git ls-files` resolves in it, and never the working tree. An unmodified mi
 `591 passed` before and after the batch, and every break went RED on a FAIL line naming the arm it
 aimed at, with no traceback. The criterion lines above name each one.
 
+## The checklist over the build commit
+
+`gotchas.py --for-diff HEAD~1..HEAD` selected thirteen classes, and three were violated.
+
+- `heredoc-escape-reaches-the-regex`: the build commit carried a literal U+2028 and U+2029 inside
+  the narration frame's control-character class, where `\u` escapes had been typed. The class still
+  matched both, so every arm was green, and a census of the kit's non-ASCII characters found them.
+  The fold writes the escapes, and `repr()` of the compiled pattern now shows them spelled out. The
+  same tool had already turned a `\u` escape in the transcript fixture into a raw ESC, which failed
+  loudly and was repaired before the commit. The class record gains the tool's behaviour, since its
+  remedy recommends that tool.
+- `two-answers-to-one-question`: the dossier typed the AC8 arm's record count, which the suite owns
+  as a constant. The fold drops the figure.
+- `amendment-leaves-its-other-half-standing`: the command line gained exit 2 for a write failure,
+  and its docstring still stated only the journal verb's statuses. The fold states the extractor's.
+
+The others were checked and hold. Every refusal arm is paired with a case that fires, and all 26
+breaks above went RED on their aimed arm. Every break mutated the code or the suite under test,
+except the one deleting a fixture row, which is AC10's own subject. No fence line is odd in any file
+the commit touched. Every definition, nested ones included, leads with a declared verb, and no type
+name ends in a banned suffix. No foreign build's id is cited. The suite pins no revision, and no
+commit landed while it ran. The suite printed `591 passed` after the fold.
+
 ## Owed to the post-build gate run
 
 Every leg of the spec's section 7, and the run records each verdict after it:
