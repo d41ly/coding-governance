@@ -1,13 +1,15 @@
 # TOOL-aReplayedCard-5 — `orient-counterfactual.js` measures one stage-2 arm per call
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-1 · base c4f02308 · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-1 · base c4f02308 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 |
+| [2026-09-14-build-TOOL-aReplayedCard-5-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aReplayedCard-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 |
+| [2026-09-14-prompt-TOOL-aReplayedCard-5-brief.md](../prompts/2026-09-14-prompt-TOOL-aReplayedCard-5-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 |
@@ -71,11 +73,16 @@ the next session can run the matrix rather than design it.
 ## 4. Design
 
 One Workflow call per arm; eight calls for the matrix. `Date.now()` is unavailable inside a
-workflow script, so wall is measured by the agent with `date +%s%N` at its first and last Bash call
+workflow script, so wall is measured by the agent with `date +%s%3N` at its first and last Bash call
 and returned in the schema; the harness never stamps time itself. Tokens are `budget.spent()`
 deltas, which count the workflow's own output tokens and are the only per-agent figure a script can
 read. Functions the script defines are graded by the js probe cell of `.lexicon.conf`, so they
-lead with table verbs: `runArm`, `measureRun`, `renderRecord`.
+lead with table verbs: `renderPrompt`, `buildOpts`, `measureRun`. There is no `runArm` wrapper,
+because the hook admits the marked loop only with `await agent(` directly in its body, so the loop
+sits at top level with the spawn inline; and no `renderRecord`, because the record is assembled
+once, at the return, and a function called once is a name with nothing to reuse. The S4 fallback is
+one spawn OUTSIDE the loop: the hook admits one marked loop per script and refuses a second `await
+agent(` resolving to the same header, so the re-run cannot live inside it.
 
 ### Files touched (estimate)
 
@@ -120,9 +127,11 @@ lead with table verbs: `runArm`, `measureRun`, `renderRecord`.
   Red when: an unspawnable arm reports a measurement.
 - **AC4** — When `node tools/workflows/check-workflow-syntax.js` and
   `bash tools/workflows/check-verifier-fanout.sh` run at the landing commit, the new script passes
-  both, and the fan-out check names the marked sequential loop as the one loop it admitted.
-  Red when: the loop is unmarked and read as an unbounded fan, or the file does not parse as an
-  async function body.
+  both; and when the fan-out check runs over a copy of the script with the
+  `gov:sequential-agents(2)` marker removed, it REDS naming the loop's `agent(` line — which is how
+  the marked loop is shown to be the one it admitted, since the hook prints nothing on admission.
+  Red when: the loop is unmarked and read as an unbounded fan, the unmarked copy passes, or the
+  file does not parse as an async function body.
 
 ## 7. Gates
 
@@ -141,6 +150,12 @@ none
   `outcome` and an Explore arm that cannot run a step falls back to the default type, recorded
   (M7); the design record's decision 2 is cited for what it says (M7); the lexicon and
   install-prefix legs join §7 and the functions lead with table verbs (L3).
+- rev-3 · 2026-09-14 · §4 · AC4 · built. The function set is `renderPrompt`, `buildOpts`,
+  `measureRun`: the hook's grammar puts the spawn inline in the marked loop, so no `runArm`
+  wrapper exists, and the record is assembled once at the return. AC4's "the check names the loop
+  it admitted" was unobservable as written — the gate prints a count and the hook is silent on
+  admission — so the observation is the RED on an unmarked copy, staged and seen. Status CLOSED;
+  AC1 and AC3 are observed by the orchestrator, which holds the `Workflow` tool this pass does not.
 
 ## 10. Reuse audit
 

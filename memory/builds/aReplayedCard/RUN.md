@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: b0d7ffd4629cd221c06aa45fc60812dc7cd38f5a
+witness: d62c9092e514182637a9033b006934a97da860d0
 phase: BUILDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
@@ -60,3 +60,7 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-13T23:15:00Z brief · item KICK-aReplayedCard-1 · reason 352f2d8be34b memory/builds/aReplayedCard/prompts/2026-09-14-prompt-KICK-aReplayedCard-1-brief.md
 
 2026-09-14T00:41:34Z dispatch · item 097d3c1b KICK-aReplayedCard-1 · reason memory/project/trace-waiver.txt
+
+2026-09-14T00:54:55Z dispatch · item d62c9092 TOOL-aReplayedCard-5 · reason tools/workflows/orient-counterfactual.js tools/workflows/orient.agent.template.md tools/workflows/README.md memory/map memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-5.md memory/builds/aReplayedCard/build/2026-09-14-build-TOOL-aReplayedCard-5-1-acceptance-ledger.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger tools/install-prefix-carried.txt
+
+2026-09-14T00:55:13Z brief · item TOOL-aReplayedCard-5 · reason f1e353552bf4 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-5-brief.md

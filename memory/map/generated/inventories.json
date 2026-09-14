@@ -137,6 +137,7 @@
       "check-workflow-syntax.js",
       "drift-audit-code.js",
       "drift-audit-state.js",
+      "orient-counterfactual.js",
       "tier2-review.js",
       "unattended-build.js",
       "unattended-unit.js"

@@ -363,6 +363,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildOpts",
+      "kind": "function",
+      "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
       "id": "buildResolvedTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2318,6 +2323,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "measureRun",
+      "kind": "function",
+      "file": "tools/workflows/orient-counterfactual.js"
+    },
+    {
       "id": "measure_conventions",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2406,6 +2416,11 @@
       "id": "meta",
       "kind": "const-export",
       "file": "tools/workflows/drift-audit-state.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
+      "file": "tools/workflows/orient-counterfactual.js"
     },
     {
       "id": "meta",
@@ -3191,6 +3206,11 @@
       "id": "renderPerLineBlanked",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderPrompt",
+      "kind": "function",
+      "file": "tools/workflows/orient-counterfactual.js"
     },
     {
       "id": "renderRoster",

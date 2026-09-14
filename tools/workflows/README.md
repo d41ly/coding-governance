@@ -68,3 +68,51 @@ node tools/workflows/check-workflow-syntax.js
 Each also accepts explicit files, which is how the suites drive their fixtures. The `--explain`
 output is where the resolved predicate path is reported: the default run's bytes are pinned by an
 acceptance criterion, so diagnostics that would change them live behind the flag.
+
+## `orient-counterfactual.js` — one stage-2 arm per call
+
+The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's
+orientation out of the main context is worth a slot, a child load and the loss of the ask. The
+owner widened that measurement to a matrix, and this harness runs ONE cell of it per `Workflow`
+call — eight calls for the whole matrix, made by the caller in whatever order it likes:
+
+| axis | values |
+|---|---|
+| `arm.agent` | `orient` (the custom definition below) · `Explore` (the built-in type) |
+| `arm.recall` | `true` — the memory-recall probe runs where the engine asks · `false` — skipped |
+| `arm.reuse` | `true` — the reuse-lookup probe runs where the engine asks · `false` — skipped |
+
+```
+Workflow { scriptPath: '{kit}/orient-counterfactual.js',
+           args: { repo: '<abs repo path>', task: '<the task, as the owner would type it>',
+                   arm: { agent: 'Explore', recall: true, reuse: true },
+                   engine: '<repo-relative path of the kickoff engine text — optional>' } }
+```
+
+Each call spawns two kickoffs of the same task, strictly one after the other: the run count is the
+marked literal `const RUNS = [0, 1]` iterated by the one `for (const i of RUNS)` loop the fan-out
+hook admits under `gov:sequential-agents(2)`. The second run reads a warm index the first one built;
+that is what "matched" means here, and the record carries both READY lines so a reader can tell
+them apart. `engine` is optional and exists for an agent type that holds no Skill tool — whether
+`Explore` is one is UNVERIFIED and is part of what its arm measures: given the path, such an agent
+Reads the engine's text instead of invoking the Skill; without it, it reports `refused-step` naming
+`Skill`.
+
+**Installing the `orient` arm.** `orient.agent.template.md` is the custom agent definition — tools
+Read, Grep, Glob and Bash, no Write, no Edit, no Agent, no worktree isolation. Nothing wires it.
+For a run: copy it to `.claude/agents/orient.md`, make the calls, remove it. Invoked with no
+definition in place, the record reads `arm unavailable: orient` and the spawn's own refusal; that is
+a recorded outcome, not a failure of the harness.
+
+**The record.** The script RETURNS it — a workflow script has no filesystem — and the caller writes
+the return under `memory/builds/<slug>/build/` in the acceptance-ledger grammar. Fields: `arm` (the
+three axis values), `verdict` (`measured`, `partial: n/2 runs spawned`, or `arm unavailable: <type>
+— <why>`), `sequential` (true only when the second run's `startMs` is after the first's `endMs`;
+null when either run has no clock), `runs` (two entries, each with a closed `outcome` — `spawned`,
+`null`, `threw` or `refused-step` — a `reason`, `tokens`, `startMs`, `endMs`, `wallMs`, `ready`,
+`card`, `recallRan`, `reuseRan`), and `fallback` (null, or the one re-run of a `refused-step` run
+under the default workflow agent type, naming `fallbackFor`). Two notes travel in the record itself
+and should travel into the written copy: `tokens` is the `budget.spent()` delta around the spawn,
+which is the workflow's OUTPUT tokens while that agent ran and not the subagent's context; `wallMs`
+is the agent's own `date +%s%3N` at its first and last Bash call, because a workflow script cannot
+read a clock.
