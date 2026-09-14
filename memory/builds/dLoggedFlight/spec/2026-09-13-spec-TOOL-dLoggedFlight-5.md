@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-5 — one redaction table, applied once on read, with a staged positive per rule
 
-**Status:** CLOSED · rev-3 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -30,15 +30,17 @@ near-miss negative, and cheap enough to run over every command head of a large s
   more substrings joined by `|`, and the rule's regex runs only on text whose lowercased form holds at
   least one of them. Observed by AC1 and AC4.
 - **S2** The rule set is a CLOSED list of class ids, each covering one class the security review
-  measured. It holds 17 ids, and AC5 asserts the table against the list in both directions:
+  measured. It holds 19 ids, and AC5 asserts the table against the list in both directions:
 
   | id | class |
   |---|---|
   | `url-userinfo` | URL userinfo, both `user:pass@` and colon-less `token@` |
   | `auth-header` | `Authorization:` Bearer, Basic or token values |
+  | `bearer-token` | a `Bearer` value of 20 or more characters under any other header or key |
   | `github-token` | `ghp_`, `gho_`, `ghu_`, `ghs_`, `ghr_` and `github_pat_` |
   | `sk-key` | anchored `sk-` and `sk-ant-` keys of 20 or more characters |
   | `aws-key` | `AKIA` access keys |
+  | `aws-sts-key` | `ASIA` temporary access keys that AWS STS issues |
   | `pem-block` | PEM private-key blocks |
   | `env-assign` | unspaced `*_TOKEN=`, `*_SECRET=`, `*_KEY=` and `*_PASSWORD=` |
   | `env-table` | a PowerShell name-and-value env row for a secret-named variable |
@@ -88,7 +90,9 @@ negatives: a `task-` id for `sk-key`, and `PIN_KEY =` and `NOT_A_TOKEN` for `env
 `ssh://git@` for `url-userinfo`: its colon-less form is redacted only from 16 characters, since a
 login name is not a token, and every token class this table names is at least 20 long. Every
 negative holds one of its own rule's hints, so the pattern, not the prefilter, is what leaves it
-alone.
+alone. `bearer-token` runs after `auth-header`, so a header value keeps that row's id, and it takes
+a value only from 20 characters, so `Bearer realm=` and a `Bearer $TOKEN` placeholder stay as they
+are. `aws-sts-key` is `aws-key`'s shape on the `ASIA` prefix, with the same lowercase near miss.
 
 "Not matched again" holds two ways. Within one call, a span overlapping one an earlier rule took is
 dropped. Across calls, a value that already reads `<redacted:` is skipped, so a rendered text scans
@@ -106,7 +110,7 @@ anything that is not a `str`.
 | `tools/runlog/redaction.tsv` | data, `.tsv` is a declared lexicon extension | none |
 | `scan_secrets`, `render_redacted`, `load_rules` | functions in `runlog_lib.py` | `py.function`, verb-led |
 | `Rule` | type | `py.type` |
-| `CLASS_IDS` | constant, the 17 ids of S2 | none |
+| `CLASS_IDS` | constant, the 19 ids of S2 | none |
 
 ### Alternatives rejected
 
@@ -182,6 +186,14 @@ none
   trap and the 16-character floor on colon-less userinfo, negatives that reach their own regex, the
   two readings of "not matched again", the template grammar, the 196-character bound AC4 needs, and
   the named results for a CRLF table, a lone CR and a non-string input. No criterion changed.
+- rev-4 · 2026-09-14 · S2 · §4 · folded observation O1 of the closing diff review's round 1. That
+  review's synthesis probed the table with synthetic credential shapes and found two misses that sit
+  beside rows the table already has: an AWS STS `ASIA` key id beside `aws-key`'s `AKIA`, and a
+  `Bearer` value under a header other than `Authorization` beside `auth-header`. Each becomes a class
+  with its positive template and near-miss negative, so the list grows from 17 ids to 19. The other
+  misses the probe named, the SendGrid, DigitalOcean, Shopify, Stripe restricted and Twilio shapes,
+  stay in the documented residue of a class with no row. No criterion changed: AC1, AC4 and AC5 read
+  every row the table holds.
 
 ## 10. Reuse audit
 

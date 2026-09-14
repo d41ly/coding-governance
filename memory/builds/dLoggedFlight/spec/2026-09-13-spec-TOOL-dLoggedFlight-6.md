@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost
 
-**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
+**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -49,8 +49,11 @@ streamed, located through the session ids the driver recorded, and kept under th
   A tool call keeps only its class and flags. The classes are driver verb (verb and slug), git
   commit, merge or push, bar run, test, read, write, edit, workflow, agent, cron and ask, and the
   residual `other` for a call none of them names. The flags are destructive git and a piped driver
-  call. Workflow and agent labels are kept only when they match `^[A-Za-z0-9._:-]{1,64}$`. Observed by
-  AC3 and AC10.
+  call. Workflow and agent labels are kept only when they match `^[A-Za-z0-9._:-]{1,64}$`. A driver
+  call's slug is read by the kit's one slug grammar, `SLUG_RE` in `runlog_lib.py`, spelled the way
+  the driver's `check_slug_shape` spells a build-folder name: a letter, then letters, digits or
+  dashes. The withheld self-test holds the two to each other over a table of names, reading that
+  function from the driver's source. Observed by AC3, AC7 and AC10.
 - **S5** Output to the user-profile store: `%LOCALAPPDATA%\runlog\<repo-key>\sessions\<sid>.json` on
   Windows, `~/Library/Application Support/runlog/<repo-key>/` on macOS, and
   `${XDG_STATE_HOME:-~/.local/state}/runlog/<repo-key>/` elsewhere, with `RUNLOG_STATE_DIR` as an
@@ -246,8 +249,12 @@ tree unless it names another command.
   `<redacted:` and the data banner, and the store directory is unchanged.
   Red when: narration is written to disk or printed unredacted.
 - **AC7** — When `--discover` runs over a fixture session holding `unattended.sh --preflight tFixture`,
-  it attributes that session to `tFixture` with `attribution=heuristic`.
-  Red when: discovery attributes a session whose only mention is inside tool output.
+  it attributes that session to `tFixture` with `attribution=heuristic`. Over a table of dashed,
+  single-letter and digit-first names, the kit's slug grammar accepts exactly the names the driver's
+  `check_slug_shape` accepts, run by bash from the driver's source, and a `--preflight` call naming
+  each one is read with that slug exactly when the driver accepts it.
+  Red when: discovery attributes a session whose only mention is inside tool output, or a slug the
+  driver accepts is not read, or one it refuses is.
 - **AC8** — When `read_records` streams a generated scratch tree of 20,000 records, the high-water
   count of records it holds at once stays at one per open file. The decoy tree's recursive listing, by
   path, size and mtime, is identical before and after each arm. A decoy transcript planted under the
@@ -302,6 +309,14 @@ New arm: `tools/runlog/selftest.py` · each rule staged RED on its fixture · fl
   and that an unquoted `$(…)` splits like any separator where rev-5 said it was never descended into;
   narration escapes control characters; the launcher also searches each arm's output and scratch for
   the canary id; the inventory adds `render_quoted` and `print_measure`. No criterion changed.
+- rev-7 · 2026-09-14 · S4 · AC7 · folded the closing diff review's round-1 L4. The classifier read a
+  driver call's slug as `[A-Za-z][A-Za-z0-9]{1,63}`, where the driver's `check_slug_shape`, and
+  hygiene check 4 with it, admit a letter then letters, digits or dashes. So `--discover --slug
+  my-build` and the model's store fallback never attributed a session to a dashed or single-letter
+  slug the driver had accepted, and such a run read `not-local` for its transcripts. The grammar is
+  now one constant in `runlog_lib`, spelled the driver's way, and AC7 grades it against the driver's
+  own function. The 64-character bound goes with the old spelling: the slug is a store field and
+  never a path, and the driver bounds none.
 
 ## 10. Reuse audit
 

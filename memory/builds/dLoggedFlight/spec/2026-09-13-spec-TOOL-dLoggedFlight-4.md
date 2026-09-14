@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push
 
-**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
+**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -36,10 +36,13 @@ to `pushes.log`, and pin the bar's run id so a push joins to its gate line exact
   <remote-sha>`, up to 10, with `ref_more=<n>` beyond. It also carries `lander=1` or `lander=0`, always
   written, according to whether the `push-main-active` marker exists in the git dir, and the
   worktree. The stdin loop keeps the ref lines it discards today. Observed by AC1 and AC6.
-- **S3** The remote URL is never written, since it can carry credentials. `remote=<name>` is written
-  only when `$1` differs from `$2`. A push to a bare URL passes the URL in both, so it writes
-  `remote_unnamed=1` instead. Either way the line records `url_userinfo=1` when `$2` holds a `user@`
-  part. Observed by AC2.
+- **S3** The remote URL is never written, since it can carry credentials, and neither is any value
+  that can hold one. `remote=<name>` is written only when `$1` has a remote name's shape, holding none
+  of `/`, `\`, `:` or `@`, and differs from `$2`. Everything else writes `remote_unnamed=1` instead. A
+  push to a bare URL passes the URL in both. Under a `url.<base>.insteadOf` or `pushInsteadOf` rewrite
+  of a URL typed on the command line, git passes the TYPED URL as `$1` and the rewritten one as `$2`,
+  so a difference between the two proves nothing about `$1`. Either way the line records
+  `url_userinfo=1` when either argument holds a `user@` part. Observed by AC2.
 - **S4** An EXIT trap writes the END line with `rc`, `exit=clean|unclean` and a `decision`. The
   decision is set before each exit after the stdin loop and is one of `skip-nondefault`,
   `skip-delete`, `refuse-manifest`, `refuse-raw`, `refuse-head`, `full` and `scoped`. Every exit after
@@ -184,9 +187,13 @@ remote and a work clone the way `.githooks/pre-push.test.sh` does, with the bar 
   once to that bare URL, both line pairs carry `url_userinfo=1`, the bare push carries
   `remote_unnamed=1`, and no line contains `pass`. A third push to the credentialed bare URL, with the
   default branch misconfigured so the hook refuses before its stdin loop, writes an `ev=once` line
-  carrying `remote_unnamed=1`, `url_userinfo=1` and `lander`. After every arm of the suite, no line of
-  the whole journal contains `pass`.
-  Red when: `$1` or `$2` reaches any line, the refusal line's remote fields included.
+  carrying `remote_unnamed=1`, `url_userinfo=1` and `lander`. A fourth push types a URL carrying
+  `user:pass@` that an `insteadOf` rule rewrites to the remote's own URL, and a fifth is refused
+  before the stdin loop through the same rewrite. Both write `remote_unnamed=1` and `url_userinfo=1`
+  and no `remote`, and no line they write holds the byte sequence `://` or the byte `@`. After every
+  arm of the suite, no line of the whole journal contains `pass`.
+  Red when: `$1` or `$2` reaches any line, the refusal line's remote fields included, or a typed URL
+  is written as a remote name.
 - **AC3** — When the stubbed bar writes a ready file as its first act and then sleeps 20 s, and the
   hook is sent TERM only after that file appears, checked with a bounded poll that also asserts the stub
   is still running, the END reads `exit=unclean` and the hook has exited before the stub's 20 s would
@@ -251,6 +258,14 @@ none
   against `render_line`, and "long-named" refs replaced by refs short enough that the count cap is
   the only thing that can remove `ref.11`, since with long names the byte cap writes the same line.
   §7: the legs of the runner suites the S5 line touches.
+- rev-6 · 2026-09-14 · S3 · AC2 · folded the closing diff review's round-1 L1. S3 took `$1`
+  differing from `$2` as proof that `$1` is a remote name. Under an `insteadOf` or `pushInsteadOf`
+  rewrite of a URL typed on the command line, git passes the typed URL as `$1` and the rewritten one
+  as `$2`, reproduced in a scratch repository on git 2.54. So the hook wrote the typed URL as
+  `remote=`, credentials included, and `url_userinfo` read `$2` alone, which the rewrite had made a
+  plain path. `remote=` now also needs a remote name's shape, and `url_userinfo` reads both
+  arguments. The difference test stays, since a bare path in the current directory has no `/` and
+  git passes it as both. Both are builtin tests, so AC7's exec count stands.
 
 ## 10. Reuse audit
 

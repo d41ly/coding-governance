@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -82,7 +82,13 @@ schema, independently of the renderer.
   lines of the trees it holds (`TOOL-dLoggedFlight-8` S2), which the leg does not read, so the model's
   end is at or after the leg's. Neither refusal turns on the difference. A preflight rotates only a
   terminal record, so a non-terminal run is the last of its build and its end meets no later window,
-  and a later end cannot put a window's end before its start. Observed by AC4 and AC5.
+  and a later end cannot put a window's end before its start. When the shared start is a commit
+  that ADDED the build's live record and one of its archives together, which `derive_run_starts`
+  marks `joint_add`, the `run-start` refusal names that shape: a squashed history leaves it, and so
+  does a memory root or a build folder moved in one commit, and the leg follows no path back past
+  it. It stays a refusal, because one log cannot tell a move from a squash and AC5 requires the
+  squash to red. No waiver clears it; the unit's acceptance ledger parks that question. Observed by
+  AC4 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -176,9 +182,12 @@ command.
   build graded under the naive key, each archive keyed on its own creation commit. The second is a
   LANDED-after-LANDED build rotated the way the driver rotates. It is green under the era-bounded
   derivation, and red once the eras are staged to span the path's whole history, which is the reading
-  round-3 H2 named.
+  round-3 H2 named. A third is a build rotated the way the driver rotates whose memory root then
+  moves in one commit, as `git mv` records it, with the conf naming the new root. The leg exits 1
+  naming that build under `run-start`, and that refusal, like the squashed history's, names the
+  shape it saw, while the rotation graded before the move names none.
   Red when: the key derivation collapses an archive into its successor, or a window ends before its
-  start, and the leg stays green.
+  start, and the leg stays green, or a moved root's refusal does not name the shape.
 
 ## 7. Gates
 
@@ -217,6 +226,16 @@ none
   holds, and the leg reads neither: own commits need a range per run, and the leg's git cost is
   constant over the population. S6 says the two ends differ, which is the larger, and why no refusal
   of the leg turns on it. Before this line, "the model's own derivation" read as the same window.
+- rev-7 · 2026-09-14 · S6 · AC5 · folded the closing diff review's round-1 L3. A memory root or a
+  build folder moved in one commit ADDS every record it moves, with renames off, so a rotated
+  build's archive and live record both started at the move. The leg then refused `run-start` on
+  every bar, `verify` looked up the pre-move key and raised, and `record --write` wrote a second
+  file. The kit README expects a root to move, and its list of what the leg does not check did not
+  name this. The refusal now names the shape, and that list names the limit. The review's first
+  option, following the pre-move path, was not taken: the model keys every read on a path under the
+  current root, so following the starts alone would leave its windows quietly wrong. Its waiver
+  route is parked in the unit's acceptance ledger, since a waiver registry is a new surface an
+  adopter authors, which is the owner's turn.
 
 ## 10. Reuse audit
 

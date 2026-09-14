@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-9 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-10 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -39,8 +39,14 @@ sources actually support. Every later surface renders from this model rather tha
   single `git log --no-renames --diff-filter=A --name-only` over the run-state paths it is handed.
   `derive_run_eras` turns the starts into ERAS, run k's being the commits from its start up to the next
   start of the same build, or to HEAD for the last run. Every path is under the declared memory root,
-  read through `resolve_memory_root` of `TOOL-dLoggedFlight-1`, never a `memory/` literal. Observed by
-  AC1, AC9 and AC18.
+  read through `resolve_memory_root` of `TOOL-dLoggedFlight-1`, never a `memory/` literal. A commit
+  that ADDS a build's live `RUN.md` and one of its archives together leaves every run it holds on
+  one start, since no earlier entry under the path names the archive's start. A squashed history
+  leaves that shape, and so does a memory root or a build folder moved in one commit, which with
+  renames off adds every record it moves; nothing here follows a path back past it.
+  `derive_run_starts` marks each run whose start is such a commit `joint_add`, and the schema leg
+  names the shape when it refuses the shared start (`TOOL-dLoggedFlight-10` S6). Observed by AC1,
+  AC9 and AC18, and the mark by `TOOL-dLoggedFlight-10` AC5.
 - **S2** Run windows. A window is half-open, `[start, end)`, and every read of a run-state path's
   history is bounded to the run's era (S1). Rotation keeps the path, so `RUN.md`'s history carries
   every predecessor's terminal write. An archive's own terminal write is read from `RUN.md` inside the
@@ -87,7 +93,12 @@ sources actually support. Every later surface renders from this model rather tha
     neither bounds them. They are read from the era and then bounded by the window, because commits
     keep naming a unit id after the run has landed, and one such commit would otherwise become a
     terminal run's last own commit. A non-terminal window's end is taken past every one of them (S2),
-    so the bound removes only commits made after a terminal run's end;
+    so the bound removes only commits made after a terminal run's end. A subject names every unit
+    id it spells, and a contiguous run spelled `<id>..<m>` names each id from `<id>` to `<m>`, the
+    range the memory-tree index generator expands in a Serves line. One reader, `scan_unit_ids`,
+    serves the own commits, the units each commit carries and S5's build commit, so no use of it
+    credits a whole-set commit to its first unit alone. A run naming more than `UNIT_RANGE_MAX`
+    ids names its first alone, so no subject can make the model's cost grow with its range;
   - merges naming the slug, inside the window;
   - push lines, joined by where they were pushed from OR by what they pushed. A line made inside the
     window from a tree the run holds joins, and so does one inside the window that pushes the default
@@ -190,18 +201,24 @@ sources actually support. Every later surface renders from this model rather tha
   `COVERAGE_STATES`, and each journal an EPOCH, the time of its producer file's first line:
   - `absent`: the file does not exist, or the window ends before its epoch;
   - `partial`: the window contains the epoch;
-  - `present`: the window starts after the epoch, and the source holds lines for the run or nothing the
-    run's own rows prove required one;
+  - `present`: the window starts after the epoch, and the source holds lines for the run, or holds
+    none while nothing the run's own rows prove required one and this node's driver journal names
+    the build;
   - `dead`: the window starts after the epoch and the source holds none while the run's own rows prove
-    activity. The proof is named per journal: for `driver` a parked row in the window, since every row
+    activity and this node's driver journal names the build. The proof is named per journal: for `driver` a parked row in the window, since every row
     is a driver verb's write; for `gates` a LANDING write in it, which `--close` makes only after its
     bar; and for `pushes` the move into LANDED, which `--landed` makes only after the push. That move
     is the one that closes a landed run's window (S2), so it lies AT the window's end and never inside
     the half-open window. The pushes proof is therefore read at the end: from the terminal END's
     `phase_to` where a terminal END closed the window, and from the first terminal write's phase where
     that write did;
-  - `not-local`: no named session has an extract or a transcript on this machine, or the journal names
-    no session and the store holds no extract attributed to the slug.
+  - `not-local`: for the transcripts, no named session has an extract or a transcript on this machine,
+    or the journal names no session and the store holds no extract attributed to the slug. For a
+    journal, the window starts after its epoch, it holds none of the run's lines, and no line of
+    this node's driver journal names the build at all. Journals never leave their clone and only the
+    driver's lines name a slug, so nothing then places the run on this node, and neither `present`
+    nor `dead` can be said of a writer for a run it never saw. A writer broken for the whole of a run
+    made here reads the same, since the model has no node identity to tell the two apart.
 
   The run-state file, git and the build folder read `present` or `absent`. The block also carries
   `idle`: whether idle gaps were judged (S6), how many fired, and how many were kept out near an
@@ -362,12 +379,16 @@ command.
 
 - **AC1** — When `derive_run_starts` reads a fixture build rotated the way the driver rotates, with
   `git mv -f` of the finished record and a fresh `RUN.md` in one commit, the archive and the live record
-  get distinct start commits, and their half-open windows are disjoint.
-  Red when: both records resolve to one commit, or the live window contains the aborted run.
+  get distinct start commits, their half-open windows are disjoint, and neither run is marked
+  `joint_add`.
+  Red when: both records resolve to one commit, the live window contains the aborted run, or a
+  rotation reads as a joint add.
 - **AC2** — When `build_run_model` reads a fixture run holding commits naming its units interleaved with
   commits of another build, the timeline carries only its own commits, in time order, beside its phase
-  moves.
-  Red when: the foreign commits enter the run.
+  moves. A commit whose subject spells both of a build's units as `X-<slug>-1..2` counts for both: its
+  timeline entry and its own-commit entry carry both ids, and it is unit 2's build commit, being
+  unit 2's first own commit outside the memory root.
+  Red when: the foreign commits enter the run, or a range is read as its first id alone.
 - **AC3** — When `scan_decisions` reads a fixture whose commits carry two `Decided:` trailers and one
   mid-body `Decided:` line, and whose specs carry one owner mark committed before the run and one agent
   mark committed inside it, the ledger lists both trailers with their shas and reports one near-miss. It
@@ -386,20 +407,25 @@ command.
   member has a fixture, and every fixture's kind is a member.
   Red when: any kind fires on the clean fixture, fails to fire on its own, has no fixture, a stale
   witness hides merged own commits, or the table wins over a refused `--landed`.
-- **AC6** — When a fixture journal holds only other runs' lines, a run whose window ends before the
-  journal's epoch reads `absent`, one whose window starts after it with twelve parked rows reads
-  `dead`, and one whose window contains it reads `partial`. When the run has lines of its own, a window
-  containing the epoch still reads `partial`, which is this run's own case, and a window starting after
-  it reads `present`. A fixture with no local transcript reads `not-local`. Every member of
-  `COVERAGE_STATES` has a fixture, and every fixture's state is a member.
+- **AC6** — When a fixture journal holds only other runs' lines, one of them a line of the run's own
+  build, a run whose window ends before the journal's epoch reads `absent`, one whose window starts
+  after it with twelve parked rows reads `dead`, and one whose window contains it reads `partial`.
+  When every line names another build, a window starting after the epoch reads `not-local`, with
+  twelve parked rows or with none. When the run has lines of its own, a window containing the epoch
+  still reads `partial`, which is this run's own case, and a window starting after it reads
+  `present`. A fixture with no local transcript reads `not-local`. Every member of `COVERAGE_STATES`
+  has a fixture, and every fixture's state is a member.
   Through `build_run_model`, the landed fixture staged with a journal older than the run and none of
   the run's own lines reads `dead` for that journal, naming its proof: the driver's by the run's
   parked rows, the gates' with no bar of the run's, and the pushes' with no landing push, both with
-  the driver journal, where the terminal END closes the window, and without it, where the terminal
-  write does.
+  the run's driver lines, where the terminal END closes the window, and without them, where the
+  terminal write does. In every one of those cases the driver journal holds a refused preflight of
+  the run's own build, made before the run. The same fixture staged with older journals whose driver
+  lines all name another build reads `not-local` for all three.
   Red when: a dead writer reads as a run that predates it, a window holding the epoch reads `present`
-  because the run has lines, any state has no fixture, or a landed run whose pre-push writer wrote
-  nothing for its landing push reads `present` because its proof sat at the window's end.
+  because the run has lines, any state has no fixture, a landed run whose pre-push writer wrote
+  nothing for its landing push reads `present` because its proof sat at the window's end, or a run
+  made on another node reads `dead`.
 - **AC7** — When `python <kit>/runlog.py model aLeakedHandle --json` runs on this tree, it prints a
   model whose parked-row counts by kind match the run-state file, whose window ends at the commit that
   first wrote `phase: LANDED`, and whose journal sources read `absent`.
@@ -634,6 +660,22 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   close that moved the phase into LANDING as the test. A killed `--close` whose END read LANDING had
   written the phase and not finished, so the clean exit is the one test, as it is for every other
   rule here.
+- rev-10 · 2026-09-14 · S1 S3 S7 · AC1 AC2 AC6 · folded the closing diff review's round-1 L2, L3
+  and L5. L2: a run made on another node read `dead` for its driver, and for its gates and pushes
+  once it had closed or landed. Journals never leave their clone, so its lines are nowhere here,
+  and the model has no node identity. S7 now reads `present` and `dead` only where this node's
+  driver journal names the build, and `not-local` otherwise, and the runlog Skill says so where it
+  had said such journals read `absent`. The review also offered changing the Skill's text alone,
+  and a `dead` that cannot be told from another node's run misleads whatever the Skill says. L3: a
+  memory root moved in one commit adds the live record and every archive at once, so every run of
+  a rotated build started at the move. S1 marks a run whose start added both, and the schema leg's
+  refusal names the shape (`TOOL-dLoggedFlight-10` rev-7). Following the pre-move path was not
+  taken. Every read the model makes is keyed on a path under the current root, the run-state
+  history, its blobs, the specs, the ledgers and the decision log among them, so following the
+  starts alone would turn a loud refusal into windows that are quietly wrong. L5:
+  `TOOL-dLoggedFlight-1..13` read as unit 1 alone, which credited eight whole-set commits of this
+  build to unit 1 on the timeline. S3 reads a range the way the index generator does, bounded by
+  `UNIT_RANGE_MAX`, a bound the generator does without because an author types its Serves line.
 
 ## 10. Reuse audit
 
