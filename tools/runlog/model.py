@@ -130,8 +130,8 @@ METHOD = {
                  "pushing the default branch to a descendant of the run's last own commit",
     "gate-join": "read where a joined push pinned gate_run, inferred from a tree the run holds otherwise",
     "trees": "inferred: a tree is held from the run's first call there that claims it, a preflight or "
-             "any verb but --status, --resume and --landed read before the close, to another run's "
-             "first claim there after the run's last",
+             f"any verb but {', '.join(TREE_BLIND_VERBS)} read before the close, to another run's first "
+             "claim there after the run's last",
     "window-end": "inferred for a non-terminal run: one second past its last journal line, record "
                   "commit, own commit, or line of a tree it holds",
     "close-head": "inferred: the first parent of the commit recording the LANDING write, else HEAD",

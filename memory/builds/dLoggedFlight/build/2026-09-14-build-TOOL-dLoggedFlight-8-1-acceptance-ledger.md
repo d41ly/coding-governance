@@ -143,10 +143,12 @@ and AC21, whose lines below that fold observed.
   the run's worktree after another build's preflight there. `journal_lines` held none of those
   lines, `push-outside-lander` did not fire, and the landing push still joined by `pushed-sha`, its
   pinned bar by `gate_run`. With no verb blind, the owner's `--status` claimed the primary tree, and
-  the same lines joined and fired the anomaly. RED seen with the key taken from every tree any call
-  ran in, as rev-6 took it; with each of `--status`, `--resume` and `--landed` in turn made a claim;
-  with the phase test dropped; with the hold never ending; and with the hold starting at the window
-  start.
+  the same lines joined and fired the anomaly. `TREE_BLIND_VERBS` drives the fixture both ways: each
+  member has a call in the primary tree, and the one other verb there is blind by its phase. RED seen
+  with the key taken from every tree any call ran in, as rev-6 took it; with each of `--status`,
+  `--resume` and `--landed` in turn made a claim; with the phase test dropped; with the hold never
+  ending; with the hold starting at the window start; and with a blind verb added that no call
+  stages.
 - AC21 — `build_run_model` (`test_model_ac21_nonterminal_end`) — added at rev-7 by the same fold, and
   observed by it. A run left BUILDING, its record on its branch and its last driver line the
   `--phase` at minute 6, committed its unit's work twenty minutes later, then barred it and pushed
@@ -231,3 +233,13 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   M1 and M4. Two runs that claim one tree in the same stretch both hold it, so a bar made there
   joins both. The schema leg's non-terminal end reads the record commits alone, which spec 10's S6
   now says.
+- **Parked by the H2 and M5 fold: the session key has H2's shape.** The bug-class checklist over the
+  fold's code commit named `join-key-widened-by-a-shared-location`. The class has a second instance
+  in the same function: a run's sessions are every session any of its calls names, `--status` and
+  `--resume` included. So another Claude session that looks at a run with `--status` joins it. Its
+  tool calls, usage and owner turns would then count as this run's, and the in-window owner count
+  is a committed fact. The options seen were three. Name sessions only from calls other than
+  `--status` and `--resume`, which keeps a landing session, since a session is no shared location.
+  Name them by the tree claim rule instead. Or keep the key and say so. None was taken, for three
+  reasons. No review confirmed it. It moves the owner-turn, usage and attribution facts that the
+  fold's next slice reworks for M1. And spec 8 would need a rule for it that no audit has read.

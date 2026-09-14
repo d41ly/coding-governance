@@ -84,10 +84,11 @@ from collections import Counter  # noqa: E402
 # with its git-only half inside AC10's arm; record AC9, the owner-time refusal; and the invariant arm
 # that sorts last and grades every model the arms built. Three new functions, so the decoy checks alone
 # move it by nine. Every idle fixture's session is made by the REAL extractor from a transcript.
-# RAISED 1130 -> 1153 by the same review's round-1 fold of H2 and M5: model AC20, the trees a run
-# holds, and AC21, a non-terminal end over every source the run owns. Two new functions, so the decoy
-# checks alone move it by six. The landed fixture now lands from the primary tree.
-ASSERTION_FLOOR = 1153
+# RAISED 1130 -> 1154 by the same review's round-1 fold of H2 and M5: model AC20, the trees a run
+# holds, with TREE_BLIND_VERBS driving its fixture both ways, and AC21, a non-terminal end over every
+# source the run owns. Two new functions, so the decoy checks alone move it by six. The landed fixture
+# now lands from the primary tree.
+ASSERTION_FLOOR = 1154
 
 PASS = []
 FAIL = []
@@ -3099,6 +3100,12 @@ def test_model_ac20_tree_holds():
     j = write_journals(fx["repo"].parent, driver=fx["driver"] + primary + moved + reuse, gates=gates,
                        pushes=fx["pushes"] + raw + render_push_once(11))
     model = build_model(fx["repo"], journals=j)
+    # THE CLOSED CONSTANT DRIVES THE FIXTURE, both ways: every member of TREE_BLIND_VERBS has a call in
+    # the primary tree, and the one call there outside it is blind only by the phase its START read.
+    seen = {ln["verb"] for ln in fx["driver"] + primary if ln["ev"] == "start" and ln["wt"] == FX_WT_PRIMARY}
+    blind = set(rl_model.TREE_BLIND_VERBS)
+    check("model AC20: the primary tree's calls stage every blind verb, and one other verb, after the close",
+          (sorted(seen & blind), sorted(seen - blind)), (sorted(blind), ["--park"]))
     check("model AC20: the run holds its own worktree and the one it moved to, never the primary tree",
           model.worktrees, sorted([FX_WT_OTHER, FX_WT_RUN]))
     check("model AC20: of eight bars, the run's own three and the pinned one join, and none another run made",
