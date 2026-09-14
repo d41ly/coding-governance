@@ -64,3 +64,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-14T10:34:15Z brief · item TOOL-aBatchedArm-5 · reason f5c01a60e141 memory/builds/aBatchedArm/prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-build-brief.md
 
 2026-09-14T10:44:23Z dispatch · item e82d4053 TOOL-aBatchedArm-5 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/selftest-pooled-evidence.txt tools/run-gates/kit.toml tools/run-gates/selftest-budgets.txt tools/gate-legs.json tools/unattended/run-unattended-gates.sh tools/unattended/kit.toml .githooks/gate-env.sh memory/guides/SESSION-KICKOFF.md memory/builds/aBatchedArm/spec/2026-09-13-spec-TOOL-aBatchedArm-5.md memory/builds/aBatchedArm/build/2026-09-14-build-TOOL-aBatchedArm-5-1-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-14T11:13:18Z brief · item TOOL-aBatchedArm-1 · reason 266624e19ca0 memory/builds/aBatchedArm/prompts/2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md
