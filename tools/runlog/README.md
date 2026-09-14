@@ -202,10 +202,23 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   last bar or push made from a tree it holds. A transcript event does not move that end, since the
   session keeps working after the run and renders the record itself. Nor does a merge naming only the
   slug, or a push joined only by what it pushed.
-- **A run's own commits** are the era's commits that descend from its start and name one of its unit
-  ids in the subject. A push joins from a tree the run holds, or by pushing the default branch to a
-  descendant of the run's last own commit, which is how the landing push from the primary tree joins.
-  A gate line joins through the `gate_run` a joined push pinned, or from a tree the run holds.
+- **One window bounds every timed set.** Once the window is known, the timeline of every kind, the
+  tool calls, attribution, usage, the own commits and every join reading them, the driver lines the
+  record commits to, and the sessions go through `check_in_window` and nothing wider. So a run's verbs
+  after its end, an owner's `--status` once it has landed say, are not its events, and a terminal
+  run's closing phase write, which lies at or past its end, is not on its timeline; `phases-walked`
+  reads that phase at the end instead. The run-state history and the review records stay bounded by
+  the era, as the spec states them.
+- **A run's own commits** are the commits inside its window that descend from its start and name one
+  of its unit ids in the subject. Commits keep naming a unit id after a build lands, and one of them
+  must never become a landed run's last own commit. A push joins from a tree the run holds, or by
+  pushing the default branch to a sha carrying the last own commit made at or before the push's
+  START, which is how the landing push from the primary tree joins. A gate line joins through the
+  `gate_run` a joined push pinned, or from a tree the run holds, inside the window either way.
+- **Attribution reads every run's ENDs in a session.** A call inside the window takes the phase of
+  its session's most recent END and the unit of its most recent unit-bearing one. When that END is
+  another run's, of this build or another, the call is that run's work and is unattributed, and a unit
+  another run set is never this run's. The coverage block's call count is the model's tool calls.
 - **A run holds a tree from its first call there that claims it.** A preflight claims its tree, and
   so does any other verb its START read before the close, except `--status`, `--resume` and
   `--landed`. Those three can run from any tree, the primary tree included, and every run lands
@@ -384,8 +397,12 @@ prefix and root, and hold the render to an independent one.
 - **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
   can be wrong and still be an integer.
 - **A line inserted before the committed first time.** `verify` hashes from that time on, so it
-  cannot see one. The model attributes no line of a run before its window opens, except a bar a joined
-  push pinned, so this misses a line the model would rarely have counted.
+  cannot see one. The model attributes no line of a run outside its window, so this misses only a line
+  it would never have counted.
+- **A spec mark made after the run, in the run's era.** The ledger still splits each spec's section 8
+  marks at the era's end, where the spec's S4 says the window's: the window's end needs the one blob
+  read that also carries the specs. For a build's last run the era is open, so a mark added to one of
+  its specs later counts as the run's. The gap is recorded in the spec's revision log, not accepted.
 - **A record verified on another node.** The commitment is checkable only where the journal is, and
   `verify` elsewhere refuses rather than guessing.
 - **The lists the record copies, in a tree without their owners.** The pre-push hook's decisions, the

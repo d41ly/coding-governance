@@ -1023,6 +1023,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "check_calls_invariant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "check_cell",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1083,7 +1088,17 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_in_history",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
+    },
+    {
       "id": "check_in_hold",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_in_window",
       "kind": "function",
       "file": "tools/runlog/model.py"
     },
@@ -1311,6 +1326,11 @@
       "id": "check_ts_type_position",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_window_invariant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "checks",
@@ -1739,6 +1759,11 @@
     },
     {
       "id": "derive_archive_name",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "derive_arm_name",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -6103,6 +6128,16 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_model_ac22_later_unit_commit",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac23_window_bound",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_model_ac2_own_commits",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6809,6 +6844,11 @@
     },
     {
       "id": "test_zz_model_idle_invariant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_zz_model_window_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

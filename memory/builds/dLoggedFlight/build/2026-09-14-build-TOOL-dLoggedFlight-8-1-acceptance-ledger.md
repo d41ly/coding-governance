@@ -13,7 +13,8 @@ through one `git fast-import`, and every journal and extract is scratch. The exc
 arms that read this tree and never write it: AC7, the decision-log report and the driver-source
 arm. The closing diff review's round-1 fold of B1 and H1 bumped the spec to rev-6 and added AC19,
 whose line below that fold observed. Its fold of H2 and M5 bumped the spec to rev-7 and added AC20
-and AC21, whose lines below that fold observed.
+and AC21, whose lines below that fold observed. Its fold of M1, M4 and M5's timeline bound bumped the
+spec to rev-8, widened AC17 and added AC22 and AC23, whose lines below that fold observed.
 
 ## The criteria
 
@@ -33,7 +34,12 @@ and AC21, whose lines below that fold observed.
 - AC3 — `scan_decisions` (`test_model_ac3_ac11_ledger`) — the two `Decided:` trailers in the final
   block came back with the sha of their commit. The mid-body line counted as one near-miss. The
   marks read `owner-before` 1 and `agent-inside` 1, the agent's mark wrapping across two lines. RED
-  seen with every mark counted inside, and with the near-miss count zeroed.
+  seen with every mark counted inside, and with the near-miss count zeroed. The rev-8 fold rebuilt
+  its fixture the way the driver writes it: the preflight commit carries the preflight record and an
+  `--abort` commit after the work carries the final one. It had written its final ABORTED record in
+  the preflight commit, a shape no verb leaves, which closed its window at its own start once own
+  commits were bounded by the window. The trailers, the decision-log rows and the ledger line then
+  read zero.
 - AC4 — `check_conformance` (`test_model_ac4_ac12_conformance`) — a build commit a minute before its
   brief row read UNMET, and its evidence named both times. RED seen with the order test dropped.
 - AC5 — `scan_anomalies` (`test_model_ac5_anomalies`) — a clean landed run, preflighted, dispatched,
@@ -100,10 +106,14 @@ and AC21, whose lines below that fold observed.
   inclusive.
 - AC14 — `build_run_usage` (`test_model_ac13_ac14_positions_usage`) — usage before the window and at
   its end stayed out, and one request per split counted. RED seen with the window filter dropped.
+  Since the rev-8 fold the filter is `check_in_window`, and it was seen RED again with that call
+  dropped, and with the window closed at its end.
 - AC15 — `build_run_model` (`test_model_ac15_ac18_journal_join`) — a journal holding a refused
   preflight, a successful one, a status, a second successful preflight and a status gave runs whose
   timelines held exactly their own lines. The refused preflight sat in run one's lines and started
-  nothing. RED seen with every line given to the live run, and with the rc test dropped.
+  nothing. RED seen with every line given to the live run, and with the rc test dropped. Since the
+  rev-8 fold it is on no run's timeline: run one landed before it, so it lies past run one's window,
+  and the arm now asserts that. RED seen with the timeline's verbs taken from the whole segment.
 - AC16 — `build_run_model` (`test_model_ac1_ac16_rotation`) — the archive's window ended at its own
   terminal write, and a non-terminal live window at one second past its last record commit. In the
   LANDED-after-LANDED fixture, the live window ran from the rotation to its own terminal write, past
@@ -116,7 +126,17 @@ and AC21, whose lines below that fold observed.
   VERIFYING 1, the second session's move reaching only its own call. The shares were 7/8 of calls and
   65/75 of wall time. Every line the model arms wrote, and every golden line, carries only its
   producer's keys, and a stray `phase_from` on an END is caught. RED seen with the first-END test
-  dropped, with points pooled across sessions, and with a unit-less END resetting the unit.
+  dropped, with points pooled across sessions, and with a unit-less END resetting the unit. Widened
+  at rev-8 by the closing diff review's round-1 fold of M1, M4 and M5's timeline bound, and observed
+  by that fold. The same session now also holds another build's `--brief` END, one more of the run's
+  own verbs, and a call past the window's end. Of ten calls inside the window, eight were attributed.
+  The pre-verb call and the call after the other build's END were not, and the call past the end was
+  not counted. The run's next END attributed again with no unit, so units split 2 and 3 as before
+  and never took the other build's. Phases split BUILDING 7 and VERIFYING 1, and the shares were
+  8/10 of calls and 75/95 of wall time. With every END read as the run's and no window end, the other
+  build's unit counted three times and the late call counted, which the liveness check asserts. RED
+  seen with the window test dropped, with another run's END attributing its calls, and with another
+  run's unit taken.
 - AC18 — `build_run_model` (`test_model_ac15_ac18_journal_join`) — three start commits and
   preflights for the last two. Run one's window came from git alone, and each START joined the start
   commit its own call made, with that commit's runkey. A START after the last start commit was named
@@ -162,7 +182,43 @@ and AC21, whose lines below that fold observed.
   it closed one second past the own commit. RED seen with the tree lines dropped from the end, with
   the own commits dropped, with the end read the rev-5 way, with the merges naming the slug taken,
   with the session's events taken, and with the segment's end dropped. The session break also moved
-  AC13's stand-in owner turn from `post-close` into the window.
+  AC13's stand-in owner turn from `post-close` into the window. Since the rev-8 fold the later merge
+  is read from git for the liveness check, and it is no longer on the timeline, which AC23 asserts.
+- AC22 — `build_run_model` and `runlog.py verify` (`test_model_ac22_later_unit_commit`) — added at
+  rev-8 by the closing diff review's round-1 fold of M1, M4 and M5's timeline bound, and observed by
+  that fold. The landed fixture's record was rendered, and then a commit on the default branch
+  naming unit 1 was made twelve minutes after the landing. The own commits, the last own commit (the
+  landing merge) and `merged` did not move. The landing push still joined by `pushed-sha` and its
+  bar by `gate_run`, and `verify` over the earlier render exited 0. The later commit descends from the
+  start and lies in the run's open era, so an era bound alone takes it. A run left at LANDING pushed
+  the default branch from the primary tree after its merge and a record commit on top, then made one
+  more own commit on its branch. That push joined by `pushed-sha`, and a push of the default branch
+  before the run's work reached it joined nothing. RED seen with own commits bounded by the era,
+  which the own-commit check caught alone, and with a push tested against the last own commit,
+  which the non-terminal push check caught alone. With both, as rev-7 had them, the landing push and
+  its bar stopped joining and `verify` exited 1 reading "mismatch": M4's false tamper signal.
+- AC23 — `build_run_model` (`test_model_ac23_window_bound`, `test_zz_model_window_invariant`) —
+  added at rev-8 by the same fold, and observed by it. The landed fixture's session was made by the
+  real extractor. It held a call around each verb, a call after another build's `--brief` END in the
+  same session, and a call after the `--landed` END. The model counted seven calls, equal to its tool
+  calls. The calls before the preflight START and after the `--landed` END were out, and the two
+  after the other build's END were counted and unattributed. Units read `X-xFixtureRun-1` 3 and
+  never the other build's. The LANDED write after the `--landed` END was off the timeline, where the
+  `--landed` verb still carried LANDED. An owner's `--status` after the landing, from another session,
+  was on neither the timeline nor the committed driver lines, and that session was not the run's.
+  `phases-walked` read MET, and the other build's later verb in the session left `multi-run-session`
+  at its one verb inside the window. On a git-only run whose LANDED write ended its window, the
+  timeline held RUNNING and BUILDING and `phases-walked` read MET by the phase at the end. Every model
+  the arms built passed both invariants, and so did the real aLeakedHandle model under AC7. RED seen
+  with the timeline's commits and merges unbounded, which AC21's merge caught; with phase moves
+  unbounded; with verbs, sessions or driver lines taken from the whole segment; with `shared_sessions`
+  unbounded; with no closing phase in `phases-walked`; with points taken from the run's own verbs
+  alone; and with the window closed at its end. Under the three timeline breaks and the closed end,
+  the invariant arm redded as well and named the arm behind each violation; with the attribution
+  window dropped, its call-count half did. One bound has no staged arm: a bar a joined push pinned
+  is also bounded, and dropping that bound turned nothing red, because the hook pins the bar it ran
+  for the pushed tree or a green it reuses for it, and no fixture shape puts one outside the window.
+  The invariant arm would red on one.
 
 ## What else the pass carried
 
@@ -190,6 +246,12 @@ and AC21, whose lines below that fold observed.
 Thirty-six breaks of the model and three of the self-test's own copies, each loaded as a module
 object from an edited string by a harness kept outside the tree. Each break turned its arm red, and
 the unbroken control passed every arm the breaks aim at. The breaks are named per criterion above.
+The fold of M1, M4 and M5's timeline bound staged sixteen more breaks of the model, and the rev-7
+own-commit logic as one combined break, each by rewriting `model.py` in place from a harness kept
+outside the tree, clearing the bytecode cache, running the suite and restoring the bytes, which a
+checksum confirmed after the last. Fifteen redded their arms. The sixteenth, the pinned bar's bound,
+had no arm to red, which AC23's line explains. The suite then ran green three times directly, at
+1186 of 1186 assertions, in 53.1 to 53.8 s each, under its 69 s budget row.
 
 ## The checklist over the slice commits
 
@@ -232,7 +294,14 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   commits after its window. Bounding every derived set by the window is the fold's next slice, with
   M1 and M4. Two runs that claim one tree in the same stretch both hold it, so a bar made there
   joins both. The schema leg's non-terminal end reads the record commits alone, which spec 10's S6
-  now says.
+  now says. The first of the three is CLOSED by the fold of M1, M4 and M5's timeline bound: every
+  timed set the model derives is bounded by the window through one predicate, and AC23 grades every
+  model the arms build against it.
+- The fold of M1, M4 and M5's timeline bound leaves S4's spec-mark split reading each spec at the
+  era's end rather than the window's. The window's end needs the one blob read that places a
+  terminal write, and that same read carries the specs, so bounding the split changes S12's calls.
+  Spec 8's rev-8 line names the gap and routes it to round 2. The kit README lists it among what
+  the model does not do.
 - **Parked by the H2 and M5 fold: the session key has H2's shape.** The bug-class checklist over the
   fold's code commit named `join-key-widened-by-a-shared-location`. The class has a second instance
   in the same function: a run's sessions are every session any of its calls names, `--status` and
@@ -243,3 +312,7 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   Name them by the tree claim rule instead. Or keep the key and say so. None was taken, for three
   reasons. No review confirmed it. It moves the owner-turn, usage and attribution facts that the
   fold's next slice reworks for M1. And spec 8 would need a rule for it that no audit has read.
+  That next slice, the fold of M1, M4 and M5's timeline bound, narrowed it by the window and no
+  further. A session whose only call on the run comes after the run's end is no longer one of its
+  sessions, which AC23 observes. One that calls `--status` inside the window still joins, and its
+  calls after that `--status` END are attributed to the run, so the park stands.

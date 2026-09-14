@@ -16,8 +16,13 @@ run's fate and no verb reads what this prints.
 
 GIT COST IS CONSTANT. Every git process goes through `run_git`, and a model costs the same number of
 them whatever the run's commit or record count: one log for the run starts, one ref listing, one log
-over the run-state paths, one over the own-commit range, one `rev-list` for the push join and one
-`cat-file --batch` for every blob. The self-test counts them independently of `GIT_CALLS`.
+over the run-state paths, one over the own-commit range, one `rev-list` of the start's descendants
+for the push join and the merged flag, and one `cat-file --batch` for every blob. The self-test
+counts them independently of `GIT_CALLS`.
+
+ONE WINDOW BOUNDS EVERY TIMED SET. Once the window is known, the timeline, the tool calls,
+attribution, usage, the own commits and every join reading them go through `check_in_window` and
+nothing wider, so no answer is windowed where one beside it is not.
 
 WHAT THIS DOES NOT DO. It judges no decision's quality and renders nothing for a tracked file. Every
 answer that is inferred rather than read is named in the model's `method` field, so a reader knows
@@ -122,12 +127,13 @@ METHOD = {
     "run-starts": "read: the commits that added each run-state path, with renames off",
     "journal-join": "read: a record-creating preflight START joins the first start commit at or "
                     "after its END, the latest such START winning a commit",
-    "own-commits": "inferred: an era commit descending from the start commit whose subject names a "
-                   "unit id of the build",
+    "own-commits": "inferred: an era commit inside the window descending from the start commit whose "
+                   "subject names a unit id of the build",
     "build-commit": "heuristic: a unit's first own non-merge commit touching a path outside the memory "
                     "root, so a spec commit that re-renders a generated index is not a build",
     "push-join": "inferred: a push from a tree the run holds inside the window, or one inside it "
-                 "pushing the default branch to a descendant of the run's last own commit",
+                 "pushing the default branch to a sha carrying the run's last own commit made at or "
+                 "before the push's START",
     "gate-join": "read where a joined push pinned gate_run, inferred from a tree the run holds otherwise",
     "trees": "inferred: a tree is held from the run's first call there that claims it, a preflight or "
              f"any verb but {', '.join(TREE_BLIND_VERBS)} read before the close, to another run's first "
@@ -135,7 +141,8 @@ METHOD = {
     "window-end": "inferred for a non-terminal run: one second past its last journal line, record "
                   "commit, own commit, or line of a tree it holds",
     "close-head": "inferred: the first parent of the commit recording the LANDING write, else HEAD",
-    "attribution": "inferred: the most recent END of the same session",
+    "attribution": "inferred: a call inside the window takes the most recent END of its session, of "
+                   "any run, and is unattributed when that END is another run's",
     "decision-log-owner": "heuristic: (owner followed by ), , or :, or owner ruling or owner call in "
                           "any case",
     "ledger-unmet": "heuristic: an acceptance line saying owed, not met or unmet",
@@ -325,6 +332,37 @@ def derive_run_eras(runs) -> list:
 
 def check_in_era(t, era) -> bool:
     return t >= era["t0"] and (era["t1"] is None or t < era["t1"])
+
+
+def check_in_window(t, window) -> bool:
+    """Whether time `t` falls inside the run's half-open window `[start, end)` (spec S2). THE ONE
+    predicate every timed set the model derives is bounded by, once the window is known: the timeline
+    of every kind, the tool calls, attribution, usage, the own commits and every join that reads
+    them, the driver lines the record commits to, the sessions and the other builds sharing them.
+    One predicate, so no answer is windowed where another beside it is not. The closing review's
+    round 1 found three that were: attribution counted every call of every session (M1), own commits
+    were bounded by the era (M4), and the timeline listed commits past the end (M5)."""
+    return (isinstance(t, (int, float)) and not isinstance(t, bool)
+            and window["start"] <= t < window["end"])
+
+
+def check_in_history(graph, tip, sha) -> bool:
+    """Whether `sha` is `tip` or an ancestor of it, walked over `graph`, `{commit: [parents]}` of the
+    run's start commit's descendants. Every commit on a path from a descendant of the start to `tip` is
+    itself one, so the walk never leaves `graph` for an ancestor it could reach."""
+    if not tip or not sha:
+        return False
+    if tip == sha:
+        return True
+    seen, stack = {tip}, [tip]
+    while stack:
+        for parent in graph.get(stack.pop(), ()):
+            if parent == sha:
+                return True
+            if parent not in seen and parent in graph:
+                seen.add(parent)
+                stack.append(parent)
+    return False
 
 
 def derive_record_commits(history, era, live_path) -> list:
@@ -769,29 +807,36 @@ def derive_idle_gaps(spans, owner_ts, start, end) -> tuple:
     return gaps, near_owner
 
 
-def build_run_usage(extracts, start, end) -> dict:
+def build_run_usage(extracts, window) -> dict:
     """Token totals inside the window, split three ways, through the extractor's own `build_usage`."""
     events = [ev for data in extracts.values() for ev in data.get("events", [])
-              if ev.get("kind") == "usage" and start <= (ev.get("t") or 0) < end]
+              if ev.get("kind") == "usage" and check_in_window(ev.get("t"), window)]
     return ex.build_usage(events)
 
 
-def derive_attribution(invs, extracts) -> dict:
-    """Which unit and phase each tool call ran under, within ONE session (spec S8).
+def derive_attribution(invs, extracts, window, run=None) -> dict:
+    """Which unit and phase each tool call inside the window ran under, within ONE session (spec S8).
 
-    A call takes the unit of the most recent unit-bearing END of its own session and the phase of the
-    most recent END's `phase_to`; a START with no END contributes its `phase_from` and no unit, and a
-    verb carrying no unit leaves the unit where it was. A call before its session's first END is
-    unattributed. Returns counts by unit and phase and the attributed share of calls and wall time.
+    `invs` are every invocation the driver journal holds, of any build, and `run` this run's, all of
+    `invs` when None. A call takes the unit of the most recent unit-bearing END of its own session and
+    the phase of the most recent END's `phase_to`; a START with no END contributes its `phase_from`
+    and no unit, and a verb carrying no unit leaves the unit where it was. The ENDs are every run's,
+    so a later END supersedes whoever made it: a call whose most recent END or START is another run's
+    is that run's work and unattributed, and a unit another run's END set is never this run's (M1 of
+    the closing review, round 1). A call before its session's first END is unattributed. Only calls
+    inside the window count, so `calls` is the model's `tools`. Returns counts by unit and phase and
+    the attributed share of calls and wall time.
     """
+    mine = {id(i) for i in (invs if run is None else run)}
     points: dict = {}
     for inv in invs:
+        own = id(inv) in mine
         for sid in inv["sids"]:
             if inv["state"] == "ended" and inv["end"] is not None:
                 unit = inv["unit"] if inv["verb"] in UNIT_VERBS and inv["unit"] else None
-                points.setdefault(sid, []).append((inv["end"], "end", inv["phase_to"] or "", unit))
+                points.setdefault(sid, []).append((inv["end"], "end", inv["phase_to"] or "", unit, own))
             elif inv["state"] == "killed-or-running" and inv["t"] is not None:
-                points.setdefault(sid, []).append((inv["t"], "start", inv["phase_from"] or "", None))
+                points.setdefault(sid, []).append((inv["t"], "start", inv["phase_from"] or "", None, own))
     for sid in points:
         points[sid].sort(key=lambda p: p[0])
     by_unit, by_phase = Counter(), Counter()
@@ -800,24 +845,26 @@ def derive_attribution(invs, extracts) -> dict:
     for sid, data in extracts.items():
         pts = points.get(sid, [])
         for ev in data.get("events", []):
-            if ev.get("kind") != "tool":
+            if ev.get("kind") != "tool" or not check_in_window(ev.get("t"), window):
                 continue
-            t = ev.get("t") or 0
+            t = ev["t"]
             dur = ev.get("dur") or 0.0
             calls += 1
             wall += dur
             seen_end = False
-            phase = unit = None
-            for pt, kind, ph, un in pts:
-                if pt > t:
+            last = unit_pt = None
+            for pt in pts:
+                if pt[0] > t:
                     break
-                if kind == "end":
+                if pt[1] == "end":
                     seen_end = True
-                phase = ph
-                if un:
-                    unit = un
-            if not seen_end:
+                last = pt
+                if pt[3]:
+                    unit_pt = pt
+            if not seen_end or not last[4]:
                 continue
+            phase = last[2]
+            unit = unit_pt[3] if unit_pt is not None and unit_pt[4] else None
             attributed += 1
             attributed_wall += dur
             by_phase[phase or ""] += 1
@@ -914,10 +961,13 @@ def check_conformance(model) -> list:
     if not built:
         out.append({"item": "brief-before-build", "unit": None, "state": "UNJUDGEABLE",
                     "evidence": "no unit has a build commit in this run"})
-    # phases-walked
+    # phases-walked. A terminal run's closing write lies at or past its window's end, so it is not a
+    # timeline event (spec S2); its phase counts here at that end instead.
+    end = (model.get("window") or {}).get("end")
+    closing = [(end, phase)] if model.get("terminal") and phase and end is not None else []
     seq = sorted([(e["t"], e["phase"]) for e in model.get("timeline", []) if e["kind"] == "phase"]
                  + [(e["end"], e["phase_to"]) for e in model.get("timeline", [])
-                    if e["kind"] == "verb" and e.get("phase_to") and e.get("end") is not None])
+                    if e["kind"] == "verb" and e.get("phase_to") and e.get("end") is not None] + closing)
     phases = [p for _, p in seq]
     if "ABORTED" in phases or phase == "ABORTED":
         out.append({"item": "phases-walked", "state": "MET", "evidence": "the run aborted"})
@@ -991,10 +1041,9 @@ def derive_merged_subclass(model) -> tuple:
     """The sub-class of a `nonterminal-merged` run and the evidence for it. A refused `--landed` in the
     window comes first, because the table of tracked bytes cannot see refusals; otherwise the record's
     own last parked row, by the drift signal's table."""
-    w = model["window"]
     for e in model.get("timeline", []):
         if (e["kind"] == "verb" and e["verb"] == "--landed" and e.get("rc") not in (None, "0")
-                and e.get("exit") == "clean" and w["start"] <= e["t"] < w["end"]):
+                and e.get("exit") == "clean" and check_in_window(e["t"], model["window"])):
             return "refused-landing", f"--landed refused at {derive_iso(e['t'])} on checks {e['checks']}"
     rows = model.get("record_rows") or []
     if not rows:
@@ -1265,28 +1314,31 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     # The own-commit range: descendants of the start commit, on the run's branch and the default one.
     span = read_git_range(root, ["--ancestry-path", f"^{pick['start']}", *tips]) if tips else []  # git 4
     era_commits = sorted((c for c in span if check_in_era(c["t"], era)), key=lambda c: c["t"])
-    own = [c for c in era_commits if id_re.search(c["subject"])]
-    own_shas = {c["sha"] for c in own}
-    last_own = own[-1]["sha"] if own else None
-    merged = None
-    descendants: set = set()
-    if last_own:
-        raw = run_git(root, ["rev-list", "--ancestry-path", f"^{last_own}", "--branches",   # git 5
-                             "--remotes"]).decode("utf-8", "replace")
-        descendants = set(raw.split())
-        tip_sha = refs["refs"].get(default_refname) if default_refname else None
-        merged = bool(tip_sha) and (tip_sha == last_own or tip_sha in descendants)
+    # The era's candidates only: the window, once known, bounds them (spec S3, rev-8). A non-terminal
+    # end is taken past every one of them, and a terminal one drops those made after the run.
+    own_era = [c for c in era_commits if id_re.search(c["subject"])]
+    # The start's descendants with their parents, ONE listing the push join and the merged flag both
+    # walk, so each push is tested against the own commit it followed rather than the last one.
+    graph: dict = {}
+    if own_era:
+        raw = run_git(root, ["rev-list", "--parents", "--ancestry-path", f"^{pick['start']}",   # git 5
+                             "--branches", "--remotes"]).decode("utf-8", "replace")
+        for line in raw.split("\n"):
+            bits = line.split()
+            if bits:
+                graph[bits[0]] = bits[1:]
 
-    # Every blob, through ONE cat-file.
+    # Every blob, through ONE cat-file. The decision log is read for every era candidate, since the
+    # window that bounds them needs this read first; the rows are taken from the bounded ones.
     era_end_rev = (refs["head"] or "HEAD") if era["next"] is None else f"{era['next']}^"
     units = read_units(root, build, id_re)
     requests = [f"{c['sha']}:{live_path}" for c in record_commits]
     for u in units:
         requests += [f"{pick['start']}^:{u['spec']}", f"{era_end_rev}:{u['spec']}"]
     log_path = f"{mr}/{DECISION_LOG}"
-    log_commits = [c for c in own if len(c["parents"]) == 1 and any(p == log_path for _, p in c["files"])]
-    for c in log_commits:
-        requests += [f"{c['sha']}^:{log_path}", f"{c['sha']}:{log_path}"]
+    for c in own_era:
+        if len(c["parents"]) == 1 and any(p == log_path for _, p in c["files"]):
+            requests += [f"{c['sha']}^:{log_path}", f"{c['sha']}:{log_path}"]
     blobs = read_blobs(root, requests) if requests else {}                              # git 6
 
     # ---- journals
@@ -1312,7 +1364,6 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     seg_ids = {id(i) for i in seg}
     holds = derive_tree_holds(seg, [i for i in all_invs if id(i) not in seg_ids])
     worktrees = sorted(holds)
-    sids = sorted({s for i in seg for s in i["sids"]})
 
     # ---- the window (spec S2)
     start_st = joined.get(k)
@@ -1345,30 +1396,46 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         t = parse_float(s.get("t"))
         if check_tree_line(s.get("wt"), t):
             tree_ts += [v for v in (t, parse_float((inv.end.fields if inv.end else {}).get("t"))) if v is not None]
-    last_event = max([i["end"] or i["t"] for i in seg] + [float(c["t"]) for c in own] + tree_ts, default=None)
+    last_event = max([i["end"] or i["t"] for i in seg] + [float(c["t"]) for c in own_era] + tree_ts,
+                     default=None)
     window = derive_window(w_start, w_from, phases_at, terminal, term_end, last_event)
     w_end = window["end"]
 
-    def check_in_window(t) -> bool:
-        return t is not None and w_start <= t < w_end
+    # ---- the window bounds every timed set from here on (spec S2, rev-8), through `check_in_window`
+    # and nothing wider. M4 of the closing review, round 1: own commits were bounded by the era, open
+    # to HEAD for a build's last run, so a later commit naming a unit id became the last own commit,
+    # unjoined the landing push and made `verify` report a journal that had not changed.
+    own = [c for c in own_era if check_in_window(float(c["t"]), window)]
+    own_shas = {c["sha"] for c in own}
+    last_own = own[-1]["sha"] if own else None
+    merged = None
+    if last_own:
+        tip_sha = refs["refs"].get(default_refname) if default_refname else None
+        merged = check_in_history(graph, tip_sha, last_own)
+    log_commits = [c for c in own if len(c["parents"]) == 1 and any(p == log_path for _, p in c["files"])]
+    # The run's verbs inside its window. Its later ones, an owner's `--status` once it has landed say,
+    # are not its events, and a session that only looked at it afterwards is not one of its sessions.
+    seg_in = [i for i in seg if check_in_window(i["t"], window)]
+    sids = sorted({s for i in seg_in for s in i["sids"]})
 
     # ---- timeline
     timeline = []
     prev = None
     for c, ph in phases_at:
-        if ph and ph != prev:
+        if ph and ph != prev and check_in_window(float(c["t"]), window):
             timeline.append({"t": float(c["t"]), "source": "run-state", "kind": "phase", "phase": ph,
                              "witness": derive_fact(blobs.get(f"{c['sha']}:{live_path}"), "witness"),
                              "sha": c["sha"]})
         prev = ph or prev
-    for i in seg:
+    for i in seg_in:
         timeline.append({"t": i["t"], "source": "driver", "kind": "verb", "verb": i["verb"],
                          "end": i["end"], "state": i["state"], "rc": i["rc"], "exit": i["exit"],
                          "checks": i["checks"], "phase_from": i["phase_from"],
                          "phase_to": i["phase_to"], "unit": i["unit"], "oob": i["oob"]})
     for c in era_commits:
         is_merge = len(c["parents"]) > 1
-        if c["sha"] in own_shas or (is_merge and slug_re.search(c["subject"])):
+        if check_in_window(float(c["t"]), window) and (
+                c["sha"] in own_shas or (is_merge and slug_re.search(c["subject"]))):
             timeline.append({"t": float(c["t"]), "source": "git", "kind": "merge" if is_merge else "commit",
                              "sha": c["sha"], "units": sorted(set(id_re.findall(c["subject"]))),
                              "own": c["sha"] in own_shas})
@@ -1378,17 +1445,19 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         s = inv.start.fields if inv.start else {}
         e = inv.end.fields if inv.end else {}
         t = parse_float(s.get("t"))
-        if not check_in_window(t):
+        if not check_in_window(t, window):
             continue
         refs_pushed = [v for key, v in s.items() if key.startswith("ref.")]
         via = None
+        # The run as it stood when the push began: the last own commit at or before its START.
+        own_at = next((c["sha"] for c in reversed(own) if c["t"] <= t), None)
         if check_in_hold(holds, s.get("wt"), t):
             via = "worktree"
-        elif last_own and default_name:
+        elif own_at and default_name:
             for r in refs_pushed:
                 bits = r.split()
                 if (len(bits) == 4 and bits[2] == f"refs/heads/{default_name}"
-                        and (bits[1] == last_own or bits[1] in descendants)):
+                        and check_in_history(graph, bits[1], own_at)):
                     via = "pushed-sha"
         if via is None:
             continue
@@ -1402,17 +1471,19 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     for line in pushes.lines:
         f = line.fields
         t = parse_float(f.get("t"))
-        if f.get("ev") == "once" and check_in_window(t) and check_in_hold(holds, f.get("wt"), t):
+        if f.get("ev") == "once" and check_in_window(t, window) and check_in_hold(holds, f.get("wt"), t):
             push_nums.add(line.lineno)
             timeline.append({"t": t, "source": "pushes", "kind": "push-refused",
                              "decision": f.get("decision"), "lander": f.get("lander")})
     for line in journals["gates"]["journal"].lines:
         f = line.fields
         t = parse_float(f.get("t"))
+        if not check_in_window(t, window):
+            continue
         via = None
         if f.get("run") and f["run"] in pinned:
             via = "gate_run"
-        elif check_in_window(t) and check_in_hold(holds, f.get("wt"), t):
+        elif check_in_hold(holds, f.get("wt"), t):
             via = "worktree"
         if via:
             gate_nums.add(line.lineno)
@@ -1420,7 +1491,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                              "verdict": f.get("verdict"), "head": f.get("head"), "rc": f.get("rc"),
                              "failed": f.get("failed")})
     for row in record["rows"]:
-        if row["kind"] in ("dispatch", "brief") and check_in_window(row["t"]):
+        if row["kind"] in ("dispatch", "brief") and check_in_window(row["t"], window):
             unit = (id_re.findall(row["item"]) or [None])[-1]
             timeline.append({"t": row["t"], "source": "run-state", "kind": row["kind"], "unit": unit,
                              "line": row["line"]})
@@ -1435,15 +1506,15 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             kind, t = ev.get("kind"), ev.get("t")
             if kind == "owner":
                 turns.append((t, sid))
-            if kind in ("owner", "compact", "limit") and check_in_window(t):
+            if kind in ("owner", "compact", "limit") and check_in_window(t, window):
                 timeline.append({"t": t, "source": "transcripts", "kind": kind,
                                  **({"via": ev.get("via")} if kind == "owner" else {})})
             # A workflow run with its label: the extractor keeps a label only token-shaped and clean
             # under the redaction table, and the committed record admits it only in its own class.
-            if kind == "workflow" and check_in_window(t):
+            if kind == "workflow" and check_in_window(t, window):
                 timeline.append({"t": t, "source": "transcripts", "kind": "workflow",
                                  "label": ev.get("label")})
-            if kind == "tool" and check_in_window(t):
+            if kind == "tool" and check_in_window(t, window):
                 note = ends.get(ev.get("call")) if ev.get("bg") else None
                 tools.append({"t": t, "end": ev.get("end"), "cls": ev.get("cls"), "bg": ev.get("bg"),
                               "rc": note.get("rc") if note else ev.get("rc"),
@@ -1470,7 +1541,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     timeline.sort(key=lambda e: (e["t"], e["source"], e["kind"]))
 
     # ---- the close, and the head it ran at
-    closes = [i for i in seg if i["verb"] == "--close" and i["state"] == "ended" and i["rc"] == "0"]
+    closes = [i for i in seg_in if i["verb"] == "--close" and i["state"] == "ended" and i["rc"] == "0"]
     close = {"t": None, "head": None}
     if closes:
         close["t"] = closes[-1]["end"]
@@ -1517,21 +1588,22 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                              "decision_rows": decision_rows, "reviews": read_review_records(root, review_paths),
                              "ledgers": read_ledger_lines(root, ledger_paths)})
 
-    # ---- other slugs' starts sharing a session with this run
+    # ---- other slugs' starts sharing a session with this run, inside its window
     shared = Counter()
     for i in all_invs:
-        if i["slug"] and i["slug"] != slug and set(i["sids"]) & set(sids):
+        if (i["slug"] and i["slug"] != slug and set(i["sids"]) & set(sids)
+                and check_in_window(i["t"], window)):
             shared[i["slug"]] += 1
     shared_sessions = [{"slug": s, "starts": n} for s, n in sorted(shared.items())]
 
     # ---- coverage
-    lines = {"driver": sum((i["state"] != "orphan-end") + (i["end"] is not None) for i in seg),
+    lines = {"driver": sum((i["state"] != "orphan-end") + (i["end"] is not None) for i in seg_in),
              "gates": sum(1 for e in timeline if e["kind"] == "gate"),
              "pushes": sum(1 for e in timeline if e["kind"] in ("push", "push-refused"))}
-    moves = [e for e in timeline if e["kind"] == "phase" and check_in_window(e["t"])]
+    moves = [e for e in timeline if e["kind"] == "phase" and check_in_window(e["t"], window)]
     moves += [{"phase": e["phase_to"]} for e in timeline
-              if e["kind"] == "verb" and e.get("phase_to") and check_in_window(e.get("end"))]
-    in_rows = [r for r in rows if check_in_window(r["t"])]
+              if e["kind"] == "verb" and e.get("phase_to") and check_in_window(e.get("end"), window)]
+    in_rows = [r for r in rows if check_in_window(r["t"], window)]
     activity = {"driver": f"{len(in_rows)} parked row(s) in the window" if in_rows else None,
                 "gates": ("a LANDING write in the window, which --close makes only after its bar"
                           if any(m["phase"] in PHASES_CLOSED for m in moves) else None),
@@ -1542,7 +1614,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         transcripts["note"] = tr_note
     coverage = measure_coverage(journals, window, lines, activity, transcripts, record_state,
                                 "present" if (root / build).is_dir() else "absent")
-    attribution = derive_attribution(seg, extracts)
+    attribution = derive_attribution(all_invs, extracts, window, run=seg_in)
     coverage["attribution"] = {k2: attribution[k2] for k2 in ("calls", "attributed", "share_calls",
                                                                "wall_s", "attributed_wall_s",
                                                                "share_wall")}
@@ -1554,7 +1626,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     start_t = w_start
     close_t = close["t"] if close["t"] is not None else (term_end if term_end is not None else w_end)
     owner_positions = build_owner_positions(turns, start_t, close_t)
-    usage = build_run_usage(extracts, w_start, w_end)
+    usage = build_run_usage(extracts, window)
 
     model = RunModel(
         slug=slug, run=k, runs=len(runs), runkey=pick["runkey"], record=pick["record"],
@@ -1566,7 +1638,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         record_rows=rows, record_commits=[{"sha": c["sha"], "t": c["t"]} for c in record_commits],
         shared_sessions=shared_sessions, units=units, ledger=ledger, conformance=[], anomalies=[],
         owner_positions=owner_positions, usage=usage, attribution=attribution, coverage=coverage,
-        journal_lines={"driver": sorted({n for i in seg for n in i["lines"]}),
+        journal_lines={"driver": sorted({n for i in seg_in for n in i["lines"]}),
                        "gates": sorted(gate_nums), "pushes": sorted(push_nums)})
     view = asdict(model)
     model.conformance = check_conformance(view)

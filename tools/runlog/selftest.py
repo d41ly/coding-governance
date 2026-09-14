@@ -88,7 +88,12 @@ from collections import Counter  # noqa: E402
 # holds, with TREE_BLIND_VERBS driving its fixture both ways, and AC21, a non-terminal end over every
 # source the run owns. Two new functions, so the decoy checks alone move it by six. The landed fixture
 # now lands from the primary tree.
-ASSERTION_FLOOR = 1154
+# RAISED 1154 -> 1186 by the same review's round-1 fold of M1, M4 and M5's timeline bound: model AC22,
+# own commits bounded by the window and a push tested against the own commit it followed; AC23, one
+# window bounding every set; and the window-invariant arm that sorts last and grades every model the
+# arms built, naming the arm behind each violation. Three new functions, so the decoy checks alone move
+# it by nine. AC17 gained a liveness check, and AC7 and AC21 gained checks of the window invariant.
+ASSERTION_FLOOR = 1186
 
 PASS = []
 FAIL = []
@@ -2087,9 +2092,37 @@ def build_landed_fixture():
             "driver": driver, "gates": gates, "pushes": pushes, "record": rm}
 
 
-# Every model an arm builds through `build_model`, graded against the idle invariant of
-# TOOL-dLoggedFlight-8 AC19 by `test_zz_model_idle_invariant`, which sorts last and so runs last.
-IDLE_SEEN = {"models": 0, "both": 0, "bad": []}
+# Every model an arm builds through `build_model`, graded against three invariants by the two
+# `test_zz_model_*` arms, which sort last and so run last: no idle gap holds a tool call
+# (TOOL-dLoggedFlight-8 AC19), every timeline event lies in the window `[start, end)`, and the
+# attribution's count of calls is the model's tool calls (AC23). Each violation names the arm whose
+# model broke it.
+MODEL_SEEN = {"models": 0, "both": 0, "with_calls": 0, "bad": [], "window": [], "calls": []}
+
+
+def check_window_invariant(model):
+    """`(kind, t)` for every timeline event of `model` outside its half-open window, written from the
+    spec's `[start, end)` and never through the model's own predicate, since a guard sharing the
+    guarded code's predicate is disabled by the bug it exists to catch. Empty when it holds."""
+    timeline = model["timeline"] if isinstance(model, dict) else model.timeline
+    w = model["window"] if isinstance(model, dict) else model.window
+    return [(e.get("kind"), e.get("t")) for e in timeline
+            if not (isinstance(e.get("t"), (int, float)) and w["start"] <= e["t"] < w["end"])]
+
+
+def check_calls_invariant(model):
+    """`(attribution's calls, tool calls)` when the two counts of one population differ, else None."""
+    att = model["attribution"] if isinstance(model, dict) else model.attribution
+    tools = model["tools"] if isinstance(model, dict) else model.tools
+    return None if att.get("calls") == len(tools) else (att.get("calls"), len(tools))
+
+
+def derive_arm_name():
+    """The `test_*` arm on the call stack, so an invariant's violation names the arm that built it."""
+    frame = sys._getframe(1)
+    while frame is not None and not frame.f_code.co_name.startswith("test_"):
+        frame = frame.f_back
+    return frame.f_code.co_name if frame is not None else "?"
 
 
 def check_idle_invariant(model):
@@ -2111,9 +2144,15 @@ def check_idle_invariant(model):
 
 def build_model(repo, journals=None, store=None, run=None):
     model = rl_model.build_run_model(repo, FX_SLUG, run=run, journal_root=journals, store=store)
-    IDLE_SEEN["models"] += 1
-    IDLE_SEEN["both"] += bool(model.tools) and any(e["kind"] == "idle" for e in model.timeline)
-    IDLE_SEEN["bad"] += check_idle_invariant(model)
+    arm = derive_arm_name()
+    MODEL_SEEN["models"] += 1
+    MODEL_SEEN["both"] += bool(model.tools) and any(e["kind"] == "idle" for e in model.timeline)
+    MODEL_SEEN["with_calls"] += bool(model.tools)
+    MODEL_SEEN["bad"] += check_idle_invariant(model)
+    MODEL_SEEN["window"] += [(arm, kind, t) for kind, t in check_window_invariant(model)]
+    calls = check_calls_invariant(model)
+    if calls is not None:
+        MODEL_SEEN["calls"].append((arm, *calls))
     return model
 
 
@@ -2261,13 +2300,13 @@ def test_model_ac3_ac11_ledger():
     files0["memory/DECISIONS.md"] = log_before
     first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files0}])
     base = shas0[1]
-    st = build_preflight_state(FX_SLUG, base, base)
+    st = pre = build_preflight_state(FX_SLUG, base, base)
     for m, kind, item in ((3, "decision", "a question?"), (4, "override", "gates-green"),
                           (5, "waiver", "parallel-when-disjoint"), (6, "rescope", f"retire {FX_UNIT2}"),
                           (7, "rescope", f"supersede {FX_UNIT2} X-xFixtureRun-3"),
                           (8, "rescope", f"add X-xFixtureRun-4"), (9, "proposal", "an amendment"),
                           (10, "dispatch", f"{base[:8]} {FX_UNIT1}"), (11, "brief", FX_UNIT1),
-                          (12, "review", "a-subject"), (13, "abort", "the stop")):
+                          (12, "review", "a-subject"), (19, "abort", "the stop")):
         st = add_runstate_row(st, derive_minute(m), kind, item, "a reason", step="3" if kind == "proposal" else None)
     st = set_runstate_fact(set_runstate_fact(st, "phase", "ABORTED"), "witness", base)
     ledger = (f"# Acceptance ledger\n\n**Serves:** journal {FX_UNIT1}\n\n- AC1 — `cmd` — observed.\n"
@@ -2275,8 +2314,11 @@ def test_model_ac3_ac11_ledger():
     body = ("The work.\n\nDecided: a mid-body line git does not parse — above a paragraph break\n\n"
             "More prose.\n\nDecided: ran one leg — the push runs the bar\nDecided: kept the name — "
             "the lexicon allows it\nCo-Authored-By: Fixture <fixture@runlog.invalid>")
+    # The preflight commits the record `--preflight` leaves, and `--abort` the final one, as the driver
+    # writes them. This fixture once wrote its final record in the preflight commit, a shape no verb
+    # leaves, which gave it an empty window once own commits were bounded by the window (spec rev-8).
     repo, shas = build_history([
-        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: pre}},
         {"t": derive_minute(15), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work", "body": body,
          "files": {"tools/a.txt": "1\n", "memory/DECISIONS.md": log_before + "\n".join(rows_new) + "\n"}},
         {"t": derive_minute(18), "subject": f"fold({FX_SLUG}): {FX_UNIT1} — the fork, the ledger, the review",
@@ -2284,6 +2326,7 @@ def test_model_ac3_ac11_ledger():
                    f"{bd}/build/2026-09-13-build-{FX_UNIT1}-1-acceptance-ledger.md": ledger,
                    f"{bd}/reviews/2026-09-13-review-{FX_UNIT1}-spec-audit-round1.md":
                        "# review\n\n## Verdict: CLEAN WITH FIXES\n"}},
+        {"t": derive_minute(20), "subject": f"records({FX_SLUG}): --abort", "files": {rm: st}},
     ], repo=first)
     model = build_model(repo)
     led = model.ledger
@@ -2667,6 +2710,14 @@ def test_model_ac7_real_tree():
           ["absent", "absent", "absent"])
     check_true("model AC7: ...and the driver's epoch is set, so its absent is the epoch rule's",
                doc.get("coverage", {}).get("driver", {}).get("epoch") is not None, str(doc.get("coverage")))
+    # AC23's invariants over a REAL run's model, which the arms' own fixtures cannot stand in for.
+    check("model AC23 real tree: every event of aLeakedHandle's timeline lies in its window, and its "
+          "attribution counts exactly its tool calls",
+          (check_window_invariant(doc), check_calls_invariant(doc)) if doc else None, ([], None))
+    check_true("model AC23 real tree liveness: the timeline holds events, and the era runs past the window's "
+               "end, so the bound had something to keep out", bool(doc.get("timeline"))
+               and doc.get("era", {}).get("t1") is None and bool(later_mentions)
+               and int(later_mentions[0]) >= doc.get("window", {}).get("end", 0), str(doc.get("era")))
     stored = list((base / "store").rglob("aLeakedHandle-*.json"))
     check("model AC7: a local copy lands beside the extracts, in the arm's own store",
           [p.parent.name for p in stored], ["models"])
@@ -2849,7 +2900,7 @@ def test_model_ac13_ac14_positions_usage():
              {"t": 3000.0, "kind": "usage", "src": "workflow", "in": 30, "out": 4, "cache_read": 0,
               "cache_write": 0},
              {"t": 5000.0, "kind": "usage", "src": "main", "in": 99, "out": 9, "cache_read": 0, "cache_write": 0}]
-    got = rl_model.build_run_usage({"a": {"events": usage}}, s, c)
+    got = rl_model.build_run_usage({"a": {"events": usage}}, {"start": s, "end": c})
     check("model AC14: only usage inside the half-open window counts, split three ways",
           {k: (v["requests"], v["in"], v["out"]) for k, v in got.items()},
           {"main": (1, 10, 2), "agent": (1, 20, 3), "workflow": (1, 30, 4)})
@@ -2893,8 +2944,10 @@ def test_model_ac15_ac18_journal_join():
           [(float(derive_minute(5)), shas[1][:8]), (MODEL_T0 + 19.5 * 60, shas[4][:8]),
            (MODEL_T0 + 34.5 * 60, shas[7][:8])])
     verbs = [[(e["verb"], e["rc"]) for e in m.timeline if e["kind"] == "verb"] for m in models]
-    check("model AC15: the refused preflight sits in run one's lines and starts no run",
-          verbs[0], [("--preflight", "1")])
+    # Run one's journal segment holds the refused preflight, but run one landed at minute 11 and the
+    # preflight came at 19, past its window's end, so it is no event of run one's either (spec S2, rev-8).
+    check("model AC15: the refused preflight starts no run, and is no event of the run that had ended "
+          "before it", (verbs[0], models[0].window["end"] < MODEL_T0 + 19 * 60), ([], True))
     check("model AC15: run two's timeline holds exactly its own lines",
           verbs[1], [("--preflight", "0"), ("--status", "0")])
     check("model AC15: ...and run three's stops at the START whose commit never reached the clone",
@@ -2905,20 +2958,22 @@ def test_model_ac15_ac18_journal_join():
 
 def test_model_ac17_attribution():
     """AC17: attribution within one session, from fixture lines built on the golden driver lines, with
-    known unit and phase splits; and every fixture line any model arm wrote holds only its producer's
-    keys."""
+    known unit and phase splits, over the calls inside the window only; another build's END in the
+    session supersedes the run's, and its unit is never the run's (M1 of the closing review, round 1);
+    and every fixture line any model arm wrote holds only its producer's keys."""
     golden = {(ln.fields["p"], ln.fields["ev"]): ln.fields
               for ln in rl.read_journal(FIXTURES / "golden-lines.txt").lines}
 
-    def build_pair(t, verb, unit=None, phase_from="", phase_to="", sid=FX_SID, end=True):
+    def build_pair(t, verb, unit=None, phase_from="", phase_to="", sid=FX_SID, end=True, slug=None, pid="4242"):
         s = dict(golden[("driver", "start")])
-        s.update(t=f"{t:.6f}", n=f"4242.{f'{t:.6f}'.replace('.', '')}", verb=verb, phase_from=phase_from)
+        s.update(t=f"{t:.6f}", n=f"{pid}.{f'{t:.6f}'.replace('.', '')}", verb=verb, phase_from=phase_from,
+                 pid=pid, **({"slug": slug} if slug else {}))
         s.pop("oob", None)
         s["sess.CLAUDE_CODE_SESSION_ID"] = sid
         out = [s]
         if end:
             e = dict(golden[("driver", "end")])
-            e.update(t=f"{t + 1:.6f}", n=s["n"], verb=verb, rc="0", checks="", phase_to=phase_to)
+            e.update(t=f"{t + 1:.6f}", n=s["n"], verb=verb, slug=s["slug"], rc="0", checks="", phase_to=phase_to)
             if unit:
                 e["unit"] = unit
             else:
@@ -2926,33 +2981,50 @@ def test_model_ac17_attribution():
             out.append(e)
         return out
 
+    # The run's verbs, then another build's `--brief` in the SAME session, as a session driving two
+    # builds writes it, and one more of the run's own verbs after it.
     lines = (build_pair(100, "--phase", phase_from="RUNNING", phase_to="BUILDING")
              + build_pair(200, "--brief", unit=FX_UNIT1, phase_from="BUILDING", phase_to="BUILDING")
              + build_pair(300, "--status", phase_from="BUILDING", phase_to="BUILDING")
              + build_pair(400, "--dispatch", unit=FX_UNIT2, phase_from="BUILDING", phase_to="BUILDING")
              + build_pair(500, "--brief", unit="X-xFixtureRun-9", phase_from="BUILDING", end=False)
-             + build_pair(600, "--phase", phase_from="BUILDING", phase_to="VERIFYING", sid=FX_SID_B))
+             + build_pair(600, "--phase", phase_from="BUILDING", phase_to="VERIFYING", sid=FX_SID_B)
+             + build_pair(800, "--brief", unit=f"X-{FX_OTHER}-1", phase_from="RUNNING", phase_to="RUNNING",
+                          slug=FX_OTHER, pid="4343")
+             + build_pair(900, "--status", phase_from="BUILDING", phase_to="BUILDING"))
     MODEL_LINES.extend(lines)
     invs = [rl_model.derive_invocation(i) for i in rl.build_invocations(
         [rl.parse_line(rl.render_line(f)) for f in sorted(lines, key=lambda f: float(f["t"]))])]
+    run = [i for i in invs if i["slug"] != FX_OTHER]
+    window = {"start": 0.0, "end": 1100.0}
 
     def build_call(t, dur=10.0):
         return {"t": t, "kind": "tool", "dur": dur}
 
-    # Session A: one call before any END (unattributed), then calls under each boundary. Session B's
-    # --phase END must not attribute session A's calls after it.
+    # Session A: one call before any END (unattributed), then calls under each boundary; one after the
+    # other build's END (its work, unattributed), one after the run's next END (attributed, with no
+    # unit), and one past the window's end (not a call of the run's at all). Session B's --phase END
+    # must not attribute session A's calls after it.
     a_calls = [build_call(50), build_call(150), build_call(250), build_call(350), build_call(450),
-               build_call(550), build_call(700)]
+               build_call(550), build_call(700), build_call(850), build_call(950), build_call(1200)]
     extracts = {FX_SID: {"events": a_calls}, FX_SID_B: {"events": [build_call(700, 5.0)]}}
-    got = rl_model.derive_attribution(invs, extracts)
-    check("model AC17: the pre-verb call is unattributed, and every other call attributed",
-          (got["calls"], got["attributed"], got["unattributed"]), (8, 7, 1))
+    got = rl_model.derive_attribution(invs, extracts, window, run=run)
+    check("model AC17: the call past the window's end is not counted, the pre-verb call and the call after "
+          "the other build's END are unattributed, and every other call is attributed",
+          (got["calls"], got["attributed"], got["unattributed"]), (10, 8, 2))
     check("model AC17: units split as the fixture's: the heartbeat keeps the brief's unit, the killed "
-          "brief contributes none", got["by_unit"], {FX_UNIT1: 2, FX_UNIT2: 3})
-    check("model AC17: phases split as the fixture's, session B's move reaching only session B",
-          got["by_phase"], {"BUILDING": 6, "VERIFYING": 1})
-    check("model AC17: the shares equal the fixture's", (got["share_calls"], got["share_wall"]),
-          (round(7 / 8, 4), round(65.0 / 75.0, 4)))
+          "brief contributes none, and the other build's unit is never the run's",
+          got["by_unit"], {FX_UNIT1: 2, FX_UNIT2: 3})
+    check("model AC17: phases split as the fixture's, session B's move reaching only session B and the "
+          "run's next END attributing again", got["by_phase"], {"BUILDING": 7, "VERIFYING": 1})
+    check("model AC17: the shares equal the fixture's, inside the window", (got["share_calls"], got["share_wall"]),
+          (round(8 / 10, 4), round(75.0 / 95.0, 4)))
+    # LIVENESS: read as the run's own, the other build's END attributes its call and its unit, and
+    # unbounded, the call past the end counts; so the fixture reaches both halves of the rule.
+    wide = rl_model.derive_attribution(invs, extracts, {"start": 0.0, "end": 10.0 ** 12})
+    check_true("model AC17 liveness: with every END the run's and no window end, the other build's unit and "
+               "the late call both count", wide["by_unit"].get(f"X-{FX_OTHER}-1", 0) == 3 and wide["calls"] == 11,
+               str(wide))
     bad = {}
     for f in MODEL_LINES + [ln.fields for ln in rl.read_journal(FIXTURES / "golden-lines.txt").lines]:
         extra = check_producer_keys(f)
@@ -3221,10 +3293,15 @@ def test_model_ac21_nonterminal_end():
     check_true("model AC21 liveness: the run's last driver line is over fifteen minutes before its own commit, "
                "so an end read from the driver alone leaves all three out", last_verb + 900 < fx["own_t"],
                str(last_verb))
-    check_true("model AC21 liveness: the model saw the later merge and the session's later call, and took "
-               "neither", any(e["kind"] == "merge" and e["t"] == fx["merge_t"] for e in model.timeline)
+    merges = run_git(["log", "--merges", "--format=%ct %s", "run"], fx["repo"]).stdout.split("\n")
+    check_true("model AC21 liveness: the later merge naming the slug is in the run's history and its session "
+               "holds a later call, and the model took neither for the end",
+               any(ln.startswith(f"{int(fx['merge_t'])} ") and FX_SLUG in ln for ln in merges)
                and model.coverage["transcripts"]["state"] == "present" and len(model.tools) > 10
-               and fx["late_call_t"] > w["end"], str(w))
+               and fx["late_call_t"] > w["end"], str(merges))
+    # AC23, M5's timeline half: the merge past the end was on the timeline while the end ignored it.
+    check("model AC23: the timeline holds no event at or past the window's end, the later merge included",
+          [(e["kind"], e["t"]) for e in model.timeline if e["t"] >= w["end"]], [])
     # A record-creating preflight of the same slug, made in another tree between the bar and the push,
     # whose commit never reached this clone: it starts no run but ends this one's journal lines, so the
     # push after it in the run's own tree is not an event of this run's (spec S2).
@@ -3242,17 +3319,169 @@ def test_model_ac21_nonterminal_end():
                bare.record_commits[-1]["t"] + 900 < fx["own_t"], str(bare.record_commits))
 
 
+def test_model_ac22_later_unit_commit():
+    """AC22: own commits are bounded by the window, not the era (M4 of the closing review, round 1). A
+    commit naming a unit id after the landing moves nothing, the landing push still joins by what it
+    pushed, and `verify` over the record rendered before that commit still reads match. A push is
+    tested against the own commit it followed, never against a later one."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    pinned = "push-1789295160000000-5151"
+    j = write_journals(repo.parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    before = build_model(repo, journals=j)
+    path = rl_record.write_record(repo, before, journal_root=j, date=RECORD_DATE)
+    # A follow-up on the default branch naming a unit id of the build, as commits keep doing after a
+    # build lands.
+    _r, later = build_history([{"t": derive_minute(40), "subject": f"fix: {FX_UNIT1} — a later touch of it",
+                                "files": {"tools/a.txt": "d\n"}}], repo=repo)
+    after = build_model(repo, journals=j)
+    check("model AC22: a commit naming a unit id after the landing moves neither the own commits, the last "
+          "own commit nor the merged flag",
+          ([c["sha"] for c in after.own_commits], after.last_own, after.merged),
+          ([c["sha"] for c in before.own_commits], fx["merge"], True))
+    check("model AC22: ...and the landing push still joins by what it pushed, its pinned bar by its id",
+          ([(e["via"], e["gate_run"]) for e in after.timeline if e["kind"] == "push"],
+           [e["via"] for e in after.timeline if e["kind"] == "gate" and e["run"] == pinned]),
+          ([("pushed-sha", pinned)], ["gate_run"]))
+    r = run_runlog(["verify", str(path), "--journals", str(j)], repo, build_arm_env(repo.parent))
+    check("model AC22: verify over the record rendered before that commit reads match, exit 0",
+          (r.returncode, "mismatch" in r.stdout), (0, False))
+    in_era = run_git(["merge-base", "--is-ancestor", after.start_commit, later[1]], repo).returncode == 0
+    check_true("model AC22 liveness: the later commit descends from the start, names a unit id and falls in "
+               "the run's open era, so an era bound alone takes it",
+               in_era and after.era["t1"] is None and derive_minute(40) > after.window["end"], str(after.era))
+    # A run left at LANDING pushes the default branch from the primary tree after its merge and a
+    # record commit on top, then makes one more own commit on its branch. The push carried the own
+    # commit it followed; the later one did not exist yet. A push of the default branch before the
+    # run's work reached it carries neither.
+    nt = build_nonterminal_fixture()
+    _r, more = build_history([
+        {"t": derive_minute(14.5), "subject": f"records({FX_SLUG}): the build index re-rendered",
+         "files": {f"memory/builds/{FX_SLUG}/README.md": f"---\nslug: {FX_SLUG}\n---\n\n# {FX_SLUG}\n\nlanding\n"}},
+        {"t": derive_minute(17), "subject": f"fix({FX_SLUG}): {FX_UNIT1} — after the push", "ref": "refs/heads/run",
+         "files": {"tools/a.txt": "e\n"}},
+    ], repo=nt["repo"])
+    pushes = (render_push_lines(15, more[1], wt=FX_WT_PRIMARY, pid=5151)
+              + render_push_lines(10, nt["base"], wt=FX_WT_PRIMARY, pid=6262))
+    j2 = write_journals(nt["repo"].parent, pushes=pushes)
+    live = build_model(nt["repo"], journals=j2)
+    check("model AC22: the push after the merge joins by what it pushed, and the push before the run's work "
+          "reached the default branch joins nothing",
+          [(e["t"], e["via"]) for e in live.timeline if e["kind"] == "push"], [(float(MODEL_T0 + 15 * 60), "pushed-sha")])
+    check_true("model AC22 liveness: the run's last own commit came after the push, on its branch, so a push "
+               "tested against it cannot join", live.last_own == more[2] and live.window["end"] > derive_minute(17)
+               and run_git(["merge-base", "--is-ancestor", more[2], more[1]], nt["repo"]).returncode != 0,
+               str((live.last_own, more)))
+
+
+def test_model_ac23_window_bound():
+    """AC23: every set the model derives is bounded by its window (M1, and M5's timeline half, of the
+    closing review, round 1). On the landed fixture: a call after the `--landed` END is not a call of
+    the run's; a call after another build's END in the same session is counted and unattributed; and
+    neither the LANDED write after the END nor an owner's `--status` after it, from another session, is
+    on the timeline, among the driver lines the record commits to, or among the run's sessions."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    other = render_driver_lines(16, "--brief", slug=FX_OTHER, phase_from="RUNNING", phase_to="RUNNING",
+                                unit=f"X-{FX_OTHER}-1", wt=FX_WT_OTHER, pid=4343)
+    after = render_driver_lines(35, "--status", phase_from="LANDED", phase_to="LANDED", wt=FX_WT_PRIMARY,
+                                sid=FX_SID_B, pid=4747)
+    # The other build goes on in the same session once this run has ended.
+    other_later = render_driver_lines(32, "--status", slug=FX_OTHER, phase_from="RUNNING", phase_to="RUNNING",
+                                      wt=FX_WT_OTHER, pid=4343)
+    j = write_journals(repo.parent, driver=fx["driver"] + other + after + other_later, gates=fx["gates"],
+                       pushes=fx["pushes"])
+
+    def derive_time(m):
+        return float(MODEL_T0 + m * 60)
+
+    # Every verb of the session ran in a tool call around it; then one call after the other build's
+    # END, one more before the run's --close, and one after the --landed END.
+    acts = [("call", derive_time(m) - 1, derive_time(m) + 1) for m in (1, 3, 4, 6, 16, 21, 27)]
+    acts += [("call", derive_time(16.5), derive_time(16.5) + 2), ("call", derive_time(30), derive_time(30) + 2)]
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(store, FX_SID, build_session_events(sorted(acts, key=lambda a: a[1])))
+    model = build_model(repo, journals=j, store=store)
+    w = model.window
+    att = model.attribution
+    check("model AC23: the call after the --landed END and the one before the preflight START are not among "
+          "the run's calls, and the attribution counts exactly its tool calls",
+          (att["calls"], len(model.tools), [c["t"] for c in model.tools if not w["start"] <= c["t"] < w["end"]]),
+          (7, 7, []))
+    check("model AC23: the calls after the other build's END are counted and unattributed, and its unit is "
+          "never the run's", (att["attributed"], att["unattributed"], att["by_unit"], att["by_phase"]),
+          (5, 2, {FX_UNIT1: 3}, {"BUILDING": 1, "LANDING": 1, "RUNNING": 3}))
+    check("model AC23: the LANDED write after the --landed END is no timeline event, and the --landed verb is",
+          ([e["t"] for e in model.timeline if e["kind"] == "phase" and e["phase"] == "LANDED"],
+           [e["phase_to"] for e in model.timeline if e["kind"] == "verb" and e["verb"] == "--landed"]), ([], ["LANDED"]))
+    late = read_journal_linenos(j, "driver", ["\tn=4747."])
+    check("model AC23: the --status after the landing is on neither the timeline nor the committed lines, and "
+          "the session it came from is not the run's",
+          ([e["t"] for e in model.timeline if e["kind"] == "verb" and e["verb"] == "--status"],
+           sorted(set(late) & set(model.journal_lines["driver"])), model.sessions,
+           model.coverage["transcripts"]["state"]), ([], [], [FX_SID], "present"))
+    check("model AC23: phases-walked still reads MET, the terminal phase read at the window's end",
+          [c["state"] for c in model.conformance if c["item"] == "phases-walked"], ["MET"])
+    check("model AC23: the only anomaly is the session shared with the other build, by its one verb inside "
+          "the window", (read_kinds(model), model.shared_sessions), (["multi-run-session"], [{"slug": FX_OTHER, "starts": 1}]))
+    check_true("model AC23 liveness: the LANDED write, the late --status, the other build's later verb and the "
+               "late call all exist past the window's end, so the bound had each to keep out",
+               any(c["t"] >= w["end"] for c in model.record_commits) and len(late) == 2
+               and derive_time(30) > w["end"] and derive_time(32) > w["end"], str((w, late)))
+    # A git-only run whose LANDED write ends its window: the write is not a timeline event, and the
+    # phase it wrote still decides phases-walked, read at the window's end.
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    st = build_preflight_state(FX_SLUG, s0[1], s0[1])
+    bare_repo, _ = build_history([
+        {"t": derive_minute(3), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(6), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+        {"t": derive_minute(8), "subject": f"feat: {FX_UNIT1} — the work", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(12), "subject": f"records({FX_SLUG}): --landed",
+         "files": {rm: set_runstate_fact(st, "phase", "LANDED")}},
+    ], repo=first)
+    bare = build_model(bare_repo)
+    check("model AC23 git-only: the LANDED write that ends the window is no timeline event, and phases-walked "
+          "still reads MET by it", ([e["phase"] for e in bare.timeline if e["kind"] == "phase"],
+                                    (bare.window["end"], bare.window["end_from"]),
+                                    [c["state"] for c in bare.conformance if c["item"] == "phases-walked"]),
+          (["RUNNING", "BUILDING"], (float(derive_minute(12)), "terminal-write"), ["MET"]))
+
+
 def test_zz_model_idle_invariant():
     """AC19's model invariant, over every model any arm built through `build_model`: no idle gap holds
     a tool call. This arm sorts last, so every other arm's models are in the count it grades."""
     check("model AC19 invariant: no idle gap of any model the arms built holds a tool call",
-          IDLE_SEEN["bad"], [])
+          MODEL_SEEN["bad"], [])
     check_true("model AC19 invariant liveness: it graded several models holding both an idle gap and tool "
-               "calls", IDLE_SEEN["both"] >= 2 and IDLE_SEEN["models"] > 20, str(IDLE_SEEN))
+               "calls", MODEL_SEEN["both"] >= 2 and MODEL_SEEN["models"] > 20,
+               str({k: v for k, v in MODEL_SEEN.items() if isinstance(v, int)}))
     check("model AC19 invariant liveness: a call starting inside a gap and one overlapping it are caught",
           check_idle_invariant({"timeline": [{"kind": "idle", "t": 100.0, "dur": 1000.0}],
                                 "tools": [{"t": 500.0, "end": 501.0}, {"t": 50.0, "end": 150.0},
                                           {"t": 1100.0, "end": 1101.0}]}), [(100.0, 500.0), (100.0, 50.0)])
+
+
+def test_zz_model_window_invariant():
+    """AC23's two model invariants, over every model any arm built through `build_model` (M1 and M5 of
+    the closing review, round 1): every timeline event lies in the window `[start, end)`, and the
+    attribution's count of calls is the model's tool calls. Sorts after every other arm."""
+    check("model AC23 invariant: no model the arms built holds a timeline event outside its window",
+          MODEL_SEEN["window"], [])
+    check("model AC23 invariant: every model's attribution counts exactly its tool calls",
+          MODEL_SEEN["calls"], [])
+    check_true("model AC23 invariant liveness: it graded many models, several of them holding tool calls",
+               MODEL_SEEN["models"] > 20 and MODEL_SEEN["with_calls"] >= 5,
+               str({k: v for k, v in MODEL_SEEN.items() if isinstance(v, int)}))
+    check("model AC23 invariant liveness: an event before the start and one AT the end are caught, the "
+          "end being open", check_window_invariant({"timeline": [{"kind": "commit", "t": 10.0},
+                                                                 {"kind": "verb", "t": 15.0},
+                                                                 {"kind": "phase", "t": 20.0}],
+                                                    "window": {"start": 11.0, "end": 20.0}}),
+          [("commit", 10.0), ("phase", 20.0)])
+    check("model AC23 invariant liveness: counts that differ are caught",
+          check_calls_invariant({"attribution": {"calls": 3}, "tools": [{}, {}]}), (3, 2))
 
 
 def test_model_driver_sets():
@@ -3499,7 +3728,7 @@ def test_record_ac1_names():
     shutil.rmtree(uncommitted, ignore_errors=True)
     # The declared memory root is where the record lands, two segments deep.
     fx2 = build_record_rotation(mr="docs/mem")
-    m = rl_model.build_run_model(fx2["repo"], FX_SLUG, run=2, journal_root=fx2["journals"])
+    m = build_model(fx2["repo"], journals=fx2["journals"], run=2)
     p = rl_record.write_record(fx2["repo"], m, journal_root=fx2["journals"], date=RECORD_DATE)
     rel = p.relative_to(fx2["repo"]).as_posix() if p else ""
     check_true("record AC1: with MEMORY_ROOT=docs/mem the record lands under docs/mem/builds/",
@@ -4291,7 +4520,7 @@ def test_schema_ac3_liveness():
     check_true("schema AC3: ...by the root assertion, never a zero read as clean",
                "REFUSED — root — " in r.stdout and "check-records GREEN" not in r.stdout, r.stdout[-300:])
     fx2 = build_record_rotation(mr="docs/mem")
-    m = rl_model.build_run_model(fx2["repo"], FX_SLUG, run=2, journal_root=fx2["journals"])
+    m = build_model(fx2["repo"], journals=fx2["journals"], run=2)
     rl_record.write_record(fx2["repo"], m, journal_root=fx2["journals"], date=RECORD_DATE)
     run_git(["-c", "core.autocrlf=false", "add", "--", "docs"], fx2["repo"])
     r = run_cli(["check-records"], fx2["repo"])

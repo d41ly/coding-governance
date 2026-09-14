@@ -101,6 +101,12 @@ record commits, which left this build's own later commits and both of its bars o
 Its git cost is constant and counted, because a model per run over a corpus of runs must not grow
 with a run's commits.
 
+**Once the window is known, ONE predicate bounds every timed set the model derives.** The timeline,
+tool calls, attribution, usage, own commits and every join reading them go through `check_in_window`.
+The closing review's round 1 found them bounded three ways: attribution counted every call of every
+session; own commits were bounded by the era, so a later commit naming a unit id became the last own
+commit and made `verify` report an unchanged journal; and the timeline listed commits past its end.
+
 **A tree joins a line to a run only while the run HOLDS it.** The first key was every tree any of
 the run's calls ran in. The run's `--landed` runs in the primary tree, and an owner's `--status` can
 too, so every run's bar and push there became this run's for its whole window. The closing review's
@@ -202,7 +208,8 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
   named in its `method` field. It reads only history reachable from HEAD. It judges idle gaps only
   where every session's transcript is local, and keeps out any gap beside an owner turn. Two runs
-  that claim one tree in the same stretch both hold it, so a bar made there joins both.
+  that claim one tree in the same stretch both hold it, so a bar made there joins both. The spec-mark
+  split still reads each spec at the era's end, not the window's.
 - **No rendered time falls in an owner turn's second.** Owner turns are counts, and a gap endpoint
   derived from one is the same datum, so the renderer refuses a record whose text carries a time in
   an owner turn's second, an idle row's start plus its duration included. A public commit time that

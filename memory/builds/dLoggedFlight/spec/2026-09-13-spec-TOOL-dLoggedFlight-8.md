@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-8 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -68,22 +68,36 @@ sources actually support. Every later surface renders from this model rather tha
   the next such START. A START that joins no start commit, as when its commit never reached this clone,
   is named in the coverage block and starts no run, and a refused preflight starts no run. No bound is
   taken from a commit that merely names the slug: commits keep naming a slug after its run ends.
-  Observed by AC1, AC9, AC15, AC16, AC18 and AC21.
-- **S3** The timeline. Observed by AC2, AC10 and AC20. It holds:
+
+  Once the window is known, every set the model derives from a timed source is bounded by it through
+  ONE predicate, `check_in_window`, and by nothing wider: the timeline's events of every kind, the
+  tool calls, attribution (S8), usage (S10), the own commits (S3) and every join that reads them, the
+  driver lines the record commits to, the sessions the run names, and the other builds sharing them
+  (S6). The run's verbs after its end, such as an owner's `--status` once it has landed, are not its
+  events. A terminal run's closing phase write lies at or past its end, so it is not a timeline event
+  either, and `end_from` says how the window closed. Two reads stay bounded by the era, as S1 and S4
+  state them: the run-state history and the review records. Observed by AC1, AC9, AC15, AC16, AC18,
+  AC21 and AC23.
+- **S3** The timeline. Observed by AC2, AC10, AC20 and AC22. It holds:
   - phase moves with their time and witness;
   - every driver verb with its rc, `exit` and checks;
-  - the run's own commits: commits inside its era that descend from its start commit and name one of
-    its unit ids, read from its `branch-ref:` where that ref resolves and from the default branch. A
+  - the run's own commits: commits inside its window that descend from its start commit and name one
+    of its unit ids, read from its `branch-ref:` where that ref resolves and from the default branch. A
     raw base-to-witness range was measured to be 82% other work, and the witness can be stale (S6), so
-    neither bounds them;
-  - merges naming the slug;
+    neither bounds them. They are read from the era and then bounded by the window, because commits
+    keep naming a unit id after the run has landed, and one such commit would otherwise become a
+    terminal run's last own commit. A non-terminal window's end is taken past every one of them (S2),
+    so the bound removes only commits made after a terminal run's end;
+  - merges naming the slug, inside the window;
   - push lines, joined by where they were pushed from OR by what they pushed. A line made inside the
     window from a tree the run holds joins, and so does one inside the window that pushes the default
-    branch's ref to a local sha with the run's last own commit in its history. The second key is how
-    the landing push joins: the protocol's lander pushes from the primary tree
-    (`TOOL-dLoggedFlight-11` S6), so a run spans its own worktree and that landing;
-  - gate lines, joined exactly by `run=` where a joined push line pinned `gate_run`, and otherwise by
-    a tree the run holds inside the window;
+    branch's ref to a local sha carrying, in its history, the run's last own commit made at or before
+    the push's START. A push is tested against the run as it stood when the push began, never against
+    an own commit made after it. The second key is how the landing push joins: the protocol's lander
+    pushes from the primary tree (`TOOL-dLoggedFlight-11` S6), so a run spans its own worktree and that
+    landing;
+  - gate lines inside the window, joined exactly by `run=` where a joined push line pinned `gate_run`,
+    and otherwise by a tree the run holds;
   - unit dispatches and briefs;
   - from the extractor where local: owner turns, compactions and limits;
   - the model's idle gaps, which S6 judges over every source, never over this timeline alone.
@@ -124,8 +138,9 @@ sources actually support. Every later surface renders from this model rather tha
     build commit is the unit's first own non-merge commit touching a path outside the memory root, so a
     spec commit that re-renders a generated index is not a build; the rule is named `heuristic` in
     `method`. UNJUDGEABLE when no unit has one;
-  - `phases-walked`: the driver's phase moves include BUILDING before LANDING, or the run aborted.
-    UNJUDGEABLE until the run reaches LANDING;
+  - `phases-walked`: the driver's phase moves include BUILDING before LANDING, or the run aborted. A
+    terminal run's phase counts among them at its window's end, since the write that closed the
+    window is not a timeline event (S2). UNJUDGEABLE until the run reaches LANDING;
   - `green-at-close`: judged at the last successful `--close` END. A joined `gates.log` line with
     `verdict=GREEN` and `head` equal to the head `--close` ran at, older than that END. That head is the
     first parent of the commit recording the close's LANDING write, or HEAD while that write is
@@ -164,7 +179,8 @@ sources actually support. Every later surface renders from this model rather tha
     turn inside it, or within fifteen minutes of either end, is kept out and counted. Its endpoints
     would place that turn to within the reply's latency, and owner turns are counts with no clock
     time (`TOOL-dLoggedFlight-9` S4).
-  - `multi-run-session`: one session id appearing in the START lines of two slugs' runs.
+  - `multi-run-session`: a session of the run's appearing, inside its window, in the START line of
+    another slug's verb.
   - `stalled`: six heartbeat `--status` calls in a row with no head or phase change, one hour at the
     declared cadence.
 - **S7** The coverage block. Observed by AC6 and AC7. Each source gets a state from
@@ -183,12 +199,16 @@ sources actually support. Every later surface renders from this model rather tha
   The run-state file, git and the build folder read `present` or `absent`. The block also carries
   `idle`: whether idle gaps were judged (S6), how many fired, and how many were kept out near an
   owner turn, with a note naming the transcripts' state when they were not judged.
-- **S8** Attribution, within one session. An event takes the unit of the most recent unit-bearing END,
-  from `--brief`, `--dispatch`, `--rescope` or `--review`, and the phase of the most recent END's
-  `phase_to`. A START with no END contributes its `phase_from` and no unit. `--status`, `--resume` and
-  every other verb that carries no unit leave the unit where it was. An event before the session's
-  first END is unattributed. The coverage block reports the share of calls and of wall time
-  attributed. Observed by AC17.
+- **S8** Attribution, within one session, over the tool calls inside the window. An event takes the
+  unit of the most recent unit-bearing END, from `--brief`, `--dispatch`, `--rescope` or `--review`,
+  and the phase of the most recent END's `phase_to`. A START with no END contributes its `phase_from`
+  and no unit. `--status`, `--resume` and every other verb that carries no unit leave the unit where
+  it was. The ENDs read are every run's in the session, of any build, so a later END supersedes an
+  earlier one whoever made it. An event whose most recent END or START belongs to another run is that
+  run's work and is unattributed, and a unit another run's END set is never this run's. An event
+  before the session's first END is unattributed. The coverage block reports the share of calls and
+  of wall time attributed, and its count of calls is the model's in-window tool calls. Observed by
+  AC17 and AC23.
 - **S9** Owner turns by position, each extractor owner turn classed by boundary events. Observed by AC13.
   - `launch`: the session's first owner turn, when it precedes the run's preflight START.
   - `pre-run`: any other turn before that START.
@@ -205,9 +225,10 @@ sources actually support. Every later surface renders from this model rather tha
 - **S12** Git cost: the model reads git in a number of calls that does not grow with the run's commit
   or record count. There are six: the run starts' one log (S1) and one ref listing, then one log over
   the own-commit range (S3) carrying bodies and trailers, one log over the build's run-state paths
-  carrying name-status, and one `rev-list` of the descendants of the run's last own commit, which gives
-  the push join its second key. One `cat-file --batch` carries blobs. A detached HEAD costs one more.
-  The wall time is printed report-only. Observed by AC8.
+  carrying name-status, and one `rev-list` of the descendants of the run's start commit with their
+  parents. The push join's second key and the merged flag walk that one listing, so a push is tested
+  against the own commit it followed (S3) at no extra call. One `cat-file --batch` carries blobs. A
+  detached HEAD costs one more. The wall time is printed report-only. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -417,11 +438,15 @@ command.
 - **AC17** — When `derive_attribution` reads a fixture built from the golden driver lines of
   `TOOL-dLoggedFlight-1` §4, with known unit and phase splits, the reported shares equal the fixture's.
   The fixture stages an event before any verb, an event in a second session, a `--phase` move, a killed
-  verb, and a heartbeat `--status` between a `--brief` and an event. Every fixture line carries only the
-  fields its producer's data model lists.
+  verb, and a heartbeat `--status` between a `--brief` and an event. It then stages, in the same
+  session, another build's `--brief` END with an event after it, one more of the run's own verbs with
+  an event after that, and an event past the window's end. The event after the other build's END is
+  unattributed, the run's next END attributes again but with no unit, and the event past the end is
+  not among the calls. Every fixture line carries only the fields its producer's data model lists.
   Red when: the pre-verb event is attributed, another session's END attributes an event, the heartbeat
-  resets the unit, the killed verb contributes a unit, or a fixture line carries a field its producer
-  never writes.
+  resets the unit, the killed verb contributes a unit, an event after another build's END is
+  attributed or takes its unit, an event outside the window is counted, or a fixture line carries a
+  field its producer never writes.
 - **AC18** — When `build_run_model` reads a fixture build with three start commits in git history and
   successful preflights for only the last two in `driver.log`, each START joins the start commit its own
   call made and that commit's runkey, and the first run's window comes from git alone. A START whose
@@ -460,6 +485,29 @@ command.
   Red when: the window closes at the last driver line, or a line from a tree the run does not hold,
   a line after the run's journal lines end, a merge naming only the slug, or a transcript event moves
   it.
+- **AC22** — When `build_run_model` reads the landed fixture after a later commit on the default
+  branch that names one of its unit ids, made after the landing, the run's own commits, its last own
+  commit and its merged flag do not move, and the landing push still joins by what it pushed.
+  `runlog.py verify` over the record rendered before that commit still reads `match`. When a
+  non-terminal fixture pushes the default branch from the primary tree after its merge and then
+  makes a later own commit on its branch, that push joins by what it pushed, and a push of the
+  default branch made before the run's work reached it joins nothing.
+  Red when: a commit after a terminal run's end becomes its last own commit, the landing push stops
+  joining, `verify` reads a mismatch that no journal byte caused, or a push is tested against an own
+  commit made after it.
+- **AC23** — When `build_run_model` reads the landed fixture, its session holds a call after the
+  `--landed` END and, inside the window, another build's `--brief` END with a call after it. The first
+  call is not among the model's calls, and the second is counted and unattributed. Neither the LANDED
+  write after the `--landed` END nor an owner's `--status` after it is on the timeline or among the
+  driver lines the record commits to, and the other build's verb in the run's session after its end
+  does not count toward `multi-run-session`. On a git-only run whose LANDED write ends its window,
+  that write is not on the timeline and `phases-walked` still reads MET. In the non-terminal fixture
+  of AC21, the later merge naming only the slug is not on the timeline. Across every model the
+  self-test builds, every timeline event lies in `[start, end)` and the attribution's count of calls
+  equals the model's tool calls.
+  Red when: a call outside the window is counted, a call after another run's END is attributed, an
+  event outside the window is on the timeline or counted as sharing a session, `phases-walked` stops
+  judging a run by the write that ended it, or the two counts differ.
 
 ## 7. Gates
 
@@ -533,6 +581,21 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   run's claim instead. That bound still covers the tree the review meant, since the primary tree
   stays in the key only where the run's own pre-close verbs ran there. Transcript events are not a
   source of the end, because the session renders the record itself.
+- rev-8 · 2026-09-14 · S2 S3 S5 S6 S8 S12 · AC17 AC22 AC23 · folded the closing diff review's round-1
+  M1, M4 and M5's timeline bound, as one window discipline. S2: every set the model derives from a
+  timed source is bounded by the window through one predicate. Rev-7 bounded some sets by the window,
+  some by the era and some by nothing, so the record listed a merge made after its own end. S3 (M4):
+  own commits are bounded by the window, and a push is tested against the last own commit made at or
+  before its START. A commit naming a unit id after a landing had become the run's last own commit,
+  unjoined the landing push, and made `verify` report a journal that had not changed. S8 (M1):
+  attribution counts only the calls inside the window and reads every run's ENDs in the session. It
+  had counted every call of every named session, and another build's later END never superseded the
+  run's own. S5: the closing phase write is no longer a timeline event, so `phases-walked` reads a
+  terminal run's phase at its end. S6: `multi-run-session` is bounded like every other set. S12: the
+  fifth git call lists the start's descendants with their parents, so each push walks to the own
+  commit it followed at no extra call. Not folded: S4's spec-mark split still reads each spec at the
+  era's end, not the window's. That end needs the one blob read that places a terminal write, so
+  bounding the split changes S12's calls, and it is left to round 2.
 
 ## 10. Reuse audit
 
