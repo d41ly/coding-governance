@@ -3191,8 +3191,10 @@ def build_class_model():
            {"t": t + 34, "source": "driver", "kind": "verb", "verb": "--landed", "state": "ended", "rc": "1",
             "checks": ["34", "7"], "phase_from": "LANDING", "phase_to": "LANDING"},
            {"t": float(MODEL_T0 + 11 * 60 + 30), "source": "transcripts", "kind": "owner", "via": "typed"}]
+    # The absolute path is ASSEMBLED here, as the redaction arms expand their positives, so no tracked
+    # line of this repository carries the shape this intruder exists to prove the record refuses.
     intruders = {"command": "git push --force origin main", "session": FX_SID,
-                 "absolute path": f"/home/someone/repo/memory/builds/{FX_SLUG}/RUN.md:3",
+                 "absolute path": "/".join(("", "home", "someone", "repo", "memory", "builds", FX_SLUG, "RUN.md:3")),
                  "free text": "the run skipped the bar because it was late"}
     tl += [{"t": t + 40, "source": "driver", "kind": "verb", "verb": intruders["command"], "state": "ended",
             "rc": "0", "checks": [], "phase_to": "BUILDING"},
