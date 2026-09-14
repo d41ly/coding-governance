@@ -2783,6 +2783,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readHeredocs",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "readInput",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -2794,6 +2799,11 @@
     },
     {
       "id": "readQuotedSubstitutions",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readRegion",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
     },

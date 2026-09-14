@@ -167,6 +167,22 @@ as typed; the author got an empty substitution in the source either way. The nea
 Reading 3 stands: the two shell-function `"$@"` cases are the only run-shaped near-misses, and the
 84 retired hits joined the mentions rather than the runs.
 
+## Reading 5 — closing round 3, a diff probe over one corpus
+
+Taken 2026-09-14 on node `a` at the round-3 fold of T1 to T8, as a DIFF and not a table: both hooks
+— the rev-7 hook as `67a11487` holds it and the fold — over one store in one sitting, 3187 files,
+106 653 commands, each hook handed the record's own `tool_name` (the fold reads it; the rev-7 hook
+ignores a fourth argument), printing every command the two classify differently. Nine distinct
+commands, and every one is a round-3 review lens's or skeptic's own probe of the shapes it was
+reporting: one the rev-7 hook denied and the fold admits — a PowerShell probe whose double-quoted
+string carries a backtick-escaped `$env:`, the T3 false-deny class — and eight the fold denies and
+rev-7 admitted, each a scratch-tree harness feeding `<<EOF` bodies, `$Env:GATE_FULL= 1` or a
+`bash -c` inside a span to a stub suite. No working command of any session moves. The unquoted
+heredoc (T1) is the shape with the widest reach in principle — `git commit -F - <<EOF` and
+`python - <<EOF` are common spellings — and the diff says this store holds no such body carrying a deny
+shape inside a `$( … )` or backticks outside the probes, which is why the table was not re-taken:
+a diff of nine probes moves no row. The near-miss walk of Reading 3 stands.
+
 ## The probe, verbatim (Reading 3 form — the `D4 selftest.py` key is its one addition over Reading 2)
 
 ```js

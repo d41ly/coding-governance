@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING
 
-**Status:** CLOSED · rev-7 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
+**Status:** CLOSED · rev-8 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -671,6 +671,27 @@ New arm: tools/unattended/adopt-unattended.test.sh · rev-7, arm 1a: `GOV_SETTIN
   comment credits F2 with the five it added. Every arm observed at the hook or adopter of
   `4d177329` first with the opposite verdict; the corpus record's Reading 4 is the A/B. Status
   stays CLOSED.
+- rev-8 · 2026-09-14 · S1 · S5 · S6 · AC2 · AC9 · AC10 · AC11 · folded closing diff review round 3,
+  `reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round3.md`, findings T1 T2 T3 T4 T5
+  T6 T7 T8 T9, the last closing fold of this build: an UNQUOTED heredoc body is walked for
+  `$( … )` and backtick spans the way a double-quoted string is, because bash expands it before
+  the consumer reads a line, and the R13 control arm that pinned `<<EOF` as prose becomes a
+  `<<'EOF'` allow beside an unquoted deny (T1); row D1 reads the `NAME= value` PowerShell spacing
+  forward, the fourth of four (T2); the walker takes the payload's `tool_name` and reads a
+  backtick inside double quotes as PowerShell's escape, never a span (T3); the view and the token
+  reader skip a `$( … )` or backtick span whole, so a quoted argument inside it cannot pair with
+  the outer quote (T4); `timeout`'s duration may be a decimal or a `$` expansion, the driver's own
+  `run_bounded` spelling (T5); the launcher option may be `py`'s version selector or `-X` with its
+  value, in the hook and in unit 2's `BAR` (T6); the view honours a backslash outside quotes as
+  the walker already did (T7); the substitution recursion passes `depth` through instead of
+  spending row D5's cap (T8); the adopter suite clears `GOV_SETTINGS_JSON` in its prologue, before
+  arm 1's `--check` (T9). Twenty-four arms, `FLOOR_ASSERTIONS` 124 to 148 by a count of the
+  helper calls in the file; every new arm observed RED-first on the hook at `67a11487` and the
+  T1 premise under real bash with a stub suite, every existing BUILDING arm re-fed to the folded
+  hook keeping its verdict save the R13 arm this fold flips, and the corpus A/B is Reading 5 —
+  nine commands move, every one a round-3 review probe.
+  Neither §4 nor §6 is rewritten for these; this line and the ledger carry them. Status stays
+  CLOSED.
 
 ## 10. Reuse audit
 

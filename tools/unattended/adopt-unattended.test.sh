@@ -67,6 +67,15 @@ DOD_EXTRA=""
 EOF
 }
 
+# The adopter's --check honours GOV_SETTINGS_JSON (aDeferredBar closing review F5), so every --check
+# below reads the FIXTURE's settings file only because the variable is clear here: the node F5
+# exists for exports a real one, and arm 1's --check as much as arm 1a's would then grade the
+# ambient path — a non-file REFUSES it and an unwired out-of-tree file reads UNWIRED, both rc=1
+# where arm 1 asserts 0, observed on an arm-1-shaped fixture with the variable set (closing round
+# 3, T9: round 2's R15 placed this line at the top of arm 1a, one arm short). The one arm that wants
+# the variable sets it inline.
+unset GOV_SETTINGS_JSON
+
 # ---- ARM 1: the ordinary adopt. Asserted on the CONTENT of what was written, because "a file
 # ---- appeared" is satisfied by a render that interpolated nothing.
 A="$TMP/host"; seed "$A"
@@ -95,10 +104,8 @@ same "arm 1 --check agrees with what --render just wrote" "$?" "0"
 # ---- file refused there too, but a marker parked under PostToolUse or under matcher `Bash` alone
 # ---- passed, an out-of-tree settings file declared through GOV_SETTINGS_JSON was reported UNWIRED,
 # ---- and a deleted fragment fell through to `in sync`.
-# The adopter honours GOV_SETTINGS_JSON (F5), so this arm reads the FIXTURE's file only because the
-# variable is clear here (closing round 2, R15): the node F5 exists for exports a real one, and
-# every expectation below would then grade the ambient path. The one arm that wants it sets it.
-unset GOV_SETTINGS_JSON
+# GOV_SETTINGS_JSON is cleared in the prologue above, before arm 1's --check (round 2 R15 put the
+# `unset` here; round 3 T9 moved it up one arm). The one arm below that wants it sets it inline.
 mv "$A/.claude/settings.json" "$A/.claude/settings.json.aside"
 out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
 same "arm 1a --check refuses with the settings file gone" "$rc" "1"
