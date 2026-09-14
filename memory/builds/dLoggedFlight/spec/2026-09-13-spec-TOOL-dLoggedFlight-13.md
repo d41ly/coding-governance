@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 13
+**Status:** SPECCED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -26,8 +26,9 @@ name the one whose witness cannot say.
 - **S1** A new signal, `run_records_nonterminal_but_merged`, built by a new function in
   `tools/drift-audit/drift_report.py` and added to its `SIGNALS` registry. The function reads each
   tracked run-state file under the engine's `ctx.memory_root`, at HEAD and never the working tree, and
-  takes its `phase:`, `witness:` and `base:` facts. It counts a record as merged when three conditions
-  hold:
+  takes its `phase:`, `witness:` and `base:` facts. The population is every `RUN.md` and every rotated
+  `RUN.<phase>.<blob8>.md` in a build folder, the two globs the driver's own single-live check reads.
+  It counts a record as merged when three conditions hold:
   - its phase is not terminal;
   - its witness is an ancestor of the engine's base ref;
   - its witness is neither equal to nor an ancestor of its own recorded `base:`.
@@ -37,6 +38,13 @@ name the one whose witness cannot say.
   writes one, and `--close` writes none, so such a record may have built and landed, as dRatifiedSeam
   did. Judging it needs the run's own commits, which three git calls cannot read, and
   `TOOL-dLoggedFlight-8` judges it from them. Observed by AC1 and AC3.
+
+  The witness is read first. A missing witness, one that is not a sha, and one that does not resolve
+  are each `unjudgeable` with their own reason. A witness that resolves and is not an ancestor of the
+  base ref is not merged, and is neither counted nor unjudgeable. For a merged witness, a missing,
+  non-sha or unresolvable `base:` is `unjudgeable`, and so is a base the base ref does not reach,
+  since one rev-list cannot relate the witness to a commit outside it. A record with no `phase:` fact
+  is `unjudgeable` too.
 - **S2** Report-only: `gateable` is false. §4 records why a gate here would red the fleet for a
   landing the owner sanctioned. Observed by AC2.
 - **S3** Each counted record gets exactly one sub-class, decided from its own last parked row by this
@@ -53,17 +61,24 @@ name the one whose witness cannot say.
   A retire or supersede row is matched before the owed-kind rule because it is the more specific cause.
   The refused-landing case cannot be told from tracked bytes, because refusals are not recorded
   there, and the detail row says so. `TOOL-dLoggedFlight-8` cites this table rather than restating it.
-  The table's kinds and acts are the driver's `PARK_KINDS_OWED`, `PARK_ACTS_OWED` and `PARK_KINDS`. An
-  arm of the withheld `tools/drift-audit/selftest.py` extracts them from the driver's source where that
-  file is present and compares both directions, and announces its skip where it is not. Its path
-  literal takes a carried row with its reason. Observed by AC6.
+  The table's kinds and acts are the driver's `PARK_KINDS_OWED`, `PARK_ACTS_OWED` and `PARK_KINDS`,
+  and the terminal set is its `PHASES_TERMINAL`. A row whose kind is outside `PARK_KINDS` is not a
+  parked row. An arm of the withheld `tools/drift-audit/selftest.py` extracts all four from the
+  driver's source where that file is present and compares both directions, and announces its skip
+  where it is not. It reaches the driver by a path derived from its own kit directory, as its siblings
+  reach the workflow and recall kits. The carried-prefix predicate does not match that form, so no
+  carried row is owed, and the count was taken with the gate's own pattern. Observed by AC6.
 - **S4** Each detail row names the record, phase, witness, the witness's relation to its base, and the
   sub-class, so a vacuous case is visible on every run. Liveness: `live` is true when the population
-  of run records is non-empty, and `of` is that population. Observed by AC1.
+  of run records is non-empty, and `of` is that population. With no run record and no
+  `.unattended.conf` at the root the signal is NOT ASKED rather than DEAD, since that repo does not
+  adopt what it reads. With the conf and no record it is DEAD. Observed by AC1.
 - **S5** Cost: three git calls in total, whatever the record count. They are one `ls-tree -r HEAD`
-  to enumerate, one `rev-list` of the base ref, and one `cat-file --batch` that returns each record's
-  content from `HEAD:<path>` and tests each witness with `<witness>^{commit}` in the same stream. The
-  witness-to-base test uses the `rev-list` set and adds no call. Observed by AC4.
+  over the build folders to enumerate, one `rev-list --parents` of the base ref, and one
+  `cat-file --batch` held open for one conversation. That stream returns each record's content by
+  the blob id `ls-tree` named at HEAD, then tests each witness and base with `<sha>^{commit}`. The
+  witness-to-base test walks the parent graph `rev-list` printed and adds no call, because the set of
+  commits alone cannot order two of its members. Observed by AC4.
 - **S6** The kit version moves from 1.10 to 1.11 across its carriers, with a self-test arm. Observed
   by AC5.
 
@@ -82,12 +97,17 @@ none
 A gate here would red every bar after any worktree landing, and the owner has sanctioned those. As soon
 as local `main` moves past such a run's witness, the count would rise above any pin, on every node,
 through no one's fault. So the signal reports and does not gate. A report-only signal is still judged
-against its pin in the table output, so a rising count is visible.
+against its pin in the table output, so a rising count is visible. This repo's project layer pins it
+at the measured 5, so the table reads `ok` at that value and `over pin` above it. The pin takes no
+RATCHETS row: a rise is nobody's fault, as above, so raising it needs no reason.
 
 The engine's base ref is resolved the way every other signal resolves it: `--base-ref`, then
 `GOV_DEFAULT_BRANCH`, then the local short name of `refs/remotes/origin/HEAD`. The kit's existing
 at-sha reader, `_read_defs_at_sha`, spends an `ls-tree` plus a `cat-file --batch`; this function
-follows the same pattern and adds the witness test to the batch rather than a fourth call.
+follows the same pattern and adds the witness test to the batch rather than a fourth call. The
+witnesses are known only once the records are read, so the batch is one process held open: the
+record blobs go first, then each `<sha>^{commit}` query. `cat-file` flushes after every object, so
+the conversation cannot deadlock on a buffer.
 
 ### Real-population measurement
 
@@ -96,24 +116,32 @@ of them are merged, each with own commits on `origin/main` after its start commi
 beyond their base and are counted. dRatifiedSeam's witness equals its base, because its run went from
 preflight to `--close`, which writes no witness, although its three own commits are merged. So the
 signal reports it `unjudgeable`. The seventh is this run, whose witness is not on `origin/main`.
+Re-measured at the build pass on 2026-09-14 against local `main`, which the engine resolves here, and
+the seven split the same way. The rotated archives join the population and are all terminal.
 
 ### Data model
 
 `{signal: "run_records_nonterminal_but_merged", value, of, tolerance: 0, gateable: False, live,
 unjudgeable, detail: ["<record> <phase> <witness8> <ahead|equal|behind> <subclass>", ...]}`.
 
+An unjudgeable row puts `unjudgeable — <reason>` where the sub-class goes, and `unknown` for a
+relation it could not read. The last detail row is the refused-landing note S3 names.
+
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
 | `build_nonterminal_merged_runs` | function | `py.function`, led by the declared `build` |
+| `_parse_run_record` · `_derive_run_subclass` · `_check_run_ancestor` | functions | `py.function`, led by `parse`, `derive` and `check` |
+| `test_nonterminal_merged_runs` · `test_park_sets_match_the_driver` · `test_version_carriers_agree` | self-test arms | `py.function`, led by the reserved `test` |
 | `run_records_nonterminal_but_merged` | signal name | drift-audit registry |
 
 ### Files touched (estimate)
 
-`tools/drift-audit/{drift_report.py,drift_signals.py,drift_signals.template.py,selftest.py,README.md}`
-with the version carriers, `tools/install-prefix-carried.txt` for the arm that reads the driver's
-source, and `memory/map/features/` if a dossier claims the signal.
+`tools/drift-audit/{drift_report.py,drift_signals.py,drift_signals.template.py,selftest.py,README.md,adopt-drift-audit.sh}`
+and the two drift workflow harnesses, which carry the version. No dossier claims a drift-audit key,
+so `memory/map/features/` is untouched, and `memory/map/generated/` re-renders because the symbol
+index lists the new public functions. No carried-prefix row moves (S3).
 
 ### Alternatives rejected
 
@@ -127,13 +155,16 @@ source, and `memory/map/features/` if a dossier claims the signal.
 
 - security — N/A; it reads tracked files and the object store.
 - perf / scale — three git calls; S5.
-- error / empty / loading states — a record with no `witness:` or no `base:` is `unjudgeable` and
-  counted apart, and so is a witness at or behind its base (S1). An unresolvable witness is
-  `unjudgeable`, not merged.
+- error / empty / loading states — a record with no `phase:`, `witness:` or `base:` is `unjudgeable`
+  and counted apart, and so is a witness at or behind its base (S1). An unresolvable or non-sha
+  witness is `unjudgeable`, not merged, and so is a merged witness whose base the base ref does not
+  reach. A failed `cat-file` or `rev-list` reports DEAD with a note, never a clean 0, and a repo with
+  no run record and no `.unattended.conf` is NOT ASKED (S4).
 - observability — the detail rows, which print the witness-to-base relation.
 - risks — none beyond the report being ignored; it is visible in the table on every run.
 - testing — one fixture per table row, one `no-progress` record and one unjudgeable record, each
   staged, plus the kit's existing meta-tests that every signal can move and none hard-codes `live`.
+  One more arm holds every version carrier the kit owns to the engine's constant (S6).
 - migration — none.
 - user docs — the drift-audit README's signal table.
 
@@ -166,14 +197,15 @@ source, and `memory/map/features/` if a dossier claims the signal.
   Red when: a carrier still reads 1.10.
 - **AC6** — When `python tools/drift-audit/selftest.py` runs where `tools/unattended/unattended.sh` is
   present, the S3 table's kind and act sets equal the driver's `PARK_KINDS_OWED`, `PARK_ACTS_OWED` and
-  `PARK_KINDS` in both directions. Where the driver is absent, the arm prints its skip.
+  `PARK_KINDS` in both directions, and the terminal set equals its `PHASES_TERMINAL`. Where the driver
+  is absent, the arm prints its skip.
   Red when: the driver gains an owed kind the table lacks and the arm stays green.
 
 ## 7. Gates
 
 `drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `kit version markers` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/drift-audit/selftest.py` · each table row, the base test, the HEAD-not-worktree read and the non-gateable property staged RED · floor raised by the arm count
+New arm: `tools/drift-audit/selftest.py` · each table row, the base test, the HEAD-not-worktree read and the non-gateable property staged RED · the suite had no assertion floor to raise, so it gains one at its executed-check count, compared only on a run where no arm skipped
 
 ## 8. Open questions
 
@@ -192,6 +224,13 @@ none
   behind its base is `unjudgeable`, since `--close` writes none and dRatifiedSeam built and landed), M7
   (each alternative of a table row is its own fixture), M11 (the table's sets are held to the driver's
   source) and M12 (the root is `ctx.memory_root`).
+- rev-5 · 2026-09-14 · S1 S3 S4 S5 · §4 · §5 · §7 · AC6 · the build pass, before its code. S5's
+  witness-to-base test cannot use the `rev-list` set, which holds no order between two of its members,
+  so it walks the `--parents` graph. The batch is one process held open, since the witnesses are read
+  from the records it returns. S1 names the rotated archives and every unjudgeable reason. S3 holds
+  the terminal set to the driver too, and reaches the driver by a derived path, so no carried row is
+  owed. S4 adds NOT ASKED for a repo with no runs and no conf. §4 pins the measured 5 and spells the
+  unjudgeable row. §7's suite had no floor to raise.
 
 ## 10. Reuse audit
 
