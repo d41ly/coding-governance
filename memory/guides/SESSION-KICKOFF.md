@@ -5,7 +5,7 @@
 last-audit: 2026-09-14T14:26:35+03:00 @ 6074d521d6ae3fa8274a493f3b7a9be6b1274109
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2ee24eca0c6c61636022a3bc5f4487a778027b00
+last-body-change: 757f1c11a8456c93951ba6500edb9553d214b831
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -55,6 +55,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
   comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 
+- **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
+  (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
+  verbatim after a compaction). Step 1 consumes it; Step 5 appends the READY card through
+  `--card --append`. A main-loop `git commit` in a session whose startup card still reads
+  `READY — none yet` is REFUSED by `tools/hooks/scratch-guard.js` with the remedy in stderr; an
+  absent or replay-written card allows. `KICK-aReplayedCard-1`, `TOOL-aReplayedCard-1`.
 - **Repo layout:** primary checkout at `C:/projects/coding-governance` (holds `main`), plus per-unit
   worktrees under `.claude/worktrees/<branch-slug>/`. `git worktree list` is the inventory. A unit
   branch's commits ride its own worktree, never the primary tree (the pre-commit branch guard refuses).
