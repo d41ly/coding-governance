@@ -2753,15 +2753,16 @@ hit "$(run)" "the extracted declared-scalar parser does not return the VALUE of 
 # ---- than a count - this checker and the adopter are themselves in that directory, so the population
 # ---- is never empty and a count floor could be reached by no fixture.
 reset_tree; rm -f $KIT_REL/check-playbook.sh
-hit "$(run)" "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined"
-
 # ---- 28a, RE-ARMED AFTER ROUND 6 FOUND THE DISCARD ENUMERATION UNWINNABLE. The rule now enumerates
 # ---- the COMPLIANT set, so the default is FAIL and a new spelling cannot widen the hole by existing.
 # ---- Four spellings are staged, and the last two are the ones round 6 found walking past the
 # ---- enumerate-the-discards version.
 DISC='does not act on its exit status'
-reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
-hit "$(run)" "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
+mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined"
+hit "$out" "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
 reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || return 0; if false; then@'
 hit "$(run)" "$DISC"
 reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || _declared=""; if false; then@'
@@ -2794,15 +2795,16 @@ hit "$(run)" "a refusing parser has NO call site this rule can see, so it was as
 reset_tree
 mutate $KIT_REL/check-playbook.sh '/^declared_list() {/,/^}/ s|return 2|:|'
 mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
-hit "$(run)" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
-
 # ---- 28b. THE EXEMPTION ROW IS RETARGETED, never replaced with a synthetic: round 6's BLOCKER 1 was
 # ---- a `key|file|literal` record destroyed by word-splitting, and the staged break that was supposed
 # ---- to cover it substituted a value with no spaces in it, so it could not exhibit the split. The
 # ---- table is newline-separated and read without splitting now, and this arm keeps the shipped
 # ---- record's real spacing while pointing its key at one the template does not declare.
-reset_tree; mutate $KIT_REL/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
-hit "$(run)" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
+mutate $KIT_REL/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
+hit "$out" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
 
 # ...and the exemption going STALE, which is the failure mode an exemption list adds. Rewriting the
 # reader it names takes its excuse with it.
