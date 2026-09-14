@@ -156,7 +156,7 @@ of a batch's TREE firing checks and need the suite.
   protocol-count and declared-parser blocks), and `grep 'assertions executed' <log>` must read
   **555** — the floor-graded `n` at 46b12b93 plus the number of `emitted` calls this unit added,
   which is **ZERO**. Red when a `FAIL` line appears, disappears or changes, or `n` is not 555.
-- AC4 — OBSERVED now by the static scan (`ac47.py`, rules in its header) over the landed file:
+- AC4 — `reset_tree` — OBSERVED now by the static scan (`ac47.py`, rules in its header) over the landed file:
   `blocks 340; groups (blocks carrying an emitted call) 0`; located and found alone — check-1
   exit arms 1 + 1 + 2 blocks, exit-code-only 5, empty-output 11, anchor 9, PATH/TMPDIR 2, remote-
   rewriting 5, every `miss` 88, every `same` 21, equality arms with `_f1_clean` 3 — `0 inside a
