@@ -687,7 +687,7 @@ has "scratch: the child prompt opens with the ground that names it" "$childU" "p
 # `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested
 # only `disposed !== true`, logged `disposal: done` and handed out the FULL roster over an undisposed
 # blocker — under a prompt whose own words are NAME in `standing` every blocker you did NOT dispose.
-# Reachable on exactly the two verdicts that structurally guarantee standing blockers.
+# Reachable on any confirmed finding since TOOL-aProbedUnit-7; these arms keep the NON-CONVERGENT shape.
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":true,"standing":["b1"],"summary":"x"}')")
 has "F4 disposed:true with a standing blocker: the roster is EMPTY" "$o" '"roster":[]'
 has "F4 disposed:true with a standing blocker: the note is DEGRADED" "$o" "DEGRADED — findings were not disposed"

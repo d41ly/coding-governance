@@ -637,8 +637,8 @@ a named refusal rather than a complete-looking list.
 A review that keeps coming back BLOCKED is the fault this kit was built to remove, and the remedy is
 not a round cap — over the tracked corpus the clean exit the method names occurs ZERO times, so a cap
 would only move the stall earlier. A SPEC subject's declared bound, `REVIEW_ROUNDS`, is not that cap:
-it ends in a DISPOSITION rather than a stall, because every blocker standing at the bound is folded
-or promoted exactly as at `NON-CONVERGENT`. Record every round and the verb tells you what the loop
+it ends in a DISPOSITION rather than a stall, because every finding standing at the bound is
+disposed exactly as at `NON-CONVERGENT`. Record every round and the verb tells you what the loop
 is doing:
 
 ```bash
