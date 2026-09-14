@@ -310,9 +310,9 @@ git -C "$d" reset -q --hard "$clean"
 # `.test.sh`; the fixture tracks the file so the paths join stays green and the one hit is the bar's.
 # A `--selftest` FLAG on another file is the direct check the child prompt admits and is not a hit.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|`tools/gate-legs.json` exists|`python tools/govkit/selftest.py` is green|' "$spec"
+sed -i 's|`tools/gate-legs.json` exists|`python tools/govkit/selftest.py` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
 git -C "$d" add -A >/dev/null
-arm "a post-cutoff §6 bullet naming a whole-suite selftest.py REDS as [bar]" 1 "$d" '[bar] `python tools/govkit/selftest.py`'
+arm "a post-cutoff §6 bullet naming a whole-suite selftest.py REDS as [bar]" 1 "$d" '[bar] `python tools/govkit/selftest.py`'   # gov:literal-python — the expected hit line, never run
 git -C "$d" reset -q --hard "$clean"
 
 # AC17 — a COMMITTED cutoff not strictly past its own commit day is REFUSED before grading, naming
