@@ -68,3 +68,18 @@ the repository".
   after staging, `git add -A memory`, and let the hook run. Then run
   `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` and act on what it names. Return
   `committed:false` with a `why` rather than a commit you cannot stand behind.
+
+## Discovery from unit 3's pass — amend the spec before building (M2 AMEND, rev bump + section 9)
+
+Unit 3 needed a scratch git clone and could not put it under the session scratchpad: git
+canonicalizes the 8.3 short spelling, the path is ~150 characters before the clone adds
+`.git/objects/pack/<40 hex>.idx`, and Windows MAX_PATH is 260 — `Filename too long`, every time
+(this node's memory records the same trap on 2026-09-03). The pass fell back to an untracked
+`.gov-scratch/` inside the worktree, which rule 3's "inside the repository" clause admits and which
+a stray `git add -A` would have committed. So the GROUND sentence and the child sentence this unit
+pins must carry ONE exception, stated with its reason: a git clone or a fixture repository, which
+needs a SHORT path on Windows, goes under the shortest ancestor of `<scratch>` the scratch-guard
+allows — `%TEMP%/<short-name>` on this node, the `<os.tmpdir()>/claude/<short-name>` base once
+unit 5 lands — never inside the worktree and never at a drive root. Every other temporary file stays
+under `<scratch>`. Put the exception in the spec's section 4 pinned text and its section 6 grep
+tokens before you write the code, and log it in section 9.
