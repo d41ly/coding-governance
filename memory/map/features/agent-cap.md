@@ -178,8 +178,10 @@ turns the cap rules off with no diff.
 ## Gaps
 
 - **The orientation deny stops forgetting, not evasion.** A commit made by a script, a heredoc or a
-  non-git tool, a deleted or hand-written card, an unwalkable `-C` target, and a session that
-  started before the wiring and never restarted all escape; a READY line's presence is asserted,
+  non-git tool, a deleted or hand-written card, a `cd`/`-C` target that is not a literal path or
+  does not exist (the last `cd <dir>` before the git token is read; an absent or shell-expanded
+  target is a witness, never a walk into an ancestor's `.git`), and a session that started before
+  the wiring and never restarted all escape; a READY line's presence is asserted,
   never its correctness. The drive fold lowercases, so on a case-sensitive filesystem the walk
   finds no `.git` and allows with the witness line — every registered node is Windows. Stated in
   the hook's header and in `tools/hooks/README.md`, with no waiver clause by owner decision.

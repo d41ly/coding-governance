@@ -194,8 +194,10 @@ A folder already in HEAD exempts nothing, or every commit after a landed prompt-
 exempt forever. This is the only step that spawns git, so the common path pays no spawn.
 
 **The ceiling.** A commit made by a script, a heredoc or a non-git tool; a deleted, hand-written or
-refused card; an unwalkable `-C` target; a session that started before the wiring and never
-restarted — all escape. The guard stops forgetting, not evasion. A READY line's PRESENCE is
+refused card; a `cd`/`-C` target that is not a literal path or does not exist (the last `cd <dir>`
+before the git token IS read, and a target the shell would expand or that is absent from disk is a
+witness rather than a walk into an ancestor's `.git`); a session that started before the wiring and
+never restarted — all escape. The guard stops forgetting, not evasion. A READY line's PRESENCE is
 asserted, never its correctness, and there is no waiver.
 
 ## The authoring rule for kit files
