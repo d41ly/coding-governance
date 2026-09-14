@@ -76,12 +76,12 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 10 | `TOOL-dLoggedFlight-10` | CLOSED | the schema leg: a committed run record outside the closed schema reds the bar |
 | 11 | `TOOL-dLoggedFlight-11` | CLOSED | the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat |
 | 12 | `TOOL-dLoggedFlight-12` | CLOSED | the runlog skill answers questions about a run from its record and its local extracts |
-| 13 | `TOOL-dLoggedFlight-13` | MISSING | drift-audit reports run records left non-terminal after their build merged |
+| 13 | `TOOL-dLoggedFlight-13` | CLOSED | drift-audit reports run records left non-terminal after their build merged |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 13 unit(s) · node d · opened 2026-09-13 · streams tooling
+**Build status:** CLOSED · 13 unit(s) · node d · opened 2026-09-13 · streams tooling
 ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13
 
 <!-- gen:build-units -->
@@ -99,10 +99,10 @@ ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedF
 | [TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar](spec/2026-09-13-spec-TOOL-dLoggedFlight-10.md) | 10 | 2 | CLOSED | rev-5 | 2026-09-14 |
 | [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-5 | 2026-09-14 |
 | [TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts](spec/2026-09-13-spec-TOOL-dLoggedFlight-12.md) | 12 | 2 | CLOSED | rev-3 | 2026-09-14 |
-| [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | SPECCED | rev-5 | 2026-09-14 |
+| [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | CLOSED | rev-5 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

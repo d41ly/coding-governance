@@ -7,8 +7,8 @@ harness's own `meta.version` to the same number.
 **Migrating 1.10 → 1.11 (additive, no caller edit).** One new signal,
 `run_records_nonterminal_but_merged`, report-only, so `--check` cannot red on it. A repo with no run
 record and no `.unattended.conf` reads it as NOT ASKED. A repo that does keep run records reads a
-non-zero value against tolerance 0 until it seeds a pin at the value it measures, as step 4 below says
-for every signal. No existing field or signal moves.
+non-zero value against tolerance 0 until it seeds a pin at the value it measures, as the install steps
+below say for every signal. No existing field or signal moves.
 
 **Migrating 1.7 → 1.8 (additive, no caller edit).** Three changes, none of which moves an existing
 field. `drift-audit-state.js` gains the aggregate `severityCorrections` return key and the matching
@@ -143,25 +143,14 @@ a sanctioned worktree landing raises the count through nobody's fault.
 
 A witness at or behind its base is **unjudgeable**, not clean. The witness is HEAD at the last verb
 that writes one, and `--close` writes none, so such a run may well have landed. The signal counts it
-apart with the reason `witness not re-written since preflight`. A missing fact, a witness or base that
-is not a sha or does not resolve, and a base the base ref does not reach are unjudgeable too, each
-with its own reason.
+apart with its reason, and every other record whose facts it cannot place goes there too.
 
-Each counted record gets one sub-class from its **last** parked row, first match wins:
-
-| the record's last parked row | sub-class |
-|---|---|
-| a `rescope` row whose act, the first word of its item, is `retire` or `supersede` | `retired-unit` |
-| a `decision`, `abort`, `override` or `waiver` row | `surfaced-park` |
-| no parked row at all | `no-rows` |
-| any other parked row | `other` |
-
-Those kinds and acts are the unattended driver's own declared sets, spelled in the engine so the
-report runs in a tree without that kit. `selftest.py` holds each set to the driver's source in both
-directions wherever the driver is present. A refused landing leaves no tracked row, so no sub-class
-can name one, and the detail says so on every run. The cost is three git calls whatever the record
-count: an `ls-tree`, a `rev-list --parents` of the base ref, and one `cat-file --batch` held open for
-the whole read.
+Each counted record gets one sub-class, read from its **last** parked row: `retired-unit`,
+`surfaced-park`, `no-rows` or `other`. The first-match table that decides it is
+`_derive_run_subclass` in `drift_report.py`, and it is not restated here. Its kinds and acts are the
+unattended driver's own declared sets, spelled in the engine so the report runs in a tree without that
+kit, and `selftest.py` holds each set to the driver's source wherever the driver is present. A refused
+landing leaves no tracked row, so no sub-class can name one, and the detail says so on every run.
 
 ### The harness note is a DERIVED contract, not prose
 
