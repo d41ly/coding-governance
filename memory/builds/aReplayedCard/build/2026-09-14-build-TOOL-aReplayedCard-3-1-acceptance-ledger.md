@@ -4,7 +4,7 @@
 
 Every observation below was made at the dispatched base tree (`1d71db6e`, the branch tip the unit
 was handed) with the unit's working-tree changes applied. No figure is copied from the brief or the
-spec; where the spec's wording moved before the record closed, its rev-4 and rev-5 lines in section 9
+spec; where the spec's wording moved before the record closed, its rev-4 to rev-6 lines in section 9
 say what and why.
 
 ## What was built
@@ -23,7 +23,7 @@ say what and why.
 - `memory/map/features/unattended.md`: one sentence in the template paragraph of Constraints & why,
   and the Gaps item narrating the defects `cFinalBerth` fixed removed, because the dossier sat ten
   bytes under its cap and a closed gap is not a gap.
-- The spec: status CLOSED, rev-5.
+- The spec: status CLOSED, rev-6.
 
 ## The wall, measured
 
@@ -46,4 +46,4 @@ it — a documented check, not a second run of a leg that costs eight and a half
 - AC1 — `tools/unattended/SKILL.template.md` — read at the tip by line number: `## Resume` at 661, the reap paragraph at 670, the schedule paragraph at 678, the cannot-be-corrected paragraph at 681, the kickoff step at 688, `## Close` at 696. The step is below the schedule paragraph and above the next heading, so the red-when — the step above the reap — does not hold.
 - AC2 — `RUN.md` — OWED TO THE ORCHESTRATOR, NOT OBSERVED HERE: it needs a fresh session and a scratch clone of this branch holding a throwaway run-state file written by `--preflight` against a keepalive that session scheduled itself, and the installed engine on this node is the primary tree's until landing. At the first post-landing resume, run the `## Resume` section in such a clone and read the transcript: the READY card is echoed, and that clone's orientation card ends with a `READY —` line naming the throwaway build's slug. Record the clone path, the session id and the card's last line beneath this line. Red as written: Step 5b halts at the READY stop because the run-state file was not read first, or the card ends without a READY line.
 - AC3 — `tools/unattended/adopt-unattended.sh --check` — at the tip, after the render: `unattended: in sync (skill rendered from template + .unattended.conf)`, exit 0. The spec named `check-unattended.sh` as the observer and that leg carries no render compare; rev-5 moved the criterion to the leg that does, and `check-unattended.sh` run whole at the tip is exit 0 after 513 s with no `FAILED` line besides.
-- AC4 — `/session-kickoff` below `--preflight` — in that same run, no check 18 and no check 20 line was printed: exit 0, no line naming check 18 or check 20 in 42 lines of output. The predicate observed directly: first `--preflight` at 175, first `/session-kickoff` at 185, unchanged from before the unit; RED on the scratch mutant as staged above.
+- AC4 — `tools/unattended/check-unattended.sh` — in the whole run AC3 also cites, no check 18 and no check 20 line was printed: exit 0, no line naming check 18 or check 20 in 42 lines of output. The predicate observed directly: first `--preflight` at 175, first `/session-kickoff` at 185, unchanged from before the unit; RED on the scratch mutant as staged above.

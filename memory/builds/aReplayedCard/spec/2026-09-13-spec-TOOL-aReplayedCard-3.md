@@ -1,6 +1,6 @@
 # TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -123,8 +123,9 @@ should re-orient; the design record's improvement 7.
 - **AC3** — When `bash tools/unattended/adopt-unattended.sh --check`, the `unattended skill
   wiring` leg, runs at the landing commit, the rendered-versus-template byte compare passes.
   Red when: the template moved and the render did not.
-- **AC4** — When that same run completes, checks 18 and 20 pass, and the first `/session-kickoff`
-  occurrence in the template is still below the first `--preflight` occurrence.
+- **AC4** — When `bash tools/unattended/check-unattended.sh` runs at the landing commit, checks 18
+  and 20 pass, and the first `/session-kickoff` occurrence in the template is still below the
+  first `--preflight` occurrence.
   Red when: a kickoff mention lands above the preflight anchor.
   cost: the design record's skeptic measured the check past 100 s; budget it, do not pipe it
   through `tail`.
@@ -153,6 +154,9 @@ none
 - rev-5 · 2026-09-14 · AC3 · the byte compare is `adopt-unattended.sh --check`, the `unattended skill
   wiring` leg, and not a check inside `check-unattended.sh`, which carries none; the criterion
   named the wrong observer, found at the build pass when the ledger line was written.
+- rev-6 · 2026-09-14 · AC4 · "that same run" pointed at AC3's `check-unattended.sh` run, which rev-5
+  moved out of AC3; AC4 now names the run itself. The bug-class checklist over the build commit
+  selected `amendment-leaves-its-other-half-standing`, and this was the standing half.
 
 ## 10. Reuse audit
 
