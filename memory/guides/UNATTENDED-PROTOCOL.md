@@ -268,7 +268,11 @@ verb. A START with no END is a call killed outright. That is the sequence this f
 refusals, repeated phase moves, resumes and killed calls. The log is machine-local and never tracked
 or pushed, and it is EVIDENCE as facts 5-7 are: no verb and no gate branches on it. A failed append
 prints one line on stderr and changes nothing else. `GOV_RUNLOG=0` in the environment turns it off,
-and `RUNLOG_SESSION_VARS` (§8) names the session each START records.
+and `RUNLOG_SESSION_VARS` (§8) names the session each START records. The committed record of a run is
+rendered from these journals by an agent step and never by a verb, since a verb may not read a log it
+is then judged by: where the runlog kit is installed, the Skill renders it after `--abort`, after
+`--close` before the merge, and again after `--landed` into the same file, each in a commit the run
+already makes.
 
 ## 3. The phase vocabulary
 

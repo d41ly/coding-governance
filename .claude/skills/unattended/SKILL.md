@@ -26,6 +26,15 @@ every 10 minutes (cron 3-59/10 * * * *) — and keep the id it returns, because 
 CronCreate  ->  keep the id
 ```
 
+**Give the job a prompt that leaves a HEARTBEAT.** Once this run has a slug, every fire runs
+`bash tools/unattended/unattended.sh --status <slug>` before anything else it does. `--status` is among the
+calls the driver journals (protocol section 2), so each fire leaves a line in the run's journal, and a
+run that stalled reads as a gap in that journal instead of as silence. No run has a run-state file
+until `--preflight` writes it, and every path this section binds schedules before that, so word the
+prompt to make the call only once the file exists: `--status` on a slug without one is a refusal,
+which the journal records as a fault rather than as a heartbeat. A run started from prose or a
+playbook does not even know its slug when it schedules.
+
 **Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
 three of the four paths below never reached it: the two that start from prose or a playbook orient,
 research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
@@ -675,8 +684,10 @@ jobs and `CronCreate`'s own listing showed both still firing. So issue
 back, and say what it returned. Assume a surviving job, not a dead one; the failure mode of assuming
 dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
 
-Then schedule the new one. This is the only exception to "read the record first": read it, reap,
-schedule, and then do the work.
+Then schedule the new one, with the heartbeat prompt the keepalive section gives: this run already
+has its slug and its run-state file, so every fire runs `bash tools/unattended/unattended.sh --status <slug>`
+first. This is the only exception to "read the record first": read it, reap, schedule, and then do
+the work.
 
 **The record cannot be corrected in place, and you must know that rather than discover it.**
 `--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
@@ -749,6 +760,47 @@ you are the only reader, and neither way of getting it wrong is silent: a `--ove
 its own `--reason` is REFUSED before anything is written, and an item you never named at all simply
 keeps blocking the close. Nothing is recorded on a reason that was written about a different item.
 
+## Record the run
+
+**This section binds only where `tools/runlog/runlog.py` exists in this repository.** Test for
+it before the first render. Where it is absent, skip every step below and say so in the wrap-up: this
+repository has not taken the runlog kit, so there is nothing to render from and no record is owed.
+Nothing else in this Skill changes when you skip it.
+
+```bash
+test -f tools/runlog/runlog.py   # exit 0: the kit is here and this section binds; exit 1: skip it
+python tools/runlog/runlog.py record <slug> --write
+```
+
+**Why it is a step at all.** The journals a run writes are machine-local and never pushed, so a run
+nobody renders is a run no other node can read. The render writes ONE closed-schema record into the
+build folder and prints the two follow-ups it cannot run itself: re-render the build index, and commit
+under a subject naming the slug and no unit id. Run the index command it prints, stage the record and
+everything the index rewrote, and let them ride the commit named below. A run that served no
+spec-defined unit gets the command's own no-record line and no file. That line is the answer, not a
+failure.
+
+**Three placements, and each rides a commit the run already makes**, so no path gains a commit it did
+not have. Each is the commit that carries the run-state file the verb just staged:
+
+1. **After `--abort`**, in the ABORTED record commit. Render, re-index and stage before you commit it.
+2. **After `--close` and before the merge, on every run that lands**, in the close's records commit:
+   the one `--close` tells you to make before you land. The record then travels with the merge, and
+   the bar at the push boundary grades it.
+3. **After `--landed`**, in the LANDED record commit. Render AGAIN: `record --write` finds the run's
+   existing file by its run key, so it rewrites the SAME file rather than adding a second one. The
+   landing push joins this run by what it pushed, so the re-render adds that push and the landing
+   bar's verdict.
+
+**Never between the lander's push and `--landed`.** Where the project declares a lander marker, a
+commit there moves HEAD off the commit the marker names, and `--landed` refuses it at check 34 — the
+wedge the section on marking it landed warns about. That is why the third render waits for the verb
+rather than following the push.
+
+**A render that refuses blocks nothing.** It names why on stderr; say so in the wrap-up and go on. The
+record is evidence, never an input: no verb reads it, and the leg that grades a committed record
+cannot see one that was never written. A skipped render is caught by nothing, so you have to say it.
+
 ## Land
 
 ```bash
@@ -786,6 +838,9 @@ marker and a moved HEAD are distinguishable. Then commit the record it writes an
 committed, every later run still counts yours as live — which no longer reds anyone's bar, but does
 put your unfinished run in every later run's concurrency report.
 
+**That record commit is where the run record re-renders**, and never before this verb returns: the
+third placement in [Record the run](#record-the-run), which binds where the runlog kit is installed.
+
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
 
@@ -805,6 +860,9 @@ closest code and put the specifics in the reason, and say so — a mismatch wort
 better than a vocabulary with a hole in it. You still owe both attestations first — reap the
 keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
 leaves exactly the same decisions unseen. An abort does not merge and does not push.
+
+**Render the run record before you commit the ABORTED record**: the first placement in
+[Record the run](#record-the-run), which binds where the runlog kit is installed.
 
 ## Reap
 
