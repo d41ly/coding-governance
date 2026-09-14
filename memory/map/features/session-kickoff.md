@@ -54,6 +54,13 @@ normalised through the same `cd … && pwd` chain — never by comparing path st
 directory has two spellings and mount points are not symlinks, so a string comparison answers
 differently depending on which flavor the caller happened to use.
 
+The checker is also the writer of the session's orientation card (`--card --write`, `--card
+--replay`, `--card --path`; `KICK-aReplayedCard-1`). The card lives under the git common dir, so
+every worktree of one repository shares the directory and a card names the tree it was written in;
+every startup cell is derived, the `node —` cell through the manifest's own `registry:` key, so the
+kit spells no charter path. The verbs run no manifest check and no fetch: those stay in the engine's
+Steps 1 and 2b, where each costs a kickoff rather than every session start.
+
 ## Gaps
 
 - **The third manifest location cannot be gated, by construction.** The engine honours a manifest at

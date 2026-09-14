@@ -536,7 +536,10 @@ from §2). Write the manifest to one of those paths so it resolves.
    claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
    `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha (HEAD on the
    default branch, else `git merge-base <remote>/<default> HEAD`; no remote →
-   `git merge-base <local-default> HEAD`); tag claims whose truth lives in another repo
+   `git merge-base <local-default> HEAD`); `registry` = the repo-relative file whose first table
+   under `## Node registry` names the project's nodes (the charter from §2 when the playbook is
+   adopted) — the checker's `--card` verbs resolve the session's node from its Machine/user
+   column; tag claims whose truth lives in another repo
    `(cross-repo — verify at use)`. Keep it SHORT — only what the engine can't derive from
    git/`CLAUDE.md`; reference the playbook, never duplicate it. (§A is derived by the agent per
    kickoff — leave it as the shape, don't fill it.)
@@ -580,7 +583,11 @@ the INVOKING directory, not from its own location — run it with the cwd inside
    actually pulled FROM — read it out of `<gov>/coding-governance-agents.template.md`, never from
    this line. Stamping an older number on a newer copy makes the marker lie, and the marker is what
    both the kickoff engine's Step-2 fallback and the re-pull mechanism read.
-6. Bump the manifest marker to `kickoff-manifest: v1.3` **LAST** — the bump silences the kit's
+5b. Add `registry: <path>` to the audit block (v1.4) — the file whose first table under
+   `## Node registry` names the project's nodes, read by the checker's `--card` verbs for the
+   session card's `node —` cell. Without it every card the project writes reads `node — UNKNOWN:
+   no registry`, and nothing else fails: the key is what the version WARN is now for.
+6. Bump the manifest marker to `kickoff-manifest: v1.4` **LAST** — the bump silences the kit's
    version WARN, the only standing signal that the body still predates the ratchet.
 
 <!-- govkit:entry push-main -->
@@ -942,7 +949,7 @@ it.
 <project>/
 ├── AGENTS.md / CLAUDE.md        # (optional) project charter / agent-instruction file (agent-instructions kit)
 ├── docs/PARALLEL.md             # governance playbook, filled (governance-template marker kept) — ONE file; §2 ships no companion
-├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.3: audit block + sealed §A region) — the engine reads this
+├── memory/guides/SESSION-KICKOFF.md  # kickoff manifest (v1.4: audit block + sealed §A region + registry key) — the engine reads this
 ├── tools/manifest-check.sh    # ratchet gate — engine-identical copy (overwrite wholesale on kit updates)
 ├── .gitattributes               # EOL rules — the checker (+ the memory tree if §3 adopted)
 ├── .memory-tree.conf            # memory-tree config           ┐

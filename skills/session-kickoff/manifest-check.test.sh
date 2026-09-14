@@ -68,8 +68,8 @@ stamp_line() {
   printf 'last-audit: 2026-07-12T12:%02d:%02d+00:00 @ %s' $((n/60)) $((n%60)) "$1"
 }
 
-write_manifest() { # $1=repo $2=sha $3=watch $4=vpaths [$5=marker] [$6=extra-body]
-  local marker="${5:-kickoff-manifest: v1.3}"
+write_manifest() { # $1=repo $2=sha $3=watch $4=vpaths [$5=marker] [$6=extra-body] [$7=last-body-change] [$8=extra audit-block line]
+  local marker="${5:-kickoff-manifest: v1.4}"
   # The FIRST location `--locations` prints. The repo-root spelling this helper used to write is no
   # longer a discovery location, and most cases here call the checker with no path argument.
   mkdir -p "$1/memory/guides"
@@ -81,6 +81,7 @@ $(stamp_line "$2")
 watch: $3
 verify-paths: $4
 last-body-change: ${7:-$2}
+${8:-}
 -->
 ## §A
 <!-- kickoff:task -->
@@ -302,7 +303,7 @@ mkdir -p "$R/memory/guides"; cat > "$R/memory/guides/SESSION-KICKOFF.md" <<'EOF'
 old body
 EOF
 commit_all "$R" manifest
-run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.3 LAST"
+run "v1.0 marker, no block → C2 retrofit" "$R" 1 "marker to v1.4 LAST"
 
 # ---- 24 v1.0 marker WITH valid block → version WARN, 0 ------------------
 mkrepo v10block
@@ -622,6 +623,16 @@ if [ -f "$SEED" ]; then
   else
     echo "FAIL the shipped seed's region equals the constant"; fail=$((fail+1))
   fi
+  # EVERY KEY THE CARD VERB READS is in the seed's audit block, or a fresh adopter's every card reads
+  # UNKNOWN with no version WARN to say why. The list is the verb's, spelled here once.
+  seedblock=$(awk '/<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$SEED")
+  for k in registry; do
+    if printf '%s\n' "$seedblock" | grep -qE "^[[:space:]]*$k:"; then
+      echo "ok   the shipped seed's audit block carries the card key '$k:'"; pass=$((pass+1))
+    else
+      echo "FAIL the shipped seed's audit block carries the card key '$k:'"; fail=$((fail+1))
+    fi
+  done
 fi
 
 # ---- C11 the per-bullet traps cap ---------------------------------------------------------------
@@ -658,10 +669,210 @@ write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md" "" "
 commit_all "$R" manifest
 run "C11 does not police bullets outside the traps section" "$R" 0 -
 
+# ---- the orientation card (--card --write | --replay | --path) ------------------------------------
+# Every arm runs in a scratch CLONE of the repository that hosts the checker, inside a LINKED
+# WORKTREE of that clone — never in this tree, because the card home is the git common dir every
+# worktree on the node shares, and a fixture card left there is one a sibling session trips on. The
+# last arm lists this repository's real common dir and asserts the suite left nothing in it.
+# Session ids carry a per-run nonce so that listing can tell the suite's cards from anyone else's.
+NONCE="mfc$$"
+GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
+CCLONE="$TMP/card-clone"; CWT="$TMP/card-wt"
+git clone -q --local "$GOVROOT" "$CCLONE" && git -C "$CCLONE" worktree add -q "$CWT" -b card-wt \
+  || { echo "FAIL card fixture: cannot clone $GOVROOT and add a worktree under $TMP"; fail=$((fail+1)); }
+CARD_HOME="$CCLONE/.git/orientation"
+CUSER="${USERNAME:-${USER:-}}"
+
+# run_card <name> <repo> <want_exit> <want_grep|-> [args...] — stdout+stderr to $CARD_OUT, stdin
+# from /dev/null so the hook channel is provably empty; `run` cannot serve here because it strips
+# the trailing newline AC1 compares, and a card's bytes are the thing under test.
+CARD_OUT="$TMP/card.out"
+run_card() {
+  local name=$1 repo=$2 want=$3 pat=$4; shift 4
+  local got
+  (cd "$repo" && bash "$CHECK" "$@" </dev/null > "$CARD_OUT" 2>&1); got=$?
+  if [ "$got" != "$want" ]; then
+    echo "FAIL $name (exit $got, want $want)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); return 1
+  fi
+  if grep -q 'fatal:' "$CARD_OUT"; then
+    echo "FAIL $name (raw git fatal leaked)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); return 1
+  fi
+  if [ "$pat" != "-" ] && ! grep -qF -- "$pat" "$CARD_OUT"; then
+    echo "FAIL $name (output lacks '$pat')"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); return 1
+  fi
+  echo "ok   $name"; pass=$((pass+1))
+}
+# check_eq <name> <want> <got>
+check_eq() {
+  if [ "$2" = "$3" ]; then echo "ok   $1"; pass=$((pass+1)); else
+    echo "FAIL $1"; printf '    want: %s\n    got:  %s\n' "$2" "$3"; fail=$((fail+1)); fi
+}
+read_cell() { grep -m1 "^$1 — " "$CARD_HOME/$2.md"; }   # $1=cell $2=session id
+
+# Two fixture registries. REG1: the Remote column repeats the user on EVERY row (a row-wide match
+# hits all three), the matching Machine/user cell is BACKTICKED (equality after stripping), one
+# decoy row carries the user after an `@` (never a match), a registry-shaped table sits BEFORE the
+# heading with a matching row (`y`), and a second registry-shaped table sits AFTER the first one
+# under another heading with a matching row (`z`). Exactly one row may answer, and it is `q`.
+# REG2: the same Remote column, and no Machine/user cell matches.
+cat > "$CWT/REG1.md" <<EOF
+# fixture registry
+
+| Tag | Machine/user | Primary tree | Remote |
+|-----|--------------|--------------|--------|
+| \`y\` | $CUSER | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+
+## Node registry
+
+| Tag | Machine/user | Primary tree | Remote |
+|-----|--------------|--------------|--------|
+| \`p\` | someone-else @ \`HOST1\` | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+| \`q\` | \`$CUSER\` | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+| \`r\` | other @ \`$CUSER\` | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+
+## §2 — Nodes
+
+| Tag | Machine/user | Primary tree | Remote |
+|-----|--------------|--------------|--------|
+| \`z\` | $CUSER @ \`HOST2\` | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+EOF
+cat > "$CWT/REG2.md" <<EOF
+## Node registry
+
+| Tag | Machine/user | Primary tree | Remote |
+|-----|--------------|--------------|--------|
+| \`p\` | ${CUSER}x | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+| \`q\` | x$CUSER @ \`HOST\` | \`/x\` | \`origin\` (github \`$CUSER/repo\`) |
+EOF
+
+# AC1 — the write verb, in the linked worktree, with the manifest naming the real registry.
+write_manifest "$CWT" "$(git -C "$CWT" rev-parse HEAD)" "AGENTS.md" "AGENTS.md" "" "" "" "registry: AGENTS.md"
+t0=$(date +%s)
+run_card "AC1 --card --write writes the card and prints it" "$CWT" 0 "orientation — $NONCE-t1 · written " --card --write --session "$NONCE-t1"
+t1=$(date +%s)
+[ -f "$CARD_HOME/$NONCE-t1.md" ] && { echo "ok   AC1 the card is at <common-dir>/orientation/<sid>.md (wall $((t1-t0))s)"; pass=$((pass+1)); } \
+  || { echo "FAIL AC1 the card is at <common-dir>/orientation/<sid>.md"; ls "$CCLONE/.git" | sed 's/^/    /'; fail=$((fail+1)); }
+if cmp -s "$CARD_OUT" "$CARD_HOME/$NONCE-t1.md"; then echo "ok   AC1 stdout equals the card's bytes"; pass=$((pass+1)); else
+  echo "FAIL AC1 stdout equals the card's bytes"; diff "$CARD_OUT" "$CARD_HOME/$NONCE-t1.md" | sed 's/^/    /'; fail=$((fail+1)); fi
+
+# AC2 — every startup cell, each derived by the suite from git and compared to the card.
+wt_top=$(git -C "$CWT" rev-parse --show-toplevel); wt_head=$(git -C "$CWT" rev-parse HEAD)
+wt_dirty=$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')
+check_eq "AC2 tree — the toplevel in git's own spelling, worktree, branch, BASE, dirty count" \
+  "tree — $wt_top · worktree · branch card-wt · BASE $wt_head · dirty $wt_dirty" "$(read_cell tree "$NONCE-t1")"
+check_eq "AC2 worktrees — the count of git worktree list" \
+  "worktrees — $(git -C "$CWT" worktree list | wc -l | tr -d '[:space:]')" "$(read_cell worktrees "$NONCE-t1")"
+memroot=$(sed -n 's/^MEMORY_ROOT=//p' "$CWT/.memory-tree.conf" 2>/dev/null | head -1 | tr -d '"')
+if [ -n "$memroot" ] && [ -f "$CWT/$memroot/LIVE.md" ]; then
+  check_eq "AC2 live — the table rows of LIVE.md minus its header" \
+    "live — LIVE.md · $(grep -c '^| \[' "$CWT/$memroot/LIVE.md") non-terminal builds" "$(read_cell live "$NONCE-t1")"
+else
+  echo "skip AC2 live — this tree declares no memory root with a LIVE.md, so the count arm has no oracle (AC10 covers the skipped: shape)"
+fi
+check_eq "AC2 recent — the five subjects of git log --oneline -5" \
+  "$(git -C "$CWT" log --oneline -5)" "$(awk '/^recent —/{f=1;next} /^READY —/{exit} f' "$CARD_HOME/$NONCE-t1.md")"
+check_eq "AC2 the card ends with the READY sentinel" "READY — none yet" "$(tail -1 "$CARD_HOME/$NONCE-t1.md")"
+grep -qE "^orientation — $NONCE-t1 · written [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{4} · by manifest-check.sh --card --write$" "$CARD_HOME/$NONCE-t1.md" \
+  && { echo "ok   AC2 the header names the session, the ISO time and the writer verb"; pass=$((pass+1)); } \
+  || { echo "FAIL AC2 the header names the session, the ISO time and the writer verb"; head -1 "$CARD_HOME/$NONCE-t1.md" | sed 's/^/    /'; fail=$((fail+1)); }
+# Counted with tr, not grep: an MSYS grep handed a CR pattern matches EVERY line (measured: 12 of 12 on a LF card).
+[ "$(tr -dc '\r' < "$CARD_HOME/$NONCE-t1.md" | wc -c | tr -d '[:space:]')" = 0 ] && { echo "ok   AC2 the card is LF"; pass=$((pass+1)); } || { echo "FAIL AC2 the card is LF"; fail=$((fail+1)); }
+
+# AC3 — no session id on either channel, then a path-shaped one; nothing is written under any of them.
+before=$(ls "$CARD_HOME" | wc -l | tr -d '[:space:]')
+run_card "AC3 no id on stdin and no --session → exit 2 naming both channels" "$CWT" 2 "none in the JSON on stdin (the SessionStart hook's channel) and no --session <sid> given" --card --write
+run_card "AC3 a session id carrying '..' is refused" "$CWT" 2 "carries '..' and is not joined into a path" --card --write --session "$NONCE-..-t3"
+run_card "AC3 a session id carrying a path separator is refused" "$CWT" 2 "carries a path separator or a byte outside" --card --write --session "$NONCE/t3"
+run_card "AC3 an empty --session value is refused" "$CWT" 2 "has no session id" --card --write --session ""
+check_eq "AC3 the refused ids wrote nothing under orientation/" "$before" "$(ls "$CARD_HOME" | wc -l | tr -d '[:space:]')"
+# The hook channel: the SessionStart JSON on stdin, no --session.
+(cd "$CWT" && printf '{"session_id":"%s","hook_event_name":"SessionStart"}\n' "$NONCE-t2" | bash "$CHECK" --card --write > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && [ -f "$CARD_HOME/$NONCE-t2.md" ] && { echo "ok   AC3 the session id is read from the hook's JSON on stdin"; pass=$((pass+1)); } \
+  || { echo "FAIL AC3 the session id is read from the hook's JSON on stdin (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+
+# AC4 — the node cell: the real registry at HEAD, then the two fixtures, then no key at all.
+if [ "$CUSER" = daily-agent ]; then
+  check_eq "AC4 node — resolves this node from the real AGENTS.md" "node — a · daily-agent" "$(read_cell node "$NONCE-t1")"
+else
+  echo "skip AC4 the exact tag against the real AGENTS.md: this node's user is '$CUSER', and the row the spec names is node a's (the fixture arms below decide the predicate)"
+fi
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG1.md"
+run_card "AC4 --card --write against fixture registry REG1" "$CWT" 0 - --card --write --session "$NONCE-t4a"
+check_eq "AC4 node — exactly one Machine/user cell matches, backticks stripped, first table only" "node — q · $CUSER" "$(read_cell node "$NONCE-t4a")"
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG2.md"
+run_card "AC4 --card --write against fixture registry REG2" "$CWT" 0 - --card --write --session "$NONCE-t4b"
+check_eq "AC4 node — no Machine/user cell matches, and the Remote column does not vote" "node — UNKNOWN: no Machine/user cell in REG2.md matches $CUSER" "$(read_cell node "$NONCE-t4b")"
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: NOPE.md"
+run_card "AC4 --card --write against a registry that is not a file" "$CWT" 0 - --card --write --session "$NONCE-t4c"
+check_eq "AC4 node — a registry path that is not a file is UNKNOWN, and the card still writes" "node — UNKNOWN: registry NOPE.md is not a file in this tree" "$(read_cell node "$NONCE-t4c")"
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md"
+run_card "AC4 --card --write with no registry key" "$CWT" 0 - --card --write --session "$NONCE-t4d"
+check_eq "AC4 node — an absent registry key is UNKNOWN: no registry" "node — UNKNOWN: no registry" "$(read_cell node "$NONCE-t4d")"
+
+# AC5 — replay: the stored bytes, one `now —` line, the file untouched; a missing card is written
+# fresh under the replay's own name, node cell resolved.
+cp "$CARD_HOME/$NONCE-t1.md" "$TMP/t1.before"
+run_card "AC5 --card --replay prints the stored card" "$CWT" 0 "orientation — $NONCE-t1 · written " --card --replay --session "$NONCE-t1"
+check_eq "AC5 replay = the stored bytes then exactly one now — line" \
+  "$(cat "$TMP/t1.before"; printf 'now — HEAD %s · card-wt · dirty %s\n' "$wt_head" "$(git -C "$CWT" status --porcelain | wc -l | tr -d '[:space:]')")" "$(cat "$CARD_OUT")"
+cmp -s "$TMP/t1.before" "$CARD_HOME/$NONCE-t1.md" && { echo "ok   AC5 the file on disk is byte-identical after the replay"; pass=$((pass+1)); } \
+  || { echo "FAIL AC5 the file on disk is byte-identical after the replay"; fail=$((fail+1)); }
+run_card "AC5 a second replay" "$CWT" 0 - --card --replay --session "$NONCE-t1"
+check_eq "AC5 a second replay still prints exactly one now — line" "1" "$(grep -c '^now — ' "$CARD_OUT")"
+write_manifest "$CWT" "$wt_head" "AGENTS.md" "AGENTS.md" "" "" "" "registry: REG1.md"
+run_card "AC5 --card --replay for a session with no card writes one" "$CWT" 0 "orientation — $NONCE-t5 · written " --card --replay --session "$NONCE-t5"
+grep -q "^orientation — $NONCE-t5 · written .* · by manifest-check.sh --card --replay$" "$CARD_HOME/$NONCE-t5.md" \
+  && { echo "ok   AC5 the replay-written card names --card --replay as its writer"; pass=$((pass+1)); } \
+  || { echo "FAIL AC5 the replay-written card names --card --replay as its writer"; head -1 "$CARD_HOME/$NONCE-t5.md" | sed 's/^/    /'; fail=$((fail+1)); }
+check_eq "AC5 the replay-written card resolves the node cell" "node — q · $CUSER" "$(read_cell node "$NONCE-t5")"
+check_eq "AC5 the replay-written card is followed by one now — line" "1" "$(grep -c '^now — ' "$CARD_OUT")"
+
+# AC6 — --path prints one line and touches nothing.
+run_card "AC6 --card --path prints the card's path" "$CWT" 0 "/orientation/$NONCE-t6.md" --card --path --session "$NONCE-t6"
+check_eq "AC6 --card --path prints exactly one line" "1" "$(wc -l < "$CARD_OUT" | tr -d '[:space:]')"
+[ ! -e "$CARD_HOME/$NONCE-t6.md" ] && { echo "ok   AC6 --card --path wrote no card"; pass=$((pass+1))
+ } || { echo "FAIL AC6 --card --path wrote no card"; fail=$((fail+1)); }
+
+# AC7 — the cap forced under the startup card's size: a refusal naming cap and overage, no file.
+(cd "$CWT" && CARD_CAP_BYTES=100 bash "$CHECK" --card --write --session "$NONCE-t7" </dev/null > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 2 ] && grep -q "over the 100-byte cap" "$CARD_OUT" && [ ! -e "$CARD_HOME/$NONCE-t7.md" ] \
+  && { echo "ok   AC7 a card over CARD_CAP_BYTES is refused with exit 2, naming the cap, and leaves no file"; pass=$((pass+1)); } \
+  || { echo "FAIL AC7 a card over CARD_CAP_BYTES is refused with exit 2, naming the cap, and leaves no file (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+
+# The dispatch itself: --card with no verb refuses; --write WITHOUT --card still reaches the manifest
+# catch-all exactly as before this verb family existed.
+run_card "--card with no verb → exit 2" "$CWT" 2 "--card needs one of --write, --replay or --path" --card --session "$NONCE-t8"
+run_card "--write without --card is still a manifest path argument" "$CWT" 2 "'--write' not found" --write
+
+# AC9 — no fetch and no ref move: a remote one commit ahead, refs identical after, no FETCH_HEAD.
+mkrepo aheadremote; AHEAD_R="$R"
+git clone -q "$AHEAD_R" "$TMP/aheadlocal" 2>/dev/null
+echo ahead > "$AHEAD_R/ahead.txt"; commit_all "$AHEAD_R" "remote moves ahead"
+h_before=$(git -C "$TMP/aheadlocal" rev-parse HEAD); o_before=$(git -C "$TMP/aheadlocal" rev-parse origin/main)
+rm -f "$TMP/aheadlocal/.git/FETCH_HEAD"
+run_card "AC9 --card --write in a repo whose remote is ahead, and with no manifest at all" "$TMP/aheadlocal" 0 "node — UNKNOWN: no registry" --card --write --session "$NONCE-t9"
+check_eq "AC9 HEAD and origin/main are unchanged after the card" "$h_before $o_before" \
+  "$(git -C "$TMP/aheadlocal" rev-parse HEAD) $(git -C "$TMP/aheadlocal" rev-parse origin/main)"
+[ ! -e "$TMP/aheadlocal/.git/FETCH_HEAD" ] && { echo "ok   AC9 no FETCH_HEAD was written"; pass=$((pass+1)); } || { echo "FAIL AC9 no FETCH_HEAD was written"; fail=$((fail+1)); }
+check_eq "AC9 a primary tree's card says primary" "tree — $(git -C "$TMP/aheadlocal" rev-parse --show-toplevel) · primary · branch main · BASE $h_before · clean" "$(grep -m1 '^tree — ' "$TMP/aheadlocal/.git/orientation/$NONCE-t9.md")"
+
+# AC10 — no .memory-tree.conf: exit 0 and a skipped: live cell, never a refusal.
+mkrepo noconf; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
+run_card "AC10 --card --write with no .memory-tree.conf exits 0" "$R" 0 "live — skipped: no .memory-tree.conf in this tree" --card --write --session "$NONCE-t10"
+
+# AC11 — this repository's REAL common dir holds no card the suite wrote.
+real_common=$(cd "$(git -C "$GOVROOT" rev-parse --git-common-dir)" && pwd)
+leaked=$(ls "$real_common/orientation" 2>/dev/null | grep -c "^$NONCE-" || true)
+check_eq "AC11 the suite left no card in this repository's shared common dir ($real_common/orientation)" "0" "$leaked"
+
 # TOOL-cSettledDocket-5 — the agreed shape, so one leg can read every suite's count. This file
 # ALREADY counted; the spec that proposed adding a counter here had grepped for another suite's
 # spelling and reported a missing capability after measuring a missing convention.
-FLOOR_ASSERTIONS=62
+# 108 = every arm that runs on EVERY node. The card section holds one arm more on node a alone (the
+# exact tag against the real AGENTS.md, which the spec words as "on this node"); it announces its
+# skip elsewhere, and a floor that counted it would red the suite on b, c and d for an arm that is
+# not theirs to reach. KICK-aReplayedCard-1.
+FLOOR_ASSERTIONS=108
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

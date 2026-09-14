@@ -14,11 +14,18 @@
 #                                         # C9/C10/C11 are FULL-RUN only: they judge the working
 #                                         # tree, not what this commit stages, and the hook that
 #                                         # runs this leg fires on every commit.
+#   manifest-check.sh --card --write [--session <sid>]    # write the session's orientation card
+#   manifest-check.sh --card --replay [--session <sid>]   # print it back, plus one `now —` line
+#   manifest-check.sh --card --path [--session <sid>]     # print where it lives, touch nothing
+#     The card verbs run NO manifest check: the session id comes from the SessionStart hook's JSON
+#     on stdin, else --session; the card lives at <git-common-dir>/orientation/<sid>.md, shared by
+#     every worktree; the `node —` cell resolves through the manifest audit block's `registry:` key.
 #
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed.
-# Exit 2 = environment error (not a git repo / no manifest found / path outside the repo).
+# Exit 2 = environment error (not a git repo / no manifest found / path outside the repo / a card
+#          verb with no session id, a path-shaped one, or a startup card over its byte cap).
 set -u
-KIT_MANIFEST_VERSION="1.3"   # gov:kit kickoff-manifest@1.3 — the registry id
+KIT_MANIFEST_VERSION="1.4"   # gov:kit kickoff-manifest@1.4 — the registry id
 
 # THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
 # from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff
@@ -68,10 +75,67 @@ for _a in "$@"; do
   esac
 done
 
+# The card verbs are CONSUMED here, before the manifest loop below, whose catch-all reads any other
+# argument as a manifest path. `--card` alone is a refusal, not a default: a verb the caller did not
+# name is a card the caller did not ask for. Without `--card`, `--write` and its siblings still fall
+# through to that catch-all exactly as they did before this block existed.
+CARD=""; CARD_VERB=""; CARD_SID=""; _rest=(); _want_sid=0
+for _a in "$@"; do [ "$_a" = --card ] && CARD=1; done
+for _a in "$@"; do
+  if [ "$_want_sid" = 1 ]; then CARD_SID="$_a"; _want_sid=0; continue; fi
+  case "$CARD$_a" in
+    1--card) ;;
+    1--write|1--replay|1--path) CARD_VERB="${_a#--}" ;;
+    1--session) _want_sid=1 ;;
+    1--session=*) CARD_SID="${_a#--session=}" ;;
+    *) _rest+=("$_a") ;;
+  esac
+done
+set -- ${_rest[@]+"${_rest[@]}"}
+if [ -n "$CARD" ] && [ -z "$CARD_VERB" ]; then
+  echo "MANIFEST env ERROR — --card needs one of --write, --replay or --path"; exit 2
+fi
+
 CALLER_PWD=$PWD
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "MANIFEST env ERROR — not a git repository"; exit 2; }
+TOPLEVEL=$ROOT   # the bytes git prints, kept for the card's `tree —` cell: ONE declared spelling, before the normalisation below
 ROOT=$(cd "$ROOT" 2>/dev/null && pwd) || { echo "MANIFEST env ERROR — cannot enter repo root"; exit 2; }   # normalize to the shell's path flavor (git-bash: C:/ vs /c/)
 cd "$ROOT" || exit 2
+
+# ---- the orientation card ------------------------------------------------------------------------
+# One file per session under the git COMMON dir, so every worktree of one repository shares the
+# directory and a card names the tree it was written in. Every startup field is DERIVED — nothing
+# here is authored, and nothing here is imperative: hook-injected text reads to the model as an
+# instruction from nobody. The cap is one constant; the append verb of the next unit refuses against
+# the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
+CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
+
+# The session id: the SessionStart hook hands `{"session_id": …}` on stdin; a hand invocation passes
+# --session. Neither is a refusal naming both, never a card under a guessed id; a separator, `..` or
+# any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path.
+read_session_id() {
+  local sid=""
+  [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  [ -n "$sid" ] || sid="$CARD_SID"
+  [ -n "$sid" ] || { echo "MANIFEST env ERROR — --card --$CARD_VERB has no session id: none in the JSON on stdin (the SessionStart hook's channel) and no --session <sid> given"; exit 2; }
+  case "$sid" in
+    *..*) echo "MANIFEST env ERROR — session id '$sid' carries '..' and is not joined into a path"; exit 2 ;;
+  esac
+  printf '%s' "$sid" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]*$' \
+    || { echo "MANIFEST env ERROR — session id '$sid' carries a path separator or a byte outside [A-Za-z0-9._-] and is not joined into a path"; exit 2; }
+  CARD_SID="$sid"
+}
+
+# `--path` answers here, before the manifest resolves: it needs the repository (for the common dir)
+# and the id, and nothing else. Print-only, exit 0, no `fail` branch — the `--locations` shape.
+if [ -n "$CARD" ]; then
+  CARD_DIR=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) \
+    || { echo "MANIFEST env ERROR — cannot resolve the git common dir, so the card has no home"; exit 2; }
+  CARD_DIR="$CARD_DIR/orientation"
+  read_session_id
+  CARD_FILE="$CARD_DIR/$CARD_SID.md"
+  [ "$CARD_VERB" = path ] && { printf '%s\n' "$CARD_FILE"; exit 0; }
+fi
 
 STAGED=0; MF=""
 for a in "$@"; do
@@ -106,6 +170,114 @@ else
     [ -f "$p" ] && { MF="$p"; break; }
   done
 fi
+
+# The audit block's text, CR-stripped; `getval` reads one key from it. Defined here because the card
+# reads the block's `registry:` key before the checks below ever run, and one reader is one reader.
+read_block() { awk '/<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$1" | tr -d '\r'; }
+getval() { printf '%s\n' "$BLOCK" | sed -n "s/^[[:space:]]*$1:[[:space:]]*\(.*\)$/\1/p" | head -1 | sed 's/[[:space:]]*$//'; }
+
+# The `node —` cell: the FIRST table under a `## Node registry` heading of the file the manifest's
+# `registry:` key names, backticks stripped, `$USERNAME` (else `$USER`) matched against the
+# Machine/user cell by equality or by the prefix `<user> @` — never row-wide, because the Remote
+# column repeats one github user on every row and a row-wide match hits all of them. No unique
+# match is UNKNOWN with the reason, printed, never guessed; the card still writes.
+derive_node_tag() {
+  local reg="$1" user="${USERNAME:-${USER:-}}" hits tag mu
+  [ -n "$reg" ] || { printf 'node — UNKNOWN: no registry\n'; return 0; }
+  [ -f "$reg" ] || { printf 'node — UNKNOWN: registry %s is not a file in this tree\n' "$reg"; return 0; }
+  [ -n "$user" ] || { printf 'node — UNKNOWN: neither USERNAME nor USER names a user\n'; return 0; }
+  IFS=$'\t' read -r hits tag mu < <(awk -v user="$user" '
+    { ln=$0; sub(/\r$/,"",ln) }
+    !intab && ln ~ /^## Node registry/ { sect=1; next }
+    sect && !intab && ln ~ /^## / { exit }
+    sect && !intab && ln ~ /^\|/ { intab=1 }
+    intab && ln !~ /^\|/ { exit }
+    !intab { next }
+    { gsub(/`/,"",ln); split(ln, c, "|"); tag=c[2]; mu=c[3]
+      gsub(/^[ \t]+|[ \t]+$/,"",tag); gsub(/^[ \t]+|[ \t]+$/,"",mu)
+      if (tag=="Tag" || tag ~ /^:?-+:?$/) next
+      if (mu==user || index(mu, user " @")==1) { hits++; found=tag; foundmu=mu } }
+    END { printf "%d\t%s\t%s\n", hits+0, found, foundmu }' "$reg")
+  case "$hits" in
+    1) printf 'node — %s · %s\n' "$tag" "$mu" ;;
+    0) printf 'node — UNKNOWN: no Machine/user cell in %s matches %s\n' "$reg" "$user" ;;
+    *) printf 'node — UNKNOWN: %s Machine/user cells in %s match %s\n' "$hits" "$reg" "$user" ;;
+  esac
+}
+
+# The startup card, rendered from facts a script can derive: no fetch, no ref move, no manifest
+# audit — the engine's Step 1 and Step 2b own those and each costs a kickoff, not a session start.
+# `$1` names the writer verb the header carries; a card the replay wrote fresh says `--card --replay`,
+# which is the one byte-level fact that tells a session started before the writer was wired from one
+# whose startup ran it. The `live —` cell reads the memory-tree conf when there is one and reports
+# `skipped:` otherwise, because this kit requires no other kit.
+derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the card and once by the `now —` line
+  local n
+  HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || HEAD_BRANCH=HEAD
+  HEAD_SHA=$(git rev-parse -q --verify 'HEAD^{commit}' 2>/dev/null) || HEAD_SHA=unborn
+  n=$(git status --porcelain 2>/dev/null | wc -l | tr -d '[:space:]')
+  if [ "$n" -eq 0 ]; then HEAD_DIRTY=clean; else HEAD_DIRTY="dirty $n"; fi
+}
+render_card() {
+  local verb="$1" registry="" kind memroot live conf
+  [ -n "$MF" ] && [ -f "$MF" ] && { BLOCK=$(read_block "$MF"); registry=$(getval 'registry'); }
+  if [ -f "$ROOT/.git" ]; then kind=worktree; else kind=primary; fi
+  derive_head_state
+  conf="$ROOT/.memory-tree.conf"
+  if [ ! -f "$conf" ]; then
+    live='live — skipped: no .memory-tree.conf in this tree'
+  else
+    memroot=$(sed -n 's/^MEMORY_ROOT=[[:space:]]*//p' "$conf" | head -1 | tr -d '\r"'"'")
+    if [ -z "$memroot" ]; then
+      live='live — skipped: .memory-tree.conf declares no MEMORY_ROOT'
+    elif [ ! -f "$ROOT/$memroot/LIVE.md" ]; then
+      live="live — skipped: $memroot/LIVE.md is absent"
+    else
+      live="live — LIVE.md · $(awk '/^\|/ && !/^\|[-|: ]*$/ {n++} END{print (n>0?n-1:0)}' "$ROOT/$memroot/LIVE.md") non-terminal builds"
+    fi
+  fi
+  printf 'orientation — %s · written %s · by %s --card --%s\n' "$CARD_SID" "$(date +%Y-%m-%dT%H:%M:%S%z)" "${0##*/}" "$verb"
+  derive_node_tag "$registry"
+  printf 'tree — %s · %s · branch %s · BASE %s · %s\n' "$TOPLEVEL" "$kind" "$HEAD_BRANCH" "$HEAD_SHA" "$HEAD_DIRTY"
+  printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
+  printf '%s\n' "$live"
+  printf 'recent —\n'
+  git log --oneline -5 2>/dev/null
+  printf 'READY — none yet\n'
+}
+
+# Persist the rendered card and print the same bytes. Rendered to a variable FIRST so an over-cap
+# card leaves no file: every startup field is bounded, so an overflow means a derivation went wrong
+# and a truncated card would carry that error into every later reader.
+write_card() {
+  local card bytes
+  card=$(render_card "$1")
+  bytes=$(printf '%s\n' "$card" | wc -c | tr -d '[:space:]')
+  if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
+    echo "MANIFEST env ERROR — the startup card is $bytes bytes, $((bytes - CARD_CAP_BYTES)) over the $CARD_CAP_BYTES-byte cap (CARD_CAP_BYTES); a bounded derivation overflowed, so nothing was written"
+    exit 2
+  fi
+  mkdir -p "$CARD_DIR" || { echo "MANIFEST env ERROR — cannot create $CARD_DIR"; exit 2; }
+  printf '%s\n' "$card" > "$CARD_FILE" || { echo "MANIFEST env ERROR — cannot write $CARD_FILE"; exit 2; }
+  printf '%s\n' "$card"
+}
+
+# The stored card, unchanged, then ONE `now —` line computed here and never stored — a second replay
+# must print one, not two. A missing card is written fresh under the replay's own name in its header.
+print_replay() {
+  if [ -f "$CARD_FILE" ]; then cat "$CARD_FILE"; else write_card replay; fi
+  derive_head_state
+  printf 'now — HEAD %s · %s · %s\n' "$HEAD_SHA" "$HEAD_BRANCH" "$HEAD_DIRTY"
+}
+
+if [ -n "$CARD" ]; then
+  case "$CARD_VERB" in
+    write)  write_card write ;;
+    replay) print_replay ;;
+  esac
+  exit 0
+fi
+
 # The message is BUILT from the same array the loop walks, so it can never again describe a different
 # list than the one that was searched.
 [ -n "$MF" ] && [ -f "$MF" ] || {
@@ -194,7 +366,7 @@ c8=$(awk '
 $c8"
 
 # C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
-RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.3 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
+RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (5b) add registry = the file whose first table under '## Node registry' names this node, which the card verbs read; (6) bump the marker to v1.4 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
 BLOCK_OK=1
 if [ "$nblocks" -eq 0 ]; then
@@ -207,8 +379,7 @@ fi
 
 LA=""; WATCH_RAW=""; VP_RAW=""
 if [ "$BLOCK_OK" = 1 ]; then
-  BLOCK=$(awk '/<!-- manifest-audit/{f=1;next} f&&/-->/{exit} f' "$MF" | tr -d '\r')
-  getval() { printf '%s\n' "$BLOCK" | sed -n "s/^[[:space:]]*$1:[[:space:]]*\(.*\)$/\1/p" | head -1 | sed 's/[[:space:]]*$//'; }
+  BLOCK=$(read_block "$MF")
   LA=$(getval 'last-audit'); WATCH_RAW=$(getval 'watch'); VP_RAW=$(getval 'verify-paths')
   LBC=$(getval 'last-body-change')
   [ -n "$LA" ] || { fail 2 "manifest-audit block lacks a last-audit value — stamp '<ISO datetime> @ <full sha>' after verifying §B."; BLOCK_OK=0; }
