@@ -1573,6 +1573,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_acceptance",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "extract_bound_names",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"

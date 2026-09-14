@@ -1,12 +1,13 @@
 # TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md](../build/2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md) | research | TOOL-aDeferredBar-1 TOOL-aDeferredBar-3 |
+| [2026-09-14-build-TOOL-aDeferredBar-2-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aDeferredBar-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aDeferredBar-2-1-spec-brief.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-2-1-spec-brief.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aDeferredBar-2-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aDeferredBar-2-2-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md) | spec-audit | TOOL-aDeferredBar-1 TOOL-aDeferredBar-3 |
@@ -251,7 +252,9 @@ history and strictly past its commit date — a skip announces itself; a pass do
 **`--list` near-misses.** Every `TICK` token of a live spec's whole text that `BAR` matches and that
 is not one of that spec's graded-population tokens, plus every graded-population match in a
 pre-cutoff spec, prints as `spec-tokens: NEAR   [bar] <spec> :: <token> — <where>` where `<where>` is
-`outside the graded population` or `predates SPEC_DIRECT_CUTOFF <date>`. Exit 0, never a hit. A
+`outside the graded population` or `predates SPEC_DIRECT_CUTOFF <date>` — or, when the key is
+blank, `SPEC_DIRECT_CUTOFF blank (arm off)` for a graded-population match, so the OFF line's carrier
+count has its `--list` counterpart (rev-4). Exit 0, never a hit. A
 fenced block's body is not a `TICK` token, so it is neither a hit nor a `NEAR` line: silence is the
 design there, and AC3 asserts the silence rather than a line.
 
@@ -265,12 +268,16 @@ the cost of this leg is the `git init` and first commit, not the checker (§5). 
 AC1, AC2, AC3, AC4, AC5, AC15, AC16, AC17 — shares one repo whose committed clean state is the
 suite's existing `scratch` fixture plus an empty tracked `tools/run-gates/run-gates.sh`, so the
 paths join stays green over a runner token and the only hit an arm can produce is the bar's. The
-WAIVER family — AC6, AC7 — shares a second, whose committed clean state is the AC1 fixture. Every
+WAIVER family — AC6, AC7 — shares a second, whose committed clean state is the AC1 fixture, and
+that commit is dated `GIT_COMMITTER_DATE=2026-08-31`, the day before its cutoff: the WAIVER family
+commits its conf, so without the backdate the Date gate would refuse the fixture instead of grading
+it (rev-4, found at build). Every
 arm is one edit from its family's committed clean state and is followed by `git add -A` as the
 existing arms are — AC17 alone also COMMITS its edit, because the refusal it observes reads the
 value's commit date and a staged value is the announced skip, not the refusal; between arms the
 repo is returned to the clean state with a single `git reset --hard <clean-sha>`, the sha captured
-once after the family's first commit, never a fresh init. The DATED family's other arms leave their
+once after the family's clean-state commit — the DATED family's is the `scratch` commit plus one
+adding the runner — never a fresh init. The DATED family's other arms leave their
 conf edits uncommitted, so their bar line carries the `relation unchecked` field and their cutoffs
 — dated before the fixture's commit day — are never refused. The fixture tokens, spelled here in a
 fence so the join never reads them as an instruction:
@@ -679,6 +686,20 @@ New arm: tools/check-spec-tokens.test.sh · ten arms over two shared scratch rep
   agree on all 52 graded tokens in 24 specs, unit 3's one is the bare suite basename round-2 M2
   names, and the count is 23 once that fold lands. §5 re-prices the two legs for the tenth arm and
   the history query.
+- rev-4 · 2026-09-14 · built, and CLOSED in the same commit. Two things the design could not see
+  from the desk, both in §4 and neither moving an acceptance criterion. §4 The suite's fixtures: the
+  WAIVER family commits its conf, so its clean-state commit is dated `GIT_COMMITTER_DATE=2026-08-31`,
+  the day before its cutoff — the Date gate S1 adds would otherwise refuse the AC6 and AC7 fixtures
+  instead of grading them, which is the relation working as specified against a fixture rev-3 had
+  not priced; and the DATED family's clean sha is captured after a second commit adding the empty
+  runner, since the `scratch` helper commits before the runner exists. §4 `--list` near-misses: a
+  third `<where>`, `SPEC_DIRECT_CUTOFF blank (arm off)`, for a graded-population match under a
+  blank key, so the AC5 OFF line's carrier count has a `--list` counterpart. Every failing case
+  observed RED by the direct checker on its staged fixture before its arm was written, AC7's on a
+  checker copy with the stale-row rule removed; the corpus measurement of §4 re-taken at
+  `2ca014fd`: 23 live carriers, 51 graded tokens, heading-text and ordinal populations identical
+  after whitespace in all 30 live specs. AC8's committed form was observed on a throwaway commit
+  that was soft-reset before the build commit, since a commit cannot observe itself.
 
 ## 10. Reuse audit
 

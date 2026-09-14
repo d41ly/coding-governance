@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # check-spec-tokens.test.sh — red/green arms for tools/check-spec-tokens.py (TOOL-dRetiredFork-20).
 #
-# HERMETIC: every arm builds its own scratch repo under mktemp -d and never touches the real tree,
-# so the suite is safe beside the other heavy legs in a concurrent bar.
+# HERMETIC: every arm runs in a scratch repo under mktemp -d — its own, or one of the two the bar
+# arms share and reset between edits — and never touches the real tree, so the suite is safe beside
+# the other heavy legs in a concurrent bar.
 #
 # Each arm asserts an EXIT CODE and, where the message is the point, a substring of stdout. The
 # refusal arms matter most: this lint's own failure mode is passing over a population it never
@@ -12,7 +13,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=20
+FLOOR_ASSERTIONS=32
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 PY=${PY:-python}
 pass=0; fail=0
@@ -191,6 +192,138 @@ arm "an absent waiver registry REFUSES" 1 "$d" "REFUSING"
 d=$base/badlegs; scratch "$d"
 printf 'not json\n' > "$d/tools/gate-legs.json"; git -C "$d" add -A >/dev/null
 arm "a manifest that does not parse REFUSES" 1 "$d" "REFUSING"
+
+# ---- TOOL-aDeferredBar-2: the bar join. Ten arms over TWO shared scratch repos rather than ten
+#      fresh ones, because the init and first commit are the cost of this leg, not the checker. Each
+#      arm is one edit from its family's committed clean state, `git add -A` as above, and the repo is
+#      returned to that state with a single reset — never a fresh init. The DATED family's clean state
+#      is the `scratch` fixture plus an empty tracked runner, so the paths join stays green over a
+#      runner token and the only hit an arm can produce is the bar's; its conf edits stay uncommitted,
+#      so the bar line carries `relation unchecked` and a cutoff dated before the commit day is never
+#      refused. AC17 alone commits, because the refusal it observes reads the value's commit date.
+d=$base/bar; scratch "$d"
+mkdir -p "$d/tools/run-gates"; : > "$d/tools/run-gates/run-gates.sh"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm runner --no-verify
+clean=$(git -C "$d" rev-parse HEAD)
+spec="$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+
+# AC1 — a post-cutoff §6 bullet backticking the flagged full bar REDS as [bar], with the substitute.
+#       The token opens `GATE_`, which NOT_A_TOKEN drops unread unless the bar test runs first.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` is green|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff §6 bullet naming the flagged bar REDS as [bar]" 1 "$d" '-spec-TOOL-tOne-1.md [bar] `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — a bar or suite is not an acceptance observation'
+git -C "$d" reset -q --hard "$clean"
+
+# AC2 — the same token on the §7 leg line REDS: NOT_A_LEG would discard it for its `bash ` opener.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|`real leg` · `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the same token on the §7 leg line REDS, read before NOT_A_LEG discards it" 1 "$d" '[bar] `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# AC3 — three placements that are NOT hits: §4 prose, a §7 `New arm:` line, and the un-backticked
+#       body of a fence under a §6 bullet. `--list` prints the first two as NEAR and nothing at all
+#       for the fence body, which is the fence exclusion asserted as silence.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+cat > "$spec" <<'SPEC'
+# TOOL-tOne-1 — a unit
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · streams tooling
+
+## 4. Design
+
+The bar is `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, named here in prose.
+
+## 6. Acceptance criteria
+
+- **AC1** — `tools/gate-legs.json` exists.
+  ```
+  bash tools/run-gates/run-selftests.sh
+  ```
+
+## 7. Gates
+
+`real leg`.
+
+New arm: `bash tools/check-spec-tokens.test.sh` · stages a break · none
+SPEC
+git -C "$d" add -A >/dev/null
+arm "a bar token in §4 prose, on a New arm: line and in a fence body is no hit" 0 "$d" "0 pre-cutoff live spec(s) carry one and are not graded"
+out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
+if [ "$(printf '%s\n' "$out" | grep -c 'NEAR   \[bar\]')" = 2 ] \
+   && [ "$(printf '%s\n' "$out" | grep -c 'outside the graded population')" = 2 ] \
+   && ! printf '%s\n' "$out" | grep -q 'run-selftests.sh'; then
+  echo "arm ok    --list prints exactly two NEAR lines and stays silent on the fence body"; pass=$((pass+1))
+else
+  echo "arm FAIL  --list — expected exactly two NEAR lines outside the graded population and no fence-body line"
+  printf '%s\n' "$out" | grep -E 'NEAR|run-selftests' | head -5; fail=$((fail+1))
+fi
+git -C "$d" reset -q --hard "$clean"
+
+# AC4 — a PRE-cutoff carrier is green, and COUNTED on the bar line rather than silently skipped.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+git -C "$d" mv "$spec" "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` is green|' "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a PRE-cutoff carrier is green, counted and not graded" 0 "$d" "1 pre-cutoff live spec(s) carry one and are not graded"
+git -C "$d" reset -q --hard "$clean"
+
+# AC5 — a BLANK key turns the join off over the AC1 tree, and the OFF line still counts the carrier.
+printf 'SPEC_DIRECT_CUTOFF=""\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` is green|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "a blank SPEC_DIRECT_CUTOFF turns the join off and still counts the carrier" 0 "$d" "SPEC_DIRECT_CUTOFF blank (arm off) · 1 live spec(s) carry a bar token"
+git -C "$d" reset -q --hard "$clean"
+
+# AC15 — the LIGHT profile: criteria under `## 5.`, Gates under `## 6.`. The ordinal read graded the
+#        Gates section as the bullet population and never saw the token; the heading read does.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` is green|; s|^## 6. Acceptance criteria$|## 5. Acceptance criteria|; s|^## 7. Gates$|## 6. Gates|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "a light-profile spec is graded where its criteria sit, not at the ordinal" 1 "$d" '[bar] `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`'
+git -C "$d" reset -q --hard "$clean"
+
+# AC16 — the EMPTY flag assignment is the OFF spelling and no hit (rev-1's branch matched it); the
+#        same assignment with a value is a hit whatever command follows it.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_FULL= cat tools/gate-legs.json` prints|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the EMPTY flag assignment is the OFF spelling and is no hit" 0 "$d" "2 token(s) examined in 1 live spec(s) at/after SPEC_DIRECT_CUTOFF 2026-09-01"
+sed -i 's|`GATE_FULL= cat|`GATE_FULL=1 cat|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "the same flag assignment with a value REDS" 1 "$d" '[bar] `GATE_FULL=1 cat tools/gate-legs.json`'
+git -C "$d" reset -q --hard "$clean"
+
+# AC17 — a COMMITTED cutoff not strictly past its own commit day is REFUSED before grading, naming
+#        the key, the value and the day it compared against. Today's checker grades this tree clean.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-02"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm cutoff --no-verify
+day=$(git -C "$d" log -1 --format=%cs)
+arm "a committed cutoff not strictly past its own commit day is REFUSED before grading" 1 "$d" "REFUSING — SPEC_DIRECT_CUTOFF 2026-09-02 is not strictly past $day"
+git -C "$d" reset -q --hard "$clean"
+
+# The WAIVER family: its committed clean state IS the AC1 fixture, and the commit is dated the day
+# before its cutoff so the relation holds and the arms grade rather than refuse.
+d=$base/barwaiver; scratch "$d"
+mkdir -p "$d/tools/run-gates"; : > "$d/tools/run-gates/run-gates.sh"
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` is green|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+GIT_COMMITTER_DATE=2026-08-31T12:00:00 git -C "$d" commit -qm ac1 --no-verify
+clean=$(git -C "$d" rev-parse HEAD)
+
+# AC6 — a waiver row keyed on the token, reason opening `[bar]`, clears the hit and is counted.
+printf 'GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a [bar] waiver row keyed on the token clears the hit and is counted" 0 "$d" "1 waiver(s)"
+git -C "$d" reset -q --hard "$clean"
+
+# AC7 — a [bar] row naming a token no spec carries REDS as stale, like any other row.
+printf 'GATE_FULL=1 bash tools/run-gates/run-gates.sh\t[bar] no spec names this\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a [bar] waiver row nothing produces REDS as stale" 1 "$d" "STALE WAIVER"
+git -C "$d" reset -q --hard "$clean"
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then
