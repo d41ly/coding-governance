@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** CLOSED · rev-6 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -77,7 +77,12 @@ schema, independently of the renderer.
   `derive_window` are moved out of `build_run_model` into functions both callers read, with no change
   to what the model computes. That costs one `git log` for the whole population, plus one log and one
   batch read over the run-state paths, whatever the number of builds. On this tree it grades six
-  rotated builds and prints each one's start commits. Observed by AC4 and AC5.
+  rotated builds and prints each one's start commits. The leg ends a non-terminal window one second
+  past the run's last record commit. The model's end also reads the run's own commits and the journal
+  lines of the trees it holds (`TOOL-dLoggedFlight-8` S2), which the leg does not read, so the model's
+  end is at or after the leg's. Neither refusal turns on the difference. A preflight rotates only a
+  terminal record, so a non-terminal run is the last of its build and its end meets no later window,
+  and a later end cannot put a window's end before its start. Observed by AC4 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -207,6 +212,11 @@ none
   history, and Files touched gains `model.py`, the README and the manifest stamp. AC5 names its
   fixtures: the H2 window needs a staged derivation to go red, because the era-bounded one cannot end
   a window before its start.
+- rev-6 · 2026-09-14 · S6 · the closing diff review's round-1 M5, folded into `TOOL-dLoggedFlight-8`
+  S2. The model's non-terminal end now reads the run's own commits and the lines of the trees it
+  holds, and the leg reads neither: own commits need a range per run, and the leg's git cost is
+  constant over the population. S6 says the two ends differ, which is the larger, and why no refusal
+  of the leg turns on it. Before this line, "the model's own derivation" read as the same window.
 
 ## 10. Reuse audit
 
