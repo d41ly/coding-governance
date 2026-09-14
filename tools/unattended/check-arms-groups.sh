@@ -8,14 +8,14 @@
 #
 # WHAT IT GRADES. One pass over ONE text file, no subprocess per group, no suite executed. The file
 # is cut into GROUPS at every tree reset, and three rules are read off each group's LINKAGE:
-#   rule A — a batched group (one carrying an `emitted` call, the token TOOL-aBatchedArm-1 gives a
+#   rule A — a batched group (one carrying a `check_emitted` call, the token TOOL-aBatchedArm-1 gives a
 #            tree shared by more than one arm) contains a `miss` or a `same` at all. A control asserts
 #            SILENCE, and on a shared tree a branch a group-mate's break pushed dark is byte-identical
 #            to one that stayed silent, so no control is ever batched (TOOL-dScriptedRepeat-15 S3).
 #   rule B — two arms in one group carry an identical assertion text: one break cannot satisfy two
 #            assertions, so the second is either dead or a copy-paste that asserts nothing new.
 #   rule C — a `run` capture in a group is assigned to a name other than `out`: a baseline captured
-#            under one name and read by another group is a poisoned baseline, invisible to `emitted`.
+#            under one name and read by another group is a poisoned baseline, invisible to `check_emitted`.
 # THE DELIMITER IS RESOLVED FROM THE FILE, never typed: every function whose body performs a hard
 # reset (`git reset --hard`) or calls one that does, transitively, is a tree reset; plus every
 # `if in_shard k` region seam. An empty resolution REFUSES. A bare `reset_tree` grep is not the
@@ -26,7 +26,7 @@
 # who did not write it (AGENTS.md §7):
 #   - ADEQUACY. Whether an arm proves anything, whether a `hit` proves what its author meant, or
 #     whether a branch the suite never names is reachable. It reads linkage, not meaning.
-#   - THE `emitted` SET. Whether a group's expected signature set is correct, complete or observed is
+#   - THE `check_emitted` SET. Whether a group's expected signature set is correct, complete or observed is
 #     the helper's own business at run time; the sentinel `"?"` is COUNTED on the liveness line and
 #     never graded, and a typed-rather-than-observed set is invisible here.
 #   - THE CHECKER. Which branches `check-unattended.sh` has, and which fire, is `check-arms.py`'s
@@ -43,7 +43,7 @@ FILE="${1:-$HERE/check-unattended.test.sh}"
 [ -f "$FILE" ] || { echo "check-arms-groups: REFUSED — no such file to lint: $FILE"; exit 2; }
 
 echo "check-arms-groups: linting $FILE"
-echo "check-arms-groups: does NOT grade adequacy, the emitted set, the checker, inline arms, function bodies or comments — linkage only (rules A, B, C; header above)"
+echo "check-arms-groups: does NOT grade adequacy, the check_emitted set, the checker, inline arms, function bodies or comments — linkage only (rules A, B, C; header above)"
 
 awk '
 # ---- helpers ------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ END {
       AL[g, NA[g]] = i; AH[g, NA[g]] = h; AT[g, NA[g]] = text
     }
     # the batched marker and its sentinel
-    if (s ~ /^[ \t]*emitted[ \t]/) { NE[g]++; if (s ~ /^[ \t]*emitted[ \t]+"\?"([ \t]|$)/) sent++ }
+    if (s ~ /^[ \t]*check_emitted[ \t]/) { NE[g]++; if (s ~ /^[ \t]*check_emitted[ \t]+"\?"([ \t]|$)/) sent++ }
     # captures
     if (match(s, /^[ \t]*[A-Za-z_][A-Za-z0-9_]*=\$\(/)) {
       nm = substr(s, RSTART, RLENGTH); sub(/^[ \t]*/, "", nm); sub(/=.*$/, "", nm)

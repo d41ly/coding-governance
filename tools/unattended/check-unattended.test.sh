@@ -29,7 +29,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # driver suite is the seams and the floors. Three carriers can break at a cut and each is handled
 # once: shell VARIABLES (none cross a boundary — scanned per boundary, recorded in the build),
 # FUNCTIONS (every region-defined helper is HOISTED; the block below `anchor_restore` names the
-# population and its derivation) and REFS (`topo_capture` at every boundary, `replay_landed_main`
+# population and its derivation) and REFS (`read_topo` at every boundary, `run_landed_replay`
 # at the boundaries where the unsharded run's topology differs from a fresh start).
 SHARD_ARITY=8
 SHARD=""; SHARD_GIVEN=0
@@ -63,7 +63,7 @@ hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 # ---- THE FOURTH HELPER, for a BATCHED block (TOOL-aBatchedArm-1 S1). A group is one `reset_tree`,
-# ---- its mutations in sequence, ONE `out=$(GOV_UNATTENDED_REPORT=1 run)`, one `emitted`, then the
+# ---- its mutations in sequence, ONE `out=$(GOV_UNATTENDED_REPORT=1 run)`, one `check_emitted`, then the
 # ---- group's `hit "$out" …` lines exactly as they were when each had a tree of its own. It grades
 # ---- the SET of failure SIGNATURES the run emitted against the set the group expects: `$1` is
 # ---- `|`-separated, each entry the interpolation-stripped signature of one `fail N "…"` branch as
@@ -90,18 +90,18 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 # ---- the run named beside the group. `"?"` is refused BY NAME — one FAIL line per group, so the
 # ---- converted file cannot pass in the window — and `out` is still stripped, so the `hit` lines
 # ---- below it read exactly what they will read once the set exists. AC3's recipe counts these.
-emitted() { # signatures · output
+check_emitted() { # signatures · output
   local _s _l _num _ok _exp _miss="" _extra="" _dark="" _nums=" " _skips
   n=$((n+1))
   out=$(grep -v '^unattended-report: ' <<<"$2" || true)   # every path below leaves `out` stripped
   if [ "$1" = "?" ]; then
     # ---- the OBSERVED set follows the refusal, indented so `grep '^FAIL'` does not count it: the
     # ---- final pass pastes a group's set from these lines, and the caller's line is the join.
-    echo "FAIL emitted: expected set not yet observed — owed at the final pass · call at line ${BASH_LINENO[0]}"; st=1
+    echo "FAIL check_emitted: expected set not yet observed — owed at the final pass · call at line ${BASH_LINENO[0]}"; st=1
     grep '^UNATTENDED check [0-9]* FAILED ' <<<"$2" | sed 's/^/    observed: /'; return
   fi
   _exp=$(printf '%s\n' "$1" | tr '|' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' || true)
-  [ -n "$_exp" ] || { echo "FAIL emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
+  [ -n "$_exp" ] || { echo "FAIL check_emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
   while IFS= read -r _s; do
     grep -qF -- "$_s" <<<"$2" || _miss="$_miss [$_s]"
   done <<<"$_exp"
@@ -121,7 +121,7 @@ emitted() { # signatures · output
     case "$_nums" in *" $_num "*) _dark="$_dark [$_l]" ;; esac
   done <<<"$_skips"
   [ -z "$_miss$_extra$_dark" ] \
-    || { echo "FAIL emitted: expected [$(printf '%s' "$_exp" | tr '\n' '|')] · missing:$_miss · unexplained:$_extra · dark:$_dark · skips: $_skips"; st=1; }
+    || { echo "FAIL check_emitted: expected [$(printf '%s' "$_exp" | tr '\n' '|')] · missing:$_miss · unexplained:$_extra · dark:$_dark · skips: $_skips"; st=1; }
 }
 
 cd "$TMP" || exit 2
@@ -515,9 +515,9 @@ land_as() {            # anchor-kind · witness
 # ---- fixture fast-forwards onto that without saying so — a bare shard hits a real merge that
 # ---- CONFLICTS on tRun/RUN.md and is swallowed whole; measured when the two-shard seam was cut,
 # ---- three arms failing naming a waiver and none naming the cause. The replay re-establishes that
-# ---- topology at every boundary whose unsharded capture carries it; `topo_capture` is what says
+# ---- topology at every boundary whose unsharded capture carries it; `read_topo` is what says
 # ---- whether a boundary owes it, and whether the replay was enough.
-replay_landed_main() {
+run_landed_replay() {
   git checkout -qf main && git merge -q --no-edit unit >/dev/null 2>&1
   git push -q -f origin main >/dev/null 2>&1
   git checkout -qf unit
@@ -528,7 +528,7 @@ replay_landed_main() {
 # CHECK_UNATTENDED_TOPO=1 prints one `topo` line per boundary, which the unsharded run emits at the
 # boundary's line and shard k at its start. The two must be byte-identical after the replay (AC8).
 # A second line carries the clock and the count, which differ by construction and are not compared.
-topo_capture() { # <boundary index>
+read_topo() { # <boundary index>
   [ -n "${CHECK_UNATTENDED_TOPO:-}" ] || return 0
   local o l a b
   o=$(git ls-remote --heads "$ORIGIN" 2>/dev/null | cut -f2 | tr '\n' ' ')
@@ -943,7 +943,7 @@ reset_tree; sed -i '/^CORE_FLOOR=/d' .unattended.conf
 # ---- to a readable-but-empty value — distinct from the unreadable case armed above.
 sed -i 's/^PHASES_CORE="[^"]*"/PHASES_CORE=" "/' $KIT_REL/unattended.sh
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "CORE_FLOOR is undeclared in .unattended.conf, and with no floor a deleted core member is indistinguishable from a set that never had one"
 hit "$out" "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
 reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' $KIT_REL/unattended.sh
@@ -954,7 +954,7 @@ reset_tree; sed -i 's/^DOD_CORE="[^"]*"/DOD_CORE=" "/' $KIT_REL/unattended.sh
 mkdir -p memory/elsewhere && git mv memory/builds/tRun/RUN.md memory/elsewhere/RUN.md
 git commit -q -am moved --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "the effective Definition-of-Done set is empty, so --close would block on nothing"
 hit "$out" "a run-state file exists under the memory root but none at the path this leg selects, so the selector is mis-segmented and every check below is silent for the wrong reason"
 
@@ -970,7 +970,7 @@ fi   # ---- end REGION 1 -------------------------------------------------------
 
 # ---- REGION 2 -----------------------------------------------------------------------------------
 if in_shard 2; then
-topo_capture 2
+read_topo 2
 reset_tree; sed -i '/^phase: /d' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file declares no phase, and a file with no phase is outside every check keyed on one"
 reset_tree; sed -i 's/^phase: RUNNING$/phase: MARINATING/' memory/builds/tRun/RUN.md
@@ -1272,7 +1272,7 @@ reset_tree; printf '\nparked: considered --no-verify to get past the hook\n' >> 
 # ---- keeps a parity check with one file from reading as a passing parity check.
 printf '\ndrifted line\n' >> memory/guides/UNATTENDED-PROTOCOL.md
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "a run-state file names the declared bypass flag, and bypassing the lander discards the whole bar the mandate leaned on"
 hit "$out" "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
@@ -1281,14 +1281,14 @@ fi   # ---- end REGION 2 -------------------------------------------------------
 
 # ---- REGION 3 -----------------------------------------------------------------------------------
 if in_shard 3; then
-topo_capture 3
+read_topo 3
 reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
 # ---- check 10, THE SECOND PAIR. TOOL-dFoldedVerdict-5 moved the verb entries into their own
 # ---- byte-compared carrier because the protocol had reached its cap exactly. A pair added without
 # ---- its own two arms is a pair nothing watches, and the check would still report green.
 printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
 hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
@@ -1354,7 +1354,7 @@ reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="six:six"/' .unattended.conf
 # ---- BASE assertion on the bar.
 sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
 hit "$out" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
 
@@ -1514,8 +1514,8 @@ fi   # ---- end REGION 3 -------------------------------------------------------
 
 # ---- REGION 4 -----------------------------------------------------------------------------------
 if in_shard 4; then
-[ "$SH_I" = 4 ] && replay_landed_main   # owed here: the unsharded capture at this line carries unit<main=yes
-topo_capture 4
+[ "$SH_I" = 4 ] && run_landed_replay   # owed here: the unsharded capture at this line carries unit<main=yes
+read_topo 4
 reset_tree
 
 # ---- check 14: a replace ref or a graft file is itself the violation. The GIT() pin makes THIS
@@ -1884,7 +1884,7 @@ mutate $KIT_REL/SKILL.template.md '/unattended.sh --preflight/d'
 mutate memory/builds/tRun/README.md '/gen:build-units/d'
 mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
 hit "$out" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
 # ---- AND THIS IS THE ARM THAT EXERCISES THE CANARY. TOOL-aQuenchedHarness-10 gave check 30 a
@@ -2101,7 +2101,7 @@ fi   # ---- end REGION 4 -------------------------------------------------------
 
 # ---- REGION 5 -----------------------------------------------------------------------------------
 if in_shard 5; then
-topo_capture 5
+read_topo 5
 reset_tree
 same "the shipped protocol's two tables join clean" "$(run)" ""
 
@@ -2360,7 +2360,7 @@ fi   # ---- end REGION 5 -------------------------------------------------------
 
 # ---- REGION 6 -----------------------------------------------------------------------------------
 if in_shard 6; then
-topo_capture 6
+read_topo 6
 reset_tree
 git commit -q --allow-empty -m unit-only --no-verify
 sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
@@ -2551,7 +2551,7 @@ reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="h
 # - both sides would agree on the same wrong token, which is the two-derived-values class.
 mutate $KIT_REL/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name:"
 hit "$out" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
@@ -2566,7 +2566,7 @@ reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
 mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 hit "$out" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
 
@@ -2577,7 +2577,7 @@ hit "$out" "a declared verb has no entry in the verb carrier, so the contract a 
 reset_tree; rm -f $KIT_REL/VERBS.template.md
 mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
 hit "$out" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"
 
@@ -2621,7 +2621,7 @@ fi   # ---- end REGION 6 -------------------------------------------------------
 
 # ---- REGION 7 -----------------------------------------------------------------------------------
 if in_shard 7; then
-topo_capture 7
+read_topo 7
 reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `slug` |/'
 hit "$(run)" "the driver declares an authorization mode that no routing row names, so a build may legally declare a mode the Skill never tells anyone how to start: recipe against"
 
@@ -2767,7 +2767,7 @@ reset_tree; rm -f $KIT_REL/check-playbook.sh
 DISC='does not act on its exit status'
 mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || true; if false; then@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "the playbook leg is not in the source population these three rules scan, so the census reader - the one that dereferences the BASE blob every DoD verdict rests on - would go unexamined"
 hit "$out" "a parser that can REFUSE is called at a site that does not act on its exit status, so the refusal arrives as the empty string every caller reads as the declared null and the item it guards grades met with nothing recorded - parser, site and call follow: declared_list at"
 reset_tree; mutate $KIT_REL/unattended.sh 's@if ! _declared=$(declared_list "$_blob" set_checks); then@_declared=$(declared_list "$_blob" set_checks) || return 0; if false; then@'
@@ -2809,7 +2809,7 @@ mutate $KIT_REL/unattended.sh     '/^declared_list() {/,/^}/ s|return 2|:|'
 # ---- record's real spacing while pointing its key at one the template does not declare.
 mutate $KIT_REL/check-unattended.sh 's@^legs|check-playbook.sh|@legsX|check-playbook.sh|@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "neither inlined parser carries a nonzero return any more, so the rule that a refusal must be read now binds nothing - either the refusal round 3 added was removed, in which case a legal multi-line declaration parses to the declared null again, or this check's derivation of which parsers can refuse has stopped matching them"
 hit "$out" "the shipped template declares a key no inlined parser ever reads, so this check certifies a parse nothing consumes while whatever does consume it is unexamined - declare a parser read for it, or an exemption naming the reader that owns it"
 
@@ -2834,7 +2834,7 @@ fi   # ---- end REGION 7 -------------------------------------------------------
 
 # ---- REGION 8 -----------------------------------------------------------------------------------
 if in_shard 8; then
-topo_capture 8
+read_topo 8
 
 # ---- 28c. The WRAPPER's own pin first, which round 5's cut could not see at all.
 # THE CONSTANT, not the wrapper line. The merged library spells the pin as `-c "$GIT_PIN_REPLACE"`,
@@ -2844,7 +2844,7 @@ reset_tree; mutate $KIT_REL/lib-unattended.sh 's|^GIT_PIN_REPLACE=.*|GIT_PIN_REP
 # ...a bare unpinned read on a verb the first widening did not carry.
 mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRAFT_FILE=/dev/null\n_probe() { git log -1 --format=%s "$1"; }@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
 hit "$out" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 
@@ -2861,7 +2861,7 @@ reset_tree; mutate $KIT_REL/check-playbook.sh 's@^GITSHOW() { git -c core.useRep
 # ---- cut reported a clean nothing for two of them.
 mutate $KIT_REL/lib-unattended.sh 's@^GIT() {@GITWRAP() {@'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "every bare git invocation in the kit was excused by the flags-only or for-each-ref property, so the raw arm graded nothing at all this run - it is reporting a clean nothing rather than a pass, and the two are not the same claim"
 hit "$out" "no git wrapper definition was found anywhere in this kit, so the GIT-spelled reads below are accepted on the strength of a definition this check cannot see - which is the same as not checking them"
 
@@ -2870,7 +2870,7 @@ reset_tree; gut_parser declared_scalar '  ((this is not shell'
 # ---- and the shipped template's own LIST declaration being refused by the parser that reads it.
 mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's|^\([a-z_][a-z_]*[[:space:]]*\)= \[\]|\1= [|'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-emitted "?" "$out"
+check_emitted "?" "$out"
 hit "$out" "the extracted declared-scalar parser could not be executed, so every parse assertion in this check would read its silence as the declared null and pass - specimen and exit status follow: ["
 hit "$out" "the shipped template's own list declaration is REFUSED by the parser that reads it, so an adopter who copies the template inherits a declaration the driver cannot parse - and this check is the template's only grader, so nothing else would say so. Key and exit status follow"
 

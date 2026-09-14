@@ -41,10 +41,10 @@ check_lacks "T0 a run with findings or a green one never prints REFUSED" "$base"
 bA=$(measure_rule A "$base"); bB=$(measure_rule B "$base"); bC=$(measure_rule C "$base")
 echo "     starting figures over the tracked suite: rule A $bA · rule B $bB · rule C $bC"
 
-# ---- plants. The locator is the first `emitted` call — the first BATCHED group — and a plant is one
+# ---- plants. The locator is the first `check_emitted` call — the first BATCHED group — and a plant is one
 # ---- line inserted after it, so every expected line number is that locator plus one.
-E=$(grep -n '^emitted ' "$SUITE" | head -1 | cut -d: -f1)
-[ -n "$E" ] || { echo "FAIL the tracked suite carries no emitted call to plant beside, so rules A and B cannot be staged"; exit 2; }
+E=$(grep -n '^check_emitted ' "$SUITE" | head -1 | cut -d: -f1)
+[ -n "$E" ] || { echo "FAIL the tracked suite carries no check_emitted call to plant beside, so rules A and B cannot be staged"; exit 2; }
 E1=$((E+1))
 write_planted() { # <copy> · <after line> · <line text>   — inserts one line after the given line number
   awk -v at="$2" -v txt="$3" '{ print } NR == at { print txt }' "$SUITE" > "$1"
@@ -68,7 +68,7 @@ check_same "AC1 a miss inside a solo group adds no rule-A finding" "$(measure_ru
 
 # ---- AC2 · rule B: two arms with one text in one group red, naming both lines
 H=$(sed -n "${E1}p" "$SUITE")
-case "$H" in hit\ *) ;; *) echo "FAIL the line after the first emitted call is not a hit line, so the duplicate cannot be planted: $H"; exit 2 ;; esac
+case "$H" in hit\ *) ;; *) echo "FAIL the line after the first check_emitted call is not a hit line, so the duplicate cannot be planted: $H"; exit 2 ;; esac
 write_planted "$T/b.sh" "$E1" "$H"
 o=$(bash "$LINT" "$T/b.sh"); rc=$?
 check_same "AC2 a duplicated assertion text in one group is RED" "$rc" "1"
@@ -102,7 +102,7 @@ check_same "AC4 a missing file exits 2" "$rc" "2"
 check_has  "AC4 a missing file is refused by name" "$o" "REFUSED"
 
 # ---- the green path, so a verdict of 0 is observed as well as the reds
-printf 'reset_tree() { git reset -q --hard "$P"; }\nif in_shard 1; then\nreset_tree\nout=$(run)\nhit "$out" "a"\nreset_tree\nout=$(GOV_UNATTENDED_REPORT=1 run)\nemitted "a|b" "$out"\nhit "$out" "a"\nhit "$out" "b"\nfi\n' > "$T/clean.sh"
+printf 'reset_tree() { git reset -q --hard "$P"; }\nif in_shard 1; then\nreset_tree\nout=$(run)\nhit "$out" "a"\nreset_tree\nout=$(GOV_UNATTENDED_REPORT=1 run)\ncheck_emitted "a|b" "$out"\nhit "$out" "a"\nhit "$out" "b"\nfi\n' > "$T/clean.sh"
 o=$(bash "$LINT" "$T/clean.sh"); rc=$?
 check_same "GREEN a clean file exits 0" "$rc" "0"
 check_has  "GREEN a clean file prints GREEN with its counts" "$o" "GREEN — 0 findings over 3 groups and 3 arms"
