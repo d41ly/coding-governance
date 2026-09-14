@@ -11,8 +11,10 @@
 | [2026-09-10-prompt-TOOL-aBatchedArm-1.md](../prompts/2026-09-10-prompt-TOOL-aBatchedArm-1.md) | research | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief-2.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief-2.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md) | journal | — |
+| [2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md) | journal | TOOL-aBatchedArm-5 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 |
 | [2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md) | spec-audit | TOOL-aBatchedArm-2 |
+| [2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md) | diff-review | TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 TOOL-aBatchedArm-5 |
 
 <!-- /gen:spec-records -->
 

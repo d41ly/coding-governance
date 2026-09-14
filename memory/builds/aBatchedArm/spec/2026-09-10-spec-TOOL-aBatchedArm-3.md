@@ -8,11 +8,13 @@
 |---|---|---|
 | [2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md) | journal | — |
+| [2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md) | journal | TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 |
 | [2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round4.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round4.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round5.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round5.md) | spec-audit | — |
+| [2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md) | diff-review | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-4 TOOL-aBatchedArm-5 |
 
 <!-- /gen:spec-records -->
 

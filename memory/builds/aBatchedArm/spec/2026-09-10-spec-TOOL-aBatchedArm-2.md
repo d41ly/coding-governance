@@ -8,7 +8,9 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-aBatchedArm-2-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-2-build-brief.md) | journal | — |
+| [2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md) | journal | TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-3 |
 | [2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round2.md) | spec-audit | TOOL-aBatchedArm-1 |
+| [2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md) | diff-review | TOOL-aBatchedArm-1 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 TOOL-aBatchedArm-5 |
 
 <!-- /gen:spec-records -->
 
