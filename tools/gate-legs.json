@@ -521,11 +521,6 @@
       "bash",
       "tools/workflows/check-protocol-parity.test.sh"
     ],
-    "guard": [
-      "memory/guides/REVIEW-PROTOCOL.md",
-      "tools/lib/",
-      "tools/workflows/"
-    ],
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300
@@ -1277,7 +1272,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120
+    "ceiling": 300
   },
   {
     "name": "kit-placeholders self-test",

@@ -34,7 +34,9 @@ globs = [
 One shell engine over the tracked contents of `<MEMORY_ROOT>/`, 22 checks, plus the epoch rule that
 makes its verdicts datable. Checks 9 and 13-21 delegate to sibling Python modules
 (`gen_build_index.py`, `corpus_ids.py`, `gotchas.py`, `row_grammar.py`); this dossier owns the engine,
-its self-test and the epoch, not those modules.
+its self-test and the epoch, not those modules. The self-test's project-key arms run the engine over
+the suite's own scratch tree, one invocation per arm, never over an archive of this repository
+(`TOOL-aRatifiedRulings-3`), so a red in the live corpus cannot red an arm that grades a conf key.
 
 The engine is COPY-INSTALLED as a standalone directory, so it carries the python resolver inline and
 derives its own prefix. It never reads its identity from a project conf: `KIT_MEMORY_TREE_VERSION` is

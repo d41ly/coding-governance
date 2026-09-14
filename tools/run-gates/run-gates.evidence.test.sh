@@ -26,7 +26,10 @@ if [ -z "$DC_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then
   . "$ROOT/tools/lib/resolve-python.sh"
   DC_PY=$(resolve_python 2>/dev/null)
 fi
-[ -n "$DC_PY" ] || DC_PY=python   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+# NO BARE FALLBACK. The idiom ban this repo's own bar carries reads `DC_PY=python` as a launcher
+# invoked without being resolved, and it was right: on the Store-stub machine that name is the
+# one launcher guaranteed NOT to run. A resolver that answered nothing is a refusal, said aloud.
+[ -n "$DC_PY" ] || { echo "evidence-test: no python launcher resolves, so the ceiling arms cannot run"; exit 2; }
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 bad=0
 # the run-gates promotion spec's S11. The count is INCREMENTED where the assertions actually happen -- in the

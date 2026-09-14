@@ -195,6 +195,16 @@ ASCII subtoken classes, `read_core` strips underscores at both ends and nothing 
 name is UNGRADEABLE for vocabulary and AMBIGUOUS for convention. One rule across both was never
 available: they agree only on pure-underscore names and the empty string.
 
+A per-definition FACT reaches the grader beside the population and never inside it. `extract`
+returns `(name, line)` pairs that another kit unpacks positionally, so the shape is frozen; the
+`decorator` selector answered that with an additive accessor keyed on the definition site, and the
+`returns:jsx` selector (`TOOL-aGradedDialect-10`) rides the same seam — `extract_jsx_defs` marks
+every declared `.tsx` function whose VALUE is an element, `scan_routes` reads both accessors
+through one `marks` dict, and the lexer's one new token kind is walked past by every definition
+arm — measured on the conformance corpus and the adopter tree, not argued from the token's
+text. The rule for which definitions carry the mark, and what each clause of it
+cost on the adopter corpus, is `parse_ts_source`'s header; a third accessor takes the same shape.
+
 ## Gaps
 
 - **No pin-direction guard.** A `probe`-mode pin can be lowered on incomplete evidence — fixing ten

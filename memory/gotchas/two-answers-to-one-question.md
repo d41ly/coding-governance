@@ -77,3 +77,11 @@ by the aReplayedCard closing review (F11): the Resume section claimed a backstop
 behaviour is graded by reading that hook's evaluation-order comment beside it, in the same review,
 and the prose is rewritten to the contract the comment states — or the backstop is built as a
 predicate change and the sentence follows the code, never the other way round.
+
+**A live instance, retired by a pointer.** Round 3 of build `dPolishedVitrine`'s closing review
+found the `brief-recorded` population stated three times, and one copy,
+`tools/unattended/.unattended.conf.example`, had dropped the condition that HEAD must still bear
+the finished claim out. The fold replaced that copy with a pointer to the protocol's
+`BRIEF_RECORDED_CUTOFF` row, so it cannot be half-fixed again. The leg's header in
+`tools/unattended/check-brief-recorded.sh` still states the predicate, because a gate's header says
+what it checks; the row and the header are the two carriers left.

@@ -8,8 +8,9 @@
 # Exit 0 = clean. Exit 1 = a violation. Exit 2 = misconfigured.
 #
 # WHAT THIS CHECKS, in one sentence: for every unit a build README carries as CLOSED after the
-# declared cutoff, the commit that BUILT that unit carries a `brief · item <id>` row in the run-state
-# file whose twelve-hex hash still joins to a tracked file at that same commit.
+# declared cutoff and BUILT WHILE A RUN WAS LIVE, the commit that BUILT that unit carries a
+# `brief · item <id>` row in the run-state file whose twelve-hex hash still joins to a tracked file
+# at that same commit.
 #
 # WHY THE BUILD COMMIT AND NOT ITS FIRST PARENT, which is where the sibling `pass-order` leg anchors.
 # `--brief` STAGES its row rather than committing it, so the row lands in the same commit as the
@@ -24,6 +25,54 @@
 # wants a brief row AT the build commit, and one conforming pass satisfies both by writing the spec in
 # an earlier commit and the brief row alongside the code. Two guards asking one question two ways is a
 # recorded class in this tree; these ask two questions.
+#
+# ONLY A UNIT BUILT DURING A RUN IS GRADED, by the owner's ruling of 2026-09-13, recorded in build
+# `dPolishedVitrine`. A brief is what a run hands the agent that builds a unit, so a unit built after
+# its build's run had already finished was built outside any run and was owed none. The first
+# adopter to meet this built a unit by hand the day after its run landed, and this leg redded it for
+# a row no run was there to write.
+#
+# THE PREDICATE IS THE PHASE OF THE RUN-STATE FILE AT THE BUILD COMMIT, the commit this leg already
+# reads the brief row from. That file names the record that was live, or had last finished, at that
+# commit: `--preflight` retires a finished record by renaming it and scaffolds the next run's record
+# in the SAME commit, so the path never names a stale run. A phase in the driver's PHASES_TERMINAL
+# means the run had finished; anything else, an absent file or phase included, is graded exactly as it
+# was before this unit. The terminal set is READ from the driver and spelled nowhere in this file.
+#
+# THE BOUNDARY IS THE COMMIT THAT WRITES THE TERMINAL PHASE. A unit whose code rides in that commit is
+# outside the run, because `--landed`'s witness is a commit already on the remote and so the code in
+# the commit recording it is not in what landed. The last live phase, LANDING, is still graded.
+#
+# A WRONGLY PICKED BUILD COMMIT MAY NOT BUY A SKIP. `build_commit` returns the EARLIEST in-range commit
+# that names the id and touches a path outside the record surface, and a hand commit made between two
+# runs qualifies. At that commit the record still reads the first run's terminal phase, and the second
+# run's preflight retires the record only afterwards, so HEAD still bears the claim out. Round 3 of the
+# closing review of build `dPolishedVitrine` reproduced a unit built during the second, live run being
+# skipped exactly that way. So before a skip is honoured, every later commit that the same predicate
+# accepts for the id is asked the same phase question, and the first one made while a run was live is
+# where the unit is graded, announced by id with both commits and counted. This fails CLOSED: a later
+# commit that names the id while a run is live grades the unit even if it only touched a file the conf
+# forgot to exclude. The library is not changed, so `pass-order` keeps the pick it always had.
+#
+# THE CLAIM MUST STILL STAND AT HEAD, because the run authors the phase it commits. A record reading
+# LANDED at one commit and BUILDING at the next would otherwise buy a unit out of this leg with two
+# hand edits that leave nothing at HEAD. So the skip is honoured only while HEAD carries a record
+# making the SAME claim - its base, phase and witness - at the run-state path, or in a retired
+# `RUN.<phase>.<8hex>.md` that did not exist yet at the build commit. The absence test is what stops a
+# run copying the claim of a record retired BEFORE the unit was built. A claim HEAD does not bear out
+# is ANNOUNCED and the unit is graded as though the run were live.
+#
+# THE TRIPLE AND NOT THE BYTES. Finished records ARE edited after they finish: a kit migration added a
+# halt code to six aborted records, two of them already retired, and a later merge fix did the same to
+# a seventh. None of those edits moved the triple. MEASURED 2026-09-13 at `f1e58789` over every build
+# with a pinned BASE, cutoff ignored: 25 units were built under a finished record, HEAD bears out all
+# 25, and a byte comparison would have borne out 8. No unit in that tree needs the retired-record half,
+# which is why a staged arm carries it. A dated snapshot of a population that grows.
+#
+# REACHABILITY FROM THE TERMINAL WITNESS WAS THE REJECTED PREDICATE. It needs the phase at the build
+# commit anyway, to know which record's witness to read; it has no answer for an aborted run whose
+# witness is not a sha, which the protocol permits; and against the two-edit forgery it adds nothing,
+# because the witness at the build commit is written in the same edit as the phase.
 #
 # WHAT THIS DOES NOT CHECK, stated in the header because a structural check reads as a semantic one
 # to everybody who did not write it:
@@ -40,13 +89,21 @@
 #   - WHETHER THE COMMITTED `opened:` OR THE COMMITTED CONF ARE HONEST. Every read below comes from
 #     the graded commit, which closes the edit-and-run bypass and NOT the class: the graded run still
 #     authors the values it commits, and protocol section 1 cost 2 concedes exactly that.
+#   - WHETHER A FINISHED RECORD THAT STANDS AT HEAD IS HONEST. The skip above trusts a terminal claim
+#     HEAD still carries. A run that forges one AND keeps it, or commits a retired record to carry it,
+#     leaves that record at HEAD, where the kit gate grades it - check 15 judges a LANDED witness. This
+#     leg buys the trace, not the verdict.
+#   - ANYTHING ABOUT A UNIT BUILT AFTER ITS RUN FINISHED. It is announced by id and reason and graded by
+#     nothing here. Whether its spec came first is still `pass-order`'s, which grades it unchanged.
 #
-# THE COUNT THAT PROVES TERM 1 RAN IS `graded` MINUS `unbuilt-in-range`, not `graded`. `graded`
-# increments before the build-commit selection, exactly as the sibling's does, so a unit graded by
-# nothing still counts as graded. That is copied deliberately and it is a hole; naming it here is the
-# whole remedy, and the arms assert on the difference.
+# THE COUNT THAT PROVES TERM 1 RAN IS `graded` MINUS `unbuilt-in-range` MINUS `built after their run
+# finished`, not `graded`. `graded` increments before the build-commit selection, exactly as the
+# sibling's does, so a unit graded by nothing still counts as graded. That is copied deliberately and
+# it is a hole; naming it here is the whole remedy, and the arms assert on the difference. The
+# post-run subset joined it rather than moving the increment, which would change what the sibling's
+# identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.19   # gov:kit unattended@1.19 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.21   # gov:kit unattended@1.21 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -146,6 +203,48 @@ if ! grep -qF -- 'brief · item ' "$DRIVER" || ! grep -qF -- ' · reason ' "$DRI
   exit 2
 fi
 
+# ----------------------------------------------------------------------------- THE TERMINAL SET
+# WHICH PHASES MEAN "THIS RUN HAS FINISHED" IS THE DRIVER'S `PHASES_TERMINAL`, and this file does not
+# spell it a second time. It is PARSED, never sourced, with the kit gate's grammar for a core
+# declaration: the first line that is exactly `PHASES_TERMINAL="…"`, trailing whitespace allowed.
+#
+# A SET THIS LEG CANNOT READ IS A DEAD PROBE, never an empty set. An empty set grades every unit as
+# though every run were still live, which is the verdict this unit exists to correct, delivered
+# silently. Checked before the cutoff for the grammar probe's reason.
+TERMINAL_PHASES=""
+while IFS= read -r _dl || [ -n "$_dl" ]; do
+  _dl=${_dl%$'\r'}
+  while :; do case "$_dl" in *' '|*$'\t') _dl=${_dl%?} ;; *) break ;; esac; done
+  case "$_dl" in
+    'PHASES_TERMINAL="'*'"') _dl=${_dl#'PHASES_TERMINAL="'}; TERMINAL_PHASES=${_dl%'"'}; break ;;
+  esac
+done < "$DRIVER"
+_tp_ok=0
+for _tp in $TERMINAL_PHASES; do
+  case "$_tp" in *[!A-Z]*) _tp_ok=0; break ;; *) _tp_ok=1 ;; esac
+done
+if [ "$_tp_ok" != 1 ]; then
+  echo "brief-recorded: DEAD PROBE — the driver's PHASES_TERMINAL cannot be read as a set of phase tokens, so this leg cannot tell a unit built after its run finished from one built during it, and an empty set would grade them all as though the run were live: [$TERMINAL_PHASES] in $DRIVER"
+  exit 2
+fi
+
+# ONE AWK PROGRAM READS A RECORD'S CLAIM, so the build commit's record and HEAD's are read the same way.
+# The claim is the record's base, phase and witness, one per line and in that order: each value is one
+# line of the record, so a newline cannot occur inside one and the joined claim cannot be ambiguous.
+# The field grammar is the driver's `fact`: the FIRST line opening with the key and a colon, a trailing
+# CR dropped, leading SPACES dropped and nothing else touched.
+#
+# A DOT CLOSES THE CLAIM, and it is load-bearing. Command substitution strips trailing newlines, so
+# without a terminator a record carrying a base and nothing else collapses to one line, and the phase
+# read below returns the BASE: a record reading `base: LANDED` would be a finished run. The first
+# draft had exactly that shape and an arm now pins it.
+CLAIM_AWK='
+  { sub(/\r$/, "") }
+  !hb && /^base:/    { v = $0; sub(/^base: */, "", v);    b = v; hb = 1 }
+  !hp && /^phase:/   { v = $0; sub(/^phase: */, "", v);   p = v; hp = 1 }
+  !hw && /^witness:/ { v = $0; sub(/^witness: */, "", v); w = v; hw = 1 }
+  END { printf "%s\n%s\n%s\n.", b, p, w }'
+
 # ------------------------------------------------------------------------------------ THE CUTOFF
 # DATE-GATED on the build README's `opened:` date, the idiom PASS_ORDER_CUTOFF, SPEC_THIN_CUTOFF,
 # UNITS_REGION_CUTOFF, LANDED_ANCHOR_CUTOFF and DISPOSITION_CUTOFF already share. BLANK turns the term
@@ -191,8 +290,8 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
   exit 2
 fi
 
-graded=0; skipped_cutoff=0; nobase=0; unbuilt=0
-violations=""
+graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0
+violations=""; announced=""
 
 # THE POPULATION COMES FROM THE GRADED COMMIT, selector included. `git ls-files` enumerates the INDEX,
 # so one `git rm --cached` of a build README - staged, nothing committed - would drop that whole build
@@ -225,6 +324,8 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     esac
   fi
   if [ -z "$base" ]; then nobase=$((nobase+1)); continue; fi
+  # The claim HEAD's own record makes, read once per build from the blob already in hand.
+  _head_claim=$(printf '%s\n' "$_runblob" | awk "$CLAIM_AWK")
 
   # The CLOSED units, from the generated region at the graded commit. A row's id is spelled twice, so
   # `match` takes the first occurrence per row rather than a `grep -o` that would emit each unit twice.
@@ -246,6 +347,71 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     # field including both separators, which makes the id a whole token by construction: without the
     # trailing ` · reason ` an id is a prefix of nine others every build with ten units will mint.
     _sb=$(GIT show "$build_c:$run" 2>/dev/null || true)
+
+    # TERM 0 - WAS A RUN LIVE WHEN THIS UNIT WAS BUILT. The header's section on units built during a
+    # run is the argument; this is the mechanism. The phase is one token or it is not terminal, so a
+    # value carrying a space cannot match two members of the set at once.
+    _claim=$(printf '%s\n' "$_sb" | awk "$CLAIM_AWK")
+    _ph=${_claim#*$'\n'}; _ph=${_ph%%$'\n'*}
+    _fin=0
+    case "$_ph" in
+      ''|*[!A-Z]*) ;;
+      *) case " $TERMINAL_PHASES " in *" $_ph "*) _fin=1 ;; esac ;;
+    esac
+    # THE PICK IS CHECKED BEFORE IT BUYS A SKIP. The header's section on a wrongly picked build commit
+    # is the argument. Every later commit that `build_commit`'s own predicate accepts for this id is
+    # asked the same phase question, the subject cache filtering first so the predicate runs only on a
+    # commit that names the id. The first one made while a run was live is where the unit is graded.
+    if [ "$_fin" = 1 ]; then
+      _live_c=""; _live_ph=""
+      for _lc in $(GIT rev-list --reverse "$build_c..HEAD" 2>/dev/null); do
+        case "${_SUBJ[$_lc]-}" in ''|*" $id "*) ;; *) continue ;; esac
+        [ -n "$(build_commit "$_lc^!" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")" ] || continue
+        _lph=$(GIT show "$_lc:$run" 2>/dev/null | awk "$CLAIM_AWK")
+        _lph=${_lph#*$'\n'}; _lph=${_lph%%$'\n'*}
+        case "$_lph" in ''|*[!A-Z]*) ;; *) case " $TERMINAL_PHASES " in *" $_lph "*) continue ;; esac ;; esac
+        _live_c=$_lc; _live_ph=$_lph; break
+      done
+      if [ -n "$_live_c" ]; then
+        regraded=$((regraded+1))
+        announced="$announced
+brief-recorded: GRADED AT A LATER COMMIT — $id: the earliest commit naming it, $(GIT rev-parse --short "$build_c"), was made while $run read $_ph, but $(GIT rev-parse --short "$_live_c") also names it and touches a path outside the record surface while $run read ${_live_ph:-no phase}, so the unit was worked on during a live run and is graded there"
+        build_c=$_live_c
+        _sb=$(GIT show "$build_c:$run" 2>/dev/null || true)
+        _fin=0
+      fi
+    fi
+    if [ "$_fin" = 1 ]; then
+      # WHO STILL MAKES THIS CLAIM AT HEAD: the run-state file itself, or a retired record that was
+      # not yet retired at the build commit. The name is shape-checked against the one grammar the
+      # driver writes, `RUN.<phase>.<8hex>.md`, and never against its own blob: a migrated retired
+      # record keeps its name and changes its bytes, so that equality is already false in this tree.
+      _stands=""
+      if [ "$_claim" = "$_head_claim" ]; then
+        _stands="$run"
+      else
+        for _ar in $(GIT ls-tree --name-only HEAD -- "$bdir/" 2>/dev/null); do
+          _an=${_ar#"$bdir/"}
+          case "$_an" in RUN.*.md) ;; *) continue ;; esac
+          _am=${_an#RUN.}; _am=${_am%.md}
+          case "${_am%.*}" in ''|*[!A-Z]*) continue ;; esac
+          case "${_am##*.}" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
+          [ -z "$(GIT ls-tree "$build_c" -- "$_ar" 2>/dev/null)" ] || continue
+          [ "$(GIT show "HEAD:$_ar" 2>/dev/null | awk "$CLAIM_AWK")" = "$_claim" ] || continue
+          _stands="$_ar"; break
+        done
+      fi
+      if [ -n "$_stands" ]; then
+        postrun=$((postrun+1))
+        announced="$announced
+brief-recorded: NOT GRADED — $id was BUILT at $(GIT rev-parse --short "$build_c") while $run read $_ph, so its run had already finished and the unit was built outside any run; $_stands still makes that claim at HEAD"
+        continue
+      fi
+      unborne=$((unborne+1))
+      announced="$announced
+brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$build_c") while $run read $_ph, but no record at HEAD still makes that claim, neither $run nor one retired after that commit, so the finished run is not taken on its word"
+    fi
+
     _rows=$(printf '%s\n' "$_sb" | grep -F " brief · item $id · reason " || true)
     if [ -z "$_rows" ]; then
       violations="$violations
@@ -310,8 +476,19 @@ done
 # operator actually reads. It does not PREVENT the widening - the conf is inside the run's reach and
 # protocol section 1 cost 2 concedes that - so what this buys is a trace, not a guard, and saying
 # which is the point.
-echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range"
+#
+# THE THREE POST-RUN COUNTS ARE SUBSETS OF `graded`, like `unbuilt-in-range`. The first is the population
+# this leg does NOT grade, and a skip must announce itself: every such unit also gets its own line below
+# naming it, the commit and the phase. The second is graded as though its run were live, and it is
+# counted because a terminal claim HEAD does not bear out is either a hand edit or a forgery, and both
+# are worth a reader's eye whether or not the unit also carries a brief. The third is graded at a later
+# commit than the one `build_commit` picked, and it is counted because each is a pick the library got
+# wrong, which the sibling leg still trusts.
+echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later"
 echo "brief-recorded: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
+if [ -n "$announced" ]; then
+  printf '%s\n' "${announced#?}"
+fi
 
 if [ -n "$violations" ]; then
   echo "brief-recorded FAILED — a CLOSED unit's build commit records no usable brief:$violations"

@@ -2,7 +2,7 @@
 # Runnable check for the portable agent-cap.js Workflow fan-out guard — BOTH rules:
 #   rule 1  raw parallel()/pipeline() outside a `gov:bounded-fanout` line   (concurrency)
 #   rule 2  a verify stage that spawns one agent per item                    (verifier arity)
-# Run: bash hooks/agent-cap.test.sh   (exit 0 = all pass)
+# Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/agent-cap.js"
@@ -952,7 +952,12 @@ if [ -n "$ROOT" ]; then
   done
   # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
   if [ -z "$KITJS" ]; then
-    rel=$(git -C "$ROOT" ls-files -- '*/hooks/agent-cap.js' 'hooks/agent-cap.js' 2>/dev/null \
+    # The two globs sit in variables so the marked line carries no line continuation: a trailing
+    # backslash would escape the space before a comment rather than the newline, and the resulting
+    # break is valid shell that silently drops the rest of the command.
+    _g_prefixed='*/hooks/agent-cap.js'
+    _g_root='hooks/agent-cap.js'   # gov:root-fixture — a root install is half of what this searches
+    rel=$(git -C "$ROOT" ls-files -- "$_g_prefixed" "$_g_root" 2>/dev/null \
           | grep -v '^\.claude/' | head -1)
     [ -n "$rel" ] && KITJS="$ROOT/$rel"
   fi

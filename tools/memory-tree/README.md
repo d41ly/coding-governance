@@ -54,7 +54,7 @@ put the KA tag in each discipline's `README.md`, not in the folder name.
 ## Adopt — new project (scaffold)
 
 ```bash
-cp memory-tree/.memory-tree.conf.example .memory-tree.conf   # then edit
+cp <kit>/.memory-tree.conf.example .memory-tree.conf   # then edit
 bash tools/memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
 bash tools/memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
 git add memory/ .memory-tree.conf && git commit

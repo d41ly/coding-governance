@@ -379,7 +379,7 @@ def test_gate_template_boundary(tmp: Path):
 
 def test_remedy_paths_are_real(tmp: Path):
     """TOOL-aRootedPrefix-2: every path the kit PRINTS must exist from the repo root. A remedy
-    naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the
+    naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the (gov:root-fixture — quoting the defect, not naming a live path)
     moment someone is stuck.
 
     Two halves. The pure half pins `relative_kit` across install shapes and pins the legacy
@@ -415,7 +415,7 @@ def test_remedy_paths_are_real(tmp: Path):
     # path leaves behind (`cp` the example, THEN run the adopter — so the adopter's create-branch
     # stamp never fires). A truthy-but-dead value must not beat the prefix-correct fallback.
     (repo / m.CONF_NAME).write_text(
-        'MAP_ROOT=memory/map\nMAP_DIFF_CMD="python codebase-map/map_diff.py"\n', encoding="utf-8"
+        'MAP_ROOT=memory/map\nMAP_DIFF_CMD="python codebase-map/map_diff.py"\n', encoding="utf-8"  # gov:root-fixture — fixture conf written at the ROOT prefix, which is what this asserts
     )
     (repo / "src").mkdir()
     (repo / "src" / "mod.py").write_text("def hello():\n    return 1\n", encoding="utf-8")
@@ -841,7 +841,7 @@ def test_affordance_exemption_drop():
     kept = m.drop_touched_exemptions(exempt, attributed)
     assert kept == frozenset({"untouched"}), kept  # touched loses grace, untouched keeps it
     # a range that hits nothing graced (foundation/UNMAPPED are never in the exempt list) is a no-op
-    assert m.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["lib/b.py"]}) == exempt
+    assert m.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["lib/b.py"]}) == exempt  # gov:root-fixture — fixture data for an exemption map, not an install path
 
     # gate consequence: the un-graced 'touched' dossier (no affordance block yet) is now an offender
     texts = {

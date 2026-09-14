@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.19 -->
+<!-- gov:kit unattended@1.21 -->
 
 # Unattended runs
 
@@ -580,7 +580,7 @@ definition, so the absence is a decision and not an oversight.
   whole range on every closing round, and until now no carrier this kit ships even named it:
 
   ```bash
-  python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
+  python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
   ```
 
   It takes a COMMITTED range, so it runs AFTER the commit and never before it — the pre-commit
