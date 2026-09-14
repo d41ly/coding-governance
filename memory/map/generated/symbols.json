@@ -338,6 +338,11 @@
       "file": "tools/workflows/unattended-build.js"
     },
     {
+      "id": "boundedParallel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -908,6 +913,11 @@
       "file": "tools/workflows/unattended-build.js"
     },
     {
+      "id": "chunk",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "claimant_index",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1366,6 +1376,11 @@
       "id": "derive_live_rows",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "derive_marker_coupling",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_memory_disciplines",
@@ -2435,6 +2450,11 @@
     {
       "id": "meta",
       "kind": "const-export",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
       "file": "tools/workflows/unattended-unit.js"
     },
     {
@@ -3236,6 +3256,11 @@
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderRoster",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "renderShippedBlanks",

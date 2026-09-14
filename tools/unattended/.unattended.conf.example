@@ -246,7 +246,9 @@ DISPOSITION_CUTOFF=""
 # whether its BUILD COMMIT carries a `brief · item <id>` row whose hash still joins to a tracked file
 # at that commit. Graded on the build README's `opened:` date. The anchor is the build commit itself
 # and not its first parent, unlike PASS_ORDER_CUTOFF above: `--brief` STAGES its row, so the row
-# lands in the same commit as the pass it describes.
+# lands in the same commit as the pass it describes. Which units the leg grades, and which it only
+# announces, is stated once, in the protocol's `BRIEF_RECORDED_CUTOFF` row at
+# <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md, and not restated here.
 #
 # BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
 # per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 50 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 51 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -155,6 +155,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `drift-audit-state.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `unattended-build.js` | unattended |
+| `unattended-build.template.js` | review-harnesses |
 | `unattended-unit.js` | unattended |
 
 ## skill-engines
@@ -194,6 +195,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
+| `fixture-lacks-a-gate-the-consumer-has.md` | govkit |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `fixture-removes-the-path-under-test.md` | run-gates |
 | `fold-text-is-unreviewed-surface.md` | build-method |

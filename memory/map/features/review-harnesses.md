@@ -21,6 +21,7 @@ workflow-scripts = [
   "drift-audit-code.js",
   "drift-audit-state.js",
   "tier2-review.js",
+  "unattended-build.template.js",
 ]
 skill-engines = []
 rendered-skills = []
@@ -68,6 +69,14 @@ predicate, two callers.
 
 The three harnesses share a pipeline that is not shared code — primed lenses, batched skeptics
 defaulting to refute, one synthesis, joined on an integer the orchestrator assigns.
+
+**The unattended build harness is RENDERED, not shipped.** `unattended-build.template.js` is the
+source, and `check-protocol-parity.test.sh --render` writes `unattended-build.js` beside it with the
+kit's own directory, the tool root, and the memory-tree kit's directory filled in. Apply writes an
+engine file verbatim, so the four install paths the harness spells used to reach an adopter at
+another prefix naming files that adopter did not have. The third token is PROBED from the tracked
+tree rather than derived from the prefix, because an adopter may install that kit flat. The harness
+is claimed by the unattended dossier and its template here, because this kit renders it.
 
 ## Gaps
 
@@ -117,3 +126,9 @@ necessarily spells the banned expression while documenting it.
 seam: agent-cap.js — reuse as the single predicate for any fan-out rule that must reach an inline
 script; extend by delegating from a file gate rather than re-implementing, the way
 check-verifier-fanout.sh already does.
+seam: check-protocol-parity.test.sh — reuse as this kit's ONLY renderer, and as the leg that grades
+what it rendered; extend by adding a `PAIRS` row and a `rendered` rule in `kit.toml`, never by
+writing a second renderer. A template in the kit dir with no row reds, so a new one cannot ship
+ungraded. A token only some templates carry is resolved PER PAIR: an unanswered probe skips, by name
+and out loud, only the pairs whose template needs it, so a new token cannot cost an install the
+pairs that never use it (`TOOL-dPolishedVitrine-1`, round 1 F3).

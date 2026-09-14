@@ -63,3 +63,11 @@ half-fixed.
 `multi-site-fix-parity` leg reading a review record's site list against the commit that claims to
 resolve it; it is unbuilt, its failing case has not been observed, and a gate nobody has seen go red
 is an assertion about nothing. Tracked as `TOOL-aScannedThrottle-9`.
+
+**A live instance, retired by a pointer.** Round 3 of build `dPolishedVitrine`'s closing review
+found the `brief-recorded` population stated three times, and one copy,
+`tools/unattended/.unattended.conf.example`, had dropped the condition that HEAD must still bear
+the finished claim out. The fold replaced that copy with a pointer to the protocol's
+`BRIEF_RECORDED_CUTOFF` row, so it cannot be half-fixed again. The leg's header in
+`tools/unattended/check-brief-recorded.sh` still states the predicate, because a gate's header says
+what it checks; the row and the header are the two carriers left.
