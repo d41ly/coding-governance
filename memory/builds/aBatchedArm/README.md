@@ -58,11 +58,11 @@ each other's contention to the wrong budget, and a declared mode carries that co
 instead of implying it. (2) The batching units are BUILT, after the shard route, not retired.
 (3) Everything on this branch lands.
 
-**OWNER RULING, 2026-09-13.** The build agents run no self-test on every step: build first, then
-ONE verification pass when the build is complete. Unit 3's first pass was stopped for it.
+**OWNER RULINGS, 2026-09-13/14.** No self-test per step; no gate until every unit is built;
+ONE verification pass at the end. Unit 3's first pass was stopped for it.
 
-**UNIT 1 CONVERTED NOTHING, measured; `emitted` landed inert.** Its ledger has the why; the
-question is parked in the run-state file.
+**OWNER RULING, 2026-09-14, unit 1:** the `$out` token allowed, nineteen groups, sets from the
+observed run at the final pass.
 
 ## Parked decisions
 
@@ -94,7 +94,7 @@ ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 
 | [TOOL-aBatchedArm-4 — declared execution modes for the self-test runner](spec/2026-09-13-spec-TOOL-aBatchedArm-4.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-13 |
 | [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 2 | 2 | CLOSED | rev-8 | 2026-09-14 |
 | [TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip](spec/2026-09-13-spec-TOOL-aBatchedArm-5.md) | 3 | 2 | CLOSED | rev-7 | 2026-09-14 |
-| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-14 |
+| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 4 | 2 | OPEN | rev-6 | 2026-09-14 |
 | [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 5 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 

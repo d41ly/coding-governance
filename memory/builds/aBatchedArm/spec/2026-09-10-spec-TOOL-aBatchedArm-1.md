@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 46b12b93 · streams tooling · order 4
+**Status:** OPEN · rev-6 · 2026-09-14 · node a · Tier-2 · base 97abf7e1 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -33,7 +33,19 @@ without deleting an assertion.
   **AC1**, **AC2** and **AC7**.
 - **S2** — convert the batchable arms from one-reset-one-run-one-assertion into groups: one
   `reset_tree`, the group's mutations applied in sequence, one `out=$(run)`, one `emitted` call, then
-  the group's existing `hit`/`miss`/`same` assertions against `$out` VERBATIM. Observed by **AC3**.
+  the group's existing `hit` assertions against `$out` with their LITERALS verbatim — the ONE token
+  change `hit "$(run)"` → `hit "$out"` is allowed (owner ruling 2026-09-14), because 174 of the
+  hit-only blocks carry the inline shape and none of the ten `$out`-shaped ones are adjacent. The
+  population is the NINETEEN candidate groups the rev-5 pass classified at `46b12b93` — enumerated
+  by line range in its acceptance ledger, 14 of two blocks and 5 of three, 43 blocks, 24 of 285
+  invocations — converted with their `emitted` argument left as the SENTINEL `emitted "?" "$out"`,
+  which the helper REFUSES by name, so the converted file cannot pass by accident before its sets
+  exist. **Each group's expected set is written from the OBSERVED run at the build's final gate
+  pass** (owner ruling 2026-09-14, superseding §4's rejection of recorded goldens for THIS shape:
+  the set is per group, derived from one run and pasted beside the group with the run it came from
+  named, never hand-typed), and the rev-5 pass proved why nothing weaker works: three of the
+  nineteen fire branches their arms never name, so a set derived from the arms reds `emitted` by
+  design. Observed by **AC3** and **AC8**.
 - **S3** — leave un-batched, each on its own tree, every arm whose break can truncate the run,
   relocate it, or leave a control without a witness. The list, and it is the unit's load-bearing
   declaration: the three check-1 branches that `exit` at `check-unattended.sh:114`, `:198` and
@@ -233,6 +245,14 @@ records.
   subject; the pair is the honest subject, and `TOOL-aBatchedArm-3` is the half that carries it.
 - **AC7** — When the converted file is scanned, NO group contains a `miss` or a `same` assertion.
   Red when: any group contains one, which is what rev-2's withdrawn admissibility rule permitted.
+- **AC8** — When the converted file is read before the final pass, every `emitted` call carries the
+  sentinel `"?"` and the helper REFUSES it by name on any run; and after the final pass every
+  `emitted` call carries a set pasted from that pass's observed run, the run named beside the group,
+  and no `"?"` remains.
+  `figure:` the set count is DERIVED — one per group — and the sets are the observed run's, never
+  typed.
+  Red when: a `"?"` survives the final pass, a set was typed from the arms rather than observed, or
+  the helper passes a sentinel.
 
 ## 7. Gates
 
@@ -257,6 +277,15 @@ under S4.
 
 ## 9. Revision log
 
+- rev-6 · 2026-09-14 · §2 S2 · §6 AC8 · base · REOPENED by owner ruling on the decision the rev-5
+  pass parked. The owner chose: allow the one token change `hit "$(run)"` → `hit "$out"`, convert
+  the nineteen groups the rev-5 classification enumerated, and write each group's expected set from
+  the OBSERVED run at the build's final gate pass. That supersedes §4's rejection of recorded
+  goldens for this one shape — per-group sets from one named run, pasted beside the group — and the
+  reason it is sound where the rejected table was not is that the assertion LITERALS still stay
+  verbatim and AC3's equivalence diff stays readable. Until the final pass every `emitted` carries
+  the sentinel `"?"`, which the helper refuses, so the converted file cannot pass vacuously in the
+  window. Base moved to `97abf7e1`, the rev-5 pass's last commit, where `emitted` already exists.
 - rev-5 · 2026-09-14 · base · §2 S2 · §2 S4 · §2 S5 · §4 Data model · §6 AC1–AC7 · the build pass,
   under the owner rulings of 2026-09-13 (no self-test per step) and 2026-09-14 (no gate until every
   unit is built), so this pass ran NO suite, NO shard, NO bar and NO `run-unattended-gates.sh`.
