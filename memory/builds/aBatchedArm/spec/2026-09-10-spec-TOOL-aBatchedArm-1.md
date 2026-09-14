@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-4 · 2026-09-13 · node a · Tier-2 · base e9ed269b · streams tooling · order 4
+**Status:** OPEN · rev-5 · 2026-09-14 · node a · Tier-2 · base 46b12b93 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -256,6 +256,41 @@ under S4.
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-14 · base · §2 S2 · §2 S4 · §2 S5 · §4 Data model · §6 AC1–AC7 · the build pass,
+  under the owner rulings of 2026-09-13 (no self-test per step) and 2026-09-14 (no gate until every
+  unit is built), so this pass ran NO suite, NO shard, NO bar and NO `run-unattended-gates.sh`.
+  **Base moved e9ed269b → 46b12b93**, past three units that changed the file this spec converts, so
+  every line number typed above is stale and every anchor was re-derived by TEXT. Four facts the
+  spec did not know, recorded here rather than re-derived by the next reader: (1) the file is EIGHT
+  shards (`TOOL-aBatchedArm-3`), `if in_shard 1` through `if in_shard 8`, 27 helpers hoisted to the
+  prologue, `topo_capture <k>` at each region's first line and `replay_landed_main` at region 4's —
+  a group never spans a seam, and those lines are not arms and are never grouped; (2) the nine-arms
+  block is a COUNTED block (`MUT=0; MUT_EXPECTED=13`, every `reset_tree`-led cycle increments `MUT`,
+  the closing `same` asserts the count), so batching any arm in it lowers the count and reds the
+  control — it stays EXACTLY as it is, S3's control-without-a-witness class; (3) the floors are set
+  (`FLOOR_ASSERTIONS=538`, `FLOOR_SHARD_1..8` beneath) and S4's re-measure and S5's budget rows are
+  NOT done here — owed at the build's final gate pass from that pass's counts; (4) `reset_tree` now
+  deletes two leaked heads in both stores (`TOOL-aBatchedArm-3` S5), and one `reset_tree` per group
+  is still the group's whole reset. **THE MEASUREMENT THIS PASS ADDS, and it is the finding:** a
+  classifier over every `reset_tree`-led block (332 at 46b12b93), under S2's shape, S3 taken flat,
+  contiguity, pairwise-disjoint touched files (a commit counts as the ref `unit`) and the brief's
+  rule that the expected set is DERIVED from the arms, finds — with every existing `hit` line
+  byte-identical, as the build brief requires — 10 BATCHABLE blocks and ZERO contiguous pairs; with
+  the one token `hit "$(run)"` → `hit "$out"` allowed, 112 BATCHABLE blocks and 19 contiguous
+  groups of 2 or 3 (43 blocks, 24 of 285 invocations). And THREE of those 19 are proven from the
+  checker's own source to emit branches their arms never name — `PHASES_CORE=" "` fires the
+  TERMINAL-phase loop once per terminal phase and check 4 on the fixture record, `DOD_CORE=" "`
+  fires check 16's table join over an empty driver set, `rm VERBS.template.md` fires check 26's
+  absent-carrier branch beside check 10's (the suite's own comment says so) — so an expected set
+  derived from the arms is INCOMPLETE for this file, `emitted`'s set equality reds on it by
+  design, and the spec's own rollout rule reverts the tranche. The complete set of every other
+  candidate is unknowable without an observed run, which the ruling forbids. **S2 therefore
+  converts NOTHING at this base**: S1's helper lands with no call site, inert; the 19 candidates
+  and the three readings that would unblock them are PARKED to the owner in the run-state file. AC4
+  and AC7 are observed by a static scan (trivially, over zero groups); AC1, AC2, AC3, AC5 and AC6
+  are AMENDED in the acceptance ledger, each naming the command the final pass observes it by.
+  §4's data-model sketch still spells the check-number form rev-1 wrote; the helper's contract is
+  S1's signature form and its own header, and the sketch is left as history rather than retyped.
 - rev-4 · 2026-09-13 · §3 Edges · mirrors `TOOL-aBatchedArm-3`'s `hands-off` as `consumes-from`, which
   memory hygiene check 12 had been redding on since the edge was declared one way only.
 - rev-3 · 2026-09-10 · §2 S1 · §2 S3 · §3 · §4 · AC6 · AC7 · order · folded spec-audit round 2
