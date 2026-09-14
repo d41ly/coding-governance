@@ -24,6 +24,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [arm-literal-strands-on-message-edit](arm-literal-strands-on-message-edit.md) | class | 5 |  | editing a fail message strands its arm silently — the branch stays armed-looking, the count drops by one, and only the arms gate notices |
 | [armed-but-unreachable-rule](armed-but-unreachable-rule.md) | class | 4 |  | a declaration can be non-empty, well-formed and still impossible to violate — testing that a rule EXISTS is not testing that it can FIRE |
 | [assertion-between-two-derived-values](assertion-between-two-derived-values.md) | class | 4 |  | a check comparing two values the same code derives from one source is a tautology, and it arms cleanly |
+| [bash-c-multiline-flattens-under-msys](bash-c-multiline-flattens-under-msys.md) | class | 4 |  | a multi-line script handed to `bash -c` from a Windows python re-parses as one line under the MSYS layer, and a backslashed `C:\` path handed to MSYS bash loses its separators, so a probe that works in a shell fails from a subprocess with an error naming neither cause |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 7 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [check-format-grades-two-populations](check-format-grades-two-populations.md) | class | 3 |  | the build README slot gate binds every tracked README on one axis and only the declared ones on the other, so a new folder can red on a rule its author never opted into |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 6 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
@@ -57,6 +58,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [process-creation-is-the-suite-cost](process-creation-is-the-suite-cost.md) | class | 2 |  | a shell suite that is 93% not-CPU is paying an on-access antivirus scanner per exec, so its cost is spawn count and nothing in the code reads that way |
 | [record-citing-a-foreign-id-defines-or-orphans-it](record-citing-a-foreign-id-defines-or-orphans-it.md) | class | 2 |  | writing another build's id into a record either DEFINES it or ORPHANS it, and the orphan count sees only one of those, so the obvious check passes on the worse half |
 | [record-without-serves-or-with-a-round-counter](record-without-serves-or-with-a-round-counter.md) | class | 7 |  | a new build record owes a Serves line and a filename that projects it, and a round counter in that filename mints an id nothing defines |
+| [reflowed-prompt-string-reads-as-a-deleted-stop](reflowed-prompt-string-reads-as-a-deleted-stop.md) | class | 2 |  | check 12 of the unattended gate greps the kickoff engine's READY prompt string as one fixed string on one physical line, so a reflow that wraps it at the house width reads as the READY stop having been deleted |
 | [row-driver-emits-a-plausible-file-with-rows-missing](row-driver-emits-a-plausible-file-with-rows-missing.md) | class | 6 |  | the backlog row driver never errors on a wrong input order or a two-sided rotation — it emits a well-formed shard with the other side's rows silently gone |
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
 | [settings-edit-takes-effect-mid-session](settings-edit-takes-effect-mid-session.md) | class | 1 |  | an edit to the hooks settings file is live on the next tool call, not at the next session, so a throwaway hook fires on the call that checks for it |
@@ -80,6 +82,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-65 record(s): 65 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+67 record(s): 67 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

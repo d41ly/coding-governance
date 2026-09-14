@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 65 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 67 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -188,6 +188,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 �
 | `arm-literal-strands-on-message-edit.md` | testsuite-counts |
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
+| `bash-c-multiline-flattens-under-msys.md` | agent-cap |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `check-format-grades-two-populations.md` | build-readme-surface |
 | `concurrency-is-not-a-budget.md` | baseline |
@@ -221,6 +222,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 7 �
 | `process-creation-is-the-suite-cost.md` | unattended |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
 | `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
+| `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
 | `row-driver-emits-a-plausible-file-with-rows-missing.md` | memory-tree-merge-driver |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `settings-edit-takes-effect-mid-session.md` | agent-cap |

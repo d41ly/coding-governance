@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
-gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
+gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mode-read-eats-a-bare-cr.md",
   "assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
   "bounded-through-a-pipe-is-unbounded.md",
