@@ -1,4 +1,4 @@
-# aBatchedArm — closing-fix ledger, round 1
+# aBatchedArm — closing-fix ledger, rounds 1 and 2
 
 **Serves:** journal TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3
 
@@ -197,3 +197,81 @@ why ×1.5 and not a tighter factor.
 - The D4 arm is scoped to a declared pooled population rather than the whole declaration, and the
   declaration is a second spelling of the `--kit` argument the kit runner passes; a static refusal
   of an undeclared `--pooled --kit` is the follow-up that would collapse the pair.
+
+## Round 2
+
+The fix pass for the round-2 closing diff review
+(`../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round2.md`, CLEAN WITH FIXES, six
+residues R1 to R6 of round 1's own fixes). ONE commit for all six, `baf97d8f`, subject
+`aBatchedArm closing fix 8: round 2's six residues — …`; the same scratch harness as round 1 (the
+suite's header and fixture builder, only the arms under observation, `run_arms`) run against the
+pre-fix runner (a copy of `HEAD:tools/run-gates/run-selftests.sh` before the commit) and then the
+fixed one; one direct timed run on a frozen clone. Every `.sh` edit through the Edit tool or
+binary-mode Python; the committed blobs carry zero CR bytes by `git cat-file`. Ran afterwards:
+`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` (2 anchored classes, 5 universal,
+each answered below), `python tools/lexicon/lexicon.py` (rc 0, offenders 984 at pin 984),
+`bash tools/run-gates/run-selftests.sh --check` (clean, 69 rows, trailer arm graded 13),
+`bash tools/check-install-prefix.sh` (clean, none rising), `bash tools/check-line-length.sh` (OK),
+`bash tools/memory-tree/check-memory-hygiene.sh` (full, after the run, its line at the end of this section). Not run:
+`check-unattended.test.sh` in any mode or shard, the other unattended suites, the bar,
+`run-unattended-gates.sh` in any mode.
+
+- **R1** (`baf97d8f`) — the per-row copy under `<git-dir>/gate-logs/selftests/` goes through the
+  sibling runner's URL-userinfo mask, inlined (the two `sed -E` expressions compared byte-identical
+  by extraction from both committed blobs), and `chmod 600`; every grep still reads `$d/out`. Arm:
+  `suite-secret.sh` echoes `fatal: unable to access 'https://u:p@example.com/x'` and exits 1; the
+  kept file lacks `u:p@`, keeps `example.com`, carries `***:***@`. Pre-fix rc 98 (the credential
+  survived the bare `cp`); fixed `ok`. The file mode is not asserted: this node cannot observe it.
+- **R2** (`baf97d8f`) — `NOBASE_RX` is extracted from the runner at the top of
+  `run-selftests.test.sh` by the review's sed; the FIRST arm asserts it non-empty and greps
+  `check-unattended.test.sh` for `echo "FAIL check_emitted: <rx>` verbatim; `suite-sentinel.sh`
+  derives its line from the same value, so the third spelling is gone. Pre-fix rc 1 against a
+  scratch copy of the owner with one word reworded (`observed` to `SEEN`); `ok` against the real
+  owner. The reasoned RAISE of `tools/install-prefix-carried.txt:110` the review priced is NOT
+  owed: the owner is reached as `$ROOT/tools/unattended/…`, and the carried-prefix predicate's
+  lead class excludes `/`, so the literal is read as derived — observed both ways (the row raised
+  to 6 redded the leg SLACK `6 -> 5`; reverted, `none rising`).
+- **R3** (`baf97d8f`) — the WALL branch keys on rc 143 OR 137 under `WALL_BREACHED` at the
+  calibrate site and the graded site; 124 stays KILLED; the RED summary reads `killed by a signal
+  or its own bound`. The D8 arm's want is the WALL line
+  `(killed by the 3s calibrate wall — NO reading written)` and its subject also asserts
+  `run wall killed: free one` (rc 98 otherwise) beside the seed-absent check (rc 99). Pre-fix rc 98
+  (the row rendered KILLED, no wall line); fixed `ok`.
+- **R4** (`baf97d8f`) — the parser refuses `--check` given with `--kit`, by name, rc 2, beside the
+  `--calibrate` refusal; the usage reads `takes no mode and no --kit`; no caller in the tree passes
+  the pair (grepped). Arm: `# pooled-kit: tools/elsewhere/` declared, `--check --kit tools/suite-ok`
+  selects both fixture rows and none under that kit. Pre-fix rc 1 `selects NO row, so the trailer
+  arm graded nothing` — the review's false red, reproduced on the fixture; fixed rc 2.
+- **R5** (`baf97d8f`) — `resolve_node_tag` and `--check`'s evidence reader compare the tag with
+  `grep -qxF` over one tag per line. Reproduced on this repo's real registry first, with nothing
+  executed (the no-reading refusal follows node resolution): the pre-fix runner accepted
+  `GOV_NODE='a b'` and named `node a b` in its refusal; the fixed one refuses it by name, rc 2.
+  Arm: the review's `GOV_NODE='t t'` cannot stage the defect on a one-tag fixture (` t ` holds no
+  ` t t `), so the setup registers a second tag `u` and the subject uses `GOV_NODE='t u'`. Pre-fix
+  rc 99 (a calibrate ran and wrote a reading under node `t u`); fixed rc 2, the file unchanged.
+- **R6** (`baf97d8f`) — `unsound_why` accumulates with `; ` at the three sites. No arm, as the
+  review ruled; this line is the documented check.
+
+`SELFTEST_FLOOR` 108 to 112: four arms (R1, R2, R4, R5); `grep -c '^arm '` reads 112. The kickoff
+manifest's `last-audit` re-stamped at the merge-base `fdd754bf` in the same commit with a delta
+line (the runner is on its watch line; C5s compares the staged stamp with HEAD's).
+
+The bug-class checklist, answered: `fixture-passes-by-finding-nothing` — every new or changed arm
+observed RED first, above; `heredoc-escape-reaches-the-regex` — no heredoc authored any `.sh`
+byte, and the R1 arm's `\*\*\*:\*\*\*@` reads as six escaped asterisks in the committed blob;
+`staged-break-substitutes-a-synthetic-value` — the R2 arm reads the real owner and the real pin,
+which is the fix; `two-answers-to-one-question` — the sentinel now has one owner and one pin,
+and the mask regex is deliberately a second copy (the kit-file ban keeps it inline), compared once
+here and gated by nothing else — recorded as the documented check; the remaining three classes
+(inline fence, amendment's other half, empty-field collapse) were read against the diff and did
+not fire.
+
+### The direct run, round 2
+
+- Clone: `git clone --local` of this worktree at `C:/Users/daily-agent/AppData/Local/Temp/cgrst2`,
+  tip `baf97d8f`, frozen — nothing committed into it.
+- Condition: direct, the suite alone, `SELFTEST_INNER_WIDTH` unset (width 1), node `a`, 18 bash
+  processes on the box before the run; the seconds-long static gates above ran beside it.
+- Verdict line, pasted from the output file: `PASS (112 arms, width 1)`. Wall from `date +%s` around the
+  suite alone: **802 s** (rc 0).
+- Against the declared ceiling of 1217 s (round 1's 811 s at ×1.5): inside it with 415 s to spare, and 9 s under round 1 with four more arms, so no re-declaration is owed (the review’s own ruling for these arms). 112 `ok`, 0 `FAIL`, 0 `ERR`; the D9 `walled 1` arm read `ok` a second time at width 1, still one observation per run and not a refutation.
