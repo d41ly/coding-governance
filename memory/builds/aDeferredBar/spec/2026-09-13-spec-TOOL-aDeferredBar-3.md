@@ -1,12 +1,14 @@
 # TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md](../build/2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md) | research | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
+| [2026-09-14-build-TOOL-aDeferredBar-3-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aDeferredBar-3-1-acceptance-ledger.md) | journal | — |
+| [2026-09-14-build-TOOL-aDeferredBar-3-2-corpus-measurement.md](../build/2026-09-14-build-TOOL-aDeferredBar-3-2-corpus-measurement.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aDeferredBar-3-1-spec-brief.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-3-1-spec-brief.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aDeferredBar-3-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aDeferredBar-3-2-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md) | spec-audit | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
@@ -136,9 +138,12 @@ target, never the common dir's, because the common dir's `HEAD` is the primary t
 
 ### The predicate
 
-Command position is the line start or the text after `;`, `&&`, `||`, `|`, `(`, `then`, `do` or
-`else`, followed by any of `env`, `export`, any number of `NAME=value` words, `timeout N`, and
-`bash` or `sh` with one short option. In the blanked view, at that position:
+Command position is the line start or the text after `;`, `&&`, `||`, `|`, `(`, `{`, `then`, `do`
+or `else`, followed by any of `env`, `export`, `time`, `nohup`, any number of `NAME=value` words,
+`timeout N`, and `bash` or `sh` with one short option. `{`, `time` and `nohup` joined at rev-4: the
+AC11 measurement of the rev-3 grammar over the shipped predicate found 31 `time bash <suite>`, 4
+`nohup bash <suite>` and 3 `{ bash <suite>` calls among the D4 near-misses, every one a run, which
+is that criterion's own RED. In the blanked view, at that position:
 
 | row | shape | what is matched | why |
 |---|---|---|---|
@@ -149,7 +154,10 @@ Command position is the line start or the text after `;`, `&&`, `||`, `|`, `(`, 
 | D5 | nested | the quoted argument of `bash -c` or `sh -c`, read from the ORIGINAL text at the offset the blanked view locates, and scanned as a command of its own, one level deep | the blanked view alone would hide it, and the corpus holds eight such calls, every one a run: `bash -c 'timeout 5400 bash tools/unattended/unattended.test.sh'` among them |
 
 A row D2, D3 or D4 token is NOT a hit when the same simple command, up to the next `;`, `&&`,
-`||`, `|` or newline, carries one of `--list`, `--check`, `--rank`, `--help` or `--render`.
+`||`, `|` or newline, carries one of `--list`, `--check`, `--rank`, `--help` or `--render`, or
+when the `bash`/`sh` in front of it carries `-n` (rev-5): `bash -n` parses and executes nothing,
+the corpus holds 412 raw `bash -n <suite>` mentions, and the wired hook denied this pass's own
+syntax check of its suite before the rule existed.
 Measured on node `a`, 2026-09-13, each direct: `run-selftests.sh --list` 5 s, `--check` 17 s,
 `--rank` 3 s, `--help` 3 s; `run-unattended-gates.sh --help` 1 s;
 `kit-dogfood-parity.test.sh --render` 1 s and `--check` 2 s; `check-protocol-parity.test.sh
@@ -293,10 +301,10 @@ so rather than letting a reader assume it is graded.
 | `memory/guides/UNATTENDED-PROTOCOL.md` | re-copied by `bash tools/unattended/adopt-unattended.sh`, never edited; check 10 of `check-unattended.sh` grades the pair |
 | `tools/unattended/unattended.test.sh` | one arm beside 50d at line 2897: a default-branch-anchored preflight writes `run-branch:` equal to `$(git symbolic-ref HEAD)` read from the fixture at the moment of the preflight, and the arm asserts against that read, never a literal — `reset_tree` at line 355 checks out `unit`, so the value there is `refs/heads/unit`, and a preflight with `HEAD` on `main` is refused outright at `unattended.sh:903` where the merge-base equals `HEAD`; its budget row (3860 s against 2569 s measured) does not move for one arm on an existing fixture |
 | `tools/unattended/gate-guard.test.sh` | new, the withheld suite; every fixture is a scratch repo under `mktemp -d` holding a `.git` `HEAD`, a conf and a record, never the real tree; prints `PASS (<n> assertions)` against a derived `FLOOR_ASSERTIONS` as `scratch-guard.test.sh:239` does; carries the `PHASES_CORE` parity arm and every payload §6 feeds by hand |
-| `tools/unattended/adopt-unattended.test.sh` | `seed()` gains `gate-guard.fragment.json` in its copy list and writes a `.claude/settings.json` carrying the fragment's marker, so its two `--check` arms at lines 76 and 119 keep exit 0 once the S6 arm exists; its 60 s budget row (38 s measured) does not move for one file write and one grep |
+| `tools/unattended/adopt-unattended.test.sh` | `seed()` gains `gate-guard.fragment.json` in its copy list and writes a `.claude/settings.json` carrying the fragment's marker, so its two `--check` arms at lines 76 and 119 keep exit 0 once the S6 arm exists; it also gains `VERBS.template.md` and `playbook.fixture.template.md` (rev-4), without which the install those arms depend on refuses; its 60 s budget row (38 s measured) does not move for two file writes and one grep |
 | `tools/unattended/kit.toml` | `gate-guard.test.sh` joins the `project-owned` include list; the `**` engine rule already ships the hook and the fragment |
 | `tools/run-gates/selftest-budgets.txt` | one row, budget from the measured reading times 1.5 floored at 60 s, so `run-unattended-gates.sh` enumerates it through the runner's list verb |
-| `tools/install-prefix-carried.txt` | the `selftest-budgets.txt` row RAISED 14 to 15 by hand with its reason, because every budget row is a gov suite path by construction and the ban admits a hand-justified raise in the pass that wants it |
+| `tools/install-prefix-carried.txt` | the `selftest-budgets.txt` row RAISED 14 to 15 by hand with its reason, because every budget row is a gov suite path by construction and the ban admits a hand-justified raise in the pass that wants it; and a hand-written row for `gate-guard.test.sh` itself (rev-4), because the carried population is every path the descriptors resolve, `project-owned` included, and the suite's arms spell the deny shapes as command strings |
 | `tools/unattended/adopt-unattended.sh` | a sixth artifact in the `--check` branch: the settings file lacks the marker read from the kit's fragment, print the UNWIRED refusal naming `$PY $ROOT/tools/settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json` and exit 1, in the branch's own sequential-refusal style. The brief named `adopt-process-monitor.sh`'s `add_problem` register; this adopter has no register and adding one for a single arm is a second style in one file |
 | `tools/unattended/README.md` | the paragraph: the act is refused, not only forbidden, and which shapes; pinned phrase above |
 | `tools/unattended/SKILL.template.md` | the half-sentence appended to the bullet unit 1 adds; pinned phrase above |
@@ -372,7 +380,8 @@ no deny shape.
 - **AC3** — When the fixture's record is moved through `VERIFYING`, `LANDING`, `LANDED` and
   `ABORTED`, every row D1 to D4 prints `rc=0` from the same invocation with empty stderr; and when
   the record is at `BUILDING`, the plain bar with `GATE_JOBS=1`, each read-only verb form of D2, D3
-  and D4, and row D1's OFF spelling, the empty assignment, print `rc=0`.
+  and D4, and row D1's OFF spelling, the empty assignment, print `rc=0`; and so does `bash -n` in
+  front of a D4 token at `BUILDING`, the no-exec syntax check (rev-5).
   Red when: `VERIFYING` is denied, which is the owed bar for kit work being refused.
 - **AC4** — When the fixture record's branch fact names another branch, or the record carries
   neither `run-branch:` nor `branch-ref:`, or `HEAD` holds a bare sha, or no record exists, or
@@ -561,6 +570,19 @@ New arm: tools/unattended/adopt-unattended.test.sh · no new arm — `seed()` wr
   `memory/map/generated/` row for the `symbols.json` regen the `kit-js` layer forces; AC12 names
   the freshness test's subject and its RED-first) · L4 (§3 hands-off edge and the rev-2 line cite
   `TOOL-aDeferredBar-4` instead of promising a row the landing would file twice).
+- rev-4 · 2026-09-14 · §4 The predicate: `{` joins the separators and `time` and `nohup` join the
+  prefix words, because the build pass's AC11 measurement of the rev-3 grammar listed 38 runs among
+  the D4 near-misses — a near-miss that is a run is the RED that criterion defines, so the grammar
+  moved rather than the finding being recorded beside it. Two files-table rows moved with what the
+  pass found: `tools/install-prefix-carried.txt` takes a second hand-written row, because the
+  carried population admits a `project-owned` suite and the new one carries 37 fixture-internal
+  command strings; and `adopt-unattended.test.sh`'s `seed()` copies `VERBS.template.md` and
+  `playbook.fixture.template.md` too, because the committed seed lacked both and the adopter's
+  install refused before rendering the Skill, so AC10's precondition did not hold on it.
+- rev-5 · 2026-09-14 · §4 The predicate and AC3: `bash -n`/`sh -n` in front of a D2, D3 or D4
+  token is not a run. Found by the wired hook itself, which denied the pass's own syntax check of
+  its suite minutes after S4 landed; 412 raw mentions of the shape in the corpus, every one a
+  parse and none a run. One allow arm in the suite and one allow payload under AC3 observed direct.
 
 ## 10. Reuse audit
 

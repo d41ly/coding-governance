@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-14T02:54:06+03:00 @ c4f0230860daf81e2988f247ab29eea73a931dba
+last-audit: 2026-09-14T03:45:44+03:00 @ c4f0230860daf81e2988f247ab29eea73a931dba
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 1447605bee171961d3a186963f673353790ec694
+last-body-change: d59e70228e0d454e135a52c97eb249e8228be0d9
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -207,9 +207,6 @@ does — hit three times in one file in one session) · `process-creation-is-the
   across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
-- All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
-  `git diff --cached --check`.
-- The memory hygiene leg is MINUTES; a timeout sized in seconds fires. Read `gate-ledger.tsv`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
@@ -222,6 +219,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
   writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
   `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
   scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
+- `gate-guard` is the third `Bash|PowerShell` hook, from the unattended kit: while this branch's
+  run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
+  `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
+  wait for the main loop's `VERIFYING`.
 - **A `PreToolUse` hook FIRES inside a `Workflow` sidechain**, measured 2026-09-12 by `scratch-guard`
   itself. A sidechain holds neither `Agent` nor `Workflow`, so it cannot fan out — that is the reason,
   never "hooks stop at the boundary". `TOOL-cRefutedPremise-1`.

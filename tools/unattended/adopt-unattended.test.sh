@@ -37,7 +37,19 @@ seed() { # dir  -> a git repo carrying the kit and a conf
       && git config core.autocrlf false )
   # BOTH SIDES ADDED A FILE HERE: main the playbook template, this branch the kit library. A fixture
   # missing either materialises a kit that cannot run, so the union is the only correct resolution.
-  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh"      "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/$KIT_REL/"
+  cp "$HERE/SKILL.template.md" "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh"      "$HERE/check-unattended.sh" "$HERE/PROTOCOL.template.md" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$HERE/gate-guard.fragment.json" "$1/$KIT_REL/"
+  # THE VERB CARRIER AND THE FIXTURE TEMPLATE TOO (TOOL-aDeferredBar-3). The adopter copies the
+  # first and RENDERS the second on its install path and exits 1 without either, before the Skill
+  # is written — so a seed lacking them left arm 1's `--check` asserting exit 0 over a tree the
+  # install had refused. Found by building AC10's fixture by hand: the precondition "seed, then
+  # install" did not hold on this seed.
+  cp "$HERE/VERBS.template.md" "$HERE/playbook.fixture.template.md" "$1/$KIT_REL/"
+  # TOOL-aDeferredBar-3: the adopter's --check reads the gate-guard hook's marker out of the
+  # settings file, so the seed carries a wired one; the UNWIRED arm below removes it and reads the
+  # refusal. The marker is read from the fragment, never spelled, for the reason the adopter gives.
+  mkdir -p "$1/.claude"
+  printf '{"hooks":{"PreToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node \\"${CLAUDE_PROJECT_DIR}/%s/%s\\""}]}]}}\n' \
+    "$KIT_REL" "$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$HERE/gate-guard.fragment.json")" > "$1/.claude/settings.json"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 LANDER="bash tools/land.sh"

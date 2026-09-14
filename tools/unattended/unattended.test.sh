@@ -2895,6 +2895,15 @@ out=$(run --preflight tRun --keepalive-id k1)
 miss "$out" "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode"
 hit "$out" "preflight OK"
 hit "$(cat memory/builds/tRun/RUN.md)" "anchor-kind: default-branch"
+# ---- 50e (TOOL-aDeferredBar-3): a DEFAULT-BRANCH-anchored preflight writes the run's LOCAL branch
+# ---- under `run-branch:`, protocol fact 13 — the fact the gate-guard hook keys on, because
+# ---- `branch-ref:` is written only where the second anchor fired and 17 of 44 anchored records in
+# ---- the real tree carried no branch fact at all. Asserted against the fixture's OWN symbolic-ref,
+# ---- read at this moment and never a literal: `reset_tree` checks out `unit`, so `refs/heads/main`
+# ---- is a value this fixture cannot produce, and a literal would pass or fail for the wrong reason.
+same "50e run-branch: equals the fixture's own git symbolic-ref HEAD" \
+  "$(grep '^run-branch: ' memory/builds/tRun/RUN.md)" "run-branch: $(git symbolic-ref HEAD)"
+miss "$(cat memory/builds/tRun/RUN.md)" "branch-ref:"
 reset_tree
 
 # ---- 32: the branch is committed but NOT published. Nothing the remote advertises authorizes it.

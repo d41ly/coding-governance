@@ -328,6 +328,21 @@ if [ "$MODE" = "--check" ]; then
     grep -nE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT" | head -5 | sed 's/^/    /'
     exit 1
   fi
+  # the SIXTH artifact (TOOL-aDeferredBar-3): the gate-guard hook is WIRED. The hook ships with the
+  # kit and is live only through an entry in .claude/settings.json; nothing else on the bar reads
+  # that file for this marker, so an adopter with the file and no entry has a guard that never
+  # fires and a --check that said "in sync". The marker is read from the kit's own fragment, never
+  # spelled here, and the remedy is the one merge command that writes the entry idempotently.
+  GG_FRAG="$KIT_DIR/gate-guard.fragment.json"
+  if [ -f "$GG_FRAG" ]; then
+    GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+    [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no marker, so the wiring arm has nothing to look for"; exit 1; }
+    if ! grep -qF "$GG_MARK" "$ROOT/.claude/settings.json" 2>/dev/null; then
+      echo "unattended: the gate-guard hook is UNWIRED — .claude/settings.json carries no entry naming $GG_MARK, so the hook that refuses a self-test suite inside a build pass never fires"
+      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json"
+      exit 1
+    fi
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi

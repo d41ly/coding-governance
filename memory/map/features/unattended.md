@@ -204,6 +204,10 @@ as a note.
   reused verbatim rather than re-implemented.
 - `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION
   and deliberately NOT for witness PRESENCE, which is its own refusal here.
+- `tools/settings-merge.py --fragment` + `tools/check-hook-destinations.sh` — wire `gate-guard.js`,
+  this kit's `PreToolUse` hook denying the flagged bar and every suite before `VERIFYING`, keyed to
+  the branch by `run-branch:`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
+  a `require` of a sibling kit is a literal the install-prefix ban refuses (`TOOL-aDeferredBar-3`).
 
 ## Reuse affordance
 
@@ -217,11 +221,8 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region carries
-twelve facts, and three carriers gave three different counts at once — seven here, eleven in the
-protocol pair, five in the driver's resume comment — none counted by any gate, which is why the unit
-that added the twelfth enumerated the carriers by path. Dossier prose is ungated, so this section
-rots silently and is worth re-deriving whenever the feature is touched.*
+*Re-derived 2026-08-20 against the tree, not carried forward. Dossier prose is ungated and rots
+silently; re-derive this section whenever the feature is touched.*
 
 - **A run has been driven end to end, and it exposed two defects rather than confirming the
   design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.
@@ -232,7 +233,6 @@ rots silently and is worth re-deriving whenever the feature is touched.*
 - **The junction arm of the adopter e2e is SKIPPED on node `a`**, which lacks the privilege to
   create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
   actually installs with is therefore unexercised here and needs a run on a node that can link.
-- **No adopter has installed this kit.** The path exists and is gated; nothing has travelled it.
 - **A bug class this build DISCOVERED is now catalogued but only gated in one place.**
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a

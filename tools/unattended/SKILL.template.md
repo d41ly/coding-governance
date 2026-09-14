@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.20 -->
+<!-- gov:kit unattended@1.21 -->
 
 # Unattended runs
 
@@ -471,7 +471,9 @@ definition, so the absence is a decision and not an oversight.
   `GATE_SELFTESTS=1` form too, run by you at `VERIFYING` and nowhere earlier. Where a pass touched
   files a leg guards and you judge a bar necessary, the plain bar with no flag is the scoped form,
   at the main loop and never in a child. The rule is the build method's M6; this bullet points at
-  it.
+  it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
+  self-test runner or any `*.test.sh` is denied on this branch until the record reaches
+  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal.
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
   no witness is skipped by the oracle that would have judged it, so an unwitnessed phase is the
   cheapest possible lie and you are the only author of that field.

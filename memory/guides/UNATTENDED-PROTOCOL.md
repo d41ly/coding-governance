@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.20 -->
+<!-- gov:kit unattended@1.21 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -220,10 +220,16 @@ belonging here:
     before recording. A single `ABORTED` terminal says a run stopped and never why; the parked reason
     is prose for the owner, and this is the field the status line, the resume path and the gate leg
     join on. Present only on an aborted record, under facts 10 and 11's reading.
+13. **The run's local branch ref**, the value of `git symbolic-ref HEAD` at preflight, recorded by
+    `--preflight` on BOTH anchors and pinned once. Fact 10 is not this: it is the ref the REMOTE
+    advertised and is absent on a default-branch run, so a reader keying on it alone sees no branch
+    for the protocol's primary anchor. This is the fact the `gate-guard` hook keys a live run to the
+    branch a tool call is made on; a record written before it existed is keyed by fact 10 instead.
 
 Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
 default-branch run for the first two, a run that did not abort for the third. That is legal: the
-"nothing else" clause bounds what may appear, not what must. Fact 9 is always written.
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, and fact 13
+whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there.
 
 **A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
 none could plus what independently verifies the value. A hand-reconstructed fact carrying no such

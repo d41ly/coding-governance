@@ -39,7 +39,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.20   # gov:kit unattended@1.20 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.21   # gov:kit unattended@1.21 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -2722,6 +2722,16 @@ verb_preflight() { # slug · keepalive-id
   # re-preflight — the base stayed pinned while the anchor evidence beside it moved to whatever
   # the remote said today, so the record described two different observations as one.
   [ -n "$(fact "$rel" anchor-kind)" ] || set_fact "$rel" anchor-kind "${ANCHOR_KIND:-default-branch}" || return 1
+  # TOOL-aDeferredBar-3 - the run's LOCAL branch ref, protocol fact 13, written on BOTH anchors and
+  # pinned once like the kind above it. `branch-ref` (fact 10) is NOT this: it is written only where
+  # the second anchor fired, so 17 of 44 anchored records in this tree — every default-branch one —
+  # carried no branch fact at all, and the gate-guard hook keyed on `branch-ref` alone read as wired
+  # and never fired on any of them. Written only when HEAD is a branch: a detached preflight writes
+  # nothing here and the hook keys nothing there, which is the fail-open that spec lists.
+  _rb=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
+  if [ -n "$_rb" ] && [ -z "$(fact "$rel" run-branch)" ]; then
+    set_fact "$rel" run-branch "$_rb" || return 1
+  fi
   # TOOL-aPromptedMandate-1 - the authorization mode, PINNED ONCE for the reason anchor-kind is:
   # written unconditionally it would drift on a re-preflight while the base it is evidence for
   # stayed pinned. `slug` is the fallback because an unreachable check_authorization leaves the
