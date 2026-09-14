@@ -1,0 +1,29 @@
+# selftest-pooled-evidence.txt — the pooled HANG-bound readings `run-selftests.sh --pooled` derives
+# each row's bound from. TOOL-aBatchedArm-5 S3. Written by `--pooled --calibrate`; its SHAPE is
+# graded by `--check`, the unguarded bar leg; it ships to NO adopter (a `project-owned` row in this
+# kit's descriptor, beside the declaration, for the same reason: readings taken on this node over
+# this population bound nothing anywhere else).
+#
+# ONE ROW PER (row name, condition token, node). The token is the runner's own `pooled@<outer>x<inner>`
+# and the node is the charter's §2 registry TAG — never a hostname, which the registry does not know.
+# SECONDS ARE MONOTONE: every calibrate raises them and never lowers them, so a reading taken on a
+# loaded day stays until `--reset <row>`, the one lowering path — the monotone rule's stated price.
+# rc, fails (the count of ^FAIL lines) and executed (the shard trailer's count, `-` where the trailer
+# is not the executed-count line) are the LATEST reading's, so a repaired suite updates its parity
+# baseline on the next calibrate with no reset. The bound `--pooled` derives is
+# `max(<serial budget>, <max seconds>)` plus `ceiling-margin.txt`'s headroom; the serial-budget floor
+# is what keeps a fast red (0.3 s on an unbound variable, exit 1) from bounding a repaired suite
+# below what it costs alone, and the FAIL count beside rc is what keeps that fast red from MATCHING.
+#
+# ROWS WHOSE SUITES PRINT NO TRAILER, declared here because the runner cannot witness their
+# completion: `check-brief-recorded.test.sh` and `check-pass-order.test.sh` exit `$st` with no
+# `PASS (` line, so a completed exit from either is a reading of rc plus ^FAIL count only, and the
+# calibrate prints that gap on the row rather than being silent about it.
+# no-trailer: unattended brief-recorded selftest
+# no-trailer: unattended pass-order selftest
+#
+# NO ROW YET, and that is the announced-unarmed state: `--pooled` over any population refuses every
+# uncalibrated row by name until `--pooled --calibrate` has run it to its end. The build's landing
+# step calibrates the population `--kit tools/unattended --list` resolves and commits the rows.
+#
+# <row>	<condition>	<node>	<max seconds>	<rc>	<fails>	<executed>	<readings>	<date>

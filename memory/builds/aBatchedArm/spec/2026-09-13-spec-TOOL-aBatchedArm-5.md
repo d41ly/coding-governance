@@ -1,11 +1,12 @@
 # TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip
 
-**Status:** OPEN · rev-6 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
+**Status:** OPEN · rev-7 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aBatchedArm-5-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-5-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-5-spec-audit-round2.md) | spec-audit | — |
@@ -156,7 +157,7 @@ never as a DoD line.
   evidence file is committed; (3) `run-unattended-gates.sh --pooled` runs and prints GREEN — parity
   GREEN, S4's — pasted with its summary line; (4) ONLY THEN the flip commit, whose contents are exactly two sets. The DoD-PHRASE
   predicate `GREEN verdict|not done until|DoD path|DoD command|landed dark`, scoped
-  `-- .githooks/gate-env.sh tools/unattended/ tools/run-gates/run-selftests.sh`, yields eight lines
+  `-- .githooks/gate-env.sh tools/unattended/ tools/run-gates/run-selftests.sh`, yields six lines
   at this base, re-derived at the landing and pasted: FIVE re-worded to the pooled criterion —
   `.githooks/gate-env.sh:26`, `tools/unattended/kit.toml:123` and `:130` (the `landed dark`
   comment), `tools/unattended/run-unattended-gates.sh:27` and `:187` (the mode-refusal text at the
@@ -392,7 +393,7 @@ re-stamped in the same commit; no body edit) · this build's records.
   four DoD carriers name `--pooled after calibration` beside `--serial` and the four pointers are
   byte-identical to BASE; and at the build's landing, `bash tools/unattended/run-unattended-gates.sh
   --pooled` on the merged tree over the population `--kit tools/unattended --list` resolves prints
-  GREEN with a summary of `killed 0 · walled 0 · unrun 0 · mismatched 0` and `fingerprint MATCHED`,
+  GREEN with a summary of `killed 0 · walled 0 · unrun 0 · unstarted 0 · mismatched 0` and `fingerprint MATCHED`,
   pasted, and the flip commit follows it with both predicate hit lists and the post-commit
   DoD-phrase re-run's empty result pasted — that half owed until then, in the amended form.
   `figure:` both sets are DERIVED by the S5 predicates under their declared path scopes at build
@@ -513,6 +514,16 @@ build time.
 
 ## 9. Revision log
 
+- rev-7 · 2026-09-14 · §2 S5 · §6 AC5 · build-time corrections, written BEFORE the first edit as
+  the brief requires. The DoD-phrase predicate run over the tree at `e82d4053` under its declared
+  scope yields SIX lines, which are exactly the six rev-6 enumerates (five re-worded, one
+  byte-unchanged); rev-6's "eight" was the carrier predicate's count carried across, and the word
+  is corrected — the enumeration was right. AC5's landing summary is S4's five-word line,
+  `unstarted` between `unrun` and `mismatched`, which rev-6 added to S4 and AC11 and not to AC5's
+  quote. Under the owner rulings of 2026-09-13 and 2026-09-14 this unit ran NO suite, fixture,
+  self-test leg or bar: every one of AC1 through AC11 is ledgered in the AMENDED form naming the
+  command the build's final gate pass observes it by, and every new arm is written with its red case
+  stated in its comment and marked `NOT YET OBSERVED RED`.
 - rev-6 · 2026-09-14 · §2 S2 · S3 · S4 · S5 · §3 · §4 Files touched · §5 · §6 AC3 · AC5 · AC6 ·
   AC11 · §7 · §10 · folded spec-audit round 4 (BLOCKED, 2 blocker rows in one defect, 6 highs, 2
   mediums, 10 confirmed rows in 4 defects, precision 0.43 — NOT strictly smaller than round 3's one

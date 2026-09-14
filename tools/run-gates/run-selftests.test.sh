@@ -27,8 +27,14 @@ RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 R='bash tools/run-gates/run-selftests.sh'
 B='tools/run-gates/selftest-budgets.txt'
 LEGS='tools/gate-legs.json'
+# THE POOLED EVIDENCE and the fixture's copy of the runner, both DERIVED from the lines above so
+# neither adds a carried literal (the install-prefix ban pins this file's count).
+E='tools/run-gates/selftest-pooled-evidence.txt'
+RC=${R#bash }
 
-SELFTEST_FLOOR=55
+# THE FLOOR, RE-DERIVED at TOOL-aBatchedArm-5: 55 at BASE, minus the retired factor-absent arm,
+# plus the arms that unit added — both counts are in that unit's acceptance ledger.
+SELFTEST_FLOOR=99
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -39,19 +45,68 @@ build_repo() {
   git config user.email t@t && git config user.name t || return 2
   cp "$RUNNER" tools/run-gates/run-selftests.sh || return 2
 
-  printf '#!/usr/bin/env bash\necho "suite ok"\nexit 0\n' > tools/suite-ok.sh
+  # EVERY COMPLETING SUITE PRINTS THE HARNESS TRAILER `PASS (`, because under parity
+  # (TOOL-aBatchedArm-5 S2/S4) a completed exit with no trailer is not a reading and does not
+  # match a baseline that has one; the suites that deliberately print none are named as such.
+  printf '#!/usr/bin/env bash\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-ok.sh
   printf '#!/usr/bin/env bash\necho "FAIL something"\nexit 1\n' > tools/suite-red.sh
-  printf '#!/usr/bin/env bash\nsleep 3\nexit 0\n' > tools/suite-slow.sh
+  printf '#!/usr/bin/env bash\nsleep 3\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-slow.sh
   # THE WALL ARM'S PAIR. Its margins have to be SECONDS or the arm is a coin flip: the wall and
   # the per-suite bound both expire near the same instant otherwise, and whichever wins decides
   # whether the row renders WALL or TIMEOUT. A 5s first suite puts the wall 5s clear of the start
   # and 5s clear of the second suite's own bound.
-  printf '#!/usr/bin/env bash\nsleep 5\nexit 0\n' > tools/suite-mid.sh
+  printf '#!/usr/bin/env bash\nsleep 5\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-mid.sh
   printf '#!/usr/bin/env bash\nsleep 30\nexit 0\n' > tools/suite-long.sh
   # THE WITNESS THAT A SUITE RAN. The refusal arms claim the runner executed nothing, and a
   # suite's stdout cannot show that -- the serial loop swallows it on a pass and the pool files
   # it. A file it leaves behind can.
-  printf '#!/usr/bin/env bash\ntouch ran.marker\nexit 0\n' > tools/suite-mark.sh
+  printf '#!/usr/bin/env bash\ntouch ran.marker\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-mark.sh
+  # ---- TOOL-aBatchedArm-5's fixtures: the red-by-design shape unit 3's rows have (three FAIL
+  # ---- lines, the executed-count trailer, exit 1); a suite that dies at once under `set -u` with
+  # ---- no FAIL line and no trailer (the fast-red class the FAIL count exists to catch); and a
+  # ---- suite that exits 0 in under a second and prints NOTHING (a completed exit that is not a
+  # ---- reading).
+  { printf '#!/usr/bin/env bash\n'
+    printf 'echo "FAIL one"; echo "FAIL two"; echo "FAIL three"\n'
+    printf 'echo "  (81 assertions executed in shard 1/8 against a floor of 78)"\n'
+    printf 'exit 1\n'
+  } > tools/suite-shard.sh
+  printf '#!/usr/bin/env bash\nset -u\necho "$THIS_IS_UNBOUND"\nexit 0\n' > tools/suite-crash.sh
+  printf '#!/usr/bin/env bash\nexit 0\n' > tools/suite-quiet.sh
+
+  # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's §2
+  # node TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
+  # `git init` has no charter, so the fixture writes one mapping the current user to tag `t`.
+  # AC2's no-row clause is staged by deleting this row.
+  printf '# fixture charter\n\n| Tag | Machine/user | Primary tree |\n|-----|---|---|\n| `t` | `%s` | fixture |\n' \
+    "${USERNAME:-$USER}" > AGENTS.md
+  # THE MARGIN the pooled bound reads beside the runner: floor 1 s, fraction 1.0 — so a bound is
+  # `max(budget, reading) + max(1, that)`, which is 2x the larger term, and every seed below is sized
+  # against that: a budget-60 row with a 1 s seed bounds at 120 s, the TIMEOUT arm's budget-1 row
+  # at 2 s (against a 3 s sleep), the suite-mid arm's budget-4 row at 8 s (against a 5 s sleep).
+  printf '# fixture margin: <floor seconds>\t<fraction of max>\n1\t1.0\tfixture\n' > tools/run-gates/ceiling-margin.txt
+  # THE SEEDED, TRACKED EVIDENCE, under BOTH tokens the arms produce: `pooled@2x1` by default (W
+  # falls to 2 with no run-gates.sh in the fixture, so outer 2, inner 1) and `pooled@1x2` under
+  # SELFTEST_OUTER_WIDTH=1. Every row an arm appends at run time is seeded in that arm's setup
+  # with tools/seed.sh, under the token it runs at.
+  {
+    printf '# fixture pooled evidence: seconds monotone; rc, fails, executed the latest reading'"'"'s.\n'
+    printf '# <row>\t<condition>\t<node>\t<max seconds>\t<rc>\t<fails>\t<executed>\t<readings>\t<date>\n'
+    for _tok in pooled@2x1 pooled@1x2; do
+      printf 'held one\t%s\tt\t1\t0\t0\t-\t1\t2026-09-14\n' "$_tok"
+      printf 'free one\t%s\tt\t1\t0\t0\t-\t1\t2026-09-14\n' "$_tok"
+    done
+  } > "$E"
+  # seed.sh <row> <token> <secs> <rc> <fails> <executed> — upsert ONE evidence row under tag `t`
+  # and stage it, so an arm's setup can size a reading without spelling nine tab fields inline.
+  { printf '#!/usr/bin/env bash\n'
+    printf 'set -u\n'
+    printf 'E=%s\n' "$E"
+    printf 'k=$(printf "%%s\\t%%s\\tt\\t" "$1" "$2")\n'
+    printf 'grep -vF -- "$k" "$E" > "$E.new"; mv "$E.new" "$E"\n'
+    printf 'printf "%%s\\t%%s\\tt\\t%%s\\t%%s\\t%%s\\t%%s\\t1\\t2026-09-14\\n" "$1" "$2" "$3" "$4" "$5" "$6" >> "$E"\n'
+    printf 'git add -A >/dev/null 2>&1\n'
+  } > tools/seed.sh
 
   # ONE held leg — `subject: kit` is half of the hold predicate — plus one leg the bar does not
   # hold, so the forward direction has something to find and something to correctly ignore.
@@ -64,7 +119,6 @@ build_repo() {
     printf '# a fixture declaration.\n'
     printf '# port-majority-share: 0.50\n'
     printf '# port-minimum-factor: 3.0\n'
-    printf '# sweep-ceiling-factor: 2\n'
     printf 'held one\t60\t\tworst of 3 readings 10s, x1.5\n'
     printf 'free one\t60\tbash tools/suite-ok.sh\tmeasured 2s on node t 2026-09-07, x1.5\n'
   } > tools/run-gates/selftest-budgets.txt
@@ -257,29 +311,33 @@ arm "--sweep prints the width pair it chose BEFORE the first verdict, so the inv
     "(outer " \
     'true' "$R --sweep"
 
-arm "--sweep reds on a failing suite and prints that suite's OWN output beneath its row" 1 \
+# RE-LABELLED at TOOL-aBatchedArm-5: under parity a suite that exits 1 with one FAIL line and no
+# trailer is a MISMATCH against its (0, 0, -) seed, and the row's own output is still printed
+# beneath it by the grep S4 preserves — the want-string is that output, unchanged.
+arm "--sweep reds a suite whose exit and FAIL count miss its baseline as MISMATCH, and prints that suite's OWN output beneath its row" 1 \
     "FAIL something" \
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
     "$R --sweep"
 
 # A suite past its bound did not FAIL and did not finish, and rendering it as either loses that.
-# suite-slow.sh sleeps 3s; a budget of 1 derives a 2s bound.
-arm "a suite past its derived bound is TIMEOUT, distinguishable from both ok and FAIL" 1 \
+# suite-slow.sh sleeps 3s; a budget of 1 with the fixture's 1 s seed bounds at max(1, 1) + max(1,
+# 1.0 x 1) = 2s — the evidence shape (TOOL-aBatchedArm-5 S1), where the factor once gave 1 x 2.
+arm "a suite past its evidence bound is TIMEOUT, distinguishable from both ok and MISMATCH" 1 \
     "TIMEOUT" \
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t1\tbash tools/suite-slow.sh|' $B" \
     "$R --sweep"
 
 # The wall borrowed from run-gates.sh --print-profile was 10800s against a population declaring
 # 13600s for one suite, so it would have killed every real sweep for arriving on time. The
-# arithmetic is now a refusal rather than a comment.
+# arithmetic is now a refusal rather than a comment; the largest bound it compares against is the
+# evidence one, 120s for a budget-60 row with a 1 s seed.
 arm "a run wall BELOW the largest per-suite bound REFUSES rather than killing the run on time" 2 \
     "would be killed before its" \
     'true' "SELFTEST_WALL=5 $R --sweep"
 
-arm "a declaration with no sweep-ceiling-factor REFUSES rather than backgrounding unbounded suites" 2 \
-    "declares no sweep-ceiling-factor" \
-    "grep -v 'sweep-ceiling-factor' $B > tmp.b && mv tmp.b $B" \
-    "$R --sweep"
+# The factor-absent refusal arm that stood here is RETIRED with the `sweep-ceiling-factor:` header
+# (TOOL-aBatchedArm-5 S1): nothing derives a bound from a factor any more, so there is no
+# absence to refuse. Its successor is the no-reading refusal below.
 
 # The bound is a probed capability. lib-selftest.sh runs UNBOUNDED without it, which is right for
 # arms that are seconds long and fatal here, where one hang suppresses every verdict line.
@@ -315,8 +373,10 @@ arm "--pooled over a green population exits 0 and SAYS it graded no cost" 0 \
     'true' "$R --pooled"
 
 # THE PAIR. One suite, one budget, two modes, two verdicts. suite-mid.sh sleeps 5s against a
-# budget of 4: --serial grades it OVER BUDGET, --pooled withholds — the bound is 4 x 2 = 8s, so
-# the suite finishes and the withholding is the ONLY thing standing between it and a verdict.
+# budget of 4: --serial grades it OVER BUDGET, --pooled withholds — the bound is max(4, 1 s seed)
+# + max(1, 1.0 x 4) = 8s, so the suite finishes and the withholding is the ONLY thing standing
+# between it and a verdict. (The factor once gave the same 8 s as 4 x 2; the seed is sized so the
+# evidence shape clears the 5 s sleep by the same margin.)
 arm "under --serial a breaching suite gets OVER BUDGET, because an uncontended clock can grade it" 1 \
     "OVER BUDGET" \
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t4\tbash tools/suite-mid.sh|' $B" \
@@ -337,8 +397,11 @@ arm "a completed pooled run points at --serial for a cost verdict, by its own pa
     "for a cost verdict, run the serial mode: $R --serial" \
     'true' "$R --pooled"
 
-arm "a RED pooled run points at the --serial re-run, by its own path" 1 \
-    "the serial re-run: $R --serial" \
+# RE-CUT at TOOL-aBatchedArm-5 S4 to the parity wording: a pooled RED is a parity red and is not
+# told to confirm itself serially; it names the calibrate, by the runner's own path, as what
+# takes a repaired suite's new baseline.
+arm "a RED pooled run names the calibrate as the remedy for a MISMATCH, by its own path, not a serial re-run" 1 \
+    "one calibrate away: $R --pooled --calibrate" \
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
     "$R --pooled"
 
@@ -368,7 +431,9 @@ arm "the tag --sweep EMITS is the tag --rank refuses, captured rather than hand-
 # ---------------------------------------------------------------- pool safety, TOOL-aPooledSweep-3
 # The private TMPDIR is the redirection; the fingerprint is the observation that it held. Neither
 # is a sandbox, and the arms below claim no more than that.
-arm "each pooled suite gets its own TMPDIR, so a mktemp inside it cannot collide with a sibling" 1 \
+# RE-LABELLED at TOOL-aBatchedArm-5: the row is a MISMATCH against its (0, 0, -) seed, and the
+# want-string is the suite's own FAIL line, still printed beneath the row.
+arm "each pooled suite gets its own TMPDIR, so a mktemp inside it cannot collide with a sibling (a MISMATCH row, its own output beneath)" 1 \
     "FAIL scratch-under-tmpdir" \
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-tmpdir.sh|' $B" \
     "$R --sweep"
@@ -418,10 +483,11 @@ arm "peak concurrency is REPORTED and never exceeds the outer width the run prin
 # (`$$` in a backgrounded subshell is the PARENT's pid), and a TERMed worker still writes a verdict
 # file, so the WALL branch, which only fired on a MISSING one, was unreachable either way.
 #
-# THE FIXTURE IS BUILT FOR MARGIN. Budget 5 x factor 2 = a 10s per-suite bound; outer 1 makes two
-# waves, so a 10s wall clears the refusal. The first suite sleeps 5s and finishes well inside its
-# own bound; the second sleeps 30s, so its own bound would not expire until ~16s. The wall lands at
-# 10s -- five seconds clear of both, which is what keeps this arm from being a coin flip.
+# THE FIXTURE IS BUILT FOR MARGIN. Budget 5 with a 1 s seed under `pooled@1x2` bounds at max(5, 1)
+# + max(1, 1.0 x 5) = 10s per suite (the factor once gave the same 10 s as 5 x 2); outer 1 makes
+# two waves, so a 10s wall clears the refusal. The first suite sleeps 5s and finishes well inside
+# its own bound; the second sleeps 30s, so its own bound would not expire until ~15s. The wall
+# lands at 10s -- five seconds clear of both, which is what keeps this arm from being a coin flip.
 arm "the run WALL kills an outstanding suite, renders it WALL, and NAMES it" 1 \
     "run wall killed" \
     "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
@@ -451,17 +517,346 @@ arm "a non-numeric SELFTEST_WALL REFUSES rather than being silently ignored" 2 \
 # the workers -- which is correct -- removed the only thing that ended the run, because the runner
 # used to be the thing being killed. Reproduced at 16 s, 17 s and 23 s against a 10 s wall before
 # the guard went in.
+# The appended rows `three` and `four` are SEEDED under the token this arm runs at, `pooled@1x2`,
+# because an unevidenced row refuses the whole run by name before anything is dispatched.
 arm "the wall STOPS the dispatch, so a suite it never reached is reported UNRUN rather than killed" 1 \
     "NEVER RUN and are UNGRADED" \
-    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && bash tools/seed.sh three pooled@1x2 1 0 0 - && bash tools/seed.sh four pooled@1x2 1 0 0 - && git add -A" \
     "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --sweep"
 
 # THE DERIVED WALL IS THE RUN'S STRUCTURAL CEILING, not a multiple of its worst suite. `largest x
 # waves` assumed every wave was as slow as the slowest member, which over the real population is
-# 2x to 15x the true maximum -- and a backstop that can never fire is not one.
+# 2x to 15x the true maximum -- and a backstop that can never fire is not one. Under the evidence
+# shape the bounds are (10 + 10) + (60 + 60) = 140 s over one slot — the same 140 s the factor
+# once produced as (10 + 60) x 2, which is why the want-string survived the re-cut unchanged.
 arm "the derived run wall is the bounded work over the pool, printed so it can be checked" 0 \
     "run wall 140s" \
     "sed -i '0,/\t60\t/{s|\t60\t|\t10\t|}' $B" \
     "SELFTEST_OUTER_WIDTH=1 $R --sweep"
+
+# ---------------------------------------------------------------- the evidence bound, TOOL-aBatchedArm-5 S1
+# Every arm from here to the floor line is that unit's. NONE has been observed RED: owner ruling
+# 2026-09-14 (no gate until every unit of the build is built), so each arm's comment states its
+# red case from the staged break alone, and the observation is the build's final gate pass.
+
+# THE BOUND IS EVIDENCE. A budget-60 row with a 1 s seed is bounded from the BUDGET: 60 + max(1,
+# 60) = 120 s, and the row says which term won and what it read. NOT YET OBSERVED RED — owner
+# ruling 2026-09-14; observed at the build's final gate pass. Red when: the bound is budget x
+# anything (the factor would print 120 here too, which is why the arm reads the TERM and not only
+# the number), or the row names no reading.
+arm "a pooled row is bounded from its serial BUDGET when the seeded reading is far below it, and says so" 0 \
+    "bounded at 120s: budget won (budget 60s; reading 1s over 1 reading(s) under pooled@2x1 on node t, 2026-09-14)" \
+    'true' "$R --pooled"
+
+# A reading ABOVE the budget wins: 200 s seeded against budget 60 bounds at 200 + max(1, 200) =
+# 400 s. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the bound stays at the budget's
+# 120 s, i.e. the reading is read and ignored.
+arm "a pooled row is bounded from its READING when the seeded reading exceeds its budget, and says so" 0 \
+    "bounded at 400s: reading won (budget 60s; reading 200s" \
+    "bash tools/seed.sh 'free one' pooled@2x1 200 0 0 -" \
+    "$R --pooled"
+
+# THE RUN WALL IS DERIVED FROM THE EVIDENCE BOUNDS: (120 + 400) over 2 slots is 260, floored at the
+# largest bound, 400. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the wall is the
+# budget-derived 120 s, or is not floored at the largest bound.
+arm "the run wall is ceil(sum of evidence bounds / outer) floored at the largest evidence bound" 0 \
+    "run wall 400s" \
+    "bash tools/seed.sh 'free one' pooled@2x1 200 0 0 -" \
+    "$R --pooled"
+
+# And the below-the-largest refusal compares against THAT bound. NOT YET OBSERVED RED — owner
+# ruling 2026-09-14. Red when: a 300 s wall is accepted over a 400 s evidence bound.
+arm "a run wall below the largest EVIDENCE bound refuses, naming that bound" 2 \
+    "population is 400s (an evidence bound)" \
+    "bash tools/seed.sh 'free one' pooled@2x1 200 0 0 -" \
+    "SELFTEST_WALL=300 $R --pooled"
+
+# THE FACTOR IS RETIRED, not merely unread: a `sweep-ceiling-factor:` header staged back into the
+# declaration changes nothing. 3 rather than 2, because 60 x 2 is the same 120 the evidence bound
+# gives and could not discriminate. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: any
+# factor-derived bound (180 s) or wall prints.
+arm "a sweep-ceiling-factor header staged back in is IGNORED — the bound and the wall are the evidence ones" 0 \
+    "bounded at 120s: budget won" \
+    "printf '# sweep-ceiling-factor: 3\n' >> $B" \
+    "$R --pooled"
+
+# THE ABSENT MARGIN REFUSES, naming the file: a silent zero-margin default is a bound nobody chose.
+# NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the run proceeds with no margin file.
+arm "a pooled run with the margin file absent REFUSES naming it, rather than defaulting a headroom" 2 \
+    "no margin declared at" \
+    "rm tools/run-gates/ceiling-margin.txt" \
+    "$R --pooled"
+
+# ---------------------------------------------------------------- the no-reading refusal, S1 / AC2
+# A row with no reading under (row, token, node) REFUSES the run — naming the row, the token and
+# --calibrate — and executes NOTHING: the marker suite is the row that DOES have a reading, and it
+# must not run either. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the run proceeds
+# under any bound (rc 99 from the marker: a factor wearing a refusal's name).
+arm "a row with NO reading under this token and node REFUSES the pooled run by name, naming --calibrate, and executes no suite" 2 \
+    "NO pooled reading under pooled@2x1 on node t" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|suite-ok.sh|suite-mark.sh|' $LEGS && git add -A" \
+    "( $R --pooled; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
+
+# A reading under a FOREIGN node is no reading here: the key carries the node because unit 3
+# measured 47 to 60 s on node `a` against ~2 s elsewhere. NOT YET OBSERVED RED — owner ruling
+# 2026-09-14. Red when: a row keyed on node `z` bounds a run on node `t`.
+arm "a row evidenced only under a FOREIGN node tag refuses the same way" 2 \
+    "NO pooled reading under pooled@2x1 on node t" \
+    "sed -i 's|\tt\t|\tz\t|' $E && git add -A" \
+    "$R --pooled"
+
+# With the registry row deleted, the node cannot be resolved and the run refuses NAMING THE USER —
+# never falling back to a hostname the registry does not know. NOT YET OBSERVED RED — owner ruling
+# 2026-09-14. Red when: the run resolves a node from anything but the registry, or runs.
+arm "with the charter's registry row deleted, a pooled run refuses naming the user, never a hostname" 2 \
+    "no registry row matches user" \
+    "grep -v '^| \`t\`' AGENTS.md > tmp.a && mv tmp.a AGENTS.md" \
+    "$R --pooled"
+
+# ---------------------------------------------------------------- --calibrate, S2 / AC3, AC8
+# The bootstrap grades NOTHING: no OVER BUDGET, no TIMEOUT, no sweep verdict — the subject greps
+# for each and exits 99 on a hit, so the arm reds on any verdict as well as on a missing summary.
+# NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: a calibration prints a verdict.
+arm "--pooled --calibrate runs every selected row under the serial-sum wall and grades nothing, saying so" 0 \
+    "calibrated 2 row(s), 0 red, graded none" \
+    'true' \
+    "out=\$($R --pooled --calibrate); rc=\$?; printf '%s\n' \"\$out\" | grep -qE 'OVER BUDGET|TIMEOUT|sweep (GREEN|RED)' && exit 99; printf '%s\n' \"\$out\"; exit \$rc"
+
+# The wall is the serial SUM of the selected budgets, undivided, and it says so. NOT YET OBSERVED
+# RED — owner ruling 2026-09-14. Red when: the wall is divided by the width (60) or is any bound.
+arm "the calibrate wall is the serial SUM of the selected budgets, undivided, and names the term that won" 0 \
+    "run wall 120s = the serial sum (serial sum 120s over 2 budget(s))" \
+    'true' "$R --pooled --calibrate"
+
+# SELFTEST_WALL TIGHTENS ONLY. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: a
+# SELFTEST_WALL above the sum loosens the wall.
+arm "SELFTEST_WALL above the serial sum tightens nothing under --calibrate, and says so" 0 \
+    "tightens nothing" \
+    'true' "SELFTEST_WALL=999 $R --pooled --calibrate"
+
+# EACH COMPLETED ROW'S READING IS WRITTEN after the closing fingerprint, with its token, tag, rc and
+# FAIL count, and the tracked file is changed by a run that still reports MATCHED — the write sits
+# outside the fingerprinted window. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the
+# file is unchanged (rc 99), or the write landed inside the window and the run reports UNSOUND.
+arm "a calibrate over a clean fixture reports the fingerprint MATCHED and has still changed the evidence file" 0 \
+    "tree fingerprint MATCHED before and after" \
+    'true' \
+    "( $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E && exit 99; exit \$rc )"
+
+# The seed is 30 s so a sub-second suite cannot raise it on a slow box; what is asserted is the
+# line's shape — row, token, tag, the kept seconds, rc, FAIL count.
+arm "a calibrate prints each reading it wrote with its token, tag, rc and FAIL count" 0 \
+    "reading free one under pooled@2x1 on node t: 30s (kept at 30s" \
+    "bash tools/seed.sh 'free one' pooled@2x1 30 0 0 -" \
+    "$R --pooled --calibrate | grep 'rc 0, 0 FAIL, - executed'"
+
+# SECONDS ARE MONOTONE, rc/fails/executed FOLLOW THE LATEST READING. A 50 s seed re-read by the
+# red-by-design shard suite (exit 1, 3 FAIL, 81 executed, under a second) keeps 50 s and takes
+# the new triple, readings 2. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: seconds
+# fall to the new reading, or rc/fails stay at the old ones.
+arm "a second calibrate with a LOWER reading and a different rc updates rc, fails and executed and NOT seconds" 0 \
+    $'free one\tpooled@2x1\tt\t50\t1\t3\t81\t2\t' \
+    "bash tools/seed.sh 'free one' pooled@2x1 50 0 0 - && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "$R --pooled --calibrate > /dev/null; cat $E"
+
+# And a HIGHER reading raises them: a 1 s seed re-read by a 3 s sleep is raised. NOT YET OBSERVED
+# RED — owner ruling 2026-09-14. Red when: the seconds stay at 1.
+arm "a calibrate with a HIGHER reading raises that row's seconds, and prints the raise" 0 \
+    "reading free one under pooled@2x1 on node t: " \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-slow.sh|' $B" \
+    "$R --pooled --calibrate | grep 'raised from 1s'"
+
+# A ROW THE WALL KILLED WRITES NO READING, IS NAMED, AND REDS THE CALIBRATE. Its seed is removed
+# first so the file's silence about it is the observation. NOT YET OBSERVED RED — owner ruling
+# 2026-09-14. Red when: a walled row's seconds land in the file (rc 99), or the run is green.
+arm "a row the calibrate wall kills writes NO reading, is named, and the calibrate exits RED counting it walled" 1 \
+    "calibrated 1 row(s), 0 red, 1 walled, 0 untrailed, graded none" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-long.sh|' $B && git add -A" \
+    "( SELFTEST_WALL=3 $R --pooled --calibrate; rc=\$?; grep -q '^free one' $E && exit 99; exit \$rc )"
+
+# A COMPLETED EXIT WITH NO TRAILER IS NOT A READING: a suite that exits 0 in under a second and
+# prints nothing is `untrailed`, writes nothing, reds the calibrate. NOT YET OBSERVED RED — owner
+# ruling 2026-09-14. Red when: the quiet exit is recorded as a reading (rc 99) or the run is green.
+arm "a suite that exits 0 with no trailer is UNTRAILED at calibrate: no reading written, the run RED" 1 \
+    "calibrated 1 row(s), 0 red, 0 walled, 1 untrailed, graded none" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-quiet.sh|' $B && git add -A" \
+    "( $R --pooled --calibrate; rc=\$?; grep -q '^free one' $E && exit 99; exit \$rc )"
+
+# A row the header DECLARES trailer-less is read as rc-plus-FAIL, and the gap is printed on the
+# row. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the declared row is untrailed.
+arm "a row the evidence header declares trailer-less is read as rc-plus-FAIL, and the gap is printed" 0 \
+    "declared trailer-less: completion NOT witnessed" \
+    "sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B && git add -A" \
+    "$R --pooled --calibrate"
+
+# --calibrate OFF --pooled REFUSES naming the pair and executes no suite — three spellings, the
+# serial one carrying the marker. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: any
+# of them runs a row (rc 99) or writes a reading.
+arm "--serial --calibrate REFUSES naming the pair and executes no suite" 2 \
+    "--calibrate modifies --pooled and nothing else, and was given with '--serial'" \
+    "sed -i 's|bash tools/suite-ok.sh|bash tools/suite-mark.sh|' $B" \
+    "( $R --serial --calibrate; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
+
+arm "--check --calibrate REFUSES naming the pair" 2 \
+    "--calibrate modifies --pooled and nothing else, and was given with '--check'" \
+    'true' "$R --check --calibrate"
+
+arm "a bare --calibrate REFUSES naming the pair" 2 \
+    "--calibrate modifies --pooled and nothing else, and was given with 'no mode'" \
+    'true' "$R --calibrate"
+
+# ---------------------------------------------------------------- --reset, S2 / AC10
+# Exactly the reset row's seconds are lowered, the calibrate ran that row and NO other (the other
+# row is the marker suite), and the decision is printed. NOT YET OBSERVED RED — owner ruling
+# 2026-09-14. Red when: the other row ran (rc 99), or the reset ran silently.
+arm "--reset <row> narrows the calibrate to that row, runs no other, and prints the decision" 0 \
+    "RESET free one under pooled@2x1 on node t: dropped its 500s reading" \
+    "bash tools/seed.sh 'free one' pooled@2x1 500 0 0 - && bash tools/seed.sh 'held one' pooled@2x1 500 0 0 - && sed -i 's|suite-ok.sh|suite-mark.sh|' $LEGS && git add -A" \
+    "( $R --pooled --calibrate --reset 'free one'; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
+
+# The reset row's seconds are LOWERED to the new reading — 500 to a sub-second suite's — with
+# readings back at 1; the awk reads the row back rather than pinning a took that a slow box can
+# move by a second. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the row keeps 500
+# (monotone won) or readings is not 1.
+arm "--reset lowers exactly that row's seconds to the new reading, readings back at 1" 0 \
+    "LOWERED free one" \
+    "bash tools/seed.sh 'free one' pooled@2x1 500 0 0 - && bash tools/seed.sh 'held one' pooled@2x1 500 0 0 -" \
+    "$R --pooled --calibrate --reset 'free one' > /dev/null; awk -F'\t' '\$1 == \"free one\" && \$4 + 0 < 500 && \$8 == 1 { print \"LOWERED \" \$0 }' $E"
+
+# And NO other row moves. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the other row's
+# 500 s is touched.
+arm "--reset moves no other row" 0 \
+    $'held one\tpooled@2x1\tt\t500\t0\t0\t-\t1\t' \
+    "bash tools/seed.sh 'free one' pooled@2x1 500 0 0 - && bash tools/seed.sh 'held one' pooled@2x1 500 0 0 -" \
+    "$R --pooled --calibrate --reset 'free one' > /dev/null; cat $E"
+
+# --reset off --calibrate refuses; --reset naming a row the file lacks refuses; each by name.
+# NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: either runs silently.
+arm "--reset off --calibrate REFUSES by name" 2 \
+    "--reset lowers a row's calibrated seconds and is a modifier of --calibrate" \
+    'true' "$R --pooled --reset 'free one'"
+
+arm "--reset naming a row the evidence file lacks REFUSES by name" 2 \
+    "--reset names 'ghost', and" \
+    'true' "$R --pooled --calibrate --reset ghost"
+
+# ---------------------------------------------------------------- the shape gate, S3 / AC9
+# `--check` reds a duplicated key, a seven-field row, a foreign-tag row and an orphaned row, each
+# naming the line; `--pooled` REFUSES over a file that will not parse rather than defaulting past
+# it. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: --check is green over any of the
+# four, or --pooled runs past the bad row.
+arm "--check reds an evidence row whose (row, token, node) key repeats, naming the line" 1 \
+    "the (row, token, node) key repeats" \
+    "printf 'free one\tpooled@2x1\tt\t7\t0\t0\t-\t1\t2026-09-14\n' >> $E && git add -A" \
+    "$R --check"
+
+arm "--check reds a seven-field evidence row, naming the line" 1 \
+    "7 field(s), not 9" \
+    "printf 'free one\tpooled@4x2\tt\t7\t0\t0\t-\n' >> $E && git add -A" \
+    "$R --check"
+
+arm "--check reds an evidence row whose node is no tag the registry table carries" 1 \
+    "no tag the charter's registry table carries" \
+    "printf 'free one\tpooled@4x2\tq\t7\t0\t0\t-\t1\t2026-09-14\n' >> $E && git add -A" \
+    "$R --check"
+
+arm "--check reds an ORPHAN evidence row naming no declared budget row" 1 \
+    "is an ORPHAN" \
+    "printf 'nobody\tpooled@2x1\tt\t7\t0\t0\t-\t1\t2026-09-14\n' >> $E && git add -A" \
+    "$R --check"
+
+arm "--check over a well-formed evidence file is green and counts its rows" 0 \
+    "4 pooled evidence row(s) well-formed" \
+    'true' "$R --check"
+
+arm "--pooled over an evidence file that will not parse REFUSES naming the file, rather than defaulting past the row" 2 \
+    "will not parse" \
+    "printf 'free one\tpooled@4x2\tt\t7\t0\t0\t-\n' >> $E && git add -A" \
+    "$R --pooled"
+
+# ---------------------------------------------------------------- AC4: --rank is untouched
+# Pooled readings live in their own file, never in the budget file's fourth column, so --rank's
+# refusal of `pooled@` has nothing to refuse after a calibrate. NOT YET OBSERVED RED — owner
+# ruling 2026-09-14. Red when: a calibrate writes a `pooled@` token into the budget file.
+arm "--rank still exits 0 after a calibrate, because pooled readings never enter the budget file" 0 \
+    "the declared share is carried by the TOP" \
+    'true' "$R --pooled --calibrate > /dev/null; $R --rank"
+
+# ---------------------------------------------------------------- parity, S4 / AC11
+# A red-by-design row whose (rc, FAIL, executed) MATCHES its baseline is `ok` and the run is GREEN.
+# NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: a matching red-by-design row exits 1.
+arm "a red-by-design row whose (rc, fails, executed) matches its baseline renders ok ... matched and the run exits 0" 0 \
+    "ok (rc 1, 3 FAIL, 81 executed matched)" \
+    "bash tools/seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "$R --pooled"
+
+# One whose triple differs is MISMATCH naming both and the acceptance, exit 1. NOT YET OBSERVED
+# RED — owner ruling 2026-09-14. Red when: a mismatching triple exits 0 or names one triple only.
+arm "a row whose triple differs from its baseline renders MISMATCH naming both triples and the acceptance, and exits 1" 1 \
+    "(rc 1, 3 FAIL, 81 executed) against baseline (rc 1, 2 FAIL, 81 executed); --calibrate to take the new baseline, --reset <row> to lower seconds" \
+    "bash tools/seed.sh 'free one' pooled@2x1 1 1 2 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "$R --pooled"
+
+# THE FAST RED: exit 1 in under a second on an unbound variable, zero FAIL lines, no trailer,
+# against a baseline of three — MISMATCH, never matched. NOT YET OBSERVED RED — owner ruling
+# 2026-09-14. Red when: the crash reads as matched, which an rc-only oracle would say.
+arm "a row exiting 1 in under a second with zero FAIL lines against a baseline of three is MISMATCH" 1 \
+    "(rc 1, 0 FAIL, - executed) against baseline (rc 1, 3 FAIL, 81 executed), and NO trailer in its output" \
+    "bash tools/seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-crash.sh|' $B" \
+    "$R --pooled"
+
+# A trailer-less completion at GRADE against a seeded green row is MISMATCH too. NOT YET OBSERVED
+# RED — owner ruling 2026-09-14. Red when: the quiet exit 0 matches (0, 0, -) by numbers alone.
+arm "a suite that exits 0 with no trailer is MISMATCH at grade against a seeded green row" 1 \
+    "(rc 0, 0 FAIL, - executed) against baseline (rc 0, 0 FAIL, - executed), and NO trailer in its output" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-quiet.sh|' $B" \
+    "$R --pooled"
+
+# THE GREEN SUMMARY names every count at zero. NOT YET OBSERVED RED — owner ruling 2026-09-14.
+# Red when: any of the five words is absent from a green summary.
+arm "a GREEN pooled summary prints killed, walled, unrun, unstarted and mismatched, each 0" 0 \
+    "killed 0 · walled 0 · unrun 0 · unstarted 0 · mismatched 0" \
+    'true' "$R --pooled"
+
+# EACH NON-COMPLETION OUTCOME COUNTED UNDER ITS OWN WORD, one fixture row staged into each class,
+# the run RED on every one. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the count
+# sits under another word, or the run is green.
+arm "the summary counts a row killed at its own bound under 'killed'" 1 \
+    "killed 1 · walled 0 · unrun 0 · unstarted 0 · mismatched 0" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t1\tbash tools/suite-slow.sh|' $B" \
+    "$R --pooled"
+
+arm "the summary counts a row the wall killed under 'walled'" 1 \
+    "killed 0 · walled 1 · unrun 0 · unstarted 0 · mismatched 0" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
+    "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --pooled"
+
+arm "the summary counts rows the wall never dispatched under 'unrun'" 1 \
+    "killed 0 · walled 1 · unrun 2 · unstarted 0 · mismatched 0" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && bash tools/seed.sh three pooled@1x2 1 0 0 - && bash tools/seed.sh four pooled@1x2 1 0 0 - && git add -A" \
+    "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --pooled"
+
+# THE WORKER-DEATH CLASS: an unbound variable under `set -u` inside the fixture's copy of the
+# runner's own worker, staged on the line before it makes its scratch directory, so every worker
+# dies before its verdict file exists — the class the runner's own `run_sweep_one` comment records.
+# Read as `unstarted`, the run RED. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: a
+# row with no verdict file and no wall breach reads GREEN or is counted under another word.
+arm "a worker dying under set -u before its verdict file is counted under 'unstarted', the run RED" 1 \
+    "killed 0 · walled 0 · unrun 0 · unstarted 2 · mismatched 0" \
+    "sed -i 's|^    mkdir -p \"\$d/tmp\" \|\| return\$|    : \"\$SELFTEST_STAGED_UNBOUND\"; mkdir -p \"\$d/tmp\" \|\| return|' $RC && grep -q SELFTEST_STAGED_UNBOUND $RC" \
+    "$R --pooled"
+
+arm "the summary counts a completed row that missed its baseline under 'mismatched'" 1 \
+    "killed 0 · walled 0 · unrun 0 · unstarted 0 · mismatched 1" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
+    "$R --pooled"
+
+# THE WITHHELD LINE THE KIT RUNNER PARSES SURVIVES parity, because §3's first non-goal keeps the
+# cost verdict withheld. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: a matched
+# red-by-design row is not counted as a withheld cost verdict.
+arm "a matched red-by-design row still counts as a WITHHELD cost verdict" 0 \
+    "2 cost verdict(s) WITHHELD under pooled@2x1" \
+    "bash tools/seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "$R --pooled"
 
 run_arms run-selftests.test.sh
