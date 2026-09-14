@@ -13,6 +13,7 @@
 | [2026-09-14-prompt-TOOL-aDeferredBar-3-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aDeferredBar-3-2-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round1.md) | diff-review | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
 | [2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round2.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round2.md) | diff-review | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
+| [2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round3.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round3.md) | diff-review | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md) | spec-audit | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md) | spec-audit | TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 |
 
