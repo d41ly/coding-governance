@@ -1103,7 +1103,7 @@ EOF
   # monotone bound and the parity baseline anyway (aBatchedArm closing review D7).
   sound=1; unsound_why=""
   outlog=""
-  say_out() { [ -n "$outlog" ] && printf '        output: %s\n' "$outlog"; return 0; }
+  print_outlog() { [ -n "$outlog" ] && printf '        output: %s\n' "$outlog"; return 0; }
   j=1
   while [ "$j" -le "$SW_N" ]; do
     name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"; key=${SW_KEY[$((j - 1))]}
@@ -1129,11 +1129,11 @@ EOF
       elif [ "$WALL_BREACHED" = 1 ]; then
         ran=$((ran + 1)); walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s        (killed by the %ss run wall before it finished)\n' "$name" "$SWEEP_WALL"
-        say_out
+        print_outlog
       else
         ran=$((ran + 1)); unstarted=$((unstarted + 1))
         printf 'FAIL  %-46s        (no verdict was written, so this suite could not start)\n' "$name"
-        say_out
+        print_outlog
       fi
       j=$((j + 1)); continue
     fi
@@ -1160,7 +1160,7 @@ EOF
       if [ "$WALL_BREACHED" = 1 ] && [ "$rc" = 143 ]; then
         st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s %5ss  (killed by the %ss calibrate wall — NO reading written)\n' "$name" "$took" "$SWEEP_WALL"
-        say_out
+        print_outlog
       elif [ "$rc" = 124 ] || [ "$rc" = 137 ] || [ "$rc" = 143 ]; then
         # A KILL IS NOT A COMPLETION whatever the trailer rule says of the row: a declared
         # trailer-less row that outlived TERM (137 after `timeout -k`'s grace) or hit the bound
@@ -1169,14 +1169,14 @@ EOF
         # TIMEOUT clause, closed.
         st=1; killed=$((killed + 1))
         printf 'KILLED %-45s %5ss  (exit %s is a kill, not a completion — NO reading written)\n' "$name" "$took" "$rc"
-        say_out
+        print_outlog
       elif [ "$nobase" = 1 ]; then
         # THE SENTINEL IS NOT A BASELINE. The trailer is there and the exit is the suite's own, but
         # a group that says its expected set is unwritten has refused by name, and a reading taken
         # over it would make the next --pooled GREEN over that refusal.
         st=1; untrailed=$((untrailed + 1))
         printf 'UNTRAILED %-42s %5ss  (exit %s, %s FAIL, and its output carries "%s" — a group with no expected set is a refusal, not a reading; paste the observed sets first)\n' "$name" "$took" "$rc" "$fails" "$SWEEP_NOBASELINE_RX"
-        say_out
+        print_outlog
       elif [ "$trailer" = 1 ] || [ "$declared_nt" = 1 ]; then
         calibrated=$((calibrated + 1)); [ "$rc" = 0 ] || cal_red=$((cal_red + 1))
         cal_rows="$cal_rows"$'\n'"$name"$'\t'"$took"$'\t'"$rc"$'\t'"$fails"$'\t'"$executed"
@@ -1185,12 +1185,12 @@ EOF
         else
           printf 'READ  %-46s %5ss  rc %s, %s FAIL, %s executed  (verdict withheld)\n' "$name" "$took" "$rc" "$fails" "$executed"
         fi
-        say_out
+        print_outlog
       else
         st=1; untrailed=$((untrailed + 1))
         printf 'UNTRAILED %-42s %5ss  (exit %s, %s FAIL, and NO trailer in its output — a completed exit is not a reading)\n' "$name" "$took" "$rc" "$fails"
         grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
-        say_out
+        print_outlog
       fi
       j=$((j + 1)); continue
     fi
@@ -1208,12 +1208,12 @@ EOF
       st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
       printf 'WALL  %-46s %5ss  cost withheld  (killed by the %ss run wall, not by its own bound)
 '         "$name" "$took" "$SWEEP_WALL"
-      say_out
+      print_outlog
     elif [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
       st=1; killed=$((killed + 1))
       printf 'TIMEOUT %-44s %5ss  (killed at its %ss evidence bound — it did not fail, it did not finish)\n' \
         "$name" "$took" "${SW_BOUND[$((j - 1))]}"
-      say_out
+      print_outlog
     else
       # THE POOLED VERDICT IS PARITY. GREEN-by-exit-code is impossible for a population whose
       # baseline is RED by design (unit 3's shard rows exit 1 when complete), so the verdict is
@@ -1235,7 +1235,7 @@ EOF
           "$name" "$took" "$got" "$base_triple" "$( [ "$trailer_ok" = 1 ] || printf ', and NO trailer in its output' )" \
           "$( [ "$nobase" = 0 ] || printf ', and its output carries "%s" — a group with no expected set is a refusal, never parity' "$SWEEP_NOBASELINE_RX" )"
         grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
-        say_out
+        print_outlog
       fi
     fi
     # EVERY POOLED VERDICT NAMES THE READING IT WAS BOUNDED BY — seconds, readings, token, node,

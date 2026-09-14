@@ -44,8 +44,13 @@ Not run: `check-unattended.test.sh` in any mode or shard, `unattended.test.sh`,
 5. `214b7183` — closing fix 5: D3(b) and D7, with the manifest re-stamp.
 6. `f23b71e0` — closing fix 6: D8, D10, D11, D12, with the manifest re-stamp.
 7. `ff549e63` — closing fix 7: D3(a).
-8. The ceiling and budget re-declaration from the direct run, and this ledger: see "The direct
-   run" below.
+8. `f51eefa7` — closing fix 3 (cont.): the ceiling and budget re-declaration from the direct
+   run, and this ledger.
+9. The last commit — the runner's `say_out` helper (commit 5) led with a verb the lexicon table
+   does not hold, so the final `python tools/lexicon/lexicon.py` read 985 over pin 984; renamed
+   `print_outlog` (11 sites, an identifier only — every printed byte unchanged), the lexicon back
+   at 984, the D3/D7 arms re-observed `ok` on the scratch harness, `--check` clean. It post-dates
+   the direct run's tip `f23b71e0`; the reading stands because the rename changes no behaviour.
 
 The manifest ratchet fires on EVERY commit that stages `tools/run-gates/run-selftests.sh` (C5s
 compares the staged stamp with HEAD's), not only the first, so commits 3 through 6 each re-stamp
