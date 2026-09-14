@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-9 · 2026-09-14 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-10 · 2026-09-14 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -44,8 +44,8 @@ Skill's copy of the same checklist line is fixed the same way.
   `adopt-unattended.sh` gains the same probe, refusal and override. `tools/unattended/kit.toml`
   declares the placeholder and a `[[regenerate]]` block running the adopter. `cross-component.test.sh`
   gets the missing entry in its hand-kept sed chain. Observed by AC8 and AC9.
-- **S5** — version bumps. review-harness goes 1.7 to 1.8 and unattended 1.18 to 1.20, at every
-  carrier `tools/check-kit-versions.sh` reads; 1.19 was taken by `main` while this branch was open. Then `--write-ratchet` DROPS the two carried rows
+- **S5** — version bumps. review-harness goes 1.7 to 1.8 and unattended 1.18 to 1.21, at every
+  carrier `tools/check-kit-versions.sh` reads; 1.19 and then 1.20 were taken by `main` while this branch was open. Then `--write-ratchet` DROPS the two carried rows
   that reached zero. Observed by AC7 and AC10.
 - **S6** — the arms, in `tools/workflows/unattended-build.test.sh` and
   `tools/unattended/adopt-unattended.test.sh`, with their failing cases observed before the fix and
@@ -412,7 +412,7 @@ review-harnesses dossier, the generated map, and this build's records.
   Red when: the adopter does not substitute the token, which reds the placeholder join; or gov's own
   checklist line changes.
 - **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with review-harness at 1.8,
-  unattended at 1.20 and govkit at 1.11. With one carrier reverted, it exits 1 naming that carrier.
+  unattended at 1.21 and govkit at 1.11. With one carrier reverted, it exits 1 naming that carrier.
   Red when: a carrier is left at the old version and the gate stays green.
 - **AC11** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on the
   branch tip, every leg is green except a leg that is also red at base, and the report names that
@@ -684,6 +684,18 @@ New arm: `tools/govkit/selftest.py` · one staged break per consumer finding in 
   judged by its index blob, and refuses a row carrying a `relocate` rung. §3's govkit bullet and hand-off edge name both govkit changes and the
   carry. The fixture gained core's hygiene arm, which the hook declaration had said the runbook
   could not reach.
+- rev-10 · 2026-09-14 · S5 · AC10 · AMENDED at the merge of `main` at `9ce37fcc`. A VERSION
+  COLLISION: `main` had shipped its own unattended 1.20 at `7ade2b08` for `aRatifiedRulings`, a
+  different kit from the 1.20 this branch took at rev-6, and the two lines merged byte for byte, so
+  `check-kit-versions.sh` could not see it. The merge renumbers this lineage to 1.21 at the fifteen
+  carriers `git grep -l 'gov:kit unattended@1\.20'` derives under `tools/unattended`,
+  `.claude/skills/unattended` and `memory/guides`, the four `KIT_UNATTENDED_VERSION` constants
+  among them, so no two different kits share a number going forward. The two numbers already
+  shipped stay shipped: inCMS core and NicoCares pulled this branch at `5cea0dfd` and carry its
+  `unattended@1.20`, which is reachable in gov main's history once the merge lands, next to
+  `main`'s own 1.20. Their routine pull to 1.21 is the follow-up `TOOL-dPolishedVitrine-16`.
+  review-harness 1.8 and govkit 1.11 were checked unclaimed on `main`, which holds 1.7 and 1.10.
+  AC10 now names 1.21.
 
 ## 10. Reuse audit
 

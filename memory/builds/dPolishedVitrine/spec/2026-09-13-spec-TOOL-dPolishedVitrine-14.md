@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live
 
-**Status:** INPROGRESS · rev-3 · 2026-09-13 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
+**Status:** INPROGRESS · rev-4 · 2026-09-14 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -43,8 +43,8 @@ exactly as before.
 - **S6** — the protocol's `BRIEF_RECORDED_CUTOFF` row says which units are graded, and the conf
   example's description points at that row rather than restating it (rev-3). The shipped protocol
   template and this repo's installed copy move together. Observed by AC11 and AC16.
-- **S7** — the change rides unattended 1.20, which this branch carries and `main` has not released,
-  so no version carrier moves. Observed by AC12.
+- **S7** — the change rides unattended 1.21, which this branch carries and `main` has not released,
+  so no version carrier moves beyond the merge's renumber (rev-4). Observed by AC12.
 - **S8** — before a skip is honoured, the leg asks every later commit that `build_commit`'s own
   predicate accepts for the id the same phase question, and grades the unit at the first one made
   while a run was live, announced with both commits and counted on the liveness line (rev-3).
@@ -280,8 +280,8 @@ real population, and it arrives when NicoCares re-pulls the kit.
   `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md`, and both carry
   the new sentence in the `BRIEF_RECORDED_CUTOFF` row.
   Red when: one copy moves without the other.
-- **AC12** — When `tools/check-kit-versions.sh` runs, it exits 0 with every unattended carrier still
-  at 1.20.
+- **AC12** — When `tools/check-kit-versions.sh` runs, it exits 0 with every unattended carrier
+  at 1.21, the merge's renumber (rev-4).
   Red when: a carrier moves, or the leg's marker disagrees with the driver's.
 - **AC13** — When `tools/unattended/check-pass-order.sh` runs over this repo before and after the
   unit, its stdout is byte-identical, and `tools/unattended/check-pass-order.test.sh` passes
@@ -347,6 +347,13 @@ New arm: `tools/unattended/check-brief-recorded.test.sh` · the leg at `c9bc0b2a
   AC15 is its `misselect` arm, red against the leg at `c9bc0b2a`. R3-10, LOW: the conf example stated
   the graded population without the claim-at-HEAD condition, so S6 and AC16 turn it into a pointer
   at the protocol row, which now also carries the later-commit condition.
+- rev-4 · 2026-09-14 · S7 · AC12 · AMENDED at the merge of `main` at `9ce37fcc`. S7's premise
+  failed: `main` DID release a 1.20, at `7ade2b08` for `aRatifiedRulings`, and it is a different
+  kit from the 1.20 this change rode. The merge renumbers this lineage to 1.21 at every carrier the
+  version gate reads, so this change now rides 1.21. The hands-off stands as it happened: NicoCares
+  pulled this branch at `5cea0dfd`, as did inCMS core, and both carry its `unattended@1.20`, which
+  gov main's history holds beside `main`'s own once the merge lands. Their routine pull to 1.21 is
+  `TOOL-dPolishedVitrine-16`. AC12 now reads 1.21.
 
 ## 10. Reuse audit
 

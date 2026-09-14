@@ -176,6 +176,15 @@ records that bar and the one before it, whose reds were that unit's. `check-pass
 assertions and `cross-component.test.sh` 19, each run by hand on the fold's tree.
 `check-unattended.test.sh` and `unattended.test.sh` were NOT run, for the reason that journal gives.
 
+## The merge of `main` at `9ce37fcc`
+
+S7 rode an unattended 1.20 that `main` had not released. `main` then released its own 1.20 at
+`7ade2b08`, a different kit, so the merge `9a5c0793` renumbered this lineage to 1.21 at every
+carrier the version gate reads, and `tools/check-kit-versions.sh` exits 0 there. The leg merged
+clean against `main`'s edits to the unattended kit. NicoCares took this change at `5cea0dfd` as
+1.20, and so did inCMS core; their pull to 1.21 is `TOOL-dPolishedVitrine-16`. Spec section 9's
+rev-4 line logs the move.
+
 ## Acceptance ledger
 
 **Evidences:** TOOL-dPolishedVitrine-14
@@ -190,7 +199,7 @@ assertions and `cross-component.test.sh` 19, each run by hand on the fold's tree
 - AC9 — amended rev-2 — the header points at the ruling in build `dPolishedVitrine` instead of citing this unit's id, which the suite carries; section 9's rev-2 line logs the drift red that forced it. Read at `e99df7d8`, `tools/unattended/check-brief-recorded.sh` names the predicate, the boundary, the corroboration, the rejected reachability predicate and both new non-checks.
 - AC10 — `tools/unattended/check-brief-recorded.test.sh` — 88 arms, exit 0, run from the repository root and from a scratch directory; every staged kit copy showed only its targeted arms red. At rev-3 it passes 94 arms, `misselect` included.
 - AC11 — `tools/unattended/check-unattended.sh` — the kit gate passed, check 10 included, over `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md`, which are byte-identical. It passed again on the bar at `728a59a4`, after rev-3 extended the row in both copies.
-- AC12 — `tools/check-kit-versions.sh` — exit 0, every unattended carrier still at 1.20.
+- AC12 — amended rev-4 — `tools/check-kit-versions.sh` exits 0 with every unattended carrier at 1.21, the merge's renumber; spec section 9's rev-4 line logs the move.
 - AC13 — `tools/unattended/check-pass-order.sh` — stdout byte-identical to its run at `f1e58789` on both bars, and `tools/unattended/check-pass-order.test.sh` passed 72 arms; `git diff` over it and the library is empty.
 - AC14 — `tools/unattended/check-brief-recorded.sh` — in the scratch clone with the cutoff lifted, 25 skipped, 0 unborne, the same 25 ids the probe found. Re-run at `c9bc0b2a` with rev-3's leg: the same 25 ids, and 0 graded at a later commit.
 - AC15 — `GRADED AT A LATER COMMIT` — the `misselect` fixture exits 1 with `NO brief row`, names the unit and counts one; against the leg at `c9bc0b2a` it exited 0 printing `NOT GRADED`, and five assertions failed.

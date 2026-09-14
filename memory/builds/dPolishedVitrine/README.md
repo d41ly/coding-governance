@@ -5,7 +5,7 @@ opened: 2026-09-12
 streams: tooling+deployer
 roster: TOOL+DEPL
 authorized-by: prompt
-ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15
+ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15 TOOL-dPolishedVitrine-16
 ---
 
 # dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
@@ -42,8 +42,9 @@ the same checklist path, and it breaks the same way.
 
 ## Parked decisions
 
-- **Unattended went to 1.20 at the merge.** `main` shipped its own 1.19 at `09a22d2b` while this
-  branch was open, and the two version lines merged byte for byte, so every carrier moved on.
+- **Unattended went to 1.20 at the first merge and 1.21 at the second.** `main` shipped its own
+  1.19 at `09a22d2b` and its own 1.20 by `9ce37fcc`, each while this branch was open, so every
+  carrier moved on twice. `TOOL-dPolishedVitrine-16` carries the consumers' re-pull to 1.21.
 - **The lexicon pin rose 984 -> 986** for the template's two helper names, which `agent-cap.js`
   recognises by name. The agent resolved it under the brief; `TOOL-aWeldedTribunal-12` keeps the
   underlying tension, every conforming harness costing two offenders, for the owner.
@@ -70,13 +71,13 @@ the same checklist path, and it breaks the same way.
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
 ids DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
-ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15
+ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15 TOOL-dPolishedVitrine-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-9 | 2026-09-14 |
-| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-3 | 2026-09-13 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-10 | 2026-09-14 |
+| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-4 | 2026-09-14 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 4 record folder(s).

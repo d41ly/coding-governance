@@ -667,6 +667,37 @@ hygiene, drift-audit records, the recall floor and its arms, method carriers and
 on-demand suites and `tools/workflows/unattended-build.test.sh` were not re-run; round 3's record of
 them stands.
 
+## The merge of `main` at `9ce37fcc`, and the second unattended renumber
+
+`main` moved 82 commits while this branch was open: `aRatifiedRulings`, `cWidenedNet`,
+`cGradedDebt`, `cSpliceWarden`, `cRefutedPremise` and the `returns:jsx` selector. The merge is
+`9a5c0793`, and its message carries each resolution.
+
+- **A version collision.** `main` shipped unattended 1.20 at `7ade2b08`, a different kit from the
+  1.20 this branch took at rev-6. The two `KIT_UNATTENDED_VERSION` lines merged byte for byte, so
+  `check-kit-versions.sh` was green over two kits at one number. This lineage is now 1.21 at every
+  carrier that gate reads and every template marker: fifteen files, derived by
+  `git grep -l 'gov:kit unattended@1\.20'`. review-harness 1.8, tier2-review 1.8 and govkit
+  1.11 were checked unclaimed on `main`, which holds 1.7, 1.7 and 1.10.
+- **What already shipped as 1.20 stays shipped.** inCMS core, on `feature/kit-harness-render`, and
+  NicoCares, on `branch/nc-kit-pull-dpv15`, pulled this branch at `5cea0dfd` and carry its
+  `unattended@1.20`. Once this merge lands, that commit is reachable in gov main's history beside
+  `main`'s own 1.20, and the marker alone cannot say which one a tree holds. The routine consumer
+  pull to 1.21 is `TOOL-dPolishedVitrine-16`.
+- **`main`'s widened install-prefix gate reds two lines this build wrote.** `TOOL-cWidenedNet-1`
+  bans a root-install kit path in any shipped file. Arm 7 of `adopt-unattended.test.sh` greps for
+  the nested checklist path to assert that it is ABSENT, and PV-AC3 in `unattended-build.test.sh`
+  builds a root-install layout on purpose. Both lines now carry `gov:root-fixture` with a reason.
+- **The alternates entry went with its fixture.** Rev-4 lent the real object database to the
+  memory-hygiene self-test's `git archive` fixture. `TOOL-aRatifiedRulings-3` retired that fixture
+  for a synthetic tree with no live spec, and the merge took that side. `TOOL-dPolishedVitrine-9`
+  now says so.
+- **The lexicon pin reads 984**, re-derived on the merged tree. `main` drained two from the shared
+  984 and this build raised two.
+- **The python resolver is no longer red.** Run alone on 2026-09-14, it failed at `24f8c712` on
+  `run-gates.evidence.test.sh:643`, `DC_PY=python`, and passed 55 assertions at `9ce37fcc` and at
+  the merged tip. `main` fixed that line in `8e4cae26`.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -691,8 +722,9 @@ them stands.
   arms 7 to 9 were seen red against the unfixed adopter.
 - AC9 — `python tools/check-kit-placeholders.py` — OBSERVED: exit 0 with the placeholder declared,
   `adopt-unattended.sh --check` in sync, and gov's Skill line 583 unchanged. Item 7 above is the red.
-- AC10 — amended rev-6 — the gate exits 0 at review-harness 1.8, unattended 1.20 and govkit 1.11
-  after the merge. Item 6 above is still the red, and spec section 9's rev-6 line logs the move.
+- AC10 — amended rev-10 — the gate exits 0 at review-harness 1.8, unattended 1.21 and govkit 1.11
+  after the second merge, which renumbered this lineage past `main`'s own 1.20. Item 6 above is
+  still the red, and spec section 9's rev-6 and rev-10 lines log the two moves.
 - AC11 — amended rev-4 — the unattended clause now compares the tip's FAIL set with base's, and
   every shard's set is identical at both. The full bar at `44be8934` was green on 102 of 106 legs.
   The python resolver is red at base too, and the other three pass when run alone at that tip. After
