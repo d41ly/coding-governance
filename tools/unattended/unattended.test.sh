@@ -5122,6 +5122,25 @@ out=$(run --audit tRun); rc=$?
 same "a CLOSED unit with an open row exits 0" "$rc" "0"
 same "a CLOSED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
 miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- THE SPEC READ IS A PROBE (closing review of aProbedUnit, round 2, cluster H, ids 5 and 18).
+# ---- The status skip above is only as good as the read that feeds it: `load_spec_facts` swallowed
+# ---- with `|| true` left the maps empty on a failed read, the CLOSED skip never fired, and the unit
+# ---- was graded STALLED with the kill order printed — the round-1 defect with its cause discarded.
+# ---- The four other probes in the verb set `dead`; this one now does too. `awk` is shadowed by a
+# ---- stub that exits 2 ONLY on an argument under `spec/`, so `spec_facts` fails on a file `-r`
+# ---- accepted while every other awk in the verb keeps answering. Its own stub dir, because the
+# ---- `stat` stub above shares `$TMP/stub` and would die first on any dirty path. Against the base
+# ---- driver: exit 0 and the CLOSED unit's line, graded by the clocks as though it were open.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "fixture: the spec closes, the row stays" --no-verify
+mkdir -p "$TMP/stubawk"
+printf '#!/bin/sh\ncase "$*" in *spec/*) exit 2 ;; esac\nexec %s "$@"\n' "$(command -v awk)" > "$TMP/stubawk/awk"; chmod +x "$TMP/stubawk/awk"
+out=$(PATH="$TMP/stubawk:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "a dead spec read exits 1" "$rc" "1"
+hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now: load_spec_facts over memory/builds/tRun/spec"
+miss "$out" "unattended-audit: ARCH-tRun-1"
 # AC4 — the bound is read through `read_bound_key`, GATE_BOUND's hoisted reader: junk and zero are
 # refusals at exit 2 before any verb runs, in GATE_BOUND's own sentence with the key name lifted out.
 reset_tree; mkconf "true" "true" "" "3600" "" "abc"
@@ -5647,7 +5666,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=779
+FLOOR_ASSERTIONS=783
+# RAISED 779 -> 783 by the closing diff review of aProbedUnit, round 2 (cluster H, ids 5 and 18): the
+# dead-spec-read `--audit` arm, one `mutate` and three assertion lines, in region two beside the
+# `--audit` arms; n read before and after the block run alone with the preamble sourced, 20 -> 24.
 # RAISED 760 -> 779 by the closing diff review of aProbedUnit: +25 `hit`/`same`/`miss` lines, one
 # `mutate` and one `n=$((n+1))` guard added, 8 assertion lines removed with the re-targeted fold
 # arms — net +19, every one in region two (clusters A, C, G, H, I), counted off the diff.
@@ -5681,7 +5703,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=583
+FLOOR_SHARD_2=587
+# +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
 # +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.
 # +19 for the TOOL-aProbedUnit-6 BOUNDED arms, all in region two.
 # +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.

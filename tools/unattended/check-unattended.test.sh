@@ -821,8 +821,11 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
   # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
   # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
   # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
+  # DISPDATE overrides it for the arms that grade a record against the driver's FOLD_CUTOFF, which
+  # the default of 2026-09-01 predates: a fold-beside-blockers row at that date is the grandfathered
+  # population, and the red arm has to commit AT the cutoff to be graded by the rule.
   git add -A >/dev/null 2>&1
-  GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
+  GIT_COMMITTER_DATE="${DISPDATE:-2026-09-01T12:00:00 +0000}" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
 }
 D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
 D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
@@ -832,10 +835,32 @@ D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
 # hole: `review_state` returns CONVERGED for count 0, so a NON-CONVERGENT row stands on a blocker,
 # the severity rule promotes every blocker, and `blockers 2 · disposition fold` was two blockers left
 # standing under a field the clause read as demanding nothing. The driver refuses the row at write
-# time now; the leg reds the hand-written one. At base this fixture printed no check 2 line.
+# time now; the leg reds one first-committed AT OR AFTER the driver's FOLD_CUTOFF, so the record is
+# committed at that date. At base this fixture printed no check 2 line.
 reset_tree; dispconf 2000-01-01
-mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
-hit "$(run)" "record disposition fold beside a NON-ZERO blocker count, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was"
+DISPDATE="2026-09-14T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was"
+
+# ...AND THE RULE HAS ITS OWN CUTOFF (closing review of aProbedUnit, round 2, cluster A — the
+# BLOCKER). Graded under DISPOSITION_CUTOFF alone, the clause above redded sixteen tracked
+# append-only records this repo's own driver wrote while `fold` was legal at every terminal exit,
+# and no verb can rewrite them. A record first-committed BEFORE FOLD_CUTOFF carrying the same row is
+# read as the contract that accepted it read it — demanding nothing — and one AT the cutoff is
+# graded by the rule. The pair is BOUNDED, the exit the kit default produces.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-09-14T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF"
+
+# ...and a FOLD_CUTOFF the leg cannot read is named, not defaulted: empty sorts before every date
+# and reds the whole grandfathered population, malformed sorts after and disarms the clause. Named
+# inside check 2's own failure rather than at a `fail` site of its own, because the pinned check-2
+# ordinals in memory/project/unarmed-branches.txt sit below the read.
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^FOLD_CUTOFF=.*|FOLD_CUTOFF=2026-09-14|'
+hit "$(run)" "the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none"
 
 # ...and a fold beside ZERO blockers still demands nothing: nothing above MEDIUM stood, so nothing
 # was owed a unit. Written by hand — the driver reaches CONVERGED at 0 and never NON-CONVERGENT —
@@ -3224,7 +3249,11 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
 # ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
 # ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
-FLOOR_ASSERTIONS=406
+FLOOR_ASSERTIONS=410
+# ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
+# ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
+# ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
+# ---- carries the same +4 and FLOOR_SHARD_2 is untouched.
 # ---- RAISED 400 -> 402 by TOOL-aProbedUnit-6: the two BOUNDED check-2 fixtures, both in region two.
 # ---- RAISED 402 -> 406 by the closing diff review of aProbedUnit (cluster C, id 12): the four
 # ---- check-2 disposition fixtures — fold beside a non-zero count, and the CONVERGED trio — which
@@ -3245,7 +3274,7 @@ FLOOR_ASSERTIONS=406
 # check asserting it, because the driver suite's own three constants cannot satisfy the same
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
-FLOOR_SHARD_1=87
+FLOOR_SHARD_1=91
 FLOOR_SHARD_2=319
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;

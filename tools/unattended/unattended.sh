@@ -499,6 +499,16 @@ read_bound_key REVIEW_ROUNDS "$REVIEW_ROUNDS_DEFAULT" rounds "a spec-audit subje
 # which a space-separated set cannot hold.
 REVIEW_VERDICTS="CLEAN|CLEAN WITH FIXES|BLOCKED"
 REVIEW_DISPOSITIONS="fold|promote"
+# THE DAY `fold` BECAME ILLEGAL AT A BLOCKER-BEARING EXIT (closing review of aProbedUnit, round 2,
+# cluster A). Until this date the driver accepted `fold` at every terminal exit, so every
+# `blockers N · BOUNDED · disposition fold` row first-committed before it was written by the driver
+# under the contract then in force, and the gate reads those rows as that contract read them. A
+# record first-committed on or after it is graded by the severity rule the `fail 37` refusal below
+# enforces. A kit constant and not a conf key, because the date is the KIT's — it names when this
+# driver's contract moved, not when an adopter declared anything — and DISPOSITION_CUTOFF alone dated
+# the FIELD, not every later rule about the field's value: sixteen tracked records this repo's own
+# driver wrote redded the bar the day the rule landed without its own cutoff.
+FOLD_CUTOFF="2026-09-14"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
@@ -2982,7 +2992,11 @@ print_audit() { # slug
   # wrote stays open under it forever — which is the right answer for `--dispatch` and the wrong one
   # for a stall clock that a keepalive ACTS on. The status is resolved the way `--plan` resolves it,
   # from the same tracked spec set, so the two verbs cannot grade one unit CLOSED and STALLED.
-  load_spec_facts $(git ls-files "$M/builds/$slug/spec/*.md" 2>/dev/null | drop_working_specs) >/dev/null 2>&1 || true
+  # A PROBE, LIKE THE FOUR ABOVE IT, so its refusal reaches the dead-probe exit (closing review of
+  # aProbedUnit, round 2, cluster H). Swallowed with `|| true`, a failed read left the maps empty,
+  # the status skip never fired, and a CLOSED unit was graded STALLED with the kill-and-redispatch
+  # remedy printed for the keepalive to act on — the round-1 defect again, with its cause discarded.
+  [ -n "$dead" ] || load_spec_facts $(git ls-files "$M/builds/$slug/spec/*.md" 2>/dev/null | drop_working_specs) >/dev/null 2>&1 || dead="load_spec_facts over $M/builds/$slug/spec"
   while IFS=$'\t' read -r u iso g decl; do
     [ -n "$u" ] || continue
     st=""; sp="${SPEC_PATH[$u]:-}"; [ -z "$sp" ] || st="${SPEC_ST[$sp]:-}"

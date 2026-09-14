@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it
 
-**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 3 · ratified 2026-09-14
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-3-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-3-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round1.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
+| [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round2.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round2.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 |
 
@@ -137,7 +138,9 @@ The body, in order:
    what `elapsed` is measured from. Before the openness test, a unit whose spec status is
    terminal (`CLOSED`/`WONTDO`) is dropped, the status resolved the way `--plan` resolves it —
    `load_spec_facts` over the tracked spec set, `SPEC_PATH` then `SPEC_ST` — so `--plan` and
-   `--audit` cannot grade one unit DONE and STALLED.
+   `--audit` cannot grade one unit DONE and STALLED. That read is a PROBE like the four clocks
+   (rev-5): a non-zero status sets `dead` and the verb exits 51 naming `load_spec_facts`, never
+   grading from empty maps.
 3. Openness, through `check_pass_open <grp> <unit> <rel> <declared>`, a new function that is the
    body of `verb_dispatch`'s sibling loop at `:4802` to `:4815` moved verbatim: `pass_commit`
    answers which commit named the unit after the anchor, and the pass is closed only when that
@@ -448,6 +451,7 @@ assignment at `:5403` is the shadowed one the file marks as inert.
 - rev-1 · 2026-09-14 · initial draft.
 - rev-2 · 2026-09-14 · §2 S3 S4 S5 · §3 · §4 · §5 · §6 AC3 AC4 AC6 AC7 AC8 AC9 · §7 · folded round-1 spec-audit clusters F (spec-3 half: this unit owns `read_bound_key`), I (id 9), M (ids 10, 11, 13) and N (id 12).
 - rev-3 · 2026-09-14 · §3 Edges · §4 · §6 AC1 AC4 AC6 · folded round-2 spec-audit clusters E (id 2: the VERBS half of AC6 greps the bullet's own form), I (id 7: AC6 pins `re-dispatch` in the keepalive section) and K (id 15: the fixture interface — `mkconf`'s sixth positional, the second `NOCONF` hit, unit 6 takes the seventh).
+- rev-5 · 2026-09-14 · §4 item 2 · folded the closing diff review round 2, cluster H (ids 5, 18): `print_audit` swallowed `load_spec_facts`'s refusal with `|| true`, so a failed read left the maps empty, the terminal-status skip never fired, and the verb fell through to the stall clock — the round-1 defect with its cause discarded, and the one probe in the function with no liveness assertion. The call now sets `dead="load_spec_facts over <spec dir>"` on a non-zero status, guarded by `[ -n "$dead" ] ||` like the clock probes so the first dead name survives, and reaches the existing `fail 51` exit. One arm in `unattended.test.sh` beside the CLOSED-unit arm: `awk` shadowed by a stub exiting 2 only on an argument under `spec/`, so `spec_facts` fails on a file `-r` accepted while every other awk in the verb answers; exit 1 and the probe named, the unit's line absent — run alone with the preamble sourced, red against a frozen copy of the base driver (exit 0, the CLOSED unit's line printed) and silent at the tip. Floors +4, region two.
 - rev-4 · 2026-09-14 · §4 item 2 · folded the closing diff review round 1, cluster A (ids 19, 1, 6): `print_audit` unions a unit's same-anchor dispatch rows with a new anchor replacing, mirroring check 23's key, and skips a unit whose spec status is terminal the way `--plan` resolves it; the `verb_dispatch` sentence claiming the two verbs cannot disagree is rewritten to state the two populations (per row for the disjointness proof, the union for the stall clock); two red-first arms in `unattended.test.sh` beside AC3 — two same-anchor rows with a pass commit inside the first, and a CLOSED spec with an open row, both printing `no unit is dispatched and open` — observed red against a frozen copy of the base kit. Floors +2 of the +19 the fold adds.
 
 ## 10. Reuse audit

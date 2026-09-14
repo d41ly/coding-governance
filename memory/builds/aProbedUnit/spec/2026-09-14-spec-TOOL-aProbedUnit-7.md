@@ -1,6 +1,6 @@
 # TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding
 
-**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-7-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-7-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round1.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |
+| [2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round2.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-diff-review-round2.md) | diff-review | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round2.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |
 
@@ -353,6 +354,67 @@ still handed out, the retry instruction kept, CEILING and NON-CONVERGENT still D
 throw kept). One fact the fold surfaces and does not close: on the clean-round shapes the callee
 writes no report, so no `**Serves:** spec-audit` record names the audited ids and `specs-audited`
 reds at `--close` for them — that is `tier2-review.js`'s and the DoD's, outside this unit's files.
+
+### The closing review's second fold (rev-5)
+
+Round 2 of the closing diff review read the rev-4 fold and found six clusters in this unit's
+files, each a fix that closed its round-1 defect on the path its own arm exercises and left a
+sibling path with the pre-fix behaviour. What rev-5 changed, by that record's cluster letter:
+
+- **B (ids 2, 7, 11, 17) — the CONVERGED disposition is derived from what was promoted.** Rev-4
+  appended `--disposition promote` iff `blockers === 0 && highs > 0`, and `highs` counts CONFIRMED
+  findings; the stage below it disposes UNVERIFIED ones too and may promote one, so `blockers 0,
+  highs 0, unverified N` recorded a bare CONVERGED row and then promoted a unit check 2 cannot see.
+  The record is now a function, `writeRound(disposition)`, called at one of two points: at zero
+  blockers with anything outstanding the DISPOSAL stage runs FIRST and the record carries
+  ` --disposition promote` iff `promotedIds` is non-empty; at a positive count, and at zero with
+  nothing outstanding, the record comes first as before. The pairing guard runs both ways —
+  `(token === 'CONVERGED') !== (blockers === 0)` throws, because `review_state` converges at 0 and
+  only at 0 — so the "at minimum" throw the review named is unreachable by construction and a
+  recorder returning CONVERGED beside a positive count is refused too. A disposal that does not
+  finish on the dispose-first path records NO round, and its DEGRADED note says so and spells the
+  hand-record command and the resume route, rather than writing a CONVERGED row over findings nobody
+  disposed. `au` no longer carries `verdict`; the AC7 fixture that paired NON-CONVERGENT, CEILING and
+  BOUNDED with a count of 0 — a shape no driver prints — now pairs them with 1.
+- **C (ids 8, 12, 13) — `auditIds` beside `subjects` is refused by name**, at the args block before
+  any agent spawns: "pass `auditIds` OR `subjects`, never both — a supplied subject set cannot be
+  scoped to the promoted units by a runtime that cannot read their specs". The `scoped to` log moved
+  inside the resolver branch, where the scoping is applied; the terminal hand-out's `nextAction` and
+  the terminal-subject throw both add "and no `subjects`". The suite's round-2 fixture still strips
+  `subjects`, now because the harness refuses the pair rather than to make the resolver run.
+- **D (ids 3, 15) — a clean round withholds the roster until its record exists.** In unattended
+  mode a `cleanRound` hand-out returns `roster: []`, a `nextAction` that names the exact binding line
+  `**Serves:** spec-audit <ids>` over the audited units (the scoped set minus `specRefused`), the
+  record path at the SUBJECT's round under `reviewDir`, the callee's note to record, and the resume
+  route — commit the record, then dispatch what `--plan <slug> --paths` lists — with `dispatch`
+  kept on the return so the caller can take it. The note opens `HELD AT HAND-OUT`. Attended mode
+  keeps the hand-out: an owner is in the loop and no DoD term reads it. The harness cannot write or
+  see the record, so "until it exists" is the caller's act, graded by `specs-audited` at `--close`;
+  what the harness closes is the silence. The backlog row is the orchestrator's.
+- **E (id 14) — the callee is handed the subject's round**, `roundNo - subjectRound + 1`: 1 for a
+  fresh generation, N for its Nth fold. `roundNo` stays the harness's own label on the record and the
+  returns. The suite's `workflow` double now traces its args as a `wargs:` line, which is what the
+  two arms read.
+- **F (id 16) — an unverified finding the stage judges not a defect has a route.** `DISPOSAL_SCHEMA`
+  gains an optional `refuted` (`integer`, `minimum: 0`); the guard reads it as 0 when absent, refuses
+  it above `au.unverified` by name, and adds it to the sum — `promoted + folded + refuted + standing
+  === confirmed + unverified` — with the severity floors untouched. The prompt says the agent may
+  REFUTE an UNVERIFIED finding, never a CONFIRMED one, with a one-line reason per finding in
+  `summary`. `refuted` rides the hoist and every post-disposal return as a stated integer.
+- **G (id 9) — a present-but-wrong-typed `round`, `subjectRound` or `auditIds` refuses by name**
+  with the received JSON, one table-driven guard beside the `mode`, `scratch` and `units` refusals;
+  `round` joins the two the review named because it is the same coerce-to-default class one field
+  over.
+
+Two existing arms flipped in place and one fixture was corrected: the `minimum: 0` count is 3, the
+two clean-round arms that asserted `"roster":[{` now assert the withholding, and AC7's loop pairs its
+three non-CONVERGED exits with a positive count. Every new or flipped arm was observed red against a
+frozen copy of the rev-4 render, one arm at a time with the preamble sourced, then green against the
+rev-5 render: 33 arms in the round-2 section, 28 red against the base, the 5 that hold on both being
+declared controls (the promoted unit still carried, record-before-dispose at a positive count, `kind:
+spec-audit`, the harness's own round on the record, and the empty roster on the refuted-above-
+unverified shape, whose discriminating arm is the message); 19 in the flipped block, 11 red — ten of
+cluster D and the `minimum: 0` count of cluster F.
 
 ### The comments that describe a shape the file no longer has
 
@@ -816,6 +878,7 @@ it belongs to` arms at 4597 and 4643 stand, their substrings kept; no arm is add
 - rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (id 22 — AC6 to AC8 reduced to their grep pairs, the six leg runs at `--close`), E (id 48 — the recorder as unit 6 leaves it, in §3), K (id 52 — the line-143 sentence and the `fail 37` message at `unattended.sh:4096` join the carriers, minus 13 bytes, `TOOL-aLeakedHandle-6` in §10, AC9), M (ids 15, 16 — AC4's RESULT keys and V7, AC8's `still disposed` and `severity rule` greps), S (id 46 — `meta.phases[2].detail`, AC6's retired-phrase grep), T (id 45 — `--reason` on the promotion command).
 - rev-3 · 2026-09-14 · §3 · §4 · §5 · §7 · S7 · S8 · AC9 · AC10 · folded the round-2 spec audit: clusters D (id 5 — AC10, the harness suite's own text by three greps in the pass and its whole run at `--close`, the row S8 and the §3 hands-off bullet lacked), G (id 28 — `review_exit_note`'s two sentences at `unattended.sh:4025` to `:4026` and the `:4107` clause with its `:4101` to `:4103` comment join S7 with severity-rule wording; AC9's zero-count greps over `blocker still standing`, base 3, and `admits BOTH`, base 2 in the driver and 1 in the suite — the audit wrote 1 for the driver and the tree says 2; the `:4634` arm moves with the clause, four arms not three, with spec 6 rev-4 corrected in the same fold).
 - rev-4 · 2026-09-14 · §4 · folded the round-1 closing diff review: clusters B (ids 10, 5 — the subject keyed per spec-set generation as `<slug>-spec-set-r<N>` with `subjectRound` carried back on CONVERGING, `promotedIds` in `DISPOSAL_SCHEMA` and on every return, `auditIds` scoping the resolver and the hand-out's `nextAction` ordering the re-invocation, `terminalSubject` as the recorder's distinct outcome; the per-invocation key the review spelled is departed from, §4 says why), C (harness end — `--disposition promote` appended at zero blockers with highs), D (id 2 — the severity split and the `promotedIds` pairing in the guard, `minimum: 0` on both counts), E (id 11 — BOUNDED excluded from the DEGRADED predicate), F (ids 14, 15 — `unverified`, `lensesDead` and `skepticsDead` read; the stage on `confirmed + unverified`; the clean-round shapes as CONVERGED at 0; the dead-lens throw kept). 55 arms added to `tools/workflows/unattended-build.test.sh`, 44 observed red against the frozen base render.
+- rev-5 · 2026-09-14 · §4 · folded the round-2 closing diff review: clusters B (ids 2, 7, 11, 17 — `writeRound(disposition)`, the DISPOSAL stage FIRST at zero blockers with anything outstanding and ` --disposition promote` iff `promotedIds` is non-empty, the pairing guard both ways, no round recorded over a DEGRADED disposal on that path; the AC7 fixture re-paired), C (ids 8, 12, 13 — `auditIds` beside `subjects` refused by name at the args block, the `scoped to` log inside the resolver branch, `subjects` named in `nextAction` and the terminal-subject throw), D (ids 3, 15 — the unattended clean-round hand-out WITHHELD with `roster: []`, `nextAction` naming the `**Serves:** spec-audit <ids>` line, the record path at the subject's round and the resume route, `dispatch` kept; attended untouched), E (id 14 — `round: roundNo - subjectRound + 1` to the callee; the suite's `workflow` double traces `wargs:`), F (id 16 — optional `refuted` in `DISPOSAL_SCHEMA`, bounded by `unverified`, in the sum, floors kept, the prompt's refute clause, `refuted` on every post-disposal return), G (id 9 — `round`, `subjectRound` and `auditIds` refused by name when present and wrong-typed). 33 arms added to `tools/workflows/unattended-build.test.sh` and 19 flipped or re-fixtured in place, 39 observed red against the frozen rev-4 render.
 
 ## 10. Reuse audit
 

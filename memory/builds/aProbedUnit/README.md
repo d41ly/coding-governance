@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aRatifiedRulings
 authorized-by: prompt
-ids: TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7
+ids: TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 TOOL-aProbedUnit-8 TOOL-aProbedUnit-9 TOOL-aProbedUnit-10 TOOL-aProbedUnit-11 TOOL-aProbedUnit-12 TOOL-aProbedUnit-13 TOOL-aProbedUnit-14 TOOL-aProbedUnit-15 TOOL-aProbedUnit-16
 ---
 
 # aProbedUnit — unattended units stop stalling: no bar in a pass, bounded commands, an audit probe, a fixed scratch root, one audit round
@@ -42,6 +42,7 @@ record under `prompts/`.
 - **No self-test suite runs inside a pass of THIS build either.** Unit 6 stages its own red case by running the single arm, never `unattended.test.sh` whole. The compensating `run-unattended-gates.sh` run is the closing pass's, once, on a frozen clone.
 - **Vocabulary changes land in every carrier in one commit**: driver, leg, harness, tests, VERBS, SKILL, protocol, and the build method where a rule moves — a paraphrase left behind is the two-answers class.
 - **A pass observes the grep or the single arm; the leg or suite half of any criterion is the close's.** Its ledger row reads `observed at --close`, never OBSERVED by a pass that did not run it. (Round-1 audit, cluster A.)
+- **The closing diff review's HIGHs were FOLDED, not promoted.** The owner's 2026-09-14 answer scopes the one-round-and-promote rule to SPEC audits; the diff review converges by fixing (M8). Rounds 2 and 3 are unrecordable under the terminal slug subject; their records sit under `reviews/`. Run's call.
 - **Classification at open**: all seven MISSING; specced by the harness's SPEC stage.
 
 ## Parked decisions
@@ -64,21 +65,22 @@ record under `prompts/`.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-09-14 · streams tooling
-ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7
+ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 TOOL-aProbedUnit-7 TOOL-aProbedUnit-8 TOOL-aProbedUnit-9 TOOL-aProbedUnit-10 TOOL-aProbedUnit-11 TOOL-aProbedUnit-12 TOOL-aProbedUnit-13 TOOL-aProbedUnit-14 TOOL-aProbedUnit-15
+ids TOOL-aProbedUnit-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aProbedUnit-1 — no gate, suite or bar runs inside a unit pass; the bar runs once, at the close](spec/2026-09-14-spec-TOOL-aProbedUnit-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-14 |
 | [TOOL-aProbedUnit-2 — every command a unit runs is bounded; a stalled non-code command is skipped and named](spec/2026-09-14-spec-TOOL-aProbedUnit-2.md) | 2 | 1 | CLOSED | rev-3 | 2026-09-14 |
-| [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-14 |
+| [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | CLOSED | rev-5 | 2026-09-14 |
 | [TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument](spec/2026-09-14-spec-TOOL-aProbedUnit-4.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-14 |
 | [TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root](spec/2026-09-14-spec-TOOL-aProbedUnit-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-14 |
-| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-14 |
-| [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | CLOSED | rev-4 | 2026-09-14 |
+| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | CLOSED | rev-7 | 2026-09-14 |
+| [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | CLOSED | rev-5 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 19 bound to this build, across 4 record folder(s).
+Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

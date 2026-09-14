@@ -677,10 +677,14 @@ It answers with one of five states, and the state is what you act on:
   by default; the closing diff review keeps its convergence loop, because its subject is the build
   slug, whose bound is the runaway ceiling. **A promotion at this exit is NOT audited by the round
   that produced it**: after `--rescope --act add` and the new spec, re-invoke the harness at round
-  N+1. It keys a fresh `--review` subject per invocation, so the subject that just ended is never
-  re-rounded, and it audits ONLY the promoted specs — the ones no tracked `spec-audit` record names
-  yet — under their own one-round bound. Skip that re-invocation and the promoted unit closes
-  un-audited, which `specs-audited` refuses at `--close`.
+  N+1. It keys the `--review` subject per spec-set generation: a post-disposal re-invoke passes
+  `auditIds` and no `subjectRound` and takes a fresh subject; a fold re-invoke copies the
+  `subjectRound` the CONVERGING return handed back. So the subject that just ended is never
+  re-rounded, and the re-invoke audits ONLY the promoted specs — the ones no tracked `spec-audit`
+  record names yet — under their own one-round bound. `auditIds` and `subjects` are never passed
+  together: the harness refuses the pair by name, because a supplied subject set cannot be scoped to
+  the promoted units. Skip that re-invocation and the promoted unit closes un-audited, which
+  `specs-audited` refuses at `--close`.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.

@@ -70,8 +70,12 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
     // TOOL-dRatifiedSeam-1. The AUDIT verdict now comes from a SUB-WORKFLOW rather than from an
     // agent, so this double has to be able to return one. It returned a bare `{}` while `workflow`
     // was unreachable, and a double that cannot produce the value under test grades nothing.
+    // THE ARGS ARE TRACED TOO (closing review round 2, cluster E). The double recorded `ref` alone,
+    // so nothing could see which ROUND the callee was handed; the harness passed the invocation
+    // round and every promoted-spec audit was primed as a fold review of a spec nobody had read.
     const workflow = async (ref, wargs) => {
       trace.push("workflow:" + ((ref && ref.scriptPath) || String(ref)))
+      trace.push("wargs:" + JSON.stringify(wargs))
       return returns["workflow"] || {}
     }
     const budget = { total: null, spent: () => 0, remaining: () => Infinity }
@@ -182,8 +186,12 @@ o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "CONVERGING: BUILD is not reached" "$o" "HELD AT AUDIT"
 n=$((n+1)); case "$o" in *"phase:Disposal"*) echo "FAIL CONVERGING reached the Disposal phase, which is the one thing this gate exists to stop"; st=1 ;; *) echo "ok   CONVERGING: the Disposal phase never ran" ;; esac
 has "CONVERGING: the caller is told what to do next" "$o" "re-invoke this harness with round"
+# A POSITIVE COUNT FOR THE THREE EXITS THE DRIVER ONLY REACHES ON ONE. `review_state` returns
+# CONVERGED for a count of 0 and for nothing else, so NON-CONVERGENT, CEILING and BOUNDED beside 0
+# was a pairing no driver prints; the harness refuses it both ways since closing review round 2,
+# cluster B, and this fixture used to hand the harness the impossible shape.
 for v in CONVERGED NON-CONVERGENT CEILING BOUNDED; do
-  o=$(run_wf "$UNITS" "$(returns "$v" 0)")
+  o=$(run_wf "$UNITS" "$(returns "$v" "$([ "$v" = CONVERGED ] && echo 0 || echo 1)")")
   n=$((n+1)); case "$o" in *'"roster":[{'*) echo "ok   $v: hands out a roster" ;; *) echo "FAIL $v handed out no roster, so a terminal verdict cannot land a build"; st=1 ;; esac
 done
 
@@ -728,7 +736,9 @@ has    "B ...and orders the audit of the promoted specs BEFORE any is dispatched
 has    "B ...naming the re-invocation's round and auditIds" "$o" 'round: 2, auditIds: [\"A-tB-p\"] and no subjectRound'
 has    "B ...and still hands out the roster" "$o" '"roster":[{'
 # The round-2 re-invocation over the promoted id: a fresh subject, no throw, and the resolver sees
-# ONLY the promoted unit. `subjects` is stripped so the resolver stage actually runs.
+# ONLY the promoted unit. `subjects` is stripped because the harness REFUSES the pair (closing
+# review round 2, cluster C, armed below): this fixture used to strip it "so the resolver stage
+# actually runs", which was the arm working around a seam the code let through.
 NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##' | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-3"],#')
 o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"abc1234"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "B round 2 over the promoted id does not throw" "$o" "RESULT"
@@ -780,7 +790,8 @@ o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"disp
 has    "D promoted 0 beside 2 blockers + 3 highs: the roster is EMPTY" "$o" '"roster":[]'
 has    "D ...and the note says the counts do not split" "$o" "do not split by severity — promoted 0 is below blockers 2 + highs 3"
 has    "D ...and the disposal is NOT done" "$o" "disposal: NOT done"
-n=$((n+1)); if [ "$(grep -c "type: 'integer', minimum: 0" "$F")" = 2 ]; then echo "ok   D promoted and folded carry minimum 0 in DISPOSAL_SCHEMA"; else echo "FAIL D DISPOSAL_SCHEMA does not pin minimum 0 on both counts"; st=1; fi
+# THREE since closing review round 2, cluster F: `refuted` joined `promoted` and `folded`.
+n=$((n+1)); if [ "$(grep -c "type: 'integer', minimum: 0" "$F")" = 3 ]; then echo "ok   D promoted, folded and refuted carry minimum 0 in DISPOSAL_SCHEMA"; else echo "FAIL D DISPOSAL_SCHEMA does not pin minimum 0 on all three counts"; st=1; fi
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     "$SPEC_OK" "$(review_out 1 1 0)" "$(rec BOUNDED)" '{"disposed":true,"standing":[],"promoted":1,"folded":0,"promotedIds":[],"summary":"x"}')")
 has    "D a promotion naming no unit is REFUSED" "$o" 'promoted 1 beside promotedIds []'
@@ -805,10 +816,28 @@ has    "F all-refuted: a RESULT, not a throw" "$o" "RESULT"
 has    "F all-refuted: read as a clean round at 0" "$o" "a clean round at 0"
 has    "F all-refuted: the round is recorded CLEAN at 0" "$o" '--verdict "CLEAN" --blockers 0'
 has    "F all-refuted: the disposal skip is announced" "$o" "disposal: skipped"
-has    "F all-refuted: the roster is handed out" "$o" '"roster":[{'
 has    "F all-refuted: unverified travels out as a stated 0" "$o" '"unverified":0'
+# ROUND 2, CLUSTER D (ids 3, 15): the clean round used to hand out the roster — this arm asserted
+# `"roster":[{` here — and the callee writes no `**Serves:** spec-audit` record on either clean path,
+# so every unit built after it failed `specs-audited` at --close with nothing to point the override
+# at. Unattended mode now WITHHOLDS the roster and names, in nextAction, the ids the record must
+# carry, the path grammar at the SUBJECT's round, and the resume route; `dispatch` stays on the
+# return so the caller can take it. Attended mode keeps the hand-out: an owner is in the loop.
+has    "D all-refuted, unattended: the roster is WITHHELD" "$o" '"roster":[]'
+has    "D ...and nextAction demands the record BEFORE any dispatch" "$o" "WRITE the spec-audit record this clean round left unwritten, BEFORE any unit is dispatched"
+has    "D ...naming the ids the binding line must carry" "$o" '**Serves:** spec-audit A-tB-1 A-tB-2 A-tB-3'
+has    "D ...and the record path at the subject round" "$o" 'memory/builds/tB/reviews/<date>-review-A-tB-1-spec-audit-round1.md'
+has    "D ...and the resume route" "$o" 'dispatch every unit `bash tools/unattended/unattended.sh --plan tB --paths` lists as READY'
+has    "D ...and the note opens HELD" "$o" '"note":"HELD AT HAND-OUT — a clean round with no tracked spec-audit record'
+has    "D ...and dispatch still travels, for the resume route" "$o" '"dispatch":{"scriptPath":"tools/workflows/unattended-unit.js"'
+has    "D ...and the withholding is logged" "$o" "hand-out: WITHHELD"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"root":"/tmp/r","blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"note":"clean: 0 findings"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
-has    "F zero findings, no unverified key: a RESULT too" "$o" '"roster":[{'
+has    "F zero findings, no unverified key: a RESULT too" "$o" "RESULT"
+has    "D zero findings, unattended: the roster is WITHHELD too" "$o" '"roster":[]'
+has    "D ...and the callee's note is quoted into the demand" "$o" "the callee said: clean: 0 findings"
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"skepticsDead":0,"unverified":0,"note":"all findings adjudicated and refuted"}}')
+has    "D attended clean round: the roster is still handed out — an owner is in the loop" "$o" '"roster":[{'
+hasnt_ "D ...and nothing is withheld" "$o" "hand-out: WITHHELD"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":0,"lensesDead":4,"note":"UNVERIFIED: no lens completed"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "F every lens dead: still THROWS" "$o" "non-integer blocker count"
 has    "F ...naming the lens deaths" "$o" "lensesDead 4"
@@ -832,6 +861,94 @@ o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused
 has    "F a synthesis return with no unverified key is REFUSED" "$o" "THROW"
 has    "F ...and the message names unverified" "$o" "unverified undefined"
 hasnt_ "F ...and the stage is never reached" "$o" "phase:Disposal"
+
+# ==================== CLOSING REVIEW ROUND 2 — CLUSTERS B, C, E, F, G (spec 7 rev-5)
+# Every arm below was observed RED against a frozen copy of the round-1 render, one arm at a time,
+# with this suite's preamble sourced, before the harness moved. Cluster D's arms sit with the
+# round-1 F arms above, because they flip the two clean-round hand-out arms in place.
+
+# ---- B (ids 2, 7, 11, 17): the CONVERGED disposition is derived from what was PROMOTED, not
+# ---- predicted from `auHighs`. `blockers 0, highs 0, unverified 2` and a disposal that promotes
+# ---- one of the unverified findings used to record a bare CONVERGED row the merge bar reads as
+# ---- demanding nothing. At zero blockers with something outstanding the DISPOSAL stage now runs
+# ---- FIRST and the record carries `promote` iff `promotedIds` is non-empty.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"promotedIds":["A-tB-9"],"summary":"d"}')")
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r1:')
+has    "R2-B zero blockers, zero highs, a promoted UNVERIFIED finding: the record carries --disposition promote" "$p" "--blockers 0 --disposition promote"
+ag=$(printf '%s\n' "$o" | grep '^agent:' | tr '\n' ' ')
+has    "R2-B ...because the disposal ran BEFORE the record" "$ag" "agent:dispose:tB agent:audit:record:r1"
+has    "R2-B ...and the log says the record follows the disposal" "$o" "the driver records this exit AFTER the disposal"
+has    "R2-B ...and the hand-out still carries the promoted unit" "$o" '"promotedIds":["A-tB-9"]'
+# The control: at a POSITIVE count the driver decides whether the loop even ended, so the record
+# comes first and the disposal after it — the order every existing NON-CONVERGENT arm was written to.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
+ag=$(printf '%s\n' "$o" | grep '^agent:' | tr '\n' ' ')
+has    "R2-B control: at two blockers the record precedes the disposal" "$ag" "agent:audit:record:r1 agent:dispose:tB"
+# The pairing guard runs BOTH ways: CONVERGED beside a positive count is a token no driver printed.
+o=$(run_wf "$UNITS" "$(returns CONVERGED 3)")
+has    "R2-B CONVERGED paired with 3 blockers THROWS" "$o" "returned CONVERGED paired with 3 blockers"
+hasnt_ "R2-B ...and DISPOSAL is not reached" "$o" "phase:Disposal"
+# A disposal that does not finish at zero blockers has nothing to record yet, and says so rather than
+# writing a bare CONVERGED row over findings nobody disposed.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 3 0)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"summary":"x"}')")
+hasnt_ "R2-B a DEGRADED disposal at zero blockers records NO round" "$o" "agent:audit:record"
+has    "R2-B ...and the note says so, with the hand-record command" "$o" 'The round was NOT recorded: at zero blockers the driver'
+# The needle carries the RESULT line's JSON-escaped quotes, one backslash each.
+has    "R2-B ...naming the subject the caller records under" "$o" '--review tB --subject tB-spec-set-r1 --verdict \"CLEAN\" --blockers 0`'
+
+# ---- C (ids 8, 12, 13): `auditIds` beside a caller-supplied `subjects` is REFUSED by name. The
+# ---- supplied set skipped the resolver, which is the only place the scoping applies, while the
+# ---- log claimed the scoping happened; the promoted unit was rostered with its spec never audited.
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-3"],#')" "$(returns CONVERGED 0)")
+has    "R2-C auditIds beside subjects: THROWS" "$o" "THROW"
+has    "R2-C ...naming the pair" "$o" 'pass `auditIds` OR `subjects`, never both'
+has    "R2-C ...and why a runtime with no filesystem cannot intersect them" "$o" "cannot be scoped to the promoted units by a runtime that cannot read their specs"
+hasnt_ "R2-C ...and the scoping is NOT logged as applied" "$o" "scoped to 1 promoted unit(s)"
+hasnt_ "R2-C ...and no agent was spawned before the refusal" "$o" "agent:"
+o=$(run_wf "$UNITS" "$(returns BOUNDED 1)")
+has    "R2-C the post-disposal nextAction names subjects among what NOT to pass" "$o" 'and no subjectRound and no `subjects`, so they take a fresh subject'
+
+# ---- E (id 14): the callee is handed the SUBJECT's round, not the invocation's. Under the kit
+# ---- default every promoted-spec audit lands at invocation round 2, and `tier2-review.js` primed
+# ---- it as a FOLD review of a spec nobody had reviewed.
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"abc1234"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "R2-E a post-disposal re-invoke at round 2 hands the callee round 1" "$w" '"round":1'
+has    "R2-E ...as a spec-audit" "$w" '"kind":"spec-audit"'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":3,"subjectRound":2,#')" "$(returns CONVERGING 3)")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "R2-E a fold re-invoke at round 3 on a subject first audited at 2 hands the callee round 2" "$w" '"round":2'
+has    "R2-E ...while the harness keeps its own round for the record" "$o" "prompt:audit:record:r3:"
+
+# ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
+# ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 2 0 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"refuted":1,"promotedIds":[],"summary":"r1 refuted: not reachable"}')")
+has    "R2-F promoted 0 + folded 2 + refuted 1 over confirmed 2 + unverified 1: the roster is handed out" "$o" '"roster":[{'
+has    "R2-F ...and refuted travels out" "$o" '"folded":2,"refuted":1'
+has    "R2-F ...and the log counts it" "$o" "promoted 0 · folded 2 · refuted 1"
+p=$(printf '%s\n' "$o" | grep '^prompt:dispose:tB:')
+has    "R2-F the prompt permits refuting an UNVERIFIED finding" "$p" "You may REFUTE an UNVERIFIED finding — never a CONFIRMED one"
+has    "R2-F ...with a one-line reason in summary" "$p" "with a one-line reason per refuted finding in \`summary\`, and count it in \`refuted\`"
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 2 0 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":1,"refuted":2,"promotedIds":[],"summary":"x"}')")
+has    "R2-F refuted 2 above unverified 1 is REFUSED by name" "$o" "refuted 2 is above the 1 unverified"
+has    "R2-F ...with an empty roster" "$o" '"roster":[]'
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+has    "R2-F the skip path carries refuted 0 out loud" "$o" '"folded":0,"refuted":0'
+
+# ---- G (id 9): a present-but-wrong-typed `round`, `subjectRound` or `auditIds` REFUSES by name
+# ---- with the received JSON, like `mode`, `scratch` and `units`, instead of folding to a default.
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"subjectRound":"2",#')" "$(returns CONVERGED 0)")
+has    "R2-G a string subjectRound is REFUSED" "$o" "THROW"
+has    "R2-G ...naming the field and the received JSON" "$o" '`subjectRound` must be a positive integer when present, got "2"'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##' | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":"A-tB-3",#')" "$(returns CONVERGED 0)")
+has    "R2-G a string auditIds is REFUSED" "$o" '`auditIds` must be an array of unit ids when present, got "A-tB-3"'
+o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":"2",#')" "$(returns CONVERGED 0)")
+has    "R2-G a string round is REFUSED too — the same class, one guard" "$o" '`round` must be a positive integer when present, got "2"'
+hasnt_ "R2-G ...before any agent is spawned" "$o" "agent:"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
