@@ -838,6 +838,13 @@ check_eq "AC6 --card --path prints exactly one line" "1" "$(wc -l < "$CARD_OUT" 
 [ "$got" = 2 ] && grep -q "over the 100-byte cap" "$CARD_OUT" && [ ! -e "$CARD_HOME/$NONCE-t7.md" ] \
   && { echo "ok   AC7 a card over CARD_CAP_BYTES is refused with exit 2, naming the cap, and leaves no file"; pass=$((pass+1)); } \
   || { echo "FAIL AC7 a card over CARD_CAP_BYTES is refused with exit 2, naming the cap, and leaves no file (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+# The arm above proves the mechanism for 100, a value it substituted. The SHIPPED value is the
+# spec's 8192, the one constant the append verb of the next unit refuses against too, and a
+# startup card cannot reach it — so the value is pinned by reading it, or a silent edit to the
+# default would leave every arm here green.
+grep -qE '^CARD_CAP_BYTES=\$\{CARD_CAP_BYTES:-8192\}$' "$CHECK" \
+  && { echo "ok   AC7 the shipped CARD_CAP_BYTES default is 8192"; pass=$((pass+1)); } \
+  || { echo "FAIL AC7 the shipped CARD_CAP_BYTES default is 8192"; grep -n '^CARD_CAP_BYTES=' "$CHECK" | sed 's/^/    /'; fail=$((fail+1)); }
 
 # The dispatch itself: --card with no verb refuses; --write WITHOUT --card still reaches the manifest
 # catch-all exactly as before this verb family existed.
@@ -868,11 +875,11 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # TOOL-cSettledDocket-5 — the agreed shape, so one leg can read every suite's count. This file
 # ALREADY counted; the spec that proposed adding a counter here had grepped for another suite's
 # spelling and reported a missing capability after measuring a missing convention.
-# 108 = every arm that runs on EVERY node. The card section holds one arm more on node a alone (the
+# 109 = every arm that runs on EVERY node. The card section holds one arm more on node a alone (the
 # exact tag against the real AGENTS.md, which the spec words as "on this node"); it announces its
 # skip elsewhere, and a floor that counted it would red the suite on b, c and d for an arm that is
 # not theirs to reach. KICK-aReplayedCard-1.
-FLOOR_ASSERTIONS=108
+FLOOR_ASSERTIONS=109
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
