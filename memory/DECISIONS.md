@@ -11,7 +11,7 @@
 
 ## KICK — kickoff
 
-*(none yet)*
+- **KICK-aReplayedCard-1** — **manifest v1.4 adds `registry:`; the session card lives in the git common dir**: `--card --write|--replay` derive and re-inject it, no fetch, no flag; detail `builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-1.md` §4 §8.
 
 ## TOOL — tooling
 

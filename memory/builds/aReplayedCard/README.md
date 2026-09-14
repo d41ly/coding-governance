@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-13
 streams: kickoff+tooling
 roster: KICK+TOOL
-ids: KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5
+ids: KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8
 authorized-by: prompt
 ---
 
@@ -75,7 +75,7 @@ None yet.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 8 unit(s) · node a · opened 2026-09-13 · streams kickoff+tooling
-ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5
+ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
