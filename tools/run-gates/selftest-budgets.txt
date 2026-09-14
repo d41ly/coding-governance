@@ -91,7 +91,7 @@ run-gates canary	3660		worst of 12 readings 2436s, x1.5
 run-gates evidence	2250		worst of 12 readings 1500s, x1.5
 run-gates gov canary	60		worst of 11 readings 19s, x1.5
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
-run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
+run-selftests self-test	1217		measured 811s on node a 2026-09-14, direct timed run of the suite alone on a frozen git clone --local at f23b71e0 (108 arms, inner width 1, 15 bash processes on the box before it started, PASS), x1.5 rounded up; the 300s ceiling it replaces was killed at 300.333s exit 124 and had observed no wall
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5

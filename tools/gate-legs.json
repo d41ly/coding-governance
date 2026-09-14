@@ -1320,6 +1320,6 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 300
+    "ceiling": 1217
   }
 ]
