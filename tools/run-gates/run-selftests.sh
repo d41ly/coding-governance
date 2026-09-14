@@ -215,7 +215,14 @@ read_registry_tags() {  # every tag the registry table carries, one per line
   done
 }
 resolve_node_tag() {
-  if [ -n "${GOV_NODE:-}" ]; then printf '%s' "$GOV_NODE"; return 0; fi
+  if [ -n "${GOV_NODE:-}" ]; then
+    # VALIDATED AGAINST THE SAME TABLE --check ENFORCES on the field it writes: an unregistered
+    # GOV_NODE used to reach the evidence file verbatim, and the unguarded --check leg then redded
+    # every bar on every node until the tracked file was hand-edited (aBatchedArm closing D11).
+    # Refused by name, and the refusal is the caller's: return 2 is "set but not a tag".
+    case " $(read_registry_tags | tr '\n' ' ')" in *" $GOV_NODE "*) printf '%s' "$GOV_NODE"; return 0 ;; esac
+    return 2
+  fi
   local user=${USERNAME:-${USER:-}} f line tok
   user=${user,,}
   [ -n "$user" ] || return 1
@@ -763,6 +770,12 @@ if [ "$MODE" = sweep ]; then
   # bound that killed 14 of 58 — and the refusal names what to type.
   read_margin || exit 2
   SWEEP_NODE=$(resolve_node_tag) || {
+    if [ $? = 2 ]; then
+      echo "run-selftests: GOV_NODE is '${GOV_NODE:-}', which is no tag the charter's §2 node table (AGENTS.md," >&2
+      echo "run-selftests: then CLAUDE.md, at the repo root) carries — a reading written under it would red" >&2
+      echo "run-selftests: --check on every bar until the tracked file was hand-edited. Nothing was run." >&2
+      exit 2
+    fi
     echo "run-selftests: no registry row matches user '${USERNAME:-${USER:-}}' in the charter's §2" >&2
     echo "run-selftests: node table (AGENTS.md, then CLAUDE.md, at the repo root), and GOV_NODE is" >&2
     echo "run-selftests: unset. Pooled evidence is keyed by NODE — a reading taken on another box" >&2
@@ -1148,6 +1161,15 @@ EOF
         st=1; walled="$walled $name"; walled_n=$((walled_n + 1))
         printf 'WALL  %-46s %5ss  (killed by the %ss calibrate wall — NO reading written)\n' "$name" "$took" "$SWEEP_WALL"
         say_out
+      elif [ "$rc" = 124 ] || [ "$rc" = 137 ] || [ "$rc" = 143 ]; then
+        # A KILL IS NOT A COMPLETION whatever the trailer rule says of the row: a declared
+        # trailer-less row that outlived TERM (137 after `timeout -k`'s grace) or hit the bound
+        # (124) was written as a baseline of that rc, and the next --pooled MISMATCHed a healthy
+        # run against it (aBatchedArm closing review D8) — the asymmetry with the graded branch's
+        # TIMEOUT clause, closed.
+        st=1; killed=$((killed + 1))
+        printf 'KILLED %-45s %5ss  (exit %s is a kill, not a completion — NO reading written)\n' "$name" "$took" "$rc"
+        say_out
       elif [ "$nobase" = 1 ]; then
         # THE SENTINEL IS NOT A BASELINE. The trailer is there and the exit is the suite's own, but
         # a group that says its expected set is unwritten has refused by name, and a reading taken
@@ -1356,10 +1378,11 @@ PY
       # THE RED SUMMARY NAMES ITS ACTUAL CAUSE. An unsound run has written nothing at all; only a
       # sound one is red for the rows that took no reading.
       echo "calibrated $calibrated row(s), $cal_red red, ${walled_n:-0} walled, $untrailed untrailed, graded none"
+      [ "$killed" -gt 0 ] && echo "run-selftests: and $killed row(s) KILLED — exit 124, 137 or 143 under a bound rather than the wall — wrote NO reading either."
       if [ "$sound" != 1 ]; then
         echo "run-selftests: NO reading was written for ANY row: $unsound_why. Fix that and calibrate again."
       else
-        [ "$((${walled_n:-0} + untrailed))" -gt 0 ] && echo "run-selftests: a walled or untrailed row wrote NO reading and stays uncalibrated; the next --pooled refuses it by name."
+        [ "$((${walled_n:-0} + untrailed + killed))" -gt 0 ] && echo "run-selftests: a walled, killed or untrailed row wrote NO reading and stays uncalibrated; the next --pooled refuses it by name."
       fi
       [ "${unrun_n:-0}" -gt 0 ] && echo "run-selftests: and ${unrun_n} row(s) were never dispatched under the wall, so they took no reading either."
     fi

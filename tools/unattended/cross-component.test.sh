@@ -18,6 +18,15 @@ hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
 
+# ---- THE KIT RUNNER'S PARSER, before the fixture because it needs none: --checks takes no mode,
+# ---- and a mode given beside it is REFUSED by name rather than dropped silently — it used to set
+# ---- MODE, skip both the no-mode refusal and the self-test block, and print a GREEN summary with
+# ---- no mode token (aBatchedArm closing review D10). The runner resolves its root from its own
+# ---- path, so the cwd here does not matter.
+_o=$(bash "$HERE/run-unattended-gates.sh" --checks --pooled 2>&1); _rc=$?
+same "--checks --pooled is refused" "$_rc" "2"
+hit "$_o" "--checks takes no mode; --pooled was given"
+
 # LOUD SKIP, never a silent one: a host that cannot host the fixture must not score a missing
 # capability as a pass. The adopter suite's junction arm is spelled the same way for the same reason.
 WORK=$(mktemp -d 2>/dev/null) || { echo "SKIP cross-component: no mktemp -d on this host"; exit 0; }
@@ -233,7 +242,7 @@ sed -i 's/^mode: prompt$/mode: slug/' memory/builds/tPrompt/RUN.md
 git add -A >/dev/null && git commit -q -m "forged mode" --no-verify && git push -qf origin unit2
 hit "$(leg)" "a run-state file records an authorization mode the build README at its own recorded BASE does not declare"
 
-FLOOR_ASSERTIONS=19
+FLOOR_ASSERTIONS=21
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 # THE TRAILER IS UNCONDITIONAL: a red-but-complete run must still carry one, or the pooled runner
 # reads it as untrailed and writes no reading (aBatchedArm closing D4).

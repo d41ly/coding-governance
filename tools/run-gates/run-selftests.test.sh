@@ -12,6 +12,11 @@
 # product, and a suite written against it here is the second adopter after the ported one — which is
 # the only way to find out whether the three verbs fit a subject nobody designed them around.
 set -u
+# THE FIXTURE KEYS EVERY EVIDENCE ROW ON TAG `t` and the runner short-circuits on GOV_NODE, so an
+# inherited `GOV_NODE=a` turned 46 arms red naming node a (aBatchedArm closing review D12) — the
+# `fixture-inherits-ambient-machine-state` class; sibling suites scrub with `env -u` for the same
+# reason. The one arm that wants GOV_NODE sets it in its own subject.
+unset GOV_NODE
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-selftests.test: not a git work tree"; exit 2; }
@@ -35,7 +40,7 @@ RC=${R#bash }
 # THE FLOOR, RE-DERIVED at TOOL-aBatchedArm-5: 55 at BASE, minus the retired factor-absent arm,
 # plus the arms that unit added — both counts are in that unit's acceptance ledger. Raised again
 # at the aBatchedArm closing fix by the arms it added; that ledger carries the count.
-SELFTEST_FLOOR=106
+SELFTEST_FLOOR=108
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -83,6 +88,10 @@ build_repo() {
     printf 'echo "  (81 assertions executed in shard 1/8 against a floor of 78)"\n'
     printf 'exit 1\n'
   } > tools/suite-sentinel.sh
+  # ---- a suite that OUTLIVES TERM (aBatchedArm closing D8): the wall's TERM is ignored, so the
+  # ---- worker's `timeout -k 5` KILLs it after the grace and it exits 137 — a kill with a
+  # ---- WALL_BREACHED flag and an rc the WALL branch does not key on.
+  printf '#!/usr/bin/env bash\ntrap "" TERM\nfor _ in 1 2 3 4 5 6 7 8 9 10; do sleep 2; done\nexit 0\n' > tools/suite-stubborn.sh
 
   # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's §2
   # node TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
@@ -826,6 +835,23 @@ arm "an UNSOUND calibrate writes no reading at all and says so, leaving the evid
     "readings NOT written: this calibrate was unsound" \
     "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B && git add -A" \
     "( $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
+
+# ---------------------------------------------------------------- a kill is not a completion, D8
+# A DECLARED trailer-less row that outlives the 3 s wall's TERM is KILLed by the worker's grace
+# and exits 137: the WALL branch keys on 143, and the declared-nt clause took any rc as a reading.
+# Its seed is removed first so the file's silence about it is the observation (rc 99 otherwise).
+arm "a declared trailer-less row killed at rc 137 is KILLED, not read: no reading written, the row named" 1 \
+    "is a kill, not a completion — NO reading written" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-stubborn.sh|' $B && git add -A" \
+    "( SELFTEST_WALL=3 $R --pooled --calibrate; rc=\$?; grep -q '^free one' $E && exit 99; exit \$rc )"
+
+# ---------------------------------------------------------------- GOV_NODE is a registry tag, D11
+# The write path trusted GOV_NODE verbatim while --check refused the row it wrote; both now read
+# the same table. The evidence file is byte-unchanged (rc 99 otherwise) and nothing ran.
+arm "GOV_NODE naming no registry tag is REFUSED by the calibrate, naming the table, with the evidence file unchanged" 2 \
+    "GOV_NODE is 'zz', which is no tag the charter's" \
+    'true' \
+    "( GOV_NODE=zz $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
 
 arm "--pooled over an evidence file that will not parse REFUSES naming the file, rather than defaulting past the row" 2 \
     "will not parse" \

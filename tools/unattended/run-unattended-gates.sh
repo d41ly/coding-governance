@@ -194,6 +194,14 @@ if [ "$ONLY" != checks ] && [ -z "$MODE" ]; then
   echo "run-unattended-gates: --checks takes no mode. Nothing was run." >&2
   exit 2
 fi
+# AND THE CONVERSE HOLDS TOO: `--checks --pooled` used to set the mode, skip both the refusal above
+# and the self-test block, and print a GREEN summary with no mode token — the mode silently
+# dropped, against the usage text and the refusal that both say --checks takes none
+# (aBatchedArm closing review D10).
+if [ "$ONLY" = checks ] && [ -n "$MODE" ]; then
+  echo "run-unattended-gates: --checks takes no mode; --$MODE was given and would have been dropped silently. Nothing was run." >&2
+  exit 2
+fi
 
 #
 # THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
