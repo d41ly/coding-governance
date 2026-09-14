@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 2bdd0b0feedf4b9ba7d7c540dbd3c68f417e0927
-phase: FOLDING
+witness: 79174865d6c558db6665a35244fc728b120b2c86
+phase: REVIEWING
 branch-sha: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 branch-ref: refs/heads/branch/unattended-build-stalls-6d0f2b
 mode: prompt
@@ -24,3 +24,5 @@ base: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 ## Parked
 
 2026-09-14T11:15:30Z review · item aProbedUnit-spec-set · reason verdict BLOCKED · blockers 3
+
+2026-09-14T12:22:33Z review · item aProbedUnit-spec-set · reason verdict CLEAN · blockers 0 · CONVERGED
