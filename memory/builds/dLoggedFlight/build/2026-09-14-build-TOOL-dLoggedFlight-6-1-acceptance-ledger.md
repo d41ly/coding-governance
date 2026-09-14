@@ -141,6 +141,10 @@ the commit touched. Every definition, nested ones included, leads with a declare
 name ends in a banned suffix. No foreign build's id is cited. The suite pins no revision, and no
 commit landed while it ran. The suite printed `591 passed` after the fold.
 
+Over that fold the checklist selected seven classes, and `amendment-leaves-its-other-half-standing`
+was violated once more: the class record's own fix still recommended a file-writing tool without
+the qualification its new section adds. A second fold points the fix at that section.
+
 ## Owed to the post-build gate run
 
 Every leg of the spec's section 7, and the run records each verdict after it:

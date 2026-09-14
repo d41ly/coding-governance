@@ -31,7 +31,8 @@ inner language, not the shell.
 ## The fix
 
 Write source with a file-writing tool, or with a RAW string, and verify with `repr()` on the compiled
-pattern rather than by printing it. When repairing, sweep tracked AND untracked files — the first
+pattern rather than by printing it. A file-writing tool is not immune either: the section below says
+which escape it interprets and the census that catches it. When repairing, sweep tracked AND untracked files — the first
 sweep here scanned tracked files only and reported zero, because the offending module was not yet
 staged.
 
