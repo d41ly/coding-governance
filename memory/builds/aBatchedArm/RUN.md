@@ -21,6 +21,22 @@ anchor-sha: 09a22d2bf5c3fc51bdc3ccee8c727b0793664106
 anchor-ref: refs/heads/main
 base: c2db2f5d2d6100af08a09da113086d114c67b603
 
+## Landing order
+
+Restated at the closing fix (D3(a) of the round-1 closing review), because unit 5's S5 ordered the
+calibrate first and unit 1's golden-writing step was owed "at the final pass" with no order pinned
+between them — and either order wasted the pass. The eight direct shard runs come FIRST:
+`bash tools/unattended/check-unattended.test.sh --shard k/8` for k in 1..8, each output to a file.
+Then the paste: every `check_emitted "?"` call takes its group's observed set from the
+`    observed:` lines beneath its `FAIL check_emitted:` line, the shard run it was read from named
+beside the call. Re-run the affected shards until no `FAIL check_emitted:` line remains. Only then
+the calibrate, `bash tools/run-gates/run-selftests.sh --pooled --calibrate --kit tools/unattended`,
+which now refuses a sentinel-carrying row as UNTRAILED and keeps each row's output under
+`<git-dir>/gate-logs/selftests/`; commit the evidence rows; then
+`bash tools/unattended/run-unattended-gates.sh --pooled` GREEN; then the DoD flip. Shard 8's
+`DERIVED, not measured` budget reading (D13) is re-measured at those direct shard runs, in the
+closed vocabulary `measured <n>s on node a <date>, direct serial run …`, so `--rank` ranks again.
+
 ## Parked
 
 2026-09-13T10:09:42Z rescope · item add TOOL-aBatchedArm-4 · reason Owner ruling 2026-09-10 on the parked scope question: the route is the shared runner. tools/run-gates/run-selftests.sh gets a slash-tolerant row checker and DECLARED execution modes, so pooled is available and serial stays possible when it is deliberately declared. This is the unit that unblocks TOOL-aBatchedArm-3, whose eight shard rows cannot be declared today (the row checker reds any slash-bearing argv token) and would run serially if they could (OUTER=1 except under --sweep, which withholds cost verdicts). A change to a shared runner grading 61 suites, added by owner instruction rather than by the run's own authority.

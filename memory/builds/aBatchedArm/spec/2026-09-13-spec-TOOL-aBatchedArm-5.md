@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-5 — the evidence-derived pooled hang bound, and the flip
 
-**Status:** CLOSED · rev-7 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
+**Status:** CLOSED · rev-8 · 2026-09-14 · node a · Tier-2 · base 1c736fd9 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -152,7 +152,12 @@ never as a DoD line.
   measured 10 bytes under `MAX_MANIFEST_BYTES`). Inside this unit the four DoD carriers gain,
   beside `--serial`, the words `--pooled after calibration` — `land dark`, unit 4 r2 B1's rule.
   **The flip is the BUILD's landing step, not this unit's**, in this order on the MERGED tree
-  (`TOOL-aLoosenedCeiling-3`): (1) `run-selftests.sh --kit tools/unattended --pooled --calibrate`
+  (`TOOL-aLoosenedCeiling-3`). **Step (0), rev-8, precedes everything below**: the eight direct
+  shard runs of `check-unattended.test.sh --shard k/8`, the paste of each group's observed set from
+  the `observed:` lines into its `check_emitted` call with the run named beside it, and re-runs
+  until no `FAIL check_emitted:` line remains — unit 1's golden-writing step, which S5 as first
+  written left unordered against the calibrate; the runner now refuses a sentinel-carrying row as
+  UNTRAILED, so the order is enforced as well as stated. Then (1) `run-selftests.sh --kit tools/unattended --pooled --calibrate`
   over the population `run-selftests.sh --kit tools/unattended --list` resolves (fourteen rows at
   this base — the list's number); on a red, the walled rows are named in the landing record, the
   build lands WITHOUT the flip, and AC3's real-row half is ledgered amended naming them; (2) the
@@ -516,6 +521,17 @@ build time.
 
 ## 9. Revision log
 
+- rev-8 · 2026-09-14 · §2 S5 · the landing order, re-stated after the round-1 closing diff
+  review (D3(a)): S5 ordered the calibrate as step (1) with no paste before it, while unit 1's
+  golden-writing step was owed "at the final pass" with no order pinned between them — calibrate
+  first baselined the fourteen `FAIL check_emitted:` sentinels as the parity oracle, paste first
+  left the calibrate unable to reuse the shard runs' output. Step (0) now precedes (1): the eight
+  direct shard runs, the paste of each group's observed set with its run named, re-runs until no
+  sentinel line remains; then the calibrate, the evidence commit, `run-unattended-gates.sh
+  --pooled` GREEN, the flip. The mechanism half (D3(b)) landed in the runner in the same closing
+  fix: a sentinel-carrying row is UNTRAILED at calibrate and MISMATCH under --pooled, and each
+  row's output is kept under `<git-dir>/gate-logs/selftests/`. The same order is written in
+  `RUN.md`'s Landing order block. Records only; the unit stays CLOSED.
 - rev-7 · 2026-09-14 · §2 S5 · §6 AC5 · build-time corrections, written BEFORE the first edit as
   the brief requires. The DoD-phrase predicate run over the tree at `e82d4053` under its declared
   scope yields SIX lines, which are exactly the six rev-6 enumerates (five re-worded, one
