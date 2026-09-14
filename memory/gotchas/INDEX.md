@@ -14,7 +14,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 
 | Class | Kind | Anchors | Universal | Description |
 |---|---|---:|---|---|
-| [a-new-leg-trips-a-growing-set-of-meta-gates](a-new-leg-trips-a-growing-set-of-meta-gates.md) | class | 4 |  | adding one gate leg trips a set of meta-gates that grows as new ones land, and a check inside an existing gate is far cheaper — but not free |
+| [a-new-leg-trips-a-growing-set-of-meta-gates](a-new-leg-trips-a-growing-set-of-meta-gates.md) | class | 6 |  | adding one gate leg trips a set of meta-gates that grows as new ones land, and a check inside an existing gate is far cheaper — but not free |
 | [a-pair-exists-and-it-is-the-wrong-one](a-pair-exists-and-it-is-the-wrong-one.md) | class | 2 |  | a scanner that pairs a delimiter with the next one of its kind finds a pair for a delimiter that opens nothing, and the span it then blanks is where the defect hides |
 | [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
 | [ab-arm-never-did-the-work](ab-arm-never-did-the-work.md) | class | 3 |  | a timing A/B whose arms are not each asserted to have DONE the work measures a refusal against a run, and the fast arm looks like the good one |
@@ -54,6 +54,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [msys-grep-counts-cr-on-every-line](msys-grep-counts-cr-on-every-line.md) | class | 3 |  | on an MSYS node `grep -c $'\r'` matches every line of an LF-only file, so a CR probe reports the whole file as CRLF and a clean tree as dirty |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
 | [node-check-is-not-a-syntax-gate](node-check-is-not-a-syntax-gate.md) | class | 2 |  | node --check exits 0 on a file whose parse fails, because module auto-detection retries the parse and swallows the failure, so a gate built on it cannot go red |
+| [observation-before-the-last-fold-of-the-same-commit](observation-before-the-last-fold-of-the-same-commit.md) | class | 3 |  | an acceptance observation taken before the last fold of the same commit is an observation of nothing, because the tree it saw is one the commit never held |
 | [one-value-field-records-a-mixed-outcome](one-value-field-records-a-mixed-outcome.md) | class | 1 |  | a per-subject field holding ONE value has to record an outcome that was mixed — take the value that DEMANDS something, never the one that demands nothing |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [pin-gated-checks-arm-nothing-without-a-pin](pin-gated-checks-arm-nothing-without-a-pin.md) | class | 5 |  | hygiene checks 13-15 alone are behind a declared pin, so a fixture conf without one arms nothing there and the checks report clean by never loading |
@@ -84,6 +85,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-69 record(s): 69 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+70 record(s): 70 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

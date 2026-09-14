@@ -358,14 +358,29 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildBlankedRun",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "buildCommandView",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "buildCommandView",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "buildComparablePath",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "buildHeredocView",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "buildOpts",
@@ -681,6 +696,11 @@
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkCommand",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "checkDriveRootLitter",
@@ -1628,6 +1648,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "extract_acceptance",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "extract_bound_names",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2338,6 +2363,11 @@
       "file": "tools/settings-merge.py"
     },
     {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "make_repo",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -2833,9 +2863,29 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readFact",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readHeadRef",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readHeredocs",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "readInput",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "readMemoryRoot",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "readMode",
@@ -2848,6 +2898,26 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readQuotedSubstitutions",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readRegion",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readSegment",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "readSpanEnd",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2858,6 +2928,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readStdin",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "readThrottleSeconds",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -2866,6 +2941,11 @@
       "id": "readTokenAt",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readTokenAt",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "read_agree_field",
@@ -2921,6 +3001,11 @@
       "id": "read_core",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_cutoff_key",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "read_debt_gloss",
@@ -3293,6 +3378,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "renderDeny",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -3523,6 +3613,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveFileRow",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "resolveHomeRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -3538,9 +3633,19 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveRepoRoot",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "resolveRoot",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "resolveRunPhase",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "resolveStamp",
@@ -3983,9 +4088,19 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "scanDenyHits",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
+    },
+    {
       "id": "scanJoinFindings",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "scanSegments",
+      "kind": "function",
+      "file": "tools/unattended/gate-guard.js"
     },
     {
       "id": "scanWriteTargets",

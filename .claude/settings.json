@@ -16,6 +16,10 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/unattended/gate-guard.js\""
           }
         ]
       }

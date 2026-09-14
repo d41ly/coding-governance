@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 69 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 70 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -219,6 +219,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `naming-leg-grades-what-python-named.md` | lexicon |
 | `node-check-is-not-a-syntax-gate.md` | review-harnesses |
+| `observation-before-the-last-fold-of-the-same-commit.md` | build-method |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `pin-gated-checks-arm-nothing-without-a-pin.md` | memory-tree-hygiene |

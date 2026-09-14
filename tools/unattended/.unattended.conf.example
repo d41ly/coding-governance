@@ -79,6 +79,16 @@ RECALL_CLI=""
 # skip only when NEITHER CLI is declared.
 MAP_CLI=""
 
+# OPTIONAL, the same shape again. The spec-token checker `--dispatch` runs over the live tree
+# BEFORE it admits a build pass, refusing the dispatch when the checker exits non-zero — a live
+# spec naming a merge bar or a self-test suite as an acceptance observation, or a token that does
+# not resolve. BLANK means no such checker is carried, and the verb ANNOUNCES the skip on stdout
+# rather than passing silently. The checker this repo declares is gov-internal, at its tool root,
+# and no kit ships it: fill the key only where the project carries its own spec-token checker. Declared here because the bar's own run of the
+# checker grades LIVE specs and an unattended build closes every unit spec in its build commit,
+# so the dispatch is the one point that sees a spec while it can still be changed.
+SPEC_TOKENS_CLI=""
+
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
 # interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,

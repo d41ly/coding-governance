@@ -181,9 +181,16 @@ python {{KIT_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 **It takes a COMMITTED range, so it runs after the commit, not before it.** Staged-but-uncommitted work is not in
 `HEAD`, so the pre-commit spelling `<pass-base>..HEAD` resolves to an empty range and prints "touches no file" —
 which reads as a clean checklist and is not one. Its stdout IS the checklist and it always exits 0 — finish it, do
-not read its status. If a class it names is already violated, that is the next pass. Then the diff-scoped
-gates for what the pass touched; the full bar runs ONCE, at the push boundary. A pass whose gate is red is not
-followed by another: fix it, or park it with the reason. A pass that produced no change commits nothing and says so.
+not read its status. If a class it names is already violated, that is the next pass.
+
+**A pass runs no merge bar and no self-test suite.** Its verification is the direct check its
+spec's acceptance names — a checker run on a staged break, a `--selftest` flag, a fixture — and a
+pass that needs a suite verdict returns that need to the main loop rather than running one. The
+bar runs ONCE, after the last unit is terminal: at the close under a mandate, at the push boundary
+otherwise. Where a pass touched files a leg guards and the MAIN LOOP judges a bar necessary, the
+plain bar with no flag is the scoped form — at the main loop, never in a child. A pass whose check
+is red is not followed by another: fix it, or park it with the reason. A pass that produced no
+change commits nothing and says so.
 
 **Parking, at any point.** Write the *question*, the *options you saw*, and the *reason you refused* into the
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the

@@ -24,7 +24,9 @@ in a dossier; the run-gates canary checks its guard names a tracked path; the ar
 
 **Run the full bar, never a list**, after adding a leg — `bash tools/run-gates/run-gates.sh` with
 `GATE_FULL=1` if the leg is guarded — because the set of meta-gates is not enumerable from memory
-and is enumerable from the bar.
+and is enumerable from the bar. That is a PUSH-BOUNDARY sentence: inside a build pass run each
+meta-gate's own script by hand and never the bar, which is the main loop's after the build is
+complete (`memory/guides/BUILD-METHOD.md` M6; `gate-guard.js` refuses the flagged forms there).
 
 **Prefer a new CHECK inside an existing gate to a new LEG.** A check inside
 `tools/memory-tree/check-memory-hygiene.sh` costs neither the codebase-map coverage assert nor

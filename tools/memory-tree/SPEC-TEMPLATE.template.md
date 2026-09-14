@@ -331,6 +331,17 @@ write, and an author discovering that the negation is all there is has found som
   Red when: the fixture carries no clause and the arm stays silent.
 ```
 
+Once a spec's filename date reaches `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`; blank turns it off),
+no backticked token in an acceptance bullet — nor on the §7 leg line — may spell a merge-bar or
+self-test-suite invocation: the runner, a `*.test.sh` at command position, or a non-empty
+`GATE_FULL=`/`GATE_SELFTESTS=` assignment. A bar or a suite is not an acceptance observation. The
+substitute is the DIRECT check: observe the checker on a staged break, a `--selftest` flag or a
+fixture, and name the suite under `New arm:` in §7, where it is a declaration and not an
+instruction. The bar and the suites run once, after the build is complete. The gate is the
+spec-token checker's `bar` join, which reads invocations as written in backticks and cannot see one
+built at runtime, inside `sh -c`, in a fenced block or in prose — those are the act, refused
+elsewhere.
+
 A criterion that cannot be observed for free, by this run, or against today's tree says so with the
 criterion instead of leaving the next session to discover it. Four things go unsaid and get paid for
 in build-time amendments. Declare whichever of them apply as named lines under the criterion's own

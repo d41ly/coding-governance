@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-14T14:26:35+03:00 @ 6074d521d6ae3fa8274a493f3b7a9be6b1274109
+last-audit: 2026-09-14T16:44:46+03:00 @ 2f7908167dffcc84216c7ae9ec9a9d43720876ea
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 757f1c11a8456c93951ba6500edb9553d214b831
@@ -214,33 +214,13 @@ does — hit three times in one file in one session; also the whole-signature an
   across repos. `both expired ... unproven either way` means contention, and now SKIPS that arm
   loudly rather than redding — re-run quiet before believing a latency claim.
   `TOOL-aPacedTurnstile-2`.
-- All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
-  `git diff --cached --check`.
-- The memory hygiene leg is MINUTES; a timeout sized in seconds fires. Read `gate-ledger.tsv`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
-- **A `PreToolUse` hook FIRES inside a `Workflow` sidechain**, measured 2026-09-12 by `scratch-guard`
-  itself. A sidechain holds neither `Agent` nor `Workflow`, so it cannot fan out — that is the reason,
-  never "hooks stop at the boundary". `TOOL-cRefutedPremise-1`.
-- Two constants that COINCIDE are not pinned equal. Ownership belongs to the one that CHANGES THE
-  OUTCOME — verify by moving it, not by reading it.
-- An exclusion is only as wide as the control it defers to, and a guard that a binding pair EXISTS
-  is not a guard that it COVERS. Prefer deleting an exclusion to widening its justification.
-- A CRLF fixture cannot test a CR guard on a Cygwin node: the runtime strips CR before `awk` sees a
-  byte, through a filename, through `getline` AND through a pipe. Assert at source level.
-- A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
-  prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
-- `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
-  adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
-- A build README's `ids:` key is DERIVED and rewritten by `--write` from the id corpus. It is not a
-  reservation range and a planned unit cannot be added to it by hand; the next render removes it.
-- A build README's `roster:` is `+`-JOINED (`PLAY+TOOL`); a space-joined value reds check 9 with a
-  message that reads like a families misconfiguration.
-- Hygiene check 12's skeleton scan matches a literal date-shape or id-shape ANYWHERE in a spec body,
-  so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
-- A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
-  source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
+- `gate-guard` is the third `Bash|PowerShell` hook, from the unattended kit: while this branch's
+  run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
+  `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
+  wait for the main loop's `VERIFYING`.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
