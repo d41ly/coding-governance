@@ -5,7 +5,7 @@
 last-audit: 2026-09-14T14:26:35+03:00 @ 6074d521d6ae3fa8274a493f3b7a9be6b1274109
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c4f0230860daf81e2988f247ab29eea73a931dba
+last-body-change: 2ee24eca0c6c61636022a3bc5f4487a778027b00
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
