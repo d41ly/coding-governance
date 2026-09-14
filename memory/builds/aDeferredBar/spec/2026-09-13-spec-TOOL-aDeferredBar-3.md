@@ -82,7 +82,8 @@ the corpus in §4 shows close to half of those runs come from there.
   was a claim about nothing. Row D1 reads the `$env:` prefix; the corpus count is still zero,
   which is why a suite arm carries it rather than a corpus row.
 - **Every criterion in §6 is a direct observation, and not because a gate demands it.** Unit 2's
-  cutoff is 2026-09-14, so this spec, dated 2026-09-13, is outside that gate's population; the
+  cutoff is 2026-09-15 (2026-09-14 when this bullet was written; unit 2 rev-3 moved it and this
+  figure was left standing until rev-6), so this spec, dated 2026-09-13, is outside that gate's population; the
   criteria are direct because the build README's fifth rule and the child prompt unit 1 ships bind
   the pass regardless, and because once S4 lands the hook itself denies a suite invocation in the
   pass that built it. Every deny shape is a §4 table row, §6 cites rows and never spells an
