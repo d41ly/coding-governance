@@ -3687,14 +3687,14 @@ def test_schema_ac2_refusals():
     unc = "\\" * 2 + "\\".join(("host", "share"))
     other = "X-xOtherBuild-1"
 
-    def at_run_state(ln):
+    def check_run_state_line(ln):
         return ln.startswith("- run-state: ")
 
-    def at_workflow(ln):
+    def check_workflow_row(ln):
         return ln.startswith("| ") and " | transcripts | workflow | tier2-review |" in ln
 
-    uuid_text, uuid_line = build_variant(clean, at_workflow, lambda ln: ln.replace("tier2-review", FX_SID))
-    free_text, free_line = build_variant(clean, at_run_state,
+    uuid_text, uuid_line = build_variant(clean, check_workflow_row, lambda ln: ln.replace("tier2-review", FX_SID))
+    free_text, free_line = build_variant(clean, check_run_state_line,
                                          lambda ln: ln + "\nthe run skipped the bar because it was late")
     variants = [
         ("headings", build_variant(clean, lambda ln: ln == "## Units", lambda ln: "## Decisions")),
@@ -3702,9 +3702,9 @@ def test_schema_ac2_refusals():
                                      lambda ln: "| " + FX_UNIT1 + ln[len("| 1"):])),
         ("cell", build_variant(clean, lambda ln: " | driver | verb | --preflight |" in ln,
                                lambda ln: ln.replace(" | driver | ", " | drivers | "))),
-        ("absolute-path posix", build_variant(clean, at_run_state, lambda ln: "- run-state: " + home)),
-        ("absolute-path drive", build_variant(clean, at_run_state, lambda ln: "- run-state: " + drive)),
-        ("absolute-path unc", build_variant(clean, at_run_state, lambda ln: "- run-state: " + unc)),
+        ("absolute-path posix", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + home)),
+        ("absolute-path drive", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + drive)),
+        ("absolute-path unc", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + unc)),
         ("uuid", (uuid_text, uuid_line)),
         ("data not-json", build_variant(clean, lambda ln: ln == '{"schema":1,"sections":{', lambda ln: ln + "{")),
         ("data extra-key", build_variant(clean, lambda ln: ln.startswith('"Units":{"facts":'),
@@ -3718,9 +3718,9 @@ def test_schema_ac2_refusals():
         ("line free-text", (free_text, free_line + 1)),
     ]
     variants = [(label, (text.encode("utf-8"), line)) for label, (text, line) in variants]
-    cr, cr_line = build_variant(clean, at_run_state, lambda ln: ln + "\r")
+    cr, cr_line = build_variant(clean, check_run_state_line, lambda ln: ln + "\r")
     variants.append(("line cr", (cr.encode("utf-8"), cr_line)))
-    bad_utf8, bad_line = build_variant(clean, at_run_state, lambda ln: ln + "\x00MARK")
+    bad_utf8, bad_line = build_variant(clean, check_run_state_line, lambda ln: ln + "\x00MARK")
     variants.append(("unreadable", (bad_utf8.encode("utf-8").replace(b"\x00MARK", b"\xff"), bad_line)))
     dup, _ = build_variant(clean, lambda ln: ln.startswith('"Units":{"facts":'),
                            lambda ln: ln.replace('"Units":{"facts":', '"Units":{"facts":{},"facts":', 1))
@@ -3761,7 +3761,8 @@ def test_schema_ac2_refusals():
     # The near misses: each is accepted, so no refusal above is a predicate that refuses everything.
     near = [
         ("a path class value with a `home` folder mid-path", build_variant(
-            clean, at_run_state, lambda ln: f"- run-state: memory/builds/{FX_SLUG}/home/RUN.md")[0].encode("utf-8")),
+            clean, check_run_state_line,
+            lambda ln: f"- run-state: memory/builds/{FX_SLUG}/home/RUN.md")[0].encode("utf-8")),
         ("a Serves range of the build's own spec-defined ids", build_variant(
             clean, lambda ln: ln.startswith("**Serves:** "),
             lambda ln: f"**Serves:** journal X-{FX_SLUG}-1..2")[0].encode("utf-8")),

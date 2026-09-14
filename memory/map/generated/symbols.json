@@ -813,6 +813,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "build_unit_id_re",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
+    },
+    {
       "id": "build_unit_rows",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1903,9 +1908,9 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
-      "id": "derive_spec_id",
+      "id": "derive_spec_unit",
       "kind": "function",
-      "file": "tools/runlog/record.py"
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "derive_status",

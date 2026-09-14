@@ -101,7 +101,15 @@ sentence.
 
 ## The checklist over the build
 
-`gotchas.py --for-diff` over the spec and code commits named eleven classes before this closing commit.
+`gotchas.py --for-diff` over the spec and code commits named eleven classes before the closing commit,
+and over the closing commit it named one more, `naming-leg-grades-what-python-named`, which the fold
+after it acts on.
+
+- `naming-leg-grades-what-python-named` was violated, and the fold fixes it. Two nested predicates in
+  the AC2 arm led with `at`, which the verb table does not carry, and the leg grades nested helpers
+  once the map arms them. They are now `check_run_state_line` and `check_workflow_row`. Every other
+  definition the unit added, nested ones included, was asked of the lexicon and leads with a declared
+  verb, and the map was regenerated in the same commit.
 
 - `two-answers-to-one-question` was violated, and the fold fixes it. The leg carried its own copy of
   which unit a spec defines, beside the model's `read_units`; both now read one function. The dossier
