@@ -69,7 +69,7 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 3 | `TOOL-dLoggedFlight-3` | CLOSED | the gate runner writes one verdict line per bar run |
 | 4 | `TOOL-dLoggedFlight-4` | CLOSED | the pre-push hook writes one line per push |
 | 5 | `TOOL-dLoggedFlight-5` | CLOSED | one redaction table, applied once on read, with a staged positive per rule |
-| 6 | `TOOL-dLoggedFlight-6` | MISSING | the transcript extractor: a run's action sequence, owner turns and cost |
+| 6 | `TOOL-dLoggedFlight-6` | CLOSED | the transcript extractor: a run's action sequence, owner turns and cost |
 | 7 | `TOOL-dLoggedFlight-7` | CLOSED | the `Decided:` commit trailer, so a choice with no commit of its own has a home |
 | 8 | `TOOL-dLoggedFlight-8` | MISSING | the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set |
 | 9 | `TOOL-dLoggedFlight-9` | MISSING | the committed per-run record: a closed-schema report and its JSON twin |

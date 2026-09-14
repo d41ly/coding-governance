@@ -97,11 +97,13 @@ change goes into the spec first, as a rev bump with its section 9 line.
   with `load_rules`, `scan_secrets` and `render_redacted` in `tools/runlog/runlog_lib.py`. Every
   credential a fixture plants is a template expanded at test time, since the kit's self-test scans
   its own tracked files with the table.
-- **6, the extractor.** A test never reads or writes a real store: every root the spec names points
-  at scratch. `extract --measure` over the real store is report-only, and nothing it prints is
+- **6, the extractor.** Landed at e727c0b0, 36f42dc9 and e99d35e7: `tools/runlog/extract.py`, with the
+  `extract` and `narration` verbs in `tools/runlog/runlog.py`. Its per-session JSON shape is in the
+  spec's §4 data model, and unit 8 reads owner turns and usage from it. A test never reads or writes a
+  real store: every root the spec names points at scratch. `extract --measure` over the real store is report-only, and nothing it prints is
   committed.
-- **7, the `Decided:` trailer.** The method template and its rendered copy stay byte-paired, and the
-  method stays under its row in `tools/template-size-limits.txt`, which the post-build run grades.
+- **7, the `Decided:` trailer.** Landed at b8c5c423 and d34641e0. Unit 8 harvests the trailer with
+  `git log --format='%(trailers:key=Decided,valueonly)'`.
 - **8, 9 and 10, the model, the record and the schema leg.** Build on the fixtures of the units
   before. Unit 8's real-population figures are re-measured, not copied from the spec. Unit 1's golden
   lines in `tools/runlog/fixtures/golden-lines.txt` were typed from the specs before any producer
@@ -135,8 +137,9 @@ change goes into the spec first, as a rev bump with its section 9 line.
    token on the `- ACn —` line itself and not on a continuation line. An AC observed by a gate leg
    is written as owed to the post-build gate run, naming the leg, and never as met. The run records
    the observation after that gate run.
-5. Set the spec's status header to CLOSED, run `python tools/memory-tree/gen_build_index.py --write`,
-   and stage what it rewrote.
+5. Set the spec's status header to CLOSED, and your row in the build README's authored roster table
+   to CLOSED. Then run `python tools/memory-tree/gen_build_index.py --write` and stage what it
+   rewrote.
 6. Commit with the subject `feat(dLoggedFlight): TOOL-dLoggedFlight-<n> — <the claim>`. Pass a
    600000 ms timeout, because the pre-commit hook runs longer than the default. Record any choice
    that has no other home as a `Decided: <choice> — <why>` line in the final trailer block, beside
