@@ -42,6 +42,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 5 |  | core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out |
 | [id-matched-as-a-substring](id-matched-as-a-substring.md) | class | 3 |  | every id ending in a 1-up sequence is a prefix of nine others, so an unanchored match joins the wrong record |
 | [inline-fence-swallows-the-rest-of-the-file](inline-fence-swallows-the-rest-of-the-file.md) | class | 1 | yes | a triple-backtick written inline in prose opens a fence the reader never closes, so every section after it silently disappears from the checker's view |
+| [inline-marker-breaks-a-line-continuation](inline-marker-breaks-a-line-continuation.md) | class | 5 |  | appending a per-line annotation to the lines a gate selected breaks any of them that ended in a backslash, and the result is valid shell that silently drops the rest of the command |
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 2 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 5 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
@@ -65,6 +66,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-50 record(s): 50 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+51 record(s): 51 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

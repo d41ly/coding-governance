@@ -111,6 +111,35 @@ is_repo_root() {
   return 1
 }
 
+# --------------------------------------------------- the paths a unit's brief rows name, once
+# Prints, one per line and normalised, every path a ` brief · item <unit> · reason ` row names in
+# the run-state file AS IT STANDS AT <commit>. Two consumers, one parser: `pass_commit` subtracts
+# this set before it calls a commit a pass commit, and check 23 subtracts the same set before it
+# grades what that commit carried. When the exclusion lived in check 23 alone, a `{run-state,
+# brief}` bookkeeping commit naming the unit — the ordinary shape, since `--brief` requires the
+# brief TRACKED and stages the run-state file beside it — was SELECTED as the pass commit, graded
+# clean once the brief was forgiven, and the pass's real commit was never read. The closing diff
+# review of aRatifiedRulings, finding 7. Only the leg was fooled: the driver's condition 1 also
+# requires an `overlaps` hit against the declared set before it closes a pass, and a brief overlaps
+# nothing an ordinary pass declares.
+#
+# THE TREE AT THE COMMIT, never the working copy: a row appended after the commit is outside it by
+# construction, which is what keeps a post-hoc `--brief` from excusing a stray write. Selected on
+# the whole field with both separators, so `-1` is not a prefix of `-10`; parsed with
+# `check-brief-recorded.sh`'s own expansions, so a grammar change breaks every reader the same way.
+# The blob lands in a VARIABLE and the loop reads the variable through a heredoc: a substitution in
+# the heredoc body is the class `pass_commit` deadlocked on.
+read_brief_paths() {  # commit · unit · run-state-path
+  _rb_run=$(GIT show "$1:$3" 2>/dev/null || true)
+  while IFS= read -r _rb_r; do
+    case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
+    _rb_r=${_rb_r#* · reason }; _rb_r=${_rb_r#* }
+    normpath "$_rb_r"; printf '\n'
+  done <<RBP
+$_rb_run
+RBP
+}
+
 # ------------------------------------------------------------- has this pass committed yet, once
 # Prints the FIRST pass commit after <anchor> and returns 0; prints nothing and returns 1 while the
 # pass is still open. Three callers need this and each spelled it separately before: the driver's
@@ -120,6 +149,9 @@ is_repo_root() {
 # `--dispatch` STAGES the run-state file, so the run commits that declaration itself — and that
 # commit's subject names the unit, because it is about that unit. Counting it closes a pass before
 # the pass has written a byte, and the whole disjointness proof then runs over an empty sibling set.
+# THE BRIEF `--brief` STAGED IS THE SAME KIND OF BOOKKEEPING: a commit whose touch set minus the
+# run-state file minus the paths its brief rows name is EMPTY moved nothing the pass wrote, and the
+# walk continues to the commit that did (`read_brief_paths` above).
 #
 # The window is `<anchor>..HEAD` and the answer is the FIRST qualifying commit, never a later one: a
 # pass's own review fold or spec bump lands after its group has ended and is not the commit that
@@ -170,6 +202,14 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
     id_in "$_psub" "$_pu" || continue
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
+    # EXACT membership against the newline-wrapped set, deliberately not `covers`: a row naming a
+    # directory must forgive nothing under it. Same test check 23 makes, on the same set.
+    _pnl=$'\n'; _pbrief="$_pnl$(read_brief_paths "$_pc" "$_pu" "$_prel")$_pnl"
+    _pleft=""
+    for _pp in $_ptouch; do
+      case "$_pbrief" in *"$_pnl$_pp$_pnl"*) ;; *) _pleft=1; break ;; esac
+    done
+    [ -n "$_pleft" ] || continue
     printf '%s\n' "$_pc"
     rm -f "$_pf"
     return 0

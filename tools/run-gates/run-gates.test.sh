@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=146
+FLOOR_ASSERTIONS=149
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -1128,6 +1128,11 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
+# tbl-loose is written OUTSIDE the guard for the same reason: the no-ceiling arm below the `fi`
+# names this profile on every host, and a file written only inside the guard leaves that arm running
+# under the runner's silent built-in fallback on a timeout-less box while claiming the profile. 4h
+# still reads it from inside the guard, byte-identical. TOOL-aRatifiedRulings-4.
+printf 'loose\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-loose.txt"
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
   # THE LEG'S CLOCK, NOT THE PROCESS TREE'S. The first spelling subtracted two WHOLE-RUN wall clocks,
@@ -1147,7 +1152,6 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
     || { echo "canary: a timed-out leg did not make the run RED — a timeout must never read as a skip or a pass"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^GATE skip' \
     && { echo "canary: a timed-out leg was reported as a SKIP — the one thing a knob may never turn a leg into"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
-  printf 'loose\t0\t0\twidth=2,timeout=0\n' > "$P/fx/tbl-loose.txt"
   runp GATE_PROFILES=fx/tbl-loose.txt >/dev/null 2>&1
   t_ctl=$(leg_secs sleeper)
   { [ -n "$t_timed" ] && [ -n "$t_ctl" ]; } \
@@ -1209,6 +1213,36 @@ JSON
 else
   echo "canary: SKIP arms 4h and 4h-kill — no working \`timeout\` on this host, so no leg can be bounded and the runner takes its INERT branch instead; arm 4m grades that branch. 4h-kill's fixture kills itself rather than waiting for a ceiling, but it still reads a tail the runner only builds under a live bound, so it skips with its sibling. The assertions are counted either way, so the executed total does not move with host capability."
 fi
+# 4h-nobound. A LEG KILLED WITH NO BOUND IN PLAY STILL NAMES THE SECONDS IT RAN. Same fixture as
+#     4h-kill with the `ceiling` key DROPPED, so `runleg` execs it directly with `bound` at 0 and no
+#     `timeout` is involved — which is why this arm sits OUTSIDE the guard: it is the one path that
+#     needs no `timeout`, and on a timeout-less host EVERY leg runs unbounded, so that host is where
+#     the branch is most reachable. The value is asserted byte for byte against the ledger row, the
+#     liveness half inside the same assertion, and the third assertion pins the SHAPE: no ceiling
+#     clause, because none was in play. Observed RED against the runner before TOOL-aLeakedHandle-9,
+#     where the tail said `(exit 137)` and the ledger said 2.424. The red case is fixture-only by
+#     class — every shipped leg declares a ceiling — which the ruling accepted with the class named:
+#     memory/gotchas/staged-break-substitutes-a-synthetic-value.md.
+cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "selfkilled", "argv": ["bash", "fx/selfkill.sh"]}
+]
+JSON
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
+o=$(runp GATE_PROFILES=fx/tbl-loose.txt)
+kt=$(printf '%s\n' "$o" | grep -m1 '^GATE FAIL  selfkilled  ')
+[ -n "$kt" ] \
+  || { echo "canary: a leg SIGKILLed with no bound in play was not reported as a named FAIL — rc=137 is a RED naming its leg, bound or no bound"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+ks=$(printf '%s\n' "$kt" | sed -n 's/.*after \([0-9][0-9.]*\)s.*/\1/p')
+kl=$(awk -F'\t' '$1=="selfkilled" { print $2; exit }' "$P/.git/gate-ledger.tsv" 2>/dev/null)
+{ [ -n "$ks" ] && [ -n "$kl" ] && [ "$ks" = "$kl" ]; } \
+  || { echo "canary: the failure tail for a leg killed with NO ceiling states '${ks:-<no number found>}'s where gate-ledger.tsv records '${kl:-<no row>}'s for the same leg on the same run. The runner already read that value on this path and printed a bare exit code instead of it."; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+printf '%s\n' "$kt" | grep -qE '^GATE FAIL  selfkilled  [(]killed after [0-9][0-9.]*s[)]$' \
+  || { echo "canary: a leg killed with no bound in play must read exactly (killed after Ns) — no ceiling clause for a ceiling that was never in play, no bare exit 137, no timeout it cannot have observed. Got: $kt"; fail=1; }
+# The reset below is the restore: the arms after it read the row set they expect.
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},

@@ -181,6 +181,7 @@
       "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
       "inline-fence-swallows-the-rest-of-the-file.md",
+      "inline-marker-breaks-a-line-continuation.md",
       "inputs-inside-the-subjects-reach.md",
       "line-keyed-registry-reds-on-a-file-that-grew.md",
       "naming-leg-grades-what-python-named.md",

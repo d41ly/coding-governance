@@ -315,7 +315,7 @@ out=$( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 same "arm 7 a flat memory-tree adopts" "$rc" "0"
 hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T}gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 7 the flat Skill names no nested checklist path" \
-  "$(grep -c "memory-tree/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"
+  "$(grep -c "memory-tree/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"  # gov:root-fixture — the nested spelling this arm asserts the flat render does NOT contain
 ( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 7 --check agrees with the flat render" "$?" "0"
 

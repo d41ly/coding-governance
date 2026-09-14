@@ -713,7 +713,7 @@ has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 's
 NE="$LAY/nested"; build_layout "$NE" scripts/workflows scripts/unattended scripts/memory-tree/gotchas.py
 run_layout "$NE" scripts/workflows --render >/dev/null
 check_layout "PV-AC3 nested:" "$NE" scripts/workflows scripts/ scripts/memory-tree GGGGG
-RT="$LAY/root"; build_layout "$RT" workflows unattended memory-tree/gotchas.py
+RT="$LAY/root"; build_layout "$RT" workflows unattended memory-tree/gotchas.py  # gov:root-fixture — the ROOT-install layout PV-AC3 builds on purpose
 run_layout "$RT" workflows --render >/dev/null
 check_layout "PV-AC3 root:" "$RT" workflows "" memory-tree GGGGG
 RF="$LAY/rootflat"; build_layout "$RF" workflows unattended gotchas.py
