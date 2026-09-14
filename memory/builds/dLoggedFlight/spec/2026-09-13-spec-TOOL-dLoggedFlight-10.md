@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** SPECCED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -37,23 +37,45 @@ schema, independently of the renderer.
   - a `Data` block that is not valid JSON or carries a key outside the schema;
   - more than 24 KB;
   - a `Serves:` line naming an id outside the record's own build.
+
+  Each refusal carries one rule id from a closed list, `RECORD_RULES`: `headings`, `first-cell`, `cell`,
+  `absolute-path`, `uuid`, `data`, `size` and `serves` are the eight above. Three more follow from a
+  closed grammar, and each is a refusal S2's list implies without naming. `line` is any line outside
+  the record grammar, such as free text, a CR byte, or a fact after a table. `name` is a file the glob
+  admits whose name the renderer would never write. `unreadable` is a record that is not UTF-8, not a
+  regular file, or unmerged in the index. A fact line is a cell: its label must be declared for its
+  section, at most once and in the declared order, and its value must match one of the label's
+  templates. `-` is admissible in every class, because it is what the renderer writes for an absent or
+  withheld value, and it is refused only as a first cell. The size rule reads `RECORD_SCHEMA`'s own
+  `cap_bytes`.
 - **S3** Liveness. The leg prints the population it graded. An empty population is reported as
   `0 records (none committed yet)` and exits 0, because a repo with no run records yet is a legitimate
   state. The leg asserts the tracked glob it reads is the one the renderer writes, and that the
   declared root holds tracked files, so a renamed pattern or a wrong root cannot empty the population in
-  silence. Observed by AC3.
+  silence. The glob is asserted at run time against the renderer's own code: the path
+  `derive_record_relpath` builds for a probe run must be one the glob admits, or the leg reds with the
+  rule `glob`. The root assertion reds with the rule `root`. Exit 0 is a graded population with no
+  refusal, 1 is any refusal or failed assertion, and 2 is a leg that could not run. Observed by AC3.
 - **S4** Cost: the leg reads the whole population in a constant number of git calls, one `ls-files`
   and one `cat-file --batch`, and declares a 60 s ceiling. Observed by AC4.
 - **S5** A render-then-grade arm. The clean fixture the leg is tested against is produced by
   `render_record` from a model fixture that populates every section with one value of each closed
   class. So a renderer and a leg that disagree fail the self-test. Observed by AC1.
+
+  The absolute-path and UUID shapes are DATA in `RECORD_SCHEMA`, under `forbidden`, and the renderer
+  withholds any value one of them finds. Building this found the disagreement S5 exists for: the
+  `label` class admits a lowercase UUID, so without that the renderer would write a record the leg
+  refuses.
 - **S6** A real-population arm for runs. The leg derives, through the population form of
   `derive_run_starts`, the start commit of every tracked run-state file under the declared root, and
-  refuses a build in which two records share one. Through `derive_run_eras` it also computes each run's
-  window from git alone, as a fresh clone must, and refuses one that ends before its start or overlaps
-  another window of its build. That costs one `git log` for the whole population, plus one log and one
+  refuses a build in which two runs share one. The tracked set comes from the leg's own `ls-files`
+  rather than the working tree. Through `derive_run_eras` it also computes each run's window from git
+  alone, as a fresh clone must, and refuses one that ends before its start or overlaps another window
+  of its build. The window is the model's own derivation, not a copy. `derive_record_commits` and
+  `derive_window` are moved out of `build_run_model` into functions both callers read, with no change
+  to what the model computes. That costs one `git log` for the whole population, plus one log and one
   batch read over the run-state paths, whatever the number of builds. On this tree it grades six
-  rotated builds. Observed by AC4 and AC5.
+  rotated builds and prints each one's start commits. Observed by AC4 and AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -80,13 +102,20 @@ first.
 | identifier | kind | cell |
 |---|---|---|
 | `check_records`, `check_record`, `scan_forbidden` | functions | `py.function`, verb-led |
+| `derive_record_relpath` | the renderer's path builder, which the leg's glob assertion calls | `py.function` |
+| `derive_record_commits`, `derive_window` | moved out of `build_run_model`, read by both | `py.function` |
+| `RECORD_RULES`, `RECORD_GLOB`, `RECORD_SCHEMA["forbidden"]` | data | constants |
 | `cmd_check_records` | CLI subcommand | reserved `cmd` |
-| `runlog record schema` | leg, `repo` / `declarations`, ceiling 60 | manifest |
+| `runlog record schema` | leg, `repo` / `declarations`, ceiling 60, unguarded | manifest |
+
+The leg ships. It is a `[[gate_leg]]` in the runlog descriptor with `history_depth = "full"`, because a
+shallow clone's boundary commit adds every run-state path at once and would give every run one start.
 
 ### Files touched (estimate)
 
-`tools/runlog/{record.py,runlog.py,selftest.py,kit.toml}`, `tools/gate-legs.json`,
-`tools/govkit/subject-pins.tsv`, `memory/map/features/runlog.md` and the regenerated map.
+`tools/runlog/{record.py,runlog.py,model.py,selftest.py,kit.toml,README.md}`, `tools/gate-legs.json`,
+`tools/govkit/subject-pins.tsv`, `memory/guides/SESSION-KICKOFF.md`'s stamp,
+`memory/map/features/runlog.md` and the regenerated map.
 
 ### Alternatives rejected
 
@@ -136,6 +165,11 @@ command.
   builds as pairwise distinct and their windows as ending at or after their starts and disjoint. On a
   fixture build whose two records share a start commit, and on one whose live window would end at its
   predecessor's terminal write, it exits 1 naming the build.
+  The first fixture is a squashed history, one commit adding an archive and `RUN.md`, and a rotated
+  build graded under the naive key, each archive keyed on its own creation commit. The second is a
+  LANDED-after-LANDED build rotated the way the driver rotates. It is green under the era-bounded
+  derivation, and red once the eras are staged to span the path's whole history, which is the reading
+  round-3 H2 named.
   Red when: the key derivation collapses an archive into its successor, or a window ends before its
   start, and the leg stays green.
 
@@ -160,6 +194,17 @@ none
 - rev-4 · 2026-09-13 · S1 S3 S6 · AC3 AC4 AC5 · folded round-3 spec audit M12 (the declared memory root,
   with a two-segment fixture and a wrong-root refusal), L3 (the cost criterion varies the build count)
   and H2's left-shift (every run's window is graded over the real population).
+- rev-5 · 2026-09-14 · S2 S3 S5 S6 · §4 · AC5 · the build pass, before its code. S2 names each rule's id
+  and adds the three a closed grammar implies, `line`, `name` and `unreadable`. It says a fact line is
+  graded as a cell, and that `-` is admissible everywhere but a first cell. S3 says how the glob and
+  root assertions run and fixes the exit codes. S5 moves the absolute-path and UUID shapes into
+  `RECORD_SCHEMA` as data the renderer also withholds by: its `label` class admits a lowercase UUID,
+  which is the renderer-leg disagreement S5 exists to catch. S6 reads the tracked set from the leg's
+  own `ls-files`, and it reads the window through two functions moved out of `build_run_model`, so the
+  leg and the model share one derivation. §4 lists the added names and why the leg ships with full
+  history, and Files touched gains `model.py`, the README and the manifest stamp. AC5 names its
+  fixtures: the H2 window needs a staged derivation to go red, because the era-bounded one cannot end
+  a window before its start.
 
 ## 10. Reuse audit
 
