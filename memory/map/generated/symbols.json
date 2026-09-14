@@ -638,6 +638,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_nonterminal_merged_runs",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_nonterminal_model",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6103,6 +6108,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_nonterminal_merged_runs",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_one_retirement_is_free",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -6131,6 +6141,11 @@
       "id": "test_out_of_vocabulary_pin_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_park_sets_match_the_driver",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_parse_contract",
@@ -6621,6 +6636,11 @@
       "id": "test_verbatim_files",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_version_carriers_agree",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_version_marker",
