@@ -47,7 +47,9 @@ CLI = HERE / "runlog.py"
 sys.path.insert(0, str(HERE))
 
 import extract as rx  # noqa: E402
+import model as rl_model  # noqa: E402
 import runlog_lib as rl  # noqa: E402
+from collections import Counter  # noqa: E402
 
 # The count this suite executed when it landed. A block of arms stranded behind an early return
 # would still print "0 failed"; the floor is what makes that a red rather than a smaller green.
@@ -56,7 +58,11 @@ import runlog_lib as rl  # noqa: E402
 # RAISED 370 -> 591 by TOOL-dLoggedFlight-6: the extractor arms, and the three decoy checks `main`
 # runs after EVERY arm, so an arm function added or removed moves the count by four at least. Two of
 # them need a directory link, which every node makes: a symlink on POSIX and a junction on Windows.
-ASSERTION_FLOOR = 591
+# RAISED 591 -> 769 by TOOL-dLoggedFlight-8: the run-model arms, fourteen functions, so the decoy
+# checks alone move it by forty-two. Two of them read this tree, AC7 over a tracked run record and the
+# decision-log report, and a third reads the driver's source; each announces a skip where its subject
+# is absent, and a skip lowers the count, which is this floor's job to see.
+ASSERTION_FLOOR = 769
 
 PASS = []
 FAIL = []
@@ -1716,6 +1722,1127 @@ def test_extract_decoy_catches_a_forgotten_root():
     check_true("extract decoy liveness: ...and the scratch scan `main` runs after every arm names "
                "that extract", any(h.endswith(f"/sessions/{canary}.json")
                                    for h in scan_named([mini], canary)), str(scan_named([mini], canary)))
+
+
+# ================================================================ TOOL-dLoggedFlight-8 — the run model
+# The ACn below are that unit's criteria, prefixed `model` so they never read as the arms above.
+#
+# HISTORIES ARE BUILT WITH ONE `git fast-import`, never a commit per step: an arm needs commit TIMES it
+# chooses, and a hundred-commit history costs four git processes this way instead of a hundred. Every
+# run-state file is written the way the driver's verbs leave it — its scaffold, `set_fact`'s in-place
+# rewrite with a new key landing under the heading, and `park()`'s appended row — and a rotation is
+# the successor's preflight commit carrying the archive at the name `archive_name_of` derives and a
+# fresh record, which is how the driver rotates. Journals are rendered by the kit's own `render_line`
+# from each producer's data model, and the key sets below hold every fixture line to those models.
+
+MODEL_T0 = 1789293600          # 2026-09-13T10:00:00Z, every model fixture's clock origin
+FX_SLUG = "xFixtureRun"
+FX_OTHER = "xOtherBuild"
+FX_WT_RUN, FX_WT_PRIMARY, FX_WT_OTHER = "fixture-wt-run", "fixture-wt-primary", "fixture-wt-other"
+FX_SID = "00000000-0000-4000-8000-00000000000a"
+FX_SID_B = "00000000-0000-4000-8000-00000000000b"
+FX_UNIT1, FX_UNIT2 = f"X-{FX_SLUG}-1", f"X-{FX_SLUG}-2"
+# EACH PRODUCER'S DATA MODEL, as the keys its writer can put on a line: the driver's (unit 2 §4), the
+# gate runner's (unit 3) and the pre-push hook's (unit 4), re-read off their writers' sources when
+# unit 8 corrected the golden lines. An indexed key is written `name.` and matches any index.
+PRODUCER_KEYS = {
+    ("driver", "start"): {"v", "t", "p", "ev", "n", "verb", "slug", "wt", "kit", "pid", "phase_from", "oob",
+                          "sess.", "sess_bad", "sess_more"},
+    ("driver", "end"): {"v", "t", "p", "ev", "n", "verb", "slug", "unit", "unit_bad", "rc", "exit",
+                        "checks", "phase_to", "dur_us"},
+    ("gates", "once"): {"v", "t", "p", "ev", "run", "wt", "head", "started", "full", "selftests", "verdict",
+                        "stage", "ran", "failed", "skipped", "held", "reused", "wall_breach", "rc", "fail.",
+                        "fail_more", "kit"},
+    ("pushes", "start"): {"v", "t", "p", "ev", "n", "remote", "remote_unnamed", "url_userinfo", "lander",
+                          "wt", "ref.", "ref_more"},
+    ("pushes", "end"): {"v", "t", "p", "ev", "n", "rc", "exit", "decision", "gate_run"},
+    ("pushes", "once"): {"v", "t", "p", "ev", "decision", "remote", "remote_unnamed", "url_userinfo",
+                         "lander", "wt"},
+}
+MODEL_LINES = []   # every journal line a model arm writes, graded against PRODUCER_KEYS by one arm
+
+
+def derive_minute(m):
+    return MODEL_T0 + int(round(m * 60))
+
+
+def check_producer_keys(fields):
+    """The keys of one line that its producer's data model does not list. Empty when it conforms."""
+    allowed = PRODUCER_KEYS.get((fields.get("p"), fields.get("ev")))
+    if allowed is None:
+        return [f"no producer act {fields.get('p')}/{fields.get('ev')}"]
+    return [k for k in fields if k not in allowed and not (
+        "." in k and k.split(".", 1)[0] + "." in allowed)]
+
+
+def build_runstate(slug):
+    """The driver's `scaffold_runmd`, byte for byte."""
+    return (f"# {slug} - run state\n\n"
+            "Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED\n"
+            "from the build README on every read, so it cannot go stale between them. This file holds\n"
+            "only what nothing else does: the phase and its witness, the keepalive id, the pinned BASE\n"
+            "with its anchor evidence, and the parked decisions.\n\n"
+            "<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\n\n## Parked\n")
+
+
+def set_runstate_fact(text, key, value):
+    """The driver's `set_fact`: rewrite the key's line in place, else insert it under the heading."""
+    lines = text.split("\n")
+    for i, ln in enumerate(lines):
+        if ln.startswith(f"{key}: "):
+            lines[i] = f"{key}: {value}"
+            return "\n".join(lines)
+    i = lines.index("## Run facts")
+    lines.insert(i + 1, f"{key}: {value}")
+    return "\n".join(lines)
+
+
+def add_runstate_row(text, t, kind, item, reason, step=None):
+    """The driver's `park()`: a blank line, then one row, appended."""
+    stamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
+    mid = f" · step {step}" if step else ""
+    return text + f"\n{stamp} {kind} · item {item}{mid} · reason {reason}\n"
+
+
+def build_preflight_state(slug, base, witness, branch_ref=None, kid="k0000001"):
+    """The record `--preflight` leaves: its facts in the order it writes them, phase RUNNING. The
+    keepalive id differs per run in a real build, which is what gives each archive its own name."""
+    text = build_runstate(slug)
+    for key, value in (("base", base), ("anchor-ref", "refs/heads/main"), ("anchor-sha", base),
+                       ("anchor-url", "https://fixture.invalid/repo"), ("keepalive", kid),
+                       ("anchor-kind", "default-branch"), ("mode", "slug")):
+        text = set_runstate_fact(text, key, value)
+    if branch_ref:
+        text = set_runstate_fact(text, "branch-ref", branch_ref)
+        text = set_runstate_fact(text, "branch-sha", base)
+    text = set_runstate_fact(text, "phase", "RUNNING")
+    return set_runstate_fact(text, "witness", witness)
+
+
+def derive_archive_name(text):
+    """`archive_name_of`: the terminal phase and the first 8 hex of the record's own blob hash."""
+    data = text.encode("utf-8")
+    blob = hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest()
+    phase = re.search(r"^phase: (\S+)$", text, re.M).group(1)
+    return f"RUN.{phase}.{blob[:8]}.md"
+
+
+def build_spec_text(uid, title, status="SPECCED", marks=""):
+    return (f"# {uid} — {title}\n\n**Status:** {status} · rev-1 · 2026-09-13 · node x · Tier-1 · base "
+            f"00000000 · streams tooling · order 1\n\n## 1. Goal\n\ng\n\n## 8. Open questions\n\n"
+            f"{marks or 'none'}\n\n## 9. Revision log\n\n- rev-1 · 2026-09-13 · initial draft.\n")
+
+
+def build_base_files(slug=FX_SLUG, mr="memory", units=(FX_UNIT1,)):
+    files = {f"{mr}/builds/{slug}/README.md": f"---\nslug: {slug}\n---\n\n# {slug}\n", "tools/a.txt": "a\n"}
+    for uid in units:
+        files[f"{mr}/builds/{slug}/spec/2026-09-13-spec-{uid}.md"] = build_spec_text(uid, "a unit")
+    return files
+
+
+def build_history(commits, repo=None):
+    """A scratch repository whose history is `commits`, imported through ONE `git fast-import`.
+
+    A commit is `{t, subject[, body][, files][, ref][, from][, merge]}`: `t` its epoch time, `files`
+    a map of path to text (None deletes), `ref` its branch, `from` and `merge` the 1-up positions of
+    earlier commits in the SAME list. Given `repo`, the batch extends it: an existing branch continues
+    from its tip, and a new one starts from main's. Returns the repo and `{position: sha}`.
+    """
+    fresh = repo is None
+    if fresh:
+        base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-model-"))
+        SCRATCH.append(base)
+        repo = base / "repo"
+        run_git(["init", "-q", "-b", "main", str(repo)], base)
+    tips = {}
+    if not fresh:
+        for line in run_git(["for-each-ref", "--format=%(refname) %(objectname)", "refs/heads"],
+                            repo).stdout.split("\n"):
+            if line.strip():
+                name, sha = line.split()
+                tips[name] = sha
+    seen, out = set(), []
+    for i, c in enumerate(commits, 1):
+        ref = c.get("ref", "refs/heads/main")
+        msg = (c["subject"] + (("\n\n" + c["body"]) if c.get("body") else "") + "\n").encode("utf-8")
+        who = f"Fixture <fixture@runlog.invalid> {c['t']} +0000"
+        head = f"commit {ref}\nmark :{i}\nauthor {who}\ncommitter {who}\ndata {len(msg)}\n".encode()
+        body = b""
+        if c.get("from"):
+            body += f"from :{c['from']}\n".encode()
+        elif ref not in seen and (ref in tips or "refs/heads/main" in tips):
+            body += f"from {tips.get(ref, tips.get('refs/heads/main'))}\n".encode()
+        seen.add(ref)
+        for m in c.get("merge", ()):
+            body += f"merge :{m}\n".encode()
+        for path, content in c.get("files", {}).items():
+            if content is None:
+                body += f"D {path}\n".encode()
+            else:
+                data = content.encode("utf-8")
+                body += f"M 100644 inline {path}\ndata {len(data)}\n".encode() + data + b"\n"
+        out.append(head + msg + body + b"\n")
+    marks = repo.parent / f"marks-{len(list(repo.parent.glob('marks-*')))}.txt"
+    r = subprocess.run(["git", "-C", str(repo), "fast-import", "--quiet", f"--export-marks={marks}"],
+                       input=b"".join(out), capture_output=True)
+    if r.returncode != 0:
+        raise RuntimeError("fast-import refused the fixture: " + r.stderr.decode("utf-8", "replace"))
+    run_git(["-c", "core.autocrlf=false", "reset", "-q", "--hard", "main"], repo)
+    shas = {}
+    for line in marks.read_text(encoding="utf-8").split("\n"):
+        if line.startswith(":"):
+            mark, sha = line.split()
+            shas[int(mark[1:])] = sha
+    return repo, shas
+
+
+def render_driver_lines(m, verb, slug=FX_SLUG, rc=0, phase_from="", phase_to="", unit=None, checks="",
+                        sid=FX_SID, wt=FX_WT_RUN, oob=False, dur=0.05, exit_="clean", end=True, pid=4242):
+    """A driver START and END in the writer's key order, at minute `m`."""
+    t = MODEL_T0 + m * 60
+    t0 = f"{t:.6f}"
+    n = f"{pid}.{t0.replace('.', '')}"
+    start = {"v": "1", "t": t0, "p": "driver", "ev": "start", "n": n, "verb": verb, "slug": slug,
+             "wt": wt, "kit": "1.20", "pid": str(pid), "phase_from": phase_from}
+    if oob:
+        start["oob"] = "1"
+    if sid:
+        start["sess.CLAUDE_CODE_SESSION_ID"] = sid
+    lines = [start]
+    if end:
+        e = {"v": "1", "t": f"{t + dur:.6f}", "p": "driver", "ev": "end", "n": n, "verb": verb, "slug": slug}
+        if unit:
+            e["unit"] = unit
+        e.update({"rc": str(rc), "exit": exit_, "checks": checks, "phase_to": phase_to,
+                  "dur_us": str(int(dur * 1e6))})
+        lines.append(e)
+    return lines
+
+
+def render_gate_line(m, run, head, verdict="GREEN", wt=FX_WT_RUN, rc=None):
+    t = MODEL_T0 + m * 60
+    return {"v": "1", "t": f"{t:.6f}", "p": "gates", "ev": "once", "run": run, "wt": wt, "head": head,
+            "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t - 30)), "full": "1",
+            "selftests": "", "verdict": verdict, "stage": "", "ran": "5",
+            "failed": "0" if verdict == "GREEN" else "1", "skipped": "0", "held": "0", "reused": "0",
+            "wall_breach": "", "rc": str(rc if rc is not None else (0 if verdict == "GREEN" else 1)),
+            "kit": "1.7"}
+
+
+def render_push_lines(m, local_sha, lander="1", wt=FX_WT_PRIMARY, decision="full", gate_run=None, rc=0,
+                      remote_ref="refs/heads/main", pid=5151):
+    t = MODEL_T0 + m * 60
+    t0 = f"{t:.6f}"
+    n = f"{pid}.{t0.replace('.', '')}"
+    start = {"v": "1", "t": t0, "p": "pushes", "ev": "start", "n": n, "remote": "origin", "lander": lander,
+             "wt": wt, "ref.1": f"refs/heads/main {local_sha} {remote_ref} {'0' * 40}"}
+    end = {"v": "1", "t": f"{t + 0.5:.6f}", "p": "pushes", "ev": "end", "n": n, "rc": str(rc),
+           "exit": "clean", "decision": decision}
+    if gate_run:
+        end["gate_run"] = gate_run
+    return [start, end]
+
+
+def write_journals(base, driver=(), gates=(), pushes=()):
+    """A scratch journal directory holding the three producer files, each written only when given."""
+    root = pathlib.Path(tempfile.mkdtemp(prefix="runlog-journals-", dir=base))
+    for name, lines in (("driver", driver), ("gates", gates), ("pushes", pushes)):
+        if lines:
+            MODEL_LINES.extend(lines)
+            data = "".join(rl.render_line(f) + "\n" for f in sorted(lines, key=lambda f: float(f["t"])))
+            (root / rl.PRODUCER_FILES[name]).write_bytes(data.encode("utf-8"))
+    return root
+
+
+def write_extract(store, sid, events, slug=FX_SLUG):
+    target = pathlib.Path(store) / "sessions" / f"{sid}.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(json.dumps({"schema": 1, "sid": sid, "attribution": "driver", "slugs": [slug],
+                                   "tree_bytes": 0, "engine_versions": {}, "coverage": {},
+                                   "events": events}).encode("ascii"))
+
+
+def build_landed_fixture():
+    """The CLEAN run: preflighted, dispatched and briefed, built on a branch, gated green at its head,
+    closed, merged, pushed through the lander with the bar pinned, and landed. No event is more than
+    eight minutes from its neighbour, so nothing in it is an anomaly."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = shas0[1]
+    st = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
+    s1 = st
+    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    st = add_runstate_row(st, derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
+    s2 = st
+    s3 = set_runstate_fact(set_runstate_fact(st, "phase", "BUILDING"), "witness", base)
+    s4 = set_runstate_fact(set_runstate_fact(s3, "phase", "LANDING"), "keepalive-reaped", "yes")
+    s5 = set_runstate_fact(set_runstate_fact(s4, "phase", "LANDED"), "witness", base)
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "ref": "refs/heads/run",
+         "files": {rm: s1}},
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): the dispatch and the brief",
+         "ref": "refs/heads/run", "files": {rm: s2}},
+        {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
+         "ref": "refs/heads/run", "files": {rm: s3, "tools/a.txt": "b\n"}},
+        {"t": derive_minute(15), "subject": f"fix({FX_SLUG}): {FX_UNIT1} — more of it",
+         "ref": "refs/heads/run", "files": {"tools/a.txt": "c\n"}},
+        {"t": derive_minute(22), "subject": f"records({FX_SLUG}): close OK, phase LANDING",
+         "ref": "refs/heads/run", "files": {rm: s4}},
+        # fast-import gives a merge its FIRST parent's tree, so the merged files are carried by hand.
+        {"t": derive_minute(24), "subject": f"merge: {FX_UNIT1} — land it", "merge": [5],
+         "files": {rm: s4, "tools/a.txt": "c\n"}},
+        {"t": derive_minute(28), "subject": f"records({FX_SLUG}): --landed", "files": {rm: s5}},
+    ], repo=first)
+    head_at_close, merge = shas[4], shas[6]
+    driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
+              + render_driver_lines(3, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + render_driver_lines(4, "--brief", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + render_driver_lines(6, "--phase", phase_from="RUNNING", phase_to="BUILDING")
+              + render_driver_lines(21, "--close", phase_from="BUILDING", phase_to="LANDING")
+              + render_driver_lines(27, "--landed", phase_from="LANDING", phase_to="LANDED"))
+    gates = [render_gate_line(20, "20260913T101930Z-7001", head_at_close),
+             render_gate_line(26, "push-1789295160000000-5151", merge, wt=FX_WT_PRIMARY)]
+    pushes = render_push_lines(25, merge, gate_run="push-1789295160000000-5151")
+    return {"repo": repo, "shas": shas, "base": base, "head_at_close": head_at_close, "merge": merge,
+            "driver": driver, "gates": gates, "pushes": pushes, "record": rm}
+
+
+def build_model(repo, journals=None, store=None, run=None):
+    return rl_model.build_run_model(repo, FX_SLUG, run=run, journal_root=journals, store=store)
+
+
+def read_kinds(model):
+    return sorted(a["kind"] for a in model.anomalies)
+
+
+def test_model_ac1_ac16_rotation():
+    """AC1 and AC16: a build rotated the way the driver rotates. Its archive and live record key on
+    distinct start commits, their half-open windows are disjoint, and each window ends where S2 says."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = shas0[1]
+    run1 = build_preflight_state(FX_SLUG, base, base)
+    aborted = add_runstate_row(set_runstate_fact(set_runstate_fact(run1, "phase", "ABORTED"), "witness", base),
+                               derive_minute(15), "abort", "the fixture stops", "code 3")
+    arch = f"memory/builds/{FX_SLUG}/{derive_archive_name(aborted)}"
+    run2 = build_preflight_state(FX_SLUG, base, base, kid="k0000002")
+    repo, shas = build_history([
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: run1}},
+        {"t": derive_minute(10), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — run one's work",
+         "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(15), "subject": f"records({FX_SLUG}): --abort", "files": {rm: aborted}},
+        {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, the finished record retired",
+         "files": {arch: aborted, rm: run2}},
+        {"t": derive_minute(25), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — run two's work",
+         "files": {"tools/a.txt": "2\n"}},
+        {"t": derive_minute(30), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(run2, "phase", "BUILDING")}},
+    ], repo=first)
+    starts = rl_model.derive_run_starts(repo, "memory", [FX_SLUG]).get(FX_SLUG, [])
+    check("model AC1: two runs, archive first", [(r["k"], pathlib.PurePosixPath(r["record"]).name)
+                                                   for r in starts],
+          [(1, pathlib.PurePosixPath(arch).name), (2, "RUN.md")])
+    check("model AC1: the archive keys on its own preflight, the live record on the rotation",
+          [r["start"] for r in starts], [shas[1], shas[4]])
+    check_true("model AC1: ...which are two distinct commits", len({r["start"] for r in starts}) == 2)
+    # THE NAIVE KEY, graded so this arm is seen able to fail: a path's own creation commit gives the
+    # archive the rotation commit, which is the live run's start, so both records resolve to one.
+    naive = run_git(["log", "--diff-filter=A", "--format=%H", "--", arch], repo).stdout.split()
+    check("model AC1 liveness: the archive's own creation commit IS the live run's start",
+          naive[-1] if naive else None, shas[4])
+    whole = rl_model.derive_run_starts(repo, "memory")
+    check("model AC1: the population form gives the same runs in one call", whole.get(FX_SLUG), starts)
+    m1, m2 = build_model(repo, run=1), build_model(repo, run=2)
+    check("model AC1: the windows are half-open and disjoint", m1.window["end"] <= m2.window["start"], True)
+    check("model AC16: the archive's window ends at its own terminal write, before the rotation",
+          (m1.window["end"], m1.window["end_from"]), (float(derive_minute(15)), "terminal-write"))
+    check("model AC16: the live, non-terminal window runs from the rotation to one second past its "
+          "last record commit", (m2.window["start"], m2.window["end"], m2.window["end_from"]),
+          (float(derive_minute(20)), float(derive_minute(30)) + 1.0, "last-activity"))
+    check("model AC1: the live window holds nothing of the aborted run",
+          [e["sha"] for e in m2.timeline if e["kind"] == "commit"], [shas[5]])
+    check("model AC1: ...and the archive's timeline holds only run one's commit",
+          [e["sha"] for e in m1.timeline if e["kind"] == "commit"], [shas[2]])
+    # AC16's LANDED-after-LANDED: the live window must not end at the PREDECESSOR's terminal write,
+    # which RUN.md's own history carries because rotation keeps the path.
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = shas0[1]
+    one = build_preflight_state(FX_SLUG, base, base)
+    one_l = set_runstate_fact(set_runstate_fact(one, "phase", "LANDED"), "witness", base)
+    arch = f"memory/builds/{FX_SLUG}/{derive_archive_name(one_l)}"
+    two = build_preflight_state(FX_SLUG, base, base, kid="k0000002")
+    two_l = set_runstate_fact(set_runstate_fact(two, "phase", "LANDED"), "witness", base)
+    repo, shas = build_history([
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: one}},
+        {"t": derive_minute(8), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — w", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(12), "subject": f"records({FX_SLUG}): --landed", "files": {rm: one_l}},
+        {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, rotated",
+         "files": {arch: one_l, rm: two}},
+        {"t": derive_minute(24), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — w2", "files": {"tools/a.txt": "2\n"}},
+        {"t": derive_minute(29), "subject": f"records({FX_SLUG}): --landed", "files": {rm: two_l}},
+        {"t": derive_minute(40), "subject": f"records({FX_SLUG}): a note that names the slug",
+         "files": {f"memory/builds/{FX_SLUG}/README.md": "later\n"}},
+    ], repo=first)
+    a, b = build_model(repo, run=1), build_model(repo, run=2)
+    check("model AC16: LANDED after LANDED, the archive ends at its own terminal write",
+          (a.window["end"], a.window["end_from"]), (float(derive_minute(12)), "terminal-write"))
+    check("model AC16: ...and the live run from the rotation to ITS own terminal write, never the "
+          "predecessor's, never the later mention",
+          (b.window["start"], b.window["end"], b.window["end_from"]),
+          (float(derive_minute(20)), float(derive_minute(29)), "terminal-write"))
+    # A terminal END in the journal comes first; with one, the live window ends there.
+    preflight = render_driver_lines(19.5, "--preflight", phase_from="LANDED", phase_to="RUNNING")
+    j = write_journals(repo.parent, driver=preflight
+                       + render_driver_lines(28.5, "--landed", phase_from="LANDING", phase_to="LANDED"))
+    c = build_model(repo, journals=j, run=2)
+    check("model AC16: a terminal END in the journal ends the window at that END",
+          (c.window["start"], round(c.window["end"], 2), c.window["end_from"]),
+          (float(MODEL_T0 + 19.5 * 60), round(MODEL_T0 + 28.5 * 60 + 0.05, 2), "terminal-end"))
+    # A --status after the landing reads LANDED on both of its lines and moved nothing, so it is not
+    # the END that ended the run: the window still ends at the terminal write. The real record of
+    # aLeakedHandle failed this way first, through the AC7 arm, before this fixture pinned it.
+    j = write_journals(repo.parent, driver=preflight
+                       + render_driver_lines(35, "--status", phase_from="LANDED", phase_to="LANDED"))
+    c = build_model(repo, journals=j, run=2)
+    check("model AC16: a --status reading LANDED on both lines ends no window",
+          (c.window["end"], c.window["end_from"]), (float(derive_minute(29)), "terminal-write"))
+
+
+def test_model_ac2_own_commits():
+    """AC2: commits naming the run's units, interleaved with another build's, and only the run's own
+    enter its timeline, in time order, beside its phase moves."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = shas0[1]
+    st = build_preflight_state(FX_SLUG, base, base)
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(4), "subject": f"feat: {FX_UNIT1} — ours", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(5), "subject": f"feat: X-{FX_OTHER}-1 — theirs", "files": {"tools/b.txt": "1\n"}},
+        {"t": derive_minute(6), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+        {"t": derive_minute(7), "subject": f"fix: X-{FX_OTHER}-2 mentions {FX_SLUG} but no unit of it",
+         "files": {"tools/b.txt": "2\n"}},
+        {"t": derive_minute(8), "subject": f"fix: {FX_UNIT2} — ours again", "files": {"tools/a.txt": "2\n"}},
+    ], repo=first)
+    model = build_model(repo)
+    got = [(e["kind"], e.get("sha") if e["kind"] == "commit" else e.get("phase"))
+           for e in model.timeline if e["kind"] in ("commit", "phase")]
+    check("model AC2: only the run's own commits, in time order, beside its phase moves", got,
+          [("phase", "RUNNING"), ("commit", shas[2]), ("phase", "BUILDING"), ("commit", shas[6])])
+    check("model AC2: the last own commit is the run's own, never the foreign one after it",
+          model.last_own, shas[6])
+    check_true("model AC2: the foreign commits exist in the range, so the filter had work to do",
+               len(run_git(["rev-list", f"{shas[1]}..main"], repo).stdout.split()) == 5)
+
+
+def test_model_ac3_ac11_ledger():
+    """AC3 and AC11: one entry per ledger source, each naming its file and line or its sha; the
+    excluded kinds stay out; trailers are git's parse and the near-miss is counted; spec marks split
+    by resolver and by whether the commit that introduced them is inside the run."""
+    bd = f"memory/builds/{FX_SLUG}"
+    rm = f"{bd}/RUN.md"
+    spec = f"{bd}/spec/2026-09-13-spec-{FX_UNIT1}.md"
+    owner_mark = "- **F1** a fork. RESOLVED (owner, 2026-09-01): the pick."
+    agent_mark = owner_mark + "\n- **F2** another. RESOLVED (agent, 2026-09-13,\n  delegated): its pick."
+    log_before = "# decisions\n\n- TOOL-xOld-1 · an old row (owner, 2026-08-01)\n"
+    rows_new = ["- X-xFixtureRun-1 · a ruling (owner, 2026-09-01) held", "- X-xFixtureRun-2 · bare (owner) held",
+                "- X-xFixtureRun-3 · colon (owner: on 2026-09-02) held", "- X-xFixtureRun-4 · Owner ruling here",
+                "- X-xFixtureRun-5 · an owner call it was", "- X-xFixtureRun-6 · the run's own choice",
+                "- X-xFixtureRun-7 · a near miss (ownership of it)"]
+    files0 = build_base_files()
+    files0[spec] = build_spec_text(FX_UNIT1, "a unit", marks=owner_mark)
+    files0["memory/DECISIONS.md"] = log_before
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files0}])
+    base = shas0[1]
+    st = build_preflight_state(FX_SLUG, base, base)
+    for m, kind, item in ((3, "decision", "a question?"), (4, "override", "gates-green"),
+                          (5, "waiver", "parallel-when-disjoint"), (6, "rescope", f"retire {FX_UNIT2}"),
+                          (7, "rescope", f"supersede {FX_UNIT2} X-xFixtureRun-3"),
+                          (8, "rescope", f"add X-xFixtureRun-4"), (9, "proposal", "an amendment"),
+                          (10, "dispatch", f"{base[:8]} {FX_UNIT1}"), (11, "brief", FX_UNIT1),
+                          (12, "review", "a-subject"), (13, "abort", "the stop")):
+        st = add_runstate_row(st, derive_minute(m), kind, item, "a reason", step="3" if kind == "proposal" else None)
+    st = set_runstate_fact(set_runstate_fact(st, "phase", "ABORTED"), "witness", base)
+    ledger = (f"# Acceptance ledger\n\n**Serves:** journal {FX_UNIT1}\n\n- AC1 — `cmd` — observed.\n"
+              f"- AC2 — `cmd` — OWED to the post-build gate run, which records\n  the verdict.\n")
+    body = ("The work.\n\nDecided: a mid-body line git does not parse — above a paragraph break\n\n"
+            "More prose.\n\nDecided: ran one leg — the push runs the bar\nDecided: kept the name — "
+            "the lexicon allows it\nCo-Authored-By: Fixture <fixture@runlog.invalid>")
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(15), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work", "body": body,
+         "files": {"tools/a.txt": "1\n", "memory/DECISIONS.md": log_before + "\n".join(rows_new) + "\n"}},
+        {"t": derive_minute(18), "subject": f"fold({FX_SLUG}): {FX_UNIT1} — the fork, the ledger, the review",
+         "files": {spec: build_spec_text(FX_UNIT1, "a unit", marks=agent_mark),
+                   f"{bd}/build/2026-09-13-build-{FX_UNIT1}-1-acceptance-ledger.md": ledger,
+                   f"{bd}/reviews/2026-09-13-review-{FX_UNIT1}-spec-audit-round1.md":
+                       "# review\n\n## Verdict: CLEAN WITH FIXES\n"}},
+    ], repo=first)
+    model = build_model(repo)
+    led = model.ledger
+    want = {s: 0 for s in rl_model.LEDGER_SOURCES}
+    want.update({"decision": 1, "abort": 1, "override": 1, "waiver": 1, "rescope-retire": 1,
+                 "rescope-supersede": 1, "review": 1, "trailer": 2, "spec-mark": 2, "decision-log": 7,
+                 "ledger": 1})
+    check("model AC11: the per-source counts equal the fixture's", led["counts"], want)
+    check("model AC11: every source of LEDGER_SOURCES has a fixture entry, and every entry's source is "
+          "a member", sorted({e["source"] for e in led["entries"]}), sorted(rl_model.LEDGER_SOURCES))
+    check("model AC11: no excluded row enters, and each is counted by kind", led["excluded"],
+          {"brief": 1, "dispatch": 1, "proposal": 1, "rescope add": 1, "review": 1})
+    check_true("model AC11: every admitted entry names a file and line, or a sha",
+               all(re.fullmatch(r"[^:]+\.md:[0-9]+|[0-9a-f]{40}|[^:]+\.md", e["ref"]) for e in led["entries"]),
+               str([e["ref"] for e in led["entries"]])[:300])
+    parked = [e for e in led["entries"] if e["source"] in ("decision", "abort", "override", "waiver",
+                                                            "rescope-retire", "rescope-supersede")]
+    check("model AC11: each parked entry's ref is its record and line",
+          sorted(e["ref"] for e in parked),
+          sorted(f"{rm}:{r['line']}" for r in model.record_rows
+                 if r["kind"] in ("decision", "abort", "override", "waiver")
+                 or (r["kind"] == "rescope" and r["item"].split()[0] in ("retire", "supersede"))))
+    check("model AC3: both trailers, with the sha of the commit carrying them",
+          [(e["value"], e["ref"]) for e in led["entries"] if e["source"] == "trailer"],
+          [("ran one leg — the push runs the bar", shas[2]), ("kept the name — the lexicon allows it", shas[2])])
+    check("model AC3: the mid-body Decided line is one near-miss", led["near_miss"], 1)
+    check("model AC3: the owner's mark predates the run and the agent's is inside it",
+          led["marks"], {"agent-inside": 1, "owner-before": 1})
+    check("model AC11: five owner spellings read as the owner's, and the near-miss and the run's own "
+          "row do not", sorted((e["id"], e["owner"]) for e in led["entries"] if e["source"] == "decision-log"),
+          [(f"X-xFixtureRun-{i}", i <= 5) for i in range(1, 8)])
+    check("model AC11: the review source is the review record, with its verdict line",
+          [(e["ref"], e["verdict"]) for e in led["entries"] if e["source"] == "review"],
+          [(f"{bd}/reviews/2026-09-13-review-{FX_UNIT1}-spec-audit-round1.md:3", "CLEAN WITH FIXES")])
+    check("model AC11: the ledger source is the owed line, not the observed one",
+          [e["ac"] for e in led["entries"] if e["source"] == "ledger"], ["AC2"])
+    counts = rl_model.scan_owner_spellings("\n".join(rows_new))
+    check("model AC11: the spelling scan counts each spelling and the near-miss over the fixture rows",
+          counts, {"(owner)": 1, "(owner,": 1, "(owner:": 1, "owner ruling": 1, "owner call": 1,
+                   "near-miss": 1})
+
+
+def test_model_ac11_decision_log_report():
+    """AC11's report-only arm: the owner spellings and near-misses over the TRACKED decision log,
+    printed. It grades that the scan ran and printed a count per spelling, never what the counts are."""
+    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
+    try:
+        mr = rl.resolve_memory_root(top)
+    except ValueError:
+        mr = None
+    log = top / mr / rl_model.DECISION_LOG if mr else None
+    if log is None or not log.is_file():
+        print("  SKIP model AC11 report: this tree tracks no decision log at its memory root, so there "
+              "is nothing to report over")
+        return
+    counts = rl_model.scan_owner_spellings(log.read_bytes().decode("utf-8", "replace"))
+    print("  report (grades nothing): decision-log owner spellings " + " ".join(
+        f"{k}={v}" for k, v in counts.items()))
+    check("model AC11 report: one count per spelling and the near-miss, so the arm printed something",
+          sorted(counts), sorted([n for n, _ in rl_model.OWNER_SPELLINGS] + ["near-miss"]))
+
+
+def test_model_ac5_anomalies():
+    """AC5: one fixture per anomaly kind and per merged sub-class; each reports exactly its kind, the
+    clean fixture none, and the two sets and the fixtures agree in both directions."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    clean = dict(driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    got = {}
+
+    def run_variant(name, want, driver=(), gates=(), pushes=(), record=None, events=None):
+        j = write_journals(repo.parent, driver=list(clean["driver"]) + list(driver),
+                           gates=list(clean["gates"]) + list(gates), pushes=list(clean["pushes"]) + list(pushes))
+        sdir = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+        if events is not None:
+            write_extract(sdir, FX_SID, events)
+        keep = (repo / fx["record"]).read_bytes()
+        if record is not None:
+            (repo / fx["record"]).write_bytes(record(keep.decode("utf-8")).encode("utf-8"))
+        try:
+            model = build_model(repo, journals=j, store=sdir)
+        finally:
+            (repo / fx["record"]).write_bytes(keep)
+        kinds = read_kinds(model)
+        got[name] = kinds
+        check(f"model AC5 {name}: reports exactly {want or 'nothing'}", kinds, sorted(want))
+        return model
+
+    run_variant("clean", [])
+    run_variant("out-of-band-edit", ["out-of-band-edit"],
+                driver=render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING", oob=True))
+    run_variant("refusal-loop", ["refusal-loop"],
+                driver=[ln for m in (11, 12, 13) for ln in render_driver_lines(
+                    m, "--phase", rc=1, checks="19", phase_from="BUILDING", phase_to="BUILDING")])
+    run_variant("killed-verb", ["killed-verb"],
+                driver=render_driver_lines(12, "--status", phase_from="BUILDING", end=False))
+    run_variant("push-outside-lander", ["push-outside-lander"],
+                pushes=render_push_lines(18, fx["head_at_close"], lander="0", wt=FX_WT_RUN, decision="refuse-raw",
+                                         rc=1))
+    run_variant("multi-run-session", ["multi-run-session"],
+                driver=render_driver_lines(9, "--status", slug=FX_OTHER, phase_from="BUILDING",
+                                           phase_to="BUILDING"))
+    run_variant("stalled", ["stalled"],
+                driver=[ln for m in (8, 9, 10, 11, 12, 13) for ln in render_driver_lines(
+                    m + 0.5, "--status", phase_from="BUILDING", phase_to="BUILDING")])
+    tool_bar = {"t": float(derive_minute(16)), "kind": "tool", "src": "main", "call": 1, "tool": "Bash",
+                "cls": "bar", "flags": [], "bg": True, "end": float(derive_minute(19)), "dur": 180.0,
+                "err": False, "rc": None}
+    tool_end = {"t": float(derive_minute(19)), "kind": "tool_end", "src": "main", "call": 1,
+                "status": "completed", "rc": 0}
+    run_variant("red-behind-zero", ["red-behind-zero"], events=[tool_bar, tool_end],
+                gates=[render_gate_line(18.5, "20260913T102800Z-7002", fx["head_at_close"], verdict="RED")])
+    run_variant("destructive-git", ["destructive-git"],
+                events=[{"t": float(derive_minute(17)), "kind": "tool", "src": "main", "call": 1, "tool": "Bash",
+                         "cls": "git-push", "flags": ["destructive"], "bg": False, "end": float(derive_minute(17)),
+                         "dur": 1.0, "err": False, "rc": 0}])
+    run_variant("converged-on-blocked", ["converged-on-blocked"],
+                record=lambda t: add_runstate_row(t, derive_minute(14), "review", "a-subject",
+                                                  "verdict BLOCKED · blockers 0 · CONVERGED"))
+    # idle-gap: the clean run's --landed arrives fifteen and a half minutes after the last event before
+    # it, the landed record's commit at minute 28, and the landing push is left out.
+    j = write_journals(repo.parent, driver=[ln for ln in fx["driver"] if float(ln["t"]) < MODEL_T0 + 26 * 60]
+                       + render_driver_lines(43.5, "--landed", phase_from="LANDING", phase_to="LANDED"),
+                       gates=fx["gates"][:1])
+    model = build_model(repo, journals=j)
+    got["idle-gap"] = read_kinds(model)
+    check("model AC5 idle-gap: fifteen and a half minutes with no event is one idle-gap", got["idle-gap"],
+          ["idle-gap"])
+    # The two kinds the terminal fixture cannot carry: a run left non-terminal. Its own repo, preflighted
+    # and closed with no --landed, its witness written once by --preflight and never again.
+    sub = build_nonterminal_fixture()
+    for name, record, want_sub, extra in (
+            ("nonterminal-merged/dRatifiedSeam shape", None, "other", ()),
+            ("nonterminal-merged/witness behind base", "behind", "other", ()),
+            ("nonterminal-merged/retired-unit", "retire", "retired-unit", ()),
+            ("nonterminal-merged/surfaced-park", "decision", "surfaced-park", ()),
+            ("nonterminal-merged/no-rows", "norows", "no-rows", ()),
+            ("nonterminal-merged/refused-landing", "decision", "refused-landing",
+             render_driver_lines(18, "--landed", rc=1, checks="34", phase_from="LANDING", phase_to="LANDING"))):
+        model = build_nonterminal_model(sub, record, extra)
+        kinds = [(a["kind"], a.get("subclass")) for a in model.anomalies]
+        check(f"model AC5 {name}: nonterminal-merged, sub-class {want_sub}", kinds,
+              [("nonterminal-merged", want_sub)])
+        got[name] = [k for k, _ in kinds]
+        got.setdefault("subclasses", set()).add(want_sub)
+    model, start = build_no_progress_model()
+    got["no-progress"] = read_kinds(model)
+    check("model AC5 no-progress: a run with no own commit after its start", got["no-progress"],
+          ["no-progress"])
+    check_true("model AC5 no-progress: its evidence names the start commit and the window end",
+               bool(model.anomalies) and start[:8] in model.anomalies[0]["evidence"]
+               and "window ends" in model.anomalies[0]["evidence"], str(model.anomalies))
+    subs = got.pop("subclasses")
+    fired = {k for v in got.values() for k in v}
+    check("model AC5: every member of ANOMALY_KINDS has a fixture that fires it, and every fixture's "
+          "kind is a member", sorted(fired), sorted(rl_model.ANOMALY_KINDS))
+    check("model AC5: every member of MERGED_SUBCLASSES has a fixture, and every fixture's sub-class "
+          "is a member", sorted(subs), sorted(rl_model.MERGED_SUBCLASSES))
+
+
+def build_nonterminal_fixture():
+    """A run left at LANDING the way dRatifiedSeam was: `--preflight` wrote the witness once, `--close`
+    wrote the phase and no witness, and the own commits were merged into the default branch. A second
+    branch holds the same run with NO own commit after its start."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(-10), "subject": "older", "files": {"tools/o.txt": "o\n"}},
+                               {"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    older, base = s0[1], s0[2]
+    st = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
+    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    st = add_runstate_row(st, derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
+    closed = set_runstate_fact(set_runstate_fact(st, "phase", "LANDING"), "keepalive-reaped", "yes")
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "ref": "refs/heads/run",
+         "files": {rm: st}},
+        {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — work", "ref": "refs/heads/run",
+         "files": {"tools/a.txt": "b\n"}},
+        {"t": derive_minute(12), "subject": f"records({FX_SLUG}): close OK, phase LANDING",
+         "ref": "refs/heads/run", "files": {rm: closed}},
+        {"t": derive_minute(14), "subject": f"merge: {FX_UNIT1} — land", "merge": [3],
+         "files": {rm: closed, "tools/a.txt": "b\n"}},
+    ], repo=first)
+    return {"repo": repo, "record": rm, "closed": closed, "older": older, "base": base,
+            "shas": {"pre": shas[1], "work": shas[2], "close": shas[3], "merge": shas[4]}}
+
+
+def build_no_progress_model():
+    """A run preflighted and moved to BUILDING that never made a commit naming one of its units."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    st = build_preflight_state(FX_SLUG, s0[1], s0[1])
+    repo, shas = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+    ], repo=first)
+    return build_model(repo), shas[1]
+
+
+def build_nonterminal_model(fx, record, extra):
+    repo = fx["repo"]
+    text = fx["closed"]
+    if record == "behind":
+        text = set_runstate_fact(text, "witness", fx["older"])
+    elif record == "retire":
+        text = add_runstate_row(text, derive_minute(13), "rescope", f"retire {FX_UNIT2}", "out of scope")
+    elif record == "decision":
+        text = add_runstate_row(text, derive_minute(13), "decision", "land or not?", "the lander refused")
+    elif record == "norows":
+        text = re.sub(r"\n[0-9]{4}-[^\n]* · item [^\n]*\n", "\n", text)
+    keep = (repo / fx["record"]).read_bytes()
+    (repo / fx["record"]).write_bytes(text.encode("utf-8"))
+    j = write_journals(repo.parent, driver=list(extra)) if extra else None
+    try:
+        return build_model(repo, journals=j)
+    finally:
+        (repo / fx["record"]).write_bytes(keep)
+
+
+def test_model_ac4_ac12_conformance():
+    """AC4 and AC12: every member of CONFORMANCE_ITEMS in every state it can take, including a close
+    with no gate line in its window, through `check_conformance` on model-shaped fixtures; and the
+    clean landed run end to end."""
+    t = float(derive_minute(10))
+
+    def run_items(**kw):
+        base = {"phase": "LANDED", "units": [], "timeline": [], "close": {"t": None, "head": None},
+                "facts": {}, "record_rows": []}
+        base.update(kw)
+        return {(c["item"], c.get("unit")): c for c in rl_model.check_conformance(base)}
+
+    unit = {"id": FX_UNIT1, "build_commit": "c" * 40, "build_t": t, "briefs": [t + 60],
+            "dispatches": [t - 60]}
+    got = run_items(units=[unit])[("brief-before-build", FX_UNIT1)]
+    check("model AC4: a build commit before its brief row reads UNMET", got["state"], "UNMET")
+    check_true("model AC4: ...and its evidence names both times",
+               rl_model.derive_iso(t) in got["evidence"] and rl_model.derive_iso(t + 60) in got["evidence"],
+               got["evidence"])
+    seen = set()
+    cases = [
+        ("brief-before-build", "MET", dict(units=[dict(unit, briefs=[t - 30])]), FX_UNIT1),
+        ("brief-before-build", "UNMET", dict(units=[dict(unit, dispatches=[])]), FX_UNIT1),
+        ("brief-before-build", "UNJUDGEABLE", dict(units=[dict(unit, build_commit=None, build_t=None)]), None),
+        ("phases-walked", "MET", dict(timeline=[{"t": t, "kind": "phase", "phase": "BUILDING"},
+                                                {"t": t + 9, "kind": "phase", "phase": "LANDING"}]), None),
+        ("phases-walked", "MET", dict(phase="ABORTED", timeline=[{"t": t, "kind": "phase", "phase": "ABORTED"}]),
+         None),
+        ("phases-walked", "UNMET", dict(timeline=[{"t": t, "kind": "phase", "phase": "RUNNING"},
+                                                  {"t": t + 9, "kind": "phase", "phase": "LANDING"}]), None),
+        ("phases-walked", "UNJUDGEABLE", dict(phase="BUILDING",
+                                              timeline=[{"t": t, "kind": "phase", "phase": "BUILDING"}]), None),
+        ("green-at-close", "MET", dict(close={"t": t + 60, "head": "h" * 40},
+                                       timeline=[{"t": t, "kind": "gate", "verdict": "GREEN", "head": "h" * 40}]),
+         None),
+        ("green-at-close", "UNMET", dict(close={"t": t + 60, "head": "h" * 40},
+                                         timeline=[{"t": t, "kind": "gate", "verdict": "GREEN", "head": "g" * 40}]),
+         None),
+        ("green-at-close", "UNMET", dict(close={"t": t + 60, "head": "h" * 40},
+                                         timeline=[{"t": t + 90, "kind": "gate", "verdict": "GREEN",
+                                                    "head": "h" * 40}]), None),
+        ("green-at-close", "UNJUDGEABLE", dict(close={"t": t + 60, "head": "h" * 40}), None),
+        ("green-at-close", "UNJUDGEABLE", dict(timeline=[{"t": t, "kind": "gate", "verdict": "GREEN",
+                                                          "head": "h" * 40}]), None),
+        ("keepalive-reaped", "MET", dict(facts={"keepalive-reaped": "yes"}), None),
+        ("keepalive-reaped", "UNMET", dict(facts={}), None),
+        ("keepalive-reaped", "UNJUDGEABLE", dict(phase="BUILDING", facts={}), None),
+        ("review-exited", "MET", dict(record_rows=[{"kind": "review", "item": "s", "line": 3,
+                                                    "reason": "verdict CLEAN · blockers 0 · CONVERGED"}]), None),
+        ("review-exited", "UNMET", dict(record_rows=[{"kind": "review", "item": "s", "line": 3,
+                                                      "reason": "verdict BLOCKED · blockers 2"}]), None),
+        ("review-exited", "UNJUDGEABLE", dict(record_rows=[]), None),
+    ]
+    for item, state, kw, key in cases:
+        got = run_items(**kw)[(item, key)]
+        check(f"model AC12: {item} reads {state} on its fixture ({got['evidence'][:60]})", got["state"], state)
+        seen.add((item, state))
+    check("model AC12: a close with no gate line in its window reads UNJUDGEABLE, never MET",
+          run_items(close={"t": t + 60, "head": "h" * 40})[("green-at-close", None)]["state"], "UNJUDGEABLE")
+    check("model AC12: every item in every state its rule names has a fixture, and nothing else",
+          sorted(seen), sorted((i, s) for i in rl_model.CONFORMANCE_ITEMS for s in rl_model.CONFORMANCE_STATES))
+    check_true("model AC12: every state a fixture produced is a member",
+               {s for _, s in seen} <= set(rl_model.CONFORMANCE_STATES))
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    check("model AC12 end to end: the clean landed run meets every item",
+          [(c["item"], c["state"]) for c in model.conformance],
+          [("brief-before-build", "MET"), ("phases-walked", "MET"), ("green-at-close", "MET"),
+           ("keepalive-reaped", "MET"), ("review-exited", "UNJUDGEABLE")])
+    check("model AC12 end to end: the head --close ran at is the LANDING commit's parent",
+          model.close["head"], fx["head_at_close"])
+
+
+def test_model_ac6_coverage():
+    """AC6: every coverage state from its own fixture, the epoch rule on both sides, and a journal
+    holding only other runs' lines telling a dead writer from one that predates the run."""
+    base = pathlib.Path(tempfile.mkdtemp(prefix="runlog-ac6-"))
+    SCRATCH.append(base)
+    other = render_driver_lines(30, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING")
+    j = write_journals(base, driver=other)
+    journals = rl_model.read_journals(j)
+    epoch = journals["driver"]["epoch"]
+    check("model AC6: the epoch is the producer file's first line", epoch, float(MODEL_T0 + 1800))
+    transcripts = {"state": "not-local"}
+    seen = {}
+
+    def run_state(name, start, end, lines, activity):
+        cov = rl_model.measure_coverage(journals, {"start": start, "end": end}, {"driver": lines},
+                                        {"driver": activity}, transcripts)
+        seen[name] = cov["driver"]["state"]
+        return cov
+
+    run_state("before the epoch", epoch - 900, epoch - 60, 0, "12 parked row(s) in the window")
+    run_state("after it, with twelve parked rows and none of its lines", epoch + 60, epoch + 900, 0,
+              "12 parked row(s) in the window")
+    run_state("holding it, with none of its lines", epoch - 60, epoch + 60, 0, "12 parked row(s)")
+    run_state("holding it, with lines of its own", epoch - 60, epoch + 60, 4, "12 parked row(s)")
+    run_state("after it, with lines of its own", epoch + 60, epoch + 900, 4, "12 parked row(s)")
+    run_state("after it, with no line and nothing proving one was owed", epoch + 60, epoch + 900, 0, None)
+    check("model AC6: each window against the epoch", seen,
+          {"before the epoch": "absent", "after it, with twelve parked rows and none of its lines": "dead",
+           "holding it, with none of its lines": "partial", "holding it, with lines of its own": "partial",
+           "after it, with lines of its own": "present",
+           "after it, with no line and nothing proving one was owed": "present"})
+    absent = rl_model.measure_coverage(rl_model.read_journals(None), {"start": 0, "end": 1}, {}, {}, transcripts)
+    seen["no journal file"] = absent["pushes"]["state"]
+    check("model AC6: a missing journal file reads absent", absent["pushes"]["state"], "absent")
+    check("model AC6: a fixture with no local transcript reads not-local",
+          absent["transcripts"]["state"], "not-local")
+    seen["no transcript"] = absent["transcripts"]["state"]
+    _x, state, _n = rl_model.resolve_run_sessions([FX_SID], FX_SLUG, store=base / "no-store", projects=None)
+    check("model AC6: ...and so does a named session with neither an extract nor a transcript here",
+          state, "not-local")
+    check("model AC6: every member of COVERAGE_STATES has a fixture, and every fixture's state is a "
+          "member", sorted(set(seen.values())), sorted(rl_model.COVERAGE_STATES))
+
+
+def test_model_ac7_real_tree():
+    """AC7: the CLI over THIS tree's aLeakedHandle, with its journals aimed at a scratch directory whose
+    first line postdates the run, and its store and transcripts at scratch too, so nothing real is
+    read but git and the tracked record."""
+    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
+    mr = rl.resolve_memory_root(top)
+    rel = f"{mr}/builds/aLeakedHandle/RUN.md"
+    if not (top / rel).is_file():
+        print("  SKIP model AC7: this tree does not carry the aLeakedHandle record the criterion names")
+        return
+    base, projects = build_projects("runlog-ac7-")
+    later = render_driver_lines(3 * 24 * 60, "--status", slug="aLeakedHandle", phase_from="LANDED",
+                                phase_to="LANDED")
+    j = write_journals(base, driver=later, gates=[render_gate_line(3 * 24 * 60, "r", "0" * 40)])
+    env = build_arm_env(base)
+    r = run_runlog(["model", "aLeakedHandle", "--json", "--journals", str(j), "--transcripts", str(projects)],
+                   top, env)
+    check("model AC7: the CLI exits 0", r.returncode, 0)
+    try:
+        doc = json.loads(r.stdout)
+    except ValueError:
+        doc = {}
+    text = (top / rel).read_bytes().decode("utf-8")
+    want = Counter(m.group(1) for m in re.finditer(r"^[0-9T:Z-]+ ([a-z]+) · item ", text, re.M))
+    check("model AC7: the parked-row counts by kind match the run-state file",
+          dict(Counter(row["kind"] for row in doc.get("record_rows", []))), dict(want))
+    landed = run_git(["log", "--reverse", "-S", "phase: LANDED", "--format=%H %ct", "--", rel], top).stdout.split()
+    check("model AC7: the window ends at the commit that first wrote phase: LANDED",
+          (doc.get("window", {}).get("end"), doc.get("window", {}).get("end_from")),
+          (float(landed[1]) if len(landed) > 1 else None, "terminal-write"))
+    later_mentions = run_git(["log", "--format=%ct", "--grep=aLeakedHandle", "-1"], top).stdout.split()
+    check_true("model AC7: ...and a later commit merely naming the slug exists, which the window does "
+               "not reach", bool(later_mentions) and len(landed) > 1 and int(later_mentions[0]) > int(landed[1]),
+               str(later_mentions))
+    check("model AC7: the journal sources read absent, by epoch for two and by file for the third",
+          [doc.get("coverage", {}).get(s, {}).get("state") for s in ("driver", "gates", "pushes")],
+          ["absent", "absent", "absent"])
+    check_true("model AC7: ...and the driver's epoch is set, so its absent is the epoch rule's",
+               doc.get("coverage", {}).get("driver", {}).get("epoch") is not None, str(doc.get("coverage")))
+    stored = list((base / "store").rglob("aLeakedHandle-*.json"))
+    check("model AC7: a local copy lands beside the extracts, in the arm's own store",
+          [p.parent.name for p in stored], ["models"])
+    check_true("model AC7: the wall time is printed, report-only", "report-only" in r.stderr, r.stderr[-300:])
+
+
+def test_model_ac8_git_calls():
+    """AC8: a run of 10 own commits and one of 100 cost the same number of git processes, counted by
+    patching `subprocess.Popen` rather than read off the model's own counter."""
+    counts = {}
+    for n in (10, 100):
+        rm = f"memory/builds/{FX_SLUG}/RUN.md"
+        first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+        st = build_preflight_state(FX_SLUG, s0[1], s0[1])
+        commits = [{"t": derive_minute(1), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}}]
+        for i in range(n):
+            st = add_runstate_row(st, derive_minute(2 + i), "dispatch", f"{s0[1][:8]} {FX_UNIT1}", "tools/a.txt")
+            commits.append({"t": derive_minute(2 + i), "subject": f"feat: {FX_UNIT1} — step {i}",
+                            "files": {"tools/a.txt": f"{i}\n", rm: st,
+                                      f"memory/DECISIONS.md": f"- X-{FX_SLUG}-{i} · row\n" * (i + 1)}})
+        repo, _ = build_history(commits, repo=first)
+        real = subprocess.Popen
+        seen = []
+
+        def arm_popen(args, *a, **kw):
+            if isinstance(args, (list, tuple)) and args and pathlib.Path(str(args[0])).stem == "git":
+                seen.append(args[1:4])
+            return real(args, *a, **kw)
+
+        subprocess.Popen = arm_popen
+        try:
+            model = build_model(repo)
+        finally:
+            subprocess.Popen = real
+        counts[n] = len(seen)
+        check(f"model AC8: the {n}-commit run modeled all its own commits", len(model.own_commits), n)
+    check_true("model AC8 liveness: the counter saw git processes at all", counts[10] > 0, str(counts))
+    check("model AC8: 10 and 100 commits cost the same number of git processes", counts[100], counts[10])
+    print(f"  report (grades nothing): model git processes {counts}")
+
+
+def test_model_ac9_no_start():
+    """AC9: a run with no preflight START and no parked rows starts at its start commit, and a later
+    commit that merely names the slug moves no window end, terminal or not."""
+    # The third variant declares its memory root as `records`, so a model that spelled the root rather
+    # than resolving it would find no run there at all.
+    for terminal, mr in ((True, "memory"), (False, "memory"), (False, "records")):
+        rm = f"{mr}/builds/{FX_SLUG}/RUN.md"
+        files = build_base_files(mr=mr)
+        if mr != "memory":
+            files[".memory-tree.conf"] = f"MEMORY_ROOT={mr}\n"
+        first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files}])
+        st = build_preflight_state(FX_SLUG, s0[1], "f" * 40)
+        last = (set_runstate_fact(st, "phase", "LANDED") if terminal else set_runstate_fact(st, "phase", "BUILDING"))
+        repo, shas = build_history([
+            {"t": derive_minute(3), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+            {"t": derive_minute(6), "subject": f"feat: {FX_UNIT1} — work", "files": {"tools/a.txt": "1\n"}},
+            {"t": derive_minute(9), "subject": f"records({FX_SLUG}): the last record write", "files": {rm: last}},
+            {"t": derive_minute(40), "subject": f"records({FX_SLUG}): a later note naming the slug",
+             "files": {f"{mr}/builds/{FX_SLUG}/README.md": "x\n"}},
+        ], repo=first)
+        model = build_model(repo)
+        label = ("terminal" if terminal else "non-terminal") + ("" if mr == "memory" else f", root {mr}")
+        check(f"model AC9 {label}: the window starts at the start commit, not the witness",
+              (model.window["start"], model.window["start_from"]), (float(derive_minute(3)), "git"))
+        check(f"model AC9 {label}: the later mention does not move the window end",
+              model.window["end"], float(derive_minute(9)) + (0.0 if terminal else 1.0))
+
+
+def test_model_ac10_joins():
+    """AC10: two bars at the same minute from two worktrees and one pinned by a push; the landing
+    push from another worktree joins by what it pushed, its pinned bar joins by id, and idle gaps of
+    15 and 14 minutes yield one."""
+    fx = build_landed_fixture()
+    run_id = "push-1789295160000000-5151"
+    gates = [render_gate_line(20, "20260913T101930Z-7001", fx["head_at_close"]),
+             render_gate_line(20.2, "20260913T101930Z-8001", fx["head_at_close"], wt=FX_WT_OTHER),
+             render_gate_line(26, run_id, fx["merge"], wt=FX_WT_PRIMARY)]
+    earlier = render_push_lines(-30, "1" * 40, lander="1", wt=FX_WT_OTHER, decision="skip-nondefault",
+                                remote_ref="refs/heads/side", pid=6161)
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=gates, pushes=earlier + fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    got = sorted((e["run"], e["via"]) for e in model.timeline if e["kind"] == "gate")
+    check("model AC10: only the run's own worktree line and the pinned line join",
+          got, sorted([("20260913T101930Z-7001", "worktree"), (run_id, "gate_run")]))
+    pushes = [(e["via"], e["gate_run"]) for e in model.timeline if e["kind"] == "push"]
+    check("model AC10: the landing push from the primary tree joins by what it pushed", pushes,
+          [("pushed-sha", run_id)])
+    check("model AC10: ...and the pushes source does not read dead", model.coverage["pushes"]["state"], "present")
+    # The same landing push with the run's commit NOT in what it pushed joins nothing.
+    stray = render_push_lines(25, "9" * 40, gate_run="push-9-9")
+    j2 = write_journals(fx["repo"].parent, driver=fx["driver"], gates=gates, pushes=earlier + stray)
+    model2 = build_model(fx["repo"], journals=j2)
+    check("model AC10 near miss: a push of a sha outside the run's history joins no run",
+          [e for e in model2.timeline if e["kind"] == "push"], [])
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    st = build_preflight_state(FX_SLUG, s0[1], s0[1])
+    repo, _ = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(17), "subject": f"feat: {FX_UNIT1} — after fifteen minutes", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(31), "subject": f"feat: {FX_UNIT1} — after fourteen", "files": {"tools/a.txt": "2\n"}},
+        {"t": derive_minute(33), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+    ], repo=first)
+    model = build_model(repo)
+    gaps = [int(e["dur"]) for e in model.timeline if e["kind"] == "idle"]
+    check("model AC10: gaps of 15 and 14 minutes yield exactly one idle-gap, the 15", gaps, [900])
+    check("model AC10: ...which is also the one idle-gap anomaly",
+          [a["kind"] for a in model.anomalies if a["kind"] == "idle-gap"], ["idle-gap"])
+
+
+def test_model_ac13_ac14_positions_usage():
+    """AC13 and AC14: owner turns classed across every boundary, the stand-in start included, and
+    usage summed inside the window only, split three ways."""
+    s, c = 1000.0, 5000.0
+    turns = [(100.0, "a"), (200.0, "a"), (1500.0, "a"), (6000.0, "a"), (1200.0, "b")]
+    got = rl_model.build_owner_positions(turns, s, c)
+    check("model AC13: launch, pre-run, in-window and post-close",
+          [(t["t"], t["position"]) for t in got["turns"]],
+          [(100.0, "launch"), (200.0, "pre-run"), (1200.0, "in-window"), (1500.0, "in-window"),
+           (6000.0, "post-close")])
+    check("model AC13: the boundaries themselves: at the start is in-window, at the close post-close",
+          [t["position"] for t in rl_model.build_owner_positions([(999.9, "x"), (1000.0, "y"), (4999.9, "y"),
+                                                                   (5000.0, "y")], s, c)["turns"]],
+          ["launch", "in-window", "in-window", "post-close"])
+    # A run with no close: its terminal END stands in, and the caller passes it as the close.
+    got = rl_model.build_owner_positions([(900.0, "a"), (4000.0, "a"), (4200.0, "a")], s, 4100.0)
+    check("model AC13: with no close, a turn after the terminal END is post-close",
+          [t["position"] for t in got["turns"]], ["launch", "in-window", "post-close"])
+    check("model AC13: every member of OWNER_POSITIONS was produced",
+          sorted({t["position"] for t in rl_model.build_owner_positions(turns, s, c)["turns"]}),
+          sorted(rl_model.OWNER_POSITIONS))
+    # The stand-in, end to end: no START, so the start commit is the start and the window end the close.
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    st = build_preflight_state(FX_SLUG, s0[1], s0[1])
+    repo, _ = build_history([
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(8), "subject": f"feat: {FX_UNIT1} — work", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(10), "subject": f"records({FX_SLUG}): BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+    ], repo=first)
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(store, FX_SID, [{"t": float(derive_minute(4)), "kind": "owner", "via": "typed"},
+                                  {"t": float(derive_minute(7)), "kind": "owner", "via": "typed"},
+                                  {"t": float(derive_minute(12)), "kind": "owner", "via": "typed"}])
+    model = build_model(repo, store=store)
+    check("model AC13 stand-in: before the start commit launch, inside the window in-window, after its "
+          "end post-close", [t["position"] for t in model.owner_positions["turns"]],
+          ["launch", "in-window", "post-close"])
+    usage = [{"t": 900.0, "kind": "usage", "src": "main", "in": 1, "out": 1, "cache_read": 0, "cache_write": 0},
+             {"t": 1000.0, "kind": "usage", "src": "main", "in": 10, "out": 2, "cache_read": 5, "cache_write": 1},
+             {"t": 2000.0, "kind": "usage", "src": "agent", "in": 20, "out": 3, "cache_read": 0, "cache_write": 0},
+             {"t": 3000.0, "kind": "usage", "src": "workflow", "in": 30, "out": 4, "cache_read": 0,
+              "cache_write": 0},
+             {"t": 5000.0, "kind": "usage", "src": "main", "in": 99, "out": 9, "cache_read": 0, "cache_write": 0}]
+    got = rl_model.build_run_usage({"a": {"events": usage}}, s, c)
+    check("model AC14: only usage inside the half-open window counts, split three ways",
+          {k: (v["requests"], v["in"], v["out"]) for k, v in got.items()},
+          {"main": (1, 10, 2), "agent": (1, 20, 3), "workflow": (1, 30, 4)})
+
+
+def test_model_ac15_ac18_journal_join():
+    """AC15 and AC18: a journal's runs are cut by its successful record-creating preflights, each
+    joined to the start commit its own call made by a named key; a refused preflight and a START whose
+    commit never reached the clone start no run."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = s0[1]
+    recs, commits = [], []
+    for i, m in enumerate((5, 20, 35)):
+        st = build_preflight_state(FX_SLUG, base, base, kid=f"k000000{i}")
+        done = set_runstate_fact(st, "phase", "LANDED")
+        files = {rm: st}
+        if recs:
+            files[f"memory/builds/{FX_SLUG}/{derive_archive_name(recs[-1])}"] = recs[-1]
+        commits += [{"t": derive_minute(m), "subject": f"records({FX_SLUG}): preflight {i + 1}", "files": files},
+                    {"t": derive_minute(m + 3), "subject": f"feat: {FX_UNIT1} — run {i + 1}",
+                     "files": {"tools/a.txt": f"{i}\n"}},
+                    {"t": derive_minute(m + 6), "subject": f"records({FX_SLUG}): landed {i + 1}",
+                     "files": {rm: done}}]
+        recs.append(done)
+    repo, shas = build_history(commits, repo=first)
+    driver = (render_driver_lines(19, "--preflight", phase_from="LANDED", rc=1, checks="7", phase_to="LANDED")
+              + render_driver_lines(19.5, "--preflight", phase_from="LANDED", phase_to="RUNNING")
+              + render_driver_lines(22, "--status", phase_from="RUNNING", phase_to="RUNNING")
+              + render_driver_lines(34.5, "--preflight", phase_from="LANDED", phase_to="RUNNING", pid=4343)
+              + render_driver_lines(37, "--status", phase_from="RUNNING", phase_to="RUNNING", pid=4343)
+              + render_driver_lines(50, "--preflight", phase_from="LANDED", phase_to="RUNNING", pid=4444)
+              + render_driver_lines(52, "--status", phase_from="RUNNING", phase_to="RUNNING", pid=4444))
+    j = write_journals(repo.parent, driver=driver)
+    models = [build_model(repo, journals=j, run=k) for k in (1, 2, 3)]
+    check("model AC18: three start commits, three runs", [m.runs for m in models], [3, 3, 3])
+    check("model AC18: the first run's window comes from git alone, the others from their STARTs",
+          [m.window["start_from"] for m in models], ["git", "driver", "driver"])
+    check("model AC18: each START joins the start commit its own call made, and its runkey",
+          [(m.window["start"], m.runkey) for m in models],
+          [(float(derive_minute(5)), shas[1][:8]), (MODEL_T0 + 19.5 * 60, shas[4][:8]),
+           (MODEL_T0 + 34.5 * 60, shas[7][:8])])
+    verbs = [[(e["verb"], e["rc"]) for e in m.timeline if e["kind"] == "verb"] for m in models]
+    check("model AC15: the refused preflight sits in run one's lines and starts no run",
+          verbs[0], [("--preflight", "1")])
+    check("model AC15: run two's timeline holds exactly its own lines",
+          verbs[1], [("--preflight", "0"), ("--status", "0")])
+    check("model AC15: ...and run three's stops at the START whose commit never reached the clone",
+          verbs[2], [("--preflight", "0"), ("--status", "0")])
+    check("model AC18: that START is named in the coverage block and starts no run",
+          [u["t"] for u in models[2].coverage["unjoined_starts"]], [float(MODEL_T0 + 50 * 60)])
+
+
+def test_model_ac17_attribution():
+    """AC17: attribution within one session, from fixture lines built on the golden driver lines, with
+    known unit and phase splits; and every fixture line any model arm wrote holds only its producer's
+    keys."""
+    golden = {(ln.fields["p"], ln.fields["ev"]): ln.fields
+              for ln in rl.read_journal(FIXTURES / "golden-lines.txt").lines}
+
+    def build_pair(t, verb, unit=None, phase_from="", phase_to="", sid=FX_SID, end=True):
+        s = dict(golden[("driver", "start")])
+        s.update(t=f"{t:.6f}", n=f"4242.{f'{t:.6f}'.replace('.', '')}", verb=verb, phase_from=phase_from)
+        s.pop("oob", None)
+        s["sess.CLAUDE_CODE_SESSION_ID"] = sid
+        out = [s]
+        if end:
+            e = dict(golden[("driver", "end")])
+            e.update(t=f"{t + 1:.6f}", n=s["n"], verb=verb, rc="0", checks="", phase_to=phase_to)
+            if unit:
+                e["unit"] = unit
+            else:
+                e.pop("unit", None)
+            out.append(e)
+        return out
+
+    lines = (build_pair(100, "--phase", phase_from="RUNNING", phase_to="BUILDING")
+             + build_pair(200, "--brief", unit=FX_UNIT1, phase_from="BUILDING", phase_to="BUILDING")
+             + build_pair(300, "--status", phase_from="BUILDING", phase_to="BUILDING")
+             + build_pair(400, "--dispatch", unit=FX_UNIT2, phase_from="BUILDING", phase_to="BUILDING")
+             + build_pair(500, "--brief", unit="X-xFixtureRun-9", phase_from="BUILDING", end=False)
+             + build_pair(600, "--phase", phase_from="BUILDING", phase_to="VERIFYING", sid=FX_SID_B))
+    MODEL_LINES.extend(lines)
+    invs = [rl_model.derive_invocation(i) for i in rl.build_invocations(
+        [rl.parse_line(rl.render_line(f)) for f in sorted(lines, key=lambda f: float(f["t"]))])]
+
+    def build_call(t, dur=10.0):
+        return {"t": t, "kind": "tool", "dur": dur}
+
+    # Session A: one call before any END (unattributed), then calls under each boundary. Session B's
+    # --phase END must not attribute session A's calls after it.
+    a_calls = [build_call(50), build_call(150), build_call(250), build_call(350), build_call(450),
+               build_call(550), build_call(700)]
+    extracts = {FX_SID: {"events": a_calls}, FX_SID_B: {"events": [build_call(700, 5.0)]}}
+    got = rl_model.derive_attribution(invs, extracts)
+    check("model AC17: the pre-verb call is unattributed, and every other call attributed",
+          (got["calls"], got["attributed"], got["unattributed"]), (8, 7, 1))
+    check("model AC17: units split as the fixture's: the heartbeat keeps the brief's unit, the killed "
+          "brief contributes none", got["by_unit"], {FX_UNIT1: 2, FX_UNIT2: 3})
+    check("model AC17: phases split as the fixture's, session B's move reaching only session B",
+          got["by_phase"], {"BUILDING": 6, "VERIFYING": 1})
+    check("model AC17: the shares equal the fixture's", (got["share_calls"], got["share_wall"]),
+          (round(7 / 8, 4), round(65.0 / 75.0, 4)))
+    bad = {}
+    for f in MODEL_LINES + [ln.fields for ln in rl.read_journal(FIXTURES / "golden-lines.txt").lines]:
+        extra = check_producer_keys(f)
+        if extra:
+            bad[f"{f.get('p')}/{f.get('ev')}"] = extra
+    check_true("model AC17: every fixture line the model arms wrote, and every golden line, carries only "
+               "fields its producer's data model lists", not bad and len(MODEL_LINES) > 20, str(bad))
+    check("model AC17 liveness: a line carrying a field its producer never writes is caught",
+          check_producer_keys({**golden[("driver", "end")], "phase_from": "X"}), ["phase_from"])
+
+
+def test_model_driver_sets():
+    """S4: the model's copies of the driver's parked-kind and owed sets, held to the driver's source in
+    both directions. The literal below is this withheld arm's one carried path; it runs where the
+    driver is present and announces its skip where it is not."""
+    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
+    src = top / "tools/unattended/unattended.sh"
+    if not src.is_file():
+        print("  SKIP model driver sets: the unattended driver is not beside this kit, so its sets "
+              "cannot be compared here")
+        return
+    text = src.read_bytes().decode("utf-8", "replace")
+    for name in ("PARK_KINDS", "PARK_KINDS_OWED", "PARK_ACTS_OWED", "PHASES_TERMINAL"):
+        rows = re.findall(rf'^{name}="([^"]*)"', text, re.M)
+        check(f"model driver sets: {name} is declared once in the driver", len(rows), 1)
+        check(f"model driver sets: the model's {name} equals the driver's, both directions",
+              sorted(rows[0].split()) if rows else None, sorted(getattr(rl_model, name)))
 
 
 def main():

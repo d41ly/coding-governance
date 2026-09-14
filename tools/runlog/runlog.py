@@ -6,10 +6,14 @@
                                         [--transcripts <projects dir>]
     python <this kit>/runlog.py extract --measure <projects dir>
     python <this kit>/runlog.py narration --session <sid> --from <t> --to <t> [--transcripts <dir>]
+    python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
 
 `extract` writes one structural extract per session to the user-profile store and prints one JSON
 object per session on stdout; `--measure` writes nothing and prints a report. `narration` prints a
 window of redacted text framed as data and writes nothing. The extractor's rules are the kit README's.
+`model` joins one run's sources into the run model and prints it, the whole JSON with `--json`, and
+writes a local copy beside the extracts; it exits 2 when the build has no committed run-state file or
+the run number names no run, and a store that does not resolve costs the copy, never the print.
 Both exit 2 on a refusal: a store, repo key, transcripts root or `--from`/`--to` time does not
 resolve, the ONE session named with `--session` is malformed or resolves outside its root, or an
 extract could not be written. Among
@@ -39,6 +43,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import extract as ex  # noqa: E402
+import model as mdl  # noqa: E402
 import runlog_lib as rl  # noqa: E402
 
 # How many refusal reasons are printed under the count. The COUNT is never capped; only the list is,
@@ -177,6 +182,48 @@ def cmd_narration(args) -> int:
     return 0
 
 
+def cmd_model(args) -> int:
+    # The journals, the store and the transcripts each resolve on their own, and a source that does
+    # not is a coverage state in the model rather than a refusal here: most runs have no journal.
+    try:
+        root = mdl.resolve_repo_root()
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    journals = args.journals
+    if journals is None:
+        try:
+            journals = rl.resolve_journal_root(root)
+        except ValueError as exc:
+            print(f"{exc}; the journals read absent", file=sys.stderr)
+    store = projects = None
+    try:
+        store = ex.resolve_state_dir() / ex.resolve_repo_key(root)
+    except ValueError as exc:
+        print(f"{exc}; no local copy is written and no extract is read", file=sys.stderr)
+    try:
+        projects = ex.resolve_projects_root(override=args.transcripts)
+    except ValueError as exc:
+        print(f"{exc}; the transcripts read not-local", file=sys.stderr)
+    try:
+        model = mdl.build_run_model(root, args.slug, run=args.run, journal_root=journals, store=store,
+                                    projects=projects)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    sys.stdout.write((mdl.render_model_json(model) if args.json else mdl.render_model_summary(model))
+                     + "\n")
+    sys.stdout.flush()
+    if store is not None:
+        try:
+            print(f"runlog: model copy {mdl.write_model_copy(model, store).as_posix()}", file=sys.stderr)
+        except (OSError, ValueError) as exc:
+            print(f"runlog: the model copy was not written: {exc}", file=sys.stderr)
+    print(f"runlog: model git_calls={model.cost['git_calls']} wall={model.cost['wall_s']}s "
+          "(report-only, grades nothing)", file=sys.stderr)
+    return 0
+
+
 def main(argv=None) -> int:
     # A path or a refusal reason can carry a character the console's code page lacks, and a print
     # that raises on it would turn a report into a traceback. Narration is transcript text, so stdout
@@ -201,7 +248,15 @@ def main(argv=None) -> int:
     pn.add_argument("--from", dest="t_from", required=True)
     pn.add_argument("--to", dest="t_to", required=True)
     pn.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
+    pm = sub.add_parser("model", help="join one run's sources into the run model and print it")
+    pm.add_argument("slug")
+    pm.add_argument("--run", type=int, help="the 1-up run of the build, oldest first; default the last")
+    pm.add_argument("--json", action="store_true", help="print the whole model as JSON")
+    pm.add_argument("--journals", help="the journal directory to read instead of this clone's own")
+    pm.add_argument("--transcripts", help="the projects dir to read instead of Claude Code's own")
     args = ap.parse_args(argv)
+    if args.cmd == "model":
+        return cmd_model(args)
     if args.cmd == "extract":
         modes = sum((bool(args.session), args.discover, bool(args.measure)))
         if modes > 1 or (args.slug and (args.session or args.measure)):
