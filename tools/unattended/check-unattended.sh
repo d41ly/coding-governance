@@ -509,8 +509,8 @@ else
         if (match(rs, /blockers [0-9]+/)) b = substr(rs, RSTART + 9, RLENGTH - 9) + 0
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
-        if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING/) term[it] = 1
-        if (rs ~ /NON-CONVERGENT|CEILING/) {
+        if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
+        if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
           needs[it] = 1
           nf = split(rs, fld, " · ")
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""

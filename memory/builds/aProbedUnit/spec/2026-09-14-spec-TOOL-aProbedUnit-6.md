@@ -1,11 +1,12 @@
 # TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit
 
-**Status:** SPECCED · rev-4 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aProbedUnit-6-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aProbedUnit-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-7 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-6-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-6-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-7 |
@@ -517,10 +518,16 @@ ledger row for that half reads `observed at --close`, per the build README's rul
 - **AC12** — When each arm section 4's suite paragraph adds is run alone by the form that
   paragraph gives — the preamble sourced, `slice_fn`'s definition sourced from `:3930`,
   `bcsetup`, `slice_fn review_state`, then the arm's own `same` or `hit` line — every line is
-  silent against the landed driver, and against the driver at base every verb arm prints
-  `FAIL`, the sliced `BOUNDED` arms print `FAIL` with `CONVERGING` in the got-column, and the
-  existing two-argument sliced arms at `tools/unattended/unattended.test.sh:4546` to `:4557`
-  stay silent against both. `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` at HEAD each stand exactly
+  silent against the landed driver, and against the driver at base every verb arm whose
+  expectation carries `BOUNDED` or the new NOTE or refusal text prints `FAIL`, the sliced
+  `BOUNDED` arms print `FAIL` with `CONVERGING` in the got-column, and the existing two-argument
+  sliced arms at `tools/unattended/unattended.test.sh:4546` to `:4557` stay silent against both.
+  Three verb arms hold against BOTH drivers by construction and are not reds at base: AC5's two
+  slug-subject arms, because the closing review is unchanged in behaviour and that is what they
+  assert; and the further-round refusal on the bounded subject, because the base driver reaches
+  the same terminal refusal through a `NON-CONVERGENT` second round. The four sliced order arms
+  (`NON-CONVERGENT`, `CONVERGED`, `CEILING`, and the ceiling-equal `CONVERGING`) are order
+  controls and hold against both by the same token. `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` at HEAD each stand exactly
   this pass's added assertion count above the values the pass's PARENT commit carries, read with
   `git show 'HEAD~1:tools/unattended/unattended.test.sh' | grep '^FLOOR_'`, which prints four
   lines: the pins are the LAST `FLOOR_ASSERTIONS` — the first, at `:5403`, is annotated
@@ -608,6 +615,7 @@ other default changes a two-argument call, and the one caller always passes it.
 - rev-1 · 2026-09-14 · initial draft.
 - rev-2 · 2026-09-14 · folded the round-1 spec audit: clusters B (ids 21, 8 — AC12 per-arm, AC9 to AC11 leg halves at `--close`), D (id 18 — AC11 against the parent commit), E (id 48 — `--disposition` stays required, the recorder retries with `promote`, F1), F (ids 23, 51 — `read_bound_key`, F2), H (id 7 — AC10's Skill oracles), O (id 31 — the ratchet leg), P (id 33 — the backlog flip is the close's).
 - rev-3 · 2026-09-14 · §3 · §4 · §8 F2 · the helper signature aligned to spec 3's four positionals, `read_bound_key <NAME> <DEFAULT> <UNIT> <NOTE>` — the `<UNIT>` word is what makes the refusal sentence true for a key that counts rounds rather than seconds; the `<NOTE>` no longer repeats the "Declare one" clause the helper prints itself (sub-spec interface agreement, M2).
+- rev-5 · 2026-09-14 · AC12 · the base-red clause narrowed from "every verb arm" to the arms whose expectation moved: measured at the pass, 12 of the 19 added arms red against a frozen copy of the base kit and 7 hold against both — AC5's two slug-subject arms and the further-round refusal by design, the four sliced order arms as controls — so "every verb arm prints FAIL" was a sentence the spec's own AC5 contradicted (build pass, TOOL-aProbedUnit-6).
 - rev-4 · 2026-09-14 · §3 · §4 · S9 · AC7 · AC12 · §10 · folded the round-2 spec audit: clusters A (ids 1, 10 — AC12's floors measured against the pass's parent commit on AC11's pattern, 706 and 510 kept as base-of-build figures spec 3 moves first), F (id 27 — the run-alone form sources `slice_fn` from `:3930`, which the preamble does not define), H (id 33 — the `WHY A PREDICATE AND NOT A COUNT` block at `:3966` to `:3969` and the `RUNAWAY_CEILING` header at `:457` to `:458` join the verb edits and Files touched; AC7's `moves the stall earlier` grep, 0 at the tip and 1 at base), K (id 15 — `mkconf`'s SEVENTH positional, `REVIEW_ROUNDS="${7-8}"`, unit 3 holding the sixth); and cluster G's correction (id 28, spec 7's) that the `:4634` arm stands in this pass and moves in unit 7's, where rev-3 said it stands unchanged.
 
 ## 10. Reuse audit

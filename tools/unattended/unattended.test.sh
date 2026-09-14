@@ -115,6 +115,7 @@ BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
 UNIT_STALL_BOUND="${6-1800}"
+REVIEW_ROUNDS="${7-8}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -4557,6 +4558,16 @@ same "an oscillation 2,1,2 is NON-CONVERGENT"         "$(review_state '2 1' 2)" 
 # predicate did not terminate, not because the loop misbehaved.
 same "a long shrinking sequence hits the ceiling"     "$(review_state '9 8 7 6 5 4 3' 2)" "CEILING"
 
+# ---- TOOL-aProbedUnit-6: THE THIRD ARGUMENT IS THE BOUND, defaulting to the ceiling, so every
+# ---- two-argument arm above holds unchanged. BOUNDED is tested after the two facts about THIS round
+# ---- and after the ceiling, so a clean round, a flat round and a ceiling hit each keep their own exit.
+same "a bound of 1 makes the first blocked round terminal"    "$(review_state '' 3 1)"      "BOUNDED"
+same "a bound of 2 ends a strictly smaller second round"      "$(review_state '3' 2 2)"     "BOUNDED"
+same "a bound equal to the ceiling arms round 1 as before"    "$(review_state '' 3 8)"      "CONVERGING"
+same "a flat count is NON-CONVERGENT before it is BOUNDED"    "$(review_state '2' 2 1)"     "NON-CONVERGENT"
+same "zero blockers is CONVERGED before it is BOUNDED"        "$(review_state '' 0 1)"      "CONVERGED"
+same "the ceiling fires before a bound equal to it"           "$(review_state '9 8 7 6 5 4 3' 2 8)" "CEILING"
+
 # ---- the verb's refusals, on disk
 bcopen
 hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
@@ -4644,6 +4655,30 @@ hit "$out" "NON-CONVERGENT · disposition fold"
 hit "$out" "FOLDED into the specs it belongs to"
 same "the fold disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold' memory/builds/tRun/RUN.md)" "1"
 same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+
+# ---- TOOL-aProbedUnit-6: A SPEC SUBJECT IS BOUNDED, THE SLUG SUBJECT IS NOT. The conf below declares
+# ---- REVIEW_ROUNDS=1 through mkconf's SEVENTH positional; every other review arm in this file runs at
+# ---- the default, the ceiling, which is why none of them moved. Against the base driver every arm
+# ---- here reads CONVERGING where BOUNDED is expected and refuses the explicit disposition.
+bcopen
+mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED and requires --disposition"
+same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --disposition promote)
+hit "$out" "BOUNDED · disposition promote"
+hit "$out" "the declared round bound of 1 is reached"
+same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+# the SLUG subject keeps the ceiling: an explicit disposition on its first blocked round is refused as
+# non-terminal, and the round itself arms the loop — the closing diff review is unchanged in behaviour.
+crdrop
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3 --disposition promote)" "not a terminal exit"
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3)" "CONVERGING"
+# ...and fold is as legal as promote at a BOUNDED exit: the field stays evidence, never a forced value.
+out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --disposition fold)
+hit "$out" "BOUNDED · disposition fold"
+same "the fold disposition is written into the bounded round's reason" "$(grep -c 'review · item B2 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition fold' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
@@ -5318,6 +5353,18 @@ NOCONF
 out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
 hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
+hit "$out" "declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of 1 round"
+reset_tree
+
+# ---- TOOL-aProbedUnit-6: REVIEW_ROUNDS above the runaway ceiling is a refusal, because the ceiling
+# ---- would fire first and the declared bound could never be reached; zero is the reader's own refusal,
+# ---- naming the key. Both exit 2 before any verb runs.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "9"
+out=$(run --status tRun)
+hit "$out" "above the runaway ceiling of 8"
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "0"
+out=$(run --status tRun)
+hit "$out" "REFUSING - REVIEW_ROUNDS is declared as '0', which is not a positive integer"
 reset_tree
 
 
@@ -5532,7 +5579,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=741
+FLOOR_ASSERTIONS=760
+# RAISED 741 -> 760 by TOOL-aProbedUnit-6, the +19 BOUNDED arms (6 sliced, 10 verb, 3 conf), each
+# run alone with the suite's preamble sourced and counted as the `hit`/`same` lines the diff adds.
 # RAISED 706 -> 741 by TOOL-aProbedUnit-3, the +35 `--audit` and bound arms, counted off a run of the
 # block alone with the suite's preamble sourced (n before and after), not off the file.
 # RAISED 675 -> 706 by TOOL-aGradedMandate, the +31 arms this build added, keeping the headroom the
@@ -5561,7 +5610,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=545
+FLOOR_SHARD_2=564
+# +19 for the TOOL-aProbedUnit-6 BOUNDED arms, all in region two.
 # +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;

@@ -636,7 +636,10 @@ a named refusal rather than a complete-looking list.
 
 A review that keeps coming back BLOCKED is the fault this kit was built to remove, and the remedy is
 not a round cap — over the tracked corpus the clean exit the method names occurs ZERO times, so a cap
-would only move the stall earlier. Record every round and the verb tells you what the loop is doing:
+would only move the stall earlier. A SPEC subject's declared bound, `REVIEW_ROUNDS`, is not that cap:
+it ends in a DISPOSITION rather than a stall, because every blocker standing at the bound is folded
+or promoted exactly as at `NON-CONVERGENT`. Record every round and the verb tells you what the loop
+is doing:
 
 ```bash
 bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
@@ -646,7 +649,7 @@ bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict 
 `--verdict` is one of exactly three: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`. `--blockers` is the
 confirmed-blocker count for THIS round, as a plain integer.
 
-It answers with one of four states, and the state is what you act on:
+It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
 - **CONVERGED** — zero blockers. The loop is done for that subject.
@@ -661,6 +664,11 @@ It answers with one of four states, and the state is what you act on:
   **Record which you took**, with `--disposition fold|promote` on the round that exits; the merge
   bar reads that field, and a fold with nothing recorded is indistinguishable from a promotion that
   never happened.
+- **BOUNDED** — the declared round bound, `REVIEW_ROUNDS` (kit default 1), is reached on a subject
+  that is not the build slug. **The loop STOPS**, exactly as at `NON-CONVERGENT`: every blocker still
+  standing is DISPOSED, and the round records which way with `--disposition fold|promote`. The owner
+  ruled on 2026-09-14 that a SPEC subject takes one round by default; the closing diff review keeps
+  its convergence loop, because its subject is the build slug, whose bound is the runaway ceiling.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.

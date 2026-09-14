@@ -40,6 +40,14 @@ GATE_BOUND="3600"
 # Set it to a few keepalive cadences, so a verdict is never one missed tick.
 UNIT_STALL_BOUND="1800"
 
+# The round bound a spec-audit subject -- any `--review` subject that is not the build slug -- takes
+# before it exits BOUNDED; the build slug keeps the runaway ceiling. OPTIONAL, on GATE_BOUND's terms:
+# absent takes the kit default of 1 and says so on stderr; non-numeric, zero, or above the runaway
+# ceiling is a refusal.
+#
+# 1 is the owner ruling: a spec subject takes one round, and a blocker it confirms is disposed.
+REVIEW_ROUNDS="1"
+
 # REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
 # accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked
 # bytes, and the run's first act must not be that.

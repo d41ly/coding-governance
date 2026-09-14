@@ -104,10 +104,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   a narrowing and refused, which is the conservative direction and is stated here rather than
   discovered.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
-  `CONVERGING`, `CONVERGED`, `NON-CONVERGENT` or `CEILING`. The round is an append-only `review` line
-  in the parked region, a `history` kind, so it never inflates the count of decisions the owner must
-  be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY smaller than the
-  round before. At a TERMINAL exit — `NON-CONVERGENT` or `CEILING` — the round RECORDS which
+  `CONVERGING`, `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED`. The round is an append-only
+  `review` line in the parked region, a `history` kind, so it never inflates the count of decisions
+  the owner must be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY
+  smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
+  most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
+  is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
+  always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS which
   disposition the run took, `fold` or `promote`: `--disposition` is REQUIRED there and REFUSED on any
   round that is not one. Both values are legal, because the method admits folding a blocker back into
   the specs it belongs to as readily as promoting it to a unit, and a record naming neither leaves the

@@ -593,7 +593,7 @@ const auRaw = await workflow(
 // throws. The 28 suite arms were green because the test double returned a `verdict` and a
 // `reportPath` I had invented, which is the fixture grading the fixture.
 //
-// WHO OWNS THE VERDICT VOCABULARY. `CONVERGING|CONVERGED|NON-CONVERGENT|CEILING` is produced by
+// WHO OWNS THE VERDICT VOCABULARY. `CONVERGING|CONVERGED|NON-CONVERGENT|CEILING|BOUNDED` is produced by
 // `unattended.sh`'s `review_state()` from the PRIOR round's counts — no JS can compute it, because
 // convergence is a property of the sequence and not of this round. The old prompt ran the driver's
 // `--review` and returned its token; that call was deleted with the agent and nothing replaced it,
@@ -657,9 +657,11 @@ const rv = attended
     ' --verdict ' + (auRaw.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
     ' --blockers ' + auRaw.blockers + '\n\n' +
     'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
-    'CEILING — verbatim, and the command\'s exit code. Do not infer the token from the blocker ' +
-    'count: it is a property of the SEQUENCE of rounds, which only the driver can see. If the ' +
-    'command fails, return its stderr rather than a token.',
+    'CEILING, BOUNDED — verbatim, and the command\'s exit code. Do not infer the token from the ' +
+    'blocker count: it is a property of the SEQUENCE of rounds, which only the driver can see. ' +
+    'If the command REFUSES naming --disposition, this round is a terminal exit: run the SAME ' +
+    'command once more with --disposition promote appended, and return THAT run\'s token and ' +
+    'exit code. If the command fails for any other reason, return its stderr rather than a token.',
   { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
 )
 if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
@@ -675,7 +677,7 @@ if (!rv || typeof rv.token !== 'string') {
 // was a non-empty string, so `"ok"` would have passed, failed the `=== 'CONVERGING'` test, and
 // fallen straight through to the hand-out. That is weaker than what it replaced, in the direction that
 // matters.
-const REVIEW_TOKENS = ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING']
+const REVIEW_TOKENS = ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING', 'BOUNDED']
 if (REVIEW_TOKENS.indexOf(rv.token) === -1) {
   throw new Error(
     'unattended-build: the driver returned "' + rv.token + '", which is not one of ' +

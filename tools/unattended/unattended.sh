@@ -293,7 +293,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""
-GATE_BOUND=""; UNIT_STALL_BOUND=""
+GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -470,14 +470,21 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 #                             and no run can split it.
 #   repo-state-out-of-mandate the repository state at start was outside what the mandate reaches.
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
-# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. The loop is bounded by a
-# CONVERGENCE PREDICATE, not by a count; this exists so a defect in that predicate cannot produce an
-# unbounded loop. It is set well above any observed converging sequence, so REACHING it is itself a
-# defect worth reporting rather than a routine outcome — and under the owner resolution the run
-# promotes and lands anyway rather than halting, which is why it must be loud in two carriers.
+# THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
+# `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
+# this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
+# set well above any observed converging sequence, so REACHING it is itself a defect worth reporting
+# rather than a routine outcome — and under the owner resolution the run promotes and lands anyway
+# rather than halting, which is why it must be loud in two carriers.
 # A file constant, not a conf key and not an environment variable, on the argument this repo already
 # recorded for its agent fan-out bound: a ceiling raisable from the environment leaves no diff behind.
 RUNAWAY_CEILING="8"
+# THE ROUND BOUND FOR A SPEC SUBJECT, TOOL-aProbedUnit-6. The third caller of `read_bound_key`, placed
+# here and not beside the other two because the one arm those keys lack — the upper bound — IS the
+# constant above, and a comparison written above its definition reads an empty string. A tracked conf
+# key rather than a constant because a conf leaves a diff behind, the property the header above wants.
+read_bound_key REVIEW_ROUNDS 1 rounds "a spec-audit subject exits BOUNDED after the kit default of 1 round"
+[ "$REVIEW_ROUNDS" -le "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }
 # THE REVIEW VERDICT VOCABULARY, closed and kit-owned. Its CANONICAL home is the memory-tree kit,
 # which enforces review-record grammar and renders the build method; a copy-installed kit cannot
 # import across that boundary, so this is a STATED duplication whose drift is armed by a row in that
@@ -3616,8 +3623,11 @@ $_bcnon"
       # WHAT THIS DOES NOT CHECK, per the charter's rule that a gate's own header says so: it does
       # not read what the review CONCLUDED, does not open the review record, and does not judge
       # whether the blockers were real. It reads that a loop for this build ran and reached one of
-      # its three declared exits. `NON-CONVERGENT` and `CEILING` are legitimate exits whose own
+      # its declared exits. `NON-CONVERGENT` and `CEILING` are legitimate exits whose own
       # obligations the leg's promotion clause grades; this term only refuses the absence of any exit.
+      # `BOUNDED` is listed for VOCABULARY PARITY and is UNREACHABLE here: this subject is the build
+      # slug, whose bound is the runaway ceiling, and `CEILING` fires at equality before `BOUNDED`
+      # can, so no round on this subject can ever carry the token (TOOL-aProbedUnit-6).
       #
       # THE SUBJECT IS THE BUILD SLUG, exactly, because `review_last_reason` compares the item with
       # `!=` as its sibling does. A spec-audit round keyed `<slug>-specs` is a different subject and
@@ -3630,7 +3640,7 @@ $_bcnon"
         return 1
       fi
       case "$_crlast" in
-        *CONVERGED*|*NON-CONVERGENT*|*CEILING*) ;;
+        *CONVERGED*|*NON-CONVERGENT*|*CEILING*|*BOUNDED*) ;;
         *)
           DOD_OUT="the last recorded review round for this build carries no terminal token, so the closing loop is still open and was abandoned rather than finished; record the round that ends it: $_crlast"
           return 1 ;;
@@ -4063,20 +4073,24 @@ verb_attest() { # slug · item · value
 # changed", and deliberately so: an oscillating sequence 2, 1, 2 converges under a changed-test and
 # never terminates, which is the shape this exists to stop.
 #
-# WHY A PREDICATE AND NOT A COUNT. Over the tracked review corpus the only exit the method states — a
-# literal clean verdict — occurs ZERO times, while BLOCKED occurs dozens of times with no disposition
-# anywhere. A round cap does not give a loop an exit; it moves the stall earlier. So the loop exits on
-# CONVERGENCE, and every blocker still standing at the exit is PROMOTED to a unit rather than parked.
+# TWO BOUNDS, ONE PREDICATE. A SPEC subject is bounded by `REVIEW_ROUNDS` (owner ruling 2026-09-14,
+# TOOL-aProbedUnit-6: one round by default) and exits BOUNDED in a disposition; the DIFF review — the
+# subject that IS the build slug — is bounded by convergence alone; and the runaway ceiling backstops
+# both. `BOUNDED` is tested AFTER the two facts about THIS round and after the ceiling, so a clean
+# round, a flat round and a ceiling hit each keep their own exit, and the default bound (the ceiling)
+# makes a two-argument call byte-for-byte the pre-bound behaviour.
 #
-# The verb reports one of four states and refuses none of them at the ceiling: CONVERGED (nothing
-# left), NON-CONVERGENT (stop and promote), CEILING (the backstop fired, which is a defect in the
-# predicate — reported loudly and survived), CONVERGING (go again).
-review_state() { # prior-counts (space separated) · this count -> the state
-  local prev="" n=0 c
+# The verb reports one of five states and refuses none of them at the ceiling: CONVERGED (nothing
+# left), NON-CONVERGENT (stop and dispose), CEILING (the backstop fired, which is a defect in the
+# predicate — reported loudly and survived), BOUNDED (the declared round bound is reached; stop and
+# dispose), CONVERGING (go again).
+review_state() { # prior-counts (space separated) · this count · [bound, default the ceiling] -> the state
+  local prev="" n=0 c bound="${3:-$RUNAWAY_CEILING}"
   for c in $1; do prev=$c; n=$((n+1)); done
   if [ "$2" = 0 ]; then printf 'CONVERGED\n'; return 0; fi
   if [ "$n" -gt 0 ] && [ "$2" -ge "$prev" ]; then printf 'NON-CONVERGENT\n'; return 0; fi
   if [ "$((n + 1))" -ge "$RUNAWAY_CEILING" ]; then printf 'CEILING\n'; return 0; fi
+  if [ "$((n + 1))" -ge "$bound" ]; then printf 'BOUNDED\n'; return 0; fi
   printf 'CONVERGING\n'
 }
 
@@ -4128,7 +4142,7 @@ review_exit_note() { # disposition -> the sentence
   esac
 }
 verb_review() { # slug · subject · verdict · blockers · disposition
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" rel prior state note disp
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" rel prior state note disp bound
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 37 "no run-state file, so there is no run to record a review round against: $rel"; return 1; }
@@ -4192,17 +4206,21 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # subject matched, and an exit token appearing anywhere on the line counted - including inside a
   # subject or a park reason that merely quotes one. Both are restored, with -F still doing the
   # subject comparison so the subject is never a pattern.
-  if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING)'; then
+  if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'; then
     fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded: $subj"
     return 1
   fi
-  state=$(review_state "$prior" "$blockers")
+  # THE BOUND IS THE SUBJECT'S. The closing diff review's subject IS the build slug and keeps the
+  # ceiling, so it converges or backstops exactly as before; every other subject is a spec audit and
+  # takes the declared REVIEW_ROUNDS. The same equality `review_last_reason` and the --close term make.
+  bound=$RUNAWAY_CEILING; [ "$subj" = "$slug" ] || bound=$REVIEW_ROUNDS
+  state=$(review_state "$prior" "$blockers" "$bound")
   # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
   # of these four tokens. A terminal exit must say which disposition it took: M4 admits BOTH, and
   # check 2 could otherwise only ever observe promotion — so a run that folded correctly had no way
   # to say so and was graded as though it had promoted. TOOL-dBriefedPass-9 measured that.
   case "$state" in
-    NON-CONVERGENT|CEILING)
+    NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$disposition" ]; then
         fail 37 "--review exits $state and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions: $REVIEW_DISPOSITIONS"
         return 1
@@ -4217,6 +4235,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   case "$state" in
     CONVERGED|NON-CONVERGENT) note=" · $state" ;;
     CEILING) note=" · CEILING" ;;
+    BOUNDED) note=" · BOUNDED" ;;
   esac
   # THE TERMINAL LINE is the exit token written into the same free-text reason, after the verdict and
   # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
@@ -4228,6 +4247,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition
     CONVERGED)      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject" ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT · disposition $disposition — the count did not shrink, so the loop STOPS here and $(review_exit_note "$disposition")" ;;
     CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $(review_exit_note "$disposition"); record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every standing blocker is disposed by severity: $(review_exit_note "$disposition")" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else

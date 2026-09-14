@@ -57,7 +57,7 @@ record under `prompts/`.
 | 3 | `TOOL-aProbedUnit-3` | CLOSED | `--audit`: the dispatched-unit stall probe, and the keepalive that runs it |
 | 4 | `TOOL-aProbedUnit-4` | CLOSED | every harness agent is handed the session scratchpad path and told to use it |
 | 5 | `TOOL-aProbedUnit-5` | CLOSED | scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root |
-| 6 | `TOOL-aProbedUnit-6` | PLANNED | `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit |
+| 6 | `TOOL-aProbedUnit-6` | CLOSED | `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit |
 | 7 | `TOOL-aProbedUnit-7` | PLANNED | disposal by severity: blockers and highs promoted, mediums and lows folded, on any confirmed finding |
 
 <!-- /roster:units -->
@@ -74,11 +74,11 @@ ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 
 | [TOOL-aProbedUnit-3 — `--audit <slug>`, the dispatched-unit stall probe, and the keepalive that runs it](spec/2026-09-14-spec-TOOL-aProbedUnit-3.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-14 |
 | [TOOL-aProbedUnit-4 — every harness agent is handed the session scratchpad, as a required `scratch` argument](spec/2026-09-14-spec-TOOL-aProbedUnit-4.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-14 |
 | [TOOL-aProbedUnit-5 — scratch-guard denies an empty temp variable, `/tmp`, and a new entry at the POSIX root](spec/2026-09-14-spec-TOOL-aProbedUnit-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-14 |
-| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-14 |
+| [TOOL-aProbedUnit-6 — `REVIEW_ROUNDS` bounds a spec-audit subject; the `BOUNDED` exit](spec/2026-09-14-spec-TOOL-aProbedUnit-6.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-14 |
 | [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | SPECCED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

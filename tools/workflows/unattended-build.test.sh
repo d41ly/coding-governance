@@ -166,13 +166,13 @@ o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 seq=$(printf '%s\n' "$o" | grep '^phase:' | tr '\n' ' ')
 same "stage order is Spec then Audit then Disposal" "$seq" "phase:Spec phase:Audit phase:Disposal "
 
-# ---- AC7: THE GATE ON THE VERDICT, over all four driver states. A gate tested only on the state
+# ---- AC7: THE GATE ON THE VERDICT, over all five driver states. A gate tested only on the state
 # ---- that OPENS it is a gate nothing proved closes.
 o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "CONVERGING: BUILD is not reached" "$o" "HELD AT AUDIT"
 n=$((n+1)); case "$o" in *"phase:Disposal"*) echo "FAIL CONVERGING reached the Disposal phase, which is the one thing this gate exists to stop"; st=1 ;; *) echo "ok   CONVERGING: the Disposal phase never ran" ;; esac
 has "CONVERGING: the caller is told what to do next" "$o" "re-invoke this harness with round"
-for v in CONVERGED NON-CONVERGENT CEILING; do
+for v in CONVERGED NON-CONVERGENT CEILING BOUNDED; do
   o=$(run_wf "$UNITS" "$(returns "$v" 0)")
   n=$((n+1)); case "$o" in *'"roster":[{'*) echo "ok   $v: hands out a roster" ;; *) echo "FAIL $v handed out no roster, so a terminal verdict cannot land a build"; st=1 ;; esac
 done

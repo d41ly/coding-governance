@@ -851,6 +851,18 @@ reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
 
+# ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
+# ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
+# ---- regex did not know the token, so a bounded promote owed nothing and the exit was green by
+# ---- absence. The `term` half cannot be discriminated by a driver-written record — the driver writes
+# ---- BOUNDED only on a strictly smaller count and the stalled-loop clause needs a flat one.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED\n'
+hit "$(run)" "record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+
 # AN ILLEGAL VALUE IS ITS OWN REFUSAL, and `promoted` is the near-miss a hand-editor actually types —
 # not a nonsense token. Reading it as ABSENT would name the wrong cause, and the hand-edited record
 # is not hypothetical: TOOL-dFoldedVerdict-3 creates exactly that class.
@@ -3186,7 +3198,8 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
 # ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
 # ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
-FLOOR_ASSERTIONS=400
+FLOOR_ASSERTIONS=402
+# ---- RAISED 400 -> 402 by TOOL-aProbedUnit-6: the two BOUNDED check-2 fixtures, both in region two.
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does — 200 against a
 # measured 230 is ~13 % of headroom — rather than pinning at 100 % of observation, which would red on
@@ -3203,7 +3216,7 @@ FLOOR_ASSERTIONS=400
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=83
-FLOOR_SHARD_2=317
+FLOOR_SHARD_2=319
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
