@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 11
+**Status:** SPECCED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -42,10 +42,13 @@ make every keepalive fire leave a heartbeat line, so a stalled run is visible in
   id. The section states that a commit between the lander's push and `--landed` wedges check 34, so no
   render goes there.
 - **S3** The keepalive section tells the scheduled job's prompt to run `--status <slug>` first once a
-  slug exists, so each fire leaves a heartbeat in `driver.log`. Observed by AC3.
+  slug exists, so each fire leaves a heartbeat in `driver.log`. The Resume section, which the
+  keepalive section says it does not bind, gives the replacement job it schedules the same prompt.
+  Observed by AC3.
 - **S4** The protocol's section 2 run-log paragraph from `TOOL-dLoggedFlight-2` gains one sentence
-  saying where the record is rendered, in the template and its installed copy, within the 3,625 bytes
-  of headroom. Observed by AC4.
+  saying where the record is rendered, in the template and its installed copy, within the headroom
+  `GUIDE_CAP_BYTES` leaves: 2,281 bytes at `9d1c87b9`, because unit 2's paragraph spent part of the
+  3,625 this spec was written against. Observed by AC4.
 - **S5** This run renders its own record at the second placement, after `--close` and before the
   merge, keyed `2f11f32d`, the commit that started its run. The `runlog record schema` leg of
   `TOOL-dLoggedFlight-10` grades that record on the merged tree BEFORE the push, run directly, and the
@@ -93,7 +96,14 @@ no precedent in the Skill: the recall and map CLIs are read by the driver alone.
 
 The Skill's keepalive section prescribes no job prompt today. The heartbeat sentence is the first, and
 it is phrased so a prompt-mode run, which has no slug when it schedules, runs `--status` only once
-preflight has minted one.
+preflight has minted one. A resumed session schedules a replacement job under a section the keepalive
+section names as outside its reach, so Resume carries the same instruction in one sentence. Without
+it the heartbeat would stop at the first resume, and a resumed run is the longest-lived kind.
+
+The section sits between Close and Land. The placement every landing run takes falls there in reading
+order. The Mark it landed and If it cannot finish sections each carry a one-line pointer to it,
+because an agent follows the verb sections in order and would otherwise read the other two placements
+only after the commit each one rides.
 
 ### Files touched (estimate)
 
@@ -135,8 +145,9 @@ record.
   present and names all three placements, the re-render into the same file, and the check 34 warning.
   Red when: a placement, the same-file rule or the warning is missing.
 - **AC3** — When the keepalive section of `tools/unattended/SKILL.template.md` is read, it tells the
-  job's prompt to run `--status <slug>` once a slug exists.
-  Red when: the sentence is absent from the rendered copy.
+  job's prompt to run `--status <slug>` once a slug exists, and the Resume section gives its
+  replacement job the same prompt.
+  Red when: the sentence is absent from the rendered copy, or Resume's replacement job carries none.
 - **AC4** — When `grep -n` searches `memory/guides/UNATTENDED-PROTOCOL.md` for the render sentence this
   unit adds to the section 2 run-log paragraph, it finds it, and check 10 of
   `tools/unattended/check-unattended.sh` finds the copy byte-identical to its template.
@@ -173,6 +184,11 @@ none
   sentence).
 - rev-4 · 2026-09-13 · S2 · folded round-3 spec audit H3: the landing push from the primary tree joins
   this run through unit 8's push join, which the third placement relies on.
+- rev-5 · 2026-09-14 · S3 S4 · §4 · AC3 · the build pass, before its code. S3 reaches the Resume
+  section's replacement job, because the keepalive section says it does not bind that path and a
+  heartbeat that stops at the first resume leaves the longest-lived jobs silent. S4's headroom figure
+  is re-measured, since unit 2 spent part of it. §4 places the section between Close and Land, with a
+  pointer from each of the two later placements.
 
 ## 10. Reuse audit
 
