@@ -1866,8 +1866,6 @@ hit "$(run)" "the Skill template never names /session-kickoff while this project
 # ...no --preflight invocation to order anything against.
 reset_tree; kick_engine
 mutate $KIT_REL/SKILL.template.md '/unattended.sh --preflight/d'
-hit "$(run)" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
-
 # ---- 30 (TOOL-dHonouredPark, closing review round 3): a --plan run may never claim terminality over
 # ---- a build it graded nothing on. The check WALKS the corpus, so its liveness assertion is the one
 # ---- that decides whether a clean verdict means anything: with every build's units pair broken,
@@ -1878,10 +1876,12 @@ hit "$(run)" "the Skill template names no --preflight invocation, so there is no
 # ---- that one build grades. From that commit on, this arm asserted a message the check cannot emit —
 # ---- `--plan tPlanOk` exits 0, the walk counts one verdict, and the liveness branch never fires.
 # ---- Measured on the fixture: tRun alone gives 0 hits, both give 1.
-reset_tree
 mutate memory/builds/tRun/README.md '/gen:build-units/d'
 mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
-hit "$(run)" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "the Skill template names no --preflight invocation, so there is no anchor to order the kickoff step against and the sequence this check exists to hold is unstated"
+hit "$out" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
 # ---- AND THIS IS THE ARM THAT EXERCISES THE CANARY. TOOL-aQuenchedHarness-10 gave check 30 a
 # ---- selection stage, so on a corpus where nothing is selected the driver would be asked about
 # ---- NOTHING and this liveness branch would pass over an empty ask - the exact vacuity it exists
