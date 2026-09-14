@@ -51,6 +51,11 @@ Not run: `check-unattended.test.sh` in any mode or shard, `unattended.test.sh`,
    `print_outlog` (11 sites, an identifier only — every printed byte unchanged), the lexicon back
    at 984, the D3/D7 arms re-observed `ok` on the scratch harness, `--check` clean. It post-dates
    the direct run's tip `f23b71e0`; the reading stands because the rename changes no behaviour.
+10. `b5c51c45` — the kickoff manifest's C9 maintenance-stall check tripped at the FULL check
+    (11 non-merge watched commits since its body-change baseline, 5 before this pass, threshold
+    ten). §B's runner line now front-loads GOV_NODE-is-a-registry-tag and the per-row output
+    path, byte-neutral under the 25600 B cap; `last-body-change` advances to `37f879ff`; the
+    full `manifest-check.sh` reads 0 FAILED.
 
 The manifest ratchet fires on EVERY commit that stages `tools/run-gates/run-selftests.sh` (C5s
 compares the staged stamp with HEAD's), not only the first, so commits 3 through 6 each re-stamp
