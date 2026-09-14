@@ -620,7 +620,7 @@ arm "with the charter's registry row deleted, a pooled run refuses naming the us
 arm "--pooled --calibrate runs every selected row under the serial-sum wall and grades nothing, saying so" 0 \
     "calibrated 2 row(s), 0 red, graded none" \
     'true' \
-    "out=\$($R --pooled --calibrate); rc=\$?; printf '%s\n' \"\$out\" | grep -qE 'OVER BUDGET|TIMEOUT|sweep (GREEN|RED)' && exit 99; printf '%s\n' \"\$out\"; exit \$rc"
+    "( out=\$($R --pooled --calibrate); rc=\$?; printf '%s\n' \"\$out\" | grep -qE 'OVER BUDGET|TIMEOUT|sweep (GREEN|RED)' && exit 99; printf '%s\n' \"\$out\"; exit \$rc )"
 
 # The wall is the serial SUM of the selected budgets, undivided, and it says so. NOT YET OBSERVED
 # RED — owner ruling 2026-09-14. Red when: the wall is divided by the width (60) or is any bound.

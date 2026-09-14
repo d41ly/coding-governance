@@ -163,6 +163,14 @@ _st_run_one() {
   local rc=""
   [ -r "$d/x.rc" ] && read -r rc < "$d/x.rc"
   if [ -z "$rc" ]; then
+    # A SUBJECT THAT `exit`s OUTSIDE PARENTHESES leaves through the harness body itself, before the
+    # rc write — so the capture file exists, the runner carries the subject's own status rather
+    # than the bound's 124/137, and the timeout diagnosis below is a lie that cost one arm its
+    # whole life (aBatchedArm closing review D5). Name the class instead.
+    if [ -e "$d/x.out" ] && [ "$outer" != 124 ] && [ "$outer" != 137 ]; then
+      printf 'ERR\tthe subject exited the harness body (status %s) before its status was written — a bare `exit` in the subject string; wrap it in ( … )\n' \
+        "$outer" > "$d/verdict"; return
+    fi
     printf 'ERR\tthe subject recorded no status (runner exit %s) — it was cut off at the %ss arm bound, or could not start\n' \
       "$outer" "$SELFTEST_ARM_TIMEOUT" > "$d/verdict"; return
   fi

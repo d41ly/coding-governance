@@ -853,9 +853,9 @@ EOF
     esac
     if [ "$SWEEP_WALL" -lt "$SWEEP_LARGEST" ]; then
       echo "run-selftests: the run wall is ${SWEEP_WALL}s but the largest per-suite bound in this" >&2
-      echo "run-selftests: population is ${SWEEP_LARGEST}s (an evidence bound), so the run would be" >&2
-      echo "run-selftests: killed before its longest suite could legitimately finish. Raise" >&2
-      echo "run-selftests: SELFTEST_WALL, or --reset the row whose reading the bound derives from." >&2
+      echo "run-selftests: population is ${SWEEP_LARGEST}s (an evidence bound), so the run would be killed before its" >&2
+      echo "run-selftests: longest suite could legitimately finish. Raise SELFTEST_WALL, or --reset the row" >&2
+      echo "run-selftests: whose reading the bound derives from." >&2
       exit 2
     fi
   fi
