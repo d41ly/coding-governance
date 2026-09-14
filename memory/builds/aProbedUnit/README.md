@@ -78,7 +78,7 @@ ids TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 
 | [TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding](spec/2026-09-14-spec-TOOL-aProbedUnit-7.md) | 7 | 2 | CLOSED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
