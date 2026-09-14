@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 72ff919ef6fda873f8ee3ae425d0683183c3988b
+witness: 39df2b1a809cd783e7a45502d61c1cc278cd6ea3
 phase: BUILDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
@@ -86,3 +86,7 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-14T05:36:46Z brief · item TOOL-aReplayedCard-2 · reason 55e80724035f memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-2-brief.md
 
 2026-09-14T06:26:48Z dispatch · item 72ff919e TOOL-aReplayedCard-2 · reason .lexicon.conf
+
+2026-09-14T07:03:34Z dispatch · item 39df2b1a KICK-aReplayedCard-3 · reason skills/session-kickoff/SKILL.md memory/guides/SESSION-KICKOFF.md memory/map/features/session-kickoff.md memory/map/generated memory/builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-3.md memory/builds/aReplayedCard/build/2026-09-14-build-KICK-aReplayedCard-3-1-acceptance-ledger.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger tools/template-size-highwater.txt
+
+2026-09-14T07:03:48Z brief · item KICK-aReplayedCard-3 · reason 37f03fb64714 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-KICK-aReplayedCard-3-brief.md

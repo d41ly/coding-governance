@@ -69,6 +69,11 @@ the id grammar and prints it on its first line, so this kit spells none — anno
 or a READY line whose BASE is not HEAD. A real READY line replaces the sentinel and the previous
 body, and re-renders the `tree —` cell in the tree the append runs in. `--card --check` re-runs the
 same check over the stored card. Neither judges relevance, scope, tier, or truth at the cited line.
+The engine consumes the card at Step 1 — its node tag, tree kind, worktree count and recent subjects
+replace `git worktree list` and the log in the batch, while the branch, `status --short`, the
+fast-forward and `rev-parse HEAD` as the BASE still run — and appends at Step 5, piping its six
+sections and the READY line through that verb before Step 2b's staged repair is committed
+(`KICK-aReplayedCard-3`), so the deny reads a READY line when the engine's own commit reaches it.
 
 ## Gaps
 

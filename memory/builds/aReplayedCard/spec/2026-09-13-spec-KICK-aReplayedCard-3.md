@@ -1,13 +1,15 @@
 # KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 5
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams kickoff · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-1 KICK-aReplayedCard-2 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-build-KICK-aReplayedCard-3-1-acceptance-ledger.md](../build/2026-09-14-build-KICK-aReplayedCard-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-1 KICK-aReplayedCard-2 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-prompt-KICK-aReplayedCard-3-brief.md](../prompts/2026-09-14-prompt-KICK-aReplayedCard-3-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
@@ -49,9 +51,12 @@ recompute", gets its first live source.
   kickoff that halts at Step 5; the 5b append is observed by `TOOL-aReplayedCard-3` AC2.
 - **S5** The engine's file stays under the `kickoff engine size <=18KiB` gate. The headroom at base
   is 207 B (`wc -c` 18225 against 18432); the clauses fit by trimming the Step 1 batch prose the
-  card now makes redundant. If they do not fit, the fallback is the design record's split of
-  Steps 0–2b into a second file with its own size leg, and that is a rev bump with a §9 line, not a
-  silent overrun. Observed by AC3.
+  card now makes redundant AND, because that prose alone is smaller than the clauses, by folding
+  Step 5's field list into the six sections (every field kept) and compressing rationale sentences
+  in Steps 1 and 5b (every rule, every inline command and all six exits kept). The split of
+  Steps 0–2b into a second file with its own size leg stays the NEXT unit's fallback, and the
+  high-water row in `tools/template-size-highwater.txt` is bumped to the landed size so growth
+  stays priced. Observed by AC3.
 - **S6** The manifest is re-stamped: `skills/session-kickoff/SKILL.md` is in `watch:`, so this unit
   owes `last-audit` with a delta line in the commit message. Observed by AC4.
 - **S7** The session-kickoff dossier is refreshed on touch, and this is the ONLY unit in the build
@@ -107,6 +112,8 @@ Live at the commit that lands it. A session without a card sees no change.
 | `skills/session-kickoff/SKILL.md` | Step 1 consume clause; Step 2b commit-after-append clause; Step 5 and 5b append clause; batch prose trimmed |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp with the delta line |
 | `memory/map/features/session-kickoff.md` | refreshed on touch |
+| `tools/template-size-highwater.txt` | the engine's row bumped to the landed size |
+| `memory/builds/aReplayedCard/build/2026-09-14-build-KICK-aReplayedCard-3-1-acceptance-ledger.md` | the observations; AC1 and AC2 owed to the orchestrator at the first post-landing kickoff |
 
 ### Alternatives rejected
 
@@ -186,6 +193,12 @@ none
   is cited as the text reordered (M5); AC1 and AC2 are observed with the junction re-pointed to
   this worktree's engine, because the installed skill is the primary's (M8); S4's observation is
   `TOOL-aReplayedCard-3` AC2 (L1); AC5 reads inline spans and the ordering sentence by text (H2).
+- rev-4 · 2026-09-14 · §2 · §4 · §10 · S5 · changed BEFORE the code, at the build pass. The three
+  clauses measured 759 B over the ceiling with the Step 1 batch prose already trimmed, so S5's
+  stated trim could not fit them and its split fallback was not taken: the fit came from folding
+  Step 5's field list into the six sections and compressing rationale in Steps 1 and 5b with every
+  rule kept, landing at 18369 B; §4 gains the high-water bump and the ledger; §10 names the
+  ratchet spec's §4 as the text S3 reorders.
 
 ## 10. Reuse audit
 
@@ -193,6 +206,9 @@ The seam is the engine's own hedge at `skills/session-kickoff/SKILL.md` lines 26
 SessionStart hook may already have reported worktree/branch state. Consume, don't recompute", which
 has had no live source until the card. `python tools/codebase-map/reuse_lookup.py` run for this
 build returned `SESSION-KICKOFF.md` and `manifest-check.sh` as the kickoff seams; the engine line
-was found by reading the engine, and Step 2b's repair-commit sentence at its lines 114–124.
+was found by reading the engine, and Step 2b's repair-commit sentence at its lines 114–124 — the
+engine's rendering of `memory/builds/aRatchetForge/spec/manifest-ratchet-spec.md` §4, "repair NOW
+as part of kickoff", which is the text S3 reorders: the repair and the re-stamp stay at kickoff,
+only the commit moves behind Step 5's append.
 
 Recall terms used: `manifest-check verb kickoff engine scratch-guard PreToolUse deny SessionStart matcher settings-merge fragment check-wiring arm session card compaction`
