@@ -87,19 +87,25 @@ SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[
 # TOOL-aHoistedPass-6 - the BUILD double is gone with the stage. What a terminal verdict now
 # reaches is the DISPOSAL stage, and past it the roster hand-out, which is a return rather than an
 # agent. `returns` takes an optional THIRD argument so an arm can hand back a FAILED disposal.
-DISPOSE_OK='{"disposed":true,"standing":[],"summary":"ok"}'
+DISPOSE_OK='{"disposed":true,"standing":[],"promoted":0,"folded":0,"summary":"ok"}'
 # THE DOUBLE RETURNS THE CALLEE'S REAL KEYS, and the first version of it did not. It invented
 # `verdict` and `reportPath`, so all 28 arms passed on two fields `tier2-review.js` has never
 # returned — the harness and its callee had never met. Its actual returns carry `blockers`,
-# `report`, `highs`, `note` and `precision`; there is no `verdict` anywhere but per-FINDING.
-review_out() { printf '{"blockers":%s,"report":"r.md","highs":0,"precision":1,"note":"n"}' "$1"; }
+# `report`, `highs`, `note`, `precision` and `confirmed`; there is no `verdict` anywhere but
+# per-FINDING. TOOL-aProbedUnit-7: `confirmed` was the one real key it omitted, and the disposal
+# stage now decides on it — `review_out <blockers> [confirmed] [highs]`, `confirmed` defaulting to
+# the blocker count and `highs` to 0, so every existing call site keeps a return that reconciles.
+review_out() { printf '{"blockers":%s,"confirmed":%s,"highs":%s,"report":"r.md","precision":1,"note":"n"}' "$1" "${2:-$1}" "${3:-0}"; }
 # The CONVERGENCE token is the driver's, recorded by an agent, so it is a separate fixture. Keeping
 # them separate is the point: a run can produce a clean review and still not converge.
 rec() { printf '{"token":"%s","exitCode":0}' "$1"; }
 # `audit <token> <blockers>` still reads as one thing at the call sites, but it now feeds the two
-# halves their own shapes.
-returns() { printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-  "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$DISPOSE_OK}"; }
+# halves their own shapes. The DEFAULT disposal double is built from the count it is paired with —
+# `promoted` equal to the blockers, `folded` 0 — so the arms that pair `NON-CONVERGENT 2` with it
+# still reconcile against the reconciling guard and still receive the full roster.
+returns() { local dflt; dflt=$(printf '{"disposed":true,"standing":[],"promoted":%s,"folded":0,"summary":"ok"}' "${2:-0}")
+  printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+  "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$dflt}"; }
 audit() { printf '%s' "$1"; }
 
 # ---- AC2: THE ARGS GUARD, BOTH DIRECTIONS. The first cut of the guard this ports from tested
@@ -282,14 +288,14 @@ n=$((n+1)); grep -qE "kind: ['\"]spec-audit['\"]" "$F" \
 # than a return value.
 
 # ---- AC2: the DEFAULT is unchanged. Every existing caller keeps the contract it had.
-o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
+o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has  "default mode: the round IS recorded through the driver" "$o" "agent:audit:record"
 has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"tools/workflows/unattended-unit.js"'
 has  "default mode: hands out a roster" "$o" '"roster":[{'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
 A_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
-o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has   "attended: hands out a roster" "$o" '"roster":[{'
 hasnt_ "attended: no round is recorded through the driver" "$o" "agent:audit:record"
 has   "attended: it SAYS the round was not recorded" "$o" "no round was recorded"
@@ -314,7 +320,7 @@ has   "attended preamble: it says an owner is in the loop" "$o" "OWNER in the lo
 
 # ---- AC10: both live verdict branches. A branch mapping a positive count to terminal would reach
 # ---- BUILD over open blockers and satisfy every other criterion here.
-o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":2,"report":"r.md"}}')
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":2,"confirmed":2,"highs":0,"report":"r.md"}}')
 has   "attended, 2 blockers: CONVERGING" "$o" "CONVERGING"
 hasnt_ "attended, 2 blockers: NO roster is handed out" "$o" '"roster":[{'
 
@@ -328,7 +334,7 @@ has  "attended, null blockers: names the degraded return" "$o" "DEGRADED"
 # ---- supplied directly: --plan rewrites a terminal unit's grade to `DONE (FORKED)`, so a bare FORKED
 # ---- and a real closed build's roster are jointly unsatisfiable.
 F_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"FORKED"}]}'
-o=$(run_wf "$F_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$F_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, FORKED unit: refuses" "$o" "THROW"
 has  "attended, FORKED unit: names the id" "$o" "A-tB-1"
 has  "attended, FORKED unit: names the state" "$o" "FORKED"
@@ -337,7 +343,7 @@ has  "attended, FORKED unit: names the state" "$o" "FORKED"
 # ---- what a closed build reports for a unit whose underlying grade was not READY, and a five-token
 # ---- allow-list halts on it — round-1's halt-at-unit-one, for the third time.
 D_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
-o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 1 terminal unit"
 has  "attended, terminal units: still hands out a roster" "$o" '"roster":[{'
 # H4 - the skip must reach the ROSTER, not only the log line. It used to be read off the composed
@@ -354,14 +360,14 @@ has   "AC25: the skipped unit is still reported in skippedTerminal" "$o" '"skipp
 # ---- AC13: a state outside every arm refuses BY NAME. Neither building nor skipping an unknown state
 # ---- is safe, and this vocabulary has been mis-transcribed twice already.
 X_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"WOBBLE"}]}'
-o=$(run_wf "$X_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$X_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, unknown state: refuses" "$o" "THROW"
 has  "attended, unknown state: names the value it did not recognise" "$o" "WOBBLE"
 
 # ---- AC12: a missing planState refuses rather than defaulting. A defaulted state puts the refusal
 # ---- predicate to work on a value nobody supplied.
 M_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1"}]}'
-o=$(run_wf "$M_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$M_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, no planState: refuses" "$o" "THROW"
 has  "attended, no planState: names the field" "$o" "planState"
 
@@ -369,15 +375,15 @@ has  "attended, no planState: names the field" "$o" "planState"
 # ---- between the stages at which a caller could re-run --plan — so the entry-time value is stale by
 # ---- construction and the stage must not refuse the build it just specced.
 N_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
-o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, unit AUTHORED this invocation: rostered despite entry-time MISSING" "$o" '"roster":[{'
 # and the control: the same MISSING state, NOT specced by stage 1, must still refuse.
-o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":["A-tB-1"],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":["A-tB-1"],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, MISSING and NOT specced: still refuses" "$o" "THROW"
 # M1 - `alreadyPresent` must NOT exempt. Those are the units the stage did NOT touch, so their
 # entry-time grade is current; exempting them bypassed the THIN/FORKED refusal on an agent's
 # say-so. Only `authored` is stale by construction.
-o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended, MISSING but only alreadyPresent: still refuses" "$o" "THROW"
 
 # ---- S1: the mode is a CLOSED pair. A typo must not fall back to a default that hands the caller
@@ -391,7 +397,7 @@ has  "bad mode: names the closed set" "$o" "unattended, attended"
 # ---- caller that supplies nothing gets no warning, which is a hole the header names rather than one
 # ---- a reader has to infer.
 W_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
-o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has  "attended + run-state file: WARNS" "$o" "WARNING: attended mode was requested"
 has  "attended + run-state file: names the slug" "$o" "tB"
 has  "attended + run-state file: CONTINUES to the hand-out" "$o" '"roster":[{'
@@ -410,7 +416,7 @@ has "header: names dispatch's order refusal" "$HDR" "ORDER REFUSAL"
 has "header: names dispatch's write-set record" "$HDR" "WRITE-SET RECORD"
 has "header: names --brief" "$HDR" "--brief"
 has "header: names --rescope" "$HDR" "--rescope"
-has "header: says M4's disposal clause is unreachable attended" "$HDR" "UNREACHABLE HERE"
+has "header: says M4's disposal clause is REACHABLE attended since unit 7" "$HDR" "REACHABLE HERE SINCE"
 has "header: says the S7 warning is caller-supplied, not detected" "$HDR" "DEPENDS ON THE CALLER AND NOT ON DETECTION"
 
 # ================================================== TOOL-aStagedLane-3 — THE SLICED SPEC FAN
@@ -423,7 +429,7 @@ S3='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","bl
   {"id":"A-tB-1","order":1,"specPath":"s1","specBriefPath":"bf1"},
   {"id":"A-tB-2","order":2,"specPath":"s2","specBriefPath":"bf2"},
   {"id":"A-tB-3","order":3,"specPath":"s3","specBriefPath":"bf3"}]}'
-o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "fan: three slices spawn three writers" "$o" "3 slice(s) -> 3 writer(s)"
 has "fan: writer 0 spawned" "$o" "agent:spec:tB:g0"
 has "fan: writer 2 spawned" "$o" "agent:spec:tB:g2"
@@ -443,7 +449,7 @@ S7='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","bl
   {"id":"A-tB-3","order":3,"specPath":"s3"},{"id":"A-tB-4","order":4,"specPath":"s4"},
   {"id":"A-tB-5","order":5,"specPath":"s5"},{"id":"A-tB-6","order":6,"specPath":"s6"},
   {"id":"A-tB-7","order":7,"specPath":"s7"}]}'
-o=$(run_wf "$S7" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S7" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 # FOUR, not five, and not seven. `chunk(x, ceil(N/K))` chunks by SIZE, so 7 slices at a cap of 5
 # give groups of 2 and therefore 4 groups. The RULE is that the writer total never EXCEEDS the
 # cap, not that it equals it; asserting 5 would have been asserting my arithmetic, not the bound.
@@ -457,7 +463,7 @@ has   "above cap: one wave, and it is at or under the cap" "$o" "parallel:4"
 has "fallback: the unit with no brief is named" "$o" "A-tB-1 has no specBriefPath"
 
 # ---- AC4: one dead writer is REFUSED, not dropped, and its siblings still return.
-o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "one dead writer: reported as DEGRADED" "$o" "DEGRADED — 1 of 3 writer(s) returned nothing"
 has "one dead writer: its unit lands in refused" "$o" "A-tB-1"
 has "one dead writer: the run still reaches the hand-out" "$o" '"roster":[{'
@@ -466,14 +472,14 @@ has "one dead writer: the run still reaches the hand-out" "$o" '"roster":[{'
 # ---- return, and a merged object is always truthy — so without this an entirely dead spec stage
 # ---- reaches AUDIT and BUILD on whatever specs already existed, with the refusal this file spends
 # ---- six lines justifying silently deleted.
-o=$(run_wf "$S3" '{"spec":null,"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec":null,"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has   "ALL writers dead: THROWS" "$o" "THROW"
 has   "ALL writers dead: says every writer returned nothing" "$o" "EVERY spec writer returned nothing"
 hasnt_ "ALL writers dead: no roster is ever handed out" "$o" '"roster"'
 
 # ---- AC7/S3c: the writers are told to AUTHOR and never COMMIT, and not to run the generator. That is
 # ---- half of clause 3 of the disjointness proof, and no gate downstream of here reads a prompt.
-o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "writers: told to author and NOT commit" "$o" "AUTHOR ONLY — DO NOT COMMIT"
 has "writers: told the caller commits once after them" "$o" "the caller commits once after all of you"
 # AC9 - S4's generator prohibition, which had no criterion at all before this arm.
@@ -491,13 +497,60 @@ has "header: it says why — the writers do not commit" "$HDR3" "author and neve
 # then a RETURN carrying an ordered roster, which the caller dispatches one main-loop `Workflow`
 # call per unit. Every arm below reads a return or the trace, because that is where the change is.
 
-# ---- AC4: CONVERGED skips disposal and SAYS SO. A skip that looks like a pass is indistinguishable
-# ---- from coverage, so the announcement is the arm — an absence alone would pass over a stage that
-# ---- was never written at all.
+# ---- AC4: a CONFIRMED COUNT OF ZERO skips disposal and SAYS SO. A skip that looks like a pass is
+# ---- indistinguishable from coverage, so the announcement is the arm — an absence alone would pass
+# ---- over a stage that was never written at all. TOOL-aProbedUnit-7 moved the predicate off the
+# ---- verdict and onto the count, so this arm now observes the count: CONVERGED with zero confirmed.
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
-hasnt_ "AC4 CONVERGED: no disposal agent is spawned" "$o" "agent:dispose:"
-has    "AC4 CONVERGED: the skip is ANNOUNCED in the log" "$o" "disposal: skipped"
-has    "AC4 CONVERGED: and the roster is still handed out" "$o" '"roster":[{'
+hasnt_ "AC4 zero confirmed: no disposal agent is spawned" "$o" "agent:dispose:"
+has    "AC4 zero confirmed: the skip is ANNOUNCED in the log" "$o" "disposal: skipped"
+has    "AC4 zero confirmed: and the roster is still handed out" "$o" '"roster":[{'
+# V2 — the skip path carries STATED ZEROS, never a missing key standing in for one.
+has    "V2 zero confirmed: the hand-out carries promoted 0 and folded 0 out loud" "$o" '"promoted":0,"folded":0'
+
+# ======================= TOOL-aProbedUnit-7 — DISPOSAL BY SEVERITY, ON ANY CONFIRMED FINDING
+# The stage ran on the VERDICT and disposed by NATURE, so a round that CONVERGED with highs, mediums
+# and lows standing disposed nothing. Every arm below reads the trace or the RESULT line; each was
+# observed RED against the unchanged render, one arm at a time, before the harness moved.
+# ---- V1: CONVERGED with four confirmed, one of them HIGH, RUNS the stage, announces the severity
+# ---- rule, spells the promotion verb with --reason, and hands out the roster with both counts.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 4 1)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":3,"summary":"d"}')")
+has "V1 CONVERGED with confirmed findings: the disposal agent RUNS" "$o" "agent:dispose:tB"
+has "V1 ...and the log says the rule, on CONVERGED too" "$o" "disposing by severity, on CONVERGED too"
+has "V1 ...and the prompt names the one high" "$o" "1 at HIGH"
+has "V1 ...and the prompt spells the promotion verb" "$o" "--rescope tB --act add --item"
+has "V1 ...with --reason, which verb_rescope requires" "$o" "--reason"
+has "V1 ...and the hand-out carries the stage's counts" "$o" '"promoted":1,"folded":3'
+has "V1 ...and the roster is handed out" "$o" '"roster":[{'
+# ---- V3: counts that do NOT reconcile — 1 + 1 + 0 standing over 3 confirmed — hand out NO roster,
+# ---- carry the counts, and are never logged done. The `{disposed:true, standing:['b1']}` defect
+# ---- with the contradiction moved into two integers.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(review_out 0 3 0)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":1,"folded":1,"summary":"x"}')")
+has    "V3 unreconciled counts: the roster is EMPTY" "$o" '"roster":[]'
+has    "V3 unreconciled counts: the note says the counts do not reconcile" "$o" "do not reconcile"
+has    "V3 unreconciled counts: the counts still travel out" "$o" '"promoted":1,"folded":1'
+hasnt_ "V3 unreconciled counts: disposal is NOT logged done" "$o" "disposal: done"
+# ---- V4: a `confirmed` that cannot be read as the contract REFUSES, in both shapes — the key
+# ---- missing, and blockers exceeding confirmed. `undefined > 0` is false, so a missing key would
+# ---- otherwise skip the stage on every round, the false-clean shape.
+o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+has    "V4 no confirmed key: REFUSES" "$o" "THROW"
+has    "V4 no confirmed key: the message names confirmed" "$o" "returned confirmed"
+hasnt_ "V4 no confirmed key: the stage is never reached" "$o" "phase:Disposal"
+o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":2,"confirmed":1,"highs":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
+has    "V4 blockers above confirmed: REFUSES" "$o" "THROW"
+has    "V4 blockers above confirmed: the message names confirmed" "$o" "returned confirmed"
+hasnt_ "V4 blockers above confirmed: the stage is never reached" "$o" "phase:Disposal"
+# ---- V5: ATTENDED mode reaches the stage at zero blockers with two confirmed, and its prompt
+# ---- promotes through the README's roster table, never through --rescope, which fail 48s with no
+# ---- run-state file. The RESULT is the attended MAIN return, since A_UNITS is READY.
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":2,"highs":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"promoted":0,"folded":2,"summary":"d"}}')
+has    "V5 attended with confirmed findings: the disposal agent RUNS" "$o" "agent:dispose:tB"
+has    "V5 attended: the prompt promotes through the README roster" "$o" "authored Units table"
+hasnt_ "V5 attended: the prompt never orders --rescope" "$o" "--rescope tB"
+has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted":0,"folded":2'
 
 # ---- AC5: a disposal that did NOT finish hands out NO roster. There is no partial hand-out: a
 # ---- roster minus the units a blocker touches is a judgement this runtime cannot make, having no
@@ -505,7 +558,7 @@ has    "AC4 CONVERGED: and the roster is still handed out" "$o" '"roster":[{'
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":false,"standing":["b1"],"summary":"x"}')")
 has "AC5 failed disposal: the disposal agent DID run" "$o" "agent:dispose:tB"
 has "AC5 failed disposal: the roster is EMPTY" "$o" '"roster":[]'
-has "AC5 failed disposal: the note is DEGRADED and says what stood" "$o" "DEGRADED — blockers were not disposed"
+has "AC5 failed disposal: the note is DEGRADED and says what stood" "$o" "DEGRADED — findings were not disposed"
 # NAMED IN THE NOTE, not merely present in the output. A bare `b1` is satisfied by the fixture's own
 # `"briefPath":"b1"`, which is the fixture-passes-by-finding-nothing class inside the arm itself —
 # observed here, green against the unchanged source, before it was tightened.
@@ -527,9 +580,11 @@ has "AC5b dead disposal stage: it says the stage returned nothing" "$o" "returne
 o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "AC6 the CONVERGING exit carries an empty roster" "$o" '"roster":[]'
 T_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
-o=$(run_wf "$T_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+o=$(run_wf "$T_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"}}')
 has "AC6 the attended every-unit-terminal exit carries an empty roster" "$o" '"roster":[]'
 has "R2F1 the attended every-unit-terminal exit says what stood" "$o" '"standing":'
+# V7 (TOOL-aProbedUnit-7) — the one return no other arm reaches carries both counts as stated zeros.
+has "V7 the attended every-unit-terminal exit carries promoted 0 and folded 0" "$o" '"promoted":0,"folded":0'
 has "AC6 ...and still says why" "$o" "every unit was already terminal"
 
 # ---- AC7/AC8: the hand-out itself. The roster is asserted WHOLE — key set, key order, values and
@@ -575,7 +630,7 @@ has "S4 skippedTerminal still travels on the hand-out" "$o" '"skippedTerminal":'
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — unattended" "$d" '"mode":"unattended"'
-o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
 
@@ -635,7 +690,7 @@ has "scratch: the child prompt opens with the ground that names it" "$childU" "p
 # Reachable on exactly the two verdicts that structurally guarantee standing blockers.
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":true,"standing":["b1"],"summary":"x"}')")
 has "F4 disposed:true with a standing blocker: the roster is EMPTY" "$o" '"roster":[]'
-has "F4 disposed:true with a standing blocker: the note is DEGRADED" "$o" "DEGRADED — blockers were not disposed"
+has "F4 disposed:true with a standing blocker: the note is DEGRADED" "$o" "DEGRADED — findings were not disposed"
 has "F4 disposed:true with a standing blocker: the blocker is NAMED" "$o" "were not disposed: b1"
 # ROUND 2, finding 1: the DEGRADED return is the ONE path where `stood` can be non-empty, and it
 # carried no `standing` key at all. The arm below asserts the payload, not the empty case. The

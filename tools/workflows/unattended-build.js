@@ -6,7 +6,7 @@ export const meta = {
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code' },
     { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit; record the round' },
-    { title: 'Disposal', detail: 'dispose every blocker still standing over the whole spec set, then hand out the roster' },
+    { title: 'Disposal', detail: 'dispose every confirmed finding by severity over the whole spec set, then hand out the roster' },
   ],
 }
 
@@ -52,10 +52,12 @@ export const meta = {
 //   4. `--brief`'s record of what each pass was handed.
 //   5. `--rescope`'s amendment row.
 //
-// AND M4's BLOCKER-DISPOSAL CLAUSE IS UNREACHABLE HERE. The DISPOSAL STAGE below runs only on a
-// non-CONVERGED verdict, and attended mode computes its verdict from the blocker count, so it
-// reaches the hand-out only at zero blockers, which is the CONVERGED one. So a run that must
-// PROMOTE a standing blocker has no route through this mode.
+// AND M4's DISPOSAL CLAUSE IS REACHABLE HERE SINCE TOOL-aProbedUnit-7. The DISPOSAL STAGE below
+// runs on the CONFIRMED COUNT and not on the verdict, so attended mode — whose verdict is computed
+// from the blocker count and reaches the hand-out only at zero blockers, the CONVERGED one — still
+// reaches the stage whenever highs, mediums or lows stand confirmed. What it loses there is the
+// `--rescope` row: a promotion in this mode is a README roster row and a spec, with no amendment
+// record behind it.
 //
 // THE S7 WARNING DEPENDS ON THE CALLER AND NOT ON DETECTION. A workflow script has no filesystem,
 // so this file cannot see whether a run-state file exists; `runStateExists` is a fact the caller
@@ -331,14 +333,19 @@ const SUBJECTS_SCHEMA = {
 //
 // The DISPOSAL stage's return follows the rule two paragraphs up: the list of what it did NOT do is
 // its own required field, never an absence. An empty `standing` with no key at all is
-// indistinguishable from a stage that disposed everything.
+// indistinguishable from a stage that disposed everything. `promoted` and `folded` are COUNTS OF
+// FINDINGS by report id, and the guard below reconciles the three against `confirmed`: a return
+// whose numbers do not add up is the `{disposed: true, standing: ['b1']}` contradiction with the
+// contradiction moved into two integers.
 const DISPOSAL_SCHEMA = {
   type: 'object',
-  required: ['disposed', 'standing', 'summary'],
+  required: ['disposed', 'standing', 'promoted', 'folded', 'summary'],
   additionalProperties: true,
   properties: {
     disposed: { type: 'boolean' },
     standing: { type: 'array', items: { type: 'string' } },
+    promoted: { type: 'integer' },
+    folded: { type: 'integer' },
     summary: { type: 'string' },
   },
 }
@@ -622,6 +629,24 @@ if (!Number.isInteger(auRaw.blockers)) {
       'is reported as one; it is never rounded to zero.',
   )
 }
+// THE COUNTS THE DISPOSAL STAGE DECIDES ON ARE READ, NOT ASSUMED. `tier2-review.js` returns
+// `confirmed` as the size of the skeptic-confirmed set and `blockers`/`highs` as the synthesis
+// pass's counts WITHIN it, so each is an integer and the two severities sum to at most the set. On
+// the callee's three degraded paths `confirmed` is `[]` beside `blockers: null`, which the refusal
+// above catches first; this one is written for the callee that CHANGES, because `undefined > 0` is
+// `false` and a `confirmed` key that quietly went missing would skip the stage on every round — the
+// false-clean shape this file refuses by name three times over. One refusal for three conditions,
+// because they have one remedy: the return cannot be read as the contract it declares.
+if (!Number.isInteger(auRaw.confirmed) || !Number.isInteger(auRaw.highs) ||
+    auRaw.blockers + auRaw.highs > auRaw.confirmed) {
+  throw new Error(
+    'unattended-build: the AUDIT sub-workflow returned confirmed ' + JSON.stringify(auRaw.confirmed) +
+      ', blockers ' + auRaw.blockers + ', highs ' + JSON.stringify(auRaw.highs) + ' at round ' +
+      roundNo + '. `blockers` and `highs` count CONFIRMED findings, so each is an integer and their ' +
+      'sum is at most `confirmed`; a count that cannot be read is a DEGRADED run and is never ' +
+      'rounded to zero.',
+  )
+}
 const lastReport = auRaw.report || ''
 // `report`, NOT `reportPath` — the second name was mine and matched nothing, so `lastReport` was
 // always '' and every disposal instruction named an empty path.
@@ -642,8 +667,9 @@ if (!lastReport) {
 // this mode can honestly produce and no more.
 //
 // `CONVERGED` AT ZERO IS THE ONLY TERMINAL THIS MODE HAS. `NON-CONVERGENT` and `CEILING` are
-// sequence verdicts, so a run needing M4's blocker disposal cannot get one here, which is what the
-// header means by the disposal clause being unreachable.
+// sequence verdicts and this mode never produces one; a run needing M4's disposal reaches it
+// through the confirmed count and not through the verdict, which is what the header means by the
+// clause being reachable here.
 //
 // The non-integer case is already refused above, in BOTH modes, and must stay so: `tier2-review.js`
 // yields `blockers: null` on its degraded paths BY DESIGN, and reading null as 0 would make every
@@ -685,7 +711,7 @@ if (REVIEW_TOKENS.indexOf(rv.token) === -1) {
       'to DISPOSAL and the hand-out — refusing instead.',
   )
 }
-const au = { verdict: rv.token, blockers: auRaw.blockers, reportPath: lastReport }
+const au = { verdict: rv.token, blockers: auRaw.blockers, confirmed: auRaw.confirmed, highs: auRaw.highs, reportPath: lastReport }
 // S3 — THE IMPOSSIBLE PAIRING IS A REFUSAL BY NAME. CONVERGING with zero blockers is this repo's
 // signature for a record no verb produced: a loop with nothing left to converge on has converged.
 // The dead stage returned exactly this pairing, and it was the tell.
@@ -700,10 +726,10 @@ const verdict = au.verdict
 log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers)
 
 // THE GATE. `CONVERGING` means the review loop has not ended, so the ROSTER IS EMPTY and this
-// returns to the caller with what it needs to fold and come back. The three terminal states admit
-// the hand-out; what the two NON-CLEAN ones additionally carry is M4's disposal instruction, which
-// is the DISPOSAL STAGE below rather than a claim asserted here. An earlier revision of this comment
-// claimed the promotion happened and no line of the program did it.
+// returns to the caller with what it needs to fold and come back. Every terminal state admits the
+// hand-out, and each of them first passes M4's disposal, which is the DISPOSAL STAGE below rather
+// than a claim asserted here and runs on the confirmed count rather than on the verdict. An earlier
+// revision of this comment claimed the promotion happened and no line of the program did it.
 if (verdict === 'CONVERGING') {
   log('audit is still CONVERGING — no roster this invocation; fold, then re-invoke at round ' + (roundNo + 1))
   return {
@@ -742,51 +768,85 @@ if (verdict === 'CONVERGING') {
 //
 // The instruction used to be a string prepended to the BUILD prompt, so it was carried by the agent
 // TOOL-aHoistedPass-6 deletes. Before that it was not carried at all: the comment above the gate
-// claimed promotion happened at the exit and no line of the program did it. So on `NON-CONVERGENT`
-// and `CEILING` — the two states that structurally guarantee standing blockers, since the driver
-// emits CONVERGED only at a count of 0 — the harness built a spec set with open blockers. This build
-// itself exited NON-CONVERGENT at round 3, so the path is reached rather than hypothetical.
+// claimed promotion happened at the exit and no line of the program did it. Then the stage ran on
+// the VERDICT — `NON-CONVERGENT` and `CEILING` only, the two states that guarantee standing
+// blockers — and disposed by NATURE, fold or promote by what the finding was. That is a predicate
+// on the wrong integer: `CONVERGED` means zero BLOCKERS this round and says nothing about highs,
+// mediums or lows, so a round that converged with eight highs, six mediums and one low (the
+// recorded shape in the `aCollapsedScan` round-1 audit) disposed nothing and handed the roster out
+// over fifteen confirmed findings.
 //
-// ON `CONVERGED` THE STAGE ANNOUNCES ITS SKIP. A skip that looks like a pass is indistinguishable
-// from coverage, and an absent `agent:dispose:` line alone would read the same over a stage that was
-// never written.
+// THE STAGE RUNS ON ANY CONFIRMED FINDING AND DISPOSES BY SEVERITY (TOOL-aProbedUnit-7): a BLOCKER
+// or HIGH is PROMOTED to a unit, a MEDIUM or LOW is FOLDED into its spec. On a confirmed count of
+// zero it announces the skip. A skip that looks like a pass is indistinguishable from coverage, and
+// an absent `agent:dispose:` line alone would read the same over a stage that was never written.
 phase('Disposal')
 // WHAT STOOD IS HOISTED OUT OF THE STAGE so the hand-out can report it. It never reached the return
 // at all, which is `degradation-known-but-unreported` — the class this file names three times in
-// its own comments and then committed one screen below.
-let stood = []
-if (verdict === 'CONVERGED') {
-  log('disposal: skipped — the verdict is CONVERGED, so the driver reported zero standing blockers')
+// its own comments and then committed one screen below. `promoted` and `folded` ride the same
+// hoist: honest zeros on the skip path, the stage's own integers past it, `null` where the stage
+// returned no integer — a stated absence, never a zero, the audit adapter's own rule.
+let stood = [], promoted = 0, folded = 0
+if (au.confirmed === 0) {
+  log('disposal: skipped — round ' + roundNo + ' confirmed no finding, so nothing stands to dispose')
 } else {
+  log('disposal: ' + au.confirmed + ' confirmed finding(s) stand at a ' + verdict + ' exit · blockers ' +
+    au.blockers + ' · highs ' + au.highs + ' — disposing by severity' +
+    (verdict === 'CONVERGED' ? ', on CONVERGED too' : ''))
+  // MODE-AWARE IN ONE CLAUSE, on the same `attended` the file already branches GROUND on: `--rescope`
+  // `fail 48`s without a run-state file, which is the state attended mode is DEFINED by, so the
+  // attended promotion is a README roster row. Until the predicate moved off the verdict this stage
+  // was unreachable in that mode and the contradiction was never live.
   const d = await agent(
     GROUND +
-      'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every blocker still standing in `' + lastReport +
-      '` — the audit exited ' + verdict + ' with ' + au.blockers + ' confirmed. BUILD-METHOD M4 ' +
-      'admits exactly two dispositions and no third: FOLD one that is a defect in a document the ' +
-      'review already read, as a rev-N bump with its section 9 line; PROMOTE one needing a ' +
-      'MECHANISM this build lacks, through `' + DRIVER + ' --rescope ' + slug +
-      ' --act add --item <id>`, then spec it at its tier so it is built like any other. Never ' +
-      'parked, never waived, never retired, never re-reviewed. Report what you did with each, and ' +
-      'NAME in `standing` every blocker you did NOT dispose.',
+      'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every CONFIRMED finding in `' + lastReport +
+      '` — the audit exited ' + verdict + ' with ' + au.confirmed + ' confirmed, ' + au.blockers +
+      ' at BLOCKER and ' + au.highs + ' at HIGH. Open the report and take each confirmed finding at ' +
+      'the severity the report gives it. BUILD-METHOD M4 disposes BY SEVERITY and admits no third ' +
+      'route. PROMOTE every BLOCKER and every HIGH: ' +
+      (attended
+        ? 'add its row to the build README\'s authored Units table, because the recording verbs are ' +
+          'unavailable with no run-state file, '
+        : 'run `' + DRIVER + ' --rescope ' + slug + ' --act add --item <id> --reason <text>`, the ' +
+          'reason being the report id and severity of the finding it closes, ') +
+      'then author its spec at its tier with a mechanism that CLOSES the finding — the change to the ' +
+      'design and the artifact that proves it — so it is audited once as a spec and built like any ' +
+      'other. FOLD every MEDIUM and every LOW into the spec it belongs to, as a rev-N bump with its ' +
+      'section 9 line. Never parked, never waived, never retired, never re-reviewed. Return ' +
+      '`promoted` and `folded` as counts of FINDINGS by report id, each id counted exactly once ' +
+      'across the two and `standing`; name every promoted unit id in `summary`; and NAME in ' +
+      '`standing` every finding you did NOT dispose.',
     { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
   )
-  // NO PARTIAL HAND-OUT. Deciding which units a standing blocker touches needs the tree, which this
+  // NO PARTIAL HAND-OUT. Deciding which units a standing finding touches needs the tree, which this
   // runtime does not have, so an empty roster is the honest refusal. `d.disposed !== true` covers a
   // dead stage and a negative answer alike.
   //
   // AND A NON-EMPTY `standing` REFUSES TOO, WHATEVER `disposed` CLAIMS. `{disposed: true, standing:
   // ['b1']}` validates against DISPOSAL_SCHEMA, and on the disposed-only test it cleared this guard,
   // logged done and handed out the FULL roster over an undisposed blocker — under a prompt whose own
-  // words are NAME in `standing` every blocker you did NOT dispose. The pairing is self-contradictory
+  // words are NAME in `standing` every finding you did NOT dispose. The pairing is self-contradictory
   // and the stage's report of what it did NOT do outranks its summary of what it did. This is the
   // third impossible pairing this file refuses by name; the other two are twelve lines above the
   // audit gate, and this guard simply did not get the pattern.
+  //
+  // AND THE COUNTS MUST RECONCILE. Every confirmed finding is promoted, folded or named standing —
+  // the prompt says so — so a return whose three numbers do not add to `confirmed` is the same
+  // self-contradiction with the contradiction moved into two integers. The reason is chosen in the
+  // order the existing arms read it; the refusal keeps their shape, an empty roster and a note.
   stood = Array.isArray(d && d.standing) ? d.standing : []
-  if (!d || d.disposed !== true || stood.length) {
-    const standing = stood.length
-      ? stood.join(', ')
-      : 'the disposal stage returned nothing at all'
-    log('disposal: NOT done — ' + standing)
+  const counted = Number.isInteger(d && d.promoted) && Number.isInteger(d && d.folded)
+  promoted = counted ? d.promoted : null
+  folded = counted ? d.folded : null
+  if (!d || d.disposed !== true || stood.length || !counted ||
+      d.promoted + d.folded + stood.length !== au.confirmed) {
+    const why = !d ? 'the disposal stage returned nothing at all'
+      : stood.length ? stood.join(', ')
+      : !counted ? 'the stage returned no integer promoted/folded counts'
+      : d.disposed !== true ? 'the stage answered disposed:false with nothing standing'
+      : 'the counts do not reconcile — promoted ' + d.promoted + ' + folded ' + d.folded +
+        ' + standing ' + stood.length + ' is not confirmed ' + au.confirmed
+    log('disposal: NOT done — ' + why)
     return {
       slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
       specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
@@ -799,11 +859,14 @@ if (verdict === 'CONVERGED') {
       // here and concludes disposal never ran, which is the inverted reading the key exists to
       // prevent. Round-2 finding 1.
       standing: stood,
-      note: 'DEGRADED — blockers were not disposed: ' + standing + '. No roster is handed out: a ' +
-        'roster minus the units a blocker touches is a judgement this runtime cannot make.',
+      promoted: promoted,
+      folded: folded,
+      note: 'DEGRADED — findings were not disposed: ' + why + '. No roster is handed out: a ' +
+        'roster minus the units a finding touches is a judgement this runtime cannot make.',
     }
   }
-  log('disposal: done — ' + (typeof d.summary === 'string' ? d.summary : ''))
+  log('disposal: done — promoted ' + promoted + ' · folded ' + folded + ' — ' +
+    (typeof d.summary === 'string' ? d.summary : ''))
 }
 // ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
@@ -886,8 +949,11 @@ if (attended && !buildUnits.length) {
     specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
     lastReport: lastReport, skippedTerminal: skippedDone, roster: [],
     // POST-DISPOSAL, so `stood` is in scope and the key belongs here for the same reason it belongs
-    // on the DEGRADED return: every non-throwing exit past the stage says what stood, out loud.
+    // on the DEGRADED return: every non-throwing exit past the stage says what stood, out loud —
+    // and what it promoted and folded, as stated zeros rather than missing keys.
     standing: stood,
+    promoted: promoted,
+    folded: folded,
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.
@@ -929,7 +995,12 @@ return {
   // empty by the time the hand-out is reached — that is the point: an empty list said out loud is a
   // different fact from a missing key, which is indistinguishable from a disposal stage that never
   // ran. Same rule DISPOSAL_SCHEMA applies to the stage's own return, applied to this one.
+  // `promoted` and `folded` are the stage's counts of findings by report id; the ids of promoted
+  // units live in the `rescope · add` rows and in the stage's summary, and the caller re-reads
+  // `--plan` for them rather than reading a second carrier of the same ids here.
   standing: stood,
+  promoted: promoted,
+  folded: folded,
   roster: buildUnits.map(function (u) {
     return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' }
   }),

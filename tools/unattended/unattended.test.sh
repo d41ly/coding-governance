@@ -4598,7 +4598,7 @@ run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/nul
 # about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
 # than asserted on.
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition fold >/dev/null
-hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
@@ -4610,15 +4610,15 @@ hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 # ...and a subject whose loop ENDED does not take another round: the history would say the opposite
 # of what happened.
-hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 
 # ---- CONVERGED is terminal too, and the refusal names where a later blocker goes. Both arms above
 # ---- reach branch 10 through NON-CONVERGENT; this one reaches it through the exit the owner ruling
 # ---- is about: a subject that converged at round 1 takes no further round, the refusal names the
-# ---- M4 fold-or-promote route, and the refused round wrote NO row — one review row, not two.
+# ---- M4 severity-rule route, and the refused round wrote NO row — one review row, not two.
 bcopen
 run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
-hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
@@ -4643,7 +4643,7 @@ hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --dispositi
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition 'fold|promote')" "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions"
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition promote)" "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state"
 run --review tRun --subject D1 --verdict BLOCKED --blockers 3 >/dev/null
-hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions"
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "and requires --disposition, because the severity rule decides which of fold and promote the exit records and a record naming neither leaves the gate inferring one from ids; legal dispositions"
 reset_tree
 
 # ---- the FOLD exit: its own sentence, and the field written AFTER the state token so the substring

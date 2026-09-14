@@ -112,9 +112,9 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
   always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS which
   disposition the run took, `fold` or `promote`: `--disposition` is REQUIRED there and REFUSED on any
-  round that is not one. Both values are legal, because the method admits folding a blocker back into
-  the specs it belongs to as readily as promoting it to a unit, and a record naming neither leaves the
-  gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a missing
+  round that is not one. Which value the run records follows the severity rule the Skill's exit
+  bullet states — a blocker or high is promoted, a medium or low folded — and a record naming
+  neither leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a missing
   subject or count, a terminal exit carrying no disposition, a disposition on a round that is not a
   terminal exit, and a round on a subject whose loop has already ended.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is

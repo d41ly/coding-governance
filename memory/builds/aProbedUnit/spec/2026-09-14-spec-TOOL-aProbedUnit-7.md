@@ -1,11 +1,12 @@
 # TOOL-aProbedUnit-7 — disposal by severity, on any confirmed finding
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-09-14 · node a · Tier-2 · base 1b000d1a · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aProbedUnit-7-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aProbedUnit-7-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-1-1-spec-briefs.md) | journal | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |
 | [2026-09-14-prompt-TOOL-aProbedUnit-7-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aProbedUnit-7-1-build-brief.md) | journal | — |
 | [2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aProbedUnit-1-spec-audit-round1.md) | spec-audit | TOOL-aProbedUnit-1 TOOL-aProbedUnit-2 TOOL-aProbedUnit-3 TOOL-aProbedUnit-4 TOOL-aProbedUnit-5 TOOL-aProbedUnit-6 |

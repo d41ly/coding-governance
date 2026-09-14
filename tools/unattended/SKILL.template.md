@@ -652,12 +652,13 @@ confirmed-blocker count for THIS round, as a plain integer.
 It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
-- **CONVERGED** — zero blockers. The loop is done for that subject.
-- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every blocker still standing
-  is DISPOSED. FOLD one that is a defect in a document the review was already reading, as a `rev-N`
-  bump with its §9 line. PROMOTE one whose closing needs a MECHANISM this build does not have: it
-  becomes a UNIT, specced at its tier, built, closed. Never parked, never waived, never RETIRED, and
-  never re-reviewed. Both terminate — a fold ends the defect, and a promoted unit is audited as a SPEC.
+- **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
+  mediums and lows are still disposed, by the severity rule the next bullet states.
+- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every CONFIRMED finding is
+  DISPOSED BY SEVERITY — and that holds at `CONVERGED` too. A BLOCKER or HIGH is PROMOTED: it
+  becomes a UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built,
+  closed. A MEDIUM or LOW is FOLDED into the spec it belongs to, as a `rev-N` bump with its §9 line.
+  Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
   reads new ids, and `build-complete`, which reads only that no row is non-terminal.

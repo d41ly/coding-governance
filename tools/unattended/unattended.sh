@@ -4136,8 +4136,8 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
 # disposition at every terminal exit — and it says so loudly rather than printing something reassuring.
 review_exit_note() { # disposition -> the sentence
   case "$1" in
-    fold)    printf '%s' "every blocker still standing was FOLDED into the specs it belongs to, which is the recorded disposition. Not promoted, not parked, not waived" ;;
-    promote) printf '%s' "every blocker still standing is PROMOTED to a unit of this build, specced at its tier and built. Not parked, not waived, not re-reviewed" ;;
+    fold)    printf '%s' "every MEDIUM and LOW confirmed at this exit was FOLDED into the specs it belongs to, which is the recorded disposition; the severity rule never folds a BLOCKER or HIGH. Not parked, not waived" ;;
+    promote) printf '%s' "every BLOCKER and HIGH confirmed at this exit is PROMOTED to a unit of this build, specced at its tier and built, and a MEDIUM or LOW is folded. Not parked, not waived, not re-reviewed" ;;
     *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
   esac
 }
@@ -4207,7 +4207,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # subject or a park reason that merely quotes one. Both are restored, with -F still doing the
   # subject comparison so the subject is never a pattern.
   if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING|BOUNDED)'; then
-    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded: $subj"
+    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded: $subj"
     return 1
   fi
   # THE BOUND IS THE SUBJECT'S. The closing diff review's subject IS the build slug and keeps the
@@ -4216,13 +4216,14 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   bound=$RUNAWAY_CEILING; [ "$subj" = "$slug" ] || bound=$REVIEW_ROUNDS
   state=$(review_state "$prior" "$blockers" "$bound")
   # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
-  # of these four tokens. A terminal exit must say which disposition it took: M4 admits BOTH, and
-  # check 2 could otherwise only ever observe promotion — so a run that folded correctly had no way
-  # to say so and was graded as though it had promoted. TOOL-dBriefedPass-9 measured that.
+  # of the state tokens. A terminal exit must say which disposition it took: M4 disposes by
+  # SEVERITY and the field records which value the exit took, and check 2 could otherwise only ever
+  # observe promotion — so a run that folded correctly had no way to say so and was graded as
+  # though it had promoted. TOOL-dBriefedPass-9 measured that.
   case "$state" in
     NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$disposition" ]; then
-        fail 37 "--review exits $state and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions: $REVIEW_DISPOSITIONS"
+        fail 37 "--review exits $state and requires --disposition, because the severity rule decides which of fold and promote the exit records and a record naming neither leaves the gate inferring one from ids; legal dispositions: $REVIEW_DISPOSITIONS"
         return 1
       fi ;;
     *)
