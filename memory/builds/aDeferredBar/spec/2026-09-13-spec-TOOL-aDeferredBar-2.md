@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation
 
-**Status:** CLOSED · rev-6 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
+**Status:** CLOSED · rev-7 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -147,7 +147,8 @@ DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
 # or a chain separator, past optional VAR=value prefixes, `timeout` with its options and duration,
-# and a bash/sh/python/py launcher with one short option (never `-n`, `-c` or `-m`; rev-6, R12) —
+# and a bash/sh/python/py launcher with one option — a short one, `py`'s version selector or `-X`
+# with its value (never `-n`, `-c` or `-m`; rev-6, R12; rev-7, T6) —
 # or a GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
 # token. A suite is a `.test.sh` file OR a whole-suite `selftest.py` file; a `--selftest` FLAG on
 # some other file is the seconds-long direct check and is not a run. A `path:line` citation fails
@@ -156,7 +157,7 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # one, `GATE_FULL=""` — the quote is not a value.
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
-    r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)-[A-Za-z]+\s+)?)?(?:\S*/)?"
+    r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
     r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|selftest\.py)(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 ```
@@ -822,6 +823,18 @@ New arm: tools/unattended/unattended.test.sh · rev-6, closing round 2: the two 
   `timeout --kill-after 5 120 bash <suite>` are hits in both, `bash -n <suite>`, `python -c` and
   `python -m` are hits in neither, so the two readers read the one token alike again. Every arm
   observed RED-first on the checker or driver at `4d177329`. Status stays CLOSED.
+- rev-7 · 2026-09-14 · §4 · folded closing diff review round 3,
+  `reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round3.md`, findings T5 and T6, the
+  alignment half only: `BAR`'s launcher-option slot takes `py`'s version selector (`-3`, `-3.12`)
+  and `-X` with its value glued or as the next word, the four spellings both readers missed in
+  lockstep (T6) — probed on the module at `67a11487`, where each was a miss, and on the fold,
+  where each is a hit and `-c`, `-m`, `-n`, the `--selftest` flag and the empty assignment stay
+  misses. `BAR` does not move for T5: its duration slot already took any word, so
+  `timeout "$GATE_BOUND" bash <suite>`, `1.5`, `$T`, `${T}s` and `-k 5s "$GATE_BOUND"` were hits
+  here while the hook read a literal alone, which is the divergence rev-6's "alike again" did not
+  see; the hook now reads those too. No arm is added to `check-spec-tokens.test.sh` and
+  `FLOOR_ASSERTIONS` stays 42: the one-payload fixture both suites read, which round 3 names as the
+  left-shift, is a backlog row and not this fold's. Status stays CLOSED.
 
 ## 10. Reuse audit
 

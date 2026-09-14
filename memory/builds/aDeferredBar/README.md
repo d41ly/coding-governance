@@ -69,7 +69,7 @@ ids TOOL-aDeferredBar-15 TOOL-aDeferredBar-16
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads](spec/2026-09-13-spec-TOOL-aDeferredBar-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-14 |
-| [TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation](spec/2026-09-13-spec-TOOL-aDeferredBar-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-14 |
+| [TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation](spec/2026-09-13-spec-TOOL-aDeferredBar-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-14 |
 | [TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING](spec/2026-09-13-spec-TOOL-aDeferredBar-3.md) | 3 | 2 | CLOSED | rev-7 | 2026-09-14 |
 <!-- /gen:build-units -->
 

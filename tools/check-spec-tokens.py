@@ -107,10 +107,13 @@ DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
 # or a chain separator, past optional VAR=value prefixes, `timeout` with its options and duration,
-# and a bash/sh/python/py launcher with one short option (never `-n`, the no-exec syntax check the
-# hook of TOOL-aDeferredBar-3 admits, nor `-c`/`-m`, whose argument is code; closing round 2 R12
-# gave this reader the slots that hook grew, so `python -u <suite>`, `py <suite>` and
-# `timeout -k 5 120 bash <suite>` read alike in both) — or a
+# and a bash/sh/python/py launcher with one option — a short one, `py`'s version selector
+# (`-3`, `-3.12`) or `-X` with its value glued or as the next word (closing round 3 T6) — never
+# `-n`, the no-exec syntax check the hook of TOOL-aDeferredBar-3 admits, nor `-c`/`-m`, whose
+# argument is code; closing round 2 R12 gave this reader the slots that hook grew, so
+# `python -u <suite>`, `py <suite>` and `timeout -k 5 120 bash <suite>` read alike in both, and
+# the duration slot already took any word, so `timeout "$GATE_BOUND" bash <suite>` was a hit here
+# before round 3 T5 made it one in the hook — or a
 # GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
 # token. A suite is a `.test.sh` file OR a whole-suite `selftest.py` file (closing review F2: six
 # manifest legs are the latter and both readers had spelled "suite" as the shell convention); a
@@ -121,7 +124,7 @@ AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF).
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
-    r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)-[A-Za-z]+\s+)?)?(?:\S*/)?"
+    r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
     r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|selftest\.py)(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
