@@ -61,12 +61,8 @@ instead of implying it. (2) The batching units are BUILT, after the shard route,
 **OWNER RULING, 2026-09-13.** The build agents run no self-test on every step: build first, then
 ONE verification pass when the build is complete. Unit 3's first pass was stopped for it.
 
-**UNIT 1 CONVERTED NOTHING, MEASURED, and the helper landed inert.** `emitted` grades the SET of
-signatures a group's tree fires; that set was to be DERIVED from the arms, and three candidate
-groups are proven from the checker's source to fire branches their arms never name, so a derived
-set reds by design and the rest are unknowable without the run the 2026-09-14 ruling forbids. The
-counts are in unit 1's acceptance ledger, the question is parked in the run-state file, and the
-"batching on top of that split" line above is owed by that decision, not by this tree.
+**UNIT 1 CONVERTED NOTHING, measured; `emitted` landed inert.** Its ledger has the why; the
+question is parked in the run-state file.
 
 ## Parked decisions
 
