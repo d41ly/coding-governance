@@ -202,13 +202,11 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   last bar or push made from a tree it holds. A transcript event does not move that end, since the
   session keeps working after the run and renders the record itself. Nor does a merge naming only the
   slug, or a push joined only by what it pushed.
-- **One window bounds every timed set.** Once the window is known, the timeline of every kind, the
-  tool calls, attribution, usage, the own commits and every join reading them, the driver lines the
-  record commits to, and the sessions go through `check_in_window` and nothing wider. So a run's verbs
-  after its end, an owner's `--status` once it has landed say, are not its events, and a terminal
-  run's closing phase write, which lies at or past its end, is not on its timeline; `phases-walked`
-  reads that phase at the end instead. The run-state history and the review records stay bounded by
-  the era, as the spec states them.
+- **One window bounds every timed set.** Once the window is known, every set the model derives from a
+  timed source goes through `check_in_window` and nothing wider; the spec's S2 names them, and the
+  two reads it leaves to the era. So a run's verbs after its end, an owner's `--status` once it has
+  landed say, are not its events, and a terminal run's closing phase write, which lies at or past its
+  end, is not on its timeline; `phases-walked` reads that phase at the end instead.
 - **A run's own commits** are the commits inside its window that descend from its start and name one
   of its unit ids in the subject. Commits keep naming a unit id after a build lands, and one of them
   must never become a landed run's last own commit. A push joins from a tree the run holds, or by

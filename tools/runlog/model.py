@@ -20,9 +20,9 @@ over the run-state paths, one over the own-commit range, one `rev-list` of the s
 for the push join and the merged flag, and one `cat-file --batch` for every blob. The self-test
 counts them independently of `GIT_CALLS`.
 
-ONE WINDOW BOUNDS EVERY TIMED SET. Once the window is known, the timeline, the tool calls,
-attribution, usage, the own commits and every join reading them go through `check_in_window` and
-nothing wider, so no answer is windowed where one beside it is not.
+ONE WINDOW BOUNDS EVERY TIMED SET. Once the window is known, every set the model derives from a timed
+source goes through `check_in_window` and nothing wider, so no answer is windowed where one beside it
+is not. The spec's S2 names the sets, and the two reads it leaves to the era.
 
 WHAT THIS DOES NOT DO. It judges no decision's quality and renders nothing for a tracked file. Every
 answer that is inferred rather than read is named in the model's `method` field, so a reader knows
@@ -335,10 +335,8 @@ def check_in_era(t, era) -> bool:
 
 
 def check_in_window(t, window) -> bool:
-    """Whether time `t` falls inside the run's half-open window `[start, end)` (spec S2). THE ONE
-    predicate every timed set the model derives is bounded by, once the window is known: the timeline
-    of every kind, the tool calls, attribution, usage, the own commits and every join that reads
-    them, the driver lines the record commits to, the sessions and the other builds sharing them.
+    """Whether time `t` falls inside the run's half-open window `[start, end)`. THE ONE predicate
+    every timed set the model derives is bounded by once the window is known, the sets spec S2 names.
     One predicate, so no answer is windowed where another beside it is not. The closing review's
     round 1 found three that were: attribution counted every call of every session (M1), own commits
     were bounded by the era (M4), and the timeline listed commits past the end (M5)."""

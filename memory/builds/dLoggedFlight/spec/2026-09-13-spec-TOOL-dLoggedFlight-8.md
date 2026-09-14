@@ -52,15 +52,15 @@ sources actually support. Every later surface renders from this model rather tha
     terminal phase on both of its lines and ends nothing;
   - for a terminal record, the first commit in its era that wrote a terminal `phase:`;
   - for a non-terminal record, one second after its last event. Its events here are its journal
-    lines, the commits in its era that touched `RUN.md`, its own commits (S3), a merge naming one of
-    its unit ids among them, and the gate and push lines made from a tree it holds (S3) before the
-    next run's journal lines begin. The second is a commit time's resolution, and it puts the run's
-    last event inside its own half-open window. Three sources never move it. A merge naming only the
-    slug does not, under the rule below for a commit that merely names it. A transcript event does
-    not, because the run's session keeps working after the run and renders the record itself, so an
-    end taken from the session would end at the render and move with every re-render. A push joined
-    only by what it pushed does not, because every later push of the default branch carries the run's
-    commits.
+    lines, the commits in its era that touched `RUN.md`, its own commits (S3) as the era holds them,
+    a merge naming one of its unit ids among them, and the gate and push lines made from a tree it
+    holds (S3) before the next run's journal lines begin. The second is a commit time's resolution,
+    and it puts the run's last event inside its own half-open window. Three sources never move it.
+    A merge naming only the slug does not, under the rule below for a commit that merely names it. A
+    transcript event does not, because the run's session keeps working after the run and renders the
+    record itself, so an end taken from the session would end at the render and move with every
+    re-render. A push joined only by what it pushed does not, because every later push of the default
+    branch carries the run's commits.
 
   Journal STARTs join git's runs by a named key, never by position. A successful record-creating
   `--preflight` START, paired with an END of `rc=0`, belongs to the start commit its own call made: the

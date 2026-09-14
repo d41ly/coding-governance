@@ -101,8 +101,8 @@ record commits, which left this build's own later commits and both of its bars o
 Its git cost is constant and counted, because a model per run over a corpus of runs must not grow
 with a run's commits.
 
-**Once the window is known, ONE predicate bounds every timed set the model derives.** The timeline,
-tool calls, attribution, usage, own commits and every join reading them go through `check_in_window`.
+**Once the window is known, ONE predicate bounds every timed set the model derives.** It is
+`check_in_window`, and spec 8's S2 names the sets.
 The closing review's round 1 found them bounded three ways: attribution counted every call of every
 session; own commits were bounded by the era, so a later commit naming a unit id became the last own
 commit and made `verify` report an unchanged journal; and the timeline listed commits past its end.
