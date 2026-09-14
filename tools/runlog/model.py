@@ -231,7 +231,7 @@ def resolve_repo_root(start=None) -> pathlib.Path:
 
 # ---------------------------------------------------------------------------------- the run starts
 
-def derive_run_starts(root, memory_root=None, slugs=None) -> dict:
+def derive_run_starts(root, memory_root=None, slugs=None, tracked=None) -> dict:
     """`{slug: [run, ...]}`, oldest first, keyed on the commit that STARTED each run.
 
     ONE git call for one build or the whole population: the commits that ADDED a run-state path, renames
@@ -240,9 +240,16 @@ def derive_run_starts(root, memory_root=None, slugs=None) -> dict:
     successor's start, an archive takes the entry immediately before the commit that added it, and the
     live `RUN.md` takes the last. A path's own creation commit cannot tell an archive from its successor.
     A run's `k` is its 1-up position, and `runkey` the first 8 hex of its start.
+
+    `tracked`, a set of repo-relative paths, answers which run-state files exist instead of the working
+    tree, so a caller grading the INDEX (the schema leg, TOOL-dLoggedFlight-10) gets the index's runs.
     """
     root = pathlib.Path(root)
     mr = memory_root if memory_root is not None else rl.resolve_memory_root(root)
+
+    def check_present(rel) -> bool:
+        return rel in tracked if tracked is not None else (root / rel).is_file()
+
     names = ["*"] if slugs is None else list(slugs)
     if not names:
         return {}
@@ -272,11 +279,11 @@ def derive_run_starts(root, memory_root=None, slugs=None) -> dict:
         found.reverse()
         runs = []
         for j, entry in enumerate(found):
-            if entry["name"] != "RUN.md" and (root / entry["path"]).is_file():
+            if entry["name"] != "RUN.md" and check_present(entry["path"]):
                 start = found[j - 1] if j > 0 else entry
                 runs.append({"record": entry["path"], "start": start["sha"], "t": start["t"]})
         live = f"{prefix}{slug}/RUN.md"
-        if (root / live).is_file():
+        if check_present(live):
             runs.append({"record": live, "start": found[-1]["sha"], "t": found[-1]["t"]})
         for k, run in enumerate(runs, 1):
             run.update(k=k, runkey=run["start"][:8])
@@ -298,6 +305,37 @@ def derive_run_eras(runs) -> list:
 
 def check_in_era(t, era) -> bool:
     return t >= era["t0"] and (era["t1"] is None or t < era["t1"])
+
+
+def derive_record_commits(history, era, live_path) -> list:
+    """The run's own writes to its live run-state path, oldest first: the era's non-merge commits that
+    added or modified it. Bounded to the era because rotation keeps the path, so the path's history
+    also holds every predecessor's writes, its terminal one included. The model and the schema leg
+    (TOOL-dLoggedFlight-10) both read this, so the two cannot bound a run's writes differently."""
+    return sorted((c for c in history if check_in_era(c["t"], era) and len(c["parents"]) <= 1
+                   and any(p == live_path and s in "AM" for s, p in c["files"])), key=lambda c: c["t"])
+
+
+def derive_window(start, start_from, phases_at, terminal, term_end=None, last_line=None) -> dict:
+    """A run's half-open window (spec S2 of TOOL-dLoggedFlight-8), from what the caller read.
+
+    `phases_at` is `[(record commit, phase)]`, oldest first, over `derive_record_commits`. The window
+    closes at the END that moved the phase into a terminal one, else, for a terminal run, at its first
+    terminal write, else one second after the later of the last journal line and the last record
+    commit, the resolution of a commit time, so the run's last event is inside its own window. A caller
+    with no journal, such as a fresh clone, passes no `term_end` and no `last_line`, and gets the window
+    git alone gives.
+    """
+    term_write = next((c for c, ph in phases_at if ph in PHASES_TERMINAL), None)
+    if term_end is not None:
+        end, end_from = term_end, "terminal-end"
+    elif terminal and term_write is not None:
+        end, end_from = float(term_write["t"]), "terminal-write"
+    else:
+        last_rec = phases_at[-1][0]["t"] if phases_at else None
+        latest = max((v for v in (last_line, last_rec) if v is not None), default=start)
+        end, end_from = float(latest) + 1.0, "last-activity"
+    return {"start": start, "end": end, "start_from": start_from, "end_from": end_from}
 
 
 # ---------------------------------------------------------------------------------- the run-state file
@@ -439,8 +477,9 @@ def resolve_default_ref(refs, default_ref=None) -> tuple:
     return None, None
 
 
-def read_blobs(root, requests) -> dict:
-    """`{request: text or None}` for `<rev>:<path>` requests, through ONE `cat-file --batch`."""
+def read_blobs(root, requests, decode=True) -> dict:
+    """`{request: text or None}` for `<rev>:<path>` requests, or any object name, through ONE
+    `cat-file --batch`. `decode=False` returns each blob's BYTES, for a caller grading bytes."""
     wanted = sorted(set(requests))
     if not wanted:
         return {}
@@ -454,7 +493,8 @@ def read_blobs(root, requests) -> dict:
         pos = nl + 1
         if len(header) == 3 and header[1] == "blob":
             size = int(header[2])
-            out[req] = raw[pos:pos + size].decode("utf-8", "replace")
+            body = raw[pos:pos + size]
+            out[req] = body.decode("utf-8", "replace") if decode else body
             pos += size + 1
         elif len(header) == 3:
             pos += int(header[2]) + 1
@@ -1122,9 +1162,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     history = read_git_range(root, list(dict.fromkeys(hist_tips)),                      # git 3
                              paths=[f"{build}/RUN.md", f"{build}/RUN.*.md"])
     live_path = f"{build}/RUN.md"
-    record_commits = sorted((c for c in history if check_in_era(c["t"], era) and len(c["parents"]) <= 1
-                             and any(p == live_path and s in "AM" for s, p in c["files"])),
-                            key=lambda c: c["t"])
+    record_commits = derive_record_commits(history, era, live_path)
     # The own-commit range: descendants of the start commit, on the run's branch and the default one.
     span = read_git_range(root, ["--ancestry-path", f"^{pick['start']}", *tips]) if tips else []  # git 4
     era_commits = sorted((c for c in span if check_in_era(c["t"], era)), key=lambda c: c["t"])
@@ -1180,19 +1218,9 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                      and (i["phase_to"] or "") in PHASES_TERMINAL
                      and (i["phase_from"] or "") not in PHASES_TERMINAL), None)
     phases_at = [(c, derive_phase(blobs.get(f"{c['sha']}:{live_path}"))) for c in record_commits]
-    term_write = next((c for c, ph in phases_at if ph in PHASES_TERMINAL), None)
-    if term_end is not None:
-        w_end, end_from = term_end, "terminal-end"
-    elif terminal and term_write is not None:
-        w_end, end_from = float(term_write["t"]), "terminal-write"
-    else:
-        last_line = max((i["end"] or i["t"] for i in seg), default=None)
-        last_rec = record_commits[-1]["t"] if record_commits else None
-        latest = max((v for v in (last_line, last_rec) if v is not None), default=w_start)
-        # One second past the later of the two, the resolution of a commit time, so the run's last
-        # event is inside its own half-open window.
-        w_end, end_from = float(latest) + 1.0, "last-activity"
-    window = {"start": w_start, "end": w_end, "start_from": w_from, "end_from": end_from}
+    window = derive_window(w_start, w_from, phases_at, terminal, term_end,
+                           max((i["end"] or i["t"] for i in seg), default=None))
+    w_end = window["end"]
 
     def check_in_window(t) -> bool:
         return t is not None and w_start <= t < w_end

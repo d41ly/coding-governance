@@ -9,6 +9,12 @@
     python <this kit>/runlog.py model <slug> [--run <n>] [--json] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py record <slug> [--run <n>] [--write] [--journals <dir>] [--transcripts <dir>]
     python <this kit>/runlog.py verify <record> [--journals <dir>]
+    python <this kit>/runlog.py check-records
+
+`check-records` is the schema leg (TOOL-dLoggedFlight-10): it grades every committed run record's
+STAGED bytes against the closed schema and every tracked run's start and window from git alone, prints
+the population it graded, and exits 0 when nothing is refused, 1 on any refusal or failed liveness
+assertion, and 2 when it cannot run. What it does not check is stated at `record.check_records`.
 
 `record` renders one run's closed-schema record from its model and, with `--write`, writes it into the
 build folder and prints the two follow-ups it cannot run: re-render the build index, and commit under a
@@ -324,6 +330,21 @@ def cmd_verify(args) -> int:
     return 1 if state == "mismatch" else 0
 
 
+def cmd_check_records(_args) -> int:
+    # Every verdict line goes to STDOUT, since this runs as a leg and the runner keeps its output; a
+    # leg that could not run says why on stderr and exits 2, which no refusal shares.
+    try:
+        root = mdl.resolve_repo_root()
+        result = rec.check_records(root)
+    except (OSError, ValueError) as exc:
+        print(f"runlog: check-records could not run: {exc}", file=sys.stderr)
+        return 2
+    lines, rc = rec.render_check_report(result)
+    sys.stdout.write("\n".join(lines) + "\n")
+    sys.stdout.flush()
+    return rc
+
+
 def main(argv=None) -> int:
     # A path or a refusal reason can carry a character the console's code page lacks, and a print
     # that raises on it would turn a report into a traceback. Narration is transcript text, so stdout
@@ -363,7 +384,11 @@ def main(argv=None) -> int:
     pv = sub.add_parser("verify", help="recompute a record's journal commitment on this machine")
     pv.add_argument("record")
     pv.add_argument("--journals", help="the journal directory to read instead of this clone's own")
+    sub.add_parser("check-records", help="the schema leg: grade every staged run record and every run's "
+                   "start and window")
     args = ap.parse_args(argv)
+    if args.cmd == "check-records":
+        return cmd_check_records(args)
     if args.cmd == "model":
         return cmd_model(args)
     if args.cmd == "record":

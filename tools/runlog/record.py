@@ -29,22 +29,31 @@ its `journal_lines` and never re-joined here. `check_commitment` rebuilds the mo
 committed number of lines from the committed first time on, so a line the run appends after the render
 is not an edit.
 
-WHAT THIS DOES NOT DO. It makes no git call: the model's calls are the whole cost, and rendering is a
-pure function of the model. It does not judge whether a value is TRUE, only that it is in its class. It
-does not choose when a record is rendered; the unattended Skill's step does. And it names nothing
-outside this kit by literal: the memory root is resolved, and the build-index generator is found beside
-this kit by its file name.
+THE SCHEMA LEG (TOOL-dLoggedFlight-10) is `check_records`, run as `runlog.py check-records`. It reads
+every committed record's STAGED bytes and refuses anything outside `RECORD_SCHEMA`, compiling the
+schema's data itself rather than calling the renderer, so a renderer bug cannot vouch for itself. It
+also derives every tracked run's start and window from git alone and refuses two runs of one build that
+share a start or whose windows overlap. What it does not check is stated at `check_records`.
+
+WHAT THIS DOES NOT DO. Rendering makes no git call: the model's calls are the whole cost, and rendering
+is a pure function of the model. It does not judge whether a value is TRUE, only that it is in its
+class. It does not choose when a record is rendered; the unattended Skill's step does. And it names
+nothing outside this kit by literal: the memory root is resolved, and the build-index generator is found
+beside this kit by its file name.
 """
 from __future__ import annotations
 
 import dataclasses
 import datetime
+import fnmatch
 import hashlib
+import itertools
 import json
 import os
 import pathlib
 import re
 import sys
+import time
 from collections import Counter
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -98,6 +107,9 @@ _PATH_SEG = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 _PATH = r"<root>/builds/<slug>/(?:" + _PATH_SEG + r"/)*" + _PATH_SEG + r"\.md"
 _UNIT = r"[A-Z]+-<slug>-[0-9]+"
 _WINDOW_USAGE = "requests {int} · in {int} · out {int} · cache-read {int} · cache-write {int}"
+# Where a token starts: the line's start, or after a space, a quote, a bracket, a table bar, a comma or
+# an equals sign. A root-shaped segment in the MIDDLE of a path class value is a folder name, not a root.
+_TOKEN_START = r"(?:^|(?<=[\s\"'`(|,\[=]))"
 
 # THE CLOSED SCHEMA (spec S4). `shaped` are regexes a value must match WHOLE; `<root>` and `<slug>` are
 # the build's own declared memory root and slug, escaped when compiled. A `unit` must also be one of
@@ -261,6 +273,18 @@ RECORD_SCHEMA = {
         },
         "Data": {"facts": (), "tables": ()},
     },
+    # SHAPES NO RECORD MAY CARRY ANYWHERE, whatever class a value passed (TOOL-dLoggedFlight-10 S5).
+    # The renderer withholds a value one of these finds, and the schema leg refuses a record in whose
+    # bytes one is found. They are data here because the `label` class admits a lowercase UUID, so a
+    # rule only the leg knew would let the renderer write a record the leg refuses. An absolute path
+    # is a drive letter, a `/Users/`, `/home/` or MSYS drive root at a token start, or a UNC prefix in
+    # either slash.
+    "forbidden": {
+        "absolute-path": (r"(?<![A-Za-z0-9])[A-Za-z]:[\\/]"
+                          + r"|" + _TOKEN_START + r"(?:/(?:[A-Za-z]|Users|home)/|//[A-Za-z0-9])"
+                          + r"|\\\\[A-Za-z0-9._$-]"),
+        "uuid": r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}",
+    },
 }
 
 
@@ -307,13 +331,19 @@ def build_matchers(slug, memory_root, own_ids) -> dict:
     return out
 
 
+def build_forbidden() -> tuple:
+    """The schema's forbidden shapes, compiled for the renderer. The schema leg compiles the same data
+    itself, in `scan_forbidden`, so neither reader vouches for the other."""
+    return tuple(re.compile(p) for p in RECORD_SCHEMA["forbidden"].values())
+
+
 def render_cell(ctx, cls, value) -> str:
     """ONE value through its class: itself when it belongs, `-` when it is absent or does not, and a
-    value that does not belong is counted as withheld."""
+    value that does not belong, or that carries a forbidden shape, is counted as withheld."""
     if cls == "none" or value is None or value == "" or value == [] or value == NONE:
         return NONE
     text = str(value)
-    if ctx["match"][cls](text):
+    if ctx["match"][cls](text) and not any(rx.search(text) for rx in ctx.get("forbidden", ())):
         return text
     ctx["withheld"] += 1
     return NONE
@@ -396,6 +426,13 @@ def derive_runkey(model) -> str:
     return key
 
 
+def derive_record_relpath(memory_root, slug, day, uid, key) -> str:
+    """The repo-relative path the renderer writes a run's record to. ONE builder: `resolve_record_path`
+    names a new record with it, and the schema leg asserts at run time that its glob admits what this
+    returns, so a renamed record cannot drop out of the leg's population in silence."""
+    return f"{memory_root}/builds/{slug}/build/{day}-build-{uid}-{RECORD_TAG}-{key}.md"
+
+
 def resolve_record_path(root, model, serves, date=None, memory_root=None) -> tuple:
     """`(path, existed)`: the run's record under `<memory root>/builds/<slug>/build/`.
 
@@ -407,7 +444,9 @@ def resolve_record_path(root, model, serves, date=None, memory_root=None) -> tup
     root = pathlib.Path(root)
     mr = memory_root if memory_root is not None else rl.resolve_memory_root(root)
     key = derive_runkey(m)
-    folder = root / mr / "builds" / m["slug"] / "build"
+    day = date or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    target = root / derive_record_relpath(mr, m["slug"], day, serves[0], key)
+    folder = target.parent
     found = sorted(folder.glob(f"*-{RECORD_TAG}-{key}.md")) if folder.is_dir() else []
     if len(found) > 1:
         raise ValueError(f"runlog: {len(found)} records carry the runkey {key}, so which one this run "
@@ -418,10 +457,9 @@ def resolve_record_path(root, model, serves, date=None, memory_root=None) -> tup
             raise ValueError(f"runlog: the existing record {found[0].name} names an id this run no longer "
                              "serves, so re-rendering into it would break check 21's projection")
         return found[0], True
-    day = date or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
     if not DATE_RE.fullmatch(str(day)):
         raise ValueError(f"runlog: {str(day)[:40]!r} is not a YYYY-MM-DD render date")
-    return folder / f"{day}-build-{serves[0]}-{RECORD_TAG}-{key}.md", False
+    return target, False
 
 
 # ---------------------------------------------------------------------------------- the rows
@@ -605,7 +643,8 @@ def build_record_parts(model, memory_root=None, commitment=None) -> dict:
                          "shrink-only pin")
     mr = memory_root if memory_root is not None else "memory"
     own = [u["id"] for u in m.get("units") or [] if u.get("id")]
-    ctx = {"match": build_matchers(str(m.get("slug") or ""), mr, own), "withheld": 0}
+    ctx = {"match": build_matchers(str(m.get("slug") or ""), mr, own), "forbidden": build_forbidden(),
+           "withheld": 0}
     rows = {"timeline": build_timeline_rows(m, ctx), "units": build_unit_rows(m, ctx),
             "entries": build_entry_rows(m, ctx), "rounds": build_round_rows(m, ctx),
             "conformance": build_conformance_rows(m, ctx), "anomalies": build_anomaly_rows(m, ctx),
@@ -901,3 +940,532 @@ def check_commitment(root, record_path, journal_root, memory_root=None) -> tuple
         return "mismatch", ("the journal changed after the render: " + "; ".join(
             f"{f} committed {want[f]} and recomputed {now.get(f, 'nothing')}" for f in bad))
     return "match", f"{want['lines']} journal line(s) hash as committed"
+
+
+# ---------------------------------------------------------------------------------- the schema leg
+
+# THE LEG'S RULES (TOOL-dLoggedFlight-10 S2), a closed list: every refusal of a record names one. The
+# first eight are the spec's list; `line`, `name` and `unreadable` are what a closed grammar implies.
+RECORD_RULES = ("headings", "first-cell", "cell", "absolute-path", "uuid", "data", "size", "serves", "line",
+                "name", "unreadable")
+# A build's runs are refused under these, and the leg's own liveness assertions under the last two.
+RUN_RULES = ("run-start", "run-window")
+LIVENESS_RULES = ("root", "glob")
+# The tracked glob the leg reads, as path SEGMENTS under the memory root, each matched with
+# `fnmatchcase`, so a `*` never crosses a `/`. `check_records` holds it to `derive_record_relpath`.
+RECORD_GLOB = ("builds", "*", "build", "*-" + RECORD_TAG + "-*.md")
+# What a table row may lead with: a time, a sha or an ordinal, so no row leads with an id.
+FIRST_CELL_CLASSES = ("utc", "sha", "int")
+# How many refusals are printed per record. The COUNT is never capped; only the list is.
+RECORD_REFUSALS_SHOWN = 20
+
+
+def check_record_glob(rel, memory_root) -> str | None:
+    """The build slug when `rel` is a path the leg's glob admits under the memory root, else None."""
+    prefix = memory_root + "/"
+    if not rel.startswith(prefix):
+        return None
+    parts = rel[len(prefix):].split("/")
+    if len(parts) != len(RECORD_GLOB) or not all(fnmatch.fnmatchcase(p, g) for p, g in zip(parts, RECORD_GLOB)):
+        return None
+    return parts[1] or None
+
+
+def read_index_entries(root, memory_root) -> list:
+    """Every INDEX entry under the declared root, as `{mode, obj, stage, path}`. ONE `ls-files`, and the
+    index rather than the working tree, so a pre-commit run grades the bytes about to be committed."""
+    raw = mdl.run_git(root, ["ls-files", "-s", "-z", "--", f":(literal){memory_root}"])
+    out = []
+    for item in raw.split(b"\0"):
+        meta, tab, path = item.partition(b"\t")
+        bits = meta.decode("ascii", "replace").split()
+        if not tab or len(bits) != 3:
+            continue
+        out.append({"mode": bits[0], "obj": bits[1], "stage": int(bits[2]) if bits[2].isdigit() else -1,
+                    "path": path.decode("utf-8", "replace")})
+    return out
+
+
+def derive_spec_id(text, slug) -> str | None:
+    """The unit id a spec defines: the first id of the build's slug on its `# ` title line, the rule the
+    model's `read_units` applies to the working tree, applied here to staged bytes."""
+    first = (text or "").split("\n", 1)[0]
+    if not first.startswith("# "):
+        return None
+    m = re.search(r"\b[A-Z]+-" + re.escape(slug) + r"-[0-9]+\b", first)
+    return m.group(0) if m else None
+
+
+def build_record_checks(slug, memory_root, own_ids) -> dict:
+    """Every class of `RECORD_SCHEMA` as `(regex source, predicate)`, bound to ONE build.
+
+    Compiled HERE from the schema's data, deliberately not taken from the renderer's `build_matchers`:
+    the leg is the second enforcement point, and one that called the renderer's code would only confirm
+    it. The regex sources feed the fact templates; the predicates grade each value whole.
+    """
+    out = {}
+    for name, pat in RECORD_SCHEMA["shaped"].items():
+        src = pat.replace("<root>", re.escape(memory_root)).replace("<slug>", re.escape(slug))
+        out[name] = (src, re.compile(src).fullmatch)
+    for name, members in RECORD_SCHEMA["vocab"].items():
+        src = "|".join(re.escape(v) for v in sorted(members, key=len, reverse=True))
+        out[name] = (src, frozenset(members).__contains__)
+    own = frozenset(own_ids)
+    unit_src, unit_rx = out["unit"]
+    out["unit"] = (unit_src, lambda text: bool(unit_rx(text)) and text in own)
+    out["units"] = (out["units"][0], lambda text: bool(text) and all(
+        bool(unit_rx(t)) and t in own for t in text.split(" ")))
+    out["none"] = ("(?!)", lambda text: False)
+    return out
+
+
+def check_cell(checks, cls, text) -> bool:
+    """A cell's text is `-`, which every class admits because the renderer writes it for an absent or
+    withheld value, or a value of its class."""
+    return isinstance(text, str) and (text == NONE or checks[cls][1](text))
+
+
+def check_fact_value(checks, templates, text) -> bool:
+    """A fact's value matches one of its label's templates, each `{class}` filled by `-` or that class."""
+    if not isinstance(text, str):
+        return False
+    for template in templates:
+        parts = PLACEHOLDER_RE.split(template)
+        classes = parts[1::2]
+        rx = "".join(re.escape(p) if i % 2 == 0 else f"({re.escape(NONE)}|{checks[p][0]})"
+                     for i, p in enumerate(parts))
+        m = re.fullmatch(rx, text)
+        if m and all(check_cell(checks, c, v) for c, v in zip(classes, m.groups())):
+            return True
+    return False
+
+
+def check_table_row(ln, cells, table, checks) -> list:
+    """Every refusal ONE table row earns: its first cell's shape, then each cell against its column's
+    class, the timeline's columns classed by the event kind its key column names."""
+    header = table["header"]
+    if len(cells) != len(header):
+        return [(ln, "cell", f"{len(cells)} cells under the {len(header)}-column `{table['name']}` header")]
+    out = []
+    if not any(checks[c][1](cells[0]) for c in FIRST_CELL_CLASSES):
+        out.append((ln, "first-cell", "the row leads with neither a timestamp, a sha nor an ordinal"))
+    if "rows" in table:
+        classes = table["rows"].get(cells[table["key"]])
+        if classes is None:
+            out.append((ln, "cell", f"column `{header[table['key']]}` names an event kind the schema does "
+                                    "not declare"))
+            return out
+    else:
+        classes = table["cols"]
+    for col, (cls, cell) in enumerate(zip(classes, cells)):
+        if not check_cell(checks, cls, cell):
+            out.append((ln, "cell", f"column `{header[col]}` holds a value outside the `{cls}` class"))
+    return out
+
+
+def scan_forbidden(lines) -> list:
+    """`(line, rule, why)` for every line carrying a forbidden shape, read from `RECORD_SCHEMA` and
+    compiled here. The shape itself is never echoed, only where it sits."""
+    rules = [(rule, re.compile(p)) for rule, p in RECORD_SCHEMA["forbidden"].items()]
+    out = []
+    for ln, line in enumerate(lines, 1):
+        for rule, rx in rules:
+            m = rx.search(line)
+            if m:
+                out.append((ln, rule, f"a forbidden shape at column {m.start() + 1}"))
+    return out
+
+
+def check_serves_line(ln, line, slug, own_ids) -> list:
+    """The head's binding line: `**Serves:** journal <ids>`, every id one a spec of THIS build defines."""
+    m = re.fullmatch(r"\*\*Serves:\*\* (\S+) (.+)", line or "")
+    if m is None:
+        return [(ln, "serves", "the head's third line is not `**Serves:** <kind> <ids>`")]
+    out = []
+    if m.group(1) != SERVES_KIND:
+        out.append((ln, "serves", f"the binding kind is not `{SERVES_KIND}`"))
+    for tok in m.group(2).split(" "):
+        r = re.fullmatch(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)(?:\.\.([0-9]+))?", tok)
+        if r is None:
+            out.append((ln, "serves", "a token that is neither a unit id nor an id range"))
+            continue
+        fam, s, lo = r.group(1), r.group(2), int(r.group(3))
+        hi = int(r.group(4)) if r.group(4) else lo
+        if s != slug:
+            out.append((ln, "serves", f"an id of the build `{s}`, outside the record's own build `{slug}`"))
+            continue
+        if hi < lo or hi - lo > len(own_ids):
+            out.append((ln, "serves", "an id range that runs backwards or past every unit the build defines"))
+            continue
+        missing = [f"{fam}-{s}-{n}" for n in range(lo, hi + 1) if f"{fam}-{s}-{n}" not in own_ids]
+        if missing:
+            out.append((ln, "serves", f"{len(missing)} id(s) no spec of `{slug}` defines, the first "
+                                      f"{missing[0]}"))
+    return out
+
+
+def parse_json_pairs(pairs):
+    """A JSON object that REFUSES a repeated key: `json.loads` keeps the last value silently, so a
+    hand-edited twin could carry text in a key the parser throws away and the bytes keep."""
+    seen = {}
+    for k, v in pairs:
+        if k in seen:
+            raise ValueError("an object repeats a key, and the parser would keep only its last value")
+        seen[k] = v
+    return seen
+
+
+def check_record_data(json_lines, fence_ln, checks) -> list:
+    """The `Data` block: JSON, with exactly the schema's keys at every level, each value in its class."""
+    if any("\\" in text for _, text in json_lines):
+        ln = next(n for n, text in json_lines if "\\" in text)
+        return [(ln, "data", "a JSON escape, which no value the schema admits needs")]
+    try:
+        doc = json.loads("\n".join(t for _, t in json_lines), object_pairs_hook=parse_json_pairs)
+    except ValueError as exc:
+        n = getattr(exc, "lineno", None)
+        ln = json_lines[n - 1][0] if n and 0 < n <= len(json_lines) else fence_ln
+        return [(ln, "data", f"the Data block is not JSON the schema admits: {getattr(exc, 'msg', exc)}")]
+
+    def locate(needle) -> int:
+        return next((n for n, text in json_lines if needle in text), fence_ln)
+
+    if not isinstance(doc, dict) or list(doc) != ["schema", "sections"]:
+        return [(fence_ln, "data", "the top level carries keys other than `schema` and `sections`, in order")]
+    out = []
+    if doc["schema"] != RECORD_SCHEMA["schema"]:
+        out.append((locate('"schema"'), "data", f"schema is not {RECORD_SCHEMA['schema']}"))
+    secs = doc["sections"]
+    want = [h for h in RECORD_SCHEMA["headings"] if h != "Data"]
+    if not isinstance(secs, dict) or list(secs) != want:
+        out.append((locate('"sections"'), "data", "the sections are not the schema's set and order"))
+    for name, sec in (secs.items() if isinstance(secs, dict) else ()):
+        spec = RECORD_SCHEMA["sections"].get(name)
+        if spec is None or name == "Data":
+            continue
+        at = locate(json.dumps(name) + ":")
+        if not isinstance(sec, dict) or list(sec) != ["facts", "tables"]:
+            out.append((at, "data", f"section `{name}` carries keys other than `facts` and `tables`"))
+            continue
+        declared = dict(spec["facts"])
+        facts = sec["facts"] if isinstance(sec["facts"], dict) else None
+        if facts is None:
+            out.append((at, "data", f"section `{name}`'s facts are not an object"))
+        for label, value in (facts or {}).items():
+            if label not in declared:
+                out.append((at, "data", f"section `{name}` carries a fact key the schema does not declare"))
+            elif not check_fact_value(checks, declared[label], value):
+                out.append((at, "cell", f"the `{label}` fact's twin value matches none of its templates"))
+        tables = sec["tables"] if isinstance(sec["tables"], list) else None
+        if tables is None:
+            out.append((at, "data", f"section `{name}`'s tables are not a list"))
+        for tb in tables or ():
+            decl = next((t for t in spec["tables"] if isinstance(tb, dict) and t["name"] == tb.get("name")), None)
+            if not isinstance(tb, dict) or list(tb) != ["name", "header", "rows"] or decl is None:
+                out.append((at, "data", f"a table in section `{name}` is not a declared name, header and rows"))
+                continue
+            if tb["header"] != list(decl["header"]):
+                out.append((locate(json.dumps(tb["name"])), "data", f"table `{decl['name']}`'s header is not "
+                                                                    "the declared one"))
+            if not isinstance(tb["rows"], list):
+                out.append((at, "data", f"table `{decl['name']}`'s rows are not a list"))
+                continue
+            for row in tb["rows"]:
+                if not isinstance(row, list) or not all(isinstance(c, str) for c in row):
+                    out.append((at, "data", f"a row of table `{decl['name']}` is not a list of strings"))
+                    continue
+                out += check_table_row(locate(json.dumps(row, ensure_ascii=False, separators=(",", ":"))),
+                                       row, decl, checks)
+    return out
+
+
+def check_record_lines(lines, checks, slug, own_ids) -> list:
+    """The record grammar, line by line: the fixed head, the declared headings in order, each section's
+    declared facts before its declared tables, and one fenced JSON block under `## Data`."""
+    out = [(ln, "line", "a CR byte; the renderer writes LF only") for ln, line in enumerate(lines, 1)
+           if "\r" in line]
+    lines = [line.replace("\r", "") for line in lines]
+    for i, want in enumerate((TITLE, "", None, "", INTRO, "")):
+        got = lines[i] if i < len(lines) else None
+        if want is None:
+            out += check_serves_line(i + 1, got, slug, own_ids)
+        elif got != want:
+            out.append((i + 1, "line", "the record's head is fixed text, and this line departs from it"))
+    headings, sec, spec, labels, table, started = [], None, None, [], None, False
+    data_state, fence_ln, json_lines = None, 0, []
+    last = len(lines) - 1 if lines and lines[-1] == "" else len(lines)
+    for idx in range(min(6, len(lines)), last):
+        ln, line = idx + 1, lines[idx]
+        if data_state == "open":
+            if line == DATA_CLOSE:
+                data_state = "closed"
+            else:
+                json_lines.append((ln, line))
+            continue
+        if line.startswith("## "):
+            headings.append((ln, line[3:]))
+            sec = line[3:] if line[3:] in RECORD_SCHEMA["sections"] else None
+            spec = RECORD_SCHEMA["sections"].get(sec) if sec else None
+            labels, table, started = [], None, False
+            continue
+        if line == "":
+            table = None
+            continue
+        if sec is None:
+            out.append((ln, "line", "a line under no declared heading"))
+            continue
+        if sec == "Data":
+            if data_state is None and line == DATA_OPEN:
+                data_state, fence_ln = "open", ln
+            else:
+                out.append((ln, "line", "a line under `## Data` outside its one fenced json block"))
+            continue
+        if line.startswith("|"):
+            started = True
+            if table is None:
+                cells = line[2:-2].split(" | ") if line.startswith("| ") and line.endswith(" |") else None
+                decl = next((t for t in spec["tables"] if cells is not None and tuple(cells) == tuple(t["header"])),
+                            None)
+                table = {"decl": decl, "sep": False}
+                if decl is None:
+                    out.append((ln, "cell", f"a table header section `{sec}` declares no table for"))
+                continue
+            if table["decl"] is None:
+                out.append((ln, "cell", "a row of an undeclared table"))
+                continue
+            if not table["sep"]:
+                table["sep"] = True
+                if line != "|" + "---|" * len(table["decl"]["header"]):
+                    out.append((ln, "line", "a table header is not followed by its separator row"))
+                continue
+            if not (line.startswith("| ") and line.endswith(" |")):
+                out.append((ln, "line", "a table row not framed `| … |`"))
+                continue
+            out += check_table_row(ln, line[2:-2].split(" | "), table["decl"], checks)
+            continue
+        if line.startswith("- "):
+            label, sep, value = line[2:].partition(": ")
+            order = [name for name, _ in spec["facts"]]
+            if not sep:
+                out.append((ln, "line", "a list line that is not `- <label>: <value>`"))
+            elif started:
+                out.append((ln, "line", "a fact after a table; a section's facts come first"))
+            elif label not in order:
+                out.append((ln, "cell", f"a fact label section `{sec}` does not declare"))
+            elif label in labels or (labels and order.index(label) < order.index(labels[-1])):
+                out.append((ln, "cell", f"the `{label}` fact repeated or out of its declared order"))
+            elif not check_fact_value(checks, dict(spec["facts"])[label], value):
+                out.append((ln, "cell", f"the `{label}` fact's value matches none of its templates"))
+            if sep and label in order:
+                labels.append(label)
+            continue
+        out.append((ln, "line", "free text: neither a heading, a fact nor a table row"))
+    names = [name for _, name in headings]
+    want = list(RECORD_SCHEMA["headings"])
+    if names != want:
+        j = next((i for i, (a, b) in enumerate(zip(names, want)) if a != b), min(len(names), len(want)))
+        ln = headings[j][0] if j < len(headings) else len(lines)
+        wanted = f"`{want[j]}`" if j < len(want) else "the end of the record"
+        out.append((ln, "headings", f"the headings depart from the schema's set and order at heading {j + 1}, "
+                                    f"where {wanted} belongs"))
+    if data_state is None:
+        out.append((len(lines), "data", "no fenced json block under `## Data`"))
+    elif data_state == "open":
+        out.append((fence_ln, "data", "the Data block's fence is never closed"))
+    else:
+        out += check_record_data(json_lines, fence_ln, checks)
+    return out
+
+
+def check_record(rel, data, slug, own_ids, memory_root) -> list:
+    """Every refusal ONE record's staged bytes earn, as sorted `(line, rule, why)`, graded against
+    `RECORD_SCHEMA` alone. Line 0 is the record as a whole."""
+    out = []
+    name = rel.rsplit("/", 1)[-1]
+    if RECORD_NAME_RE.fullmatch(name) is None:
+        out.append((0, "name", "the glob admits this name, and the renderer would never write it"))
+    cap = RECORD_SCHEMA["cap_bytes"]
+    if len(data) > cap:
+        out.append((data[:cap].count(b"\n") + 1, "size", f"{len(data)} bytes, over the {cap}-byte cap, "
+                                                         "which this line crosses"))
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        out.append((data[:exc.start].count(b"\n") + 1, "unreadable", "the bytes are not UTF-8"))
+        return sorted(out)
+    lines = text.split("\n")
+    out += scan_forbidden(lines)
+    out += check_record_lines(lines, build_record_checks(slug, memory_root, own_ids), slug, own_ids)
+    return sorted(set(out))
+
+
+def check_run_states(root, memory_root, tracked, texts) -> dict:
+    """S6: every tracked run's start and window, from git alone, as a fresh clone must derive them.
+
+    `tracked` is the index's path set and `texts` each tracked run-state file's staged text. Three git
+    calls whatever the number of builds: `derive_run_starts`'s one log over the population, one log
+    over the run-state paths, and one batch read of the terminal runs' record writes. The window is the
+    model's own derivation, read through `derive_record_commits` and `derive_window`, never a copy.
+    """
+    runs_by = mdl.derive_run_starts(root, memory_root, None, tracked=tracked)
+    live = {f"{memory_root}/builds/{slug}/RUN.md" for slug in runs_by}
+    history = mdl.read_git_range(root, ["HEAD"], paths=[f"{memory_root}/builds/*/RUN.md"]) if runs_by else []
+    by_path: dict = {}
+    for c in history:
+        for p in {p for _s, p in c["files"] if p in live}:
+            by_path.setdefault(p, []).append(c)
+    plan, requests = [], []
+    for slug, runs in sorted(runs_by.items()):
+        live_path = f"{memory_root}/builds/{slug}/RUN.md"
+        for run, era in zip(runs, mdl.derive_run_eras(runs)):
+            commits = mdl.derive_record_commits(by_path.get(live_path, []), era, live_path)
+            terminal = mdl.derive_phase(texts.get(run["record"])) in mdl.PHASES_TERMINAL
+            plan.append((slug, live_path, run, commits, terminal))
+            if terminal:
+                requests += [f"{c['sha']}:{live_path}" for c in commits]
+    blobs = mdl.read_blobs(root, requests)
+    windows: dict = {}
+    for slug, live_path, run, commits, terminal in plan:
+        phases = [(c, mdl.derive_phase(blobs.get(f"{c['sha']}:{live_path}")) if terminal else None)
+                  for c in commits]
+        windows.setdefault(slug, []).append((run, mdl.derive_window(float(run["t"]), "git", phases, terminal)))
+    refusals, builds = [], []
+    for slug, pairs in sorted(windows.items()):
+        by_start: dict = {}
+        for run, _w in pairs:
+            by_start.setdefault(run["start"], []).append(run["k"])
+        shared = {s: ks for s, ks in by_start.items() if len(ks) > 1}
+        for s, ks in sorted(shared.items()):
+            refusals.append((slug, "run-start", f"runs {', '.join(map(str, ks))} share the start commit {s[:8]}, "
+                                                "so their keys and windows collapse into one"))
+        backwards = [(run, w) for run, w in pairs if w["end"] < w["start"]]
+        for run, w in backwards:
+            refusals.append((slug, "run-window", f"run {run['k']}'s window ends at {mdl.derive_iso(w['end'])}, "
+                                                 f"before it starts at {mdl.derive_iso(w['start'])}"))
+        overlaps = [(a, b) for a, b in itertools.combinations(pairs, 2)
+                    if a[1]["start"] < b[1]["end"] and b[1]["start"] < a[1]["end"]]
+        for (ra, wa), (rb, wb) in overlaps:
+            refusals.append((slug, "run-window", f"runs {ra['k']} and {rb['k']} overlap, "
+                                                 f"[{mdl.derive_iso(wa['start'])}, {mdl.derive_iso(wa['end'])}) and "
+                                                 f"[{mdl.derive_iso(wb['start'])}, {mdl.derive_iso(wb['end'])})"))
+        builds.append({"slug": slug, "runs": [(run["k"], run["start"], w) for run, w in pairs],
+                       "distinct": not shared, "ordered": not backwards, "disjoint": not overlaps})
+    return {"builds": builds, "refusals": refusals, "runs": sum(len(p) for p in windows.values())}
+
+
+def check_records(root, memory_root=None) -> dict:
+    """The schema leg (TOOL-dLoggedFlight-10): every committed run record graded, and every run's start
+    and window, over the INDEX, in five git calls whatever the population.
+
+    The population is every tracked `<memory root>/builds/*/build/*-runlog-*.md`, read from the index,
+    so a pre-commit run grades the bytes about to be committed. Two liveness assertions keep an empty
+    population honest: the declared root must hold tracked files (`root`), and the glob must admit the
+    path the renderer's own `derive_record_relpath` builds (`glob`). A record the index holds unmerged,
+    or as anything but a regular file, is refused as `unreadable`, never skipped.
+
+    WHAT THIS DOES NOT CHECK. Whether a record's values are TRUE: a count can be wrong and still be an
+    integer, and a sha can name a commit the run never made. Whether the Data twin AGREES with the
+    markdown: each copy is graded on its own. Whether a record's run exists, or its name's key is that
+    run's start. Records in any other folder or under any other name, which the glob never reads. A run
+    on a branch HEAD has not merged, since the starts are read from HEAD. A window's END against the
+    commit graph: windows are compared in commit time, so a clock skew between two nodes that puts a
+    predecessor's terminal write after its successor's start moves a window without redding it.
+
+    Raises ValueError when the memory root refuses or git cannot be run, which the command makes exit 2.
+    """
+    t0 = time.perf_counter()
+    calls0 = mdl.GIT_CALLS[0]
+    root = pathlib.Path(root)
+    mr = memory_root if memory_root is not None else rl.resolve_memory_root(root)
+    out = {"root": mr, "glob": "/".join((mr,) + RECORD_GLOB), "records": [], "refusals": [], "liveness": [],
+           "run_state": None, "pending": 0, "git_calls": 0, "wall_s": 0.0}
+    probe = derive_record_relpath(mr, "xProbe", "2000-01-01", "X-xProbe-1", "0" * 8)
+    if check_record_glob(probe, mr) is None:
+        out["liveness"].append(("glob", f"the glob {out['glob']} does not admit {probe}, the path the "
+                                        "renderer writes, so it would grade a population the renderer "
+                                        "never produces"))
+    entries = read_index_entries(root, mr)
+    if not entries:
+        out["liveness"].append(("root", f"the declared memory root {mr} holds no tracked file, so an empty "
+                                        "population would be a wrong root rather than a clean one"))
+    records, specs, run_files = {}, {}, {}
+    for e in entries:
+        slug = check_record_glob(e["path"], mr)
+        rest = e["path"][len(mr) + 1:].split("/")
+        if slug is not None:
+            records.setdefault(e["path"], (slug, []))[1].append(e)
+        elif len(rest) == 4 and rest[0] == "builds" and rest[2] == "spec" and rest[3].endswith(".md"):
+            specs.setdefault(rest[1], []).append(e)
+        elif len(rest) == 3 and rest[0] == "builds" and (rest[2] == "RUN.md" or mdl.ARCHIVE_RE.fullmatch(rest[2])):
+            run_files[e["path"]] = e
+    with_records = {slug for slug, _ in records.values()}
+    wanted = [e["obj"] for _p, (_s, es) in records.items() for e in es if e["stage"] == 0]
+    wanted += [e["obj"] for slug in with_records for e in specs.get(slug, []) if e["stage"] == 0]
+    wanted += [e["obj"] for e in run_files.values() if e["stage"] == 0]
+    blobs = mdl.read_blobs(root, wanted, decode=False)
+    own = {slug: {i for i in (derive_spec_id((blobs.get(e["obj"]) or b"").decode("utf-8", "replace"), slug)
+                              for e in specs.get(slug, [])) if i}
+           for slug in with_records}
+    for rel, (slug, es) in sorted(records.items()):
+        out["records"].append(rel)
+        e = es[0]
+        if len(es) != 1 or e["stage"] != 0:
+            found = [(0, "unreadable", "the index holds this record unmerged, so no one set of bytes is staged")]
+        elif e["mode"] not in ("100644", "100755"):
+            found = [(0, "unreadable", "the index holds this record as something other than a regular file")]
+        elif blobs.get(e["obj"]) is None:
+            found = [(0, "unreadable", "the staged blob could not be read")]
+        else:
+            found = check_record(rel, blobs[e["obj"]], slug, own.get(slug, set()), mr)
+        out["refusals"] += [(rel, ln, rule, why) for ln, rule, why in found]
+    if run_files:
+        texts = {p: (blobs.get(e["obj"]) or b"").decode("utf-8", "replace") for p, e in run_files.items()}
+        out["run_state"] = check_run_states(root, mr, set(run_files), texts)
+        out["pending"] = len(run_files) - out["run_state"]["runs"]
+    out["git_calls"] = mdl.GIT_CALLS[0] - calls0
+    out["wall_s"] = round(time.perf_counter() - t0, 3)
+    return out
+
+
+def render_check_report(result) -> tuple:
+    """`(lines, rc)`: what the leg prints, and 0 for a graded population with no refusal, else 1."""
+    lines = []
+    for rule, why in result["liveness"]:
+        lines.append(f"runlog: check-records REFUSED — {rule} — {why}")
+    n = len(result["records"])
+    shown = Counter()
+    refused = {rel for rel, *_ in result["refusals"]}
+    for rel, ln, rule, why in result["refusals"]:
+        shown[rel] += 1
+        if shown[rel] <= RECORD_REFUSALS_SHOWN:
+            lines.append(f"runlog: {rel}:{ln} refused — {rule} — {why}")
+    for rel, count in sorted(shown.items()):
+        if count > RECORD_REFUSALS_SHOWN:
+            lines.append(f"runlog: {rel}: {count - RECORD_REFUSALS_SHOWN} more refusal(s) not listed")
+    if n == 0:
+        lines.append(f"runlog: check-records 0 records (none committed yet) under {result['glob']}")
+    else:
+        lines.append(f"runlog: check-records {n} record{'s' if n != 1 else ''} under {result['glob']} · "
+                     f"{len(refused)} refused · {len(result['refusals'])} refusal(s)")
+    rs = result["run_state"]
+    run_refusals = rs["refusals"] if rs else []
+    if rs:
+        rotated = [b for b in rs["builds"] if len(b["runs"]) > 1]
+        lines.append(f"runlog: check-records run-state {len(rs['builds'])} builds · {rs['runs']} runs · "
+                     f"{len(rotated)} rotated · {result['pending']} run-state file(s) not yet committed")
+        for b in rotated:
+            starts = " ".join(s[:8] for _k, s, _w in b["runs"])
+            spans = " ".join(f"[{mdl.derive_iso(w['start'])}, {mdl.derive_iso(w['end'])})" for _k, _s, w in b["runs"])
+            lines.append(f"runlog: check-records run-state {b['slug']} · {len(b['runs'])} runs · starts {starts} · "
+                         f"{'distinct' if b['distinct'] else 'SHARED'} · windows {spans} · "
+                         f"{'each ends at or after its start' if b['ordered'] else 'one ends BEFORE its start'} · "
+                         f"{'disjoint' if b['disjoint'] else 'OVERLAPPING'}")
+        for slug, rule, why in run_refusals:
+            lines.append(f"runlog: check-records run-state {slug} refused — {rule} — {why}")
+    else:
+        lines.append("runlog: check-records run-state 0 builds: no run-state file is tracked under the root")
+    lines.append(f"runlog: check-records git_calls={result['git_calls']} wall={result['wall_s']}s "
+                 "(report-only, grades nothing)")
+    bad = bool(result["liveness"] or result["refusals"] or run_refusals)
+    lines.append(f"runlog: check-records {'RED' if bad else 'GREEN'}")
+    return lines, 1 if bad else 0

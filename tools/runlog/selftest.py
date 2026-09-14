@@ -3230,14 +3230,14 @@ def build_class_model():
     m["sessions"] = [FX_SID]
     m["worktrees"] = [intruders["absolute path"]]
     m["facts"]["note"] = intruders["free text"]
-    return m, intruders, j
+    return m, intruders, j, fx
 
 
 def test_record_ac4_classes():
     """AC4: one value of every class reaches the file and every member of every closed vocabulary a
     table carries does; the four intruders in fields the renderer reads are withheld and counted, and
     none of them, nor anything from a field it never reads, reaches the file."""
-    m, intruders, j = build_class_model()
+    m, intruders, j, _fx = build_class_model()
     text = rl_record.render_record(m, "memory", rl_record.measure_commitment(m, j))
     cells = read_record_cells(text)
     sch = rl_record.RECORD_SCHEMA
@@ -3543,6 +3543,405 @@ def test_record_ac8_cost():
     check("record AC8: rendering the 500-row model makes no subprocess call", rendered, 0)
     check("record AC8 liveness: the patched counter sees a git call made under it", len(seen), 1)
     print(f"  report (grades nothing): record render over 500 timeline rows {wall:.3f}s")
+
+
+# ================================================================ the schema leg (TOOL-dLoggedFlight-10)
+#
+# The clean record every arm below grades is RENDERED by `render_record`, from the model that carries one
+# value of every class, and never typed, so a renderer and a leg that disagree fail here (spec S5). Each
+# refusal is staged on a copy of it in a fixture INDEX, because the leg grades what is staged, and each
+# stands beside a near miss the leg accepts. The absolute paths and the UUIDs are assembled at test time,
+# as the redaction arms assemble their positives, so no tracked line carries a shape the leg refuses.
+
+SCHEMA_FX = {}
+# The two builds round-3 H2 names by slug, whose live windows the unbounded reading ended early.
+H2_BUILDS = ("aPacedTurnstile", "dUnstalledConvoy")
+
+
+def build_schema_fixture():
+    """The class model's record, written by the renderer into its own fixture repo beside a spec for
+    every unit it names, and staged. Built once; an arm that stages a variant restores the clean one."""
+    if SCHEMA_FX:
+        return SCHEMA_FX
+    m, _intruders, j, fx = build_class_model()
+    repo = fx["repo"]
+    path = rl_record.write_record(repo, m, journal_root=j, date=RECORD_DATE)
+    for u in m["units"]:
+        spec = repo / "memory" / "builds" / FX_SLUG / "spec" / f"2026-09-13-spec-{u['id']}.md"
+        if not spec.exists():
+            spec.write_bytes(build_spec_text(u["id"], "a unit").encode("utf-8"))
+    run_git(["-c", "core.autocrlf=false", "add", "--", "memory"], repo)
+    SCHEMA_FX.update(repo=repo, rel=path.relative_to(repo).as_posix(), clean=path.read_bytes(), m=m)
+    return SCHEMA_FX
+
+
+def write_staged(repo, rel, data, work=None):
+    """Stage `data` at `rel` byte for byte, then leave `work` in the working copy when it is given, so
+    the index and the working tree can differ."""
+    p = repo / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_bytes(data)
+    run_git(["-c", "core.autocrlf=false", "add", "--", rel], repo)
+    if work is not None:
+        p.write_bytes(work)
+
+
+def read_refusals(out):
+    """`[(line, rule)]` off the leg's refusal lines, read by their printed shape."""
+    return [(int(m.group(1)), m.group(2)) for m in re.finditer(r":([0-9]+) refused — ([a-z-]+) — ", out)]
+
+
+def build_variant(text, find, make):
+    """`(variant, line)`: `text` with its first line `find` accepts replaced by `make(line)`, which may
+    return several lines, and the 1-up number of that line."""
+    lines = text.split("\n")
+    i = next(n for n, ln in enumerate(lines) if find(ln))
+    lines[i] = make(lines[i])
+    return "\n".join(lines), i + 1
+
+
+def measure_git_calls(fn):
+    """`(subcommands, result)`: every git process `fn` starts, counted by patching `subprocess.Popen`
+    rather than read off the kit's own counter, named by its subcommand."""
+    real, seen = subprocess.Popen, []
+
+    def arm_popen(args, *a, **kw):
+        if isinstance(args, (list, tuple)) and args and pathlib.Path(str(args[0])).stem == "git":
+            rest = list(args[1:])
+            while rest and rest[0] in ("-C", "-c"):
+                rest = rest[2:]
+            seen.append(rest[0] if rest else "")
+        return real(args, *a, **kw)
+
+    subprocess.Popen = arm_popen
+    try:
+        result = fn()
+    finally:
+        subprocess.Popen = real
+    return seen, result
+
+
+def test_schema_ac1_render_then_grade():
+    """AC1 and S5: the record `render_record` made from the model carrying every class, staged in a
+    fixture index, grades clean as `1 record`. A UUID-shaped workflow label, which the label class
+    admits, is withheld by the renderer, and a renderer that stops withholding it writes a record the
+    leg refuses: the disagreement this arm exists to red on."""
+    fx = build_schema_fixture()
+    r = run_cli(["check-records"], fx["repo"])
+    check("schema AC1: check-records over the rendered record exits 0", r.returncode, 0)
+    check_true("schema AC1: ...printing `1 record`", re.search(r"check-records 1 record under ", r.stdout) is not None,
+               (r.stdout + r.stderr)[-400:])
+    check_true("schema AC1: ...with nothing refused", " · 0 refused · " in r.stdout, r.stdout[-400:])
+    cells = read_record_cells(fx["clean"].decode("utf-8"))
+    sch = rl_record.RECORD_SCHEMA
+    missing = [f"{name} {v}" for name in ("event", "source", "coverage-state", "ledger-source", "gate-verdict",
+                                          "push-decision", "conformance-item", "conformance-state", "anomaly-kind",
+                                          "merged-subclass", "review-verdict", "review-exit", "unit-status",
+                                          "yes-no", "owner-position")
+               for v in sch["vocab"][name] if v not in cells]
+    check("schema AC1 liveness: the graded record carries every member of every closed vocabulary", missing, [])
+    m = dict(fx["m"])
+    m["timeline"] = sorted(fx["m"]["timeline"] + [{"t": float(derive_minute(12)) + 35, "source": "transcripts",
+                                                   "kind": "workflow", "label": FX_SID_B}], key=lambda e: e["t"])
+    held = rl_record.render_record(m, "memory")
+    check_true("schema S5 liveness: the label class alone admits a lowercase UUID",
+               re.fullmatch(sch["shaped"]["label"], FX_SID_B) is not None)
+    check("schema S5: the renderer withholds a UUID-shaped label and counts it",
+          (FX_SID_B in held, "- values withheld: 5" in held), (False, True))
+    real = rl_record.build_forbidden
+    rl_record.build_forbidden = lambda: ()
+    try:
+        leaked = rl_record.render_record(m, "memory")
+    finally:
+        rl_record.build_forbidden = real
+    write_staged(fx["repo"], fx["rel"], leaked.encode("utf-8"))
+    r = run_cli(["check-records"], fx["repo"])
+    write_staged(fx["repo"], fx["rel"], fx["clean"])
+    at = next(n for n, ln in enumerate(leaked.split("\n"), 1) if FX_SID_B in ln)
+    check("schema S5: a renderer that stops withholding it writes a record the leg refuses, exit 1", r.returncode, 1)
+    check_true("schema S5: ...naming the uuid rule on the row's line", (at, "uuid") in read_refusals(r.stdout),
+               r.stdout[-500:])
+
+
+def test_schema_ac2_refusals():
+    """AC2: each refusal of S2, and the three a closed grammar adds, staged on a copy of the rendered
+    record: exit 1 naming the rule and the line, every rule of `RECORD_RULES` staged and no other rule
+    printed. Near misses the leg accepts stand beside them."""
+    fx = build_schema_fixture()
+    repo, rel, raw = fx["repo"], fx["rel"], fx["clean"]
+    clean = raw.decode("utf-8")
+    home = "/".join(("", "home", "someone", "RUN.md"))
+    drive = "\\".join(("C:", "Users", "someone"))
+    unc = "\\" * 2 + "\\".join(("host", "share"))
+    other = "X-xOtherBuild-1"
+
+    def at_run_state(ln):
+        return ln.startswith("- run-state: ")
+
+    def at_workflow(ln):
+        return ln.startswith("| ") and " | transcripts | workflow | tier2-review |" in ln
+
+    uuid_text, uuid_line = build_variant(clean, at_workflow, lambda ln: ln.replace("tier2-review", FX_SID))
+    free_text, free_line = build_variant(clean, at_run_state,
+                                         lambda ln: ln + "\nthe run skipped the bar because it was late")
+    variants = [
+        ("headings", build_variant(clean, lambda ln: ln == "## Units", lambda ln: "## Decisions")),
+        ("first-cell", build_variant(clean, lambda ln: ln.startswith("| 1 | decision | "),
+                                     lambda ln: "| " + FX_UNIT1 + ln[len("| 1"):])),
+        ("cell", build_variant(clean, lambda ln: " | driver | verb | --preflight |" in ln,
+                               lambda ln: ln.replace(" | driver | ", " | drivers | "))),
+        ("absolute-path posix", build_variant(clean, at_run_state, lambda ln: "- run-state: " + home)),
+        ("absolute-path drive", build_variant(clean, at_run_state, lambda ln: "- run-state: " + drive)),
+        ("absolute-path unc", build_variant(clean, at_run_state, lambda ln: "- run-state: " + unc)),
+        ("uuid", (uuid_text, uuid_line)),
+        ("data not-json", build_variant(clean, lambda ln: ln == '{"schema":1,"sections":{', lambda ln: ln + "{")),
+        ("data extra-key", build_variant(clean, lambda ln: ln.startswith('"Units":{"facts":'),
+                                         lambda ln: ln.replace('"Units":{', '"Units":{"note":"x",', 1))),
+        ("data escape", build_variant(clean, lambda ln: ln.startswith("[") and '"workflow","tier2-review"' in ln,
+                                      lambda ln: ln.replace("tier2-review", "tier2\\u002dreview"))),
+        ("serves other-build", build_variant(clean, lambda ln: ln.startswith("**Serves:** "),
+                                             lambda ln: "**Serves:** journal " + other)),
+        ("serves undefined-id", build_variant(clean, lambda ln: ln.startswith("**Serves:** "),
+                                              lambda ln: f"**Serves:** journal X-{FX_SLUG}-99")),
+        ("line free-text", (free_text, free_line + 1)),
+    ]
+    variants = [(label, (text.encode("utf-8"), line)) for label, (text, line) in variants]
+    cr, cr_line = build_variant(clean, at_run_state, lambda ln: ln + "\r")
+    variants.append(("line cr", (cr.encode("utf-8"), cr_line)))
+    bad_utf8, bad_line = build_variant(clean, at_run_state, lambda ln: ln + "\x00MARK")
+    variants.append(("unreadable", (bad_utf8.encode("utf-8").replace(b"\x00MARK", b"\xff"), bad_line)))
+    dup, _ = build_variant(clean, lambda ln: ln.startswith('"Units":{"facts":'),
+                           lambda ln: ln.replace('"Units":{"facts":', '"Units":{"facts":{},"facts":', 1))
+    fence = clean.split("\n").index(rl_record.DATA_OPEN) + 1
+    variants.append(("data repeated-key", (dup.encode("utf-8"), fence)))
+    cap = rl_record.RECORD_SCHEMA["cap_bytes"]
+    at_data = clean.index("\n## Data\n") + 1
+    fill = cap - len(raw)
+    exact = (clean[:at_data] + "\n" * fill + clean[at_data:]).encode("utf-8")
+    over = (clean[:at_data] + "\n" * (fill + 1) + clean[at_data:]).encode("utf-8")
+    variants.append(("size", (over, over[:cap].count(b"\n") + 1)))
+    seen = set()
+    for label, (data, line) in variants:
+        rule = label.split(" ", 1)[0]
+        write_staged(repo, rel, data)
+        r = run_cli(["check-records"], repo)
+        found = read_refusals(r.stdout)
+        seen.update(rule_ for _ln, rule_ in found)
+        check(f"schema AC2 {label} at line {line}: check-records exits 1", r.returncode, 1)
+        check_true(f"schema AC2 {label} at line {line}: ...naming the {rule} rule on that line", (line, rule) in found,
+                   f"{found[:8]} {r.stdout[-300:]}")
+    write_staged(repo, rel, uuid_text.encode("utf-8"))
+    found = read_refusals(run_cli(["check-records"], repo).stdout)
+    check("schema AC2 uuid: the label class admitted the UUID, so only the shape rule refuses its line",
+          sorted(rule_ for ln, rule_ in found if ln == uuid_line), ["uuid"])
+    # A name the glob admits and the renderer would never write, beside the clean record.
+    folder = rel.rsplit("/", 1)[0]
+    misnamed = f"{folder}/{RECORD_DATE}-build-{FX_UNIT1}-runlog-notahex1.md"
+    write_staged(repo, rel, raw)
+    write_staged(repo, misnamed, raw)
+    r = run_cli(["check-records"], repo)
+    seen.update(rule_ for _ln, rule_ in read_refusals(r.stdout))
+    check("schema AC2 name: a glob-admitted name the renderer never writes exits 1", r.returncode, 1)
+    check_true("schema AC2 name: ...naming the rule against that file, line 0",
+               f"{misnamed}:0 refused — name — " in r.stdout, r.stdout[-300:])
+    run_git(["rm", "-q", "--cached", "--", misnamed], repo)
+    (repo / misnamed).unlink()
+    # The near misses: each is accepted, so no refusal above is a predicate that refuses everything.
+    near = [
+        ("a path class value with a `home` folder mid-path", build_variant(
+            clean, at_run_state, lambda ln: f"- run-state: memory/builds/{FX_SLUG}/home/RUN.md")[0].encode("utf-8")),
+        ("a Serves range of the build's own spec-defined ids", build_variant(
+            clean, lambda ln: ln.startswith("**Serves:** "),
+            lambda ln: f"**Serves:** journal X-{FX_SLUG}-1..2")[0].encode("utf-8")),
+        ("a record of exactly the cap", exact),
+    ]
+    for what, data in near:
+        write_staged(repo, rel, data)
+        r = run_cli(["check-records"], repo)
+        check(f"schema AC2 near miss, {what}: exit 0", r.returncode, 0)
+    check("schema AC2 near miss: the cap-sized record is exactly the cap", len(exact), cap)
+    write_staged(repo, rel, raw)
+    check("schema AC2: every rule of RECORD_RULES was staged, and no refusal named another",
+          sorted(seen), sorted(rl_record.RECORD_RULES))
+
+
+def test_schema_ac3_liveness():
+    """AC3: no tracked record is `0 records (none committed yet)` and exit 0; a declared root holding no
+    tracked file reds; `MEMORY_ROOT=docs/mem` grades the record there; and a glob the renderer does not
+    write reds by the leg's own assertion."""
+    repo, _ = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    r = run_cli(["check-records"], repo)
+    check("schema AC3: with no record tracked the leg exits 0", r.returncode, 0)
+    check_true("schema AC3: ...and says `0 records (none committed yet)`",
+               "0 records (none committed yet)" in r.stdout, r.stdout[-300:])
+    (repo / ".memory-tree.conf").write_bytes(b"MEMORY_ROOT=docs/nowhere\n")
+    r = run_cli(["check-records"], repo)
+    check("schema AC3: a declared root holding no tracked file reds, exit 1", r.returncode, 1)
+    check_true("schema AC3: ...by the root assertion, never a zero read as clean",
+               "REFUSED — root — " in r.stdout and "check-records GREEN" not in r.stdout, r.stdout[-300:])
+    fx2 = build_record_rotation(mr="docs/mem")
+    m = rl_model.build_run_model(fx2["repo"], FX_SLUG, run=2, journal_root=fx2["journals"])
+    rl_record.write_record(fx2["repo"], m, journal_root=fx2["journals"], date=RECORD_DATE)
+    run_git(["-c", "core.autocrlf=false", "add", "--", "docs"], fx2["repo"])
+    r = run_cli(["check-records"], fx2["repo"])
+    check("schema AC3: with MEMORY_ROOT=docs/mem the record there is graded, exit 0", r.returncode, 0)
+    check_true("schema AC3: ...as `1 record under docs/mem/builds/`", "1 record under docs/mem/builds/" in r.stdout,
+               r.stdout[-300:])
+    keep = rl_record.RECORD_GLOB
+    rl_record.RECORD_GLOB = ("builds", "*", "build", "*-" + rl_record.RECORD_TAG + ".md")
+    try:
+        res = rl_record.check_records(fx2["repo"])
+    finally:
+        rl_record.RECORD_GLOB = keep
+    check("schema AC3: a glob the renderer does not write empties the population and reds by `glob`",
+          (len(res["records"]), [rule for rule, _why in res["liveness"]], rl_record.render_check_report(res)[1]),
+          (0, ["glob"], 1))
+
+
+def test_schema_ac4_cost_and_index():
+    """AC4: fixture indexes of 1 and 100 records, and of 1 and 50 builds carrying run-state files, cost
+    the same git calls, the five S4 and S6 name; and the leg grades the index, not the working tree."""
+    fx = build_schema_fixture()
+    repo, rel = fx["repo"], fx["rel"]
+    folder = rel.rsplit("/", 1)[0]
+    copies = [f"{folder}/{RECORD_DATE}-build-{FX_UNIT1}-runlog-{i:08x}.md" for i in range(1, 100)]
+    counts = {}
+    for n in (1, 100):
+        if n == 100:
+            for c in copies:
+                (repo / c).write_bytes(fx["clean"])
+            run_git(["-c", "core.autocrlf=false", "add", "--", *copies], repo)
+        calls, res = measure_git_calls(lambda: rl_record.check_records(repo))
+        counts[n] = calls
+        check(f"schema AC4: the {n}-record index is graded whole and clean", (len(res["records"]), res["refusals"]),
+              (n, []))
+    run_git(["rm", "-q", "--cached", "--", *copies], repo)
+    for c in copies:
+        (repo / c).unlink()
+    check("schema AC4: 1 and 100 records cost the same git calls", counts[100], counts[1])
+    check("schema AC4: ...the five S4 and S6 name, in order", counts[1], ["ls-files", "cat-file", "log", "log", "cat-file"])
+    builds = {}
+    for n in (1, 50):
+        base, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": {"memory/README.md": "m\n"}}])
+        commits = []
+        for b in range(n):
+            slug = f"xBuild{b:02d}"
+            rm = f"memory/builds/{slug}/RUN.md"
+            st = build_preflight_state(slug, s0[1], s0[1])
+            commits += [{"t": derive_minute(1 + 2 * b), "subject": f"records({slug}): preflight", "files": {rm: st}},
+                        {"t": derive_minute(2 + 2 * b), "subject": f"records({slug}): --landed",
+                         "files": {rm: set_runstate_fact(st, "phase", "LANDED")}}]
+        many, _ = build_history(commits, repo=base)
+        calls, res = measure_git_calls(lambda: rl_record.check_records(many))
+        builds[n] = calls
+        check(f"schema AC4: the {n}-build index grades every build's run, clean",
+              (len(res["run_state"]["builds"]), res["run_state"]["refusals"]), (n, []))
+    check("schema AC4: 1 and 50 builds cost the same git calls", builds[50], builds[1])
+    print(f"  report (grades nothing): check-records git calls {counts[1]}")
+    bad, _ = build_variant(fx["clean"].decode("utf-8"), lambda ln: ln.startswith("- run-state: "),
+                           lambda ln: ln + "\nthe run skipped the bar because it was late")
+    write_staged(repo, rel, bad.encode("utf-8"), work=fx["clean"])
+    check("schema AC4 liveness: the working copy differs from the index",
+          run_git(["diff", "--quiet", "--", rel], repo).returncode, 1)
+    r = run_cli(["check-records"], repo)
+    check("schema AC4: a staged violation under a clean working copy reds, exit 1", r.returncode, 1)
+    write_staged(repo, rel, fx["clean"], work=bad.encode("utf-8"))
+    r = run_cli(["check-records"], repo)
+    check("schema AC4: a clean staged record under a violating working copy stays green", r.returncode, 0)
+    write_staged(repo, rel, fx["clean"])
+
+
+def build_h2_fixture():
+    """A LANDED-after-LANDED build rotated the way the driver rotates, the shape round-3 H2 names: a
+    `git mv -f` of the finished record plus a fresh `RUN.md` in the successor's preflight commit."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, shas0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = shas0[1]
+    one = build_preflight_state(FX_SLUG, base, base)
+    one_l = set_runstate_fact(set_runstate_fact(one, "phase", "LANDED"), "witness", base)
+    arch = f"memory/builds/{FX_SLUG}/{derive_archive_name(one_l)}"
+    two = build_preflight_state(FX_SLUG, base, base, kid="k0000002")
+    two_l = set_runstate_fact(set_runstate_fact(two, "phase", "LANDED"), "witness", base)
+    repo, _ = build_history([
+        {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: one}},
+        {"t": derive_minute(12), "subject": f"records({FX_SLUG}): --landed", "files": {rm: one_l}},
+        {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, rotated", "files": {arch: one_l, rm: two}},
+        {"t": derive_minute(29), "subject": f"records({FX_SLUG}): --landed", "files": {rm: two_l}},
+    ], repo=first)
+    return repo
+
+
+def test_schema_ac5_runs():
+    """AC5: over this tree, every rotated build's starts are distinct and its windows ordered and
+    disjoint. A squashed history, the naive key and the unbounded era each red, naming the build."""
+    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
+    mr = rl.resolve_memory_root(top)
+    archives = run_git(["ls-files", "--", f"{mr}/builds/*/RUN.*.md"], top).stdout.split()
+    rotated = sorted({p[len(mr) + 1:].split("/")[1] for p in archives})
+    if not all(s in rotated for s in H2_BUILDS):
+        print("  SKIP schema AC5 real tree: this tree does not track the rotated builds round-3 H2 names")
+    else:
+        r = run_cli(["check-records"], top)
+        per = {m.group(1): m.group(0) for m in re.finditer(r"run-state (\S+) · [0-9]+ runs · starts [^\n]*", r.stdout)}
+        check("schema AC5: the leg reports every rotated build this tree tracks, by ls-files", sorted(per), rotated)
+        check("schema AC5: ...each with distinct starts, windows ending at or after their starts, disjoint",
+              [s for s, ln in per.items() if not ("· distinct ·" in ln and "each ends at or after its start" in ln
+                                                  and ln.endswith("· disjoint"))], [])
+    bd = f"memory/builds/{FX_SLUG}"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    landed = set_runstate_fact(build_preflight_state(FX_SLUG, s0[1], s0[1]), "phase", "LANDED")
+    squashed, _ = build_history([{"t": derive_minute(5), "subject": f"records({FX_SLUG}): a squashed history",
+                                  "files": {f"{bd}/{derive_archive_name(landed)}": landed,
+                                            f"{bd}/RUN.md": build_preflight_state(FX_SLUG, s0[1], s0[1], kid="k2")}}],
+                                repo=first)
+    r = run_cli(["check-records"], squashed)
+    check("schema AC5: a squashed history, one commit adding an archive and RUN.md, exits 1", r.returncode, 1)
+    check("schema AC5: ...naming the build under both run rules",
+          sorted(set(re.findall(rf"run-state {FX_SLUG} refused — (run-[a-z]+) — ", r.stdout))),
+          ["run-start", "run-window"])
+    rot = build_record_rotation()["repo"]
+    clean_runs = rl_record.check_records(rot)["run_state"]
+    check("schema AC5 near miss: a build rotated the way the driver rotates is graded clean",
+          clean_runs["refusals"], [])
+    real = rl_model.derive_run_starts
+
+    def arm_naive(root, memory_root=None, slugs=None, tracked=None):
+        out = real(root, memory_root, slugs, tracked=tracked)
+        for runs in out.values():
+            for run in runs:
+                if not run["record"].endswith("/RUN.md"):
+                    added = run_git(["log", "--diff-filter=A", "--format=%H %ct", "--", run["record"]], root).stdout.split()
+                    run.update(start=added[-2], t=int(added[-1]))
+        return out
+
+    rl_model.derive_run_starts = arm_naive
+    try:
+        res = rl_record.check_records(rot)
+    finally:
+        rl_model.derive_run_starts = real
+    lines, rc = rl_record.render_check_report(res)
+    check("schema AC5: the naive key, each archive on its own creation commit, collapses the archive into its "
+          "successor and reds naming the build", (rc, any(f"run-state {FX_SLUG} refused — run-start — " in ln
+                                                           for ln in lines)), (1, True))
+    h2 = build_h2_fixture()
+    res = rl_record.check_records(h2)
+    runs = next(b for b in res["run_state"]["builds"] if b["slug"] == FX_SLUG)["runs"]
+    check("schema AC5 near miss: LANDED after LANDED under the era-bounded derivation is clean",
+          res["run_state"]["refusals"], [])
+    check("schema AC5: ...the archive ending at its own terminal write and the live run running from the rotation "
+          "to ITS own", [(w["start"], w["end"]) for _k, _s, w in runs],
+          [(float(derive_minute(5)), float(derive_minute(12))), (float(derive_minute(20)), float(derive_minute(29)))])
+    eras = rl_model.derive_run_eras
+    rl_model.derive_run_eras = lambda rs: [dict(e, t0=0, t1=None) for e in eras(rs)]
+    try:
+        res = rl_record.check_records(h2)
+    finally:
+        rl_model.derive_run_eras = eras
+    lines, rc = rl_record.render_check_report(res)
+    check("schema AC5: the eras staged to span the path's whole history end the live window at its "
+          "predecessor's terminal write, before its start, and the leg exits 1 naming the build",
+          (rc, [ln for ln in lines if f"run-state {FX_SLUG} refused — run-window — run 2's window ends at "
+                f"{rl_model.derive_iso(derive_minute(12))}, before it starts" in ln] != []), (1, True))
 
 
 def read_shell_function(text, name):
