@@ -1,12 +1,13 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-7 · 2026-09-14 · node a · Tier-2 · base 97abf7e1 · streams tooling · order 4
+**Status:** CLOSED · rev-7 · 2026-09-14 · node a · Tier-2 · base 97abf7e1 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-aBatchedArm-1-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-14-build-TOOL-aBatchedArm-1-2-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-1-2-acceptance-ledger.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aBatchedArm-1.md](../prompts/2026-09-10-prompt-TOOL-aBatchedArm-1.md) | research | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief-2.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief-2.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md) | journal | — |
@@ -306,7 +307,9 @@ under S4.
   survivor's two branches were read to be in independent arms of the checker. The invocation is
   `out=$(GOV_UNATTENDED_REPORT=1 run)` — S1's channel and the helper's own header — where the pass-2
   brief typed `out=$(run)` as shorthand; the helper strips the skip lines before the `hit` lines
-  read `$out`. The helper gains the `"?"` refusal by name. Blank lines between grouped blocks are
+  read `$out`. The helper gains the `"?"` refusal by name, and prints the run's `FAILED` lines
+  beneath it, indented, with the caller's line: `out` is captured and never printed, so that is
+  where the final pass pastes each group's set from. Blank lines between grouped blocks are
   dropped and each block's comment stays ahead of its mutation; nothing else in the file moves.
 - rev-6 · 2026-09-14 · §2 S2 · §6 AC8 · base · REOPENED by owner ruling on the decision the rev-5
   pass parked. The owner chose: allow the one token change `hit "$(run)"` → `hit "$out"`, convert
