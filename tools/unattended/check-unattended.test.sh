@@ -1279,13 +1279,13 @@ fi   # ---- end REGION 2 -------------------------------------------------------
 if in_shard 3; then
 topo_capture 3
 reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
-hit "$(run)" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
-
 # ---- check 10, THE SECOND PAIR. TOOL-dFoldedVerdict-5 moved the verb entries into their own
 # ---- byte-compared carrier because the protocol had reached its cap exactly. A pair added without
 # ---- its own two arms is a pair nothing watches, and the check would still report green.
-reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
-out=$(run)
+printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
 hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
 reset_tree; rm -f $KIT_REL/VERBS.template.md
@@ -1345,13 +1345,14 @@ same "a blank KICKOFF_ENGINE turns the check off" "$(run)" ""
 reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="6"/' .unattended.conf
 hit "$(run)" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
 reset_tree; sed -i 's/^CORE_FLOOR=.*/CORE_FLOOR="six:six"/' .unattended.conf
-hit "$(run)" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
-
 # ---- check 9 branch 1: an ABSENT `base:` line is the violation, not the exemption. The check was
 # ---- wrapped in `if [ -n "$rb" ]`, so deleting one line from a run-WRITABLE file disarmed the only
 # ---- BASE assertion on the bar.
-reset_tree; sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
-hit "$(run)" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
+sed -i '/^base: /d' memory/builds/tRun/RUN.md; git add -A
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon"
+hit "$out" "a run-state file records no BASE, and the record is written by the run — an absent pin is not a satisfied one"
 
 # ---- check 9 branch 3: the anchor sitting AT HEAD, at a phase that CLAIMS work was done. The two
 # ---- halves of this kit used to disagree here - the driver blesses this state at preflight, where a
