@@ -77,6 +77,8 @@ unit in this build uses. Built first, by owner ruling D12-i11.
 - **hands-off** `TOOL-dDerivedDocket-5` — the same criterion over the unattended suites.
 - **hands-off** `TOOL-dDerivedDocket-23` — the FAIL-line normaliser and the detached scratch
   worktree runner at R, which that unit reuses to re-run a red bar leg at R.
+- **hands-off** `TOOL-dDerivedDocket-30` — `--attribute`, under which that unit runs the unattended
+  suites once, since they are red at BASE and "no NEW failure" is the only criterion they can meet.
 
 ## 4. Design
 

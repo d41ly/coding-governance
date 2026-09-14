@@ -67,6 +67,8 @@ add to it, and the leg says so when something tries.
   and no mode to condition on.
 - **consumes-from** `TOOL-dDerivedDocket-15` — the V13 verdict S5 extends and the `--new-build`
   scaffold S6 constrains.
+- **hands-off** `TOOL-dDerivedDocket-20` — the Skill and protocol text for the authority rule, which
+  this spec's §5 places with the carriers unit.
 
 ## 4. Design
 

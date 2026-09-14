@@ -100,7 +100,9 @@ change reds the bar everywhere and is repaired forward instead of trusted.
 - **hands-off** `TOOL-dDerivedDocket-32` — check 25 inside the unguarded `memory hygiene` leg,
   which remote CI runs over a full-history checkout.
 - **hands-off** `TOOL-dDerivedDocket-34` — the flip's own landing merge is a transition this check
-  audits, and the flip stages the real-tree RED of it.
+  audits.
+- **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of this check, which the arming
+  unit runs after the flip, as the spec brief assigns.
 
 ## 4. Design
 

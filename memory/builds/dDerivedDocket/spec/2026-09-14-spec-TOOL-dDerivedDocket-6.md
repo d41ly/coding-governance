@@ -1,0 +1,372 @@
+# TOOL-dDerivedDocket-6 — ask parser and status fold
+
+**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Backlog status is the one work-state fact this repo still types by hand, and a typed status drifts
+from the records that decide it. Build the model that replaces it: one grammar for the per-build
+`BACKLOG.md` file, the two spec-header verbs `closes` and `advances`, and an order-free fold that
+derives every ask's status from sets of records, with REOPEN, severity and the verdicts that refuse
+a malformed or contradictory record. The model ships DARK: nothing renders from it until the view
+unit wires it in, and nothing in this repo's output moves.
+
+## 2. Scope (IN)
+
+- **S1** A new memory-tree kit module, `backlog.py`, beside the generator in the kit directory it
+  derives from its own location. Stdlib only, no git, no history, no clock. Observed by AC1 and AC11.
+- **S2** The file grammar in §4: an H1, an optional blockquote, a `## Asks` section of ask rows and a
+  `## Dispositions` section of verb rows, and nothing else. Continuation lines are refused. Content
+  never raises: every unparseable line is a V2 verdict naming the file and line. Observed by AC1.
+- **S3** Row shapes: the ask row with its optional `unit` marker; status rows `CLOSED by`, `WONTDO`,
+  `BLOCKED on`, `DEFERRED until`, `KEEP` and `REOPEN of`; the `SEV` row; and the `RELOCATED`
+  provenance row the transition audit counts and the fold ignores. One renderer per shape lives
+  beside its parser, so every later writer spells a row the one way the parser reads it, and one
+  classifier returns any line's row class and target, so no other reader spells the grammar again.
+  Observed by AC1 and AC2.
+- **S4** The anchor property, asserted with the REAL `extract.anchor_at` and never a copy: an ask row
+  anchors its id, and no other row shape anchors anything. Observed by AC2.
+- **S5** Two status-header verbs, `closes <ids>` and `advances <ids>`, parsed by `parse_spec` in
+  `tools/memory-tree/gen_build_index.py` through a reader in this module. Ranges expand through the
+  generator's existing `_expand_ids`. Each verb is permitted and never required; a malformed value, a
+  repeated verb, or one id under both verbs is a named refusal, exactly as `order` is. Observed by
+  AC3.
+- **S6** The fold in §4: two strata, first matching rule wins, over SETS. Terminal evidence beats
+  live evidence, CLOSED beats WONTDO, a non-`unit` closing spec reading WONTDO contributes nothing,
+  and a hold releases automatically when its target goes terminal. Every status is a function of
+  sets alone, never of dates, file order or row order. Observed by AC4, AC5 and AC7.
+- **S7** REOPEN (owner ruling D4): a `REOPEN · <id> · of <record>` row cancels exactly the closing or
+  declining records it names. Re-citing a cancelled record stays cancelled; new evidence re-closes.
+  Observed by AC6.
+- **S8** Severity (owner ruling D7): an ask's severity is the most severe of the SEV rows naming it,
+  in any file, else `unlabelled`. Observed by AC8.
+- **S9** The legacy row reader: one function reading one physical line of a pre-flip shard or
+  archive into id, status token and body. It admits id-first and status-first rows, the `·` or the
+  ASCII ` - ` separator, and the `CLOSED by` slot, and it folds a `WITHDRAWN` token to WONTDO with a
+  `withdrawn` flag. It never guesses: anything else returns nothing, with the reason. Observed by AC9.
+- **S10** Verdicts V1 to V12 in §4, computed as data by one function whose inputs are the parsed
+  files, the spec index and the caller's map of build statuses. Each cross-file verdict names both
+  files and both slugs. Observed by AC10.
+- **S11** Two conf keys, read here and declared in the kit's conf example and descriptor.
+  `BACKLOG_MODE` takes `shards` or `builds`; absent or blank reads `shards`; any other value is a
+  refusal; the key and its spelling are frozen forever (design A1). `ASK_CUTOFF` is a date that arms
+  the forward-only verdicts; blank under `builds` is itself a verdict, because it would silently
+  disarm V9, V12 and the scaffold's V14. Observed by AC11.
+- **S12** Dark proof: with gov in `shards` mode and no header carrying either verb, this tree's
+  generated artifacts do not move. Observed by AC12.
+
+## 3. Non-goals (OUT)
+
+- Reading `builds/*/BACKLOG.md` from the tree, rendering the family views, the data-loss and mode
+  guards, the `--asks` print modes, the roster skip, filing homes and the liveness line. All are the
+  view unit's; this unit hands it functions.
+- Any hygiene-engine switch for checks 4, 6, 7, 8, 13, 15 or 20. That is the engine unit's.
+- The clause tail (`seen`, `accept`, `out`, `may`, `verify`, `data`), `SCOPE` rows, V13, V14 and
+  READY. Those are the envelope unit's; this grammar leaves the ask text's suffix to it.
+- Joining a legacy row wrapped across lines, and reporting a shard's unparseable lines. The planner
+  owns the census; this unit owns only the one-line reader it calls.
+- Writing any `BACKLOG.md`, and migrating anything.
+- A `CYCLE` status placeholder (§8 F2).
+
+### Edges
+
+- **hands-off** `TOOL-dDerivedDocket-7` — the parser, the fold, the verdict function, the row
+  renderers and the liveness counts, which the generator wires into its collect, render and check
+  paths.
+- **hands-off** `TOOL-dDerivedDocket-8` — the two conf keys' spelling and semantics, which the
+  hygiene engine switches on, and the ask row's `filed` field, which check 13's pre-cutoff skip reads.
+- **hands-off** `TOOL-dDerivedDocket-9` — the `RELOCATED` provenance row, which the fold ignores and
+  the transition audit counts, and the frozen `BACKLOG_MODE` spelling it classifies commits by.
+- **hands-off** `TOOL-dDerivedDocket-10` — the row classifier, by whose class and target the row
+  driver counts a `BACKLOG.md` row in its duplicate census, so a SEV row and a status row for one
+  ask on two branches are two records and not one id written twice.
+- **hands-off** `TOOL-dDerivedDocket-11` — the legacy row reader, the row renderers and the fold,
+  with which the planner reads every legacy copy and predicts each id's derived status.
+- **hands-off** `TOOL-dDerivedDocket-12` — the ask, status and `RELOCATED` row renderers the
+  relocation engine writes with, and the fold it runs before and after a planned record to decide
+  whether that record changes a derived status.
+- **hands-off** `TOOL-dDerivedDocket-15` — the ask text and pointer split that the clause tail
+  extends, the verb-row grammar that `SCOPE` rows join, and the verdict numbering that continues at
+  V13.
+- **hands-off** `TOOL-dDerivedDocket-24` — the ask, SEV and KEEP row renderers the inherited-red
+  auto-file writes with, so an auto-filed ask parses under this grammar.
+
+## 4. Design
+
+### The file grammar
+
+```text
+file     := H1 BLANK* QUOTE* [ "## Asks" (BLANK | ask)* ] [ "## Dispositions" (BLANK | verbrow)* ]
+ask      := "- " ID " · filed " DATE [ " · unit" ] " · " TEXT [ " → " POINTER ]
+verbrow  := status | sev | provenance
+status   := "- CLOSED · "   ID " · by "    (ID | SHA)        " · " WHY
+          | "- WONTDO · "   ID                               " · " WHY
+          | "- BLOCKED · "  ID " · on "    ID                " · " WHY
+          | "- DEFERRED · " ID " · until " ID                " · " WHY
+          | "- KEEP · "     ID                               " · " WHY
+          | "- REOPEN · "   ID " · of "    (ID | SHA | SLUG) " · " WHY
+sev      := "- SEV · " ID " · " ("BLOCKER" | "HIGH" | "MED" | "LOW") " · " WHY
+provenance := "- RELOCATED · " ID " · by " SHA " · " ("kept" | "dropped" | "amended") ": " WHY
+ID       := FAMILY "-" SLUG "-" DIGITS, FAMILY from FAMILIES
+SHA      := 7 to 40 lower-case hex digits
+SLUG     := a folder name under builds/
+DATE     := four digits, two digits, two digits, joined by hyphens
+```
+
+`TEXT` is free prose on one physical line; the envelope unit later reads a clause suffix out of it,
+right to left. `WHY` is free prose and must be non-empty. `unit` is recognised only as the whole
+field after `filed`. A SLUG is disjoint from a SHA by construction: every slug in this corpus carries
+an upper-case letter, and a SHA carries none.
+
+### Classes of verb row, and what one-per-file means
+
+| Class | Verbs | At most one per (file, target) | Read by |
+|---|---|---|---|
+| status | CLOSED WONTDO BLOCKED DEFERRED KEEP REOPEN | yes (V4) | the fold |
+| severity | SEV | yes (V4) | the severity rule |
+| provenance | RELOCATED | no; one per (file, target, sha) | the transition audit only |
+
+A disposer changes its mind by editing or deleting its own row, which keeps each class a SET. A
+session never REOPENs its own CLOSED row: that is two status rows for one target in one file, and V4
+refuses it. The classes are separate because the triage sweep and the envelope's owner-call idiom
+both write a status row AND a SEV row for one ask in one file, which a single per-file rule would
+refuse.
+
+### The fold
+
+For ask A: C(A) is every spec whose header `closes` A, plus A's same-id spec when A carries `unit`;
+P(A) is every spec whose header `advances` A; D(A) is every status row naming A, in any file; X(A)
+is the set of `of` values of REOPEN rows naming A.
+
+```text
+STRATUM 1 — terminality, reading no holds
+  closing(A)   = { s in C(A) : s reads CLOSED and s ∉ X(A) }
+               ∪ { CLOSED rows in D(A) whose `by` value ∉ X(A) }
+  declining(A) = { WONTDO rows in D(A) whose file slug ∉ X(A) }
+               ∪ { A's same-id spec, when A carries `unit`, reads WONTDO and is ∉ X(A) }
+  R1 CLOSED    if closing(A) is non-empty
+  R2 WONTDO    else if declining(A) is non-empty
+STRATUM 2 — live asks only; live(T) reads stratum 1 for a filed ask, the header token for a spec
+  R3 INPROGRESS  some spec in C(A) ∪ P(A) reads INPROGRESS
+  R4 SPECCED     some spec in C(A) ∪ P(A) reads OPEN or SPECCED
+  R5 BLOCKED     some spec in C(A) ∪ P(A) reads BLOCKED, or some BLOCKED row in D(A) has a live target
+  R6 DEFERRED    some spec in C(A) ∪ P(A) reads DEFERRED, or some DEFERRED row in D(A) has a live target
+  R7 OPEN        otherwise
+```
+
+A hold target T resolves to a filed ask when T is both a filed ask and a spec H1 (design critique
+F12). A target that is neither leaves R5 or R6 undecidable when it is the only hold evidence, and the
+status renders the placeholder `UNRESOLVED` beside a V6 verdict. KEEP never changes a status.
+
+**Why two strata.** A hold's release needs only its target's terminality, and terminality reads no
+hold. So every status is decidable in two passes with no recursion, and a hold cycle is a deadlock
+the verdicts name, never a status nobody can compute.
+
+**Decided by.** R1 names the closing evidence, R2 the declining file slug or spec id, R3 to R6 the
+spec id or the `on`/`until` target, R7 nothing. The view's column and the print modes read this, so
+a reader sees why and not only what.
+
+### REOPEN, order-free
+
+An `of` value names one kind of record, and the parse decides which: a spec id cancels that spec's
+membership of C(A); an evidence value cancels every CLOSED row naming A with that `by` value; a
+folder slug cancels that folder's WONTDO row for A. Re-closing needs evidence REOPEN has not named: a
+new spec that `closes` A, or a CLOSED row `by` a different id or sha. The fold still reads sets only,
+because cancellation is a set difference and not a sequence.
+
+### Verdicts
+
+All computed as data; none raises. The view unit reports them through the generator's check and the
+hygiene gate's check 9.
+
+| # | Verdict | Cross-file |
+|---|---|---|
+| V1 | an ask's id slug is not the folder it is filed in | yes |
+| V2 | a line matching no shape, a continuation line, a row outside its section, or a tracked file that parses to nothing | no |
+| V3 | two ask rows for one id, anywhere | yes |
+| V4 | two rows of one class for one target in one file | no |
+| V5 | SPECCED, INPROGRESS or OPEN used as a verb, or `WITHDRAWN` used as one (its remedy names the WONTDO form) | no |
+| V6 | a hold target that is neither a filed ask nor a spec H1, a self-hold, or a hold cycle among live asks | yes |
+| V7 | a verb-row target, or a `closes`/`advances` id, that is not a filed ask | yes |
+| V8 | a CLOSED row whose `by` id is neither a filed ask nor a spec H1; a SHA is shape-checked only | yes |
+| V9 | an ask filed on or after `ASK_CUTOFF`, not carrying `unit`, whose id equals a spec H1 | yes |
+| V10 | a build whose derived status is terminal holds an ask deriving OPEN with no status row naming it in any file | yes |
+| V11 | a REOPEN whose `of` names no record currently closing or declining its target | yes |
+| V12 | an ask filed on or after `ASK_CUTOFF` with no SEV row naming it in any file | yes |
+
+V10 is retroactive over every finished build (owner ruling D6), counts a row in ANY file (design
+§17.2), and counts a REOPEN as that ask's KEEP (design §17.1). A cross-file verdict can be green on
+each branch and red after their merge; the message names both files and both slugs, so the lander
+fixes it with one edit.
+
+### Inventory
+
+| Identifier | Kind | Cell |
+|---|---|---|
+| `backlog.py` and its public functions: read the conf, parse a file, read a legacy row, read header verbs, classify a row, fold, derive verdicts, render each row shape, `--selftest` | kit module | lexicon python function cell; every name passes `lexicon.py --suggest` before it is written |
+| `BACKLOG_MODE`, `ASK_CUTOFF` | conf keys | screaming snake, as every key there |
+| `closes`, `advances` | status-header verbs | the header tail's declared-verb set |
+| `UNRESOLVED` | status placeholder | none; it never reaches a spec header |
+
+### Files touched (estimate)
+
+`backlog.py` (new) · `tools/memory-tree/gen_build_index.py` (`parse_spec` gains the two keys, and
+its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.example` ·
+`tools/memory-tree/kit.toml` (two optional keys) · `memory/HYGIENE.md` is NOT touched here.
+
+### Alternatives rejected
+
+- **A status token on the ask row** (the `derive` design). Measured by both critiques at 46 and 43
+  rows disagreeing with the derived status on day one; with no token there is nothing to disagree.
+- **Inferring `unit` from equal ids** (`derive` R1, `ops` fold step 1). Refuted on this corpus by
+  four pairs that are different subjects (design §2.3); declared, never inferred.
+- **A date-ordered fold** (`ops`). A rev bump re-dates a spec and changes a status, same-day ties
+  have no honest rule, and merge order decides (design §4.2).
+- **A disposition table** (`derive`). The real row driver replayed it to a structure conflict; dash
+  rows merged clean (design §7).
+- **A `CYCLE` placeholder** (§8 F2).
+
+## 5. Production-readiness checklist
+
+- security — reads text only and executes nothing from any row; the parser never raises on content,
+  so one bad file cannot refuse every artifact; no write surface at all.
+- perf / scale — one pass per file, and the fold is linear in rows plus spec links; about 600 asks
+  and 90 files at the switch-over, measured by the planner at flip time.
+- error / empty / loading states — a file that parses to nothing is V2, not a clean zero; an
+  undecidable status renders `UNRESOLVED` with its V6; an unknown `BACKLOG_MODE` value is a refusal.
+- observability — the counts the liveness line prints (asks, rows, links, files, live, verdicts) are
+  returned by the fold for the view unit to print.
+- risks — an over-claiming `closes` closes an ask silently (design §16 risk 1); it shows in the
+  Decided-by column. A TEXT that happens to be exactly `unit` is read as the marker.
+- testing — this module's `--selftest`, run inside the `build-index selftest` leg: every shape, every
+  rule, every verdict staged RED, order-permutation arms, and the real-grammar anchor arm.
+- migration — none; nothing in this tree is written. The keys default to today's behaviour.
+- user docs — the grammar and fold reach HYGIENE and the kit README through the engine and docs
+  units; this unit's module docstring states the grammar and what it does not check.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `backlog.py --selftest` parses a fixture file holding one of every row shape, it
+  returns every row with no verdict; a continuation line, a row above `## Asks`, an ask row under
+  `## Dispositions`, and a file holding only its H1 each yield V2 naming the line.
+  Red when: the parser skips an unrecognised line instead of reporting it, so a mis-segmented file
+  reads exactly like a clean one.
+- **AC2** — When the selftest runs every row shape through the real `extract.anchor_at` resolved
+  from the memory-recall kit, the ask row returns its id and every status, SEV, REOPEN and RELOCATED
+  row returns nothing; each renderer's output parses back to the row it was rendered from.
+  Red when: the arm grades a local copy of the anchor grammar, so a change to the real one passes.
+  fixture: needs the memory-recall kit; with it absent the arm announces the skip and names the kit.
+- **AC3** — When `python3 tools/memory-tree/gen_build_index.py --selftest` parses fixture headers
+  carrying `closes EXMP-aFoo-2..4` and `advances EXMP-cBaz-3`, the unit records carry the expanded
+  lists; `closes 2x`, a second `closes`, and one id under both verbs each refuse naming the file.
+  Red when: a malformed value is dropped silently, so the spec renders with no link and its ask
+  never closes.
+- **AC4** — When `backlog.py --selftest` folds one fixture per rule R1 to R7, each ask derives that
+  rule's token and its Decided-by names the evidence; an ask with a CLOSED row and a live closing spec
+  derives CLOSED; one with CLOSED and WONTDO evidence derives CLOSED.
+  Red when: rules are evaluated live-first, so a stale SPECCED spec hides a recorded closure.
+- **AC5** — When a non-`unit` ask's only closing spec reads WONTDO, the ask derives OPEN; when a
+  `unit` ask's same-id spec reads WONTDO, it derives WONTDO.
+  Red when: a WONTDO closing spec declines an ask it was only one attempt at.
+- **AC6** — When a fixture REOPENs a CLOSED ask naming its closing spec, the ask derives live; a
+  second CLOSED row citing the same spec leaves it live; a CLOSED row by a new sha re-closes it; a
+  REOPEN naming a folder slug cancels that folder's WONTDO; a REOPEN whose `of` names nothing
+  closing its target yields V11.
+  Red when: a REOPEN cancels every closing record of the ask instead of the one it names.
+- **AC7** — When `backlog.py --selftest` folds one fixture corpus under every permutation of its file
+  order and of the row order inside each file, every ask's token and Decided-by are identical across
+  runs.
+  Red when: any rule reads the first or last matching row, so status depends on order.
+- **AC8** — When an ask carries SEV rows `LOW` in one file and `HIGH` in another, its severity is
+  `HIGH`; an ask with none reads `unlabelled`.
+  Red when: the last-read SEV row wins, which makes severity depend on file order.
+- **AC9** — When the legacy reader reads an id-first row, a status-first row, a row using ` - `
+  separators, a `CLOSED by` slot and a `WITHDRAWN` token, it returns each id and status, and WONTDO
+  with the `withdrawn` flag for the last; a prose line returns nothing with its reason.
+  Red when: an unreadable line is returned as OPEN, which is a guess a migration then writes.
+- **AC10** — When `backlog.py --selftest` stages each verdict V1 to V12 into an otherwise clean
+  fixture, exactly that verdict is reported, and the clean fixture reports none; each cross-file
+  verdict names both files.
+  Red when: a verdict's fixture also trips a second verdict, so its arm cannot tell which rule fired.
+- **AC11** — When `BACKLOG_MODE` is absent, blank, `shards`, `builds` and `shard` in turn, the conf
+  reader returns shards, shards, shards, builds, and a refusal naming the legal set; `builds` with a
+  blank `ASK_CUTOFF` returns the named verdict.
+  Red when: an unrecognised value reads as `shards`, so a typo silently keeps an adopter unswitched.
+- **AC12** — When `python tools/memory-tree/gen_build_index.py --check` runs on this tree after the
+  unit, it exits 0 and a `--write` over a scratch clone changes no tracked file.
+  Red when: `parse_spec` refuses or re-renders a header that carries neither verb, so the dark unit
+  moves the corpus.
+
+## 7. Gates
+
+`build-index selftest` · `memory hygiene` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+
+New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rule and verdict staged into in-memory fixtures by this module's arms · none; the leg's ceiling moves only if its evidenced maximum does
+
+## 8. Open questions
+
+- **F1** — How does a REOPEN name a WONTDO row, which carries no evidence field? (a) By the folder
+  slug of the file holding it, the identity V4 already guarantees. (b) By an optional evidence field
+  added to WONTDO. (c) It cannot; only the disposer deletes it. (c) contradicts ruling D4's text, and
+  (b) makes a triage decline without evidence unreopenable. RESOLVED (agent, 2026-09-14, delegated):
+  (a).
+- **F2** — FACT-QUESTION · Does a hold cycle make a status undecidable, as design §5.2's `CYCLE`
+  placeholder assumes? Probe: the fold's own dependency graph. Terminality reads only closing and
+  declining evidence, never a hold, so a cycle's members are all decidable; the probe could have
+  come out the other way had R1 or R2 read a hold. RESOLVED (agent, 2026-09-14, delegated): no; a
+  cycle is V6 and its members render their true token. `UNRESOLVED` stays for a target naming nothing.
+- **F3** — Does one-per-file cover SEV and provenance rows? (a) One rule over every verb row. (b) Per
+  class, provenance excluded. (a) refuses the sweep's status-plus-SEV pair and the relocation's
+  flip-plus-provenance pair. RESOLVED (agent, 2026-09-14, delegated): (b).
+- **F4** — Where does the legacy row reader live? (a) In the planner. (b) Here. The transition audit,
+  the relocation tools, the planner and the switch-over all read legacy rows, and permanence (design
+  §18r.5) keeps that reader alive after every other shards-mode path retires. RESOLVED (agent,
+  2026-09-14, delegated): (b), one physical line per call. The planner's permissive parser — the
+  one the relocation spec names as unit 11's — joins declared wraps, calls this reader once per
+  logical row and reports what it cannot read, so there is one row grammar and one census.
+- **F5** — Must rows sit under their own heading? (a) No, the shape decides. (b) Yes. The row
+  driver's misfiling postcondition already grades headings at merge time, and a misplaced row costs
+  one move. RESOLVED (agent, 2026-09-14, delegated): (b), as part of V2.
+- The rulings this unit executes: D1 adopt; D2 no inferred pairing; D4 REOPEN cancels a named
+  record; D5 DEFERRED names a release id; D6 closeout gated and retroactive; D7 SEV rows forward-only
+  — all RESOLVED (owner, 2026-09-13). D12-g's scoped check-13 skip, whose `filed` input this grammar
+  carries — RESOLVED (owner, 2026-09-13).
+
+## 9. Revision log
+
+- rev-1 · 2026-09-14 · initial draft. Adds three edges the brief's table does not list: hands-off to
+  unit 10, whose duplicate census reads this unit's row classifier, and hands-off to units 12 and 24,
+  reciprocating the consumes-from lines those specs declare.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "derive a record status as a pure function of other
+records"` returned name-stem neighbours only — `derive_scope`, `gotchas.records`, govkit's derive
+helpers — none of which folds a status, and it reports the shell layer unscanned. The seams this unit
+extends were found by reading source: `derive_status` at `tools/memory-tree/gen_build_index.py:635`
+is the precedent for a status derived from spec headers (`TOOL-aFoldedQuarry-4`); `_parse_order` at
+`:385` is the shape the two verbs copy, anchored and refusing; `_expand_ids` at `:500` expands
+ranges; `extract.anchor_at` in the memory-recall kit is the one anchor grammar, reached by the lazy
+import `tools/memory-tree/merge-rows.py` already uses. Recall returned `TOOL-aMouldedFolio-1`, the
+authored-versus-derived axis this unit applies to backlog status, and `TOOL-cGradedDebt-2`, which
+already made `WITHDRAWN` a synonym for WONTDO.
+
+Where the design and BASE disagree: design §4.1 cites four live `WITHDRAWN` rows in the TOOL shard;
+at BASE there are none — `TOOL-cGradedDebt-2` rewrote them — so S9's fold matters only for
+straggler branches forked before that commit, which is exactly the population the permanent reader
+exists for. Design §5.2's `CYCLE` placeholder is dropped (§8 F2). No spec header at BASE carries
+`closes` or `advances`, measured by `git grep` over every spec.
+
+M12 losses are the design's own tested rejections, carried in §4 Alternatives rejected with the
+measurement that rejected each.
+
+Recall terms used: `backlog status token derived authored fold WITHDRAWN WONTDO REOPEN severity closes advances spec header verb`

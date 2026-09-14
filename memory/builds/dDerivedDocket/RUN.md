@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: abac6d59cae3baf711fac4d275bf13a401e01901
 
 ## Parked
+
+2026-09-14T01:23:21Z rescope · item retire TOOL-dDerivedDocket-14 · reason regrounding at BASE found the work already landed: TOOL-cSpliceWarden-2 (CLOSED before BASE) made hygiene check 10 resolve backlog archives by filename, admit the b suffix and announce a skip; the spec is a WONTDO record naming that successor and re-checks the claim in its section 6

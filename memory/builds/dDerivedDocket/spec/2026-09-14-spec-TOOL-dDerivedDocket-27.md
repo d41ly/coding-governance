@@ -1,0 +1,251 @@
+# TOOL-dDerivedDocket-27 — declared gate wall
+
+**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 27
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+The driver bounds the whole `gates-green` call at `GATE_BOUND`, 3600 s in gov, and that one number
+covers the turnstile queue AND the bar. The runner's own wall is 21600 s, armed only after the queue,
+and the queue alone may wait 7200 s (K15). So a close is killed for contention with its bar never
+started (TOOL-aUnblockedFleet-8, i97), and a full bar here cannot fit at all: the largest declared
+leg ceiling is 16040 s. By owner ruling D12-i7 there is ONE declared number, `GATE_WALL` in
+`.unattended.conf`, exported to the runner; the driver's bound on the bar derives from it and from
+the runner's queue bound; and a conf check reds a wall below the largest leg ceiling. The driver also
+reads how the bar ended — tree moved, host at fault, killed before it started — and says which hold
+fits, instead of reporting all three like a red leg.
+
+## 2. Scope (IN)
+
+- **S1** `GATE_WALL`, a positive integer of seconds in `.unattended.conf`, validated at conf load the
+  way `GATE_BOUND` is. The driver exports it to `$GATE_CMD`, whose runner already reads it
+  (`tools/run-gates/run-gates.sh:422`). Blank leaves the runner's profile wall in force, announced.
+  Observed by AC1 and AC5.
+- **S2** `GATE_PROFILE_CMD`, a declared command that prints the runner's resolved profile; gov sets
+  the runner's `--print-profile`. Blank means the bar has no profile, and it stays bounded by
+  `GATE_BOUND`, announced. Observed by AC1.
+- **S3** The runner's `--print-profile` gains two keys: `queue`, the turnstile's maximum wait, with its
+  computation hoisted above the verb's exit; and `ceiling_max`, the largest positive `ceiling` in the
+  resolved manifest, or `-` when none is declared. Observed by AC6.
+- **S4** The bar's bound is the BACKSTOP: wall plus queue plus `GATE_BACKSTOP_MARGIN`, a source
+  constant of 600 s with an arm seam of the same name. `--preflight` computes it through
+  `GATE_PROFILE_CMD` under `GATE_BOUND`, prints the sum and its three terms, and pins it as a
+  `gate-backstop` fact. `gates-green` bounds `$GATE_CMD` by that fact, while every other declared
+  command keeps `GATE_BOUND`. Observed by AC1 and AC2.
+- **S5** `gates-green` maps the bar's ending, first match wins: exit 0 is MET; exit 3, TREE MOVED, runs
+  the bar once more and a second exit 3 is UNMET naming the move; exit 4, HOST, is UNMET with a
+  `hold` line naming `host-degraded` and `probe host`; a kill at the backstop with no
+  `gate queue: acquired` line in the output is UNMET as never started, with a `hold` line naming
+  `host-degraded` and `probe gate`; a kill after that line keeps today's never-returned text; anything
+  else is UNMET as a red bar. Observed by AC2, AC3 and AC7.
+- **S6** The conf check: the leg reds, and `--preflight` refuses, when the effective wall is below the
+  runner's `ceiling_max`, naming both numbers. Blank `GATE_PROFILE_CMD` makes the check announce that
+  it cannot compare. Observed by AC4 and AC5.
+- **S7** The Skill's Close section: on a `hold` line from `gates-green`, reap the keepalive and run
+  `--hold` with the code and condition that line names, never `--override`. Observed by AC8.
+- **S8** Gov's `.unattended.conf` declares `GATE_WALL="21600"` and `GATE_PROFILE_CMD`, and its
+  `GATE_BOUND` comment is rewritten, because that bound no longer governs this repository's bar.
+  Observed by AC5.
+- **S9** The unattended and run-gates kit versions move once for this build. Observed by AC9.
+- **S10** The unattended suites run once at the unit's end under attribution. Observed by AC10.
+
+## 3. Non-goals (OUT)
+
+- **The runner's endings themselves.** Exit 3 is the scratch-hygiene unit's, and exit 4, the serial
+  retry and the `acquired` line are the honest-verdicts unit's. This unit reads them.
+- **Holding automatically inside `--close`.** `--hold` requires the keepalive reaped and a clean,
+  committed tree, which a close that has just failed an item cannot meet. The driver names the hold;
+  the Skill takes it.
+- **A `GATE_QUEUE_BOUND` key**, DR 21.4 U25's queue bound. D12-i7 ruled one declared number, and the
+  runner's queue bound is already declared as a multiple of its TTL; S3 reports it, nothing sets it.
+- **The attended bar and the push boundary.** The pre-push hook and a person's run keep the profile
+  row's wall. `GATE_WALL` here governs the unattended bar only.
+- **`GATE_BOUND`'s default and its other consumers**: the wiring check, the lander probes and the
+  asks witness keep the declared bound.
+
+### Edges
+
+- **consumes-from** `TOOL-dDerivedDocket-4` — the `host-degraded` hold code and the `probe gate` and
+  `probe host` conditions the two `hold` lines name, and the `--hold` verb S7 routes to.
+- **consumes-from** `TOOL-dDerivedDocket-25` — exit 3, TREE MOVED, which S5 re-runs once.
+- **consumes-from** `TOOL-dDerivedDocket-26` — exit 4 and the `gate queue: acquired` line, without
+  which a kill in the queue cannot be told from a kill in a leg.
+
+## 4. Design
+
+### Data model
+
+```
+.unattended.conf     GATE_WALL="21600"
+                     GATE_PROFILE_CMD="bash tools/run-gates/run-gates.sh --print-profile"
+--print-profile      queue<TAB><TS_MAXWAIT>          ceiling_max<TAB><n>|-
+RUN.md fact          gate-backstop: <sum> (wall <w> + queue <q> + margin <m>)
+stdout               unattended: the merge bar is bounded at <sum>s — wall <w> + queue <q> + margin <m>
+DOD_OUT              hold · host-degraded · until probe gate · the bar was killed at its backstop before it acquired the repository
+                     hold · host-degraded · until probe host · the runner exited HOST
+```
+
+### Why the three terms
+
+The runner arms its wall at the first dispatch, after the queue (`tools/run-gates/run-gates.sh:1580`),
+and the queue fails open at `TS_MAXWAIT` (`tools/run-gates/run-gates.sh:601`), so the longest a
+healthy bar can take is queue plus wall. The margin covers what happens after the wall fires: the
+watcher's poll, at most 30 s, the kill of each leg's tree and the verdict render. 600 s is twenty
+polls; PINNED 2026-09-14 from that one bound, and the printed terms re-derive it on every run. A
+backstop that fires means the runner outlived its own wall, which is a wedge, never a slow leg.
+
+### Why the backstop is pinned
+
+`--preflight` pins it because `GATE_WALL` is a working-tree declaration the run can edit, and a bound
+that moves between the two reads is two bounds. A record that predates the fact is recomputed at
+`gates-green`, announced. `--resume` does not re-pin; a changed wall takes effect at the next
+preflight, which is the one verb that starts a run.
+
+### Why a declared profile command
+
+Probing `$GATE_CMD --print-profile` directly would guess that the declared gate is this runner. An
+adopter's gate that ignores its arguments would start a full bar at preflight. `GATE_PROFILE_CMD`
+makes the question declared, and blank keeps every adopter exactly where it is.
+
+### The conf check
+
+The effective wall is `GATE_WALL`, else the profile's `wall`. The check reads `ceiling_max` from the
+same profile command, so the unattended kit names no manifest path by literal. A wall below it fires
+on a healthy bar that dispatches the largest leg, which the runner's own profile comment records as
+the failure strictly worse than a loose bound (`tools/run-gates/gate-profiles.txt:58`).
+
+### Files touched (estimate)
+
+`tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
+`tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` ·
+`tools/unattended/SKILL.template.md` · `tools/unattended/.unattended.conf.example` · `.unattended.conf`
+· `tools/run-gates/run-gates.sh` · `tools/run-gates/run-gates.test.sh` · `tools/run-gates/README.md` ·
+the rendered Skill.
+
+### Alternatives rejected
+
+- **Deriving the wall from the profile (D12-i7 option a).** The owner ruled the wall hand-set, and the
+  ruling's consequences name the conf check that keeps a hand-set wall honest.
+- **Raising `GATE_BOUND` to cover wall and queue.** It also bounds the wiring check and the lander
+  probes; a six-hour bound on a wiring check is a wedge nobody notices.
+- **Reading a queue-status file to tell a queued bar from a running one** (TOOL-aUnblockedFleet-6).
+  Its audit refuted it three ways, one of them that the file is deleted before a bar can be killed;
+  the `acquired` stdout line is what the honest-verdicts unit replaced it with.
+
+## 5. Production-readiness checklist
+
+- security — no new surface: `GATE_PROFILE_CMD` is a project-declared command like `GATE_CMD`, run
+  under `GATE_BOUND`, and its output is parsed for integers only.
+- perf / scale — one bounded profile call per preflight, and one re-run of the bar only on exit 3.
+- error / empty / loading states — a blank profile command keeps `GATE_BOUND`, announced; a profile
+  that prints no `queue` or no `wall` falls back the same way, naming the missing key; a malformed
+  `GATE_WALL` refuses at conf load.
+- observability — the backstop and its three terms at preflight and at every `gates-green`, and the
+  `hold` lines.
+- risks — a wedged close now waits up to the backstop, about eight hours here; that is D12-i7's
+  stated cost. A wall raised in the conf mid-run takes effect only at the next preflight.
+- testing — driver and leg arms with a stub gate that answers the profile and sleeps, exits 3, exits 4
+  or hangs before `acquired`, each staged RED; the runner arm in its held canary.
+- migration — gov declares both keys in the unit's commit; an adopter keeps `GATE_BOUND` until it
+  declares a profile command.
+- user docs — `.unattended.conf.example`, the Skill's Close section, `tools/run-gates/README.md` for
+  the two profile keys.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `tools/unattended/unattended.test.sh` gives `gates-green` a stub gate that answers the
+  profile with `wall 5` and `queue 20`, waits 12 s, prints `gate queue: acquired`, and exits 0, under
+  a conf declaring `GATE_BOUND="10"`, the item is MET and the printed bound names all three terms.
+  Red when: the bar is bounded by `GATE_BOUND`, which charges the queue to the bar and kills it.
+- **AC2** — When the stub hangs without printing `gate queue: acquired` and the margin seam makes the
+  backstop 3 s, the item is UNMET as never started, with a `hold` line naming `host-degraded` and
+  `probe gate`.
+  Red when: the kill reads as a red bar, which is the i97 misreport.
+- **AC3** — When the stub in `tools/unattended/unattended.test.sh` exits 3 once and then 0, the item
+  is MET and the output names one re-run; when it exits 3 twice, the item is UNMET naming the moved
+  tree.
+  Red when: exit 3 reads as a failed leg, or the re-run repeats without bound.
+- **AC4** — When a conf declares `GATE_WALL` below the profile's `ceiling_max`,
+  `bash tools/unattended/check-unattended.sh` reds naming both numbers and `--preflight` refuses
+  before any write.
+  Red when: the check compares the wall with the profile's own `wall`, which passes any wall.
+- **AC5** — When the leg runs over the real tree, gov's declared wall clears the largest declared leg
+  ceiling; with `GATE_WALL` staged at 10800 it reds naming the largest ceiling.
+  Red when: gov's conf leaves the wall undeclared, so the unattended bar runs under a number nobody
+  chose.
+  figure: the largest ceiling is DERIVED at observation from `tools/gate-legs.json`; it is 16040 at
+  BASE, PINNED 2026-09-14 for the staged break only.
+- **AC6** — When `bash tools/run-gates/run-gates.sh --print-profile` runs, it prints `queue` equal to
+  four times the resolved turnstile TTL and `ceiling_max` equal to the manifest's largest ceiling.
+  Red when: `queue` is printed before the TTL is resolved and reads 0.
+  permission: the runner arm lives in the held canary; it runs at the build's one post-build bar.
+- **AC7** — When the stub exits 4, the item is UNMET with a `hold` line naming `host-degraded` and
+  `probe host`.
+  Red when: HOST reads as a red leg, so the run fixes a subject that is not at fault.
+- **AC8** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over the
+  rendered tree, the Skill's Close section routes a `hold` line to `--hold` and never to `--override`.
+  Red when: the render routes the line to an override, which spends the one check on a host fault.
+- **AC9** — When `bash tools/check-kit-versions.sh` runs, the unattended and run-gates constants agree
+  with their markers.
+  Red when: a constant moves and a marker does not.
+- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
+  unit's end, it reports no NEW failure.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  cost: the unattended suites' declared budgets, once, with the BASE side cached.
+  permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
+
+## 7. Gates
+
+`unattended kit gate` · `unattended skill wiring` · `run-gates canary` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+
+New arm: tools/unattended/unattended.test.sh · a stub gate that queues, hangs before acquiring, exits 3 twice, or exits 4 · none
+New arm: tools/unattended/check-unattended.test.sh · a conf whose wall is below the profile's largest ceiling · none
+New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest with known ceilings · the canary's executed-assertion floor
+
+## 8. Open questions
+
+- **F1 — where does the bar's bound come from?** RESOLVED (owner, 2026-09-13): D12-i7, `GATE_WALL`
+  hand-set in `.unattended.conf`, exported to the runner, the driver's bound derived from it, a conf
+  check against the largest ceiling, initially 21600.
+- **F2 — how does the driver learn the queue bound and the largest ceiling?** Options: probe
+  `$GATE_CMD --print-profile`; a declared profile command; read the manifest itself. The first can
+  start an adopter's full gate at preflight, and the third names another kit's path by literal.
+  RESOLVED (agent, 2026-09-14, delegated): `GATE_PROFILE_CMD`, blank meaning no profile.
+- **F3 — does a `hold` line hold the run?** Options: `--close` enters HELD itself, or it names the hold
+  and the Skill takes it. The first cannot meet `--hold`'s own preconditions mid-close. RESOLVED
+  (agent, 2026-09-14, delegated): named by the driver, taken by the Skill.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-14 · initial draft from DR 21.4 U25 under D12-i7. Departs from DR's option-(a) text
+  where the ruling does: no `GATE_QUEUE_BOUND` key, and the wall is declared rather than derived.
+  Takes the exit-3 re-run the scratch-hygiene unit handed here, and adds `GATE_PROFILE_CMD` (F2). Adds
+  two edges the brief's table does not list, both already declared by their producers: consumes-from
+  units 25 and 26.
+
+## 10. Reuse audit
+
+- **Probe result.** `reuse_lookup.py` over "bound the merge bar by the runner wall plus the queue wait"
+  returned `run_bounded` in `tools/process-monitor/census.py` — a different kit's bounded runner, not
+  this driver's — and the run-gates `LEGS_FILE` affordance seam; `.sh` is unscanned. Reading source
+  found the seams this unit extends: the driver's `run_bounded` (`tools/unattended/unattended.sh:182`)
+  and its `GATE_BOUND` validation (`tools/unattended/unattended.sh:305`), the `gates-green` arm and its
+  never-returned text, and the runner's `--print-profile` verb (`tools/run-gates/run-gates.sh:511`),
+  whose header already names a second reader as its purpose.
+- **DR against BASE.** K15's numbers hold at BASE: `GATE_BOUND="3600"` in `.unattended.conf`, every
+  profile row at `wall=21600`, and `TS_MAXWAIT` derived as four TTLs, 7200 s at the 1800 s fallback.
+  DR's "read from `--print-profile`" would find no queue key there at BASE; S3 adds it.
+- **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
+- Recall terms used: GATE_BOUND GATE_WALL wall TS_MAXWAIT turnstile queue acquired backstop
+  print-profile ceiling host-degraded run_bounded — passed as `--terms` with the question "why does
+  GATE_BOUND kill a bar that is still queued and how should the wall be declared". Top hits:
+  TOOL-aUnblockedFleet-8, TOOL-aProvenReuse-6, the retired TOOL-aUnblockedFleet-6 spec,
+  TOOL-aBoundedCeiling-12 and TOOL-aReapedSpinner-16.

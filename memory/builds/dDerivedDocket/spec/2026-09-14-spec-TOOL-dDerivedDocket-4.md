@@ -85,6 +85,10 @@ per-slug lease so two sessions cannot drive one slug, and route every phase read
 - **hands-off** `TOOL-dDerivedDocket-28` — the named precondition seam in `--hold` where the
   run-owned process reap goes, and the `--status` line the orphan count joins.
 - **hands-off** `TOOL-dDerivedDocket-29` — the checkpoint, which gains the pending review runId.
+- **hands-off** `TOOL-dDerivedDocket-16` — `derived_phase()`, which that unit reads to decide which
+  builds hold a live run.
+- **hands-off** `TOOL-dDerivedDocket-24` — the `inherited-red` hold code and the resumable HELD
+  stop the park policy ends in.
 
 ## 4. Design
 

@@ -339,7 +339,7 @@ the landing with the relocation recipe as a park. That is the design's A10 class
   `gen_build_index.py --check` exits 0 again.
   Red when: a break is staged over a tree where builds mode is not armed, so the verdict never runs
   and the RED is the mode guard's instead of the verdict's.
-- **AC14** — When `python tools/memory-tree/migrate_backlog.py --stragglers` runs before the write, it
+- **AC14** — When `migrate_backlog.py --stragglers` runs before the write, it
   prints a refs-examined count above zero, and the inventory is recorded in this unit's journal.
   Red when: only local branches are walked, so a pushed straggler on another node reads as none.
 - **AC15** — When the landing reconcile's classification is rehearsed with `migrate_backlog.py`

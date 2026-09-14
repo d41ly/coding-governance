@@ -48,7 +48,7 @@ already applies to `authorized-by:`, `playbook:` and `pieces:`
 - Re-deriving READY or any ask status. That is the fold's (unit 6), printed by unit 15's
   `--asks --tsv`, and a second implementation of status would be a second answer to one question.
 - Check 13's claimant rule across the whole corpus is the memory-tree engine's, refined by D12-g in
-  unit 15. S3 is narrower: it covers the run's own folder for every foreign id, legacy ones included,
+  unit 8 (`TOOL-dDerivedDocket-8` S6). S3 is narrower: it covers the run's own folder for every foreign id, legacy ones included,
   which is where the 27 hazard ids came from (DR §19.1 K9).
 - Moving the freeze to `--close` (unit 22) changes which phases S4 grades. Unit 22 extends S4 to a
   derived-LANDED record in the same commit that moves the freeze; this unit grades recorded LANDED.
