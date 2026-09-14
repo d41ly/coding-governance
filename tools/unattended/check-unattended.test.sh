@@ -2542,37 +2542,39 @@ hit "$(run)" "DIRECTIVES_FLOOR is declared below the kit's own core directive co
 # I, review L2: a PROJECT-declared scope. Two carriers say the scope is kit-owned; nothing enforced
 # it, because scope_of composes core PLUS extra and would have honoured this silently.
 reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9:prompt"/'
-hit "$(run)" "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name:"
-
 # I, review L3: a pass kind outside the vocabulary. The both-ways join to the protocol cannot see it
 # - both sides would agree on the same wrong token, which is the two-derived-values class.
-reset_tree; mutate $KIT_REL/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
-hit "$(run)" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
+mutate $KIT_REL/unattended.sh 's/^PHASES_PASSKIND="SPECCING /PHASES_PASSKIND="INVENTED /'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "a project-declared directive carries a SCOPE, and the scope is kit-owned because a project-selectable one is a narrowing of the core wearing another name:"
+hit "$out" "a phase is published as a build-method pass kind and is not in the core vocabulary, so the contract names a position no run can ever occupy:"
 reset_tree
 
 # ---- the proposal-kind unit: check 26, the VERB SET across the documents that spell it. Each arm
 # ---- removes ONE carrier and asserts THIS check speaks, because a leg that reds on everything arms
 # ---- every branch and checks nothing.
 reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
-hit "$(run)" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
-
 # The VERB CARRIER, which is where the entries live after TOOL-dFoldedVerdict-5. BOTH copies, so
 # check 10's byte-parity arm does not fire alongside and leave two messages where the arm under test
 # is one of them.
-reset_tree
 mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
 mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
-hit "$(run)" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
+hit "$out" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
 
 # The carrier ABSENT. Its own named refusal, because the guard it replaced was `[ -f X ] && read X`
 # with no else — which skips the whole join in silence and reports a green that means nothing. This
 # arm accepts that check 10's missing-half branch speaks too: `hit` asserts the message under test is
 # PRESENT, and the alternative is a fixture that cannot reach the state at all.
 reset_tree; rm -f $KIT_REL/VERBS.template.md
-hit "$(run)" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
-
-reset_tree; mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
-hit "$(run)" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"
+mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+emitted "?" "$out"
+hit "$out" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
+hit "$out" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"
 
 # LIVENESS. Every arm above iterates the declared set, so a set that fails to parse would run zero
 # comparisons and report exactly the green a fully-wired driver reports.
