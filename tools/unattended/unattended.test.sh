@@ -114,6 +114,8 @@ LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
+UNIT_STALL_BOUND="${6-1800}"
+REVIEW_ROUNDS="${7-7}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -4608,6 +4610,16 @@ same "an oscillation 2,1,2 is NON-CONVERGENT"         "$(review_state '2 1' 2)" 
 # predicate did not terminate, not because the loop misbehaved.
 same "a long shrinking sequence hits the ceiling"     "$(review_state '9 8 7 6 5 4 3' 2)" "CEILING"
 
+# ---- TOOL-aProbedUnit-6: THE THIRD ARGUMENT IS THE BOUND, defaulting to the ceiling, so every
+# ---- two-argument arm above holds unchanged. BOUNDED is tested after the two facts about THIS round
+# ---- and after the ceiling, so a clean round, a flat round and a ceiling hit each keep their own exit.
+same "a bound of 1 makes the first blocked round terminal"    "$(review_state '' 3 1)"      "BOUNDED"
+same "a bound of 2 ends a strictly smaller second round"      "$(review_state '3' 2 2)"     "BOUNDED"
+same "a bound equal to the ceiling arms round 1 as before"    "$(review_state '' 3 8)"      "CONVERGING"
+same "a flat count is NON-CONVERGENT before it is BOUNDED"    "$(review_state '2' 2 1)"     "NON-CONVERGENT"
+same "zero blockers is CONVERGED before it is BOUNDED"        "$(review_state '' 0 1)"      "CONVERGED"
+same "the ceiling fires before a bound equal to it"           "$(review_state '9 8 7 6 5 4 3' 2 8)" "CEILING"
+
 # ---- the verb's refusals, on disk
 bcopen
 hit "$(run --review tNoSuchBuild --subject S1 --verdict BLOCKED --blockers 1)" "no run-state file, so there is no run to record a review round against"
@@ -4636,9 +4648,9 @@ bcopen
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
 # The second call EXITS, so TOOL-dFoldedVerdict-1 makes --disposition mandatory here. This arm is
 # about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
-# than asserted on.
-run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition fold >/dev/null
-hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close.
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition promote >/dev/null
+hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
@@ -4650,16 +4662,30 @@ hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 # ...and a subject whose loop ENDED does not take another round: the history would say the opposite
 # of what happened.
-hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 
 # ---- CONVERGED is terminal too, and the refusal names where a later blocker goes. Both arms above
 # ---- reach branch 10 through NON-CONVERGENT; this one reaches it through the exit the owner ruling
 # ---- is about: a subject that converged at round 1 takes no further round, the refusal names the
-# ---- M4 fold-or-promote route, and the refused round wrote NO row — one review row, not two.
+# ---- M4 severity-rule route, and the refused round wrote NO row — one review row, not two.
 bcopen
 run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
-hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
+# ---- CONVERGED takes an OPTIONAL disposition (closing review of aProbedUnit, cluster C, id 12). The
+# ---- severity rule disposes the HIGHS that stood at zero blockers, and the harness promotes them;
+# ---- refusing the field here left that promotion unrecordable and invisible to the gate. Never
+# ---- required: the C1 round above recorded with no field and still does. Against the base driver
+# ---- the first call is refused as "not a terminal exit" and the row count reads 0.
+out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition promote)
+hit "$out" "CONVERGED · disposition promote — the loop is done for this subject, and"
+hit "$out" "PROMOTED"
+same "the optional promote is written into the converged round's reason" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+# ...and `fold` there is the value for nothing above MEDIUM — legal, redundant, and the one exit
+# `review_exit_note fold` is still reachable from.
+out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition fold)
+hit "$out" "CONVERGED · disposition fold"
+hit "$out" "FOLDED into the specs it belongs to"
 reset_tree
 
 # ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
@@ -4683,18 +4709,55 @@ hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --dispositi
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition 'fold|promote')" "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions"
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition promote)" "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state"
 run --review tRun --subject D1 --verdict BLOCKED --blockers 3 >/dev/null
-hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions"
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "blocker(s) standing and requires --disposition promote, because the severity rule promotes every blocker and a record naming no disposition leaves the gate inferring one from ids"
 reset_tree
 
-# ---- the FOLD exit: its own sentence, and the field written AFTER the state token so the substring
-# ---- the gate leg already reads is untouched. That placement is why S4 put it there.
+# ---- FOLD AT A BLOCKER-BEARING EXIT IS REFUSED (closing review of aProbedUnit, cluster C). This arm
+# ---- used to pin `NON-CONVERGENT · disposition fold` as LEGAL: `review_state` returns CONVERGED for
+# ---- count 0, so every NON-CONVERGENT, CEILING or BOUNDED exit stands on a blocker, and the severity
+# ---- rule promotes every blocker — `blockers 2 · disposition fold` was a row the gate read as
+# ---- demanding nothing while two blockers stood. The refusal writes NOTHING, so the subject is still
+# ---- open and the same round records with `promote`, the field AFTER the state token as before.
 bcopen
 run --review tRun --subject D2 --verdict BLOCKED --blockers 2 >/dev/null
 out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition fold)
-hit "$out" "NON-CONVERGENT · disposition fold"
-hit "$out" "FOLDED into the specs it belongs to"
-same "the fold disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold' memory/builds/tRun/RUN.md)" "1"
+hit "$out" "blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+hit "$out" "--review exits NON-CONVERGENT with 2 blocker(s) standing"
+same "a refused fold wrote nothing" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition promote)
+hit "$out" "NON-CONVERGENT · disposition promote"
+same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote' memory/builds/tRun/RUN.md)" "1"
 same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+
+# ---- TOOL-aProbedUnit-6: A SPEC SUBJECT IS BOUNDED, THE SLUG SUBJECT IS NOT. The conf below declares
+# ---- REVIEW_ROUNDS=1 through mkconf's SEVENTH positional; every other review arm in this file runs at
+# ---- the default, ONE BELOW the ceiling (a bound equal to it is refused at startup, cluster H of
+# ---- aProbedUnit's closing review), which is why none of them moved. Against the base driver every arm
+# ---- here reads CONVERGING where BOUNDED is expected and refuses the explicit disposition.
+bcopen
+mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED with 3 blocker(s) standing and requires --disposition promote"
+same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --disposition promote)
+hit "$out" "BOUNDED · disposition promote"
+hit "$out" "the declared round bound of 1 is reached"
+# the echo names the rule the exit applies — every CONFIRMED finding, by severity — and not the
+# pre-severity-rule "every standing blocker" (cluster G of the closing review, the driver half)
+hit "$out" "so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY:"
+same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+# the SLUG subject keeps the ceiling: an explicit disposition on its first blocked round is refused as
+# non-terminal, and the round itself arms the loop — the closing diff review is unchanged in behaviour.
+crdrop
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3 --disposition promote)" "not a terminal exit"
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3)" "CONVERGING"
+# ...and fold is REFUSED at a BOUNDED exit exactly as at NON-CONVERGENT: three blockers stand, the
+# severity rule promotes every one, and a row saying `fold` beside them is the hole the field was
+# added to close (cluster C). Nothing is written, so the subject stays open.
+out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --disposition fold)
+hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
+same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
@@ -4997,6 +5060,152 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is 
 reset_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
+# ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
+# ---- dispatch row is still open, the tree's two clocks, and a verdict against UNIT_STALL_BOUND.
+# ---- Every arm below is the driver over the scratch repo; the fixture is the one the `--dispatch`
+# ---- arms above already build, plus a READY spec COMMITTED on the unit branch: at UNIT0 the build
+# ---- has no spec, so `--dispatch` refuses it as MISSING and no row would exist to audit. The bound
+# ---- rides mkconf's SIXTH positional.
+build_audit_fixture() { # reset, commit a READY spec, preflight
+  reset_tree
+  mkdir -p memory/builds/tRun/spec
+  printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+  git add -A && git commit -q -m "fixture: a READY spec" --no-verify
+  run --preflight tRun --keepalive-id k1 >/dev/null
+}
+# AC1 — STALLED. The dispatch row an hour old, the fixture commit an hour old by GIT_COMMITTER_DATE,
+# the tree clean, the bound 60s. `last-write none` must read as OLDER than any bound: a clean tree
+# read as "written just now" is PROGRESSING forever, which is the reassuring-zero class.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mkconf "true" "true" "" "3600" "" "60"
+HOUR_AGO=$(( $(date -u +%s) - 3600 ))
+mutate memory/builds/tRun/RUN.md "s/^[0-9T:-]*Z dispatch · item /$(date -u -d "@$HOUR_AGO" +%Y-%m-%dT%H:%M:%SZ) dispatch · item /"
+git add -A && GIT_COMMITTER_DATE="$HOUR_AGO +0000" git commit -q -m "fixture: age the clocks" --no-verify
+out=$(run --audit tRun); rc=$?
+same "AC1 a STALLED verdict exits 0" "$rc" "0"
+hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
+hit "$out" "· last-write none ·"
+hit "$out" "· STALLED"
+hit "$out" "unattended-audit: remedy — stop the unit's task, then re-dispatch ARCH-tRun-1 with a brief naming what stalled and that it is skipped"
+# AC2 — PROGRESSING. One untracked file under the declared directory, made with touch: the listing
+# must carry `ls-files --others`, and the write clock must be consulted, not the commit clock alone.
+mkdir -p work && touch work/new.txt
+out=$(run --audit tRun); rc=$?
+same "AC2 a PROGRESSING verdict exits 0" "$rc" "0"
+hit "$out" "· PROGRESSING"
+miss "$out" "unattended-audit: remedy"
+same "AC2 last-write is numeric after an untracked write" "$(printf '%s\n' "$out" | grep -cE 'ARCH-tRun-1 .* last-write [0-9]+s ago ')" "1"
+# AC8 — a listed path DELETED from disk is skipped, not a dead probe. `rm`, not `git rm --cached`:
+# the latter leaves the file on disk, so `stat` answers and the branch under test is never reached.
+rm memory/guides/BUILD-METHOD.md
+out=$(run --audit tRun); rc=$?
+same "AC8 a deletion in the listing is skipped, exit 0" "$rc" "0"
+hit "$out" "· PROGRESSING"
+miss "$out" "UNATTENDED check 51 FAILED"
+same "AC8 last-write stays numeric after the skip" "$(printf '%s\n' "$out" | grep -cE 'last-write [0-9]+s ago')" "1"
+# AC5, third branch — a probe that cannot answer is a refusal, never a zero. `stat` shadowed on PATH
+# by a stub exiting 1, over the same dirty tree, so the mtime probe dies on a path that EXISTS.
+mkdir -p "$TMP/stub"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stub/stat"; chmod +x "$TMP/stub/stat"
+out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "AC5 a dead mtime probe exits 1" "$rc" "1"
+hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now:"
+miss "$out" "· PROGRESSING"
+# AC5, first branch — no run-state file.
+reset_tree
+out=$(run --audit tNoRun); rc=$?
+same "AC5 no run-state file exits 1" "$rc" "1"
+hit "$out" "no run-state file, so there is no dispatched unit to audit for idleness:"
+# AC5, second branch — a terminal record. Not `refuse_if_terminal`: its sentence says the verb would
+# REWRITE the record, and this verb rewrites nothing, so that sentence would be false here.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+out=$(run --audit tRun); rc=$?
+same "AC5 a finished run exits 1" "$rc" "1"
+hit "$out" "the run is already finished, so no unit of it can be dispatched and open, and a keepalive still auditing it should have been reaped:"
+# AC3 — no open unit is ONE line and exit 0, never silence over nothing.
+build_audit_fixture
+out=$(run --audit tRun); rc=$?
+same "AC3 no dispatch row exits 0" "$rc" "0"
+same "AC3 the no-unit line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "1"
+# ...a commit naming the unit AND writing inside the declared set closes the pass — the openness
+# test is `check_pass_open`, the one `--dispatch` uses, so the two verbs cannot disagree.
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mkdir -p work && printf 'x\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 build" --no-verify
+out=$(run --audit tRun)
+same "AC3 a build commit inside the declared set closes the pass" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ...and a commit naming the unit but touching ONLY the run-state file leaves it open — the
+# declaration commit is the ordinary shape a run produces, and counting it closed every pass at
+# declaration time once already.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+out=$(run --audit tRun)
+hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
+miss "$out" "no unit is dispatched and open"
+# ---- SAME-ANCHOR ROWS ARE ONE PASS (closing review of aProbedUnit, cluster A, ids 19/1/6). Two
+# ---- one-path rows at one anchor — `--writes` is repeatable and the driver's own repair is "declare
+# ---- again" — and a pass commit inside the FIRST row's set. The last-row read asked whether the
+# ---- pass wrote its LAST path and graded a finished unit open; the union asks whether it wrote
+# ---- inside ANY of them, which is check 23's key. Against the base driver the unit's line prints.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/two.txt >/dev/null 2>&1
+same "two same-anchor rows for one unit" "$(grep -c 'dispatch · item [0-9a-f]* ARCH-tRun-1 · reason' memory/builds/tRun/RUN.md)" "2"
+mkdir -p work && printf 'x\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 build" --no-verify
+out=$(run --audit tRun)
+same "a pass commit inside the FIRST of two same-anchor rows closes the pass" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is the
+# ---- disjointness proof's and answers conservatively — a pass that declared a path it never wrote
+# ---- stays open under it forever — so a CLOSED unit read as STALLED and the keepalive was handed a
+# ---- kill-and-redispatch order for it, on this repo, for hours. `--plan` graded the same unit DONE.
+# ---- The status is resolved the way `--plan` resolves it. The closing commit here does NOT name the
+# ---- unit, so `check_pass_open` alone still says open; only the status guard closes it.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "fixture: the spec closes, the row stays" --no-verify
+out=$(run --audit tRun); rc=$?
+same "a CLOSED unit with an open row exits 0" "$rc" "0"
+same "a CLOSED unit with an open row is not listed" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ---- THE SPEC READ IS A PROBE (closing review of aProbedUnit, round 2, cluster H, ids 5 and 18).
+# ---- The status skip above is only as good as the read that feeds it: `load_spec_facts` swallowed
+# ---- with `|| true` left the maps empty on a failed read, the CLOSED skip never fired, and the unit
+# ---- was graded STALLED with the kill order printed — the round-1 defect with its cause discarded.
+# ---- The four other probes in the verb set `dead`; this one now does too. `awk` is shadowed by a
+# ---- stub that exits 2 ONLY on an argument under `spec/`, so `spec_facts` fails on a file `-r`
+# ---- accepted while every other awk in the verb keeps answering. Its own stub dir, because the
+# ---- `stat` stub above shares `$TMP/stub` and would die first on any dirty path. Against the base
+# ---- driver: exit 0 and the CLOSED unit's line, graded by the clocks as though it were open.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mutate memory/builds/tRun/spec/one.md 's/^\*\*Status:\*\* SPECCED/**Status:** CLOSED/'
+git add -A && git commit -q -m "fixture: the spec closes, the row stays" --no-verify
+mkdir -p "$TMP/stubawk"
+printf '#!/bin/sh\ncase "$*" in *spec/*) exit 2 ;; esac\nexec %s "$@"\n' "$(command -v awk)" > "$TMP/stubawk/awk"; chmod +x "$TMP/stubawk/awk"
+out=$(PATH="$TMP/stubawk:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "a dead spec read exits 1" "$rc" "1"
+hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now: load_spec_facts over memory/builds/tRun/spec"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# AC4 — the bound is read through `read_bound_key`, GATE_BOUND's hoisted reader: junk and zero are
+# refusals at exit 2 before any verb runs, in GATE_BOUND's own sentence with the key name lifted out.
+reset_tree; mkconf "true" "true" "" "3600" "" "abc"
+out=$(run --audit tRun); rc=$?
+same "AC4 a non-integer UNIT_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+hit "$out" "which is not a positive integer of seconds"
+reset_tree; mkconf "true" "true" "" "3600" "" "0"
+out=$(run --audit tRun); rc=$?
+same "AC4 a zero UNIT_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+reset_tree
+
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
@@ -5269,6 +5478,32 @@ DOD_EXTRA=""
 NOCONF
 out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
+hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
+# THE DEFAULT IS READ OUT OF THE DRIVER, not retyped: the NOTE interpolates `REVIEW_ROUNDS_DEFAULT`
+# exactly as its two siblings interpolate theirs, so a raised argument cannot leave the sentence
+# saying 1 (cluster I of aProbedUnit's closing review). A literal-digit default in any
+# `read_bound_key` call is what that fold removed, and the count below pins it at zero.
+RR_DEF=$(sed -n 's/^REVIEW_ROUNDS_DEFAULT=\([0-9]*\).*/\1/p' "$SCRIPT" | head -1)
+n=$((n+1)); [ -n "$RR_DEF" ] || { echo "FAIL REVIEW_ROUNDS_DEFAULT could not be read out of the driver, so the NOTE arm below would assert an empty default"; st=1; }
+hit "$out" "declares no REVIEW_ROUNDS, so a spec-audit subject exits BOUNDED after the kit default of ${RR_DEF} round"
+same "no read_bound_key call types its default as a literal digit" "$(grep -cE '^read_bound_key [A-Z_]+ [0-9]' "$SCRIPT")" "0"
+reset_tree
+
+# ---- TOOL-aProbedUnit-6: REVIEW_ROUNDS above the runaway ceiling is a refusal, because the ceiling
+# ---- would fire first and the declared bound could never be reached; zero is the reader's own refusal,
+# ---- naming the key. Both exit 2 before any verb runs.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "9"
+out=$(run --status tRun)
+hit "$out" "above the runaway ceiling of 8"
+# ...and EQUAL to it (cluster H of the closing review): `review_state` tests the ceiling first, so a
+# bound of 8 is exactly the value the sentence refuses and `-le` let through; `-lt` closes it.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "8"
+out=$(run --status tRun); rc=$?
+same "a bound equal to the ceiling exits 2" "$rc" "2"
+hit "$out" "REFUSING - REVIEW_ROUNDS is 8, at or above the runaway ceiling of 8"
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "0"
+out=$(run --status tRun)
+hit "$out" "REFUSING - REVIEW_ROUNDS is declared as '0', which is not a positive integer"
 reset_tree
 
 
@@ -5483,7 +5718,20 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=713
+FLOOR_ASSERTIONS=790
+# RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
+# (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
+# the sum of both raises over the shared 706 base.
+# RAISED 779 -> 783 by the closing diff review of aProbedUnit, round 2 (cluster H, ids 5 and 18): the
+# dead-spec-read `--audit` arm, one `mutate` and three assertion lines, in region two beside the
+# `--audit` arms; n read before and after the block run alone with the preamble sourced, 20 -> 24.
+# RAISED 760 -> 779 by the closing diff review of aProbedUnit: +25 `hit`/`same`/`miss` lines, one
+# `mutate` and one `n=$((n+1))` guard added, 8 assertion lines removed with the re-targeted fold
+# arms — net +19, every one in region two (clusters A, C, G, H, I), counted off the diff.
+# RAISED 741 -> 760 by TOOL-aProbedUnit-6, the +19 BOUNDED arms (6 sliced, 10 verb, 3 conf), each
+# run alone with the suite's preamble sourced and counted as the `hit`/`same` lines the diff adds.
+# RAISED 706 -> 741 by TOOL-aProbedUnit-3, the +35 `--audit` and bound arms, counted off a run of the
+# block alone with the suite's preamble sourced (n before and after), not off the file.
 # RAISED 675 -> 706 by TOOL-aGradedMandate, the +31 arms this build added, keeping the headroom the
 # paragraph above declares. The bump first landed on the SHADOWED assignment 31 lines up and did
 # nothing; this is the one the run reads.
@@ -5514,9 +5762,12 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=517
-# +5 for the SPEC_TOKENS_CLI dispatch arms (aDeferredBar closing review F3) and +2 for the resolver
-# arm (round 2, R2), both region two; the F3 fold credited six for five (R16).
+FLOOR_SHARD_2=594
+# +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
+# +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
+# +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.
+# +19 for the TOOL-aProbedUnit-6 BOUNDED arms, all in region two.
+# +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

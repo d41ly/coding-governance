@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-14T16:44:46+03:00 @ 2f7908167dffcc84216c7ae9ec9a9d43720876ea
+last-audit: 2026-09-15T00:19:02+03:00 @ 286b62d1422a4996973784639c02520d6c90be17
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 757f1c11a8456c93951ba6500edb9553d214b831
+last-body-change: 286b62d1422a4996973784639c02520d6c90be17
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -221,6 +221,10 @@ does — hit three times in one file in one session; also the whole-signature an
   run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
   `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
   wait for the main loop's `VERIFYING`.
+- `scratch-guard` (aProbedUnit, 2026-09-14) also DENIES a write rooted at an EMPTY `$TMPDIR`/`$TMP`/`$TEMP`
+  — and `TMPDIR` IS empty on this node, so `$TMPDIR/x` is `/x` — any `/tmp` target, and root litter.
+  Rules: `tools/hooks/README.md`. Write to the session scratchpad; a git clone goes under
+  `%TEMP%/<short>` (MAX_PATH).
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.

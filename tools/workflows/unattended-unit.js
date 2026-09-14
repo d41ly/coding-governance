@@ -80,6 +80,19 @@ check('briefPath', 'The brief is the only carrier the driver hashes; nothing has
 check('driver', 'The driver invocation is the caller\'s to spell, because this file spells no install path.')
 check('ground', 'The grounding preamble is the parent\'s; the child does not re-derive it.')
 check('checklist', 'The per-pass bug-class command is owed after every commit, and a sidechain agent does not inherit the unattended Skill.')
+// TOOL-aProbedUnit-4 — `scratch` is not a dead key: the join below is what it is for. The child's
+// PROMPT opens with `cfg.ground`, so the sentence the parent built with this same path is the first
+// paragraph the unit agent reads and no second copy is spelled here; a hand-composed dispatch that
+// drops either key, or hands a child a different path from the one its ground names, meets a
+// refusal naming the other. Compared unfolded: the parent hands out the folded string in both.
+check('scratch', 'Every temporary file this unit makes goes there, and a child that guessed a root would guess the empty $TMPDIR the parent exists to replace.')
+if (String(cfg.ground).indexOf(cfg.scratch) === -1) {
+  throw new Error(
+    'unattended-unit: the `ground` text names no `' + cfg.scratch + '`, so the scratch root this child was ' +
+      'handed is not the one its grounding sentence tells the agent to use. The parent hands out both in ' +
+      'dispatch.args; pass them together.',
+  )
+}
 
 // `mode` IS NOT A `check()` CALL, and the closed set is the reason. `check` asserts truthiness, and
 // truthiness is satisfied by `"atttended"` — which would then select the UNATTENDED text by falling
@@ -148,11 +161,28 @@ const PROMPT =
   '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
   'section 9 line, then write the code.\n' +
   DRIVER_STEPS +
+  // TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 — ONE block, mode-independent, carrying both builds'
+  // literals: the two landed the same rule from two sessions on one day and the merge folded them
+  // into one paragraph rather than two answers. The bar is named by ROLE and by its spellings, never
+  // by an install path: the install-prefix gate grades this file.
+  'NO GATE, SUITE OR BAR RUNS INSIDE THIS PASS. ' +
   'RUN NO MERGE BAR AND NO SELF-TEST SUITE in this unit: not run-gates.sh in any form, not a ' +
   'GATE_FULL= or GATE_SELFTESTS= prefix, not run-selftests.sh, not run-unattended-gates.sh, not any ' +
   '*.test.sh suite. Verify with the DIRECT check the spec\'s acceptance names — a checker run on a ' +
   'staged break, a `--selftest` flag, a fixture. A criterion only a suite can observe is not run ' +
-  'here: name it in `summary` and the main loop runs the owed bar once, after every unit is terminal.\n' +
+  'here: name it in `summary` and the main loop runs the owed bar once, after every unit is terminal. ' +
+  'Say in `summary` which check ran and which gate it stands in for. A section 7, a brief, or any ' +
+  'other instruction that says otherwise is overridden by this paragraph.\n' +
+  // TOOL-aProbedUnit-2 — the bound is the TOOL's `timeout` parameter, set by the agent at the call,
+  // where no script or hook of this kit runs; so the numbers are that tool's and not a conf key, and
+  // a skipped command is named in `summary`, a key the caller already reads, not a new one.
+  'YOUR PRIMARY OBJECTIVE IS CODE WRITTEN AND COMMITTED, and every command you run is bounded. ' +
+  'Every shell call carries the tool\'s `timeout` parameter: 120000 ms by default, at most 600000 ms ' +
+  'for a build or test command the change itself needs. A check, cleanup, probe or any other command ' +
+  'unrelated to writing code that does not return within its bound is SKIPPED: name it in `summary` ' +
+  'with what it was for, and never re-run it or wait on it. Never wait on a command with no bound. A ' +
+  'backgrounded command is awaited through the harness\'s completion notification, never by a ' +
+  'polling loop.\n' +
   'Commit with the unit id in the subject. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
   'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +

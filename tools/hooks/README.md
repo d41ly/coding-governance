@@ -231,3 +231,49 @@ ban list, in the pass that wants it. Those reasons survive later writes. A defin
 of the predicate — which necessarily makes many literals newly visible at once — goes through a
 separate re-baseline mode guarded by a declared predicate epoch, so it can be spent once per
 change to the predicate and never to absorb a literal.
+
+## scratch-guard — the write-target guard, and what it cannot see
+
+The second hook in this home, wired on `Bash|PowerShell`, reads each tool call's TEXT for write
+targets (redirects, `tee`/`touch`/`mkdir`, the last argument of `cp`/`mv`/`install`/`rsync`, and a
+`TMPDIR=`/`TMP=`/`TEMP=` assignment) and denies one that lands where agent scratch does not belong.
+Deny is stderr plus exit 2; allow prints nothing. The sanctioned roots are DERIVED, never authored:
+`TMPDIR`, `TEMP` and `TMP` at run time, `<home>/.claude`, and the CLI's own scratch base
+`<os.tmpdir()>/claude`. A target under one of those is allowed before any rule runs.
+
+**The five rules**, each a `kind` the deny message names in its own sentence:
+
+- `home` — a target under the operator's home directory that is not under a sanctioned root.
+- `drive-root` — a target that creates a NEW top-level entry at a drive root, `C:/gvi`; the
+  conventional names are `DRIVE_ROOT_CONVENTIONAL` in the hook.
+- `empty-var` — a target opening with `$TMPDIR`, `${TMP}`, `$TEMP` (any of the three, braced or
+  not) whose variable is empty or unset in the hook's environment, so the bytes land at the
+  filesystem root. A non-empty variable is expanded and grading continues on the result; a
+  `${TMPDIR:-default}` form expands to its default when the variable is empty; a variable the SAME
+  command assigns (`TMP=$(mktemp -d); echo x > $TMP/f`) is not graded, because its value is
+  unknowable textually.
+- `tmp` — a target at or under `/tmp`, denied by owner ruling on 2026-09-14 even on a Git-Bash host
+  where `/tmp` is a mount onto TEMP, because the habit is what is being ended. A temp variable
+  whose value is exactly `/tmp` contributes NO allowed root, or `TEMP=/tmp` would re-open every
+  write the rule closes; `/tmp/sub` as a value still does. `<os.tmpdir()>/claude` stays allowed
+  INSIDE the prefix, so a POSIX host whose scratchpad sits under `/tmp` keeps its one destination.
+- `posix-root` — a target that creates a new top-level entry at the POSIX root, `/mir/x`; the
+  conventional names are `POSIX_ROOT_CONVENTIONAL`, with `tmp` and `temp` deliberately absent so
+  the two rules cannot disagree about `/tmp`.
+
+**What the predicate does NOT catch, because it is textual and stays so.** Four shapes walk past
+it, and the upgrade path if they stop being rare is a real tokenizer rather than more regexes:
+
+- Variable indirection beyond the three temp spellings and `~`/`$HOME`: `D=/tmp; echo x > $D/f`
+  is graded as an unresolved token that misses every rule.
+- A `cd`: `cd /tmp && echo x > y` writes a relative path the hook reads as repo-relative.
+- A heredoc'd script: a Python `open('/tmp/x','w')` inside a `<<EOF` body is blanked before
+  scanning, so nothing inside it is a target.
+- A PowerShell variable spelling: `$env:TEMP\x` opens with `$env:`, which none of the three
+  spellings match; the corpus measurement that motivated the rules was Bash-shaped, so this is
+  stated rather than closed.
+
+The suite is `scratch-guard.test.sh`. Its arms hand every environment override to the hook from
+INSIDE node — a JavaScript prelude on `process.env`, the hook spawned as that node's child — because
+on a Git-Bash host the MSYS runtime rewrites a POSIX-shaped `TEMP=/tmp` on its way to native
+`node.exe`, and GNU `env` refuses `-u` after an assignment.

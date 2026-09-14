@@ -3,7 +3,7 @@
  * gate-guard — a PreToolUse guard that refuses the flagged merge bar and every self-test suite
  * while the unattended run on the current branch is in a phase before VERIFYING.
  *
- * gov:kit unattended@1.23 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.24 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aDeferredBar-3 under the build folder of that slug.
