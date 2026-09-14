@@ -80,7 +80,11 @@ from collections import Counter  # noqa: E402
 # copy of an owner's name its own check. All five announce a skip where no bash that shares this
 # filesystem is on PATH, and a skip puts the count under this floor, which is how a node that cannot
 # run the adopter reds rather than passes.
-ASSERTION_FLOOR = 1084
+# RAISED 1084 -> 1128 by the closing review's round-1 fold of B1 and H1: model AC19, the idle rule,
+# with its git-only half inside AC10's arm; record AC9, the owner-time refusal; and the invariant arm
+# that sorts last and grades every model the arms built. Three new functions, so the decoy checks alone
+# move it by nine. Every idle fixture's session is made by the REAL extractor from a transcript.
+ASSERTION_FLOOR = 1128
 
 PASS = []
 FAIL = []
@@ -1980,6 +1984,52 @@ def write_extract(store, sid, events, slug=FX_SLUG):
                                    "events": events}).encode("ascii"))
 
 
+def build_session_events(acts, sid=FX_SID):
+    """One session's extract events, made by the REAL extractor from a main transcript written the way
+    the harness writes one, so no event is typed in a shape the extractor would not produce.
+
+    `acts` are tuples with epoch-second times: `("call", t, t_end)` is an assistant `tool_use` with its
+    usage and the `tool_result` at `t_end`; `("reply", t)` an assistant text record with its usage;
+    `("owner", t)` a typed turn of human origin; `("limit", t)` a rejected-quota API error."""
+    _base, projects = build_projects("runlog-idle-")
+    usage = {"input_tokens": 4, "output_tokens": 2, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+
+    def render_stamp(t):
+        return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(t)) + ".%03dZ" % int((t - int(t)) * 1000)
+
+    records = []
+    for n, act in enumerate(acts, 1):
+        kind, t = act[0], act[1]
+        head = {"uuid": f"i-{n}", "timestamp": render_stamp(t), "version": "9.9.1"}
+        msg = {"id": f"msg-i{n}", "role": "assistant", "model": "fixture-model"}
+        if kind == "call":
+            records.append({"type": "assistant", **head, "requestId": f"req-i{n}", "message": dict(
+                msg, content=[{"type": "tool_use", "id": f"toolu_i{n}", "name": "Bash",
+                               "input": {"command": "bash fixture-step.sh", "description": "a fixture step"}}],
+                usage=usage)})
+            records.append({"type": "user", "uuid": f"i-{n}-r", "timestamp": render_stamp(act[2]),
+                            "version": "9.9.1", "message": {"role": "user", "content": [
+                                {"type": "tool_result", "tool_use_id": f"toolu_i{n}", "content": "done"}]},
+                            "toolUseResult": {"stdout": "done", "stderr": "", "interrupted": False,
+                                              "isImage": False, "noOutputExpected": False}})
+        elif kind == "reply":
+            records.append({"type": "assistant", **head, "requestId": f"req-i{n}", "message": dict(
+                msg, content=[{"type": "text", "text": "a fixture reply"}], usage=usage)})
+        elif kind == "owner":
+            records.append({"type": "user", **head, "message": {"role": "user", "content": "carry on with it"},
+                            "origin": {"kind": "human"}, "promptSource": "sdk"})
+        elif kind == "limit":
+            records.append({"type": "assistant", **head, "message": dict(
+                msg, content=[{"type": "text", "text": "You have hit the fixture limit"}]),
+                "isApiErrorMessage": True, "error": "rate_limit", "apiErrorStatus": 429,
+                "quotaLimits": {"status": "rejected", "rateLimitType": "five_hour", "resetsAt": int(t) + 1200,
+                                "isUsingOverage": False}})
+        else:
+            raise ValueError(f"no transcript act {kind!r}")
+    write_transcript_lines(projects / FIXTURE_PROJECT / f"{sid}.jsonl", records)
+    return rx.extract_session(rx.resolve_session_tree(sid, projects), "driver", [FX_SLUG])["events"]
+
+
 def build_landed_fixture():
     """The CLEAN run: preflighted, dispatched and briefed, built on a branch, gated green at its head,
     closed, merged, pushed through the lander with the bar pinned, and landed. No event is more than
@@ -2025,8 +2075,34 @@ def build_landed_fixture():
             "driver": driver, "gates": gates, "pushes": pushes, "record": rm}
 
 
+# Every model an arm builds through `build_model`, graded against the idle invariant of
+# TOOL-dLoggedFlight-8 AC19 by `test_zz_model_idle_invariant`, which sorts last and so runs last.
+IDLE_SEEN = {"models": 0, "both": 0, "bad": []}
+
+
+def check_idle_invariant(model):
+    """`(gap start, call start)` for every tool call an idle gap of `model` holds: one starting inside
+    the gap, or one whose span overlaps it. Empty when the invariant holds."""
+    timeline = model["timeline"] if isinstance(model, dict) else model.timeline
+    tools = model["tools"] if isinstance(model, dict) else model.tools
+    out = []
+    for e in timeline:
+        if e.get("kind") != "idle":
+            continue
+        a, b = e["t"], e["t"] + e["dur"]
+        for c in tools:
+            end = c["end"] if c.get("end") is not None else c["t"]
+            if a < c["t"] < b or (c["t"] < b and end > a):
+                out.append((a, c["t"]))
+    return out
+
+
 def build_model(repo, journals=None, store=None, run=None):
-    return rl_model.build_run_model(repo, FX_SLUG, run=run, journal_root=journals, store=store)
+    model = rl_model.build_run_model(repo, FX_SLUG, run=run, journal_root=journals, store=store)
+    IDLE_SEEN["models"] += 1
+    IDLE_SEEN["both"] += bool(model.tools) and any(e["kind"] == "idle" for e in model.timeline)
+    IDLE_SEEN["bad"] += check_idle_invariant(model)
+    return model
 
 
 def read_kinds(model):
@@ -2317,11 +2393,17 @@ def test_model_ac5_anomalies():
                 record=lambda t: add_runstate_row(t, derive_minute(14), "review", "a-subject",
                                                   "verdict BLOCKED · blockers 0 · CONVERGED"))
     # idle-gap: the clean run's --landed arrives fifteen and a half minutes after the last event before
-    # it, the landed record's commit at minute 28, and the landing push is left out.
-    j = write_journals(repo.parent, driver=[ln for ln in fx["driver"] if float(ln["t"]) < MODEL_T0 + 26 * 60]
-                       + render_driver_lines(43.5, "--landed", phase_from="LANDING", phase_to="LANDED"),
-                       gates=fx["gates"][:1])
-    model = build_model(repo, journals=j)
+    # it, the landed record's commit at minute 28, and the landing push is left out. The session's
+    # transcript is local, since idleness is judged only then (spec S6, rev-6): every driver verb ran
+    # in a tool call around it, the record commit in one around its commit time, and nothing between.
+    driver = ([ln for ln in fx["driver"] if float(ln["t"]) < MODEL_T0 + 26 * 60]
+              + render_driver_lines(43.5, "--landed", phase_from="LANDING", phase_to="LANDED"))
+    j = write_journals(repo.parent, driver=driver, gates=fx["gates"][:1])
+    calls = [("call", float(ln["t"]) - 1, float(ln["t"]) + 1) for ln in driver if ln["ev"] == "start"]
+    calls.append(("call", float(derive_minute(28)) - 6, float(derive_minute(28)) + 1))
+    istore = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(istore, FX_SID, build_session_events(sorted(calls, key=lambda c: c[1])))
+    model = build_model(repo, journals=j, store=istore)
     got["idle-gap"] = read_kinds(model)
     check("model AC5 idle-gap: fifteen and a half minutes with no event is one idle-gap", got["idle-gap"],
           ["idle-gap"])
@@ -2668,21 +2750,46 @@ def test_model_ac10_joins():
     model2 = build_model(fx["repo"], journals=j2)
     check("model AC10 near miss: a push of a sha outside the run's history joins no run",
           [e for e in model2.timeline if e["kind"] == "push"], [])
-    rm = f"memory/builds/{FX_SLUG}/RUN.md"
-    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
-    st = build_preflight_state(FX_SLUG, s0[1], s0[1])
-    repo, _ = build_history([
-        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
-        {"t": derive_minute(17), "subject": f"feat: {FX_UNIT1} — after fifteen minutes", "files": {"tools/a.txt": "1\n"}},
-        {"t": derive_minute(31), "subject": f"feat: {FX_UNIT1} — after fourteen", "files": {"tools/a.txt": "2\n"}},
-        {"t": derive_minute(33), "subject": f"records({FX_SLUG}): phase BUILDING",
-         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
-    ], repo=first)
-    model = build_model(repo)
+    repo, store = build_gaps_fixture()
+    model = build_model(repo, store=store)
     gaps = [int(e["dur"]) for e in model.timeline if e["kind"] == "idle"]
     check("model AC10: gaps of 15 and 14 minutes yield exactly one idle-gap, the 15", gaps, [900])
     check("model AC10: ...which is also the one idle-gap anomaly",
           [a["kind"] for a in model.anomalies if a["kind"] == "idle-gap"], ["idle-gap"])
+    # AC19's git-only half, on the same run: no transcript, so nothing is judged idle, and the coverage
+    # block says so rather than reporting the missing source as a clean zero.
+    bare = build_model(repo)
+    check("model AC19 git-only: the same run with no transcript yields no idle-gap",
+          [e for e in bare.timeline if e["kind"] == "idle"] + [a for a in bare.anomalies if a["kind"] == "idle-gap"],
+          [])
+    check("model AC19 git-only: ...and its coverage reads not judged, naming the transcripts' state",
+          (bare.coverage["idle"]["judged"], bare.coverage["idle"]["gaps"], "not-local" in bare.coverage["idle"].get(
+              "note", "")), (False, None, True))
+
+
+def build_gaps_fixture():
+    """A git-only run with no journal, its four commits' stretches 15 minutes, 14 and two apart, and the
+    session that made them discovered in the store by its slug, as the model finds one with no journal.
+    Each commit ran in a tool call six seconds before it to one second after it, so the commit times are
+    spaced for the SILENCES between those calls to be exactly 900 and 840 seconds."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    st = build_preflight_state(FX_SLUG, s0[1], s0[1])
+    t2 = derive_minute(2)
+    t17 = t2 + 900 + 7
+    t31 = t17 + 840 + 7
+    t33 = t31 + 120
+    repo, _ = build_history([
+        {"t": t2, "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": t17, "subject": f"feat: {FX_UNIT1} — after fifteen minutes", "files": {"tools/a.txt": "1\n"}},
+        {"t": t31, "subject": f"feat: {FX_UNIT1} — after fourteen", "files": {"tools/a.txt": "2\n"}},
+        {"t": t33, "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+    ], repo=first)
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(store, FX_SID, build_session_events([("call", float(t) - 6, float(t) + 1)
+                                                        for t in (t2, t17, t31, t33)]))
+    return repo, store
 
 
 def test_model_ac13_ac14_positions_usage():
@@ -2843,6 +2950,112 @@ def test_model_ac17_attribution():
                "fields its producer's data model lists", not bad and len(MODEL_LINES) > 20, str(bad))
     check("model AC17 liveness: a line carrying a field its producer never writes is caught",
           check_producer_keys({**golden[("driver", "end")], "phase_from": "X"}), ["phase_from"])
+
+
+def build_idle_fixture():
+    """A run left RUNNING whose one session's transcript is local, built for the idle rule (spec S6,
+    rev-6). Its stretches, in minutes, each between two events inside the window:
+    - 2 to 16 holds a short tool call every two minutes, and a heartbeat `--status` closes it;
+    - 16 to 38 holds no timeline event and a short tool call every two minutes: busy;
+    - 39 to 65 is one 26-minute foreground call, a bar: busy;
+    - 66 to 85 is a nineteen-minute silence, over fifteen minutes from every owner turn: idle;
+    - 85 to 109 is a silence an owner turn closes, its reply four seconds after it;
+    - 111 to 132 is a silence an owner turn opens, after a three-second reply;
+    - 134 to 154 is a silence a limit opens, with an owner turn at 142 and the reply at the reset.
+    The owner launched the run half a minute before its preflight, which dispatched unit 1. Every
+    stretch that should be busy starts more than fifteen minutes after that launch turn, so the owner
+    guard cannot be what keeps it from reading idle."""
+    def derive_time(m):
+        return float(MODEL_T0 + m * 60)
+
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = s0[1]
+    st = add_runstate_row(build_preflight_state(FX_SLUG, base, base), derive_time(1.5), "dispatch",
+                          f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    repo, _ = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight and the dispatch", "files": {rm: st}},
+        {"t": derive_minute(38), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — after twenty minutes of calls",
+         "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(66), "subject": f"fix({FX_SLUG}): {FX_UNIT1} — after the bar",
+         "files": {"tools/a.txt": "2\n"}},
+    ], repo=first)
+    driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
+              + render_driver_lines(1.5, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + [ln for m in (16, 85, 155) for ln in render_driver_lines(
+                  m, "--status", phase_from="RUNNING", phase_to="RUNNING")])
+    j = write_journals(repo.parent, driver=driver)
+    owners = [derive_time(0.5), derive_time(109), derive_time(111), derive_time(142)]
+    acts = [("owner", owners[0]), ("reply", owners[0] + 5)]
+    acts += [("call", derive_time(m) - 1, derive_time(m) + 1) for m in (1, 1.5, 16, 85, 155)]
+    acts += [("call", derive_time(m) - 6, derive_time(m) + 1) for m in (2, 38, 66)]
+    acts += [("call", derive_time(m), derive_time(m) + 1) for m in list(range(3, 16, 2)) + list(range(17, 38, 2))]
+    acts += [("call", derive_time(39), derive_time(65)),
+             ("owner", owners[1]), ("reply", owners[1] + 4), ("call", owners[1] + 6, owners[1] + 8),
+             ("owner", owners[2]), ("reply", owners[2] + 3),
+             ("call", derive_time(132), derive_time(132) + 1),
+             ("limit", derive_time(134)), ("owner", owners[3]), ("reply", derive_time(154))]
+    events = build_session_events(sorted(acts, key=lambda a: a[1]))
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(store, FX_SID, events)
+    return {"repo": repo, "journals": j, "store": store, "events": events, "owners": owners,
+            "calls": (derive_time(16), derive_time(38)), "bar": (derive_time(39), derive_time(65)), "idle": (derive_time(66) + 1, derive_time(85) - 1)}
+
+
+def test_model_ac19_idle():
+    """AC19: idle gaps over every source (H1 of the closing review) and never beside an owner turn
+    (B1). The fixture's busy stretches yield no gap, its one true silence yields one, and its three
+    silences beside an owner turn are kept out and counted; with no transcript, nothing is judged."""
+    fx = build_idle_fixture()
+    (c0, c1), (b0, b1) = fx["calls"], fx["bar"]
+    model = build_model(fx["repo"], journals=fx["journals"], store=fx["store"])
+    gaps = [(e["t"], e["t"] + e["dur"]) for e in model.timeline if e["kind"] == "idle"]
+    check("model AC19: the transcripts read present, so idleness is judged",
+          (model.coverage["transcripts"]["state"], model.coverage["idle"]["judged"]), ("present", True))
+    check("model AC19: twenty minutes of short tool calls between two timeline events yield no idle gap",
+          [g for g in gaps if g[0] < c1 and g[1] > c0], [])
+    check("model AC19: one 26-minute foreground call yields no idle gap",
+          [g for g in gaps if g[0] < b1 and g[1] > b0], [])
+    check("model AC19: the nineteen-minute silence far from every owner turn is the one idle gap",
+          gaps, [fx["idle"]])
+    check("model AC19: ...and the one idle-gap anomaly, at its start",
+          [(a["kind"], a["t"]) for a in model.anomalies if a["kind"] == "idle-gap"], [("idle-gap", fx["idle"][0])])
+    check("model AC19: the silences an owner turn closes, opens and sits inside are kept out and counted",
+          (model.coverage["idle"]["gaps"], model.coverage["idle"]["near_owner"]), (1, 3))
+    guard = rl_model.IDLE_OWNER_GUARD_S
+    check("model AC19: no idle gap starts or ends within the guard of an owner turn",
+          [g for g in gaps for o in fx["owners"] if g[0] - guard <= o <= g[1] + guard], [])
+    check("model AC19: no idle gap holds a tool call's start or overlaps its span", check_idle_invariant(model), [])
+    # LIVENESS, from the fixture's own events: read over the timeline alone, as rev-5 read it, the two
+    # busy stretches are idle; and without the guard the three owner silences are gaps too. So the
+    # fixture reaches both halves of the rule rather than passing by holding nothing.
+    tl = [(e["t"], None) for e in model.timeline if e["kind"] not in ("owner", "idle")]
+    naive, _n = rl_model.derive_idle_gaps(tl, [], model.window["start"], model.window["end"])
+    check_true("model AC19 liveness: over the timeline alone the calls and the bar read idle",
+               any(a < c1 and b > c0 for a, b in naive) and any(a < b1 and b > b0 for a, b in naive), str(naive))
+    spans = tl + [(ev["t"], ev.get("end") if ev["kind"] == "tool" else None) for ev in fx["events"]
+                  if ev["kind"] != "owner"]
+    unguarded, _n = rl_model.derive_idle_gaps(spans, [], model.window["start"], model.window["end"])
+    check("model AC19 liveness: with no owner turn to guard, the three owner silences are gaps too",
+          len(unguarded), 4)
+    # With the journal but no local transcript, as on an adopter whose journal names no session.
+    bare = build_model(fx["repo"], journals=fx["journals"])
+    check("model AC19: with no local transcript the same run yields no idle-gap, and says it was not judged",
+          ([e for e in bare.timeline if e["kind"] == "idle"], bare.coverage["idle"]["judged"],
+           bare.coverage["idle"]["near_owner"]), ([], False, None))
+
+
+def test_zz_model_idle_invariant():
+    """AC19's model invariant, over every model any arm built through `build_model`: no idle gap holds
+    a tool call. This arm sorts last, so every other arm's models are in the count it grades."""
+    check("model AC19 invariant: no idle gap of any model the arms built holds a tool call",
+          IDLE_SEEN["bad"], [])
+    check_true("model AC19 invariant liveness: it graded several models holding both an idle gap and tool "
+               "calls", IDLE_SEEN["both"] >= 2 and IDLE_SEEN["models"] > 20, str(IDLE_SEEN))
+    check("model AC19 invariant liveness: a call starting inside a gap and one overlapping it are caught",
+          check_idle_invariant({"timeline": [{"kind": "idle", "t": 100.0, "dur": 1000.0}],
+                                "tools": [{"t": 500.0, "end": 501.0}, {"t": 50.0, "end": 150.0},
+                                          {"t": 1100.0, "end": 1101.0}]}), [(100.0, 500.0), (100.0, 50.0)])
 
 
 def test_model_driver_sets():
@@ -3557,6 +3770,75 @@ def test_record_ac8_cost():
     check("record AC8: rendering the 500-row model makes no subprocess call", rendered, 0)
     check("record AC8 liveness: the patched counter sees a git call made under it", len(seen), 1)
     print(f"  report (grades nothing): record render over 500 timeline rows {wall:.3f}s")
+
+
+def test_record_ac9_owner_times():
+    """AC9 (B1 of the closing review): no rendered time falls in an owner turn's second. A real model
+    with owner turns beside three silences renders with none. A model given an idle row that starts in
+    one, ends in one, or ends the second before one under truncation refuses, naming no time, and
+    writes nothing; each near miss three seconds further away renders."""
+    fx = build_idle_fixture()
+    model = build_model(fx["repo"], journals=fx["journals"], store=fx["store"])
+    text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, fx["journals"]))
+    owners = {int(o) for o in fx["owners"]}
+    check_true("record AC9 liveness: the model holds the fixture's four owner turns",
+               sorted(int(t["t"]) for t in model.owner_positions["turns"]) == sorted(owners),
+               str(model.owner_positions["counts"]))
+    utcs = [int(rl_model.parse_iso(tok)) for tok in re.findall(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]{8}Z", text)]
+    check_true("record AC9 liveness: the record carries times to compare", len(utcs) > 10, str(len(utcs)))
+    check("record AC9: no UTC the real record carries falls in an owner turn's second",
+          sorted(u for u in utcs if u in owners), [])
+    idle = [(int(rl_model.parse_iso(r[0])), int(r[3][:-1])) for r in scan_record_rows(text)
+            if len(r) == 7 and r[2] == "idle"]
+    check("record AC9: the record shows the one idle row the model kept", len(idle), 1)
+    check("record AC9: ...and no idle row's UTC plus its duration, nor the second after, is an owner turn's",
+          [s for s, d in idle if {s + d, s + d + 1} & owners], [])
+    check("record AC9: the Coverage section says idle gaps were judged, and counts the three kept out",
+          "- idle gaps: judged yes · near an owner turn 3" in text, True)
+    m = dataclasses.asdict(model)
+    o = fx["owners"][1]
+
+    def build_variant(t, dur, drop=None):
+        v = json.loads(json.dumps(m))
+        v["timeline"] = sorted(v["timeline"] + [{"t": t, "source": "model", "kind": "idle", "dur": dur}],
+                               key=lambda e: e["t"])
+        if drop == "timeline":
+            v["timeline"] = [e for e in v["timeline"] if e["kind"] != "owner"]
+        elif drop == "positions":
+            v["owner_positions"]["turns"] = []
+        return v
+
+    def read_refusal(v):
+        try:
+            rl_record.render_record(v, "memory")
+        except ValueError as exc:
+            return str(exc)
+        return None
+
+    for name, t, dur in (("starts in", o + 0.4, 1200.0), ("ends in", o - 1200.0, 1200.0),
+                         ("ends, under truncation, the second before", o - 1200.3, 1200.3)):
+        msg = read_refusal(build_variant(t, dur))
+        check(f"record AC9: an idle row that {name} an owner turn's second refuses", bool(msg and "owner turn" in msg),
+              True)
+        check(f"record AC9: ...and the refusal of the row that {name} it names no time", bool(msg) and re.search(
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T", msg) is None and str(int(o)) not in msg, True)
+        check(f"record AC9 near miss: the row that {name} it, moved three seconds further away, renders",
+              read_refusal(build_variant(t - 3, dur)), None)
+    check("record AC9: the truncated case's rendered end is the second BEFORE the turn, so only the "
+          "second-after comparison catches it", int(o - 1200.3) + int(1200.3), int(o) - 1)
+    check("record AC9: with the timeline's owner rows gone, the owner positions still refuse",
+          bool(read_refusal(build_variant(o + 0.4, 1200.0, drop="timeline"))), True)
+    check("record AC9: with the owner positions gone, the timeline's owner rows still refuse",
+          bool(read_refusal(build_variant(o + 0.4, 1200.0, drop="positions"))), True)
+    folder = fx["repo"] / "memory" / "builds" / FX_SLUG / "build"
+    try:
+        rl_record.write_record(fx["repo"], build_variant(o + 0.4, 1200.0), journal_root=fx["journals"],
+                               date=RECORD_DATE)
+        wrote = "returned"
+    except ValueError:
+        wrote = "refused"
+    check("record AC9: write_record refuses the regressed model and writes nothing",
+          (wrote, sorted(p.name for p in folder.glob("*-runlog-*.md")) if folder.is_dir() else []), ("refused", []))
 
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)

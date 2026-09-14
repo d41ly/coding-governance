@@ -23,6 +23,12 @@ over `RECORD_CAP_BYTES`, which cells of unusual width can cause, halves what it 
 timeline's rows first, then the lists' bound, in turn. Every elision and aggregation is stated in the
 record itself.
 
+NO TIME IN AN OWNER TURN'S SECOND. Owner turns are counts per position, and a value derived from one
+is the same datum: an idle row that starts or ends on a turn places it. `scan_owner_times` reads the
+text a render would write and `render_record` refuses the whole record when any UTC in it, or any idle
+row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap beside an
+owner turn out already; this is the renderer's own check, so a model that regressed cannot publish one.
+
 THE COMMITMENT makes a later edit to the journal detectable on the node that holds it: the sha256, the
 line count and the first and last times of the journal lines the MODEL attributed to the run, read from
 its `journal_lines` and never re-joined here. `check_commitment` rebuilds the model and hashes the
@@ -265,6 +271,10 @@ RECORD_SCHEMA = {
                 ("journal starts", ("{int} joined of {int} record-creating",)),
                 ("unjoined starts", ("{int}",)),
                 ("sessions", ("{int} named · {int} extracted",)),
+                # The model's `idle` entry (TOOL-dLoggedFlight-8 S6, rev-6): whether idle gaps were
+                # judged at all, and how many were kept out beside an owner turn. `-` when not judged,
+                # so an absent judgement never reads as a clean zero.
+                ("idle gaps", ("judged {yes-no} · near an owner turn {int}",)),
             ),
             "tables": (
                 {"name": "sources", "header": ("#", "source", "state", "lines", "bad", "epoch"),
@@ -286,6 +296,12 @@ RECORD_SCHEMA = {
         "uuid": r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}",
     },
 }
+# THE OWNER-TIME REFUSAL reads the RENDERED text, never the model's own gaps, so what it grades is what
+# would be written (spec S4, rev-6). A UTC token anywhere, and an idle row in either copy: the markdown
+# table row and the Data twin's JSON row, each with its UTC and its duration.
+UTC_TOKEN_RE = re.compile(RECORD_SCHEMA["shaped"]["utc"])
+IDLE_ROW_RES = (re.compile(r"^\| (" + RECORD_SCHEMA["shaped"]["utc"] + r") \| [^|]* \| idle \| ([0-9]{1,12})s \|"),
+                re.compile(r'^\["(' + RECORD_SCHEMA["shaped"]["utc"] + r')","[^"]*","idle","([0-9]{1,12})s"'))
 
 
 # ---------------------------------------------------------------------------------- small helpers
@@ -734,6 +750,7 @@ def build_record_doc(parts, edge, bound) -> dict:
     cov = m.get("coverage") or {}
     starts = cov.get("journal_starts") or {}
     tr = cov.get("transcripts") or {}
+    idle = cov.get("idle") or {}
     doc["Coverage"] = {
         "facts": [("journal starts", render_fact(ctx, derive_fact_templates("Coverage", "journal starts")[0],
                                                  (derive_count(starts.get("joined", 0)),
@@ -741,7 +758,10 @@ def build_record_doc(parts, edge, bound) -> dict:
                   ("unjoined starts", str(len(cov.get("unjoined_starts") or []))),
                   ("sessions", render_fact(ctx, derive_fact_templates("Coverage", "sessions")[0],
                                            (derive_count(tr.get("sessions", 0)),
-                                            derive_count(tr.get("extracts", 0)))))],
+                                            derive_count(tr.get("extracts", 0))))),
+                  ("idle gaps", render_fact(ctx, derive_fact_templates("Coverage", "idle gaps")[0],
+                                            (derive_yes_no(idle.get("judged")),
+                                             derive_count(idle.get("near_owner")))))],
         "tables": [{"name": "sources", "header": derive_table("Coverage", "sources")["header"],
                     "rows": rows["coverage"]}]}
     return doc
@@ -785,11 +805,45 @@ def render_markdown(doc, serves) -> str:
     return "\n".join(out) + "\n"
 
 
+def scan_owner_times(model, text) -> list:
+    """Every place the rendered `text` carries a time in the second of an owner turn the model holds
+    (spec S4, rev-6), as `(line, what)`, naming the place and NEVER the time. Empty when none does.
+
+    Every UTC token is compared with each turn's second. So is each idle row's END, its UTC plus its
+    duration: the start and the duration are each truncated to the second, so the true end lies in
+    that second or the next, and a turn in either is recovered by the sum. The turns are read from the
+    model's owner positions and from any owner row its timeline still holds, so a model that dropped
+    one list is still graded by the other. This is the renderer's OWN check, over the text it would
+    write, and it does not trust the model to have kept its idle gaps away from an owner turn.
+    """
+    m = derive_view(model)
+    owners = set()
+    for t in [p.get("t") for p in ((m.get("owner_positions") or {}).get("turns") or []) if isinstance(p, dict)] \
+            + [e.get("t") for e in (m.get("timeline") or []) if isinstance(e, dict) and e.get("kind") == "owner"]:
+        if isinstance(t, (int, float)) and not isinstance(t, bool) and t >= 0:
+            owners.add(int(t))
+    hits = []
+    if not owners:
+        return hits
+    for ln, line in enumerate(text.split("\n"), 1):
+        for tok in UTC_TOKEN_RE.findall(line):
+            sec = mdl.parse_iso(tok)
+            if sec is not None and int(sec) in owners:
+                hits.append((ln, "a time"))
+        for rx in IDLE_ROW_RES:
+            row = rx.match(line)
+            start = mdl.parse_iso(row.group(1)) if row else None
+            if start is not None and {int(start) + int(row.group(2)), int(start) + int(row.group(2)) + 1} & owners:
+                hits.append((ln, "an idle row's end, its time plus its duration"))
+    return hits
+
+
 def render_record(model, memory_root=None, commitment=None, bounds=None) -> str:
     """The record's bytes, as text. A pure function of the model: no git call and no file read.
 
-    Raises ValueError when the run served no spec-defined unit, or when even every section aggregated
-    and no timeline row shown cannot fit the cap.
+    Raises ValueError when the run served no spec-defined unit, when even every section aggregated
+    and no timeline row shown cannot fit the cap, or when the text would carry a time in the second of
+    an owner turn (`scan_owner_times`), which nothing downstream could withdraw once published.
     """
     parts = build_record_parts(model, memory_root, commitment)
     edge, bound = bounds or (TIMELINE_EDGE, LIST_BOUND)
@@ -797,6 +851,13 @@ def render_record(model, memory_root=None, commitment=None, bounds=None) -> str:
     while True:
         text = render_markdown(build_record_doc(parts, edge, bound), parts["serves"])
         if len(text.encode("utf-8")) <= RECORD_CAP_BYTES:
+            hits = scan_owner_times(parts["m"], text)
+            if hits:
+                raise ValueError(f"runlog: the record would carry {len(hits)} time(s) in the second of an "
+                                 f"owner turn, the first being {hits[0][1]} on line {hits[0][0]}. A record "
+                                 "keeps owner turns to counts per position with no clock time, so it is "
+                                 "refused and nothing is written; an idle gap beside an owner turn, which "
+                                 "the model should have kept out, is the likely cause")
             return text
         if edge == 0 and bound == 0:
             raise ValueError(f"runlog: the record is {len(text.encode('utf-8'))} bytes with every section "

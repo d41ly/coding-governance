@@ -19,7 +19,7 @@ skill-engines = []
 rendered-skills = ["runlog"]
 gotcha-classes = ["nt-against-a-missing-file-is-true.md",
   "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md",
-  "staged-break-runs-stale-bytecode.md"]
+  "staged-break-runs-stale-bytecode.md", "withheld-value-recovered-from-a-derived-one.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -184,8 +184,12 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   hide the call inside them. `--discover` is a heuristic and says so.
 - **The run model infers, and says which answers are inferred.** The build commit, the owner's
   decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
-  named in its `method` field. It reads only history reachable from HEAD, and a git-only run's sparse
-  sources read as idle gaps.
+  named in its `method` field. It reads only history reachable from HEAD. It judges idle gaps only
+  where every session's transcript is local, and keeps out any gap beside an owner turn.
+- **No rendered time falls in an owner turn's second.** Owner turns are counts, and a gap endpoint
+  derived from one is the same datum, so the renderer refuses a record whose text carries a time in
+  an owner turn's second, an idle row's start plus its duration included. A public commit time that
+  shares such a second by coincidence is refused too, since text cannot tell the two apart.
 - **The record proves shapes, not truth.** A count can be wrong and still be an integer. The lists it
   copies from the pre-push hook, the spec template and the hygiene doc are held to them only by the
   withheld self-test, and its commitment is checkable only on the node that holds the journal.

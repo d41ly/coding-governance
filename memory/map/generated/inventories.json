@@ -214,7 +214,8 @@
       "two-answers-to-one-question.md",
       "two-guards-one-question-two-answers.md",
       "two-readers-of-one-config-one-re-derived.md",
-      "vacuous-selector-empty-population.md"
+      "vacuous-selector-empty-population.md",
+      "withheld-value-recovered-from-a-derived-one.md"
     ],
     "guides": [
       "ANNOTATION-STYLE.md",

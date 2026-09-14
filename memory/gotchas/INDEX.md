@@ -70,7 +70,8 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-guards-one-question-two-answers](two-guards-one-question-two-answers.md) | class | 3 |  | two guards that ask one question different ways become jointly unsatisfiable, and the tree they wedge has no legal move left |
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
+| [withheld-value-recovered-from-a-derived-one](withheld-value-recovered-from-a-derived-one.md) | class | 2 |  | a schema withholds a value by name and still publishes one derived from it, so a reader recovers the withheld value from the rendered one by arithmetic |
 
-56 record(s): 56 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+57 record(s): 57 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

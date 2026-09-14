@@ -11,7 +11,8 @@ gate leg was run, per the owner's instruction of 2026-09-13, and no suite that e
 `tools/unattended/` before this build ran. Every history an arm reads is a scratch repository built
 through one `git fast-import`, and every journal and extract is scratch. The exceptions are three
 arms that read this tree and never write it: AC7, the decision-log report and the driver-source
-arm.
+arm. The closing diff review's round-1 fold of B1 and H1 bumped the spec to rev-6 and added AC19,
+whose line below that fold observed.
 
 ## The criteria
 
@@ -120,6 +121,16 @@ arm.
   commit its own call made, with that commit's runkey. A START after the last start commit was named
   in the coverage block and started no run. RED seen with STARTs joined by position, and with the
   unjoined START not cutting the segment.
+- AC19 — `build_run_model` (`test_model_ac19_idle`, `test_zz_model_idle_invariant`) — added at rev-6
+  by the closing diff review's round-1 fold of B1 and H1, and observed by that fold. The session was
+  made by the real extractor from a transcript. Twenty minutes of two-minute calls between two
+  timeline events and a 26-minute foreground call yielded no idle gap. The nineteen-minute silence
+  yielded the one gap and the one `idle-gap`, at its start. The three silences an owner turn closed,
+  opened and sat inside were kept out, and `idle` counted one fired and three near an owner turn. With
+  the journal and no transcript, and on AC10's run with neither, nothing was judged, and the coverage
+  said so. No gap of any model the arms built held a tool call. RED seen with the gaps read over the
+  timeline alone, with the owner guard dropped, with owner turns put back among the events, and with
+  idleness judged whatever the transcripts read.
 
 ## What else the pass carried
 
@@ -180,5 +191,7 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   pass re-derived, and not to those writers' sources.
 - On a run with no journal, `idle-gap` reads its sparse sources as idleness. The spec defines the
   kind over every source, and the model does not guess which gaps a journal would have filled.
+  CLOSED by the closing diff review's round-1 fold of H1: the model judges no idle gap unless every
+  session's transcript is local, and its coverage says when it did not judge.
 - The runlog kit stays at 1.0, as the brief sets it, and no leg, fixture file or pin moved. The
   budget row now reads 19 s in the ranker's integer spelling, still under the 60 s floor.

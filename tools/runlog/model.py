@@ -78,6 +78,12 @@ REVIEW_EXITS = ("CONVERGED", "NON-CONVERGENT", "CEILING")
 # where it was, so a heartbeat `--status` between a `--brief` and an event does not reset it.
 UNIT_VERBS = ("--brief", "--dispatch", "--rescope", "--review")
 IDLE_GAP_S = 900
+# B1 (closing review, round 1): a stretch with an owner turn inside it, or within this many seconds of
+# either end, is kept out of the idle gaps and counted. Dropping the turn from the gap sequence is not
+# enough alone: the owner's reply lands seconds after the turn, so a gap that ends on the reply still
+# places the turn to within that latency. One idle threshold, because a stretch that close is the
+# owner's own episode rather than the run's idleness.
+IDLE_OWNER_GUARD_S = IDLE_GAP_S
 # F1, RESOLVED (agent, 2026-09-13, delegated): six heartbeats with no head or phase change, one hour
 # at the declared ten-minute cadence. Both numbers are printed in the anomaly's evidence.
 HEARTBEAT_CADENCE_S = 600
@@ -124,6 +130,10 @@ METHOD = {
                           "any case",
     "ledger-unmet": "heuristic: an acceptance line saying owed, not met or unmet",
     "stall-heads": "inferred: the run's own and record commits stand in for its worktree head",
+    "idle": "inferred: a stretch of IDLE_GAP_S or more between two events that no event of any source "
+            "covers, a tool call covering its span and an owner turn covering nothing; judged only "
+            "where the transcripts read present, and kept out within IDLE_OWNER_GUARD_S of an owner "
+            "turn",
     "sessions": "read from the run's START lines; heuristic when discovered by slug in the store",
 }
 
@@ -684,6 +694,37 @@ def build_owner_positions(turns, start, close) -> dict:
     return {"counts": counts, "turns": classed}
 
 
+def derive_idle_gaps(spans, owner_ts, start, end) -> tuple:
+    """`(gaps, near_owner)`: the idle stretches of the half-open window `[start, end)` (spec S6).
+
+    `spans` are `(t, t_end)` pairs, one per event of every source the run holds EXCEPT an owner turn,
+    with `t_end` None for a point. A tool call is its whole span, so a long bar, or a stretch of
+    workflow calls, covers what it ran through. Each span is clipped to the window and the covered
+    stretches merged; a hole of `IDLE_GAP_S` or more BETWEEN two of them is a gap, and a hole reaching
+    a window edge is not. A gap with an owner turn inside it, or within `IDLE_OWNER_GUARD_S` of either
+    end, is not returned but counted in `near_owner`: its endpoints would place that turn, and the
+    committed record keeps owner turns to counts with no clock time.
+    """
+    covered = []
+    for t, t_end in spans:
+        if not isinstance(t, (int, float)) or isinstance(t, bool):
+            continue
+        b = t_end if isinstance(t_end, (int, float)) and not isinstance(t_end, bool) and t_end > t else t
+        if b < start or t >= end:
+            continue
+        covered.append((max(t, start), min(b, end)))
+    owners = [o for o in owner_ts if isinstance(o, (int, float)) and not isinstance(o, bool)]
+    gaps, near_owner, reach = [], 0, None
+    for a, b in sorted(covered):
+        if reach is not None and a - reach >= IDLE_GAP_S:
+            if any(reach - IDLE_OWNER_GUARD_S <= o <= a + IDLE_OWNER_GUARD_S for o in owners):
+                near_owner += 1
+            else:
+                gaps.append((reach, a))
+        reach = b if reach is None else max(reach, b)
+    return gaps, near_owner
+
+
 def build_run_usage(extracts, start, end) -> dict:
     """Token totals inside the window, split three ways, through the extractor's own `build_usage`."""
     events = [ev for data in extracts.values() for ev in data.get("events", [])
@@ -990,8 +1031,8 @@ def scan_anomalies(model) -> list:
                                     "CONVERGED"})
     for e in tl:
         if e["kind"] == "idle":
-            out.append({"kind": "idle-gap", "t": e["t"], "evidence": f"{int(e['dur'])} s with no event from "
-                                                        f"{derive_iso(e['t'])}"})
+            out.append({"kind": "idle-gap", "t": e["t"], "evidence": f"{int(e['dur'])} s with no event of "
+                                                        f"any source from {derive_iso(e['t'])}"})
     for other in model.get("shared_sessions", []):
         out.append({"kind": "multi-run-session", "t": None,
                     "evidence": f"a session of this run also started {other['starts']} verb(s) of "
@@ -1341,10 +1382,24 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                               "rc": note.get("rc") if note else ev.get("rc"),
                               "flags": ev.get("flags") or []})
     timeline.sort(key=lambda e: (e["t"], e["source"], e["kind"]))
-    inside = [e for e in timeline if check_in_window(e["t"])]
-    for a, b in zip(inside, inside[1:]):
-        if b["t"] - a["t"] >= IDLE_GAP_S:
-            timeline.append({"t": a["t"], "source": "model", "kind": "idle", "dur": b["t"] - a["t"]})
+    # ---- idle gaps (spec S6, rev-6), over EVERY source with a tool call covering its span, and never
+    # with an owner turn as an event. Rev-5 read the timeline alone, which holds no tool call, so every
+    # busy stretch read idle (H1), and an in-window owner turn became a gap's start or end, which the
+    # record renders (B1). Judged only where every named session's transcript is local, since only
+    # then is every call seen and every owner turn the guard needs known.
+    idle = {"judged": tr_state == "present", "gaps": None, "near_owner": None}
+    if idle["judged"]:
+        spans = [(e["t"], e.get("end") if e["kind"] in ("verb", "push") else None)
+                 for e in timeline if e["kind"] != "owner"]
+        spans += [(ev.get("t"), ev.get("end") if ev.get("kind") == "tool" else None)
+                  for data in extracts.values() for ev in data.get("events", []) if ev.get("kind") != "owner"]
+        gaps, near = derive_idle_gaps(spans, [t for t, _sid in turns], w_start, w_end)
+        for a, b in gaps:
+            timeline.append({"t": a, "source": "model", "kind": "idle", "dur": b - a})
+        idle.update(gaps=len(gaps), near_owner=near)
+    else:
+        idle["note"] = ("idleness is judged only where every named session's transcript is local, and "
+                        f"the transcripts read {tr_state}")
     timeline.sort(key=lambda e: (e["t"], e["source"], e["kind"]))
 
     # ---- the close, and the head it ran at
@@ -1424,6 +1479,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     coverage["attribution"] = {k2: attribution[k2] for k2 in ("calls", "attributed", "share_calls",
                                                                "wall_s", "attributed_wall_s",
                                                                "share_wall")}
+    coverage["idle"] = idle
     coverage["unjoined_starts"] = [{"t": u["t"], "slug": u["slug"]} for u in unjoined]
     coverage["default_branch"] = default_name
     coverage["journal_starts"] = {"joined": len(joined), "record-creating": len(joined) + len(unjoined)}

@@ -543,6 +543,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_gaps_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_gov_index",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -559,6 +564,11 @@
     },
     {
       "id": "build_history",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_idle_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -776,6 +786,11 @@
       "id": "build_self_chain",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "build_session_events",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_session_tree",
@@ -1051,6 +1066,11 @@
       "id": "check_guarded",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "check_idle_invariant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "check_in_era",
@@ -1791,6 +1811,11 @@
       "id": "derive_id_families",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_idle_gaps",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "derive_install_order",
@@ -4983,6 +5008,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "scan_owner_times",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "scan_owner_turns",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -6023,6 +6053,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_model_ac19_idle",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_model_ac1_ac16_rotation",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6334,6 +6369,11 @@
     },
     {
       "id": "test_record_ac8_cost",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac9_owner_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -6726,6 +6766,11 @@
       "id": "test_zero_records_is_loud",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_zz_model_idle_invariant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "text_merge",

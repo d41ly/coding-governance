@@ -12,7 +12,8 @@ in 26.7 s. No gate leg was run, per the owner's instruction of 2026-09-13, and n
 `tools/unattended/` before this build ran. Every history an arm reads is a scratch repository built
 through one `git fast-import`, and every journal, extract and store is scratch. Every fixture model is
 a real `build_run_model` over a scratch history, or one such model lengthened by copying its own
-entries.
+entries. The closing diff review's round-1 fold of B1 bumped the spec to rev-6 and added AC9, whose
+line below that fold observed.
 
 ## The criteria
 
@@ -76,6 +77,16 @@ entries.
 - AC8 — `subprocess` patched (`test_record_ac8_cost`) — rendering the 500-row model made no subprocess
   call, and the patched counter saw the one git call made under it afterwards. The render took 0.003 s,
   printed and not graded. RED seen with one git call added to the render.
+- AC9 — `render_record` (`test_record_ac9_owner_times`) — added at rev-6 by the closing diff review's
+  round-1 fold of B1, and observed by that fold. A real model, its session made by the real extractor
+  from a transcript with owner turns beside three silences, rendered one idle row. No UTC in its text,
+  and no idle row's start plus its duration or the second after, fell in an owner turn's second, and
+  Coverage read `judged yes · near an owner turn 3`. Idle rows added to that model starting in an owner
+  turn's second, ending in one, and ending the second before one under truncation each refused, with
+  a line naming no time. Each moved three seconds further away rendered. With either list of owner
+  turns removed the other still refused, and `write_record` refused and wrote nothing. RED seen with
+  the refusal switched off, and with the second-after comparison dropped, which lets the truncated
+  end through.
 
 ## What else the pass carried
 
@@ -146,7 +157,9 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - The build commit's second `Decided:` trailer, that the status tokens go unheld for want of a carried
   literal, was reversed by the fold, which reads them through the declared memory root instead.
 - The record's timeline carries idle gaps, whose end is an event's time, and that event can be an owner
-  turn. The kit README names it.
+  turn. The kit README names it. CLOSED by the closing diff review's round-1 fold of B1, which found
+  the README line an unratified narrowing of S4 and struck it: the model keeps a gap beside an owner
+  turn out, and the render refuses any time in an owner turn's second.
 - `verify` cannot see a line inserted before the committed first time. The model attributes none there
   except a bar a joined push pinned, and the kit README names it.
 - The runlog kit stays at 1.0, as the brief sets it, and no leg, fixture file or pin moved. The budget

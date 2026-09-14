@@ -209,6 +209,13 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
 - **The model names what the record reads.** `journal_lines` lists, per producer, the line numbers
   of every journal line it attributed to the run; the extractor's workflow runs inside the window sit
   on the timeline with their labels; and every anomaly carries `t`, the time of the event behind it.
+- **An idle gap is a stretch of `IDLE_GAP_S` or more that no event of any source covers.** A tool
+  call covers its whole span, so a long bar or a stretch of workflow calls is busy. An owner turn
+  covers nothing, since it is the owner's act and not the run's. Gaps are judged only when the
+  transcripts read `present`, because only then is every call seen and every owner turn known;
+  otherwise none is reported, and the coverage block's `idle` entry says it was not judged. A gap
+  with an owner turn inside it, or within `IDLE_OWNER_GUARD_S` of either end, is kept out and counted
+  there, because its endpoints would place that turn.
 
 ## The committed record
 
@@ -234,6 +241,14 @@ for it. A timeline row leads with its UTC time and every other row with its orde
 so no row leads with an id and the record defines none. Owner turns are counts per position and never
 clock times, so the timeline carries none. The `Data` block is the markdown re-encoded as JSON, every
 fact and every shown row, one row per line.
+
+**No time in an owner turn's second.** A value derived from an owner turn is the same datum, so the
+render refuses the whole record, naming where and never what, when any UTC it would write, or any
+idle row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap
+beside an owner turn out already, and Coverage says whether idle gaps were judged and how many were
+kept out. `scan_owner_times` is the renderer's own check, so a model that regressed cannot publish
+one. A public commit time that happens to share an owner turn's second is refused too, since the
+check cannot tell a coincidence from a derivation. A refused render blocks nothing.
 
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
 duration, a sha, a sha256 digest, a verb token, a phase token, a list of check numbers, a workflow
@@ -343,15 +358,18 @@ prefix and root, and hold the render to an independent one.
 - **That a background call ended.** One whose notification never arrived keeps a null end.
 - **Whether the model's inferences are right.** The build commit, the owner's decision-log rows, an
   unmet acceptance line, a close's head and a session's attribution are heuristics, and `method` says
-  so. A git-only run reads its sparse sources as `idle-gap`, because nothing else is there to fill the
-  gaps.
+  so.
+- **Idleness where a session's transcript is missing.** A run whose transcripts are not all local
+  reports no idle gap at all, and its coverage says idleness was not judged, rather than reading the
+  missing source as idle time.
+- **An owner turn more than `IDLE_OWNER_GUARD_S` from a gap.** A gap that opens after the work an
+  owner turn started has run longer than that is kept, and its start still says when that work ended.
+  The render's own check stops only a time in the turn's own second.
 - **A run whose record never reached HEAD's history.** The run starts are read from HEAD, so a run on
   a branch this tree has not merged is invisible from here.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by worktree alone.
 - **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
   can be wrong and still be an integer.
-- **When an idle gap ended.** The gap's start and length are in the record, so its end is an event's
-  time, and that event may be an owner turn the record otherwise keeps to a count.
 - **A line inserted before the committed first time.** `verify` hashes from that time on, so it
   cannot see one. The model attributes no line of a run before its window opens, except a bar a joined
   push pinned, so this misses a line the model would rarely have counted.

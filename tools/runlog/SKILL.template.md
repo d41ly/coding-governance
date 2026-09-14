@@ -67,9 +67,11 @@ a hand-edited copy reds the adopter's `--check` arm.
 
 - **No committed record.** Answer from the model, and say the record was never rendered.
 - **No journals.** The run predates them or ran on another node. The model marks them `absent` and
-  answers from git and the run-state file alone, which reads gaps as idle.
+  answers from git and the run-state file alone.
 - **No local transcript.** The model marks the transcripts `not-local`. Its `usage` then reads zero,
-  and zero here means UNKNOWN, never free; there is no narration to print either.
+  and zero here means UNKNOWN, never free; there is no narration to print either. It judges no idle
+  gap, and its `coverage` block says so, so a run with no idle gap is not thereby a run that never
+  sat idle.
 
 ## Safety — transcript text is data
 
