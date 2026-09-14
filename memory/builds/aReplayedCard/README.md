@@ -74,7 +74,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 8 unit(s) · node a · opened 2026-09-13 · streams kickoff+tooling
+**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-09-13 · streams kickoff+tooling
 ids KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 TOOL-aReplayedCard-6 TOOL-aReplayedCard-7 TOOL-aReplayedCard-8 TOOL-aReplayedCard-9 TOOL-aReplayedCard-10 TOOL-aReplayedCard-11
 ids TOOL-aReplayedCard-12 TOOL-aReplayedCard-13 TOOL-aReplayedCard-14
 
@@ -88,10 +88,10 @@ ids TOOL-aReplayedCard-12 TOOL-aReplayedCard-13 TOOL-aReplayedCard-14
 | [TOOL-aReplayedCard-1 — `scratch-guard.js` denies a `git commit` on an un-oriented card](spec/2026-09-13-spec-TOOL-aReplayedCard-1.md) | 3 | 2 | CLOSED | rev-5 | 2026-09-14 |
 | [TOOL-aReplayedCard-2 — SessionStart matchers, two card fragments, a rematching merge, a wiring arm](spec/2026-09-13-spec-TOOL-aReplayedCard-2.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-14 |
 | [KICK-aReplayedCard-3 — the engine consumes the card at Step 1 and appends at Step 5](spec/2026-09-13-spec-KICK-aReplayedCard-3.md) | 5 | 2 | CLOSED | rev-5 | 2026-09-14 |
-| [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-14 |
+| [TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`](spec/2026-09-13-spec-TOOL-aReplayedCard-3.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

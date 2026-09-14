@@ -1,13 +1,15 @@
 # TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base c4f02308 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-build-TOOL-aReplayedCard-3-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aReplayedCard-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
+| [2026-09-14-prompt-TOOL-aReplayedCard-3-brief.md](../prompts/2026-09-14-prompt-TOOL-aReplayedCard-3-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round2.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md](../reviews/2026-09-14-review-KICK-aReplayedCard-1-spec-audit-round3.md) | spec-audit | KICK-aReplayedCard-1 KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
@@ -118,8 +120,8 @@ should re-orient; the design record's improvement 7.
   section's first act reaps the recorded keepalive, and reaping the live run's job from a second
   session is the failure the section exists to prevent; recorded in the ledger with the clone path.
   cost: one kickoff, one keepalive scheduled and reaped by the fixture session.
-- **AC3** — When `bash tools/unattended/check-unattended.sh` runs at the landing commit, the
-  rendered-versus-template byte compare passes.
+- **AC3** — When `bash tools/unattended/adopt-unattended.sh --check`, the `unattended skill
+  wiring` leg, runs at the landing commit, the rendered-versus-template byte compare passes.
   Red when: the template moved and the render did not.
 - **AC4** — When that same run completes, checks 18 and 20 pass, and the first `/session-kickoff`
   occurrence in the template is still below the first `--preflight` occurrence.
@@ -144,6 +146,13 @@ none
   TOOL-aReplayedCard-2` edge and order 5, because AC2 needs a wired writer (M5).
 - rev-3 · 2026-09-14 · header · order 6, because AC2 also consumes `KICK-aReplayedCard-3`'s Step 5b
   append and the two cannot share a parallel step (round-2 M2).
+- rev-4 · 2026-09-14 · S1 · header · at the build pass: the step sits last in `## Resume`, after the
+  paragraph on the record that cannot be corrected in place, and the schedule paragraph's ordering
+  sentence gains the words `kick off` so the section states its sequence once rather than in a
+  copy the new step would contradict. Status CLOSED; AC2 is owed at the first post-landing resume.
+- rev-5 · 2026-09-14 · AC3 · the byte compare is `adopt-unattended.sh --check`, the `unattended skill
+  wiring` leg, and not a check inside `check-unattended.sh`, which carries none; the criterion
+  named the wrong observer, found at the build pass when the ledger line was written.
 
 ## 10. Reuse audit
 
