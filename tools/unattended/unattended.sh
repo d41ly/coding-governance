@@ -197,6 +197,45 @@ run_bounded() { # argv...
   return "$_rc"
 }
 
+# THE PYTHON RESOLVER, INLINE (aDeferredBar closing round 2, R2 and R8). --dispatch runs the
+# spec-token checker the conf DECLARES, and the launcher it runs it with is resolved here and
+# nowhere else: this kit is copy-installed as a standalone directory, so `../lib/` does not exist
+# in an adopting repo, and the bare `python3` the first cut fell back to there is the MS-Store
+# stub that answers `command -v` and exits 9009 without running anything. The block is
+# byte-identical to the canonical copy and its parity gate reds if it drifts; the driver suite
+# asserts the resolved variable is the only launcher spelling outside it.
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+
 # The bound itself. DEFAULTED rather than required, and ANNOUNCED rather than silent.
 #
 # A required key would make --preflight refuse every adopter whose .unattended.conf predates it, so
@@ -4707,21 +4746,23 @@ verb_dispatch() { # slug · unit · writes...
   # builds, and the checker is a direct check in seconds that the gate-guard hook admits. DECLARED,
   # never spelled — `SPEC_TOKENS_CLI` is repo-relative in the conf, in RECALL_CLI's register — and
   # BLANK or absent means the kit is not adopted, which is ANNOUNCED rather than passed over.
-  # The launcher is resolved beside this kit when the resolver ships there; an adopter laid out
-  # without it falls back to the name, the same last resort the kit's own suites take.
+  # The launcher is the inline resolver's answer and nothing else (closing round 2, R2 and R8):
+  # the first cut EXECUTED a bare `python3` on the adopter layout, which on Windows is the stub the
+  # resolver exists to refuse, and every --dispatch there was then refused with a diagnosis
+  # blaming the tree. `resolve_python` cannot be made to fail from the driver suite's fixture
+  # without hiding every launcher from PATH, so that branch is pinned rather than armed.
   if [ -n "${SPEC_TOKENS_CLI:-}" ]; then
     [ -f "$ROOT/$SPEC_TOKENS_CLI" ] || { fail 49 "--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing: $SPEC_TOKENS_CLI"; return 1; }
-    local _stpy _strc
-    if [ -f "$KIT_DIR/../lib/resolve-python.sh" ]; then
-      # shellcheck source=/dev/null
-      . "$KIT_DIR/../lib/resolve-python.sh"
-      _stpy=$(resolve_python) || { fail 49 "--dispatch: no usable python launcher resolves beside this kit, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
-    else
-      _stpy=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-    fi
+    local _stpy _strc _sttail
+    _stpy=$(resolve_python) || { fail 49 "--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run: $SPEC_TOKENS_CLI"; return 1; }
     run_bounded "$_stpy" "$SPEC_TOKENS_CLI"; _strc=$?
     if [ "$_strc" != 0 ]; then
-      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')"
+      # A checker that GRADED leaves `spec-tokens:` lines; one that never ran leaves none, and the
+      # tail then names the rc and the first line it did print, so a launcher or import failure is
+      # not read as a spec that reds.
+      _sttail=$(printf '%s\n' "$RB_OUT" | grep -E '^spec-tokens: ' | grep -vE 'live spec\(s\) ·|bar join ·|Gates heading' | head -3 | tr '\n' ' ')
+      [ -n "$_sttail" ] || _sttail="the checker printed no spec-tokens: line, so it did not grade — first line: $(printf '%s\n' "$RB_OUT" | head -1)"
+      fail 49 "--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ($SPEC_TOKENS_CLI exited $_strc in ${RB_TOOK}s): $_sttail"
       return 1
     fi
   else

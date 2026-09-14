@@ -2276,11 +2276,16 @@ while IFS= read -r ln; do
   sed -n "$((no-4)),${no}p" "$SCRIPT" | grep -q 'trusted_base'     || { echo "FAIL check_authorization is called without a trusted_base guard within 4 lines: $ln"; st=1; }
 done <<<"$ug"
 
-# ---- SOURCE-level: the driver must not grow a python dependency. Every other kit here carries the
-# ---- launcher resolver inline because it needs python; this one does not, and a `python` appearing
-# ---- in it later would be an un-resolved launcher rather than a resolved one.
-np=$(grep -nE '(^|[^-[:alnum:]])(python3?|py) ' "$SCRIPT" | grep -v '^[0-9]*:#' || true)
+# ---- SOURCE-level: the driver runs python ONLY through the resolver it carries inline (aDeferredBar
+# ---- closing round 2, R2). The premise this arm used to state -- the driver has no python dependency
+# ---- -- stopped being true when --dispatch grew the spec-token check, and the arm was RED on the
+# ---- fold that made it false. Now: the marker-delimited `>>> resolve_python` block is the ONE place
+# ---- the candidate names may appear (its parity gate holds it byte-identical to the canonical copy),
+# ---- and outside it and outside comments the only launcher spelling is the resolved variable.
+n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FAIL the driver carries no inline resolve_python block, so any launcher it runs is unresolved"; st=1; }
+np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
+n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
 
 # ============================================================ TOOL-aBoundedVerdict-15
 # ---- S1: the two phase writers that did NOT stage now do. The leg's whole per-run population is the
@@ -4175,7 +4180,7 @@ if [ -f "$STC" ]; then
   git add memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md >/dev/null 2>&1
   printf 'SPEC_TOKENS_CLI="tools/check-spec-tokens.py"\n' >> .unattended.conf
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
-  n=$((n+1)); case "$o" in *"--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it"*) echo "ok   dispatch: a live spec naming the flagged bar as its observation REFUSES the dispatch" ;; *) echo "FAIL dispatch: a live spec naming the flagged bar was dispatched against -- $o"; st=1 ;; esac
+  n=$((n+1)); case "$o" in *"--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ("*) echo "ok   dispatch: a live spec naming the flagged bar as its observation REFUSES the dispatch" ;; *) echo "FAIL dispatch: a live spec naming the flagged bar was dispatched against -- $o"; st=1 ;; esac
   n=$((n+1)); case "$o" in *"[bar]"*) echo "ok   dispatch: the refusal carries the checker's own [bar] line" ;; *) echo "FAIL dispatch: the refusal does not carry the checker's [bar] line -- $o"; st=1 ;; esac
   # The same tree with the key BLANK: an ANNOUNCED skip on stdout, and the dispatch is declared.
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
@@ -4185,7 +4190,7 @@ if [ -f "$STC" ]; then
   # A declared path that is not there is a refusal, not a check that passes by running nothing.
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="tools/gone.py"|' .unattended.conf
   o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
-  n=$((n+1)); case "$o" in *"SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing"*) echo "ok   dispatch: a declared checker that is not there is refused" ;; *) echo "FAIL dispatch: a missing declared checker was not refused -- $o"; st=1 ;; esac
+  n=$((n+1)); case "$o" in *"--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing"*) echo "ok   dispatch: a declared checker that is not there is refused" ;; *) echo "FAIL dispatch: a missing declared checker was not refused -- $o"; st=1 ;; esac
   # Restore the fixture the brief arms below read: the undated spec name, no extras.
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
@@ -5468,12 +5473,14 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=712
+FLOOR_ASSERTIONS=713
 # RAISED 675 -> 706 by TOOL-aGradedMandate, the +31 arms this build added, keeping the headroom the
 # paragraph above declares. The bump first landed on the SHADOWED assignment 31 lines up and did
 # nothing; this is the one the run reads.
-# RAISED 706 -> 712 at aDeferredBar's closing review F3: the six SPEC_TOKENS_CLI dispatch arms, a
-# static count, all in region two.
+# RAISED 706 -> 711 at aDeferredBar's closing review F3: the five SPEC_TOKENS_CLI dispatch arms, all in
+# region two. That fold wrote 712 and "six" here for five `n=$((n+1))` lines (round 2, R16); the
+# count is DERIVED from the fold's diff, never typed beside it. RAISED 711 -> 713 at round 2 (R2):
+# the source-level resolver arm went from one assertion to three.
 # THE FLOOR IS MODE-SELECTED. Without this every shard leg reds forever against the unsharded floor,
 # which is the defect the spec audit caught before this was written.
 #
@@ -5497,8 +5504,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=516
-# +6 for the SPEC_TOKENS_CLI dispatch arms (aDeferredBar closing review F3), region two.
+FLOOR_SHARD_2=517
+# +5 for the SPEC_TOKENS_CLI dispatch arms (aDeferredBar closing review F3) and +2 for the resolver
+# arm (round 2, R2), both region two; the F3 fold credited six for five (R16).
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

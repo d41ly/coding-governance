@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -52,7 +52,8 @@ Tier-2 by the manifest's tier rule: it changes the spec template's rules and a s
 - **S5** — Ten arms in `tools/check-spec-tokens.test.sh`, sharing one scratch repo per fixture
   family, and its assertion floor `FLOOR_ASSERTIONS` moved from 20 to 32, the count the suite prints
   when every arm runs; the closing round adds four arms and two parity assertions (rev-5) and moves
-  the floor to 38. Observed by AC1 through AC7, AC15, AC16 and AC17, each arm's fixture exercised
+  the floor to 38; round 2 adds two leg-line cutoff refusals, the `py` launcher hit and the parity
+  accounting assertion (rev-6) and moves it to 42. Observed by AC1 through AC7, AC15, AC16 and AC17, each arm's fixture exercised
   by the direct checker, and the floor by AC19; the suite's own verdict is the main loop's at
   `VERIFYING`, per the build README's rule 6.
 - **S6** — One paragraph in `tools/memory-tree/SPEC-TEMPLATE.template.md` under the §6 rules,
@@ -76,7 +77,13 @@ Tier-2 by the manifest's tier rule: it changes the spec template's rules and a s
   skip on stdout. The key is added to this repo's conf, to the kit's shipped example, to the
   protocol's section 8 key table (check 22 of the kit gate joins the three), and to the verb
   carrier's `--dispatch` entry; the driver's initialiser gains it; three driver-suite arms observe
-  the refusal, the announced skip and a declared path that is not there. Observed by AC20.
+  the refusal, the announced skip and a declared path that is not there. Observed by AC20. The
+  launcher the verb runs the checker with is the resolver the driver carries INLINE, byte-identical
+  to the canonical copy and gated by its parity arm (rev-6, closing round 2 R2 and R8): the rev-5
+  cut sourced `../lib/` when present and EXECUTED a bare `python3` otherwise, which on the adopter
+  layout is the one launcher the resolver exists to refuse, and the driver suite's own
+  no-python-dependency arm was red on it. That arm now asserts the resolved variable is the only
+  launcher spelling outside the block.
 
 ## 3. Non-goals (OUT)
 
@@ -138,15 +145,17 @@ DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 # a light-profile spec drops `## 5.` and the ordinal read grades whatever sits sixth.
 AC_HEAD = re.compile(r"^## [0-9]+[.] Acceptance criteria[ \t]*$", re.M)
 # A merge-bar or suite INVOCATION: the runner or a suite at command position — the token's start
-# or a chain separator, past optional VAR=value prefixes, `timeout N` and a bash/sh/python
-# launcher — or a GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
+# or a chain separator, past optional VAR=value prefixes, `timeout` with its options and duration,
+# and a bash/sh/python/py launcher with one short option (never `-n`, `-c` or `-m`; rev-6, R12) —
+# or a GATE_FULL= / GATE_SELFTESTS= assignment with a NON-EMPTY value anywhere in the
 # token. A suite is a `.test.sh` file OR a whole-suite `selftest.py` file; a `--selftest` FLAG on
 # some other file is the seconds-long direct check and is not a run. A `path:line` citation fails
 # the trailing lookahead and stays the cites join's; a grep over a suite FILE has grep at command
 # position and is not a run; the empty assignment is the OFF spelling, and so is the QUOTED empty
 # one, `GATE_FULL=""` — the quote is not a value.
 BAR = re.compile(
-    r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+\S+\s+)?(?:bash\s+|sh\s+|python3?\s+)?(?:\S*/)?"
+    r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
+    r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)-[A-Za-z]+\s+)?)?(?:\S*/)?"
     r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|selftest\.py)(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 ```
@@ -156,11 +165,18 @@ filename convention, and six of the manifest's `chunk = selftests` legs — govk
 gate ledger — are `python … selftest.py` whole-suite runs that walked past both. The `selftest.py`
 word shape and the python launcher close that; the `--selftest` flag form stays admitted, because
 it is the direct check unit 1's child prompt names. The population is no longer restated: a parity
-arm in the suite derives every `chunk = selftests` argv without a `--selftest` flag from
-`tools/gate-legs.json` and asserts `BAR` matches each, so a new convention reds rather than drifts;
-its one declared, announced exemption is the pytest-convention `test_recall_floor.py`, gov-only
-and seconds long, because a `test_*.py` shape would hit an adopter's single-file pytest run. Its
-sibling arm in `gate-guard.test.sh` does the same for the hook. And the quoted-empty
+arm in the suite derives EVERY `chunk = selftests` argv from `tools/gate-legs.json` and asserts
+`BAR` matches each, so a new convention reds rather than drifts. rev-6 (closing round 2 R3): the
+rev-5 arm dropped the `--selftest` flag form by rule and silently, eight legs short of the
+population it certified; now the ONE exemption rule is a ceiling — a flag-form leg whose manifest
+`ceiling` is at or under `DIRECT_CHECK_BOUND` (300 s, the manifest's own default ceiling) is the
+direct check the child prompt admits, printed with its ceiling, and a flag-form leg above it is
+declared by name with its ceiling and reason or reds: `corpus_ids.py` at 2690 s and
+`gen_build_index.py` at 350 s are the two declared, beside the pytest-convention
+`test_recall_floor.py`, gov-only and seconds long, because a `test_*.py` shape would hit an
+adopter's single-file pytest run. A third assertion holds graded plus printed exemptions equal to
+the manifest's count, so no unannounced skip is left to grow. Its sibling arm in
+`gate-guard.test.sh` does the same for the hook. And the quoted-empty
 `GATE_FULL=""` is the OFF spelling here as it is in the hook: rev-3's `\S` read the quote as a
 value, so the two predicates disagreed on that one token. Measured on this tree at the fold: the
 pre-cutoff carrier count on the report line moves 23 to 27, four live specs backticking a
@@ -236,7 +252,10 @@ day and the gate refused a value nobody re-set — reproduced in a scratch repo,
 a requote leaves at one, and the same repo dates the value 2026-08-31 after both. Before the
 history query, a value that is not an ISO date is REFUSED outright (rev-5, closing review F10):
 the relation and the arming test are string comparisons, and `2026-9-15` satisfied neither, so the
-join reported as set while grading nothing. A value that
+join reported as set while grading nothing. One helper, `read_cutoff_key`, does that for EVERY
+cutoff key the checker reads — `SPEC_LEGLINE_CUTOFF` was armed by the same comparison and left
+unvalidated — and it reads the DATE through `datetime.date.fromisoformat` rather than the shape
+alone, so `2026-13-45` refuses too (rev-6, closing round 2 R7 and R11). A value that
 is not STRICTLY PAST that date is refused before any spec is graded, exit 1, on a line naming the
 key, the value and the date it saw:
 
@@ -333,6 +352,9 @@ rev-5 F9, no hit                     GATE_FULL="" cat tools/gate-legs.json
 rev-5 F2, hit                        python tools/govkit/selftest.py   (the DATED clean state tracks the file)
 rev-5 F10, refused, uncommitted      SPEC_DIRECT_CUTOFF="2026-9-15"
 rev-5 F4, WAIVER family, graded      SPEC_DIRECT_CUTOFF=2026-09-01 requoted bare in a commit dated 2026-09-20, plus the AC6 row
+rev-6 R7, refused, uncommitted       SPEC_LEGLINE_CUTOFF="2026-9-8"
+rev-6 R11, refused, uncommitted      SPEC_LEGLINE_CUTOFF="2026-13-45"
+rev-6 R12, hit                       py tools/govkit/selftest.py
 ```
 
 rev-5's four arms sit in the two families above: F9, F2 and F10 in the DATED family, one edit each
@@ -409,7 +431,7 @@ answer, states both clauses, carries the reading, and says what blank does.
 | file | change |
 |---|---|
 | `tools/check-spec-tokens.py` | `DIRECT_KEY`, `AC_HEAD`, `BAR`, `extract_acceptance`, the bullet loop on it, the bar test first in both loops, the date gate, the relation refusal and its one history query, the counts, the report line with its `relation unchecked` field, the `NEAR` printing, the docstring with its five pinned phrases — about 65 lines |
-| `tools/check-spec-tokens.test.sh` | ten arms plus one inline `--list` assertion over two shared scratch repos, AC17's arm the only one that commits; `FLOOR_ASSERTIONS` from 20 to 32, the count the suite prints when every arm runs |
+| `tools/check-spec-tokens.test.sh` | ten arms plus one inline `--list` assertion over two shared scratch repos, AC17's arm the only one that commits; `FLOOR_ASSERTIONS` from 20 to 32, the count the suite prints when every arm runs; rev-6: the parity arm over every `chunk = selftests` leg with the ceiling rule and its accounting assertion, two leg-line cutoff refusals, the `py` hit, 38 to 42 |
 | `.memory-tree.conf` | the key at the relation's answer at the build commit — 2026-09-15 as measured 2026-09-14 — with a register comment: what it gates, BOTH clauses of the relation and the three readings that produced the date, the zero-population cost, what blank does |
 | `tools/memory-tree/.memory-tree.conf.example` | the key blank, with a comment in the idiom of the `SPEC_LEGLINE_CUTOFF` row; by hand, because the example-parity arm derives its key set from the engine alone |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | one paragraph beside the two §6 cutoff paragraphs; the marker line |
@@ -421,10 +443,11 @@ answer, states both clauses, carries the reading, and says what blank does.
 | `memory/map/features/spec-tokens.md` | title and constraints prose: four joins; a paragraph on the bar join and its cutoff |
 | `memory/map/generated/` | re-rendered by `python tools/codebase-map/gen_map.py --write` only if `--check` reports drift after the checker edit |
 | `memory/project/spec-token-waivers.txt` | untouched; see S10 |
-| `tools/unattended/unattended.sh` | rev-5, S11: `--dispatch` runs the declared checker after the MISSING/THIN gate and refuses on a non-zero exit, announces a blank key; the initialiser gains `SPEC_TOKENS_CLI` |
+| `tools/unattended/unattended.sh` | rev-5, S11: `--dispatch` runs the declared checker after the MISSING/THIN gate and refuses on a non-zero exit, announces a blank key; the initialiser gains `SPEC_TOKENS_CLI`. rev-6: the `resolve_python` block inline, the checker run as `"$_stpy"` only, the refusal's tail says when the checker did not grade at all |
+| `tools/unattended/kit.toml` · `memory/project/unarmed-branches.txt` · `tools/install-prefix-carried.txt` | rev-6: `SPEC_TOKENS_CLI` joins `optional_keys` (R17); the two order-gate pin rows re-keyed 18 → 21 and 19 → 22 and the resolver refusal pinned with its reason (R1); the driver's carried row raised 7 → 8 by hand for the block's marker line |
 | `.unattended.conf` · `tools/unattended/.unattended.conf.example` | rev-5, S11: the key, set here and blank in the example, each with its register comment |
 | `tools/unattended/PROTOCOL.template.md` · `tools/unattended/VERBS.template.md` and their renders under `memory/guides/` | rev-5, S11: the section 8 key row (check 22 joins it) and the `--dispatch` entry's sentence; re-copied by the adopter |
-| `tools/unattended/unattended.test.sh` | rev-5, S11: six assertions in three dispatch arms, region two; `FLOOR_ASSERTIONS` 706 to 712 and `FLOOR_SHARD_2` 510 to 516 by that static count |
+| `tools/unattended/unattended.test.sh` | rev-5, S11: five assertions in three dispatch arms, region two, credited as six by the rev-5 fold (R16); rev-6: the two refusal patterns carry the full signatures `check-arms` keys on, the source-level no-python arm becomes three assertions on the inline block; `FLOOR_ASSERTIONS` 706 to 713 and `FLOOR_SHARD_2` 510 to 517 by the derived count |
 
 Thirteen carriers for one paragraph and one regex is the kit's own convention, not this unit's
 choice: the version lives in one constant and nine marker lines, the kit-versions leg compares them
@@ -647,11 +670,12 @@ a watched-file touch owes stamps in several carriers is what this table is for.
   build commit, each prints 1.
   Red when: any prints 0, a docstring clause dropped or reworded away from its pin, or 2, the
   phrase duplicated outside the docstring; all five print 0 on this tree today.
-- **AC19** — When `grep -c '^FLOOR_ASSERTIONS=38' tools/check-spec-tokens.test.sh` runs at the
-  closing fold's commit, it prints 1, and the suite's own `PASS (38 assertions)` line at
+- **AC19** — When `grep -c '^FLOOR_ASSERTIONS=42' tools/check-spec-tokens.test.sh` runs at the
+  closing fold's commit, it prints 1, and the suite's own `PASS (42 assertions)` line at
   `VERIFYING` names the same count — the twenty existing arms, the ten of S5 with AC16's two runs,
-  AC3's inline `--list` assertion, and rev-5's four arms and two parity assertions sum to it (the
-  build commit observed the same grep at 32, before the closing round's six).
+  AC3's inline `--list` assertion, rev-5's four arms and two parity assertions, and rev-6's two
+  leg-line refusals, `py` hit and parity accounting sum to it (the build commit observed the same
+  grep at 32, the round-1 fold at 38).
   Red when: 0 — the floor left behind the executed count, so arms could strand past an early exit
   with the suite green, the green-by-absence class round-1 M8 named.
   figure: PINNED — the floor is a shrink-only literal the suite reads, so the count is static and
@@ -687,7 +711,11 @@ New arm: tools/check-spec-tokens.test.sh · ten arms over two shared scratch rep
 
 New arm: tools/check-spec-tokens.test.sh · rev-5, the closing round: the quoted-empty flag (F9), a whole-suite `selftest.py` bullet (F2), a non-ISO cutoff refused (F10), a later requote that must not re-date the setting commit (F4), and two parity assertions deriving every `chunk = selftests` argv from the manifest and asserting `BAR` matches each, one declared exemption announced · `FLOOR_ASSERTIONS` from 32 to 38, observed by AC19
 
-New arm: tools/unattended/unattended.test.sh · rev-5, S11: three `--dispatch` arms, six assertions — the declared checker refuses over a live spec naming the flagged bar, a blank key announces the skip and declares, a declared path that is not there refuses; the break is the driver at `8b5b3f0c`, which declared all three · `FLOOR_ASSERTIONS` 706 to 712, `FLOOR_SHARD_2` 510 to 516
+New arm: tools/check-spec-tokens.test.sh · rev-6, closing round 2: the parity arm keeps every `--selftest` leg in its population and exempts by manifest ceiling against a declared bound, printing each exemption with its ceiling, with a third assertion that graded plus exempt equals the manifest's count (R3); `SPEC_LEGLINE_CUTOFF` values `2026-9-8` and `2026-13-45` refused (R7, R11); a `selftest.py` behind the `py` launcher hit (R12) · `FLOOR_ASSERTIONS` from 38 to 42, observed by AC19
+
+New arm: tools/unattended/unattended.test.sh · rev-5, S11: three `--dispatch` arms, five assertions — the declared checker refuses over a live spec naming the flagged bar, a blank key announces the skip and declares, a declared path that is not there refuses; the break is the driver at `8b5b3f0c`, which declared all three · `FLOOR_ASSERTIONS` 706 to 711, `FLOOR_SHARD_2` 510 to 515 by the derived count (the rev-5 fold wrote 712 and 516 for six; R16)
+
+New arm: tools/unattended/unattended.test.sh · rev-6, closing round 2: the two refusal patterns carry the full signatures `check-arms` keys on, so branches 17 and 19 of check 49 read as armed (R1); the source-level arm asserts the inline `resolve_python` block is present, no launcher is spelled outside it or a comment, and the checker runs through `"$_stpy"` (R2); the break is the driver at `4d177329`, where the suite's own grep hit lines 4718 and 4720 · `FLOOR_ASSERTIONS` 711 to 713, `FLOOR_SHARD_2` 515 to 517
 
 ## 8. Open questions
 
@@ -780,6 +808,19 @@ New arm: tools/unattended/unattended.test.sh · rev-5, S11: three `--dispatch` a
   over the live tree before admitting a pass (S11, AC20); four arms, two manifest-parity assertions
   and three driver-suite arms, every one observed RED-first on the pre-fold checker or driver; the
   floors move by the static counts. Status stays CLOSED.
+- rev-6 · 2026-09-14 · S5 · S11 · §4 · §7 · AC19 · folded closing diff review round 2,
+  `reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round2.md`, findings R1 R2 R3 R7 R8
+  R11 R12 R16 R17: the driver carries `resolve_python` inline and runs the checker through it only,
+  with the branch-17 and branch-19 arm patterns carrying their full signatures and branch 18 pinned;
+  one `read_cutoff_key` helper refuses a non-date value on every cutoff key; `BAR` takes the `py`
+  launcher, one short launcher option and `timeout`'s options; the parity arm exempts by ceiling
+  against a declared bound and accounts for the whole manifest; the descriptor declares
+  `SPEC_TOKENS_CLI` and the three registers stop naming a kit that ships no checker; the floors and
+  the two lines that said six now say five. Fork E re-probed on both readers after R12: `py
+  <selftest.py>`, `python -u <selftest.py>`, `timeout -k 5 120 bash <suite>` and
+  `timeout --kill-after 5 120 bash <suite>` are hits in both, `bash -n <suite>`, `python -c` and
+  `python -m` are hits in neither, so the two readers read the one token alike again. Every arm
+  observed RED-first on the checker or driver at `4d177329`. Status stays CLOSED.
 
 ## 10. Reuse audit
 

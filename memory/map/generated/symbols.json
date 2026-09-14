@@ -2878,6 +2878,11 @@
       "file": "tools/lexicon/subtokens.py"
     },
     {
+      "id": "read_cutoff_key",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_debt_gloss",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"

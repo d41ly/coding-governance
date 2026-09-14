@@ -13,10 +13,12 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=38
+FLOOR_ASSERTIONS=42
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
+# RAISED 38 -> 42 at closing round 2, by the count of `arm`/`pass=` lines its diff added: two
+# leg-line cutoff refusals (R7, R11), the `py` launcher hit (R12) and the parity accounting (R3).
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 PY=${PY:-python}
 pass=0; fail=0
@@ -331,6 +333,26 @@ git -C "$d" add -A >/dev/null
 arm "a non-ISO cutoff is REFUSED rather than reported as set while grading nothing" 1 "$d" "REFUSING — SPEC_DIRECT_CUTOFF 2026-9-15 is not an ISO date"
 git -C "$d" reset -q --hard "$clean"
 
+# closing round 2, R7 and R11 — the SAME refusal for EVERY cutoff key, and for the DATE rather than
+# the shape. F10 gated SPEC_DIRECT_CUTOFF alone: the checker at 4d177329 printed
+# `SPEC_LEGLINE_CUTOFF 2026-9-8` as set at exit 0 over a leg join it never armed, and `2026-13-45`
+# passed the shape test with no day in it. Observed RED-first on that checker, both values.
+printf 'SPEC_LEGLINE_CUTOFF="2026-9-8"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a non-ISO SPEC_LEGLINE_CUTOFF is REFUSED like the direct key, not reported as set" 1 "$d" "REFUSING — SPEC_LEGLINE_CUTOFF 2026-9-8 is not an ISO date"
+printf 'SPEC_LEGLINE_CUTOFF="2026-13-45"\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a cutoff with the ISO shape and no such day is REFUSED" 1 "$d" "REFUSING — SPEC_LEGLINE_CUTOFF 2026-13-45 is not an ISO date"
+git -C "$d" reset -q --hard "$clean"
+
+# closing round 2, R12 — `py`, the Windows launcher and the resolver's third candidate, is a launcher
+# to this reader as it is to the hook. The checker at 4d177329 graded this bullet clean.
+printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
+sed -i 's|`tools/gate-legs.json` exists|`py tools/govkit/selftest.py` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
+git -C "$d" add -A >/dev/null
+arm "a whole-suite selftest.py behind the py launcher REDS as [bar]" 1 "$d" '[bar] `py tools/govkit/selftest.py`'   # gov:literal-python — the expected hit line, never run
+git -C "$d" reset -q --hard "$clean"
+
 # The WAIVER family: its committed clean state IS the AC1 fixture, and the commit is dated the day
 # before its cutoff so the relation holds and the arms grade rather than refuse.
 d=$base/barwaiver; scratch "$d"
@@ -366,34 +388,61 @@ arm "a later commit that requotes the cutoff line does not re-date the setting c
 git -C "$d" reset -q --hard "$clean"
 
 # ---- closing review F2, the PARITY arm: the suite population is DERIVED from the gate manifest and
-#      never restated here. Every `chunk = selftests` leg whose argv carries no `--selftest` flag is
-#      a whole-suite run, and `BAR` must match its argv as a command string; a suite convention that
-#      drifts out of the predicate reds here rather than walking past it, which is how six python
-#      legs did. ONE assertion over the population, so the floor does not move with the manifest,
-#      plus one that the population is non-empty. The exemption is DECLARED and ANNOUNCED with its
-#      reason, and a stale name reds: test_recall_floor.py is the pytest `test_*.py` convention,
-#      gov-only and 12 s to 34 s in the ledger; a `test_*.py` shape would hit an adopter's
-#      single-file pytest run, which is exactly the direct check a spec may name.
+#      never restated here — EVERY `chunk = selftests` leg, the `--selftest` flag form included
+#      (closing round 2, R3: the F2 arm dropped the flag form by rule and silently, and the
+#      population it certified was eight legs short, one of them a 599 s suite). `BAR` must match
+#      each whole-suite argv as a command string; a suite convention that drifts out of the
+#      predicate reds here rather than walking past it, which is how six python legs did. ONE
+#      assertion over the population, so the floor does not move with the manifest, one that the
+#      population is non-empty, and one that the graded count plus the PRINTED exemptions equals the
+#      manifest's own count — so no unannounced skip is left to grow.
+#      THE ONE EXEMPTION RULE is a ceiling, not a flag: a `--selftest` leg whose manifest `ceiling`
+#      is at or under DIRECT_CHECK_BOUND is the seconds-long direct check the child prompt admits,
+#      exempt by that fact and printed with its ceiling; a `--selftest` leg ABOVE the bound is a
+#      suite by cost that this reader cannot see (BAR reads a token, never a ceiling), so each one
+#      is DECLARED below by script name with its ceiling and reason, and an undeclared one reds.
+#      The bound is the manifest's own default ceiling — sixteen of its selftests legs sit exactly
+#      at 300 — because a bound under it exempts nothing and names every flag form. Declared:
+#        test_recall_floor.py — the pytest `test_*.py` convention, gov-only and 12 s to 34 s in the
+#          ledger; a `test_*.py` shape would hit an adopter's single-file pytest run, which is
+#          exactly the direct check a spec may name.
+#        corpus_ids.py --selftest (ceiling 2690 s, 599 s in the ledger) and gen_build_index.py
+#          --selftest (350 s) — flag-form suites above the bound; the backlog row this round owes
+#          moves their entrypoints to a `selftest.py` file both readers already deny.
 LEGS="$(dirname "$LINT")/gate-legs.json"
+DIRECT_CHECK_BOUND=300
+PARITY_EXEMPT="test_recall_floor.py corpus_ids.py gen_build_index.py"
 # `-c`, not `python -` with a heredoc: the Windows python launcher reads the first argument after
 # `-` as a script and runs its shebang, which is how a probe of this arm ran bash instead.
 parity=$("$PY" -c 'import importlib.util, json, sys
 spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-exempt = set(sys.argv[3].split())
-pop = [" ".join(l["argv"]) for l in json.load(open(sys.argv[2], encoding="utf-8"))
-       if l.get("chunk") == "selftests" and "--selftest" not in l["argv"]]
-seen = {c.rsplit("/", 1)[-1] for c in pop} & exempt
-skipped = [c for c in pop if c.rsplit("/", 1)[-1] in exempt]
-bad = [c for c in pop if c not in skipped and not m.BAR.search(c)]
+exempt = set(sys.argv[3].split()); bound = int(sys.argv[4])
+legs = [l for l in json.load(open(sys.argv[2], encoding="utf-8")) if l.get("chunk") == "selftests"]
+seen, skipped, bad, graded = set(), [], [], 0
+for l in legs:
+    cmd = " ".join(l["argv"]); ceil = l.get("ceiling", 0)
+    script = next((a.rsplit("/", 1)[-1] for a in l["argv"] if "/" in a), "")
+    if script in exempt:
+        seen.add(script); skipped.append("declared exempt (ceiling %ss): %s" % (ceil, cmd)); continue
+    if "--selftest" in l["argv"]:
+        if ceil <= bound:
+            skipped.append("a --selftest direct check at or under the %ss bound (ceiling %ss): %s" % (bound, ceil, cmd)); continue
+        bad.append("(a --selftest leg above the %ss bound is a suite BAR cannot see and is not declared exempt: %s, ceiling %ss)" % (bound, cmd, ceil)); continue
+    graded += 1
+    if not m.BAR.search(cmd): bad.append(cmd)
 bad += ["(stale exemption: " + x + ")" for x in exempt - seen]
-print(len(pop)); print(len(skipped)); print("\n".join(bad))' "$LINT" "$LEGS" "test_recall_floor.py")
-popn=$(printf '%s\n' "$parity" | sed -n 1p | tr -d '\r'); skipn=$(printf '%s\n' "$parity" | sed -n 2p | tr -d '\r')
-unmatched=$(printf '%s\n' "$parity" | sed -n '3,$p' | tr -d '\r' | grep -c .)
-if [ "${popn:-0}" -gt 0 ] 2>/dev/null; then echo "arm ok    parity: the manifest holds $popn whole-suite selftests leg(s), $skipn declared exempt"; pass=$((pass+1))
+print(len(legs)); print(graded); print(len(skipped)); print("\n".join(skipped)); print("--"); print("\n".join(bad))' "$LINT" "$LEGS" "$PARITY_EXEMPT" "$DIRECT_CHECK_BOUND")
+parity=$(printf '%s\n' "$parity" | tr -d '\r')
+legn=$(printf '%s\n' "$parity" | sed -n 1p); popn=$(printf '%s\n' "$parity" | sed -n 2p); skipn=$(printf '%s\n' "$parity" | sed -n 3p)
+printf '%s\n' "$parity" | sed -n '4,/^--$/p' | sed '$d' | sed 's/^/          skip: /'
+unmatched=$(printf '%s\n' "$parity" | sed '1,/^--$/d' | grep -c .)
+if [ "${popn:-0}" -gt 0 ] 2>/dev/null; then echo "arm ok    parity: the manifest holds $popn whole-suite selftests leg(s), $skipn exempt and printed above"; pass=$((pass+1))
 else echo "arm FAIL  parity: the manifest holds no whole-suite selftests leg, so parity would be certified over nothing"; fail=$((fail+1)); fi
 if [ "$unmatched" = 0 ]; then echo "arm ok    parity: BAR matches every whole-suite selftests argv of the manifest"; pass=$((pass+1))
-else echo "arm FAIL  parity: a manifest suite invocation BAR does not match:"; printf '%s\n' "$parity" | sed -n '3,$p' | sed 's/^/          /'; fail=$((fail+1)); fi
+else echo "arm FAIL  parity: a manifest suite invocation BAR does not match:"; printf '%s\n' "$parity" | sed '1,/^--$/d' | sed 's/^/          /'; fail=$((fail+1)); fi
+if [ "$((${popn:-0} + ${skipn:-0}))" = "${legn:-x}" ]; then echo "arm ok    parity: graded $popn + exempt $skipn = the manifest's $legn selftests legs, no unannounced skip"; pass=$((pass+1))
+else echo "arm FAIL  parity: graded $popn + exempt $skipn != the manifest's $legn selftests legs — a leg was skipped without being printed"; fail=$((fail+1)); fi
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then
