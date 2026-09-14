@@ -108,6 +108,129 @@ Gates run in Phase A, seconds each, none a suite: `run-selftests.sh --check` —
 the brief's predicted red), then clean after the hand raise; `check-line-length.sh` OK;
 `check-arms.py --check` rc 0; `run-gates.gov.test.sh` `PASS (16 assertions)`; `bash -n` on the suite.
 
+## Phase B — the one verification pass
+
+**Harness.** Four frozen `git clone --local` trees under `C:/Users/daily-agent/AppData/Local/Temp/u3b/`:
+`base` at `0422ea2e`, `head`, `brk` and `pool` at the Phase A commit `43a0a2d6`. `one.sh` runs the
+suite once, direct, no trace, stdout+stderr to a file with `date +%s` stamps either side; the
+environment is the caller's. **The BASE clone carries ONE staged line**: HEAD's
+`echo "  ($n assertions executed in $MODE against a floor of $FLOOR)"` inserted before the floor
+grade — the suite is RED at BASE and prints its floor-graded count only on `PASS` or a floor breach,
+so without it AC6's pre-split count is readable nowhere; an `echo` moves no verdict, and the first
+pass's alternative, an exported `BASH_XTRACEFD`, leaked into every child `sh` as stderr the arms
+capture, which is why its traced runs cannot supply a FAIL set. **Run 2 is direct, not through
+`run-selftests.sh --serial`**: that loop captures each suite into `out=$(...)` and prints four FAIL
+lines of it, so the counts, FAIL sets and captures the brief expected from it do not exist in its
+output; the direct loop runs the same argv with the same clock, one after another, and keeps every
+byte. The runner's own `--serial` pass over the eight rows is taken as well, for the budget readings
+in the runner's spelling. **Box state before every timed run** is a `ps` count printed first.
+
+**Declared before run 2 — the balance tolerance:** `max(shard) <= 1.35 × (sum / 8)` on the serial
+walls. The pooled wall the goal grades is the longest shard, so anything looser than about a third
+over the ideal is a re-cut that buys back more than its one permitted repeat costs; anything tighter
+asks a cut confined to `reset_tree`-led edges for a balance it may not have.
+
+**Host state at Phase B start.** `ps -ef` at 22:52 showed another session's
+`run-gates.turnstile.test.sh` (started 22:44, `claude-da35-cwd`, not this session's) with its bars;
+not mine to kill, so Phase B waited for it. That session (`unattended-asurfaced-lexicon-7cf573`)
+went on to `run-gates.test.sh`, `run-gates.evidence.test.sh`, a full `GATE_SELFTESTS=1 GATE_JOBS=4`
+bar at 23:22, another at 00:29, and a `.githooks/pre-push` bar on the primary tree at 02:07; a third
+tree (`backlog-items-build-c4c36b`) ran `check-memory-hygiene.test.sh` at 23:41. The first clear
+window was 00:03, and run 1a started in it.
+
+**What this node costs per checker invocation, measured in this pass.** With the box at 5 % CPU
+and no other session's process running (04:03), one `run` — the suite's `bash check-unattended.sh`
+over the fixture — took 47 to 60 s wall (`ps` stamps on the child, 04:03:18 → 04:04:05 and on).
+The suite makes 293 of them, so an unsharded run on node `a` is ~4 to 5 hours whatever the load;
+the 9067 s budget reading was not a contended figure, it was this node. The `~2 s` per invocation
+`TOOL-aTracedSpawn-2` bounds is not what this box does, and the HEAD unsharded run's own
+`topo-at` stamps agree: `t=2933 n=81` at boundary 2, `t=6747 n=139` at 3, `t=8397 n=177` at 4 —
+36 to 43 s per assertion, with two to four suites of mine and at most one other session's bar
+present. Concurrency between suites moved that figure little, which is the throughput-bound
+regime `TOOL-aPacedTurnstile-8` measured and the one AC4 grades.
+
+**Run 1a — the unsharded run at BASE** (`b1-unsharded`): started 00:03:45 with `ps before: 0`,
+ended 05:50:43, wall 20817 s, rc 1, **554 assertions executed in unsharded against a floor of
+392** (the staged echo), 21 `FAIL` lines, 0 fork-noise lines, the C21 pair and `rc=` after the
+count line, so the run reached its end. The 21 lines are the suite's pre-existing red: the
+dispatched-verb surface arm, the DoD-floor pair (`11 against 12`), the killed-remote-observation
+arm, and the seventeen `fixture no-op` / `missing` lines of the protocol-count and declared-parser
+blocks (`TOOL-aQuenchedHarness-9`, `TOOL-aHoistedPass-38`, not this unit's). This set is AC12's
+baseline and 554 is AC6's pre-split count.
+**Run 2u — the unsharded run at HEAD** (`b2-unsharded`, `CHECK_UNATTENDED_TOPO=1`): started
+01:14 beside run 1a, untimed, ended 07:03:54, wall 20977 s, rc 1, **555 assertions executed in
+unsharded against a floor of 392**, 21 `FAIL` lines, 0 fork-noise lines, seven `topo boundary=`
+lines. The 21 lines are BYTE-IDENTICAL to run 1a's (sorted set comparison, `analyze.py`): the
+delete, the cut, the hoist, the replay and the counter moved no unsharded verdict. 555 against
+554 is the ONE assertion S6 adds — the `same` over `MUT`/`MUT_EXPECTED` — and nothing else, so
+AC6's "equals the pre-split count" holds as 554 + 1 and the rev-8 line says so. The seven
+captures, verbatim: boundaries 2, 3, 5, 6, 7, 8 read `origin=[refs/heads/main ]
+local=[refs/heads/main refs/heads/unit ] unit<main=no unit<origin-main=no`; boundary 4 reads the
+same name sets with `unit<main=yes unit<origin-main=yes` — exactly the prediction, and the one
+boundary that owes the replay. `topo-at` stamps: `t=2933 n=81` · `t=6747 n=139` · `t=8397 n=177`
+· `t=11804 n=254` · `t=13734 n=318` · `t=15663 n=393` · `t=18598 n=506`. **AC4 arm one, attempt 1** (`attempt1/b1-s1of2`, `b1-s2of2`): the
+pair started 02:03:36 with no other session's process on the box and this pass's two unsharded runs
+named as the only load; the primary tree's `pre-push` bar arrived at 02:07:27, four minutes in. At
+03:05, with region 1 of shard 1 not yet through, both were stopped (rc 143, wall 3665 s, no
+trailer) — **NO READING**, and the pair is re-taken in a clean window. **Run 2 — the eight shards,
+direct, serial, TOPO=1** (`b2-s1..8`): started 04:05:46 beside this pass's two unsharded runs and no
+other session's process, ended 08:27:03. Every shard carries its trailer. Per shard — wall · count
+· FAIL lines · condition:
+
+| shard | wall s | count | FAIL | beside |
+|---|---|---|---|---|
+| 1 | 3176 | 81 | 3 | both unsharded runs |
+| 2 | 2182 | 58 | 1 | both unsharded runs |
+| 3 | 2320 | 38 | 0 | both unsharded runs |
+| 4 | 3028 | 77 | 0 | both unsharded runs (1a ended 05:50 inside it) |
+| 5 | 1127 | 64 | 6 | the HEAD unsharded run, then the BASE pair from 07:04 |
+| 6 | 1059 | 75 | 0 | the BASE pair |
+| 7 | 1877 | 113 | 11 | the BASE pair, and `session-orientation-tooling-2faa`'s `run-gates.test.sh` from 07:51 |
+| 8 | 893 | 49 | 0 | the same |
+
+- **AC1** — `81+58+38+77+64+75+113+49 = 555`, and run 2u's floor-graded count
+  is 555. EQUAL, `PROLOGUE_ARMS` 0. The partition is also visible in run 2u's own `topo-at`
+  stamps: `n=81, 139, 177, 254, 318, 393, 506` are exactly the running sums.
+- **AC6** — the union of the eight `FAIL` sets is 21 lines and is IDENTICAL, as a sorted set, to
+  run 2u's 21; per region the split is 3 · 1 · 0 · 0 · 6 · 0 · 11 · 0 in both. Count: 555 against
+  the pre-split 554, the S6 assertion (above).
+- **AC8, the positive half** — every shard's opening capture is byte-identical to run 2u's line at
+  that boundary: 2, 3, 5, 6, 7, 8 fresh, 4 `unit<main=yes unit<origin-main=yes` after
+  `replay_landed_main`. Seven MATCH, none differ. (Shard 1 has no boundary.)
+- **Balance, as declared** — sum 15662 s, mean 1958 s, max 3176 s (shard 1), `max/mean = 1.62`,
+  OUTSIDE 1.35. The walls are CONFOUNDED by the load shift inside the pass: shards 1–4 ran at 39,
+  38, 61 and 39 s per assertion beside two unsharded runs, shards 5–8 at 17.6, 14.1, 16.6 and
+  18.2 s beside two shard runs. Normalising 1–4 to the lighter rate (`~17 s/assertion`: 1380 ·
+  990 · ~650 · 1310) the max moves to shard 7 (1877 s against a mean of ~1160) and the ratio is
+  still ~1.6 — region 7 carries 113 of 555 assertions, one fifth of the suite. The verdict is
+  OUTSIDE on both readings, so the re-cut and the one permitted repeat are owed. The per-block
+  profile that decides the new cut is `prof-s7` below; the walls above are recorded as the FIRST
+  candidate beside the chosen one.
+
+**AC4 arm one, attempt 2 — the two-shard reading at BASE** (`b1-s1of2`, `b1-s2of2`): two
+concurrent direct invocations on the BASE clone, started 07:04:39 with `ps before: 7` — that count
+is this pass's own serial shard (5/8 at the time) and its children, no other session's process;
+`session-orientation-tooling-2faa`'s `run-gates.test.sh` ran beside it 07:51 to ~08:20, and the
+`prof-s7` profile below from 08:30. **shard 1/2: 4193 s, rc 1, trailer present, 4 FAIL lines** ·
+**shard 2/2: 6656 s, rc 1, trailer present, 17 FAIL lines** — both READINGS by the trailer rule,
+4 + 17 = 21 the pre-existing set, 0 fork-noise lines. The two-shard longest is **6656 s**.
+
+**The per-block profile of region 7** (`prof-s7`, a scratch clone at the Phase A commit with an
+`echo "nmark L<line> n=$n t=$SECONDS"` before each of region 7's 47 `reset_tree`-led lines, run as
+`--shard 7/8`, 08:30 to 08:55, wall 1546 s, 113 assertions, 47 marks): the first half (L2560 to
+L2705, 63 assertions) costs 498 s and the second half (the check-28 round-2 `mutate` arms) 1048 s,
+at 36 to 107 s per two-assertion block. At the `# ---- 28c.` header (first `reset_tree` L2770 of
+that copy) the counters read `n=93 t=1119`, so the tail past it is 20 assertions and 427 s.
+
+**The re-cut, one boundary.** Region 8 now begins at that header: region 7 keeps 93 assertions,
+region 8 takes 69. Every other boundary is where it was, so six of the seven captures already
+observed stand; boundary 8's is re-observed by the repeat's unsharded run. The prediction from the
+normalised walls (shards 1–4 divided by the 2.3 load ratio measured across the pass: 1380 · 950 ·
+1010 · 1320, then 1127 · 1059 · ~1119 · ~1320): max ≈ 1380 against a mean ≈ 1160, `~1.19`,
+inside 1.35. Region 7 carries no `push`, `branch -f`, `checkout main` or `anchor_*` line, so the
+topology at the new edge is boundary 7's; the variable scan re-run on the re-cut file reports 0
+crossings on both readings, and `check-arms.py --check` is green.
+
 ## What this ledger does not evidence
 
-Pending Phase B.
+Pending Phase B's repeat.

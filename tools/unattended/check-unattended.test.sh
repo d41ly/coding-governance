@@ -2763,6 +2763,12 @@ hit "$(run)" "a declaration key the shipped template ships is read by an ad-hoc 
 reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md '/^```toml/,/^```$/ s|^\([a-z_][a-z_]*[[:space:]]*=\)|  \1|'
 hit "$(run)" "the shipped template yielded no declaration key to bind to a reader, so every key in it could be read by an ad-hoc pipeline and this rule would stay green over the empty set"
 
+fi   # ---- end REGION 7 -----------------------------------------------------------------------------------
+
+# ---- REGION 8 -----------------------------------------------------------------------------------
+if in_shard 8; then
+topo_capture 8
+
 # ---- 28c. The WRAPPER's own pin first, which round 5's cut could not see at all.
 # THE CONSTANT, not the wrapper line. The merged library spells the pin as `-c "$GIT_PIN_REPLACE"`,
 # so a break aimed at the old literal no-ops - and it is the constant that check 28c now follows, so
@@ -2813,12 +2819,6 @@ hit "$(run)" "the declared-list parser is missing from one of the two scripts th
 
 # ...and the ANSWER, over the line the shipped template actually carries. Agreement alone is
 # satisfied by two identical wrong copies, which is how the defect that produced this check shipped.
-
-fi   # ---- end REGION 7 -----------------------------------------------------------------------------------
-
-# ---- REGION 8 -----------------------------------------------------------------------------------
-if in_shard 8; then
-topo_capture 8
 reset_tree; mutate $KIT_REL/PLAYBOOK-TEMPLATE.template.md 's/^piece_checks = \[\]/piece_checks = [oops]/'
 hit "$(run)" "the shipped template's own declaration line does not parse to the declared null, so an adopter who copies the template verbatim inherits phantom check names and every piece grades unchecked - key and parse follow:"
 
