@@ -10,6 +10,7 @@
 | [2026-09-14-build-TOOL-aDeferredBar-2-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aDeferredBar-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aDeferredBar-2-1-spec-brief.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-2-1-spec-brief.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aDeferredBar-2-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aDeferredBar-2-2-build-brief.md) | journal | — |
+| [2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round1.md) | diff-review | TOOL-aDeferredBar-1 TOOL-aDeferredBar-3 |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round1.md) | spec-audit | TOOL-aDeferredBar-1 TOOL-aDeferredBar-3 |
 | [2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md](../reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md) | spec-audit | TOOL-aDeferredBar-1 TOOL-aDeferredBar-3 |
 
