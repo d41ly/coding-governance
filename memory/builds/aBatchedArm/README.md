@@ -95,7 +95,7 @@ ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 
 | [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 5 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 19 bound to this build, across 4 record folder(s).
+Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
