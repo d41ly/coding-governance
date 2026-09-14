@@ -629,6 +629,10 @@ EOF
   if [ -f "$EVIDENCE" ]; then
     ev_tags=$(read_registry_tags)
     ev_rows=0; ev_faults=""; ev_nt="|"; ev_kits=""
+    # READ ONCE INTO A VARIABLE and feed the loop from that: a heredoc holding a command
+    # substitution is the shape the shell-hygiene leg gates (a loop that can wait for an EOF that
+    # never arrives), and the population loops feed from $POP the same way.
+    EV_TEXT=$(read_evidence)
     while IFS=$'\t' read -r kind a b c _rest; do
       [ -n "${kind:-}" ] || continue
       case "$kind" in
@@ -649,7 +653,7 @@ EOF
           fi ;;
       esac
     done <<EOF
-$(read_evidence)
+$EV_TEXT
 EOF
     if [ -n "$ev_faults" ]; then
       echo "run-selftests: the pooled evidence at $EVIDENCE is malformed — every row is nine tab fields (row, condition, node, seconds, rc, fails, executed, readings, date), keyed once, on a registry tag, naming a declared row:" >&2
@@ -803,6 +807,7 @@ if [ "$MODE" = sweep ]; then
   # at run time so a hand edit cannot bound a row with a number nobody could parse.
   declare -A EV_SECS=() EV_RC=() EV_FAILS=() EV_EXEC=() EV_READINGS=() EV_DATE=() EV_NOTRAILER=()
   ev_bad=""
+  EV_TEXT=$(read_evidence)   # read once, fed as a variable: the shell-hygiene leg's rule
   while IFS=$'\t' read -r kind a b c d e f g h i; do
     [ -n "${kind:-}" ] || continue
     case "$kind" in
@@ -813,7 +818,7 @@ if [ "$MODE" = sweep ]; then
            EV_READINGS["$k"]=$h; EV_DATE["$k"]=$i ;;
     esac
   done <<EOF
-$(read_evidence)
+$EV_TEXT
 EOF
   if [ -n "$ev_bad" ]; then
     echo "run-selftests: the pooled evidence at $EVIDENCE will not parse, and a bound read past a" >&2
