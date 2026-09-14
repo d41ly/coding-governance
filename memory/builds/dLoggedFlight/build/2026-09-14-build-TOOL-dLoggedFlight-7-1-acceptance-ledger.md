@@ -59,6 +59,24 @@ existed under `tools/unattended/` before this build ran.
   commit before this one, so this commit is both the newest bump of `KIT_MEMORY_TREE_VERSION` and the
   newest engine line moved in the range.
 
+## The checklist over the build commit
+
+`gotchas.py --for-diff HEAD~1..HEAD` selected twelve classes, and one was violated twice, both in
+the build-method dossier.
+
+- `two-answers-to-one-question`: the new Gaps bullet restated how the run model's harvest counts a
+  line git did not parse, which unit 8's spec owns, and an older bullet said the line axis binds
+  first where M1 says the byte half does. The fold points both at their owners.
+
+The others were checked and hold. The AC3 arm's empty answer is paired with a liveness arm on the
+same commit, and every staged break went red on the arm it aimed at. The arm reads the shipped
+example, never a simpler stand-in. No heredoc wrote a tracked file, and the added lines carry no
+non-ASCII byte beyond `§`, `·` and `—`. No touched document has an odd fence count. No other carrier
+copies M10's routing list or M9's row, so the amendment left no other half. The size leg strips CR
+before it counts. The engine-range probe is live: over the same paths it now prints this commit. The
+spec reads CLOSED, as the dispatch requires, beside two criteria written as owed. No `read` is in
+the diff, and no review fold is.
+
 ## Owed to the post-build gate run
 
 Every leg of the spec's section 7, and the run records each verdict after it:

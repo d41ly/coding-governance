@@ -74,8 +74,8 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 - **Headroom is MEASURED, not recorded here.** The pair that used to sit in this bullet was wrong in
   the measurement and in the caps it named, because both move and a number typed beside them does
   not. The caps are declared on the method's own line 8; compare with
-  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. The line axis binds before the
-  byte axis, so M1's displacement rule stays load-bearing.
+  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. Which axis binds first is M1's to
+  state, and only the byte axis has a leg.
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.
@@ -97,8 +97,8 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 - **The `Decided:` trailer M10 routes a choice to is ungated, by design.** Whether a choice was made
   is not observable, so nothing refuses a run that left none. M10's own example went through git's
   trailer parser once, in the pass that wrote it (`TOOL-dLoggedFlight-7` AC3), and nothing grades a
-  later edit to it. The run model's harvest is specced to count a `Decided:` line git did not parse
-  as a near-miss (`TOOL-dLoggedFlight-8`), which reports and never refuses.
+  later edit to it. How a run's trailers are harvested, and a line git did not parse counted, is the
+  run model's spec to say (`TOOL-dLoggedFlight-8`).
 
 ## Reuse affordance
 
