@@ -62,6 +62,59 @@ st=0; n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
+# ---- THE FOURTH HELPER, for a BATCHED block (TOOL-aBatchedArm-1 S1). A group is one `reset_tree`,
+# ---- its mutations in sequence, ONE `out=$(GOV_UNATTENDED_REPORT=1 run)`, one `emitted`, then the
+# ---- group's `hit "$out" …` lines exactly as they were when each had a tree of its own. It grades
+# ---- the SET of failure SIGNATURES the run emitted against the set the group expects: `$1` is
+# ---- `|`-separated, each entry the interpolation-stripped signature of one `fail N "…"` branch as
+# ---- `check-arms.py` derives it (the longest literal run between interpolations, trailing `:" `
+# ---- trimmed) — the only per-branch identifier the checker emits; a check NUMBER is not one, since
+# ---- 6 of 29 carry a single branch. No signature contains `|` (measured over all 178 at 46b12b93).
+# ---- It REDS when an expected signature is on no `UNATTENDED check N FAILED` line, when such a
+# ---- line carries no expected signature (a break fired a branch nobody asserted), or when a skip
+# ---- line on the report channel names a check number one of the explained lines carries — a check
+# ---- pushed onto a skip path by a group-mate prints nothing on the default channel and is
+# ---- byte-identical to one that stayed silent, which is why a group runs with the channel ON. The
+# ---- skip lines are then STRIPPED from the global `out`, so the verbatim `hit` lines below read
+# ---- what an unbatched arm read. The failure prints the expected set, the observed misses and
+# ---- extras, and every skip line seen. ONE assertion, whatever the set's size.
+# ---- WHAT IT DOES NOT CHECK: that a branch fired for the reason its arm intended — a signature on
+# ---- the line is all it sees, and the per-branch `hit` lines stay for that. Nor can it tell a
+# ---- `miss` control's branch dark from silent, which is why no `miss` and no `same` is ever in a
+# ---- group (TOOL-dScriptedRepeat-15 S3, taken flat). And it cannot know a break's COMPLETE
+# ---- emission: an expected set derived from the arms alone is incomplete wherever a break fires
+# ---- a branch no arm names — three such blocks are proven in the build record — so a group's set
+# ---- is written from an OBSERVED run or not at all.
+# ---- NO CALL SITE AT 46b12b93. Measured: zero groups whose set can be written without a run, and
+# ---- the 2026-09-14 ruling forbade the run, so this landed inert; the acceptance ledger has the
+# ---- distribution and the run-state file the parked question.
+emitted() { # signatures · output
+  local _s _l _num _ok _exp _miss="" _extra="" _dark="" _nums=" " _skips
+  n=$((n+1))
+  _exp=$(printf '%s\n' "$1" | tr '|' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' || true)
+  [ -n "$_exp" ] || { echo "FAIL emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
+  while IFS= read -r _s; do
+    grep -qF -- "$_s" <<<"$2" || _miss="$_miss [$_s]"
+  done <<<"$_exp"
+  while IFS= read -r _l; do
+    case "$_l" in "UNATTENDED check "*" FAILED "*) ;; *) continue ;; esac
+    _num=${_l#UNATTENDED check }; _num=${_num%% *}; _ok=0
+    while IFS= read -r _s; do
+      case "$_l" in *"$_s"*) _ok=1; _nums="$_nums$_num "; break ;; esac
+    done <<<"$_exp"
+    [ "$_ok" = 1 ] || _extra="$_extra [$_l]"
+  done <<<"$2"
+  _skips=$(grep '^unattended-report: ' <<<"$2" || true)
+  while IFS= read -r _l; do
+    [ -n "$_l" ] || continue
+    _num=${_l#*check }; _num=${_num%%[!0-9]*}
+    [ -n "$_num" ] || continue
+    case "$_nums" in *" $_num "*) _dark="$_dark [$_l]" ;; esac
+  done <<<"$_skips"
+  [ -z "$_miss$_extra$_dark" ] \
+    || { echo "FAIL emitted: expected [$(printf '%s' "$_exp" | tr '\n' '|')] · missing:$_miss · unexplained:$_extra · dark:$_dark · skips: $_skips"; st=1; }
+  out=$(grep -v '^unattended-report: ' <<<"$2" || true)
+}
 
 cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t \

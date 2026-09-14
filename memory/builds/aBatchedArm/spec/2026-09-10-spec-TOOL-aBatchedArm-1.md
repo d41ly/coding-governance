@@ -1,11 +1,12 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-5 · 2026-09-14 · node a · Tier-2 · base 46b12b93 · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base 46b12b93 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-14-build-TOOL-aBatchedArm-1-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aBatchedArm-1.md](../prompts/2026-09-10-prompt-TOOL-aBatchedArm-1.md) | research | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-1-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-1-spec-audit-round1.md) | spec-audit | — |
