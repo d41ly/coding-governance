@@ -538,6 +538,11 @@
       "file": "tools/lexicon/canon.py"
     },
     {
+      "id": "build_front_variant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_gov_index",
       "kind": "function",
       "file": "tools/govkit/census.py"
@@ -566,6 +571,11 @@
       "id": "build_invocations",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "build_item_variant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_kit_copy",
@@ -761,6 +771,16 @@
       "id": "build_session_tree",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "build_skill_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_skill_tree",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_source_cited_ids_with_no_record",
@@ -1901,6 +1921,11 @@
       "id": "derive_short_sha",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_skill_steps",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "derive_source_paths",
@@ -3428,6 +3453,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_cli_help",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3684,6 +3714,21 @@
     },
     {
       "id": "read_shell_function",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_skill_front",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_skill_items",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_skill_section",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -4143,6 +4188,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_skill_copy",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4261,6 +4311,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "resolve_cell",
@@ -4618,6 +4673,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "run_adopter",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "run_bounded",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -4896,6 +4956,26 @@
       "id": "scan_shell_tokens",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_skill_copies",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_skill_description",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_skill_procedure",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_skill_safety",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "scan_slot_budget",
@@ -6386,6 +6466,31 @@
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_skill_ac1_adopter",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_skill_ac2_description",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_skill_ac3_procedure",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_skill_ac4_safety",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_skill_copied_names",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_skill_description_invariants",

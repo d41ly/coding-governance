@@ -102,7 +102,7 @@ run-gates gov canary	60		worst of 11 readings 19s, x1.5
 run-gates run-log line	280		worst of 6 readings 186s on node d 2026-09-13 by direct invocation, the fastest 62s, x1.5. TOOL-dLoggedFlight-3, withheld from adopters
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
-runlog selftest	60		measured 40s on node d 2026-09-14, the worst of three direct invocations rounded up (38.5 to 39.1 s) after TOOL-dLoggedFlight-10 added the schema-leg arms, so x1.5 is 60 s and meets this file's floor exactly; 27 s after TOOL-dLoggedFlight-9 added the committed-record arms; 19 s after TOOL-dLoggedFlight-8's run-model arms, 8 s after TOOL-dLoggedFlight-6's extractor arms, 3.6 s after TOOL-dLoggedFlight-5's redaction arms and 2.4 s before them
+runlog selftest	69		measured 46s on node d 2026-09-14, the worst of three direct invocations rounded up (44.9 to 45.3 s) after TOOL-dLoggedFlight-12 added the Skill arms, whose adopter runs cost about 6 s, so x1.5 is 69 s; 40 s after TOOL-dLoggedFlight-10 added the schema-leg arms; 27 s after TOOL-dLoggedFlight-9 added the committed-record arms; 19 s after TOOL-dLoggedFlight-8's run-model arms, 8 s after TOOL-dLoggedFlight-6's extractor arms, 3.6 s after TOOL-dLoggedFlight-5's redaction arms and 2.4 s before them
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5

@@ -816,6 +816,17 @@
     "ceiling": 60
   },
   {
+    "name": "runlog skill wiring",
+    "argv": [
+      "bash",
+      "tools/runlog/adopt-runlog.sh",
+      "--check"
+    ],
+    "chunk": "wiring",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",

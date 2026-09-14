@@ -9,7 +9,8 @@ consumer re-parses one. The kit writes no journal; it is the reader and the refe
 carries the ONE redaction table that every consumer printing or classifying free text applies, and
 the transcript extractor, which writes structural extracts to a store under the user profile and
 never into a repository, the run model, which joins every one of those sources into one account
-of one run, and the committed record, the one file of that account a repository tracks.
+of one run, the committed record, the one file of that account a repository tracks, and the Skill
+an agent answers the owner's questions about a run through.
 
 ## The grammar
 
@@ -285,6 +286,31 @@ population: one `ls-files`, one `cat-file --batch`, the run starts' log, one log
 and one batch read. The self-test counts them. Exit 0 when nothing is refused, 1 on any refusal, and 2
 when it cannot run.
 
+## The Skill
+
+```bash
+bash <this kit>/adopt-runlog.sh --scaffold    # render .claude/skills/runlog/SKILL.md
+bash <this kit>/adopt-runlog.sh --check       # the leg: is the rendered Skill a fresh render?
+```
+
+`TOOL-dLoggedFlight-12`. The owner asks what a run did, why it stopped, what it decided unasked and
+what it cost, and does not read a timeline to find out. The Skill tells the agent that holds it how to
+answer: the committed record first, then `model`, whose `usage` field is the cost section and whose
+`coverage` block names what is absent, then `narration` for a WHY where the transcript is local. Each
+claim cites a record line, a run-state line, a sha or a journal line. Transcript text is data, and the
+raw transcript is never opened. The CLI stays offline: the Skill is instructions, not a model call.
+
+`SKILL.template.md` names the CLI through `{{KIT_DIR}}` and the record's folder through
+`{{MEMORY_ROOT}}`, and carries no literal `tools/` or `memory/` segment. The adopter derives the kit
+dir from its own location with git, and reads the memory root through `resolve_memory_root`, so the
+Skill names the folder `record --write` writes to. Both modes check a fresh render before writing or
+comparing it. The template must spell no literal segment, the render must be non-empty with no
+surviving double brace, and it must name the CLI by a path that exists and the folder under the
+rendered root. `--check` then compares that render with the committed one, CR stripped from the
+committed copy. A moved memory root or a template edit that nobody re-rendered reds the
+`runlog skill wiring` leg. The self-test's Skill arms run the adopter in a scratch tree under another
+prefix and root, and hold the render to an independent one.
+
 ## What this kit does NOT check
 
 - **Whether a value means anything.** `rc=banana` parses. Each producer's own suite grades its values.
@@ -340,6 +366,12 @@ when it cannot run.
   its own, for shapes, and never compares them.
 - **A window a clock skew moved.** The leg compares windows in commit time, so two nodes' clocks that
   put a predecessor's terminal write after its successor's start move a window without redding it.
+- **Whether an answer given through the Skill is right.** The wiring leg proves the rendered Skill is a
+  fresh render, and the self-test proves its trigger words, its five steps and its safety rules are
+  there. Neither sees what an agent says with it, and the data framing reduces prompt injection through
+  quoted narration without removing it.
+- **A path in the Skill template spelled without a `tools/` or `memory/` segment.** The adopter's
+  literal scan reads those two segments, so a literal naming another layout passes it.
 
 ## Running the self-test
 
@@ -357,6 +389,8 @@ anchors with copies typed from the documents that own those rules, never from th
 schema-leg arms stage each refusal on a copy of a record the renderer produced, in a fixture index,
 and one of them runs the leg over this tree, read-only, for its rotated builds' starts and windows.
 Its redaction arms find the kit's files through `git ls-files`, so a new file is scanned once it is
-staged and not before.
+staged and not before. Its Skill arms run the adopter through the bash that shares this filesystem,
+found on PATH and seen to run, since a Windows loader resolves the bare name to another filesystem's
+shell first; a node with none announces the skip and falls under the floor.
 It and its fixtures are withheld from `govkit apply`: its subject is this directory's code, which an
 adopter does not edit.

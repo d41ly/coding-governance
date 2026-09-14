@@ -2,20 +2,21 @@
 
 ```toml
 feature = "runlog"
-title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, the run model that joins every source into one account of one run, the closed-schema record that puts that account in a tracked file, and the schema leg that grades every committed record's bytes"
+title = "The line grammar the three run-log producers write, the one reader every consumer parses them through, the one redaction table free text passes through, the extractor that turns a session's transcripts into structural events, the run model that joins every source into one account of one run, the closed-schema record that puts that account in a tracked file, the schema leg that grades every committed record's bytes, and the rendered Skill an agent answers the owner's questions about a run through"
 status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
   "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9",
-  "TOOL-dLoggedFlight-10"]
+  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12"]
 
 [claims]
-gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema"]
+gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
+  "runlog skill wiring"]
 kits = ["runlog"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = []
-rendered-skills = []
+rendered-skills = ["runlog"]
 gotcha-classes = ["nt-against-a-missing-file-is-true.md",
   "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md",
   "staged-break-runs-stale-bytecode.md"]
@@ -26,6 +27,7 @@ lexicon-verbs = []
 globs = [
   "tools/runlog/**",
   ".githooks/pre-push.runlog.test.sh",
+  ".claude/skills/runlog/SKILL.md",
 ]
 ```
 
@@ -116,6 +118,16 @@ from git alone, reading the model's own `derive_record_commits` and `derive_wind
 copy. Staged against this tree, the naive key and the unbounded era each red every rotated build it
 tracks, the two defects the round-2 and round-3 audits named.
 
+**The Skill is rendered, and its CLI stays offline.** The owner asks questions and reads no timeline,
+so `TOOL-dLoggedFlight-12` ships instructions to the agent that holds them rather than a model call:
+record, then model, then narration for a WHY, every claim cited and the absent sources named. The
+Skill names the CLI and the record's folder, both per-repository values, so the template carries
+tokens and no literal `tools/` or `memory/` segment. The adopter reads the root through the kit's own
+reader, so the Skill names the folder `record --write` writes to. No agent type is fenced to
+read-only tools, so the protection is the redacted narration verb and the data framing, never a
+fence, and the Skill forbids opening the raw transcript. The self-test runs the adopter through the
+bash found on PATH and seen to run, since the bare name reaches WSL's launcher first on node `d`.
+
 ## Shared seams
 
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
@@ -134,8 +146,9 @@ tracks, the two defects the round-2 and round-3 audits named.
   The run model, `TOOL-dLoggedFlight-8`, shipped next: it joins the journals, the extracts, git and
   the run-state file into one run. The committed record, `TOOL-dLoggedFlight-9`, shipped after it: it
   renders from the model and reads its run key, its attributed journal lines, its workflow runs and its
-  anomaly times rather than re-deriving any of them. The question-answering skill,
-  `TOOL-dLoggedFlight-12`, prints narration through its `narration` verb.
+  anomaly times rather than re-deriving any of them. The question-answering Skill,
+  `TOOL-dLoggedFlight-12`, shipped last: it names the `model` and `narration` verbs and the record's
+  folder, and adds no verb of its own.
 - `RECORD_SCHEMA` is shared as data with the record schema leg, `TOOL-dLoggedFlight-10`, which shipped
   after the record and holds its glob to the renderer's `derive_record_relpath` at run time. The
   unattended Skill's render step, `TOOL-dLoggedFlight-11`, runs `record --write` and the index
@@ -179,6 +192,9 @@ tracks, the two defects the round-2 and round-3 audits named.
 - **The schema leg compares windows in commit time.** A clock skew between two nodes that puts a
   predecessor's terminal write after its successor's start moves a window without redding it, and the
   leg never compares a record's two copies with each other.
+- **An answer given through the Skill is not graded.** The wiring leg proves a fresh render and the
+  self-test proves its words, steps and rules are present. Quoted narration can still carry an
+  injection the data framing reduces and does not remove.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.
@@ -212,3 +228,7 @@ the schema, which the renderer and the schema leg both read, never a value rende
 seam: `record.check_records` + `RECORD_RULES` — reuse for grading any committed run record, or every
 tracked run's start and window, over the index; extend via a new rule id with the staged fixture that
 produces it, which the self-test demands in both directions, never a second grader.
+
+seam: `adopt-runlog.sh` `render_skill` + `check_render` — reuse for any Skill whose paths differ per
+repository; extend via a token substituted in `render_skill`, declared in the descriptor's
+`placeholders`, and checked for in the render by `check_render`, never a literal path.

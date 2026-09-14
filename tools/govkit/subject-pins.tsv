@@ -101,6 +101,7 @@ run-gates wiring	repo	wiring
 run-selftests self-test	kit	selftests
 runlog record schema	repo	declarations
 runlog selftest	kit	selftests
+runlog skill wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests

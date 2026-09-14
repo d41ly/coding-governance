@@ -216,3 +216,10 @@ tools/runlog/fixtures/* text eol=lf
 # The redaction table (TOOL-dLoggedFlight-5) is read with a TAB split, and the kit's scan of its own
 # files reads bytes. The loader tolerates a CRLF checkout; this pin keeps gov's own copy from needing it.
 tools/runlog/*.tsv text eol=lf
+# The runlog Skill (TOOL-dLoggedFlight-12), pinned for the reason the three rendered Skills above are:
+# `adopt-runlog.sh --check` byte-compares the rendered copy against a fresh LF render. It strips CR
+# from the working copy first, so the pin keeps the committed bytes deterministic rather than holding
+# the leg up. The template is pinned beside it, since the adopter reads it and the kit's self-test
+# renders from it independently.
+.claude/skills/runlog/SKILL.md text eol=lf
+tools/runlog/SKILL.template.md text eol=lf
