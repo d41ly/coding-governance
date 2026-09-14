@@ -258,8 +258,16 @@ def main(argv):
         # SETTING COMMIT's date and not to the newest spec date on the tree: from the day after
         # landing, that comparison refuses exactly the population the join exists to grade. A value
         # not yet in history cannot be checked and is announced, never refused or passed.
-        set_on = run("git", "-C", str(root), "log", "-1", "--format=%cs",
-                     f'-G^{DIRECT_KEY}="?{direct_cut}"?$', "--", ".memory-tree.conf").strip()
+        q = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs",
+                            f'-G^{DIRECT_KEY}="?{direct_cut}"?$', "--", ".memory-tree.conf"],
+                           capture_output=True, text=True)
+        if q.returncode:
+            # A delegate whose status is discarded reads a query that never ran as "not yet
+            # committed" — the announced skip with the wrong reason, which the next reader trusts.
+            print(f"spec-tokens: REFUSING — the history query for {DIRECT_KEY} {direct_cut} failed, "
+                  f"so the relation cannot be asserted: {q.stderr.strip() or 'git exited ' + str(q.returncode)}")
+            return 1
+        set_on = q.stdout.strip()
         if not set_on:
             relation = " · relation unchecked: value not yet committed"
         elif direct_cut <= set_on:
