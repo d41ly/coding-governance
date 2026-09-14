@@ -70,6 +70,10 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
+- `--audit` — one line per unit whose latest dispatch row is still open: how long the TREE has been
+  idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+  `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
+  the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.

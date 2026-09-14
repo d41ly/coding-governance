@@ -32,6 +32,14 @@ GATE_CMD="bash tools/run-gates/run-gates.sh"
 # Set it ABOVE your slowest legitimate bar. A bound that fires on a healthy run gets deleted.
 GATE_BOUND="3600"
 
+# The idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when
+# BOTH the newest write in the tree and the newest commit are older than this. OPTIONAL, on
+# GATE_BOUND's terms: absent takes the kit default and says so on stderr; non-numeric or zero is a
+# refusal.
+#
+# Set it to a few keepalive cadences, so a verdict is never one missed tick.
+UNIT_STALL_BOUND="1800"
+
 # REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
 # accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked
 # bytes, and the run's first act must not be that.

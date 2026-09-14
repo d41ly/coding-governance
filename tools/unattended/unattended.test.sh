@@ -114,6 +114,7 @@ LANDER="echo land"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
+UNIT_STALL_BOUND="${6-1800}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -4945,6 +4946,105 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is 
 reset_tree; rm -f memory/builds/tRun/RUN.md
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
+# ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
+# ---- dispatch row is still open, the tree's two clocks, and a verdict against UNIT_STALL_BOUND.
+# ---- Every arm below is the driver over the scratch repo; the fixture is the one the `--dispatch`
+# ---- arms above already build, plus a READY spec COMMITTED on the unit branch: at UNIT0 the build
+# ---- has no spec, so `--dispatch` refuses it as MISSING and no row would exist to audit. The bound
+# ---- rides mkconf's SIXTH positional.
+build_audit_fixture() { # reset, commit a READY spec, preflight
+  reset_tree
+  mkdir -p memory/builds/tRun/spec
+  printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+  git add -A && git commit -q -m "fixture: a READY spec" --no-verify
+  run --preflight tRun --keepalive-id k1 >/dev/null
+}
+# AC1 — STALLED. The dispatch row an hour old, the fixture commit an hour old by GIT_COMMITTER_DATE,
+# the tree clean, the bound 60s. `last-write none` must read as OLDER than any bound: a clean tree
+# read as "written just now" is PROGRESSING forever, which is the reassuring-zero class.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mkconf "true" "true" "" "3600" "" "60"
+HOUR_AGO=$(( $(date -u +%s) - 3600 ))
+mutate memory/builds/tRun/RUN.md "s/^[0-9T:-]*Z dispatch · item /$(date -u -d "@$HOUR_AGO" +%Y-%m-%dT%H:%M:%SZ) dispatch · item /"
+git add -A && GIT_COMMITTER_DATE="$HOUR_AGO +0000" git commit -q -m "fixture: age the clocks" --no-verify
+out=$(run --audit tRun); rc=$?
+same "AC1 a STALLED verdict exits 0" "$rc" "0"
+hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
+hit "$out" "· last-write none ·"
+hit "$out" "· STALLED"
+hit "$out" "unattended-audit: remedy — stop the unit's task, then re-dispatch ARCH-tRun-1 with a brief naming what stalled and that it is skipped"
+# AC2 — PROGRESSING. One untracked file under the declared directory, made with touch: the listing
+# must carry `ls-files --others`, and the write clock must be consulted, not the commit clock alone.
+mkdir -p work && touch work/new.txt
+out=$(run --audit tRun); rc=$?
+same "AC2 a PROGRESSING verdict exits 0" "$rc" "0"
+hit "$out" "· PROGRESSING"
+miss "$out" "unattended-audit: remedy"
+same "AC2 last-write is numeric after an untracked write" "$(printf '%s\n' "$out" | grep -cE 'ARCH-tRun-1 .* last-write [0-9]+s ago ')" "1"
+# AC8 — a listed path DELETED from disk is skipped, not a dead probe. `rm`, not `git rm --cached`:
+# the latter leaves the file on disk, so `stat` answers and the branch under test is never reached.
+rm memory/guides/BUILD-METHOD.md
+out=$(run --audit tRun); rc=$?
+same "AC8 a deletion in the listing is skipped, exit 0" "$rc" "0"
+hit "$out" "· PROGRESSING"
+miss "$out" "UNATTENDED check 51 FAILED"
+same "AC8 last-write stays numeric after the skip" "$(printf '%s\n' "$out" | grep -cE 'last-write [0-9]+s ago')" "1"
+# AC5, third branch — a probe that cannot answer is a refusal, never a zero. `stat` shadowed on PATH
+# by a stub exiting 1, over the same dirty tree, so the mtime probe dies on a path that EXISTS.
+mkdir -p "$TMP/stub"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stub/stat"; chmod +x "$TMP/stub/stat"
+out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "AC5 a dead mtime probe exits 1" "$rc" "1"
+hit "$out" "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now:"
+miss "$out" "· PROGRESSING"
+# AC5, first branch — no run-state file.
+reset_tree
+out=$(run --audit tNoRun); rc=$?
+same "AC5 no run-state file exits 1" "$rc" "1"
+hit "$out" "no run-state file, so there is no dispatched unit to audit for idleness:"
+# AC5, second branch — a terminal record. Not `refuse_if_terminal`: its sentence says the verb would
+# REWRITE the record, and this verb rewrites nothing, so that sentence would be false here.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+out=$(run --audit tRun); rc=$?
+same "AC5 a finished run exits 1" "$rc" "1"
+hit "$out" "the run is already finished, so no unit of it can be dispatched and open, and a keepalive still auditing it should have been reaped:"
+# AC3 — no open unit is ONE line and exit 0, never silence over nothing.
+build_audit_fixture
+out=$(run --audit tRun); rc=$?
+same "AC3 no dispatch row exits 0" "$rc" "0"
+same "AC3 the no-unit line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "1"
+# ...a commit naming the unit AND writing inside the declared set closes the pass — the openness
+# test is `check_pass_open`, the one `--dispatch` uses, so the two verbs cannot disagree.
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+mkdir -p work && printf 'x\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 build" --no-verify
+out=$(run --audit tRun)
+same "AC3 a build commit inside the declared set closes the pass" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
+miss "$out" "unattended-audit: ARCH-tRun-1"
+# ...and a commit naming the unit but touching ONLY the run-state file leaves it open — the
+# declaration commit is the ordinary shape a run produces, and counting it closed every pass at
+# declaration time once already.
+build_audit_fixture
+run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
+git add -A && git commit -q -m "ARCH-tRun-1 declare dispatch" --no-verify
+out=$(run --audit tRun)
+hit "$out" "unattended-audit: ARCH-tRun-1 · dispatched"
+miss "$out" "no unit is dispatched and open"
+# AC4 — the bound is read through `read_bound_key`, GATE_BOUND's hoisted reader: junk and zero are
+# refusals at exit 2 before any verb runs, in GATE_BOUND's own sentence with the key name lifted out.
+reset_tree; mkconf "true" "true" "" "3600" "" "abc"
+out=$(run --audit tRun); rc=$?
+same "AC4 a non-integer UNIT_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+hit "$out" "which is not a positive integer of seconds"
+reset_tree; mkconf "true" "true" "" "3600" "" "0"
+out=$(run --audit tRun); rc=$?
+same "AC4 a zero UNIT_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+reset_tree
+
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
@@ -5217,6 +5317,7 @@ DOD_EXTRA=""
 NOCONF
 out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
+hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
 reset_tree
 
 
@@ -5431,7 +5532,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=706
+FLOOR_ASSERTIONS=741
+# RAISED 706 -> 741 by TOOL-aProbedUnit-3, the +35 `--audit` and bound arms, counted off a run of the
+# block alone with the suite's preamble sourced (n before and after), not off the file.
 # RAISED 675 -> 706 by TOOL-aGradedMandate, the +31 arms this build added, keeping the headroom the
 # paragraph above declares. The bump first landed on the SHADOWED assignment 31 lines up and did
 # nothing; this is the one the run reads.
@@ -5458,7 +5561,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=510
+FLOOR_SHARD_2=545
+# +35 for the TOOL-aProbedUnit-3 `--audit` arms, which sit in region two beside the `--dispatch` arms.
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

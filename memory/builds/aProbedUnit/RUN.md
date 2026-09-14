@@ -34,3 +34,7 @@ base: 1b000d1a83998506bd2199cc815e34a9b82cdbf0
 2026-09-14T12:48:04Z dispatch · item a69c95b4 TOOL-aProbedUnit-2 · reason tools/workflows/unattended-unit.js tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/workflows/unattended-build.test.sh memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-2.md memory/builds/aProbedUnit/README.md memory/LIVE.md memory/ledger/2026-09.md memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-2-1-acceptance-ledger.md
 
 2026-09-14T12:48:08Z brief · item TOOL-aProbedUnit-2 · reason 7b6a6f80583a memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-2-1-build-brief.md
+
+2026-09-14T12:54:38Z dispatch · item 0f129179 TOOL-aProbedUnit-3 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/PROTOCOL.template.md tools/unattended/kit.toml tools/unattended/.unattended.conf.example .claude/skills/unattended/SKILL.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .unattended.conf memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/builds/aProbedUnit/spec/2026-09-14-spec-TOOL-aProbedUnit-3.md memory/builds/aProbedUnit/README.md memory/LIVE.md memory/ledger/2026-09.md memory/builds/aProbedUnit/build/2026-09-14-build-TOOL-aProbedUnit-3-1-acceptance-ledger.md
+
+2026-09-14T12:54:44Z brief · item TOOL-aProbedUnit-3 · reason 2eca58a01da8 memory/builds/aProbedUnit/prompts/2026-09-14-prompt-TOOL-aProbedUnit-3-1-build-brief.md

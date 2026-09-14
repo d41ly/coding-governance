@@ -26,6 +26,16 @@ before ORIENTING. Use `{{KEEPALIVE_CREATE}}`, at the cadence this project declar
 {{KEEPALIVE_CREATE}}  ->  keep the id
 ```
 
+**What the tick runs.** The prompt it schedules is the stall probe — once the run has a slug, run
+`bash {{KIT_DIR}}/unattended.sh --audit <slug>`; before `--preflight` no slug exists and the tick
+does nothing. The verb prints one line per dispatched-and-open unit with how long the TREE has
+been idle and a verdict against `UNIT_STALL_BOUND`. On `PROGRESSING` do nothing. On `STALLED`,
+act: stop the unit's task, record why with `--park` or a brief note, then re-dispatch that unit
+with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
+is doing or whether a process is stuck — its figures are the tree's, and the process side is the
+process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
+while a `Workflow` ran in the background and did nothing with the turn.
+
 **Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
 three of the four paths below never reached it: the two that start from prose or a playbook orient,
 research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
@@ -593,7 +603,8 @@ definition, so the absence is a decision and not an oversight.
   than reading its status. A class it names that is already violated is the next pass. (Adopters
   whose memory tree ships without that kit have no such command; the obligation is then whatever
   their own build method names.)
-- Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
+- Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`, and the units with
+  `bash {{KIT_DIR}}/unattended.sh --audit <slug>`.
 
 ## While the work runs
 

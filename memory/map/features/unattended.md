@@ -37,8 +37,8 @@ globs = [
 
 ## Constraints & why
 
-**The checkpoint is replaced, not removed.** Every other kit here makes a rule enforceable. This one
-removes a rule — the explicit ask before a merge and a push — and its whole burden is to put
+**The checkpoint is replaced, not removed.** Every other kit makes a rule enforceable. This one
+removes a rule — the explicit ask before a merge and a push — and its burden is to put
 something machine-checkable in the vacated slot. That is why the mandate is ASSERTED rather than
 written by the run, and why reachability from the pinned BASE is part of the contract: a run that can
 author its own authorization has none, and every gate downstream would certify it.
@@ -46,9 +46,8 @@ author its own authorization has none, and every gate downstream would certify i
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
 runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
 call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
-verdict — control flow, not a rule an agent remembers. It
-verifies nothing: a Workflow script has no filesystem, so every observation is a claim its own agent
-returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
+verdict — control flow, not a rule an agent remembers. It verifies nothing: a Workflow script
+has no filesystem, so every observation is a claim its own agent returned; the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
 `agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: DISPOSAL is
 ONE agent over the whole set, and the convergence LOOP sits in the caller while the harness holds
 the GATE, its iteration count being data-dependent and so unboundable.
@@ -70,18 +69,18 @@ pinned BASE against `refs/remotes/origin/<default>` and justified it in a source
 ref could not move without a push. That was false — `git update-ref` moves it offline — and it was
 reproduced end to end: preflight printed OK over a base the run had authored, the leg agreed silently,
 and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
-and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert rather than
-detected: neither value is read at all.
+and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert, not detected:
+neither value is read at all.
 
 **A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
 sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
 neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
 ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
-away from the repo. The two suppressions are not interchangeable and only the second stops a graft —
+away from the repo. The two suppressions are not interchangeable and only the second stops a graft;
 measured, not assumed.
 
 **The boundary is stated rather than implied.** A design panel broke four independent anchor
-mechanisms and converged on the reduction that a check running under the run's own uid cannot
+mechanisms and converged on the reduction that a check under the run's own uid cannot
 constitute authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
 shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
 run-state file at all — and names the only control that binds: re-running the same leg in a clone the
@@ -89,9 +88,9 @@ run never touched.
 
 **Nothing in a script can reach the scheduler.** The keepalive store is in-memory and session-scoped,
 so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
-therefore splits by actor — the agent schedules and reaps, the driver records an id and asserts a
-recorded reap — and the reaped item is labelled agent-attested wherever it is reported, so it never
-spends the `--close` override budget.
+splits by actor — the agent schedules and reaps, the driver records an id and asserts a recorded
+reap — and the reaped item is labelled agent-attested wherever it is reported, so it never spends
+the `--close` override budget. The tick runs `--audit`, the unit stall probe.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
