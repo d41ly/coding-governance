@@ -925,7 +925,7 @@ rm -f "$(_rp_log)" "$(_rp_maplog)"
 out=$(_rp_close)
 hit "$out" "every declared probe log is ABSENT"
 hit "$out" "recall/queries.jsonl"
-hit "$out" "codebase-map/lookups.jsonl"
+hit "$out" "codebase-map/lookups.jsonl"  # gov:root-fixture — expected-output substring from a fixture probe log
 
 # 4e. ADOPTED AND PRESENT — a map log naming THIS tree, and NO recall log. MET on the map half
 #     alone, which is the arm the closed unit claimed and never had: before this reader existed the
@@ -4638,7 +4638,7 @@ run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/nul
 # about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
 # than asserted on.
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition fold >/dev/null
-hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
@@ -4650,7 +4650,17 @@ hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 # ...and a subject whose loop ENDED does not take another round: the history would say the opposite
 # of what happened.
-hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
+hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+
+# ---- CONVERGED is terminal too, and the refusal names where a later blocker goes. Both arms above
+# ---- reach branch 10 through NON-CONVERGENT; this one reaches it through the exit the owner ruling
+# ---- is about: a subject that converged at round 1 takes no further round, the refusal names the
+# ---- M4 fold-or-promote route, and the refused round wrote NO row — one review row, not two.
+bcopen
+run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded"
+same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
+reset_tree
 
 # ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
 bcopen

@@ -38,8 +38,11 @@ src_of() { for c in "$REPO/tools/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; 
 install_driver() {
   local p="$1" rel src
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
-  for rel in memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh \
-             memory-recall/extract.py memory-recall/recall_conf.py; do
+  # A CONTINUED LINE CANNOT CARRY A COMMENT — the backslash would escape the space before it,
+  # not the newline — so the list is two assignments, each of which can be marked.
+  _rels="memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  _rels="$_rels memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  for rel in $_rels; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
     # of the driver — the shim's resolver, the memory-recall kit the anchor grammar is imported
@@ -267,7 +270,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
     && ck "AC8 recall kit absent -> skip, exit 0" 1 || ck "AC8 recall kit absent -> skip, exit 0" 0
 
   # state 2 — kit adopted, hook opt-in NOT taken -> skip, exit 0 (never UNWIRED)
-  cp "$FRAG" memory-recall/recall-opened.fragment.json
+  cp "$FRAG" memory-recall/recall-opened.fragment.json  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'opt-in not taken'; } \
     && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
@@ -277,7 +280,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
   # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
   # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
-  printf '// stub\n' > memory-recall/recall-opened.js
+  printf '// stub\n' > memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
@@ -293,7 +296,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   cp "$SMERGE" tools/settings-merge.py
 
   # state 4 — merged into settings.json -> ok, exit 0
-  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1
+  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
@@ -301,7 +304,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from
   # WIRE §3c step 4 (two separate commands) in reverse order, and from any later loss of the
   # untracked hook file; Claude Code then runs `node` against nothing on every Read.
-  rm -f memory-recall/recall-opened.js
+  rm -f memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
     && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
@@ -437,7 +440,7 @@ out=$(chk --check); rc=$?
 # a merge driver that cannot start exits non-zero without writing %A: git then reports CONFLICT and
 # leaves the path holding OURS-only content with no markers. The remedy has to name the launcher that
 # TRAVELS WITH THE KIT, because `tools/lib/pyrun.sh` is gov-internal and an adopter never receives it.
-cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py
+cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'merge-rows.sh beside it'; } \
   && ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 1 \
@@ -467,7 +470,10 @@ chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); r
 # ...and it is the KIT-INTERNAL launcher that won, not the gov-internal shim. `install_driver` lays
 # both, so without this the fallback could silently win everywhere and every arm here would still
 # pass — while an adopter, who receives only the kit, got a command naming a file they do not have.
-{ printf '%s' "$got" | grep -q 'memory-tree/merge-rows.sh' \
+# The pattern sits in a variable so the marked line carries no line continuation — a trailing
+# backslash escapes the space before a comment, not the newline, and the break is valid shell.
+_want_launcher='memory-tree/merge-rows.sh'   # gov:root-fixture — the kit launcher's own spelling
+{ printf '%s' "$got" | grep -q "$_want_launcher" \
   && ! printf '%s' "$got" | grep -q 'pyrun'; } \
   && ck "AC10 the kit launcher wins over the gov-internal shim" 1 \
   || ck "AC10 the kit launcher wins over the gov-internal shim" 0
@@ -568,7 +574,7 @@ qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && 
 rm -rf "$Q"
 git checkout -q -- $KIT_REL/memory-recall/extract.py 2>/dev/null || true
 if grep -q 'def anchor_at(line, g=None):' $KIT_REL/memory-recall/extract.py; then
-  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py
+  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
 fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \

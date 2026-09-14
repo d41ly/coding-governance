@@ -640,7 +640,10 @@ if [ -z "$DC_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then
   . "$ROOT/tools/lib/resolve-python.sh"
   DC_PY=$(resolve_python 2>/dev/null)
 fi
-[ -n "$DC_PY" ] || DC_PY=python
+# NO BARE FALLBACK. The idiom ban this repo's own bar carries reads `DC_PY=python` as a launcher
+# invoked without being resolved, and it was right: on the Store-stub machine that name is the
+# one launcher guaranteed NOT to run. A resolver that answered nothing is a refusal, said aloud.
+[ -n "$DC_PY" ] || { echo "evidence-test: no python launcher resolves, so the ceiling arms cannot run"; exit 2; }
 # Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
 # third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
 # `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row

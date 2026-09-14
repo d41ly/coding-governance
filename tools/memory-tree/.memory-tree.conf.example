@@ -156,7 +156,7 @@ CHARTER="AGENTS.md"
 
 # --- corpus_ids.py (checks 13-15; check 16 is STRUCTURAL and behind no pin). Every number below
 # --- is MEASURED against YOUR corpus by
-# --- `python memory-tree/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
+# --- `python <kit>/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
 # --- copied from a larger tree is either vacuous or permanently red. Blank turns its check off.
 # --- Ship them blank, run --measure once the tree has content, and paste what it prints.
 # Orphan ids: cited but never defined. Shrink-only once set.

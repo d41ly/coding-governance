@@ -7,14 +7,11 @@
 # states), one carrying a .codebase-map.conf (the only place check 7's MAP_SUB branch is reachable),
 # and one built by adopt-memory-tree.sh --scaffold itself, so the scaffolder is asserted against the
 # GATE rather than against a second description of the scaffolder.
-#   bash memory-tree/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
+#   bash <kit>/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
 #
 # The tree is FLAT (kit 1.5): builds/<slug>/, backlog/<FAMILY>.md, one root DECISIONS.md. The
 # discipline is a value in the spec status header, not a directory.
 set -u
-KIT_REL="${KIT_REL:-tools/memory-tree}"   # TOOL-dRetiredFork-15: this suite had no functional
-                                          # site when the KIT_REL sweep ran, so it carried no
-                                          # default; the project-key arms below are its first.
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/check-memory-hygiene.sh"
 TMP=$(mktemp -d)
@@ -2299,12 +2296,20 @@ n=$((n+1))
 # ---- so the retirement had no notification channel at all. The class generalises: a delegated
 # ---- checker gained a channel that is meaningful at exit 0, and every arm called the callee.
 _b1=$(mktemp -d)
+# THIS TREE IS ALSO THE PROJECT-KEY FIXTURE (TOOL-aRatifiedRulings-3), so its conf is written by the
+# one helper the project-key arms rewrite it with: the four base lines plus the retired
+# READ_PATH_CEILING that provokes the notice, then the arm's one key line.
+pk_set() {   # $1 = a conf line, or empty for the fixture's base conf
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > "$_b1/.memory-tree.conf"
+  printf 'READ_PATH_CEILING="135677"\n' >> "$_b1/.memory-tree.conf"
+  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$_b1/.memory-tree.conf"
+  return 0
+}
 (
   cd "$_b1" || exit 1
   git init -q .; git config user.email t@t.test; git config user.name t
   mkdir -p memory/guides memory/builds/tOne/spec memory/project
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
-  printf 'READ_PATH_CEILING="135677"\n' >> .memory-tree.conf
+  pk_set ""
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
@@ -2328,69 +2333,49 @@ case "$_b1out" in
   *"READ_PATH_CEILING is declared"*) : ;;
   *) echo "FAIL the gate exited 0 and said nothing about a conf that still declares the retired READ_PATH_CEILING; corpus_ids.py prints that notice at exit 0 and this wrapper is the only caller an adopter ever runs"; st=1 ;;
 esac
-rm -rf "$_b1"
-
-# THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
-# 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
-# shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
-# rule is shrink-only upward, so the tighter surviving pin wins over recomputing from scratch.
-FLOOR_ASSERTIONS=235
-[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 # ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
 # Three arms per validated key -- default, valid override, INVALID override -- because the invalid
 # case is the only one that matters here. BUILD_SLUG_RE and RECORD_SERVES_CUTOFF NARROW what is
 # graded, so a bad value does not red: it silently grades nothing and reports green. These arms are
 # what stop that reaching an adopter.
-GOVROOT=$(git -C "$HERE" rev-parse --show-toplevel)
-# ONE FIXTURE, REUSED. The first cut built a fresh scratch tree per arm -- `git archive` of the whole
-# repo plus a `git init` and a commit, fourteen times -- and the suite TIMED OUT at ten minutes.
-# Nothing about these arms needs a fresh tree: they vary ONE CONF LINE and re-read the same corpus,
-# so the tree is built once and the conf is rewritten between runs. Section 7 is explicit that cost
-# is a verdict, and a suite nobody can afford to run is a suite nobody runs.
-PKD=$(mktemp -d)
-( cd "$GOVROOT" && git archive HEAD ) | tar -x -C "$PKD" 2>/dev/null
-# THE WORKING CHECKER, OVERLAID. `git archive HEAD` hands the fixture the COMMITTED script, so every
-# arm below would grade the pre-change code and report that a new key does not work. Measured: all
-# six invalid-value arms passed against HEAD and proved nothing.
-cp "$GOVROOT/$KIT_REL/check-memory-hygiene.sh" "$PKD/$KIT_REL/" 2>/dev/null
-cp "$GOVROOT/.memory-tree.conf" "$PKD/.memory-tree.conf.base" 2>/dev/null
-# BASE_RESOLVE_CUTOFF OFF IN THIS FIXTURE, and it is not a convenience. The tree below is a
-# `git archive` into a FRESH `git init`, so its object database holds exactly one commit: every LIVE
-# spec's `base` sha answers `missing`, and check 12 reds for a reason that is a property of the
-# fixture rather than of the corpus or of any key under test. The engine already skips this arm on a
-# shallow clone for that exact reason — "a tree it cannot grade" — and a synthetic one-commit repo is
-# the same case the skip's own test does not recognise. Measured at TOOL-cGradedDebt-1: with two live
-# post-cutoff specs in the corpus, `pk_base` came back 1 and the suite's own liveness line correctly
-# declared every arm below it meaningless. Left unfixed, this block dies the first time anyone leaves
-# a live spec in the tree, which is most of the time.
-printf 'BASE_RESOLVE_CUTOFF=""\n' >> "$PKD/.memory-tree.conf.base"
-( cd "$PKD" && git init -q . && git config user.email t@t && git config user.name t \
-    && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
-pk_set() {   # $1 = a conf line, or empty for the shipped default
-  cp "$PKD/.memory-tree.conf.base" "$PKD/.memory-tree.conf"
-  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$PKD/.memory-tree.conf"
-  return 0
-}
-pk_rc()  { ( cd "$PKD" && bash "$KIT_REL/check-memory-hygiene.sh" >/dev/null 2>&1; echo $? ); }
-pk_out() { ( cd "$PKD" && bash "$KIT_REL/check-memory-hygiene.sh" 2>&1 ); }
+#
+# ONE FIXTURE, REUSED, AND IT IS THE CHECK-16 NOTE TREE ABOVE (TOOL-aRatifiedRulings-3). The second
+# cut ran every arm over a `git archive` of this whole repository: 1902 tracked files at 28 s a
+# run, seven proceeding runs plus the archive build, 37% of the suite's wall clock -- and its
+# control arm was red whenever the live corpus was, mid-build included, so every arm beneath it
+# graded a red no key owned. The arms vary ONE CONF LINE. The check-16 fixture tree above is
+# already asserted clean at rc 0 and already provokes a notice, which is the positive artifact the
+# control needs; 8 s a run. Its size is `git ls-files | wc -l` in that tree, not a number typed here. One run per arm, and every arm that grades a RED asserts the finding's TEXT,
+# never an rc alone -- the rc-only violated-slug arm printed `ok` on that unowned red.
+#
+# THE ONE RUNNER: stdout and stderr on stdout, the checker's rc as its own. `pk_rc` is gone -- an
+# abort arm used to run the checker twice over the same conf, once for rc and once for text.
+pk_out() { ( cd "$_b1" && bash "$HERE/check-memory-hygiene.sh" 2>&1 ); }
 
 # BUILD_SLUG_RE
-pk_set ""; pk_base=$(pk_rc)
-n=$((n+1)); [ "$pk_base" = 0 ] && echo "ok   project keys: the fixture is clean with no key set" \
-  || { echo "FAIL project keys: the fixture is not clean unset (rc=$pk_base) — every arm below is meaningless"; st=1; }
+# THE CONTROL READS THE CLEAN RUN ABOVE, not a run of its own: rc 0 AND the notice, so a clean
+# verdict carries proof that run reached check 16 rather than exiting 0 on nothing.
+n=$((n+1))
+case "$_b1rc:$_b1out" in
+  0:*"READ_PATH_CEILING is declared"*) echo "ok   project keys: the fixture is clean with no key set" ;;
+  *) echo "FAIL project keys: the fixture is not clean unset (rc=$_b1rc), or its clean run never reached check 16 — every arm below is meaningless"; st=1 ;;
+esac
 
-pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; r=$(pk_rc)
+pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; o=$(pk_out); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   BUILD_SLUG_RE: a pattern gov's own slugs satisfy still passes" \
   || { echo "FAIL BUILD_SLUG_RE: a satisfiable pattern redded (rc=$r)"; st=1; }
 
-pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; r=$(pk_rc)
-n=$((n+1)); [ "$r" != 0 ] && echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" \
-  || { echo "FAIL BUILD_SLUG_RE: a violated pattern passed — the key is not reaching check 4"; st=1; }
+pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; o=$(pk_out); r=$?
+n=$((n+1))
+case "$o" in
+  *"HYGIENE check 4 FAILED"*"memory/builds/tOne (bad folder name"*) echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" ;;
+  *) echo "FAIL BUILD_SLUG_RE: a violated pattern did not red check 4 naming memory/builds/tOne (rc=$r) — the key is not reaching check 4"; st=1 ;;
+esac
 
 # THE INVALID CASES. Each of these would otherwise grade nothing and report clean.
 for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
-  pk_set "BUILD_SLUG_RE=\"$bad_re\""; r=$(pk_rc); o=$(pk_out)
+  pk_set "BUILD_SLUG_RE=\"$bad_re\""; o=$(pk_out); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*BUILD_SLUG_RE*) echo "ok   BUILD_SLUG_RE='$bad_re' ABORTS naming the key" ;;
@@ -2399,12 +2384,12 @@ for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
 done
 
 # RECORD_SERVES_CUTOFF
-pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; r=$(pk_rc)
+pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; o=$(pk_out); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   RECORD_SERVES_CUTOFF: a past cutoff is accepted" \
   || { echo "FAIL RECORD_SERVES_CUTOFF: a past cutoff redded (rc=$r)"; st=1; }
 
 for bad_cut in '2099-01-01' 'yesterday'; do
-  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; r=$(pk_rc); o=$(pk_out)
+  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; o=$(pk_out); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*RECORD_SERVES_CUTOFF*) echo "ok   RECORD_SERVES_CUTOFF='$bad_cut' ABORTS naming the key" ;;
@@ -2414,11 +2399,11 @@ done
 
 # ENTRY_CAP_UNIT
 for unit in chars bytes; do
-  pk_set "ENTRY_CAP_UNIT=\"$unit\""; r=$(pk_rc)
+  pk_set "ENTRY_CAP_UNIT=\"$unit\""; o=$(pk_out); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ENTRY_CAP_UNIT=$unit is accepted" \
     || { echo "FAIL ENTRY_CAP_UNIT=$unit redded (rc=$r)"; st=1; }
 done
-pk_set 'ENTRY_CAP_UNIT="glyphs"'; r=$(pk_rc); o=$(pk_out)
+pk_set 'ENTRY_CAP_UNIT="glyphs"'; o=$(pk_out); r=$?
 n=$((n+1))
 case "$r:$o" in
   2:*ENTRY_CAP_UNIT*) echo "ok   ENTRY_CAP_UNIT='glyphs' ABORTS naming the key" ;;
@@ -2430,14 +2415,14 @@ esac
 # adopter conf predating the key must not red on a kit upgrade, so a missing key has to pass, and an
 # arm that only tested the abort would leave that free to regress silently. TOOL-cSpliceWarden-1.
 for rmode in cut snapshot; do
-  pk_set "ROTATION_MODE=\"$rmode\""; r=$(pk_rc)
+  pk_set "ROTATION_MODE=\"$rmode\""; o=$(pk_out); r=$?
   n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE=$rmode is accepted"     || { echo "FAIL ROTATION_MODE=$rmode redded (rc=$r)"; st=1; }
 done
-pk_set 'ROTATION_MODE=""'; r=$(pk_rc)
+pk_set 'ROTATION_MODE=""'; o=$(pk_out); r=$?
 n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE blank is UNDECLARED and passes"   || { echo "FAIL ROTATION_MODE blank redded (rc=$r) — an adopter conf predating the key would red on upgrade"; st=1; }
 # Case matters, and the near-miss is the arm worth having: `Cut` is the typo a human makes.
 for rbad in Cut rotate; do
-  pk_set "ROTATION_MODE=\"$rbad\""; r=$(pk_rc); o=$(pk_out)
+  pk_set "ROTATION_MODE=\"$rbad\""; o=$(pk_out); r=$?
   n=$((n+1))
   case "$r:$o" in
     2:*ROTATION_MODE*) echo "ok   ROTATION_MODE='$rbad' ABORTS naming the key" ;;
@@ -2447,16 +2432,33 @@ done
 
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of
-# them, accepting any file under project/ and disabling the check while reporting clean.
+# them, accepting any file under project/ and disabling the check while reporting clean. BOTH
+# files are committed: the registry the key names must be absent from check 3's list and the
+# probe it does not name must be in it, and a `*unlisted-probe*` match alone could not tell the
+# key widening from check 3 listing everything.
 pk_set 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
-printf 'x\n' > "$PKD/memory/project/unlisted-probe.txt"
-( cd "$PKD" && git add -A && git commit -q -m probe --no-verify ) >/dev/null 2>&1
+printf 'x\n' > "$_b1/memory/project/my-registry.txt"
+printf 'x\n' > "$_b1/memory/project/unlisted-probe.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m probe --no-verify ) >/dev/null 2>&1
 o=$(pk_out)
-( cd "$PKD" && git rm -q memory/project/unlisted-probe.txt && git commit -q -m unprobe --no-verify ) >/dev/null 2>&1
-rm -rf "$PKD"
+rm -rf "$_b1"
 n=$((n+1))
-case "$o" in *unlisted-probe*) echo "ok   PROJECT_REGISTRY_EXTRA widens only what it names" ;;
-  *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;; esac
+case "$o" in
+  *"memory/project/my-registry.txt"*) echo "FAIL PROJECT_REGISTRY_EXTRA: check 3 named the registry the key admits — the key is not reaching check 3"; st=1 ;;
+  *"HYGIENE check 3 FAILED"*"memory/project/unlisted-probe.txt"*) echo "ok   PROJECT_REGISTRY_EXTRA widens only what it names" ;;
+  *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;;
+esac
+
+# THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
+# 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
+# shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
+# rule is shrink-only upward, so the tighter surviving pin wins over recomputing from scratch.
+# RAISED TO THE PRINTED COUNT and HOISTED to sit immediately above the PASS line
+# (TOOL-aRatifiedRulings-3): it used to be graded BEFORE the project-key section, so it read `n`
+# thirteen short of what the PASS line prints, and a pin read off that line would have redded
+# the suite on its first run. The pinned number is now the printed number, exactly.
+FLOOR_ASSERTIONS=374
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

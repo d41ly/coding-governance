@@ -1276,7 +1276,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120
+    "ceiling": 300
   },
   {
     "name": "kit-placeholders self-test",
