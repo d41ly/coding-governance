@@ -61,8 +61,12 @@ corpus: 3134 files · 104559 Bash/PowerShell tool_use commands · 79514 sidechai
 
 D4 rose 1471 to 1518 — the 47 runs the widened grammar reaches, the 38 classified above plus the
 ones a `time` in front of a `timeout` hid. After rev-4 the same walk over run-shaped near-misses
-finds ONE call, a shell function `t(){ …; "$@"; }` invoking a suite through `"$@"`, which is the
-run-time-assembly ceiling and stays a near-miss by design. Every D1 near-miss is one of two kinds:
+found ONE call, a shell function `t(){ …; "$@"; }` invoking a suite through `"$@"`, which is the
+run-time-assembly ceiling and stays a near-miss by design — **and that count was wrong; Reading 3
+below replaces it.** The walk read only the tokens that SURVIVED in the blanked view, so it could
+not see a suite inside a double-quoted `$( … )`, which the view blanked as string content, and it
+filed `-eL` and `120` as mention heads when they were `stdbuf -oL -eL bash <suite>` and
+`timeout -k 5 120 bash <suite>`, both runs. Every D1 near-miss is one of two kinds:
 166 carry the token only inside a string or a heredoc body, and 91 are the empty assignment or a
 bare `grep GATE_FULL=` argument — the OFF spelling and a mention, neither a flagged bar. The D3
 near-misses are `sed -n`, `grep -n`, `wc -l` and `cat` over the runner's own source.
@@ -77,14 +81,66 @@ tools/unattended/check-unattended.test.sh`, where the suite name is a `--writes`
 **A third reading came from the wired hook itself.** Minutes after S4, the hook denied this pass's
 `bash -n gate-guard.test.sh` — a syntax check that executes nothing. The corpus holds 412 raw
 `bash -n <suite>` mentions (57 on the driver suite alone), so a hook denying them would be switched
-off within a day. Spec rev-5 admits `bash -n`/`sh -n` in front of a D2 to D4 token; nothing else
-in the tables above moves, because those forms were never hits.
+off within a day. Spec rev-5 admits `bash -n`/`sh -n` in front of a D2 to D4 token. This record
+first said nothing else in the tables above moved "because those forms were never hits", which
+was false: under rev-4 the head after `bash -n` WAS the suite, so every one of those calls was a
+D4 hit, and rev-5 moved D4 down by about 210 commands. Reading 3 carries the rev-5 figure.
 
 The ORDER is the finding either way: D4 is 1518 of the 1929 command-level hits and 574 of them
 came from a sidechain, which is the population the child prompt's instruction cannot reach and the
 hook can.
 
-## The probe, verbatim
+## Reading 3 — the closing round's fold, an A/B over one corpus
+
+Taken 2026-09-14 on node `a` at the closing review's fold of F2, F7 and F8, by the probe below with
+one addition — a `D4 selftest.py` row, keyed on a D4 or D5 hit whose token ends `selftest.py`, so
+the whole-suite python legs F2 added to row D4 are counted apart from the `.test.sh` ones. BOTH
+hooks were run over the SAME store in one sitting — the shipped rev-5 hook as `8b5b3f0c` holds it,
+and the fold — because the store grows while a session runs and a figure from Reading 2 is not
+comparable to one taken now. 3157 files, 105 497 commands, 80 423 sidechain.
+
+| shape | rev-5 hits | sidechain | near-misses | fold hits | sidechain | near-misses |
+|---|---|---|---|---|---|---|
+| D1 GATE_FULL= | 253 | 62 | 233 | 253 | 62 | 233 |
+| D1 GATE_SELFTESTS= | 53 | 1 | 102 | 53 | 1 | 102 |
+| D2 | 44 | 31 | 849 | 47 | 34 | 846 |
+| D3 | 21 | 4 | 682 | 22 | 5 | 681 |
+| D4 `.test.sh` | 1305 | 546 | 7640 | 1372 | 585 | 7573 |
+| D4 `selftest.py` | 0 | 0 | 3513 | 782 | 357 | 2731 |
+| plain bar, allowed | 423 | 156 | — | 434 | 165 | — |
+
+What each delta is. **F2**: 782 commands in this store ran a whole-suite `selftest.py`, 357 of
+them from a sidechain, and the shipped hook admitted every one — the largest single hole the
+predicate had, and invisible to Reading 2 because its token set was the `.test.sh` convention. The
+2731 remaining `selftest.py` near-misses were walked the same way as the `.test.sh` ones: NONE
+carries a python launcher in front of a `selftest.py` token in the blanked view — every one is a
+mention, `grep`/`sed`/`cat`/`git diff` over the file, its name inside a heredoc or a quoted
+string. (The `--selftest` FLAG form is not in this row at all: its token is `--selftest`, not
+`selftest.py`, and the parity arms are where that admission is asserted.) **F7**: the 67 `.test.sh` commands, 3 `run-selftests.sh` commands and 1
+`run-unattended-gates.sh` command that joined the hit columns are the three shapes the review named
+— a suite inside a double-quoted `$( … )`, `timeout` with options before its duration, and
+`stdbuf`/`nice`/`ionice` in front of the launcher — plus a fourth the re-walk surfaced, `time` by
+path (`/usr/bin/time -f '%e' bash <suite>`). The plain-bar column rose by the 11 `timeout -k`
+invocations of the plain bar the grammar now reads through. **F8**: D1 does not move — the
+`$env:` spelling has zero corpus instances, as spec §3 recorded; the arm exists because it is the
+second wired tool's only spelling of the act, not because the store holds one.
+
+**The near-miss walk, corrected.** Run over the blanked VIEW of every `.test.sh` command the hook
+does not deny, keeping only a `bash`/`sh` launcher followed by a `.test.sh` token that survives
+blanking, in a simple command carrying none of `READ_ONLY_VERBS` and no `-n` — the same method
+Reading 2 used, with the two exclusions it applied by hand made explicit. Against the rev-5 hook
+it finds FIVE run-shaped near-misses, not one: `stdbuf -oL -eL bash <suite>`,
+`timeout -k 5 120 bash <suite>`, `/usr/bin/time -f 'real %e' bash <suite>`, and two shell
+functions (`t(){ …; "$@"; }` and `run(){ …; "$@"; }`) invoking a suite through `"$@"`. The
+double-quoted `$( … )` shape does not appear in that count because the rev-5 view blanks it —
+which is exactly what the earlier walk could not see, and why its ONE was wrong. Against the
+fold's hook the same walk finds TWO, both the shell-function `"$@"` class, the run-time-assembly
+ceiling spec §3 states and the header's `ponytail:` line owns. Every other class the raw text
+offers — 132 `&&`-led, 75 `PY`-led, 16 `PYEOF`-led — is a token inside a heredoc body or a quoted
+string, a mention, and the walk over the raw text that produced those figures is the
+over-inclusive one this correction retires.
+
+## The probe, verbatim (Reading 3 form — the `D4 selftest.py` key is its one addition over Reading 2)
 
 ```js
 #!/usr/bin/env node
@@ -108,8 +164,10 @@ const TOKENS = {
   D2: /run-selftests\.sh/,
   D3: /run-unattended-gates\.sh/,
   D4: /\.test\.sh\b/,
+  'D4 selftest.py': /selftest\.py\b/,
 }
 const keyOf = (h) => {
+  if ((h.row === 'D4' || h.row === 'D5') && /selftest\.py$/.test(h.token)) return 'D4 selftest.py'
   const r = h.row === 'D1' ? (h.token.startsWith('GATE_FULL=') ? 'D1 GATE_FULL=' : 'D1 GATE_SELFTESTS=') : h.row
   if (r === 'D5') return h.what === 'flag' ? (h.token.startsWith('GATE_FULL=') ? 'D1 GATE_FULL=' : 'D1 GATE_SELFTESTS=')
     : (/run-selftests\.sh$/.test(h.token) ? 'D2' : /run-unattended-gates\.sh$/.test(h.token) ? 'D3' : 'D4')

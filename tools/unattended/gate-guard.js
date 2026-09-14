@@ -16,21 +16,33 @@
  * surface that sees the act, and a `Bash|PowerShell` PreToolUse hook fires inside a sidechain
  * (`TOOL-cRefutedPremise-1`). Close to half of the corpus runs come from there.
  *
- * WHAT IT DENIES, at COMMAND POSITION in a string-blanked view of the command:
+ * WHAT IT DENIES, at COMMAND POSITION in a string-blanked view of the command — the head word after
+ * any of `env`, `export`, `time`, `nohup`, `NAME=value` words, `timeout` with its options and
+ * duration, `stdbuf`/`nice`/`ionice` with their options, and a launcher with one short option:
  *   D1  `GATE_FULL=<value>` or `GATE_SELFTESTS=<value>` with a NON-EMPTY value, bare or after
- *       `export`; the empty assignment is the OFF spelling the runner's own `-n` test reads, so it
- *       is the plain bar and is not a hit.
+ *       `export`, and the PowerShell-native `$env:GATE_FULL=<value>` too (closing review F8);
+ *       the empty assignment, bare or quoted, is the OFF spelling the runner's own `-n` test
+ *       reads, so it is the plain bar and is not a hit.
  *   D2  a word ending `run-selftests.sh`           — every declared self-test
  *   D3  a word ending `run-unattended-gates.sh`    — this kit's own suites
- *   D4  a word ending `.test.sh`                   — any one suite, other kits' included
+ *   D4  a word ending `.test.sh` or `selftest.py`  — any one suite, other kits' included; the
+ *       launcher in front may be `bash`, `sh`, `python` or `python3`. A bare `--selftest` FLAG on
+ *       some other file (`gotchas.py --selftest`) is the seconds-long direct check the child prompt
+ *       names and is NOT a hit; the whole-suite `selftest.py` FILE is (closing review F2 — six of
+ *       the manifest's `chunk = selftests` legs are that file, govkit's at 3445 s among them).
  *   D5  the quoted body of `bash -c` / `sh -c`, scanned once as a command of its own
  * A D2, D3 or D4 token is NOT a hit when the same simple command carries one of READ_ONLY_VERBS:
  * those forms answer in seconds and one of them is how the memory-tree kit re-renders its guides.
+ * The rows are measured against the manifest rather than restated beside it: the suite's parity arm
+ * feeds every `chunk = selftests` argv that carries no `--selftest` flag to this predicate.
  *
  * WHAT IT NEVER DENIES. The plain bar — `run-gates.sh` with neither flag — is the scoped form the
  * owner allows at the main loop, and this hook cannot tell a child from the main loop; the child
  * prompt forbids it there by instruction. A quoted MENTION of any of the shapes — a commit
- * message, a `grep` argument, a heredoc body — is invisible by construction of the view.
+ * message, a `grep` argument, a heredoc body — is invisible by construction of the view, with one
+ * exception the view keeps on purpose: a `$( … )` inside DOUBLE quotes is a command (closing
+ * review F7), so `printf '%s' "$(bash <suite>)"` is the run it is, while the same span in single
+ * quotes stays content.
  *
  * THE KEY. The predicate runs first, and the filesystem is read only on a hit: the overwhelming
  * majority of tool calls carry no deny shape and cost one scan of one string. On a hit the hook
@@ -117,12 +129,30 @@ function buildCommandView(cmd) {
     const ch = view[i]
     if (ch === "'" || ch === '"') {
       let j = i + 1
+      // ONE DEPARTURE from the scratch-guard copy (closing review F7): inside a DOUBLE-quoted
+      // string a `$( … )` span is a command, not content — `printf '%s' "$(bash <suite>)"` runs the
+      // suite — so it is kept unblanked, paren depth tracked, and scanSegments reads it through the
+      // `(` and `)` separators it already honours. Single quotes stay content.
+      let keep = ''
       while (j < view.length && view[j] !== ch) {
-        if (ch === '"' && view[j] === '\\') j++
+        if (ch === '"' && view[j] === '\\') { keep += '  '; j += 2; continue }
+        if (ch === '"' && view[j] === '$' && view[j + 1] === '(') {
+          let depth = 0
+          const start = j
+          j++   // past the `$`; the loop below opens on the `(`
+          do {
+            if (view[j] === '(') depth++
+            else if (view[j] === ')') depth--
+            j++
+          } while (j < view.length && depth > 0)
+          keep += view.slice(start, j)
+          continue
+        }
+        keep += ' '
         j++
       }
       const close = j < view.length ? j : view.length
-      out += ch + ' '.repeat(Math.max(0, close - i - 1)) + (j < view.length ? ch : '')
+      out += ch + keep.slice(0, Math.max(0, close - i - 1)) + (j < view.length ? ch : '')
       i = close + 1
     } else {
       out += ch
@@ -192,7 +222,10 @@ function scanSegments(cmd, view) {
   return out
 }
 
-const FLAG_RE = /^(GATE_FULL|GATE_SELFTESTS)=(.*)$/
+// The PowerShell-native spelling too (closing review F8): under the second tool this hook is wired
+// on, `NAME=value cmd` is not valid syntax and the one spelling that runs the flagged bar there is
+// `$env:GATE_SELFTESTS=1; bash …`. readTokenAt already unquotes, so `$env:GATE_FULL=""` is OFF.
+const FLAG_RE = /^(?:\$env:)?(GATE_FULL|GATE_SELFTESTS)=(.*)$/
 const ASSIGN_RE = /^[A-Za-z_][A-Za-z0-9_]*=/
 const DURATION_RE = /^\d+[smhd]?$/
 const SHORT_OPT_RE = /^-[A-Za-z]+$/
@@ -200,7 +233,7 @@ const SHORT_OPT_RE = /^-[A-Za-z]+$/
 function resolveFileRow(tok) {
   if (/run-selftests\.sh$/.test(tok)) return { row: 'D2', what: 'runner', shape: 'the self-test runner' }
   if (/run-unattended-gates\.sh$/.test(tok)) return { row: 'D3', what: 'runner', shape: 'the self-test runner' }
-  if (/\.test\.sh$/.test(tok)) return { row: 'D4', what: 'suite', shape: 'a self-test suite' }
+  if (/\.test\.sh$/.test(tok) || /selftest\.py$/.test(tok)) return { row: 'D4', what: 'suite', shape: 'a self-test suite' }
   return null
 }
 
@@ -223,10 +256,37 @@ function scanDenyHits(cmd, view, depth) {
       if (flag && flag[2] !== '') {
         hits.push({ row: 'D1', what: 'flag', shape: 'the flagged merge bar', token: t })
         k++
-      } else if (t === 'env' || t === 'export' || t === 'time' || t === 'nohup' || ASSIGN_RE.test(t)) {
+      } else if (t === 'env' || t === 'export' || t === 'nohup' || ASSIGN_RE.test(t)) {
         k++
-      } else if (t === 'timeout' && k + 1 < toks.length && DURATION_RE.test(toks[k + 1])) {
-        k += 2
+      } else if (t === 'stdbuf' || t === 'nice' || t === 'ionice' || t === 'time' || /\/time$/.test(t)) {
+        // Prefix words that take options before the launcher (closing review F7): `stdbuf -oL -eL
+        // bash <suite>`, `nice -n 10 bash <suite>`, `/usr/bin/time -f '%e' bash <suite>` — the
+        // last found by the corpus walk this fold re-ran. Their `-x` options and the value after
+        // a bare `-n`, `-c`, `-f` or `-o` are skipped.
+        k++
+        while (k < toks.length && /^-/.test(toks[k])) {
+          if (/^-[ncfo]$/.test(toks[k]) && k + 1 < toks.length) k++
+          k++
+        }
+      } else if (t === 'timeout' && k + 1 < toks.length && (DURATION_RE.test(toks[k + 1]) || /^-/.test(toks[k + 1]))) {
+        // `timeout [-k DURATION] [-s SIG] [--foreground] DURATION cmd` (closing review F7): the
+        // options and their values are skipped before the duration, so `-k` no longer makes
+        // `timeout` the head and `timeout -k 5 120 bash <suite>` is the run it is.
+        k++
+        while (k < toks.length && /^-/.test(toks[k])) {
+          if (/^-[ks]$/.test(toks[k]) && k + 1 < toks.length) k++
+          k++
+        }
+        if (k < toks.length && DURATION_RE.test(toks[k])) k++
+      } else if (t === 'python' || t === 'python3') {
+        // The launcher of a `selftest.py` suite (closing review F2). One short option is skipped
+        // the way bash's is; `-c` and `-m` carry code or a module and never a suite file, so the
+        // segment is left alone rather than read as shell — python code is not this predicate's.
+        k++
+        if (k < toks.length && SHORT_OPT_RE.test(toks[k])) {
+          if (toks[k] === '-c' || toks[k] === '-m') { head = null; break }
+          k++
+        }
       } else if (t === 'bash' || t === 'sh') {
         k++
         if (k < toks.length && SHORT_OPT_RE.test(toks[k])) {

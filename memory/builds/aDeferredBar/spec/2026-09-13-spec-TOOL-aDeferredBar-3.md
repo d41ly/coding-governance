@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
+**Status:** CLOSED · rev-6 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -75,8 +75,12 @@ the corpus in §4 shows close to half of those runs come from there.
   predicate is textual; `s=tools/unattended; bash $s/unattended.test.sh` walks past it, as does a
   python heredoc that spawns the suite. The same ceiling `scratch-guard.js` states of itself, and
   no call in the corpus has either shape; the upgrade path is a tokenizer, not more regexes.
-- **No PowerShell-native spelling.** `$env:GATE_FULL=` occurs zero times in the corpus. The hook
-  reads PowerShell calls too, but the shapes it knows are the shell ones.
+- **No PowerShell-native spelling** was rev-1 to rev-5's reading, on the ground that
+  `$env:GATE_FULL=` occurs zero times in the corpus. WITHDRAWN at rev-6 (closing review F8): the
+  hook is wired on `Bash|PowerShell`, `NAME=value cmd` is not PowerShell syntax, so `$env:NAME=value;`
+  is that tool's ONLY spelling of the act, and a claim of PowerShell coverage with no arm for it
+  was a claim about nothing. Row D1 reads the `$env:` prefix; the corpus count is still zero,
+  which is why a suite arm carries it rather than a corpus row.
 - **Every criterion in §6 is a direct observation, and not because a gate demands it.** Unit 2's
   cutoff is 2026-09-14, so this spec, dated 2026-09-13, is outside that gate's population; the
   criteria are direct because the build README's fifth rule and the child prompt unit 1 ships bind
@@ -141,17 +145,23 @@ target, never the common dir's, because the common dir's `HEAD` is the primary t
 
 Command position is the line start or the text after `;`, `&&`, `||`, `|`, `(`, `{`, `then`, `do`
 or `else`, followed by any of `env`, `export`, `time`, `nohup`, any number of `NAME=value` words,
-`timeout N`, and `bash` or `sh` with one short option. `{`, `time` and `nohup` joined at rev-4: the
+`timeout N`, and `bash` or `sh` with one short option. rev-6 (closing review F7) widens the prefix
+grammar to what the corpus actually types: `timeout` with its `-k`/`-s`/`--foreground` options
+before the duration, `stdbuf`, `nice`, `ionice` and `time` by path (`/usr/bin/time -f FMT`) with
+their options, and `python`/`python3` with one short option as a launcher (never `-c` or `-m`,
+whose argument is code); and the blanked view keeps a `$( … )` span inside DOUBLE quotes unblanked
+with its paren depth tracked, so `printf '%s' "$(bash <suite>)"` is read as the run it is while the
+same span in single quotes stays content. `{`, `time` and `nohup` joined at rev-4: the
 AC11 measurement of the rev-3 grammar over the shipped predicate found 31 `time bash <suite>`, 4
 `nohup bash <suite>` and 3 `{ bash <suite>` calls among the D4 near-misses, every one a run, which
 is that criterion's own RED. In the blanked view, at that position:
 
 | row | shape | what is matched | why |
 |---|---|---|---|
-| D1 | flag prefix | `GATE_FULL=` or `GATE_SELFTESTS=` followed by a non-empty value, bare or after `export` | `run-gates.sh:158` tests `-n`, so the empty assignment is the OFF spelling and is not a hit |
+| D1 | flag prefix | `GATE_FULL=` or `GATE_SELFTESTS=` followed by a non-empty value, bare or after `export`, and the PowerShell-native `$env:GATE_FULL=` (rev-6, F8) | `run-gates.sh:158` tests `-n`, so the empty assignment, bare or quoted, is the OFF spelling and is not a hit |
 | D2 | runner | a word ending `run-selftests.sh` | every declared self-test |
 | D3 | runner | a word ending `run-unattended-gates.sh` | this kit's own suites |
-| D4 | suite | a word ending `.test.sh` | any one suite, other kits' included |
+| D4 | suite | a word ending `.test.sh` or `selftest.py` (rev-6, F2), behind `bash`, `sh`, `python` or `python3` | any one suite, other kits' included; a `--selftest` FLAG on another file is the seconds-long direct check and is not a hit; the suite's parity arm derives every `chunk = selftests` argv from the manifest and asserts each is a hit, one exemption announced |
 | D5 | nested | the quoted argument of `bash -c` or `sh -c`, read from the ORIGINAL text at the offset the blanked view locates, and scanned as a command of its own, one level deep | the blanked view alone would hide it, and the corpus holds eight such calls, every one a run: `bash -c 'timeout 5400 bash tools/unattended/unattended.test.sh'` among them |
 
 A row D2, D3 or D4 token is NOT a hit when the same simple command, up to the next `;`, `&&`,
@@ -301,12 +311,12 @@ so rather than letting a reader assume it is graded.
 | `tools/unattended/PROTOCOL.template.md` | fact 13 in section 2's numbered list, and the sentence after fact 12 amended so fact 13 is named as always written when `HEAD` is a branch |
 | `memory/guides/UNATTENDED-PROTOCOL.md` | re-copied by `bash tools/unattended/adopt-unattended.sh`, never edited; check 10 of `check-unattended.sh` grades the pair |
 | `tools/unattended/unattended.test.sh` | one arm beside 50d at line 2897: a default-branch-anchored preflight writes `run-branch:` equal to `$(git symbolic-ref HEAD)` read from the fixture at the moment of the preflight, and the arm asserts against that read, never a literal — `reset_tree` at line 355 checks out `unit`, so the value there is `refs/heads/unit`, and a preflight with `HEAD` on `main` is refused outright at `unattended.sh:903` where the merge-base equals `HEAD`; its budget row (3860 s against 2569 s measured) does not move for one arm on an existing fixture |
-| `tools/unattended/gate-guard.test.sh` | new, the withheld suite; every fixture is a scratch repo under `mktemp -d` holding a `.git` `HEAD`, a conf and a record, never the real tree; prints `PASS (<n> assertions)` against a derived `FLOOR_ASSERTIONS` as `scratch-guard.test.sh:239` does; carries the `PHASES_CORE` parity arm and every payload §6 feeds by hand |
-| `tools/unattended/adopt-unattended.test.sh` | `seed()` gains `gate-guard.fragment.json` in its copy list and writes a `.claude/settings.json` carrying the fragment's marker, so its two `--check` arms at lines 76 and 119 keep exit 0 once the S6 arm exists; it also gains `VERBS.template.md` and `playbook.fixture.template.md` (rev-4), without which the install those arms depend on refuses; its 60 s budget row (38 s measured) does not move for two file writes and one grep |
+| `tools/unattended/gate-guard.test.sh` | new, the withheld suite; every fixture is a scratch repo under `mktemp -d` holding a `.git` `HEAD`, a conf and a record, never the real tree; prints `PASS (<n> assertions)` against a derived `FLOOR_ASSERTIONS` as `scratch-guard.test.sh:239` does; carries the `PHASES_CORE` parity arm and every payload §6 feeds by hand; rev-6 adds the F2 deny and flag-allow pair, the manifest-parity pair, four F7 run-shape denies with a token check and a control, and the two F8 PowerShell `$env:` arms with a token check — `FLOOR_ASSERTIONS` 90 to 103 by that static count |
+| `tools/unattended/adopt-unattended.test.sh` | `seed()` gains `gate-guard.fragment.json` in its copy list and writes a `.claude/settings.json` carrying the fragment's marker, so its two `--check` arms at lines 76 and 119 keep exit 0 once the S6 arm exists; it also gains `VERBS.template.md` and `playbook.fixture.template.md` (rev-4), without which the install those arms depend on refuses; its 60 s budget row (38 s measured) does not move for two file writes and one grep; rev-6 adds arm 1a (F6, F5, F11): the settings file moved aside, the marker under `PostToolUse`, the marker under matcher `Bash` alone, an out-of-tree settings file declared through `GOV_SETTINGS_JSON`, the fragment deleted, and the restored tree — eight assertions; the suite carries no assertion floor and is on no bar, which is a backlog row and not this fold's |
 | `tools/unattended/kit.toml` | `gate-guard.test.sh` joins the `project-owned` include list; the `**` engine rule already ships the hook and the fragment |
 | `tools/run-gates/selftest-budgets.txt` | one row, budget from the measured reading times 1.5 floored at 60 s, so `run-unattended-gates.sh` enumerates it through the runner's list verb |
-| `tools/install-prefix-carried.txt` | the `selftest-budgets.txt` row RAISED 14 to 15 by hand with its reason, because every budget row is a gov suite path by construction and the ban admits a hand-justified raise in the pass that wants it; and a hand-written row for `gate-guard.test.sh` itself (rev-4), because the carried population is every path the descriptors resolve, `project-owned` included, and the suite's arms spell the deny shapes as command strings |
-| `tools/unattended/adopt-unattended.sh` | a sixth artifact in the `--check` branch: the settings file lacks the marker read from the kit's fragment, print the UNWIRED refusal naming `$PY $ROOT/tools/settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json` and exit 1, in the branch's own sequential-refusal style. The brief named `adopt-process-monitor.sh`'s `add_problem` register; this adopter has no register and adding one for a single arm is a second style in one file |
+| `tools/install-prefix-carried.txt` | the `selftest-budgets.txt` row RAISED 14 to 15 by hand with its reason, because every budget row is a gov suite path by construction and the ban admits a hand-justified raise in the pass that wants it; and a hand-written row for `gate-guard.test.sh` itself (rev-4), because the carried population is every path the descriptors resolve, `project-owned` included, and the suite's arms spell the deny shapes as command strings; re-keyed 37 to 39 (F1: the rev-5 arms landed after the row was written in the same commit), 39 to 42 (F2) and 42 to 48 (F7, F8), each with its reason, and `unattended.test.sh`'s row 3 to 8 for unit 2's fixture-internal paths |
+| `tools/unattended/adopt-unattended.sh` | a sixth artifact in the `--check` branch: the settings file lacks the marker read from the kit's fragment, print the UNWIRED refusal naming `$PY $ROOT/tools/settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json` and exit 1, in the branch's own sequential-refusal style. The brief named `adopt-process-monitor.sh`'s `add_problem` register; this adopter has no register and adding one for a single arm is a second style in one file. rev-6 (F5, F11): the settings file is `${GOV_SETTINGS_JSON:-$ROOT/.claude/settings.json}`, the way `check-wiring.sh` resolves it, and the marker must sit in a group under the fragment's `event` with the fragment's `matcher`, read without a JSON parser in the `matchers_of` shape; an absent fragment REFUSES naming the file, because `KIT_DIR` is this script's own directory and the `**` rule ships the fragment beside it |
 | `tools/unattended/README.md` | the paragraph: the act is refused, not only forbidden, and which shapes; pinned phrase above |
 | `tools/unattended/SKILL.template.md` | the half-sentence appended to the bullet unit 1 adds; pinned phrase above |
 | `.claude/skills/unattended/SKILL.md` | re-rendered by `bash tools/unattended/adopt-unattended.sh`, never edited |
@@ -374,7 +384,14 @@ no deny shape.
   `printf '%s' "$P" | node "$HOOK"; echo "rc=$?"` per payload, each of eleven payloads — row D1
   with the `GATE_FULL` prefix, D1 after `export`, D1 behind `env`, D1 behind a `NAME=value` word,
   D1 behind `timeout 30`, D1 after `&&`, D1 after `then`, D2, D3, D4, and D5 wrapping a D4 token in
-  `bash -c` quotes — prints `rc=2` and each stderr names its matched token.
+  `bash -c` quotes — prints `rc=2` and each stderr names its matched token. rev-6 adds, each
+  observed `rc=0` first on the rev-5 hook: a python launcher in front of a whole-suite selftest.py
+  file, spelled as prose here because that shape is now a hit (F2, with `python3 <file> --selftest`
+  as its `rc=0` control), a suite inside a double-quoted `$( … )`, `timeout -k 5 120 bash <suite>`,
+  `(stdbuf -oL -eL bash <suite>) &` and `/usr/bin/time -f FMT bash <suite>` (F7), and under
+  tool `PowerShell` `$env:GATE_SELFTESTS=1; bash <bar>` with `$env:GATE_FULL=""; bash <bar>` as its
+  `rc=0` control (F8); and the parity payloads: every `chunk = selftests` argv of `tools/gate-legs.json`
+  without a `--selftest` flag, fed at `BUILDING`, prints `rc=2`, one declared exemption announced.
   Red when: an arm's stderr names a token the fixture command does not contain, the D5 arm allows
   because the nested body was blanked and never read, or either separator arm allows, which is a
   predicate matching at line start only.
@@ -433,7 +450,12 @@ no deny shape.
   install step is the precondition: `--check` refuses sequentially and its first arm
   (`adopt-unattended.sh:259`, the unrendered Skill) exits 1 on a tree that is only seeded, before
   any sixth arm runs, so a seed-only fixture observes the Skill arm and not this one. Observed RED
-  first: the installed-then-unwired tree against the adopter as it stands prints `rc=0`.
+  first: the installed-then-unwired tree against the adopter as it stands prints `rc=0`. rev-6
+  (F5, F6, F11), each observed against the adopter at `8b5b3f0c` first: the marker under
+  `PostToolUse` or under matcher `Bash` alone prints `rc=1` UNWIRED (that adopter printed `in sync`);
+  the settings file moved out of tree and declared through `GOV_SETTINGS_JSON` prints `rc=0` (that
+  adopter printed UNWIRED); the fragment deleted from the installed copy prints `rc=1` naming
+  `gate-guard.fragment.json is missing from the kit` (that adopter printed `in sync`).
   Red when: an unwired tree passes `--check`, which is the silent-unwiring class.
 - **AC11** — When `node "$PROBE" "$HOOK" ~/.claude/projects` runs, where `PROBE` is the probe
   script the build record carries verbatim and which requires the hook's exported `scanDenyHits`
@@ -442,7 +464,10 @@ no deny shape.
   that table, and every near-miss example printed is a mention, not a run.
   fixture: the store under `~/.claude/projects/` on node `a`; 3049 files on 2026-09-13.
   cost: about 70 s on node `a`.
-  figure: DERIVED at observation time; §4's table is the 2026-09-13 reading.
+  figure: DERIVED at observation time; §4's table is the 2026-09-13 reading, and the record's
+  Reading 3 (rev-6) is an A/B of the rev-5 hook and the fold over one store, with the near-miss
+  walk corrected: five run-shaped near-misses under rev-5, two under the fold, both the
+  shell-function `"$@"` ceiling.
   Red when: a listed near-miss is a run, which means the command-position grammar admits a shape
   the blanked view then hides.
 - **AC12** — When `python tools/codebase-map/test_codebase_map.py` runs, it exits 0 with the
@@ -494,9 +519,13 @@ mentions this kit nowhere. `memory hygiene` joins for the protocol render's byte
 
 New arm: tools/unattended/gate-guard.test.sh · a fixture record at BUILDING and the flagged bar, one arm per §6 payload, the `PHASES_CORE` parity arm, and the default-branch record keyed by `run-branch:` · `FLOOR_ASSERTIONS` derived at the suite's first green, none moved
 
+New arm: tools/unattended/gate-guard.test.sh · rev-6, the closing round: the whole-suite `selftest.py` deny with the `--selftest` flag as its allow control, the manifest-parity pair over every `chunk = selftests` argv, four run-shape denies (a double-quoted `$( … )`, `timeout` with options, `stdbuf`, `time` by path) with a control, and the two PowerShell `$env:` arms · `FLOOR_ASSERTIONS` 90 to 103 by the static count
+
 New arm: tools/unattended/unattended.test.sh · a default-branch-anchored preflight read back for `run-branch:` against the fixture's own `git symbolic-ref HEAD`, never a literal; the break is a driver that does not write it · none
 
 New arm: tools/unattended/adopt-unattended.test.sh · no new arm — `seed()` writes the settings file the S6 arm reads; the break is an unseeded tree, `--check` exits 1 · none
+
+New arm: tools/unattended/adopt-unattended.test.sh · rev-6, arm 1a: the settings file gone, the marker under the wrong event, under the wrong matcher, out of tree through `GOV_SETTINGS_JSON`, the fragment gone, and the restored tree; the break is the adopter at `8b5b3f0c` · no floor exists in this suite to move, recorded as a backlog row
 
 ## 8. Open questions
 
@@ -584,6 +613,19 @@ New arm: tools/unattended/adopt-unattended.test.sh · no new arm — `seed()` wr
   token is not a run. Found by the wired hook itself, which denied the pass's own syntax check of
   its suite minutes after S4 landed; 412 raw mentions of the shape in the corpus, every one a
   parse and none a run. One allow arm in the suite and one allow payload under AC3 observed direct.
+- rev-6 · 2026-09-14 · §3 · §4 · §6 · §7 · AC2 · AC10 · AC11 · folded closing diff review round 1,
+  `reviews/2026-09-14-review-TOOL-aDeferredBar-1-closing-diff-round1.md`, findings F1 F2 F5 F6 F7
+  F8 F11: the `install-prefix-carried.txt` row re-keyed with its reasons and the AC9 ledger line
+  amended to the tree it observed (F1, with the class recorded under `memory/gotchas/`); row D4
+  gains the whole-suite `selftest.py` file behind a python launcher, with the manifest-parity arm
+  (F2); the view keeps a double-quoted `$( … )` span and the prefix grammar takes `timeout`'s
+  options, `stdbuf`/`nice`/`ionice` and `time` by path (F7, and the corpus record's near-miss walk
+  corrected in its Reading 3); row D1 reads the PowerShell-native `$env:` prefix and the §3
+  non-goal is withdrawn (F8); the adopter resolves the settings file as `check-wiring.sh` does and
+  asserts the marker under the fragment's event and matcher (F5), refuses an absent fragment (F11),
+  and its suite gains the UNWIRED arm the seed comment promised (F6). Every arm observed RED-first
+  on the rev-5 hook or the `8b5b3f0c` adopter; floors move by the static counts. Status stays
+  CLOSED.
 
 ## 10. Reuse audit
 

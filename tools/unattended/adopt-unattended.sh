@@ -333,15 +333,40 @@ if [ "$MODE" = "--check" ]; then
   # that file for this marker, so an adopter with the file and no entry has a guard that never
   # fires and a --check that said "in sync". The marker is read from the kit's own fragment, never
   # spelled here, and the remedy is the one merge command that writes the entry idempotently.
+  # The fragment is SHIPPED SURFACE (closing review F11): KIT_DIR is this script's own directory
+  # and the `**` engine rule ships the fragment beside it, so its absence is a broken copy and a
+  # refusal naming the file, like the five artifacts above — not the silent `in sync` it was.
   GG_FRAG="$KIT_DIR/gate-guard.fragment.json"
-  if [ -f "$GG_FRAG" ]; then
-    GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
-    [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no marker, so the wiring arm has nothing to look for"; exit 1; }
-    if ! grep -qF "$GG_MARK" "$ROOT/.claude/settings.json" 2>/dev/null; then
-      echo "unattended: the gate-guard hook is UNWIRED — .claude/settings.json carries no entry naming $GG_MARK, so the hook that refuses a self-test suite inside a build pass never fires"
-      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json"
-      exit 1
-    fi
+  [ -f "$GG_FRAG" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json is missing from the kit, so the gate-guard wiring cannot be checked and nothing else on the bar asserts the file — re-copy the kit"; exit 1; }
+  GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no marker, so the wiring arm has nothing to look for"; exit 1; }
+  GG_EVENT=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  GG_MATCHER=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  [ -n "$GG_EVENT" ] && [ -n "$GG_MATCHER" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in"; exit 1; }
+  # THE SETTINGS FILE IS RESOLVED THE WAY check-wiring.sh RESOLVES IT (closing review F5): a
+  # declared GOV_SETTINGS_JSON first, else the repo's own — an out-of-tree layout is a legitimate
+  # per-machine choice that resolver documents, and grepping the in-tree path alone redded it
+  # UNWIRED while the printed remedy would have created the in-tree decoy check-wiring warns about.
+  # And the marker must sit in a group under the fragment's EVENT with the fragment's MATCHER:
+  # an entry parked under PostToolUse, or under another matcher, passed the bare grep and never
+  # fired. Read without a JSON parser, as check-wiring's `matchers_of` reads it: flattened, each
+  # `{"matcher":` opens a group and its hooks array ends at the first `]`; the group's event is the
+  # last `"<Event>":[` seen before it, carried forward when the last such key is the group's own
+  # `"hooks":[`.
+  SJ=${GOV_SETTINGS_JSON:-$ROOT/.claude/settings.json}
+  GG_WIRED=$( [ -f "$SJ" ] && tr -d ' \t\r\n' < "$SJ" | sed 's/{"matcher":/\n{"matcher":/g' \
+    | awk -v M="$GG_MARK" -v W="$GG_MATCHER" -v E="$GG_EVENT" '
+        { lead = prev; prev = $0
+          s = lead; key = ""
+          while (match(s, /"[A-Za-z]+":\[/)) { key = substr(s, RSTART + 1, RLENGTH - 4); s = substr(s, RSTART + RLENGTH) }
+          if (key != "" && key != "hooks") ev = key
+          g = $0; sub(/\].*$/, "", g)
+          if (index(g, M) && ev == E && match(g, /^{"matcher":"[^"]*"/) && substr(g, 13, RLENGTH - 13) == W) print "wired"
+        }' | head -1 )
+  if [ "$GG_WIRED" != wired ]; then
+    echo "unattended: the gate-guard hook is UNWIRED — ${SJ#"$ROOT"/} carries no $GG_EVENT entry under matcher $GG_MATCHER naming $GG_MARK, so the hook that refuses a self-test suite inside a build pass never fires"
+    echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json"
+    exit 1
   fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0

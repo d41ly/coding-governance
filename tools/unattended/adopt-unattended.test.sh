@@ -45,7 +45,7 @@ seed() { # dir  -> a git repo carrying the kit and a conf
   # install" did not hold on this seed.
   cp "$HERE/VERBS.template.md" "$HERE/playbook.fixture.template.md" "$1/$KIT_REL/"
   # TOOL-aDeferredBar-3: the adopter's --check reads the gate-guard hook's marker out of the
-  # settings file, so the seed carries a wired one; the UNWIRED arm below removes it and reads the
+  # settings file, so the seed carries a wired one; arm 1a moves it aside, misfiles it and reads the
   # refusal. The marker is read from the fragment, never spelled, for the reason the adopter gives.
   mkdir -p "$1/.claude"
   printf '{"hooks":{"PreToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node \\"${CLAUDE_PROJECT_DIR}/%s/%s\\""}]}]}}\n' \
@@ -87,6 +87,40 @@ same "arm 1 left no placeholder" \
   "$(grep -cE '\{\{[A-Z_]+\}\}' "$A/.claude/skills/unattended/SKILL.md" || true)" "0"
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1 --check agrees with what --render just wrote" "$?" "0"
+
+# ---- ARM 1a: THE UNWIRED REFUSAL and the group it must sit in (aDeferredBar closing review F6, F5,
+# ---- F11). The seed comment above promised an UNWIRED arm that did not exist: both --check arms ran
+# ---- on wired trees, so a regressed marker read would have reported `in sync` over a hook that never
+# ---- fires. Each break below was observed against the adopter at 8b5b3f0c first: the moved-aside
+# ---- file refused there too, but a marker parked under PostToolUse or under matcher `Bash` alone
+# ---- passed, an out-of-tree settings file declared through GOV_SETTINGS_JSON was reported UNWIRED,
+# ---- and a deleted fragment fell through to `in sync`.
+mv "$A/.claude/settings.json" "$A/.claude/settings.json.aside"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a --check refuses with the settings file gone" "$rc" "1"
+hit "$out" "gate-guard hook is UNWIRED"
+mv "$A/.claude/settings.json.aside" "$A/.claude/settings.json"
+# The marker under the WRONG EVENT, then under the wrong MATCHER: present in the file, never fired.
+sed 's/PreToolUse/PostToolUse/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a a marker under PostToolUse is UNWIRED" "$?" "1"
+sed 's/PostToolUse/PreToolUse/; s/Bash|PowerShell/Bash/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a a marker under another matcher is UNWIRED" "$?" "1"
+sed 's/"Bash"/"Bash|PowerShell"/' "$A/.claude/settings.json" > "$A/.claude/s.tmp" && mv "$A/.claude/s.tmp" "$A/.claude/settings.json"
+# An OUT-OF-TREE settings file, declared the way check-wiring.sh resolves it, is wired.
+mv "$A/.claude/settings.json" "$TMP/settings.out-of-tree.json"
+( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.out-of-tree.json" bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a an out-of-tree settings file declared via GOV_SETTINGS_JSON is wired" "$?" "0"
+mv "$TMP/settings.out-of-tree.json" "$A/.claude/settings.json"
+# The fragment is shipped surface: absent is a refusal naming the file, never a silent pass.
+mv "$A/$KIT_REL/gate-guard.fragment.json" "$TMP/fragment.aside"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a --check refuses with the fragment gone" "$rc" "1"
+hit "$out" "gate-guard.fragment.json is missing from the kit"
+mv "$TMP/fragment.aside" "$A/$KIT_REL/gate-guard.fragment.json"
+( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 1a the restored tree is in sync again" "$?" "0"
 
 # ---- ARM 1b: HOSTILE CONF VALUES, round-tripped.
 # ---- Conf values are free prose. The previous `sed` render interpolated them unescaped into

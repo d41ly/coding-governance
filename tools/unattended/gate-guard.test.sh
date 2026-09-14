@@ -118,6 +118,55 @@ run "nohup bash <suite> & -> deny"                 2 "$B" 'nohup bash tools/x.te
 run "{ bash <suite>; } -> deny"                    2 "$B" 'cd x && { bash tools/x.test.sh > out; echo rc=$?; }'
 run "  near-miss: time bash <suite> --check -> allow" 0 "$B" 'time bash tools/x.test.sh --check'
 
+# ---- closing review F2: a whole-suite `selftest.py` FILE is a suite; a `--selftest` FLAG is not -----
+# Both readers of this build spelled "suite" as the `.test.sh` filename convention, and the manifest's
+# python whole-suite legs — govkit's at 3445 s — walked past both. RED-first on the shipped hook:
+# the first payload printed rc=0.
+run "F2 python <kit>/selftest.py -> deny"           2 "$B" 'python tools/govkit/selftest.py'; check_names "F2 selftest.py" 'tools/govkit/selftest.py'
+run "F2 a --selftest FLAG on another file -> allow"  0 "$B" 'python3 tools/memory-tree/gotchas.py --selftest'
+# THE PARITY ARM, and the reason the rows above are not the last word: the suite population is the
+# manifest's `chunk = selftests` legs, DERIVED here rather than restated, minus the `--selftest`
+# flag form the child prompt admits. Every member must be a hit at BUILDING. ONE assertion over the
+# population, so the floor does not move with the manifest, plus one that the population is
+# non-empty — a manifest naming no suite would otherwise certify parity by grading nothing.
+# The exemption list is a DECLARED, ANNOUNCED skip with its reason, asserted live (a stale name reds):
+#   test_recall_floor.py — the pytest `test_*.py` convention, gov-only, 12 s to 34 s in the ledger.
+#   A `test_*.py` word shape would deny an adopter's single-file pytest run, which is exactly the
+#   direct check a spec may name, so the class is not gated and this one member is named instead.
+LEGS="$HERE/../gate-legs.json"
+PARITY_EXEMPT='test_recall_floor.py'
+if [ -f "$LEGS" ]; then
+  pop=$("$TESTPY" -c 'import json,sys
+for l in json.load(open(sys.argv[1], encoding="utf-8")):
+    a = l.get("argv") or []
+    if l.get("chunk") == "selftests" and "--selftest" not in a: print(" ".join(a))' "$LEGS" | tr -d '\r')
+  # `tr -d '\r'`: a Windows python writes CRLF to a pipe, and a CR on the basename made the exemption
+  # never match — observed while writing this arm, and the stale-exemption clause is what said so.
+  popn=$(printf '%s\n' "$pop" | grep -c .)
+  if [ "$popn" -gt 0 ]; then echo "ok   parity: the manifest holds $popn whole-suite selftests leg(s)"; pass=$((pass+1))
+  else echo "FAIL parity: the manifest holds no whole-suite selftests leg, so parity would be certified over nothing"; fail=$((fail+1)); fi
+  unmatched=""; skipped=""; exempt_seen=""
+  while IFS= read -r cmd; do
+    [ -n "$cmd" ] || continue
+    base=${cmd##*/}
+    case " $PARITY_EXEMPT " in *" $base "*) skipped="$skipped $base"; exempt_seen="$exempt_seen $base"; continue ;; esac
+    payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Bash","cwd":sys.argv[1],"tool_input":{"command":sys.argv[2]}}))' "$(resolve_native "$B")" "$cmd")
+    printf '%s' "$payload" | node "$HOOK" >/dev/null 2>&1; [ $? = 2 ] || unmatched="$unmatched
+     $cmd"
+  done <<PARITY
+$pop
+PARITY
+  for x in $PARITY_EXEMPT; do
+    case " $exempt_seen " in *" $x "*) ;; *) unmatched="$unmatched
+     (stale exemption: $x names no whole-suite selftests leg in the manifest)" ;; esac
+  done
+  for x in $skipped; do echo "     skip: $x — declared exempt, see the comment above"; done
+  if [ -z "$unmatched" ]; then echo "ok   parity: every whole-suite selftests leg of the manifest is a hit at BUILDING ($popn legs, $(printf '%s' "$skipped" | wc -w) exempt)"; pass=$((pass+1))
+  else echo "FAIL parity: a manifest suite invocation the hook does NOT deny at BUILDING:$unmatched"; fail=$((fail+1)); fi
+else
+  echo "FAIL parity: no gate manifest beside the kit at $LEGS, so the suite population cannot be derived"; fail=$((fail+1))
+fi
+
 # ---- AC3: the allow set is the tail of PHASES_CORE from VERIFYING -------------------------------
 for ph in VERIFYING LANDING LANDED ABORTED; do
   F=$(build_fixture "$ph")
@@ -228,8 +277,23 @@ run "suite inside a subshell -> deny"                          2 "$B" '(cd /x; b
 run "suite inside a command substitution -> deny"              2 "$B" 'x=$(bash tools/x.test.sh)'
 run "bash -x <suite> -> deny"                                  2 "$B" 'bash -x tools/x.test.sh'
 
+# ---- closing review F7: three corpus RUN shapes the rev-5 view let through, each observed rc=0 first
+# A double-quoted `$( … )` was blanked as string content; `timeout -k 5 120` made `-k` the head;
+# `stdbuf` was not a prefix word. Each is a sidechain-corpus shape, and each is a run.
+run "F7 a suite inside a double-quoted \$( ) -> deny"          2 "$B" 'printf "rc=%s\n" "$(bash tools/memory-tree/kit-dogfood-parity.test.sh; echo $?)"'; check_names "F7 subst" 'tools/memory-tree/kit-dogfood-parity.test.sh'
+run "F7 timeout -k 5 120 bash <suite> -> deny"                 2 "$B" 'timeout -k 5 120 bash tools/unattended/unattended.test.sh > out 2>&1'
+run "F7 (stdbuf -oL -eL bash <suite>) & -> deny"               2 "$B" '(stdbuf -oL -eL bash tools/run-gates/run-gates.test.sh > out 2>&1) &'
+# ...and the fourth the re-run corpus walk surfaced: `time` by path, with its format option.
+run "F7 /usr/bin/time -f FMT bash <suite> -> deny"             2 "$B" "/usr/bin/time -f 'real %e' bash tools/x.test.sh > out 2>&1"
+run "  control: a single-quoted \$( ) stays content -> allow"  0 "$B" "echo '\$(bash tools/x.test.sh)'"
+
 # ---- PowerShell is the same act through the other shell ------------------------------------------
 run "PowerShell running a suite -> deny"                       2 "$B" "$D4" PowerShell
+# closing review F8: the PowerShell-NATIVE flag spelling. `NAME=value cmd` is not PowerShell syntax,
+# so the one spelling that runs the flagged bar under the second wired tool is `$env:NAME=value;`.
+# The shipped FLAG_RE anchored on the bare name and both `$env:` forms printed rc=0.
+run "F8 PowerShell \$env:GATE_SELFTESTS=1; bash <bar> -> deny" 2 "$B" '$env:GATE_SELFTESTS=1; bash tools/run-gates/run-gates.sh' PowerShell; check_names "F8 env" '[$]env:GATE_SELFTESTS=1'
+run "F8 PowerShell \$env:GATE_FULL=\"\"; bash <bar> -> allow"  0 "$B" '$env:GATE_FULL=""; bash tools/run-gates/run-gates.sh' PowerShell
 run "out-of-scope tool name -> allow"                          0 "$B" "$BAR" Zsh
 
 # ---- the PHASES_CORE parity arm: the restatement in the hook equals the driver's tail ------------
@@ -255,7 +319,11 @@ n=$((pass+fail))
 # static count of the arms above at ~10% headroom, because the pass that wrote this file may not
 # run it (the hook it tests denies the invocation at BUILDING); the main loop's first green at
 # VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=90
+FLOOR_ASSERTIONS=103
+# RAISED 90 -> 94 at the closing review's F2, by the static count of the arms it added: the
+# selftest.py deny, the --selftest flag allow, and the two parity assertions. RAISED 94 -> 103 at
+# its F7 and F8 by the same rule: four run-shape denies with one token check and one control, and
+# the two PowerShell `$env:` arms with one token check.
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
