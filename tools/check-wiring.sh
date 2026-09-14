@@ -198,7 +198,7 @@ first_of() { for c in "$@"; do [ -f "$c" ] && { echo "$c"; return; }; done; }
 # EVERY matcher whose group carries the marker, one per line — not just the first. A settings.json
 # may legitimately hold several groups, and `settings-merge.py` ADDS the widened group rather than
 # migrating a stale one, so "the first group mentioning the hook" is the wrong question to ask.
-matchers_of() { # marker -> the matcher of each group carrying it (empty if the marker is absent)
+matchers_of() { # marker [hook-basename] -> the matcher of each group carrying BOTH (empty if absent)
   # A REFUSAL PROPAGATES. The retired form tested the settings path with `|| return 0`, so a
   # missing file was indistinguishable from a present file with no matching group — which is the
   # whole defect. Returning 2 keeps them apart even though `wired` treats both as not-wired.
@@ -207,14 +207,19 @@ matchers_of() { # marker -> the matcher of each group carrying it (empty if the 
   # (they are the verb's own arguments), and a bare `grep -F "$1"` reads one as an OPTION: grep
   # exits 2, the pipeline yields nothing, and every card check prints UNWIRED over a correctly
   # merged file forever. TOOL-aReplayedCard-2.
+  # THE SECOND KEY, `$2`, is the hook's BASENAME, which the stripped view keeps intact: a bare-flag
+  # marker (`--write`) alone took an adopter's own `--write-log` hook for the card writer, in this
+  # reader and in the merger's (the aReplayedCard closing review, F5). Absent, it defaults to the
+  # marker itself, so a one-key caller filters twice on one key and reads exactly as before.
   tr -d ' \t\r\n' < "$_sj" \
     | sed 's/{"matcher":/\n{"matcher":/g' \
     | sed 's/\].*$//' \
     | grep -F -e "$1" \
+    | grep -F -e "${2:-$1}" \
     | sed -n 's/^{"matcher":"\([^"]*\)".*/\1/p'
 }
-wired() { # marker · the matcher the fragment declares
-  [ -n "$2" ] && matchers_of "$1" | grep -qxF "$2"
+wired() { # marker · the matcher the fragment declares · [hook-basename]
+  [ -n "$2" ] && matchers_of "$1" "${3:-}" | grep -qxF "$2"
 }
 
 # The launcher named in a remedy string. It is PRINTED rather than run, which is exactly why it
@@ -531,6 +536,11 @@ check_recall_opened() {
 # The fragments sit at the kit's HOME in this repo and at `{prefix}/` in an adopter — the kit is
 # `kind = "flat"`, so the engine and its two fragments ship side by side — and their `{here}` token
 # resolves to whichever of those the fragment was found at. Advisory like every other arm.
+#
+# WHAT THIS DOES NOT CHECK: any other SessionStart entry. The `check-wiring.sh --session` entry and
+# the process-monitor session entry ship fragments too, and NO arm here reads their matchers — the
+# merger re-matches them on apply, and a hand edit or a later narrowing to `startup` passes green
+# (the aReplayedCard closing review, F12). The two card fragments are graded; the count is two.
 check_card() {
   local name frag marker hooksh cmatcher found nfound=0 nok=0 line=""
   for name in orientation-card orientation-replay; do
@@ -549,7 +559,7 @@ check_card() {
       return
     fi
     if [ ! -f "$hooksh" ]; then
-      if wired "$marker" "$cmatcher"; then
+      if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
         echo "UNWIRED  card      — settings.json dispatches $marker but $hooksh is missing; every session start runs bash against nothing. Fix: re-copy the kickoff-manifest kit beside $frag"
         unwired=$((unwired+1))
       else
@@ -557,14 +567,14 @@ check_card() {
       fi
       return
     fi
-    if wired "$marker" "$cmatcher"; then
+    if wired "$marker" "$cmatcher" "$(basename "$hooksh")"; then
       nok=$((nok+1)); line="$line${line:+, }$marker at '$cmatcher'"
       continue
     fi
     # Name the value FOUND rather than a generic miss, and the matcher EXPECTED beside it: the
     # replay wired under `resume` alone is the exact state this arm exists to catch — it looks
     # wired, and the card is gone after the first compaction.
-    found=$(matchers_of "$marker" | paste -sd, - 2>/dev/null || matchers_of "$marker" | tr '\n' ',')
+    found=$(matchers_of "$marker" "$(basename "$hooksh")" | paste -sd, - 2>/dev/null || matchers_of "$marker" "$(basename "$hooksh")" | tr '\n' ',')
     if [ -n "$found" ]; then
       echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
     else

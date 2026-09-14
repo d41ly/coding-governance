@@ -48,8 +48,9 @@ render as UNQUOTED argv tokens joined by single spaces — the one shape under w
 substring of the command in BOTH readers, this file's plain view and check-wiring's
 whitespace-stripped one — so the loader admits only a closed character class for them.
 
-Dedup is a substring test on the marker, scoped to the event: an entry carrying the marker under
-the same event is THIS hook wherever it sits. Since TOOL-dRetiredFork-14 one whose whole rendered
+Dedup is a substring test on the marker AND the hook's basename (`check_ours`), scoped to the event:
+an entry carrying both under the same event is THIS hook wherever it sits — the marker alone
+took an adopter's `--write-log` hook for the card writer (F5 of the aReplayedCard closing review). Since TOOL-dRetiredFork-14 one whose whole rendered
 command differs is REWRITTEN in place (a stale path OR a changed argument list); since
 TOOL-aReplayedCard-2 one sitting in a group whose matcher is not the fragment's is MOVED to the
 fragment's group, and the group it left is dropped if that emptied it. Two fragments declaring one
@@ -244,10 +245,21 @@ def resolve_hook_path(hook_path: str, frag_file: str | None = None) -> str:
     return hook_path.replace("{kit}", _kit_rel())
 
 
-def set_group(pre: list, matcher: str, marker: str) -> None:
-    """Move the entry carrying `marker` OUT of every group under this event whose matcher is not
-    `matcher`, dropping any group that emptied. The caller then lands the fragment's entry in the
-    group holding its matcher, so the hook fires on exactly the events the fragment declares.
+def check_ours(command, marker: str, hook_path: str) -> bool:
+    """THE ONE JOIN: a command is this fragment's hook when it carries the marker AND the hook's
+    basename. The marker alone was the join, and two shipped markers are bare flags (`--write`,
+    `--replay`): an adopter's own SessionStart hook carrying `--write-log` was moved, overwritten
+    and reported as the wired card writer, silently (the aReplayedCard closing review, F5).
+    `check-wiring.sh`'s `matchers_of` joins on the same pair."""
+    text = command if isinstance(command, str) else ""
+    return marker in text and PurePosixPath(hook_path).name in text
+
+
+def set_group(pre: list, matcher: str, marker: str, hook_path: str) -> None:
+    """Move the entry carrying `marker` (and the hook's basename — `check_ours`) OUT of every group
+    under this event whose matcher is not `matcher`, dropping any group that emptied. The caller
+    then lands the fragment's entry in the group holding its matcher, so the hook fires on exactly
+    the events the fragment declares.
 
     The re-match is scoped to marker AND event — `pre` is one event's group list — so a basename
     marker shared across events (`procmon-hook.js` on PostToolUse and on SessionStart) never moves
@@ -261,7 +273,7 @@ def set_group(pre: list, matcher: str, marker: str) -> None:
         if isinstance(g, dict) and g.get("matcher") != matcher and isinstance(g.get("hooks"), list):
             before = g["hooks"]
             g["hooks"] = [h for h in before
-                          if not (isinstance(h, dict) and marker in str(h.get("command", "")))]
+                          if not (isinstance(h, dict) and check_ours(h.get("command", ""), marker, hook_path))]
             if before and not g["hooks"]:
                 continue
         kept.append(g)
@@ -281,7 +293,7 @@ def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP, frag_file: str | No
     entry = {"type": "command",
              "command": render_command(hook_path, frag.get("interpreter", _DEFAULT_INTERPRETER),
                                        frag.get("args", ()))}
-    set_group(pre, matcher, marker)
+    set_group(pre, matcher, marker, hook_path)
     group = next((g for g in pre if isinstance(g, dict) and g.get("matcher") == matcher), None)
     if group is None:
         pre.append({"matcher": matcher, "hooks": [entry]})
@@ -302,7 +314,7 @@ def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP, frag_file: str | No
     # the same drift as a moved file — the hook runs, and does the wrong verb.
     want = entry["command"]
     for h in inner:
-        if not isinstance(h, dict) or marker not in str(h.get("command", "")):
+        if not isinstance(h, dict) or not check_ours(h.get("command", ""), marker, hook_path):
             continue
         if str(h.get("command", "")) != want:
             h["command"] = want   # REWRITE in place: same hook, right command
@@ -550,6 +562,19 @@ def _selftest() -> int:
             ss14 = json.loads(sf14.read_text(encoding="utf-8"))["hooks"]["SessionStart"]
             assert [h["command"] for g in ss14 for h in g["hooks"]] == \
                 [f'bash "${{CLAUDE_PROJECT_DIR}}/{eng}" --card --write'], ss14
+            # 14c) F5 — a FOREIGN SessionStart hook whose command carries the bare marker as a
+            #      substring (`--write-log`) but not the writer's basename survives the card merge
+            #      byte-identical and in its own group; the card lands beside it under its matcher.
+            sf14c = root / "s14c.json"
+            foreign = 'node "${CLAUDE_PROJECT_DIR}/tools/mine.js" --write-log'
+            sf14c.write_text(json.dumps({"hooks": {"SessionStart": [
+                {"matcher": "startup", "hooks": [{"type": "command", "command": foreign}]}]}}) + "\n",
+                encoding="utf-8")
+            assert main([str(sf14c), "--fragment", str(card)]) == 0
+            ss14c = json.loads(sf14c.read_text(encoding="utf-8"))["hooks"]["SessionStart"]
+            assert [(g["matcher"], [h["command"] for h in g["hooks"]]) for g in ss14c] == \
+                [("startup", [foreign]),
+                 ("startup|clear", [f'bash "${{CLAUDE_PROJECT_DIR}}/{eng}" --card --write'])], ss14c
         else:
             print("settings-merge selftest: SKIP arms 13-14 (card fragments) — the kickoff kit is not installed beside this script")
 

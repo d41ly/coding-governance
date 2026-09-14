@@ -56,10 +56,14 @@ fragment, for a kit that ships its directory; and `{here}`, the fragment's own d
 the hook-destinations gate expand them identically, and the gate refuses when they do not. The
 `marker` must be a substring of the rendered command under the merger's plain view AND under
 `check-wiring.sh`'s whitespace-stripped view — space-free, therefore — and it may lead with a dash:
-the card fragments use `--write` and `--replay`. A SessionStart fragment ALWAYS declares a matcher
-from `startup|resume|clear|compact`; the merger re-matches an entry it finds under the wrong one,
-and `check-wiring.sh` reds on an entry under a matcher that is not the fragment's, because a
-SessionStart hook that never fires looks exactly like one that is wired.
+the card fragments use `--write` and `--replay` — and BOTH readers join on the marker AND the hook's
+basename, so an adopter's own hook carrying `--write-log` is never taken for the card writer. A
+SessionStart fragment ALWAYS declares a matcher from `startup|resume|clear|compact`; the merger
+re-matches an entry it finds under the wrong one, and `check-wiring.sh`'s card arm reds on a CARD
+entry under a matcher that is not its fragment's, because a SessionStart hook that never fires looks
+exactly like one that is wired. The `check-wiring.sh --session` and process-monitor session entries
+are NOT graded by any arm: their matchers are re-matched on apply and never read afterwards, so a
+hand narrowing passes green (the aReplayedCard closing review, F12).
 
 ## What the hook DENIES, and how to satisfy it
 

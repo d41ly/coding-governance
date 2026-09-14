@@ -893,7 +893,7 @@ render_ready_line() { printf 'READY — aTest · node a · card-wt · base %s ·
 # grandchild that spawns `git ls-files memory/` on its own account, and the checker's is the one
 # spelled `ls-files -- …`, so the argv shape tells them apart. Python's own subprocess spawns never
 # reach a shim (CreateProcess wants an .exe), which is fine — they are not the checker's.
-export SPAWN_LOG="$TMP/spawns" REAL_GIT="$(command -v git)" REAL_PY="$(command -v python)"; : > "$SPAWN_LOG"
+export SPAWN_LOG="$TMP/spawns" REAL_GIT="$(command -v git)" REAL_PY="$(command -v "$(resolve_python)")"; : > "$SPAWN_LOG"   # REAL_PY is RESOLVED by running, never named
 SHIM="$TMP/shim"; mkdir -p "$SHIM"
 cat > "$SHIM/git" <<'SHIM_GIT'
 #!/usr/bin/env bash
@@ -907,7 +907,7 @@ exec "$REAL_PY" "$@"
 SHIM_PY
 chmod +x "$SHIM/git" "$SHIM/python"
 printf '## task\n- **Title:** t\n## read\n- `skills/session-kickoff/SKILL.md:47-60` — the skeleton\n## records\n- TOOL-cBriefedPilot-11 — one clause — memory/backlog/TOOL.md:455\n%s\n' "$(render_ready_line "$wt_head")" \
-  | (cd "$CWT" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+  | (cd "$CWT" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?   # gov:literal-python — names the SHIM on PATH, which exec's the resolved REAL_PY
 [ "$got" = 0 ] && grep -q '^- TOOL-cBriefedPilot-11 — one clause' "$K2CARD" && ! grep -q 'UNVERIFIED' "$K2CARD" \
   && { echo "ok   K2 AC1 a clean body is appended with no UNVERIFIED line"; pass=$((pass+1)); } \
   || { echo "FAIL K2 AC1 a clean body is appended with no UNVERIFIED line (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
@@ -964,8 +964,14 @@ printf '## task\n- `AGENTS.md:1`\n%s\n%s\n' "$(render_ready_line "$wt_head")" "$
 [ "$got" = 2 ] && grep -q 'the body carries 2 READY lines' "$CARD_OUT" && { echo "ok   K2 S5 a body with two READY lines is refused"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S5 a body with two READY lines is refused (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 # S1 — the reader could not answer: a launcher that exits non-zero, then one whose first line is
-# not the grammar (`echo` prints the argv), then a git that fails on ls-files.
-printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && GOV_PYTHON=false bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
+# not the grammar (`echo` prints the argv), then a git that fails on ls-files. The failing launcher
+# is a SHIM that passes the resolver's `-c "import sys"` probe and fails everything else, shadowing
+# all three names: since F2 the checker RUNS its candidates and falls through a dead one, so a plain
+# `GOV_PYTHON=false` would resolve to the real python and never reach the reader's refusal.
+SHIMBAD="$TMP/shimbad"; mkdir -p "$SHIMBAD"
+printf '#!/usr/bin/env bash\n[ "$1" = -c ] && exit 0\nexit 1\n' > "$SHIMBAD/python3"
+cp "$SHIMBAD/python3" "$SHIMBAD/python"; cp "$SHIMBAD/python3" "$SHIMBAD/py"; chmod +x "$SHIMBAD"/*
+printf '## task\n- `AGENTS.md:1`\n' | (cd "$CWT" && PATH="$SHIMBAD:$PATH" GOV_PYTHON= bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?
 [ "$got" = 2 ] && grep -q 'the id reader exited 1, so the defined-id set is unknown rather than empty' "$CARD_OUT" \
   && { echo "ok   K2 S1 a failing id reader is a refusal, not an empty set"; pass=$((pass+1)); } \
   || { echo "FAIL K2 S1 a failing id reader is a refusal, not an empty set (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
@@ -1052,6 +1058,44 @@ render_big_body two | (cd "$CWT2" && CARD_CAP_BYTES=$k2c_cap bash "$CHECK" --car
 check_eq "K2 AC10 ...and the card holds one READY line, one task section, the second title" "1 1 1 0" \
   "$(grep -c '^READY — ' "$K2CCARD") $(grep -c '^## task' "$K2CCARD") $(grep -c 'Title:\*\* two' "$K2CCARD") $(grep -c 'Title:\*\* one' "$K2CCARD")"
 
+# ---- the aReplayedCard closing review, round 1: F1, F7, F8 and F9, each observed RED first -------
+# F1 — memory-tree installed WITHOUT memory-recall: the reader is present, its grammar is not. The
+# append must degrade to "id citations unchecked" and still judge the paths, never refuse — a
+# refusal here was a lockout whose printed remedy re-ran the refusing append. The grammar file is
+# hidden in the worktree for the one arm and restored after it.
+K2E="$NONCE-k2e"; K2ECARD="$CARD_HOME/$K2E.md"
+run_card "F1 setup: a card for the no-grammar arm" "$CWT" 0 - --card --write --session "$K2E"
+mv "$CWT/tools/memory-recall/extract.py" "$CWT/tools/memory-recall/extract.py.hid"
+printf '## task\n- `AGENTS.md:1`\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
+mv "$CWT/tools/memory-recall/extract.py.hid" "$CWT/tools/memory-recall/extract.py"
+[ "$got" = 0 ] && grep -q '^NOTE: id citations unchecked — .*the id grammar lives in the memory-recall kit' "$CARD_OUT" && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
+  && { echo "ok   F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL F1 a reader with no memory-recall kit degrades to the NOTE, the path is judged, the append lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+check_eq "F1 ...and the card ends with the body's READY line" "$(render_ready_line "$wt_head")" "$(tail -1 "$K2ECARD")"
+# F7 — a root-level tracked file cited by NAME is a path token (the spec-token lint's "exact tracked
+# path" half); a slashless dotted word that is not tracked (`e.g`) is nothing, never an UNVERIFIED.
+printf '## task\n- read AGENTS.md first, e.g. before TOOL-zCardFixture-10\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && grep -q ' 2 tokens · 0 unverified ' "$CARD_OUT" \
+  && { echo "ok   F7 a root-level tracked file cited by name and an id are 2 tokens, 0 unverified, and e.g is nothing (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL F7 a root-level tracked file cited by name and an id are 2 tokens, 0 unverified, and e.g is nothing (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+# F8 — a `..` citation is a claim about some other tree: skipped, never handed to `git ls-files`,
+# whose `outside repository` fatal used to refuse the whole body.
+printf '## task\n- `skills/session-kickoff/SKILL.md` and ../../outside.md\n%s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2E" > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && grep -q ' 1 tokens · 0 unverified ' "$CARD_OUT" \
+  && { echo "ok   F8 a ..-segment citation beside a tracked path is skipped and the body lands (exit 0)"; pass=$((pass+1)); } \
+  || { echo "FAIL F8 a ..-segment citation beside a tracked path is skipped and the body lands (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+# F9 — `--card --check` grades what the SESSION wrote: a commit subject in the writer's `recent —`
+# block naming an untracked path is git's text, blanked before the check, never an UNVERIFIED.
+K2F="$NONCE-k2f"
+git -C "$CWT2" commit -q --no-verify --allow-empty -m "drop tools/gone.sh from the bar" \
+  || { echo "FAIL F9 setup: the fixture commit in worktree B failed"; fail=$((fail+1)); }
+f9_head=$(git -C "$CWT2" rev-parse HEAD)
+run_card "F9 setup: a card whose recent block names tools/gone.sh" "$CWT2" 0 "drop tools/gone.sh from the bar" --card --write --session "$K2F"
+printf '## task\n- `AGENTS.md:1`\nREADY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$f9_head" | (cd "$CWT2" && bash "$CHECK" --card --append --session "$K2F" > "$CARD_OUT" 2>&1); got=$?
+check_eq "F9 setup: the body over that card appends" "0" "$got"
+run_card "F9 --card --check over a card whose only miss is a commit subject exits 0" "$CWT2" 0 - --card --check --session "$K2F"
+check_eq "F9 ...and prints nothing" "0" "$(grep -c . "$CARD_OUT")"
+
 # S1 — a tree without the memory-tree kit: the id half announces its skip, and a startup card with
 # no path citation is DEAD PROBE on --check.
 mkrepo noreader; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
@@ -1072,8 +1116,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # exact tag against the real AGENTS.md, which the spec words as "on this node"); it announces its
 # skip elsewhere, and a floor that counted it would red the suite on b, c and d for an arm that is
 # not theirs to reach. KICK-aReplayedCard-1 (109), then the 56 append and check arms of
-# KICK-aReplayedCard-2.
-FLOOR_ASSERTIONS=165
+# KICK-aReplayedCard-2, then the 9 arms of the closing review's round-1 fold (F1, F7, F8, F9).
+FLOOR_ASSERTIONS=174
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

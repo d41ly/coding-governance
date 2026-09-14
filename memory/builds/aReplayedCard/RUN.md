@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 8012832b8b26d56e0cc596f3e35e8480183c5d10
-phase: VERIFYING
+witness: e54c3849dcb7e3e3483a7842adfd1547ed31f250
+phase: FOLDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
 mode: prompt

@@ -342,6 +342,11 @@ printf -- '---\nslug: y\n---\n' > "$SGWT/memory/builds/y/README.md"   # the inde
 run_card "AC4 staged blob carries the key, worktree copy does not -> allow (the BLOB is read)" 0 "one;;exempt" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
 git -C "$SGWT" add memory/builds/y/README.md && printf -- '---\nslug: y\nauthorized-by: prompt\n---\n' > "$SGWT/memory/builds/y/README.md"
 run_card "AC4 staged blob lacks the key, worktree copy carries it -> deny" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+# F10 (the aReplayedCard closing review): the key OUTSIDE the front matter — a column-0 line in the
+# body, the shape a fenced example or copied prose leaves — exempts nothing, because the unattended
+# driver reads the key between line 1's `---` and the next `---` and nowhere else.
+printf -- '---\nslug: y\n---\n\n```\nauthorized-by: prompt\n```\n' > "$SGWT/memory/builds/y/README.md" && git -C "$SGWT" add memory/builds/y/README.md
+run_card "AC4 staged NEW README with authorized-by: prompt in the BODY only, front matter without it -> deny (F10)" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
 git -C "$SGWT" rm -q -f --cached memory/builds/y/README.md && rm -rf "$SGWT/memory"
 mkdir -p "$SGWT/docs" && printf -- '---\nauthorized-by: prompt\n---\n' > "$SGWT/docs/README.md" && git -C "$SGWT" add docs/README.md
 run_card "AC4 NEW docs/README.md carrying the key -> deny (outside the rule)" 2 "any;;sentinel" 'git commit -m x' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
@@ -408,23 +413,64 @@ run_card "AC9 git -c a=b commit, sentinel -> deny" 2 "any;;sentinel" 'git -c a=b
 run_card "AC9 git -c \"a=b\" commit, sentinel -> deny" 2 "any;;sentinel" 'git -c "a=b" commit' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
 write_card sgtest-e1 "$SG_TOP_WT" write "$SG_READY"
 run_card "AC9 git -C </c/ spelling> commit from OUTSIDE with a real card naming the fixture -> allow, stderr EMPTY (the fold walked)" 0 empty "git -C $SG_TOP_WT_MSYS commit -m y" session_id=sgtest-e1 "cwd=$SG_CWD_OUT"
-run_card "AC9 git -C /nowhere/x commit -> allow, the unwalkable line" 0 "one;;no .git above" 'git -C /nowhere/x commit' session_id=sgtest-e1 "cwd=$SG_CWD_WT"
+run_card "AC9 git -C /nowhere/x commit -> allow, the does-not-exist line (F4: a missing start is never walked)" 0 "one;;does not exist" 'git -C /nowhere/x commit' session_id=sgtest-e1 "cwd=$SG_CWD_WT"
+mkdir -p "$TMP/nogit"; SG_NOGIT=$(cd "$TMP/nogit" && node -p 'process.cwd()')
+run_card "AC9 git -C <an existing dir under no repository> commit -> allow, the unwalkable line" 0 "one;;no .git above" "git -C $SG_NOGIT commit" session_id=sgtest-e1 "cwd=$SG_CWD_WT"
 
-# ---- AC10: the CROSS-KIT arm — the writer's own card, from the step's base blob, in the worktree --
-# The live writer is edited in this same step, so the arm runs the blob the step was dispatched at:
-# a spelling fold between the two kits reds HERE, on the writer's real bytes, not on a hand copy.
-SG_WRITER_BASE=${SG_WRITER_BASE:-c95fe32a}
-if git -C "$HERE" show "$SG_WRITER_BASE:skills/session-kickoff/manifest-check.sh" > "$TMP/manifest-check.sh" 2>/dev/null \
-   && (cd "$SGWT" && bash "$TMP/manifest-check.sh" --card --write --session sgtest-w1 </dev/null >"$TMP/writer.out" 2>&1) \
+# ---- F3 and F4 (the aReplayedCard closing review): `cd <dir> && git commit`, and targets that ----
+# ---- do not exist or are not literal paths ----------------------------------------------------
+# F3 — the compound form is judged against the tree the `cd` names, in BOTH directions: the card
+# names the worktree and the payload cwd is the primary; the card names the primary and the same
+# command runs. Absolute and relative `cd` targets, the relative one from the fixtures' parent.
+run_card "F3 cd <wt> && git commit from the primary, cell = wt -> allow, stderr EMPTY" 0 empty "cd $SG_TOP_WT && git commit -m y" session_id=sgtest-e1 "cwd=$SG_CWD_FIX"
+run_card "F3 cd sgwt && git commit from the fixtures' parent (relative), cell = wt -> allow, stderr EMPTY" 0 empty 'cd sgwt && git commit -m y' session_id=sgtest-e1 "cwd=$SG_CWD_OUT"
+write_card sgtest-f3 "$SG_TOP_FIX" write "$SG_READY"
+run_card "F3 cd <wt> && git commit, cell = primary -> deny naming <wt> as the target and cd <wt> && /session-kickoff" 2 "any;;$SG_TOP_FIX;;this commit targets $(build_comparable "$SG_CWD_WT");;cd $(build_comparable "$SG_CWD_WT") && /session-kickoff" "cd $SG_TOP_WT && git commit -m y" session_id=sgtest-f3 "cwd=$SG_CWD_FIX"
+run_card "F3 the last cd wins: cd <primary>; cd <wt> && git commit, cell = wt -> allow, stderr EMPTY" 0 empty "cd $SG_TOP_FIX; cd $SG_TOP_WT && git commit -m y" session_id=sgtest-e1 "cwd=$SG_CWD_OUT"
+# F4 — a `-C` target that does not exist used to walk UP into the primary's `.git` and deny with a
+# remedy that re-homed the card to the wrong tree; an unexpandable one (`$X`, `~/x`) resolved
+# literally to a directory that does not exist and did the same. Both are witnesses now.
+run_card "F4 git -C ../sgfix/nope commit from the worktree (the walk from a missing start would land on the PRIMARY's .git), real card naming the worktree -> allow, the does-not-exist line" 0 "one;;does not exist;;sgfix/nope" 'git -C ../sgfix/nope commit -m y' session_id=sgtest-e1 "cwd=$SG_CWD_WT"
+run_card "F4 git -C \"\$X\" commit on a sentinel card -> allow, the not-a-literal-path line" 0 "one;;not a literal path;;\$X" 'git -C "$X" commit -m y' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+run_card "F4 cd \$S && git commit on a sentinel card (a scratch fixture) -> allow, the not-a-literal-path line" 0 "one;;not a literal path;;\$S" 'cd $S && git commit -m y' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+run_card "F4 cd ~/x && git commit on a sentinel card -> allow, the not-a-literal-path line" 0 "one;;not a literal path;;~/x" 'cd ~/x && git commit -m y' session_id=sgtest-d1 "cwd=$SG_CWD_WT"
+
+# ---- AC10: the CROSS-KIT arm — the writer's own card, from the LIVE writer, in the worktree ------
+# The WORKING TREE's `skills/session-kickoff/manifest-check.sh` by default, so a spelling fold
+# between the two kits reds HERE, on the writer's real bytes: it ran from a blob pinned at the
+# step's base (`c95fe32a`, 208 lines behind the writer that shipped) and could not see the
+# `tree —` re-render or the appended READY line the live writer produces (the aReplayedCard closing
+# review, F6). `SG_WRITER_BASE=<sha>` takes a blob EXPLICITLY; neither present is an announced skip.
+SG_WRITER="$ROOT/skills/session-kickoff/manifest-check.sh"
+if [ -n "${SG_WRITER_BASE:-}" ]; then
+  SG_WRITER="$TMP/manifest-check.sh"
+  git -C "$HERE" show "$SG_WRITER_BASE:skills/session-kickoff/manifest-check.sh" > "$SG_WRITER" 2>/dev/null || rm -f "$SG_WRITER"
+fi
+if [ ! -f "$SG_WRITER" ]; then
+  echo "SKIP AC10 the kickoff kit's writer is not at $SG_WRITER — the cross-kit arm has no writer to run; install skills/session-kickoff/ or pass SG_WRITER_BASE=<sha>"
+elif (cd "$SGWT" && bash "$SG_WRITER" --card --write --session sgtest-w1 </dev/null >"$TMP/writer.out" 2>&1) \
    && [ -f "$SG_CARDS/sgtest-w1.md" ]; then
-  echo "ok   AC10 the base-blob writer wrote $SG_CARDS/sgtest-w1.md from the linked worktree"; pass=$((pass+1))
+  echo "ok   AC10 the writer at $SG_WRITER wrote $SG_CARDS/sgtest-w1.md from the linked worktree"; pass=$((pass+1))
   run_card "AC10 the writer's card unchanged (sentinel in place) -> deny naming the sentinel and the card path" 2 "any;;sentinel;;$SG_CARD_FIX/sgtest-w1.md" 'git commit -m x' session_id=sgtest-w1 "cwd=$SG_CWD_WT"
   sed -i "s/^READY — none yet\$/$SG_READY/" "$SG_CARDS/sgtest-w1.md"
   run_card "AC10 the sentinel replaced by a real READY line through sed -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-w1 "cwd=$SG_CWD_WT"
   rm -f "$SG_CARDS/sgtest-w1.md"
   run_card "AC10 the writer's card removed -> allow, the absence line" 0 "one;;absent;;sgtest-w1.md" 'git commit -m x' session_id=sgtest-w1 "cwd=$SG_CWD_WT"
+  # THE FOLD ITSELF: a fresh card, then the writer's own `--card --append` with a real READY body
+  # pinned at the worktree's HEAD — the append re-renders the `tree —` cell and replaces the sentinel
+  # — and the hook reads that card. Every spelling both kits share is exercised end to end here.
+  sg_w1_head=$(git -C "$SGWT" rev-parse HEAD)
+  if (cd "$SGWT" && bash "$SG_WRITER" --card --write --session sgtest-w1 </dev/null >"$TMP/writer.out" 2>&1) \
+     && printf '## task\n- `README.md:1`\nREADY — sgtest · node a · sg-wt · base %s · Tier-1 · gates none\n' "$sg_w1_head" \
+        | (cd "$SGWT" && bash "$SG_WRITER" --card --append --session sgtest-w1 >"$TMP/append.out" 2>&1); then
+    echo "ok   AC10 the writer's --card --append landed a real READY body on sgtest-w1"; pass=$((pass+1))
+  else
+    echo "FAIL AC10 the writer's --card --append refused the real READY body:"; sed 's/^/     /' "$TMP/append.out" 2>/dev/null; fail=$((fail+1))
+  fi
+  run_card "AC10 the card the live writer wrote AND appended -> allow, stderr EMPTY (the cross-kit fold)" 0 empty 'git commit -m x' session_id=sgtest-w1 "cwd=$SG_CWD_WT"
+  rm -f "$SG_CARDS/sgtest-w1.md"
 else
-  echo "FAIL AC10 the writer at $SG_WRITER_BASE did not run from the linked worktree, or wrote no card:"; sed 's/^/     /' "$TMP/writer.out" 2>/dev/null; fail=$((fail+1))
+  echo "FAIL AC10 the writer at $SG_WRITER did not run from the linked worktree, or wrote no card:"; sed 's/^/     /' "$TMP/writer.out" 2>/dev/null; fail=$((fail+1))
 fi
 write_card sgtest-w2 "$SG_TOP_WT_MSYS" write "$SG_READY"
 run_card "AC10 the card holding /c/… and the payload C:\\… for one tree -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-w2 "cwd=$SG_CWD_WT"
@@ -456,7 +502,7 @@ n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
 # reviewed diff or not at all.
-FLOOR_ASSERTIONS=122
+FLOOR_ASSERTIONS=134
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

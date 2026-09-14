@@ -18,6 +18,13 @@ ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
 # The kit's own prefix, DERIVED — a scratch adopter tree is built at it, and spelling it out
 # is exactly the literal the install-prefix ban refuses.
 KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
+# The python the hook is pointed at, RESOLVED by running it when the shared resolver is present.
+if [ -f "$KIT_DIR/../lib/resolve-python.sh" ]; then
+  . "$KIT_DIR/../lib/resolve-python.sh"
+  TESTPY=$(resolve_python) || { echo "adopt-process-monitor.test: no usable python"; exit 2; }
+else
+  TESTPY=python   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+fi
 # The floor the merge bar's `check-testsuite-counts.sh` reads: a suite that prints no
 # executed count against a declared floor could strand a block of its arms past an exit and
 # still report success.
@@ -162,7 +169,7 @@ fi
 # how "nothing to report" becomes indistinguishable from "the probe could not run".
 HOOK="$KIT_DIR/procmon-hook.js"
 GD=$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null)
-run_hook() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$ROOT" PROCMON_PYTHON="${2:-python}" node "$HOOK" 2>&1; }
+run_hook() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$ROOT" PROCMON_PYTHON="${2:-$TESTPY}" node "$HOOK" 2>&1; }
 
 if [ -f "$HOOK" ] && command -v node >/dev/null 2>&1; then
   rm -f "$GD/procmon-stamp" 2>/dev/null

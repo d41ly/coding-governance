@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md](../build/2026-09-13-build-KICK-aReplayedCard-1-0-orientation-design.md) | research | KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-build-KICK-aReplayedCard-1-1-acceptance-ledger.md](../build/2026-09-14-build-KICK-aReplayedCard-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-14-build-KICK-aReplayedCard-1-2-closing-fold-round1.md](../build/2026-09-14-build-KICK-aReplayedCard-1-2-closing-fold-round1.md) | journal | KICK-aReplayedCard-2 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 |
 | [2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md](../prompts/2026-09-13-prompt-KICK-aReplayedCard-1-0-run-mandate.md) | journal | KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |
 | [2026-09-14-prompt-KICK-aReplayedCard-1-brief.md](../prompts/2026-09-14-prompt-KICK-aReplayedCard-1-brief.md) | journal | — |
 | [2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md](../reviews/2026-09-13-review-KICK-aReplayedCard-1-spec-audit-round1.md) | spec-audit | KICK-aReplayedCard-2 KICK-aReplayedCard-3 TOOL-aReplayedCard-1 TOOL-aReplayedCard-2 TOOL-aReplayedCard-3 TOOL-aReplayedCard-4 TOOL-aReplayedCard-5 |

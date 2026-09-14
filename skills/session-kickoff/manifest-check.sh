@@ -303,6 +303,44 @@ render_tree_cell() {
   printf 'tree — %s · %s · branch %s · BASE %s · %s\n' "$TOPLEVEL" "$kind" "$HEAD_BRANCH" "$HEAD_SHA" "$HEAD_DIRTY"
 }
 
+# The python that spawns the id reader. INLINED from the shared resolver named on the marker line
+# below, byte-identical and gated by that resolver's own self-test, because this kit is
+# copy-installed flat and has no `../lib/` to source. It RUNS each candidate: `${GOV_PYTHON:-python}` was a second, narrower
+# resolver here, and on a host with only `python3` or with the Store stub it exited 127 or 9009,
+# the append refused every body, and the commit deny's remedy re-ran the refusing append
+# (the aReplayedCard closing review, F2).
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+
 # The memory-tree kit's id reader, by the engine's own <MEMORY_TREE_KIT> rule: whichever of
 # `tools/memory-tree/` or `memory-tree/` holds it. Empty when neither does; the caller says so.
 resolve_id_reader() {
@@ -314,11 +352,15 @@ resolve_id_reader() {
 }
 
 # One token per line, `<line>\t<kind>\t<token>\t<range>`, kinds `path` (a slash and an extension —
-# the rule the spec-token lint applies to a spec's acceptance bullets), `base` (a basename
-# with an extension and a `:<line>` tail, the house style `run-gates.sh:407`) and `id` (the reader's
+# the first half of the rule the spec-token lint applies to a spec's acceptance bullets), `cand`
+# (its second half: a slashless dotted token — `AGENTS.md`, `README.md` — that COUNTS as a path
+# only on an exact tracked hit, so `e.g` is never an UNVERIFIED and a root-level file cited by name
+# is never "nothing to check"; the aReplayedCard closing review, F7), `base` (a basename with an
+# extension and a `:<line>` tail, the house style `run-gates.sh:407`) and `id` (the reader's
 # grammar). Not a token: a glob, a `{{placeholder}}`, a `$var`, a `<slot>`, a `GATE_` knob, a URL,
-# and an absolute path — the `tree —` cell carries one, and a checkout location is not a claim
-# about the tree. Backticks, brackets and quotes separate; trailing sentence punctuation is dropped.
+# a `..` segment (a claim about some other tree, and `git ls-files` fatals on it — F8), and an
+# absolute path — the `tree —` cell carries one, and a checkout location is not a claim about the
+# tree. Backticks, brackets and quotes separate; trailing sentence punctuation is dropped.
 # A line that is itself an annotation is BLANKED, not deleted, so line numbers still address the
 # rows they belong to — which is what lets `--check` re-run over a card it annotated.
 extract_card_tokens() {
@@ -333,7 +375,7 @@ extract_card_tokens() {
         if (t=="" || index(t,"://") || t ~ /[*?]/ || t ~ /\/$/) continue
         c=substr(t,1,1)
         if (c=="/" || c==":" || c=="$" || c=="~" || c=="<" || substr(t,1,2)=="{{" || substr(t,1,5)=="GATE_") continue
-        if (t ~ /^[A-Za-z]:/) continue
+        if (t ~ /^[A-Za-z]:/ || t ~ /(^|\/)\.\.(\/|$)/) continue
         r=""
         if (match(t, /:[0-9]+(-[0-9]+)?$/)) { r=substr(t, RSTART+1); t=substr(t, 1, RSTART-1) }
         if (t ~ /[\/.]$/) continue
@@ -341,6 +383,7 @@ extract_card_tokens() {
         if (index(base, ".")==0) continue
         if (k>1) print NR "\tpath\t" t "\t" r
         else if (r!="") print NR "\tbase\t" t "\t" r
+        else print NR "\tcand\t" t "\t"
       } }' "$filtered"
   [ -n "$CARD_ID_ERE" ] && grep -noE "\\b($CARD_ID_ERE)\\b" "$filtered" | awk -F: '{print $1 "\tid\t" $2 "\t"}'
   return 0
@@ -358,20 +401,27 @@ check_card_citations() {
   if [ -z "$reader" ]; then
     echo "NOTE: id citations unchecked — no corpus_ids.py under tools/memory-tree/ or memory-tree/ in this tree, so only paths are judged"
   else
-    py=${GOV_PYTHON:-python}
+    py=$(resolve_python) || { echo "MANIFEST env ERROR — no usable python launcher for the id reader $reader, so the defined-id set is unknown rather than empty; resolve_python's refusal above names every candidate it ran, and GOV_PYTHON=<launcher> is the override"; exit 2; }
     "$py" "$reader" --print-defined-ids > "$CARD_TMP/idout" 2>&1; st=$?
-    if [ "$st" != 0 ]; then
+    # Exit 3 is the reader's NAMED degradation — memory-tree installed without memory-recall, so
+    # no grammar and no set — and it lands on the same branch as "no reader": paths are still
+    # judged and the append proceeds. Every other non-zero status is a reader that could not answer.
+    if [ "$st" = 3 ]; then
+      echo "NOTE: id citations unchecked — $(tr -d '\r' < "$CARD_TMP/idout" | head -1 | head -c 300); only paths are judged"
+      CARD_ID_ERE=""; : > "$CARD_TMP/ids"
+    elif [ "$st" != 0 ]; then
       echo "MANIFEST env ERROR — the id reader exited $st, so the defined-id set is unknown rather than empty: $py $reader --print-defined-ids — $(tr -d '\r' < "$CARD_TMP/idout" | head -c 300)"; exit 2
+    else
+      CARD_ID_ERE=$(sed -n "1s/^$CARD_ID_ERE_KEY//p" "$CARD_TMP/idout" | tr -d '\r')
+      [ -n "$CARD_ID_ERE" ] || { echo "MANIFEST env ERROR — the id reader's first line is not the id grammar ('${CARD_ID_ERE_KEY}…'), so no id token can be recognised: $(head -1 "$CARD_TMP/idout" | tr -d '\r')"; exit 2; }
+      sed '1d' "$CARD_TMP/idout" | tr -d '\r' > "$CARD_TMP/ids"
     fi
-    CARD_ID_ERE=$(sed -n "1s/^$CARD_ID_ERE_KEY//p" "$CARD_TMP/idout" | tr -d '\r')
-    [ -n "$CARD_ID_ERE" ] || { echo "MANIFEST env ERROR — the id reader's first line is not the id grammar ('${CARD_ID_ERE_KEY}…'), so no id token can be recognised: $(head -1 "$CARD_TMP/idout" | tr -d '\r')"; exit 2; }
-    sed '1d' "$CARD_TMP/idout" | tr -d '\r' > "$CARD_TMP/ids"
   fi
   extract_card_tokens "$f" | sort -u | sort -t "$(printf '\t')" -k1,1n -s > "$CARD_TMP/tokens"
   CARD_TOKENS=$(grep -c . "$CARD_TMP/tokens"); CARD_TOKENS=${CARD_TOKENS:-0}
   while IFS=$'\t' read -r ln kind tok rng; do
     case "$kind" in
-      path) paths+=("$tok") ;;
+      path|cand) paths+=("$tok") ;;
       base) globs+=("$tok" "*/$tok") ;;
     esac
   done < "$CARD_TMP/tokens"
@@ -386,6 +436,8 @@ check_card_citations() {
     case "$kind" in
       id)   grep -qxF -- "$tok" "$CARD_TMP/ids" && continue ;;
       path) grep -qxF -- "$tok" "$CARD_TMP/tracked" && hit="$tok" ;;
+      cand) grep -qxF -- "$tok" "$CARD_TMP/tracked" && continue
+            CARD_TOKENS=$((CARD_TOKENS - 1)); continue ;;   # a candidate that is not tracked was never a token
       base) n=$(awk -v b="$tok" '{k=split($0,s,"/"); if (s[k]==b) c++} END{print c+0}' "$CARD_TMP/tracked")
             if [ "$n" = 1 ]; then hit=$(awk -v b="$tok" '{k=split($0,s,"/"); if (s[k]==b) print}' "$CARD_TMP/tracked")
             elif [ "$n" -gt 1 ]; then note=" (ambiguous: $n matches)"; fi ;;
@@ -458,6 +510,10 @@ add_card_body() {
 # `--card --check`: the same check over the whole stored card, its own annotations skipped, one line
 # per miss and exit 1 on any; exit 1 too for a real READY line with no `## task` beneath it (a
 # kickoff ran and left no scope on disk) and for a card with nothing to check. Writes nothing.
+# The `recent —` run — git's own `<sha> <subject>` lines, which the session never wrote and cannot
+# fix — is BLANKED before the check, the way annotation lines are (blanked, not deleted, so line
+# numbers still address the rows they belong to): a commit subject naming a since-removed path is
+# not a citation (the aReplayedCard closing review, F9).
 check_card() {
   local real
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID"; exit 2; }
@@ -465,7 +521,11 @@ check_card() {
   if [ "$real" -gt 0 ] && ! grep -q '^## task' "$CARD_FILE"; then
     echo "MANIFEST env ERROR — $CARD_FILE carries a real READY line and no '## task' section: a kickoff ran and left no scope on disk"; exit 1
   fi
-  check_card_citations "$CARD_FILE"
+  awk '{ ln=$0; sub(/\r$/, "", ln) }
+       ln ~ /^recent —/ { inlog=1; print ""; next }
+       inlog && ln ~ /^[0-9a-f]{7,40} / { print ""; next }
+       { inlog=0; print ln }' "$CARD_FILE" > "$CARD_TMP/checked"
+  check_card_citations "$CARD_TMP/checked"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — $CARD_FILE carries no path-shaped and no id-shaped token"; exit 1; }
   if [ -s "$CARD_TMP/misses" ]; then
     awk -F '\t' '{print $2 " · line " $1}' "$CARD_TMP/misses"

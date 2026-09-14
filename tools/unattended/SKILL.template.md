@@ -689,9 +689,11 @@ tree and re-pins the anchor, which costs more than the stale field does.
 before the first pass.** Its unattended hand-back fires because the run-state file exists in a
 non-terminal phase: it emits the READY card, appends it to this session's orientation card, and
 continues at the phase the record names, halting nowhere. It is owed because a resumed session
-starts with no card, or a replay-written one, and its first commit would otherwise be the first
-durable act nobody oriented — the one a card-reading commit deny refuses. Skip it silently if the
-project has no such skill, as the start path does.
+starts with no card, or a replay-written one — two states the card-reading commit deny does NOT
+reach (both allow, with a witness line: a session the writer never ran for cannot run the remedy)
+— so nothing else will orient it, and its first commit would otherwise be the first durable act
+nobody oriented. A backstop that refuses it would be a predicate change in the hook, not a
+sentence here. Skip it silently if the project has no such skill, as the start path does.
 
 ## Close
 

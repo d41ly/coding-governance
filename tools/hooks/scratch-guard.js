@@ -46,7 +46,8 @@
  *
  * WHAT ESCAPES IT, so nobody reads this as containment: a commit made by a script, a heredoc, a
  * non-git tool, a `$(git commit)` (the token must be followed by whitespace or the end); a deleted
- * card, a hand-written card, a card the writer refused to write, an unwalkable `-C` target, and a
+ * card, a hand-written card, a card the writer refused to write, a `cd`/`-C` target that is not a
+ * literal path or does not exist (the last `cd <dir>` before the git token IS read, F3), and a
  * session that started before the wiring and never restarted — an ABSENT card and a card the replay
  * wrote fresh (`--card --replay` in its header) both ALLOW, because a session the writer never ran
  * for cannot run the remedy. The guard stops forgetting, not evasion. A READY line's PRESENCE is
@@ -411,14 +412,35 @@ const COMMIT_SHAPED = new RegExp(
 const ANCHOR_MODES = ['prompt', 'recipe']
 const SENTINEL = 'READY — none yet'
 
-/** Every `-C` value inside the matched span, read from the ORIGINAL at the offset the view located. */
+/**
+ * The directories the commit's tree resolves through, in order: the LAST `cd <dir>` before the git
+ * token (`cd <tree> && git commit` is the compound shape a session that opens at the worktrees'
+ * parent writes — it was judged against the payload cwd, a wrong deny in one direction and a silent
+ * cross-tree allow in the other; the aReplayedCard closing review, F3), then every `-C` value inside
+ * the matched span. Each is read from the ORIGINAL at the offset the view located.
+ */
 function extractCommitTarget(cmd, view, from, to) {
   const out = []
+  const cdRx = /(?:^|[\s;&|(])cd\s+/g
+  const before = view.slice(0, from)
+  let m
+  let cd = null
+  while ((m = cdRx.exec(before)) !== null) cd = readTokenAt(cmd, m.index + m[0].length)
+  if (cd !== null) out.push(cd)
   const rx = /(?:^|\s)-C\s+/g
   const span = view.slice(from, to)
-  let m
   while ((m = rx.exec(span)) !== null) out.push(readTokenAt(cmd, from + m.index + m[0].length))
   return out
+}
+
+/**
+ * A target the walk must not resolve: empty (`cd &&`), `-` (OLDPWD), or one the shell would expand
+ * (`$ROOT`, `~/x`, `${X}`, a backtick) — `path.resolve` then names a directory that does not exist
+ * and the walk lands on the nearest ancestor's `.git`, which in a `.claude/worktrees/` layout is the
+ * PRIMARY tree (F4). Such a target, like one absent from disk, is a witness, never a verdict.
+ */
+function checkUnwalkableTarget(tok) {
+  return tok === '' || tok === '-' || /^[$~]|\$\{|`/.test(tok)
 }
 
 /** Walk up from a drive-folded start to the directory holding `.git` — the toplevel — or null. */
@@ -486,8 +508,12 @@ function checkAuthorizedReadme(toplevel) {
     const r = runGit(args)
     return r.status === 0 ? r.stdout.split(/\r?\n/).filter((p) => /(^|\/)builds\/[^/]+\/README\.md$/.test(p)) : []
   }
+  // FRONT MATTER ONLY — the slice between the opening `---` on line 1 and the next `---` line, the
+  // scope the unattended driver reads the key in. Matching the whole file exempted a README whose
+  // BODY carried the key in a fenced example while the driver authorized nothing (F10).
   const readMode = (bytes) => {
-    const m = /^authorized-by:[ \t]*(\S+)[ \t]*$/m.exec(bytes || '')
+    const fm = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(bytes || '')
+    const m = fm && /^authorized-by:[ \t]*(\S+)[ \t]*$/m.exec(fm[1])
     return m && ANCHOR_MODES.includes(m[1]) ? m[1] : null
   }
   for (const p of readPaths(['diff', '--cached', '--name-only', '--diff-filter=A', '--', '*builds/*/README.md'])) {
@@ -523,7 +549,8 @@ function renderOrientationDeny(card, condition, cardTree, here) {
  *  1. not a `git commit` by COMMIT_SHAPED → null
  *  2. `agent_id` present → null (a subagent's shell calls are never gated)
  *  3. `session_id` or `cwd` missing → null, silently; `tool_use_id` is not read
- *  4. the `-C` target or `cwd`, drive-folded, walks to no `.git` → witness
+ *  4. a `cd`/`-C` target that is not a literal path, does not exist, or — drive-folded — walks to
+ *     no `.git` → witness (a walk from a missing start would land on an ancestor's `.git`)
  *  5. no card for this session, or a replay-written one → witness
  *  6. a real READY line AND the card's tree equals the resolved toplevel → null
  *  7. a NEW authorized README (checkAuthorizedReadme — the only step that spawns) → witness; else deny
@@ -536,7 +563,10 @@ function checkOriented(cmd, data) {
   if (data.agent_id) return null
   if (!data.session_id || !data.cwd) return null
   const targets = extractCommitTarget(cmd, view, m.index, m.index + m[0].length)
+  const unwalkable = targets.find(checkUnwalkableTarget)
+  if (unwalkable !== undefined) return { witness: `orientation not checked — target ${unwalkable || '(empty)'} is not a literal path; git will refuse the commit itself, or resolve it where this hook cannot` }
   const start = path.resolve(buildComparablePath(data.cwd), ...targets.map(buildComparablePath))
+  if (!require('fs').existsSync(start)) return { witness: `orientation not checked — target ${buildComparablePath(start)} does not exist; git will refuse the commit itself` }
   const hit = resolveToplevel(start)
   if (!hit) return { witness: `orientation not checked — no .git above ${buildComparablePath(start)}, git will refuse the commit itself` }
   const common = resolveCommonDir(hit)

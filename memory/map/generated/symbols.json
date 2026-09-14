@@ -708,6 +708,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkUnwalkableTarget",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "check_argv_of",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -761,6 +766,11 @@
       "id": "check_msys_addressable",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "check_ours",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
     },
     {
       "id": "check_packing",

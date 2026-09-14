@@ -434,7 +434,12 @@ done
 # ------------------------------ 10: every nested runner resolves a DIFFERENT common dir -----------
 # The population is READ from the manifest at run time. A suite that listed the legs would grade a
 # set that goes stale the first time one is added — an earlier wording named two when six qualified.
-nested=$( "${PYBIN:-python}" -c '
+# The launcher, RESOLVED by running it where the shared resolver is present; this suite SHIPS, so
+# the fallback is the bare name, marked as the guess it is. `PYBIN=` overrides.
+TS_PY="${PYBIN:-}"
+if [ -z "$TS_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then . "$ROOT/tools/lib/resolve-python.sh"; TS_PY=$(resolve_python 2>/dev/null); fi
+[ -n "$TS_PY" ] || TS_PY=python   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+nested=$( "$TS_PY" -c '
 import json, os, sys
 p = os.environ.get("GATE_LEGS") or "tools/gate-legs.json"
 try: legs = json.load(open(p))

@@ -744,7 +744,17 @@ def _render_defined_ids(root: str, conf: dict) -> list:
 
 def print_defined_ids(root: str, conf: dict) -> int:
     """Print the id grammar, then every id this corpus DEFINES, one per line. Read-only; the pins do
-    not gate it — it is a set for a caller, not a check."""
+    not gate it — it is a set for a caller, not a check.
+
+    Exit 3 is a NAMED DEGRADATION, not a refusal: the grammar lives in the memory-recall kit, and a
+    tree holding memory-tree alone has no id set to print. The caller (`manifest-check.sh --card
+    --append`) maps 3 onto its "id citations unchecked" branch and still judges paths; before this
+    the grammar's Problem exited 1, the append refused every body, and the commit deny's printed
+    remedy re-ran the refusing append — a lockout (the aReplayedCard closing review, F1)."""
+    if not (GRAMMAR_DIR / "extract.py").is_file():
+        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s/extract.py "
+              "is not installed; adopt that kit to check id citations" % GRAMMAR_DIR)
+        return 3
     for line in _render_defined_ids(root, conf):
         print(line)
     return 0
@@ -842,6 +852,22 @@ def cmd_selftest() -> int:
             lambda: (lambda ls: "ok" if ls[0].startswith("# id-ere: ") and "(?" not in ls[0]
                      and r"\d" not in ls[0] and re.fullmatch(ls[0][len("# id-ere: "):], "ARCH-tOne-1")
                      and ls[1:] == ["ARCH-tOne-1"] else repr(ls))(_render_defined_ids(t, c)))
+        # The aReplayedCard closing review, F1: with no memory-recall kit beside this one the verb
+        # DEGRADES — exit 3, one line naming the kit — instead of raising the grammar's Problem.
+        # GRAMMAR_DIR is pointed at a directory that does not exist, then restored.
+
+        def _check_degraded():
+            import contextlib
+            saved, buf = globals()["GRAMMAR_DIR"], io.StringIO()
+            globals()["GRAMMAR_DIR"] = saved / "nowhere"
+            try:
+                with contextlib.redirect_stdout(buf):
+                    rc = print_defined_ids(t, c)
+            finally:
+                globals()["GRAMMAR_DIR"] = saved
+            return f"rc={rc} lines={len(buf.getvalue().splitlines())} {buf.getvalue().strip()}"
+        arm("--print-defined-ids with no memory-recall kit exits 3 with one line naming the kit",
+            "rc=3 lines=1 corpus_ids: no id set — the id grammar lives in the memory-recall kit", _check_degraded)
 
         # ---- TOOL-aWeldedTribunal-5: the conf parser, graded against BASH rather than asserted.
         # ---- bash is the reference because bash is what the format IS; the python half is the copy,

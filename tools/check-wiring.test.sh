@@ -236,7 +236,9 @@ JSON
   # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
   # denies every matcher there is.
   rm -f .claude/settings.json
-  "${PYBIN:-python}" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
+  "$py" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
