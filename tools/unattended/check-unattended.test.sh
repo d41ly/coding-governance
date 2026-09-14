@@ -85,12 +85,18 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 # ---- emission: an expected set derived from the arms alone is incomplete wherever a break fires
 # ---- a branch no arm names — three such blocks are proven in the build record — so a group's set
 # ---- is written from an OBSERVED run or not at all.
-# ---- NO CALL SITE AT 46b12b93. Measured: zero groups whose set can be written without a run, and
-# ---- the 2026-09-14 ruling forbade the run, so this landed inert; the acceptance ledger has the
-# ---- distribution and the run-state file the parked question.
+# ---- THE SENTINEL (owner ruling 2026-09-14, spec rev-6). Every group the rev-6 pass converted
+# ---- carries `"?"` until the build's final gate pass pastes its set from the OBSERVED run, with
+# ---- the run named beside the group. `"?"` is refused BY NAME — one FAIL line per group, so the
+# ---- converted file cannot pass in the window — and `out` is still stripped, so the `hit` lines
+# ---- below it read exactly what they will read once the set exists. AC3's recipe counts these.
 emitted() { # signatures · output
   local _s _l _num _ok _exp _miss="" _extra="" _dark="" _nums=" " _skips
   n=$((n+1))
+  if [ "$1" = "?" ]; then
+    echo "FAIL emitted: expected set not yet observed — owed at the final pass"; st=1
+    out=$(grep -v '^unattended-report: ' <<<"$2" || true); return
+  fi
   _exp=$(printf '%s\n' "$1" | tr '|' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -v '^$' || true)
   [ -n "$_exp" ] || { echo "FAIL emitted: no signature given, so the set it would grade is empty and every run would satisfy it"; st=1; return; }
   while IFS= read -r _s; do
