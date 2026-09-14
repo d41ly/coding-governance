@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 18
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
+| [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
 
 <!-- /gen:spec-records -->
 
@@ -20,13 +20,17 @@ reading of each mandate fact, re-derived from inputs the run cannot move, so tha
 mistaken or stale fact reds the bar instead of certifying itself. This is the pattern check 19
 already applies to `authorized-by:`, `playbook:` and `pieces:`
 (`tools/unattended/check-unattended.sh:1387-1418`), extended to the four facts the ask path adds.
+`asks-ready:` and the freeze's content are re-derived by re-running the declared producer on frozen
+inputs before the record is published, and announced as not re-derived after (S8).
 
 ## 2. Scope (IN)
 
 - **S1** The `asks:` fact against the build README. The leg re-parses the `asks:` front-matter line
   from the README blob at the recorded BASE, the blob check 19 already reads, and requires it
-  byte-equal to the recorded fact. For a non-terminal record it also requires the README at HEAD to
-  carry the same bytes, which is property P6 seen from the leg. Observed by AC1 and AC2.
+  byte-equal to the recorded fact. For a record in a working phase or HELD, it also requires the
+  README at HEAD to carry the same bytes, which is property P6 seen from the leg. A record at LANDING
+  or at a terminal phase is past its close, and nothing re-reads its README's `asks:` line. Observed
+  by AC1 and AC2.
 - **S2** P5 re-derived. For every mandated id the leg requires the ask row `- <id> · filed ` in the
   home build's `BACKLOG.md` at the recorded `m-base:`, and it checks `m-base:` itself against the
   pinned `anchor-sha:`, never against `base:` (fix F4). Observed by AC3 and AC4.
@@ -34,36 +38,59 @@ already applies to `authorized-by:`, `playbook:` and `pieces:`
   that build's folder may carry a line that anchors an id whose slug is not this build's, judged by
   the memory-recall kit's own `anchor_at`, never by a copy of its shapes. Observed by AC5 and AC6.
 - **S4** The freeze is present. Every record whose phase is LANDED and that carries an `asks:` fact
-  carries an `asks-at-landing:` fact naming every mandated id. Observed by AC7.
+  carries an `asks-at-landing:` fact naming every mandated id. Observed by AC7 and AC13.
 - **S5** One authorization path (owner ruling D12-a). A record carrying an `asks:` fact must record
-  mode `slug`, and no record may carry one while the conf's `ASKS_CMD` is blank. Observed by AC8.
+  mode `slug`, and no record may carry one while the conf's `ASKS_CMD` is blank. Its driver twin is
+  unit 16 S2's preflight refusal, so a record reaching this arm was written around the driver.
+  Observed by AC8.
 - **S6** Every arm is vacuous without an `asks:` fact and says so on one line, with the count of
   mandated records it examined. Observed by AC9.
 - **S7** Every new `fail` branch gets an arm in `tools/unattended/check-unattended.test.sh`, and
   `ARMS_FLOORS` moves in the same commit. Observed by AC10.
+- **S8** The pins re-derived before publication. For every mandated record whose preflight commit
+  (the commit that first recorded `m-base:`, as S2 finds it) is not reachable from the default
+  branch's advertised tip, the leg re-runs unit 16's call shape 1 at the recorded `m-base:` and
+  requires its `<id>=<grade>` pairs to equal `asks-ready:`. For every such record carrying
+  `asks-at-landing:`, it re-runs call shape 2 over M ∪ F — F enumerated at that commit by the shared
+  P5 line matcher — at the FIRST PARENT of the commit that introduced the `asks-at-landing:` line,
+  which is the tree `--landed` (primary) or `--close` (in-place) examined, and requires the
+  `<id>=<STATUS>` pairs to equal the fact. Both calls run through the conf's `ASKS_CMD`, bounded; a
+  breach is never answered, not a red. A record already reachable from the advertised tip is counted
+  and announced as published and not re-derived; with the tip unobserved, every mandated record is
+  re-derived and the reason printed. Where the introducing commit cannot be found, S2's announced
+  fallback applies and this arm skips by name. Observed by AC11 and AC12.
 
 ## 3. Non-goals (OUT)
 
 - Pinning any fact. The driver's preflight pins `asks:`, `asks-ready:` and `m-base:` (unit 16) and
   `--landed` writes `asks-at-landing:` (unit 17). This unit only reads.
-- Re-deriving READY or any ask status. That is the fold's (unit 6), printed by unit 15's
-  `--asks --tsv`, and a second implementation of status would be a second answer to one question.
+- Implementing READY or any ask status. That is the fold's (unit 6), printed by unit 15's
+  `--asks --tsv`; the leg re-runs the declared producer on frozen inputs (S8) and compares, and holds
+  no second implementation.
 - Check 13's claimant rule across the whole corpus is the memory-tree engine's, refined by D12-g in
   unit 8 (`TOOL-dDerivedDocket-8` S6). S3 is narrower: it covers the run's own folder for every foreign id, legacy ones included,
   which is where the 27 hazard ids came from (DR §19.1 K9).
-- Moving the freeze to `--close` (unit 22) changes which phases S4 grades. Unit 22 extends S4 to a
-  derived-LANDED record in the same commit that moves the freeze; this unit grades recorded LANDED.
+- Moving the freeze to `--close` under in-place (unit 22) changes which records S4 grades. Unit 22
+  extends S4's population to a committed LANDING record under `LANDER_MODE=in-place` in the same
+  commit that moves the freeze. This unit grades recorded LANDED, which includes a record unit 22's
+  rotation retires.
 - The real-tree staged RED of S3 on a typed resolution table is unit 35's.
 
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-16` — the pinned `asks:`, `m-base:` and `anchor-sha:`
-  facts, `ASKS_CMD`, and the ask-row line matcher the driver's P5 uses. Without them S1, S2 and S5
-  have nothing to compare.
+  facts, `ASKS_CMD`, and the ask-row line matcher the driver's P5 uses, and call shapes 1 and 2 that
+  S8 re-runs, over inputs the record pins. Without them S1, S2 and S5 have nothing to compare.
 - **consumes-from** `TOOL-dDerivedDocket-17` — the `asks-at-landing:` fact S4 requires on a landed
-  record.
+  record, and the freeze's content S8 re-derives.
+- **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute <BASE>`, whose
+  NEW set is the only criterion the unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
 - **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of S3, a typed resolution table
   in a mandated run's folder, after gov sets `ASKS_CMD`.
+- **hands-off** `TOOL-dDerivedDocket-20` — the folder-wide anchor ban, whose carrier sentence
+  protocol §2 states.
+- **hands-off** `TOOL-dDerivedDocket-22` — S4's freeze-presence arm, whose population that unit
+  extends in the commit that moves the freeze.
 
 ## 4. Design
 
@@ -71,11 +98,12 @@ already applies to `authorized-by:`, `playbook:` and `pieces:`
 
 | Arm | Reads | Never reads |
 |---|---|---|
-| S1 | the README blob at the recorded BASE, and at HEAD for a live record | the driver's own parse |
+| S1 | the README blob at the recorded BASE, and at HEAD for a record in a working phase or HELD | the driver's own parse |
 | S2 | the pinned `anchor-sha:`; the commit that first recorded `m-base:`; the home `BACKLOG.md` blob at `m-base:` | `base:`, and any working-tree file |
 | S3 | tracked files under the run's build folder; the recall kit's `anchor_at` | a local list of anchor shapes |
 | S4 | the record's own facts | the witness, which may have moved since landing |
 | S5 | the record's `mode:` and the conf's `ASKS_CMD` | anything the Skill printed |
+| S8 | the conf's `ASKS_CMD`; the recorded `m-base:`, `asks:` and folder slug; the commit that introduced the freeze; the advertised tip | the witness output the run recorded, and HEAD's tree for the freeze |
 
 ### S2, the m-base re-derivation
 
@@ -108,7 +136,8 @@ narrower predicate would need the witness, which S3 deliberately does not read.
 ### Fail codes
 
 S1, S2 and S5 are declaration second opinions and report under check 19, beside the arms they
-extend. S4 is a terminal-record fact and reports under check 15. S3 is a new class and takes a new
+extend. S4 is a terminal-record fact and reports under check 15. S8's `asks-ready:` half reports
+under check 19, its freeze half under check 15. S3 is a new class and takes a new
 leg code, allocated at build time as the next integer above the leg's highest, because other units
 of this build allocate leg codes concurrently.
 
@@ -142,18 +171,25 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
 ## 5. Production-readiness checklist
 
 - security — every arm reads committed blobs or the record; the anchor extractor runs over tracked
-  text and executes nothing it reads.
+  text and executes nothing it reads. S8 executes the conf-declared `ASKS_CMD` as the driver does,
+  never ask text; `--at` reads committed trees.
 - perf / scale — per mandated record, two `git show` calls for S1, one per mandated id for S2, and
   one interpreter per folder for S3. Zero mandated records today, so the leg's cost does not move.
+  S8 runs at most two bounded producer calls per UNPUBLISHED mandated record, so its cost follows the
+  runs in flight and does not grow with the archive.
 - error / empty / loading states — no `asks:` fact is announced vacuity; an unreadable blob or an
   unresolvable `m-base:` is a named refusal; a missing extractor is a named skip.
 - observability — one line per arm per mandated record, and one summary count line per run.
 - risks — S2's equality depends on preflight staging the record before any other commit, which
   unit 16's preflight inherits from today's; the fallback covers the cases where it cannot be shown.
+  A run whose own unit changes READY reds S8 on its own record, because the leg re-runs today's
+  producer at `m-base:`; that difference is real, and the run parks it.
 - testing — one fixture per arm in `tools/unattended/check-unattended.test.sh`, each observed RED;
-  the unattended suites run once at the unit's end (D12-h).
+  the unattended suites run once at the unit's end (D12-h), read through unit 1's
+  `--attribute <BASE>`.
 - migration — none; every existing record is vacuous.
-- user docs — none beyond the leg's own header comments, which state what each arm does NOT check.
+- user docs — none beyond the leg's own header comments, which state what each arm does NOT check;
+  the folder-wide ban's carrier sentence is unit 20's (S3).
 
 ## 6. Acceptance criteria
 
@@ -162,16 +198,18 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
   Red when: the arm compares the fact against the driver's parse, or against the README at HEAD
   only, so a README edited after BASE agrees with a forged fact.
 - **AC2** — When a live fixture record's README at HEAD carries an `asks:` line that differs from the
-  one at BASE, check 19 reds; the same README on a LANDED record does not red.
-  Red when: the HEAD half grades terminal records, so a later edit to a landed build's README reds
-  the bar forever.
+  one at BASE, check 19 reds. The same README on a LANDED record, and on a committed LANDING record in
+  either lander mode, does not red.
+  Red when: the HEAD half grades a record past its close, so the owner's follow-up `asks:` edit reds
+  a landed record forever, and under in-place it does so through a record that never rotates.
 - **AC3** — When a mandated id has no ask row in its home `BACKLOG.md` at the fixture's `m-base:`,
   check 19 reds naming the id and the blob it read.
   Red when: the arm reads the working tree, so a row filed after the run started satisfies it.
-- **AC4** — When a fixture's recorded `m-base:` is replaced by an older ancestor of `anchor-sha:`,
-  check 19 reds; when the introducing commit cannot be found, the arm prints that it fell back to
-  ancestry.
-  Red when: the arm derives the merge-base from `base:`, or the fallback runs silently.
+- **AC4** — When a fixture record's `base:` and `m-base:` are both replaced by the same older
+  ancestor of `anchor-sha:`, check 19 reds naming `m-base:`; when the introducing commit cannot be
+  found, the arm prints that it fell back to ancestry.
+  Red when: the arm derives the merge-base from `base:`, so the forged pair agrees with itself, or
+  the fallback runs silently.
 - **AC5** — When a mandated fixture run's folder carries a table row whose first cell is a
   backticked foreign id, the new S3 check reds naming the file and line; a link-wrapped first cell
   does not red.
@@ -189,17 +227,33 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
 - **AC9** — When the leg runs over today's tree, it prints one line stating that no record pins an
   `asks:` fact, with the count 0.
   Red when: the leg prints nothing, so vacuity reads as a pass.
-- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --selftests` runs once at the end
-  of the unit, every arm this unit added passes and each was observed RED with its fix unstaged;
-  the run shows no NEW failure against unit 1's baseline.
+- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
+  end of the unit, it reports no NEW failure, and every arm this unit added passes, each observed RED
+  with its fix unstaged.
   Red when: an arm is wired without its failing case ever being seen.
   cost: one run of the unattended suites, the unit's single sanctioned suite run (D12-h).
+- **AC11** — When a fixture record's `asks-ready:` reads `EXMP-aFoo-3=yes` while the stub producer
+  at the recorded `m-base:` grades that id `no`, and the record's preflight commit is not on the
+  fixture remote's advertised tip, `bash tools/unattended/check-unattended.sh` reds check 19 naming
+  both pairs; with the preflight commit on the advertised tip, the record is not re-run and is
+  counted in one `published, not re-derived` line.
+  Red when: the arm compares `asks-ready:` against the record's own other facts, or re-runs the
+  producer at HEAD, so a run that edited `yes` to `no` takes F3's laxer path unseen.
+- **AC12** — When an unpublished fixture record's `asks-at-landing:` reads `EXMP-aFoo-3=CLOSED` while
+  the stub producer, at the first parent of the commit that introduced that line, reports it OPEN,
+  check 15 reds naming both; a REOPEN at HEAD does not red a published record.
+  Red when: the freeze is re-derived at HEAD, so a later REOPEN reds a correct record for ever, or
+  not re-derived at all, so a forged freeze passes S4.
+- **AC13** — When a fixture record in S4's population carries an `asks-at-landing:` that omits one
+  id of its `asks:`, check 15 reds naming the id.
+  Red when: S4 checks the fact's presence only, so a freeze missing one mandated id passes and that
+  ask's frozen answer is lost.
 
 ## 7. Gates
 
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per arm S1 to S5 carrying the break, plus a vacuous fixture · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per arm S1 to S5 carrying the break, plus a vacuous fixture, a forged `asks-ready:` pair and a forged freeze, each unpublished, and one published record · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
 ## 8. Open questions
 
@@ -213,12 +267,33 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
 - **F2 — may the leg reach the recall kit's extractor at all?** It must not name the kit by literal.
   RESOLVED (agent, 2026-09-14, delegated): through the declared `RECALL_CLI`, with a blank key an
   announced skip, which is the kit's existing adoption idiom for that key.
+- **F3 — does the leg second-opinion `asks-ready:` and the freeze's content, and over which
+  records?** Options: (i) re-derive both on every bar for every mandated record, re-running unit
+  16's call shape 1 at the recorded `m-base:` and call shape 2 at the tree the freeze was computed
+  at; (ii) state in the Goal, S4 and the leg header that both go unverified; (iii) (i) bounded to
+  UNPUBLISHED records, those whose introducing commit is not yet reachable from the advertised
+  default tip, with the published remainder announced by count. (i) costs one generator run per
+  mandated record per bar for ever, against the charter's "cost is a verdict", and a later READY-rule
+  change would red an archived record whose pin was right when written; (ii) leaves the "second
+  signature, not a second opinion" of TOOL-aUnmannedHelm-6 standing. RESOLVED (agent, 2026-09-14,
+  delegated): (iii), which catches a forged pin at every bar before it can land and never grades a
+  published record against a later producer. It relies on unit 16 rev-2 passing no live-build set,
+  which makes the READY call a pure function of pinned inputs.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft from DR §19.8 U13, fixes F2 and F4, and ruling D12-a. Adds one
   edge the brief's table does not carry: hands-off unit 35, which DR §19.8 U15 names as staging the
   leg's RED on a typed resolution table. The IDLIST arm of fix F2 is reduced under D12-a (§8 F1).
+- rev-2 · 2026-09-14 · §1 §3 §4 §5 §7 §8 · S1 S4 S5 S8 · AC2 AC4 AC10 AC11 AC12 AC13 · spec audit
+  round 1 folded. G3 M9: S8 re-derives `asks-ready:` and the freeze before publication (AC11, AC12;
+  §8 F3), possible because unit 16 rev-2 passes no live-build set (G3 H4). G3 M22: AC4 forges `base:`
+  and `m-base:` together. G3 L3: AC13 reds a freeze omitting a mandated id. G3 H6: S5 names its
+  driver twin. G3 H9: `--attribute <BASE>`, consumes-from unit 1. G3 M4: hands-off unit 20. G3 H8 and
+  G3's observation on in-place LANDING records: S1's HEAD half grades only records in a working
+  phase or HELD, because a committed LANDING record is past its close (AC2); §3's fourth bullet
+  states that the derived-terminal unit extends S4's population to a committed in-place LANDING
+  record in the commit that moves the freeze, with a hands-off edge to that unit.
 
 ## 10. Reuse audit
 

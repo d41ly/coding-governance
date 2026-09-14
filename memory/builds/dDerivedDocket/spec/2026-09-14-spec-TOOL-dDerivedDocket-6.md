@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-6 — ask parser and status fold
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
+| [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 
 <!-- /gen:spec-records -->
 
@@ -44,7 +44,8 @@ unit wires it in, and nothing in this repo's output moves.
 - **S6** The fold in §4: two strata, first matching rule wins, over SETS. Terminal evidence beats
   live evidence, CLOSED beats WONTDO, a non-`unit` closing spec reading WONTDO contributes nothing,
   and a hold releases automatically when its target goes terminal. Every status is a function of
-  sets alone, never of dates, file order or row order. Observed by AC4, AC5 and AC7.
+  sets alone, never of dates, file order or row order. Observed by AC4, AC5 and AC7; AC4 stages the
+  hold release, the `UNRESOLVED` placeholder and a hold cycle's true tokens.
 - **S7** REOPEN (owner ruling D4): a `REOPEN · <id> · of <record>` row cancels exactly the closing or
   declining records it names. Re-citing a cancelled record stays cancelled; new evidence re-closes.
   Observed by AC6.
@@ -54,14 +55,16 @@ unit wires it in, and nothing in this repo's output moves.
   archive into id, status token and body. It admits id-first and status-first rows, the `·` or the
   ASCII ` - ` separator, and the `CLOSED by` slot, and it folds a `WITHDRAWN` token to WONTDO with a
   `withdrawn` flag. It never guesses: anything else returns nothing, with the reason. Observed by AC9.
-- **S10** Verdicts V1 to V12 in §4, computed as data by one function whose inputs are the parsed
-  files, the spec index and the caller's map of build statuses. Each cross-file verdict names both
-  files and both slugs. Observed by AC10.
+- **S10** Verdicts V1 to V12, V15 and V16 in §4, computed as data by one function whose inputs are
+  the parsed files, the spec index and the caller's map of build statuses. Each cross-file verdict
+  names both files and both slugs. Observed by AC10.
 - **S11** Two conf keys, read here and declared in the kit's conf example and descriptor.
   `BACKLOG_MODE` takes `shards` or `builds`; absent or blank reads `shards`; any other value is a
-  refusal; the key and its spelling are frozen forever (design A1). `ASK_CUTOFF` is a date that arms
-  the forward-only verdicts; blank under `builds` is itself a verdict, because it would silently
-  disarm V9, V12 and the scaffold's V14. Observed by AC11.
+  refusal; the key and its spelling are frozen forever (design A1). `ASK_CUTOFF` is a `DATE` that
+  arms the forward-only verdicts. Under `builds`, a blank value is verdict V15 and a value that does
+  not match `DATE` (for example `2026-9-30`) is verdict V16; either one disarms V9, V12 and the
+  scaffold's V14 and is therefore reported, never silent. Under `shards` the key is not read.
+  Observed by AC11.
 - **S12** Dark proof: with gov in `shards` mode and no header carrying either verb, this tree's
   generated artifacts do not move. Observed by AC12.
 
@@ -77,16 +80,23 @@ unit wires it in, and nothing in this repo's output moves.
   owns the census; this unit owns only the one-line reader it calls.
 - Writing any `BACKLOG.md`, and migrating anything.
 - A `CYCLE` status placeholder (§8 F2).
+- The `memory/DECISIONS.md` row recording that DEPL-dGaugedVintage-13's 'COUNTED, NEVER REFUSED'
+  stance is superseded by the `unit`/`advances` model (design §4.4) is the switch-over's, written
+  with the signal's retirement (unit 34 S10), because this unit ships dark.
 
 ### Edges
 
 - **hands-off** `TOOL-dDerivedDocket-7` — the parser, the fold, the verdict function, the row
   renderers and the liveness counts, which the generator wires into its collect, render and check
-  paths.
+  paths — including the conf verdicts V15 and V16, which the view unit's `--check` reports like any
+  other verdict.
 - **hands-off** `TOOL-dDerivedDocket-8` — the two conf keys' spelling and semantics, which the
-  hygiene engine switches on, and the ask row's `filed` field, which check 13's pre-cutoff skip reads.
+  hygiene engine switches on, and the ask row's `filed` field, which check 13's pre-cutoff skip reads
+  — and V15 and V16, on either of which check 13's pre-cutoff skip treats the cutoff as unusable.
 - **hands-off** `TOOL-dDerivedDocket-9` — the `RELOCATED` provenance row, which the fold ignores and
-  the transition audit counts, and the frozen `BACKLOG_MODE` spelling it classifies commits by.
+  the transition audit counts, and the frozen `BACKLOG_MODE` spelling it classifies commits by, and
+  the `BACKLOG_MODE` entry in `tools/memory-tree/kit.toml`'s config key list, which unit 9's
+  `requires_if` condition names.
 - **hands-off** `TOOL-dDerivedDocket-10` — the row classifier, by whose class and target the row
   driver counts a `BACKLOG.md` row in its duplicate census, so a SEV row and a status row for one
   ask on two branches are two records and not one id written twice.
@@ -97,9 +107,12 @@ unit wires it in, and nothing in this repo's output moves.
   whether that record changes a derived status.
 - **hands-off** `TOOL-dDerivedDocket-15` — the ask text and pointer split that the clause tail
   extends, the verb-row grammar that `SCOPE` rows join, and the verdict numbering that continues at
-  V13.
+  V13; V15 and V16 are this unit's conf verdicts, so the envelope keeps V13 and V14.
 - **hands-off** `TOOL-dDerivedDocket-24` — the ask, SEV and KEEP row renderers the inherited-red
   auto-file writes with, so an auto-filed ask parses under this grammar.
+- **hands-off** `TOOL-dDerivedDocket-34` — the `unit` and `advances` model whose adoption supersedes
+  DEPL-dGaugedVintage-13's stance; unit 34 S10 writes the DECISIONS row naming it when it retires the
+  signal and its pin.
 
 ## 4. Design
 
@@ -120,7 +133,7 @@ provenance := "- RELOCATED · " ID " · by " SHA " · " ("kept" | "dropped" | "a
 ID       := FAMILY "-" SLUG "-" DIGITS, FAMILY from FAMILIES
 SHA      := 7 to 40 lower-case hex digits
 SLUG     := a folder name under builds/
-DATE     := four digits, two digits, two digits, joined by hyphens
+DATE     := four digits, two digits, two digits, joined by hyphens, zero-padded, so a string comparison is a date comparison
 ```
 
 `TEXT` is free prose on one physical line; the envelope unit later reads a clause suffix out of it,
@@ -203,11 +216,16 @@ hygiene gate's check 9.
 | V10 | a build whose derived status is terminal holds an ask deriving OPEN with no status row naming it in any file | yes |
 | V11 | a REOPEN whose `of` names no record currently closing or declining its target | yes |
 | V12 | an ask filed on or after `ASK_CUTOFF` with no SEV row naming it in any file | yes |
+| V15 | `ASK_CUTOFF` is blank while `BACKLOG_MODE` is `builds` | no |
+| V16 | `ASK_CUTOFF` is set and does not match `DATE` while `BACKLOG_MODE` is `builds` | no |
 
 V10 is retroactive over every finished build (owner ruling D6), counts a row in ANY file (design
 §17.2), and counts a REOPEN as that ask's KEEP (design §17.1). A cross-file verdict can be green on
 each branch and red after their merge; the message names both files and both slugs, so the lander
-fixes it with one edit.
+fixes it with one edit. V15 and V16 are returned by the conf reader and included in the verdict
+function's output, so every consumer that iterates the module's codes reports them. V13 and V14 are
+the envelope unit's (owner ruling D12-d names V14), so the conf verdicts continue the one sequence
+past them rather than taking a separate namespace unit 36's README drift arm would not collect.
 
 ### Inventory
 
@@ -273,8 +291,13 @@ its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.e
   never closes.
 - **AC4** — When `backlog.py --selftest` folds one fixture per rule R1 to R7, each ask derives that
   rule's token and its Decided-by names the evidence; an ask with a CLOSED row and a live closing spec
-  derives CLOSED; one with CLOSED and WONTDO evidence derives CLOSED.
-  Red when: rules are evaluated live-first, so a stale SPECCED spec hides a recorded closure.
+  derives CLOSED; one with CLOSED and WONTDO evidence derives CLOSED; an ask whose only hold is a
+  `BLOCKED` row on a target that folds CLOSED derives OPEN; an ask whose only hold names a target that
+  is neither a filed ask nor a spec H1 renders `UNRESOLVED` beside V6; and two live asks each
+  `BLOCKED` on the other both derive BLOCKED, their true token, while V6 names the cycle.
+  Red when: rules are evaluated live-first, so a stale SPECCED spec hides a recorded closure; or R5
+  drops 'has a live target', so a released hold stays BLOCKED after its blocker closes and neither
+  unit 11's prediction nor unit 34's AC3 can tell.
 - **AC5** — When a non-`unit` ask's only closing spec reads WONTDO, the ask derives OPEN; when a
   `unit` ask's same-id spec reads WONTDO, it derives WONTDO.
   Red when: a WONTDO closing spec declines an ask it was only one attempt at.
@@ -294,14 +317,16 @@ its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.e
   separators, a `CLOSED by` slot and a `WITHDRAWN` token, it returns each id and status, and WONTDO
   with the `withdrawn` flag for the last; a prose line returns nothing with its reason.
   Red when: an unreadable line is returned as OPEN, which is a guess a migration then writes.
-- **AC10** — When `backlog.py --selftest` stages each verdict V1 to V12 into an otherwise clean
-  fixture, exactly that verdict is reported, and the clean fixture reports none; each cross-file
-  verdict names both files.
+- **AC10** — When `backlog.py --selftest` stages each verdict V1 to V12, V15 and V16 into an
+  otherwise clean fixture, exactly that verdict is reported, and the clean fixture reports none; each
+  cross-file verdict names both files.
   Red when: a verdict's fixture also trips a second verdict, so its arm cannot tell which rule fired.
 - **AC11** — When `BACKLOG_MODE` is absent, blank, `shards`, `builds` and `shard` in turn, the conf
   reader returns shards, shards, shards, builds, and a refusal naming the legal set; `builds` with a
-  blank `ASK_CUTOFF` returns the named verdict.
-  Red when: an unrecognised value reads as `shards`, so a typo silently keeps an adopter unswitched.
+  blank `ASK_CUTOFF` returns V15; `builds` with `ASK_CUTOFF="2026-9-30"` returns V16 naming the key;
+  `builds` with `2026-09-30` returns neither.
+  Red when: an unrecognised mode reads as `shards`, or an unpadded cutoff is accepted and compared as
+  a raw string, so an October ask sorts before a September cutoff and V9, V12 and V14 go quiet on it.
 - **AC12** — When `python tools/memory-tree/gen_build_index.py --check` runs on this tree after the
   unit, it exits 0 and a `--write` over a scratch clone changes no tracked file.
   Red when: `parse_spec` refuses or re-renders a header that carries neither verb, so the dark unit
@@ -347,6 +372,13 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rul
 - rev-1 · 2026-09-14 · initial draft. Adds three edges the brief's table does not list: hands-off to
   unit 10, whose duplicate census reads this unit's row classifier, and hands-off to units 12 and 24,
   reciprocating the consumes-from lines those specs declare.
+- rev-2 · 2026-09-14 · S6 · S10 · S11 · §3 · §4 · AC4 · AC10 · AC11 · folds spec-audit round 1. G2 M1
+  (47) and M2 (7): the two `ASK_CUTOFF` conf verdicts become V15 (blank) and V16 (not a zero-padded
+  `DATE`), in the verdict output unit 7 reports, AC10 and AC11. G2 M14 (5): AC4 stages hold release,
+  `UNRESOLVED` and a hold cycle. G2 M9 (72), with G5 M6 (69) folded on unit 34: the DECISIONS
+  supersession row is unit 34's, recorded as a non-goal and a hands-off to 34, an edge the brief's
+  table does not list. G2 M8's unit-6 end: the hands-off to 9 names the `BACKLOG_MODE` config-key
+  entry.
 
 ## 10. Reuse audit
 

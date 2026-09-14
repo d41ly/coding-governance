@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-29 — review durability across a dead fan
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 29
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -31,13 +31,13 @@ runId recorded as a run fact.
   that skips the write cannot return cleanly. Observed by AC1 and AC12.
 - **S2** The review key, computed in the script from its inputs and nothing else: the kind, the
   round, the pinned subject, and a fingerprint over `context`, `byDesign` and `priorFindings`. The
-  pinned subject is every `path@blob` in the order given for a spec audit, and the base sha plus
-  the RESOLVED head sha for a diff review. Observed by AC2 and AC3.
-- **S3** One resume probe agent runs before the Find phase. It resolves `head` to a sha on a diff
-  review, and from then on every lens prompt and the record's range line name that sha instead of
-  the ref. It reads the key directory and returns each file it finds, parsed. A lens whose file
-  carries the computed key is reused; every other lens is dispatched. A dead probe dispatches every
-  lens and logs that it did. Observed by AC2, AC3 and AC4.
+  pinned subject is every `path@blob` in the order given for a spec audit, and the RESOLVED base sha
+  plus the RESOLVED head sha for a diff review (§8 F5). Observed by AC2 and AC3.
+- **S3** One resume probe agent runs before the Find phase. It resolves `base` and `head` to shas on
+  a diff review, and from then on every lens prompt and the record's range line name those shas
+  instead of the refs. It reads the key directory and returns each file it finds, parsed. A lens
+  whose file carries the computed key is reused; every other lens is dispatched. A dead probe
+  dispatches every lens with the refs as given and logs that it did. Observed by AC2, AC3 and AC4.
 - **S4** A skeptic batch is reused when its file carries the computed key AND a fingerprint of the
   batch's own findings, ids and claims together. Any other batch is dispatched. Observed by AC5.
 - **S5** The `deferred-platform` exit. Every return gains an `exit` field. It reads
@@ -57,8 +57,10 @@ runId recorded as a run fact.
 - **S8** Carriers. `tools/workflows/REVIEW-PROTOCOL.template.md` gains the durability rule and its
   render `memory/guides/REVIEW-PROTOCOL.md` is regenerated. The unattended Skill, the verb carrier
   and the stops companion unit 4 creates gain the re-run-once-then-hold step and the
-  `--pending-run` flag. `memory/map/features/review-harnesses.md` prose is refreshed. Both kit
-  versions move. Observed by AC11 and AC13.
+  `--pending-run` flag. `memory/map/features/review-harnesses.md` prose is refreshed. The review
+  harness's version moves here, once for this build's landing range, since this is the first unit
+  to scope that move; the unattended kit's move is `TOOL-dDerivedDocket-1`'s, and this unit's driver
+  bytes ride it. Observed by AC11 and AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -106,7 +108,7 @@ store, and it is paid only on a cross-node take-over.
 ```
 key = <kind> "-r" <round> "-" <subject> "-" <fnv1a32(canonical JSON of context, byDesign, priorFindings)>
 subject (spec-audit)  = fnv1a32 of every "<path>@<blob>" joined by newlines, in the order given
-subject (diff-review) = <base, first 12 hex> "-" <resolved head, first 12 hex>
+subject (diff-review) = <resolved base, first 12 hex> "-" <resolved head, first 12 hex>
 ```
 
 FNV-1a is written with `Math.imul` and string built-ins, which a workflow script admits; the runtime
@@ -221,7 +223,7 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
 - observability — the `exit` field on every return, the `pending` labels, a log line per reused lens
   and batch, and the `pending run` checkpoint line.
 - risks — a stale file reused for a changed question. The key covers every input the lens prompt
-  interpolates, and AC3 stages the case.
+  interpolates, and AC3 stages each component of the key.
 - testing — whole-script arms in `tools/workflows/tier2-review.test.sh` using the AsyncFunction
   runner `tools/workflows/unattended-build.test.sh` already uses; driver cases by hand in a scratch
   fixture repo, D12-h's method (b).
@@ -242,10 +244,12 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   with identical `args` is fed a probe return carrying the two surviving files under the computed
   key, the second trace records exactly two `find:` spawns.
   Red when: the re-run dispatches all four lenses.
-- **AC3** — When the probe returns a lens file whose `key` field names another round or another
-  head sha, `tools/workflows/tier2-review.test.sh` sees that lens dispatched.
-  Red when: reuse matches on the lens name or the directory alone, so a stale lens answers a
-  changed question.
+- **AC3** — When the probe returns a lens file whose `key` field differs from the computed key in one
+  component only — another round, another head sha, another resolved base sha after `origin/main`
+  moved, one spec-audit subject's blob, or the fingerprint over `context`, `byDesign` and
+  `priorFindings` — `tools/workflows/tier2-review.test.sh` sees that lens dispatched in each case.
+  Red when: the key omits a component, or reuse matches on the lens name or the directory alone, so
+  a stale lens answers a changed question.
 - **AC4** — When the probe stub returns null in `tools/workflows/tier2-review.test.sh`, every lens
   is dispatched and the log carries a line saying nothing could be reused.
   Red when: a dead probe is read as every file present, so no lens runs and the review is empty.
@@ -254,8 +258,12 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   Red when: batch reuse keys on the id range alone, which after a changed lens pairs old verdicts
   with new findings.
 - **AC6** — When all four lens stubs return null, the harness returns `exit: 'deferred-platform'`,
-  `blockers: null`, and a `pending` list naming the four `find:` labels.
-  Red when: the return reads `exit: 'complete'` or carries a note beginning `clean`.
+  `blockers: null`, and a `pending` list naming the four `find:` labels; when two lens stubs return
+  null and the survivors find nothing, it returns `deferred-platform` with those two labels pending;
+  and when one lens stub returns null and every finding is refuted by its skeptics, it returns
+  `deferred-platform` too.
+  Red when: any of the three paths returns `exit: 'complete'` or a note beginning `clean` or
+  `partial`, so the unattended adapter records a review round over a partial fan as clean.
 - **AC7** — When one skeptic batch stub returns null, and separately when the synthesis stub returns
   null, each run returns `deferred-platform` with the dead label in `pending`, and no synthesis runs
   after a dead batch.
@@ -266,9 +274,11 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   Red when: the non-integer blocker refusal fires first and the run dies reading DEGRADED.
   cost: seconds, run by hand, since no bar runs this suite at BASE.
 - **AC9** — When `unattended.sh --hold <slug> ... --pending-run wf_0a1b2c3d-4e5` runs in a scratch
-  fixture repo, `--status` prints `pending run wf_0a1b2c3d-4e5` in the checkpoint block; after a
+  fixture repo, `--status` prints `pending run wf_0a1b2c3d-4e5` in the checkpoint block, and a
+  `--resume` take-over of that record prints the relaunch line naming `wf_0a1b2c3d-4e5`; after a
   resume and a second `--hold` with no flag, the checkpoint prints no pending run.
-  Red when: the fact survives the second hold, so a checkpoint names a run from an earlier stop.
+  Red when: the fact survives the second hold, so a checkpoint names a run from an earlier stop; or
+  the take-over never prints the relaunch, so the recorded runId is written and never used.
   permission: this unit may not run the unattended suites; the arm is written, and the case is
   observed by running the verb itself in the fixture, D12-h's method (b).
 - **AC10** — When `--pending-run` carries ` · ` or a newline, `--hold` refuses with a numbered
@@ -285,7 +295,7 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   ignored and S1's schema field is satisfied by a path to nothing.
   cost: nothing beyond the closing review, which runs anyway. fixture: none exists until then.
 - **AC13** — When `bash tools/check-kit-versions.sh` runs, `tier2-review.js` carries 1.8 under both
-  of its kit ids and the unattended driver's version and marker agree.
+  of its kit ids.
   Red when: a kit's shipped bytes move and its marker is left behind.
 
 ## 7. Gates
@@ -313,10 +323,19 @@ New arm: `tools/unattended/unattended.test.sh` · `--hold --pending-run` with a 
   unit 4's `--hold`. A deferred run has no verdict or blocker count, which `--review` requires, and
   the stop that needs a runId later is exactly the one that holds. RESOLVED (agent, 2026-09-14,
   delegated): `--hold --pending-run`.
+- **F5 — how is a ref-valued diff base keyed?** Options: (a) the probe resolves `base` to a sha like
+  `head`, and the key and every prompt name it; (b) reuse is refused whenever `base` is not a pinned
+  hex id. (b) disables reuse for the harness's own default, `origin/main`. RESOLVED (agent,
+  2026-09-14, delegated): (a), which also pins every diff review to an immutable base.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · folds the round-1 spec audit (G4 M10, M26, M27, L5, M7; G1 M11). M10: S2
+  and S3 have the probe resolve the diff base too, and the key and prompts name the sha (F5). M26:
+  AC3 stages every key component. M27: AC6 stages both partial-death exits. L5: AC9 observes the
+  take-over's relaunch line. M7 with G1 M11: S8 moves the review harness only; the unattended move
+  is unit 1's, and AC13 keeps its review-harness half.
 
 ## 10. Reuse audit
 

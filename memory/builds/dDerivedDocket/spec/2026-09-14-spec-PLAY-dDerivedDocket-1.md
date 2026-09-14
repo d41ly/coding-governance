@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams playbook · order 37
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams playbook · order 37
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 DEPL-dDerivedDocket-1 |
+| [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 DEPL-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -30,7 +30,10 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   "(kit-conditional — drop this block…)" note and the italic "Two independent blocks…" paragraph
   above the kickoff-manifest exception are deleted, because both ask a reader to do what the renderer
   now does. The fence opens directly under the kickoff-manifest bullet, so a dropped block leaves
-  one blank line before §2. Observed by AC1 and AC2.
+  one blank line before §2. The kickoff-manifest exception, from its heading through its bullet, gets
+  its own `<!-- kit:kickoff-manifest -->` fence, because the deleted paragraph's first sentence was
+  that block's only qualifier and nothing else drops it for a target without the kickoff-manifest
+  kit (the aScouredKit wave-3 review, F2). Observed by AC1 and AC2.
 - **S3** §6's record-types bullet reads true in both backlog modes: the backlog keeps stable ids with
   gaps allowed, and where an ask's status lives is the memory tree's rule, reached through §5. The
   words "status updated in place" leave the template. §1's reconcile bullet keeps its wording (§8
@@ -39,8 +42,9 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   `bash tools/playbook/adopt-playbook.sh --target .` in the same commit, and two authored passages
   outside the region describe builds mode. The layout line lists `backlog/<FAMILY>.md` with the
   other GENERATED members, and the node-registry paragraph says asks are filed per build in
-  `memory/builds/<slug>/BACKLOG.md` with `memory/backlog/<FAMILY>.md` as their generated view.
-  Observed by AC3, AC4 and AC6.
+  `memory/builds/<slug>/BACKLOG.md` with `memory/backlog/<FAMILY>.md` as their generated view. The
+  Conventions bullet on merging and pushing points at §1 Landing's substitute instead of restating
+  it (S8). Observed by AC3, AC4 and AC6.
 - **S5** One `memory/DECISIONS.md` row under `## PLAY — playbook`, keyed by this unit's id,
   recording D12-i3 as the owner ruled it and the §6 wording change. Observed by AC7.
 - **S6** The kickoff manifest's `last-audit` is re-stamped in the same commit with a delta line in
@@ -50,6 +54,12 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   AC8.
 - **S7** The net byte budget: the template's CR-stripped size falls at this unit's commit, and
   `AGENTS.md` stays within its declared ceiling. Observed by AC1 and AC4.
+- **S8** §1 Landing's explicit-ask substitute bullet, inside the first `kit:unattended` fence, says
+  the build folder the run did not create is the DEFAULT-BRANCH anchor's property and that the
+  protocol names what its second anchor weakens. It stays one line of at most 450 characters, names
+  no lander verb or mode, and keeps S7's net byte budget negative. Gov's authored Conventions bullet
+  in `AGENTS.md` stops restating the property and points at §1 Landing's substitute. Observed by AC9
+  and AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -86,26 +96,36 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 | Where, at BASE | Now | After |
 |---|---|---|
 | `coding-governance-agents.template.md:55`-`:57`, the `kit:unattended` fence | one bullet: the explicit-ask substitute | that bullet, then the S1 landing bullet |
+| `coding-governance-agents.template.md:56`, the substitute bullet | "a committed build folder the run did not create", unqualified | qualified to the default-branch anchor (S8) |
 | `coding-governance-agents.template.md:63`-`:64` | the italic "Two independent blocks…" paragraph | deleted, with its blank line |
+| `coding-governance-agents.template.md:66`-`:68`, the kickoff-manifest exception | its heading and bullet, unfenced | the same heading and bullet inside a `kit:kickoff-manifest` fence (S2) |
 | `coding-governance-agents.template.md:70`-`:77` | "**Unattended runs** *(kit-conditional — drop this block…)*" and its bullet, unfenced | "**Unattended runs.**" and the same bullet, inside a `kit:unattended` fence |
 | `coding-governance-agents.template.md:148` | "the backlog is mutable (stable ids, status updated in place; gaps fine)" | the S3 wording |
 | `AGENTS.md:78`-`:472`, the `gov:playbook` region | the BASE render | a fresh render |
 | `AGENTS.md:52`-`:53`, the layout line | `backlog/<FAMILY>.md` listed after the GENERATED pair | listed as the third GENERATED member |
 | `AGENTS.md:70`-`:71`, the node-registry paragraph | "backlogs shard per family at `memory/backlog/<FAMILY>.md`" | asks filed per build, and the family file their generated view |
+| `AGENTS.md:581`-`:582`, the Conventions bullet on merging and pushing | "— or a committed build folder the run did not create" | "— or §1 Landing's one substitute" (S8) |
 | `memory/DECISIONS.md`, `## PLAY — playbook` | one row | a second row, this unit's |
 | `memory/guides/SESSION-KICKOFF.md` audit block | the switch-over's stamp | re-stamped |
 
 ### Proposed text
 
-The build may reword inside the constraints S1, S3 and AC10 state. The template passages:
+The build may reword inside the constraints S1, S3, S8, AC10 and AC11 state, and re-measures what it
+writes. The template passages:
 
 ```markdown
 <!-- kit:unattended -->
-- That explicit ask has ONE substitute: … (unchanged)
+- That explicit ask has ONE substitute: a committed build folder the run did not create at the default-branch anchor (the protocol names a weaker second), whose shape your merge bar validates. It must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
 - An unattended run lands by its protocol's landing rule, not the local-first one above.
 <!-- /kit:unattended -->
 …
+- Migrations are reversible — test up/down/up.
+<!-- kit:kickoff-manifest -->
+
+**Kickoff-manifest merge exception.**
+
 - The manifest reconciles additively EXCEPT its `last-audit` line — … (unchanged)
+<!-- /kit:kickoff-manifest -->
 <!-- kit:unattended -->
 
 **Unattended runs.**
@@ -118,6 +138,17 @@ The build may reword inside the constraints S1, S3 and AC10 state. The template 
 - Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog keeps stable ids (gaps fine), and how an ask's status is kept is the memory tree's rule (§5).
 ```
 
+The substitute bullet drops the sentence "The mandate is ASSERTED, never written by the run that uses
+it": the property survives inside "did not create at the default-branch anchor", which is the
+protocol's own qualifier for it, and a wording that kept the sentence beside the qualifier measured
++37 to +39 bytes on 2026-09-14, which would leave the template's net near −7: too thin to spend.
+Each kickoff-manifest fence marker sits directly under the line before it, so a target that selects
+neither kit still gets one blank line before §2.
+
+Gov's authored Conventions bullet in `AGENTS.md` reads "— or §1 Landing's one substitute" in place of
+"— or a committed build folder the run did not create". It is shorter, so it spends none of the
+ceiling headroom S4 and other units draw on; AC4 grades the file.
+
 The decision row, one line of at most 300 characters:
 
 ```markdown
@@ -127,20 +158,26 @@ The decision row, one line of at most 300 characters:
 ### Byte accounting
 
 PINNED: measured 2026-09-14 by applying the proposed text to BASE's template in a scratch copy and
-rendering it with `render_playbook.py` for a target that selects the unattended kit.
+rendering it with `render_playbook.py` for a target that selects the unattended kit. The S8 and
+kickoff-manifest fence rows were measured at rev-2 the same day by applying their text to a scratch
+copy of BASE's template; their region column follows the renderer's rule that a selected kit's
+markers are stripped, and was not rendered.
 
 | Edit | Template bytes | Rendered region bytes |
 |---|---|---|
 | S1 landing bullet | +89 | +89 |
+| S8 substitute bullet, 392 characters | +1 | +1 |
 | S2 italic paragraph deleted | −186 | −186 |
 | S2 heading note deleted | −93 | −93 |
-| S2 fence markers | +49 | 0, because a surviving block loses its markers |
+| S2 unattended fence markers | +49 | 0, because a surviving block loses its markers |
+| S2 kickoff-manifest fence markers | +61 | 0 for a target selecting the kit, as gov does |
 | S3 §6 bullet | +34 | +34 |
-| total | −107, so 48,778 of 49,152 | −156 |
+| total | −45, so 48,840 of 49,152 | −155 |
 
-The authored `AGENTS.md` passages in S4 add about 63 bytes, so the charter moves from 64,347 to
-about 64,254 of its 64,512 ceiling. The switch-over and the remote-CI unit may change `AGENTS.md`
-before this unit runs; AC4 grades the file at this unit's commit rather than trusting this sum.
+The authored `AGENTS.md` passages in S4 add about 63 bytes and S8's Conventions clause saves 21, so
+the charter moves from 64,347 to about 64,234 of its 64,512 ceiling. The switch-over and the
+remote-CI unit may change `AGENTS.md` before this unit runs; AC1 and AC4 grade the commit rather
+than trusting this sum.
 
 ### Why the fence is safe to add
 
@@ -149,7 +186,8 @@ select the kit, and strips only the markers for one that did. `unattended` is al
 entry, because the explicit-ask bullet is fenced with it, so no new refusal can fire. Measured at
 BASE: a scratch target whose `kits` omit `unattended` receives the unfenced block and its pointer
 to `UNATTENDED-PROTOCOL.md`, a protocol that target does not have. With the proposed text it
-receives neither.
+receives neither. `kickoff-manifest` is a registry entry too (`tools/govkit/registry.toml`), and gov
+selects it, so gov's region keeps the exception.
 
 ### Rollout
 
@@ -178,7 +216,7 @@ receives neither.
 
 - security — no new authority and no new write path. The explicit-ask substitute is unchanged, the
   landing bullet grants nothing, and the fence narrows what a target without the kit receives.
-- perf / scale — N/A: prose. Gov's charter, read every session, gets about 90 bytes shorter.
+- perf / scale — N/A: prose. Gov's charter, read every session, gets about 110 bytes shorter.
 - error / empty / loading states — a target that did not select the unattended kit now receives
   neither unattended block. The renderer refuses an unknown fence name, and `unattended` is known.
 - observability — the size gate's `template-size OK` line for both subjects, the render check's
@@ -200,17 +238,23 @@ receives neither.
   `template-size OK`.
   Red when: the landing bullet lands without the §1 deletions, which grows the file while it stays
   under its ceiling, so the size gate stays green and only the parent comparison catches it.
-  figure: DERIVED at the commit. BASE's 48,885 and the −107 projection are PINNED, measured
+  figure: DERIVED at the commit. BASE's 48,885 and the −45 projection are PINNED, measured
   2026-09-14; design §11's 49,032 was measured at `09a22d2b`.
 - **AC2** — When `python tools/playbook/render_playbook.py --target <scratch>` renders the template
-  for a scratch target whose `kits` omit `unattended`, `grep -c 'UNATTENDED-PROTOCOL'` over the
-  rendered `AGENTS.md` prints 0 and the landing bullet is absent; with `unattended` restored, the
-  same render carries both.
+  for scratch targets whose `kits` omit `unattended`, omit `kickoff-manifest`, omit both, and omit
+  neither, `grep -c 'UNATTENDED-PROTOCOL'` over the rendered `AGENTS.md` prints 0 exactly where
+  `unattended` is omitted, `grep -c 'Kickoff-manifest merge exception'` prints 0 exactly where
+  `kickoff-manifest` is omitted, the landing bullet follows `unattended`, and no render carries two
+  consecutive blank lines before §2; and
+  `grep -c 'kit-conditional — drop this block' coding-governance-agents.template.md` prints 0.
   Red when: the "Unattended runs" block stays unfenced, which is BASE's state and printed 1 in this
-  fixture on 2026-09-14, or the landing bullet sits on the unconditional local-first bullet.
+  fixture on 2026-09-14, or the landing bullet sits on the unconditional local-first bullet; or the
+  exception stays unfenced, so an adopter without the kickoff-manifest kit receives it with its only
+  qualifier deleted; or the heading note survives inside the new fence, which the parent byte
+  comparison and every render miss.
   fixture: a scratch git repository on `main` holding this repo's `.memory-tree.conf`, a copy of
-  `.governance/deploy.toml` with `unattended` removed from `kits` and a `playbook_path` answer naming
-  a copy of the template, and a stub answer for every placeholder
+  `.governance/deploy.toml` with the kit selection under test in `kits` and a `playbook_path` answer
+  naming a copy of the template, and a stub answer for every placeholder
   `tools/govkit/entries/playbook.kit.toml` declares that the copy leaves unanswered. Built in the
   scratchpad and discarded; the tree holds none.
 - **AC3** — When `bash tools/playbook/adopt-playbook.sh --target . --check` runs at this unit's
@@ -231,9 +275,11 @@ receives neither.
   `tools/memory-tree/check-memory-hygiene.sh:611`.
 - **AC6** — When `grep -n 'backlogs shard per family' AGENTS.md` runs it prints nothing, and the
   node-registry paragraph names `memory/builds/*/BACKLOG.md` as where asks are filed and
-  `memory/backlog/*.md` as their generated view.
+  `memory/backlog/*.md` as their generated view; and the layout line lists the family views,
+  `backlog/<FAMILY>`, among the GENERATED members.
   Red when: only the region is re-rendered and the authored paragraph keeps its BASE wording, which
-  contradicts the switched tree the same file's layout line describes.
+  contradicts the switched tree the same file's layout line describes; or the layout line keeps
+  listing the views after the GENERATED pair as authored files.
 - **AC7** — When `grep -c '^- \*\*PLAY-dDerivedDocket-1\*\*' memory/DECISIONS.md` runs it prints 1,
   and that row sits between `## PLAY — playbook` and `## KICK — kickoff`, names D12-i3, and is at
   most 300 characters.
@@ -247,12 +293,19 @@ receives neither.
 - **AC9** — When `bash tools/check-line-length.sh` runs, both declared subjects pass at 450
   characters.
   Red when: the landing sentence is appended to the explicit-ask bullet, a 391-character line at
-  `coding-governance-agents.template.md:56`, which makes it about 480.
+  `coding-governance-agents.template.md:56` at BASE and 392 after S8, which makes it about 480.
 - **AC10** — When the lines of the first `kit:unattended` fence in
   `coding-governance-agents.template.md` are searched with `grep -cE 'in-place|--prepare|--land|LANDER_MODE'`,
   the count is 0, and the landing bullet names the protocol's landing rule.
   Red when: the bullet quotes the consequence text's "in-place landing", which is false for an
   adopter whose lander mode is the kit default and restates the protocol's rule in the charter.
+- **AC11** — When `grep -c 'default-branch anchor'` runs over the first `kit:unattended` fence of
+  `coding-governance-agents.template.md`, it prints 1, and
+  `grep -n 'folder the run did not create' AGENTS.md` finds no hit outside the `gov:playbook`
+  region.
+  Red when: the bullet keeps "a committed build folder the run did not create" unqualified, which is
+  false for every run the second anchor authorizes, this build's own prompt-mode run among them; or
+  the Conventions bullet keeps restating it, which the grep finds at BASE's `AGENTS.md:582`.
 
 ## 7. Gates
 
@@ -303,6 +356,14 @@ an observation made once in the unit pass. The bar runs once, on the landing mer
   to the runbook unit, `DEPL-dDerivedDocket-1`, for its sentence on the unattended blocks. Departs
   from design §11's wording on two lines (§8 F1, F5) and from D12-i3's consequence text on the
   clause's words (§8 F3), each for a source fact at BASE the design did not have.
+- rev-2 · 2026-09-14 · spec-audit G5 round 1 fold. M13 (42): new S8 qualifies §1 Landing's
+  explicit-ask substitute to the default-branch anchor, as design §19.8 assigns U6, and repoints gov's
+  authored Conventions bullet; S4, §4 edits table, proposed text and byte accounting, AC11, §10. M14
+  (71): S2 fences the kickoff-manifest exception, per the aScouredKit wave-3 review's F2; §4 proposed
+  text, byte accounting and "Why the fence is safe to add"; AC2 renders four kit selections; §10.
+  L4 (28): AC2 greps the heading note away and AC6 reads the layout line. Byte accounting
+  re-measured: the template's net is −45, not −107, and the region's −155; AC9 names the 392-character
+  bullet.
 
 ## 10. Reuse audit
 
@@ -331,6 +392,12 @@ Where the design and the source disagree at BASE, re-verified here:
   at this writing, makes the lander mode a declaration whose blank reads `primary` (§8 F3).
 - The "Unattended runs" block is unfenced at BASE though it tells a reader to drop it. It arrived in
   that shape at the charter's convergence into one file.
+- Design §19.8 assigns U6 the stale authorization sentence at `AGENTS.md:129`; D12-a dropped E2 but
+  not prompt mode, so the sentence is still false on the second anchor (S8).
+- The finding that prescribed fencing both halves — the kickoff-manifest exception as well as the
+  unattended block — is F2 of
+  `memory/builds/aScouredKit/reviews/2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-behaviour.md`
+  (S2).
 
 M12 was not reached: the owner's ruling and the design chose the mechanism, and each fork above is
 wording or placement decided by a measurement or a veto.

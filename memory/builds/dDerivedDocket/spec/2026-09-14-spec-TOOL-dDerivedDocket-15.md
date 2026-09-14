@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 15
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
+| [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
 
 <!-- /gen:spec-records -->
 
@@ -35,7 +35,8 @@ list into a build README the owner lands, so authority stays with the owner's co
   (fix F6), a SCOPE row whose target is not a filed ask, and two SCOPE rows for one target in one
   file. Observed by AC3.
 - **S4** Verdict V14 (owner ruling D12-d), builds mode only and forward-only: an ask filed on or after
-  `ASK_CUTOFF` must carry `accept`, or a `seen` that carries a command. Observed by AC4.
+  `ASK_CUTOFF` whose MERGED clauses (S2: the ask row and every SCOPE row naming it) carry neither
+  `accept` nor a `seen` that carries `run`. Observed by AC4.
 - **S5** The READY predicate of §4 over a mandated set M, graded `yes`, `legacy` or `no`, with fix F5
   on R2 and fix F6 on R5 and `legacy`. Observed by AC5 and AC6.
 - **S6** Print modes on unit 7's `--asks`: `--ready <IDLIST>` sets M, `--target <slug>` names the
@@ -44,13 +45,14 @@ list into a build README the owner lands, so authority stays with the owner's co
   prints the machine projection of §4. All write nothing and exit 0. Observed by AC5, AC7 and AC8.
 - **S7** `PROBE_ALLOW` in `.memory-tree.conf`, shipped blank (owner ruling D12-e), and
   `--asks --probe <id>`, the one path that may execute a `seen` command. It refuses unless the
-  command's leading argv tokens match a declared prefix, and it never runs through a shell. Observed
-  by AC9.
+  command's leading argv tokens equal one declared `PROBE_ALLOW` entry token for token (§4, §8 F5),
+  and it never runs through a shell. Observed by AC9.
 - **S8** `gen_build_index.py --new-build <slug> --asks <IDLIST>`, the scaffold of owner ruling D12-a:
   it parses the list all or nothing (fix F2), refuses a slug the all-time grep finds, an id with no
   filed ask, and a list whose every id grades `no`, and otherwise writes the build README with a
   canonical one-line `asks:` key, its bound row in `memory/project/readme-contract.txt`, and the
-  `--write` render. It never emits `may:`. Observed by AC10 and AC11.
+  `--write` render, and writes `ids:` and `status: OPEN` among its keys (§4). It never emits `may:`.
+  Observed by AC10, AC11 and AC13.
 - **S9** Arms for every verdict, grade and refusal above in `gen_build_index.py --selftest`, each
   observed RED with its fix unstaged. Observed by AC12.
 
@@ -69,6 +71,10 @@ list into a build README the owner lands, so authority stays with the owner's co
 - No run executes a `seen` command in this build: gov's `PROBE_ALLOW` stays blank.
 - No `--mode` on the scaffold. Owner ruling D12-a dropped the zero-commit ids start, so the only
   README the scaffold writes is an owner-landed `slug`-mode one.
+- The scaffold's README resolves to `slug`, so the mode-scoped directives bind it as they bind any
+  `slug` run: `researched` and `solution-tested` do not (TOOL-aPromptedMandate-4), and
+  `pieces-recorded` and `playbook-followed` do not (recipe mode only). The question whether the first
+  two should is parked (unit 16 §3).
 
 ### Edges
 
@@ -76,14 +82,16 @@ list into a build README the owner lands, so authority stays with the owner's co
   the fold R2 reads, the verdict list V13 and V14 join, and the `ASK_CUTOFF` key V14 compares.
 - **consumes-from** `TOOL-dDerivedDocket-7` — the `--asks` print mode S6 extends, its link-wrapped
   first cell, and the `--write` render the scaffold runs.
-- **hands-off** `TOOL-dDerivedDocket-16` — READY at a pinned rev with a target folder and live
-  builds, the `--tsv` projection, and the `--new-build` command the driver's ids refusal prints.
+- **hands-off** `TOOL-dDerivedDocket-16` — READY at a pinned rev with a target folder (the driver
+  passes no live-build set), the `--tsv` projection, and the `--new-build` command the driver's ids
+  refusal prints.
 - **hands-off** `TOOL-dDerivedDocket-17` — the eleven-field `--tsv` row and its closing examined
   line, which the `asks-disposed` witness parses.
 - **hands-off** `TOOL-dDerivedDocket-19` — V13, which that unit extends to a SCOPE row carrying
   `may`, and the scaffold, which that unit asserts never emits `may:`.
 - **hands-off** `TOOL-dDerivedDocket-20` — the clause grammar, READY and `--probe`, which the
-  companion guide states as contract and the Skill's orientation steps call.
+  companion guide states as contract and the Skill's orientation steps call, and the rule that a
+  scaffolded build's first spec commit deletes `status: OPEN`.
 - **hands-off** `TOOL-dDerivedDocket-24` — the `seen` and `accept` clauses an auto-filed
   inherited-red ask carries, so it is filed runnable under V14.
 - **hands-off** `TOOL-dDerivedDocket-34` — V13, staged RED on the real tree after the switch-over.
@@ -131,7 +139,8 @@ no      otherwise
 ```
 
 Without `--ready`, each id is graded with M = {A}. Without `--live-builds`, every foreign live
-spec counts as a live claim, which is the conservative reading a human query gets. A foreign live
+spec counts as a live claim, which is the conservative reading a human query gets and the reading the
+ask driver pins, because no tree it reads shows every run in flight (unit 16 §8 F2). A foreign live
 spec that R2 admits because its build is not live is printed in the closers field as `stale:<id>`,
 which is how fix F5 names a stale claim without a fourth grade (§8 F2). Status comes from unit 6's
 fold only; this predicate adds no status rule.
@@ -145,17 +154,55 @@ ask  <id>  <status>  <decided-by>  <home>  <sev>  <ready>  <missing>  <holds>  <
 examined  <n>
 ```
 
-`missing` lists the failing rules as `R<n>` joined by commas, or `-`; `holds` and `closers` list
-ids joined by commas, or `-`. The human table is the same data with a link-wrapped first cell, so a
-pasted copy anchors nothing (design §19.7 layer 1). Its summary line reads
+Each field's value set, spelled as unit 7's `--json` projection spells the same data, so the two
+projections share one spelling:
+
+- `status`: unit 6's vocabulary `CLOSED WONTDO INPROGRESS SPECCED BLOCKED DEFERRED OPEN`, or
+  `UNRESOLVED` for unit 6's placeholder.
+- `decided-by`: a comma list of EVERY member of the set that decided the status, never one member
+  picked (`memory/gotchas/one-value-field-records-a-mixed-outcome.md`): for CLOSED the `closing`
+  set, for WONTDO the `declining` set (the `--json` fields of those names), for unit 6's fold rules
+  R3 to R6 the deciding spec ids and hold targets; `-` for its R7, OPEN. These are the fold's rule
+  numbers, not READY's. A spec member is its id; a CLOSED row's member is its `by`
+  value, a hex sha. The two shapes are disjoint, because an id carries a family prefix.
+- `home`: the home build's slug; never empty.
+- `sev`: unit 6's SEV label, or `-` when the ask carries none.
+- `ready`: `yes`, `legacy` or `no`.
+- `missing`: the failing rules as `R<n>` joined by commas, or `-`.
+- `holds`: live hold targets joined by commas, or `-`.
+- `grant`: the merged `may` grants joined by commas; `none` when the merged value is `none`; `-`
+  when no `may` clause exists.
+- `closers`: the ask's LIVE closing specs (the `--json` `live_specs` set), each an id, a foreign one
+  that R2 admitted prefixed `stale:`; `-` when none. A CLOSED closing spec is never here: it is a
+  member of `decided-by`.
+
+No field is ever empty. Every field that can be empty carries `-`, because the kit reads TAB records
+with `IFS=$'\t' read` and a run of tabs collapses
+(`memory/gotchas/empty-field-collapses-unless-it-is-last.md`). A consumer validates each field
+against its value set, so a reorder or an empty field is a parse refusal, never a misread row.
+
+The human table is the same data with a link-wrapped first cell, so a pasted copy anchors nothing
+(design §19.7 layer 1). Its summary line reads
 `asks: <n> examined · <y> ready · <l> legacy · <x> not ready · at <rev or the working tree>`.
+
+Under `--tsv`, stdout carries the n `ask` lines and the one `examined` line and nothing else. The
+tolerated-by-waiver line `collect()` prints (`tools/memory-tree/gen_build_index.py:819-822`), unit
+7's S11 liveness line and every other notice go to stderr, by unit 7's rule that every `--asks`
+output mode writes only its value to stdout.
 
 ### The probe runner
 
-`--asks --probe <id>` takes the merged `seen` command, refuses it outright if it carries a shell
-metacharacter or a newline, splits it into argv without a shell, and runs it only when those argv
-tokens begin with one of the whitespace-separated prefixes in `PROBE_ALLOW`, bounded, from the repo
-root. It prints the locator, the decision and, when it ran, the exit status and the output tail.
+`--asks --probe <id>` takes the one `run` command of the merged `seen`. When the ask row and its
+SCOPE rows carry more than one `run`, it refuses as ambiguous, names each row and runs nothing (§8
+F7). It refuses the command outright, before splitting, if it carries a shell metacharacter or a
+newline, splits it into argv without a shell, and runs it only when those argv tokens begin with one
+of the entries of `PROBE_ALLOW`, bounded, from the repo root. Entries are separated by `|`; an entry
+is one or more whitespace-separated argv tokens, and it matches only when each of its tokens EQUALS
+the command's token at that position, so `python3` never admits `python3x` and `tools/` never admits
+`tools/../x` (§8 F5). A single-token interpreter entry such as `python3` admits `python3 -c` followed
+by anything: declare the script, not the interpreter. The bound kills a command that outlives it and
+reports it as never answered. It prints the locator, the decision and, when it ran, the exit status
+and the output tail.
 Blank `PROBE_ALLOW` refuses every command and says which key would admit it. Ask text is written by
 whoever filed it, so this is the only place the kit executes a filer's bytes (charter §9).
 
@@ -169,10 +216,18 @@ ranges that `_expand_ids` (`tools/memory-tree/gen_build_index.py:500`) already e
 anchors nothing.
 
 The README carries `slug`, `node` (the slug's leading tag), `opened`, `streams` and `roster`
-derived from the asks' families through `FAMILIES`, `authorized-by: slug` and `asks:`. The five
-canon slots of `SLOT_CANON` (`tools/memory-tree/gen_build_index.py:107-113`) get generated bodies
-naming the asks and the tree they were read at, so the file carries no authored prose; the units
-roster pair is empty. The contract row is BOUND, so the registry's exempt pin does not move. The
+derived from the asks' families through `FAMILIES`, `ids:` (written empty and filled by the
+`--write` render the scaffold runs), `status: OPEN`, `authorized-by: slug` and `asks:`.
+`status: OPEN` is required because `derive_status` has no spec to derive from
+(`tools/memory-tree/gen_build_index.py:635-641`). The run's first spec commit deletes it, because an
+authored status beside a parseable spec header is the generator's two-answers refusal (`:643-648`);
+this build's own README did exactly that at `c6cb6951`. The five canon slots of `SLOT_CANON`
+(`tools/memory-tree/gen_build_index.py:107-113`) get generated bodies naming the asks and the tree
+they were read at, so the file carries no authored prose; the units roster pair is empty. Every
+generated body cites an ask inside prose, never as a bullet's or a table row's first token:
+`A_BOLD_LI`, `A_DASH` and `A_TABLE` anchor an id that leads one
+(`tools/memory-recall/extract.py:117-121`), and the new build would become a second claimant under
+check 13. The contract row is BOUND, so the registry's exempt pin does not move. The
 readiness table prints before anything is written, and a list whose every id grades `no` stops
 there, which is design §19.2's disqualifier stop.
 
@@ -206,8 +261,9 @@ there, which is design §19.2's disqualifier stop.
 ## 5. Production-readiness checklist
 
 - security — READY and the print modes read records only. `--probe` executes a filer's command only
-  under a declared argv prefix, without a shell, bounded; gov declares none. The scaffold writes a
-  README with no `may:`, so it can grant nothing.
+  under a declared `PROBE_ALLOW` entry matched token for token, without a shell, bounded; gov
+  declares none. An entry naming a bare interpreter admits arbitrary code, and §4 says so. The
+  scaffold writes a README with no `may:`, so it can grant nothing.
 - perf / scale — one pass over the tracked `BACKLOG.md` files, which the fold already makes; `--at`
   adds two git processes.
 - error / empty / loading states — an id with no ask grades `no` on R1 and is named; in shards mode
@@ -225,42 +281,71 @@ there, which is design §19.2's disqualifier stop.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the selftest parses the §4 example ask, `backlog.py` yields its four clauses and
-  pointer, and a clause-free legacy row yields the same fields unit 6 yields.
-  Red when: the tail is read left to right, so a TEXT containing ` · out ` swallows the real clauses.
+- **AC1** — When the selftest parses the §4 example ask, `backlog.py` yields its three clauses and
+  its pointer; when it parses a fixture row whose TEXT contains ` · out ` before the real `seen` and
+  `accept` clauses, it yields the real `seen` and `accept` values read right to left, and `--check`
+  reports V13 on the misread `out` value; a clause-free legacy row yields the same fields unit 6
+  yields.
+  Red when: the tail is read left to right, so the TEXT's ` · out ` swallows the real clauses and no
+  V13 names it.
 - **AC2** — When a fixture carries a SCOPE row adding `accept` to an ask with only `seen`,
-  `gen_build_index.py --asks --tsv` grades it `yes`, and its status is unchanged by the SCOPE row.
-  Red when: a SCOPE row moves the derived status.
+  `gen_build_index.py --asks --tsv` grades it `yes`, and its status is unchanged by the SCOPE row;
+  with the ask row and a SCOPE row both carrying `accept`, `--asks <id>` prints both values; a SCOPE
+  row carrying `may none` beside the ask's grant leaves the grant unchanged.
+  Red when: a SCOPE row moves the derived status, or a SCOPE row replaces the ask's value, so one
+  `accept` disappears.
 - **AC3** — When a builds-mode fixture carries a `seen` locator with a bare line number, a doubled
   label, a SCOPE row naming an unfiled id, and a second SCOPE row for one target in one file,
   `gen_build_index.py --check` names V13 four times with each file and row.
   Red when: the bare line number passes, so an ask stays located after its line moved.
-- **AC4** — When a fixture ask filed on `ASK_CUTOFF` carries neither `accept` nor a `seen` with
-  `run`, `--check` names V14; the same ask filed the day before passes.
-  Red when: V14 grades asks filed before the cutoff, which reds every legacy ask on arrival.
-- **AC5** — When `gen_build_index.py --asks --ready` grades a fixture set holding an OPEN ask with
-  `accept`, an ask held on one outside the set, and a legacy ask with a pointer and no acceptance,
-  it prints `yes`, `no` naming R3, and `legacy`.
-  Red when: `legacy` is granted with both R4 and R5 failing, which fix F6 forbids.
+- **AC4** — When `gen_build_index.py --check` runs over a fixture holding asks filed on
+  `ASK_CUTOFF` — one with no clause, one with a bare `seen`, one carrying `accept`, one carrying
+  `seen … run`, and one with no clause that a SCOPE row cures with `accept` — it names V14 for the
+  first two only, and the clause-free ask filed the day before passes.
+  Red when: V14 reds every ask filed on or after the cutoff, or grades asks filed before it, which
+  reds every legacy ask on arrival.
+- **AC5** — When `gen_build_index.py --asks --tsv --ready` grades a fixture set holding an OPEN ask
+  with `accept` (`yes`); an ask held on one outside the set (`no`, missing `R3`); an ask whose hold
+  target is inside the set (R3 passes); an id with no ask row and an id with two (`no`, `R1`); an ask
+  filed in a foreign folder (`no`, `R1`); a pointer whose path is absent from the tree (`no`, `R4`);
+  an external locator with no `data` clause (`no`, `R6`); a pre-cutoff ask with a pointer and no
+  acceptance (`legacy`); and a pre-cutoff ask with neither pointer nor acceptance (`no`, `R4,R5`),
+  each row's `ready` and `missing` fields equal the values named.
+  Red when: the last ask is graded `legacy` with both R4 and R5 failing, which fix F6 forbids, or any
+  named rule is ignored so its row reads `yes`.
 - **AC6** — When an ask's only live closing spec sits in another build, the ask grades `no` on R2;
   with `--live-builds` omitting that build it grades `yes` and the closers field reads `stale:` and
-  the spec id; with `--target` naming that build it grades `yes`.
+  the spec id; with `--target` naming that build it grades `yes`; a terminal ask grades `no` on R2; a
+  `unit` ask of the `--target` folder that is not terminal grades `yes`.
   Red when: a foreign live spec in a live build is admitted, so two builds answer one ask.
-- **AC7** — When `--asks --tsv` runs over three fixture asks, it prints three lines of exactly eleven
-  TAB-separated fields led by `ask`, then `examined` and 3.
-  Red when: a field is added or reordered without the witness in unit 17 failing first.
+- **AC7** — When `gen_build_index.py --asks --tsv` runs over a builds-mode fixture holding an
+  unlabelled OPEN ask, an ask closed by one CLOSED spec and one CLOSED row, and a BLOCKED ask graded
+  `yes`, plus one header tolerated by waiver, the whole of stdout is exactly four lines: three `ask`
+  lines of exactly eleven TAB-separated fields, then `examined` and 3. Every field holds the value
+  the fixture fixes, position by position: field 3 the status; field 4 `-` for the OPEN ask and both
+  closing members for the closed one; field 6 `-` for the unlabelled ask; field 7 the grade; field 11
+  `-` or the live closer. No field is empty, and the waiver line appears on stderr.
+  Red when: a notice reaches stdout, a field is empty, or two fields swap (status and ready, say), so
+  a consumer parsing by position misreads a row that still has eleven fields.
 - **AC8** — When `--asks --ready --at <rev>` runs with a fixture's working tree edited after `<rev>`,
   the grades reflect `<rev>` only, and `git status --porcelain` is unchanged.
   Red when: `--at` reads a working-tree file, so a row filed after the pinned base grades as filed.
-- **AC9** — When `--asks --probe <id>` runs with `PROBE_ALLOW` blank it refuses naming the key; with
-  a matching prefix it runs and prints the exit status; with `;` in the command it refuses before
-  splitting.
-  Red when: the command is handed to a shell, so an allowed prefix followed by `;` runs anything.
-- **AC10** — When `gen_build_index.py --new-build <slug> --asks` receives `EXMP-aFoo-3 -4` over a
-  fixture filing both, it writes a README whose `asks:` line reads `EXMP-aFoo-3..4`, a bound
-  contract row, and rendered regions, and `gen_build_index.py --check-format` passes on it.
-  Red when: the scaffold writes a README the slot contract refuses, so the owner's one command
-  produces a red bar.
+- **AC9** — When `gen_build_index.py --asks --probe <id>` runs with `PROBE_ALLOW` blank it refuses
+  naming the key; with a non-blank `PROBE_ALLOW` of which no entry matches, it refuses naming the
+  key; with `python3` declared and the command `python3x …` it refuses; with the two-token entry
+  `python3 p.py` declared it runs `python3 p.py`, prints the exit status, and refuses `python3 q.py`;
+  with `;` or a newline in the command it refuses before splitting; with a fixture command that
+  sleeps past the bound it kills it and reports it never answered; with two `seen … run` values it
+  refuses as ambiguous naming both rows.
+  Red when: the match is a string prefix, or the command reaches a shell, so an allowed entry admits
+  `python3x`, `tools/../x` or `; anything`.
+- **AC10** — When `gen_build_index.py --new-build <slug> --asks` receives `EXMP-aFoo-3 -4` in a
+  scratch fixture repository filing both, and the scaffold's files are then staged, the README's
+  `asks:` line reads `EXMP-aFoo-3..4`, it carries `authorized-by: slug`, `status: OPEN` and a filled
+  `ids:`, its contract row is bound, and `gen_build_index.py --check` and
+  `gen_build_index.py --check-format` both exit 0.
+  Red when: the key list drops `ids`, or the scaffold writes `authorized-by: prompt`, so the owner's
+  one command produces a README the bar refuses or one units 16, 18 and 19 treat as run-writable.
 - **AC11** — When the scaffold receives `EXMP-aFoo-3...5`, an unfiled id, a slug the all-time grep
   finds, or a list whose every id grades `no`, it exits non-zero and writes nothing; over an ask
   carrying `may`, its README has no `may:` line.
@@ -271,6 +356,12 @@ there, which is design §19.2's disqualifier stop.
   cost: one kit selftest run; held, so it runs at the landing bar under `GATE_SELFTESTS=1`.
   permission: unit passes run no gate legs (fix F7), so each arm's RED is observed by hand against a
   scratch fixture in the pass, and the selftest itself runs at the one post-build bar.
+- **AC13** — When the memory-recall kit's `anchor_at` runs over every line the scaffold writes for
+  AC10's fixture, it returns no anchor.
+  Red when: a generated bullet reads `- EXMP-aFoo-3 — …`, which anchors a foreign id under the new
+  build.
+  fixture: the selftest reaches `anchor_at` through the declared route unit 18 S3 uses,
+  `RECALL_CLI`, and a blank key is a named skip of this arm, never a pass.
 
 ## 7. Gates
 
@@ -288,11 +379,25 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   three grades, with the stale spec named `stale:` in closers; (c) the memory-tree kit reads each
   build's run-state file. (a) reaches unit 17 unhardened, whose rules key on `yes`; (c) couples the
   kit to another kit's file and cannot see a derived landing. RESOLVED (agent, 2026-09-14,
-  delegated): (b), with the live-build set supplied by the one caller that knows it.
+  delegated): (b), with the live-build set supplied only by a caller that can observe every live run;
+  the ask driver cannot and passes none (unit 16 §8 F2 at rev-2).
 - **F3 — where does the `PROBE_ALLOW` key live?** RESOLVED (agent, 2026-09-14, delegated): in
   `.memory-tree.conf`, beside `ASK_CUTOFF`, because the only runner is this kit's `--probe`.
 - **F4 — check 13's pre-cutoff scoping (D12-g).** RESOLVED (agent, 2026-09-14, delegated): unit 8's,
   as the spec brief's roster assigns, so the skip and its scope land as one change.
+- **F5 — how is `PROBE_ALLOW` written and matched?** Options: whitespace entries by string prefix;
+  whitespace entries by token equality; `|` entries of whole tokens by token-sequence equality. The
+  first admits `python3x` and `tools/../x`; the first two cannot express an entry narrower than one
+  interpreter. RESOLVED (agent, 2026-09-14, delegated): the third, the only one under which §5's
+  security claim holds.
+- **F6 — does a SCOPE row's `accept` satisfy V14?** Options: the ask row's own clauses; the merged
+  clauses. The first gives V14 and R5 two answers to one question and leaves a non-filer no way to
+  cure an ask without writing into its home folder. RESOLVED (agent, 2026-09-14, delegated): the
+  merged clauses, the same merge R5 reads.
+- **F7 — which command does `--probe` run when two merged `seen` values carry `run`?** Options:
+  refuse; the ask row's; each. RESOLVED (agent, 2026-09-14, delegated): refuse as ambiguous; running
+  a second writer's command for someone else's ask widens the exec surface (veto 3), and ignoring it
+  is silent.
 
 ## 9. Revision log
 
@@ -301,6 +406,15 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   units 17, 19, 24 and 34, whose specs declare the consuming end, and hands-off unit 20, whose
   carriers state this unit's grammar as contract. Leaves D12-g to unit 8 per the
   brief's roster: unit 18's spec says unit 15 refines check 13, and one of the two pointers is wrong.
+- rev-2 · 2026-09-14 · §3 §4 §5 §8 · S4 S7 S8 · AC1 AC2 AC4 AC5 AC6 AC7 AC9 AC10 AC13 · spec audit
+  round 1 (G3) folded: H1 `--tsv` owns stdout, one rule with unit 7 (G2 M4); H2 every field's value
+  set, `-` for every empty field; H10 the scaffold writes `ids:` and `status: OPEN`, AC10 staged end
+  to end; H11 `PROBE_ALLOW` grammar (§8 F5); M11 generated bodies anchor nothing (AC13); M14 a failing
+  fixture per READY rule; M15 AC7 asserts every position; M16 AC1's fixture carries ` · out `; M17 V14
+  reads the merged clauses (§8 F6); L1 `--probe` refuses two `run` values (§8 F7); H4 the ask driver
+  passes no live-build set (unit 16 §8 F2 at rev-2); M8 §3 lists which mode-scoped directives bind
+  the scaffold's README. AC9's two-token fixture names `p.py` and `q.py` at the fixture root, so no
+  untracked path reaches the spec-token join.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 12
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
+| [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 
 <!-- /gen:spec-records -->
 
@@ -25,10 +25,12 @@ audit can count, and refuses to finish while any change is unaccounted.
 - **S1** `migrate_backlog.py --relocate --as <slug> [--from <ref>]`, run on the straggler after it
   merged the default branch. The straggler side is `HEAD` while `MERGE_HEAD` exists, else the first
   parent of a merge `HEAD`, else `--from <ref>`; the other side is `MERGE_HEAD`, the second parent,
-  or `HEAD` respectively. Anything else refuses and prints the recipe. Observed by AC1 and AC9.
+  or `HEAD` respectively. Anything else refuses and prints the recipe. The `--from` form takes S5's
+  confirmation (§4). Observed by AC1, AC9 and AC15.
 - **S2** The classification table in §4 maps every delta entry to records: a new ask row in its id's
   slug folder, a disposition in the `--as` folder, a path repoint of the ask text (ruling D9), a
-  mechanical drop, or NEEDS-HUMAN. Observed by AC1, AC2 and AC11.
+  mechanical drop, or NEEDS-HUMAN, under the policy set §4 names for the verb. Observed by AC1, AC2
+  and AC11.
 - **S3** Provenance (design A4). Every delta entry gets exactly one
   `- RELOCATED · <id> · by <sha> · kept|dropped|amended: <why>` row in the `--as` folder's
   `BACKLOG.md`, where `<sha>` is the change commit unit 9's delta names. After writing, the verb
@@ -38,13 +40,18 @@ audit can count, and refuses to finish while any change is unaccounted.
   confirmation, makes the verb write NOTHING and print the plan with the exact re-run command. A
   human classifies an entry with `--drop <id>=<why>`, which writes a `dropped:` provenance row and no
   other record. Observed by AC2.
-- **S5** Confirmation (design A6). Under `--repair` and `--ingest`, a planned record that changes the
-  id's derived status at the target tree requires `--confirm <id>`; without it the verb refuses,
-  naming the status before and after and the change commit. `--relocate` writes its author's flips
-  and lists every status change in its table. Observed by AC3.
-- **S6** `--ingest <ref> --as <slug>`, run from a builds-mode checkout of the default branch for a
-  straggler nobody will revisit. Same engine, delta of `<ref>` against `HEAD`, no merge made.
-  Observed by AC5.
+- **S5** Confirmation (design A6). Under `--repair`, `--ingest` and `--relocate --from`, a planned
+  record that changes the id's derived status at the target tree requires `--confirm <id>`; without
+  it the verb refuses, naming the status before and after and the change commit. `--relocate` in its
+  MERGE_HEAD and concluded-merge forms writes its author's flips and lists every status change in its
+  table. Observed by AC3.
+- **S6** `--ingest <ref> --as <slug>` has two forms. The straggler form runs from a builds-mode
+  checkout for a straggler nobody will revisit, under the straggler set. The LANDING form is admitted
+  only when `<ref>` is the default tip resolved as §4 "Straggler inventory" resolves it, that tip's
+  `.memory-tree.conf` blob reads shards and HEAD's reads builds; it runs the migration set with
+  `--signed` and `--triage-ask`, and prints the re-derived `ASK_CUTOFF` (§4). Both take the delta of
+  `<ref>` against HEAD with no merge commit, through unit 9's no-merge delta, whether or not a merge
+  of `<ref>` is in progress, and write only per-build files. Observed by AC5 and AC14.
 - **S7** `--repair <merge-sha> --as <slug>`, run from any builds-mode checkout for a transition that
   hygiene check 25 reports. It plans only the entries not already accounted at `HEAD`, so a second
   run plans nothing. Observed by AC4.
@@ -62,9 +69,14 @@ audit can count, and refuses to finish while any change is unaccounted.
 - **S11** Under `--relocate`, every view path and every backlog archive path is set to the other
   side's version, or removed where the other side has none, and `gen_build_index.py --write`
   re-renders the views before the table prints. Observed by AC1 and AC11.
-- **S12** Arms for every verb in the kit selftest `migrate_backlog.py --selftest`, each observed RED
-  with its fix unstaged, and the selftest's `PASS (<n> assertions)` floor moved in the same commit.
-  Observed by AC10.
+- **S12** Arms for every verb, every row of §4's entry-path table and both policy sets in the kit
+  selftest `migrate_backlog.py --selftest`, each observed RED with its fix unstaged, and the
+  selftest's `PASS (<n> assertions)` floor moved in the same commit. Observed by AC10.
+- **S13** Two policy sets (§4). The straggler set runs `--relocate`, `--repair` and `--ingest` in its
+  straggler form; the migration set runs `--write` and `--ingest` in its landing form (S6).
+  `--signed` and `--triage-ask` on a writing verb or form outside the migration set exit 2 naming the
+  form; `--plan --signed`, unit 11's read-only prediction, is unaffected. Observed by AC12, AC13 and
+  AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -75,8 +87,9 @@ audit can count, and refuses to finish while any change is unaccounted.
 - `--write`, the switch-over's whole-corpus migration, is unit 34's thin driver over this engine.
 - Printing the recipe in hook bodies, and the drift signal over `--stragglers`, are unit 13's.
 - An unattended run never performs a relocation (design A10); that rule lives in the unattended
-  carriers, unit 20. The engine does not detect a run. The switch-over's own landing reconcile is
-  unit 34's decision (its §8 F5), not this unit's.
+  carriers, unit 20. The engine does not detect a run. The switch-over's landing reconcile is unit
+  34's procedure (its §4); this unit supplies its engine form, `--ingest`'s landing form (S6), and
+  never decides which ids the reconcile confirms.
 - No severity and no `accept` or `seen` clause is invented for a relocated ask. An ask whose
   first-seen date falls on or after `ASK_CUTOFF` is written and listed, and the generator's own
   verdicts then name what it owes.
@@ -92,19 +105,22 @@ audit can count, and refuses to finish while any change is unaccounted.
 - **consumes-from** `TOOL-dDerivedDocket-7` — `gen_build_index.py --write`, its data-loss guard,
   which S11 satisfies by restoring the views first, and the recipe constant in `backlog.py`, which
   `--recipe` prints and the view header renders.
-- **consumes-from** `TOOL-dDerivedDocket-9` — the delta, callable for a straggler-side commit against
-  the other side's commits without a merge commit, and the accounting predicate S3 re-reads.
+- **consumes-from** `TOOL-dDerivedDocket-9` — `delta(ours, theirs)` and `accounted(entries, tip)`
+  (its S13): the delta every verb takes with no merge commit, both `--ingest` forms included, and
+  the accounting predicate S3 re-reads.
 - **consumes-from** `TOOL-dDerivedDocket-10` — the row driver's shard-into-view banner, whose recipe
   block S10 compares.
 - **consumes-from** `TOOL-dDerivedDocket-11` — `tools/memory-tree/migrate_backlog.py`, its permissive
-  legacy-row parser, and its `--selftest` leg, which S12 extends.
+  legacy-row parser, and its `--selftest` leg, which S12 extends; its S7 names-an-id test, which §4
+  P3 adopts for a hold; and the signed-record header cells its §4 pins, which `--signed` reads (P4).
 - **hands-off** `TOOL-dDerivedDocket-13` — `--stragglers` for the session-start inventory and the
   drift signal, and `--recipe` for the hook bodies' parity arm.
 - **hands-off** `TOOL-dDerivedDocket-20` — `--recipe`, the text the unattended carriers tell a run
   on a pre-flip BASE to park with, because a run never relocates (design A10).
-- **hands-off** `TOOL-dDerivedDocket-34` — the engine with its disposition-home policy and provenance
-  switch for `--write`, `--stragglers` for the inventory before the write, and `--dry-run` for the
-  landing-reconcile rehearsal.
+- **hands-off** `TOOL-dDerivedDocket-34` — the engine's two policy sets (§4): the migration set
+  `--write` drives, its `--signed` adjudication input and its `--triage-ask` value for holds naming no
+  id; the landing form of `--ingest` (S6), which the landing reconcile runs; `--stragglers` for the
+  inventory before the write; and `--dry-run` for the reconcile rehearsal.
 - **hands-off** `DEPL-dDerivedDocket-1` — `--stragglers` and `--recipe`, which the adopter runbook's
   migrate steps name.
 
@@ -120,9 +136,49 @@ it is one. Legacy rows are read with unit 11's parser, which admits every shape 
 lists. The planner's output is a set of records per file, a NEEDS-HUMAN list and a CONFIRM list;
 the writer applies it only when both lists are empty.
 
-Two policies are parameters, so unit 34 can drive the same engine: where a disposition goes (the
-`--as` folder here, the ask owner's folder under `--write`), and whether provenance rows are written
-(always here; never for a linear switch-over, which is no transition).
+Four policies are parameters, grouped into two named policy SETS, so unit 34 can drive the same
+engine (S13):
+
+- **P1, disposition home, per record class.** A transferred legacy token — a flip, a terminal token
+  or a hold — goes to the `--as` folder under the straggler set, and to the ask OWNER's folder under
+  the migration set. A signed triage verdict goes to the `--as` folder under either set. A
+  provenance row goes to the `--as` folder.
+- **P2, provenance.** Written by every verb except `--write`, because a linear switch-over is no
+  transition.
+- **P3, unnamed hold.** Two values: `needs-human` under the straggler set, and `hold-on <id>` under
+  the migration set, the id supplied by `--triage-ask <id>`. A hold names an id when its target is a
+  filed ask or a spec H1 at the target tree, and under `--write` every census id counts as filed —
+  unit 11 S7's test, adopted verbatim; a shorthand such as `-4`, a decision id, or anything else
+  names none.
+- **P4, signed adjudication, migration set only.** The signed same-id record sets `unit` on each new
+  ask row it signs `unit`. The signed triage record's verdict is written for every id it lists that
+  the target tree does not already dispose in any file; an id already disposed plans nothing, which
+  keeps the verb idempotent.
+
+**Selection.** `--write` always runs the migration set, and `--ingest` runs it in its landing form
+only (S6). Every other verb and form runs the straggler set. `--signed` or `--triage-ask` on any other
+WRITING verb or form exits 2 naming the form. `--plan --signed` is unit 11's read-only prediction
+option and is untouched by this rule.
+
+**The landing form's cutoff.** The landing form of `--ingest` prints `ASK_CUTOFF=<date>`: the later
+of the current value and the first date strictly after every `filed` date it wrote. Unit 34's
+landing reconcile writes that value into `.memory-tree.conf` (its §4); this unit never writes the
+conf.
+
+### Every entry path to the writer
+
+| Entry path | Policy set | Confirmation and inputs |
+|---|---|---|
+| `--relocate`, MERGE_HEAD form or concluded-merge form | straggler | the author's flips written unconfirmed and listed |
+| `--relocate --from <ref>` | straggler | S5 confirmation |
+| `--repair` | straggler | S5 confirmation |
+| `--ingest`, straggler form | straggler | S5 confirmation |
+| `--ingest`, landing form | migration | S5 confirmation; `--signed` and `--triage-ask` admitted |
+| `--write` | migration | no provenance; the signed records as its adjudication |
+
+One selftest arm per row: AC1 runs the three `--relocate` side resolutions, AC15 the `--from` form's
+confirmation, AC3 `--repair` and the straggler-form `--ingest`, AC14 the landing form, and AC12 and
+AC13 the migration set `--write` drives, whose own `--write` fixtures are unit 34's.
 
 ### Classification
 
@@ -132,10 +188,11 @@ Two policies are parameters, so unit 34 can drive the same engine: where a dispo
 | new id with a terminal or held token | ask row, plus the disposition the flip rows below give | `kept: new ask` |
 | flip to CLOSED | `- CLOSED · <id> · by <change sha> · …` in the `--as` file | `kept: flip to CLOSED` |
 | flip to WONTDO or WITHDRAWN | `- WONTDO · <id> · <the row's own reason, or "withdrawn">` | `kept: flip to WONTDO` |
-| flip to BLOCKED or DEFERRED naming an id | `- BLOCKED · <id> · on <X>` or `- DEFERRED · <id> · until <X>` | `kept: hold` |
+| flip to BLOCKED or DEFERRED naming an id (it names an id when the target is a filed ask or a spec H1 at the target tree; under `--write` every census id counts as filed; unit 11 S7's test) | `- BLOCKED · <id> · on <X>` or `- DEFERRED · <id> · until <X>` | `kept: hold` |
 | flip between live tokens | none; the status is derived now | `kept: live flip, derived` |
 | text change confined to path tokens | the ask text in its home file repointed (D9) | `amended: path repoint` |
-| any other text change; a flip to a live token from a terminal one; a hold naming no id | NEEDS-HUMAN | via `--drop` only |
+| any other text change; a flip to a live token from a terminal one | NEEDS-HUMAN | via `--drop` only |
+| a hold naming no id | NEEDS-HUMAN under the straggler set; under the migration set `- BLOCKED · <id> · on <triage-id>` or `- DEFERRED · <id> · until <triage-id>` in the ask owner's folder (P3) | straggler set: via `--drop` only; migration set: `kept: hold on the triage ask` in the landing form, none under `--write` |
 | removed row that was terminal at the merge base | none | `dropped: terminal row removed` |
 | removed row that was live at the merge base | NEEDS-HUMAN | via `--drop` only |
 
@@ -147,7 +204,7 @@ A planned disposition for a target the `--as` file already disposes is NEEDS-HUM
 file carries one disposition per target. An entry already accounted at the target tree plans
 nothing, which is what makes every verb idempotent.
 
-### Confirmation, and why it binds two verbs of three
+### Confirmation, and which forms it binds
 
 The fold is run over the target tree before and after the planned records. A record whose id moves
 status is status-changing. `--repair` and `--ingest` are run by someone other than the straggler's
@@ -155,7 +212,13 @@ author, after the fact, on a tree whose default side may have acted deliberately
 design lab case e09b had `--repair` write CLOSED over a deliberate reopen. Those two verbs therefore
 refuse a status-changing record without `--confirm <id>`. `--relocate` is run by the author on a
 fresh merge, and the recipe every banner carries is one command; making it demand per-id
-confirmation would break the recipe on its own instruction (§8 F1).
+confirmation would break the recipe on its own instruction (§8 F1). `--relocate --from <ref>`
+compares a ref with a HEAD that need not be the ref's own merge, which is `--ingest`'s shape, so it
+takes the same gate (§8 F8). The recipe's one-command line is the MERGE_HEAD form, which stays
+unconfirmed.
+
+The landing form keeps S5: the caller passes `--confirm` per id. Unit 34 §4 states which ids its
+reconcile confirms: only ids the receiving branch never acted on since the fork.
 
 ### The relocate tree restore
 
@@ -188,7 +251,7 @@ that `origin/main` lacks. PINNED as that measurement; the command re-derives it.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `--relocate`, `--ingest`, `--repair`, `--stragglers`, `--recipe` | CLI modes of `migrate_backlog.py` | flags; the functions behind them lead with a `.lexicon.conf` verb, checked by `lexicon.py --suggest` before they are written |
-| `--as`, `--from`, `--drop`, `--confirm`, `--dry-run`, `--local`, `--tsv` | CLI options | flags |
+| `--as`, `--from`, `--drop`, `--confirm`, `--dry-run`, `--local`, `--tsv`, `--signed`, `--triage-ask` | CLI options | flags |
 
 ### Files touched (estimate)
 
@@ -201,7 +264,8 @@ line for the new modes, if unit 11 created one.
 - **WONTDO as the drop record** (design §18r.3). Rejected by the bypass hunt's A4: it declines a live
   ask, and §2.1 forbids status on a drop.
 - **Dispositions in the ask owner's folder.** Rejected by design §3: every authored byte lives in its
-  writer's folder; the migration is the one sanctioned exception and it is unit 34's.
+  writer's folder; the migration — the switch-over and its landing reconcile — is the one sanctioned
+  exception, it is unit 34's, and §4 P1 bounds it to the migration set.
 - **Confirmation-free `--repair`.** Rejected by lab case e09b (design A6), which wrote CLOSED over a
   deliberate reopen.
 - **Classifying a transition by the straggler's tip conf.** Rejected by the bypass hunt's blocker
@@ -211,7 +275,9 @@ line for the new modes, if unit 11 created one.
 
 - security — the three writing verbs are the sanctioned cross-folder writers after the flip. They
   transfer text an owner already wrote, execute nothing from any row, and read git objects through
-  unit 9's pinned dereference.
+  unit 9's pinned dereference. The landing form's owner-folder writes are reachable only while the
+  default tip is in shards mode, which after a switch-over lands is never, so the migration's
+  cross-folder write stays bounded to the switch-over and its landing.
 - perf / scale — one delta walk per verb; `--stragglers` pays one narrowing walk for every ref and a
   delta only per candidate ref, and `--local` bounds the session-start call to local branches.
 - error / empty / loading states — refusal with nothing written on NEEDS-HUMAN or CONFIRM; exit 2
@@ -220,8 +286,9 @@ line for the new modes, if unit 11 created one.
 - observability — the conservation table on every verb: id, kind, classification, records, file,
   and the status before and after.
 - risks — a text change on a continuation line of a wrapped legacy row is invisible to anchor keying
-  (unit 9's stated risk). A relocate over a default side that reopened an ask since the fork writes
-  the author's close; the table shows it and no confirmation is demanded (§4).
+  (unit 9's stated risk). A relocate in its MERGE_HEAD or concluded-merge form over a default side
+  that reopened an ask since the fork writes the author's close; the table shows it and no
+  confirmation is demanded (§4).
 - testing — S12's arms, each staged RED with its fix unstaged; the selftest is a held kit leg, so the
   landing bar owes `GATE_FULL=1 GATE_SELFTESTS=1`.
 - migration — none of its own; the modes are inert until the default branch is in builds mode, and
@@ -234,9 +301,15 @@ line for the new modes, if unit 11 created one.
   one row, flipped one to CLOSED and repointed one path, and runs
   `migrate_backlog.py --relocate --as <slug>`, it exits 0; the ask row sits in its id's folder, the
   CLOSED disposition cites the flip commit, the ask text carries the new path, each entry has one
-  `RELOCATED` row, and `transition_audit.py --staged` accepts the merge commit.
+  `RELOCATED` row, and `transition_audit.py --staged` accepts the merge commit; the same fixture with
+  the merge already committed, and again with `--from <ref>` and `--confirm <flip id>`, yields records
+  byte-identical to the MERGE_HEAD run; and the relocated new ask's `filed` equals the author day of
+  the fixture commit that first added its row, not the day of the merge or of the relocation run.
   Red when: a `RELOCATED` row cites the merge sha instead of the change commit, so unit 9's
-  accounting reads the entry unaccounted.
+  accounting reads the entry unaccounted; or one entry form resolves the sides swapped, which only the
+  cross-form byte comparison sees, because S3's re-read uses the same resolved sides.
+  fixture: the fixture's commits are dated on distinct days, so a wrong source cannot coincide with
+  the right one.
 - **AC2** — When the fixture straggler also amends one row's prose, `--relocate` exits 1, names the id
   and the `--drop` re-run, and `git status --porcelain` shows the tree exactly as the merge left it;
   re-run with `--drop <id>=<why>` it exits 0 and writes one `dropped:` row for that id.
@@ -244,8 +317,10 @@ line for the new modes, if unit 11 created one.
 - **AC3** — When a fixture's default side carries a REOPEN for an id the straggler closed,
   `migrate_backlog.py --repair <merge-sha> --as <slug>` exits 1 naming the id, its status before
   and after, and `--confirm`; with `--confirm <id>` it writes. An uncontested new ask is written
-  without confirmation.
-  Red when: the repair writes CLOSED over the reopen unconfirmed, which is lab case e09b.
+  without confirmation; `migrate_backlog.py --ingest <the contested ref> --as <slug>` refuses the
+  same way, naming the id and `--confirm`.
+  Red when: the repair or the ingest writes CLOSED over the reopen unconfirmed, which is lab case
+  e09b.
 - **AC4** — When a fixture transition is committed with `--no-verify` and unaccounted,
   `bash tools/memory-tree/check-memory-hygiene.sh` reds check 25; after `--repair` it passes; a
   second `--repair` plans zero records.
@@ -282,12 +357,41 @@ line for the new modes, if unit 11 created one.
 - **AC11** — When the fixture straggler rotated a flipped row into a backlog archive, `--relocate`
   accounts the flip once and removes the archive path the default side does not carry.
   Red when: the archive stays tracked, which the tracked-archive verdict reds after the flip (D8).
+- **AC12** — When the selftest runs the engine over one fixture corpus holding a DEFERRED row naming
+  nothing and a BLOCKED row naming an EXMP decision id, once under the straggler set and once under
+  the migration set with `--triage-ask EXMP-aFoo-9`, the straggler run plans NEEDS-HUMAN for both and
+  writes nothing, and the migration run writes `- DEFERRED · <id> · until EXMP-aFoo-9` and
+  `- BLOCKED · <id> · on EXMP-aFoo-9` in the ask owners' folders.
+  Red when: the names-an-id test is dropped from the classification table, so the decision-id hold
+  is written verbatim and reds V6.
+  fixture: the same corpus unit 11 AC5 reads, so the planner and the engine cannot drift on it.
+- **AC13** — When the selftest runs the migration set over a fixture holding one legacy CLOSED row
+  and a signed triage record listing one OPEN ask on a finished build and one ask already disposed at
+  the target, the CLOSED disposition lands in its owner's folder, the triage verdict in the `--as`
+  folder, and the already-disposed id plans nothing.
+  Red when: the triage verdict is written in the ask owner's folder, the one-writer breach unit 33
+  §8 F4 rejected.
+- **AC14** — When the selftest stages the landing shape — a builds-mode HEAD and a shards-mode default
+  tip carrying one new ask on a finished build, one flip to CLOSED and one text amendment —
+  `--ingest <tip> --as <slug> --signed <fixture records> --dry-run` lists the new ask, the flip under
+  CONFIRM and the amendment under NEEDS-HUMAN and writes nothing. With the amendment removed and
+  `--confirm <flip id>`, it writes the ask in its slug folder, the flip in its owner's folder, the
+  triage verdict and one `RELOCATED` row per entry in the `--as` folder, and prints `ASK_CUTOFF=` the
+  day after the new ask's `filed`. The same command with a builds-mode tip, or with `--signed` on the
+  straggler form, exits 2 naming the form.
+  Red when: the reconcile's command is `--relocate`, whose side resolution reads HEAD as the
+  straggler and exits 2 on the shards-mode other side (AC9).
+- **AC15** — When a fixture HEAD carries a REOPEN for an id that `<ref>` closed,
+  `migrate_backlog.py --relocate --from <ref> --as <slug>` exits 1 naming the id, its status before
+  and after, and `--confirm`; with `--confirm <id>` it writes.
+  Red when: the `--from` form writes CLOSED over the reopen unconfirmed, which is lab case e09b
+  through a sibling write path.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `testsuite counts (every bar self-test prints one)` · `codebase-map coverage + freshness` · `build-index selftest` · `row-keyed merge driver replay`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, `--dry-run`, the recipe parity · the selftest's assertion floor
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, `--dry-run`, the recipe parity, every row of §4's entry-path table, the two policy sets over one shared hold fixture, the per-class disposition home · the selftest's assertion floor
 
 ## 8. Open questions
 
@@ -310,6 +414,24 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   10 and 13 print it before or beside this one. RESOLVED (agent, 2026-09-14, delegated): the constant
   unit 7 keeps in `backlog.py`, as that unit's own F5 resolved; `--recipe` prints it, this unit's
   selftest compares the three Python renderings, and unit 13 compares its shell copy.
+- **F6 — how does the engine treat a legacy hold that names no id, and where does each record class
+  land?** Options: (a) a third policy with a straggler value and a migration value, and a per-class
+  disposition home; (b) two policies, with unit 34 rewriting holds before the engine sees them; (c)
+  `--drop`. (b) is a second classifier outside the engine and (c) loses the hold under `--write`,
+  where provenance is off. RESOLVED (agent, 2026-09-14, delegated): (a); the straggler value keeps
+  NEEDS-HUMAN, and the migration value holds on the triage ask unit 34 files.
+- **F7 — which verb carries the switch-over's landing reconcile?** Options: (a) a new mode for an
+  in-progress merge whose MERGE_HEAD is the shards side; (b) `--ingest <tip>` before the merge, as
+  its own commit; (c) a landing form of `--ingest`, admitted only for a shards-mode default tip under
+  a builds-mode HEAD, run during or after the landing merge. (a) is a mode the ratified design does
+  not name (M3 veto 2, as unit 33 §8 F1 reads it); (b) races the tip between two commits. RESOLVED
+  (agent, 2026-09-14, delegated): (c); S5's per-id confirmation is unchanged, and unit 34 §4 states
+  which ids its caller confirms.
+- **F8 — does `--relocate --from <ref>` take S5's confirmation?** Options: (a) no, like the
+  MERGE_HEAD form; (b) yes; (c) restrict `--from` to a HEAD whose lineage is the straggler's. (a) is
+  `--ingest` without its gate; (c) removes the form for a branch that no longer carries its merge.
+  RESOLVED (agent, 2026-09-14, delegated): (b); the recipe's one-command line is the MERGE_HEAD form,
+  which stays unconfirmed.
 
 ## 9. Revision log
 
@@ -319,6 +441,20 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   `DEPL-dDerivedDocket-1`, whose carriers name `--recipe`. Units 6, 7 and 10 declare the matching
   lines. The recipe constant's home follows unit 7's §8 F5. Unit 9's spec describes its delta per transition merge; this spec needs
   it callable for a straggler-side commit with no merge, which the M2 interface cross-read confirms.
+- rev-2 · 2026-09-14 · spec-audit G2 and G5 round 1 fold. G2 B1 (2, 41) with G5 B1 (13, 31) and G5
+  M2 (15, 37): §4 "The engine" states four policies P1 to P4 and two policy sets, with a per-class
+  disposition home and a third policy for a hold naming no id; S2 names the set, new S13, the
+  classification table splits the unnamed-hold row and adopts unit 11 S7's names-an-id test
+  (consumes-from 11 names it); AC12, AC13; §8 F6; hands-off 34 rewritten. G2 B3 (42) with G5 B2 (14,
+  32, 58): S6's landing form of `--ingest`, bounded to a shards-mode default tip, and §4's entry-path
+  table; §5 security bound; AC14; §8 F7; the §3 non-goal that disowned the reconcile now says the
+  procedure is unit 34's and the engine form is this unit's. G5 H1 (33): the landing form prints the
+  re-derived `ASK_CUTOFF` (§4). G2 M7 (50): S1 and S5 put `--relocate --from` under S5's
+  confirmation, §4 "Confirmation, and which forms it binds", AC15, §8 F8. G2 M25 (32): AC1 compares
+  the three side resolutions. G2 M27 (34): AC1 grades `filed`. G2 M26 (33): AC3 covers `--ingest`.
+  S12 and §7's arm line name every entry path and both policy sets. G2 H1's unit-12 end:
+  consumes-from 9 names `delta(ours, theirs)` and `accounted(entries, tip)`, which unit 9 S13 now
+  carries, closing the rev-1 line's cross-read note.
 
 ## 10. Reuse audit
 

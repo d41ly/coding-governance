@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-1 — held-suite failure baseline
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -30,34 +30,40 @@ unit in this build uses. Built first, by owner ruling D12-i11.
   summary line `attributed N of M suite(s) against <R8>`. Observed by AC1 and AC5.
 - **S2** One normaliser, applied identically to both sides, reduces each FAIL line to what does not
   vary between two runs of an unchanged suite. Observed by AC1.
-- **S3** A suite that exits non-zero on a side without printing its count line or any FAIL line is a
-  DEAD PROBE on that side, never an empty set. `N` counts only suites with a verdict on both sides.
-  Observed by AC2.
+- **S3** A suite that exits non-zero on a side while its FAIL set on that side is empty is a DEAD
+  PROBE on that side, with or without a count line (KF14, as the red-attribution unit applies it).
+  `N` counts only suites with a verdict on both sides. Observed by AC2 and AC9.
 - **S4** The R-side set is cached per (R, suite, suite-file blob at R), written only after an R run
   that completed. Observed by AC4.
-- **S5** Exit status under `--attribute`: 1 when any NEW FAIL or DEAD PROBE exists, else 0, with
-  INHERITED and FIXED reported and not failing. The no-flag mode's output and exit are unchanged.
-  Observed by AC1, AC2 and AC8.
+- **S5** Exit status under `--attribute`: 1 when any NEW FAIL, any DEAD PROBE, or an L-side OVER
+  BUDGET verdict exists, else 0. INHERITED and FIXED are reported and never fail. The R side carries
+  no budget verdict (F3). The summary line names each cause separately, so a reader can tell a cost
+  verdict from a NEW failure. The no-flag mode's output and exit are unchanged. Observed by AC1, AC2,
+  AC3, AC8 and AC10.
 - **S6** `tools/unattended/run-unattended-gates.sh --attribute <R>` forwards the flag to its
   delegated self-test half and prints one line saying its `--checks` half is not attributed.
   Observed by AC6.
-- **S7** The one-character `$1` fix in `tools/unattended/unattended.test.sh` that
-  TOOL-aHoistedPass-36 cause 1 and TOOL-aTracedSpawn-1 record, so the unsharded suite reaches its
-  count line. Observed by AC3.
+- **S7** Two backlog rows are disposed at build time, with commit 8b29f0b9 as the evidence. That
+  commit, an ancestor of BASE, already fixed the bare `$1` abort at
+  `tools/unattended/unattended.test.sh:4107`. The first row, TOOL-aTracedSpawn-1, is CLOSED citing
+  it. The second, TOOL-aHoistedPass-36, records its stop (1) as fixed by it and stays OPEN for its
+  stop (2). NOT OBSERVED by a criterion: these are records, and check 13 and the row grammar grade
+  their shape.
 - **S8** The compensating-check wording moves from "a GREEN verdict" to "no NEW FAIL against the
   build's BASE, and every INHERITED FAIL named by a filed backlog row", in the three places that
   state it: the `tools/unattended/kit.toml` self-test block and both runner headers. Observed by
   AC7.
 - **S9** The run-gates and unattended kit version markers move, because shipped bytes change in
-  both kits. NOT OBSERVED by a criterion here: the `kit version markers` leg grades it.
+  both kits. NOT OBSERVED by a criterion here: the `kit version markers` leg grades it. This is the
+  build's one move for each of the two kits: every later unit's bytes in either kit ride it.
 
 ## 3. Non-goals (OUT)
 
 - Attributing MERGE-BAR legs. Re-running a red bar leg at R, per-leg signatures and the KF14
   classification belong to the red-attribution unit; this unit handles self-test suites only.
-- Fixing any inherited failure. TOOL-aHoistedPass-38's open causes and the suites
-  TOOL-aQuenchedHarness-9 measured red stay filed; this unit makes them attributable, not green.
-  Whatever the roughly thirty arms S7 makes reachable say is data, as TOOL-aHoistedPass-36 states.
+- Fixing any inherited failure. TOOL-aHoistedPass-38's open causes, stop (2) of
+  TOOL-aHoistedPass-36, and the suites TOOL-aQuenchedHarness-9 measured red all stay filed. This unit
+  makes them attributable, not green. Whatever the unattended suites report at BASE is data.
 - Auto-filing an ask per INHERITED FAIL. That is the inherited-red policy unit's, after the flip.
 - A periodic run of the held population. TOOL-aBoundedCeiling-10's periodic half is the remote-CI
   unit's scheduled held-suite run (D12-i12); this unit only advances that row.
@@ -76,10 +82,27 @@ unit in this build uses. Built first, by owner ruling D12-i11.
   is allowed to run once at its end.
 - **hands-off** `TOOL-dDerivedDocket-4` — the same criterion over the unattended suites.
 - **hands-off** `TOOL-dDerivedDocket-5` — the same criterion over the unattended suites.
+- **hands-off** `TOOL-dDerivedDocket-16` — the same criterion over the unattended suites that unit
+  runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-17` — the same criterion over the unattended suites that unit
+  runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-18` — the same criterion over the unattended suites that unit
+  runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-22` — the "no NEW FAIL" criterion over the unattended suites
+  that unit runs once at its end.
 - **hands-off** `TOOL-dDerivedDocket-23` — the FAIL-line normaliser and the detached scratch
   worktree runner at R, which that unit reuses to re-run a red bar leg at R.
+- **hands-off** `TOOL-dDerivedDocket-24` — the "no NEW FAIL" criterion over the unattended suites
+  that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-27` — the "no NEW FAIL" criterion over the unattended suites
+  that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-28` — the "no NEW FAIL" criterion over the unattended suites
+  that unit runs once at its end.
 - **hands-off** `TOOL-dDerivedDocket-30` — `--attribute`, under which that unit runs the unattended
   suites once, since they are red at BASE and "no NEW failure" is the only criterion they can meet.
+- **hands-off** `TOOL-dDerivedDocket-32` — both runner headers as S8 leaves them, whose "nothing
+  runs automatically" sentence that unit corrects, and the run-gates and unattended version moves
+  (S9) its header edits ride.
 
 ## 4. Design
 
@@ -105,8 +128,9 @@ attr  <suite name>  NEW <n> · INHERITED <n> · FIXED <n> · R <sha8> fresh|cach
         NEW        <normalised line>
         INHERITED  <normalised line>
         FIXED      <normalised line>
-attr  <suite name>  DEAD PROBE at L|R — exit <rc>, no count line and no FAIL line
-attributed N of M suite(s) against <sha8> · NEW <n> · INHERITED <n> · FIXED <n> · DEAD <n>
+attr  <suite name>  DEAD PROBE at L|R — exit <rc>, no FAIL line
+attr  <suite name>  OVER BUDGET at L — <n>s against <budget>s
+attributed N of M suite(s) against <sha8> · NEW <n> · INHERITED <n> · FIXED <n> · DEAD <n> · OVER <n>
 ```
 
 `absent` means the suite does not exist at R, so all of S(L) is NEW, and the line says so.
@@ -147,20 +171,15 @@ blocker (KF14). A varying value the normaliser does not know reads NEW, which is
 A cache miss runs a suite twice. The budget verdict is the L side's only, because the no-flag mode's
 cost rule is a statement about the suite at the tree being graded. The R side prints its own seconds
 and carries no verdict. With the cache, each (R, suite) is paid once per build, which is what makes
-"each suite once at the unit's end" affordable across the twelve self-test units.
-
-### The `$1` fix
-
-The arm is located by reproduction, not by line: the builder runs the suite unsharded at BASE, sees
-`$1: unbound variable`, and escapes that character. The line was NOT re-located at BASE while
-writing this spec (UNVERIFIED): a grep for `$1` in a case-pattern position found no candidate.
-TOOL-aTracedSpawn-1 records the same stop from the runner's side, so both rows answer to this fix.
+"each suite once at the unit's end" affordable across the twelve self-test units. Under
+`--attribute` the L side's OVER BUDGET exits 1, exactly as it does with no flag.
 
 ### Files touched (estimate)
 
 `tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` ·
-`tools/unattended/run-unattended-gates.sh` · `tools/unattended/unattended.test.sh` ·
-`tools/unattended/kit.toml` · the two kit version markers · the run-gates dossier prose.
+`tools/unattended/run-unattended-gates.sh` · `tools/unattended/kit.toml` ·
+`memory/backlog/TOOL.md`, for the two dispositions · the two kit version markers · the run-gates
+dossier prose.
 
 ### Alternatives rejected
 
@@ -203,11 +222,10 @@ TOOL-aTracedSpawn-1 records the same stop from the runner's side, so both rows a
 - **AC2** — When the fixture suite exits non-zero at L before printing any count line or FAIL line,
   its block reads `DEAD PROBE at L`, the summary's N excludes it, and the run exits 1.
   Red when: the abort is read as an empty FAIL set, so the suite reads clean.
-- **AC3** — When `bash tools/unattended/unattended.test.sh` runs with no arguments at the unit's end,
-  it reaches its count line instead of dying on an unbound positional parameter.
-  Red when: the fix is reverted, the run ends `$1: unbound variable`, and S3 reads it DEAD PROBE.
-  cost: the suite's declared budget row, run once.
-  permission: D12-i8 lifts the standing do-not-run instruction for this unit only.
+- **AC3** — When `bash tools/run-gates/run-selftests.sh --attribute <R>` runs over a fixture suite
+  that fails arm A at both R and L, it prints `INHERITED 1` and `NEW 0` and exits 0.
+  Red when: the exit derives from S(L) being non-empty, as the no-flag loop's `st=1` does, so every
+  inherited failure fails the unit that inherited it.
 - **AC4** — When a fixture's R run is killed by a short bound and `--attribute <R>` is then run
   again, the second run reads `fresh` on the R side; a third run after a completed R run reads
   `cached` and `git worktree list` gains no entry during it.
@@ -225,6 +243,14 @@ TOOL-aTracedSpawn-1 records the same stop from the runner's side, so both rows a
 - **AC8** — When `bash tools/run-gates/run-selftests.sh --kit <dir>` runs without `--attribute` over
   the fixture population, its stdout and exit status equal the BASE runner's.
   Red when: any attribution code path executes in the default mode.
+- **AC9** — When a fixture suite prints its count line, prints no line the FAIL selector matches,
+  and exits non-zero at L, its block reads `DEAD PROBE at L` and the run exits 1.
+  Red when: the rule also requires the count line to be absent, so a suite that prints its count and
+  then dies reads as an empty set, which is green by absence.
+- **AC10** — When a fixture suite whose budget row is below its runtime runs under `--attribute`,
+  its L block reads `OVER BUDGET`, NEW reads 0, and the run exits 1.
+  Red when: attribute mode drops the budget verdict, so "a runner REDS on breach" stops holding in
+  the mode this build's self-test units verify with.
 
 ## 7. Gates
 
@@ -248,12 +274,25 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
 - **F3 — is the R-side run budget-graded?** Options: grade it like L, or print its seconds with no
   verdict. Grading it would red a suite for the cost of evidence nobody asked it to be fast at.
   RESOLVED (agent, 2026-09-14, delegated): no verdict on the R side.
+- **F4 — does an L-side budget breach fail under `--attribute`?** Options: (a) yes, reported apart
+  from NEW; (b) no, reported only. (b) suspends charter §7's rule that a runner reds on breach.
+  RESOLVED (agent, 2026-09-14, delegated): (a).
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft. Adds three edges the brief's table does not list, all inside
   this spec's own group: hands-off to units 3, 4 and 5, which verify with this unit's criterion
   exactly as unit 2 does.
+- rev-2 · 2026-09-14 · §2 S3 S5 S7 S9 · §3 · §4 · §6 AC3 AC9 AC10 · §8 F4 · §10 · round-1 spec-audit
+  fold (G1 H5, M11, M12, M17, M18, M19, L5; G3 H9; G4 L1; G5 L1). S7's `$1` fix is withdrawn,
+  because commit 8b29f0b9, an ancestor of BASE, already carries it; S7 now disposes its two backlog
+  rows. The rev-1 AC3 goes with it, M19 is moot, and AC3 is now the inherited-only exit criterion.
+  S3's DEAD PROBE takes KF14's definition, with or without a count line (AC9). An L-side OVER BUDGET
+  exits 1 under `--attribute` (F4, AC10). S9 is the build's one run-gates and unattended version
+  move. Edges beyond the brief's table, which lists only units 2 and 23: hands-off to units 3, 4 and
+  5 (rev-1), to unit 30 (rev-1, previously unlisted), and to units 22, 24, 27 and 28 (added here).
+  G3 H9 adds hands-off to units 16, 17 and 18, which read `--attribute <BASE>`. G5 L1 adds a
+  hands-off to unit 32, which corrects both runner headers S8 leaves and rides S9's version moves.
 
 ## 10. Reuse audit
 
@@ -267,7 +306,10 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
   `INHERITED` over `tools/` found nothing but an unrelated word in `profile_bar.py`. Recall surfaced
   the rows this answers: TOOL-aBoundedCeiling-10, TOOL-aHoistedPass-36, TOOL-aTracedSpawn-1 and
   TOOL-aQuenchedHarness-9. Where the design record and the source disagree: nowhere found at BASE
-  for the compensating-check block or the runners; the `$1` arm's line was not re-located.
+  for the compensating-check block or the runners; commit 8b29f0b9 (2026-09-08), an ancestor of
+  BASE, already replaced the bare `$1` in the case pattern at
+  `tools/unattended/unattended.test.sh:4107` with a path-agnostic match, and its message records
+  that the arm still fails at check 49. The rev-1 S7 re-specified that fix and is withdrawn.
 - M12 was not reached, because an existing seam fits and the design names the mechanism.
 - Recall terms used: `held-suite self-tests inherited-red baseline FAIL-set attribution
   run-selftests run-unattended-gates compensating-check kit-DoD GATE_SELFTESTS dead-probe`

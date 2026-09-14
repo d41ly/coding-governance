@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-11 — migration planner
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
+| [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 
 <!-- /gen:spec-records -->
 
@@ -27,12 +27,17 @@ per-id status prediction as records the delegated signer signs and the switch-ov
   directory it derives from its own location. This unit creates it with `--plan` and `--selftest`;
   the relocation and switch-over units add their modes to it. `--plan` reads only the repo it runs
   in, through that repo's own conf, so an adopter's deployer build runs it unchanged. It writes
-  nothing unless `--record` names a directory, and then writes only there. Observed by AC8 and AC9.
+  nothing unless `--record` names a directory, and then writes only there. The repo `--plan` reads is
+  the checkout it is invoked in (`git rev-parse --show-toplevel` of the working directory), never the
+  module's own location, and every call into the generator's collect path receives that root, so the
+  switch-over's landing reconcile can run this module over a worktree of the remote tip. Observed by
+  AC8, AC9 and AC12.
 - **S2** The permissive legacy parser. It reads every line of every live shard and every family-stem
   backlog archive, joins a declared wrapped row (an indented continuation beneath a row), and passes
   each logical row to the parser unit's one-line legacy reader. A line that is row-shaped and reads
   as nothing is reported by file and line, and `--plan` then exits 1 and files no worksheet. It never
-  drops a row and never guesses a status. Observed by AC1.
+  drops a row and never guesses a status. A corpus with no row copy refuses by name and files no
+  worksheet, because a plan over nothing proves conservation trivially. Observed by AC1 and AC13.
 - **S3** The census. One copy per id: a live copy beats an archived one, and among archived copies a
   terminal one beats a non-terminal one. Two live copies of one id are a blocker, because
   conservation would need two asks. It also derives: the distinct-id count, the slugs owning rows,
@@ -76,7 +81,9 @@ per-id status prediction as records the delegated signer signs and the switch-ov
 - **S11** A `--selftest` over fixture repositories with real history, printing `PASS (<n>
   assertions)` against a floor constant, on a new gate leg, `backlog migration selftest`, in chunk
   `selftests` with subject `kit`, guarded on the kit directories it reads, and claimed by the
-  memory-tree hygiene dossier. The relocation unit extends this suite. Observed by AC10.
+  memory-tree hygiene dossier. The relocation unit extends this suite. Its ceiling is stated in
+  `tools/gate-legs.json`, and a row in `tools/run-gates/selftest-budgets.txt` budgets it with its
+  basis. Observed by AC10.
 - **S12** The unit's own product: `--plan` run over this repo in the unit's pass, filing the records
   into this build's `build/` folder as `TOOL-dDerivedDocket-11`, which is what the delegated signer
   signs. Observed by AC11.
@@ -91,7 +98,8 @@ per-id status prediction as records the delegated signer signs and the switch-ov
 - A census over an adopter's tree from this build (§8 F3). Each adopter runs `--plan` in its own
   deployer build.
 - The one-line legacy row grammar and the fold. The parser unit's; this unit calls them.
-- Minting the triage ask's id. The orchestrator mints it at the switch-over.
+- Minting or filing the triage ask. The orchestrator mints its id at the switch-over, and
+  `TOOL-dDerivedDocket-34`'s `--write --triage-ask` files it.
 
 ### Edges
 
@@ -101,12 +109,18 @@ per-id status prediction as records the delegated signer signs and the switch-ov
   renderer the census sizes prospective views with. Without them the triage population and the
   prediction have no build status to read.
 - **hands-off** `TOOL-dDerivedDocket-12` — the module, the permissive legacy parser, the copy-choice
-  rule, and the `--selftest` leg that the relocation engine extends.
+  rule, and the `--selftest` leg that the relocation engine extends; S7's names-an-id test, which
+  that unit's classification table adopts for its unnamed-hold policy; and the signed-record header
+  cells §4 pins, which that unit's `--signed` reads.
 - **hands-off** `TOOL-dDerivedDocket-33` — the same-id and triage worksheets, with the columns §4
   pins, which the signer reads and signs.
 - **hands-off** `TOOL-dDerivedDocket-34` — the census's distinct-id count the conservation check
   counts against, the per-id report its status proof compares with, and the size, filing-home and
-  archive-citation findings its commit must absorb.
+  archive-citation findings its commit must absorb; the placeholder `TRIAGE-ASK`, for which that unit
+  substitutes the minted id (its S1 files it, and its AC3 compares with the substitution); and
+  `--plan` run over a worktree of the remote tip at the landing reconcile (S1).
+- **hands-off** `TOOL-dDerivedDocket-36` — the signed-record header cells §4 pins, which the kit
+  README's signed-records row states.
 - **hands-off** `DEPL-dDerivedDocket-1` — `--plan` and its records, which the adopter runbook's first
   step runs in an adopter's own tree.
 
@@ -135,7 +149,8 @@ worksheet anchors an id.
 
 The signed records the prediction reads are the signer's markdown tables. The planner locates their
 columns by the header cells `Ask`, `Verdict` and, on the triage record, `Field`, and refuses a record
-whose header lacks one; §8 F4 records why these bytes are pinned here.
+whose header lacks one; §8 F4 records why these bytes are pinned here; the signer unit's §4 pins the
+same header rows.
 
 ### Evidence, and what each class rests on
 
@@ -179,13 +194,14 @@ measurement; `--plan` re-derives every one of them and the switch-over reads its
 |---|---|---|
 | `migrate_backlog.py` and its public functions: parse legacy rows, choose a copy, build the census, build each worksheet, predict, prove conservation, write records | kit module | lexicon python function cell; names pass `lexicon.py --suggest` before they are written |
 | `--plan`, `--record`, `--record-as`, `--signed`, `--selftest` | CLI mode and options | flags |
-| `TRIAGE-ASK` | placeholder in the triage and status worksheets | none; the switch-over substitutes the minted id |
+| `TRIAGE-ASK` | placeholder in the triage and status worksheets | none; the switch-over's `--write --triage-ask <id>` files the minted id, and its AC3 substitutes it for this placeholder |
 | `backlog migration selftest` | gate leg | a gate-legs key, claimed by the memory-tree hygiene dossier |
 
 ### Files touched (estimate)
 
-`migrate_backlog.py` (new) · `tools/gate-legs.json` · `memory/map/features/memory-tree-hygiene.md` ·
-`memory/map/generated/` · the four records under `memory/builds/dDerivedDocket/build/`.
+`migrate_backlog.py` (new) · `tools/gate-legs.json` · `tools/run-gates/selftest-budgets.txt` (one
+budget row and its basis) · `memory/map/features/memory-tree-hygiene.md` · `memory/map/generated/` ·
+the four records under `memory/builds/dDerivedDocket/build/`.
 
 ### Alternatives rejected
 
@@ -222,28 +238,44 @@ measurement; `--plan` re-derives every one of them and the switch-over reads its
 - **AC1** — When `migrate_backlog.py --plan` runs over a fixture repo, the census counts every row copy
   across shards and archives, joins the fixture's wrapped row, and chooses the live copy over an
   archived one; adding one row-shaped line that reads as nothing makes `--plan` exit 1 naming its
-  file and line with no worksheet written.
-  Red when: the unreadable line is skipped, so the distinct-id count is one short under a green exit.
+  file and line with no worksheet written; an id with two archived copies, one CLOSED and one OPEN,
+  and no live copy is chosen as CLOSED under either file order.
+  Red when: the unreadable line is skipped, so the distinct-id count is one short under a green exit;
+  or the first archived copy is taken, which reopens the flips the 2026-08-17 reconcile lost.
 - **AC2** — When the fixture holds two live copies of one id, `--plan` exits 1 naming both files.
   Red when: the planner picks one silently, so conservation certifies a migration that drops a row.
 - **AC3** — When the fixture history holds a row born OPEN and later flipped to SPECCED, a row added in
   its same-id spec's own commit, and a pair with neither, the same-id worksheet reads
-  `specced-in-place`, `born-in-spec-commit` and `none` with the showing sha for the first two.
-  Red when: the class is read from equal ids alone, so every pair reads `specced-in-place`.
+  `specced-in-place`, `born-in-spec-commit` and `none` with the showing sha for the first two; and a
+  pair whose row shares no words with its spec's H1 and Goal carries `low_overlap` set with its
+  score, while a matching pair does not.
+  Red when: the class is read from equal ids alone, so every pair reads `specced-in-place`; or the
+  flag is always false, so the signer's U3 never fires.
 - **AC4** — When the fixture holds an OPEN ask on a finished build that another spec's body closes, one
   a product commit's message names, one whose pointer path is untracked, and one whose same-id spec
   reads CLOSED, the triage worksheet proposes CLOSED by that spec, CLOSED by that commit, `none` with
-  `dead_pointer` set, and `none` for the last.
-  Red when: the same-id spec is proposed as evidence, which answers D2 inside the triage.
+  `dead_pointer` set, and `none` for the last; an ask whose only naming commit is the one that filed
+  it proposes `none`, and so does an ask named only by a commit that touched just the memory tree; an
+  ask whose row names a live hold proposes that hold with basis `row-names-hold`; the three
+  design-named rows are listed with basis `design-named`; and an ask whose legacy token is CLOSED, on
+  a finished build, is absent from the triage worksheet.
+  Red when: the same-id spec is proposed as evidence, which answers D2 inside the triage; or the
+  filing commit is proposed as closing evidence, F2's rejected option (a), which the signer's T3 then
+  signs as a closure.
 - **AC5** — When the fixture holds legacy rows CLOSED, WONTDO, BLOCKED naming an id, and DEFERRED
   naming none, the status worksheet predicts CLOSED, WONTDO, BLOCKED and DEFERRED, the last held on
-  `TRIAGE-ASK`, and each prediction's `decided_by` names the previewed record.
+  `TRIAGE-ASK`, and each prediction's `decided_by` names the previewed record; a BLOCKED row naming
+  `-4` and one naming an EXMP decision id both preview as holds on `TRIAGE-ASK`.
   Red when: the prediction applies its own status rule instead of the parser unit's fold, so the plan
   and the switch-over can disagree.
+  fixture: the same corpus the relocation unit's AC12 runs through the engine, so the planner and the
+  engine cannot drift on it.
 - **AC6** — When `--plan --signed` names a signed same-id record marking one pair `unit` whose spec
   reads CLOSED, that id's predicted status becomes CLOSED and its class `mirror-closed`; the
   conservation proof counts each normalization and exits 1 on a fixture row whose text differs in any
-  other way.
+  other way; a signed triage record whose verdict is CLOSED on one ask predicts CLOSED with class
+  `triaged`; and a triage record whose header lacks `Field` is refused, naming the record and the
+  cell.
   Red when: a signed record missing its `Verdict` header cell is read as all `not-unit`.
 - **AC7** — When a fixture slug's prospective `BACKLOG.md` exceeds the declared row cap, the census
   names that slug and its size, and the README-less slugs are listed as filing homes.
@@ -260,20 +292,33 @@ measurement; `--plan` re-derives every one of them and the switch-over reads its
   figure: every count it prints is DERIVED at run time.
 - **AC10** — When `migrate_backlog.py --selftest` runs, it prints its `PASS (<n> assertions)` line at
   or above the floor constant, and `tools/gate-legs.json` carries the leg claimed by the hygiene
-  dossier with the codebase-map coverage leg green.
+  dossier with the codebase-map coverage leg green; `bash tools/run-gates/run-selftests.sh --check`
+  passes.
   Red when: an arm's failing case was never observed with its fix unstaged.
   cost: one kit selftest run; it is held, so it binds at the landing bar under `GATE_SELFTESTS=1`.
+  permission: unit passes run no gate legs (fix F7), so each arm's RED is observed by hand against a
+  scratch fixture with its fix unstaged and recorded in the pass journal, and the leg runs at the one
+  post-build bar.
 - **AC11** — When the unit's pass runs `--plan` over this repo with `--record` naming this build's
-  `build/` folder, the four records land there, the triage worksheet's row count equals the census's
-  OPEN-on-finished-build count, and `bash tools/memory-tree/check-memory-hygiene.sh` names none of the
-  four records.
+  `build/` folder, the four records land there, the triage worksheet's row count equals the number of
+  status-worksheet rows predicting OPEN whose slug has a build README and is absent from
+  `memory/LIVE.md`, counted from those two files rather than by the planner's population function,
+  and `bash tools/memory-tree/check-memory-hygiene.sh` names none of the four records.
   Red when: a worksheet row leads with an id in a list or table shape, so check 13 sees the record as
   a second claimant of every ask it lists.
   cost: minutes, for the history walks and the hygiene run.
+- **AC12** — When the selftest runs `--plan` with its working directory in a second worktree of a
+  fixture repository checked out at an older commit that holds one row fewer, the census counts that
+  worktree's rows, not the module's tree.
+  Red when: the repo is resolved from the module's location, so the landing reconcile's plan reads
+  the run branch, where the shards are views, and files empty worksheets.
+- **AC13** — When `--plan` runs over a fixture with no shard and no family archive, it exits 1 naming
+  the empty population and files no worksheet.
+  Red when: an unresolved `MEMORY_ROOT` reads zero rows and certifies conservation under a green exit.
 
 ## 7. Gates
 
-`memory hygiene` · `build-index selftest` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit version markers` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `build-index selftest` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit version markers` · `spec tokens (a spec's own names resolve)` · `every held leg is budgeted, every budget row resolves`
 
 New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `backlog migration selftest` leg · fixture repositories for each census rule, evidence class, proposal rule, normalization and refusal · the suite's own floor constant
 
@@ -310,6 +355,19 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `b
 - rev-1 · 2026-09-14 · initial draft. Adds two edges the brief's table does not list: hands-off to
   unit 34, reciprocating that spec's consumes-from, and hands-off to the adopter runbook, which runs
   `--plan`.
+- rev-2 · 2026-09-14 · spec-audit round 1 fold. G2 B1 (2, 41) and B2 (23, 43), with G5 B1 (13,
+  31): §3 Non-goals says unit 34's `--write --triage-ask` files the triage ask; hands-off 34 names
+  the `TRIAGE-ASK` substitution and hands-off 12 the S7 names-an-id test unit 12's engine adopts;
+  §4 Inventory's `TRIAGE-ASK` cell; §10's open policy line closed by unit 12's migration set. G5 B3
+  (34): S1 reads the checkout it is invoked in, AC12, hands-off 34 names the landing reconcile's
+  plan. G2 M5 (27, 44) with G5 M1 (11, 36, 55): §4 says unit 33 pins the same header rows; AC6 covers a signed
+  triage verdict and a record lacking `Field`. G2 M10 (57): S11's budget row, §4 Files touched, AC10
+  runs `run-selftests.sh --check`, §7 gains its leg. G2 M21 (24): AC1's archived-copy rule. G2 M22
+  (25): AC4's F2 exclusions, hold proposal and design-named rows. G2 M23 (26): AC3's low-overlap
+  flag. G2 M24 (28): S2 and AC13 refuse an empty corpus. G2 L3 (29): AC11 counts the triage from two
+  files, AC4 excludes a CLOSED ask. G2 L4 (30): AC5 stages shorthand and decision-id holds, one
+  fixture with unit 12 AC12. G2 L5 (31): AC10's permission note. G5 M15's unit-11 end: hands-off 36,
+  the header cells the kit README states.
 
 ## 10. Reuse audit
 
@@ -332,8 +390,9 @@ copies at `09a22d2b`; `TOOL-cSpliceWarden-4` and `-7` since reconciled the archi
 BLOCKED and DEFERRED rows name no full id at all — "blocked on `-4` and `-11`", "only on the owner's
 word" — so S7's triage-ask rule has a real population, measured by grepping the live shards. The relocation spec classifies a hold naming no id as
 NEEDS-HUMAN for a straggler delta; the switch-over applies design §9 step 6 to the whole corpus
-instead, and this preview follows step 6. Which policy the switch-over passes that engine is a line
-the M2 interface cross-read must see in the switch-over spec.
+instead, and this preview follows step 6. The M2 cross-read carried it: the switch-over's S1 drives
+the relocation unit's engine in its migration set, whose unnamed-hold value is a hold on the
+`--triage-ask` id (the relocation unit's §4 P3).
 
 M12 losses are the design's own tested rejections, carried in §4 Alternatives rejected with the
 measurement that rejected each.

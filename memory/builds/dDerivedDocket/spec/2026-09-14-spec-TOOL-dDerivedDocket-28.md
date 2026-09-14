@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 28
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -32,9 +32,12 @@ rule: nothing kills a process this run did not start.
   the reader. Where procfs is absent the token is `-`, and a `-` record is counted and never reaped,
   announced. Observed by AC3 and AC8.
 - **S3** An ORPHAN is a recorded process that is alive with its recorded start token while its
-  recorded driver is not. `--preflight`, `--resume`, `gates-green` before it starts a bar, and `--hold`
-  reap every orphan of their own slug, one at a time, through `$PROCMON_CMD --kill-msys <pid>`, and
-  prune records whose process is gone. Observed by AC1 and AC2.
+  recorded driver is not. `--preflight`, `gates-green` before it starts a bar, `--hold`, and
+  `--resume` on a row that holds the lease reap every orphan of their own slug, one at a time,
+  through `$PROCMON_CMD --kill-msys <pid>`, and prune records whose process is gone. The rows that
+  hold the lease are the take-over, at the HELD unit's reap step, and the holder's matching-id
+  orientation. `--resume`'s refusal, no-id and still-held rows only COUNT orphans, and write neither
+  the ledger nor the lease. Observed by AC1, AC2, AC9 and AC11.
 - **S4** The wrapper `run_bounded` starts carries the repository root as an argument token, so the
   process-monitor fence still admits the tree once its parent is gone; the runner's own re-exec
   through its absolute path gives the runner the same property. Observed by AC1.
@@ -47,7 +50,9 @@ rule: nothing kills a process this run did not start.
   own bar is still running. Observed by AC6.
 - **S8** The rule, in the stops companion guide and the Skill: a process not in the ledger is
   reported and never killed, whatever its command line says. Observed by AC7.
-- **S9** The unattended kit version moves once for this build. Observed by AC9.
+- **S9** No unattended version constant moves here: this unit's bytes ride the move
+  `TOOL-dDerivedDocket-1` S9 makes once for the build. NOT OBSERVED by a criterion here:
+  `kit version markers` grades the final tree's constant-marker agreement.
 - **S10** The unattended suites run once at the unit's end under attribution. Observed by AC10.
 
 ## 3. Non-goals (OUT)
@@ -68,6 +73,10 @@ rule: nothing kills a process this run did not start.
   whose directory the ledger shares, and the `--status` line the orphan count joins.
 - **consumes-from** `TOOL-dDerivedDocket-25` — the runner re-executed through its absolute path,
   without which the fence refuses to reap a runner whose parent is gone.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" reading of the unattended suites
+  under `--attribute` against BASE, which this unit's final criterion (AC10) uses.
+- **consumes-from** `TOOL-dDerivedDocket-22` — the in-place removal point, since an in-place landing
+  writes no terminal until a rotation that may never come.
 
 ## 4. Design
 
@@ -110,10 +119,12 @@ and the record is kept, so a later reap can succeed and a person can read why th
 ### Pruning and concurrency
 
 Appends are single short lines. Pruning rewrites the ledger by tmp-then-rename and happens only in
-the four reaping verbs, all of which run under the slug's lease, so the rewrite cannot race an append
-from another session. A record is pruned when its process is gone or its token no longer matches. At
-a terminal write the ledger is removed when no recorded process is alive, and kept with a line saying
-so when one is.
+the four reaping verbs, each of which holds the slug's lease when it reaps. `--resume` reaps only on
+a row that holds it. So the rewrite cannot race an append from another session, and no reaper call
+runs where `run_bounded`'s lease refresh would write a lease the verb does not hold. A record is
+pruned when its process is gone or its token no longer matches. At a terminal write, and at an
+in-place `--landed`'s successful observation, the ledger is removed when no recorded process is
+alive, and kept with a line saying so when one is.
 
 ### Inventory
 
@@ -158,8 +169,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 ## 6. Acceptance criteria
 
 - **AC1** — When `tools/unattended/unattended.test.sh` kills a fixture driver while its stub bar
-  sleeps, and then runs `--resume` with `PROCMON_CMD` set, the stub's process is gone and the output
-  names it as a reaped orphan; a sleeper started outside the driver with the same argv is still alive.
+  sleeps, and then runs `--resume` on the holder's matching-id row with `PROCMON_CMD` set, the stub's
+  process is gone and the output names it as a reaped orphan; a sleeper started outside the driver
+  with the same argv is still alive.
   Red when: orphans are matched by command line, so the foreign sleeper dies too.
 - **AC2** — When the fixture holds an unrecorded process whose parent is gone, no reaping verb kills
   it, and `--status` does not count it.
@@ -167,8 +179,8 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 - **AC3** — When a ledger line names a pid whose current start token differs from the recorded one,
   the reap reports `exited, pid reused` and kills nothing.
   Red when: identity is the pid alone, so a reused pid is killed.
-- **AC4** — When `PROCMON_CMD` is blank, `--resume` over a live orphan prints that reaping is off and
-  counts it, and the orphan is still alive.
+- **AC4** — When `PROCMON_CMD` is blank, `--resume` on the holder's matching-id row over a live
+  orphan prints that reaping is off and counts it, and the orphan is still alive.
   Red when: a blank reaper falls back to a direct `kill`, which bypasses the fence.
 - **AC5** — When `--status` runs over a fixture with one live orphan, it prints `orphans 1` and the
   orphan is still alive afterwards.
@@ -183,14 +195,22 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 - **AC8** — When the fixture points the procfs seam at a directory that does not exist, new records
   carry `-`, `--resume` counts them and reaps none, and says why.
   Red when: a record without a token is reaped on the pid alone.
-- **AC9** — When `bash tools/check-kit-versions.sh` runs, the unattended version constant and every
-  rendered marker agree.
-  Red when: the constant moves and a render keeps the old marker.
+- **AC9** — When a no-id `--resume`, and then a `--resume --keepalive-id B`, run over a fixture
+  whose fresh lease names keepalive A and whose ledger records a live orphan, each refuses, the
+  orphan is still alive, and the ledger and the lease files are byte-unchanged.
+  Red when: `--resume` reaps or prunes on a row that does not hold the lease, which races the
+  holder's appends and writes a lease it does not hold.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
   unit's end, it reports no NEW failure.
   Red when: an arm this unit added fails, or an existing arm newly fails because of it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
+- **AC11** — When a fixture driver is killed while its stub bar sleeps and the same slug's
+  `gates-green` then runs, the orphan is reaped before the new stub bar starts. The same holds for
+  `--preflight`. After either verb, a ledger record whose process has exited is gone from the
+  ledger.
+  Red when: only `--resume` reaps, although i26's run reaches `gates-green` again without passing
+  through `--resume`.
 
 ## 7. Gates
 
@@ -218,6 +238,11 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   shell-recorded pid needs `--kill-msys`, which exists for exactly this caller. Adds the fence
   requirement S4 and the start token S2, neither of which DR states. One edge the brief's table does
   not list is added, already declared by its producer: consumes-from unit 25.
+- rev-2 · 2026-09-14 · §2 S3 S9 · §3 · §4 · §6 AC1 AC4 AC9 AC11 · round-1 spec-audit fold (G1 M3,
+  M11, M30, L1, L5). `--resume` reaps only on a row that holds the lease, and only counts elsewhere
+  (AC9). Reaping by `gates-green` and `--preflight`, and pruning, are observed (AC11). The ledger is
+  removed at an in-place `--landed` as well as at a terminal. S9 rides the held-suite baseline unit's
+  version move. Adds consumes-from units 1 and 22.
 
 ## 10. Reuse audit
 

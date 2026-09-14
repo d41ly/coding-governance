@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 25
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -49,17 +49,29 @@ The header carries no `closes` verb because the status parser at BASE does not k
   verdict describes it`, writes `verdict TREE MOVED` into the run record, writes no full-green
   stamp, and exits 3. A bar that failed AND moved stays RED with exit 1, and its RED line names the
   move. The header's exit-code line (`tools/run-gates/run-gates.sh:3`) and
-  `tools/run-gates/README.md` gain exit 3. Observed by AC1.
-- **S6** — the kit version. `KIT_RUN_GATES_VERSION` and its `gov:kit` marker move from 1.6 to 1.7,
-  because a new exit code is a contract change a caller reads. Observed by AC7.
+  `tools/run-gates/README.md` gain exit 3. Observed by AC1 and AC7.
+- **S6** — the kit version. NOT OBSERVED by a criterion here: this unit moves no version constant. A
+  new exit code is a contract change a caller reads, so the run-gates kit must move, and it moves
+  once in this build's landing range, in `TOOL-dDerivedDocket-1`, whose S9 moves it; this unit's
+  bytes ride that move. `kit version markers` grades only the final tree's constant-marker
+  agreement.
+- **S7** — the kickoff manifest. `memory/guides/SESSION-KICKOFF.md`'s trap that every hermetic leg
+  runs `mktemp -d` into the ambient `TMPDIR` and that a reader should point `TMPDIR` at an empty dir
+  before blaming the diff (`:297-299` at BASE) is rewritten: the runner now redirects each leg's
+  `TMPDIR` into its own scratch and sweeps a dead bar's, so the growth comes only from bars that
+  predate this unit or run another repository. `last-audit` is re-stamped in the same commit with a
+  delta line in the commit message, because `tools/run-gates/run-gates.sh` is in the manifest's
+  `watch:` list. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
 - **The driver's reading of exit 3.** DR 21.4 U23 put "`gates-green` reads that as UNMET and
   re-runs once" in this unit. It moves to the gate-wall unit named in the edges below, which already
   rewrites `gates-green` and is the one unit of the three that may run the unattended suite (D12-i8).
-  That keeps every driver-side reading of a runner exit in one spec. The pre-push hook needs no
-  change for exit 3: any non-zero status already blocks a push.
+  The gate-wall unit's `gates-green` table is then the one place the driver maps a runner exit; the
+  inherited-red policy unit's reading of exit 1 is an arm of that table, declared by an edge between
+  those two units. The pre-push hook needs no change for exit 3: any non-zero status already blocks
+  a push.
 - **Legacy litter.** Scratch left by bars before this unit has no `owner` file and is never swept.
   The by-name sweep of named residue was TOOL-aTetheredScratch-2's and is not repeated.
 - **Sweeping another repository's scratch.** The sweep reads only `gate-work.*` directories whose
@@ -123,7 +135,7 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
 
 `tools/run-gates/run-gates.sh`, `tools/run-gates/run-gates.test.sh`,
 `tools/run-gates/run-gates.turnstile.test.sh`, `tools/run-gates/README.md`,
-`tools/run-gates/kit.toml` (version), `memory/map/features/run-gates.md` (prose refresh on touch).
+`memory/guides/SESSION-KICKOFF.md`, `memory/map/features/run-gates.md` (prose refresh on touch).
 
 ### Alternatives rejected
 
@@ -184,14 +196,24 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
 - **AC6** — When the post-build bar runs with `GATE_FULL=1 GATE_SELFTESTS=1`, the
   `template size gate selftest` leg is green under the redirected `TMPDIR`. Red when: S1 exports a
   drive-letter spelling, the four-arm failure TOOL-aTetheredScratch-2 measured.
-- **AC7** — When `bash tools/check-kit-versions.sh` runs, the runner's version constant and its
-  `gov:kit` marker agree at 1.7. Red when: one of the two is bumped without the other.
+- **AC7** — When one fixture leg fails an assertion while another edits a tracked file mid-bar,
+  `bash tools/run-gates/run-gates.sh` in the canary's scratch repo exits 1, its RED line names the
+  moved tree, and the run record holds no `verdict TREE MOVED`.
+  Red when: TREE MOVED outranks a failed leg, so exit 3 hides a real red and the gate-wall unit's
+  re-run ends UNMET naming the move instead of the leg.
+  permission: the canary is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`.
+- **AC8** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
+  passes with the re-stamped `last-audit`, and the §B `TMPDIR` trap names the runner's own scratch
+  redirect.
+  Red when: the stamp moves and the trap still says every hermetic leg writes into the ambient
+  `TMPDIR`, which passes the gate while the stamp asserts a re-verification that did not happen.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates turnstile` · `template size gate selftest` · `kit version markers` · `memory hygiene`
+`run-gates canary` · `run-gates turnstile` · `template size gate selftest` · `kit version markers` · `kickoff-manifest ratchet` · `memory hygiene`
 
 New arm: tools/run-gates/run-gates.test.sh · a leg that edits a tracked file mid-bar · none
+New arm: tools/run-gates/run-gates.test.sh · a failing leg beside a leg that edits a tracked file mid-bar · none
 New arm: tools/run-gates/run-gates.test.sh · two bars killed by signal 9 with scratch held · none
 New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside a running first · none
 
@@ -215,6 +237,12 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside
 - rev-1 · 2026-09-14 · initial draft from DR 21.4 U23. Diverges from DR in two places, both
   recorded in §3 and §8: the `gates-green` re-run moves to the gate-wall unit, and the absolute
   argv comes from a runner re-exec rather than from the callers.
+- rev-2 · 2026-09-14 · folds the round-1 spec audit (G4 M7, M20, L7, H5; G1 M11). M7 with G1 M11:
+  the run-gates move is unit 1's, so S6 is a NOT OBSERVED pointer, `tools/run-gates/kit.toml` leaves
+  Files touched, and the rev-1 version pin is gone; AC7 now holds M20's failed-and-moved criterion,
+  and S5 names it. L7: S7 rewrites the kickoff manifest's TMPDIR trap and re-stamps it (AC8, gate
+  `kickoff-manifest ratchet`). H5: §3's claim that every driver reading of a runner exit sits in one
+  spec now names the inherited-red arm and its edge.
 
 ## 10. Reuse audit
 

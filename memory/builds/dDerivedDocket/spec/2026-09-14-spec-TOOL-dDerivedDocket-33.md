@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 33
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -25,12 +25,13 @@ later reader re-derives by re-running one script over the planner's recorded out
 - **S1** A signing script, filed as a recording-named artifact under
   `memory/builds/dDerivedDocket/build/`, reads the planner's two worksheets and writes two signed
   records. It is a pure function of its inputs and the tree it reads, and a `--check` mode re-derives
-  both records and diffs them against the tracked copies. Observed by AC1 and AC2.
+  both records and diffs them against the tracked copies. The records carry the header rows §4 pins,
+  which the planner and the writer read. Observed by AC1, AC2 and AC12.
 - **S2** The same-id rules U1 to U4 in §4 decide the `unit` marker for every pair the planner lists.
   `unit` is signed only where the planner's evidence says the row was specced in place or born in
   its spec's own commit, the pair is not one the design names as different subjects, and the planner
   did not flag the pair as low-overlap. Every other pair is signed not-`unit`, naming the first rule
-  it failed. Observed by AC3.
+  it failed in the order §4 evaluates them. Observed by AC3 and AC14.
 - **S3** The triage rules T1 to T6 in §4 decide one disposition for every ask the planner lists as
   deriving OPEN on a finished build after the migration's own dispositions. CLOSED and WONTDO are
   signed only with evidence the script re-reads itself. A row no rule decides is signed KEEP, and its
@@ -39,24 +40,34 @@ later reader re-derives by re-running one script over the planner's recorded out
   it as superseded and one file may carry only one disposition per target. Observed by AC6.
 - **S5** No severity is signed. Every triage row records `unlabelled`, and the record's header
   carries the census that found no recorded severity in the legacy rows. Observed by AC7.
-- **S6** Neither signed record anchors an id. Each table row leads with a row number, and the ask id
-  sits in a later cell, so no reader counts the record as a second definition. Observed by AC8.
+- **S6** Neither signed record anchors an id. Each table row leads with its deciding rule id (`U1` to
+  `U4`, `T1` to `T6`, or `all` on a `unit` row), the ask id sits in the second cell, and rows are
+  sorted by ask id: family, then slug, then numeric sequence. So no reader counts the record as a
+  second definition, and a re-run changes only the rows whose evidence moved. Observed by AC8 and
+  AC10.
 - **S7** One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, records that
   both tables were signed under delegation and points at the two signed records. Observed by AC9.
 - **S8** A verdict depends only on its own row's evidence, so re-running the script over a worksheet
   recomputed at a later tree changes only the rows whose evidence moved. The flip's landing
-  reconcile relies on this. Observed by AC10.
+  reconcile relies on this when it re-signs a worksheet pair the planner recomputed at the remote tip
+  (S11). Observed by AC10.
 - **S9** The script prints one liveness line counting what it signed per verdict, and refuses an
   empty worksheet or a row it cannot parse instead of skipping it. Observed by AC11.
 - **S10** Every triage disposition is to be written in this build's own `BACKLOG.md`, the signer's
   file, which the closeout rule accepts from any file (owner ruling D6 as amended in design §17.2).
-  NOT OBSERVED here: this unit writes no `BACKLOG.md`. The write is `TOOL-dDerivedDocket-34`'s, and
-  its acceptance criteria observe it.
+  NOT OBSERVED here: this unit writes no `BACKLOG.md`. The write is `TOOL-dDerivedDocket-34`'s,
+  through the relocation engine's per-class disposition home, and unit 34 AC18 observes it.
+- **S11** The landing re-run. `--worksheets <same-id> <triage>` names a worksheet pair, by default
+  the pair `TOOL-dDerivedDocket-11` filed, and `--tail landing` writes the two records with unit
+  tails `signed-same-id-landing` and `signed-triage-landing`, leaving the switch-over's records
+  byte-unchanged. Each landing record's header names its worksheets' paths and blob shas and the tree
+  sha they were computed at. The rules and every other property are S2 to S9's. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
 - No `BACKLOG.md` row, view or disposition is written. The signed records are inputs to the flip,
-  which applies them exactly.
+  which applies them exactly. The landing records are applied by the relocation engine's `--ingest`
+  landing form, not here.
 - No planner logic. Evidence that needs a history walk, such as "born in its spec's own commit", is
   consumed from the planner's worksheet and never re-derived here; a second walk would be a second
   answer to one question.
@@ -70,10 +81,14 @@ later reader re-derives by re-running one script over the planner's recorded out
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-11` — the same-id worksheet and the triage worksheet the
-  planner files as build records, with the evidence fields §4 lists. Without them there is nothing
-  to sign, and the script refuses.
-- **hands-off** `TOOL-dDerivedDocket-34` — the two signed records, applied exactly by the flip, and
-  the script itself, which the flip's landing reconcile re-runs over the asks the landing tip added.
+  planner files as build records, with the evidence fields §4 lists, and the header cells `Ask`,
+  `Verdict` and `Field` its §4 pins, which `--plan --signed` reads (AC12). Without them there is
+  nothing to sign, and the script refuses.
+- **hands-off** `TOOL-dDerivedDocket-34` — the two signed records, applied exactly by the flip; and
+  the landing re-run (S11), which the landing reconcile runs over the worksheets the planner
+  recomputes at the remote tip, and whose records the reconcile's `--ingest --signed` applies.
+- **hands-off** `TOOL-dDerivedDocket-36` — the signed records' shape, header cells and columns,
+  which the kit README's signed-records row states.
 
 ## 4. Design
 
@@ -96,11 +111,16 @@ the planner's spec spells them differently, the M2 interface cross-read decides 
 **Outputs.** Two markdown records under `memory/builds/dDerivedDocket/build/`, each carrying
 `**Serves:** journal TOOL-dDerivedDocket-33` in its first twelve lines:
 
-- the signed same-id record: one row per pair, with the columns row number, ask id, spec path,
-  verdict (`unit` or `not-unit`), deciding rule, evidence;
-- the signed triage record: one row per ask, with the columns row number, ask id, verdict
-  (`KEEP`, `CLOSED`, `WONTDO`, `BLOCKED` or `DEFERRED`), the `by`/`on`/`until` field, deciding
-  rule, evidence, severity (`unlabelled`), plus an exclusions list.
+- the signed same-id record: one row per pair under the header row
+  `| Rule | Ask | Spec | Verdict | Evidence |`, where Verdict is `unit` or `not-unit`;
+- the signed triage record: one row per ask under the header row
+  `| Rule | Ask | Verdict | Field | Evidence | Severity |`, where Verdict is `KEEP`, `CLOSED`,
+  `WONTDO`, `BLOCKED` or `DEFERRED`, Field holds the `by`, `on` or `until` value or `-`, and Severity
+  is `unlabelled`; the exclusions list follows the table.
+
+These header bytes are pinned. The planner unit's §4 locates the columns by `Ask`, `Verdict` and
+`Field`, and the switch-over's `--write` and the relocation engine's `--signed` read the same cells.
+Rows lead with the deciding rule id and are sorted by ask id (S6).
 
 Each record's header states: the signer as `(agent, 2026-09-14, delegated)`; the authority, which is
 the owner mandate record's "single owner turn" section; each worksheet's path and git blob sha; the
@@ -108,7 +128,9 @@ rule set, which is this spec at its current rev; and the liveness counts.
 
 ### The same-id rules
 
-Evaluated in order; the first rule a pair FAILS decides `not-unit` and is named.
+Evaluated in the order U2, U1, U3, U4; the first rule a pair FAILS decides `not-unit` and is named.
+U2 goes first, so a design-named collision is always denied by the design's own rule, whatever its
+evidence.
 
 | Rule | A pair signs `unit` only if |
 |---|---|
@@ -181,6 +203,9 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
 | the signing script | build-folder python artifact, unit tail `signer` | `memory/builds/dDerivedDocket/build/` | not graded: the naming leg's population is `tools/`, `skills/`, `.githooks/` and `.claude/`; its functions still lead with a verb `.lexicon.conf` declares |
 | the signed same-id record | build record, unit tail `signed-same-id` | same folder | recording-file grammar, check 5 |
 | the signed triage record | build record, unit tail `signed-triage` | same folder | recording-file grammar, check 5 |
+| the landing same-id record | build record, unit tail `signed-same-id-landing` | same folder | recording-file grammar, check 5 |
+| the landing triage record | build record, unit tail `signed-triage-landing` | same folder | recording-file grammar, check 5 |
+| `--worksheets`, `--tail` | options of the signing script | the script | not graded: a build-folder script |
 | rule ids U1-U4, T1-T6 | labels inside the records | the two records | none |
 | the decision row | one `memory/DECISIONS.md` row, keyed by this unit's id | TOOL heading | entry budget, check 7 |
 
@@ -254,17 +279,19 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
   Red when: a default level is written for a row whose text records none.
   figure: the census is PINNED at 0 of 521 legacy rows, measured 2026-09-14 at BASE, and the script
   re-derives it on every run.
-- **AC8** — When both signed records are tracked and `python tools/memory-tree/corpus_ids.py --check`
-  runs, it reports no id defined twice.
-  Red when: a table row leads with a backticked id, which the recall grammar reads as a definition,
-  so check 13 sees the record as a second claimant of an ask the backlog already defines.
+- **AC8** — When `anchor_at` from `tools/memory-recall/extract.py` runs over every line of both
+  signed records it returns no id, and `python tools/memory-tree/corpus_ids.py --check` reports no id
+  defined twice.
+  Red when: a table row leads with an ask id, which the recall grammar reads as a definition; check
+  13 alone cannot see that for the triage record, because after the switch-over pre-cutoff
+  `BACKLOG.md` asks leave its build-folder definitions (unit 8 S6).
 - **AC9** — When `memory/DECISIONS.md` is read, its TOOL heading carries one row keyed by this unit's
   id that points at both signed records and fits the entry budget.
   Red when: the row restates the rules instead of pointing at them, which breaches the budget and
   makes the row a second copy of this spec.
 - **AC10** — When a copy of the triage worksheet gains one synthetic row and the signing script's
-  `--check` mode re-runs over the copy, the diff of the signed triage record against its tracked copy is that one added row plus
-  the liveness counts.
+  `--check` mode re-runs over the copy, the diff of the signed triage record against its tracked copy
+  is that one added row, the header's worksheet path and blob-sha lines, and the liveness counts.
   Red when: a verdict depends on a population-wide statistic, so an added ask moves an unrelated
   signature at the flip's landing reconcile.
 - **AC11** — When the signing script (`--check` and the signing run alike) runs over an empty
@@ -272,6 +299,21 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
   the worksheet and the line.
   Red when: the bad row is skipped and the liveness line still prints a count, which reads exactly
   like a clean signing.
+- **AC12** — When unit 11's planner, `migrate_backlog.py`, runs as
+  `--plan --signed <same-id record> <triage record>` from `tools/memory-tree/`
+  over the two signed records after the signing, it exits 0 and reports both records applied.
+  Red when: a header cell is spelled otherwise, such as `ask id` or `by/on/until`, which the planner
+  refuses, so the mismatch first shows at the flip.
+- **AC13** — When the script runs with `--worksheets <pair> --tail landing`, `<pair>` being a copy of
+  the worksheet pair whose triage worksheet carries one added row, it writes two `-landing` records
+  whose rows equal the switch-over records' rows plus that one row, and `git status --porcelain` shows the switch-over's two records unchanged.
+  Red when: the landing run overwrites the switch-over's records, so the signatures the flip applied
+  are no longer the ones tracked.
+- **AC14** — When the script signs synthetic same-id worksheet rows — a `specced-in-place` row
+  carrying the low-overlap flag, a row whose spec path does not exist, and a row whose spec's H1 lacks
+  the ask id, the last two also carrying `specced-in-place` evidence and no flag — each signs
+  `not-unit`, the first under U3 and the other two under U4.
+  Red when: U3 or U4 is dropped, so a low-overlap pair signs `unit` and closes an ask nobody answered.
 
 ## 7. Gates
 
@@ -301,6 +343,19 @@ this unit's pass and again by the flip before it applies the records.
   migration's own rows. (b) This build's own `BACKLOG.md`. RESOLVED (agent, 2026-09-14, delegated):
   (b). The one-writer rule puts a judgment in its author's file, and design §17.2 already moved the
   closeout's satisfying record to any file for exactly this case.
+- **F5** — In which order do U1 to U4 run? (a) U1 first, as rev-1 lists them. (b) U2 first.
+  Measured for the G5 audit at BASE: all four design-named rows carry evidence `none`, so under (a)
+  U1 decides each and AC3's "under rule U2" is never observed. RESOLVED (agent, 2026-09-14,
+  delegated): (b); the design's denial dominates evidence, which is also the conservative order.
+- **F6** — What leads a signed row, and in what order are the rows? (a) A row number, unordered, as
+  rev-1. (b) The deciding rule id, with rows sorted by ask id. (c) The verdict. (a) renumbers every
+  later row when one is added, which breaks S8 and AC10; (c) puts a status token first, the
+  `| CLOSED |` shape the legacy parser admits. RESOLVED (agent, 2026-09-14, delegated): (b).
+- **F7** — What does the landing reconcile's re-run sign? (a) The planner's worksheets recomputed at
+  the remote tip, under a landing tail. (b) The `--asks --all --json` projection at the merged tree.
+  (c) Nothing; park when the population is non-empty. (b) carries no proposal, text or pointer, so
+  only KEEP could be signed; (c) parks the routine landing. RESOLVED (agent, 2026-09-14, delegated):
+  (a).
 - The rulings this unit executes and does not revisit: D2, legacy same-id pairs not linked by
   default; D6, the closeout is a gate from the switch-over, retroactive, sweep first; D7, severity
   now and forward-only — all RESOLVED (owner, 2026-09-13). The delegation of both signatures to this
@@ -309,6 +364,16 @@ this unit's pass and again by the flip before it applies the records.
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · spec-audit G5 round 1 fold. H7 (8): §4 evaluates U2 first, S2 names the
+  order; §8 F5. H8 (12): S6 leads each row with its deciding rule id and sorts by ask id, AC10's
+  diff includes the header's worksheet lines; §8 F6; §10's shape sentence follows. M1 (11, 36, 55)
+  with G2 M5 (27, 44): §4 Outputs pin the header rows with `Ask`, `Verdict` and `Field`,
+  consumes-from 11 names the cells, AC12 runs `--plan --signed` over the records. B3 (34): new S11
+  landing re-run under a `-landing` tail, S8, §3 Non-goals and hands-off 34, §4 Inventory rows,
+  AC13; §8 F7. M19 (9): AC14 stages U3 and U4, S2 cites it. M20 (56): AC8 reads anchors directly
+  with `anchor_at`. M2 (15, 37): S10 points at unit 34 AC18. M15's unit-33 end: hands-off 36, the
+  record shape the kit README states. Orchestrator: AC12 names the planner by basename, because its
+  path is untracked until unit 11 lands and the spec-tokens paths arm reds a full untracked path.
 
 ## 10. Reuse audit
 
@@ -319,7 +384,7 @@ proposal, and its scan-coverage line reports the shell layer unscanned. The reca
 design record, the brief's own delegation section, and the curation-debt note for
 `TOOL-aWeighedCompass-3`, and no record of any earlier delegated signing. The nearest prior art is
 the three hand-typed resolution tables unattended runs wrote for foreign ids, which design §19.1 K9
-measured as the source of 14 of the 27 anchor-hazard ids; §4's row-number-first record shape exists
+measured as the source of 14 of the 27 anchor-hazard ids; §4's rule-id-first record shape exists
 to avoid exactly that. The recorded precedent for a closeout rule is nicocares' closed-build rows
 gate, which is external and is upstreamed by this build's closeout verdict, not by this unit.
 

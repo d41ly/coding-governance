@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-8 — hygiene engine in builds mode
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
+| [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 
 <!-- /gen:spec-records -->
 
@@ -44,8 +44,8 @@ so this repo and every adopter see nothing until they switch.
 - **S6** Check 13 (owner ruling D12-g): a `BACKLOG.md` ask row filed before `ASK_CUTOFF` does not
   count as its folder's claim on the id, so the legacy foreign anchors stay quiet; an ask filed on or
   after it does, so a new foreign anchor is a collision. The row still DEFINES the id for check 14, so
-  no legacy ask becomes an orphan. A blank cutoff skips every ask row and says so once. Observed by
-  AC5.
+  no legacy ask becomes an orphan. A cutoff the parser unit returns as V15 (blank) or V16 (not a
+  `DATE`) under `builds` skips every ask row and says so once, naming that verdict. Observed by AC5.
 - **S7** Check 15 under `builds`: the present-tense corpus drops `backlog/` and adds
   `builds/<slug>/BACKLOG.md`, so every path an ask cites stays graded and the views' derived text does
   not (owner ruling D9). Observed by AC6.
@@ -68,6 +68,11 @@ so this repo and every adopter see nothing until they switch.
   them. Observed by AC12.
 - **S13** Every new `fail` branch is armed in the engine's self-test in the same commit, and
   `ARMS_FLOORS` for the engine moves by the branches added. Observed by AC13.
+- **S14** The two frozen waivers this unit's edits would unpin — rows
+  `tools/memory-tree/corpus_ids.py:935` and `:939` of `tools/install-prefix-waivers.txt`, the check-15
+  selftest's wrong-prefix fixture and the citation it proves — become in-line
+  `# gov:root-fixture — <reason>` markers on those two fixture lines, and both rows leave the
+  registry in the same commit, so no later edit above them can unpin them again. Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -84,8 +89,9 @@ so this repo and every adopter see nothing until they switch.
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-6` — the conf reader and the two keys' semantics, and the
-  ask row's `filed` field that check 13's skip reads. Without them the Python checks would each spell
-  a second reader.
+  ask row's `filed` field that check 13's skip reads, and the conf verdicts V15 and V16 on which that
+  skip treats the cutoff as unusable. Without them the Python checks would each spell a second
+  reader.
 - **consumes-from** `TOOL-dDerivedDocket-7` — the family view set that leaves check 6 and stays in
   check 7, and the archive guard that checks 10, 20 and 24 defer to under `builds`.
 - **hands-off** `TOOL-dDerivedDocket-34` — an engine that grades a builds-mode tree, so the switch-over
@@ -141,7 +147,7 @@ each way would be a cycle. No third conf reader is written.
 `tools/memory-tree/corpus_ids.py` · `tools/memory-tree/row_grammar.py` ·
 `tools/memory-tree/HYGIENE.template.md` · `memory/HYGIENE.md` ·
 `tools/memory-tree/SPEC-TEMPLATE.template.md` · `memory/TEMPLATE-SPEC.md` · `.memory-tree.conf`
-(`ARMS_FLOORS` only).
+(`ARMS_FLOORS` only) · `tools/install-prefix-waivers.txt` (two rows leave, S14).
 
 ### Alternatives rejected
 
@@ -197,9 +203,11 @@ each way would be a cycle. No third conf reader is written.
 - **AC5** — When `python3 tools/memory-tree/corpus_ids.py --selftest` stages an ask filed after the
   fixture's cutoff and anchors its id in a second build folder, check 13 names the collision; the same
   shape for an ask filed before the cutoff raises nothing; and that pre-cutoff id is not reported as an
-  orphan by check 14.
+  orphan by check 14; with the fixture's cutoff set to `2026-9-30`, check 13 skips every ask row and
+  its one line names V16.
   Red when: the skip is taken for every ask row regardless of date, which is the blanket skip D12-g
-  replaced.
+  replaced; or a malformed cutoff is compared as a raw string, so a post-cutoff collision is skipped
+  silently.
 - **AC6** — When a builds-mode fixture ask cites a dead backticked path, check 15 names it; the same
   token in a view is not graded; in the shards fixture a dead path in a shard is still named.
   Red when: the present corpus drops `backlog/` without adding `BACKLOG.md`, so 227 graded ask path
@@ -236,10 +244,16 @@ each way would be a cycle. No third conf reader is written.
   branch is armed by its self-test assertion and the engine's `ARMS_FLOORS` entry has moved by the
   branches added.
   Red when: the branch lands unarmed and the floor stays, so a deletion of the new remedy passes.
+- **AC14** — When `bash tools/check-install-prefix.sh` runs at this unit's commit, it passes;
+  `grep -c 'corpus_ids.py' tools/install-prefix-waivers.txt` prints 0, and both fixture lines in
+  `tools/memory-tree/corpus_ids.py` carry `gov:root-fixture` with a reason.
+  Red when: a line added above line 935 leaves the two position-keyed rows pointing at shifted lines,
+  which the gate reports as stale waivers and two unwaived hits on the bar while every unit-pass
+  observation stays green.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `corpus-ids selftest` · `row-grammar selftest` · `kit/dogfood doc parity` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `corpus-ids selftest` · `row-grammar selftest` · `kit/dogfood doc parity` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · builds-mode and shards-mode scratch trees for checks 4, 6, 7, 8 and 10, the curation-debt view row, and a typo'd mode value · the engine's arms floor, by the branches added
 New arm: `tools/memory-tree/corpus_ids.py` `--selftest` · a post-cutoff and a pre-cutoff ask anchored in a second folder, and a dead path in an ask and in a view · none
@@ -250,10 +264,11 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
 - **F1** — Who reports a tracked family archive under `builds`? (a) Each of checks 10, 20 and 24, as
   today. (b) Check 9's archive guard alone, with check 10 counting what it left. RESOLVED (agent,
   2026-09-14, delegated): (b); one fact, one finding, and the count line keeps the deferral visible.
-- **F2** — What does check 13 do with a blank `ASK_CUTOFF` under `builds`? (a) Skip nothing, redding
-  the 27 legacy anchors. (b) Skip every ask row and say so. The parser unit already reports a blank
-  cutoff under `builds` as a verdict, so (a) adds 27 findings to one misconfiguration. RESOLVED
-  (agent, 2026-09-14, delegated): (b).
+- **F2** — What does check 13 do with a blank or malformed `ASK_CUTOFF` under `builds`? (a) Skip
+  nothing, redding the 27 legacy anchors. (b) Skip every ask row and say so. The parser unit returns
+  a blank cutoff as V15 and a malformed one as V16, and the view unit's `--check` reports both, so
+  (a) adds 27 findings to one misconfiguration that is already red. RESOLVED (agent, 2026-09-14,
+  delegated): (b).
 - **F3** — Does check 3 need a builds-mode change? FACT-QUESTION · Probe: its two whitelists at
   `tools/memory-tree/check-memory-hygiene.sh:483` and `:490` against the builds-mode tree shape. The
   probe could have found `BACKLOG.md` refused had check 3 descended into build folders. RESOLVED
@@ -265,6 +280,10 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft.
+- rev-2 · 2026-09-14 · S6 · S14 · §3 · §4 · §7 · §8 · AC5 · AC14 · folds spec-audit round 1. G2 M1
+  (47) and M2 (7): S6, F2's premise and AC5 name V15 and V16. G2 M11 (58): S14 and AC14 convert the
+  two `corpus_ids.py` install-prefix waivers to in-line markers, and §7 gains
+  `install-prefix (shipped surface)`.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-2 — in-place landing merge
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -36,18 +36,25 @@ D12-i1.
   Observed by AC3 and AC10.
 - **S4** `--land` computes the carry set — the commits the push would publish that rode in through
   local `<def>` — and refuses when any of them belongs to another build, naming each sha, its
-  subject and its derived build. Observed by AC2.
+  subject and its derived build. Observed by AC2 and AC12.
 - **S9** `--carry --slug <slug>` prints the same carry set and exits 1 when it holds a foreign
   commit, 0 when it does not, and never writes, fetches beyond one observation, or pushes. It is the
   one spelling of the predicate, so the driver's close can ask it rather than re-implement it.
-  Observed by AC10.
+  Observed by AC10 and AC12.
+- **S10** `--prepared --slug <slug>` exits 0 when HEAD carries a prepared merge by S3's three facts,
+  observed now, and 1 naming the fact that failed. It never writes, never fetches beyond one
+  observation, and never pushes. `--land`'s step 1 calls the same function, so the driver asks
+  rather than re-implements. Observed by AC11.
 - **S5** Otherwise `--land` writes the lander marker in THIS worktree's git dir and pushes
   `HEAD:refs/heads/<def>`, never local `<def>`. The LANDER_MARKER record is written exactly as the
   attended path writes it. Observed by AC1 and AC4.
 - **S6** On a push rejected as a race, `--land` re-prepares onto the newly advertised tip and
   retries, bounded by `GOV_PUSH_MAIN_MAX_RETRIES`. Observed by AC7.
-- **S7** An unrecognised argument refuses with exit 2 and pushes nothing. The no-argument invocation
-  behaves exactly as at BASE. Observed by AC6.
+- **S7** Under the new flags, exit 2 is reserved for an argument refusal: an unrecognised argument,
+  or a missing or malformed `--slug`. Such a call pushes nothing. Exit 3 means the lander could not
+  observe what it needs: not a repository, an undeterminable default branch, or a failed `ls-remote`
+  or fetch. The no-argument invocation behaves exactly as at BASE, including its own exit 2.
+  Observed by AC6 and AC13.
 - **S8** `tools/push-main.test.sh` gains one arm per criterion, over a scratch repository with a
   local bare remote and a linked worktree. NOT OBSERVED during the unit pass: the suite is a gate
   leg, and unit passes run no gate legs by owner rule; the one post-build bar grades it (AC9).
@@ -69,9 +76,14 @@ D12-i1.
 - **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" reading of the held push-main
   suite at the post-build bar, so a red there is attributed against BASE before it is called this
   unit's.
-- **hands-off** `TOOL-dDerivedDocket-3` — the three flags, their refusal texts and the
-  prepared-merge shape, which the run's landing path calls from the Skill, grades at `gates-green`
-  and asks through `--carry` at `--close`.
+- **hands-off** `TOOL-dDerivedDocket-3` — the four flags, `--prepared` among them as the one
+  spelling of the prepared-merge test, their refusal texts and the prepared-merge shape, which the
+  run's landing path calls from the Skill, grades at `gates-green` and asks through `--carry` at
+  `--close`; and their exit codes, 2 for an argument refusal and 3 for an observation failure.
+- **hands-off** `TOOL-dDerivedDocket-17` — the prepared merge's first-parent shape, which the
+  run's-own-commits function relies on.
+- **hands-off** `TOOL-dDerivedDocket-19` — the prepared merge's first-parent shape the cross-run
+  arm's exclusion relies on.
 
 ## 4. Design
 
@@ -152,7 +164,7 @@ the design record's wording and is recorded in §9.
 
 The script accepts no arguments at BASE and ignores any it is given. A mistyped `--land` would
 therefore run the attended path, which pushes local `<def>` — the exact hazard this unit exists to
-remove. So any argument other than the three flags and their `--slug` refuses with exit 2. That is
+remove. So any argument other than the four flags and their `--slug` refuses with exit 2. That is
 the one observable change to the no-flag contract, and it only affects an invocation that passed
 something.
 
@@ -222,8 +234,8 @@ quotes the usage line.
   clean, and the message names `git merge <remote>/<def>`.
   Red when: the abort path leaves HEAD detached at R or B pointing at a half merge.
 - **AC9** — When the post-build bar runs `tools/push-main.test.sh` with the self-tests included, the
-  arms for AC1 to AC8 and AC10 are present and pass, and `run-selftests.sh --attribute` against BASE
-  reports no NEW failure for that suite.
+  arms for AC1 to AC8 and AC10 to AC13 are present and pass, and `run-selftests.sh --attribute`
+  against BASE reports no NEW failure for that suite.
   Red when: an arm was wired without its failing case having been observed.
   permission: the suite is a gate leg, so only the one post-build bar runs it.
 - **AC10** — When a single-parent records commit sits on top of T, `--land` accepts it and pushes
@@ -231,6 +243,21 @@ quotes the usage line.
   fixture exits 1 naming the same sha that `--land` names, while writing nothing.
   Red when: `--carry` re-derives the set by a different expression than `--land` uses, so the two
   can disagree about one landing.
+- **AC11** — When `--prepared --slug tFix` runs over AC10's fixtures (a single-parent records commit
+  on T, a second merge on T) and over a plain `git merge` reconcile, its exit agrees with `--land`'s
+  precondition verdict on each, and it writes nothing.
+  Red when: the driver or `--land` re-derives the shape by a different expression, so the two
+  disagree about one landing.
+- **AC12** — When local `<def>` carries a commit touching `memory/builds/tFix/` that B merged,
+  `--carry --slug tFix` exits 0 and `--land` pushes. When local `<def>` instead carries a commit
+  whose subject names no unit id and which touches no build folder, `--carry` names it `unknown` and
+  exits 1.
+  Red when: attribution fails open on an unknown commit, or refuses every non-empty carry set, so a
+  branch that merged its own attended commits cannot land.
+- **AC13** — When `--carry --slug tFix` runs in a fixture whose `origin/HEAD` is unset and whose
+  `GOV_DEFAULT_BRANCH` is blank, it exits 3 and not 2.
+  Red when: an observation failure shares exit 2 with an argument refusal, so the driver reports a
+  network fault as a `LANDER_MODE` misdeclaration.
 
 ## 7. Gates
 
@@ -252,6 +279,10 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   grammar.
 - **F3 — the D12-i1 landing shape.** RESOLVED (owner, 2026-09-13): in place on the run's branch,
   D12-i1 option (a).
+- **F4 — how does the driver's close test for a prepared merge?** Options: (a) a read-only
+  `--prepared` query; (b) the driver re-derives the three facts, with a parity criterion. (b) is two
+  spellings of one predicate, which this unit's `--carry` exists to avoid. RESOLVED (agent,
+  2026-09-14, delegated): (a).
 
 ## 9. Revision log
 
@@ -260,6 +291,13 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   record does not name, because its U19 runs the carry refusal at `--close` as well and one
   predicate must have one spelling. Admits a single-parent tail on T, because U19 commits the close
   records on T before `--land` runs.
+- rev-2 · 2026-09-14 · §2 S4 S7 S9 S10 · §3 · §4 · §6 AC9 AC11 AC12 AC13 · §8 F4 · round-1
+  spec-audit fold (G1 M15, M20, L3; G3 M1, H7). Adds S10, `--prepared`, the one spelling of the
+  prepared-merge test the landing path's `gates-green` now asks (F4, AC11). Adds AC12: an own-build
+  carry is accepted and an `unknown` commit refused. Under the new flags, S7 reserves exit 2 for an
+  argument refusal and gives an observation failure exit 3 (AC13); the no-flag path keeps BASE's
+  codes. AC9's arm list names the new criteria. G3 M1/H7: hands-off units 17 and 19, whose
+  run's-own-commits function excludes the advertised tip that is the prepared merge's first parent.
 
 ## 10. Reuse audit
 

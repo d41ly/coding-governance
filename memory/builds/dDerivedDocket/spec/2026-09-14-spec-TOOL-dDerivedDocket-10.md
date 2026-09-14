@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-10 — driver refuses shard-into-view
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
+| [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 
 <!-- /gen:spec-records -->
 
@@ -29,7 +29,7 @@ A3).
   view predicate. When exactly one side is a view, the driver writes a conflict — ours, then theirs,
   between markers, the closing marker naming the refusal — prints the refusal and the recipe from
   the view unit's one constant on stderr, and exits 1. It never auto-resolves such a pair. Observed
-  by AC1 and AC2.
+  by AC1, AC2 and AC10.
 - **S2** Where the refusal reaches. Whenever the post-switch tree's attributes govern — a straggler
   merged into the default branch, `git merge --squash`, `git rebase` and `git pull --rebase` — the
   refusal fires, measured in design §18r.1. Observed by AC2.
@@ -47,7 +47,7 @@ A3).
   always, every `builds/*/BACKLOG.md` under `BACKLOG_MODE=builds` — over a population derived from
   the conf and refused when empty. It then runs an in-memory three-way of a view rendered with this
   repo's own header against an authored shard and asserts the refusal fires. It prints one liveness
-  line. Observed by AC6 and AC7.
+  line. Observed by AC6, AC7 and AC11.
 - **S6** A new gate leg runs S5 on every bar: chunk `declarations`, subject `repo`, no guard, so the
   kept attribute and the refusal cannot rot quietly between kit edits (design A3). The leg is claimed
   by the merge-driver dossier, with the map regenerated in the same commit. Observed by AC8.
@@ -87,7 +87,8 @@ A3).
   what makes keeping the backlog attribute worth it at the switch-over and what the landing reconcile
   meets when the remote tip's shards moved.
 - **hands-off** `DEPL-dDerivedDocket-1` — the refusal the adopter runbook tells an adopter to expect
-  once it adds the per-build attribute and switches.
+  once it adds the per-build attribute and switches, and the `row-driver view refusal` leg, which is
+  gov's alone and which an adopter adds in its own deployer build when it switches.
 
 ## 4. Design
 
@@ -108,7 +109,8 @@ The written body is the fail-closed body the driver already writes on any except
 dominant-terminator rule, so a CRLF worktree gets CRLF markers. Only the closing label and the stderr
 text differ. When `%O` is a view and both sides are shards, or both sides are views, nothing new
 happens: the first is a re-authored view on both branches, which check 9's data-loss guard reds, and
-the second is an ordinary view merge that `--write` repairs.
+the second is an ordinary view merge that `--write` repairs (unit 7 S8 re-renders over a conflict
+region whose two sides are both view lines).
 
 ### Which driver runs, by merge shape (design §18r.1, git 2.54.0.windows.1)
 
@@ -151,12 +153,13 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
 | `ViewShardRefused` | exception class | lexicon python class cell |
 | the class-keyed census helper | python function | lexicon python function cell; names pass `lexicon.py --suggest` first |
 | `--check` | CLI mode of the driver | a flag |
-| `row-driver view refusal` | gate leg | a gate-legs key, claimed by the merge-driver dossier |
+| `row-driver view refusal` | gate leg | a gate-legs key, claimed by the merge-driver dossier; an `[[exempt_leg]]` in `tools/govkit/registry.toml` (§8 F4) |
 
 ### Files touched (estimate)
 
 `tools/memory-tree/merge-rows.py` · `tools/memory-tree/merge-rows.test.sh` · `tools/gate-legs.json` ·
-`memory/map/features/memory-tree-merge-driver.md` · `memory/map/generated/`.
+`tools/govkit/registry.toml` · `memory/map/features/memory-tree-merge-driver.md` ·
+`memory/map/generated/`.
 
 ### Alternatives rejected
 
@@ -226,19 +229,31 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
   overridden elsewhere passes.
 - **AC8** — When `tools/gate-legs.json` is read it carries the new leg with subject `repo`, chunk
   `declarations` and no guard, and the codebase-map coverage leg is green with the leg claimed by the
-  merge-driver dossier.
+  merge-driver dossier; `tools/govkit/registry.toml` carries an `[[exempt_leg]]` naming it with its
+  reason, and `govkit selfcheck` passes.
   Red when: the leg ships guarded on the kit directory, so an edit elsewhere that breaks the view
   header never re-runs it.
 - **AC9** — When each of AC1 to AC7's fixes is unstaged in turn, its arm in
   `tools/memory-tree/merge-rows.test.sh` or its `--check` observation turns red, and restoring the fix
   turns it green.
   Red when: an arm passes with its fix removed, which is an arm grading nothing.
+- **AC10** — When `bash tools/memory-tree/merge-rows.test.sh` merges two branches that each
+  re-rendered one fixture view with adjacent row changes, the driver takes its key path with no
+  refusal, and `gen_build_index.py --write` then exits 0 with the view byte-equal to a fresh render;
+  and a shard-against-shard merge over a view base is not refused.
+  Red when: the refusal keys on "either side is a view", which conflicts every concurrent re-render
+  after the switch.
+- **AC11** — When `merge-rows.py --check` runs on a builds-mode fixture tracking two
+  `builds/*/BACKLOG.md` files, its governed count includes both; with one file's attribute removed it
+  exits 1 naming that file; with none tracked it prints the zero-`BACKLOG.md` announcement and passes.
+  Red when: the `BACKLOG.md` selector is mis-rooted, which AC6 cannot see because `DECISIONS.md` and
+  the shards keep the count above zero.
 
 ## 7. Gates
 
-`row-keyed merge driver replay` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`row-keyed merge driver replay` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck`
 
-New arm: `tools/memory-tree/merge-rows.test.sh` · a view-against-shard three-way, the three §18r.1 shapes the driver governs, an unimportable predicate, and the two `BACKLOG.md` concurrency pairs · none; the suite is on the testsuite-count waiver
+New arm: `tools/memory-tree/merge-rows.test.sh` · a view-against-shard three-way, the three §18r.1 shapes the driver governs, an unimportable predicate, the two `BACKLOG.md` concurrency pairs, two re-rendered views, and two shards over a view base · none; the suite is on the testsuite-count waiver
 New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-driver view refusal` leg · the attribute removed from a scratch `.gitattributes`, and a driver copy with the refusal disabled · none
 
 ## 8. Open questions
@@ -254,6 +269,13 @@ New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-drive
 - **F3** — Who adds the `BACKLOG.md` attribute line? The brief's note for this unit says ADDED; the
   switch-over spec already carries it as its S5. RESOLVED (agent, 2026-09-14, delegated): the
   switch-over, so one commit owns the attribute change and this unit proves the driver first.
+- **F4** — Does an adopter receive the `row-driver view refusal` leg? (a) A `[[gate_leg]]` in
+  `tools/memory-tree/kit.toml`, shipped to every memory-tree adopter. (b) An `[[exempt_leg]]` in
+  `tools/govkit/registry.toml`, on gov's bar only, like its sibling `row-keyed merge driver replay`.
+  (a) asserts the backlog attribute in every adopter's tree on upgrade, including adopters whose
+  attribute emission is the concurrent adopter-wiring work or whose driver is inert, a shipped
+  surface this unit does not scope (M3 veto 2). RESOLVED (agent, 2026-09-14, delegated): (b); an
+  adopter takes the leg in its own deployer build when it switches.
 - The rulings this unit executes: D11 made the straggler guard fleet-wide and permanent, and
   amendment A2 keeps the backlog attribute — RESOLVED (owner, 2026-09-13).
 
@@ -262,6 +284,12 @@ New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-drive
 - rev-1 · 2026-09-14 · initial draft. Adds three edges the brief's table does not list:
   consumes-from unit 6, for the row classifier, and hands-off to unit 12 and to the adopter runbook,
   reciprocating the consumes-from lines those specs declare.
+- rev-2 · 2026-09-14 · spec-audit G2 round 1 fold. M12 (74): the new leg is an `[[exempt_leg]]` in
+  `tools/govkit/registry.toml`, named in §4 Inventory and Files touched, AC8 reads it,
+  `govkit selfcheck` joins §7, the hands-off to DEPL names the leg; §8 F4. M19 (21): AC10 merges two
+  re-rendered views and two shards over a view base, S1 cites it and §7's replay arm line names
+  both; with M3 (45) AC10 re-renders after the merge and §4 "The refusal" points at unit 7 S8. M20
+  (22): AC11 grades the builds-mode `BACKLOG.md` population, S5 cites it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-30 — checker defects from the stop census
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 30
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 |
+| [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -36,26 +36,35 @@ parser accepts that no document names and no arm exercises is the one invocation
   and `gov:conf-allow-end` sentinels, must be empty. One direction only. Two `fail 22` branches: a
   missing, repeated or empty sentinel region, and a non-empty difference naming each key. The
   comment recording the join as withdrawn is replaced. Observed by AC4.
-- **S4** Check 26 gains a flag arm. The parser population is every `--<name>` token on a non-comment
-  line inside a new bare sentinel pair, `gov:argv-begin` and `gov:argv-end`, around the driver's
-  top-level argument loop, sub-loops included. The documented population is every `--<name>` token
-  on the driver header's `#   unattended.sh` lines. A documented flag with no parser token fails 26,
-  and so does a parser flag the header never names. Observed by AC5, AC6 and AC7.
-- **S5** The driver header documents every flag the parser accepts. At BASE six are parsed and
-  undocumented, and any flag an earlier unit of this build added is graded the same way at this
-  unit's commit. Observed by AC7.
+- **S4** Check 26 gains a flag arm. The parser population is every `--<name>` token on a
+  non-comment line inside a new bare sentinel pair, `gov:argv-begin` and `gov:argv-end`, around the
+  driver's top-level argument loop, sub-loops included, PLUS every member of `VERBS_SLUG` and
+  `VERBS_INLINE`, read from their declarations, because a slug verb is recognised by set membership
+  and never appears as a token inside the loop (§8 F5). The documented population is every
+  `--<name>` token on the driver header's `#   unattended.sh` lines. A documented flag with no parser
+  token fails 26, and so does a parser flag the header never names. Observed by AC5, AC6, AC7 and
+  AC12.
+- **S5** The driver header documents every flag the parser accepts. At BASE seven are parsed and
+  undocumented — `--code`, `--framed`, `--playbook-sha`, `--records-root`, `--run`, `--set` and
+  `--waive` — and `--framed` goes on the `--plan` header line beside `[--paths]`; any flag an earlier
+  unit of this build added is graded the same way at this unit's commit. Observed by AC7 and AC12.
 - **S6** Every argument a parser accepts appears in an arm. Check 26's flag arm also requires each
   driver parser flag on a non-comment line of `unattended.test.sh`, and each argument the leg's own
-  scope parser accepts on a non-comment line of `check-unattended.test.sh`. Where a suite is not
-  installed, which is every adopter tree, the arm prints one announced skip naming the suite on the
-  REPORT channel. The two arms missing at BASE, a `--version` smoke arm and an `--only 28` run of the
-  leg, are added. Observed by AC8.
+  scope parser accepts — every `--<name>` token on a non-comment line between the same bare pair,
+  `gov:argv-begin` and `gov:argv-end`, placed around the `case "${1:-}"` block in
+  `tools/unattended/check-unattended.sh` (`:85-90` at BASE) and extracted by the same exact-line
+  match — on a non-comment line of `check-unattended.test.sh`. Where a suite is not installed, which
+  is every adopter tree, the arm prints one announced skip naming the suite on the REPORT channel.
+  The four arms missing at BASE are added: a `--version` smoke arm and a `--framed` arm in
+  `unattended.test.sh`, and `--only 28` and `--skip 28` runs of the leg in
+  `check-unattended.test.sh`. Observed by AC8 and AC13.
 - **S7** Every new `fail` branch has an arm in `check-unattended.test.sh`, and `ARMS_FLOORS` in
   `.memory-tree.conf` moves in the same commit. The unattended suites run once, at the unit's end,
   under unit 1's attribution. Observed by AC9.
-- **S8** The kit version and marker move, and the check 31 comment that justifies `${core:-}` and
-  `${M:-}` by the crash this unit fixes is rewritten to say they are now belt and braces.
-  Observed by AC10.
+- **S8** The check 31 comment that justifies `${core:-}` and `${M:-}` by the crash this unit fixes
+  is rewritten to say they are now belt and braces. Observed by AC10. NOT OBSERVED for the version:
+  the unattended kit moves once in this build's landing range, in `TOOL-dDerivedDocket-1`, and this
+  unit's bytes ride that move; `kit version markers` grades only the final tree's agreement.
 - **S9** The kickoff manifest's `last-audit` is re-stamped in the same commit, with a delta line in
   the commit message, because `.memory-tree.conf` is in its `watch:` list and the staged leg refuses
   a watched change without one. The §B claims that file feeds are re-read first; only the
@@ -135,24 +144,45 @@ of them the moment it lands; a key one of them forgot to admit is fixed in this 
 ### Check 26's flag arm
 
 At BASE the driver's argument loop starts at `tools/unattended/unattended.sh:4936`, and the header
-usage lines are `:5-22`. Measured by the header-line match on 2026-09-14 at BASE, the parser accepts
-`--code`, `--playbook-sha`, `--records-root`, `--run`, `--set` and `--waive`, none of which any header
-line names, and every one of them is a real argument of a documented verb. S5 adds each to its verb's
-header line, which also puts it in the rendered usage text. `--witness`, `--paths` and `--framed` are
-parsed inside the `--phase` and `--plan` arms rather than as case labels, which is why the population
-is tokens in the fenced region and not case labels alone.
+usage lines are `:5-22`. Measured at BASE on 2026-09-14 with the population rule of S4, PINNED as
+that measurement:
 
-The suite half measures `--version` as the one driver flag no line of `unattended.test.sh` names, and
-`check-unattended.test.sh` never runs the leg with `--only 28`; its one mention is a comment
-explaining why an arm avoids it. Both are added. The arm grades PRESENCE on a non-comment line and
-says so in its header: it cannot tell an arm that asserts something about a flag from one that merely
-passes it.
+- tokens `--<name>` on non-comment lines of the argument loop (`:4936` `while [ $# -gt 0 ]; do` to
+  `:5034` `done`): 30; members of `VERBS_SLUG` and `VERBS_INLINE` (`:87-90`): 18; union: 44.
+  Header `#   unattended.sh` lines (`:5-22`): 37 tokens.
+- loop tokens alone against the header: 14 header tokens have no loop token — `--abort`,
+  `--attest`, `--brief`, `--close`, `--dispatch`, `--landed`, `--park`, `--preflight`, `--propose`,
+  `--record-piece`, `--record-set`, `--rescope`, `--resume` and `--status`, every slug verb but
+  `--review` — because they dispatch by `VERBS_SLUG` membership through `is_slug_verb` (`:92`) in
+  the loop's catch-all arm.
+- the union against the header: no header token is missing; 7 parser tokens are undocumented —
+  `--code`, `--framed`, `--playbook-sha`, `--records-root`, `--run`, `--set` and `--waive`.
+- suite halves: `--framed` and `--version` appear on no non-comment line of `unattended.test.sh`;
+  `--only` and `--skip` appear on no non-comment line of `check-unattended.test.sh`.
+
+```bash
+awk 'NR>=4936 && NR<=5034 && $0 !~ /^[[:space:]]*#/' tools/unattended/unattended.sh | grep -oE -- '--[a-z][a-z0-9-]*'
+grep -E '^VERBS_(SLUG|INLINE)=' tools/unattended/unattended.sh | grep -oE -- '--[a-z][a-z0-9-]*'
+awk 'NR>=5 && NR<=22' tools/unattended/unattended.sh | grep -E '^#   unattended\.sh' | grep -oE -- '--[a-z][a-z0-9-]*'
+```
+
+The line numbers are BASE's; after S4 the loop is read between its sentinels. Every one of the seven
+is a real argument of a documented verb. S5 adds each to its verb's header line, which also puts it
+in the rendered usage text. `--witness`, `--paths` and `--framed` are parsed inside the `--phase` and
+`--plan` arms rather than as case labels, which is why the population is tokens in the fenced region
+and not case labels alone.
+
+The suite half measures `--version` and `--framed` as the two driver flags no non-comment line of
+`unattended.test.sh` names, and `--only` and `--skip` as the two leg flags no non-comment line of
+`check-unattended.test.sh` names; all four are added. The arm grades PRESENCE on a non-comment line
+and says so in its header: it cannot tell an arm that asserts something about a flag from one that
+merely passes it.
 
 ### Inventory
 
 | Identifier | Kind | Cell |
 |---|---|---|
-| `gov:argv-begin`, `gov:argv-end` | bare sentinel comments in the driver | none; bare so no extractor line can match them |
+| `gov:argv-begin`, `gov:argv-end` | bare sentinel comments in the driver AND in the leg, around each file's own argument parser | none; bare so no extractor line can match them |
 | new `fail 22` and `fail 26` branches | leg refusals | `harness arms` population; each is armed or the floor does not move |
 | any new shell helper | shell function | lexicon `sh` function cell; each name passes `python tools/lexicon/lexicon.py --suggest <name>` before it is written |
 
@@ -184,7 +214,7 @@ prose.
   announced skip, and a brief row with a malformed hash does not cover anything.
 - observability — the per-check skip lines under `--only 28`, the covered-brief report line, and the
   key and flag names in every new refusal.
-- risks — the header gains six flags, which changes the rendered usage text; nothing parses that
+- risks — the header gains seven flags, which changes the rendered usage text; nothing parses that
   text except check 26 itself.
 - testing — arms in `tools/unattended/check-unattended.test.sh` for each new branch and each staged
   break in §6, run once at the unit's end under `--attribute`.
@@ -220,12 +250,15 @@ prose.
 - **AC6** — When a fixture copy of the driver adds a parser arm `--frobnicate)` that no header line
   names, the leg fails 26 naming it.
   Red when: the arm joins one direction only, and an undocumented flag reaches no reader.
-- **AC7** — When `bash tools/unattended/check-unattended.sh` runs on the real tree after this unit, the
-  flag arm passes with the six flags §4 names on their verbs' header lines.
-  Red when: the header is left as at BASE, which the new arm reds six times.
+- **AC7** — When `bash tools/unattended/check-unattended.sh` runs on the real tree after this unit,
+  the flag arm passes with every parser flag, the seven §4 names included, on its verb's header line,
+  and with every slug verb found through `VERBS_SLUG`.
+  Red when: the header is left as at BASE, which the new arm reds seven times, or the population
+  reads the loop alone, which reds fourteen documented slug verbs.
 - **AC8** — When a fixture copy of `unattended.test.sh` drops every line naming `--version`, the leg
   fails 26 naming it; with the suite absent, the leg's REPORT channel carries one skip line naming
-  the suite and the exit status is the other checks' verdict.
+  the suite and the exit status is the other checks' verdict; and when a fixture copy of
+  `unattended.test.sh` drops every line naming `--framed`, the leg fails 26 naming it.
   Red when: an absent suite is read as an empty one and reds every flag in an adopter tree.
 - **AC9** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
   unit's end, it reports no NEW failure, and `python3 tools/memory-tree/check-arms.py --check` passes
@@ -233,12 +266,24 @@ prose.
   Red when: a new branch ships with no arm, so the harness arms leg reds on the floor.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: D12-i8 lifts the do-not-run instruction for this unit.
-- **AC10** — When `bash tools/check-kit-versions.sh` runs, the unattended kit's constant and marker
-  agree at the moved version.
-  Red when: the driver's bytes move and the marker is left behind.
+- **AC10** — When `grep -n 'belt and braces' tools/unattended/check-unattended.sh` runs after this
+  unit, the check 31 comment names `${core:-}` and `${M:-}` as belt and braces and no longer gives
+  the `--only 28` crash as their reason.
+  Red when: the comment still justifies them by a crash that no longer happens, so a reader keeps
+  two guards for a reason that is false.
 - **AC11** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
   passes with the re-stamped `last-audit`.
   Red when: the conf moves with no re-stamp, which the staged leg refuses at the commit.
+- **AC12** — When a fixture copy of the driver keeps a slug verb's header line but drops the verb
+  from `VERBS_SLUG`, the leg fails 26 naming it; with the verb restored to the set and no case label
+  anywhere, the leg passes.
+  Red when: the parser population is the loop's case labels alone, so a verb the set dispatches
+  reads as undocumented-parser or missing-parser by accident.
+- **AC13** — When a fixture copy of `check-unattended.test.sh` drops every line naming `--skip`, the
+  leg fails 26 naming `--skip`; with the leg's `gov:argv-begin` sentinel deleted, it fails 26 naming
+  the region.
+  Red when: the leg half has no fenced population, so an implementation grading only the driver half
+  passes every other criterion.
 
 ## 7. Gates
 
@@ -248,13 +293,15 @@ New arm: `tools/unattended/check-unattended.test.sh` · an edited brief, a sibli
 New arm: `tools/unattended/check-unattended.test.sh` · a removed allow-list key, a deleted sentinel, a documented flag with no parser token, a parser flag with no header line, a suite missing `--version` · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--only 28` · none
 New arm: `tools/unattended/unattended.test.sh` · the driver run with `--version` · none
+New arm: `tools/unattended/unattended.test.sh` · the driver run with `--plan --framed` · none
+New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip 28` · none
 
 ## 8. Open questions
 
 - **F1** — Which direction does the flag join grade? Options: (a) documented to parser, DR's third
-  criterion; (b) both. (b) reds six flags at BASE, which S5 documents in the same commit.
+  criterion; (b) both. (b) reds seven flags at BASE, which S5 documents in the same commit.
   RESOLVED (agent, 2026-09-14, delegated): (b). It satisfies DR's criterion and also catches the
-  flag nobody can read about, at the cost of six header edits.
+  flag nobody can read about, at the cost of seven header edits.
 - **F2** — Where does the suite-arm class gate live? Options: (a) inside each suite, asserting its own
   coverage; (b) in the leg's check 26, with an announced skip where a suite is absent. (a) runs only
   when the suite runs, and the unattended suites are on no bar, so it would be a gate nobody runs.
@@ -265,11 +312,22 @@ New arm: `tools/unattended/unattended.test.sh` · the driver run with `--version
 - **F4** — Does check 23's exemption read the brief's blob from the working tree or from the pass
   commit? RESOLVED (agent, 2026-09-14, delegated): from the pass commit, since the question is what
   that commit wrote.
+- **F5 — how does the flag arm see verbs dispatched by set membership?** Options: (a) the parser
+  population includes the `VERBS_SLUG` and `VERBS_INLINE` members, read from their declarations; (b) a
+  second fence around the post-loop `case "$VERB"` dispatch. The driver states that the set is the
+  dispatch, and check 26's verb join already reads it. RESOLVED (agent, 2026-09-14, delegated): (a).
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-14 · initial draft. Adds one edge the brief's table does not list,
   consumes-from unit 1, for the attributed suite run.
+- rev-2 · 2026-09-14 · folds the round-1 spec audit (G4 H6, M23, M7; G1 M11). H6: S4's parser
+  population adds the `VERBS_SLUG` and `VERBS_INLINE` members (F5, AC12); seven flags are
+  undocumented at BASE, not six, `--framed` among them, and the probe and its BASE output, re-run by
+  the fold, are in §4 (S5, AC7, and F1's count); `--framed` and `--skip` gain arms (S6, AC8). M23:
+  S6 fences the leg's own scope parser with the same sentinel pair (AC13). M7 with G1 M11: S8's
+  version half is a pointer to unit 1 under the build's one-owner rule, and AC10 now observes the
+  check 31 comment S8 rewrites.
 
 ## 10. Reuse audit
 

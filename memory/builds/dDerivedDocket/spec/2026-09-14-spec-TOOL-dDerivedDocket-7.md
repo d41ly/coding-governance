@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-7 — generated family view
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
+| [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 
 <!-- /gen:spec-records -->
 
@@ -35,21 +35,29 @@ does not move until the switch-over.
   under `shards` it reads it exactly as today. Observed by AC9.
 - **S4** Under `builds`, `plan()` renders `<MEMORY_ROOT>/backlog/<FAMILY>.md` for every family
   `FAMILIES` declares, in the §4 grammar; a family with no live ask renders `*No live ask.*`, so
-  every declared family has a view. Observed by AC1 and AC2.
+  every declared family has a view. Observed by AC1, AC2 and AC18.
 - **S5** The view defines no id: its first cell is link-wrapped and it carries no dash row, asserted
   with the real `extract.anchor_at` over every line. Observed by AC2.
 - **S6** The view header carries the relocation recipe of design §18r.4, rendered from one constant
   with the kit prefix derived, never spelled — so a pre-switch branch that conflicts on a view reads
   the instruction inside the conflict region (design layer L4). The same constant feeds every
   message this unit prints. Observed by AC3.
-- **S7** Verdicts: `--check` reports every fold verdict V1 to V12 and the three guards below, with
-  its code, and exits 1; `--write` renders every artifact over a tree carrying any of them, prints
-  them, and exits 0, because a render is not a verdict. Observed by AC4.
-- **S8** The data-loss guard, the one exception to S7: before overwriting a view, `--write` reads it,
-  and a line that leads with an id after a list marker, or a conflict marker, is authored content the
-  grammar never emits. `--write` then writes every OTHER artifact, leaves that view byte-unchanged,
-  names each line and the recipe's three entry points, and exits 1; `--check` reports the same in
-  place of its usual `--write` remedy. Observed by AC5.
+- **S7** Verdicts: `--check` reports every verdict code the parser unit's module exports
+  (`TOOL-dDerivedDocket-6` §4), the conf-reader verdicts for `ASK_CUTOFF` included, and the three
+  guards below, with its code, and exits 1; `--write` renders every artifact over a tree carrying any
+  of them, prints them, and exits 0, because a render is not a verdict. The reporting arm iterates
+  the exported codes rather than a typed list, so a code with no reporting arm reds the selftest.
+  Observed by AC4 and AC15.
+- **S8** The data-loss guard, the one exception to S7: before writing a view path, `--write` reads
+  whatever file sits there, whether or not it carries the generator's header, and a line that leads
+  with an id after a list marker, or a conflict marker, is authored content the grammar never emits —
+  except a conflict region every line of whose two sides the view grammar emits (a table row, a
+  header or recipe line, or a blank line): that is a view-against-view merge, `--write` re-renders
+  over it and prints `re-rendered over a view conflict: <path>`. On authored content `--write` writes
+  every OTHER artifact, leaves that view byte-unchanged, names each line and the recipe's three entry
+  points, and exits 1; `--check` reports the same in place of its usual `--write` remedy. The guard
+  never consults the view predicate; that predicate is the row driver's (§4 "Recognising a view").
+  Observed by AC5, AC14 and AC16.
 - **S9** The mode guard: under `shards`, a tracked `BACKLOG.md`, or a spec header carrying `closes`
   or `advances`, is a verdict — the half-migration shape (design critique A8). Observed by AC6.
 - **S10** The archive guard: under `builds`, a tracked rotated archive whose stem is a declared
@@ -57,12 +65,18 @@ does not move until the switch-over.
   design A5). Observed by AC7.
 - **S11** A liveness line on every run. Under `builds`: `build-index: backlog <a> ask(s) · <d>
   row(s) · <l> link(s) in <h> file(s) · <v> live · <k> verdict(s)`. Under `shards`: one line saying
-  the layout is shards and no view is rendered. Observed by AC10.
-- **S12** Print modes that write nothing and always exit 0: `--asks [FAMILY|ID] [--all] [--status
-  <token>] [--build <slug>] [--json]`. The table form lists live asks, or every ask with `--all`; an
-  id argument prints that ask's status and everything that decided it, terminal included. The JSON
-  form is `{mode, examined, asks}` carrying the fields §4 names, which drift-audit and the agent
-  carriers read. Under `shards` they print the mode notice and an empty set. Observed by AC11.
+  the layout is shards and no view is rendered. Under `--asks` the line goes to stderr. Observed by
+  AC10.
+- **S12** Print modes that write nothing, `--asks [FAMILY|ID] [--all] [--status <token>] [--build
+  <slug>] [--json]`, whose stdout carries only the mode's value — the table, the JSON object, or the
+  output of any option a later unit adds to `--asks`, `TOOL-dDerivedDocket-15`'s `--tsv` among them —
+  while the tolerated-header line, the liveness line and every other notice go to stderr. They exit 0
+  on any fold verdict, and a `collect()` refusal exits 1 with the refusal on stderr and nothing on
+  stdout, because the tree cannot be read. The table form lists live asks, or every ask with `--all`;
+  an id argument prints that ask's status and everything that decided it, terminal included. The
+  JSON form is `{mode, examined, asks}` carrying the fields §4 names, which drift-audit and the agent
+  carriers read. Under `shards` they print the mode notice on stderr and an empty set on stdout.
+  Observed by AC11 and AC17.
 - **S13** One conf key, `BACKLOG_EXCERPT_CHARS`, default 72, declared in the kit's conf example and
   descriptor; a non-positive or non-numeric value is a refusal. Observed by AC12.
 - **S14** Dark proof: with gov in `shards`, this tree's artifacts do not move. Observed by AC13.
@@ -83,21 +97,28 @@ does not move until the switch-over.
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-6` — the parser, the fold, the verdict function, the row
-  renderers, the liveness counts and the two conf keys. Without them there is nothing to render and
-  no verdict to report.
+  renderers, the liveness counts and the two conf keys, and the exported verdict codes, conf-reader
+  verdicts included, which S7 iterates. Without them there is nothing to render and no verdict to
+  report.
 - **hands-off** `TOOL-dDerivedDocket-8` — the view file set, which leaves check 6's caps and stays in
   check 7's entry budget, and the verdict report check 9 surfaces.
 - **hands-off** `TOOL-dDerivedDocket-10` — the view-recognition predicate and the recipe constant,
   which the row driver's shard-into-view refusal reads and prints.
 - **hands-off** `TOOL-dDerivedDocket-11` — collect's spec index and build-status map under `builds`,
-  the view renderer the planner measures prospective views with, and the `--asks --json` shape its
-  per-id report is compared against after the switch.
+  and the view renderer the planner measures prospective views with.
 - **hands-off** `TOOL-dDerivedDocket-12` — `--write` and its data-loss guard, which the relocation
   engine satisfies by restoring the views before it renders, and the recipe constant, which that
   unit's `--recipe` prints rather than holding a second copy.
 - **hands-off** `TOOL-dDerivedDocket-15` — the bare `--asks` print mode that unit's `--ready`,
   `--tsv` and `--at` options extend, its link-wrapped first cell, and the `--write` render its
-  scaffold runs.
+  scaffold runs; and the rule that an `--asks` output mode writes only its value to stdout, which
+  `--tsv` inherits.
+- **hands-off** `TOOL-dDerivedDocket-16` — the `--asks --build` table form the filing-home refusal
+  prints, and the stdout rule the driver's parse relies on.
+- **hands-off** `TOOL-dDerivedDocket-20` — the `--all` table form the build method's M9 row names.
+- **hands-off** `TOOL-dDerivedDocket-34` — `--write`, `--check` and `--asks --json`, which the
+  switch-over runs on this repo for the first time, and the data-loss guard, which its writer
+  satisfies by removing the authored shards before the first render.
 
 ## 4. Design
 
@@ -162,13 +183,19 @@ offending line, then the recipe's three entry points: `--relocate --as <slug>` o
 `--repair <merge-sha>` after a landing, and `--ingest <ref>` from the default branch for a branch
 nobody will revisit.
 
+A file at a view path with no generator header is read the same way: a pre-switch shard left in
+place, and a view whose conflict was resolved by taking an authored shard's side, both trip the
+guard. A conflict region both of whose sides hold only lines the view grammar emits is re-rendered
+over (S8); a region with even one line the grammar never emits, such as an id-leading list row,
+still trips the guard.
+
 ### The JSON projection
 
 `--asks --json` prints one object: `mode`, `examined`, and `asks`, a list whose items carry `id`,
 `home`, `file`, `line`, `filed`, `unit`, `status`, `decided_by`, `sev`, `closing`, `declining`,
 `holds` and `live_specs`. The switch-over's three drift signals read exactly `closing`, `declining`,
 `live_specs` and `sev`; an `examined` of zero while a `BACKLOG.md` is tracked is theirs to call a
-DEAD PROBE.
+DEAD PROBE. stdout holds that object and nothing else.
 
 ### Inventory
 
@@ -228,7 +255,8 @@ DEAD PROBE.
   carry the recipe lines byte-identical to the one constant, with the fixture's kit prefix rather
   than a spelled `tools/` literal.
   Red when: the view spells its own copy of the recipe and the two drift apart.
-- **AC4** — When the selftest stages each verdict V1 to V12 into a builds-mode fixture, `--check`
+- **AC4** — When the selftest stages each verdict code the parser unit's module exports into a
+  builds-mode fixture, `--check`
   exits 1 naming that verdict's code and `--write` exits 0 having written every artifact.
   Red when: `--write` refuses on a content verdict, so one bad ask blocks every render.
 - **AC5** — When a fixture view carries an appended authored dash row, and separately a conflict
@@ -266,6 +294,33 @@ DEAD PROBE.
 - **AC13** — When `python tools/memory-tree/gen_build_index.py --check` runs on this repo after the
   unit, it exits 0, and `--write` over a scratch clone changes no tracked file.
   Red when: any builds-mode branch runs under shards, so the dark unit moves this repo's artifacts.
+- **AC14** — When a builds-mode fixture holds an authored shard with no generator header at a view
+  path, `--write` exits 1, leaves that file byte-unchanged, writes every other artifact and names the
+  shard's first id-leading line.
+  Red when: the guard reads only files the view predicate recognises, so the take-theirs shard
+  `TOOL-dDerivedDocket-10` §5 relies on it to catch is overwritten.
+- **AC15** — When a builds-mode fixture's `ASK_CUTOFF` is blank, and separately `2026-9-30`,
+  `--check` exits 1 naming the key and the conf verdict's code.
+  Red when: the conf reader returns its verdict and nothing reports it, so V9, V12, V14 and check
+  13's forward check are disarmed under a green `--check`.
+- **AC16** — When a fixture view carries a conflict region whose two sides are view table rows for
+  adjacent asks, `--write` exits 0 and the view equals a fresh render; when one side of the region
+  holds an id-leading list row, the guard fires as in AC5.
+  Red when: any conflict marker trips the guard, so an ordinary post-flip view conflict blocks the
+  re-render and points the lander at the straggler recipe.
+- **AC17** — When `--asks TOOL --all --json` runs on a fixture carrying one tolerated header and one
+  fold verdict, `json.loads` over the whole of stdout succeeds and the exit is 0; on a fixture whose
+  front matter `collect()` refuses, it exits 1 with nothing on stdout.
+  Red when: the tolerated-header line prints to stdout ahead of the JSON, so every consumer gets a
+  decode error, the class the hygiene engine's ON STDERR note records at
+  `tools/memory-tree/check-memory-hygiene.sh:187-194`.
+- **AC18** — When the selftest renders a fixture holding asks `-2` and `-10` of one slug, one
+  terminal ask, and one ask whose text carries a pipe, a backticked path, a link and 200 characters,
+  the view lists `-2` before `-10`, omits the terminal ask, and renders that ask's summary cell
+  byte-equal to the expected excerpt: `|` as `/`, backticks stripped, the link reduced to its text,
+  cut at the last space before `BACKLOG_EXCERPT_CHARS` and ended with `…`.
+  Red when: a pipe in the ask text splits the table row, or the renderer lists a terminal ask, which
+  falsifies the header's claim that an unlisted id is terminal.
 
 ## 7. Gates
 
@@ -295,6 +350,20 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixt
   it. (b) In the migrator, with this unit holding a copy until then. (b) is two copies for three
   units. RESOLVED (agent, 2026-09-14, delegated): (a); the relocation spec's parity arm then compares
   three renderings of one constant, and the M2 cross-read carries the location to that spec.
+- **F6** — Which files does the data-loss guard read? (a) Only files the view predicate recognises.
+  (b) Every file at a view path. (a) lets `--write` erase the take-theirs shard the row driver unit
+  relies on it to catch. RESOLVED (agent, 2026-09-14, delegated): (b); the switch-over's writer
+  removes the authored shards before the first render (`TOOL-dDerivedDocket-34` S1).
+- **F7** — What does `--write` do with a view conflict region whose two sides are both view lines?
+  (a) Trip the guard, like any conflict marker. (b) Re-render over it. (c) Have the row driver take
+  ours on a view-against-view merge. (a) blocks the re-render the charter prescribes for a generated
+  index and prints a straggler recipe where no straggler exists; (c) changes the driver's merge
+  rules, which the row driver unit's §3 puts out of scope. RESOLVED (agent, 2026-09-14, delegated):
+  (b); a region holding any line the view grammar never emits still trips the guard.
+- **F8** — What does `--asks` do when `collect()` refuses the tree? (a) Report the refusal inside the
+  JSON and exit 0. (b) Exit 1 with nothing on stdout, keeping exit 0 for fold verdicts. (a) adds a
+  field every consumer of the pinned projection must learn, and hands them partial data; (b) keeps
+  AC11's promise for the verdicts it names. RESOLVED (agent, 2026-09-14, delegated): (b).
 - The rulings this unit executes: D1 adopt; D3 no hard view cap; D7 the Sev column; D8 no backlog
   archive after the proof; D9 view text is ungraded while asks stay graded — all RESOLVED (owner,
   2026-09-13).
@@ -303,6 +372,17 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixt
 
 - rev-1 · 2026-09-14 · initial draft. Adds two edges the brief's table does not list, hands-off to
   units 12 and 15, reciprocating the consumes-from lines those specs declare.
+- rev-2 · 2026-09-14 · spec-audit round 1 fold. G2 H3 (55): S8's data-loss guard reads every file
+  at a view path, header or not, and never consults the view predicate; §4 guard paragraph; AC14;
+  §8 F6; hands-off to unit 34. G2 M3 (45): S8 re-renders over a conflict region both of whose sides
+  are view lines; AC16; §8 F7. G2 M4 (56) with G3 H1 (51): S11 and S12's one stdout rule, naming
+  the table, `--json` and unit 15's `--tsv`, with a `collect()` refusal exiting 1; §4 JSON
+  projection; AC17; §8 F8; hands-off 15 names the rule. G2 M1 (12): S7 and AC4 iterate the verdict
+  codes unit 6 exports, conf-reader verdicts included; AC15; consumes-from 6 names them. G2 M15 (10):
+  AC18 observes the summary cell, the sort and the terminal exclusion; S4 cites it. G3 M2 (44):
+  hands-off unit 16. G3 L5 (49): hands-off unit 20. Orchestrator: the hands-off to unit 11 no longer
+  names `--asks --json`; the per-id comparison against it is unit 34's status proof, and the
+  hands-off to 34 already names the verb.
 
 ## 10. Reuse audit
 

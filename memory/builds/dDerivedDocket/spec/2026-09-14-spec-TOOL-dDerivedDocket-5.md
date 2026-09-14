@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -68,7 +68,9 @@ default-off gate for this one feature, and this unit records that ruling as a de
   it, and the verb carrier documents `--scheduled`. Observed by AC10.
 - **S11** Gov's `.unattended.conf` declares `RESUME_SCHEDULE="on"` and the desktop app's
   scheduled-task tool pair; the kit's conf example declares `on` with placeholder tool names.
-  Observed by AC13.
+  `tools/unattended/kit.toml`'s conf-placeholder hole extends its discharge probe to
+  `RESUME_SCHEDULE_(CREATE|DELETE)`: a verbatim copy of the example substitutes no `{{…}}`
+  placeholder, so AC9's red never fires for it. Observed by AC13 and AC15.
 - **S12** One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, records the
   owner's ruling that auto-resume ships on and that it overrides charter §9's default-off gate for
   this feature only. Observed by AC12.
@@ -86,7 +88,8 @@ default-off gate for this one feature, and this unit records that ruling as a de
   invisible to a schedule filed on the holding node. §5 states it.
 - Migrating adopters' confs. Each adopter meets the new keys in its own deployer build; the
   standing placeholder is what makes that decision unmissable there.
-- The unattended kit's version constant. It moves once per landing range, not per unit.
+- The unattended kit's version constant. It moves once per landing range, not per unit; the build's
+  one move is the held-suite baseline unit's (`TOOL-dDerivedDocket-1` S9).
 
 ### Edges
 
@@ -149,7 +152,7 @@ Evaluated in order, before unit 4's take-over writes anything:
 
 | # | Refuses when | Why |
 |---|---|---|
-| 1 | the record is not HELD | a working phase would fall into the lease's no-id orientation row and a second session would drive the slug |
+| 1 | the record is not HELD | a working phase belongs to the lease matrix, which refuses a session that cannot show the lease's keepalive, and a schedule is filed only for a hold |
 | 2 | `held-at` differs from `--scheduled` | the hold this task was filed for has ended and a later one began |
 | 3 | the remote-advertised run-branch tip is neither HEAD nor an ancestor of it, under `ANCHOR_SCOPE=published` | another session pushed work after the hold; a pushed hold commit of this worktree's own is an ancestor and passes |
 | 4 | the remote does not answer | freshness cannot be shown, and a restart that might double-drive is worse than one that waits for a human |
@@ -173,7 +176,9 @@ no declared carrier, and a standing `{{RESUME_SCHEDULE_CREATE}}` placeholder in 
 skill-wiring check reds. That forces the choice — declare a carrier, or write `off` — at the upgrade,
 in the adopter's own deployer build, rather than letting a hold silently schedule nothing. `--hold`
 itself never refuses for a missing carrier: the hold is the safe state, and refusing it would push the
-run back toward the ABORTED ending unit 4 exists to replace.
+run back toward the ABORTED ending unit 4 exists to replace. That argument holds for an upgrader whose
+key is absent. A fresh adopter who copies the example verbatim is caught by the extended discharge
+probe instead.
 
 ### Inventory
 
@@ -190,8 +195,9 @@ run back toward the ABORTED ending unit 4 exists to replace.
 `tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
 `tools/unattended/adopt-unattended.sh` · `tools/unattended/SKILL.template.md` ·
 `tools/unattended/VERBS.template.md` · `tools/unattended/PROTOCOL.template.md` · unit 4's companion
-template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` · the three test files
-named in §7 · the rendered guides and Skill · `memory/DECISIONS.md`.
+template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
+`tools/unattended/kit.toml` · the three test files named in §7 · the rendered guides and Skill ·
+`memory/DECISIONS.md`.
 
 ### Alternatives rejected
 
@@ -263,8 +269,8 @@ named in §7 · the rendered guides and Skill · `memory/DECISIONS.md`.
   HELD record whose local bare remote was advanced by a second clone, it refuses each time with a
   numbered message and the run-state file and lease are byte-unchanged; with the remote made
   unreachable it refuses naming the remote.
-  Red when: the scheduled path falls through to the lease's no-id orientation row on a working
-  phase, so a second session drives the slug.
+  Red when: the scheduled path falls through to the lease matrix on a working phase instead of
+  refusing before it, so a scheduled session is treated as a resuming holder.
 - **AC8** — When the same flag runs against the matching HELD record, once with the remote at the
   pre-hold `witness` and once with the hold commit pushed,
   unit 4's take-over completes and the new history row carries `scheduled`.
@@ -297,6 +303,12 @@ named in §7 · the rendered guides and Skill · `memory/DECISIONS.md`.
   Red when: an arm this unit added fails, or an existing arm newly fails because of it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the owner's self-test lift for this build's unattended units covers this unit.
+- **AC15** — When the discharge command of `tools/unattended/kit.toml`'s conf-placeholder hole runs
+  in a fixture whose `.unattended.conf` is the shipped example copied verbatim, it exits non-zero on
+  the `RESUME_SCHEDULE_CREATE` line. With gov's declared carrier pair it exits 0.
+  Red when: the probe covers only `KEEPALIVE_(CREATE|DELETE|INTERVAL)`, so the angle-bracket carrier
+  names render as literal prose and the Skill tells an agent to file restarts with a tool named
+  `<...>`.
 
 ## 7. Gates
 
@@ -330,6 +342,10 @@ this unit's pass with gov's declared pair, and recorded in the unit's journal. N
   carriers' own tool contracts. The same read produced the negative for the keepalive carrier, which
   is the liveness of the probe. RESOLVED (agent, 2026-09-14, delegated): yes for the desktop pair —
   on-disk tasks, fired at next launch when due while closed — and no for the keepalive pair.
+- **F6** — How is a verbatim copy of the example's carrier placeholders caught? (a) Extend
+  `kit.toml`'s conf-placeholder discharge probe to both keys. (b) Ship the keys absent, so the render
+  placeholder survives. (b) removes the keys' documentation from the example. RESOLVED (agent,
+  2026-09-14, delegated): (a).
 - The rulings this unit executes: D12-i9 put a durable resume scheduler in this build, and the single
   owner turn ruled it on everywhere, the kit shipping it on and adopters opting out, recorded as a
   decision row — RESOLVED (owner, 2026-09-14).
@@ -338,6 +354,11 @@ this unit's pass with gov's declared pair, and recorded in the unit's journal. N
 
 - rev-1 · 2026-09-14 · initial draft. Adds one edge the brief's table does not list, consumes-from
   unit 1, reciprocating that spec's hands-off to this one.
+- rev-2 · 2026-09-14 · §2 S11 · §3 · §4 · §6 AC7 AC15 · §8 F6 · round-1 spec-audit fold (G1 M14,
+  with H2's and M11's consequences here). `kit.toml`'s conf-placeholder discharge probe extends to
+  `RESUME_SCHEDULE_(CREATE|DELETE)`, so a verbatim copy of the example reds (F6, AC15). Refusal rule
+  1 and AC7 point at the lease matrix, whose no-id row now refuses after the HELD unit restored KF7.
+  §3 names the held-suite baseline unit as the build's one unattended version move.
 
 ## 10. Reuse audit
 

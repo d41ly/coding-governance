@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier
 
-**Status:** SPECCED · rev-1 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 36
+**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 36
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
-| [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -26,9 +26,11 @@ one section the adopter runbook points at, and gate the part of it that can drif
 - **S1** A section in `tools/memory-tree/README.md`, "Backlog modes — authored shards and per-build
   asks", which the adopter runbook's switch section names as the home of the grammar, the verdicts
   and the status fold. It states the absent-key default, the row kinds with who writes each, the
-  fold's rules in their order, the verdict list, the ask clauses and READY, the print modes, and the
-  transition audit with a pointer to the recipe `migrate_backlog.py --recipe` prints rather than a
-  copy of it. Observed by AC1 and AC2.
+  fold's rules in their order, the verdict list, the ask clauses and READY, the print modes, the
+  signed-record shape `--plan --signed` and `--write` read — the header cells `Ask`, `Verdict` and,
+  on the triage record, `Field`, the columns each record carries, and the worksheet path and sha its
+  header names — and the transition audit with a pointer to the recipe
+  `migrate_backlog.py --recipe` prints rather than a copy of it. Observed by AC1 and AC2.
 - **S2** A drift arm in `gen_build_index.py --selftest`: every verdict id and every disposition kind
   the ask module's source declares must appear in that README section, and the arm prints the counts
   it compared, refusing when either count is zero. Observed by AC2.
@@ -56,7 +58,11 @@ one section the adopter runbook points at, and gate the part of it that can drif
   marker, and a kit an earlier unit of this build already moved in this landing range is not moved
   twice. The memory-tree constant follows `tools/memory-tree/check-verdict-epoch.sh`'s topological
   rule: its one bump for the landing range sits at or after the range's last engine change, which
-  this unit places here when no later unit moves an engine line. Observed by AC8.
+  this unit places here when no later unit moves an engine line. The memory-tree constant sits at
+  `tools/memory-tree/check-memory-hygiene.sh:20`, a file in the kickoff manifest's `watch:` list, so
+  the same commit re-reads the §B claims that file feeds and re-stamps `last-audit` in
+  `memory/guides/SESSION-KICKOFF.md` by the manifest's stamp rule, with a delta line in the commit
+  message. Observed by AC8 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -65,7 +71,8 @@ one section the adopter runbook points at, and gate the part of it that can drif
 - `memory/guides/BUILD-METHOD.md` is the carriers unit's and the method-carriers unit's; this unit
   only makes the kit README's explanation of M6 agree with whatever they leave.
 - The charter, `AGENTS.md` and the adopter runbook are the charter unit's and the runbook unit's.
-  The kickoff manifest's backlog claims are the switch-over's.
+  The kickoff manifest's backlog claims are the switch-over's; this unit only re-stamps `last-audit`
+  for its own watched edit (S7).
 - No rename of the `backlog-shards` inventory. Every dossier carries that field name, and renaming it
   would churn all of them to say what one comment can.
 - No change to what the ask module parses or decides. S2's arm reads its source and changes none of
@@ -73,6 +80,9 @@ one section the adopter runbook points at, and gate the part of it that can drif
 
 ### Edges
 
+- **consumes-from** `TOOL-dDerivedDocket-11` — the signed-record header cells its §4 pins, which the
+  README's signed-records row states.
+- **consumes-from** `TOOL-dDerivedDocket-33` — the signed record's shape, which the same row states.
 - **consumes-from** `TOOL-dDerivedDocket-34` — the switched tree the docs describe, with its views
   rendered and asks filed. Written before it, every sentence here would describe a tree that does
   not exist.
@@ -97,8 +107,9 @@ own source, not a promise.
 | the fold | its rules in order, order-free over sets, REOPEN cancelling a named record | prose, citing the fold function by name |
 | verdicts | each V-number with its one-line meaning | S2's arm, over the ids the module raises |
 | ask clauses | `seen`, `accept`, `may`, `out`, `verify`, READY, and `PROBE_ALLOW` | prose, citing the envelope unit's parser |
-| print modes | `--asks` with `--all`, `--json`, `--build`, `--ready`, `--tsv`, `--at` and `--probe`, and the `--new-build` scaffold | prose; a mode the generator lacks would fail AC1's walk |
+| print modes | `--asks` with `--all`, `--json`, `--build`, `--ready`, `--tsv`, `--at` and `--probe`, and the `--new-build` scaffold | prose, stating the argument each mode takes, that `--build`, `--ready` and `--at` qualify `--asks`, and that `--probe` refuses while `PROBE_ALLOW` is blank; every flag is resolved by AC1 |
 | stragglers | the transition audit, `--stragglers`, `--relocate`, `--ingest`, `--repair` | a pointer to `--recipe`, which is single-sourced |
+| signed records | the two records an owner signs, their header cells and columns, and the verbs that read them | prose, citing the planner unit's pinned cells and the signer unit's record shape |
 
 ### The drift arm
 
@@ -151,7 +162,9 @@ its name and gains a comment saying the files are authored shards or generated v
 and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md` and its render ·
 `memory/README.md` · `memory/map/features/memory-tree-backlog.md` (new) ·
 `memory/map/features/govkit.md` · `memory/map/features/memory-tree-merge-driver.md` ·
-`memory/map/baseline.toml` · `tools/codebase-map/map_extractors.py` · `memory/map/generated/`.
+`memory/map/baseline.toml` · `tools/codebase-map/map_extractors.py` · `memory/map/generated/` ·
+`tools/memory-tree/check-memory-hygiene.sh` (the version constant) ·
+`memory/guides/SESSION-KICKOFF.md` (the audit block).
 
 ### Alternatives rejected
 
@@ -179,25 +192,46 @@ and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md
 
 ## 6. Acceptance criteria
 
-- **AC1** — When each read-only print mode the README section names is run as
-  `python tools/memory-tree/gen_build_index.py <mode>` on the switched tree, it exits 0; the
-  `--new-build` scaffold, which writes, is matched by name against the generator's own usage text
-  instead of being run.
-  Red when: the section names a flag the generator does not have, which an adopter following the
-  runbook meets as an unknown-argument error.
+- **AC1** — When every flag the README section names for `tools/memory-tree/gen_build_index.py`
+  and for the migration tool beside it, `migrate_backlog.py` — the stragglers row's `--stragglers`,
+  `--relocate`, `--ingest`, `--repair` and `--recipe` included — is looked up in that tool's
+  `--help` output, each is listed; each argument-free print mode the section names runs as
+  `python tools/memory-tree/gen_build_index.py <mode>` on the switched tree and exits 0; the section
+  states the argument of every mode that takes one, the `--new-build` scaffold matched by name
+  against the generator's usage text instead of being run; and the section's signed-records row
+  names `Ask`, `Verdict` and `Field`.
+  Red when: the section names a flag or verb a tool lacks, `--straggler` for `--stragglers`, which an
+  adopter following the runbook meets as an unknown-argument error; or a mode that needs an argument
+  is run bare and reds a correct README; or the signed-records row is absent, so an adopter's
+  runbook step 3 points at a format nobody states.
 - **AC2** — When `python3 tools/memory-tree/gen_build_index.py --selftest` runs against a scratch copy
   of the README with one verdict's line deleted, the drift arm fails naming that verdict; on the real
   README it prints non-zero compared counts and passes.
   Red when: the arm reads verdict ids from the README instead of the module, so it can only confirm
   itself.
 - **AC3** — When `git ls-files tools/memory-tree` is compared with the README's "What's here" table,
-  every tracked kit file has a row, and the merge-driver block carries three attribute lines.
-  Red when: a file this build added under the kit, such as the transition audit module, has no row.
-- **AC4** — When `grep -n 'backlog shards' tools/workflows/tier2-review.js` runs, it finds the phrase
-  only inside the sentence naming the `mode` fallback, and `bash tools/check-install-prefix.sh`
-  passes.
-  Red when: the lens names the generator by a prefixed path, which the install-prefix gate refuses
-  for a file deployed verbatim.
+  every tracked kit file has a row, and the merge-driver block carries three attribute lines;
+  `grep -c 'changes nothing until' tools/memory-tree/README.md` finds the upgrade note naming
+  `BACKLOG_MODE`; the merge-driver section carries the sentence saying why the
+  `memory/backlog/*.md merge=rows` line stays; and every backticked token of M6 clause 3 in
+  `memory/guides/BUILD-METHOD.md` at this unit's commit occurs in the README's M6 clause-3 section.
+  Red when: a file this build added under the kit, such as the transition audit module, has no row;
+  or the README's M6 explanation disagrees with the build-method render while every other criterion
+  stays green.
+- **AC4** — When `grep -n -- '--asks --json'` runs over each of the five carriers —
+  `tools/workflows/tier2-review.js`, `tools/workflows/drift-audit-state.js`,
+  `tools/drift-audit/SKILL.template.md`, `tools/workflows/REVIEW-PROTOCOL.template.md` and
+  `tools/memory-recall/SKILL.template.md` — each prints a hit inside the sentence naming the `mode`
+  fallback, and each carrier's BASE phrase — `the backlog shards`
+  (`tools/workflows/tier2-review.js:315`), `the backlog rows`
+  (`tools/workflows/drift-audit-state.js:198`), `the OPEN backlog rows`
+  (`tools/drift-audit/SKILL.template.md:109`), `the open backlog`
+  (`tools/workflows/REVIEW-PROTOCOL.template.md:188`) and `DECISIONS.md` / `BACKLOG.md` index
+  (`tools/memory-recall/SKILL.template.md:91`) — occurs only inside that sentence; and
+  `bash tools/check-install-prefix.sh` passes.
+  Red when: one carrier keeps its BASE wording, so after the switch its agents read a view of live
+  asks only and miss every terminal ask and its reason, or a verbatim-deployed script names the
+  generator by a prefixed path.
 - **AC5** — When `bash tools/workflows/check-protocol-parity.test.sh`,
   `bash tools/memory-recall/adopt-memory-recall.sh --check` and
   `bash tools/drift-audit/adopt-drift-audit.sh --check` run, each rendered carrier matches its
@@ -216,10 +250,14 @@ and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md
   or after the range's last engine change.
   Red when: a marker is left behind its constant after a template edit, or the epoch bump lands
   before an engine line this unit moved.
+- **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs at this unit's commit, check 5
+  passes and the `last-audit` line in `memory/guides/SESSION-KICKOFF.md` differs from its parent's.
+  Red when: the version bump is committed without the re-stamp, which the staged leg's check 5
+  refuses at pre-commit because `tools/memory-tree/check-memory-hygiene.sh` is in `watch:`.
 
 ## 7. Gates
 
-`build-index selftest` · `review-protocol parity (kit vs dogfood)` · `memory-recall skill wiring` · `drift-audit wiring` · `workflow script syntax` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `memory hygiene` · `line length`
+`build-index selftest` · `review-protocol parity (kit vs dogfood)` · `memory-recall skill wiring` · `drift-audit wiring` · `workflow script syntax` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `memory hygiene` · `line length` · `kickoff-manifest ratchet`
 
 New arm: `tools/memory-tree/gen_build_index.py --selftest` · a scratch README missing one verdict line, and a module whose extraction yields nothing · the build-index selftest's arm count
 
@@ -239,6 +277,13 @@ New arm: `tools/memory-tree/gen_build_index.py --selftest` · a scratch README m
 
 - rev-1 · 2026-09-14 · initial draft. Adds one edge the brief's table does not list, hands-off the
   runbook unit, which declares the matching consumes-from.
+- rev-2 · 2026-09-14 · S1 · S7 · §3 · §4 · §7 · AC1 · AC3 · AC4 · AC9 · folds spec-audit round 1. G5 M8
+  (38): S7 re-stamps the kickoff manifest for the watched version edit, AC9, §7 gains
+  `kickoff-manifest ratchet`. G5 M25 (24): AC4 reads all five carriers. G5 M26 (25): AC1 resolves
+  every flag against `--help` and runs only argument-free modes. G5 L3 (27): AC3 reads the upgrade
+  note, the keep-the-line sentence and the M6 clause-3 tokens. G5 M15's unit-36 end: S1 and the
+  README table gain the signed-record shape, with consumes-from 11 and 33, two edges the brief's
+  table does not list.
 
 ## 10. Reuse audit
 
