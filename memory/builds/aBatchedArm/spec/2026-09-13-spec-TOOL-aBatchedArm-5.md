@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-14-build-TOOL-aBatchedArm-5-1-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-build-TOOL-aBatchedArm-5-2-closing-fix-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-5-2-closing-fix-ledger.md) | journal | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 |
+| [2026-09-15-build-TOOL-aBatchedArm-5-3-landing-ledger.md](../build/2026-09-15-build-TOOL-aBatchedArm-5-3-landing-ledger.md) | journal | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 |
 | [2026-09-14-prompt-TOOL-aBatchedArm-5-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-build-brief.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md) | journal | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 |
 | [2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md](../reviews/2026-09-14-review-TOOL-aBatchedArm-1-closing-diff-round1.md) | diff-review | TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 |

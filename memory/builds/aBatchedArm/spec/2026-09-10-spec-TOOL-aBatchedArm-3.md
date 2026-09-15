@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-build-TOOL-aBatchedArm-5-2-closing-fix-ledger.md](../build/2026-09-14-build-TOOL-aBatchedArm-5-2-closing-fix-ledger.md) | journal | TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 |
+| [2026-09-15-build-TOOL-aBatchedArm-5-3-landing-ledger.md](../build/2026-09-15-build-TOOL-aBatchedArm-5-3-landing-ledger.md) | journal | TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 |
 | [2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md](../prompts/2026-09-14-prompt-TOOL-aBatchedArm-5-closing-fix-brief.md) | journal | TOOL-aBatchedArm-5 TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 |
 | [2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md) | spec-audit | — |
