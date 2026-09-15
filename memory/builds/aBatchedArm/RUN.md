@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: 1 parked: TOOL-aBatchedArm-1 S2 (which groups, from what expected set) — surfaced to the owner 2026-09-14 and ruled: convert the nineteen candidate groups, goldens pasted from the observed run at the final pass; fourteen converted, five refused with reasons in the pass-2 ledger, the sets pasted at 7549981a
+keepalive-reaped: recorded c1d67ccd died with the 2026-09-15 02:31 Windows Update reboot (CronDelete: no scheduled job with that id; CronList empty on resume); the replacement cbb666f3 scheduled at resume was reaped before this close (CronDelete: cancelled; CronList: no scheduled jobs)
 witness: 0bda01304f3dda643cfcbf9444f886e84c0ea810
 phase: VERIFYING
 branch-sha: c2db2f5d2d6100af08a09da113086d114c67b603
