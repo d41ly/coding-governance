@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes
 keepalive-reaped: yes
 witness: 0bda01304f3dda643cfcbf9444f886e84c0ea810
-phase: VERIFYING
+phase: LANDING
 branch-sha: c2db2f5d2d6100af08a09da113086d114c67b603
 branch-ref: refs/heads/branch/unattended-checks-performance-a37d8d
 mode: prompt
