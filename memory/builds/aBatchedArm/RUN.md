@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: 1 parked: TOOL-aBatchedArm-1 S2 (which groups, from what expected set) — surfaced to the owner 2026-09-14 and ruled: convert the nineteen candidate groups, goldens pasted from the observed run at the final pass; fourteen converted, five refused with reasons in the pass-2 ledger, the sets pasted at 7549981a
-keepalive-reaped: recorded c1d67ccd died with the 2026-09-15 02:31 Windows Update reboot (CronDelete: no scheduled job with that id; CronList empty on resume); the replacement cbb666f3 scheduled at resume was reaped before this close (CronDelete: cancelled; CronList: no scheduled jobs)
+parked-surfaced: yes
+keepalive-reaped: yes
 witness: 0bda01304f3dda643cfcbf9444f886e84c0ea810
 phase: VERIFYING
 branch-sha: c2db2f5d2d6100af08a09da113086d114c67b603
@@ -106,3 +106,7 @@ closed vocabulary `measured <n>s on node a <date>, direct serial run …`, so `-
 2026-09-15T11:14:16Z rescope · item add TOOL-aBatchedArm-2 · reason LATE record at the landing: this unit was specced under M2 on 2026-09-10 in the commits after the run's first live-phase commit d5e301f5 (unit 1's spec), so the roster the run entered BUILDING with held unit 1 alone; check 24's ADD arm named the gap at the final gate pass and the row is written now rather than the record left contradicting the roster it built
 
 2026-09-15T11:14:18Z rescope · item add TOOL-aBatchedArm-3 · reason LATE record at the landing: this unit was specced under M2 on 2026-09-10 in the commits after the run's first live-phase commit d5e301f5 (unit 1's spec), so the roster the run entered BUILDING with held unit 1 alone; check 24's ADD arm named the gap at the final gate pass and the row is written now rather than the record left contradicting the roster it built
+
+2026-09-15T11:27:40Z review · item aBatchedArm · reason verdict BLOCKED · blockers 13
+
+2026-09-15T11:27:40Z review · item aBatchedArm · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
