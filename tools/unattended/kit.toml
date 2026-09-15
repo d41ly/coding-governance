@@ -134,15 +134,16 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `tools/unattended/` is not done until this prints GREEN and the verdict is in the landing report:
+# `tools/unattended/` is not done until this prints parity GREEN and the verdict is in the landing report:
 #
-#     bash tools/unattended/run-unattended-gates.sh --serial        # the self-tests, each graded; --pooled after calibration
-#     bash tools/unattended/run-unattended-gates.sh --all --serial  # and the legs beside them; --pooled after calibration
+#     bash tools/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
+#     bash tools/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
 #
 # The mode is DECLARED and never defaulted (TOOL-aBatchedArm-4): a route reaching the self-tests
 # with neither `--serial` nor `--pooled` refuses. `--pooled` runs them through the shared runner's
-# bounded pool and withholds every cost verdict; it is landed dark, named by no DoD command until
-# the bound it inherits is sound (`TOOL-aBatchedArm-5`).
+# bounded pool, withholds every cost verdict and grades PARITY against the runner's calibrated
+# pooled evidence, taken on node a 2026-09-15 (`TOOL-aBatchedArm-5`); the on-demand cost reading
+# is the serial mode, which grades each suite against its budget.
 #
 # There is no gate behind that sentence. A kit edit that guts a check now lands green unless a person
 # runs it, and this file is where that trade is recorded as having been made deliberately.

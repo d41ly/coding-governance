@@ -24,7 +24,7 @@
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
 # nothing runs the self-tests automatically. A change under this directory that guts a check lands
 # green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `tools/unattended/` is a GREEN verdict from `run-unattended-gates.sh --selftests --serial` (--pooled after calibration) pasted
+# `tools/unattended/` is a GREEN parity verdict from `run-unattended-gates.sh --selftests --pooled` pasted
 # into the landing report. The mode is DECLARED (TOOL-aBatchedArm-4): --serial grades each suite
 # against its budget, --pooled runs them through the runner's pool and withholds every cost verdict,
 # and a route that reaches the self-test half with neither REFUSES rather than defaulting.
@@ -189,8 +189,8 @@ done
 # the caller who reads only the exit code is told what to type rather than what went wrong.
 if [ "$ONLY" != checks ] && [ -z "$MODE" ]; then
   echo "run-unattended-gates: no execution mode was given, and every route to the self-test half (bare, --selftests, --all) declares --serial or --pooled:" >&2
-  echo "run-unattended-gates:   --serial   each suite alone, graded against its budget — the recorded DoD path" >&2
-  echo "run-unattended-gates:   --pooled   the runner's bounded pool, every cost verdict withheld" >&2
+  echo "run-unattended-gates:   --serial   each suite alone, graded against its budget — the on-demand cost reading" >&2
+  echo "run-unattended-gates:   --pooled   the runner's bounded pool, parity against the calibrated evidence — the recorded DoD path" >&2
   echo "run-unattended-gates: --checks takes no mode. Nothing was run." >&2
   exit 2
 fi

@@ -23,8 +23,8 @@
 # WHAT THIS COSTS, said plainly rather than discovered later. Nothing exercises the kit self-tests
 # automatically any more, at any boundary. A change under a kit directory that guts a check lands
 # green. The compensating check is a person running them, and the DoD for work touching a kit is a
-# GREEN verdict pasted into the landing report:
-#     bash tools/unattended/run-unattended-gates.sh --selftests --serial   # --pooled after calibration (TOOL-aBatchedArm-5)
+# GREEN parity verdict pasted into the landing report (the pooled evidence bound, TOOL-aBatchedArm-5):
+#     bash tools/unattended/run-unattended-gates.sh --selftests --pooled
 #     GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
 # It also costs the drift detection TOOL-aBoundedCeiling-10 filed: a held leg stops reporting when it
 # breaks, and two such reds were found on main in one session. That row is the follow-up.
