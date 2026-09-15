@@ -399,8 +399,11 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
   # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
   # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
   # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
+  # DISPDATE overrides it for the arms that grade a record against the driver's FOLD_CUTOFF, which
+  # the default of 2026-09-01 predates: a fold-beside-blockers row at that date is the grandfathered
+  # population, and the red arm has to commit AT the cutoff to be graded by the rule.
   git add -A >/dev/null 2>&1
-  GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
+  GIT_COMMITTER_DATE="${DISPDATE:-2026-09-01T12:00:00 +0000}" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
 }
 drop_readme()  { rm -f memory/builds/tRun/README.md; }
 break_fm()     { printf 'not front matter at all\n\n# tRun\n' > memory/builds/tRun/README.md; }
@@ -1104,11 +1107,59 @@ reset_tree
 D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
 D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
 
-# A FOLD-ONLY EXIT DEMANDS NOTHING, and the region does not grow. Under the old predicate this same
-# fixture redded, which is the whole defect: a run that folded correctly was graded as though it had
-# promoted.
+# A FOLD BESIDE A NON-ZERO BLOCKER COUNT IS A REFUSAL (closing review of aProbedUnit, cluster C).
+# This fixture used to be the green "a fold-only exit demands nothing" control, and that was the
+# hole: `review_state` returns CONVERGED for count 0, so a NON-CONVERGENT row stands on a blocker,
+# the severity rule promotes every blocker, and `blockers 2 · disposition fold` was two blockers left
+# standing under a field the clause read as demanding nothing. The driver refuses the row at write
+# time now; the leg reds one first-committed AT OR AFTER the driver's FOLD_CUTOFF, so the record is
+# committed at that date. At base this fixture printed no check 2 line.
 reset_tree; dispconf 2000-01-01
-mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was"
+
+# ...AND THE RULE HAS ITS OWN CUTOFF (closing review of aProbedUnit, round 2, cluster A — the
+# BLOCKER). Graded under DISPOSITION_CUTOFF alone, the clause above redded sixteen tracked
+# append-only records this repo's own driver wrote while `fold` was legal at every terminal exit,
+# and no verb can rewrite them. A record first-committed BEFORE FOLD_CUTOFF carrying the same row is
+# read as the contract that accepted it read it — demanding nothing — and one AT the cutoff is
+# graded by the rule. The pair is BOUNDED, the exit the kit default produces.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition fold\n'
+hit "$(run)" "record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF"
+
+# ...and a FOLD_CUTOFF the leg cannot read is named, not defaulted: empty sorts before every date
+# and reds the whole grandfathered population, malformed sorts after and disarms the clause. Named
+# inside check 2's own failure rather than at a `fail` site of its own, because the pinned check-2
+# ordinals in memory/project/unarmed-branches.txt sit below the read.
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^FOLD_CUTOFF=.*|FOLD_CUTOFF=2026-09-15|'
+hit "$(run)" "the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none"
+
+# ...and a fold beside ZERO blockers still demands nothing: nothing above MEDIUM stood, so nothing
+# was owed a unit. Written by hand — the driver reaches CONVERGED at 0 and never NON-CONVERGENT —
+# which is exactly the population this clause grades.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+
+# A CONVERGED ROW RECORDING `promote` OWES AN ID (cluster C, id 12). The severity rule disposes the
+# HIGHS that stood at zero blockers, the driver records the promotion on the converged row, and
+# `needs` never read a CONVERGED row — so a promotion the harness performed was invisible to the bar
+# and a missing unit passed. At base the first fixture printed no check 2 line.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote\n'
+hit "$(run)" "1 subject(s) EXITED recording disposition promote and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+# ...its green control: the id present, the row passes.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+# ...and a CONVERGED row with NO field is still the ordinary converged round and demands nothing.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED\n'
 miss "$(run)" "check 2 FAILED"
 
 # ...and the GREEN CONTROL for it: the same fixture with the disposition stripped is a REFUSAL, not a
@@ -1126,6 +1177,18 @@ hit "$(run)" "EXITED recording disposition promote and the generated units regio
 # ...and its green control: the same promote exit WITH the id present passes.
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+
+# ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
+# ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
+# ---- regex did not know the token, so a bounded promote owed nothing and the exit was green by
+# ---- absence. The `term` half cannot be discriminated by a driver-written record — the driver writes
+# ---- BOUNDED only on a strictly smaller count and the stalled-loop clause needs a flat one.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED\n'
+hit "$(run)" "record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
 
 # AN ILLEGAL VALUE IS ITS OWN REFUSAL, and `promoted` is the near-miss a hand-editor actually types —
@@ -3403,6 +3466,10 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- merged arms), every floor below ~3 % under its reading, FLOOR_SHARD_8 now a READING and not
 # ---- a derivation. The unsharded floor is the sum's discount; no unsharded run was taken at this
 # ---- pass, and the eight-shard partition is the pooled route's own reading.
+# ---- MERGED 2026-09-15 with main's +10 assertions (aProbedUnit: four check-2 disposition fixtures,
+# ---- two BOUNDED check-2 fixtures, and the round-2 trio with its `mutate`, all in main's old
+# ---- region one's check-2 block and region two); every floor below stays a MINIMUM the counts
+# ---- rose past, and all nine are re-read from the post-merge shard runs at the landing.
 FLOOR_ASSERTIONS=559
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning

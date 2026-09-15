@@ -30,10 +30,19 @@ FIX_HOME='/c/Users/fixtureuser'
 FIX_PROFILE='C:\Users\fixtureuser'
 FIX_TEMP='C:\Users\FIXTUR~1\AppData\Local\Temp'
 
-# run <name> <expected_exit> <command-text> [tool] — the payload is BUILT, never hand-spliced;
+# run <name> <expected_exit> <command-text> [tool] [pre] — the payload is BUILT, never hand-spliced;
 # an unescaped backslash in a Windows path is the top JSON breaker and every arm here carries one.
+#
+# THE FIFTH ARGUMENT IS JAVASCRIPT ON process.env, NEVER `env` WORDS. An arm that needs TEMP=/tmp,
+# or TEMP unset, cannot hand that through the shell on a Git-Bash host: the MSYS runtime rewrites a
+# POSIX-shaped value for native node.exe (`TEMP=/tmp node -e ...` prints the TEMP path, measured
+# 2026-09-14 on node `a`, and MSYS2_ENV_CONV_EXCL does not stop it), and GNU `env` refuses `-u` after
+# an assignment. So the prelude runs INSIDE node, where MSYS cannot reach, and the hook runs as that
+# node's child with stdin, stdout and stderr inherited — main(), the stdin parse and renderDeny all
+# run, and every sentence assertion below still reads the hook's own stderr. `?? 1` because
+# process.exit(null) exits 0 on node 22, and a signal-killed hook must not read as an allow.
 run() {
-  local name=$1 want=$2 cmd=$3 tool=${4:-Bash}
+  local name=$1 want=$2 cmd=$3 tool=${4:-Bash} pre=${5:-}
   local payload got
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":sys.argv[1],"tool_input":{"command":sys.argv[2]}}))' "$tool" "$cmd")
   # THE LIVENESS GUARD. The hook exits 0 on unparseable stdin by design, so a builder that produced
@@ -42,7 +51,7 @@ run() {
   case "$payload" in *'"command"'*) ;; *) echo "FAIL $name (the payload builder produced nothing)"; fail=$((fail+1)); return;; esac
   printf '%s' "$payload" \
     | HOME="$FIX_HOME" USERPROFILE="$FIX_PROFILE" TEMP="$FIX_TEMP" TMP="$FIX_TEMP" TMPDIR= \
-      node "$HOOK" >/dev/null 2>"$TMP/err"
+      node -e "$pre;const r=require('child_process').spawnSync(process.execPath,[process.argv[1]],{stdio:'inherit'});process.exit(r.status??1)" "$HOOK" >/dev/null 2>"$TMP/err"
   got=$?
   if [ "$got" = "$want" ]; then echo "ok   $name (exit $got)"; pass=$((pass+1))
   else echo "FAIL $name (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
@@ -94,9 +103,9 @@ run "touch -> deny"                               2 'touch ~/.a'
 run "mkdir -> deny"                               2 'mkdir -p ~/.gov-push'
 run "  near-miss: mkdir in repo -> allow"         0 'mkdir -p memory/builds/x'
 run "cp destination -> deny"                      2 'cp memory/x.md ~/.backup.md'
-run "cp home-rooted SOURCE -> allow"              0 'cp ~/.merge-bar.log /tmp/inv/'
+run "cp home-rooted SOURCE -> allow"              0 'cp ~/.merge-bar.log memory/inv/'
 run "mv destination -> deny"                      2 'mv memory/x.md ~/.backup.md'
-run "mv home-rooted SOURCE -> allow"              0 'mv ~/.merge-bar.log /tmp/inv/'
+run "mv home-rooted SOURCE -> allow"              0 'mv ~/.merge-bar.log memory/inv/'
 run "rsync destination -> deny"                   2 'rsync -a memory/ ~/.mirror/'
 
 # ---- the DRIVE-ROOT rule. The home rule above was scoped to home, so everything outside it was
@@ -107,7 +116,8 @@ run "drive-root mkdir -> deny"                    2 'mkdir -p /c/gvi'
 run "drive-root redirect -> deny"                 2 'echo x > /c/temp-hyg.txt'
 run "drive-root windows spelling -> deny"         2 'mkdir C:/gvi'
 run "drive-root cp DESTINATION -> deny"           2 'cp memory/x.md /c/scratch/inv/'
-run "  near-miss: /tmp is a real root -> allow"   0 'echo x > /tmp/hyg.txt'
+run "/tmp write -> deny (the 2026-09-14 ruling)"  2 'echo x > /tmp/hyg.txt'
+run "  near-miss: under the fixture TEMP -> allow" 0 'echo x > C:/Users/FIXTUR~1/AppData/Local/Temp/hyg.txt'
 run "  near-miss: under a project -> allow"       0 'echo x > /c/projects/incms/f.txt'
 run "  near-miss: windows dir -> allow"           0 'echo x > /c/Windows/Temp/f.txt'
 run "  near-miss: /dev/null -> allow"             0 'echo hi > /dev/null'
@@ -127,6 +137,112 @@ run "TEMP write, LONG spelling -> allow"          0 'echo x > C:/Users/fixtureus
 run "TEMP write, msys spelling -> allow"          0 'echo x > /c/Users/fixtureuser/AppData/Local/Temp/a.log'
 run "scratchpad under TEMP -> allow"              0 'cat > /c/Users/fixtureuser/AppData/Local/Temp/claude/x/s.md'
 run "sibling of TEMP -> deny"                     2 'echo x > /c/Users/fixtureuser/AppData/Local/Tempest/a.log'
+
+# ---- the three rules TOOL-aProbedUnit-5 added: an EMPTY temp variable, /tmp, and POSIX-root litter.
+# ---- Every denial below exited 0 against the hook at base 1b000d1a, measured 2026-09-14 on node
+# ---- `a`; the controls exit 0 at base and at the tip. Adjacent rules are told apart by the KIND
+# ---- SENTENCE in stderr, never by exit status — every denial exits 2 — so a boundary arm asserts
+# ---- the sentence it expects AND the absence of its neighbour's.
+PRE_TMP='process.env.TEMP="/tmp";process.env.TMP="/tmp";delete process.env.TMPDIR'
+PRE_NONE='delete process.env.TMPDIR;delete process.env.TMP;delete process.env.TEMP'
+SENT_TMP='/tmp is not a sanctioned destination'
+SENT_POSIX='POSIX_ROOT_CONVENTIONAL'
+
+# rule 1, `empty-var`: `cp x $TMPDIR/y` with TMPDIR empty lands at `/y`. The fixture prefix already
+# pins TMPDIR empty and TEMP set; the allow half needs TMPDIR NON-empty, which only the prelude can do.
+run "\$TMPDIR EMPTY -> deny (the write lands at /)" 2 'cp x $TMPDIR/y'
+case "$(cat "$TMP/err")" in
+  *'$TMPDIR is EMPTY'*'lands at the filesystem root'*) echo "ok   the empty-var deny names \$TMPDIR and says where the bytes land"; pass=$((pass+1)) ;;
+  *) echo "FAIL the empty-var deny does not name the variable, or does not say the write lands at the root"; fail=$((fail+1)) ;;
+esac
+case "$(cat "$TMP/err")" in
+  *"BLOCKED by scratch-guard"*'$TMPDIR/y'*"appdata/local/temp"*) echo "ok   the empty-var deny keeps the BLOCKED prefix, the target and a resolved root"; pass=$((pass+1)) ;;
+  *) echo "FAIL the empty-var deny dropped the shared prefix, the target or the roots list"; fail=$((fail+1)) ;;
+esac
+run "  \$TMPDIR set through the prelude -> allow"  0 'cp x $TMPDIR/y' Bash 'process.env.TMPDIR="C:/Users/FIXTUR~1/AppData/Local/Temp"'
+run "\${TEMP} UNSET -> deny"                      2 'echo x > ${TEMP}/y' Bash 'delete process.env.TEMP'
+case "$(cat "$TMP/err")" in
+  *'$TEMP is EMPTY'*) echo "ok   the braced spelling is matched and the deny names \$TEMP"; pass=$((pass+1)) ;;
+  *) echo "FAIL the \${TEMP} deny does not name TEMP"; fail=$((fail+1)) ;;
+esac
+run "  \$TEMP set -> allow (expands under the TEMP root)" 0 'echo x > $TEMP/a.log'
+run "  same-command TMP= assignment -> allow"    0 'TMP=$(mktemp -d); echo x > $TMP/f' Bash 'delete process.env.TMP'
+run "\${TMPDIR:-/tmp} default expands -> deny (tmp)" 2 'echo x > ${TMPDIR:-/tmp}/y'
+case "$(cat "$TMP/err")" in
+  *"$SENT_TMP"*) echo "ok   the expanded default reached the tmp rule"; pass=$((pass+1)) ;;
+  *) echo "FAIL the default form was denied by some rule other than tmp, or not expanded"; fail=$((fail+1)) ;;
+esac
+
+# rule 2, `tmp`: denied by the 2026-09-14 ruling even on a Git-Bash host where /tmp maps onto TEMP.
+run "/tmp/hyg -> deny (tmp)"                      2 'echo x > /tmp/hyg'
+case "$(cat "$TMP/err")" in
+  *"BLOCKED by scratch-guard"*'/tmp/hyg'*"appdata/local/temp"*"$SENT_TMP"*) echo "ok   the tmp deny names the scratchpad and keeps the prefix, the target and a root"; pass=$((pass+1)) ;;
+  *) echo "FAIL the tmp deny is missing its sentence, the prefix, the target or the roots list"; fail=$((fail+1)) ;;
+esac
+# THE /tmp BOUNDARY. `/tmpx` is four characters, absent from POSIX_ROOT_CONVENTIONAL and not `/tmp`:
+# rule 3 claims it whatever rule 2 does, so an exit-0 control here would be red at a correct tip.
+run "/tmpx/hyg -> deny (posix-root, NOT tmp)"     2 'echo x > /tmpx/hyg'
+case "$(cat "$TMP/err")" in
+  *"$SENT_TMP"*) echo "FAIL a bare startsWith('/tmp') gave /tmpx the tmp sentence"; fail=$((fail+1)) ;;
+  *"$SENT_POSIX"*) echo "ok   /tmpx carries the posix-root sentence and not the tmp one"; pass=$((pass+1)) ;;
+  *) echo "FAIL /tmpx was denied with neither the tmp nor the posix-root sentence"; fail=$((fail+1)) ;;
+esac
+# The exception is keyed on os.tmpdir(), not on the literal: under the fixture TEMP the derived
+# tmpdir is NOT /tmp, so /tmp/claude is just another /tmp write.
+run "/tmp/claude/x under the fixture env -> deny" 2 'echo x > /tmp/claude/x'
+case "$(cat "$TMP/err")" in
+  *"$SENT_TMP"*) echo "ok   /tmp/claude is denied when os.tmpdir() is not /tmp"; pass=$((pass+1)) ;;
+  *) echo "FAIL /tmp/claude was denied for a reason other than tmp"; fail=$((fail+1)) ;;
+esac
+
+# rule 2's exception, `<os.tmpdir()>/claude`, DERIVED under the emptied environment rather than pinned.
+# On a POSIX host that derives /tmp and proves the new root; on a Windows node it derives
+# C:\Windows\temp, under a conventional drive root, and this arm is a CONTROL that says so.
+sg_derived=$(node -e "$PRE_NONE;console.log(require('os').tmpdir())")
+run "<os.tmpdir()>/claude under the emptied env -> allow (a proof only where that derives /tmp; a control under a conventional drive root, as on every Windows node)" 0 "echo x > $sg_derived/claude/x" Bash "$PRE_NONE"
+# THE DISCRIMINATING PAIR, and the one half of this rule that can fail on every registered node.
+# With TEMP=/tmp and TMP=/tmp handed INSIDE node, os.tmpdir() derives /tmp on Windows and POSIX
+# alike, the new root is /tmp/claude, and no other root covers /tmp because a /tmp-valued variable
+# contributes none. The LIVENESS assertion first: a runtime that rewrites the value reports itself
+# by name instead of a deny for the wrong reason. Its red is the shell-prefix form, which prints TEMP.
+sg_probe=$(node -e "$PRE_TMP;console.log(require('os').tmpdir())")
+case "$sg_probe" in
+  /tmp)
+    echo "ok   the prelude reaches the hook: os.tmpdir() derives /tmp inside node"; pass=$((pass+1))
+    run "os.tmpdir()=/tmp: /tmp/claude/x -> allow (the scratch base inside the denied prefix)" 0 'echo x > /tmp/claude/x' Bash "$PRE_TMP"
+    run "os.tmpdir()=/tmp: /tmp/other -> deny (a /tmp-valued TEMP joins no root)" 2 'echo x > /tmp/other' Bash "$PRE_TMP"
+    case "$(cat "$TMP/err")" in
+      *"$SENT_TMP"*) echo "ok   /tmp/other under TEMP=/tmp carries the tmp sentence"; pass=$((pass+1)) ;;
+      *) echo "FAIL /tmp/other under TEMP=/tmp was denied for a reason other than tmp"; fail=$((fail+1)) ;;
+    esac
+    # THE EXPANSION ARM. Every other set temp variable in this suite is itself an allowed root, so
+    # `$TEMP/a.log` is allowed whether or not the variable expands, and the expansion branch of
+    # `buildResolvedTarget` had no arm that could red it: dropping `env[t[1]] ||` from it left the
+    # suite green (closing diff review round 1, cluster K). Here TEMP is the one value that is NOT
+    # a root, so `$TEMP/other` is denied by the tmp rule only if the variable expanded to /tmp —
+    # unexpanded it is an unresolved token that no rule claims, and the arm reads exit 0.
+    run "TEMP=/tmp: \$TEMP/other expands and is denied (tmp)" 2 'echo x > $TEMP/other' Bash "$PRE_TMP"
+    case "$(cat "$TMP/err")" in
+      *"$SENT_TMP"*) echo "ok   \$TEMP/other under TEMP=/tmp expanded and carries the tmp sentence"; pass=$((pass+1)) ;;
+      *) echo "FAIL \$TEMP/other under TEMP=/tmp was denied for a reason other than tmp, or not expanded"; fail=$((fail+1)) ;;
+    esac ;;
+  *) echo "FAIL the prelude did not reach the hook: os.tmpdir() derived '$sg_probe', not /tmp, so the discriminating pair grades nothing"; fail=$((fail+1)) ;;
+esac
+
+# rule 3, `posix-root`: a new top-level entry at the POSIX root, the drive rule's shape without a
+# drive letter. Four targets in 55,231 real Bash calls, every one agent throwaway.
+run "posix-root mkdir -> deny"                    2 'mkdir -p /mir/x'
+case "$(cat "$TMP/err")" in
+  *"BLOCKED by scratch-guard"*'/mir/x'*"appdata/local/temp"*"$SENT_POSIX"*) echo "ok   the posix-root deny names its set and keeps the prefix, the target and a root"; pass=$((pass+1)) ;;
+  *) echo "FAIL the posix-root deny is missing its sentence, the prefix, the target or the roots list"; fail=$((fail+1)) ;;
+esac
+run "  near-miss: /dev/null -> allow"             0 'echo x > /dev/null'
+run "  near-miss: /c/projects/x is the drive rule's -> allow" 0 'echo x > /c/projects/x'
+run "  near-miss: /usr/local/x is conventional -> allow" 0 'mkdir -p /usr/local/x'
+# The macOS near-miss: `/Users` is where every macOS home lives, and the set held `private` and
+# `volumes` without it, so this write was denied as new top-level litter on every macOS host
+# (closing diff review round 1, cluster J). Red against the hook before `users` joined the set.
+run "  near-miss: /Users/Shared/f is a macOS root -> allow" 0 'echo x > /Users/Shared/f'
 
 # ---- the two views: a quoted operator is invisible, a quoted target still resolves ----------------
 # Without the blanking, the guard denies the commit message describing it — including this build's.
@@ -502,7 +618,10 @@ n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. An arm stranded
 # past an early exit is invisible to grep and to a reader; only the total moves. Lower it in a
 # reviewed diff or not at all.
-FLOOR_ASSERTIONS=134
+# 164 = 134 (the suite as landed by aReplayedCard) + the 27 assertions TOOL-aProbedUnit-5 added (26 in
+# its block, 1 from re-targeting the /tmp near-miss) + the 3 its round-1 fold added (clusters J and K).
+# The pin sits alone on its line because the testsuite-counts leg reads it anchored.
+FLOOR_ASSERTIONS=164
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
