@@ -100,3 +100,7 @@ closed vocabulary `measured <n>s on node a <date>, direct serial run …`, so `-
 2026-09-14T16:04:55Z review · item TOOL-aBatchedArm-1 · reason verdict BLOCKED · blockers 4
 
 2026-09-14T17:45:59Z review · item TOOL-aBatchedArm-1 · reason verdict CLEAN · blockers 0 · CONVERGED
+
+2026-09-15T11:14:16Z rescope · item add TOOL-aBatchedArm-2 · reason LATE record at the landing: this unit was specced under M2 on 2026-09-10 in the commits after the run's first live-phase commit d5e301f5 (unit 1's spec), so the roster the run entered BUILDING with held unit 1 alone; check 24's ADD arm named the gap at the final gate pass and the row is written now rather than the record left contradicting the roster it built
+
+2026-09-15T11:14:18Z rescope · item add TOOL-aBatchedArm-3 · reason LATE record at the landing: this unit was specced under M2 on 2026-09-10 in the commits after the run's first live-phase commit d5e301f5 (unit 1's spec), so the roster the run entered BUILDING with held unit 1 alone; check 24's ADD arm named the gap at the final gate pass and the row is written now rather than the record left contradicting the roster it built
