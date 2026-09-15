@@ -3467,16 +3467,18 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- a derivation. The unsharded floor is the sum's discount; no unsharded run was taken at this
 # ---- pass, and the eight-shard partition is the pooled route's own reading.
 # ---- MERGED 2026-09-15 with main's +10 assertions (aProbedUnit: four check-2 disposition fixtures,
-# ---- two BOUNDED check-2 fixtures, and the round-2 trio with its `mutate`, all in main's old
-# ---- region one's check-2 block and region two); every floor below stays a MINIMUM the counts
-# ---- rose past, and all nine are re-read from the post-merge shard runs at the landing.
-FLOOR_ASSERTIONS=559
+# ---- two BOUNDED check-2 fixtures, and the round-2 trio with its `mutate`), which all landed in
+# ---- REGION 2 of this partition. RE-READ the same day, node a, from the eight direct shard runs on
+# ---- a frozen clone at a117faeb, 8-wide on an idle box (517-922 s each): 83 · 69 · 40 · 78 · 64 ·
+# ---- 78 · 95 · 80 (sum 587 = 577 + the ten), FAIL union still the 21-line oracle, no check_emitted
+# ---- red; FLOOR_SHARD_2 and FLOOR_ASSERTIONS re-read ~3 % under, the other seven unchanged.
+FLOOR_ASSERTIONS=569
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
 FLOOR_SHARD_1=80
-FLOOR_SHARD_2=57
+FLOOR_SHARD_2=67
 FLOOR_SHARD_3=38
 FLOOR_SHARD_4=75
 FLOOR_SHARD_5=62
