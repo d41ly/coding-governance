@@ -41,9 +41,9 @@ leg's source rule, the Skill's routing and the class record.
   `check_time_sources` refuses, naming the slot, a key `scan_time_slots` returns with no entry, a source
   outside `TIME_SOURCES`, and an entry keyed to no slot. Observed by AC1.
 - **S2** Moved to `TOOL-dLoggedFlight-22` S1. NOT OBSERVED here: that unit's AC1 observes it.
-- **S3** Moved. The commitment went to `TOOL-dLoggedFlight-21` S1 to S4, and the window, the duration
-  and the two provenance facts went to `TOOL-dLoggedFlight-24` S1 to S3. NOT OBSERVED here: those
-  units' AC1 to AC4 observe it.
+- **S3** Moved. The commitment went to `TOOL-dLoggedFlight-21` S1 to S4, the window and the duration to
+  `TOOL-dLoggedFlight-24` S1 and S2, and the two provenance facts on to `TOOL-dLoggedFlight-25` S1. NOT
+  OBSERVED here: unit 21's AC1 to AC4, unit 24's AC1 and AC4, and unit 25's AC1, AC2 and AC5 observe it.
 - **S4** Moved to `TOOL-dLoggedFlight-22` S2. NOT OBSERVED here: that unit's AC2 observes it.
 - **S5** Moved to `TOOL-dLoggedFlight-22` S3. NOT OBSERVED here: that unit's AC3 observes it.
 - **S6** Moved to `TOOL-dLoggedFlight-23` S1 to S5. NOT OBSERVED here: that unit's AC1 to AC4 observe
@@ -183,13 +183,14 @@ none
   sentence, with a consumes-from edge to `TOOL-dLoggedFlight-12`. L1: S9 and AC8 rewrite the gotcha's fix
   section, and Files touched names it. The order moves from 20 to 24, so `-21`, `-24` and `-22` land
   first.
-- rev-3 · 2026-09-16 · AC5 · folded M5 of the spec audit of units 21 to 24, round 1, whose subjects did
+- rev-3 · 2026-09-16 · AC5 · S3 · folded M5 of the spec audit of units 21 to 24, round 1, whose subjects did
   not include this unit. `TOOL-dLoggedFlight-22` removes the `verb` layout, and `check_table_row` refuses a
   row whose kind has no layout under rule `cell` before any class check (`tools/runlog/record.py:1141-1145`
   at `f7bf9d2f`), so a verb row could not tell the source rule from that refusal. AC5's fixture is a kept
   `commit` row sourced `driver`, and its Red-when names the rule. The order moves from 24 to 27, after
   `TOOL-dLoggedFlight-25`, `-26` and `-27` are inserted before it. Because this rev moved by a review
-  that did not audit this unit, the spec is unreviewed again under BUILD-METHOD M4.
+  that did not audit this unit, the spec is unreviewed again under BUILD-METHOD M4. S3's pointer names
+  where the provenance facts went once `TOOL-dLoggedFlight-25` took them from unit 24.
 
 ## 10. Reuse audit
 

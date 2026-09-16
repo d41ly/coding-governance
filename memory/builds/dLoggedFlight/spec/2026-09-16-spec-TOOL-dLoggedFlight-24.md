@@ -76,7 +76,7 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 - **consumes-from** `TOOL-dLoggedFlight-10` — `check_run_states`' git-only window, which S1 copies and
   AC1 compares.
 - **hands-off** `TOOL-dLoggedFlight-20` — its rev-1 S3 window clause and M1's provenance facts, which
-  moved here.
+  moved here; the provenance facts moved on to `TOOL-dLoggedFlight-25`.
 - **hands-off** `TOOL-dLoggedFlight-25` — S3 and S4 with AC2 and AC3: the provenance facts and the
   window's stability, observed over real models at each render placement.
 - **hands-off** `TOOL-dLoggedFlight-22` — the Summary window with no journal time, which must land
