@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 25
+**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -48,8 +48,10 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 
   Each sentinel differs from every commit time and run-state row time in the fixture, and from each
   such time plus any difference of two such times, plus zero or one second, and its clock time differs
-  from every public time's. The arm asserts that choice before it grades, so a coincidence in the
-  fixture cannot fail it. Observed by AC1 and AC3.
+  from every public time's. No difference of two sentinels, and no sentinel less a public time, equals
+  a non-negative difference of two public times, since the renderer computes `duration` as end less start
+  (`tools/runlog/record.py:624`) and S3's duration rule accepts any public difference. The arm asserts
+  that choice before it grades, so a coincidence in the fixture cannot fail it. Observed by AC1 and AC3.
 - **S3** The token rule. Over the markdown and the Data twin, where a public time is a fixture commit's
   committer time or a run-state row's time:
   - every `utc` token equals a public time;
@@ -86,6 +88,8 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   column.
 - **consumes-from** `TOOL-dLoggedFlight-24` — the Summary `window` and `duration` facts, rendered from
   commit times.
+- **consumes-from** `TOOL-dLoggedFlight-25` — the `window closed by` fact and the closing bound at each
+  render placement, which a terminal placement renders from the last record commit's time.
 
 ## 4. Design
 
@@ -126,7 +130,8 @@ enumerate which sums are legitimate.
 - perf / scale — one render of one fixture; no git call beyond the fixture's model build.
 - error / empty / loading states — a slot that rendered nothing reds by name rather than passing empty.
 - observability — each failure names the slot, the class or the token's line.
-- risks — a sentinel chosen near a public sum would fail the arm, which S2's pre-check refuses first.
+- risks — a sentinel chosen near a public sum or difference would make a staged break invisible or fail
+  the arm, which S2's pre-check refuses first.
 - testing — each AC staged RED on a copy of the fixture model or of the schema.
 - migration — N/A — test code only.
 - user docs — the kit README's record section names the arm.
@@ -135,17 +140,24 @@ enumerate which sums are legitimate.
 
 - **AC1** — When `test_record_time_population` renders S2's fixture through `render_record`, every token
   obeys S3's rule in both copies.
-  Red when: any token breaks it. Staged RED three ways, each on a copy: a renderer whose Summary
+  Red when: any token breaks it. Staged RED five ways, each on a copy: a renderer whose Summary
   `duration` reads the model's journal-bounded `window`, a model whose one kept `commit` row carries a
-  journal event's time, and a model whose `run` count is a sentinel epoch second.
+  journal event's time, a model whose `run` count is a sentinel epoch second, and two copies each
+  carrying one sentinel encoding no `utc` token covers, its `HH:MM:SS` and its ISO form. No kept class
+  but `utc` admits a colon (`record.py:117-152`), so those two ride a ledger entry `ref` on a schema copy
+  whose `ref` class is widened to admit that encoding. Before its verdict, every staged RED asserts that
+  its broken token reached the text and lies outside the set S3 accepts, and it reds as a dead probe
+  otherwise.
 - **AC2** — When the fixture's kept rows pass twice `TIMELINE_EDGE`, the `elided` fact renders, and its
   two times equal the first and last omitted kept rows' times, neither a sentinel.
   Red when: the fact does not render, or either time differs; staged RED by a renderer copy whose elided
   range is read from the model's unfiltered timeline.
 - **AC3** — When the arm enumerates `scan_time_slots(RECORD_SCHEMA)`, every slot rendered a token. With
   the fixture's review round removed, it reds naming the Decisions `rounds` table's `UTC` column. With
-  the kept rows cut to `TIMELINE_EDGE`, it reds naming the Timeline `elided` fact.
-  Red when: either staged fixture passes.
+  the kept rows cut to `TIMELINE_EDGE`, it reds naming the Timeline `elided` fact. Enumerating a copy of
+  `RECORD_SCHEMA` that declares one extra `utc` slot the fixture's record never fills, it reds naming
+  that slot.
+  Red when: any staged fixture or copy passes, or the arm's slot list is typed.
 - **AC4** — When the arm runs over a copy of `RECORD_SCHEMA` whose `time_classes` omits `duration`, it
   reds naming `duration` as a class that matched a rendered difference of public times.
   Red when: the copy passes.
@@ -154,7 +166,7 @@ enumerate which sums are legitimate.
 
 `runlog selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC1's three model copies, AC2's renderer copy, AC3's two cut fixtures and AC4's schema copy · floor raised by the arm count
+New arm: `tools/runlog/selftest.py` · AC1's five copies, AC2's renderer copy, AC3's two cut fixtures and extra-slot schema copy, and AC4's schema copy · floor raised by the arm count
 
 ## 8. Open questions
 
@@ -165,6 +177,13 @@ none
 - rev-1 · 2026-09-16 · initial draft, promoted from H1 and H2 of the spec audit of units 14, 16 and
   20, round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-20` rev-1 S6 and AC1's sentinel
   arm.
+- rev-2 · 2026-09-16 · S2 · AC1 · AC3 · §3 · §5 · §7 · folded M3 and M4 of the spec audit of units 21 to 24,
+  round 1. M3: AC3 stages a schema copy with one extra `utc` slot and reds on a typed slot list, and AC1
+  stages the `HH:MM:SS` and ISO encodings on a widened `ref` class, since no kept class but `utc` admits
+  a colon. M4: S2's pre-check refuses a sentinel difference, or a sentinel less a public time, that
+  equals a public difference, and every staged RED asserts its break lies outside the accepted set
+  before its verdict. §3 gains the edge to `TOOL-dLoggedFlight-25`, promoted by the same audit. The
+  order moves from 25 to 28.
 
 ## 10. Reuse audit
 

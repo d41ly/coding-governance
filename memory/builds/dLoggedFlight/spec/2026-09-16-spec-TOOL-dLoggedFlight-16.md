@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning
 
-**Status:** CLOSED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 14
+**Status:** CLOSED · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -93,6 +93,8 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   at all, and the discovered-path arm that reads `stale`.
 - **hands-off** `TOOL-dLoggedFlight-22` — the `--close` Timeline `rc` loop of the AC10 arm, which that
   unit retires with the verb rows; S4 and AC4 pin only the arm's count assertions.
+- **hands-off** `TOOL-dLoggedFlight-27` — `COUNTED_STATES` with `stale` outside it, which that unit's
+  declared count sources read for the `withheld rows` fact and the five transcript-counted Summary facts.
 
 ## 4. Design
 
@@ -196,6 +198,8 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   `TOOL-dLoggedFlight-22`. S4 and AC4 said the AC10 arm stands unedited, and that unit retires the arm's
   verb-row loop, so the two could not both pass one bar run. "Unedited" now names the arm's count
   assertions only, and the edge to `-22` says who edits the rest.
+- rev-3 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-27`, a unit the spec audit of units 21 to 24,
+  round 1, promoted from H4 at its BOUNDED exit. `COUNTED_STATES` and this unit's scope do not change.
 
 ## 10. Reuse audit
 

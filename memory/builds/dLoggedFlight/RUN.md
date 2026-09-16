@@ -140,3 +140,11 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T16:21:45Z brief · item TOOL-dLoggedFlight-14 · reason 07132d6e7329 memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md
 
 2026-09-16T16:35:03Z review · item dLoggedFlight-spec-set-r6 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-16T16:46:43Z rescope · item add TOOL-dLoggedFlight-25 · reason spec audit round 1 of units 21 to 24 BOUNDED, B1 BLOCKER and H3 HIGH promoted: the provenance loop stopped reaching the render, and every committed record closes by last-activity with no criterion observing it
+
+2026-09-16T16:46:43Z rescope · item add TOOL-dLoggedFlight-26 · reason spec audit round 1 of units 21 to 24 BOUNDED, H1 HIGH promoted: unit 22's reader inventory missed five assertions on counts and values that retired rows carry
+
+2026-09-16T16:46:44Z rescope · item add TOOL-dLoggedFlight-27 · reason spec audit round 1 of units 21 to 24 BOUNDED, H4 HIGH and H2 HIGH promoted: withheld rows rendered 0 for a source never read, and its count of 1 per kind could not hold on the landed model
+
+2026-09-16T16:46:51Z decision · item a hygiene check that refuses a spec retiring a name, row kind or vocabulary whose readers it does not inventory by value as well as by name · reason M6 of the spec audit of units 21 to 24: the class behind three consecutive spec-audit blockers. Options seen: a memory/HYGIENE.md check over spec section 2 retirement clauses; a documented spec-audit check only; nothing. The predicate is prose, so it owes a dry run over every live spec before wiring, and it changes memory/HYGIENE.md, a governance carrier, which BUILD-METHOD M3 veto 2 makes the owner's. TOOL-dLoggedFlight-26 carries the documented check and the self-test half this kit can hold

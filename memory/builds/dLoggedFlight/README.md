@@ -5,7 +5,7 @@ opened: 2026-09-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24
+ids: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27
 ---
 
 # dLoggedFlight — unattended runs recorded as they happen, and a record any node can read
@@ -55,11 +55,13 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 - **Landing.** The approved worktree push (owner, 2026-09-13) is refused by the pre-push hook without
   a bypass, so the build lands through `tools/push-main.sh` from the primary tree when that tree is
   idle, and parks otherwise. `TOOL-dLoggedFlight-11` records why.
-- **M2 classification:** units 1 to 13 MISSING at start; 14 to 24 MISSING when promoted or added.
+- **M2 classification:** units 1 to 13 MISSING at start; 14 to 27 MISSING when promoted or added.
 
 ## Parked decisions
 
-- None yet.
+- Whether a hygiene check should refuse a spec whose retirement inventory finds readers by name only.
+  Parked in `RUN.md` on 2026-09-16 with its options and reason: it changes `memory/HYGIENE.md`, a
+  governance carrier, so it is the owner's under BUILD-METHOD M3's second veto.
 
 <!-- roster:units -->
 
@@ -88,14 +90,18 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 21 | `TOOL-dLoggedFlight-21` | MISSING | the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines |
 | 22 | `TOOL-dLoggedFlight-22` | MISSING | the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name |
 | 23 | `TOOL-dLoggedFlight-23` | MISSING | one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot |
-| 24 | `TOOL-dLoggedFlight-24` | MISSING | the Summary window, its duration and its provenance render the git-only window the schema leg derives |
+| 24 | `TOOL-dLoggedFlight-24` | MISSING | the Summary window and its duration render the git-only window the schema leg derives |
+| 25 | `TOOL-dLoggedFlight-25` | MISSING | the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements |
+| 26 | `TOOL-dLoggedFlight-26` | MISSING | every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps |
+| 27 | `TOOL-dLoggedFlight-27` | MISSING | the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 24 unit(s) · node d · opened 2026-09-13 · streams tooling
+**Build status:** SPECCED · 27 unit(s) · node d · opened 2026-09-13 · streams tooling
 ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13
-ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24
+ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26
+ids TOOL-dLoggedFlight-27
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -113,24 +119,27 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLogg
 | [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-7 | 2026-09-16 |
 | [TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts](spec/2026-09-13-spec-TOOL-dLoggedFlight-12.md) | 12 | 2 | CLOSED | rev-5 | 2026-09-16 |
 | [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | CLOSED | rev-6 | 2026-09-16 |
-| [TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning](spec/2026-09-16-spec-TOOL-dLoggedFlight-16.md) | 14 | 2 | CLOSED | rev-2 | 2026-09-16 |
+| [TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning](spec/2026-09-16-spec-TOOL-dLoggedFlight-16.md) | 14 | 2 | CLOSED | rev-3 | 2026-09-16 |
 | [TOOL-dLoggedFlight-14 — a session's live transcript is read before its store extract, on the named and the discovered path](spec/2026-09-16-spec-TOOL-dLoggedFlight-14.md) | 15 | 2 | CLOSED | rev-4 | 2026-09-16 |
 | [TOOL-dLoggedFlight-17 — the owner-time refusal re-reads every session the model read, and holds an idle row to the model's own guard](spec/2026-09-16-spec-TOOL-dLoggedFlight-17.md) | 16 | 2 | WONTDO | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-15 — a row an owner act can cause carries no time that places the act](spec/2026-09-16-spec-TOOL-dLoggedFlight-15.md) | 17 | 2 | WONTDO | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-18 — an owner-causable journal line sets neither the window's rendered end nor the commitment's times](spec/2026-09-16-spec-TOOL-dLoggedFlight-18.md) | 18 | 2 | WONTDO | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-19 — every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes](spec/2026-09-16-spec-TOOL-dLoggedFlight-19.md) | 19 | 2 | WONTDO | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-21 — the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines](spec/2026-09-16-spec-TOOL-dLoggedFlight-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-16 |
-| [TOOL-dLoggedFlight-24 — the Summary window, its duration and its provenance render the git-only window the schema leg derives](spec/2026-09-16-spec-TOOL-dLoggedFlight-24.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name](spec/2026-09-16-spec-TOOL-dLoggedFlight-22.md) | 23 | 2 | SPECCED | rev-2 | 2026-09-16 |
-| [TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced](spec/2026-09-16-spec-TOOL-dLoggedFlight-20.md) | 24 | 2 | SPECCED | rev-2 | 2026-09-16 |
-| [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 25 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-dLoggedFlight-24 — the Summary window and its duration render the git-only window the schema leg derives](spec/2026-09-16-spec-TOOL-dLoggedFlight-24.md) | 22 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements](spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps](spec/2026-09-16-spec-TOOL-dLoggedFlight-26.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name](spec/2026-09-16-spec-TOOL-dLoggedFlight-22.md) | 25 | 2 | SPECCED | rev-3 | 2026-09-16 |
+| [TOOL-dLoggedFlight-27 — the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read](spec/2026-09-16-spec-TOOL-dLoggedFlight-27.md) | 26 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced](spec/2026-09-16-spec-TOOL-dLoggedFlight-20.md) | 27 | 2 | SPECCED | rev-3 | 2026-09-16 |
+| [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 28 | 2 | SPECCED | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
 Records: 27 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
+Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27.
 
-Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
+Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -158,9 +167,12 @@ Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFli
 | 19 | `TOOL-dLoggedFlight-19` | no |
 | 21 | `TOOL-dLoggedFlight-21` | no |
 | 22 | `TOOL-dLoggedFlight-24` | no |
-| 23 | `TOOL-dLoggedFlight-22` | no |
-| 24 | `TOOL-dLoggedFlight-20` | no |
-| 25 | `TOOL-dLoggedFlight-23` | no |
+| 23 | `TOOL-dLoggedFlight-25` | no |
+| 24 | `TOOL-dLoggedFlight-26` | no |
+| 25 | `TOOL-dLoggedFlight-22` | no |
+| 26 | `TOOL-dLoggedFlight-27` | no |
+| 27 | `TOOL-dLoggedFlight-20` | no |
+| 28 | `TOOL-dLoggedFlight-23` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

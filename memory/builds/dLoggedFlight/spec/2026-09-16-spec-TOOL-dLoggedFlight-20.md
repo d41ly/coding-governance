@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 24
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -144,9 +144,10 @@ remote, and that is why they are the kept sources.
   the Summary `window` slot's sources, and on a copy with the Decisions `rounds` table's `UTC` entry
   removed from `sources`, it refuses naming that slot.
   Red when: either staged copy passes, or a time slot has no entry.
-- **AC5** — When `check-records` reads a fixture record carrying a verb row with a time, it exits 1 naming
-  the record, the line and the source rule.
-  Red when: the record is accepted.
+- **AC5** — When `check-records` reads a fixture record carrying a kept `commit` row whose `source` cell
+  reads `driver`, it exits 1 naming the record, the line and the source rule. `driver` is a member of the
+  `source` vocabulary and `commit` keeps its layout, so no rule but the source rule can refuse that row.
+  Red when: the record is accepted, or the refusal names a rule other than the source rule.
 - **AC7** — When `grep -n 'no event times' .claude/skills/runlog/SKILL.md` runs, it finds the sentence,
   the question table's between-two-times row names the model's `timeline` as its first source, and the
   description's routing does not put the committed record first for a question about a time.
@@ -182,6 +183,13 @@ none
   sentence, with a consumes-from edge to `TOOL-dLoggedFlight-12`. L1: S9 and AC8 rewrite the gotcha's fix
   section, and Files touched names it. The order moves from 20 to 24, so `-21`, `-24` and `-22` land
   first.
+- rev-3 · 2026-09-16 · AC5 · folded M5 of the spec audit of units 21 to 24, round 1, whose subjects did
+  not include this unit. `TOOL-dLoggedFlight-22` removes the `verb` layout, and `check_table_row` refuses a
+  row whose kind has no layout under rule `cell` before any class check (`tools/runlog/record.py:1141-1145`
+  at `f7bf9d2f`), so a verb row could not tell the source rule from that refusal. AC5's fixture is a kept
+  `commit` row sourced `driver`, and its Red-when names the rule. The order moves from 24 to 27, after
+  `TOOL-dLoggedFlight-25`, `-26` and `-27` are inserted before it. Because this rev moved by a review
+  that did not audit this unit, the spec is unreviewed again under BUILD-METHOD M4.
 
 ## 10. Reuse audit
 
