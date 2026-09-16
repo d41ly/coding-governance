@@ -6,7 +6,7 @@ streams: deployer+tooling
 roster: DEPL+TOOL
 status: OPEN
 authorized-by: prompt
-ids: DEPL-cMendedVintage-1
+ids: DEPL-cMendedVintage-1 TOOL-cMendedVintage-9
 ---
 
 # cMendedVintage — `update` gains an install-effect stage, and stops rolling kits back for work it declined to do
@@ -40,25 +40,25 @@ did not revert, and an outbox nothing drains.
 
 ## Build-level rules
 
-- **Owner answers, 2026-09-16, one turn.** All six phases of the delivered fix plan are in scope,
-  and the leg-emission stage is built in this run rather than deferred — it reuses unit 10's write
-  stage, which is why it is sequenced after it.
-- **`GOVKIT_RERENDER` may not flip until unit 6 lands.** `TOOL-dPolishedVitrine-11` records that the
-  regenerate DELETES fixture records govkit ships as engine rows. Flipping the default first turns a
-  recorded data-loss defect on for every adopter, which is M3's veto 3.
-- **Two gates may not precede their remedy.** Unit 8 reds this repo until unit 1b lands
-  `--render`; unit 11 reds every adopter whose pins moved until unit 10 ships in the same release.
-- **Mixed roster, by construction.** The govkit engine units are `DEPL`; the units in `tools/<kit>/`
-  are `TOOL`. The build is one build because every `TOOL` unit exists only to satisfy the deployer's
-  update contract.
-- **gov does not dogfood govkit** — no `.governance/install.json` in this tree — so almost every
-  acceptance here is a selftest arm over a fixture, never an observation of a live install. Units
-  whose criterion cannot be observed in this repo say so in their own §6 rather than implying more.
-- **Classification at open**: all 22 MISSING; specced by the harness's SPEC stage.
-- **The memory gate is RED at this commit, by construction, and clears at the SPEC pass.** Check 21
-  reds because the mandate record's `Serves:` names a unit id no spec H1 defines yet, and check 14
-  reds on all 22 cited-but-undefined ids. `RECORD_UNBOUND_PIN` sits at its floor, so the `none` form
-  is unavailable and the record cannot be written unbound. Observed before the push, not after it.
+- **Owner answers, 2026-09-16, one turn.** All six phases of the fix plan are in scope, and the
+  leg-emission stage is built here rather than deferred: `-13` reuses `-10`'s write stage.
+- **Three ordering constraints, spelled as ids because the `#` column is a position and not a rank
+  (§2).** `GOVKIT_RERENDER` may not flip until `DEPL-cMendedVintage-6` lands — the eleventh
+  dPolishedVitrine row records that the regenerate DELETES fixture records govkit ships as engine
+  rows, so flipping first arms a known data-loss defect at every adopter (M3 veto 3).
+  `DEPL-cMendedVintage-8` reds this repo until `TOOL-cMendedVintage-1` lands `--render`.
+  `DEPL-cMendedVintage-11` reds every adopter whose pins moved until `DEPL-cMendedVintage-10` ships
+  beside it. A first cut spelled all three positionally and every one was wrong once the roster was
+  sorted into the order they demand.
+- **Mixed roster.** govkit engine units are `DEPL`, units under `tools/<kit>/` are `TOOL`. One build,
+  because every `TOOL` unit exists only to satisfy the deployer's update contract.
+- **gov does not dogfood govkit** — no `.governance/install.json` here — so nearly every acceptance
+  is a selftest arm over a fixture, never a live install. A unit whose criterion cannot be observed
+  in this repo says so in its own §6.
+- **Classification at open**: all 23 MISSING; specced by the harness's SPEC stage.
+- **The memory gate is RED at BASE by construction and clears at the SPEC pass**: check 21 on the
+  mandate record's `Serves:` line, check 14 on the cited-but-undefined ids. `RECORD_UNBOUND_PIN` is
+  at its floor, so the record could not be written unbound. Observed before the push, not after.
 
 ## Parked decisions
 
@@ -68,34 +68,35 @@ did not revert, and an outbox nothing drains.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `DEPL-cMendedVintage-1` | OPEN | no rollback over a step this run declined; the declines print unconditionally |
-| 2 | `DEPL-cMendedVintage-2` | OPEN | a failed restore keeps its receipt row forward and is named in the order |
-| 3 | `DEPL-cMendedVintage-3` | OPEN | the coverage tail joins each open gap to its own refusal reason |
-| 4 | `DEPL-cMendedVintage-4` | OPEN | the unattributed remedy names `--re-adopt --pin`; `--allow-ungraded` retired |
-| 5 | `DEPL-cMendedVintage-5` | OPEN | `[[regenerate]]` for lexicon, drift-audit and memory-recall, with lexicon's `[[outcome]]` |
-| 6 | `DEPL-cMendedVintage-6` | OPEN | the regenerate stops deleting the fixture records govkit ships as engine rows |
-| 7 | `DEPL-cMendedVintage-7` | OPEN | `GOVKIT_RERENDER` defaults ON; the two off-path selftest arms pin it `0` |
-| 8 | `DEPL-cMendedVintage-8` | OPEN | a descriptor shipping `rendered` rows and declaring no `[[regenerate]]` reds `selfcheck` |
-| 9 | `DEPL-cMendedVintage-9` | OPEN | no descriptor destination may resolve under `{memory_root}/project/` |
-| 10 | `DEPL-cMendedVintage-10` | OPEN | `update --write` writes the `.gitattributes` block and takes the renormalize with it |
-| 11 | `DEPL-cMendedVintage-11` | OPEN | `cmd_check` grades the attributes row's block |
-| 12 | `DEPL-cMendedVintage-12` | OPEN | `apply`'s CONFIGURE honours `deploy["inert"]` |
-| 13 | `DEPL-cMendedVintage-13` | OPEN | `update --write` emits gate legs, on unit 10's write stage |
-| 14 | `DEPL-cMendedVintage-14` | OPEN | stale conflict orders are reaped; an order filename keys on the full path |
-| 15 | `TOOL-cMendedVintage-1` | OPEN | `adopt-memory-tree.sh --render`, the one adopter with no render path |
-| 16 | `TOOL-cMendedVintage-2` | OPEN | `sh_hygiene.py` takes an optional registry; gate-lint stops seeding into the memory tree |
-| 17 | `TOOL-cMendedVintage-3` | OPEN | `check-wiring.sh`'s boundary walk can produce the empty prefix its comment declares legal |
-| 18 | `TOOL-cMendedVintage-4` | OPEN | the three settings-merge remedies resolve at the install prefix |
-| 19 | `TOOL-cMendedVintage-5` | OPEN | the carried predicate sees a `${VAR:-tools/…}` default-value literal |
-| 20 | `TOOL-cMendedVintage-6` | OPEN | `check-receipt.sh`, the receipt-sync leg, and its row on gov's own bar |
-| 21 | `TOOL-cMendedVintage-7` | OPEN | that leg reports rows carrying `evidence: "unattributed"` |
-| 22 | `TOOL-cMendedVintage-8` | OPEN | process-monitor's empty-live-scope arm gets a code distinct from a conf refusal |
+| 1 | `TOOL-cMendedVintage-9` | OPEN | `--card --write` resolves its session id without blocking on an open stdin |
+| 2 | `DEPL-cMendedVintage-1` | OPEN | no rollback over a step this run declined; the declines print unconditionally |
+| 3 | `DEPL-cMendedVintage-2` | OPEN | a failed restore keeps its receipt row forward and is named in the order |
+| 4 | `DEPL-cMendedVintage-3` | OPEN | the coverage tail joins each open gap to its own refusal reason |
+| 5 | `DEPL-cMendedVintage-4` | OPEN | the unattributed remedy names `--re-adopt --pin`; `--allow-ungraded` retired |
+| 6 | `DEPL-cMendedVintage-5` | OPEN | `[[regenerate]]` for lexicon, drift-audit and memory-recall, with lexicon's `[[outcome]]` |
+| 7 | `TOOL-cMendedVintage-1` | OPEN | `adopt-memory-tree.sh --render`, the one adopter with no render path |
+| 8 | `DEPL-cMendedVintage-6` | OPEN | the regenerate stops deleting the fixture records govkit ships as engine rows |
+| 9 | `DEPL-cMendedVintage-7` | OPEN | `GOVKIT_RERENDER` defaults ON; the two off-path selftest arms pin it `0` |
+| 10 | `DEPL-cMendedVintage-8` | OPEN | a descriptor shipping `rendered` rows and declaring no `[[regenerate]]` reds `selfcheck` |
+| 11 | `TOOL-cMendedVintage-2` | OPEN | `sh_hygiene.py` takes an optional registry; gate-lint stops seeding into the memory tree |
+| 12 | `DEPL-cMendedVintage-9` | OPEN | no descriptor destination may resolve under `{memory_root}/project/` |
+| 13 | `TOOL-cMendedVintage-3` | OPEN | `check-wiring.sh`'s boundary walk can produce the empty prefix its comment declares legal |
+| 14 | `TOOL-cMendedVintage-4` | OPEN | the three settings-merge remedies resolve at the install prefix |
+| 15 | `TOOL-cMendedVintage-5` | OPEN | the carried predicate sees a `${VAR:-tools/…}` default-value literal |
+| 16 | `DEPL-cMendedVintage-10` | OPEN | `update --write` writes the `.gitattributes` block and takes the renormalize with it |
+| 17 | `DEPL-cMendedVintage-11` | OPEN | `cmd_check` grades the attributes row's block |
+| 18 | `DEPL-cMendedVintage-12` | OPEN | `apply`'s CONFIGURE honours `deploy["inert"]` |
+| 19 | `DEPL-cMendedVintage-13` | OPEN | `update --write` emits gate legs, on unit 10's write stage |
+| 20 | `DEPL-cMendedVintage-14` | OPEN | stale conflict orders are reaped; an order filename keys on the full path |
+| 21 | `TOOL-cMendedVintage-6` | OPEN | `check-receipt.sh`, the receipt-sync leg, and its row on gov's own bar |
+| 22 | `TOOL-cMendedVintage-7` | OPEN | that leg reports rows carrying `evidence: "unattributed"` |
+| 23 | `TOOL-cMendedVintage-8` | OPEN | process-monitor's empty-live-scope arm gets a code distinct from a conf refusal |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
-ids DEPL-cMendedVintage-1
+ids DEPL-cMendedVintage-1 TOOL-cMendedVintage-9
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
