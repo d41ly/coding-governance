@@ -105,9 +105,9 @@ exist there yet.
   - the README's schema paragraph (`tools/runlog/README.md:317-323`) and the module docstring
     (`record.py:7`) drop "a verb token", "a list of check numbers" and "a workflow label", and the
     README's UUID sentence names a path class's file segment in place of `label`;
-  - the README's sentence on a Timeline `rc` (`README.md:330-331`) and the docstring's clause on "the rc
+  - the README's sentence on a Timeline `rc` (`tools/runlog/README.md:330-331`) and the docstring's clause on "the rc
     of an END" (`record.py:12-13`) retire with `derive_clean_rc`;
-  - the README's residue bullet on the copied lists (`README.md:476-478`), the dossier's sentence on "the
+  - the README's residue bullet on the copied lists (`tools/runlog/README.md:476-478`), the dossier's sentence on "the
     record's copies of the pre-push hook's decisions" (`memory/map/features/runlog.md:181-182`) and the
     comment "THREE LISTS ANOTHER FILE OWNS" (`record.py:89-93`) drop the push decisions and count two
     lists.
