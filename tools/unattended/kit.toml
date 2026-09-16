@@ -34,14 +34,19 @@ role = "engine"
 # from it. It is not a gate leg either. `run-unattended-gates.sh` picks it up from its budget row with
 # the rest, and it also runs alone, which is how a build holding the siblings back runs it.
 [[files]]
-include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "runlog-writer.test.sh", "unattended.test.sh"]
+include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "runlog-writer.test.sh", "unattended.test.sh"]
 role = "project-owned"
 
+# `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
+# bug-class checklist names by path. The adopter PROBES the tracked tree for it rather than deriving
+# it from `TOOL_ROOT`, because an adopter may install that kit flat in its tool root, and it refuses
+# when neither spelling is tracked. The review-harness kit's build harness carries the same command
+# and fills it the same way, so the two carriers cannot disagree about where the checklist lives.
 [[files]]
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/unattended/SKILL.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
 
 [[files]]
 include = ["PROTOCOL.template.md"]
@@ -89,13 +94,22 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
 argv = ["bash", "{kit}/adopt-unattended.sh"]
 mutates_index = false
 requires_config_first = true
+
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. Every `rendered` row above is written by the
+# adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER unset, `update` lands
+# the new templates, leaves the renders stale, and then fails its own post-write check on the Skill
+# and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this block
+# prevents it only under the flag. The adopter re-renders unconditionally, so it is the whole argv;
+# its declared outcomes below classify its exit exactly as they do for `apply`.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-unattended.sh"]
 
 [check]
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]

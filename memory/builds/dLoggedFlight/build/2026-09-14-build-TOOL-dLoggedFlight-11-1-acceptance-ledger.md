@@ -32,7 +32,9 @@ observes is owed to the landing, and the last section says where it will be reco
   three placements at 786 (`--abort`), 787 (`--close`, before the merge) and 790 (`--landed`). The
   re-render into the SAME file by run key is at 790 and 791, and the check 34 warning is at 795 to 798.
   RED: the same grep over HEAD's rendered Skill prints nothing.
-- AC3 — `--status <slug>` in the keepalive section of `tools/unattended/SKILL.template.md` — template
+- AC3 — `--audit <slug>` in the keepalive section of `tools/unattended/SKILL.template.md`, re-observed at
+  the second origin/main reconcile (2026-09-16), where main's stall probe replaced the `--status`
+  heartbeat and the section now names the probe the run's heartbeat. The original observation follows: template
   line 30 carries `bash {{KIT_DIR}}/unattended.sh --status <slug>`, which renders at line 30 of the
   Skill inside `## Before any path — schedule the keepalive NOW`. The wording that makes the call only
   once the run-state file exists is at 32 to 35. The Resume section gives its replacement job the same

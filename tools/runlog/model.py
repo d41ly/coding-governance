@@ -86,7 +86,9 @@ UNIT_VERBS = ("--brief", "--dispatch", "--rescope", "--review")
 # `--status` and `--resume` only read the record, so the owner or any session runs them from any tree;
 # `--landed` runs after the close in the primary tree, which every run lands from. Keyed on every tree
 # any call ran in, one owner's `--status` there made every other run's bar and push the run's.
-TREE_BLIND_VERBS = ("--status", "--resume", "--landed")
+# `--audit`, main's stall probe and the call the keepalive tick runs, reads the record as `--status`
+# does, so it claims no tree either (the second origin/main reconcile, 2026-09-16).
+TREE_BLIND_VERBS = ("--status", "--resume", "--landed", "--audit")
 IDLE_GAP_S = 900
 # B1 (closing review, round 1): a stretch with an owner turn inside it, or within this many seconds of
 # either end, is kept out of the idle gaps and counted. Dropping the turn from the gap sequence is not
@@ -98,6 +100,9 @@ IDLE_OWNER_GUARD_S = IDLE_GAP_S
 # at the declared ten-minute cadence. Both numbers are printed in the anomaly's evidence.
 HEARTBEAT_CADENCE_S = 600
 STALL_HEARTBEATS = 6
+# The calls that count as a heartbeat: `--status`, and `--audit`, the stall probe the keepalive tick
+# runs since the second origin/main reconcile.
+HEARTBEAT_VERBS = ("--status", "--audit")
 REFUSAL_LOOP_MIN = 3
 # L5 (closing review, round 1): a commit subject names every id of a contiguous range it spells
 # `<id>..<m>`, as the memory-tree index generator expands one in a Serves line. A range of more ids
@@ -1167,7 +1172,7 @@ def scan_anomalies(model) -> list:
     for streak in scan_heartbeat_streaks(verbs, heads):
         if len(streak) >= STALL_HEARTBEATS:
             out.append({"kind": "stalled", "t": streak[0]["t"],
-                        "evidence": f"{len(streak)} --status calls in a row from "
+                        "evidence": f"{len(streak)} heartbeat calls in a row from "
                                     f"{derive_iso(streak[0]['t'])} to {derive_iso(streak[-1]['end'])} "
                                     f"with phase {streak[0]['phase_to']} and no commit; the rule is "
                                     f"{STALL_HEARTBEATS} heartbeats, one hour at the declared "
@@ -1176,11 +1181,11 @@ def scan_anomalies(model) -> list:
 
 
 def scan_heartbeat_streaks(verbs, heads) -> list:
-    """Maximal runs of consecutive ended `--status` calls sharing one `phase_to` with no commit of the
+    """Maximal runs of consecutive ended heartbeat calls (`HEARTBEAT_VERBS`) sharing one `phase_to` with no commit of the
     run between their first START and their last END. Any other verb breaks a run."""
     streaks, cur = [], []
     for e in verbs:
-        beat = e["verb"] == "--status" and e["state"] == "ended" and e.get("end") is not None
+        beat = e["verb"] in HEARTBEAT_VERBS and e["state"] == "ended" and e.get("end") is not None
         if not beat:
             streaks.append(cur)
             cur = []

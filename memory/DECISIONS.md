@@ -11,7 +11,9 @@
 
 ## KICK — kickoff
 
-*(none yet)*
+- **KICK-aReplayedCard-1** — **manifest v1.4 adds `registry:`; the session card lives in the git common dir**: `--card --write|--replay` derive and re-inject it, no fetch, no flag; detail `builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-1.md` §4 §8.
+- **KICK-aReplayedCard-2** — **the id grammar rides the reader, not the checker**: `corpus_ids.py --print-defined-ids` prints the ERE first and the defined set after; the append joins against it and spells none. Detail `builds/aReplayedCard/spec/2026-09-13-spec-KICK-aReplayedCard-2.md` §4.
+- **KICK-aReplayedCard-3** — **the manifest repair COMMITS after the card append**: repair and re-stamp still at kickoff; Step 5 commits after `--card --append` so the deny sees a READY line. Supersedes the moment `builds/aRatchetForge/spec/manifest-ratchet-spec.md` §4 set.
 
 ## TOOL — tooling
 
@@ -98,10 +100,20 @@
 
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
 - TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
+- TOOL-dPolishedVitrine-1 · OWNER RULING 2026-09-12: the build harness is RENDERED at install rather than handed paths in args. Its install literals become KIT_DIR, TOOL_ROOT and MEMORY_TREE_DIR, the last PROBED from a tracked gotchas.py and refused when absent: adopters install memory-tree flat
+- TOOL-dPolishedVitrine-12 · round 1: F1 is repaired by a migration (update, commit, `adopt --re-adopt` pinning every recorded base) and not a govkit role move, filed DEPL-dPolishedVitrine-1; F3 SUPERSEDES -1's refusal in the parity script: a missing gotchas.py skips only the pair naming it
+- TOOL-dPolishedVitrine-13 · round 2 SUPERSEDES -12's sequence: three runbook blocks commit update's own writes before any render and pin renders from `plan` and their kit's regenerate, not the receipt; the govkit selftest runs them verbatim; the regenerate creates no live copy
+- TOOL-dPolishedVitrine-14 · OWNER RULING 2026-09-13: brief-recorded grades only units built while a run was LIVE. A unit whose build commit's RUN.md reads a terminal phase is announced, not graded, while HEAD still carries that base, phase and witness. pass-order unchanged; nc waives its miss
 - TOOL-aLeakedHandle-6 · OWNER RULING (2026-09-13): a blocker found on a subject whose review loop already CONVERGED is DISPOSED under M4 fold/promote and never re-rounded; no re-arm on a rev bump. Owes an M4 sentence and a check-37 message. Options and cost: builds/aLeakedHandle/RUN.md.
 - TOOL-aLeakedHandle-7 · OWNER RULING (2026-09-13): check 23 EXCLUDES the path a `brief · item <unit>` row names, since `--brief` stages it and the pass never had a write to declare. Clears 30 corpus lines; the class still fires elsewhere. Owes one staged-red arm. builds/aLeakedHandle/RUN.md.
 - TOOL-aLeakedHandle-8 · OWNER RULING (2026-09-13): the memory-hygiene self-test ceiling breach is answered by making the SUITE CHEAPER, not by re-declaring 900 s. pk_rc/pk_out re-run the whole checker per arm; one run must serve several. Tier-2 unit. Measurement: aJoinedCanon's 2026-09-07 park.
 - TOOL-aLeakedHandle-9 · OWNER RULING (2026-09-13): BUILD the no-ceiling rc=137 branch of report_one, `(killed after <secs>s)`, from backlog row TOOL-aLeakedHandle-5. Every leg declares a ceiling today, so its red case is fixture-only; ratified anyway. Tier-1, one branch plus one arm.
+- TOOL-aProbedUnit-8 · OWNER RULING (2026-09-14): gates run ONCE per session, pre-merge. No gate leg, suite or bar inside a unit pass; a pass verifies by the single grep or arm its criterion names, the leg half is `--close`'s. Carried by the child prompt, GROUND, M6, the Skill. builds/aProbedUnit/.
+- TOOL-aProbedUnit-9 · OWNER RULING (2026-09-14): ONE spec-audit round by default (`REVIEW_ROUNDS=1`, exit `BOUNDED`, spec subjects only; the diff review converges by fixing); every confirmed finding disposed BY SEVERITY: blockers and highs PROMOTED to units, mediums and lows FOLDED.
+- TOOL-aProbedUnit-10 · OWNER RULING (2026-09-14): every harness agent is handed the session scratchpad (`scratch`, REQUIRED) and writes every temporary file under it; the scratch-guard denies an EMPTY `$TMPDIR`/`$TMP`/`$TEMP` at a target's head, `/tmp`, and a new POSIX-root entry. Node d's 6 h rm.
+- TOOL-aProbedUnit-11 · a run watches its own units: `--audit <slug>` grades each open dispatched unit's tree idle time against `UNIT_STALL_BOUND` (1800 s) and prints the remedy; the keepalive runs it. A git clone under the scratchpad hits MAX_PATH on Windows, so a clone takes `%TEMP%/<short>`.
+- **TOOL-aReplayedCard-1** — **the commit deny binds sessions started under the wiring**: `git commit` alone; a NEW `authorized-by: prompt|recipe` README exempts; an absent or replay-written card allows. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md` §8.
+- **TOOL-aReplayedCard-2** — **fragments carry `interpreter`/`args`; `{here}` serves a flat kit**: the merger renders unquoted, re-matches by marker and event; three readers resolve `{here}` with a parity refusal. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-2.md` §4.
 
 ## DEPL — deployer
 
@@ -157,6 +169,7 @@
 - **TOOL-aReapedSpinner-20** — **a backgrounded subshell inherits the fds of the shell that spawned it, and disown does not close them**: the turnstile ticker's `sleep` outlived every bar holding stdout, so any captured run waited 300s after exit. builds/aReapedSpinner/. — _2026-09-08, `a`_
 - **TOOL-aReapedSpinner-22** — **a suite that times out hides every assertion after the hang, so fixing the hang is how you find out what was never graded**: the canary's wall arm had been unreachable and unconditionally red. builds/aReapedSpinner/. — _2026-09-08, `a`_
 - **TOOL-dMuffledSentinel-1** — **check 21 refuses a bindings parse that did not complete**: `2>/dev/null || true` turned an adopter generator lacking the mode into a clean corpus over 1531 records. The N row is the liveness half. builds/dMuffledSentinel/. — _2026-09-11, `d`_
+- DEPL-dPolishedVitrine-3 · govkit 1.11: `update` lands an unclaimed source BEFORE it re-renders, so a kit's new template reaches its `[[regenerate]]` in the same run, and a failed regenerate stops promising a rollback its kit's `[check]` cannot give. Amends TOOL-dPolishedVitrine-1 §3
 - **TOOL-dMuffledSentinel-2** — **the pass-order and trace waiver registries take a declared path**: `PASS_ORDER_WAIVER` and `TRACE_WAIVER`, blank keeping memory/project/, and a declared path must resolve. builds/dMuffledSentinel/. — _2026-09-12, `d`_
 - **TOOL-dMuffledSentinel-3** — **drift-audit 1.10 and unattended 1.19, over the bytes unit 2 changed**: an adopter pulling unit 2 could not tell the vintages apart, and inCMS refused the pull. builds/dMuffledSentinel/. — _2026-09-12, `d`_
 - **TOOL-cGradedDebt-1** — **a waiver row that hides nothing now REDS**: `curation-debt.txt` asserted only that a listed path was tracked, so the `TOOL.md` row outlived its fault by three weeks. Listed files stay IN checks 6/7/8, findings partitioned. builds/cGradedDebt/. — _2026-09-12, `c`_

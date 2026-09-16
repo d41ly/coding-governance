@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 58 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 78 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -159,8 +159,10 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `check-workflow-syntax.js` | review-harnesses |
 | `drift-audit-code.js` | review-harnesses |
 | `drift-audit-state.js` | review-harnesses |
+| `orient-counterfactual.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `unattended-build.js` | unattended |
+| `unattended-build.template.js` | review-harnesses |
 | `unattended-unit.js` | unattended |
 
 ## skill-engines
@@ -184,6 +186,7 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 
 | key | claimant |
 |---|---|
+| `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
 | `a-pair-exists-and-it-is-the-wrong-one.md` | agent-cap |
 | `a-view-fix-trades-one-blindness-for-another.md` | agent-cap |
 | `ab-arm-never-did-the-work.md` | run-gates |
@@ -194,8 +197,11 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
 | `async-job-starts-with-sigint-ignored.md` | run-gates |
+| `bash-c-multiline-flattens-under-msys.md` | agent-cap |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
+| `check-format-grades-two-populations.md` | build-readme-surface |
 | `concurrency-is-not-a-budget.md` | baseline |
+| `conf-value-interpolated-into-a-regex.md` | agent-cap |
 | `containment-tested-one-way.md` | unattended |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
 | `degradation-known-but-unreported.md` | review-harnesses |
@@ -203,11 +209,13 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixed-sleep-does-not-place-a-signal.md` | runlog |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
+| `fixture-lacks-a-gate-the-consumer-has.md` | govkit |
 | `fixture-passes-by-finding-nothing.md` | baseline |
 | `fixture-removes-the-path-under-test.md` | run-gates |
 | `fold-text-is-unreviewed-surface.md` | build-method |
 | `format-derived-from-arity.md` | run-gates |
 | `gate-green-by-accident-on-generated-bytes.md` | baseline |
+| `git-rm-cached-refuses-a-diverged-index-blob.md` | agent-cap |
 | `grammar-bound-to-the-wrong-root.md` | baseline |
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
@@ -216,21 +224,33 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `join-key-widened-by-a-shared-location.md` | runlog |
+| `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
+| `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `naming-leg-grades-what-python-named.md` | lexicon |
+| `node-check-is-not-a-syntax-gate.md` | review-harnesses |
 | `nt-against-a-missing-file-is-true.md` | runlog |
+| `observation-before-the-last-fold-of-the-same-commit.md` | build-method |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
+| `pin-gated-checks-arm-nothing-without-a-pin.md` | memory-tree-hygiene |
 | `process-creation-is-the-suite-cost.md` | unattended |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
+| `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
+| `reflowed-prompt-string-reads-as-a-deleted-stop.md` | unattended |
+| `row-driver-emits-a-plausible-file-with-rows-missing.md` | memory-tree-merge-driver |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
+| `settings-edit-takes-effect-mid-session.md` | agent-cap |
+| `shipped-checker-edit-is-an-adopter-contract-change.md` | session-kickoff |
 | `signal-trap-runs-the-exit-handler-twice.md` | run-gates |
+| `sourced-conf-blank-overrides-the-default.md` | memory-tree-hygiene |
 | `spec-names-code-its-base-lacks.md` | unattended |
 | `staged-break-runs-stale-bytecode.md` | runlog |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |
 | `structured-record-split-on-whitespace.md` | unattended |
 | `subprocess-resolves-a-different-shell.md` | baseline |
+| `suite-edited-while-bash-executes-it.md` | memory-tree-hygiene |
 | `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `swallowed-delegate-reads-as-clean.md` | memory-tree-hygiene |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
@@ -241,7 +261,9 @@ Inventories: gate-legs: 111 · kits: 17 · git-hooks: 3 · workflow-scripts: 6 �
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
+| `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |
 | `withheld-value-recovered-from-a-derived-one.md` | runlog |
+| `worktree-crlf-outside-the-gated-population.md` | run-gates |
 
 ## guides
 

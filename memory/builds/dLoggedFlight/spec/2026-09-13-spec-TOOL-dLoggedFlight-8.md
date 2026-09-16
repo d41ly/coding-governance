@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-10 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-11 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -115,9 +115,9 @@ sources actually support. Every later surface renders from this model rather tha
   - the model's idle gaps, which S6 judges over every source, never over this timeline alone.
 
   The trees a run HOLDS key the two joins by tree above and S2's window end. A driver call CLAIMS the
-  tree it ran in when it is a preflight, or when its verb is none of `--status`, `--resume` and
-  `--landed` and its START read a phase before the close. `--status` and `--resume` only read the
-  record, so they run from any tree. `--landed`, and any verb run once the run has closed, belong to
+  tree it ran in when it is a preflight, or when its verb is none of `--status`, `--resume`,
+  `--audit` and `--landed` and its START read a phase before the close. `--status`, `--resume` and
+  `--audit`, the stall probe, only read the record, so they run from any tree. `--landed`, and any verb run once the run has closed, belong to
   the landing, which runs in the primary tree every run lands from. The run holds each tree its own
   calls claimed, from its first claim there to the first claim there by another run's call after its
   own last one. So neither the owner's `--status` nor the run's own `--landed` makes the primary tree
@@ -196,7 +196,7 @@ sources actually support. Every later surface renders from this model rather tha
     time (`TOOL-dLoggedFlight-9` S4).
   - `multi-run-session`: a session of the run's appearing, inside its window, in the START line of
     another slug's verb.
-  - `stalled`: six heartbeat `--status` calls in a row with no head or phase change, one hour at the
+  - `stalled`: six heartbeat calls, `--status` or `--audit`, in a row with no head or phase change, one hour at the
     declared cadence.
 - **S7** The coverage block. Observed by AC6 and AC7. Each source gets a state from
   `COVERAGE_STATES`, and each journal an EPOCH, the time of its producer file's first line:
@@ -684,6 +684,10 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   `TOOL-dLoggedFlight-1..13` read as unit 1 alone, which credited eight whole-set commits of this
   build to unit 1 on the timeline. S3 reads a range the way the index generator does, bounded by
   `UNIT_RANGE_MAX`, a bound the generator does without because an author types its Serves line.
+- rev-11 · 2026-09-16 · S3 · S6 · the second origin/main reconcile: main added `--audit`, the stall probe the keepalive
+  tick now runs. It reads the record like `--status`, so it claims no tree, and it is a heartbeat
+  for `stalled`. The AC20 fixture takes it from `TREE_BLIND_VERBS`, and AC5 gains two stalled
+  streaks, one of `--audit` and one mixed.
 
 ## 10. Reuse audit
 

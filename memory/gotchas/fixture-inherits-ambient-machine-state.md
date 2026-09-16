@@ -40,3 +40,16 @@ Ambient state a fixture can inherit without saying so: git identity, `core.autoc
 No machine gate. The generalisable protection is that an empty capture is never fed onward — the
 `$ahead` above was empty and got passed straight to `update-ref`, which is what turned a clear
 identity error into an unrelated SHA1 complaint two steps later.
+
+## It bit again as Python's UTF-8 mode
+
+Build `dPolishedVitrine`, round 3 of its closing review. The consumer migration in
+`WIRE-INTO-PROJECT.md` writes a small program that reads govkit's saved output as UTF-8. govkit
+prints an em dash on every line and never reconfigures its stdout, so on Windows outside Python's
+UTF-8 mode a redirected stdout is the ANSI code page, and the program raised `UnicodeDecodeError` on
+byte 0x97. The fixture passed on node `d`, which exports `PYTHONUTF8=1` and `PYTHONIOENCODING=utf-8`,
+and would have crashed on any fresh Windows node.
+
+Gated for that fixture: `tools/govkit/selftest.py` runs every migration block with `PYTHONUTF8=0`
+and `PYTHONIOENCODING` unset, and an arm announces a skip on a node whose code page is UTF-8 anyway,
+where the dependency cannot show. Locale belongs on the list above for exactly this reason.

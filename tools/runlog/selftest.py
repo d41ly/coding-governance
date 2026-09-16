@@ -2575,6 +2575,14 @@ def test_model_ac5_anomalies():
     run_variant("stalled", ["stalled"],
                 driver=[ln for m in (8, 9, 10, 11, 12, 13) for ln in render_driver_lines(
                     m + 0.5, "--status", phase_from="BUILDING", phase_to="BUILDING")])
+    # The keepalive tick runs main's stall probe, `--audit`, since the second origin/main reconcile, so a
+    # streak of it, alone or mixed with `--status`, is a streak of heartbeats too.
+    run_variant("stalled by --audit", ["stalled"],
+                driver=[ln for m in (8, 9, 10, 11, 12, 13) for ln in render_driver_lines(
+                    m + 0.5, "--audit", phase_from="BUILDING", phase_to="BUILDING")])
+    run_variant("stalled by a mixed --status and --audit streak", ["stalled"],
+                driver=[ln for i, m in enumerate((8, 9, 10, 11, 12, 13)) for ln in render_driver_lines(
+                    m + 0.5, ("--status", "--audit")[i % 2], phase_from="BUILDING", phase_to="BUILDING")])
     tool_bar = {"t": float(derive_minute(16)), "kind": "tool", "src": "main", "call": 1, "tool": "Bash",
                 "cls": "bar", "flags": [], "bg": True, "end": float(derive_minute(19)), "dur": 180.0,
                 "err": False, "rc": None}

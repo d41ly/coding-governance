@@ -272,13 +272,16 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
     }' "$@"
 }
 
-# The five exits that run BEFORE the trap exists, named by their TEXT: this unit's own insertions
-# moved their line numbers, and a text that matches twice is a second exit nobody exempted.
+# The exits that run BEFORE the trap exists, named by their TEXT: this unit's own insertions moved
+# their line numbers, and a text that matches twice is a second exit nobody exempted. The sixth is
+# the REVIEW_ROUNDS ceiling refusal main added before the install, found by this enumeration at the
+# second origin/main reconcile (2026-09-16).
 EXEMPT_EXITS='exit 2
 ROOT="$(GIT rev-parse --show-toplevel 2>/dev/null)" || { echo "unattended: not a GIT repo"; exit 2; }
 cd "$ROOT" || exit 2
 echo "unattended: project-specific value from there and restates none of them."; exit 2; }
-exit 2 ;;'
+exit 2 ;;
+[ "$REVIEW_ROUNDS" -lt "$RUNAWAY_CEILING" ] || { echo "unattended: REFUSING - REVIEW_ROUNDS is $REVIEW_ROUNDS, at or above the runaway ceiling of $RUNAWAY_CEILING, so the ceiling would fire first and the declared bound could never be reached." >&2; exit 2; }'
 
 check_exit_rows() { # label · driver · library -> UNMARKED (unexempted unmarked rows), EXEMPTED count
   local label="$1" drv="$2" lib="$3" install rows row f ln mk tx ex cnt

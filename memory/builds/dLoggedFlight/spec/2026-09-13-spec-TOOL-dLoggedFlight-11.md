@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 11
+**Status:** CLOSED · rev-6 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -43,9 +43,10 @@ make every keepalive fire leave a heartbeat line, so a stalled run is visible in
   Each render is followed by the build-index re-render and a commit subject naming the slug and no unit
   id. The section states that a commit between the lander's push and `--landed` wedges check 34, so no
   render goes there.
-- **S3** The keepalive section tells the scheduled job's prompt to run `--status <slug>` first once a
-  slug exists, so each fire leaves a heartbeat in `driver.log`. The Resume section, which the
-  keepalive section says it does not bind, gives the replacement job it schedules the same prompt.
+- **S3** The keepalive section's scheduled prompt runs the stall probe, `--audit <slug>`, once a slug
+  exists, and says the probe is also the run's heartbeat: the driver journals it, so each fire leaves
+  a line in `driver.log`. The Resume section, which the keepalive section says it does not bind,
+  gives the replacement job it schedules the same stall-probe prompt.
   Observed by AC3.
 - **S4** The protocol's section 2 run-log paragraph from `TOOL-dLoggedFlight-2` gains one sentence
   saying where the record is rendered, in the template and its installed copy, within the headroom
@@ -147,8 +148,8 @@ record.
   present and names all three placements, the re-render into the same file, and the check 34 warning.
   Red when: a placement, the same-file rule or the warning is missing.
 - **AC3** — When the keepalive section of `tools/unattended/SKILL.template.md` is read, it tells the
-  job's prompt to run `--status <slug>` once a slug exists, and the Resume section gives its
-  replacement job the same prompt.
+  job's prompt to run the stall probe `--audit <slug>` once a slug exists and names it the run's
+  heartbeat, and the Resume section gives its replacement job the same prompt.
   Red when: the sentence is absent from the rendered copy, or Resume's replacement job carries none.
 - **AC4** — When `grep -n` searches `memory/guides/UNATTENDED-PROTOCOL.md` for the render sentence this
   unit adds to the section 2 run-log paragraph, it finds it, and check 10 of
@@ -191,6 +192,9 @@ none
   heartbeat that stops at the first resume leaves the longest-lived jobs silent. S4's headroom figure
   is re-measured, since unit 2 spent part of it. §4 places the section between Close and Land, with a
   pointer from each of the two later placements.
+- rev-6 · 2026-09-16 · S3 · AC3 · the second origin/main reconcile: main replaced the keepalive tick with its stall
+  probe, `--audit <slug>`. The driver journals it like every verb but `--version` and `--plan`, so
+  the probe IS the heartbeat, and the Skill says so instead of scheduling `--status` beside it.
 
 ## 10. Reuse audit
 

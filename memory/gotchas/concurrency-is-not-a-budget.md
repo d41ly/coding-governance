@@ -50,3 +50,12 @@ The enforcement point matters more than the predicate. The offending script was 
 string on a `Workflow` tool call and was never a file, so a gate over `tools/**/*.js` would have
 covered four already-compliant harnesses and zero of the observed failures. Put the check where the
 source actually passes through.
+
+## The bound is a file constant, and the cap hook is the first of two
+
+`tools/hooks/agent-cap.js` is wired on `Workflow|Agent`, the exact pair — `Workflow` alone leaves
+direct spawns unguarded. Its bound is a FILE CONSTANT: an `AGENT_CAP` environment override is
+refused, not honoured, so the only way to move the number is a change to the file the bar
+compares. Its rule count is owned by the kit's own README under `tools/hooks/` and restated nowhere, because the copy
+the manifest once carried rotted. The rules a review runs under are
+`memory/guides/REVIEW-PROTOCOL.md`; the ready-made harness is `tools/workflows/tier2-review.js`.

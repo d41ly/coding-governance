@@ -32,6 +32,22 @@ GATE_CMD="bash tools/run-gates/run-gates.sh"
 # Set it ABOVE your slowest legitimate bar. A bound that fires on a healthy run gets deleted.
 GATE_BOUND="3600"
 
+# The idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when
+# BOTH the newest write in the tree and the newest commit are older than this. OPTIONAL, on
+# GATE_BOUND's terms: absent takes the kit default and says so on stderr; non-numeric or zero is a
+# refusal.
+#
+# Set it to a few keepalive cadences, so a verdict is never one missed tick.
+UNIT_STALL_BOUND="1800"
+
+# The round bound a spec-audit subject -- any `--review` subject that is not the build slug -- takes
+# before it exits BOUNDED; the build slug keeps the runaway ceiling. OPTIONAL, on GATE_BOUND's terms:
+# absent takes the kit default of 1 and says so on stderr; non-numeric, zero, or above the runaway
+# ceiling is a refusal.
+#
+# 1 is the owner ruling: a spec subject takes one round, and a blocker it confirms is disposed.
+REVIEW_ROUNDS="1"
+
 # REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
 # accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked
 # bytes, and the run's first act must not be that.
@@ -78,6 +94,16 @@ RECALL_CLI=""
 # kit is not adopted; the item counts rows from whichever declared logs exist, and announces a
 # skip only when NEITHER CLI is declared.
 MAP_CLI=""
+
+# OPTIONAL, the same shape again. The spec-token checker `--dispatch` runs over the live tree
+# BEFORE it admits a build pass, refusing the dispatch when the checker exits non-zero — a live
+# spec naming a merge bar or a self-test suite as an acceptance observation, or a token that does
+# not resolve. BLANK means no such checker is carried, and the verb ANNOUNCES the skip on stdout
+# rather than passing silently. The checker this repo declares is gov-internal, at its tool root,
+# and no kit ships it: fill the key only where the project carries its own spec-token checker. Declared here because the bar's own run of the
+# checker grades LIVE specs and an unattended build closes every unit spec in its build commit,
+# so the dispatch is the one point that sees a spec while it can still be changed.
+SPEC_TOKENS_CLI=""
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
@@ -246,7 +272,9 @@ DISPOSITION_CUTOFF=""
 # whether its BUILD COMMIT carries a `brief · item <id>` row whose hash still joins to a tracked file
 # at that commit. Graded on the build README's `opened:` date. The anchor is the build commit itself
 # and not its first parent, unlike PASS_ORDER_CUTOFF above: `--brief` STAGES its row, so the row
-# lands in the same commit as the pass it describes.
+# lands in the same commit as the pass it describes. Which units the leg grades, and which it only
+# announces, is stated once, in the protocol's `BRIEF_RECORDED_CUTOFF` row at
+# <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md, and not restated here.
 #
 # BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
 # per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole

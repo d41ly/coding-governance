@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb
 
-**Status:** CLOSED · rev-6 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
+**Status:** CLOSED · rev-7 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -105,8 +105,8 @@ process spawn on the hot path and must not change how the driver dies.
   `:5015`, `:5019`, `:5020`, `:5021`, `:5032`, `:5039`, `:5040` and `:5059`. A marker on an exit that
   is not journaled, as `--plan`'s and `--version`'s are not, is harmless. The suite enumerates every `exit` across the whole of `tools/unattended/unattended.sh`
   and `tools/unattended/lib-unattended.sh`, excluding awk program text and comments, and fails on one
-  without the marker. The only exemptions are the named pre-install lines `:74`, `:275`, `:276`, `:279`
-  and `:310`. So an exit added later inside a verb body, the likeliest place, cannot slip past. The
+  without the marker. The only exemptions are the pre-install exits the suite names by their TEXT: the
+  five this unit found, and the `REVIEW_ROUNDS` ceiling refusal main added before the install. So an exit added later inside a verb body, the likeliest place, cannot slip past. The
   suite names each exemption by its line's TEXT, never its number, and requires each text to match
   exactly one site above the install: this unit's own insertions move the numbers, and a second copy
   of an exempt line is an exit nobody exempted.
@@ -220,7 +220,7 @@ one build folder, and never runs the existing unattended suites.
   `rc` equal to the process exit status. The shapes are `exit "$status"`, an inline `--phase` exit and
   a usage error. A sandbox conf that sets its own `trap 'exit 0' EXIT` changes neither. The suite also
   enumerates every `exit` in `tools/unattended/unattended.sh` and `tools/unattended/lib-unattended.sh`
-  by §4's rule, with §4's five exemptions, and fails on one with no clean-exit marker. The enumeration
+  by §4's rule, with §4's named exemptions, and fails on one with no clean-exit marker. The enumeration
   is staged RED with an unmarked `exit` inside a verb body above the install line, and with one in
   `lib-unattended.sh`. Observed with `bash <suite>`.
   Red when: the trap is installed after the argument loop, or before the conf source, or an exit site
@@ -320,6 +320,11 @@ none
   the budget rows and so does run it. AC13 joins the writer's pure-bash unit shape to the ERE in
   `_ids_of`, because a second spelling of one grammar is the two-answers class and nothing compared
   them; the arm was staged RED from each side.
+- rev-7 · 2026-09-16 · §4 · AC2 · the second origin/main reconcile: main added a pre-install exit, the
+  `REVIEW_ROUNDS` ceiling refusal, which the enumeration found. The exemptions are named by text and
+  now number six. The section 2 run-log paragraph and the §8 key row were tightened by 827 bytes at the
+  same merge, so the rendered protocol fits `GUIDE_CAP_BYTES` beside main's additions; every anchor
+  AC10 greps is unchanged.
 
 ## 10. Reuse audit
 

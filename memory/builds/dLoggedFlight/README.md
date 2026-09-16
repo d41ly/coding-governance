@@ -88,16 +88,16 @@ ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedF
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses](spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-14 |
-| [TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb](spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-13 |
+| [TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb](spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-16 |
 | [TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run](spec/2026-09-13-spec-TOOL-dLoggedFlight-3.md) | 3 | 2 | CLOSED | rev-6 | 2026-09-13 |
 | [TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push](spec/2026-09-13-spec-TOOL-dLoggedFlight-4.md) | 4 | 2 | CLOSED | rev-6 | 2026-09-14 |
 | [TOOL-dLoggedFlight-5 — one redaction table, applied once on read, with a staged positive per rule](spec/2026-09-13-spec-TOOL-dLoggedFlight-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-14 |
 | [TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost](spec/2026-09-13-spec-TOOL-dLoggedFlight-6.md) | 6 | 2 | CLOSED | rev-7 | 2026-09-14 |
 | [TOOL-dLoggedFlight-7 — the `Decided:` commit trailer, so a choice with no commit of its own has a home](spec/2026-09-13-spec-TOOL-dLoggedFlight-7.md) | 7 | 2 | CLOSED | rev-2 | 2026-09-13 |
-| [TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set](spec/2026-09-13-spec-TOOL-dLoggedFlight-8.md) | 8 | 2 | CLOSED | rev-10 | 2026-09-14 |
+| [TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set](spec/2026-09-13-spec-TOOL-dLoggedFlight-8.md) | 8 | 2 | CLOSED | rev-11 | 2026-09-16 |
 | [TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin](spec/2026-09-13-spec-TOOL-dLoggedFlight-9.md) | 9 | 2 | CLOSED | rev-7 | 2026-09-14 |
 | [TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar](spec/2026-09-13-spec-TOOL-dLoggedFlight-10.md) | 10 | 2 | CLOSED | rev-7 | 2026-09-14 |
-| [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-5 | 2026-09-14 |
+| [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-6 | 2026-09-16 |
 | [TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts](spec/2026-09-13-spec-TOOL-dLoggedFlight-12.md) | 12 | 2 | CLOSED | rev-3 | 2026-09-14 |
 | [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | CLOSED | rev-5 | 2026-09-14 |
 <!-- /gen:build-units -->

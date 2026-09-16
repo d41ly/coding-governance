@@ -25,6 +25,8 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "suite-invalidated-by-a-commit-under-it.md",
   "fixture-removes-the-path-under-test.md",
   "format-derived-from-arity.md",
+  "worktree-crlf-outside-the-gated-population.md",
+  "a-new-leg-trips-a-growing-set-of-meta-gates.md",
   "signal-trap-runs-the-exit-handler-twice.md",
   "async-job-starts-with-sigint-ignored.md"]
 guides = []

@@ -97,4 +97,5 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aLeakedHandle](../aLeakedHandle/README.md)
+- **Child builds:** [aProbedUnit](../aProbedUnit/README.md)
 <!-- /gen:build-edges -->

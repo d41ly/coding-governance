@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.21   # gov:kit unattended@1.21 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.25   # gov:kit unattended@1.25 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -375,6 +375,13 @@ RUNAWAY_CEILING=$(core_of RUNAWAY_CEILING)
 # already obey it. A restatement drifts silently: widen the driver's set and this leg tells a
 # record it was hand-edited when the driver itself wrote the value.
 REVIEW_DISPOSITIONS=$(core_of REVIEW_DISPOSITIONS)
+# THE FOLD RULE'S OWN CUTOFF, read the same way (closing review of aProbedUnit, round 2, cluster A).
+# DISPOSITION_CUTOFF dates the FIELD; this dates the later rule about the field's VALUE, and a ratchet
+# that grades history needs one per rule it grades — the fold-beside-blockers clause under the
+# field's cutoff alone redded sixteen tracked records the driver itself wrote under the contract that
+# accepted them. Unreadable is named inside check 2 rather than at a `fail` site of its own, because
+# the three pinned check-2 ordinals in memory/project/unarmed-branches.txt sit below this line.
+FOLD_CUTOFF=$(core_of FOLD_CUTOFF)
 # The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
@@ -427,6 +434,14 @@ elif [ -z "$RUNAWAY_CEILING" ]; then
   fail 2 "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 else
   rv_bad=""
+  # ---- A CUTOFF NOTHING CAN COMPARE grades every record or none: an empty one sorts before every
+  # ---- date and reds the whole grandfathered population, a malformed one sorts after and disarms
+  # ---- the clause silently. Named once, into the same failure the clauses below feed.
+  case "$FOLD_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) rv_bad="$rv_bad
+  (the driver declares no readable ISO-date FOLD_CUTOFF, so the fold-beside-blockers clause cannot tell a record written under the old contract from one graded by the severity rule and would red every record or none: '$FOLD_CUTOFF')" ;;
+  esac
   for rvf in $(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null); do
     [ -f "$rvf" ] || continue
     grep -q '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rvf" 2>/dev/null || continue
@@ -497,7 +512,13 @@ else
       # that and the first cut took the sibling's clause verbatim.
       if [ -z "$rv_fc" ] || printf '%s\n%s\n' "$DISPOSITION_CUTOFF" "$rv_fc" | sort -C; then rv_graded=1; fi
     fi
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v disps="|$REVIEW_DISPOSITIONS|" '
+    # THE FOLD RULE HAS ITS OWN CUTOFF, from the SAME first-commit date by the same idiom. A record
+    # before it was written when the driver accepted `fold` at a blocker-bearing exit, and reading it
+    # by today's rule redded sixteen tracked append-only records no verb can rewrite. An empty date
+    # grades here too, for the reason the sibling gives: it is the in-flight run.
+    rv_foldgraded=0
+    if [ "$rv_graded" = 1 ] && { [ -z "$rv_fc" ] || printf '%s\n%s\n' "$FOLD_CUTOFF" "$rv_fc" | sort -C; }; then rv_foldgraded=1; fi
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v foldgraded="$rv_foldgraded" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -509,15 +530,25 @@ else
         if (match(rs, /blockers [0-9]+/)) b = substr(rs, RSTART + 9, RLENGTH - 9) + 0
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
-        if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING/) term[it] = 1
-        if (rs ~ /NON-CONVERGENT|CEILING/) {
-          needs[it] = 1
-          nf = split(rs, fld, " · ")
+        if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
+        nf = split(rs, fld, " · ")
+        if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
+          needs[it] = 1; bl[it] = b
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
+        }
+        # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
+        # C). The severity rule disposes the HIGHS that stood at zero blockers, and the driver
+        # records `CONVERGED · disposition promote` when it did; a promotion this clause never
+        # counted was a promotion the bar could not see. Only under the graded path: the id-delta
+        # proxy predates the field and never read a converged row, and a converged subject is not
+        # one that "EXITED without converging".
+        else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
+          needs[it] = 1; bl[it] = b
+          disp[it] = substr(fld[nf], length("disposition ") + 1)
         }
       }
       END {
-        nneed = 0; nomiss = ""; illegal = ""
+        nneed = 0; nomiss = ""; illegal = ""; foldbad = ""
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
@@ -528,8 +559,12 @@ else
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
             else if (disp[it] == "promote") nneed++
-            # a subject recording `fold` demands NOTHING, which is the entire point of reading the
-            # field instead of inferring an answer from ids
+            else if (bl[it] > 0 && foldgraded == 1) foldbad = foldbad " " it "=" bl[it]
+            # a subject recording `fold` beside ZERO blockers demands NOTHING, which is the entire
+            # point of reading the field instead of inferring an answer from ids; beside a non-zero
+            # count it is a blocker left standing under a field that says nothing was — from
+            # FOLD_CUTOFF on. Before it the driver accepted the row, and it demands what it demanded
+            # when it was written: nothing
           }
         }
         if (graded == 1) {
@@ -537,11 +572,13 @@ else
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
           if (illegal != "")
             printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
+          if (foldbad != "")
+            printf "\n  %s (exited subject(s)%s record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was)", f, foldbad
           if (nneed > 0) {
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker has no unit. A subject recording disposition fold demands nothing here)", f, nneed, newids + 0
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker or high has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nneed, newids + 0
           }
         }
         else {

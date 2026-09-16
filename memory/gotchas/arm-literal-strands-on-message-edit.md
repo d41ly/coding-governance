@@ -82,3 +82,17 @@ that changes the text AFTER the first interpolation. For the second class the ar
 two-file edit and the only check is reading both. A refusal whose distinguishing words all sit after
 an interpolation has, in effect, no automated arm at all — which is a reason to put the distinguishing
 words BEFORE the first one.
+
+## Two more facets of the signature grammar, evicted here from the kickoff manifest
+
+**An arm must contain the branch's ENTIRE literal signature.** A readable PREFIX of a long message
+reds, and a literal word sitting between the sentence and the first interpolation is part of the
+signature — so end the sentence and let only interpolations follow it. Adding branches RENUMBERS the
+per-check ordinals, which invalidates any `memory/project/unarmed-branches.txt` row below the
+insertion point: re-key those rows in the same commit.
+
+**A positional in a `fail` message CANNOT be armed.** `tools/memory-tree/check-arms.py` reads a bare
+`$1` as literal text inside the signature, so an arm quoting the rendered message never matches the
+source. Bind the positional to a name and put it at the END, after the sentence, where it is an
+interpolation the signature stops at. Both facets are gated by the same `--check`, and both bit
+before they were written down.
