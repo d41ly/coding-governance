@@ -54,7 +54,8 @@ prefix, and let the adopter write them instead of renaming them.
 - No new descriptor token, and no engine change in `tools/govkit/govkit.py`. The destination is
   spelled with `{prefix}` and `{kit_id}`, which `target_context` already seeds.
 - No change to the fixture PIECES, to `playbook.fixture.template.md`, or to what
-  `check-playbook.sh` checks. The records' bytes are unchanged apart from the placeholder.
+  `check-playbook.sh` checks. The records' BODY is unchanged apart from the placeholder; rev-2's S1
+  adds the kit-version marker line above it, which is the only other byte that moved.
 - No withdrawal of the old rows at an adopter. An `update` after this lands reports each stale engine
   row as withdrawn and writes an order under the target's outbox; deletion still needs
   `--write-withdrawals`, and that stays the operator's call.
