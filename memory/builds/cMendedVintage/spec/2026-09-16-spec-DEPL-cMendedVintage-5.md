@@ -113,9 +113,16 @@ these blocks, so the observable change in this repo is confined to what `govkit 
 
 | Path | Change |
 |---|---|
-| `tools/lexicon/kit.toml` | one regenerate block, one outcome block, version bump |
-| `tools/drift-audit/kit.toml` | one regenerate block, version bump |
-| `tools/memory-recall/kit.toml` | one regenerate block, version bump |
+| `tools/lexicon/kit.toml` | one regenerate block, one outcome block |
+| `tools/drift-audit/kit.toml` | one regenerate block |
+| `tools/memory-recall/kit.toml` | one regenerate block |
+| each kit's version constant and every `gov:kit` marker its entry claims | S6's bump |
+
+S6 is more than three lines: selfcheck arm 5c holds every `gov:kit` marker inside an entry's derived
+set equal to that entry's constant, so the bump moves each marker carrier too — including the
+workflow harnesses `drift-audit` declares as `marker_carriers`, and the rendered lexicon Skill, whose
+marker the adopter writes from the constant. Read the set from the entries rather than from a list
+here; it is `entry_members` plus `marker_carriers`, which is what arm 5c itself reads.
 
 ## 5. Production-readiness checklist
 
@@ -177,10 +184,10 @@ none
 - rev-2 · 2026-09-16 · built. Three changes, none to the design. (a) The S4 block ships with a
   comment stating what its probe does NOT tell apart — a failed first scaffold leaves the same
   absent conf — and naming `DEPL-cMendedVintage-16` as the unit that narrows it. The probe itself is
-  unchanged, per that unit's ownership of the repair. (b) Section 3's file estimate was three
-  descriptors; S6's bumps also move every `gov:kit` marker each entry claims, which selfcheck arm 5c
-  holds equal to the constant, plus the two workflow harnesses drift-audit declares as
-  `marker_carriers` and the rendered lexicon Skill, whose marker is derived from the constant.
+  unchanged, per that unit's ownership of the repair. (b) Section 4's file table listed three
+  descriptors and has been corrected: S6's bump moves every `gov:kit` marker inside each entry's
+  derived set, which selfcheck arm 5c holds equal to that entry's constant, so the real write set is
+  `entry_members` plus `marker_carriers` and is read from the entries rather than listed twice.
   (c) AC1 was observed per-argv rather than through `update`'s re-render loop: each declared argv was
   run in this tree and each rewrote its own `rendered` row, and the AC2 fixture ran the lexicon argv
   against a staged target with no conf. The loop itself is unchanged code already exercised by the

@@ -61,9 +61,9 @@ required_keys_render = ["MEMORY_ROOT", "FAMILIES"]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
 mutates_index = false
 
-# THE RE-RENDER an `update` runs when GOVKIT_RERENDER=1 is exported. It rewrites the one `rendered`
-# row above from `SKILL.template.md` plus the shared memory-tree conf, which is the only artifact in
-# this entry whose content is derived rather than copied.
+# THE RE-RENDER an `update` runs when GOVKIT_RERENDER=1 is exported. It rewrites what the `rendered`
+# rule above declares, from `SKILL.template.md` plus the shared memory-tree conf — content derived
+# from the adopting tree rather than copied from gov's, which is what makes it go stale.
 #
 # `--scaffold` IS THE RENDER MODE HERE, unlike the sibling kit whose scaffold refuses once a
 # declaration exists: this one owns no conf of its own, reads the memory-tree kit's, and renders
