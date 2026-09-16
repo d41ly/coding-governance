@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-19 — every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 19
+**Status:** WONTDO · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 19 · superseded by TOOL-dLoggedFlight-20 (owner, 2026-09-16: the committed record carries no journal or transcript time)
 
 <!-- gen:spec-records -->
 

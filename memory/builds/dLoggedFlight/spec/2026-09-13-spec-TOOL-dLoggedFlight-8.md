@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-13 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-14 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -291,6 +291,7 @@ sources actually support. Every later surface renders from this model rather tha
   gate classes.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill runs `model` and reads its
   coverage block.
+- **hands-off** `TOOL-dLoggedFlight-20` — the timeline, window and anomalies, each with the source the record keeps times from.
 
 ## 4. Design
 
@@ -704,6 +705,8 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
 - rev-13 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-16` to `-19`, the units the spec audit
   of units 14 and 15, round 1, promoted at its BOUNDED exit. The edge to `-15` drops the window end,
   which moved to `-18`.
+- rev-14 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-20`: the owner's ruling of 2026-09-16
+  keeps every journal and transcript time out of the committed record.
 
 ## 10. Reuse audit
 

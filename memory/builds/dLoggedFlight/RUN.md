@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 2aaae60d047b417e59d0aa4561f53a4fa82460b3
-phase: REVIEWING
+witness: 82a1ace004a62cb49638d8652b1891e9d7f246ed
+phase: SPECCING
 branch-sha: a4007553c89f244136b3783b3a0b1bd3223f25ab
 branch-ref: refs/heads/branch/unattended-build-transparency-ea83a5
 mode: prompt
@@ -110,3 +110,13 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T13:11:10Z rescope · item add TOOL-dLoggedFlight-18 · reason spec audit round 1 of units 14 and 15 BOUNDED, H1 HIGH and H2 HIGH promoted: the commitment last and a NONE gate line's window end carried a held line's time
 
 2026-09-16T13:11:11Z rescope · item add TOOL-dLoggedFlight-19 · reason spec audit round 1 of units 14 and 15 BOUNDED, H3 HIGH promoted: the class gate enumerated row kinds and missed every other UTC slot of the schema
+
+2026-09-16T13:42:12Z rescope · item add TOOL-dLoggedFlight-20 · reason owner ruling 2026-09-16: the committed record carries no time a journal or transcript produced, closing the owner-time leak class by construction
+
+2026-09-16T13:42:12Z rescope · item supersede TOOL-dLoggedFlight-15 -> TOOL-dLoggedFlight-20 · reason owner ruling 2026-09-16: no journal or transcript time is committed, so this per-path hold of such a time has nothing left to hold
+
+2026-09-16T13:42:13Z rescope · item supersede TOOL-dLoggedFlight-17 -> TOOL-dLoggedFlight-20 · reason owner ruling 2026-09-16: no journal or transcript time is committed, so this per-path hold of such a time has nothing left to hold
+
+2026-09-16T13:42:13Z rescope · item supersede TOOL-dLoggedFlight-18 -> TOOL-dLoggedFlight-20 · reason owner ruling 2026-09-16: no journal or transcript time is committed, so this per-path hold of such a time has nothing left to hold
+
+2026-09-16T13:42:14Z rescope · item supersede TOOL-dLoggedFlight-19 -> TOOL-dLoggedFlight-20 · reason owner ruling 2026-09-16: no journal or transcript time is committed, so this per-path hold of such a time has nothing left to hold

@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-9 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-10 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -138,6 +138,7 @@ leg can prove nothing else got in.
   `check_commitment`, whose window fact and commitment times change and whose template does not.
 - **hands-off** `TOOL-dLoggedFlight-19` — `RECORD_SCHEMA`, whose `utc` slots the class gate reads.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill reads this record first.
+- **hands-off** `TOOL-dLoggedFlight-20` — `RECORD_SCHEMA` and the renderer, whose times it restricts to git and run-state sources.
 
 ## 4. Design
 
@@ -326,6 +327,8 @@ none
 - rev-9 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-16` to `-19`, the units the spec audit
   of units 14 and 15, round 1, promoted at its BOUNDED exit. The edge to `-14` left with that unit's
   S5, which moved to `-17`, and the edge to `-15` drops the layout table, which `-19` reads.
+- rev-10 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-20`: the owner's ruling of 2026-09-16
+  keeps every journal and transcript time out of the committed record.
 
 ## 10. Reuse audit
 

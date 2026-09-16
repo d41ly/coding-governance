@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** CLOSED · rev-8 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -100,6 +100,7 @@ schema, independently of the renderer.
 - **consumes-from** `TOOL-dLoggedFlight-9` — the closed schema, the record naming and the renderer the
   clean fixture comes from, with the run starts it reads from the model.
 - **hands-off** `TOOL-dLoggedFlight-11` — the leg that grades this run's own record before its landing.
+- **hands-off** `TOOL-dLoggedFlight-20` — the leg it gives the time-source rule.
 
 ## 4. Design
 
@@ -235,6 +236,8 @@ none
   current root, so following the starts alone would leave its windows quietly wrong. Its waiver
   route is parked in the unit's acceptance ledger, since a waiver registry is a new surface an
   adopter authors, which is the owner's turn.
+- rev-8 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-20`: the owner's ruling of 2026-09-16
+  keeps every journal and transcript time out of the committed record.
 
 ## 10. Reuse audit
 

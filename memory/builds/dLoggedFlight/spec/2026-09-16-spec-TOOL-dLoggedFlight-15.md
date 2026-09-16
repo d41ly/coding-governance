@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-15 — a row an owner act can cause carries no time that places the act
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 17
+**Status:** WONTDO · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 17 · superseded by TOOL-dLoggedFlight-20 (owner, 2026-09-16: the committed record carries no journal or transcript time)
 
 <!-- gen:spec-records -->
 

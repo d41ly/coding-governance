@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-18 — an owner-causable journal line sets neither the window's rendered end nor the commitment's times
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 18
+**Status:** WONTDO · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 18 · superseded by TOOL-dLoggedFlight-20 (owner, 2026-09-16: the committed record carries no journal or transcript time)
 
 <!-- gen:spec-records -->
 

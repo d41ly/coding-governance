@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-17 — the owner-time refusal re-reads every session the model read, and holds an idle row to the model's own guard
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 16
+**Status:** WONTDO · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 16 · superseded by TOOL-dLoggedFlight-20 (owner, 2026-09-16: the committed record carries no journal or transcript time)
 
 <!-- gen:spec-records -->
 

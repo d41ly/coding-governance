@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-14 — a session's live transcript is read before its store extract, on the named and the discovered path
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 15
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -19,8 +19,10 @@ it here. Make a local transcript the source of every session it belongs to, name
 read on the discovered path only the sessions that reach the run's window.
 
 The spec audit of this unit, round 1, moved two halves out. The freshness key, its test and what a
-short source withholds are `TOOL-dLoggedFlight-16` (B1). The independent owner-time refusal is
-`TOOL-dLoggedFlight-17` (H4, H5).
+short source withholds are `TOOL-dLoggedFlight-16` (B1). The independent owner-time refusal went to
+`TOOL-dLoggedFlight-17` (H4, H5), which the owner's ruling of 2026-09-16 superseded by
+`TOOL-dLoggedFlight-20`: the record carries no journal or transcript time, so no owner time is left to
+refuse. What this unit still owns is count correctness.
 
 ## 2. Scope (IN)
 
@@ -42,11 +44,10 @@ short source withholds are `TOOL-dLoggedFlight-16` (B1). The independent owner-t
     dropped.
 
   The sessions S4 keeps are the sessions the model read, for every rule that counts or tests sessions:
-  `TOOL-dLoggedFlight-16`'s freshness test and `TOOL-dLoggedFlight-17`'s independent read. The
+  `TOOL-dLoggedFlight-16`'s freshness test and every transcript-derived count the record keeps. The
   Coverage `sessions` fact's extracted count is the number kept. Observed by AC3 and AC7.
-- **S5** Moved to `TOOL-dLoggedFlight-17`, which re-reads owner turns from every session the model
-  read and holds an idle row to `IDLE_OWNER_GUARD_S`. NOT OBSERVED here: that unit's criteria observe
-  it.
+- **S5** Retired. It moved to `TOOL-dLoggedFlight-17`, which `TOOL-dLoggedFlight-20` supersedes: the
+  committed record no longer carries a time the refusal guarded. NOT OBSERVED here.
 - **S6** The class, recorded. `memory/gotchas/withheld-value-recovered-from-a-derived-one.md` gains this
   instance: a cache preferred over its source, with its freshness key never read. Observed by AC6.
 
@@ -54,9 +55,8 @@ short source withholds are `TOOL-dLoggedFlight-16` (B1). The independent owner-t
 
 - Whether a store extract covers the window, and what a short one withholds. `TOOL-dLoggedFlight-16`
   owns both.
-- The independent owner-time refusal. `TOOL-dLoggedFlight-17` owns it.
-- The rows an owner act causes. `TOOL-dLoggedFlight-15` holds those, and this unit only fixes which
-  owner turns the model knows.
+- Any committed time. `TOOL-dLoggedFlight-20` keeps every journal and transcript time out of the
+  record, which retired the owner-time refusal and the held rows.
 - One residue of S4, stated because it cannot be read away. A session whose transcript has left this
   machine, and whose extract was made before it did anything inside the window, is indistinguishable
   from an earlier run's session, and it is dropped. With no other session kept, the transcripts read
@@ -71,9 +71,12 @@ short source withholds are `TOOL-dLoggedFlight-16` (B1). The independent owner-t
   changes.
 - **consumes-from** `TOOL-dLoggedFlight-16` — the window `resolve_run_sessions` takes, and the `stale`
   state the discovered-path arm reads.
-- **hands-off** `TOOL-dLoggedFlight-15` — the owner turns its held rows are measured against.
-- **hands-off** `TOOL-dLoggedFlight-17` — the sessions the model read, which the independent refusal
-  re-reads.
+- **hands-off** `TOOL-dLoggedFlight-15` — superseded by `TOOL-dLoggedFlight-20`; the edge stays because
+  that retired record declares it.
+- **hands-off** `TOOL-dLoggedFlight-17` — superseded by `TOOL-dLoggedFlight-20`; the edge stays because
+  that retired record declares it.
+- **hands-off** `TOOL-dLoggedFlight-20` — the transcript-derived counts the record keeps once every
+  journal and transcript time is withheld.
 
 ## 4. Design
 
@@ -170,6 +173,9 @@ none
   and H5 went to `TOOL-dLoggedFlight-17`, which takes S5 and AC5. The order moves from 14 to 15 so unit
   16 lands first, the title drops the half that moved, and the edge to `TOOL-dLoggedFlight-9` left with
   S5.
+- rev-3 · 2026-09-16 · §1 · S4 · S5 · §3 · the owner's ruling of 2026-09-16 (no journal or
+  transcript time is committed) supersedes `TOOL-dLoggedFlight-15` and `-17` by `TOOL-dLoggedFlight-20`:
+  S5 retires, and this unit keeps count correctness.
 
 ## 10. Reuse audit
 
