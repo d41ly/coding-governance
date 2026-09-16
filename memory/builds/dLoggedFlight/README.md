@@ -110,9 +110,9 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLogg
 | [TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set](spec/2026-09-13-spec-TOOL-dLoggedFlight-8.md) | 8 | 2 | CLOSED | rev-15 | 2026-09-16 |
 | [TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin](spec/2026-09-13-spec-TOOL-dLoggedFlight-9.md) | 9 | 2 | CLOSED | rev-11 | 2026-09-16 |
 | [TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar](spec/2026-09-13-spec-TOOL-dLoggedFlight-10.md) | 10 | 2 | CLOSED | rev-9 | 2026-09-16 |
-| [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-6 | 2026-09-16 |
+| [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-7 | 2026-09-16 |
 | [TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts](spec/2026-09-13-spec-TOOL-dLoggedFlight-12.md) | 12 | 2 | CLOSED | rev-5 | 2026-09-16 |
-| [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | CLOSED | rev-5 | 2026-09-14 |
+| [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | CLOSED | rev-6 | 2026-09-16 |
 | [TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning](spec/2026-09-16-spec-TOOL-dLoggedFlight-16.md) | 14 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-14 — a session's live transcript is read before its store extract, on the named and the discovered path](spec/2026-09-16-spec-TOOL-dLoggedFlight-14.md) | 15 | 2 | SPECCED | rev-4 | 2026-09-16 |
 | [TOOL-dLoggedFlight-17 — the owner-time refusal re-reads every session the model read, and holds an idle row to the model's own guard](spec/2026-09-16-spec-TOOL-dLoggedFlight-17.md) | 16 | 2 | WONTDO | rev-1 | 2026-09-16 |

@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged
 
-**Status:** CLOSED · rev-5 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 13
+**Status:** CLOSED · rev-6 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -84,6 +84,10 @@ name the one whose witness cannot say.
   commits alone cannot order two of its members. Observed by AC4.
 - **S6** The kit version moves from 1.10 to 1.11 across its carriers, with a self-test arm. Observed
   by AC5.
+- **S7** The conf reader the signal globs through. `load_conf` in `tools/drift-audit/drift_report.py`
+  reads a quoted value as the text up to its matching quote, whatever follows it, so
+  `MEMORY_ROOT="memory"  # note` reads `memory` as bash reads it, and the signal globs the declared
+  root rather than reporting DEAD PROBE. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -204,6 +208,10 @@ index lists the new public functions. No carried-prefix row moves (S3).
   `PARK_KINDS` in both directions, and the terminal set equals its `PHASES_TERMINAL`. Where the driver
   is absent, the arm prints its skip.
   Red when: the driver gains an owed kind the table lacks and the arm stays green.
+- **AC7** — When `test_conf_parser_matches_bash` in `tools/drift-audit/selftest.py` sources a conf
+  holding `QUOTED_NOTE="noted"  # a note` and `SINGLE_NOTE='single' # a note`, `load_conf` reads each
+  value identically to the POSIX shell.
+  Red when: either value keeps its quotes; staged RED against the reader before rev-6.
 
 ## 7. Gates
 
@@ -236,6 +244,12 @@ none
   owed. S4 adds NOT ASKED for a repo with no runs and no conf. §4 pins the measured 5 and spells the
   unjudgeable row. §5's testing line still said `no-progress`, rev-3's name for what rev-4 made
   `unjudgeable`, and now names each fixture by reason. §7's suite had no floor to raise.
+- rev-6 · 2026-09-16 · S7 · AC7 · folded R2-L5 of the closing diff review, round 2. `load_conf` told a
+  quoted value from an unquoted one by whether its first and last characters matched, so a quoted
+  value followed by a comment kept its quotes, and this unit's signal globbed a quoted root. S7 ports
+  the runlog reader's matching-quote rule, and AC7 adds both quoted spellings to the bash-parity
+  fixture, raising the floor from 259 to 261. The version does not move again: 1.11 is this build's
+  single move.
 
 ## 10. Reuse audit
 

@@ -26,9 +26,11 @@ before ORIENTING. Use `{{KEEPALIVE_CREATE}}`, at the cadence this project declar
 {{KEEPALIVE_CREATE}}  ->  keep the id
 ```
 
-**What the tick runs.** The prompt it schedules is the stall probe — once the run has a slug, run
-`bash {{KIT_DIR}}/unattended.sh --audit <slug>`; before `--preflight` no slug exists and the tick
-does nothing. The verb prints one line per dispatched-and-open unit with how long the TREE has
+**What the tick runs.** The prompt it schedules is the stall probe — once this session's
+`--preflight` has written the run's record, run `bash {{KIT_DIR}}/unattended.sh --audit <slug>`;
+before that the tick does nothing. A slug can be known earlier, and a probe issued then refuses with
+check 51, or on a re-run build says the keepalive should have been reaped: both are expected before
+`--preflight`, and neither is a signal to reap the keepalive `--preflight` is about to need. The verb prints one line per dispatched-and-open unit with how long the TREE has
 been idle and a verdict against `UNIT_STALL_BOUND`. On `PROGRESSING` do nothing. On `STALLED`,
 act: stop the unit's task, record why with `--park` or a brief note, then re-dispatch that unit
 with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit

@@ -43,7 +43,7 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 259
+CHECK_FLOOR = 261
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -123,6 +123,8 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
         'TRAILING=spaced   \n'
         'export EXPORTED=exported\n'
         'INLINE=value   # a trailing comment bash does not put in the value\n'
+        'QUOTED_NOTE="noted"  # a note after a quoted value\n'
+        "SINGLE_NOTE='single' # a note after a single-quoted value\n"
     )
     p = tmp / ".memory-tree.conf"
     p.write_text(body, encoding="utf-8", newline="\n")
@@ -135,8 +137,10 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     if sh is None:
         skip("conf parser vs shell", "no POSIX shell here can source a file at this path")
         return
+    # TOOL-dLoggedFlight-13 R2-L5 — QUOTED_NOTE and SINGLE_NOTE: a quoted value followed by a comment
+    # kept its quotes, because the parser told quoted from unquoted by the value's last character.
     for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING",
-                "EXPORTED", "INLINE"):
+                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE"):
         res = run([sh, "-c", f'set -a; . ./.memory-tree.conf; printf "%s" "${key}"'], tmp)
         if res.returncode != 0:
             check(f"{sh} could source the conf for {key}", False, res.stderr.strip()[:120])

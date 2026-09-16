@@ -71,6 +71,11 @@ failed the check it aims at both times.
   `waiver` dropped from the engine read `engine lacks ['waiver']`, which is the driver holding an
   owed kind the table lacks. `review` and `add` added read `driver lacks`, and LANDED dropped from the
   terminal set read `engine lacks ['LANDED']`.
+- AC7 — `test_conf_parser_matches_bash` in `tools/drift-audit/selftest.py` — owed to the post-build
+  suite run, which the gate-guard hook holds until VERIFYING. Observed directly on 2026-09-16 at spec
+  rev-6: `load_conf` over a conf holding `MEMORY_ROOT="memory"  # note` and `SINGLE_NOTE='single' # a
+  note` read `memory` and `single`, and the reader at HEAD before the fold read `"memory"` and
+  `'single'` over the same file. The arm's RED is that break, staged at the post-build run.
 
 ## What else the pass carried
 

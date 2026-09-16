@@ -34,7 +34,11 @@ observes is owed to the landing, and the last section says where it will be reco
   RED: the same grep over HEAD's rendered Skill prints nothing.
 - AC3 — `--audit <slug>` in the keepalive section of `tools/unattended/SKILL.template.md`, re-observed at
   the second origin/main reconcile (2026-09-16), where main's stall probe replaced the `--status`
-  heartbeat and the section now names the probe the run's heartbeat. The original observation follows: template
+  heartbeat and the section now names the probe the run's heartbeat. Re-observed again at spec rev-7
+  (2026-09-16, R2-L3): template lines 29 to 33 make the call once `--preflight` has written the run's
+  record and say a check-51 refusal before then is not a signal to reap, and the rendered Skill carries
+  the same lines at 29 to 33, which `tools/unattended/adopt-unattended.sh --check` read as in sync. RED:
+  HEAD's template before the fold conditions the call on a slug existing. The original observation follows: template
   line 30 carries `bash {{KIT_DIR}}/unattended.sh --status <slug>`, which renders at line 30 of the
   Skill inside `## Before any path — schedule the keepalive NOW`. The wording that makes the call only
   once the run-state file exists is at 32 to 35. The Resume section gives its replacement job the same

@@ -108,11 +108,14 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
         k = k.strip().removeprefix("export ").strip()
         v = v.strip().strip("\r")
         # Bash sourcing semantics for the restricted grammar the conf documents: a quoted value
-        # keeps everything inside the quotes; an UNQUOTED value ends at whitespace, so a trailing
-        # inline comment cannot leak into it. Both rules are `map_lib.load_conf`'s and both were
-        # missing here — see the docstring.
-        if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
-            v = v[1:-1]
+        # is the text up to its MATCHING quote, whatever follows it; an UNQUOTED value ends at
+        # whitespace, so a trailing inline comment cannot leak into it. Both rules are
+        # `map_lib.load_conf`'s and both were missing here — see the docstring. The quoted rule
+        # first tested whether the value's first and last characters matched, so
+        # `KEY="v"  # note` kept its quotes (TOOL-dLoggedFlight-13, closing review round 2 R2-L5).
+        close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
+        if close >= 0:
+            v = v[1:close]
         else:
             v = v.split()[0] if v.split() else ""
         conf[k] = v
