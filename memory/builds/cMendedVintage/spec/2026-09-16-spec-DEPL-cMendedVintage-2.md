@@ -21,18 +21,20 @@ the file actually went back, and name the path that did not in the order.
 
 ## 2. Scope (IN)
 
-- **S1** The four restore-failure branches inside the rollback path loop
-  (`tools/govkit/govkit.py:7664`, `:7678`, `:7687` and the containment refusal at `:7650`) record the
-  path they could not restore in an `unrestored` list before they `continue`. Observed by AC1.
-- **S2** The `ROLLBACK_FIELDS` revert and the `withdrawn_rows` removal at `tools/govkit/govkit.py:7729`
-  run only when every path of that snapshot entry that this run WROTE is in `restored`. Observed by
-  AC2 and AC3.
+- **S1** The four restore-failure branches inside `tools/govkit/govkit.py`'s rollback path loop —
+  the `demand_contained_dest` refusal, the `git rm --cached` failure, the `git update-index` failure
+  and the `git checkout-index` failure — record the path they could not restore in an `unrestored`
+  list before they `continue`. Named by their calls and not by line numbers: rev-1 spelled those and
+  they drifted 41 lines in one commit, then again inside this unit's own. Observed by AC1.
+- **S2** The `ROLLBACK_FIELDS` revert and the `withdrawn_rows` removal at the foot of the snapshot-entry
+  loop run only when every path of that snapshot entry that this run WROTE is in `restored`. Observed by
+  AC2 for the failing half and AC5 for the clean one; the `WROTE` filter itself is observed by
+  nothing and AC3 says why.
 - **S3** The rollback order gains a fourth block naming every unrestored path, and its lead sentence
   stops claiming that every path below was put back. The block's LINE is derived from the same
   `_left` predicate that gates the revert, never from `unrestored` alone, so a path the gate did not
-  hold is never printed under a sentence claiming its row was left forward. The containment refusal
-  at `tools/govkit/govkit.py:7646` is that case and it takes its own sentence, named in §4. Observed
-  by AC4 and AC6.
+  hold is never printed under a sentence claiming its row was left forward. The `demand_contained_dest`
+  refusal is that case and it takes its own sentence, named in §4. Observed by AC4 and AC6.
 - **S4** That fourth block states the half-restored case explicitly: when `git checkout-index` is what
   failed, the index was ALREADY reverted to the pre-run blob while the worktree file did not come
   back, so index and worktree disagree at that path and the row was left at this run's values.
@@ -45,7 +47,7 @@ the file actually went back, and name the path that did not in the order.
   is unchanged.
 - No retry, no second restore attempt, no fallback write. A restore that git refused is an operator
   problem, and a tool that keeps trying is how a part-restored tree becomes an unreadable one.
-- No change to the `origin == "landed"` branch at `tools/govkit/govkit.py:7627`, which already gates
+- No change to the `origin == "landed"` branch, which already gates
   its own row removal on the same predicate. This unit lifts that idea one level out; it does not
   rewrite that branch.
 - Nothing about WHICH kits reach the restore loop. That is the unit before this one.
@@ -62,15 +64,17 @@ the file actually went back, and name the path that did not in the order.
 
 ### The defect, read from source
 
-`tools/govkit/govkit.py:7566` opens `for s in [x for x in snap_rows if x["kit"] == eid]:` and then
+`tools/govkit/govkit.py`'s rollback arm opens `for s in [x for x in snap_rows if x["kit"] == eid]:`
+and then
 `for p in s["paths"]:`. Inside the inner loop, four outcomes end in `continue`: a containment refusal,
 a `git rm --cached` that would not unstage, a `git update-index` that would not take the entry, and a
 `git checkout-index` that could not write the worktree file. Each appends nothing to `restored`.
 
 Control then leaves the inner loop and reaches, unconditionally, the block that copies
 `s["fields"]` back onto `s["row"]` for every key in `ROLLBACK_FIELDS` and drops the row from
-`withdrawn_rows`. The receipt is serialised at `tools/govkit/govkit.py:7827`. So the file on disk
-holds what this run wrote while its row claims the pre-run `sha256`, `oid`, `commit` and `version` —
+`withdrawn_rows`, and the receipt is then serialised to `install.json`. So the file on disk is not
+what the row describes — it holds what this run wrote, or, where `checkout-index -f` refused, nothing
+at all — while the row claims the pre-run `sha256`, `oid`, `commit` and `version` —
 which is the exact disagreement `DEPL-dCarriedReceipt-7` and `-8` were built to prevent, arriving
 through the failure path instead of the success path.
 
@@ -86,15 +90,20 @@ else:
 
 Two details the shape depends on. The filter is `p in written_paths and p not in restored`, not
 `p not in restored` alone: a path this run never wrote is collected into `untouched` and reverting
-the row is correct for it, so an unfiltered predicate would keep every row forward whenever an entry
-carried one untouched path. And the predicate is the one the `origin == "landed"` branch thirty
+the row is correct for it, so an unfiltered predicate would keep that entry's row forward for a path
+it had no business holding. AC3 records that no entry reachable today mixes the two, so the filter
+is a class guard rather than a fix for a live case — its reason lives at the code site, where the
+next reader of the predicate will meet it. And the predicate is the one the `origin == "landed"` branch thirty
 lines above already computes for itself as `_left_landed`; this is the same test one level out, which
 is why it is a gate and not a new mechanism.
 
 ### What the row keeping its forward values means
 
-The row then describes the bytes that are actually on disk, which is the invariant the receipt exists
-to hold. The consequence is stated rather than left to be discovered: the next `update` sees that row
+The row then describes what this run did rather than a pre-run state nothing returned to, which is
+the weaker claim the receipt can actually stand behind: where the restore left the file this run's,
+the row matches it, and where `checkout-index` took the file away entirely the row at least stops
+attesting a `sha256` for content that was never put back. The consequence is stated rather than left
+to be discovered: the next `update` sees that row
 at this run's vintage and will not re-offer the work, so the operator's repair is the order file and
 not a second update. That is the correct trade — a receipt that agrees with the tree and re-offers
 nothing beats a receipt that disagrees and re-offers everything, because only the second one can
@@ -104,9 +113,10 @@ silently overwrite an operator's manual repair.
 
 The lead sentence today reads "Every path marked `restored` below was put back to the index entry it
 had before the first byte moved, and its receipt row with it." It becomes conditional: the sentence
-stands for the `restored` block, and a new sentence says that any path under `NOT restored` is one
-the rollback could not return, that its bytes are this run's, and that its receipt row was therefore
-LEFT at this run's values on purpose.
+is narrowed to the `restored` block with an `and ONLY those`, and a new sentence says that any path
+under `NOT restored` is one the rollback could not return at all, whose own line names what refused
+and what its receipt row now holds. The line does not say whose bytes are on disk, because after a
+refused `checkout-index` nothing in this tool knows.
 
 The fourth block is emitted beside the three that exist:
 
@@ -129,7 +139,7 @@ sees a deletion they did not make, and the order is the only place that explains
 
 ### The containment case prints a different sentence
 
-The containment refusal at `tools/govkit/govkit.py:7580` runs BEFORE the `p not in written_paths`
+The `demand_contained_dest` refusal runs BEFORE the `p not in written_paths`
 test at `:7584`, and its own header says it exists for a receipt row spelling `../../x` that the
 write loop refused — which is a path absent from `written_paths` by construction. So `_left` excludes
 it and the revert DOES run for its entry. Printing it under the sentence above would make two false
@@ -161,7 +171,7 @@ block, one order block and two sentences. `tools/govkit/selftest.py` — one fix
 
 ### The fixture, and why it does not exist today
 
-`tools/govkit/govkit.py:7623`'s own header says no arm reaches the three plumbing failures, because
+The `NO ARM REACHES THE THREE PLUMBING FAILURES` header in `tools/govkit/govkit.py` says no arm reaches the three plumbing failures, because
 each needs the TARGET's git to refuse a call the suite does not manufacture. The cheapest
 manufacturable one is `checkout-index`, and rev-2 named the wrong way to manufacture it: a DIRECTORY
 at the worktree path does NOT reproduce the branch, because `checkout-index -f` removes a directory
@@ -171,7 +181,7 @@ written, and the probe reported the path `restored`.
 What does reproduce it is a git filter the target's own git must honour: the kit's `[check]` script,
 which runs AFTER the write and BEFORE the rollback, writes a `.gitattributes` binding the victim path
 to a `required` filter whose smudge command fails. `checkout-index` then exits non-zero with
-`smudge filter … failed` and the branch at `tools/govkit/govkit.py:7687` is reached. That window is
+`smudge filter … failed` and the `git checkout-index` branch is reached. That window is
 the fixture's whole trick and it is why no fixture could stage this from outside the run: before the
 write the path must be ordinary or the write loop trips on it, and after the rollback it is too late.
 It is a fixture edit rather than a git mock, and it is the arm AC1, AC2 and AC4 are observed on.
@@ -276,7 +286,7 @@ adopter's ordinary run changes behaviour.
 
 New arm: tools/govkit/selftest.py · a rolled-back kit whose own check installs a `required` git
 filter over one of its paths, so `git checkout-index -f` refuses and the branch at
-`tools/govkit/govkit.py:7687` is reached · none
+the `git checkout-index` branch is reached · none
 
 `govkit refusal join` is named because this unit reuses the four existing `r.fail` branches and adds
 none, so its branch pin and enumerated anchor set must be unchanged by this commit.
@@ -312,7 +322,7 @@ none
 ## 10. Reuse audit
 
 The seam this unit extends is in the same function and was found by reading it rather than by name:
-`tools/govkit/govkit.py:7638`'s `_left_landed = [p for p in s["paths"] if p not in restored]`, the
+`tools/govkit/govkit.py`'s `_left_landed = [p for p in s["paths"] if p not in restored]`, the
 predicate the landed branch already computes to decide whether its own row may be dropped. This unit
 is that predicate hoisted one level, and `python tools/codebase-map/reuse_lookup.py "update verb rolls
 a kit back after declining its render step"` surfaces no other candidate — its ranked hits are
