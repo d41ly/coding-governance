@@ -7,7 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-build-TOOL-dLoggedFlight-14-1-acceptance-ledger.md](../build/2026-09-16-build-TOOL-dLoggedFlight-14-1-acceptance-ledger.md) | journal | — |
-| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 |
+| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 |
 | [2026-09-16-review-TOOL-dLoggedFlight-14-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-14-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-15 |
 | [2026-09-16-review-TOOL-dLoggedFlight-20-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-20-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 |
 

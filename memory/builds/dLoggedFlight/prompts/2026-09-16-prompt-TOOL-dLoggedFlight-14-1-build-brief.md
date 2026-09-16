@@ -1,9 +1,9 @@
-# Build brief — TOOL-dLoggedFlight-14, -16 and -20 to -24
+# Build brief — TOOL-dLoggedFlight-14, -16 and -20 to -27
 
-**Serves:** journal TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24
+**Serves:** journal TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27
 
-This is what the building agent for any one of these seven units is handed, beyond its spec. Units 1 to
-13 are CLOSED and their code is on this branch; these seven change that code. Read "Every unit", then
+This is what the building agent for any one of these ten units is handed, beyond its spec. Units 1 to
+13 are CLOSED and their code is on this branch; these ten change that code. Read "Every unit", then
 your own entry under "By unit", then "The pass". Your spec is the design and this file is the house
 knowledge. Where the two disagree, the spec wins. A needed change goes into the spec first, as a rev
 bump with its section 9 line.
@@ -68,11 +68,18 @@ Build in this order; each unit reads the landed code of the units before it.
 - **21, the commitment.** A digest and a line count, and `verify` recomputes from the time-ordered
   prefix. Land it before 22 and 20, which consume a commitment with no time.
 - **24, the Summary window.** The git-only window the schema leg already derives, reused, not
-  re-derived a third time. Before 22 and 20.
+  re-derived a third time. Before 25, 22 and 20.
+- **25, the window's closer.** After 24. The closer names a terminal write its own commit carries, and
+  its arms observe real models at each of the Skill's render placements. It removes the window loop
+  from `test_record_ac4_classes` that 26 then works over.
+- **26, derived fixture counts.** After 25. Every count and value the record arms assert over a shared
+  fixture builder is derived from what the builder placed, on kinds the record keeps. Before 22.
 - **22, the retirements.** The journal rows, the time columns and `scan_owner_times` retire, and every
   arm, vocabulary and floor reading them is rewritten by name. Grep the suite for each retired name
   before you call it done.
-- **20, the source rule.** After 21, 24 and 22. What it still owns after its audit is its spec's
+- **27, the withheld-rows fact.** After 22. Each retired kind is counted from a declared source, and a
+  source the model did not read renders `-`, never `0`.
+- **20, the source rule.** After 21, 24, 25, 26, 22 and 27. What it still owns after its audit is its spec's
   current rev; read its section 9 before its section 2.
 - **23, the population arm.** Last. One arm over every time-bearing token a render writes, classes and
   slots read from `RECORD_SCHEMA`, and a fixture that reaches every conditional slot.
