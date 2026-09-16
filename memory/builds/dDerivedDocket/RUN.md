@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: aea85743c2923c88c2b697fbba551ba4dad2d228
-phase: FOLDING
+witness: 18cf0c1b7b1a0dc26b15cedb6307707364f77b1e
+phase: REVIEWING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
@@ -46,3 +46,9 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-14T08:53:21Z decision · item AGENTS.md says core.hooksPath is repo-GLOBAL so the hook gating a push is the PRIMARY tree's; that is false under the relative value this repo's wiring writes. Should this build correct it? · reason Options: (i) unit 13 or PLAY-dDerivedDocket-1 corrects the sentence; (ii) leave it to the owner. Refused: the merge-bar paragraph of AGENTS.md is a governance carrier no unit scopes for that sentence (veto 2). It blocks nothing.
 
 2026-09-14T09:07:47Z rescope · item add TOOL-dDerivedDocket-37 · reason Protocol section 11 adoption. The round-1 spec audits found by hand, in two groups, a hands-off bullet promising a sibling a token the sibling never names. After the fold, a probe over this build's 37 live specs graded 131 hands-off payload tokens and found three more (units 7, 10 and 13 handing units 11, DEPL and 35 a token those never name), fixed by the orchestrator. The join makes the spec-tokens leg red where it should; nothing measured worsens; gov-internal file exempt from shipping, so no veto.
+
+2026-09-16T11:19:34Z review · item dDerivedDocket-specs-g1 · reason verdict BLOCKED · blockers 2
+
+2026-09-16T11:19:34Z review · item dDerivedDocket-specs-g2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-16T11:19:35Z review · item dDerivedDocket-specs-g5 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

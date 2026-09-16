@@ -145,9 +145,9 @@ ids TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 TOOL-dDerivedDocket-38 TOOL-dD
 | [TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names](spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md) | 39 | 2 | SPECCED | rev-1 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dDerivedDocket-37.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dDerivedDocket-37.
 <!-- /gen:build-index -->
