@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-29 — review durability across a dead fan
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 29
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
@@ -58,10 +58,11 @@ runId recorded as a run fact.
 - **S8** Carriers. `tools/workflows/REVIEW-PROTOCOL.template.md` gains the durability rule and its
   render `memory/guides/REVIEW-PROTOCOL.md` is regenerated. The unattended Skill, the verb carrier
   and the stops companion unit 4 creates gain the re-run-once-then-hold step and the
-  `--pending-run` flag. `memory/map/features/review-harnesses.md` prose is refreshed. The review
-  harness's version moves here, once for this build's landing range, since this is the first unit
-  to scope that move; the unattended kit's move is `TOOL-dDerivedDocket-1`'s, and this unit's driver
-  bytes ride it. Observed by AC11 and AC13.
+  `--pending-run` flag. `memory/map/features/review-harnesses.md` prose is refreshed. No version
+  constant moves here. The review harness moves once for this build's landing range in
+  `TOOL-dDerivedDocket-21`, the first unit in build order to change that kit's bytes, and this unit's
+  review-harness bytes ride that move; the unattended kit's move is `TOOL-dDerivedDocket-1`'s, and
+  this unit's driver bytes ride it. Observed by AC11 and AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -295,9 +296,18 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   Red when: the directory is empty after lenses returned, which means the write instruction is
   ignored and S1's schema field is satisfied by a path to nothing.
   cost: nothing beyond the closing review, which runs anyway. fixture: none exists until then.
-- **AC13** — When `bash tools/check-kit-versions.sh` runs, `tier2-review.js` carries 1.8 under both
-  of its kit ids.
-  Red when: a kit's shipped bytes move and its marker is left behind.
+- **AC13** — When `tools/workflows/tier2-review.js` is read with `git show` at this unit's build
+  commit, the line carrying `version: '` reads 1.8 as `meta.version`, in the `gov:kit tier2-review@`
+  marker and in the `gov:kit review-harness@` marker, the one move unit 21 makes over BASE's 1.7;
+  when `git diff HEAD^ HEAD -- tools/workflows/tier2-review.js` runs on that commit, no removed or
+  added line carries `version: '`; and `bash tools/check-kit-versions.sh` exits 0.
+  Red when: a kit's shipped bytes move and its marker is left behind; or this unit moves the review
+  harness a second time in the landing range, so the line reads past 1.8, which
+  `tools/check-kit-versions.sh` cannot see, because it grades only that the three tokens agree and
+  a second move keeps them agreeing.
+  permission: the reads are `git show` and `git diff` observations in the pass;
+  `check-kit-versions.sh` is the `kit version markers` leg and runs at the build's one post-build
+  bar.
 
 ## 7. Gates
 
@@ -337,6 +347,15 @@ New arm: `tools/unattended/unattended.test.sh` · `--hold --pending-run` with a 
   AC3 stages every key component. M27: AC6 stages both partial-death exits. L5: AC9 observes the
   take-over's relaunch line. M7 with G1 M11: S8 moves the review harness only; the unattended move
   is unit 1's, and AC13 keeps its review-harness half.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, third pass. The fold-2 verifier problem that §2 S8
+  still claimed the review harness's move as the first unit to scope it, decided by the orchestrator
+  as the first-to-change rule: unit 21 S6 changes that kit's descriptor at order 21, so unit 21 S8
+  owns the move. §2 S8 drops the move and says this unit's review-harness bytes ride unit 21's. §6
+  AC13 keeps its 1.8 read, one move over BASE's 1.7; its `Red when:` also reds a second move by this
+  unit, and a permission line places its leg at the build's one post-build bar. Fold verification:
+  `tools/check-kit-versions.sh` grades only that the three version tokens agree, so it could see
+  neither the 1.8 value nor a second move; §6 AC13 now reads the version line with `git show` at the
+  build commit and with `git diff HEAD^ HEAD`, as unit 21's AC8 reads its own moves.
 
 ## 10. Reuse audit
 

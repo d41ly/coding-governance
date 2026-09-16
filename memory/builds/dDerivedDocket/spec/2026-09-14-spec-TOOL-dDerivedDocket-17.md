@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 17
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
@@ -75,7 +75,8 @@ under it.
   and `m-base:` facts, and the P5 line matcher that enumerates F, and the one TSV parse the witness
   reuses. Without them T1 to T5 have no mandate to grade and no range to bound T4.
 - **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute <BASE>`, whose
-  NEW set is the only criterion the unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
+  attributed verdict, `verdict clean` with every inherited suite filed, is the only criterion the
+  unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
 - **consumes-from** `TOOL-dDerivedDocket-2` — the prepared merge whose first parent is the
   advertised tip, which is why excluding that tip leaves exactly the run's commits.
 - **consumes-from** `TOOL-dDerivedDocket-15` — the `--asks --tsv` row shape the witness parses
@@ -134,12 +135,14 @@ foreign build's file to decide anything.
 
 **The run's own commits.** One function in `tools/unattended/lib-unattended.sh`, named at build
 time through `lexicon.py --suggest`, lists the commits reachable from an endpoint, not reachable
-from a base, and not reachable from an exclusion tip. T4 calls it with HEAD at `--close`, `m-base:`,
+from a base, and not reachable from any of the one or more exclusion tips it is given. T4 calls it
+with HEAD at `--close`, `m-base:`,
 and the default branch's advertised tip as `--close` already observes it. Under in-place landing
 `--close` runs on the prepared merge, whose first parent is the advertised tip (unit 2 §4), so
 default-branch commits landed since `m-base:` are excluded and a foreign build's CLOSED row landed in
 the window is not the run's; T5 already owns 'closed with someone else's evidence'. Unit 19's
-cross-run arm calls the same function, and unit 22 supplies the endpoint for a derived-LANDED record
+cross-run arm calls the same function, with one exclusion tip per merge its terminal walk reads, and
+unit 22 supplies the endpoint for a derived-LANDED record
 (§8 F5).
 
 A bound breach in T2 reads "never answered", the same distinction `gates-green` draws
@@ -216,7 +219,10 @@ Minted identifiers, each named at build time through
 `tools/unattended/PROTOCOL.template.md` · `memory/guides/UNATTENDED-PROTOCOL.md` ·
 `.unattended.conf` · `tools/unattended/.unattended.conf.example` · `.memory-tree.conf` ·
 `tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` ·
-`memory/map/features/unattended.md`.
+`memory/map/features/unattended.md`. This unit moves no kit version constant, under the build's
+one-owner rule that the unit first to change a kit's bytes in build order owns that kit's one move.
+Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, because unit 13 changes
+`tools/drift-audit/` bytes first, and its unattended bytes ride unit 1's move (unit 1 S9).
 
 ### Alternatives rejected
 
@@ -298,9 +304,15 @@ Minted identifiers, each named at build time through
   and is not gateable; over a fixture with no run-state file it reads DEAD PROBE.
   Red when: the signal counts overrides of every item, or reports 0 over no records.
 - **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  end of the unit, it reports no NEW failure, and every arm this unit added passes, each observed RED
-  with its fix unstaged.
-  Red when: an arm is wired without its failing case ever being seen.
+  end of the unit, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
+  `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or
+  `DEAD PROBE at R` is named by its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. Every arm this
+  unit added passes, each observed RED with its fix unstaged.
+  Red when: an arm is wired without its failing case ever being seen; or the attributed run is read
+  by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or pushed
+  past its budget, reads as clean; or an inherited failure is attributed away with no record filing
+  it.
   cost: one run of the unattended suites, which is the unit's single sanctioned suite run (D12-h).
 - **AC13** — When `--close` runs in `tools/unattended/unattended.test.sh` on a no-mandate fixture
   whose own `BACKLOG.md` files an ask that has no disposition row and is not terminal, with
@@ -370,6 +382,14 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two
   plainly. RESOLVED (agent, 2026-09-14, delegated): the third, through one library function unit 19
   shares; it restates design fix F4's 'T4's range is `m-base..HEAD`' as the run's own commits within
   it.
+- **F6 — which unit's version move do this unit's drift-audit bytes ride?** S6 changes
+  `tools/drift-audit/drift_report.py` and `tools/drift-audit/selftest.py`, and unit 13, ordered
+  earlier, changes the same kit. Options: (a) unit 13, the first unit in build order to change
+  drift-audit bytes, the rule unit 9 F9 applies to check-wiring and G4 round 1 set for run-gates;
+  (b) unit 21, which rev-2 of its S8 named as the earliest to scope the move; (c) this unit moves
+  `KIT_DRIFT_AUDIT_VERSION` itself. (c) breaks the build's one-owner rule, and (b) names an owner
+  later than two units that change the bytes. RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator:
+  (a). This unit moves no drift-audit constant, and Files touched names the move it rides.
 
 ## 9. Revision log
 
@@ -387,6 +407,24 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two
   AC8 asserts order, not adjacency; M13 AC9 names check 3; M20 the success path (AC16, AC17); M21
   AC18 to AC20 and AC4's grade and reason; L2 AC8's no-mandate and numeric-order arms. The library
   function joins the Inventory and Files touched.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. It moves §3 Edges, §4 Files touched, §6 AC12 and
+  §8 F6.
+  - Plan c1 E38, G1 H1 (2, 24), a sibling fold from the G1 round-2 record: AC12 reads unit 1's
+    `verdict clean` (unit 1 S10) and the inherited-suite filing, its `Red when:` gains the
+    NEW-count-alone reading, and the §3 consumes-from edge to unit 1 names the attributed verdict in
+    place of the NEW set. Fold verification then gave AC12's `Red when:` the rest of plan c1 §12's
+    standard consumer text, the over-budget reading and the unfiled inherited failure, so it goes red
+    on every half of unit 1 S10's criterion, as the other consumers' criteria do.
+  - The fold-2 verifier problem on unit 21, kit version ownership, decided by the orchestrator and
+    recorded as §8 F6: the unit first to change a kit's bytes in build order owns that kit's one
+    version move, so unit 13 owns the drift-audit move. Files touched now says this unit moves no
+    version constant: S6's drift-audit bytes ride unit 13's move, and its unattended bytes ride unit
+    1 S9. Fold verification reworded F6's option (b) to say rev-2 of unit 21 S8 named it, because
+    unit 21 S8 no longer scopes the drift-audit move.
+  - Third pass, from the orchestrator's decision on the fold verifier's terminal-row exclusion
+    problems (unit 19 §8 F8, a content-based run side): §4's run's-own-commits function takes one or
+    more exclusion tips, because unit 19's terminal walk excludes one parent at each merge it reads.
+    T4's call, with the advertised tip alone, is unchanged.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-23 — red attribution, report-only
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 23
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -58,10 +58,10 @@ the inherited-red policy unit's.
   AC7.
 - **S9** No version constant moves in this unit. The kits whose shipped bytes S3 and S7 change each
   move once in this build's landing range, in their owner unit — `TOOL-dDerivedDocket-1` for
-  run-gates, `TOOL-dDerivedDocket-21` for drift-audit and lexicon, `TOOL-dDerivedDocket-36` for
-  memory-tree under the verdict-epoch rule — and this unit's bytes ride those moves; install-prefix
-  carries no version constant. NOT OBSERVED by a criterion here: `kit version markers` grades the
-  final tree's constant-marker agreement, which is all it can grade.
+  run-gates, `TOOL-dDerivedDocket-13` for drift-audit, `TOOL-dDerivedDocket-21` for lexicon,
+  `TOOL-dDerivedDocket-36` for memory-tree under the verdict-epoch rule — and this unit's bytes ride
+  those moves; install-prefix carries no version constant. NOT OBSERVED by a criterion here:
+  `kit version markers` grades the final tree's constant-marker agreement, which is all it can grade.
 
 ## 3. Non-goals (OUT)
 
@@ -388,6 +388,11 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   one bound, and a wall cut reads DEAD PROBE `cut by the wall` (F6, AC15); a hands-off to unit 27
   declares it. G1 M11: S9's owners follow the build's one-owner rule (run-gates unit 1, drift-audit
   and lexicon unit 21, memory-tree unit 36).
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, third pass. S9, from fold verifier problem f3 on
+  kit-version ownership, decided by the orchestrator as the unit first in build order to change a
+  kit's shipped bytes owning that kit's one version move: S9 names unit 13, whose S11 makes the
+  drift-audit move, in place of unit 21, which keeps lexicon; run-gates and memory-tree keep their
+  owners, and S9 stays NOT OBSERVED here.
 
 ## 10. Reuse audit
 

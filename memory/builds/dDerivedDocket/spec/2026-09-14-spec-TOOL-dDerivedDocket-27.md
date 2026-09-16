@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 27
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -51,8 +51,11 @@ fits, instead of reporting all three like a red leg.
   whose pinned `GATE_RUN_ID` has an `attribution` record takes the inherited-red policy unit's
   decision table — MET with a `gates-inherited` fact when every red is INHERITED, none aged, the tree
   unmoved and the policy at R `land`; else UNMET with the attribution lines, and under `park` or with
-  any red aged a `hold · inherited-red · until probe gate` line; anything else is UNMET as a red bar.
-  Observed by AC2, AC3, AC7, AC11 and AC13.
+  any red aged a `hold · inherited-red · until probe gate` line; and that arm keeps the policy unit's
+  auto-file of one ask per INHERITED leg, with its reuse of an OPEN ask for the same leg and R, which
+  prints `gates-green: ask <id> already OPEN for leg <leg> at <R8> · reused` instead of filing a
+  second; anything else is UNMET as a red bar. Observed by AC2, AC3, AC7, AC11 and AC13, and the
+  kept auto-file by AC10, whose attributed run reds when an arm the policy unit added newly fails.
 - **S6** The conf check: the leg reds, and `--preflight` refuses, when the effective wall is below the
   runner's `ceiling_max`, naming both numbers. Blank `GATE_PROFILE_CMD` makes the check announce that
   it cannot compare. Observed by AC4 and AC5.
@@ -103,7 +106,10 @@ fits, instead of reporting all three like a red leg.
   without which a healthy red bar outlives the backstop and reads as never-returned.
 - **consumes-from** `TOOL-dDerivedDocket-24` — the age and bisection runs, inside the runner's wall,
   and the decision table for exit 1 with an attribution record, the `gates-inherited` fact and the
-  `inherited-red` hold line, which S5's closed table carries as one arm.
+  `inherited-red` hold line, which S5's closed table carries as one arm; and that unit's auto-file of
+  one ask per INHERITED leg inside the arm, with its reuse of an OPEN ask for the same leg and R,
+  which prints `gates-green: ask <id> already OPEN for leg <leg> at <R8> · reused`, which the arm
+  keeps.
 - **hands-off** `TOOL-dDerivedDocket-32` — `ceiling_max` on `--print-profile` (S3), the lower bound
   of the CI bar job's `GATE_WALL`.
 
@@ -120,6 +126,7 @@ stdout               unattended: the merge bar is bounded at <sum>s — wall <w>
 DOD_OUT              hold · host-degraded · until probe gate · the bar was killed at its backstop before it acquired the repository
                      hold · host-degraded · until probe host · the runner exited HOST
                      hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>
+stdout               gates-green: ask <id> already OPEN for leg <leg> at <R8> · reused    (the policy unit's auto-file, kept)
 ```
 
 ### Why the three terms
@@ -321,6 +328,11 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
   - G1 L6 (21): AC8 observes S7's `platform-unavailable` fallback in the rendered Close section.
   - G1 H1 (2, 24): AC10 reads `verdict clean` and the inherited-suite filing, and the consumes-from
     edge to unit 1 is updated.
+- rev-4 · 2026-09-16 · spec-audit round 2 fold, third pass. From the fold-2 verifier problem that
+  neither end of the edge with unit 24 named that unit's `gates-green` auto-file, which its plan c1
+  ADD 4 fold extended with an OPEN-ask reuse: §2 S5's exit-1 attribution arm keeps the auto-file and
+  its reuse, observed through AC10's attributed run of the policy unit's arms; the §3 consumes-from
+  edge to unit 24 names both and the reuse line; §4 Data model adds the reuse line to stdout.
 
 ## 10. Reuse audit
 

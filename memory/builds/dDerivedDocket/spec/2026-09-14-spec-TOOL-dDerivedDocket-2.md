@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-2 — in-place landing merge
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -85,8 +85,8 @@ D12-i1.
 - **hands-off** `TOOL-dDerivedDocket-17` — the prepared merge's first-parent shape, which the
   run's-own-commits function relies on.
 - **hands-off** `TOOL-dDerivedDocket-19` — the prepared merge's first-parent shape the cross-run
-  arm's exclusion relies on, and its `merge: <slug> — land onto` subject and single-parent tail, by
-  which that unit's terminal-record exclusion recognises the merge on a recorded witness.
+  arm's exclusion relies on, and its second parent, the run branch, which that unit's
+  terminal-record exclusion reads as the merge's run side by content.
 - **hands-off** `TOOL-dDerivedDocket-34` — `--prepare`'s conflict refusal, which names
   `git merge <remote>/<def>` on B as the reconcile to do first, and its clean merge over a branch
   that already contains the tip; the switch-over's landing reconcile makes that merge itself, with
@@ -327,6 +327,10 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
     consumes-from edge to unit 1 is updated.
   - G5 round-2 H1 (21, 36, 52), unit-2 end: §3 hands-off 34 names `--prepare`'s conflict refusal and
     the reconcile the switch-over's landing makes before `--prepare --slug <slug>`.
+- rev-4 · 2026-09-16 · §3 · spec-audit round 2 fold, third pass, from the orchestrator's decision on
+  the fold verifier's terminal-row exclusion problems (unit 19 §8 F8): unit 19 reads a merge's run
+  side by content and no longer by the prepared merge's subject, so the hands-off edge to unit 19
+  names T's second parent, the run branch, in place of the subject.
 
 ## 10. Reuse audit
 

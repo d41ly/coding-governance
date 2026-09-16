@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -57,12 +57,19 @@ default-off gate for this one feature, and this unit records that ruling as a de
   `--keepalive-id`, and its history row carries `scheduled`. Observed by AC7 and AC8.
 - **S7** `--status` on a HELD record prints the owed-schedule line beside unit 4's checkpoint.
   Observed by AC3.
-- **S8** The Skill carries the agent's half. The hold step files the printed schedule with
-  `{{RESUME_SCHEDULE_CREATE}}` under the printed name. Every resume path issues
-  `{{RESUME_SCHEDULE_DELETE}}` against that name BEFORE the keepalive reap, and a take-over pushes
-  its record before any other work, so a schedule on another node meets rule 3 of §4. A refused
-  scheduled resume deletes its own task and stops. With the switch `off` the render writes a fixed
-  "not scheduled" literal in place of both tool keys. Observed by AC9 and AC10.
+- **S8** The Skill carries the agent's half. The hold step issues `{{RESUME_SCHEDULE_DELETE}}`
+  against the printed name, going on when no task has it, then files the printed schedule with
+  `{{RESUME_SCHEDULE_CREATE}}` under that name, because a task an ended hold filed can still hold
+  the name (§8 F10). A take-over pushes its record before any other work, so a schedule on another
+  node meets rule 3 of §4. The Resume section issues `{{RESUME_SCHEDULE_DELETE}}` against the name,
+  going on when no task has it, as after an `owner` hold, which owes none. It does so only AFTER a
+  take-over's `--resume` succeeds and its record is pushed, never before that `--resume`, and never
+  when it refuses or prints `still held`, so a manual resume before an `after` hold's instant leaves
+  the owed restart filed (§8 F9). A resume that refuses or prints `still held`,
+  scheduled or manual, leaves the named task in place, reaps the keepalive it scheduled for the
+  take-over, reads its scheduler's listing back to confirm the reap, and stops (§8 F8). With the
+  switch `off` the render writes a fixed "not scheduled" literal in place of both tool keys.
+  Observed by AC9 and AC10.
 - **S9** The `keepalive-reaped` attestation covers the resume schedule too. `--close` and `--abort`
   name every schedule the record's hold history owed, beside the keepalive id, so the agent attests
   over a list it was shown. No new DoD item: the core DoD count is the asks-disposed unit's to move.
@@ -138,12 +145,19 @@ one-shot; there is no recurring task to outlive the run. The chain ends at the s
 The name is `unattended-resume-` followed by the slug in lower case. Any session holding only the
 slug can therefore reap it, so no write on a HELD record is needed to record a carrier id. Lower case,
 because a carrier that sanitises names to kebab case would otherwise store a name a later delete does
-not match. The prompt the driver prints, and the agent files verbatim:
+not match.
+
+Every hold of a slug files under that one name, so the Skill's hold step deletes the name before it
+files, and goes on when no task has it: gov's carrier keeps a fired one-shot listed, disabled, under
+its id (§8 F10). The delete loses nothing a hold owes. `--hold` refuses on a HELD record, so any task
+under the name belongs to a hold that has already ended, and rule 2 below refuses it on `held-at`.
+
+The prompt the driver prints, and the agent files verbatim:
 
 ```text
 Resume the unattended run for build <slug>. Work only in the git worktree at <absolute toplevel>.
 Load the unattended skill and follow its Resume section with: --resume <slug> --scheduled <held-at> --keepalive-id <the id of the keepalive you schedule first>.
-If the driver refuses, delete the scheduled task named <name> and stop.
+If the driver refuses or prints still held, delete the keepalive you scheduled for this resume, list your scheduler's jobs to confirm it is gone, leave the scheduled task named <name> in place because a later hold may have filed it, and stop.
 ```
 
 Every interpolated value has a validated shape: the slug passed `check_slug`, the toplevel came from
@@ -154,6 +168,16 @@ session no one watches.
 The `--keepalive-id` placeholder is fixed prompt text, not an interpolated value. The scheduled
 session fills it with the keepalive its own scheduler created, because the HELD unit's take-over
 refuses a missing id.
+
+The last line reaps that keepalive because nothing else would. A keepalive left firing after a
+refusal ticks `--resume <slug> --keepalive-id <own id>` as its first act (the HELD unit's F6), and on
+a HELD record that call goes down the take-over row with no `--scheduled`, so it skips rules 2 to 4
+below, rule 3 among them. A `still held` resume writes nothing and takes no lease, so it leaves the
+same job firing and reaps it the same way (§8 F8).
+
+The same line leaves the named task alone. A session refused because a later hold began would
+otherwise delete, under the one name every hold of the slug shares, the restart that later hold
+filed. The Skill deletes the task only after a take-over's `--resume` succeeds (§8 F9).
 
 ### The scheduled-resume refusals
 
@@ -230,7 +254,9 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   holds without progress; one bounded `ls-remote` per scheduled restart.
 - error / empty / loading states — every refusal is numbered and writes nothing; an absent carrier
   records `none · no carrier` and says so at `--hold` and `--status`; a failed file call leaves the
-  run HELD with the owed line naming a task that does not exist, which a manual restart clears.
+  run HELD with the owed line naming a task that does not exist, which a manual restart clears; a
+  manual resume that prints `still held` leaves the owed task filed (§8 F9), while a scheduled
+  resume refused under rule 3 or 4 has spent its one-shot and leaves the hold to a manual restart.
 - observability — the three `--hold` lines, the `--status` owed line, the `scheduled` field on the
   take-over history row, and the schedule names at `--close` and `--abort`.
 - risks — a cross-node take-over that has not pushed yet is invisible to rule 3, so for that window
@@ -258,9 +284,14 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
 - **AC3** — When `--hold` runs on a HELD-capable fixture with `--until "after <future instant>"` and
   the switch on, the record gains `resume-owed` naming `unattended-resume-` plus the lower-cased slug
   and that exact instant, `--hold` prints the name, instant and prompt lines, the prompt spelling
-  `--keepalive-id`, and `--status` prints the owed line.
+  `--keepalive-id` and a last line that, on a refusal or `still held`, deletes the keepalive the
+  session scheduled, listing the scheduler's jobs to confirm it, and leaves the named task in place,
+  and `--status` prints the owed line.
   Red when: the fire instant is computed as `held-at` plus the delay for an `after` hold, so a
-  usage-limit hold restarts into the same limit.
+  usage-limit hold restarts into the same limit; or the prompt's refusal line does not delete the
+  keepalive, so the job the scheduled session filed first keeps ticking a take-over that none of the
+  scheduled-resume refusals guards; or it deletes the named task, so a session refused because a
+  later hold began deletes that hold's restart, filed under the same name.
 - **AC4** — When the fixture holds with `--until "probe host"`, `resume-owed` names `held-at` plus
   `RESUME_SCHEDULE_DELAY`; with `--until owner` it reads `none · owner` and no prompt line prints.
   Red when: an `owner` hold owes a schedule, restarting a machine into a stop only a human can clear.
@@ -297,11 +328,21 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   Red when: an on conf with no carrier renders a clean Skill, so an adopter learns at its first hold
   that nothing will restart it.
 - **AC10** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over
-  the rendered tree, `--scheduled` is carried by the verb guide, the Skill's hold step files the
-  printed name with the create tool, its resume section deletes that name before the keepalive reap,
-  and the companion guide renders byte-identical to its template.
+  the rendered tree, `--scheduled` is carried by the verb guide; the Skill's hold step deletes the
+  printed name with the delete tool and then files it with the create tool; its resume section
+  deletes that name only after a take-over's `--resume` succeeds, and not before that `--resume` or
+  on its refusal or `still held` branch; that branch, for a scheduled or a manual resume, leaves the
+  named task in place, reaps the keepalive the session scheduled for the take-over and reads the
+  scheduler's listing back before it stops; and the companion guide renders byte-identical to its
+  template.
   Red when: the resume section never deletes the schedule, so a manual restart leaves a durable task
-  that later fires into a live run.
+  that later fires into a live run; or it deletes the schedule before `--resume`, or on a refusal or
+  `still held`, so a manual resume before an `after` hold's instant leaves the run HELD with no
+  restart filed while `--status` names a deleted task; or the hold step files without clearing the
+  name, so its create meets an id an ended hold's disabled one-shot still holds; or a refused resume
+  stops with its new keepalive still scheduled, so that job's first tick takes the HELD record over
+  with no `--scheduled`, past the remote-freshness refusal a schedule filed on another node relies
+  on.
 - **AC11** — When `--close` and `--abort` run on a fixture record whose history holds a hold row,
   each names that schedule beside the keepalive id in the attestation it asks for.
   Red when: the attestation names only the keepalive, so a durable task outlives the run under a
@@ -343,8 +384,9 @@ New arm: `tools/unattended/unattended.test.sh` · HELD fixtures for each fire ru
 New arm: `tools/unattended/check-unattended.test.sh` · fixture confs with an unrecognised switch value and a carrier equal to the keepalive tool · the check-unattended.sh arms floor, by the branches added
 New arm: `tools/unattended/adopt-unattended.test.sh` · an on conf with no carrier declared · none
 
-The observation that a real carrier accepts the printed name and instant is made once, by hand, in
-this unit's pass with gov's declared pair, and recorded in the unit's journal. No gate can make it.
+The observation that a real carrier accepts the printed name and instant, and accepts that name
+again after a delete of it (§8 F10), is made once, by hand, in this unit's pass with gov's declared
+pair, and recorded in the unit's journal. No gate can make it.
 
 ## 8. Open questions
 
@@ -381,9 +423,61 @@ this unit's pass with gov's declared pair, and recorded in the unit's journal. N
   Under (a), the auto-file the inherited-red policy unit stages on every `gates-green`, committed
   before `--hold`, resets the streak on every hold of the one stop class that cannot progress in-run.
   (c) moves the fix into a unit ordered after this one and leaves the predicate open to the next
-  record the machinery writes. RESOLVED (agent, 2026-09-16, delegated): (b). Rows filed about a stop
-  are bookkeeping, not progress on the build. Duplicate asks are then bounded by
-  `RESUME_SCHEDULE_LIMIT`.
+  record the machinery writes. The inherited-red policy unit's §8 F8 has since adopted (c)'s reuse
+  on its own side, so a repeated hold over one leg red at one R files no second ask. It does not
+  make (b) redundant: a hold after R advances still files a new ask, which (a) would count as
+  progress. RESOLVED (agent, 2026-09-16, delegated): (b). Rows filed about a stop are bookkeeping,
+  not progress on the build. With the reuse in place, `RESUME_SCHEDULE_LIMIT` bounds only the asks
+  filed as R advances.
+- **F8 — what stops the keepalive a refused take-over scheduled from driving the slug?** The
+  scheduled prompt, and the HELD unit's Resume rule for a manual take-over, both schedule a keepalive
+  before the `--resume` that may refuse, and nothing reaped it at rev-3. Its tick runs
+  `--resume <slug> --keepalive-id <own id>`, which on a HELD record takes the take-over row with no
+  `--scheduled` and so skips rules 2 to 4 of §4; rule 3 is the double-drive this unit exists to stop.
+  A `still held` resume writes nothing and leaves the same job firing. Options:
+  - (a) reap it in the contract text: the prompt's last line, S8's Skill step and the HELD unit's
+    Resume rule delete the keepalive the session scheduled for the take-over and read the listing
+    back, whenever that resume refuses or prints `still held`;
+  - (b) a lease-matrix row making a keepalive tick's `--resume` on a HELD record refuse rather than
+    take over.
+
+  (b) needs the driver to tell a tick from a deliberate restart, and both pass the same arguments,
+  so it needs a new input. (a) adds no driver surface; its reap is agent-attested, as every
+  keepalive reap is (§3). RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a), observed here
+  by AC3 and AC10 and in the HELD unit by its AC11.
+- **F9 — when does the Skill delete the durable schedule a hold owes?** As the round-2 fold's second
+  pass left S8, every resume path deleted it before the keepalive reap, and in the HELD unit's
+  take-over rule that reap comes before `--resume`. A manual resume on an `after` hold before its
+  instant therefore deleted the schedule, printed `still held`, reaped its own keepalive under F8
+  and stopped: the run stayed HELD with nothing filed to restart it, and `--status` still printed an
+  owed line naming the deleted task. Options:
+  - (a) delete it only after a take-over's `--resume` succeeds, never before that `--resume`, and
+    never on a refusal or `still held`, scheduled or manual;
+  - (b) keep the early delete, and on `still held` have the manual take-over re-file the owed
+    schedule from the `--status` owed line before it stops.
+
+  (b) leaves a window between the delete and the re-file in which a stopped session loses the
+  restart, and the re-file needs the prompt, which the `--status` owed line does not print. (a)
+  leaves a restart filed until the resume it was filed for has happened. A task firing into a run a
+  manual take-over made live, before that take-over deletes it, meets rule 1 of §4 and refuses, and
+  the refusal leaves it listed for that take-over's own delete, or, when that delete never runs, for
+  the next hold's clear (F10). A scheduled resume refused under rule 3 or 4 has spent its one-shot
+  either way, so leaving its task in place loses nothing.
+  RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a), observed here by AC3 and
+  AC10 and in the HELD unit by its AC11.
+- **FACT-QUESTION · F10 — does the hold step need the name cleared before it files?** Every hold of a
+  slug files under one name, and §4's carrier requirements say nothing about a name already taken;
+  under F9 a refused or `still held` resume leaves its task in place. Probe: read the tool contract of
+  gov's declared carrier pair. The observation that decides: whether a create under a taken id
+  replaces the task there, and whether an ordinary run leaves ids taken, as a fired one-shot that
+  stays listed would. Liveness: the same read can show a create that replaces a taken id, under
+  which the clear is unnecessary. RESOLVED (agent, 2026-09-16, delegated): yes. The
+  contract, read again 2026-09-16 on node `d`, says a one-time task disables itself after it fires
+  rather than leaving the list, sends a change to an existing task to its update tool rather than its
+  create tool, and leaves a deleted task's prompt file on disk. So the hold step deletes the name,
+  going on when no task has it, before it files (S8). The delete loses nothing a hold owes, because
+  `--hold` refuses on a HELD record, so a task under the name belongs to a hold that has ended. The
+  contract does not say whether a create under a deleted id succeeds; §7's hand observation makes it.
 - The rulings this unit executes: D12-i9 put a durable resume scheduler in this build, and the single
   owner turn ruled it on everywhere, the kit shipping it on and adopters opting out, recorded as a
   decision row — RESOLVED (owner, 2026-09-14).
@@ -405,6 +499,24 @@ this unit's pass with gov's declared pair, and recorded in the unit's journal. N
     corrected.
   - G1 M5 (27): the §4 scheduled prompt, S6, AC3 and AC8 pass the session's own `--keepalive-id`.
   - G1 H1 (2, 24): AC14 reads `verdict clean`, and the §3 consumes-from edge to unit 1 is updated.
+- rev-4 · 2026-09-16 · round-2 fold, second pass. The verifier problem on units 5 and 4, a
+  keepalive left firing after a refused take-over, decided by the orchestrator as option (a): the
+  §4 scheduled prompt's last line and S8's Skill step delete the named task and then reap the
+  keepalive the session scheduled, reading the listing back, when the resume refuses or prints
+  `still held`, and §4 says why. AC3 checks the printed prompt and AC10 the rendered Skill. New §8
+  F8. Unit 4's Resume rule carries the same clause, and its AC11 checks it. Spec-audit round 2
+  fold, third pass, from the second pass's verifier problem on units 5 and 4, a manual resume on an
+  `after` hold deleting the owed schedule, decided by the orchestrator as option (a) and recorded as
+  new §8 F9: S8's Resume section deletes the named task only after a take-over's `--resume`
+  succeeds, and a refusal or `still held`, scheduled or manual, leaves it in place, which withdraws
+  the task delete this line's second-pass half gave the §4 prompt's last line and S8; §4 says why,
+  and the prompt's last line now leaves the task in place. The hold step clears the name before it
+  files, from a read of the carrier's contract (new §8 F10, S8, §4 The name and the prompt, §7).
+  AC3's prompt line and AC10's Skill steps and `Red when:` clauses follow, and §5 names the
+  `still held` state. §8 F7's reasoning says the inherited-red policy unit's §8 F8 adopts the
+  OPEN-ask reuse F7 rejected as (c) here, and F7 keeps (b). Fold verification: S8's Resume delete
+  goes on when no task has the name, as after an `owner` hold, and F9 says a task that fires into
+  a take-over's live run before that take-over's delete is removed by that delete.
 
 ## 10. Reuse audit
 

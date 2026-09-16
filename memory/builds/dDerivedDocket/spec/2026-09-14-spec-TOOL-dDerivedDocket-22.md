@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 22
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -122,19 +122,25 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   phase is still derived from the advertised tip. The process-ledger unit removes its ledger at the
   same point, observed by that unit's AC12. The lease half is observed by AC15.
 - **S17** For a LANDING record whose landing commit C (S1) is an ancestor of the advertised tip, the
-  run's-own-commits function (unit 17) takes C as its endpoint. Its exclusion is the one unit 19's
-  terminal-record exclusion function computes from C:
-  - when C is unit 2's prepared merge T, or reaches T through single-parent commits only, and T's
-    subject is `merge: <slug> — land onto` naming this record's slug, the exclusion is T's first
-    parent;
-  - otherwise, when C has two parents, it is C's first parent;
-  - otherwise there is none.
+  run's-own-commits function (unit 17) takes C as its endpoint. Its exclusions are the ones unit
+  19's terminal-record exclusion function computes from C:
+  - the walk starts at C and passes each single-parent commit to its parent;
+  - at each two-parent commit it meets, C included, the run side is the parent from which a commit
+    since BASE touching this record's run-state path is reachable,
+    `git rev-list -1 <parent> ^<BASE> -- <run-state path>`. The other parent is excluded and the
+    walk descends the run side, so unit 2's prepared merge T excludes its first parent and a plain
+    reconcile on the run branch excludes its second, the default-branch commits it brought in;
+  - where neither parent, or both, reach such a commit, that merge adds no exclusion and the walk
+    stops there, the fail-closed direction;
+  - with no merge met, there is none.
 
-  Under `primary`, C sits on the run branch. The range is then unit 19's terminal reading with its
-  stated residual for a plain mid-run reconcile, which is the same range the record keeps once
-  `--landed` makes it terminal. A record S4 rotated is a terminal record whose witness is C, so unit
-  19's terminal row grades it by the same function and reaches the same range. The function reads
-  the commit graph only, never the remote. Unit 19's cross-run arm and unit 17's T4 read it.
+  Under `primary`, C sits on the run branch, and its range holds the same run commits the record
+  keeps once `--landed` makes it terminal, whether that witness is the landing merge, a fix commit
+  on it, or push-main's reconcile. A record S4 rotated is a terminal record whose witness is C, so
+  unit 19's terminal row grades it by the same function and reaches the same range. The function
+  reads the commit graph, the recorded BASE and the record's run-state path, and no default-branch
+  tip, so it makes no observation of its own. Unit 19's cross-run arm reads it; unit 17's T4 calls
+  the run's-own-commits function with the advertised tip as its exclusion and never reads this one.
   Observed by AC6 and AC17.
 
 ## 3. Non-goals (OUT)
@@ -171,9 +177,9 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
 - **consumes-from** `TOOL-dDerivedDocket-18` — the freeze-presence arm (S4 there), whose population
   S15 extends to a committed in-place LANDING record.
 - **consumes-from** `TOOL-dDerivedDocket-19` — the cross-run arm whose derived-LANDED endpoint S17
-  supplies; the terminal-record exclusion function S17 applies to the landing commit, which
-  recognises unit 2's prepared merge by its `merge: <slug> — land onto` subject; and the
-  unattended-suite arms that unit added, which this unit's AC13 run executes first.
+  supplies; the terminal-record exclusion function S17 applies to the landing commit, which reads
+  each merge's run side by the parent that reaches a commit touching the record's run-state path;
+  and the unattended-suite arms that unit added, which this unit's AC13 run executes first.
 - **consumes-from** `TOOL-dDerivedDocket-20` — the unattended-suite arms that unit added, which this
   unit's AC13 run executes first.
 - **hands-off** `TOOL-dDerivedDocket-28` — the in-place removal point, `--landed`'s successful
@@ -232,7 +238,7 @@ its reason in the second global. Every caller then reads LANDING, the writing ve
 | the freeze-presence arm (check 15) | committed LANDING under in-place, plus recorded LANDED | the freeze is due at close under in-place (S15) |
 | the leg's S10 fact-set arm | by mode: recorded LANDED, rotated derived LANDED, and committed LANDING under in-place | the facts are due at close under in-place and at `--landed` under primary |
 | `archive_name_of` | no, recorded | it reads the bytes it is handed; S4 hands it a scratch copy already carrying the terminal, before the write gate, so the name derives from the post-write bytes |
-| the leg's check 19 cross-run arm (unit 19) | yes, and a rotated record by its witness | a landed record's range ends at its landing commit and excludes the prepared merge's first parent; otherwise the owner's default-branch grant reds it, and reds the archived record for ever |
+| the leg's check 19 cross-run arm (unit 19) | yes, and a rotated record by its witness | a landed record's range ends at its landing commit and, at each merge on its tail, excludes the parent that reaches none of the record's own commits since BASE: the prepared merge's first parent, or a plain reconcile's second; otherwise the owner's default-branch grant reds it, and reds the archived record for ever |
 | `gen_build_index.py` and `memory/LIVE.md` | no | KF5: committed and freshness-gated |
 
 ### In-place `--landed`
@@ -447,13 +453,16 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 - **AC17** — When check 19's cross-run arm grades a derived-LANDED in-place fixture record, and an
   owner commit on the default branch, landed after BASE and before `--prepare`, adds `may:` to a
   build README, the arm does not red. A `may:` line added by that run's own commit reds.
-  Under `primary`, take a run branch that merged the default branch plainly mid-run. A `may:` commit
-  the run made BEFORE that reconcile reds on the derived-LANDED record, which is graded with no
-  exclusion taken from the reconcile.
+  Under `primary`, take a run branch that merged the default branch plainly mid-run, after an owner
+  commit adding `may:` to a build README landed there. On the derived-LANDED record, a `may:` commit
+  the run made BEFORE that reconcile reds, and the owner commit the reconcile brought in does not,
+  because the exclusion taken from the reconcile is its second parent and never its first.
   Red when: the arm reads the derived-LANDED record as live, so its range becomes whatever the graded
-  tree has not pushed, and the owner's push is blocked; or S17 takes the first two-parent commit on
-  the chain whatever its subject, so under `primary` a plain reconcile's first parent, a run commit,
-  is excluded and the run's earlier grant goes ungraded.
+  tree has not pushed, and the owner's push is blocked; or S17 excludes a merge's parent by its
+  position rather than by which parent reaches a commit touching the run-state path since BASE, so
+  under `primary` a plain reconcile's first parent, a run commit, is excluded and the run's earlier
+  grant goes ungraded; or it takes nothing from that reconcile, so the owner's grant it brought in
+  reds the landed record and, once rotated, the archive for ever.
 - **AC18** — When `bash tools/unattended/check-unattended.sh` grades a `RUN.LANDED.` fixture record
   whose `witness` is on the bare remote's advertised tip and whose `landed-derived` names a commit
   that tip does not contain, check 15 reds naming the record and the `landed-derived` commit. The
@@ -468,7 +477,7 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 
 New arm: tools/unattended/unattended.test.sh · a pushed and an unpushed LANDING record, a lander killed after its push, an in-place local-arm landing, and `--landed` in each mode with the record commit already on the advertised tip · none
 New arm: tools/unattended/check-unattended.test.sh · a record whose witness was pushed and record was not, and a LANDED record missing a fact after the cutoff · none
-New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row drops the prepared-merge branch · none
+New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row takes no exclusion at a merge · none
 New arm: tools/unattended/check-unattended.test.sh · a pre-cutoff LANDED record, anchorless and without the landing facts, rotated after the cutoff · none
 New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` first-commit date without `--follow` under `tools/unattended/`, the predicate run over the tree with hits and near-misses printed before it is wired (charter §7); `check-unattended.sh:1276` is a live hit at BASE · none
 
@@ -508,21 +517,26 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   half-rotated build. RESOLVED (agent, 2026-09-16, delegated): (c). Every refusal still precedes the
   gate, and a blob mismatch is caught before the move, where restoring the record from HEAD leaves
   nothing moved.
-- **F8 — which exclusion does a landing commit that sits on a prepared merge take?** Options:
-  - (a) rev-2's first two-parent commit on the chain, with unit 19's terminal row routing a record
-    carrying `landed-derived` here;
-  - (b) a third `landed-derived` field that records the exclusion;
-  - (c) one function in unit 19's terminal row, keyed on unit 2's prepared-merge subject and the
-    single-parent tail, and applied here to the landing commit.
+- **F8 — which exclusion does a landing commit that sits on a merge take?** rev-2 took the first
+  two-parent commit on the chain, which excludes a run commit under `primary` whenever the run merged
+  the default branch plainly. A third `landed-derived` field recording the exclusion was rejected:
+  it is authored, a hand-written archive can widen it to hide its own commits, and it cannot cover an
+  ABORTED record. rev-3 applied unit 19's terminal function, keyed then on unit 2's prepared-merge
+  subject, and the second fold pass added unit 19's tip tests for a plain reconcile. Fold
+  verification found those tip tests fail open on the ordinary primary route (unit 19 §8 F8).
+  Options:
+  - (a) the run side of each merge told by content, the parent that reaches a commit touching the
+    record's run-state path since BASE, the other excluded, nested merges descended, and no
+    exclusion where neither parent or both reach one, decided once in unit 19's function;
+  - (b) keep the tip tests, and state their fail-open shapes as residual.
 
-  (a) excludes a run commit under `primary` whenever the run merged the default branch plainly, and
-  it needs a second routing rule for rotated records. (b) is an authored exclusion that a
-  hand-written archive can widen to hide its own commits, and it cannot cover an ABORTED record.
-  RESOLVED (agent, 2026-09-16, delegated): (c). It fixes three cases: the rotated record, the primary
-  reconcile, and an in-place run aborted after its close. It also gives a primary record the same
-  range before and after `--landed`. Where no prepared merge is found, the fallback is unit 19's
-  terminal reading, not unit 17's advertised-tip exclusion. For a landed record that tip already
-  contains the landing commit, so the range would be empty (unit 19 §8 F8).
+  (b) knowingly accepts a fail-open on the ordinary primary route. RESOLVED (agent, 2026-09-16,
+  delegated), decided by the orchestrator: (a), in unit 19's function (unit 19 §8 F8), restated by
+  S17 and graded by AC17. It covers the rotated record, the primary reconcile and an in-place run
+  aborted after its close, and gives a primary record the same run commits before and after
+  `--landed`. The fallback where no merge is met is unit 19's terminal reading, not unit 17's
+  advertised-tip exclusion: for a landed record that tip already contains the landing commit, so the
+  range would be empty.
 - **F9 — what does in-place `--landed` leave in the lease?** Options:
   - (a) exempt from both `presumed-stopped` rows any LANDING record for which `landing_commit_of`
     returns a commit;
@@ -576,6 +590,24 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   - Fold verification: §4 "In-place `--landed`" says it writes nothing to the tree, its one write
     being S16's lease. AC18's fixture pins the `witness` on the advertised tip, so check 15's existing
     witness ancestry test cannot red the record in the new test's place.
+- rev-4 · 2026-09-16 · §2 S17 · §4 · §8 F8 · AC17 · spec-audit round 2 fold, second pass, from fold
+  verifier problem f2 (plain-reconcile residual), decided by the orchestrator as option A in unit
+  19's function. S17's restatement gains the plain-reconcile case, whose exclusion is the
+  reconcile's second parent when the advertised tip holds it, and says the function reads the tip
+  its caller observed, where it said the function never reads the remote. §4's readers row for check
+  19 names that exclusion. AC17's `primary` arm now asserts that an owner commit the mid-run
+  reconcile brought in does not red, where it graded that record with no exclusion. §8 F8 records
+  the decision. Fold verification: S17's closing sentence says unit 17's T4 calls the
+  run's-own-commits function with the advertised tip as its exclusion, which is unit 17's text, and
+  no longer that T4 reads the exclusion function. Third pass, §2 S17 · §3 · §4 · §7 · §8 F8 ·
+  AC17, from the fold verifier's two problems on unit 19's terminal-row exclusion, a fix commit on a
+  pushed landing merge and push-main's reconcile as the witness, decided by the orchestrator as a
+  content-based run side in unit 19's function. S17's bullets restate that rule: at each merge on
+  C's tail the parent that reaches a commit touching the record's run-state path since BASE is the
+  run side, the other parent is excluded and the walk descends, and where neither or both do there
+  is no exclusion. S17 drops the subject key and the tip test, and says the function reads no tip.
+  §8 F8 is rewritten as that decision. The consumes-from edge to unit 19, the readers row for check
+  19, AC17's `Red when:` and §7's staged RED for the whole-leg arm follow.
 
 ## 10. Reuse audit
 

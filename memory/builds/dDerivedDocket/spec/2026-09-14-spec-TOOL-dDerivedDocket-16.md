@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 16
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
@@ -105,7 +105,8 @@ ids-shaped invocation to the owner's one-command scaffold instead of guessing (o
   driver passes no live-build set), the eleven-field `--tsv` projection, the `--new-build` command
   S6 prints, and the scaffold's key list, which is the shape a mandate-only build starts in.
 - **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute <BASE>`, whose
-  NEW set is the only criterion the unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
+  attributed verdict, `verdict clean` with every inherited suite filed, is the only criterion the
+  unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
 - **consumes-from** `TOOL-dDerivedDocket-7` — the `--asks --build <slug>` table form that call shape
   3 prints, and the stdout rule shapes 1 and 2 rely on.
 - **hands-off** `TOOL-dDerivedDocket-17` — `ASKS_CMD` and the pinned `asks:`, `asks-ready:` and
@@ -122,7 +123,8 @@ ids-shaped invocation to the owner's one-command scaffold instead of guessing (o
 - **hands-off** `TOOL-dDerivedDocket-35` — the `ASKS_CMD` contract and its example entry, which that
   unit sets gov's value against, and P5 at preflight, which it stages RED on the real tree.
 - **hands-off** `TOOL-dDerivedDocket-24` — the `ASKS_CMD` key and its projection contract, which that
-  unit's auto-file calls to read its staged rows back.
+  unit's auto-file calls to read its staged rows back, and to read back an earlier auto-filed id it
+  may reuse.
 
 ## 4. Design
 
@@ -156,10 +158,14 @@ place of the listing one line saying `ASKS_CMD` is not adopted, naming the key a
 fold knows which are live. Naming the generator in a refusal's hint has precedent in the driver's own
 repair hints (`tools/unattended/unattended.sh:1525`, `:2011`, `:2042`).
 
-A later caller adds one more shape: the inherited-red auto-file of unit 24 reads its staged rows back
-with `<ASKS_CMD> --tsv --ready <new ids> --target <slug>` over the WORKING TREE. It carries no `--at`,
-because the rows are staged and exist at no rev, and no `--live-builds`, because only the new row's
-status, severity and home are read; it is parsed as shapes 1 and 2 are.
+A later caller adds one more shape: the inherited-red auto-file of unit 24 runs
+`<ASKS_CMD> --tsv --ready <ids> --target <slug>` over the WORKING TREE, for two reads. It reads its
+staged rows back under their new ids; and before it files for a leg, it reads back an earlier
+auto-filed id for the same leg red at the same rev, which an earlier Close sequence may already
+have committed, to decide whether that OPEN ask is reused instead. It carries no `--at`,
+because a new row is staged and exists at no rev and the reuse reads the tree a new row would join,
+and no `--live-builds`, because only a row's status, severity and home are read; it is parsed as
+shapes 1 and 2 are.
 
 Gov's value, set by unit 35, is the generator's `--asks` mode. The output is unit 15's projection:
 exactly eleven TAB fields led by `ask`, then `examined` and a count. Anything else is a parse refusal
@@ -335,10 +341,16 @@ build.
   Red when: the mode change passes silently, so a run plans against asks its BASE never filed.
 - **AC13** — When `bash tools/unattended/check-unattended.sh` runs, check 22's join is green with
   `ASKS_CMD` in the example conf and in both protocol copies; when
-  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the unit's end, it
-  reports no NEW failure, and every arm this unit added passes, each observed RED with its fix
-  unstaged.
-  Red when: the key is set by a project and documented nowhere, or an arm lands unobserved.
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the unit's end, its
+  attribution summary reads `verdict clean`, meaning no NEW FAIL, no `DEAD PROBE at L` and no
+  `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by its
+  file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. Every arm this
+  unit added passes, each observed RED with its fix unstaged.
+  Red when: the key is set by a project and documented nowhere, or an arm lands unobserved; or the
+  attributed run is read by its NEW count alone, so a suite this unit's change aborted before its
+  first FAIL line, or pushed past its budget, reads as clean; or an inherited failure is attributed
+  away with no record filing it.
   cost: one run of the unattended suites, the unit's single sanctioned run (D12-h).
   permission: the leg runs named here and in AC9 are observed at the one post-build bar, because
   unit passes run no gate legs (fix F7); ruling D12-h lifts the suites only.
@@ -426,6 +438,17 @@ New arm: `tools/unattended/unattended.test.sh` · one fixture per refusal and ou
   and M9: hands-off 17 and 18 name the P5 matcher, the one parse and the re-run call shape. G4 L2:
   hands-off unit 24, and §4 names that unit's working-tree read-back as a later caller's shape with
   no `--at`, so the protocol row says "the shapes listed" rather than a count.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, second pass. Plan c1 E37, G1 H1 (2, 24), a sibling
+  fold from the G1 round-2 record, over §3 Edges and §6 AC13: AC13 reads unit 1's `verdict clean` (unit 1
+  S10) and the inherited-suite filing, its `Red when:` gains the NEW-count-alone reading, and the §3
+  consumes-from edge to unit 1 names the attributed verdict in place of the NEW set. Fold
+  verification then gave AC13's `Red when:` the rest of plan c1 §12's standard consumer text, the
+  over-budget reading and the unfiled inherited failure, so it goes red on every half of unit 1
+  S10's criterion, as the other consumers' criteria do. Spec-audit round 2 fold, third pass, from
+  the second pass's low-severity verifier problem on this unit: unit 24 S10 and §8 F8 now reuse an
+  OPEN auto-filed ask, reading its earlier, possibly committed id back with the same call, so §4's
+  paragraph on that later caller's shape and the §3 hands-off edge to unit 24 name both reads. The
+  call's arguments are unchanged, and no criterion moves.
 
 ## 10. Reuse audit
 

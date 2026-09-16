@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-30 — checker defects from the stop census
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 30
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -87,9 +87,10 @@ parser accepts that no document names and no arm exercises is the one invocation
 
 ### Edges
 
-- **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute`, whose "no NEW
-  FAIL" reading is the only criterion the unattended suites can meet, since they are red at BASE for
-  causes this unit does not own. Added by this spec; the brief's table does not list it.
+- **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute`, whose attributed
+  verdict, `verdict clean` with every inherited suite filed, is the only criterion the unattended
+  suites can meet, since they are red at BASE for causes this unit does not own. Added by this spec;
+  the brief's table does not list it.
 
 ## 4. Design
 
@@ -238,8 +239,8 @@ prose.
 - **AC3** — When `GOV_UNATTENDED_REPORT=1 bash tools/unattended/check-unattended.sh --only 28` runs
   on the real tree, it exits 0 and prints one skip line each for checks 30 and 31; without the
   variable it exits 0 and prints nothing.
-  Red when: the conf read stays inside the guard, and the run exits 1 on `MEMORY_ROOT: unbound
-  variable`.
+  Red when: the conf read stays inside the guard, and the run exits 1 on
+  `MEMORY_ROOT: unbound variable`.
 - **AC4** — When a fixture copy of the leg removes one key from between the `gov:conf-allow`
   sentinels, the leg fails 22 naming that key; with one sentinel deleted, it fails 22 naming the
   region.
@@ -262,9 +263,16 @@ prose.
   `unattended.test.sh` drops every line naming `--framed`, the leg fails 26 naming it.
   Red when: an absent suite is read as an empty one and reds every flag in an adopter tree.
 - **AC9** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, it reports no NEW failure, and `python3 tools/memory-tree/check-arms.py --check` passes
-  with the moved `ARMS_FLOORS` row.
-  Red when: a new branch ships with no arm, so the harness arms leg reds on the floor.
+  unit's end, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
+  `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or
+  `DEAD PROBE at R` is named by its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. And
+  `python3 tools/memory-tree/check-arms.py --check` passes with the moved `ARMS_FLOORS` row.
+  Red when: a new branch ships with no arm, so the harness arms leg reds on the floor; or an arm this
+  unit added fails, or an existing arm newly fails because of it; or the attributed run is read by
+  its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or pushed
+  past its budget, reads as clean; or an inherited failure is attributed away with no record filing
+  it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: D12-i8 lifts the do-not-run instruction for this unit.
 - **AC10** — When `grep -n 'belt and braces' tools/unattended/check-unattended.sh` runs after this
@@ -329,6 +337,15 @@ New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip
   S6 fences the leg's own scope parser with the same sentinel pair (AC13). M7 with G1 M11: S8's
   version half is a pointer to unit 1 under the build's one-owner rule, and AC10 now observes the
   check 31 comment S8 rewrites.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, second pass. Plan c1 E41, G1 H1 (2, 24), a sibling
+  fold from the G1 round-2 record: §6 AC9 reads unit 1's `verdict clean` and the inherited-suite
+  filing, and the §3 consumes-from edge to unit 1 is updated. Fold verification: §6 AC3's `Red when:`
+  code span, which opened on one line and closed on the next, is reflowed onto one line; the words
+  are unchanged. Third pass, from the fold-2 verifier problem that §6 AC9's `Red when:` carried only
+  the shorter consumer clause: AC9 now also reds when an arm this unit added fails or an existing arm
+  newly fails, when a suite is pushed past its budget, and when an inherited failure is attributed
+  away with no record filing it, so each positive clause of unit 1 S10's criterion has a red, as
+  units 16, 17 and 18 state them.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling+kickoff · order 34
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling+kickoff · order 34
 
 <!-- gen:spec-records -->
 
@@ -35,8 +35,10 @@ necessary, so no gate reads a half-switched tree.
   `memory/builds/dDerivedDocket/BACKLOG.md`, it files the triage ask with its KEEP (S17) and the
   signed triage dispositions. After the conservation proof passes, and only then, it removes the
   authored shard files from the worktree and the index, so the first builds-mode render writes the
-  views into absent paths (§4 Rollout, §8 F9). Its refusals are §5's, each observed by AC17. Observed
-  by AC1, AC2, AC3, AC16, AC18, AC19 and AC26.
+  views into absent paths (§4 Rollout, §8 F9). Its refusals are §5's, each observed by AC17. The
+  worksheets it applies are re-planned at rollout step 5 with only the recorded design-named ids
+  still in the triage population (§8 F16). Observed by AC1, AC2, AC3, AC16, AC18, AC19, AC26 and
+  AC28.
 - **S2** Conservation. Every id the planner's census collected has exactly one ask row, and its text
   equals the legacy text apart from the declared normalizations in §4. Observed by AC2.
 - **S3** The family views are rendered by `gen_build_index.py --write` for all four declared
@@ -82,7 +84,7 @@ necessary, so no gate reads a half-switched tree.
   repository shaped as the landing and against the current remote tip. The landing merge is a
   transition whenever the tip's lineage carries a shards-mode backlog commit since the fork (unit 9
   S3's predicate), and the rows main gains during the build, with the triage its finished builds now
-  owe, must be carried across it. Observed by AC15, AC20, AC24 and AC25.
+  owe, must be carried across it. Observed by AC15, AC20, AC24, AC25 and AC28.
 - **S16** The per-id status report: after the switch, each id's derived status equals the status the
   planner's per-id report predicts under the signed tables. The two writes outside the
   prediction, S11's disposal and S17's triage ask, are named exceptions. Observed by AC3.
@@ -129,8 +131,9 @@ necessary, so no gate reads a half-switched tree.
 - **consumes-from** `TOOL-dDerivedDocket-11` — the census the conservation proof counts against, and
   the per-id report the status proof compares with, and the placeholder `TRIAGE-ASK`, for which
   S17's id is substituted in AC3; and `--plan` at the switch-over's parent, which rollout step 5
-  re-runs, and over a worktree of the remote tip, which reconcile step 2 runs (its S1). Added by
-  this spec, not in the brief's edge table.
+  re-runs, and over a worktree of the remote tip, which reconcile step 2 runs (its S1), with its S6
+  refusal naming each `--design-named` id outside the triage population, by which both steps drop a
+  recorded id (§8 F16). Added by this spec, not in the brief's edge table.
 - **consumes-from** `TOOL-dDerivedDocket-12` — the delta engine in its migration set (the owner's
   folder for transferred tokens, the `--as` folder for signed triage verdicts, a hold on the
   `--triage-ask` id for a hold naming no id), the provenance row shape, the landing form of
@@ -177,7 +180,7 @@ necessary, so no gate reads a half-switched tree.
 | carriers of the deletion | the archive basenames at `.memory-tree.conf:387`, `tools/memory-tree/.memory-tree.conf.example:201`, `tools/memory-tree/check-memory-hygiene.sh:1057`, `tools/memory-tree/README.md:133`, `tools/memory-tree/row_grammar.py:167` and `:630`, reworded to describe the same-day suffix without naming a deleted file | `tools/check-dead-paths.sh` derives its needles from git and reds any carrier outside `memory/` naming them |
 | conf | `BACKLOG_MODE`, `ASK_CUTOFF`; the two `.unattended.conf` lines at `.unattended.conf:206` and `:207`; the added attribute line beside `.gitattributes:65` | the mode is what every builds-mode verdict keys on |
 | recall | the durable-home alternative beside `tools/memory-recall/extract.py:144`; `CACHE_VERSION` at `tools/memory-recall/query.py:134`; `KIT_MEMORY_RECALL_VERSION` and its `gov:kit memory-recall@` README marker, moved once here as the earliest unit to change that kit's shipped bytes | an old cache would serve anchors from files this commit deletes |
-| drift | the pin at `tools/drift-audit/drift_signals.py:260` and its signal retire; the live-rows watermark at `:288` re-measured; `_TERMINAL_STATUSES` at `tools/drift-audit/drift_report.py:1324` stays the shards-mode filter only; three new signals, whose drift-audit bytes ride unit 21 S8's one move of that kit's version; the DECISIONS row recording the supersession | a retired signal left one commit reports a reassuring zero |
+| drift | the pin at `tools/drift-audit/drift_signals.py:260` and its signal retire; the live-rows watermark at `:288` re-measured; `_TERMINAL_STATUSES` at `tools/drift-audit/drift_report.py:1324` stays the shards-mode filter only; three new signals, whose drift-audit bytes ride unit 13 S11's one move of that kit's version; the DECISIONS row recording the supersession | a retired signal left one commit reports a reassuring zero |
 | disposal | WONTDO for `TOOL-aWeighedCompass-3`, superseded by this unit | its split-or-shorten call dissolves with the shard |
 | manifest | the rotation-union trap at `memory/guides/SESSION-KICKOFF.md:200`, the check-8 trap at `:251`, the pointer-map rows at `:114`-`:117` and the governing-docs line at `:67`, then the re-stamp | the manifest's staged leg refuses a watched-file change without a re-stamp, and the re-stamp asserts the claims were re-verified |
 
@@ -278,10 +281,16 @@ P3), which is also what unit 11's plan over the tip predicts. The reconcile is t
    run inside this merge whether or not it conflicted.
 2. Plan at the tip. Run `git worktree add --detach <scratch> <tip>`, then run the branch's
    `migrate_backlog.py --plan --record <run-tree>/memory/builds/dDerivedDocket/build --record-as TOOL-dDerivedDocket-34`
-   inside that worktree, then remove the worktree. Its records carry the tip's commit day; on the
-   day rollout step 5's re-plan records carry, they replace those worksheets at the same paths,
-   and the switch-over's signed records still name each by blob sha, which the switch-over commit
-   keeps.
+   inside that worktree, with `--design-named` given once for each id that the header of the triage
+   worksheet at `<switch>`, the switch-over commit derived under Confirmation below, records and
+   that is still in the triage population at the tip, found as rollout step 5 finds them, then
+   remove the worktree. Without the option those rows would vanish from worksheets that can replace
+   the switch-over's, and their header would record no ids (unit 11 §4). An id dropped here gets no
+   journal line, because this step runs outside any unit pass: the dropped set is the `<switch>`
+   header's ids less this header's, and each id's row at `<tip>` shows why it left (§8 F16). Its
+   records carry the tip's commit day; on the day rollout step 5's re-plan records carry, they
+   replace those worksheets at the same paths, and the switch-over's signed records still name each
+   by blob sha, which the switch-over commit keeps.
 3. Sign. Run the signer's landing re-run (unit 33 S11), `--worksheets <that pair> --tail landing`.
    It reads each row's text at the tree sha the worksheet records, never in this tree, where step 1
    replaced the shards with views. Its `--check` exits 0.
@@ -351,8 +360,15 @@ confirms an id the receiving side acted on (§8 F7).
 4. Mint `<triage-id>` and record it in the pass journal (S17).
 5. Re-plan, re-sign, then write. At the switch-over's parent, run
    `migrate_backlog.py --plan --record memory/builds/dDerivedDocket/build --record-as TOOL-dDerivedDocket-34`,
-   with `--design-named` given once for each id unit 11's triage worksheet header records. Run the
-   signer over that pair, `--worksheets <same-id worksheet> <triage worksheet> --tail switch`
+   with `--design-named` given once for each id unit 11's triage worksheet header records that is
+   still in the triage population at this tree. To find them, run the same command first without
+   `--record` and `--record-as`, which writes nothing. While it exits 1 naming recorded ids as
+   outside the triage population (unit 11 S6), drop each id it names, write one line into the pass
+   journal naming that id, not leading with it, as dropped from the design-named set, and run it
+   again; any other refusal stops the step. A pass between unit 11's and this one can flip such an
+   ask's legacy token to a terminal one, and unit 11's refusal stays as it is (§8 F16). Run the
+   signer over that pair,
+   `--worksheets <same-id worksheet> <triage worksheet> --tail switch`
    (unit 33 S11), and its `--check`, gov's operator step. Then run
    `migrate_backlog.py --write --as dDerivedDocket --signed <switch same-id record> <switch triage record> --triage-ask <triage-id>`.
    Every pass between unit 11's and this one can move the planner's output: a shard line shifts
@@ -367,8 +383,8 @@ confirms an id the receiving side acted on (§8 F7).
 8. Confirm the per-id report, the conservation table, the recall floor and `drift_report.py --check`.
 9. Commit, with the pre-commit hook's timeout raised to 600000 ms.
 10. Stage and remove the four breaks.
-11. Rehearse the landing reconcile: AC15, AC24 and AC25 in a scratch repository, and AC20 against
-    the live tip inside a scratch worktree of the run branch, removed afterwards.
+11. Rehearse the landing reconcile: AC15, AC24, AC25 and AC28 in a scratch repository, and AC20
+    against the live tip inside a scratch worktree of the run branch, removed afterwards.
 12. Commit the acceptance ledger and the status flip.
 
 ### Inventory
@@ -395,7 +411,7 @@ confirms an id the receiving side acted on (§8 F7).
 | `tools/memory-tree/migrate_backlog.py` | `--write`, and its selftest's `--write` fixtures |
 | `tools/memory-tree/` carriers | five comment or prose lines reworded |
 | `tools/memory-recall/extract.py`, `query.py`, `recall_conf.py`, `README.md` | durable alternative, cache version, kit version and its marker |
-| `tools/drift-audit/drift_report.py`, `drift_signals.py` | retire, re-point, add; no version move, which is unit 21's |
+| `tools/drift-audit/drift_report.py`, `drift_signals.py` | retire, re-point, add; no version move, which is unit 13's |
 | `tools/drift-audit/selftest.py` | the shards-mode and dead-probe fixtures AC21 runs |
 | `memory/DECISIONS.md` | one row under the TOOL heading |
 | `memory/builds/*/README.md` | generated regions re-rendered |
@@ -435,7 +451,7 @@ confirms an id the receiving side acted on (§8 F7).
   the straggler inventory, the three new signals' examined counts, and the landing triage
   population's size, printed by the rehearsal (AC20).
 - risks — the flip lands through a merge it cannot fully rehearse, because the tip keeps moving. The
-  landing reconcile is rehearsed (AC15, AC24 and AC25 in scratch, AC20 against the live tip in a
+  landing reconcile is rehearsed (AC15, AC24, AC25 and AC28 in scratch, AC20 against the live tip in a
   scratch worktree), and the entries it cannot classify or confirm park rather than guess. Between this commit and the landing merge,
   check 25 prints `transitions examined 0` and passes, because the switch-over commit is a mode
   boundary (unit 9 S7); any DEAD PROBE there is a real fault, such as the two conf readers
@@ -672,7 +688,7 @@ confirms an id the receiving side acted on (§8 F7).
   `git diff HEAD^ HEAD -- tools/memory-recall/query.py tools/memory-recall/recall_conf.py tools/memory-recall/README.md tools/drift-audit/drift_report.py`
   runs on the switch-over commit, it shows `CACHE_VERSION` moved, `KIT_MEMORY_RECALL_VERSION` moved
   together with its `gov:kit memory-recall@` README marker, and `KIT_DRIFT_AUDIT_VERSION` unmoved,
-  because unit 21 S8 moves that constant once for the landing range; and
+  because unit 13 S11 moves that constant once for the landing range; and
   `bash tools/check-kit-versions.sh` exits 0.
   Red when: extraction changes with no `CACHE_VERSION` bump, which neither `check-recall.py`, whose
   extraction never reads the query cache, nor `extract.py` can see, so a warm cache serves anchors
@@ -680,6 +696,23 @@ confirms an id the receiving side acted on (§8 F7).
   range, against the build's one-owner rule.
   permission: the diff is read in the pass; `bash tools/check-kit-versions.sh` is the
   `kit version markers` leg and binds at the one post-build bar.
+- **AC28** — A scratch repository holds three `EXMP` asks OPEN on finished builds that no rule
+  selects, and a triage worksheet `migrate_backlog.py --plan` recorded with `--design-named` given
+  once for each, so its header names all three. A later commit flips the first ask's legacy token
+  to CLOSED, and a commit after it flips the second's. When rollout step 5's re-plan runs at the
+  first flip, its run without `--record` exits 1 naming the first id, writes nothing and leaves
+  `git status --porcelain` unchanged; its re-run with the other two exits 0, and so does its recorded
+  run, whose triage worksheet header names those two and not the first, with a `design-named` row
+  for each; and a journal file inside the scratch repository holds one line naming the first id, not
+  leading with it, as dropped. When reconcile step 2's plan then runs inside a worktree of the
+  second flip, starting from the two ids that header records, its run without `--record` exits 1
+  naming the second id, its recorded run with the third exits 0 and its header names only the third
+  id, and that journal file gains no line.
+  Red when: step 5 or step 2 passes every recorded id, so unit 11's refusal of an id outside the
+  triage population stops the switch-over or the landing with no recovery; or step 5 drops an id
+  with no journal line, so its header's shrunken id set reads as unexplained beside unit 11's; or
+  an id still in the triage population is dropped, so a closure the design named is never signed.
+  cost: seconds. fixture: a scratch repository built in the pass; it writes nothing outside it.
 
 ## 7. Gates
 
@@ -771,6 +804,21 @@ the real tree for the first time.
   and re-stamp in a commit apart from the merge they belong to. RESOLVED (agent, 2026-09-16,
   delegated): (b); unit 12 F9 still admits a merge concluded early by hand, and `--prepare` runs
   only after step 7.
+- **F16** — What gives way when an id a recorded triage header names as design-named has left the
+  triage population by the time rollout step 5 or reconcile step 2 plans again? Unit 11 S6 refuses
+  such an id by name with no worksheet written, and a pass between orders 11 and 34 can flip its
+  legacy token to a terminal one, as main can before the landing. Options:
+  - (a) step 5 passes only the recorded ids still in the triage population, found by that refusal
+    over a run that writes nothing, and records each dropped id in the pass journal;
+  - (b) unit 11 S6 reports an out-of-population id on its liveness line and skips it instead of
+    refusing.
+
+  (b) turns the refusal into a skip for every caller, so a mistyped id reads as a liveness line
+  and its design-named row silently never exists, and it moves unit 11's AC4.
+  RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a); unit 11 S6 and its AC4 stay as they
+  are. Reconcile step 2 filters the same way at the tip, which the orchestrator's step-2 decision
+  did not anticipate, and writes no journal line, since it runs outside any unit pass and the
+  `<switch>` header less its own names the dropped set. Observed by AC28.
 - The rulings this unit executes and does not revisit: D1 adopt, D3 no hard view cap, D6 closeout
   gated from this commit, D8 delete the archives, D9 check 15 keeps grading asks, D11-c direct-push
   landing — all RESOLVED (owner, 2026-09-13). The delegated signatures, and the replacement of the
@@ -832,6 +880,23 @@ the real tree for the first time.
   `git rev-list --topo-order --reverse HEAD --not <tip>`, not on HEAD's first-parent chain, which
   after step 8 runs through the prepared merge, and AC24's second tip adds a REOPENed id's flip that
   must park.
+- rev-4 · 2026-09-16 · round-2 fold, second pass, two verifier problems on this unit decided by the
+  orchestrator. The step-2 problem: §4 landing reconcile step 2's `--plan` passes `--design-named`
+  once for each id the triage worksheet header at `<switch>` records, as rollout step 5 does, so its
+  worksheets keep the design-named rows and record the ids. The step-5 problem, option 1: §4
+  Rollout step 5 passes only the recorded ids still in the triage population, found by unit 11 S6's
+  refusal over a run without `--record`, and records each dropped id in the pass journal; step 2
+  filters the same way at the tip and writes no journal line. S1 names the filter, S1 and S15 are
+  observed by new AC28, which stages a flipped id before step 5 and another before step 2, and new
+  §8 F16 records the fork. Fold verification: AC28's step-2 arm observes the probe run exiting 1
+  naming the second flipped id before its recorded run exits 0, and its journal is a file inside the
+  scratch repository, which the fixture line already confines; §4 Rollout step 11 and §5 risks list
+  AC28 among the scratch rehearsals; the §3 consumes-from edge to unit 11 names its S6 refusal.
+  Third pass, from fold verifier problem f3 on kit-version ownership, decided by the orchestrator as
+  the unit first in build order to change a kit's shipped bytes owning that kit's one version move:
+  the §4 drift row and AC27 name unit 13 S11, and the Files touched row for
+  `tools/drift-audit/drift_report.py` names unit 13, in place of unit 21 S8 as the drift-audit
+  version owner; the rev-3 line's "ride unit 21 S8" is history and stays.
 
 ## 10. Reuse audit
 

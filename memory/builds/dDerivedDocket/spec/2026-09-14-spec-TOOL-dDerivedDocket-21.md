@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 21
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
@@ -62,11 +62,18 @@ does not name.
   the B1 block at `tools/lexicon/adopt-lexicon.sh:459` — are rewritten to name the new class. The
   `lexicon wiring` grade stays: it is unguarded, so it still grades the declaration if a guard is
   ever narrowed again. Observed by AC7.
-- **S8** Under the build's one-owner rule this unit moves, once, the version of each kit whose move
-  it is the earliest to scope: drift-audit, govkit, lexicon and codebase-map. Memory-tree's move is
-  the memory-tree docs unit's under `check-verdict-epoch.sh`'s topological rule, and the review
-  harness's is the review-durability unit's; the bytes S6 changes in those two kits ride those moves.
-  Observed by AC8.
+- **S8** Under the build's one-owner rule, the unit that first changes a kit's shipped bytes in build
+  order moves that kit's version once, and every later unit's bytes in that kit ride the move (§8
+  F3). This unit moves govkit, lexicon, codebase-map and the review harness, once each. The review
+  harness's move is `meta.version` and both the `gov:kit tier2-review@` and `gov:kit review-harness@`
+  markers in `tools/workflows/tier2-review.js`: S6 changes that kit's descriptor,
+  `tools/workflows/kit.toml`, at order 21, before the review-durability unit first touches
+  `tier2-review.js`, and that unit's review-harness bytes ride this move. It does NOT move
+  drift-audit: unit 13, ordered earlier, changes `tools/drift-audit/` first and owns that move, and
+  the drift-audit bytes S1 and S2 change ride it. Memory-tree's move is the memory-tree docs unit's,
+  an exception to that rule, because `check-verdict-epoch.sh`'s topological rule requires the one
+  bump to sit at or after the range's last engine change; the bytes S6 changes in that kit ride that
+  move. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -181,7 +188,13 @@ like a corpus with nothing to fix.
 `tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · `tools/drift-audit/README.md`
 · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/gate-legs.json` ·
 `tools/lexicon/kit.toml` · `tools/lexicon/adopt-lexicon.sh` · `tools/codebase-map/kit.toml` ·
-`tools/memory-tree/kit.toml` · `tools/workflows/kit.toml` · the drift-audit and govkit dossiers.
+`tools/memory-tree/kit.toml` · `tools/workflows/kit.toml` · the drift-audit and govkit dossiers. The
+S8 version moves add `tools/lexicon/lexicon.py` and the lexicon markers in `canon.py`, `README.md`
+and `LEXICON.md`, with the rendered lexicon Skill re-rendered; `tools/codebase-map/map_lib.py`, with
+the generated map that mirrors its version regenerated; govkit's constant and marker in
+`tools/govkit/govkit.py`; and the review harness's `meta.version` and its two `gov:kit` markers, all
+on one line of `tools/workflows/tier2-review.js`. No drift-audit version carrier is touched: the
+drift-audit bytes ride unit 13's move (S8).
 
 ### Alternatives rejected
 
@@ -256,9 +269,25 @@ like a corpus with nothing to fix.
   neither states that a root conf falls into no guard class, and `lexicon wiring` still grades the
   declaration.
   Red when: the stale sentence survives beside a guard that now names the conf.
-- **AC8** — When `bash tools/check-kit-versions.sh` runs, the drift-audit, govkit, lexicon and
-  codebase-map version constants agree with their markers.
-  Red when: a constant moves and its marker does not.
+- **AC8** — When `KIT_GOVKIT_VERSION` in `tools/govkit/govkit.py`, `KIT_LEXICON_VERSION` in
+  `tools/lexicon/lexicon.py`, `KIT_CODEBASE_MAP_VERSION` in `tools/codebase-map/map_lib.py` and the
+  `meta.version` of `tools/workflows/tier2-review.js` are read at the unit's build commit and, with
+  `git show`, at `abac6d59`, each build-commit value is greater, compared as a dotted version
+  component by component, the review harness reading 1.8 over BASE's 1.7; every `gov:kit` marker for
+  that kit in the same file carries the same value, which in `tier2-review.js` is both the
+  `gov:kit tier2-review@` and the `gov:kit review-harness@` marker; when
+  `git diff HEAD^ HEAD -- tools/drift-audit/drift_report.py` runs on the unit's build commit, it
+  shows no change to the `KIT_DRIFT_AUDIT_VERSION` line; and `bash tools/check-kit-versions.sh`
+  exits 0.
+  Red when: one of the four moves is skipped, which `tools/check-kit-versions.sh` cannot see,
+  because it grades presence and constant-marker agreement and BASE's values already satisfy both;
+  or a constant moves and its marker does not; or the review harness moves to any value but 1.8,
+  which the review-durability unit's check of both kit ids then contradicts; or this unit moves
+  `KIT_DRIFT_AUDIT_VERSION` as well, a second move of that kit in one landing range beside the move
+  unit 13 owns.
+  permission: the reads are `git show` and `git diff` observations in the pass;
+  `check-kit-versions.sh` is the `kit version markers` leg and runs at the build's one post-build
+  bar.
 - **AC9** — When `python tools/govkit/govkit.py selfcheck` runs over the real tree after S6, the
   `recall floor` guard names `.memory-tree.conf` and no near-miss line names that leg; with that guard
   entry reverted in a scratch copy, selfcheck stays green and its near-miss line names `recall floor`,
@@ -268,7 +297,7 @@ like a corpus with nothing to fix.
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `govkit selftest` · `lexicon naming predicates` · `lexicon wiring` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `govkit selftest` · `lexicon naming predicates` · `lexicon wiring` · `kit version markers` · `codebase-map coverage + freshness` · `workflow script syntax` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/drift-audit/selftest.py · a bare-remote fixture with local main behind, at and ahead of a raised pin, plus an unfetched tracking ref · none
 New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file, a conf-reading guarded leg without the conf, and a guarded leg reading a root conf through a same-directory module · none
@@ -287,6 +316,25 @@ New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file,
   branch announced. Refusing breaks every remote-less fixture and adopter for a hazard that needs a
   second copy of the branch to exist. RESOLVED (agent, 2026-09-14, delegated): local, announced; an
   `origin` without the tracking ref still refuses.
+- **F3 — which unit owns a kit's one version move?** Units 13 and 17 both change `tools/drift-audit/`
+  bytes before this unit does, and rev-2's S8 claimed the drift-audit move as the earliest unit to
+  scope it, while unit 9 F9 names the first unit to change a kit's bytes. Options: (a) the first
+  unit in build order to change the kit's shipped bytes, so unit 13 owns drift-audit and this unit
+  keeps govkit, lexicon and codebase-map and takes the review harness; (b) the earliest unit to
+  scope the move, which is this one for drift-audit and the review-durability unit for the review
+  harness. (b) leaves units 13 and 17 shipping changed drift-audit bytes under an unmoved constant
+  for eight orders, and reads the rule the reverse of the way unit 9 F9 and the run-gates owner apply
+  it. The review harness is the same case. S6 changes its descriptor, `tools/workflows/kit.toml`, at
+  order 21, and that edit reaches adopters at `govkit apply` exactly as S6's codebase-map descriptor
+  edit does, while the review-durability unit first touches `tier2-review.js` at order 29, so (b)
+  leaves S6's bytes under an unmoved constant for the same eight orders. Two earlier units change
+  other files under `tools/workflows/`, and neither is counted as a review-harness change: unit 13's
+  edits to the two drift-audit workflow scripts are its own drift-audit move, whose
+  `gov:kit drift-audit@` marker those scripts carry, and unit 20's `unattended-build.js` carries its
+  own `gov:kit unattended-build@` identity and no review-harness marker.
+  RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a), observed by AC8, which
+  also reads that this unit leaves `KIT_DRIFT_AUDIT_VERSION` unmoved and moves the review harness's
+  `meta.version` with both of its markers.
 
 ## 9. Revision log
 
@@ -305,6 +353,25 @@ New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file,
   bytes never name the conf. M7 and L3: S8 and AC8 follow the build's
   one-owner rule for kit versions — drift-audit, govkit, lexicon and codebase-map move here, and
   memory-tree and the review harness ride their owners' moves.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, second pass. The fold-2 verifier problem on kit
+  version ownership (f3), decided by the orchestrator as the first unit to change a kit's bytes:
+  §2 S8 drops drift-audit, whose move unit 13 owns, and keeps govkit, lexicon and codebase-map; §6
+  AC8 now reads each of the three moves against `abac6d59`, since the marker check alone passes at
+  BASE, and reads `KIT_DRIFT_AUDIT_VERSION` unmoved by this unit's commit; §4 Files touched names
+  the three kits' version carriers and no drift-audit one; §7 gains
+  `codebase-map coverage + freshness`, which grades the generated map the codebase-map move
+  regenerates; §8 F3 records the decision. Fold verification: §2 S8 now marks memory-tree's move as
+  an exception to the first-to-change rule, which `check-verdict-epoch.sh` places at or after the
+  range's last engine change; the owners S8 names are unchanged. Third pass, from the fold-2
+  verifier problem that S8 still gave the review harness's move to the review-durability unit,
+  decided by the orchestrator as the first-to-change rule: §2 S8 moves the review harness here, its
+  `meta.version` and both `gov:kit` markers in `tier2-review.js`, because S6 changes that kit's
+  descriptor at order 21; §6 AC8 reads that fourth move against `abac6d59`, 1.8 over 1.7; §4 Files
+  touched names `tier2-review.js`; §7 gains `workflow script syntax`, the leg that grades that file;
+  §8 F3 gains the review-harness case and says why the `tools/workflows/` edits of units 13 and 20
+  are not counted. Third-pass fold verification: §2 S8's clause naming whose bytes ride the review
+  harness's move is reworded to name the review-durability unit, not `tier2-review.js`; the owners
+  S8 names are unchanged.
 
 ## 10. Reuse audit
 

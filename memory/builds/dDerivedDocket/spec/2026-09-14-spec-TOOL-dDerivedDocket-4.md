@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -91,7 +91,9 @@ lists among this unit's closes.
   differs from the recorded one. Observed by AC5, AC10 and AC13.
 - **S10** The contract text goes to a new companion guide, `UNATTENDED-STOPS.md`, rendered from the
   kit like the verb carrier; the protocol gains two rows, one in §3 and one in §7. The `unattended`
-  dossier claims the new guide key. Observed by AC11.
+  dossier claims the new guide key. The Skill's Resume section carries §4's take-over rule, under
+  which a take-over whose `--resume` refuses or prints `still held` reaps only the job it scheduled
+  and reads the result back. Observed by AC11.
 - **S11** A DECISIONS row supersedes `TOOL-aBoundedVerdict-2`'s "never a new phase" for a
   non-terminal, resumable phase, minted by the orchestrator under this build's slug at build time.
   NOT OBSERVED by a criterion: it is a record, and check 13 and the recall floor grade its shape.
@@ -256,8 +258,20 @@ take-over rule:
 > when no `LEASE` line prints, the keepalive the record's `keepalive` fact names, you hold the lease:
 > resume with `--resume <slug> --keepalive-id <that id>` and do not reap it.
 > Otherwise you are taking over: reap the recorded job and read the result back, schedule a new one,
-> then run `--resume <slug> --keepalive-id <new id>`, which records the new id. Replace your own job
-> only through `--resume <slug> --keepalive-id <new> --replaces <old>`.
+> then run `--resume <slug> --keepalive-id <new id>`, which records the new id. If that resume refuses
+> or prints `still held`, reap only the job you just scheduled, read the result back, and stop. Replace
+> your own job only through `--resume <slug> --keepalive-id <new> --replaces <old>`.
+
+The refused-take-over sentence is the auto-resume unit's §8 F8, decided for both units. A job left
+scheduled after a refused take-over ticks `--resume <slug> --keepalive-id <own id>` (F6), which on a
+HELD record takes the take-over row without `--scheduled` and skips that unit's remote-freshness
+refusals. `still held` writes nothing and takes no lease, so it leaves the same job firing.
+
+Its `only` is the auto-resume unit's §8 F9, also decided for both units. That unit files a durable
+restart for a hold, and its Resume step deletes that restart only after a take-over's `--resume`
+succeeds, never before it and never on this branch. Here the reap of the recorded job comes before
+`--resume`, so a delete placed beside it would remove the restart whenever a manual resume on an
+`after` hold prints `still held`, and leave the run HELD with nothing filed to restart it.
 
 The "reap before schedule" measurement paragraph stays, scoped to the take-over case. The Skill's
 keepalive section names the tick's first act, once a run-state file exists, as
@@ -443,13 +457,21 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
 - **AC11** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over
   the rendered tree, `--hold` is declared in the driver, carried by the verb guide, invoked in the
   Skill, and the companion guide renders byte-identical to its template; the Skill's Resume section
-  passes `--keepalive-id` on every `--resume` it spells, and its keepalive section names
+  passes `--keepalive-id` on every `--resume` it spells, its take-over branch removes nothing before
+  that resume but the recorded job and, when that resume refuses or prints `still held`, reaps only
+  the job it scheduled and reads the result back, and its keepalive section names
   `--resume <slug> --keepalive-id` as the tick's first act. The verb guide's `--hold` entry lists
   `--reaped` and `--keepalive-unreachable`.
   Red when: the Skill never invokes `--hold`, so no agent following it would ever pause a run; or
   the Skill's Resume step still spells `--resume <slug>` with no id, so every holder is refused and
   every follower of the Skill takes the refusal for a stop; or the synopsis omits the keepalive
-  flags, so a route spelled from it is refused at its only ending.
+  flags, so a route spelled from it is refused at its only ending; or a refused take-over stops with
+  its new job still scheduled, so that job keeps ticking `--resume` on the HELD record and takes it
+  over unwatched once the refusal or the unmet condition clears, with none of the scheduled-resume
+  refusals in front of it; or the take-over branch removes anything besides the recorded job before
+  its `--resume`, or besides the job it scheduled once that resume refuses or prints `still held`,
+  so once the auto-resume unit files a restart under the slug's name, a manual resume before an
+  `after` hold's instant deletes that restart and leaves the run HELD with nothing to restart it.
 - **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
   unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
@@ -576,7 +598,9 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   Skill names the tick's first act as `--resume <slug> --keepalive-id <own id>`, whose matching-id
   row refreshes the lease; (b) no tick refresh, with the bound's first term covering the silence.
   RESOLVED (agent, 2026-09-14, delegated): (a). It delivers KF7's refresh source through a row that
-  already exists, and it adds no driver surface.
+  already exists, and it adds no driver surface. Because that tick goes down the take-over row on a
+  HELD record, a take-over that refuses or prints `still held` reaps the job it scheduled, as unit 5
+  §8 F8 decides for both units, and removes nothing else, as unit 5 §8 F9 decides for both (§4).
 - **F7 — may a hold be taken over an unpublished tip?** Design §21.7 requires the branch pushed
   before HELD. Options: (a) never; (b) for `platform-unavailable` only, when the remote does not
   answer, recording the tip; (c) for any code. (a) leaves a sustained outage with no clean end,
@@ -663,6 +687,19 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
     its resumes pass C, so the new leaseless-holder row cannot read either as the holder. §4 The
     lease's refresh-sources sentence states S6's write-gate and `run_bounded` conditions, and §5
     names the matrix's two absent rows.
+- rev-4 · 2026-09-16 · round-2 fold, second pass. The verifier problem on units 5 and 4, a
+  keepalive left firing after a refused take-over, decided by the orchestrator as option (a) and
+  recorded as unit 5 §8 F8: §4 The Skill's Resume section's take-over rule reaps the job it
+  scheduled and reads the result back when that resume refuses or prints `still held`, with a
+  paragraph cross-referencing that fork, which F6's mark also names; S10 names the rule; AC11
+  checks the rendered Skill for it. Fold verification: §8 F6's added sentence says the tick goes
+  down the take-over row on a HELD record, not that every tick takes one over. Spec-audit round 2
+  fold, third pass, from the second pass's verifier problem on units 5 and 4, a manual resume on an
+  `after` hold deleting the owed schedule, decided by the orchestrator as option (a) and recorded as
+  unit 5 §8 F9: §4's take-over rule reaps only the job it scheduled on a refusal or `still held`,
+  and a new paragraph after it says the restart a hold owes is deleted only after a take-over's
+  `--resume` succeeds; S10 says `only`; AC11 and its `Red when:` read that the branch removes
+  nothing else; §8 F6's mark sentence cites unit 5 §8 F9.
 
 ## 10. Reuse audit
 

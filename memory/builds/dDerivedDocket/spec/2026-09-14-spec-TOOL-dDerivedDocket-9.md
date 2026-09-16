@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 9
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -480,9 +480,9 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   check-wiring bytes, and `tools/check-kit-versions.sh` has no need row for
   `KIT_CHECK_WIRING_VERSION`, so no gate requires the move. Options: (a) this unit, the earliest to
   change those bytes, with unit 13's riding its move; (b) unit 13; (c) each unit. (c) breaks the
-  build's one-owner rule, and (b) names an owner later than the first change, the reverse of unit 21
-  S8's earliest-to-scope order. RESOLVED (agent, 2026-09-16, delegated): (a), observed by AC17
-  against `abac6d59`.
+  build's one-owner rule, and (b) names an owner later than the first change, against the
+  first-to-change rule unit 21 S8 states and unit 13 §8 F9 applies to drift-audit.
+  RESOLVED (agent, 2026-09-16, delegated): (a), observed by AC17 against `abac6d59`.
 
 ## 9. Revision log
 
@@ -509,6 +509,12 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   gains `kit version markers` and, for S11's ceiling, `leg ceilings clear their evidenced maximum`;
   §8 F9. Fold verification: AC8, AC10 and AC16 name the `commit-msg` hook by basename, the file this
   unit creates.
+- rev-4 · 2026-09-16 · spec-audit round 2 fold, third pass. §8 F9, from fold verifier problem f3 on
+  kit-version ownership, decided by the orchestrator as the unit first in build order to change a
+  kit's shipped bytes owning that kit's one version move: F9's rejection of (b) no longer cites an
+  earliest-to-scope order in unit 21 S8, which unit 21 §8 F3 rejected, and cites the first-to-change
+  rule unit 21 S8 states and unit 13 §8 F9 applies to drift-audit. F9's resolution, S17 and AC17 are
+  unchanged.
 
 ## 10. Reuse audit
 

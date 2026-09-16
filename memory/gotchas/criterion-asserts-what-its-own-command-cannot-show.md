@@ -33,6 +33,14 @@ was written for.
 
 Every one of them was written by someone who had just read the code.
 
+One leg keeps being cited for this: `tools/check-testsuite-counts.sh` asserts a suite's SHAPE and
+never a count. It runs nothing, and it only reads that a `PASS ($n assertions)` echo, a non-zero
+`FLOOR_ASSERTIONS` pin and a reference to that pin exist. A criterion that names it as the witness
+that a floor ROSE therefore cannot go red. Observe the suite itself instead: its printed count at
+the bar that runs it, and a static count of its arm calls against the pin. It was recorded against
+this leg in TOOL-aLoosenedCeiling-1's review (finding 5), TOOL-aJoinedCanon-1's spec audit round 2
+(H7), and TOOL-dDerivedDocket-37's G6 spec audit round 1 (H1).
+
 ## The fix
 
 Make the criterion DERIVE rather than ASSERT. Name the invocation that enumerates the set and have

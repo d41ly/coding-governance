@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 18
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -85,7 +85,8 @@ inputs before the record is published, and announced as not re-derived after (S8
 - **consumes-from** `TOOL-dDerivedDocket-17` — the `asks-at-landing:` fact S4 requires on a landed
   record, and the freeze's content S8 re-derives.
 - **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute <BASE>`, whose
-  NEW set is the only criterion the unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
+  attributed verdict, `verdict clean` with every inherited suite filed, is the only criterion the
+  unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
 - **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of S3, a typed resolution table
   in a mandated run's folder, after gov sets `ASKS_CMD`.
 - **hands-off** `TOOL-dDerivedDocket-20` — the folder-wide anchor ban, whose carrier sentence
@@ -229,9 +230,15 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
   `asks:` fact, with the count 0.
   Red when: the leg prints nothing, so vacuity reads as a pass.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  end of the unit, it reports no NEW failure, and every arm this unit added passes, each observed RED
-  with its fix unstaged.
-  Red when: an arm is wired without its failing case ever being seen.
+  end of the unit, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
+  `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or
+  `DEAD PROBE at R` is named by its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. Every arm this
+  unit added passes, each observed RED with its fix unstaged.
+  Red when: an arm is wired without its failing case ever being seen; or the attributed run is read
+  by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or pushed
+  past its budget, reads as clean; or an inherited failure is attributed away with no record filing
+  it.
   cost: one run of the unattended suites, the unit's single sanctioned suite run (D12-h).
 - **AC11** — When a fixture record's `asks-ready:` reads `EXMP-aFoo-3=yes` while the stub producer
   at the recorded `m-base:` grades that id `no`, and the record's preflight commit is not on the
@@ -295,6 +302,13 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
   phase or HELD, because a committed LANDING record is past its close (AC2); §3's fourth bullet
   states that the derived-terminal unit extends S4's population to a committed in-place LANDING
   record in the commit that moves the freeze, with a hands-off edge to that unit.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. Plan c1 E39, G1 H1 (2, 24), a sibling fold from the
+  G1 round-2 record, over §3 Edges and §6 AC10: AC10 reads unit 1's `verdict clean` (unit 1 S10) and
+  the inherited-suite filing, its `Red when:` gains the NEW-count-alone reading, and the §3
+  consumes-from edge to unit 1 names the attributed verdict in place of the NEW set. Fold
+  verification then gave AC10's `Red when:` the rest of plan c1 §12's standard consumer text, the
+  over-budget reading and the unfiled inherited failure, so it goes red on every half of unit 1
+  S10's criterion, as the other consumers' criteria do.
 
 ## 10. Reuse audit
 

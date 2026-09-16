@@ -21,17 +21,18 @@ as a rev bump with its section 9 line, then write the code.
   End each commit message with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
 - Stage explicit paths, never `git add -A` or `git add .`.
 - Call Python as `python`, never `python3`. In the Bash tool a heredoc loses an escape level, so write
-  any helper script to a file under `$TMPDIR` and run it. Scratch goes to `$TMPDIR`, never the tree.
-- **Run no merge-bar leg, and never `tools/run-gates/run-gates.sh`.** The pre-commit hook's fast legs
-  are not a gate run. You may run a declaration checker a criterion names as its witness when it takes
-  seconds: `bash tools/memory-tree/check-memory-hygiene.sh`, `python tools/check-spec-tokens.py`,
-  `python tools/lexicon/lexicon.py`, `bash tools/check-kit-versions.sh`,
-  `python tools/codebase-map/gen_map.py --check`, `bash skills/session-kickoff/manifest-check.sh`.
-- **Self-tests.** Only units 1, 3, 4, 5, 16, 17, 18, 22, 24, 27, 28 and 30 run unattended-kit suites,
-  each suite once at the unit's end, by the command the spec names. That is the owner's scoped lift of
-  a standing instruction that otherwise forbids running them. Every other unit runs no `*.test.sh` of
-  the unattended kit at all. A `*.test.sh` of another kit may be run once when the unit's own
-  criterion names it and the spec carries no `permission:` line deferring it to the post-build bar.
+  any helper script to a file and run it. Scratch goes under a `mktemp -d` directory, never the tree;
+  do not trust `$TMPDIR`, which can be unset in this shell and then resolves to the MSYS root.
+- **Run no gate** (owner rule). No section 7 leg, no `tools/gate-legs.json` row, no hand-run checker
+  such as the hygiene gate or `tools/check-spec-tokens.py`, and never `tools/run-gates/run-gates.sh`.
+  Every gate runs once, after all units are built. A criterion whose observation IS a gate leg is owed
+  to that post-build run, and the orchestrator writes its ledger line then. The pre-commit hook still
+  fires on your commit; that is the hook, not a gate you ran.
+- **The test file you are writing is the exception**: run it directly, because that is how its refusals
+  are staged RED. Two limits apply. Only units 1, 3, 4, 5, 16, 17, 18, 22, 24, 27, 28 and 30 run
+  unattended-kit suites, each once at the unit's end: the owner's scoped lift of a standing instruction
+  that otherwise forbids running them. And a suite whose criterion carries a `permission:` line
+  deferring it to the post-build bar is not run in the pass.
 - **Dark until the flip.** Before unit 34, the shards mode stays byte-identical. New behaviour waits
   behind `BACKLOG_MODE="builds"`, a blank key, or inert data, exactly as the spec says.
 - A kit file names nothing outside itself by literal (charter section 12). A kit's version moves only
@@ -55,8 +56,9 @@ as a rev bump with its section 9 line, then write the code.
    `**Serves:** journal <unit-id>` line, a title, then `**Evidences:** <unit-id>` and one line per
    criterion you observed in this pass, in the form `memory/HYGIENE.md` "Acceptance ledger" states,
    sharing a backticked token with its criterion. A criterion whose `permission:` line defers it to
-   the post-build bar gets NO line from you; the orchestrator writes it after that bar runs. A
-   criterion you found wrong gets the AMENDED form, naming the rev that changed it.
+   the post-build bar, or to a run the orchestrator makes after your commit, gets NO line from you;
+   the orchestrator writes it after that run. A criterion you found wrong gets the AMENDED form,
+   naming the rev that changed it.
 
 Commit with the unit id first in the subject, then run the checklist command your prompt names and act
 on each class it lists before you return.

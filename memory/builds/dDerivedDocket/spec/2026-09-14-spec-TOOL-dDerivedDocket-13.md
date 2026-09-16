@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 13
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -92,6 +92,16 @@ before a merge rather than as a repair after one.
   note at `tools/check-wiring.sh:234` says the value in effect names another checkout, which supplies
   the hook; the gotcha's description drops the premise, and `memory/gotchas/INDEX.md` is regenerated
   with `python tools/memory-tree/gotchas.py --write`. Observed by AC13.
+- **S11** The build's one-owner rule gives each kit's one version move to the unit first in build
+  order to change that kit's shipped bytes, and S6 and S9 are the build's first `tools/drift-audit/`
+  changes, so this unit moves the drift-audit version (§8 F9). In one commit it raises
+  `KIT_DRIFT_AUDIT_VERSION` in `tools/drift-audit/drift_report.py` as an X.Y pair, and sets every
+  `gov:kit drift-audit@` marker to the same value: in `tools/drift-audit/README.md`,
+  `tools/drift-audit/drift_report.py`, `tools/drift-audit/drift_signals.py`,
+  `tools/drift-audit/drift_signals.template.py`, `tools/drift-audit/selftest.py` and
+  `tools/drift-audit/adopt-drift-audit.sh`, and in `tools/workflows/drift-audit-code.js` and
+  `tools/workflows/drift-audit-state.js` with each harness's `version:` field. The drift-audit bytes
+  every later unit of this build changes ride this move. Observed by AC15.
 
 ## 3. Non-goals (OUT)
 
@@ -237,14 +247,18 @@ inventory; after it, the stragglers left, until zero.
 marker, S7) · `.githooks/pre-push` (S4, and its header, S10) · `tools/check-wiring.sh` (S5, and the
 comment at 188-190 and the note at 234, S10) · `tools/check-wiring.test.sh` (S9, and the comment at
 811, S10) · `tools/install-prefix-waivers.txt` (one row leaves, S7) ·
-`tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · `tools/gate-legs.json` ·
-`tools/govkit/registry.toml` · `tools/govkit/subject-pins.tsv` (regenerated, S7) ·
-`memory/map/features/memory-tree-hygiene.md` · `memory/map/generated/` ·
+`tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · the other drift-audit
+version carriers (S11): `tools/drift-audit/README.md`, `tools/drift-audit/drift_signals.py`,
+`tools/drift-audit/drift_signals.template.py`, `tools/drift-audit/adopt-drift-audit.sh`,
+`tools/workflows/drift-audit-code.js` and `tools/workflows/drift-audit-state.js` ·
+`tools/gate-legs.json` · `tools/govkit/registry.toml` · `tools/govkit/subject-pins.tsv`
+(regenerated, S7) · `memory/map/features/memory-tree-hygiene.md` · `memory/map/generated/` ·
 `memory/gotchas/hookspath-resolves-into-another-checkout.md` and the generated
-`memory/gotchas/INDEX.md` (S10). This unit moves no kit version constant: its check-wiring bytes ride
-unit 9's move of `KIT_CHECK_WIRING_VERSION` (unit 9 S17), and its drift-audit bytes ride unit 21's
-(unit 21 S8), under the build's one-owner rule. `tools/check-wiring.sh` lines 188-190 and 234 are
-reworded in place with no change in line count; every new line sits below line 621.
+`memory/gotchas/INDEX.md` (S10). Under the build's one-owner rule this unit moves one kit version,
+`KIT_DRIFT_AUDIT_VERSION` with its markers (S11), being the first unit in build order to change
+`tools/drift-audit/` bytes; its check-wiring bytes ride unit 9's move of `KIT_CHECK_WIRING_VERSION`
+(unit 9 S17). `tools/check-wiring.sh` lines 188-190 and 234 are reworded in place with no change in
+line count; every new line sits below line 621.
 
 ### Alternatives rejected
 
@@ -370,6 +384,19 @@ reworded in place with no change in line count; every new line sits below line 6
   Red when: AC12 inlines its own topology, so unit 35's clone and this suite build two topologies
   that can drift, which the edge to unit 35 exists to prevent; or the mode sets a hooks path, so unit
   35's clone no longer measures the value `tools/check-wiring.sh` writes.
+- **AC15** — When the `KIT_DRIFT_AUDIT_VERSION = ` line of `tools/drift-audit/drift_report.py` is
+  read at the unit's build commit and, with `git show`, at `abac6d59`, the build commit's value is
+  higher as an X.Y pair. `git grep -c "gov:kit drift-audit@<value>"` over each file S11 names counts
+  at least one hit in each, and
+  `git grep -h -o "gov:kit drift-audit@[0-9][0-9.]*" -- tools/drift-audit tools/workflows` prints no
+  other value. `bash tools/check-kit-versions.sh` exits 0.
+  Red when: this unit's drift-audit bytes ship at BASE's version, which `tools/check-kit-versions.sh`
+  cannot see, because it compares the constant with the README marker and the two harnesses and
+  never with BASE, so an adopter pulling the new signal cannot tell the two vintages apart; or a
+  marker that script does not read, such as the one in `tools/drift-audit/drift_signals.template.py`,
+  keeps BASE's value.
+  permission: the two reads and both greps are `git show` and `git grep` observations in the pass;
+  `check-kit-versions.sh` is the `kit version markers` leg and runs at the one post-build bar.
 
 ## 7. Gates
 
@@ -417,6 +444,14 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   fixture file. (b) adds a tracked `.githooks/` path owing its own `[[exempt]]` row and has unit 35
   source a test file. RESOLVED (agent, 2026-09-16, delegated): (a); the mode sets no hooks path, so
   each caller sets the value it measures.
+- **F9 — which unit moves the drift-audit kit version?** Units 13, 17, 21, 23, 26, 34 and 36 all
+  change `tools/drift-audit/` or its two workflow harnesses, and this unit is the first in build
+  order. Options: (a) this unit, the first to change those bytes, the reading unit 9 F9 applies to
+  check-wiring; (b) unit 21, which rev-2 of its S8 named as the earliest to scope the move; (c) each
+  unit. (c) breaks the build's one-owner rule, and (b) moves the version after two units'
+  drift-audit bytes have already changed, so the tree between orders 13 and 21 ships new drift-audit
+  bytes under BASE's version. RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a), S11,
+  observed by AC15 against `abac6d59`; unit 21 §8 F3 records the same decision from its end.
 
 ## 9. Revision log
 
@@ -450,6 +485,13 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   Fold verification: AC3 names the `pre-rebase` hook by basename, the file this unit creates; §7
   gains `leg ceilings clear their evidenced maximum`, the leg that grades S8's ceiling, as unit 9's
   §7 does for its S11.
+- rev-4 · 2026-09-16 · S11 · §4 · §8 F9 · AC15 · spec-audit round 2 fold, second pass, from fold
+  verifier problem f3 on kit-version ownership, decided by the orchestrator as reading (a): the unit
+  first in build order to change a kit's bytes owns that kit's one move. New S11 moves
+  `KIT_DRIFT_AUDIT_VERSION` and every `gov:kit drift-audit@` marker once, here. §4's Files touched
+  names the version carriers and drops rev-3's claim that the drift-audit bytes ride unit 21 S8.
+  New AC15 reads the constant against `abac6d59`, both marker greps and
+  `bash tools/check-kit-versions.sh`. New §8 F9 records the decision.
 
 ## 10. Reuse audit
 

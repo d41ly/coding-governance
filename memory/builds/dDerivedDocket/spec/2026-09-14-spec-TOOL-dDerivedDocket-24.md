@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-24 — inherited-red policy
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 24
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -81,12 +81,18 @@ absorb rule, and files an ask for every inherited leg so the red has an owner on
 - **S10** The auto-file, DARK until `ASKS_CMD` is declared: for each INHERITED leg the driver writes,
   in the run's own `BACKLOG.md` and staged, an ask carrying a `seen` clause with a pinned locator and
   a `run` command and an `accept` clause, a SEV row and a KEEP row. It then asks `ASKS_CMD` for the
-  new id and requires exactly one OPEN ask back; otherwise it removes its rows and says why. With
-  `ASKS_CMD` blank it prints the rows it would have filed and writes nothing. The rows are staged,
-  never committed: no driver verb commits. On the MET path they ride the close's records commit; on a
-  path that prints a `hold ·` line, the Skill's Close sequence — commit the staged records, push the
-  branch, reap the keepalive, then `--hold` with `--reaped` — commits them before `--hold`, whose
-  clean-tree precondition would otherwise refuse (unit 4 S3). Observed by AC9 and AC21.
+  new id and requires exactly one OPEN ask back; otherwise it removes its rows and says why. Before
+  writing a leg's rows it REUSES: when the build's `BACKLOG.md` already carries an auto-filed ask for
+  the same leg red at the same R, and `ASKS_CMD` reads that id back as one OPEN ask, the driver prints
+  that it reused the id and writes no row for that leg, so a repeated hold on one inherited red never
+  files a second HIGH ask (§8 F8). An ask for that leg at another R, or one not read back OPEN, is
+  not reused, and a new ask is filed. With `ASKS_CMD` blank it prints the rows it would have filed
+  and writes nothing. The rows are staged, never committed: no driver verb commits. On the MET path
+  they ride the close's records commit; on a path that prints a `hold ·` line, the Skill's Close
+  sequence — commit the staged records, push the branch, reap the keepalive, then `--hold` with
+  `--reaped` — commits them before `--hold`, whose clean-tree precondition would otherwise refuse
+  (unit 4 S3). The gate-wall unit's later rewrite of `gates-green` carries the auto-file and its
+  reuse (hands-off below). Observed by AC9, AC21 and AC23.
 - **S11** Gov's `.githooks/gate-env.sh` declares `INHERITED_RED=land` and `INHERITED_RED_MAX_AGE=10`,
   and `.unattended.conf` declares `GATE_POLICY_FILE` naming that file. Observed by AC11. NOT OBSERVED
   for versions: this unit moves no version constant; the unattended and run-gates kits move once in
@@ -120,23 +126,26 @@ absorb rule, and files an ask for every inherited leg so the red has an owner on
 - **consumes-from** `TOOL-dDerivedDocket-23` — the attribution record, its five verdicts and the
   `GATE_ATTRIBUTE` pass, which S3 extends and S5 to S7 read.
 - **consumes-from** `TOOL-dDerivedDocket-4` — the `inherited-red` hold code, the `probe gate`
-  condition and the `--hold` verb a park ends with, and the stops companion guide S8 writes into.
+  condition and the `--hold` verb a park ends with, the resumable HELD stop AC23's second hold
+  resumes from, and the stops companion guide S8 writes into.
 - **consumes-from** `TOOL-dDerivedDocket-6` — the ask row and the SEV and KEEP disposition rows S10
   writes, in the grammar that unit's parser reads and its renderers spell. The driver is shell and
   cannot call a Python renderer in another kit without a declared command, so it writes in that
   grammar and has the parser, reached through `ASKS_CMD`, read each new id back.
 - **consumes-from** `TOOL-dDerivedDocket-15` — the `seen` clause with its pinned locator and `run`
   command, and the `accept` clause, which make the auto-filed ask runnable under V14.
-- **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute`, whose "no NEW
-  FAIL" reading of the unattended suites against BASE is the only criterion AC12 can meet over suites
-  red at BASE for causes this unit does not own.
+- **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute`, whose attributed
+  verdict of the unattended suites against BASE, `verdict clean` with every inherited suite filed, is
+  the only criterion AC12 can meet over suites red at BASE for causes this unit does not own.
 - **consumes-from** `TOOL-dDerivedDocket-16` — the `ASKS_CMD` key and its eleven-field projection
   contract, through which S10 reads each auto-filed id back.
 - **hands-off** `TOOL-dDerivedDocket-27` — the age and bisection runs, kept inside the runner's wall
   with the rest of the attribution pass, and the decision table `gates-green` applies to exit 1 when
   the pinned attribution record exists, with the `gates-inherited` fact and the
-  `hold · inherited-red · until probe gate` line; that unit rewrites `gates-green` into a closed table
-  after this one.
+  `hold · inherited-red · until probe gate` line; and S10's auto-file of one ask per INHERITED leg
+  inside that arm, with its reuse of an OPEN ask for the same leg and R, which prints
+  `gates-green: ask <id> already OPEN for leg <leg> at <R8> · reused` instead of filing a second.
+  That unit rewrites `gates-green` into a closed table after this one, and the table carries both.
 
 ## 4. Design
 
@@ -154,6 +163,7 @@ RUN.md fact                      gates-inherited: <R8> <leg>,<leg>
 RUN.md fact                      gates-run: <GATE_RUN_ID> <head8>
 hook stdout                      pre-push: scoped gate on <def> push — inherited green <S8> at base <R8>
                                  pre-push: red on inherited legs only — landing under INHERITED_RED=land: <legs>
+driver stdout                    gates-green: ask <id> already OPEN for leg <leg> at <R8> · reused
 ```
 
 ### Reading the policy at R
@@ -229,6 +239,18 @@ reads the WORKING TREE — no `--at`, because the rows are staged and exist at n
 `--live-builds`, because only the new row's status, severity and home are read — and it is one of
 the call shapes the ask-awareness unit's contract enumerates.
 
+The reuse runs first, per INHERITED leg. The driver reads the build's `BACKLOG.md` in the working
+tree for ask rows carrying the fixed string `inherited red: leg <leg> red at <R8>,`, in file order,
+and reads each matched id back with the same call shape,
+`$ASKS_CMD --tsv --ready <id> --target <slug>`. The first id read back as one `ask` row with status
+OPEN, SEV HIGH and this slug as its home is reused: the driver prints
+`gates-green: ask <id> already OPEN for leg <leg> at <R8> · reused` and writes nothing for that leg.
+No match, or no match read back OPEN, files the three rows above. The match needs both the leg and
+R, because the `seen` locator and the `run` command pin R: an ask for the same leg at an older R
+points a reader at a tree the red no longer describes. A repeated hold under `park` is the
+population this closes — each resume of a held run reruns `gates-green` over the same inherited red
+— and with the ask committed by the first Close sequence, the second finds it.
+
 ### Files touched (estimate)
 
 `tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
@@ -263,7 +285,8 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   announced; a missing attribution record leaves `gates-green` exactly as at BASE; a zero remote sha
   on a new branch reads `park`.
 - observability — the hook's two new decision lines, the `gates-inherited` fact, the aged and owner
-  fields, and the printed would-be rows while the auto-file is dark.
+  fields, the printed would-be rows while the auto-file is dark, and the reuse line naming the OPEN
+  ask a repeated hold did not duplicate.
 - risks — a flaky leg can bisect to the wrong owner; the ask's `seen` names the argv, so a reader
   re-runs it. An attended push also lands over an inherited red under `land`, which is gov's policy
   for every push rather than an unattended exception, and the hook's decision line says so.
@@ -309,12 +332,15 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   for that commit and no anomaly; a commit with the same paths and a unit id in its subject is still
   the anomaly.
   Red when: the absorb grammar also admits a subject naming a unit id.
-- **AC9** — When the fixture's `ASKS_CMD` is blank, `gates-green` over an inherited-only bar prints the
-  three rows it would file and `git status --porcelain` shows no change to the build's `BACKLOG.md`;
-  with `ASKS_CMD` set to a fixture witness, the three rows are staged in it, the ask carrying `seen`
-  and `accept`; with a witness that returns no row for the new id, the rows are removed and named.
+- **AC9** — When the fixture's `ASKS_CMD` is blank, `gates-green` over an inherited-only bar under
+  `land` at R, the MET path, prints the three rows it would file and `git status --porcelain` shows
+  no change to the build's `BACKLOG.md`; with `ASKS_CMD` set to a fixture witness, the item is still
+  MET and the three rows are staged in it, the ask carrying `seen` and `accept`; with a witness that
+  returns no row for the new id, the rows are removed and named. AC21 and AC23 observe the `park`
+  path.
   Red when: rows are written while `ASKS_CMD` is blank, which arms the auto-file before the flip, or
-  kept when the parser cannot read them back.
+  kept when the parser cannot read them back; or the auto-file runs only on a path that prints a
+  `hold ·` line, so a MET landing over an inherited red files no ask.
 - **AC10** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over the
   rendered tree, the companion guide states ABSORB's four conditions and the absorb subject, and the
   Skill's Close section names the hold for an inherited red under `park`, and the Close section
@@ -331,8 +357,14 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   driver alone, read `park` and D12-i4 has no effect for unattended runs.
   permission: both suites run at this unit's end (D12-i8) and at the build's one post-build bar.
 - **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, it reports no NEW failure.
-  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
+  its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it; or the run is
+  read by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or
+  pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
+  filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
 - **AC13** — When the fixture run's `gates-run` fact names a bar whose record reads every red leg
@@ -402,12 +434,26 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   Red when: the predicate still matches `GATE_SELFTESTS` alone, so gov's `land` could ship to
   adopters under a green zero.
   permission: `govkit selftest` is a held kit leg; it runs at the build's one post-build bar.
+- **AC23** — When `gates-green` in `tools/unattended/unattended.test.sh` runs under `park` at R with
+  `ASKS_CMD` set to a fixture witness over an inherited-only bar, the fixture holds as AC21 does,
+  then resumes the held run with `--resume <slug> --keepalive-id <id>`, runs `gates-green` again over
+  the same leg red at the same R and holds a second time: the second `gates-green` prints the reuse
+  line naming the first ask's id and stages no row, the second `--hold` is accepted, and the build's
+  `BACKLOG.md` holds exactly one ask row for that leg and R, with one SEV row and one KEEP row for
+  its id. With the witness reading the first ask back CLOSED before the second run, a second ask is
+  filed; with the second run's R advanced to a new sha carrying the same red, a second ask is filed.
+  Red when: the second hold files a duplicate HIGH ask for a red that already has an OPEN one, so
+  every repeated hold of one inherited red adds another ask for an owner to dispose; or the reuse
+  matches the leg alone, so a red at a new R is folded into an ask whose `seen` locator pins the old
+  one; or it reuses an ask the parser reads CLOSED, so a red whose ask was closed is left with no
+  open record.
+  permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `run-gates canary` · `pre-push self-test` · `pass-order history` · `memory hygiene` · `kit version markers` · `govkit selfcheck` · `govkit selftest` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · an inherited-only fixture bar under each policy, an override and an abort over an OWN attribution, and a blank ASKS_CMD · none
+New arm: tools/unattended/unattended.test.sh · an inherited-only fixture bar under each policy, an override and an abort over an OWN attribution, a blank ASKS_CMD, and a second hold over one inherited red at one R · none
 New arm: .githooks/pre-push.test.sh · a branch-committed land policy against a park policy at R, and an inherited stamp with a moved remote sha · none
 New arm: tools/run-gates/run-gates.test.sh · a red leg already red at the age window's far end · the canary's executed-assertion floor
 New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_RED=land` · none
@@ -439,6 +485,15 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
   the pattern; (b) one `POLICY_KEYS` constant the pattern compiles from; (c) the keys
   `.githooks/gate-env.sh` assigns, read at selfcheck time. (c) finds none at BASE, drops
   `GATE_SELFTESTS`, and names a hook path by literal. RESOLVED (agent, 2026-09-14, delegated): (b).
+- **F8 — what does the auto-file do when an OPEN ask already covers the same inherited red?**
+  Options: (a) file a new ask on every `gates-green`, as rev-2, with the duplicates bounded by the
+  auto-resume unit's `RESUME_SCHEDULE_LIMIT`; (b) reuse an OPEN ask the build's `BACKLOG.md` already
+  carries for the same leg and the same R, confirmed through the same `ASKS_CMD` read-back; (c) reuse
+  any ask for the same leg, whatever R. (a) files one more HIGH ask per repeated hold of one red,
+  which the bound caps but never removes; (c) folds a red at a new R into an ask whose `seen` locator
+  and `run` command pin the old R, so a reader re-runs a tree the red no longer describes. (b) adds
+  no write surface and no call shape: it reads the file S10 already writes and calls the read-back
+  S10 already makes. RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (b), observed by AC23.
 
 ## 9. Revision log
 
@@ -468,6 +523,23 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
   already did. G4 M19 with G1 M11: S11 and AC11 take fold plan c4 C4-M19's rewrite, settled by the
   orchestrator where the two plans disagreed, because it grades all three of gov's declarations and
   keeps AC12, where c1 E19's deletion dropped the declaration half.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, second pass.
+  - Plan c1 E40, G1 H1 (2, 24), a sibling fold from the G1 round-2 record: §6 AC12 reads unit 1's
+    `verdict clean` and the inherited-suite filing, and the §3 consumes-from edge to unit 1 is
+    updated.
+  - Plan c1 ADD 4, decided by the orchestrator as a fold in this unit's scope: §2 S10's auto-file
+    reuses an OPEN ask the build's `BACKLOG.md` already carries for the same leg and the same R, read
+    back through the existing `ASKS_CMD` call shape, instead of filing a duplicate HIGH ask on a
+    repeated hold; §4 The auto-file states the match and the reuse line; §5 observability; new §6
+    AC23 holds twice on one inherited red and observes exactly one ask; §7 arm line; §8 F8; the §3
+    consumes-from edge to unit 4 names the resumable HELD stop AC23 resumes from.
+  - Third pass, from the fold-2 verifier problem that neither end of the edge to unit 27 named the
+    auto-file: the §3 hands-off to unit 27 names S10's auto-file, its OPEN-ask reuse and the reuse
+    line, whose tokens unit 27 carries, and §2 S10 says the gate-wall unit's rewrite of
+    `gates-green` carries them. Fold verification: unit 27 observes the kept auto-file only through
+    this unit's arms, and §6 AC9 named no policy, so a rewrite that filed only on the hold path could
+    pass every arm; AC9 now runs under `land` at R on the MET path, and its `Red when:` reds an
+    auto-file that runs only where a `hold ·` line prints.
 
 ## 10. Reuse audit
 

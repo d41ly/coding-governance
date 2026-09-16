@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-26 — honest verdicts under contention
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 26
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
@@ -87,7 +87,7 @@ that row stays OPEN.
 - **S8** — carriers. `tools/run-gates/README.md` states exit 4, the exit precedence S5 fixes, the
   `GATE retry` tail and the `pending` chunk verdict. Observed by AC8. NOT OBSERVED for versions: this
   unit moves no version constant; drift-audit moves once in this build's landing range in
-  `TOOL-dDerivedDocket-21` and run-gates in `TOOL-dDerivedDocket-1`, and this unit's bytes ride those
+  `TOOL-dDerivedDocket-13` and run-gates in `TOOL-dDerivedDocket-1`, and this unit's bytes ride those
   moves — `kit version markers` grades only the final tree's agreement.
 - **S9** — the kickoff manifest. `memory/guides/SESSION-KICKOFF.md`'s command-block line that a leg
   outliving its `ceiling` is killed 'RED naming the leg and the number' (`:127` at BASE) is
@@ -323,6 +323,11 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record ·
   counts are staged (AC12, AC1). L3 with G1 M11: S8's versions are pointers to units 21 and 1, and
   `tools/drift-audit/kit.toml` leaves Files touched (AC8 reads the README). L7: S9 rewrites the
   kickoff ceiling line and re-stamps it (AC13). M16: consumes-from unit 23 for the CONTENDED seam.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold, third pass. S8, from fold verifier problem f3 on
+  kit-version ownership, decided by the orchestrator as the unit first in build order to change a
+  kit's shipped bytes owning that kit's one version move: S8's version pointer names unit 13, whose
+  S11 makes the drift-audit move, in place of unit 21; run-gates stays unit 1's, and S8's version
+  clause stays NOT OBSERVED here.
 
 ## 10. Reuse audit
 

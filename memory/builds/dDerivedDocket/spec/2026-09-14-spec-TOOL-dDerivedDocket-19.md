@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-19 — authority only from an owner-committed README
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 19
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
@@ -77,11 +77,11 @@ add to it, and the leg says so when something tries.
 - **consumes-from** `TOOL-dDerivedDocket-15` — the V13 verdict S5 extends and the `--new-build`
   scaffold S6 constrains.
 - **consumes-from** `TOOL-dDerivedDocket-17` — the run's-own-commits function the cross-run arm
-  calls.
+  calls, given one exclusion tip for a live record and one per merge the terminal walk reads for a
+  terminal record.
 - **consumes-from** `TOOL-dDerivedDocket-2` — the prepared merge whose first parent is the
-  advertised tip, which is why excluding that tip leaves exactly the run's commits, and its
-  `merge: <slug> — land onto` subject, by which the terminal-record exclusion recognises it on a
-  witness's single-parent tail.
+  advertised tip, which is why excluding that tip leaves exactly the run's commits, and whose second
+  parent is the run branch, the side the terminal-record exclusion reads as the run's.
 - **hands-off** `TOOL-dDerivedDocket-20` — the Skill and protocol text for the authority rule, which
   this spec's §5 places with the carriers unit.
 - **hands-off** `TOOL-dDerivedDocket-22` — the cross-run arm's endpoint for a derived-LANDED record,
@@ -117,28 +117,48 @@ A run lands commits on the default branch; a README it lands becomes a default-b
 the next run, so without a guard one run could grant another (TOOL-aStandingWrit-1). The arm walks
 each run's OWN commits, through the run's-own-commits function unit 17 adds to
 `tools/unattended/lib-unattended.sh`, and reds a commit whose diff against its first parent adds or
-changes a `may:` front-matter line in any `memory/builds/*/README.md`. The endpoint and exclusion per
-recorded state:
+changes a `may:` front-matter line in any `memory/builds/*/README.md`. A two-parent commit is read
+by its combined diff, `git diff-tree --cc`, instead. Its first-parent diff carries everything its
+other parent brought in, which for a reconcile is default-branch content, while each parent's own
+commits in the range are graded where they were made, so a merge answers only for the lines it
+wrote itself (§8 F8). The endpoint and exclusion per recorded state:
 
 - a record in a working phase or HELD: endpoint HEAD, base the recorded BASE, exclusion the default
   branch's advertised tip as the leg already observes it for check 7 (`ADV_HEAD`); with the tip
   unobserved, the local default-branch ref, announced as the weaker reading;
-- a terminal record: endpoint its recorded witness. The exclusion is computed by one function in
+- a terminal record: endpoint its recorded witness. Its exclusions are computed by one function in
   `tools/unattended/lib-unattended.sh`, which this unit adds beside the arm, and a terminal record
-  with no witness fact is skipped by name, never passed. The function works through three cases,
-  first match wins:
-  1. **A prepared merge on the witness's tail.** Walk the witness's first-parent chain through
-     single-parent commits only. If that walk reaches a two-parent commit T whose subject begins
-     with unit 2's `merge: <slug> — land onto` naming this record's own slug, or the witness is T
-     itself, the exclusion is T's first parent. This is the in-place shape. The close commit, and any
-     record commit after it, sit on T, so the witness has one parent while its history since BASE
-     runs through T's first parent into every default-branch commit landed since BASE. The shape
+  with no witness fact is skipped by name, never passed. The function reads the commit graph, the
+  recorded BASE and the record's run-state path, which is its build folder's `RUN.md` even for an
+  archived record, because every record commit the run made touched that path. It reads no
+  default-branch tip. It walks from the witness, passing each single-parent commit to its parent.
+  At each two-parent commit it meets, the witness included, the RUN SIDE is the parent from which a
+  commit since BASE touching the run-state path is reachable,
+  `git rev-list -1 <parent> ^<BASE> -- <run-state path>`. The function excludes the other parent
+  and descends the run side, so nested merges are read in turn. Where neither parent, or both,
+  reach such a commit, that merge adds no exclusion and the walk stops there, the fail-closed
+  direction; the walk also stops at a commit BASE holds and at a commit with more than two parents.
+  The shapes it reads (§8 F8):
+  1. **Unit 2's prepared merge T.** An in-place close commit, and any record commit after it, sit
+     on T, whose second parent is the run branch, so T's first parent is excluded. Without that, the
+     witness's history since BASE runs into every default-branch commit landed since BASE. This
      covers a record unit 22's `--preflight` rotated, whose witness is the landing commit, and an
      in-place run aborted after its close.
-  2. **A two-parent witness with no such T.** The exclusion is the witness's first parent: the
-     primary lander's `--no-ff` landing.
-  3. **Otherwise** there is no exclusion. The witness is the run branch's own tip, whose history
-     since BASE is the run's.
+  2. **A plain reconcile R on the run branch**, the `git merge <remote>/<def>` a run makes when
+     `--prepare` refuses and names it, or mid-run under primary. The run side is R's first parent,
+     so R's second parent, the default-branch commits the reconcile brought in, an owner's `may:`
+     commit among them, is excluded. `--abort` records HEAD, so a run aborted directly after R has R
+     as its witness, read the same way, and so is a landed primary record whose witness, the landing
+     merge's second parent, is R.
+  3. **The primary lander's `--no-ff` landing merge L**, pushed or not, as the witness or under a
+     single-parent fix commit that push-main then pushed. The run side is L's second parent, the run
+     branch, so L's first parent is excluded.
+  4. **Push-main's reconcile**, the `git merge --no-ff <remote>/<def>` it makes on the default branch
+     when the remote moved, which is then the pushed HEAD, the marker's commit and `--landed`'s
+     witness. The run side is its first parent, which holds L, so its second parent, other nodes'
+     commits, is excluded and the walk goes on to L.
+  5. **No merge on the tail.** The witness is the run branch's own tip, whose history since BASE is
+     the run's, and there is no exclusion.
 - a LANDING record whose landing commit is on the advertised tip (derived LANDED, D12-i2): unit 22
   supplies the endpoint, its landing commit. The exclusion is this function applied to that commit,
   so the record's range does not change when it is rotated or made terminal;
@@ -148,18 +168,21 @@ recorded state:
   landing commit would never grade those (§8 F7).
 
 It reads the diff, never the run's own claim. A grant a person types on the default branch reaches a
-run's tree only through a default-branch commit, which the exclusion removes, so the arm never reds
-the channel D12-j keeps open.
+run's tree only through a default-branch commit, which the exclusion removes, and through the merge
+that brought it in, whose combined diff does not carry it, so the arm never reds the channel D12-j
+keeps open.
 
-Stated residual: a record whose witness reaches no prepared merge, and whose run merged the default
-branch plainly into its own branch, keeps those commits in its range, because a plain reconcile does
-not carry the prepared-merge subject. That population is a primary-mode run, and an in-place run
-aborted before `--prepare`. Under in-place landing, unit 2 S3 refuses a plain reconcile made in
-place of the prepared merge at `--land`. A reconcile made before `--prepare` sits on T's
-second-parent side, and T's first parent already holds the commits it brought in, so a record that
-reaches T is not in the residual. The function recognises T by its subject and its single-parent
-tail, which a commit forged to carry that subject would also satisfy; like the anchor's own limit in
-§3, the arm closes the kit's route, not a deliberate forgery.
+Stated residual: the function tells a merge's sides by where the record's commits are, not by who
+made the other commits. A side that holds run commits but no commit touching the run-state path
+since BASE reads as default-branch content, and its commits leave the range. A branch forked from
+the run branch after the record's first commit holds that commit, so it reads as both sides and
+takes no exclusion; only a branch forked outside the run's history, at BASE or on the default
+branch, carrying run commits and merged in, has that shape. No verb of the kit makes one, and like
+the anchor's own limit in §3, the arm closes the kit's route, not a deliberate construction. A run
+whose record commits already reached the default branch, in an earlier landing or through another
+node's run of the same slug, reads both sides at a later merge and stops there, which can red an
+owner's grant but hides no run commit. The function makes no remote observation, so a stale or
+unobserved tip changes no terminal range.
 
 ### Fail codes
 
@@ -178,8 +201,9 @@ honest absence. The fixtures carry the coverage.
 - two driver refusal codes, numbers allocated at build time;
 - the grant-token normalising function in `tools/unattended/lib-unattended.sh` (S3), shared by the
   driver and the leg;
-- the terminal-record exclusion function in `tools/unattended/lib-unattended.sh`, which recognises a
-  prepared merge by unit 2's subject and single-parent tail, shared with unit 22's S17;
+- the terminal-record exclusion function in `tools/unattended/lib-unattended.sh`, which reads each
+  merge on a witness's tail by the parent that reaches a commit touching the record's run-state path
+  since BASE, shared with unit 22's S17;
 - one `memory/DECISIONS.md` row under this unit's own id.
 
 Any new shell function is named through `python tools/lexicon/lexicon.py --suggest <identifier>
@@ -215,8 +239,9 @@ least five units of this build; this unit's net growth there is at most 600 B.
 
 - security — this unit narrows an authority surface to one owner channel and adds a refusal for the
   run-side route; it adds no write path.
-- perf / scale — one more key in an existing scan; the cross-run arm is one diff per run range,
-  over the README glob only.
+- perf / scale — one more key in an existing scan; the cross-run arm is one diff per commit in the
+  run range, over the README glob only, and a terminal record's walk adds one `git rev-list -1` per
+  parent of each merge it meets.
 - error / empty / loading states — absent key pins `none`; a malformed grant is a named refusal; a
   prompt-mode grant is a named refusal.
 - observability — the pinned fact is printed at preflight and re-read by the leg.
@@ -262,18 +287,34 @@ least five units of this build; this unit's net growth there is at most 600 B.
   tip. Check 19 does not red in any of three records:
   - a live record;
   - a terminal primary-mode record whose witness is the `--no-ff` landing merge over the same owner
-    commit;
+    commit, graded once with that merge on the advertised tip and once unpushed, where a `may:`
+    commit the run made still reds in both;
   - a terminal in-place record whose witness is the single-parent close commit on that prepared
     merge, where a `may:` commit the run made before `--prepare` still reds.
 
-  On a terminal record whose witness's tail meets a plain `git merge` reconcile, no exclusion is
-  taken from that reconcile, so a `may:` commit the run made before it reds.
+  Two more terminal primary-mode records land a run that made a `may:` commit, over the same owner
+  commit. In each, check 19 reds naming the run's commit and names no owner commit:
+  - one whose witness is a single-parent fix commit on top of that landing merge, pushed;
+  - one whose witness is push-main's `git merge --no-ff <remote>/<def>` reconcile, made after
+    another node pushed a second owner commit adding `may:` to a build README.
+
+  Take a run that adds `may:` to another build's README in its own commit, then brings the same kind
+  of owner commit in through a plain `git merge` reconcile, and aborts before `--prepare`. Grade it
+  once live, before the abort, and its terminal record twice, once with the reconcile itself as the
+  witness and once with a single-parent commit after it. In all three, check 19 reds naming the
+  run's commit and does not red for the owner's, because the terminal exclusion is the reconcile's
+  second parent and never its first, and the reconcile answers only for its combined diff.
   Red when: the arm reads only the run's own README, so the cross-run grant passes; or it walks
   `BASE..HEAD` or `BASE..witness`, so the owner's default-branch grant reds a run that then cannot
   land, and once archived reds the bar for ever; or the terminal row takes an exclusion only from a
   two-parent witness, so an in-place record's single-parent close commit ranges over every
-  default-branch commit landed since BASE; or it takes one from any two-parent commit on the tail,
-  so a plain reconcile's first parent, a run commit, hides the run's earlier grant.
+  default-branch commit landed since BASE; or it takes nothing from a plain reconcile, so an owner's
+  grant that an aborted run reconciled in reds the archive for ever; or it reads a merge's run side
+  from parent order or from the default-branch tip, not from which parent reaches a commit touching
+  the run-state path since BASE, so a reconcile's first parent, or a landing merge's second parent
+  under a fix commit, is excluded and the run's grant passes, or push-main's reconcile has its first
+  parent excluded with the whole run behind it; or it reads a merge by its first-parent diff, so
+  the owner's grant a reconcile brought in reds through the reconcile itself.
 - **AC7** — When a fixture `BACKLOG.md` carries a `SCOPE` row with a `may` clause, the backlog
   verdicts report V13 naming the row.
   Red when: V13 grades only the clause grammar and admits the label.
@@ -306,7 +347,7 @@ least five units of this build; this unit's net growth there is at most 600 B.
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `kit/dogfood doc parity` · `build-method size` · `build-index selftest` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a `slug` README with `may:`, a `prompt` and a `recipe` README with `may:`, a malformed grant, a grant in both spellings · `ARMS_FLOORS` for `tools/unattended/unattended.sh`
-New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, an owner commit reaching the run through a prepared merge, a terminal in-place record whose witness is the close commit on that prepared merge, and a terminal record whose tail meets a plain reconcile · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, an owner commit reaching the run through a prepared merge, a terminal primary-mode record whose witness is the landing merge, pushed and unpushed, a primary record whose witness is a fix commit on that pushed landing merge, a primary record whose witness is push-main's reconcile over another node's owner `may:` commit, a terminal in-place record whose witness is the close commit on that prepared merge, and a run aborted before `--prepare` after a plain reconcile brought an owner `may:` commit in, graded live and with its witness once the reconcile and once a commit after it · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
 ## 8. Open questions
 
@@ -344,22 +385,39 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   (b) never grades a commit made after a refused push, which is exactly when a run keeps writing, so
   it covers less. RESOLVED (agent, 2026-09-14, delegated): (a), the more complete survivor; unit 22
   needs no endpoint for this population.
-- **F8 — what does the terminal-record row exclude when the witness sits on a prepared merge?**
-  Options:
-  - (a) rev-2: the witness's first parent only when the witness has two parents;
-  - (b) route a record carrying unit 22's `landed-derived` fact to unit 22 before the two-parent
-    test;
-  - (c) one exclusion function keyed on graph shape: the first parent of the prepared merge the
-    witness reaches through single-parent commits, recognised by unit 2's subject for the record's
-    slug, else the two-parent test, else none.
+- **F8 — what does the terminal-record row exclude when its witness is, or sits on, a merge?**
+  rev-2 excluded a two-parent witness's first parent only, which ranges an in-place record's
+  single-parent close commit over every default-branch commit landed since BASE, so an owner's grant
+  reds the archive for ever (spec audit G1 round 2, B2). rev-3 walked single-parent commits to unit
+  2's prepared merge, recognised by its `merge: <slug> — land onto` subject. The second fold pass
+  added default-branch tip tests, one reading a merge on the tail as a plain reconcile and one
+  telling a reconcile witness from a landing merge. Fold verification found both fail open on the
+  ordinary primary route: under a single-parent fix commit on a pushed `--no-ff` landing merge, the
+  reconcile test excluded the run branch; and with push-main's own `--no-ff` reconcile as the
+  witness, the first parent excluded held the landing merge and the whole run. Options:
+  - (a) tell each merge's run side by content: the parent from which a commit since BASE touching
+    the record's run-state path is reachable. Exclude the other, descend the run side through nested
+    merges, and take no exclusion where neither parent or both reach one;
+  - (b) keep the tip tests, and state their fail-open shapes as residual.
 
-  (a) ranges an in-place record's single-parent close commit over every default-branch commit landed
-  since BASE, so an owner's grant reds the archive for ever (spec audit G1 round 2, B2). (b) keys on
-  a fact only a rotation writes, so an in-place run aborted after its close keeps that defect, and it
-  needs a second rule for the primary reconcile (M4). RESOLVED (agent, 2026-09-16, delegated): (c).
-  It needs no fact, covers rotated, aborted and derived-LANDED records with one function, and gives a
-  primary record the same range before and after `--landed`. F7 is unchanged, because its population
-  is a LANDING record not yet on the advertised tip.
+  (b) knowingly accepts a fail-open on the ordinary primary route, where a fix commit follows the
+  landing merge or push-main reconciles. RESOLVED (agent, 2026-09-16, delegated), decided by the
+  orchestrator: (a), §4's terminal-record bullet. One rule reads T, a plain reconcile, a primary
+  landing merge, push-main's reconcile and a landed witness that is the run's last reconcile. It
+  needs no fact, subject or tip, and gives a primary record the same run commits before and after
+  `--landed`. F7 is unchanged, because its population is a LANDING record not yet on the advertised
+  tip.
+
+  Excluding a reconcile's second parent does not keep the owner's grant out on its own, because the
+  arm diffs a commit against its first parent and a reconcile's first-parent diff carries what it
+  brought in. Options: (i) diff a merge against the parent the walk excluded; (ii) skip two-parent
+  commits; (iii) read a two-parent commit by its combined diff, `git diff-tree --cc`, the lines
+  neither parent holds; (iv) keep the first-parent diff. (iv) reds the owner's grant through every
+  reconcile, live or terminal. (ii) never grades a grant written in a merge's own conflict
+  resolution. (i) needs a run side, which a live range and a merge the walk stopped at lack, and it
+  reads an owner's local commit not yet pushed as the merge's. RESOLVED (agent, 2026-09-16,
+  delegated): (iii), in every range the arm walks. Each parent's own commits in the range are graded
+  where they were made, so the merge answers only for what it wrote.
 
 ## 9. Revision log
 
@@ -391,6 +449,31 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   - The consumes-from edge to unit 2 names the subject, and the hands-off edge to unit 22 names the
     function (§8 F8).
   - F7 is kept: its population is a LANDING record not yet on the advertised tip.
+- rev-4 · 2026-09-16 · §4 · §7 · §8 F8 F9 · S4 · AC6 · spec-audit round 2 fold, second pass, from
+  fold verifier problem f2 (plain-reconcile residual), decided by the orchestrator as option A. §4's
+  terminal exclusion function gains case 2: a plain reconcile's second parent, when the
+  default-branch tip holds it, is excluded, and the function reads the tip the working-phase bullet
+  reads. §8 F8 records that decision. §8 F9 extends case 2 to an unlanded two-parent witness,
+  because `--abort` records the reconcile itself as its witness. The stated residual is rewritten,
+  and the Inventory names the reconcile reading. AC6's plain-reconcile arm grades a run aborted
+  before `--prepare` under both witness shapes and asserts that the owner's reconciled `may:` commit
+  does not red, and §7's arm line follows. S4's text is unchanged; AC6 still observes it. Fold
+  verification: AC6's primary-mode record is graded with its landing-merge witness pushed and
+  unpushed, the run's own `may:` commit still red in both, with a matching Red when clause, so each
+  of §8 F9's two tip tests is observed; §7's arm line names that record. Third pass, §3 §4 §5 §6 §7
+  §8 F8 F9 · AC6, from the fold verifier's two problems on the terminal-row exclusion, a fix commit
+  on a pushed landing merge and push-main's reconcile as the witness, decided by the orchestrator as
+  a content-based run side. §4's terminal-record bullet replaces the four cases and every tip test
+  with one rule: at each merge on the witness's tail, the parent that reaches a commit touching the
+  record's run-state path since BASE is the run side, the other parent is excluded and the walk
+  descends, and where neither or both do there is no exclusion. The function no longer reads unit
+  2's subject or the tip. The cross-run arm reads a two-parent commit by its combined diff, a fork
+  this pass decided, because a reconcile's first-parent diff carries the owner's grant. The stated
+  residual, the Inventory, §5's perf line and the consumes-from edges to units 2 and 17 follow. §8
+  F8 is rewritten as both decisions, and F9, which this rev's second pass added, is withdrawn into
+  it. F7 is kept. AC6 gains the fix-commit and push-main-reconcile records and grades the aborted
+  run live as well; its `Red when:` replaces the tip-test clause, and §7's arm line follows. S4's
+  text is unchanged; AC6 still observes it.
 
 ## 10. Reuse audit
 
