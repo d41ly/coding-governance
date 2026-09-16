@@ -48,13 +48,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-16 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-09-16 · streams tooling
 ids TOOL-dMergedTally-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dMergedTally-1 — the disposal guard counts raw findings on both sides of its subtraction](spec/2026-09-16-spec-TOOL-dMergedTally-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-09-16 |
+| [TOOL-dMergedTally-1 — the disposal guard counts raw findings on both sides of its subtraction](spec/2026-09-16-spec-TOOL-dMergedTally-1.md) | — | 2 | CLOSED | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).

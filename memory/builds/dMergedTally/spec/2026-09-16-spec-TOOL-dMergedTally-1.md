@@ -1,6 +1,6 @@
 # TOOL-dMergedTally-1 — the disposal guard counts raw findings on both sides of its subtraction
 
-**Status:** INPROGRESS · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling
+**Status:** CLOSED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling
 
 <!-- gen:spec-records -->
 
