@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md](../build/2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md) | journal | DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 |
 | [2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round1.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round1.md) | diff-review | DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 |
+| [2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round2.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round2.md) | diff-review | DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 |
 | [2026-09-16-review-DEPL-dBackdatedFixture-2-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-2-spec-audit-round1.md) | spec-audit | DEPL-dBackdatedFixture-2 |
 
 <!-- /gen:spec-records -->

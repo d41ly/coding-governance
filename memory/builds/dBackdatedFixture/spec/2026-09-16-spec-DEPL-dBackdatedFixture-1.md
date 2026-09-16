@@ -1,6 +1,6 @@
-# DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced
+# DEPL-dBackdatedFixture-1 — the vintage fixtures drop rows the old vintage never shipped
 
-**Status:** INPROGRESS · rev-4 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
+**Status:** INPROGRESS · rev-5 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md](../build/2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md) | journal | DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3 |
 | [2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round1.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round1.md) | diff-review | DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3 |
+| [2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round2.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round2.md) | diff-review | DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3 |
 | [2026-09-16-review-DEPL-dBackdatedFixture-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -20,7 +21,8 @@ rewinding every row of a fresh `check-wiring` receipt to `24f39915`. `TOOL-aRepl
 (`39df2b1a`, 2026-09-14) added `tools/check-wiring.fragment.json` to that kit, and that source did not
 exist at `24f39915`. The fixtures therefore record the empty blob's id as its `gov_oid`. `update`'s S9
 preamble (`DEPL-dCarriedReceipt-7`) refuses the whole receipt at exit 2, which is its designed
-behaviour. This unit makes the two fixtures model a state a real adopter can hold. Three further
+behaviour. This unit makes the two fixtures hold only rows the vintage shipped, with their `commit`,
+`sha256` and `gov_oid` taken from that vintage; `version` and `oid` stay at HEAD. Three further
 labels are `check` arms that type `2/2`; they are `DEPL-dBackdatedFixture-3`.
 
 ## 2. Scope (IN)
@@ -41,9 +43,10 @@ labels are `check` arms that type `2/2`; they are `DEPL-dBackdatedFixture-3`.
   No arm is weakened: the ones whose population S1 widens are named in §4 with the reason each still
   grades its target, and the one that would not is `DEPL-dBackdatedFixture-2`. Observed by AC4.
 - **S4** — A row with no `source` is left untouched by `write_vintage_receipt`, which is what
-  `delta_target` already did. NOT OBSERVED: `apply` and `adopt` emit a source-less `attributes` row
-  only when the selection declares an `lf_pin`, and check-wiring declares none, so neither builder
-  holds such a row and no arm can see the branch.
+  `delta_target` already did. NOT OBSERVED: `apply` emits a source-less `attributes` row when its
+  selection or a kit the receipt already records declares an `lf_pin`, and `adopt` when its selection
+  does. Both builders apply check-wiring alone to a fresh target, and check-wiring declares none, so
+  neither holds such a row and no arm can see the branch.
 
 ## 3. Non-goals (OUT)
 
@@ -109,7 +112,7 @@ Each candidate was tested before choosing, with the probe script driving the rea
 | B. leave such rows at the pin's vintage | the mixed-vintage receipt were refused | not refused; `current 1 · stale 2`, then `current 3` |
 | C. choose a newer fixed vintage | no commit shipped every current source with different `check-wiring.sh` bytes | one exists today (`39df2b1a`) |
 
-A is chosen. It models what every adopter who installed `check-wiring` before 2026-09-14 holds. B passes,
+A is chosen. Its ROW SET is what every adopter who installed `check-wiring` before 2026-09-14 holds. B passes,
 but it builds a receipt no verb writes. C fixes this instance and breaks again the next time the kit
 gains a file. A's cost is the widened populations in the table above. A second probe ran A over
 `delta_target`'s shape: `update --to 372e6b2a --write` exited 0 with `diverged` and `stale`, and `check`
@@ -157,7 +160,7 @@ then printed `provenance: 2/2 resolved`.
 
 New arm: tools/govkit/selftest.py · `[dBF]` AC1 and the two AC2 state arms, staged RED by making `write_vintage_receipt` rewind an absent source instead of dropping it · none
 New arm: tools/govkit/selftest.py · `[dBF]` AC2 LIVENESS, staged RED by removing `check-wiring.fragment.json` from the check-wiring descriptor's `include` and `claims` · none
-New arm: tools/govkit/selftest.py · `[dBF]` AC3 acceptance arms, staged RED by that same break · none
+New arm: tools/govkit/selftest.py · `[dBF]` AC3 acceptance arms, staged RED by making `write_vintage_receipt` rewind an absent source instead of dropping it · none
 
 ## 8. Open questions
 
@@ -181,6 +184,11 @@ none
   B1: the new module-level function needs `gen_map.py --write`, so `codebase-map coverage + freshness`
   joins §7. M1: the AC2 liveness arm gets its own break, the descriptor no longer shipping the
   fragment. L2: S4's NOT OBSERVED reason names the `attributes` row `apply` and `adopt` do emit.
+- rev-5 · 2026-09-16 · §1 · S4 · §4 · §7 · folded closing diff review round 2 (CLEAN WITH FIXES,
+  7 confirmed of 11; CONVERGED at zero blockers). R2-M1: the AC3 `New arm:` line names its break
+  instead of "that same break", which the inserted liveness line had repointed. R2-L2: S4 says
+  `apply` pins the selection plus the receipt's recorded kits. R2-L3: the title, §1 and §4 claim the
+  row set and the three rewound fields, not an install a real adopter holds.
 
 ## 10. Reuse audit
 

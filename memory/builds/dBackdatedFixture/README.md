@@ -64,12 +64,12 @@ ids DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | INPROGRESS | rev-4 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-1 — the vintage fixtures drop rows the old vintage never shipped](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | INPROGRESS | rev-5 | 2026-09-16 |
 | [DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed](spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-16 |
 | [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

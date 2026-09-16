@@ -229,13 +229,14 @@ def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
     WHAT IS REWOUND, AND WHAT IS NOT. `commit`, `sha256` and `gov_oid` move to `vintage`, and BOTH
     identities from the SAME vintage, or the row is S9's corruption rather than an older install --
     through the engine's own helpers, so the fixture and the thing it grades cannot disagree about
-    what a blob is named. `version` and `oid` stay as `apply` wrote them at HEAD, so `update`'s
-    per-kit delta over this fixture reads `level` where a real install at `24f39915` reads DIFFERS.
+    what a blob is named. `version` and `oid` stay as `apply` wrote them at HEAD, so any comparison
+    of either against a vintage reads as if the target were at HEAD, whichever `--to` a run names.
     No arm grades either field over these fixtures today; one that does must rewind them first.
 
-    A row with no `source` is left as `apply` wrote it. `apply` and `adopt` emit one -- the
-    synthesized `attributes` row -- whenever the selection declares an `lf_pin`; check-wiring declares
-    none, so neither builder holds one and no arm observes the branch. Keep the guard: without it
+    A row with no `source` is left as `apply` wrote it. `apply` emits one -- the synthesized
+    `attributes` row -- when its selection or a kit the receipt already records declares an `lf_pin`,
+    and `adopt` when its selection does. Both builders apply check-wiring alone to a fresh target and
+    it declares none, so neither holds one and no arm observes the branch. Keep the guard: without it
     `cat-file -e <vintage>:None` fails and `.gitattributes` would be `git rm`'d. The arms that grade
     this helper read the target's STATE against the descriptor, never this return value.
     """
