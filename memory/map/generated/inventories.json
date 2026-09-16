@@ -183,6 +183,7 @@
       "gate-green-by-accident-on-generated-bytes.md",
       "git-rm-cached-refuses-a-diverged-index-blob.md",
       "grammar-bound-to-the-wrong-root.md",
+      "hand-named-gate-list-green-while-the-bar-reds.md",
       "heredoc-escape-reaches-the-regex.md",
       "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
