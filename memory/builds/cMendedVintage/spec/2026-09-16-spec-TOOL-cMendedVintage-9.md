@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin
 
-**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -30,11 +30,12 @@ answered the question by passing `--session`, so a card verb invoked from a harn
   reads stdin. Observed by AC2 and AC3.
 - **S3** The comment block above `read_session_id` states the precedence the code now has, because
   the block as written says the two channels are read in the other order. Observed by AC5.
-- **S4** `skills/session-kickoff/manifest-check.test.sh` gains one arm that HOLDS stdin open and
-  asserts the verb returns, so the hang is in the suite rather than only in the fix. That suite's
-  `FLOOR_ASSERTIONS` is RAISED by the arm's assertion count in the same commit, because the floor is
-  shrink-only and an unraised floor makes a suite that never gained the arm red nothing. Observed by
-  AC6.
+- **S4** `skills/session-kickoff/manifest-check.test.sh` gains two arms: one HOLDS stdin open and
+  asserts the verb returns, so the hang is in the suite rather than only in the fix, and a liveness
+  arm ahead of it asserts that holder reports no EOF, so the first cannot pass by finding nothing.
+  That suite's `FLOOR_ASSERTIONS` is RAISED by their assertion count in the same commit, because the
+  floor is shrink-only and an unraised floor makes a suite that never gained them red nothing.
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -105,8 +106,8 @@ suite carries its own `FLOOR_ASSERTIONS`, compared at
 `skills/session-kickoff/manifest-check.test.sh:1121`, and `tools/check-testsuite-counts.sh` derives
 its population from `tools/gate-legs.json`, which names that suite. Both instruments are shrink-only:
 they catch an arm that DISAPPEARS and neither can demand one that was never written. Raising the
-floor by the new arm's assertion count in the same commit is what converts "the arm exists" from a
-promise in this spec into something that reds when the arm is absent.
+floor by the new arms' assertion count in the same commit is what converts "the arms exist" from a
+promise in this spec into something that reds when they are absent.
 
 ### Alternatives rejected
 
@@ -143,8 +144,8 @@ entries in `.claude/settings.json` take the unchanged path.
   residual is a future caller that passes both and expects stdin to win; S3's comment is what such a
   caller reads.
 - **testing** — four direct observations against the real script (AC1-AC4), one source assertion
-  (AC5), and one arm folded into the kit's own suite by S4 whose presence AC6 grades through the
-  raised floor rather than through AC1, which passes with or without it.
+  (AC5), and two arms folded into the kit's own suite by S4 whose presence AC6 grades through the
+  raised floor rather than through AC1, which passes with or without them.
 - **migration** — N/A, nothing stored changes.
 - **user docs** — `skills/session-kickoff/SKILL.md` describes the verbs and not the id channels, so
   no page changes. The comment block S3 rewrites is the documentation for this behaviour.
@@ -218,6 +219,11 @@ none
   rather than the drafted `sleep`-held pipe, and gains a liveness arm asserting that holder reports
   no EOF, so the suite pays the bound only on a red run and cannot pass by EOF. S4's assertion count
   is therefore 2, and `FLOOR_ASSERTIONS` moved 174 → 176. AC1's own command is unchanged.
+- rev-4 · 2026-09-16 · S4 · §4 · §5 · the singular halves rev-3 left standing, found by the
+  `amendment-leaves-its-other-half-standing` class on the unit's own diff: three passages still said
+  S4 adds "one arm". No criterion's text is touched — AC6 reads "the new arm's assertion count" and
+  its count is DERIVED either way, so amending it would put the acceptance ledger's OBSERVED line
+  for AC6 in doubt over a plural.
 
 ## 10. Reuse audit
 

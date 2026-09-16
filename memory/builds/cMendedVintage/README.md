@@ -118,7 +118,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin](spec/2026-09-16-spec-TOOL-cMendedVintage-9.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-16 |
+| [TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin](spec/2026-09-16-spec-TOOL-cMendedVintage-9.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-16 |
 | [DEPL-cMendedVintage-1 — no rollback over a render step this run declined](spec/2026-09-16-spec-DEPL-cMendedVintage-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-2 — a failed restore keeps its receipt row forward, and the order names the path](spec/2026-09-16-spec-DEPL-cMendedVintage-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-3 — the coverage tail joins each open gap to its own refusal reason](spec/2026-09-16-spec-DEPL-cMendedVintage-3.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-16 |
