@@ -23,7 +23,7 @@ invent an identity for it. `update`'s S9 integrity check refuses that receipt, a
 
 - The suite is green again, and the tool is left unchanged because it was right.
 - A kit that gains a file no longer breaks the fixtures that backdate an install.
-- A fixture that `update` refuses gets one arm naming the refusal, not 27 arms blaming the probe.
+- A fixture that `update` refuses adds one FAIL line carrying the refusal, ahead of the arms it breaks.
 
 ## Detriments if this is not built
 
@@ -37,13 +37,15 @@ invent an identity for it. `update`'s S9 integrity check refuses that receipt, a
 - **Tier-2 by the owner's prompt.** The repo's own tier rule would call a selftest-only change Tier-1.
   The owner ruled Tier-2 before the cause was known, and that ruling stands.
 - **The engine is not edited.** The S9 refusal and the landing of an unclaimed source are both ratified
-  behaviour (`DEPL-dCarriedReceipt-7`, `TOOL-aScouredKit-25`). The spec records the probe showing it.
+  behaviour (`DEPL-dCarriedReceipt-7`; DEPL-dRatifiedSeam-1 S3 at `3fe56d56`). The spec records the probe.
 - **Every new arm is observed RED on a staged break before it lands.** The full suite runs once after
   the unit is built, at the main loop.
 
 ## Parked decisions
 
-- None.
+- **`TOOL-aFlaggedScaffold-3` is OPEN and wrong.** It says `update` cannot land a source gov started
+  shipping; `3fe56d56` built exactly that. Options: annotate it, or close it naming `3fe56d56`.
+  Refused here because a backlog edit is not this unit's mechanism, and recall keeps returning it.
 
 <!-- roster:units -->
 
@@ -60,7 +62,7 @@ ids DEPL-dBackdatedFixture-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | — | 2 | OPEN | rev-1 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | — | 2 | OPEN | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
