@@ -6512,7 +6512,7 @@ user_skills = "/tmp/gk-fake-skills"
                            "fi\n"
                            "exit 0\n")
 
-        def _dr_render(v: int) -> str:
+        def render_script(v: int) -> str:
             return ('#!/usr/bin/env bash\n'
                     'd="$(cd "$(dirname "$0")" && pwd)"\n'
                     f'printf "V=%s\\n" "{v}" > "$d/out.txt"\n')
@@ -6523,7 +6523,7 @@ user_skills = "/tmp/gk-fake-skills"
                                'to = "{kit}/out.txt"\n\n',
                       "adopt": '["bash", "{kit}/render.sh"]',
                       "files": {"conf.txt": "V=1\n", "out.tmpl": "V=1\n",
-                                "render.sh": _dr_render(1)}},
+                                "render.sh": render_script(1)}},
         })
         _tdr = build_verify_target(_gdr, "declined-t", ["stale"])
         check("[-1] PRECONDITION the adopter really rendered the destination the rendered row names",
@@ -6538,7 +6538,7 @@ user_skills = "/tmp/gk-fake-skills"
         # rendered destination does not, because nothing in `update` writes one.
         (_gdr / "tools" / "stale" / "conf.txt").write_text("V=2\n", encoding="utf-8", newline="\n")
         (_gdr / "tools" / "stale" / "out.tmpl").write_text("V=2\n", encoding="utf-8", newline="\n")
-        (_gdr / "tools" / "stale" / "render.sh").write_text(_dr_render(2), encoding="utf-8",
+        (_gdr / "tools" / "stale" / "render.sh").write_text(render_script(2), encoding="utf-8",
                                                             newline="\n")
         git(_gdr, "add", "-A")
         git(_gdr, "commit", "-qm", "B")
