@@ -34,14 +34,18 @@ echo b > b; git add b; git commit -q -m second 2>/dev/null; ck "commit off defau
 git commit -q --no-verify -m second; ck "--no-verify overrides the guard" $? 0
 
 # ---- the codebase-map leg ------------------------------------------------------------------------
-# A stand-in gate at the leg's own path, red while a flag file exists. The hook consumes only the
-# gate's exit status and output, so that is the whole contract the stand-in holds; the REAL gate was
-# observed red on a staged break when the leg landed. These arms keep the trigger, the remedy and the
-# unstaged-artifact refusal from regressing. The resolver is this repo's own, because the leg sources it.
+# A stand-in gate, red while a flag file exists. The hook consumes only the gate's exit status and
+# output, so that is the whole contract the stand-in holds; the REAL gate was observed red on a staged
+# break when the leg landed. These arms keep the trigger, the remedy and the two refusals from
+# regressing. The gate, the map root and the resolver sit at paths gov does not use, because the leg
+# DERIVES all three and a fixture at gov's own paths would pass a leg that had them spelled back in.
 git checkout -q main
-mkdir -p tools/codebase-map tools/lib map/generated
-cp "${HOOK%/*}/../tools/lib/resolve-python.sh" tools/lib/
-cat > tools/codebase-map/test_codebase_map.py <<'EOF'
+repo_src="${HOOK%/*}/.."
+resolver=$(cd "$repo_src" && git ls-files -- '*resolve-python.sh' | head -n 1)
+[ -n "$resolver" ] || { echo "FAIL no tracked resolve-python.sh in $repo_src — the map arms cannot run"; exit 2; }
+mkdir -p gate vendor map/generated
+cp "$repo_src/$resolver" vendor/
+cat > gate/test_map.py <<'EOF'
 import os, sys
 if os.path.exists("gate-red"):
     print("FAIL test_generated_artifacts_are_fresh")
@@ -49,7 +53,7 @@ if os.path.exists("gate-red"):
     sys.exit(1)
 print("ok   test_generated_artifacts_are_fresh")
 EOF
-echo 'MAP_ROOT=map' > .codebase-map.conf
+printf 'MAP_ROOT=map\nGATE_FILE=gate/test_map.py\n' > .codebase-map.conf
 echo '{"v":1}' > map/generated/x.json
 git add -A; git commit -q --no-verify -m map-fixture
 
@@ -76,6 +80,11 @@ printf '%s\n' "$out" | grep -q 'NOT staged'; ck "the refusal names the unstaged 
 
 git add map/generated/x.json
 git commit -q -m d >/dev/null 2>&1; ck "a green map gate with its artifacts staged is allowed" $? 0
+
+printf 'MAP_ROOT=map\nGATE_FILE=gate/moved.py\n' > .codebase-map.conf; git add .codebase-map.conf
+echo 'z = 3' > f.py; git add f.py
+out=$(git commit -q -m f 2>&1); ck "a GATE_FILE naming no file is refused, not skipped" $? 1
+printf '%s\n' "$out" | grep -q 'names no file'; ck "the refusal names the conf key" $? 0
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
