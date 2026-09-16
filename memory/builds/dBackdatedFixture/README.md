@@ -63,11 +63,11 @@ ids DEPL-dBackdatedFixture-1
 | [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | — | 2 | OPEN | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: DEPL-dBackdatedFixture-1.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dBackdatedFixture-1.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
