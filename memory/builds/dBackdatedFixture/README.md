@@ -5,7 +5,7 @@ opened: 2026-09-16
 streams: deployer
 roster: DEPL
 authorized-by: prompt
-ids: DEPL-dBackdatedFixture-1
+ids: DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3
 ---
 
 # dBackdatedFixture — the govkit selftest's vintage fixtures stop inventing rows the old vintage never shipped
@@ -32,8 +32,8 @@ invent an identity for it. `update`'s S9 integrity check refuses that receipt, a
 
 ## Build-level rules
 
-- **One unit, one mechanism**: the fixtures that model an install at an older gov vintage, and the
-  arms graded over them. Classified at opening: MISSING, then authored.
+- **Three units, sequential, one file.** Unit 1 opened MISSING and was authored; round 1 BLOCKED it,
+  and M4's disposition PROMOTED its blocker and its high to units 2 and 3, audited as specs.
 - **Tier-2 by the owner's prompt.** The repo's own tier rule would call a selftest-only change Tier-1.
   The owner ruled Tier-2 before the cause was known, and that ruling stands.
 - **The engine is not edited.** The S9 refusal and the landing of an unclaimed source are both ratified
@@ -51,30 +51,38 @@ invent an identity for it. `update`'s S9 integrity check refuses that receipt, a
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `DEPL-dBackdatedFixture-1` | OPEN | one vintage-rewind helper for both backdating fixtures, the check arms' counts derived, and a fixture-acceptance arm |
+| 1 | `DEPL-dBackdatedFixture-1` | OPEN | one vintage-rewind helper for both backdating fixtures, and a fixture-acceptance arm per builder |
+| 2 | `DEPL-dBackdatedFixture-2` | OPEN | the `[dGV-9]` arms grade only rows the receipt held before the write (audit B1, promoted) |
+| 3 | `DEPL-dBackdatedFixture-3` | OPEN | the `u5a` check arms take their expected figures from the descriptor (audit H1, promoted) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node d · opened 2026-09-16 · streams deployer
-ids DEPL-dBackdatedFixture-1
+**Build status:** OPEN · 3 unit(s) · node d · opened 2026-09-16 · streams deployer
+ids DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | — | 2 | OPEN | rev-2 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | OPEN | rev-3 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed](spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `DEPL-dBackdatedFixture-1` | no |
+| 2 | `DEPL-dBackdatedFixture-2` | no |
+| 3 | `DEPL-dBackdatedFixture-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
