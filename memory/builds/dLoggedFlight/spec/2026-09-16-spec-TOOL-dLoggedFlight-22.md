@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
+**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -178,11 +178,11 @@ next retirement of a vocabulary cannot leave an arm naming its members.
 - **AC4** — When the rewritten `test_record_ac4_classes` reads a copy of `RECORD_SCHEMA` that keeps
   `push-decision`, it reds naming the unreached members; on the real schema it passes.
   Red when: the copy passes, or the arm's lists are typed.
-- **AC5** — When `python tools/runlog/selftest.py` runs after S5, every arm in S5's table passes as the
-  table says, `test_record_ac9_owner_times` is absent, and the printed assertion count is at or above
-  the re-declared `ASSERTION_FLOOR`, whose comment names `TOOL-dLoggedFlight-22`.
-  Red when: an arm in the table fails, the floor falls with no comment naming this unit, or an arm still
-  reads a retired row, column, vocabulary or function.
+- **AC5** — When `ASSERTION_FLOOR` in the runlog kit's self-test module is read after S5, its comment names
+  `TOOL-dLoggedFlight-22`, the file defines no `test_record_ac9_owner_times`, and each arm in S5's table
+  is edited as the table says. The suite run that grades those arms is this spec's `New arm:` line.
+  Red when: the floor falls with no comment naming this unit, `test_record_ac9_owner_times` is still
+  defined, or an arm still reads a retired row, column, vocabulary or function.
 
 ## 7. Gates
 
@@ -203,6 +203,9 @@ New arm: `tools/runlog/selftest.py` · AC1's retired-kind rows and AC4's schema 
 - rev-1 · 2026-09-16 · initial draft, promoted from B2 of the spec audit of units 14, 16 and 20,
   round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-20` rev-1 S2, S4 and S5 with their
   AC2, AC4 and AC6, and restates `TOOL-dLoggedFlight-16` AC4's pin.
+- rev-2 · 2026-09-16 · AC5 · the spec-token checker refuses a suite run as an acceptance observation.
+  AC5 now reads the floor's comment and the file's definitions directly, and the suite stays under
+  `New arm:`. Made in the main loop while the spec audit of units 21 to 24 read rev-1; no design moved.
 
 ## 10. Reuse audit
 

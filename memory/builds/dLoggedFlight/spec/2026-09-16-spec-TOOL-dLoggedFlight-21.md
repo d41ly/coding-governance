@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-21 — the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 21
+**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
@@ -56,9 +56,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   entry today. One self-test arm renders the class model's record, parses each mapped fact's rendered
   value with its parser in both the markdown and the Data twin, and reds naming the label the parser
   cannot fullmatch. Observed by AC3.
-- **S6** The docs. The commitment paragraph of `tools/runlog/README.md` (`README.md:313-318`), its
-  residue bullet "A line inserted before the committed first time" (`README.md:435-437`), the module
-  docstring's commitment paragraph (`record.py:34-38`) and the map dossier's sentence
+- **S6** The docs. The commitment paragraph of `tools/runlog/README.md` (`tools/runlog/README.md:313-318`), its
+  residue bullet "A line inserted before the committed first time" (`tools/runlog/README.md:435-437`), the module
+  docstring's commitment paragraph (`tools/runlog/record.py:34-38`) and the map dossier's sentence
   (`memory/map/features/runlog.md:125-127`) state S3 and S4, and none of them names a committed first
   time. Observed by AC4.
 
@@ -176,6 +176,9 @@ New arm: `tools/runlog/selftest.py` · AC2's inserted line and AC3's widened tem
   round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-20` rev-1 S3's commitment clause
   and supersedes `TOOL-dLoggedFlight-9` S5's first and last timestamps and its AC5 arm's commitment
   shape.
+- rev-2 · 2026-09-16 · S6 · the three code citations name their kit path, so the spec-token checker
+  reads `tools/runlog/README.md` and `tools/runlog/record.py` rather than the root README. Spelling
+  only, made in the main loop while the spec audit of units 21 to 24 read rev-1; no design moved.
 
 ## 10. Reuse audit
 
