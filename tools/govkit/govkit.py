@@ -7907,9 +7907,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # these destinations and recorded WHY it refused each one; printing the gap set and the
         # refusal set as two disjoint lists left the operator to pair them by eye. Keyed on `dest`,
         # which is the same string both sides carry, so no normalisation is possible to get wrong.
-        # The reason is READ from the list rather than re-derived here: a second copy of the eight
-        # refusal strings is the prose-beside-its-source class, and it would drift from the one the
-        # operator actually saw on the REFUSED line below.
+        # The reason is READ from the list rather than re-derived here: a second copy of the refusal
+        # strings is the prose-beside-its-source class, and it would drift from the one the operator
+        # actually saw on the REFUSED line below.
         #
         # `_landed_new` is deliberately NOT consulted. A landed destination was `git add`ed, so
         # `coverage_rows` -- which filters on `dest not in tracked(target)` -- cannot return it, and
