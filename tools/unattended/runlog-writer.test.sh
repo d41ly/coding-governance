@@ -347,7 +347,9 @@ check_ac2_exits() {
   check "AC2 the install line is found" "$([ -n "$INSTALL_LINE" ] && echo found)" found
   check "AC2 every exit site carries the clean-exit marker or a named exemption" "${UNMARKED:-none}" none
   check "AC2 each exemption text matches exactly one site" "$EXEMPT_OK" 1
-  check "AC2 all five exemptions were seen" "$EXEMPTED" 5
+  # The count is the list's own length, never a typed figure: the sixth arrived at a reconcile, and a
+  # typed five went red on a correct list.
+  check "AC2 every named exemption was seen" "$EXEMPTED" "$(grep -c . <<<"$EXEMPT_EXITS")"
   check "AC2 the scan sees the post-install exits too" "$([ "$ALL_ROWS" -gt 5 ] && echo yes)" yes
   # THE ENUMERATION'S FAILING CASES, staged into COPIES every run: an unmarked exit inside a verb body
   # ABOVE the install, one in the library, and a marked one as the control. A checker only ever seen

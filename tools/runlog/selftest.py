@@ -108,7 +108,10 @@ from collections import Counter  # noqa: E402
 # where no bash shares this filesystem, and that skip lowers the count.
 # RAISED 1288 -> 1289 when the bug-class checklist moved L2's key to the run's own journal segment: a
 # rotated build whose first run alone was driven here reads its second run's driver not-local.
-ASSERTION_FLOOR = 1289
+# RAISED 1289 -> 1291 at the second origin/main reconcile, where main's stall probe `--audit` became the
+# keepalive tick: two stalled streaks, one of `--audit` and one mixed with `--status`. AC20's fixture
+# gains an `--audit` call from the primary tree, which its existing blind-verb check now requires.
+ASSERTION_FLOOR = 1291
 
 PASS = []
 FAIL = []
@@ -3508,11 +3511,14 @@ def test_model_ac20_tree_holds():
     pinned = "push-1789295160000000-5151"
     # The run's calls in the primary tree, each of a kind that claims nothing, and each the first to
     # claim it should its own rule go: a premature `--landed`, refused before the close; the owner's
-    # `--status` and `--resume`, from a plain terminal that names no session; a `--park` of the landing
-    # after the close; and the fixture's own `--landed`, at minute 27.
+    # `--status` and `--resume`, from a plain terminal that names no session; a keepalive tick's `--audit`,
+    # the stall probe main added at the second reconcile; a `--park` of the landing after the close; and
+    # the fixture's own `--landed`, at minute 27.
     primary = (render_driver_lines(8, "--landed", rc=1, checks="34", phase_from="BUILDING", phase_to="BUILDING",
                                    wt=FX_WT_PRIMARY)
                + render_driver_lines(9, "--status", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
+                                     sid=None)
+               + render_driver_lines(11.5, "--audit", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
                                      sid=None)
                + render_driver_lines(13, "--resume", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
                                      sid=None)
