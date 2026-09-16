@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 8aac753c81bc0f7b27dae3e3b98e5f3d93af597a
-phase: SPECCING
+witness: 1f42235793aedbff4ab821b4dd777e404d345abb
+phase: BUILDING
 branch-sha: 859daa67e728ae273d5278536fb462c04077f16f
 branch-ref: refs/heads/branch/govkit-update-rollbacks-0502c4
 mode: prompt

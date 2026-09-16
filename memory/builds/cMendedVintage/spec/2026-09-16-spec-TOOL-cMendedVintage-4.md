@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 14
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -146,7 +146,7 @@ the defect with a variable wrapped around it.
   `[ -z "$SMERGE" ]` would silently stop firing; none exists today, and AC2 is written over the
   file's own text rather than over one site so a missed carrier reds.
 - testing — AC1, AC3 and AC4 each run one real script in a scratch repository installed at
-  `scripts/`. AC2 gates the CLASS across all three files. The permanent arm is declared in section 7.
+  `<prefix>/`. AC2 gates the CLASS across all three files. The permanent arm is declared in section 7.
 - migration — section 4's Migration table, and S6's ratchet rewrite in the same commit.
 - user docs — `WIRE-INTO-PROJECT.md` §3c step 4 and §3e each name the merger's install path in
   runbook prose. Those are instructions a human follows at gov's own prefix and are outside this
@@ -154,10 +154,10 @@ the defect with a variable wrapped around it.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `check-wiring.sh` and `agent-cap.js` are installed at `scripts/` in a scratch git
+- **AC1** — When `check-wiring.sh` and `agent-cap.js` are installed at `<prefix>/` in a scratch git
   repository whose `settings.json` carries no agent-cap hook and NO `settings-merge.py` is present,
-  `bash scripts/check-wiring.sh --check` prints an `UNWIRED  agent-cap` remedy naming
-  `scripts/settings-merge.py`.
+  `bash <prefix>/check-wiring.sh --check` prints an `UNWIRED  agent-cap` remedy naming
+  `<prefix>/settings-merge.py`.
   Red when: the fallback still spells `tools/settings-merge.py`, so the operator is handed a path
   that does not exist in their tree.
   fixture: a scratch git repository under this run's short fixture root; `TOOL-cMendedVintage-3`
@@ -168,16 +168,16 @@ the defect with a variable wrapped around it.
   half of the memory-recall `cp` instruction.
   Red when: one of the three carriers is fixed and a sibling is not, which is the patch-the-reported-
   path shape this unit exists to avoid.
-- **AC3** — When `process-monitor` is installed at `scripts/process-monitor/` in a scratch repository
-  with a valid `.process-monitor.conf` and no wired hook, `bash scripts/process-monitor/adopt-process-monitor.sh --check`
-  prints a remedy naming `scripts/settings-merge.py`.
+- **AC3** — When `process-monitor` is installed at `<prefix>/process-monitor/` in a scratch repository
+  with a valid `.process-monitor.conf` and no wired hook, `bash <prefix>/process-monitor/adopt-process-monitor.sh --check`
+  prints a remedy naming `<prefix>/settings-merge.py`.
   Red when: `TOOL_ROOT` is derived from a `tools/` default instead of from `KIT_REL`, which produces
   the identical string at gov's own prefix and a dead one everywhere else.
   fixture: the conf must parse, or the run exits at the declaration refusal before reaching `:219`.
-- **AC4** — When `memory-recall` is installed at `scripts/memory-recall/` in a scratch repository and
-  `bash scripts/memory-recall/adopt-memory-recall.sh --scaffold --with-hook` runs with no
+- **AC4** — When `memory-recall` is installed at `<prefix>/memory-recall/` in a scratch repository and
+  `bash <prefix>/memory-recall/adopt-memory-recall.sh --scaffold --with-hook` runs with no
   `settings-merge.py` present, the printed `cp` line and the following invocation both name
-  `scripts/`, and the comment above them describes the resolution the code performs.
+  `<prefix>/`, and the comment above them describes the resolution the code performs.
   Red when: only the invocation is derived and the `cp` destination is left literal, so the operator
   installs the tool where the next line will not look for it.
 - **AC5** — When `bash tools/check-install-prefix.sh --check` runs after the commit, it exits 0, and
@@ -191,7 +191,7 @@ the defect with a variable wrapped around it.
 
 `check-wiring self-test` · `install-prefix (shipped surface)` · `process-monitor wiring` · `process-monitor adopter selftest` · `memory-recall skill wiring` · `hook destinations (every declared hook path ships)` · `settings-merge selftest`
 
-New arm: `tools/check-wiring.test.sh` · a `scripts/` install with no merger present, asserting the
+New arm: `tools/check-wiring.test.sh` · a `<prefix>/` install with no merger present, asserting the
 agent-cap remedy names the install prefix · no assertion floor to move.
 
 ## 8. Open questions
@@ -201,6 +201,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · §6 · TOKEN SPELLING, no criterion changed. AC1, AC3 and AC4 named the scratch fixture's installed files with a literal scripts/ prefix. `tools/check-spec-tokens.py` reds on a backticked path-shaped token `git ls-files` cannot resolve, and it is right to: those are paths inside a fixture the arms build, not paths in this tree. `--dispatch` refuses every unit of the build while that checker is red, so nothing could be dispatched. They now read `<prefix>/…`, because `check_path_shaped`'s `NOT_A_TOKEN` excludes a token opening `<` — an escape by SHAPE rather than a waiver, and a truer statement of the criterion, which must hold at any install prefix that is not the tool root rather than at one spelling of it. The waiver registry was deliberately not used: it is shrink-only so a new hit cannot be waived away quietly, which is the property that forced the real fix.
 
 ## 10. Reuse audit
 
