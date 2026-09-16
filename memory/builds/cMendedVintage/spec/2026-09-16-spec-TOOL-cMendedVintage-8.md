@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 23
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -239,7 +239,7 @@ New arm: `tools/process-monitor/adopt-process-monitor.test.sh` · a scratch repo
 
 ## 8. Open questions
 
-**F1 — the value of the new code.** 2 is free in `scope.py` but is spent in
+- **F1 — the value of the new code.** 2 is free in `scope.py` but is spent in
 `adopt-process-monitor.sh` on "wrong invocation or not a repo", and the two files are read together.
 RESOLVED (agent, 2026-09-16, delegated): 3, so no integer means two things across the pair. It passes
 all three of M3's vetoes — no new dependency, no new surface, no widened write path — and it is the
@@ -249,6 +249,7 @@ two files disagree.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · §8 · SHAPE REPAIR, no decision changed. The fork items were written as bare `**F1 — …**` bold paragraphs; the classifier at `tools/unattended/unattended.sh:1797` counts an item only when the line opens `- `, `* ` or `### `, and with zero items it takes a branch that never consults the resolution mark and accepts only a `none` opening line. So a section carrying a conforming `RESOLVED (agent, …)` mark graded FORKED and the unit could not be dispatched. Ten sibling specs in this build use the `- ` bullet and all grade READY, so the house shape is the bullet and these two were the outliers. The reader errs toward FORKED, which is the safe direction, so this is a defect in the spec and not in the classifier. The resolution text, the chosen option and every criterion are byte-identical; the round-1 spec audit that reviewed this design still names this id and is not invalidated by a non-semantic reshape.
 
 ## 10. Reuse audit
 

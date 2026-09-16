@@ -138,9 +138,9 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-12 — `apply`'s CONFIGURE honours `deploy["inert"]`](spec/2026-09-16-spec-DEPL-cMendedVintage-12.md) | 18 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-13 — `update --write` emits gate legs](spec/2026-09-16-spec-DEPL-cMendedVintage-13.md) | 19 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the full path](spec/2026-09-16-spec-DEPL-cMendedVintage-14.md) | 20 | 2 | SPECCED | rev-2 | 2026-09-16 |
-| [TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar](spec/2026-09-16-spec-TOOL-cMendedVintage-6.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar](spec/2026-09-16-spec-TOOL-cMendedVintage-6.md) | 21 | 2 | SPECCED | rev-3 | 2026-09-16 |
 | [TOOL-cMendedVintage-7 — the receipt leg reports rows carrying `evidence: "unattributed"`](spec/2026-09-16-spec-TOOL-cMendedVintage-7.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal](spec/2026-09-16-spec-TOOL-cMendedVintage-8.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal](spec/2026-09-16-spec-TOOL-cMendedVintage-8.md) | 23 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it](spec/2026-09-16-spec-DEPL-cMendedVintage-15.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-16 — the lexicon outcome block cannot accept a failed first scaffold](spec/2026-09-16-spec-DEPL-cMendedVintage-16.md) | 25 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write](spec/2026-09-16-spec-DEPL-cMendedVintage-17.md) | 26 | 2 | SPECCED | rev-1 | 2026-09-16 |

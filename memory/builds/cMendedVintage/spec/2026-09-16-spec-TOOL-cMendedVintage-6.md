@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 21
+**Status:** SPECCED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
@@ -274,7 +274,7 @@ this file is not in the population `tools/check-testsuite-counts.sh` reads.
 
 ## 8. Open questions
 
-**F1 — the shipped file's extension.** The brief spells the deliverable `check-receipt.sh` and the
+- **F1 — the shipped file's extension.** The brief spells the deliverable `check-receipt.sh` and the
 build README's roster row 21 repeats that spelling. The work is a JSON parse and a sha256, so a
 shell spelling needs a new inlined copy of `resolve_python` plus an embedded python program, and it
 buys no fallback: the runner itself refuses to start without python. RESOLVED (agent, 2026-09-16,
@@ -284,7 +284,7 @@ public surface, and reuses the runner's existing argv-0 resolution rather than a
 The build README's roster row still says `.sh` and the build's closing README re-read owns fixing
 that line; this spec is the record of why the two differ.
 
-**F2 — the chunk.** `wiring` groups the adopter `--check` legs and `declarations` groups the legs
+- **F2 — the chunk.** `wiring` groups the adopter `--check` legs and `declarations` groups the legs
 that join a declared population against the tracked surface. RESOLVED (agent, 2026-09-16,
 delegated): `declarations`. The receipt is a declaration and this leg is the join; `wiring` answers
 whether a kit is installed, which this leg does not ask. The value is pinned in
@@ -299,6 +299,7 @@ leg off a bar.
   bytes, so every clone that is not the install machine is at risk. The row now names that population
   and cites finding 36 of the aSealedCaravan record, and AC7 measures the residue on a CRLF-expanded
   clone rather than asserting it away.
+- rev-3 · 2026-09-16 · §8 · SHAPE REPAIR, no decision changed. The fork items were written as bare `**F1 — …**` bold paragraphs; the classifier at `tools/unattended/unattended.sh:1797` counts an item only when the line opens `- `, `* ` or `### `, and with zero items it takes a branch that never consults the resolution mark and accepts only a `none` opening line. So a section carrying a conforming `RESOLVED (agent, …)` mark graded FORKED and the unit could not be dispatched. Ten sibling specs in this build use the `- ` bullet and all grade READY, so the house shape is the bullet and these two were the outliers. The reader errs toward FORKED, which is the safe direction, so this is a defect in the spec and not in the classifier. The resolution text, the chosen option and every criterion are byte-identical; the round-1 spec audit that reviewed this design still names this id and is not invalidated by a non-semantic reshape.
 
 ## 10. Reuse audit
 
