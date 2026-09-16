@@ -167,7 +167,9 @@ METHOD = {
             "covers, a tool call covering its span and an owner turn covering nothing; judged only "
             "where the transcripts read present, and kept out within IDLE_OWNER_GUARD_S of an owner "
             "turn",
-    "sessions": "read from the run's START lines; heuristic when discovered by slug in the store",
+    "sessions": "read from the run's START lines; heuristic when discovered by slug in the store, where "
+                "a session is kept only when it reaches the window; each read from its local transcript "
+                "before its store extract",
 }
 
 GIT_CALLS = [0]
@@ -701,9 +703,20 @@ def check_extract_covers(data, window) -> bool:
 
 
 def resolve_run_sessions(sids, slug, window, store=None, projects=None) -> tuple:
-    """`(extracts, state, note)`: each session's structural extract, from the store where one was
-    written, else extracted in memory where its transcript is on this machine. With no session named
-    by the journal, the store's extracts attributed to the slug stand in, heuristically.
+    """`(extracts, state, note)`: each session's structural extract. A session's LIVE transcript is its
+    source wherever `resolve_session_tree` finds one on this machine, extracted in memory; a store
+    extract stands in only where none is local (TOOL-dLoggedFlight-14 S1). The store extract is a cache
+    of the transcript, and read first it hides every owner turn and call made after it was cut, from the
+    counts and from the idle guard alike. With no session named by the journal, the store's extracts
+    attributed to the slug name the sessions, heuristically, and each takes the same order.
+
+    A DISCOVERED session is read only when it reaches the window, decided before anything is extracted
+    (S4). With its transcript local it is dropped unread when every file of its tree was last modified
+    before the window's start, and once extracted it is kept only when an event lies inside the window;
+    a tree with a file that cannot be stat'ed is extracted, the safe direction. With no transcript local
+    its store extract is kept only when it holds an event inside the window. The sessions kept are the
+    sessions read, for the freshness test below and for every count the model derives. A session the
+    journal NAMES is never dropped, since the journal says it is the run's.
 
     Every session read from a STORE extract, named or discovered, is held to `window` through
     `check_extract_covers`; one extracted in memory here covers by construction, since it was extracted
@@ -712,36 +725,79 @@ def resolve_run_sessions(sids, slug, window, store=None, projects=None) -> tuple
     already named by the note. The note counts the short sessions and names none of them."""
     extracts, notes, short = {}, [], set()
     store_dir = pathlib.Path(store) if store else None
+
+    def resolve_local_tree(sid):
+        """`sid`'s session tree where its main transcript is on this machine and opens for reading, else
+        None, so an unreadable transcript falls back to the store the way a missing one does."""
+        if projects is None:
+            return None
+        try:
+            tree = ex.resolve_session_tree(sid, projects)
+        except ValueError:
+            return None
+        if tree.main is None:
+            return None
+        try:
+            with open(tree.main, "rb"):
+                pass
+        except OSError:
+            return None
+        return tree
+
+    def read_store_extract(path):
+        try:
+            data = json.loads(path.read_bytes())
+        except (OSError, ValueError):
+            return None
+        return data if isinstance(data, dict) else None
+
+    def measure_tree_touched(tree):
+        """The latest modification time among the tree's files, or None when one cannot be stat'ed."""
+        latest = None
+        for path in (tree.main, *tree.agents, *tree.workflow_agents, *tree.workflows):
+            try:
+                mtime = path.stat().st_mtime
+            except OSError:
+                return None
+            latest = mtime if latest is None else max(latest, mtime)
+        return latest
+
+    def check_reaches_window(data):
+        events = data.get("events")
+        return isinstance(events, list) and any(isinstance(ev, dict) and check_in_window(ev.get("t"), window)
+                                                for ev in events)
+
     discovered = False
     if store_dir is not None and not sids:
         sess_dir = store_dir / ex.SESSIONS_DIR
         for p in sorted(sess_dir.glob("*.json")) if sess_dir.is_dir() else []:
-            try:
-                data = json.loads(p.read_bytes())
-            except (OSError, ValueError):
+            data = read_store_extract(p)
+            if (data is None or slug not in (data.get("slugs") or [])
+                    or not ex.SID_RE.fullmatch(str(data.get("sid", "")))):
                 continue
-            if slug in (data.get("slugs") or []) and ex.SID_RE.fullmatch(str(data.get("sid", ""))):
-                extracts[data["sid"]] = data
-                discovered = True
-                if not check_extract_covers(data, window):
-                    short.add(data["sid"])
+            sid, stored = data["sid"], True
+            tree = resolve_local_tree(sid)
+            if tree is not None:
+                touched = measure_tree_touched(tree)
+                if touched is not None and touched < window["start"]:
+                    continue
+                data, stored = ex.extract_session(tree, "heuristic", [slug]), False
+            if not check_reaches_window(data):
+                continue
+            extracts[sid] = data
+            discovered = True
+            if stored and not check_extract_covers(data, window):
+                short.add(sid)
     for sid in sids:
         data, stored = None, False
-        if store_dir is not None:
+        tree = resolve_local_tree(sid)
+        if tree is not None:
+            data = ex.extract_session(tree, "driver", [slug])
+        elif store_dir is not None:
             p = store_dir / ex.SESSIONS_DIR / f"{sid}.json"
             if p.is_file():
-                try:
-                    data = json.loads(p.read_bytes())
-                except (OSError, ValueError):
-                    data = None
+                data = read_store_extract(p)
                 stored = data is not None
-        if data is None and projects is not None:
-            try:
-                tree = ex.resolve_session_tree(sid, projects)
-            except ValueError:
-                tree = None
-            if tree is not None and tree.main is not None:
-                data = ex.extract_session(tree, "driver", [slug])
         if data is not None:
             extracts[sid] = data
             if stored and not check_extract_covers(data, window):

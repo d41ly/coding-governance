@@ -7,7 +7,7 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
   "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9",
-  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-16"]
+  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-14", "TOOL-dLoggedFlight-16"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
@@ -181,8 +181,8 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   driver's writer key sets beside them. The record's copies of the pre-push hook's decisions, the
   spec template's status tokens and check 22's verdicts are held the same way. Its staging harness met
   a stale-bytecode trap, claimed here as `staged-break-runs-stale-bytecode.md`.
-- The gate runner's own `redact()` stays separate: it masks leg output on write, under its own stated
-  scope, and this table does not replace it.
+- The gate runner's own `redact()` stays separate: it masks leg output on write, and this table does
+  not replace it.
 - `.memory-tree.conf` — read, never written. The reader copies the memory-tree engine's line reader
   rather than importing it, since kits install independently; the self-test holds the copy to it and
   to bash.

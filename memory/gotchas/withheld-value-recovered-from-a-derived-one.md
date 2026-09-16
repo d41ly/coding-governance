@@ -36,6 +36,15 @@ Dropping the owner turns from the gap sequence was not the whole fix. The owner'
 seconds after the turn, so a gap then ended on the reply and placed the turn to within the reply's
 latency: the causal form of the same class.
 
+The same build's closing review, round 2, reproduced the blocker through a third door, R2-B1: **a
+cache preferred over its source, with its freshness key never read.** A session's store extract is
+derived from its transcript, and `tools/runlog/model.py` read the extract first. An extract cut
+before the run's last owner turn withheld that turn from the owner count, and the idle guard,
+reading the same stale turns, let a gap end beside a turn it could not see. The guard shared its
+input with the defect it guarded. `TOOL-dLoggedFlight-14` reads a local transcript before its
+extract, and `TOOL-dLoggedFlight-16` grades an extract by its `extracted_at` where no transcript
+is local.
+
 ## The fix
 
 Three parts, and the first is the one that holds.

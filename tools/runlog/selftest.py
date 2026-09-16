@@ -114,7 +114,9 @@ from collections import Counter  # noqa: E402
 # RAISED 1291 -> 1317 by TOOL-dLoggedFlight-16, extract freshness: AC6's stale fixture, one check; the
 # fresh fixture's own liveness check; and three new functions, AC1 with two checks, AC2 and AC3 with six
 # and AC4's shapes with seven, whose decoy checks move it by nine.
-ASSERTION_FLOOR = 1317
+# RAISED 1317 -> 1338 by TOOL-dLoggedFlight-14, source order: three new functions, AC1 with four checks,
+# AC3 with five and AC7 with three, whose decoy checks move it by nine.
+ASSERTION_FLOOR = 1338
 
 PASS = []
 FAIL = []
@@ -2119,14 +2121,17 @@ def write_extract(store, sid, events, slug=FX_SLUG, extracted_at=FX_EXTRACTED_AT
     target.write_bytes(json.dumps(data).encode("ascii"))
 
 
-def build_session_events(acts, sid=FX_SID):
+def build_session_events(acts, sid=FX_SID, projects=None):
     """One session's extract events, made by the REAL extractor from a main transcript written the way
     the harness writes one, so no event is typed in a shape the extractor would not produce.
 
     `acts` are tuples with epoch-second times: `("call", t, t_end)` is an assistant `tool_use` with its
     usage and the `tool_result` at `t_end`; `("reply", t)` an assistant text record with its usage;
-    `("owner", t)` a typed turn of human origin; `("limit", t)` a rejected-quota API error."""
-    _base, projects = build_projects("runlog-idle-")
+    `("owner", t)` a typed turn of human origin; `("limit", t)` a rejected-quota API error. Given
+    `projects`, the transcript is written under that root and stays there, local to a model that reads
+    it (TOOL-dLoggedFlight-14); otherwise under a scratch root of its own."""
+    if projects is None:
+        _base, projects = build_projects("runlog-idle-")
     usage = {"input_tokens": 4, "output_tokens": 2, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
 
     def render_stamp(t):
@@ -2261,8 +2266,9 @@ def check_idle_invariant(model):
     return out
 
 
-def build_model(repo, journals=None, store=None, run=None):
-    model = rl_model.build_run_model(repo, FX_SLUG, run=run, journal_root=journals, store=store)
+def build_model(repo, journals=None, store=None, run=None, projects=None):
+    model = rl_model.build_run_model(repo, FX_SLUG, run=run, journal_root=journals, store=store,
+                                     projects=projects)
     arm = derive_arm_name()
     MODEL_SEEN["models"] += 1
     MODEL_SEEN["both"] += bool(model.tools) and any(e["kind"] == "idle" for e in model.timeline)
@@ -4920,6 +4926,224 @@ def test_fresh_ac4_three_shapes():
                   "1 of 2 sessions have no local transcript" in note, FX_SID in note or FX_SID_B in note)
            for name, note in notes.items()},
           {"short": (True, False, False), "mixed": (True, True, False)})
+
+
+# ================================================================ source order (TOOL-dLoggedFlight-14)
+#
+# A store extract is a cache of its session's transcript, and the model once read it first: a stale one
+# hid the owner turns and calls made after it was cut, and the idle guard judged with the same stale
+# turns. Every session here is made by the REAL extractor from a transcript written under a projects root
+# the model is handed, every file time is set rather than left to the clock, and every window is read
+# from a first build of its fixture, never typed. Each arm holds the store-first reading beside its own
+# as the near miss, so each probe is seen to move.
+
+SOURCE_FX = {}
+
+
+def build_source_fixture():
+    """A run left RUNNING, its one session named by the driver journal and its transcript local, with a
+    twenty-minute driver silence from minute 4 to minute 24 and no commit inside it. The owner's turn
+    comes at minute 20, its reply four seconds later and a call after that, so the silence the transcript
+    holds before the turn is over fifteen minutes and ends beside it. The store extract of the same
+    session is cut before the turn, holding the calls to minute 4 alone, and its `extracted_at` covers
+    the window, so only the order the two sources are read in tells the readings apart."""
+    def derive_time(m):
+        return float(MODEL_T0 + m * 60)
+
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = s0[1]
+    repo, _ = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight",
+         "files": {rm: build_preflight_state(FX_SLUG, base, base)}},
+        {"t": derive_minute(26), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — after the owner's turn",
+         "files": {"tools/a.txt": "1\n"}},
+    ], repo=first)
+    driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
+              + render_driver_lines(4, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
+              + [ln for m in (24, 30) for ln in render_driver_lines(
+                  m, "--status", phase_from="RUNNING", phase_to="RUNNING")])
+    owner = derive_time(20)
+    cut = [("call", derive_time(1) - 1, derive_time(1) + 1), ("call", derive_time(2) - 6, derive_time(2) + 1),
+           ("call", derive_time(4) - 1, derive_time(4) + 1)]
+    full = cut + [("owner", owner), ("reply", owner + 4), ("call", owner + 6, owner + 8),
+                  ("call", derive_time(24) - 1, derive_time(24) + 1),
+                  ("call", derive_time(26) - 6, derive_time(26) + 1),
+                  ("call", derive_time(30) - 1, derive_time(30) + 1)]
+    _base, projects = build_projects("runlog-source-ac1-")
+    build_session_events(full, projects=projects)
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(store, FX_SID, build_session_events(cut))
+    return {"repo": repo, "journals": write_journals(repo.parent, driver=driver), "store": store,
+            "projects": projects, "owner": owner}
+
+
+def build_discovered_fixture():
+    """A git-only run left BUILDING, whose session no journal names, so the model discovers it in the
+    store by its slug. Its record dispatched unit 1, so it renders: `render_record` refuses a run that
+    dispatched or closed no unit. Beside it: its window, read from a first build with no store; its
+    session's transcript under a projects root of its own, holding two calls, an owner turn with its
+    reply and two calls more, all inside the window, with the file's time set inside it too; the events
+    the real extractor makes of that transcript, and of its first two calls alone; and an EARLIER session
+    of the same slug, under a projects root of its own, whose every event precedes the window's start.
+    Built once for the arms below."""
+    if SOURCE_FX:
+        return SOURCE_FX
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
+    base = s0[1]
+    st = add_runstate_row(build_preflight_state(FX_SLUG, base, base), derive_minute(1.5), "dispatch",
+                          f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    repo, _ = build_history([
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight and the dispatch", "files": {rm: st}},
+        {"t": derive_minute(20), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
+         "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(30), "subject": f"records({FX_SLUG}): phase BUILDING",
+         "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
+    ], repo=first)
+    bare = build_model(repo)
+    start, end = bare.window["start"], bare.window["end"]
+    cut = [("call", start + 60, start + 62), ("call", start + 300, start + 302)]
+    full = cut + [("owner", start + 600), ("reply", start + 604), ("call", start + 606, start + 608),
+                  ("call", end - 30, end - 28)]
+    _base, projects = build_projects("runlog-source-own-")
+    events = build_session_events(full, projects=projects)
+    os.utime(projects / FIXTURE_PROJECT / f"{FX_SID}.jsonl", (start + 60, start + 60))
+    _base, earlier_projects = build_projects("runlog-source-earlier-")
+    earlier = [("call", start - 3600, start - 3598), ("owner", start - 3000), ("call", start - 2400, start - 2398)]
+    SOURCE_FX.update(repo=repo, start=start, end=end, bare_state=bare.coverage["transcripts"]["state"],
+                     projects=projects, events=events, cut=build_session_events(cut),
+                     earlier_projects=earlier_projects,
+                     earlier=build_session_events(earlier, sid=FX_SID_B, projects=earlier_projects),
+                     earlier_path=earlier_projects / FIXTURE_PROJECT / f"{FX_SID_B}.jsonl")
+    return SOURCE_FX
+
+
+def build_source_store(fx, name, sessions):
+    """A store of its own holding `sessions`, `(sid, events, extracted_at)` triples."""
+    store = pathlib.Path(tempfile.mkdtemp(prefix=f"runlog-source-{name}-", dir=fx["repo"].parent))
+    for sid, events, extracted_at in sessions:
+        write_extract(store, sid, events, extracted_at=extracted_at)
+    return store
+
+
+def test_source_ac1_transcript_first():
+    """AC1: a named session whose transcript is local is read from it, not from the store extract cut
+    before the owner's turn, so the idle guard reads that turn and the owner count is the transcript's."""
+    fx = build_source_fixture()
+    guard = rl_model.IDLE_OWNER_GUARD_S
+
+    def read_near_rows(model):
+        return [(e["t"], e["t"] + e["dur"]) for e in model.timeline if e["kind"] == "idle"
+                and e["t"] - guard <= fx["owner"] <= e["t"] + e["dur"] + guard]
+
+    local = build_model(fx["repo"], journals=fx["journals"], store=fx["store"], projects=fx["projects"])
+    cached = build_model(fx["repo"], journals=fx["journals"], store=fx["store"])
+    check("source AC1: with its transcript local, the named session is read from it: the transcripts read "
+          "present, no idle row lies within IDLE_OWNER_GUARD_S of the owner's turn, and the in-window owner "
+          "count is the transcript's one",
+          (local.sessions, local.coverage["transcripts"]["state"], read_near_rows(local),
+           local.owner_positions["counts"]["in-window"]), ([FX_SID], "present", [], 1))
+    check("source AC1: ...and the silence before the turn is judged and kept out beside it, so the guard read "
+          "the transcript's turn", (local.coverage["idle"]["judged"], local.coverage["idle"]["gaps"],
+                                    local.coverage["idle"]["near_owner"]), (True, 0, 1))
+    check_true("source AC1 liveness: the store extract read alone reads present, holds no owner turn and yields "
+               "one idle row within the guard of the turn, so the store read first reds both halves",
+               cached.coverage["transcripts"]["state"] == "present"
+               and cached.owner_positions["counts"]["in-window"] == 0 and len(read_near_rows(cached)) == 1,
+               str((cached.coverage["transcripts"], cached.owner_positions["counts"], read_near_rows(cached))))
+    check_true("source AC1 liveness: the transcript holds calls past the cut the store extract lacks",
+               len(local.tools) > len(cached.tools), str((len(local.tools), len(cached.tools))))
+
+
+def test_source_ac3_discovered_order():
+    """AC3: a discovered session takes the same order. With its transcript local, a stale store extract cut
+    before the owner's turn is not read; with none local, that stale extract withholds, through the
+    freshness test applied to the discovered path as to the named one."""
+    fx = build_discovered_fixture()
+    at = int(fx["end"]) - 1
+    check_true("source AC3 liveness: the first build with no store read not-local, and the stale stamp lies "
+               "before the window's end", fx["bare_state"] == "not-local" and at < fx["end"],
+               str((fx["bare_state"], at, fx["end"])))
+    stale_cut = build_source_store(fx, "stale-cut", [(FX_SID, fx["cut"], at)])
+    local = build_model(fx["repo"], store=stale_cut, projects=fx["projects"])
+    cached = build_model(fx["repo"], store=stale_cut)
+    check("source AC3: discovered with a stale store extract and its transcript local, the session is read "
+          "from the transcript: present, one extract, and the transcript's owner turn and four calls",
+          (local.coverage["transcripts"]["state"], local.coverage["transcripts"]["extracts"],
+           local.owner_positions["counts"]["in-window"], len(local.tools)), ("present", 1, 1, 4))
+    check("source AC3 near miss: the same store with no transcript local reads the cut extract, stale and "
+          "holding no owner turn", (cached.coverage["transcripts"]["state"],
+                                     cached.owner_positions["counts"]["in-window"]), ("stale", 0))
+    shapes = (("stale", at), ("fresh", FX_EXTRACTED_AT))
+    counts, idle, models = {}, {}, {}
+    for name, stamp in shapes:
+        model = build_model(fx["repo"], store=build_source_store(fx, f"whole-{name}", [(FX_SID, fx["events"], stamp)]))
+        text = rl_record.render_record(model, "memory")
+        models[name] = model
+        counts[name] = sorted({c for label in TRANSCRIPT_FACTS for c in read_fact_counts(text, label)})
+        facts = parse_record_markdown(text).get("Coverage", {}).get("facts", {})
+        idle[name] = facts.get("idle gaps", "").split(" · ")[0]
+    check("source AC3: discovered with no transcript local and a stale extract holding in-window events, the "
+          "transcripts read stale, idle gaps read judged no, and every owner-turn, usage and attributed-call "
+          "count renders -; the fresh near miss reads present, judged yes, with integers",
+          {name: (models[name].coverage["transcripts"]["state"], idle[name],
+                  "-" if counts[name] == ["-"] else ("int" if counts[name] and all(c.isdigit() for c in counts[name])
+                                                     else str(counts[name]))) for name, _s in shapes},
+          {"stale": ("stale", "judged no", "-"), "fresh": ("present", "judged yes", "int")})
+    check_true("source AC3 liveness: both models read the discovered extract and hold its in-window owner turn "
+               "and calls, so each - is the renderer's decision",
+               all(m.owner_positions["counts"]["in-window"] == 1 and m.attribution["calls"] > 0
+                   and m.coverage["transcripts"]["extracts"] == 1 for m in models.values()),
+               str({n: (m.owner_positions["counts"], m.attribution["calls"]) for n, m in models.items()}))
+
+
+def test_source_ac7_discovered_reach():
+    """AC7: an earlier session of the same slug, every event and its `extracted_at` before the window's
+    start, is not read from the store; with its transcript local and its file older than the window it is
+    not even extracted; with its file touched at the window's start it is extracted once and still not
+    counted. `extract_session` is wrapped inside this arm to count its calls and restored in a `finally`."""
+    fx = build_discovered_fixture()
+    early = int(fx["start"]) - 60
+    own = build_source_store(fx, "own", [(FX_SID, fx["events"], FX_EXTRACTED_AT)])
+    two = build_source_store(fx, "two", [(FX_SID, fx["events"], FX_EXTRACTED_AT), (FX_SID_B, fx["earlier"], early)])
+
+    def read_extracted(model):
+        value = parse_record_markdown(rl_record.render_record(model, "memory")).get("Coverage", {}).get(
+            "facts", {}).get("sessions", "")
+        return value.split(" · ")[-1]
+
+    alone = build_model(fx["repo"], store=own)
+    both = build_model(fx["repo"], store=two)
+    check("source AC7: with no transcript local, the earlier session's extract is not read: the Coverage sessions "
+          "fact's extracted count excludes it, and the state is the one the run's own session gives",
+          (read_extracted(both), both.coverage["transcripts"]["state"]),
+          ("1 extracted", alone.coverage["transcripts"]["state"]))
+    extracts, state, _note = rl_model.resolve_run_sessions([], FX_SLUG, {"start": fx["start"] - 7200.0,
+                                                                          "end": fx["end"]}, store=two)
+    check("source AC7 liveness: over a window opening before the earlier session's events, both sessions are "
+          "read and the earlier one's extract turns the state stale, so the store holds what the window keeps out",
+          (sorted(extracts), state, alone.coverage["transcripts"]["state"]), ([FX_SID, FX_SID_B], "stale", "present"))
+    calls = []
+    real = rl_model.ex.extract_session
+
+    def extract_counted(tree, *args, **kwargs):
+        calls.append(tree.sid)
+        return real(tree, *args, **kwargs)
+
+    got = {}
+    rl_model.ex.extract_session = extract_counted
+    try:
+        for name, touched in (("before the start", fx["start"] - 60), ("at the start", fx["start"])):
+            os.utime(fx["earlier_path"], (touched, touched))
+            calls.clear()
+            model = build_model(fx["repo"], store=two, projects=fx["earlier_projects"])
+            got[name] = (calls.count(FX_SID_B), read_extracted(model), model.coverage["transcripts"]["state"])
+    finally:
+        rl_model.ex.extract_session = real
+    check("source AC7: with the earlier session's transcript local, its file last modified before the window's "
+          "start leaves it unextracted, and modified at the start extracts it once and still counts it out",
+          got, {"before the start": (0, "1 extracted", "present"), "at the start": (1, "1 extracted", "present")})
 
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)

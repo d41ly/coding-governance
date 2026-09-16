@@ -538,6 +538,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_discovered_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_edges",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -861,6 +866,16 @@
       "id": "build_source_cited_ids_with_no_record",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "build_source_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_source_store",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_spec_record_index",
@@ -7036,6 +7051,21 @@
       "id": "test_skill_drift_reds",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_source_ac1_transcript_first",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_source_ac3_discovered_order",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_source_ac7_discovered_reach",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_source_cited_ids",

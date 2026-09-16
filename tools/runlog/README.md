@@ -258,6 +258,19 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   otherwise none is reported, and the coverage block's `idle` entry says it was not judged. A gap
   with an owner turn inside it, or within `IDLE_OWNER_GUARD_S` of either end, is kept out and counted
   there, because its endpoints would place that turn.
+- **A session's live transcript is read before its store extract.** Wherever `resolve_session_tree`
+  finds a session's transcript on this machine and its main file opens, the model extracts it in
+  memory; a store extract stands in only where none is local. The extract is a cache of the
+  transcript, and read first a stale one hid every owner turn and call made after it was cut, from
+  the counts and from the idle guard alike. A session discovered by slug in the store is read only
+  when it reaches the window, decided before anything is extracted: with its transcript local it is
+  dropped unread when every file of its tree was last modified before the window's start, and kept
+  once extracted only when an event lies inside the window; with none local, its store extract is
+  kept only when it holds an event inside the window. The store holds every past session of a
+  build, so without this a render would read the build's history, and an earlier run's extract that
+  is never refreshed would read `stale` forever. The sessions kept are the sessions read, for the
+  freshness test and for every count, and the Coverage `sessions` fact's extracted count is their
+  number. A session the journal names is never dropped.
 - **A store extract made before the window's end reads `stale`.** `check_extract_covers` passes an
   extract only when its `extracted_at` is an integer at or after the window's end; a missing field or
   any other value never passes, so an extract written before the field existed is stale until it is
@@ -412,7 +425,11 @@ prefix and root, and hold the render to an independent one.
 - **A call the classifier cannot see.** It is not a shell: `bash -c`, `eval`, a `$(…)` inside quotes,
   an alias and a shell function are not descended into, so a call nested in one is `other`.
 - **Which repository a discovered session ran in.** `--discover` attributes a session to a slug
-  because one of its shell calls ran the driver's preflight for it, and says `heuristic`.
+  because one of its shell calls ran the driver's preflight for it, and says `heuristic`. Nor
+  whether a discovered session the model dropped was the run's: one whose transcript has left this
+  machine, and whose extract was made before it did anything inside the window, looks exactly like
+  an earlier run's session. With no other session kept the transcripts read `not-local`; with one,
+  the counts are short by that session.
 - **That a background call ended.** One whose notification never arrived keeps a null end.
 - **Whether the model's inferences are right.** The build commit, the owner's decision-log rows, an
   unmet acceptance line, a close's head and a session's attribution are heuristics, and `method` says
