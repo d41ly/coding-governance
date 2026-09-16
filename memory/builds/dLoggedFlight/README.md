@@ -107,11 +107,11 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15
 | [TOOL-dLoggedFlight-15 — a row an owner act can cause carries no time that places the act](spec/2026-09-16-spec-TOOL-dLoggedFlight-15.md) | 15 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -100,3 +100,5 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T12:25:34Z rescope · item add TOOL-dLoggedFlight-14 · reason closing review round 2 NON-CONVERGENT, R2-B1 promoted: a stale store extract reads present, so the owner-time guard runs on turns the extract lacks
 
 2026-09-16T12:25:35Z rescope · item add TOOL-dLoggedFlight-15 · reason closing review round 2 NON-CONVERGENT, R2-H1 promoted: rows an owner act causes carry that act's time into the committed record
+
+2026-09-16T12:54:38Z review · item dLoggedFlight-spec-set-r4 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
