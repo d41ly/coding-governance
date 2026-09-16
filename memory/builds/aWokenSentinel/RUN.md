@@ -23,3 +23,5 @@ anchor-ref: refs/heads/main
 base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 
 ## Parked
+
+2026-09-16T12:00:05Z rescope · item add TOOL-aWokenSentinel-7 · reason Measured 2026-09-16: the Stop hook's stdin carries session_crons, the cron store no script can reach. keepalive-reaped stops being an attestation (TOOL-aPromptedMandate-11, OPEN since 08-18) and becomes a check against the last stop the hook recorded. Discovered by unit 3's probe; a second mechanism, so its own unit, ordered last.

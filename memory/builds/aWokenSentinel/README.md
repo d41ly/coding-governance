@@ -7,7 +7,7 @@ roster: TOOL
 status: OPEN
 parents: aPrimedKeepalive aProbedUnit
 authorized-by: prompt
-ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6
+ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7
 ---
 
 # aWokenSentinel — a keepalive that lives outside the failure domain of the run it keeps alive
@@ -43,7 +43,7 @@ research record under `build/`.
 - **No self-test suite runs inside a pass.** A pass observes the single arm or the staged break; `run-unattended-gates.sh` runs once, at the close, on a frozen clone.
 - **Vocabulary changes land in every carrier in one commit**: driver, leg, VERBS, SKILL, protocol, conf and its example.
 - **The CLI token is the owner's**, minted out of band; unit 5 ships inert until registered and reports an absent login as an announced skip, never a pass.
-- **Classification at open**: all six MISSING; specced by the harness's SPEC stage from the briefs under `prompts/`.
+- **Classification at open**: all MISSING; specced by the harness's SPEC stage from the briefs under `prompts/`. Unit 7 was ADDED after preflight by `--rescope`, on the measured `session_crons` field.
 
 ## Parked decisions
 
@@ -59,18 +59,19 @@ research record under `build/`.
 | 4 | `TOOL-aWokenSentinel-4` | PLANNED | `stall-recorder`: a `StopFailure` hook that writes the stall to a sidecar under the git dir |
 | 5 | `TOOL-aWokenSentinel-5` | PLANNED | `resume-tick.sh`: the OS-scheduled out-of-process resumer, acting on a stale lease only |
 | 6 | `TOOL-aWokenSentinel-6` | PLANNED | the contract: protocol §5, the Skill, the conf knobs and the kit version, with the cron job demoted to the idle-wake |
+| 7 | `TOOL-aWokenSentinel-7` | PLANNED | `keepalive-reaped` becomes CHECKED at `--close` against the cron listing the stop-guard recorded, no longer attested |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-16 · streams tooling
-ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6
+ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -131,14 +131,32 @@ task runs whether or not the user is logged on" — measured false for the unele
   stalls are E, and aGroundedOrientation re-parked after being told to proceed.
 - **Attempts capped** for the tick, recorded per run, with the cap itself the fallback's trigger.
 
-## 6. Unresolved, and what decides each
+## 6. Resolved on 2026-09-16, node `a`, with the CLI logged in (basis: measured)
+
+Three `claude -p` turns in a scratch project under the session scratchpad, each bounded by
+`timeout` and `--max-turns`, a logging `Stop` and `SubagentStop` hook in its `.claude/settings.json`;
+the transcripts and the project were deleted afterwards.
+
+- **`Stop` blocks and continues.** A hook printing `{"decision":"block","reason":"…"}` on exit 0
+  turned `say 1` into 1 → 2 → 3; the reason reaches the model as a user turn headed
+  `Stop hook feedback:`. The third stop, with the hook silent, ended the run. 16 s wall.
+- **`Stop`'s stdin carries, beyond `session_id` and `transcript_path`:** `cwd`, `permission_mode`,
+  `effort`, `hook_event_name`, `stop_hook_active` (false on the first stop, true on every
+  continuation), `last_assistant_message`, **`background_tasks`** and **`session_crons`** — the
+  hook can see the pending background tasks and the cron store that no script could reach. This
+  is what makes `keepalive-reaped` checkable rather than attested, and unit 7 was added for it.
+- **`Stop` fires for the MAIN agent only.** A sub-agent's end fires `SubagentStop`, whose stdin
+  adds `agent_id`, `agent_transcript_path` and `agent_type`, under the PARENT's `session_id`. So a
+  `Stop` hook can never trap a Workflow or Agent child.
+- **`claude -p --resume <sid>` returns the session's context** ("1, 2, 3") under the same id, and
+  `-p` warns after 3 s with no stdin — a resumer redirects `</dev/null`.
+- **Two concurrent resumers on one transcript both complete.** Each wrote its line, both replied,
+  and the transcript parsed with zero unparseable lines afterwards. The harm is not corruption: it
+  is two agents holding one run, which is why the tick kills the recorded tree before resuming.
+
+Still open, and where each goes:
 
 - Whether a pending Agent, Workflow or background Bash blocks the cron tick: owner-reported,
-  unmeasured. Decided by one idle turn with a background sleep and a two-minute one-shot job.
-- Two concurrent `claude -p --resume` writers on one transcript: unmeasured (auth blocked the
-  probe on 09-13; the CLI is logged in as of 09-16). Decided by the probe in unit 5's spec.
-- Whether `Stop` fires in a Workflow sub-agent (`SubagentStop` is documented as the sub-agent
-  event): decided by unit 3's probe before its hook is wired.
-- Which fields `StopFailure`'s stdin carries beyond `session_id`: unit 4's hook records the whole
-  compact JSON line so it assumes none.
-- Whether `stop_session` unsticks a hung tool call: not needed; the watchdog session is rejected.
+  unmeasured; one idle turn with a background sleep decides it. Backlog, not this build.
+- Which fields `StopFailure`'s stdin carries: unit 4's hook records the whole compact JSON line and
+  assumes none beyond `session_id`.
