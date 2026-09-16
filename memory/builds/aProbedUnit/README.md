@@ -103,4 +103,5 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aRatifiedRulings](../aRatifiedRulings/README.md)
+- **Child builds:** [aWokenSentinel](../aWokenSentinel/README.md)
 <!-- /gen:build-edges -->
