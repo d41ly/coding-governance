@@ -2019,6 +2019,41 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          still prints. Probed over the real tree first: three hits, all in the review-harness
     #          kit, the three the review named plus the descriptor sentence it offered as the model,
     #          and no near-miss.
+    #
+    #          THE INVERTED POPULATION, DEPL-cMendedVintage-8. Everything above opens by skipping a
+    #          descriptor that declares no [[regenerate]], so its population is the kits that ALREADY
+    #          have the block and what it grades is their prose. The kits that NEED one are exactly
+    #          the ones it cannot see — a predicate whose population excludes every instance of the
+    #          defect it names. So the join runs first, over the same descriptor map: a descriptor
+    #          shipping any `role = "rendered"` row and declaring no [[regenerate]] is a refusal,
+    #          because `update` can only report those rows and the adopter's copies go one vintage
+    #          stale at every update with nothing able to refresh them. It is the same predicate
+    #          `update` already applies to decline a kit at install time, asserted here over gov's
+    #          own registry so the defect cannot ship in the first place.
+    #
+    #          WHAT THIS HALF DOES NOT CHECK. Only that a block is DECLARED — not that its argv
+    #          exists, runs, or re-renders the rows the rule names; the outcome probes and the
+    #          `update` verb own that. Nor does it refuse the mirror shape, a declared regenerate
+    #          over no rendered row: that argv runs and re-renders nothing, which is harmless. There
+    #          is no waiver, deliberately: a kit that genuinely wants an unrefreshable rendered row
+    #          has no escape until one exists to write it for.
+    n_rr_rendered = n_rr_rendered_declared = 0
+    for eid, (d, _dpath) in descs.items():
+        n_rendered = sum(1 for _row in (d.get("files") or [])
+                         if str((_row or {}).get("role")) == "rendered")
+        if not n_rendered:
+            continue
+        n_rr_rendered += 1
+        if d.get("regenerate"):
+            n_rr_rendered_declared += 1
+            continue
+        r.fail(f"entry '{eid}' ships {n_rendered} `rendered` row(s) and declares no [[regenerate]] "
+               f"— `update` can only REPORT those rows, so every adopter's copy goes one vintage "
+               f"stale at the first update and nothing can refresh it. Declare the block, or give "
+               f"the kit a render entrypoint first and then declare it")
+    r.note(f"rendered rows: {n_rr_rendered} descriptor(s) ship at least one, "
+           f"{n_rr_rendered_declared} of those declare [[regenerate]]")
+
     _rr_lead = re.compile(r"^\s*(#+|//+|\*+|>+|-\s)?\s?")
     _rr_split = re.compile(r"(?<=[.!?])\s+(?=[A-Z`(\"'*_])")
     _rr_update = re.compile(r"\bupdate\b", re.I)
@@ -2034,7 +2069,13 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         _home = (d.get("home") or "").rstrip("/")
         _ls = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", f"{_home}/"],
                              capture_output=True, text=True, check=False).stdout.split("\0")
-        _rel_d = pathlib.Path(dpath).resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
+        # `root / dpath`, not `pathlib.Path(dpath)`: the descriptor path is repo-relative and a bare
+        # `.resolve()` anchors it to the PROCESS CWD. `repo_root()` walks up from this file and
+        # inherits nothing, so `selfcheck` is meant to run from any directory — and from any
+        # directory but the gov checkout this line raised ValueError on the first kit declaring a
+        # [[regenerate]], which is every kit that ships a rendered row. Found by the control fixture
+        # of DEPL-cMendedVintage-8, whose scratch tree is not the cwd.
+        _rel_d = (root / dpath).resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
         for _f in sorted({x for x in _ls if x} | {_rel_d}):
             try:
                 _text = (root / _f).read_text(encoding="utf-8")

@@ -119,3 +119,11 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T20:15:07Z brief · item DEPL-cMendedVintage-7 · reason 3f486e666da1 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-7-2-build-brief.md
 
 2026-09-16T20:20:15Z dispatch · item 0ddee337 DEPL-cMendedVintage-7 · reason tools/govkit/govkit.py,tools/govkit/selftest.py,tools/drift-audit/kit.toml,tools/lexicon/kit.toml,tools/memory-recall/kit.toml,tools/memory-tree/kit.toml,tools/unattended/kit.toml,tools/workflows/kit.toml,tools/workflows/README.md,tools/workflows/check-protocol-parity.test.sh,tools/workflows/unattended-build.test.sh,WIRE-INTO-PROJECT.md,memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-7.md,memory/builds/cMendedVintage/RUN.md,memory/LIVE.md
+
+2026-09-16T20:32:09Z dispatch · item e6612579 DEPL-cMendedVintage-8 · reason tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-09-16T20:32:10Z brief · item DEPL-cMendedVintage-8 · reason 9107164ffeb8 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-8-2-build-brief.md
+
+2026-09-16T20:35:38Z dispatch · item e6612579 DEPL-cMendedVintage-8 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-8.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-16T20:42:30Z dispatch · item e6612579 DEPL-cMendedVintage-8 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-8.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md

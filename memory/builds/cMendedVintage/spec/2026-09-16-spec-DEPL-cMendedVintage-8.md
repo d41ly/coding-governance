@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-8 — a descriptor shipping `rendered` rows must declare a regenerate
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 11
+**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-8-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-8-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -32,13 +33,18 @@ themselves, with no new declaration and no new file.
   registry entry, no waiver file, no exemption key. A kit that genuinely wants a rendered row with no
   regenerate has no escape here, which is the point: at BASE there are four such kits and every one
   is a live defect. Observed by AC1.
-- **S4** A failing case is observed before this lands: a scratch copy of the tree with one
-  `[[regenerate]]` block removed reds `selfcheck`, and the unmodified tree does not. Observed by AC3.
+- **S4** A failing case is observed before this lands, on a PURPOSE-BUILT fixture rather than by
+  editing a shipped descriptor: a scratch gov tree carrying one entry whose descriptor has a rendered
+  row and no `[[regenerate]]` reds `selfcheck`, and the same descriptor with the block declared does
+  not. Observed by AC3. rev-2 states the fixture; rev-1 said "a scratch copy of the tree with one
+  block removed", which stages the break inside a real kit's descriptor.
 
 ## 3. Non-goals (OUT)
 
 - No change to arm 7l's existing prose checks. The claim sentence and the silence sentence keep their
-  predicates, their population and their notes.
+  predicates, their population and their notes. rev-2 amends this: one line of that half's PATH
+  RESOLUTION moved, because the control fixture found it crashing. No predicate, population or note
+  moved with it. See section 9.
 - No waiver mechanism. Adding one before a single case needs it would ship an escape from a rule
   whose whole value is that it has none.
 - No refusal for the mirror shape — a descriptor declaring a regenerate while shipping no rendered
@@ -110,8 +116,8 @@ then repaired has never been run against a tree that is otherwise clean.
 - risks — the arm could red a kit legitimately shipping a rendered row it never refreshes. At BASE no
   such kit exists, and the four it names are all defects. Section 3 records that no waiver ships
   until one does.
-- testing — AC1 and AC2 run the checker directly; AC3 runs it against a scratch copy with the break
-  staged.
+- testing — AC1 and AC2 run the checker directly; AC3 runs it against a purpose-built scratch gov
+  tree whose descriptor carries the break.
 - migration — none.
 - user docs — the arm's own header comment states what it does not check, per the gate rule; no page
   changes.
@@ -131,12 +137,15 @@ then repaired has never been run against a tree that is otherwise clean.
   declare a regenerate.
   Red when: the note is printed only inside the failure branch, which makes a clean run silent and a
   broken predicate indistinguishable from a satisfied one.
-- **AC3** — When one `[[regenerate]]` block is removed from a descriptor in a scratch copy of this
-  tree and `python tools/govkit/govkit.py selfcheck` runs there, it fails naming that kit; restoring
-  the block makes the same command exit 0.
-  Red when: the predicate reads the key on the wrong object, so removing a real block changes
+- **AC3** — When `python tools/govkit/govkit.py selfcheck` runs against a scratch gov tree whose one
+  entry's descriptor carries a rendered row and no `[[regenerate]]`, it fails naming that kit; the
+  same descriptor with the block declared makes the same command exit 0.
+  Red when: the predicate reads the key on the wrong object, so a descriptor with no block changes
   nothing and the arm has never been seen to fire.
-  fixture: a scratch copy of the tree under the run's scratch root, never the worktree itself.
+  fixture: a scratch gov tree under the run's scratch root, built from the suite's own
+  `build_scratch_gov_kit`, never the worktree itself and never a shipped descriptor edited in place.
+  A fixture proves the mechanism only for the fixture's own values, so AC1's second half is what
+  proves it over the SHIPPED descriptors.
 - **AC4** — When `python tools/check-kit-placeholders.py` runs, it exits 0, confirming this arm did
   not change which rules the placeholder join reads.
   Red when: the new predicate mutates the descriptor dictionaries it walks, which the placeholder
@@ -160,6 +169,25 @@ move.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · AC3's CONTROL fixture — the first descriptor in the suite to declare a
+  `[[regenerate]]`, and therefore the first to reach arm 7l's prose half on a scratch tree — died
+  with a `ValueError` instead of passing. That half resolved the repo-relative descriptor path
+  against the PROCESS CWD rather than against the tree being checked, and `repo_root()` walks up
+  from the script's own file and inherits nothing, so `selfcheck` is meant to run from any
+  directory. Reproduced at BASE from `C:/Temp`: `ValueError: 'C:\Temp\tools\memory-tree\kit.toml'
+  is not in the subpath of ...`, raised on the first kit declaring a block, which here is every kit
+  that ships a rendered row. So the divergence from section 3's non-goal is one operand,
+  `pathlib.Path(dpath)` to `root / dpath`, and the sentence predicates, the population and the two
+  notes are byte-identical. It is left-shifted by the same control arm: the fixture is the only
+  exerciser of that code path outside gov's own checkout, and it reds without the fix.
+- rev-2 · 2026-09-16 · S4 and AC3 restated. rev-1 asked for "a scratch copy of the tree with one
+  `[[regenerate]]` block removed", which stages the break inside a shipped descriptor; the build
+  brief forbids that, and it is the wrong shape anyway — a fixture proves a mechanism only for the
+  fixture's own values. What was built is a purpose-built scratch gov tree, and AC1's second half is
+  what carries the mechanism onto the SHIPPED descriptors: the arm as committed, run against a
+  detached worktree at base 859daa67, exits 1 naming `memory-tree` with 4 rendered rows, and
+  `memory-recall`, `drift-audit` and `lexicon` with 1 each, its note reading 6 shipping and 2
+  declaring. At this unit's tip the same command exits 0 and the note reads 6 and 6.
 
 ## 10. Reuse audit
 

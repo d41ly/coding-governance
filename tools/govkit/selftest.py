@@ -2561,6 +2561,54 @@ user_skills = "/tmp/gk-fake-skills"
             check("a rendered rule whose entry has a blocks_adopt hole is an ORDER",
                   row.strip().startswith("ORDER"), row or blk.stdout)
 
+            # ---- DEPL-cMendedVintage-8: A `rendered` ROW WITH NO `[[regenerate]]` IS A REFUSAL ----
+            # Arm 7l's prose half opens by skipping every descriptor that declares no block, so the
+            # population it grades is the kits that ALREADY have one and the kits that NEED one are
+            # exactly the ones it cannot see. The refusal that inverts that population has no
+            # exerciser in gov's own tree — every descriptor shipping a rendered row declares a
+            # block, which is the state this gate exists to HOLD — so it is armed on a fixture, and
+            # the control below is what stops it being a ban on rendered rows. A fixture proves a
+            # mechanism only for the fixture's own values, so the predicate was also run over the
+            # SHIPPED descriptors at this build's base: it exited 1 there naming four real kits, one
+            # of them with four rendered rows. That run is in the spec; it cannot live here, because
+            # the tree it measured is the one this build repaired.
+            #
+            # The fixture claims its own non-rendered files with a second rule on purpose: without
+            # it the tree reds on the per-file claim arm instead, and the control would then be
+            # green-by-absence of a passing tree rather than by the block being declared.
+            _rr_desc = ('id = "demo"\nhome = "tools/demo"\n'
+                        'version_from = { none = "fixture" }\n\n'
+                        '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n'
+                        'to = "docs/demo.md"\n\n'
+                        '[[files]]\ninclude = ["adopt-demo.sh", "kit.toml"]\nrole = "engine"\n\n'
+                        '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'
+                        'mutates_index = false\n')
+            _rr_bad = run_in(build_scratch_gov_kit("rendered-no-regen", _rr_desc))
+            check("AC1 a descriptor shipping a `rendered` row and declaring no [[regenerate]] REDS",
+                  _rr_bad.returncode == 1
+                  and "ships 1 `rendered` row(s) and declares no [[regenerate]]" in _rr_bad.stdout,
+                  _rr_bad.stdout + _rr_bad.stderr)
+            check("AC1 ...and the refusal names the kit and what goes stale, not just the rule",
+                  "entry 'demo'" in _rr_bad.stdout and "one vintage stale" in _rr_bad.stdout,
+                  _rr_bad.stdout)
+            # THE NOTE IS THE LIVENESS ASSERTION and it is asserted on the RED run too: a join that
+            # reports nothing is indistinguishable from a predicate that matched nothing.
+            check("AC2 ...and the note counts both sides of the join",
+                  "rendered rows: 1 descriptor(s) ship at least one, 0 of those declare"
+                  in _rr_bad.stdout, _rr_bad.stdout)
+            _rr_ok = run_in(build_scratch_gov_kit(
+                "rendered-regen",
+                _rr_desc + '\n[[regenerate]]\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'))
+            check("AC3 CONTROL: the same descriptor with the block declared is GREEN, and the note "
+                  "prints on a clean run",
+                  _rr_ok.returncode == 0
+                  and "rendered rows: 1 descriptor(s) ship at least one, 1 of those declare"
+                  in _rr_ok.stdout, _rr_ok.stdout + _rr_ok.stderr)
+            # This control is also the only arm in the suite that reaches arm 7l's prose half on a
+            # fixture — it is the first descriptor here to declare a block — and at BASE it died
+            # with a ValueError, because that half resolved the repo-relative descriptor path
+            # against the PROCESS CWD rather than against the tree being checked.
+
         # ========== DEPL-dCarriedReceipt-12: write preconditions and the outbox lock ==========
         # EVERY arm below was observed RED on a real scratch target before the engine moved. At the
         # base sha: in a LINKED WORKTREE both verbs walked straight through a live MERGE_HEAD,
