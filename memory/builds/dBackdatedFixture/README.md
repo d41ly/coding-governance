@@ -58,15 +58,15 @@ invent an identity for it. `update`'s S9 integrity check refuses that receipt, a
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node d · opened 2026-09-16 · streams deployer
+**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-09-16 · streams deployer
 ids DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | OPEN | rev-3 | 2026-09-16 |
-| [DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed](spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-16 |
-| [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed](spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 2 record folder(s).

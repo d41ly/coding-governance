@@ -1,6 +1,6 @@
 # DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed
 
-**Status:** OPEN · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 2
+**Status:** INPROGRESS · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -54,7 +54,8 @@ In the `verrefresh` block, after the sentinel loop and before `update --write`, 
 `_added = [f for f in files if f["path"] not in _held]`. The existing three arms keep their labels
 and predicates, grading the scoped `_moved`; the third gains `len(_moved) > 0 and`. One new arm:
 `[dBF] LIVENESS the write ADDED a row the sentinel never touched, so the scoping excludes something`,
-asserting `len(_added) > 0`, with the added paths in its detail.
+asserting `len(_added) > 0`. `check()` prints a detail only on FAIL, so its detail names what a red
+needs: the receipt's paths after the write and the `_held` set before it.
 
 ### Inventory
 
@@ -76,8 +77,8 @@ No new function. One new arm label, prefixed `[dBF]`.
 - security — N/A — a test arm; no product write path changes.
 - perf / scale — N/A — one extra set built from rows already read.
 - error / empty / loading states — S2 and S3 are the empty-population guards.
-- observability — the liveness arm prints the added paths, so a red names what the write did or did
-  not add.
+- observability — a red liveness arm prints the receipt's paths and the pre-write set, so it names what
+  the write failed to add. A green arm prints nothing, as every `check()` arm does.
 - risks — S2 reds if `update --write` over `verrefresh` ever lands nothing new, for instance once
   `check-wiring` stops shipping a file `24f39915` lacked. That red is the fixture reporting that it no
   longer exercises the scoping, which is the intent.
@@ -92,8 +93,10 @@ No new function. One new arm label, prefixed `[dBF]`.
   `FAIL` while the added row is still present in `install.json`.
   Red when: `_moved` admits a row the receipt did not hold before the write.
 - **AC2** — When `update --write` runs over the `verrefresh` fixture, the `[dBF]` liveness arm reads
-  `ok` and its detail names `tools/check-wiring.fragment.json`, and under AC1's staged break it still
-  reads `ok`.
+  `ok`, and under AC1's staged break it still reads `ok`. With a `continue` staged as the first
+  statement of the unclaimed-source landing loop in `govkit.py` (`for _dest, _row0 in sorted(...)`), it
+  reads `FAIL` with the receipt's paths and `_held` in its detail, while the first two `[dGV-9]` arms
+  still read `ok`.
   Red when: the write adds no row, or the arm is computed from `_moved` instead of the pre-write set.
 - **AC3** — When `_moved` is empty, the third `[dGV-9]` arm reads `FAIL`. AC1's staged break empties
   it, because both held rows keep the sentinel, so under that break all three `[dGV-9]` arms read `FAIL`
@@ -104,7 +107,8 @@ No new function. One new arm label, prefixed `[dBF]`.
 
 `govkit selftest` · `lexicon naming predicates`
 
-New arm: tools/govkit/selftest.py · `[dGV-9]` scoping and `[dBF]` liveness, staged RED by deleting the `version` refresh at `govkit.py:6814` · none
+New arm: tools/govkit/selftest.py · `[dGV-9]` scoping, staged RED by deleting the `version` refresh at `govkit.py:6814` · none
+New arm: tools/govkit/selftest.py · `[dBF]` liveness, staged RED by a `continue` at the top of `update`'s unclaimed-source landing loop · none
 
 ## 8. Open questions
 
@@ -114,6 +118,11 @@ none
 
 - rev-1 · 2026-09-16 · promoted from spec audit round 1's BLOCKER B1 on `DEPL-dBackdatedFixture-1`,
   carrying rev-2's S4 and AC5 of that spec.
+- rev-2 · 2026-09-16 · §4 · §5 · AC2 · §7 · folded spec audit round 1 of units 2 and 3 (CLEAN WITH
+  FIXES, 5 confirmed of 19). M1: the liveness arm gets its own staged break, a `continue` in the
+  unclaimed-source landing loop, because the 6814 break leaves it green by design. M2: `check()` prints
+  a detail only on FAIL, so AC2 no longer claims an `ok` line names a path, and the detail is what a
+  red needs.
 
 ## 10. Reuse audit
 

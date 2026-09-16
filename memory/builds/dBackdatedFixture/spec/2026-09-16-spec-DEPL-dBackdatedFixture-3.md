@@ -1,6 +1,6 @@
 # DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor
 
-**Status:** OPEN · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 3
+**Status:** INPROGRESS · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -28,7 +28,9 @@ contract: the expectation comes from the descriptors. It is round 1's HIGH H1, p
   `writes` with a `src`. Observed by AC1.
 - **S2** — Each arm asserts its figure is non-zero and appears in `check`'s stdout in the shape `check`
   prints: `integrity: N/N`, `provenance: P/P`, `sidecar: H line(s) compared against H hashed row(s)`.
-  The arm labels are unchanged. Observed by AC1, AC2, AC3 and AC4.
+  The arm labels are unchanged. The shape is observed by AC1, AC2, AC3 and AC4. The non-zero floor is
+  NOT OBSERVED: every criterion runs with N = P = H = 3, and a zero needs a descriptor that ships no
+  file, which no break here constructs. It stays as a guard against a vacuous `N/N` of `0/0`.
 - **S3** — No literal count remains in the three arms. Observed by AC1.
 - **S4** — When this unit and `DEPL-dBackdatedFixture-1` are built, the suite's closing line reads
   `govkit-selftest: all arms held`. Observed by AC5.
@@ -79,7 +81,7 @@ No new function. No new arm label.
 
 - security — N/A — a test arm; no product write path changes.
 - perf / scale — N/A — one descriptor read and one in-process expansion.
-- error / empty / loading states — each figure carries a non-zero floor.
+- error / empty / loading states — each figure carries a non-zero floor, unobserved, as S2 states.
 - observability — each arm's detail stays `check`'s full stdout, which prints all three figures.
 - risks — a defect in `resolve_entry` moves the expectation with the install and is not caught here;
   selfcheck's own descriptor arms are where that lives.
@@ -123,6 +125,8 @@ none
 
 - rev-1 · 2026-09-16 · promoted from spec audit round 1's HIGH H1 on `DEPL-dBackdatedFixture-1`, with
   that record's M1 fold: one staged break per figure plus a receipt-shrink break.
+- rev-2 · 2026-09-16 · S2 · §5 · folded spec audit round 1 of units 2 and 3 (CLEAN WITH FIXES). L1:
+  the non-zero floor is marked NOT OBSERVED, since every criterion runs with a figure of 3.
 
 ## 10. Reuse audit
 

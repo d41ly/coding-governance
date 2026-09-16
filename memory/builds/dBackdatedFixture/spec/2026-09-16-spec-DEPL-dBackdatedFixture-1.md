@@ -1,6 +1,6 @@
 # DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced
 
-**Status:** OPEN · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
+**Status:** INPROGRESS · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
