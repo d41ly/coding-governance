@@ -126,9 +126,9 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLogg
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 25 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 4 record folder(s).
+Records: 24 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24.
+Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 
 Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24.
 <!-- /gen:build-index -->
