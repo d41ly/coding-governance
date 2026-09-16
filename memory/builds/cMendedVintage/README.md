@@ -116,7 +116,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires](spec/2026-09-16-spec-DEPL-cMendedVintage-4.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-16 |
 | [DEPL-cMendedVintage-5 — `[[regenerate]]` for the three kits whose adopter already renders](spec/2026-09-16-spec-DEPL-cMendedVintage-5.md) | 6 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-16 — the lexicon outcome block cannot accept a failed first scaffold](spec/2026-09-16-spec-DEPL-cMendedVintage-16.md) | 7 | 2 | CLOSED | rev-2 | 2026-09-16 |
-| [TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path](spec/2026-09-16-spec-TOOL-cMendedVintage-1.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path](spec/2026-09-16-spec-TOOL-cMendedVintage-1.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-16 |
 | [DEPL-cMendedVintage-6 — the fixture records are rendered per prefix, so nothing deletes them](spec/2026-09-16-spec-DEPL-cMendedVintage-6.md) | 9 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-7 — `GOVKIT_RERENDER` defaults ON, and `=0` becomes the revert](spec/2026-09-16-spec-DEPL-cMendedVintage-7.md) | 10 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-8 — a descriptor shipping `rendered` rows must declare a regenerate](spec/2026-09-16-spec-DEPL-cMendedVintage-8.md) | 11 | 2 | SPECCED | rev-1 | 2026-09-16 |
@@ -141,7 +141,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-21 — the atomic write is one helper, and something fails when it is absent](spec/2026-09-16-spec-DEPL-cMendedVintage-21.md) | 30 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-15 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 

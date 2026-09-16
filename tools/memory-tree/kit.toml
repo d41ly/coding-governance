@@ -80,6 +80,29 @@ defaults = { MEMORY_ROOT = "memory" }
 argv = ["bash", "{kit}/adopt-memory-tree.sh", "--scaffold"]
 mutates_index = true
 
+# `--render` AND NOT THE `[adopt]` ARGV, which is the whole reason this block exists. `--scaffold`
+# takes one of exactly two branches on an adopted tree and NEITHER re-renders: the marker branch
+# prints `already scaffolded — nothing to do` and exits 0, and a marker-less root is refused. So the
+# four `rendered` rows below — `{memory_root}/HYGIENE.md`, `{memory_root}/TEMPLATE-SPEC.md`,
+# `{memory_root}/guides/BUILD-METHOD.md` and `{memory_root}/guides/ANNOTATION-STYLE.md` — had no verb
+# able to refresh them, and went one vintage stale on every pull. `--render` skips the adoption guard,
+# requires the `gov:kit memory-tree@` marker instead, and writes those four and nothing else.
+#
+# GATED BY `GOVKIT_RERENDER`, like every block of this kind: with that flag unset the re-render step
+# is declined, so a `govkit update` refreshes nothing here and still relabels each moved `rendered`
+# row `re-rendered` before the flag is ever read. Reachable by hand at any time.
+#
+# SAFE TO RE-RUN for the reason the mode was cut this narrow: it seeds no conf, writes no waiver
+# registry, creates no directory beyond a destination's own parent, and leaves a file whose render is
+# already current byte-identical and unmentioned. It cannot reset a measured pin, because it never
+# touches a file that holds one.
+#
+# NO `[[outcome]]` PAIR. `--render` exits 1 only on a tree already carrying `{memory_root}/HYGIENE.md`
+# without the marker — the state `refused-foreign-tree` below already classifies — or on the missing
+# conf the `[adopt]` argv refuses on identically. Neither is re-adjudicated here.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
+
 [[outcome]]
 code = 1
 probe = { must_exist = ".memory-tree.conf", must_not_exist = "{memory_root}/HYGIENE.md" }
@@ -130,7 +153,7 @@ discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
 none = """
-the adopter accepts only `--scaffold`, measured. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
+the adopter's two modes both WRITE — `--scaffold` creates a tree and `--render` rewrites the four rendered rows — so neither can stand in for a read-only probe. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
 """
 
 [[gate_leg]]

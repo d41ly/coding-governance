@@ -1,12 +1,13 @@
 # TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 8
+**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-TOOL-cMendedVintage-1-2-build-brief.md](../prompts/2026-09-16-prompt-TOOL-cMendedVintage-1-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -30,7 +31,8 @@ guard, re-renders those four files and nothing else, and declare that mode as th
   carry the scaffold's create-from-nothing fallback into `--render`: the `else` at
   `tools/memory-tree/adopt-memory-tree.sh:109`, which writes a one-line `HYGIENE.md` stub when
   `$HERE/HYGIENE.template.md` is absent, becomes a refusal under `--render` and keeps its create
-  behaviour under `--scaffold` alone. Observed by AC2 and AC6.
+  behaviour under `--scaffold` alone. Under `--render` an absent template refuses for ALL FOUR rows
+  (rev-3), before the first write, so a partial set is never left on disk. Observed by AC2 and AC6.
 - **S3** `--render` runs after the existing `.memory-tree.conf` and `READINESS_ROWS` refusals and
   after the placeholder derivations, requires the adoption marker — a `gov:kit memory-tree@` line in
   the tree's `HYGIENE.md` — and exits 1 naming `--scaffold` when the marker is absent. It creates no
@@ -53,8 +55,9 @@ guard, re-renders those four files and nothing else, and declare that mode as th
 - No new outcome block in the descriptor. `--render` exits 1 only where the tree already carries
   `HYGIENE.md` — the case the existing `refused-foreign-tree` outcome classifies — or where the conf
   is missing, which is the `[adopt]` argv's own pre-existing refusal and is not re-adjudicated here.
-- No change to `check-memory-hygiene.sh`, to the templates themselves, or to what any of the four
-  rendered files says.
+- No change to what `check-memory-hygiene.sh` CHECKS, to what the templates say, or to what any of
+  the four rendered files says. S6's version constant and the `gov:kit memory-tree@` markers that
+  pair with it live in those files and do move — that is the bump, not a behaviour change (rev-3).
 
 ### Edges
 
@@ -75,7 +78,7 @@ adoption guard, and `render_doc` consumes exactly those. So the render set is se
 scaffold with no new derivation: the mode branch sits between the conf refusals and the guard.
 
 ```
-MODE=${1:---scaffold}                # --scaffold | --render, anything else is the usage refusal
+MODE=${1:-}                          # --scaffold | --render; anything else, INCLUDING nothing, is the usage refusal
 … conf + READINESS_ROWS refusals (unchanged) …
 if [ "$MODE" = "--render" ]; then
   <marker present?> || exit 1        # names --scaffold in the message
@@ -204,6 +207,24 @@ three refusals are observed once, by AC1 through AC3, on the fixture those crite
   would have carried the scaffold's create-from-nothing `else` into `--render`, where it overwrites
   an adopter's committed `HYGIENE.md`. S2 makes that branch a refusal under `--render`, §5 records
   the class, and AC6 stages an absent template.
+- rev-3 · 2026-09-16 · §4 · S1 · S2 · AC2 · three divergences taken at build time, each here before
+  the code was written.
+  §4's sketch defaulted a missing mode word to `--scaffold`. REFUSED: a bare invocation is a usage
+  refusal today, §3 says `--scaffold`'s refusals are untouched, and defaulting a missing word to the
+  verb that CREATES a tree is a widening nobody asked for. `MODE=${1:-}` and the mode word stays
+  required.
+  S2 named only `HYGIENE.template.md`'s `else` as the refusal. WIDENED: `render_all` refuses under
+  `--render` when ANY of the four templates is absent, and refuses BEFORE the first write. The three
+  siblings have no `else` at all — an absent template there means the row is silently skipped, which
+  is the permanently-stale-row failure S2 and §5 exist to close, one file over. Refusing early is
+  also what makes AC6's "writes nothing" true of the whole set rather than of the first destination.
+  AC2's fixture truncates the SECOND rendered row, not the first. Measured: truncating
+  `HYGIENE.md` removes the adoption marker with it, so S3's guard refuses the re-render — correctly,
+  and that is AC3's case, not AC2's. AC2 says "one of the four"; it is now the second one.
+  §3's third non-goal read "no change to `check-memory-hygiene.sh`, to the templates themselves",
+  which S6 contradicts: the version constant lives in the first and its paired marker in all four
+  templates, and AC5 grades exactly that pair. Reworded to say what it meant — no change to what
+  those files CHECK or SAY.
 
 ## 10. Reuse audit
 

@@ -95,3 +95,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T19:18:43Z dispatch · item 9597176f DEPL-cMendedVintage-16 · reason tools/lexicon/kit.toml tools/govkit/matrix.py tools/lexicon/README.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-16.md memory/LIVE.md
 
 2026-09-16T19:24:45Z dispatch · item 9597176f DEPL-cMendedVintage-16 · reason tools/lexicon/kit.toml tools/govkit/matrix.py tools/lexicon/README.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-16.md memory/builds/cMendedVintage/README.md
+
+2026-09-16T19:32:00Z dispatch · item 52f1612f TOOL-cMendedVintage-1 · reason tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/kit.toml
+
+2026-09-16T19:32:02Z brief · item TOOL-cMendedVintage-1 · reason d54944afbe21 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-TOOL-cMendedVintage-1-2-build-brief.md
+
+2026-09-16T19:36:13Z dispatch · item 52f1612f TOOL-cMendedVintage-1 · reason tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/kit.toml tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/README.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/BUILD-METHOD.template.md tools/memory-tree/ANNOTATION-STYLE.template.md memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides/BUILD-METHOD.md memory/guides/ANNOTATION-STYLE.md memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-1.md memory/LIVE.md
