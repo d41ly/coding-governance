@@ -5902,8 +5902,14 @@ user_skills = "/tmp/gk-fake-skills"
         _14_GUARD_UNWIRED = ('test -f "$d/wired.marker" || exit 1\n'
                              "exit 0\n")
 
-        def build_kit14(eid: str, arm: str) -> str:
-            """One fixture descriptor. `arm` selects which `[check]` SHAPE it declares."""
+        def build_kit14(eid: str, arm: str, extra: str = "", adopt: str = "[]") -> str:
+            """One fixture descriptor. `arm` selects which `[check]` SHAPE it declares.
+
+            `extra` appends `[[files]]` rows AFTER the `**` engine row, so a later row overrides it
+            for the paths it names — which is how the shipped descriptors spell a `rendered`
+            destination. `adopt` is the `[adopt].argv` literal, because a kit that declares a
+            rendered row must have an adopter that WRITES it or `apply` fails the install.
+            """
             chk = {
                 "argv": '[check]\nargv = ["bash", "{kit}/check.sh"]\n',
                 "none": '[check]\nnone = "a fixture kit that declares no runnable check"\n',
@@ -5914,7 +5920,8 @@ user_skills = "/tmp/gk-fake-skills"
                     'version_from = { none = "fixture" }\n\n'
                     + chk +
                     '\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                    "[adopt]\nargv = []\nmutates_index = false\n")
+                    + extra +
+                    f"[adopt]\nargv = {adopt}\nmutates_index = false\n")
 
         def build_verify_gov(tag: str, kits: dict) -> tuple[pathlib.Path, pathlib.Path]:
             """A scratch gov carrying one entry per requested kit, and the run LOG its checks write.
@@ -5941,8 +5948,10 @@ user_skills = "/tmp/gk-fake-skills"
             for eid, spec in kits.items():
                 d = g / "tools" / eid
                 d.mkdir(parents=True, exist_ok=True)
-                (d / "kit.toml").write_text(build_kit14(eid, spec.get("arm", "argv")),
-                                            encoding="utf-8", newline="\n")
+                (d / "kit.toml").write_text(
+                    build_kit14(eid, spec.get("arm", "argv"), spec.get("extra", ""),
+                                spec.get("adopt", "[]")),
+                    encoding="utf-8", newline="\n")
                 (d / "check.sh").write_text(
                     "#!/usr/bin/env bash\n"
                     'd="$(cd "$(dirname "$0")" && pwd)"\n'
@@ -6239,9 +6248,13 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] AC6 ...and gov_commit advanced, because a verified run is a clean run",
               json.loads((_t6 / ".governance" / "install.json").read_text(
                   encoding="utf-8")).get("gov_commit") == _B6, "")
+        # DEPL-cMendedVintage-1 AC4 adds the fifth count to this list rather than to an arm of its
+        # own: the rule being graded is that EVERY count prints including its zero, and a new count
+        # graded somewhere else is a new count nothing holds to that rule.
         check("[-14] §5 EVERY tally prints, including the zeros — an absence is never coverage",
               all(w in _w6.stdout for w in ("verified 1", "unverified 0", "not-run 2",
-                                            "rolled back 0", "pre-existing red 0")),
+                                            "rolled back 0", "pre-existing red 0",
+                                            "declined red 0")),
               str([ln for ln in _w6.stdout.splitlines() if "verify:" in ln]))
 
         # ---- AC7: THE SKIP ANNOUNCES ITSELF. A declared `none` and an argv that does not resolve
@@ -6323,6 +6336,121 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] AC9 LIVENESS both runs happened — a wedge escape that skipped the after-pass "
               "would report the same words over one subprocess",
               read_runs14(_log9v) == ["demo", "demo"], str(read_runs14(_log9v)))
+
+        # ======== DEPL-cMendedVintage-1 — NO ROLLBACK OVER A RENDER STEP THIS RUN DECLINED ========
+        #
+        # THE MEASURED RED, on this fixture, against the engine with `-1` not landed: `update
+        # --write` printed `ROLLED BACK`, reverted `tools/stale/conf.txt` to its pre-run blob, wrote
+        # `update-rollback-stale.md`, and printed NO decline line at all. The next run classifies
+        # the reverted rows identically and decides identically, because a rolled-back run takes the
+        # `if r.problems` arm and withholds the `gov_commit` re-stamp. Observed at two adopters as
+        # five rollbacks and three kits that could not advance at any number of retries.
+        #
+        # WHY A NEW FIXTURE RATHER THAN THE `-14` ROLLBACK ONE. `_rr_stale` is EMPTY in every arm
+        # above: none of their kits ships a `rendered` row, so re-running them proves nothing about
+        # this branch — the `fixture-passes-by-finding-nothing` class. This kit ships one, and its
+        # own `[check]` compares the render against the engine file beside it, so the RENDER going
+        # one vintage stale is what makes the check red. `update` never writes a rendered row
+        # (`UPDATE_ROLE["rendered"]` caps at report), so the staleness is the run's own decline.
+        _dr_GUARD_STALE = ('test -f "$d/out.txt" || exit 3\n'
+                           'if [ "$(cat "$d/out.txt")" != "$(cat "$d/conf.txt")" ]; then\n'
+                           '  echo "check: the render is stale — out.txt does not match conf.txt"\n'
+                           "  exit 1\n"
+                           "fi\n"
+                           "exit 0\n")
+
+        def _dr_render(v: int) -> str:
+            return ('#!/usr/bin/env bash\n'
+                    'd="$(cd "$(dirname "$0")" && pwd)"\n'
+                    f'printf "V=%s\\n" "{v}" > "$d/out.txt"\n')
+
+        _gdr, _logdr = build_verify_gov("declined", {
+            "stale": {"guard": _dr_GUARD_STALE,
+                      "extra": '[[files]]\ninclude = ["out.tmpl"]\nrole = "rendered"\n'
+                               'to = "{kit}/out.txt"\n\n',
+                      "adopt": '["bash", "{kit}/render.sh"]',
+                      "files": {"conf.txt": "V=1\n", "out.tmpl": "V=1\n",
+                                "render.sh": _dr_render(1)}},
+        })
+        _tdr = build_verify_target(_gdr, "declined-t", ["stale"])
+        check("[-1] PRECONDITION the adopter really rendered the destination the rendered row names",
+              read_text14(_tdr / "tools" / "stale" / "out.txt") == "V=1\n",
+              repr(read_text14(_tdr / "tools" / "stale" / "out.txt")))
+        _predr = run_in_gov(_gdr, "check", "--target", str(_tdr))
+        check("[-1] PRECONDITION the kit's own check is GREEN before the write — without it the "
+              "green-to-red transition this branch diverts cannot exist",
+              "govkit check — stale: adopted" in _predr.stdout, _predr.stdout[-900:])
+        _snapdr = read_index_oid14(_tdr, "tools/stale/conf.txt")
+        # Gov's second vintage: the engine file and the render's TEMPLATE both move. The target's
+        # rendered destination does not, because nothing in `update` writes one.
+        (_gdr / "tools" / "stale" / "conf.txt").write_text("V=2\n", encoding="utf-8", newline="\n")
+        (_gdr / "tools" / "stale" / "out.tmpl").write_text("V=2\n", encoding="utf-8", newline="\n")
+        (_gdr / "tools" / "stale" / "render.sh").write_text(_dr_render(2), encoding="utf-8",
+                                                            newline="\n")
+        git(_gdr, "add", "-A")
+        git(_gdr, "commit", "-qm", "B")
+        _Bdr = gout(_gdr, "rev-parse", "HEAD").strip()
+        _recdra = json.loads((_tdr / ".governance" / "install.json").read_text(encoding="utf-8"))
+        remove_runs14(_logdr)
+        # THE FLAG IS STRIPPED RATHER THAN ASSUMED UNSET: AC3 is a claim about a flag-OFF run, and
+        # inheriting a developer's exported `GOVKIT_RERENDER=1` would make it a claim about nothing.
+        _wdr = subprocess.run(
+            [sys.executable, str(_gdr / "tools" / "govkit" / "govkit.py"),
+             "update", "--target", str(_tdr), "--write"], capture_output=True, text=True,
+            env={k: v for k, v in os.environ.items() if k != "GOVKIT_RERENDER"})
+        _obdr = _tdr / ".governance" / "outbox"
+
+        check("[-1] AC1 the kit is printed DECLINED RED, with both states and both exit codes",
+              any(ln.startswith("govkit update — verify stale:") and "DECLINED RED" in ln
+                  and "adopted -> landed-but-inert" in ln and "exit 0 -> 1" in ln
+                  for ln in _wdr.stdout.splitlines()), _wdr.stdout[-1600:])
+        check("[-1] AC1 NO ROLLBACK: the index does NOT match the pre-write snapshot",
+              read_index_oid14(_tdr, "tools/stale/conf.txt") != _snapdr,
+              f"{read_index_oid14(_tdr, 'tools/stale/conf.txt')} vs {_snapdr}")
+        check("[-1] AC1 ...and gov's new bytes stand on disk",
+              read_bytes14(_tdr / "tools" / "stale" / "conf.txt") == b"V=2\n",
+              repr(read_bytes14(_tdr / "tools" / "stale" / "conf.txt")))
+        _rowdr = {f["path"]: dict(f) for f in json.loads(
+            (_tdr / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]}
+        check("[-1] AC1 ...and its receipt row keeps THIS run's values — the `for k in "
+              "ROLLBACK_FIELDS` revert sits inside the loop this exit skips",
+              _rowdr.get("tools/stale/conf.txt", {}).get("commit") == _Bdr,
+              str(_rowdr.get("tools/stale/conf.txt"))[:400])
+        check("[-1] AC1 an `update-declined-red-<kit>.md` order is written, and NO rollback order",
+              (_obdr / "update-declined-red-stale.md").is_file()
+              and not (_obdr / "update-rollback-stale.md").exists(),
+              str(sorted(p.name for p in _obdr.glob("*"))) if _obdr.is_dir() else "no outbox")
+        # THE RUN STILL FAILS. A build that made this green would have converted the wedge into a
+        # silent data problem, which is strictly worse than the wedge.
+        check("[-1] AC1 the run still exits non-zero and the receipt is NOT re-stamped",
+              _wdr.returncode != 0
+              and json.loads((_tdr / ".governance" / "install.json").read_text(
+                  encoding="utf-8")).get("gov_commit") == _recdra.get("gov_commit"),
+              _wdr.stdout[-1200:])
+
+        _orddr = read_text14(_obdr / "update-declined-red-stale.md")
+        _firstdr = next((p.strip() for p in _orddr.split("\n\n")
+                         if p.strip() and not p.startswith("# ")), "")
+        check("[-1] AC2 the order's FIRST sentence is the decline string this run recorded for it, "
+              "ahead of any merge advice",
+              _firstdr.startswith("this kit ships `rendered` rows and declares no [[regenerate]]"),
+              repr(_firstdr[:240]))
+        # NOT `"restored" not in _orddr` alone: with no order file that string is empty and the arm
+        # is vacuously green, which is the shape this whole unit exists to refuse.
+        check("[-1] AC2 ...and it never says `restored`, because nothing was",
+              bool(_orddr) and "restored" not in _orddr, _orddr[:700])
+
+        check("[-1] AC3 the flag-OFF run NAMES the decline that decided the disposition",
+              any(ln.startswith("govkit update —   DECLINED stale:")
+                  for ln in _wdr.stdout.splitlines()),
+              str([ln for ln in _wdr.stdout.splitlines() if "DECLINED" in ln]))
+        check("[-1] AC4 ...and the new disposition is counted under its own tally rather than "
+              "folded into the rollback one",
+              "declined red 1" in _wdr.stdout and "rolled back 0" in _wdr.stdout,
+              str([ln for ln in _wdr.stdout.splitlines() if "govkit update — verify:" in ln]))
+        check("[-1] LIVENESS both check runs happened — an exit that skipped the after-pass would "
+              "print the same words over one subprocess",
+              read_runs14(_logdr) == ["stale", "stale"], str(read_runs14(_logdr)))
 
         # ---- §5's error state: a check that CANNOT LAUNCH is red, never unmeasured and never a
         # ---- traceback. Measured through `check`, which is the verb that reports the finding.
@@ -9487,9 +9615,18 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-PV] R2-7 a flag-off update over a moved template PRINTS the render's row `re-rendered`",
               len(_pvov) == 1 and _pvov[0].lstrip().startswith("re-rendered") and "[rendered" in _pvov[0],
               str(_pvov) + _pvoff.stdout[-700:])
-        check("[-PV] R2-7 ...while no render ran: the bytes are the last vintage's, and no regenerate "
-              "or decline is named", (_pvt / _pvH).read_text(encoding="utf-8") == _pvRENDERED
-              and "ran review-harness" not in _pvoff.stdout and "DECLINED" not in _pvoff.stdout,
+        # DEPL-cMendedVintage-1 S5 INVERTS THE DECLINE HALF OF THIS ARM. It used to assert
+        # `"DECLINED" not in _pvoff.stdout`, which graded DEPL-dRetiredFork-3 AC6's ask for output
+        # byte-identical to the pre-change run while the flag is off. That criterion is SUPERSEDED:
+        # as of `-1` a decline decides whether a kit's writes are reverted, so a silent one is the
+        # defect rather than the dark landing. The arm's SUBJECT — that no render RAN — is still
+        # correct and still worth asserting, so that half is untouched.
+        check("[-PV] R2-7 ...while no render ran: the bytes are the last vintage's, no regenerate "
+              "ran, and the decline that says so IS named",
+              (_pvt / _pvH).read_text(encoding="utf-8") == _pvRENDERED
+              and "ran review-harness" not in _pvoff.stdout
+              and any(ln.startswith("govkit update —   DECLINED review-harness:")
+                      for ln in _pvoff.stdout.splitlines()),
               _pvoff.stdout[-900:])
         # R3-5, the later update: it moved the edited row to C, and it commits through the hooks. Block 3
         # run now, as Done used to advise, must STOP rather than rewind that row to the migration's pin.

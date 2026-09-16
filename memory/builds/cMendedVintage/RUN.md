@@ -53,3 +53,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T17:22:15Z dispatch · item 09c9415a TOOL-cMendedVintage-9 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-9.md
 
 2026-09-16T17:29:04Z dispatch · item 09c9415a TOOL-cMendedVintage-9 · reason skills/session-kickoff/manifest-check.sh skills/session-kickoff/manifest-check.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-9.md memory/builds/cMendedVintage/README.md memory/builds/cMendedVintage/build/2026-09-16-build-TOOL-cMendedVintage-9-acceptance-ledger.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-16T17:36:36Z dispatch · item 1900b591 DEPL-cMendedVintage-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-09-16T17:36:37Z brief · item DEPL-cMendedVintage-1 · reason aa8c0a836794 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-2-build-brief.md
+
+2026-09-16T17:39:29Z dispatch · item 1900b591 DEPL-cMendedVintage-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-1.md

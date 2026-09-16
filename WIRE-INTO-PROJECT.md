@@ -1007,6 +1007,15 @@ kit's own README.
 
 ## Maintenance
 
+### The orders `update` leaves under `.governance/outbox/`
+
+`update-declined-red-<kit>.md` means that kit's own `[check]` went green-to-red across this run and
+the cause was a render step **this run declined**, not the bytes it wrote: nothing was rolled back,
+the writes stand, the receipt is not re-stamped, and its first sentence names the declined step to
+fix — a missing `[[regenerate]]` argv, or `GOVKIT_RERENDER=1`. Its siblings are
+`update-rollback-<kit>.md`, where this run's writes really were reverted, and
+`update-preexisting-red-<kit>.md`, where the kit was red before the run started.
+
 ### The build harness is rendered from review-harness 1.8 — migrating a receipt that rows it as an engine file
 
 Before review-harness 1.8, `unattended-build.js` shipped as an engine file, so a receipt written

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-1 — no rollback over a render step this run declined
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 2
+**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-0-run-mandate.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-0-run-mandate.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-1-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -231,6 +232,18 @@ disagrees means a refusal was added that this spec did not price.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · built, with two divergences recorded before the code was written. (a) §5's
+  user-docs item says `WIRE-INTO-PROJECT.md`'s maintenance section "describes what an operator does
+  with an outbox order"; it does not — that section holds two migration runbooks and nothing about
+  the outbox at all. The build ADDS the subsection rather than extending one, naming all three order
+  filenames so the new one is readable against its two siblings instead of standing alone. (b) AC5's
+  arm is at `tools/govkit/selftest.py:9490` in rev-1's reading; the `"DECLINED" not in _pvoff.stdout`
+  clause is at `:9492` and the kit it now asserts is `review-harness`, which is the kit `_pvoff`
+  touches by way of the `tier2-review.js` engine row it merges forward. The arm's subject is
+  unchanged. Also recorded: the direct check is a standalone fixture driving `update --write` over a
+  purpose-built gov tree, run against the unfixed engine FIRST (rollback order written, bytes
+  reverted, no decline printed) and then against the fixed one; the equivalent arms are committed to
+  `selftest.py` and are graded by the suite at the run's close, not in this pass.
 
 ## 10. Reuse audit
 

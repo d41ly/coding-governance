@@ -7380,6 +7380,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     _rerender_on = os.environ.get("GOVKIT_RERENDER") == "1"
     _rr_ran: list[str] = []
     _rr_declined: list[tuple[str, str]] = []
+    # DEPL-cMendedVintage-1 S1. A STRICT SUBSET OF `_rr_declined`, and the subset is the point: it
+    # holds ONLY the declines that are about a render going stale, because those are the ones whose
+    # consequence is the kit's own `[check]` reding on a step THIS RUN chose not to perform. The
+    # verify pass below reads it to refuse a rollback it would otherwise cause itself.
+    #
+    # THE INERT DECLINE IS NOT IN HERE, and that exclusion is the unit's whole safety margin. A
+    # target holding a kit inert chose that posture; if its check reds after this run moved bytes,
+    # this run is what broke it and the rollback is correct. Widening this dict is how the change
+    # turns from "stop punishing a kit for a step we declined" into "stop rolling anything back".
+    #
+    # A DICT RATHER THAN A SET because the order file's first sentence IS the decline string, and
+    # re-deriving that prose at the verify site would be a second copy of it.
+    _rr_stale: dict[str, str] = {}
     if write:
         for _eid in touched_kits:
             _d, _ = descs[_eid]
@@ -7409,13 +7422,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # and a silent skip here would report that state as a clean run. TOOL-dRetiredFork-29.
                 if any(str((_row or {}).get("role")) == "rendered"
                        for _row in (_d.get("files") or [])):
-                    _rr_declined.append((_eid, "this kit ships `rendered` rows and declares no "
-                                               "[[regenerate]] argv, so they stay one vintage "
-                                               "stale; its adopter cannot do this job"))
+                    _why_rr = ("this kit ships `rendered` rows and declares no "
+                               "[[regenerate]] argv, so they stay one vintage "
+                               "stale; its adopter cannot do this job")
+                    _rr_declined.append((_eid, _why_rr))
+                    _rr_stale[_eid] = _why_rr
                 continue
             if not _rerender_on:
-                _rr_declined.append((_eid, "the re-render step is OFF (set GOVKIT_RERENDER=1); "
-                                           "its artifacts are one vintage stale until it is run"))
+                _why_rr = ("the re-render step is OFF (set GOVKIT_RERENDER=1); "
+                           "its artifacts are one vintage stale until it is run")
+                _rr_declined.append((_eid, _why_rr))
+                _rr_stale[_eid] = _why_rr
                 continue
             _ctx_rr = target_context(target, deploy, _eid, _d)
             for _blk in list(_regen):
@@ -7459,16 +7476,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "This kit declares no [check] argv, so nothing below can roll its "
                               "writes back: they stay staged, and the render has to be repaired "
                               "by hand before the next update"))
-    # AC6 — SILENT WHEN THE FLAG IS OFF. The criterion asks for output byte-identical to the
-    # pre-change run, and a step that announces its own absence is not dark. Once the flag is
-    # ON every decline is named, which is section 5s observability item and the class this
-    # build keeps closing: a skip that looks like a pass.
+    # THE COUNTS STAY GATED: they are the re-render STEP's own report, and a flag-off run ran
+    # nothing, so "0 argv run" would be a report about a step that did not happen.
     if _rerender_on:
         print(f"govkit update — re-render: {len(_rr_ran)} argv run, "
               f"{len(_rr_declined)} declined")
         for _line in _rr_ran:
             print(f"govkit update —   ran {_line}")
-    for _eid, _why in (_rr_declined if _rerender_on else []):
+    # DEPL-cMendedVintage-1 S4 — THE DECLINES ARE NOT GATED, and this SUPERSEDES half of
+    # DEPL-dRetiredFork-3's AC6, which asked for output byte-identical to the pre-change run while
+    # the flag is off. That criterion bought a safe dark landing for a step that printed nothing and
+    # did nothing. As of this unit a decline DECIDES whether a kit's writes are reverted, so it is
+    # no longer decoration and silence is the defect: with the gate in place, the only record the
+    # operator sees of the thing that decided the disposition was nothing at all.
+    for _eid, _why in _rr_declined:
         # A SKIP THAT LOOKS LIKE A PASS IS THE CLASS THIS BUILD KEEPS CLOSING. Every declined kit is
         # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
         print(f"govkit update —   DECLINED {_eid}: {_why}")
@@ -7500,7 +7521,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # path is classified untouched by the closing tally, which reports it as a file this run
     # never wrote -- while it sits staged in the adopter's index.
     written_paths = set(changed) | set(renamed) | set(deleted) | set(_landed_new)
-    n_verified = n_unverified = n_rolled = n_preexisting = 0
+    n_verified = n_unverified = n_rolled = n_preexisting = n_declined_red = 0
     for eid in touched_kits:
         d, _ = descs[eid]
         ctx_v = target_context(target, deploy, eid, d)
@@ -7550,6 +7571,53 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
         # S5. GREEN BEFORE, RED AFTER: this run broke it, and only this kit is undone.
         if was == "adopted" and now == "landed-but-inert":
+            # DEPL-cMendedVintage-1 S2. THE ARM NOW HAS TWO EXITS, and this is the first: a kit
+            # whose check reds because of a RENDER STEP THIS RUN DECLINED is not a kit this run's
+            # bytes broke. The old single exit ran the kit's own `[check]` — the program whose job
+            # is to ask whether the render happened — and then reverted correct bytes on the red it
+            # had caused itself. Because a rolled-back run takes the `if r.problems` arm and
+            # withholds the `gov_commit` re-stamp, the next run classified identically and decided
+            # identically: measured at two adopters as five rollbacks and three kits that could not
+            # advance at any number of retries.
+            #
+            # THE TEST SITS AT THE TOP OF THE ARM, not inside the path loop, and that placement is
+            # what leaves the RECEIPT ROW alone as well as the bytes: the `for k in ROLLBACK_FIELDS`
+            # block that reverts the row sits INSIDE that loop, so skipping the loop skips the
+            # revert for free and no second guard is needed.
+            #
+            # THE RUN STILL FAILS. What changes is that the writes STAND; the verdict does not go
+            # green. Suppressing the `r.fail` here would convert a wedge into a silent data problem,
+            # which is strictly worse than the wedge.
+            if eid in _rr_stale:
+                n_declined_red += 1
+                _why_dr = _rr_stale[eid]
+                # A DISTINCT FILENAME, modelled on the `update-preexisting-red-` writer above —
+                # which already exists for exactly this class, a red that is not this run's doing.
+                # Reusing `update-rollback-<eid>.md` would make the operator's only record of the
+                # event a document whose every sentence is about paths that were put back.
+                (outbox / f"update-declined-red-{eid}.md").write_text(
+                    f"# {eid} is red because of a render step this run DECLINED\n\n"
+                    f"{_why_dr}\n\n"
+                    f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                    f"{exits}\n"
+                    f"vintage {base_commit} -> {to_commit}\n\n"
+                    f"This kit's check passed before this run and fails after it, but the cause is "
+                    f"the declined step named above and NOT the bytes this run wrote. Nothing was "
+                    f"rolled back: this run's writes stand, its receipt row keeps the values this "
+                    f"run gave it, and the receipt is NOT re-stamped, so the next run "
+                    f"re-classifies these rows from the vintage they are actually at.\n\n"
+                    f"WHAT TO FIX: the declined step, not the merge. Either declare a "
+                    f"[[regenerate]] argv for this kit, or run this update again with "
+                    f"GOVKIT_RERENDER=1 — whichever the sentence above names. Until the render is "
+                    f"refreshed this kit's check stays red at every run.\n",
+                    encoding="utf-8", newline="\n")
+                print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · DECLINED RED: not "
+                      f"rolled back — {_why_dr}")
+                r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
+                       f"{exits}. This run DECLINED the step that would have refreshed it — "
+                       f"{_why_dr} — so its writes were NOT rolled back and an order was written "
+                       f"under .governance/outbox/")
+                continue
             n_rolled += 1
             # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
             # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
@@ -7726,7 +7794,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # EVERY COUNT PRINTS, including the zeros. An absence is never coverage, and a silent
     # pre-existing-red tally would hide exactly the kits nothing verified.
     print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
-          f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting}")
+          f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting} · "
+          f"declined red {n_declined_red}")
 
     # ---- TOOL-aWeldedTribunal-6. THE GAP SET: what gov SHIPS for a kit this target claims and this
     # ---- target does not hold. The classification loop above iterates the RECEIPT, so a file gov

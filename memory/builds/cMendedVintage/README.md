@@ -119,7 +119,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin](spec/2026-09-16-spec-TOOL-cMendedVintage-9.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-16 |
-| [DEPL-cMendedVintage-1 — no rollback over a render step this run declined](spec/2026-09-16-spec-DEPL-cMendedVintage-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-1 — no rollback over a render step this run declined](spec/2026-09-16-spec-DEPL-cMendedVintage-1.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-2 — a failed restore keeps its receipt row forward, and the order names the path](spec/2026-09-16-spec-DEPL-cMendedVintage-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-3 — the coverage tail joins each open gap to its own refusal reason](spec/2026-09-16-spec-DEPL-cMendedVintage-3.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires](spec/2026-09-16-spec-DEPL-cMendedVintage-4.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-16 |
@@ -150,7 +150,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-21 — the atomic write is one helper, and something fails when it is absent](spec/2026-09-16-spec-DEPL-cMendedVintage-21.md) | 30 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 
