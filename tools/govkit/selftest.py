@@ -779,10 +779,25 @@ def main() -> int:
         rec = json.loads(rp_v.read_text(encoding="utf-8"))
         for f in rec["files"]:
             f["version"] = "STALE-SENTINEL"
+        # DEPL-dBackdatedFixture-2. THE POPULATION IS THE ROWS HELD BEFORE THE WRITE. The fixture no
+        # longer carries a row its vintage never shipped, so `update --write` LANDS that file as a new
+        # row with a freshly resolved `version` (DEPL-dRatifiedSeam-1 S3). That row never held the
+        # sentinel, and it alone satisfied all three arms below with the refresh they guard deleted --
+        # measured by the spec audit on a scratch clone, `govkit.py`'s raw-write `version` line staged
+        # as `pass`. So the arms grade `_held` rows only, and the liveness arm proves the scoping
+        # excludes something rather than nothing.
+        _held = {f["path"] for f in rec["files"]}
         rp_v.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
         p = run("update", "--target", str(vr), "--write")
         rec = json.loads(rp_v.read_text(encoding="utf-8"))
-        _moved = [f for f in rec["files"] if f.get("version") != "STALE-SENTINEL"]
+        _moved = [f for f in rec["files"]
+                  if f["path"] in _held and f.get("version") != "STALE-SENTINEL"]
+        _added = [f["path"] for f in rec["files"] if f["path"] not in _held]
+        check("[dBF] LIVENESS the write ADDED a row the sentinel never touched, so the scoping "
+              "excludes something",
+              len(_added) > 0,
+              f"receipt after the write {sorted(f['path'] for f in rec['files'])} · held before "
+              f"{sorted(_held)}")
         check("[dGV-9] update --write refreshes a refreshed row's version, not only sha256/commit",
               len(_moved) > 0, json.dumps(rec["files"], indent=1)[:900])
         check("[dGV-9] and the refreshed value is the constant's SOURCE LINE, the shape "
@@ -790,7 +805,7 @@ def main() -> int:
               any("KIT_CHECK_WIRING_VERSION" in (f.get("version") or "") for f in _moved),
               json.dumps([f.get("version") for f in rec["files"]])[:500])
         check("[dGV-9] and sha256 and commit moved with it, so the three stay one fact",
-              all(f.get("commit") and f.get("sha256") for f in _moved),
+              len(_moved) > 0 and all(f.get("commit") and f.get("sha256") for f in _moved),
               json.dumps(_moved, indent=1)[:600])
 
         # --- DEPL-dGaugedVintage-10. THE MEASURER'S OWN CURRENCY. `demand_published_vintage` and
