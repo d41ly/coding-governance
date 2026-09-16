@@ -6212,6 +6212,86 @@ user_skills = "/tmp/gk-fake-skills"
                   _to14 / ".governance" / "outbox" / "update-rollback-demo.md"),
               read_text14(_to14 / ".governance" / "outbox" / "update-rollback-demo.md"))
 
+        # ---- DEPL-cMendedVintage-2. A RESTORE THE TARGET'S GIT REFUSES. The three plumbing
+        # ---- branches had no arm at all, and the header above them says why: each needs the
+        # ---- TARGET's own git to refuse a call, which nothing outside the run can arrange. The
+        # ---- window is the kit's own `[check]`, which runs AFTER the write and BEFORE the
+        # ---- rollback — so the check installs a `required` filter whose smudge command fails, and
+        # ---- `checkout-index` then cannot write that one path.
+        # ----
+        # ---- A DIRECTORY AT THE PATH DOES NOT WORK, measured before this was written: git removes
+        # ---- a directory in its way under `-f` and restores the file cleanly, so that fixture
+        # ---- would have graded an ordinary rollback and passed for the wrong reason.
+        _2_VICTIM_A = "victim one\nvictim two\nvictim three\n"
+        _2_VICTIM_B = _2_VICTIM_A.replace("victim two", "victim TWO")
+        _2_GUARD_SABOTAGE = (_14_GUARD_CONFLICT
+                             .replace("then\n",
+                                      "then\n"
+                                      '  root="$(cd "$d/../.." && pwd)"\n'
+                                      '  git -C "$root" config filter.boom.smudge "false"\n'
+                                      '  git -C "$root" config filter.boom.required true\n'
+                                      '  printf "victim.txt filter=boom\\n" > "$d/.gitattributes"\n'))
+        assert "filter.boom" in _2_GUARD_SABOTAGE, "the sabotage must be IN the guard, or the arms " \
+                                                   "below grade a rollback that never failed"
+        _g2, _log2 = build_verify_gov("refused", {
+            "demo": {"guard": _2_GUARD_SABOTAGE,
+                     "files": {"conf.txt": _14_CONF_A, "victim.txt": _2_VICTIM_A}},
+        })
+        _t2 = build_verify_target(_g2, "refused-t", ["demo"])
+        (_t2 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8", newline="\n")
+        settle(_t2, "the adopter edits LEGACY")
+        (_g2 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g2 / "tools" / "demo" / "victim.txt").write_text(_2_VICTIM_B, encoding="utf-8",
+                                                           newline="\n")
+        git(_g2, "add", "-A")
+        git(_g2, "commit", "-qm", "B")
+        _B2 = gout(_g2, "rev-parse", "HEAD").strip()
+        _rec2a = json.loads((_t2 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row2a = {f["path"]: dict(f) for f in _rec2a["files"]}
+        _w2 = run_in_gov(_g2, "update", "--target", str(_t2), "--write")
+        check("[-2] the fixture REALLY reaches the `checkout-index` branch — without that every arm "
+              "below grades an ordinary rollback and this whole block is an assertion about nothing",
+              "`git checkout-index` could not write the worktree file" in (_w2.stdout + _w2.stderr),
+              _w2.stdout[-1500:] + _w2.stderr[-1500:])
+        _rec2b = json.loads((_t2 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _row2b = {f["path"]: dict(f) for f in _rec2b["files"]}
+        _ord2 = read_text14(_t2 / ".governance" / "outbox" / "update-rollback-demo.md")
+        _sha2_run = hashlib.sha256(_2_VICTIM_B.encode()).hexdigest()
+        check("[-2] AC1 the order names the path it could not restore, under its own verb",
+              "NOT restored tools/demo/victim.txt" in _ord2, _ord2)
+        check("[-2] AC1 ...and under NO other verb — before this unit a failed path was in none of "
+              "the three lists, which reads as a file the rollback never touched",
+              "restored  tools/demo/victim.txt" not in _ord2
+              and "removed   tools/demo/victim.txt" not in _ord2
+              and "left alone tools/demo/victim.txt" not in _ord2, _ord2)
+        check("[-2] AC2 the receipt row for the failed path is LEFT at this run's sha256 rather "
+              "than reverted to the pre-run one it does not have on disk",
+              _row2b.get("tools/demo/victim.txt", {}).get("sha256") == _sha2_run
+              and _row2a["tools/demo/victim.txt"].get("sha256") != _sha2_run,
+              str(_row2b.get("tools/demo/victim.txt"))[:400])
+        check("[-2] AC2 ...and its `commit` stayed forward with it, because the gate is ONE decision "
+              "per entry and a split row is what `-7` S9 refuses the next run on",
+              _row2b.get("tools/demo/victim.txt", {}).get("commit") == _B2
+              and _row2a["tools/demo/victim.txt"].get("commit") != _B2,
+              str(_row2b.get("tools/demo/victim.txt"))[:400])
+        check("[-2] AC2 the worktree does not hold the pre-run bytes either, so nothing anywhere "
+              "claims a restore that did not happen",
+              read_bytes14(_t2 / "tools" / "demo" / "victim.txt") != _2_VICTIM_A.encode(),
+              repr(read_bytes14(_t2 / "tools" / "demo" / "victim.txt")[:80]))
+        check("[-2] AC4 the order's lead paragraph stops claiming every path below was put back, "
+              "and introduces the block that contradicts it",
+              "and ONLY those" in _ord2 and "could not return at all" in _ord2, _ord2[:1400])
+        check("[-2] AC4 ...and the NOT restored line carries the half-restored fact: `update-index` "
+              "had already taken the pre-run blob, so index and worktree now disagree",
+              "the index was ALREADY reverted to the pre-run blob" in _ord2
+              and "the index and the worktree now disagree" in _ord2, _ord2)
+        check("[-2] AC5 the SAME run still reverts the path it DID restore, bytes and row together "
+              "— the gate fires on the failed entry and on nothing else",
+              "restored  tools/demo/conf.txt" in _ord2
+              and _row2b.get("tools/demo/conf.txt", {}).get("sha256")
+              == _row2a["tools/demo/conf.txt"].get("sha256"),
+              str(_row2b.get("tools/demo/conf.txt"))[:400])
+
         # ---- AC6: ONLY TOUCHED KITS RUN, TWICE EACH. Three claimed kits, one moving rows. The arm
         # ---- fails both against a draft that baselines every claimed kit — six subprocesses, the
         # ---- whole-bar behaviour §3 refuses — and against one that skips the baseline, which is

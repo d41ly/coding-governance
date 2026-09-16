@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-2 — a failed restore keeps its receipt row forward, and the order names the path
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 3
+**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-2-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-2-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -21,20 +22,21 @@ the file actually went back, and name the path that did not in the order.
 ## 2. Scope (IN)
 
 - **S1** The four restore-failure branches inside the rollback path loop
-  (`tools/govkit/govkit.py:7594`, `:7609`, `:7618` and the containment refusal at `:7588`) record the
+  (`tools/govkit/govkit.py:7664`, `:7678`, `:7687` and the containment refusal at `:7650`) record the
   path they could not restore in an `unrestored` list before they `continue`. Observed by AC1.
-- **S2** The `ROLLBACK_FIELDS` revert and the `withdrawn_rows` removal at `tools/govkit/govkit.py:7659`
+- **S2** The `ROLLBACK_FIELDS` revert and the `withdrawn_rows` removal at `tools/govkit/govkit.py:7729`
   run only when every path of that snapshot entry that this run WROTE is in `restored`. Observed by
   AC2 and AC3.
 - **S3** The rollback order gains a fourth block naming every unrestored path, and its lead sentence
   stops claiming that every path below was put back. The block's LINE is derived from the same
   `_left` predicate that gates the revert, never from `unrestored` alone, so a path the gate did not
   hold is never printed under a sentence claiming its row was left forward. The containment refusal
-  at `tools/govkit/govkit.py:7580` is that case and it takes its own sentence, named in §4. Observed
+  at `tools/govkit/govkit.py:7646` is that case and it takes its own sentence, named in §4. Observed
   by AC4 and AC6.
 - **S4** That fourth block states the half-restored case explicitly: when `git checkout-index` is what
-  failed, the index was already reverted, so the row's `sha256` matches the worktree and its `oid`
-  does not. Observed by AC4.
+  failed, the index was ALREADY reverted to the pre-run blob while the worktree file did not come
+  back, so index and worktree disagree at that path and the row was left at this run's values.
+  Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -109,15 +111,21 @@ LEFT at this run's values on purpose.
 The fourth block is emitted beside the three that exist:
 
 ```
-NOT restored <path> — <the git operation that refused>; its bytes are this run's and its
-                      receipt row was left forward so the receipt still describes the tree
+NOT restored <path> — <the git operation that refused>; the rollback did not return it, so its
+                      receipt row was LEFT at this run's values rather than claiming a pre-run
+                      state the tree does not have
 ```
 
 S4's half-restored sentence is emitted for the `checkout-index` branch specifically, because that is
 the only one of the four where a partial revert already happened: `update-index` succeeded, so the
-index names the pre-run blob while the worktree holds this run's bytes and the row's `sha256`. An
-operator reading `git status` there sees a modification they did not make, and the order is the only
-place that explains it.
+index names the pre-run blob. What the WORKTREE holds there was measured rather than assumed, and it
+is not what rev-2 of this spec claimed. `git checkout-index -f` unlinks the existing file BEFORE it
+writes the replacement, so on the failing path the worktree file is simply GONE — staged, in the
+probe under §"The fixture", as an absent `tools/demo/victim.txt` beside an index entry naming the
+pre-run blob. The sentence therefore says that index and worktree disagree and that the row was left
+at this run's values; it does not promise which bytes are on disk, because after a refused
+`checkout-index` that is git's business and not this tool's. An operator reading `git status` there
+sees a deletion they did not make, and the order is the only place that explains it.
 
 ### The containment case prints a different sentence
 
@@ -153,11 +161,20 @@ block, one order block and two sentences. `tools/govkit/selftest.py` — one fix
 
 ### The fixture, and why it does not exist today
 
-`tools/govkit/govkit.py:7556`'s own header says no arm reaches the three plumbing failures, because
+`tools/govkit/govkit.py:7623`'s own header says no arm reaches the three plumbing failures, because
 each needs the TARGET's git to refuse a call the suite does not manufacture. The cheapest
-manufacturable one is `checkout-index`: make the worktree path a DIRECTORY where the receipt names a
-file, so `checkout-index -f` cannot write it. That is a fixture edit rather than a git mock, it
-reproduces the exact branch S4 describes, and it is the arm AC1 through AC4 are observed on.
+manufacturable one is `checkout-index`, and rev-2 named the wrong way to manufacture it: a DIRECTORY
+at the worktree path does NOT reproduce the branch, because `checkout-index -f` removes a directory
+in its way and restores the file cleanly — measured on the real engine before any of this was
+written, and the probe reported the path `restored`.
+
+What does reproduce it is a git filter the target's own git must honour: the kit's `[check]` script,
+which runs AFTER the write and BEFORE the rollback, writes a `.gitattributes` binding the victim path
+to a `required` filter whose smudge command fails. `checkout-index` then exits non-zero with
+`smudge filter … failed` and the branch at `tools/govkit/govkit.py:7687` is reached. That window is
+the fixture's whole trick and it is why no fixture could stage this from outside the run: before the
+write the path must be ordinary or the write loop trips on it, and after the rollback it is too late.
+It is a fixture edit rather than a git mock, and it is the arm AC1, AC2 and AC4 are observed on.
 
 ### Alternatives rejected
 
@@ -188,9 +205,10 @@ adopter's ordinary run changes behaviour.
 - **observability** — the order gains a fourth block and the `r.fail` messages are unchanged, so the
   path appears both in the run's findings and in the durable record.
 - **risks** — the main one is the filter: dropping `p in written_paths` would keep rows forward for
-  untouched paths and quietly invert the fix. AC3 is written against exactly that mistake.
-- **testing** — three direct selftest arms over one new fixture, plus the existing rollback arms held
-  green as the negative case.
+  untouched paths and quietly invert the fix. Nothing observes that today (AC3, retired), so the
+  reason is written at the code site where the next reader of the predicate will meet it.
+- **testing** — direct selftest arms over one new fixture, plus the existing rollback arms held green
+  as the negative case. AC6 gets none and §6 says why.
 - **migration** — N/A; nothing stored changes shape and no back-fill is possible.
 - **user docs** — `WIRE-INTO-PROJECT.md`'s maintenance section gains two sentences on what a
   `NOT restored` line means and why the row was left forward.
@@ -202,18 +220,34 @@ adopter's ordinary run changes behaviour.
   `r.fail` message and in the order's `NOT restored` block.
   Red when: the branch still only `continue`s, so the path is in none of `restored`, `removed` or
   `left alone`, and the order is silent about a file the rollback did not return.
-  fixture: built by this unit — a directory at the worktree path the receipt names as a file.
+  fixture: built by this unit — the kit's own `[check]` binds that path to a `required` git filter
+  whose smudge command fails, in the window between the write and the rollback.
 - **AC2** — When that run finishes, the receipt row for the failed path still carries this run's
-  `sha256`, and the file on disk hashes to it.
+  `sha256` and `commit`, and the worktree does NOT hold the pre-run bytes — so no row claims a
+  restore that did not happen. The disk side is stated as a negative on purpose: rev-2 asked for the
+  file to hash to the row, and a refused `checkout-index -f` leaves no file at all, so that positive
+  is unobservable on the only fixture that reaches the branch.
   Red when: the unconditional revert survives, so the row carries the pre-run `sha256` while the
-  worktree holds this run's bytes.
-- **AC3** — When a snapshot entry carries one path this run wrote and restored and one path this run
-  never wrote, that entry's row IS reverted.
-  Red when: the predicate omits `p in written_paths`, so an untouched path blocks the revert and every
-  successful rollback stops reverting its rows.
+  worktree does not.
+- **AC3** — RETIRED as an observable criterion, by reading the code it was written against. The only
+  snapshot entry carrying two paths is a `renamed` one, and both its spellings enter `written_paths`
+  together or neither does: a rename that lands puts both in `renamed`, and a rename the occupied
+  destination refuses writes neither. A `withdrawn` entry carries exactly one path, and that path is
+  in `deleted`. So NO fixture can stage an entry mixing a written path with an untouched one, and
+  dropping `p in written_paths` today changes no receipt anywhere — rev-2 claimed it would break
+  "every successful rollback", which is false.
+  The filter STAYS, as a class guard with its reason at the code site: the first verdict that writes
+  one path of a multi-path entry inverts the fix without it. What is observable is the other half,
+  that the gate does not fire on a clean rollback, and AC5 owns that.
+  Red when: the filter is dropped AND some later verdict writes one path of a multi-path entry while
+  leaving another untouched — then that untouched path pins its row forward and the rollback stops
+  reverting rows it did restore. No fixture reaches that population today, which is why this
+  criterion is retired to a code-site comment rather than staged; a criterion no run can fail is the
+  green-by-absence class and is not left standing as if it were coverage.
 - **AC4** — When the order file from AC1 is read, its lead sentence no longer claims that every path
   below was put back, and the `NOT restored` line for the `checkout-index` failure says that the
-  index holds the pre-run blob while the worktree and the row hold this run's bytes.
+  index was already reverted to the pre-run blob while the worktree file did not come back, so the
+  two disagree.
   Red when: the lead sentence is left as written, so the document's first claim is false of the block
   printed under it.
 - **AC5** — When the existing rollback arms run unchanged — the `-14` fixture at
@@ -228,15 +262,21 @@ adopter's ordinary run changes behaviour.
   Red when: the block is assembled from `unrestored` as one list, so the containment case takes the
   restore branch's sentence and the one document written to explain a failed restore makes two false
   claims about the only population that branch exists for.
-  fixture: the containment case needs only a hand-edited receipt row and no git refusal, so it is
-  cheaper to stage than the three plumbing branches beside it.
+  fixture: NONE, and that is recorded rather than smoothed over. Reaching this line needs a receipt
+  row whose `path` escapes the target AND a verdict touching enough to enter `snap_rows`, which the
+  receipt-integrity preamble is built to refuse before the rollback is ever reached; rev-2 called it
+  cheap without staging it. The sentence selection ships class-guarded, on exactly the footing the
+  containment refusal above it already declares for itself — guarded because the class is the same
+  and the cost is one condition, not because a fixture demonstrated it. The branch count is held by
+  `govkit refusal join` on the owed bar; the sentence itself is held by nothing and says so here.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix`
 
-New arm: tools/govkit/selftest.py · a rolled-back kit whose worktree path is a directory, so
-`git checkout-index -f` refuses and the branch at `tools/govkit/govkit.py:7618` is reached · none
+New arm: tools/govkit/selftest.py · a rolled-back kit whose own check installs a `required` git
+filter over one of its paths, so `git checkout-index -f` refuses and the branch at
+`tools/govkit/govkit.py:7687` is reached · none
 
 `govkit refusal join` is named because this unit reuses the four existing `r.fail` branches and adds
 none, so its branch pin and enumerated anchor set must be unchanged by this commit.
@@ -252,6 +292,22 @@ none
   refusal rejects is excluded by the `_left` filter, so its row IS reverted, and printing it under
   the restore branch's sentence made two false claims. The block is now derived per path from the
   predicate that decided it, the containment case has its own sentence, and AC6 stages it.
+- rev-3 · 2026-09-16 · S1 · S2 · S3 · S4 · §4 · §5 · AC2 · AC3 · AC4 · AC6 · §7 · the build pass staged the
+  failure against the real engine before writing the fix, and it falsified three of this spec's
+  claims. (a) A DIRECTORY at the worktree path does not make `checkout-index -f` refuse — git removes
+  it and restores the file — so the fixture rev-2 named would have graded a clean rollback; the
+  fixture is now a `required` git filter the kit's own check installs in the window between the write
+  and the rollback. (b) `checkout-index -f` unlinks before it writes, so on the failing path the
+  worktree file is ABSENT, not this run's bytes: S4's half-restored sentence, AC2's disk clause and
+  the order's line are restated as index-and-worktree-disagree rather than as a promise about which
+  bytes are on disk. (c) AC6's containment case was called cheap to stage and is not — no fixture
+  reaches it and it now says so, on the same class-guard footing the refusal it reports on already
+  declares. (d) AC3 is retired: no reachable snapshot entry mixes a written path with an untouched
+  one, so the filter it graded is unobservable today and the criterion said otherwise. Also: every
+  `tools/govkit/govkit.py` line number in rev-1 was taken before
+  `DEPL-cMendedVintage-1` landed in the same function and had drifted +41; they are re-taken here
+  against 03ba97f1 and will drift again, which is why each one is named beside the identifier it
+  points at.
 
 ## 10. Reuse audit
 

@@ -1016,6 +1016,15 @@ fix — a missing `[[regenerate]]` argv, or `GOVKIT_RERENDER=1`. Its siblings ar
 `update-rollback-<kit>.md`, where this run's writes really were reverted, and
 `update-preexisting-red-<kit>.md`, where the kit was red before the run started.
 
+A `NOT restored <path>` line in a rollback order means your git refused the call that would have put
+that path back — the line names which call — so the rollback is PART done and its receipt row was
+deliberately left at this run's values rather than reverted, because a row claiming a pre-run state
+the tree does not have is what makes the next run classify from bytes that are not there. The repair
+is yours and the order is the only record of it: the next `update` sees that row at this run's
+vintage and will not re-offer the work. Where `git checkout-index` is the call that refused, the
+index was already reverted to the pre-run blob before it ran, so `git status` shows a change at that
+path you did not make.
+
 ### The build harness is rendered from review-harness 1.8 — migrating a receipt that rows it as an engine file
 
 Before review-harness 1.8, `unattended-build.js` shipped as an engine file, so a receipt written

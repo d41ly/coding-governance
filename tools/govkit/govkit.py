@@ -7634,6 +7634,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # entry it had" sentence is false of it.
             removed_landed: list[str] = []
             untouched: list[str] = []
+            # DEPL-cMendedVintage-2 S1. EVERY FAILURE ABOVE NAMES ITSELF HERE, paired with the git
+            # operation that refused. A failed path used to appear in NONE of the three lists below,
+            # which reads as a path nothing touched -- while the tail reverted its receipt row
+            # anyway. The list is (path, why) rather than a bare path because the order prints the
+            # refusing operation, and a second lookup to recover it is a second place to get wrong.
+            unrestored: list[tuple[str, str]] = []
             for s in [x for x in snap_rows if x["kit"] == eid]:
                 for p in s["paths"]:
                     # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
@@ -7648,6 +7654,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         demand_contained_dest(p, f"rollback of kit '{eid}'")
                     except Refusal as _esc:
                         r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
+                        unrestored.append((p, "refused as outside the target"))
                         continue
                     if p not in written_paths:
                         untouched.append(p)
@@ -7665,6 +7672,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                    f"before this run and `git rm --cached` would not unstage it: "
                                    f"{rmv.stderr.strip()}. The target is now PART restored — say so "
                                    f"rather than reporting a rollback that did not happen")
+                            unrestored.append((p, "`git rm --cached` would not unstage it"))
                             continue
                         if (target / p).is_file():
                             (target / p).unlink()
@@ -7678,6 +7686,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
                                f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
                                f"PART restored")
+                        unrestored.append((p, "`git update-index` would not take its pre-run entry"))
                         continue
                     (target / p).parent.mkdir(parents=True, exist_ok=True)
                     cox = subprocess.run(
@@ -7688,6 +7697,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                f"and `git checkout-index` could not write the worktree file: "
                                f"{cox.stderr.strip()}. The target is now PART restored — a silent "
                                f"partial restore is worse than the write it was undoing")
+                        # S4. THE ONLY HALF-DONE ONE, and the sentence is measured rather than
+                        # reasoned: `update-index` above already took the pre-run blob, and
+                        # `checkout-index -f` unlinks the existing file BEFORE it writes the
+                        # replacement -- so when it refuses, the worktree file is GONE rather than
+                        # holding this run's bytes. Index and worktree disagree; which bytes sit on
+                        # disk is git's business at that point and this line does not promise any.
+                        unrestored.append(
+                            (p, "`git checkout-index` could not write the worktree file, and the "
+                                "index was ALREADY reverted to the pre-run blob, so the index and "
+                                "the worktree now disagree at this path"))
                         continue
                     restored.append(p)
 
@@ -7722,6 +7741,25 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                             pass
                     continue
 
+                # DEPL-cMendedVintage-2 S2. THE ROW GOES BACK ONLY IF THE FILE DID. This is
+                # `_left_landed` thirty lines up, one level out: the landed branch already refuses
+                # to drop a row whose path it could not remove, and the block below reverted a row
+                # whatever the path loop decided. A failed restore therefore left the file holding
+                # this run's bytes while its row claimed the pre-run `sha256`, and the run persisted
+                # that -- the exact disagreement `-7` and `-8` were built to prevent, arriving
+                # through the failure path instead of the success one.
+                #
+                # `p in written_paths` IS LOAD-BEARING. An entry's path this run never wrote is
+                # collected into `untouched`, and reverting the row is correct for it; without the
+                # filter a single untouched path in a renamed entry would pin that row forward and
+                # invert the fix. The row that stays forward describes the bytes actually on disk,
+                # which costs the operator a re-offer they will not get -- stated in the order,
+                # because a receipt that agrees with the tree beats one that re-offers work over an
+                # unrepaired path.
+                _left = [p for p in s["paths"] if p in written_paths and p not in restored]
+                if _left:
+                    continue
+
                 # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
                 # row stamped forward re-creates `-8` exactly — the next run reads the row as
                 # `equal` against bytes that were reverted — and restoring only some of the six is
@@ -7748,19 +7786,39 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 f"{exits}\n"
                 f"vintage {base_commit} -> {to_commit}\n\n"
                 f"This kit's check PASSED before this run and FAILS after it, so this run is what "
-                f"broke it. Every path marked `restored` below was put back to the index entry "
-                f"it had before the first byte moved, and its receipt row with it. Every path "
-                f"marked `removed` was one this run LANDED: it had no earlier state to return "
-                f"to, so it was deleted and the row this run minted for it was dropped. No other "
+                f"broke it. Every path marked `restored` below — and ONLY those — was put back to "
+                f"the index entry it had before the first byte moved, and its receipt row with it. "
+                f"Every path marked `removed` was one this run LANDED: it had no earlier state to "
+                f"return to, so it was deleted and the row this run minted for it was dropped. "
+                f"Every path marked `NOT restored` is one the rollback could not return at all; "
+                f"its own line says what refused and what its receipt row now holds. No other "
                 f"kit was touched: a green kit's write is correct and reverting it to punish a "
                 f"sibling discards a good result.\n\n"
                 + "".join(f"restored  {p}\n" for p in restored)
                 + "".join(f"removed   {p}\n" for p in removed_landed)
+                # DEPL-cMendedVintage-2 S3. ASSEMBLED PER PATH FROM THE PREDICATE THAT DECIDED IT,
+                # never from `unrestored` as one list. The containment refusal fires BEFORE the
+                # `p not in written_paths` test, so its path is excluded by `_left` and its row IS
+                # reverted with the rest of its entry -- printing it under the sentence below would
+                # claim the bytes are this run's and that the row stayed forward, and both are
+                # false. The report and the revert read one predicate or they disagree.
+                + "".join(
+                    f"NOT restored {p} — {_why_u}; "
+                    + ("the rollback did not return it, so its receipt row was LEFT at this run's "
+                       "values rather than claiming a pre-run state the tree does not have\n"
+                       if p in written_paths else
+                       "nothing was written for it and its receipt row was reverted with the rest "
+                       "of its entry\n")
+                    for p, _why_u in unrestored)
                 # F7. BOTH LISTS. This line used to fire whenever `restored` was empty, so a
                 # rollback that really did REMOVE a landing told the operator that nothing had
                 # happened -- printed directly beneath the `removed` line contradicting it.
+                # `unrestored` JOINS THE TEST for the same reason the `removed` list did: this line
+                # says every path was refused BEFORE it was written, which is false of a path that
+                # was written and then could not be put back — and it would print directly beneath
+                # the block naming those paths.
                 + ("(nothing to restore: every path this kit owns was refused before it was "
-                   "written)\n" if not restored and not removed_landed else "")
+                   "written)\n" if not restored and not removed_landed and not unrestored else "")
                 + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
                           f"undo\n" for p in untouched)
                 + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
