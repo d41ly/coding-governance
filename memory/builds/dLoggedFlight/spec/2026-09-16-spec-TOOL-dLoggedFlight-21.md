@@ -75,6 +75,8 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 - **consumes-from** `TOOL-dLoggedFlight-9` — S5's commitment, `measure_commitment`,
   `check_commitment` and the AC5 arm, whose first and last timestamps this unit supersedes.
 - **hands-off** `TOOL-dLoggedFlight-20` — its rev-1 S3 commitment clause, which moved here.
+- **hands-off** `TOOL-dLoggedFlight-22` — the commitment with no time, which must land before the
+  owner-time refusal retires.
 - **hands-off** `TOOL-dLoggedFlight-23` — the commitment line, which carries no time token for the
   population arm to grade.
 

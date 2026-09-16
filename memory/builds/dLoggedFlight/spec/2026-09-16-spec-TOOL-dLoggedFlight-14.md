@@ -144,7 +144,7 @@ passes it.
 - **AC6** — When `python tools/memory-tree/gotchas.py --for-paths tools/runlog/model.py` runs, it selects
   `withheld-value-recovered-from-a-derived-one`, whose record names this instance.
   Red when: the class record does not name the stale-cache instance.
-- **AC7** — When the discovered-path fixture's store also holds an extract of the same slug from an
+- **AC7** — When the `--discover` fixture's store also holds an extract of the same slug from an
   earlier session, whose every event and whose `extracted_at` precede the window's start, with no
   local transcript, that session is not read: the Coverage `sessions` fact's extracted count excludes
   it, and the state is the one the run's own session gives. With that session's transcript local and

@@ -73,6 +73,8 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   AC1 compares.
 - **hands-off** `TOOL-dLoggedFlight-20` — its rev-1 S3 window clause and M1's provenance facts, which
   moved here.
+- **hands-off** `TOOL-dLoggedFlight-22` — the Summary window with no journal time, which must land
+  before the owner-time refusal retires.
 - **hands-off** `TOOL-dLoggedFlight-23` — the `window` and `duration` slots whose tokens the
   population arm holds to commit times.
 
@@ -138,9 +140,9 @@ The `opened-by` and `closed-by` vocabularies narrow, and neither is renamed.
   commit.
   figure: DERIVED — both windows and every commit time are read from the fixture at observation time,
   never typed.
-- **AC2** — When a commit naming a unit id is added on the default branch after the run's terminal
-  write, `render_record` re-renders the run with `window` and `duration` facts byte-identical to the
-  first render.
+- **AC2** — When `render_record` re-renders the run after a commit naming a unit id lands on the
+  default branch past the run's terminal write, the `window` and `duration` facts are byte-identical to
+  the first render.
   Red when: either fact moves; staged RED against an era-bounded rendering with that one later commit
   in the fixture.
 - **AC3** — When `render_record` renders a model whose `window` reads `start_from` `driver` and
