@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-6 — the fixture records are rendered per prefix, so nothing deletes them
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer+tooling · order 9
+**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer+tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-6-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-6-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -26,6 +27,12 @@ prefix, and let the adopter write them instead of renaming them.
   the kit root, outside the records directory, each carrying `{{KIT_DIR}}` where the piece path is
   spelled today. They sit outside `fixture-records/` because `check-playbook.sh` globs that directory
   and would read a template as a record. Observed by AC3.
+  rev-2: each template also carries the kit's `gov:kit unattended@<version>` marker as its first
+  line, which the kit-version leg requires of every tracked `*.template.md` in the kit directory, so
+  both records gain that line and the "bytes unchanged" clause below is narrowed to the body. The
+  alternative was naming the two files out of that leg's population, which is a gate narrowed by
+  spelling. `check-playbook.sh` reads a record by `piece:`, `hash:`, `run:` and its verdict lines, so
+  a leading comment is inert to it — measured, both in this repo and at a foreign prefix.
 - **S2** `tools/unattended/kit.toml` gains one `rendered` rule per template, each declaring
   `placeholders = ["KIT_DIR"]` and `to = "{kit}/fixture-records/{prefix}~{kit_id}~fixture-pieces~<n>~piece.md.md"`,
   which is the name the adopter derives from its own kit path. Observed by AC1.
@@ -143,8 +150,13 @@ beside the kit's other templates. `check-playbook.sh` reads the same corpus it r
 
 - **AC1** — When `python tools/govkit/govkit.py plan --target <dir> --kits unattended` runs against a
   scratch target whose declared prefix is not `tools`, the two fixture-record destinations it prints
-  carry that prefix in their basenames, and no destination it prints has a basename opening with
+  carry that prefix in their basenames, and no `write` row it prints has a basename opening with
   `tools~`.
+  rev-2 narrowed that clause from "no destination it prints" to "no `write` row", because the S3
+  claim is what prints the other two: a `project-owned` row is marked `ORDER` by construction,
+  exactly as this descriptor's seven withheld self-tests already are, and `apply` writes neither. The
+  original wording could not be met by any design that withholds through a destination claim, which
+  is the design S3 mandates.
   Red when: the project-owned claim of S3 is missing, so the wildcard pool ships gov's spelling
   alongside the rendered row and both appear in the plan.
   fixture: a scratch target created under the run's scratch root, because this repo keeps no govkit
@@ -193,9 +205,28 @@ added there would not run at the boundary this unit is about.
   destination the sweep would produce, so a sweep would be a second spelling of one rule, and the
   stale gov-spelled copies are reported as withdrawn rows with an order rather than left invisible.
 
+### Residue the build measured (rev-2)
+
+The COPY-INSTALL path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit directory and reads no
+descriptor, so a target that installs that way receives gov's two records beside the rendered pair
+and `check-playbook.sh` reports each as an orphan record. It does not red — the reader classifies and
+only `--close` blocks — and it is the standing of the seven self-tests that same path also copies and
+that the descriptor withholds from `apply` alone. Measured at prefix `scripts`: pieces 2, verified 2,
+plus two orphan notes naming gov's spelling. Deleting them from the adopter was refused for section
+3's reason: an adopter that deletes is the class this unit closes, and a stale copy is the operator's
+call through a withdrawal order. The runbook carries no removal step for this kit's withheld files at
+all, which predates this unit and is reported rather than widened into here.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · built. AC1's second clause narrowed to `write` rows, because the S3 claim
+  prints as `ORDER` by construction; S1's templates carry the kit-version marker, so both records
+  gain that line; the copy-install residue measured and recorded above. AC5 was not observed in this
+  pass — it needs a receipt, and `apply` refuses the scratch install without `memory-tree` and
+  `review-harness` beside it, which is a three-kit setup rather than a check. What AC5 asks about is
+  established one level up by AC1: at a foreign prefix gov's spelling is on no `write` row, so no
+  update writes a file for a rename to clobber, and the rename is deleted.
 
 ## 10. Reuse audit
 
