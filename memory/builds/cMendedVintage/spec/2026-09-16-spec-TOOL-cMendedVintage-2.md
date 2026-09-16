@@ -1,12 +1,14 @@
 # TOOL-cMendedVintage-2 — gate-lint stops seeding into the memory tree
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 12
+**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-TOOL-cMendedVintage-2-acceptance-ledger.md](../build/2026-09-16-build-TOOL-cMendedVintage-2-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-TOOL-cMendedVintage-2-2-build-brief.md](../prompts/2026-09-16-prompt-TOOL-cMendedVintage-2-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -199,6 +201,14 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · the build pass adds `memory/map/features/gate-lint.md` to the files touched.
+  Section 4's Inventory listed no dossier and section 2 named none, but the dossier claims the glob
+  `tools/gate-lint/*` and three of its paragraphs assert the seed rule ships the registry — claims
+  this unit makes false. Refreshing them is the §1 Definition of Done's "dossier prose refreshed on
+  touch", not new scope: no claim key moves, and `memory/map/generated/` names the deleted template
+  nowhere, so nothing is regenerated. Also recorded here because section 5's testing line did not:
+  a CLOSED Tier-2 spec dated after `ACCEPTANCE_LEDGER_CUTOFF` owes an acceptance ledger under the
+  build folder, so this unit writes one.
 
 ## 10. Reuse audit
 

@@ -3,7 +3,7 @@
 
 Project-agnostic. Run over any repo:
 
-    python <this file> <registry-path> [root]     # scan; exit 0 clean, 1 on an undeclared site
+    python <this file> [registry-path] [root]     # scan; exit 0 clean, 1 on an undeclared site
     python <this file> --selftest                 # prove the predicate in BOTH directions
 
 THE CLASS. `while read … done <<TAG` with `$(cmd)` in the heredoc body, or `done <<< "$(cmd)"`.
@@ -50,6 +50,13 @@ THE REGISTRY is a shrink-only declaration of the sites that predate the gate, on
 line-keyed registry reds on unrelated edits, and a gate whose steady state is red gets bypassed.
 Set equality in both directions: a measured site with no row fails, and a row the scan no longer
 finds fails, so draining a site forces its row out instead of leaving a widened exemption behind.
+
+THE REGISTRY ARGUMENT IS OPTIONAL, and omitting it is a POSTURE rather than a mistake. With no
+argument the run grades against an empty declaration and reports every measured site as undeclared
+— a RED leg, which is the honest first reading of a tree nobody has graded yet, and byte-identically
+what an empty registry file produces. An argument that WAS supplied and does not resolve is a typo
+and refuses: `resolve_declaration` keeps those two apart, because collapsing them would let a
+mis-spelled path grade silently against nothing while reading exactly like a first install.
 """
 from __future__ import annotations
 
@@ -89,7 +96,7 @@ GATED = [key for key, _label, gated in CLASSES if gated]
 #: A printed count nothing reads is the same nothing as no count: this repository has shipped
 #: nine arms stranded past an unconditional exit while the suite printed a total and every
 #: other gate held. Raise it with the arms; it may never be lowered to fit a regression.
-FLOOR_ASSERTIONS = 24
+FLOOR_ASSERTIONS = 27
 
 
 def check_substitution(text: str) -> bool:
@@ -260,6 +267,28 @@ def read_registry(path: pathlib.Path) -> tuple[dict[tuple[str, str], int], list[
     return declared, malformed
 
 
+def resolve_declaration(arg: str | None) -> tuple[dict[tuple[str, str], int], list[str]]:
+    """The declared sites for the OPTIONAL registry argument, or a refusal. Three states.
+
+    ABSENT is the posture this scanner ships in, and it used to be the one state it refused. An
+    empty declaration grades every measured site as undeclared, which is byte-identically what an
+    empty registry file produces and what a first install is documented to see — so the refusal
+    forbade the state the kit hands a new adopter, and did it at the leg the adopter runs first.
+
+    SUPPLIED AND UNRESOLVABLE raises. The two must not collapse into one: a mis-spelled path that
+    graded against an empty declaration would report the whole population as new and read exactly
+    like an honest first install, which is a typo wearing a posture's clothes.
+    """
+    if arg is None:
+        return {}, []
+    path = pathlib.Path(arg)
+    if not path.is_file():
+        raise OSError(f"no registry at {path} — the argument was SUPPLIED and does not resolve to "
+                      f"a file, which is a typo and not a posture; OMIT it to grade against an "
+                      f"empty declaration")
+    return read_registry(path)
+
+
 def check_registry(measured: dict[tuple[str, str], int],
                    declared: dict[tuple[str, str], int]) -> list[str]:
     """Set equality in both directions, with the counts. Returns one line per violation."""
@@ -401,6 +430,22 @@ def run_selftest() -> int:
         _rows, bad = read_registry(reg)
         test("a non-numeric count is refused as malformed", len(bad), 1)
 
+        # ---- the OPTIONAL argument, in all three of its states ---------------------------------
+        # Asserted here rather than through a run, because a tree scan cannot tell the absent case
+        # from the empty-file case — they produce the same declaration, which is the whole claim.
+        test("an absent argument resolves to an empty declaration, not a refusal",
+             resolve_declaration(None), ({}, []))
+        reg.write_text("a.sh\tHIT\t1\tpredates the gate\n", encoding="utf-8")
+        test("an argument naming a file is read through the same parser",
+             resolve_declaration(str(reg)), ({("a.sh", "HIT"): 1}, []))
+        try:
+            resolve_declaration(str(pathlib.Path(scratch) / "nosuch.txt"))
+            refusal = "resolved"
+        except OSError as exc:
+            refusal = "named" if "nosuch.txt" in str(exc) else f"refused without naming it: {exc}"
+        test("an argument that was supplied and does not resolve refuses, naming the path",
+             refusal, "named")
+
     if n < FLOOR_ASSERTIONS:
         print(f"SELFTEST FAIL: {n} assertion(s) executed, under the floor of {FLOOR_ASSERTIONS} — an arm is stranded past an early exit, which is the one defect a printed count can see and a per-arm check cannot")
         ok = False
@@ -411,22 +456,15 @@ def run_selftest() -> int:
 def main(argv: list[str]) -> int:
     if "--selftest" in argv:
         return run_selftest()
-    if len(argv) < 2:
-        print("usage: sh_hygiene <registry-path> [root] | sh_hygiene --selftest", file=sys.stderr)
-        return 2
-    registry = pathlib.Path(argv[1])
-    root = pathlib.Path(argv[2] if len(argv) > 2 else ".").resolve()
+    args = argv[1:]
+    root = pathlib.Path(args[1] if len(args) > 1 else ".").resolve()
     if not root.is_dir():
         print(f"sh-hygiene: not a directory: {root}", file=sys.stderr)
         return 2
-    if not registry.is_file():
-        print(f"sh-hygiene: no registry at {registry} — a scan with no declaration to compare "
-              f"would report the whole population as new, or nothing at all", file=sys.stderr)
-        return 2
     try:
-        declared, malformed = read_registry(registry)
+        declared, malformed = resolve_declaration(args[0] if args else None)
     except OSError as exc:
-        print(f"sh-hygiene: the registry is unreadable, which is a refusal: {exc}", file=sys.stderr)
+        print(f"sh-hygiene: {exc}", file=sys.stderr)
         return 2
     try:
         findings, scanned = scan_tree(root)
