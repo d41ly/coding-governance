@@ -1122,7 +1122,7 @@ has "PV-F3 a drifted protocol still reds in that install" "$o" "DRIFT"
 has "PV-F3 ...at exit 1" "$o" "rc=1"
 
 # ---- ROUND 2 R2-3: THE REGENERATE REFRESHES AN INSTALL, IT NEVER CREATES ONE. govkit runs the argv
-# ---- `kit.toml` declares on every update with GOVKIT_RERENDER=1, captures its output and prints one
+# ---- `kit.toml` declares on every update unless GOVKIT_RERENDER=0, captures its output and prints one
 # ---- line, and rows nothing it writes. So a render mode that creates a missing live copy put a
 # ---- second review protocol into a consumer that keeps its own extract on purpose, and nothing named
 # ---- the file. The argv is read out of `kit.toml` and run exactly as declared, because a mode this

@@ -138,11 +138,12 @@ argv = ["bash", "{kit}/adopt-unattended.sh"]
 mutates_index = false
 requires_config_first = true
 
-# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. Every `rendered` row above is written by the
-# adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER unset, `update` lands
-# the new templates, leaves the renders stale, and then fails its own post-write check on the Skill
-# and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this block
-# prevents it only under the flag. The adopter re-renders unconditionally, so it is the whole argv;
+# THE RE-RENDER an update runs by default; GOVKIT_RERENDER=0 declines it. Every `rendered` row above
+# is written by the adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER=0,
+# `update` lands the new templates, leaves the renders stale, and then fails its own post-write check
+# on the Skill and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this
+# block prevents it unless an operator turns the step off. The adopter re-renders unconditionally,
+# so it is the whole argv;
 # its declared outcomes below classify its exit exactly as they do for `apply`.
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-unattended.sh"]

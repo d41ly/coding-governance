@@ -25,9 +25,9 @@ argument is the leg that grades them:
 the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A
 workflow script has no filesystem when it runs, so it cannot find its siblings, and apply would
 write a shipped copy verbatim, naming this repo's `tools/` layout in every adopter. So the kit
-renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on an update run
-with `GOVKIT_RERENDER=1`. With `GOVKIT_RERENDER` unset `update` declines that block and NAMES the
-decline on stdout — `DECLINED review-harness: the re-render step is OFF …` — on every `--write`,
+renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on every update run
+unless `GOVKIT_RERENDER=0` is exported. With `GOVKIT_RERENDER=0` set `update` declines that block and
+NAMES the decline on stdout — `DECLINED review-harness: the re-render step is OFF …` — on every `--write`,
 whatever the flag says (`DEPL-cMendedVintage-1`, which made that decline decide whether a kit's
 writes are rolled back; a decline that can decide that must not be invisible). It still prints the
 harness row as `re-rendered` although no render ran, and where your bar wires the parity leg, that

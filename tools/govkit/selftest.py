@@ -6545,12 +6545,14 @@ user_skills = "/tmp/gk-fake-skills"
         _Bdr = gout(_gdr, "rev-parse", "HEAD").strip()
         _recdra = json.loads((_tdr / ".governance" / "install.json").read_text(encoding="utf-8"))
         remove_runs14(_logdr)
-        # THE FLAG IS STRIPPED RATHER THAN ASSUMED UNSET: AC3 is a claim about a flag-OFF run, and
-        # inheriting a developer's exported `GOVKIT_RERENDER=1` would make it a claim about nothing.
+        # THE FLAG IS PINNED OFF RATHER THAN STRIPPED, since DEPL-cMendedVintage-7: AC3 is a claim
+        # about a flag-OFF run, the step is ON by default, and an env-stripped run now takes the
+        # other path — so the strip that used to make this a claim about something would make it a
+        # claim about nothing. `0` is the operator's own revert, spelled here for the same reason.
         _wdr = subprocess.run(
             [sys.executable, str(_gdr / "tools" / "govkit" / "govkit.py"),
              "update", "--target", str(_tdr), "--write"], capture_output=True, text=True,
-            env={k: v for k, v in os.environ.items() if k != "GOVKIT_RERENDER"})
+            env=dict(os.environ, GOVKIT_RERENDER="0"))
         _obdr = _tdr / ".governance" / "outbox"
 
         check("[-1] AC1 the kit is printed DECLINED RED, with both states and both exit codes",
@@ -7730,13 +7732,13 @@ user_skills = "/tmp/gk-fake-skills"
             # the declared sites, so neither move could be forgotten on one side only.
             #
             # `None`, AND THE REASON IS THE FEATURE ITSELF. The re-render step announces every
-            # argv it runs and every kit it declines -- but ONLY when GOVKIT_RERENDER=1, because
-            # AC6 asks for output byte-identical to the pre-change run while the flag is off,
-            # and a dark feature that announces its own absence is not dark. This map is graded
-            # with the flag unset, so there is no live needle to assert HERE. The announcement
-            # under the flag is asserted by the `[-PV]` arms near the end of this suite, which set
-            # it; until build dPolishedVitrine this line said "the S6 arms below" did, and none
-            # of them sets it.
+            # argv it runs, and that announcement is gated on `_rerender_on` -- the step is ON
+            # unless GOVKIT_RERENDER=0 is exported (DEPL-cMendedVintage-7; before that flip the
+            # gate ran the other way and this entry read the same). A needle whose presence turns
+            # on an environment value is not a property this map can hold, so there is none HERE.
+            # The announcement is asserted by the `[-PV]` arms near the end of this suite, which
+            # pin the value in both directions; until build dPolishedVitrine this line said "the
+            # S6 arms below" did, and none of them sets it.
             "_cmd_update": None,
         }
         # ---- DEPL-dRetiredFork-5, ROUND 2. THE VERDICT ARMS WERE SWAPPED ----------------------
@@ -9152,6 +9154,12 @@ user_skills = "/tmp/gk-fake-skills"
         # variables, and the arms passed here while the runbook crashed on a fresh node. The runbook's
         # own variables go too, so a node that happens to export `TRAILER`, `MEMORY_TREE_DIR` or
         # `GOVKIT_RERENDER` cannot decide an arm that was written without them.
+        #
+        # THE STRIP STAYS, AND EVERY BLOCK BELOW NOW RUNS WITH THE STEP ON (DEPL-cMendedVintage-7).
+        # Removing `GOVKIT_RERENDER` leaves the re-render at its default, which is on, and that is
+        # the right environment here: block 1 is the only block that runs `update`, and it exports
+        # `GOVKIT_RERENDER=1` on that line itself, so the strip drops this node's opinion and
+        # decides nothing either way.
         _pvENV = {k: v for k, v in os.environ.items()
                   if k not in ("PYTHONUTF8", "PYTHONIOENCODING", "TRAILER", "MEMORY_TREE_DIR",
                                "GOVKIT_RERENDER", "GOV", "KIT", "PY")}
@@ -9302,8 +9310,10 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- R3-3's STARTING STATE. The consumer took its routine pull first: a flag-off `update
         # ---- --write` to B, committed through its hooks, which is core's documented procedure.
+        # PINNED OFF, not stripped (DEPL-cMendedVintage-7): the step is ON by default now, and the
+        # whole of R3-3 is that this pull left `update` no regenerate to run.
         _pvqou = run_pv_govkit(_pvg, "update", "--target", str(_pvqo), "--write",
-                               env={k: v for k, v in os.environ.items() if k != "GOVKIT_RERENDER"})
+                               env=dict(os.environ, GOVKIT_RERENDER="0"))
         _pvqoc = run_pv_commit(_pvqo, "the routine pull", ".governance/install.json",
                                ".governance/install.sums")
         check("[-PV] R3-3 PRECONDITION the flag-off pull moved the tree to B and committed through the "
@@ -9790,8 +9800,10 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- row `re-rendered` and prints it before the flag is read, so the carriers that said "prints
         # ---- nothing" had an operator read that line as proof a render ran. It runs on the target the
         # ---- migration left clean.
+        # PINNED OFF, not stripped (DEPL-cMendedVintage-7): the subject is a flag-OFF update, and
+        # with the step now ON by default an env-stripped run would render and grade the opposite.
         _pvoff = run_pv_govkit(_pvg, "update", "--target", str(_pvt), "--write",
-                               env={k: v for k, v in os.environ.items() if k != "GOVKIT_RERENDER"})
+                               env=dict(os.environ, GOVKIT_RERENDER="0"))
         _pvov = [ln for ln in _pvoff.stdout.splitlines()
                  if ln.startswith("  ") and ln.rstrip().endswith(_pvH)]
         check("[-PV] R2-7 a flag-off update over a moved template PRINTS the render's row `re-rendered`",

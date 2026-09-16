@@ -62,8 +62,8 @@ required_keys_render = ["MEMORY_ROOT"]
 argv = ["bash", "{kit}/adopt-drift-audit.sh"]
 mutates_index = false
 
-# THE RE-RENDER an `update` runs when GOVKIT_RERENDER=1 is exported. It rewrites what the `rendered`
-# rule above declares, from `SKILL.template.md` plus the shared memory-tree conf — content derived
+# THE RE-RENDER an `update` runs by default; GOVKIT_RERENDER=0 declines it. It rewrites what the
+# `rendered` rule above declares, from `SKILL.template.md` plus the shared memory-tree conf — content derived
 # from the adopting tree rather than copied from gov's, which is what makes it go stale.
 #
 # THE SAME WORDS AS `[adopt]`, and that is a property rather than an oversight. This adopter carries

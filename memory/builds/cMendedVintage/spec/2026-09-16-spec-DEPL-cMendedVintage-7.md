@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-7 — `GOVKIT_RERENDER` defaults ON, and `=0` becomes the revert
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 10
+**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-7-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-7-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -168,6 +169,19 @@ against those arms' own fixtures · no assertion floor to move.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · built. Three corrections to section 4's estimates, none to the design. The
+  S3 population DERIVED at build time is twelve files, not the six the "Files touched" table
+  guessed: the four sibling descriptors that ship a `rendered` row, the two `*.test.sh` headers
+  under the review-harness home, and `selftest.py`'s own prose all state the old default. S3 said
+  the population is derived, so this is the estimate being wrong rather than the scope moving. S2's
+  site list is FOUR, not the two the brief named: `selftest.py` removed the variable from a child
+  environment at four places, three of which have the off path as their subject and are now pinned
+  to `0` (the `-1` DECLINED-RED arm, R3-3's routine pull, R2-7's flag-off update), and the fourth is
+  the runbook-block `_pvENV` strip, which keeps the strip and carries the line S2 allows — block 1
+  exports the value on its own `update` line, so the strip only drops this node's opinion. Three
+  carriers also claimed a flag-off `update` prints nothing about the decline, which has been false
+  since `DEPL-cMendedVintage-1` made declines print; they were corrected with the sentence around
+  them, and `selfcheck` now reports zero live instances of arm 7l's negative half.
 
 ## 10. Reuse audit
 

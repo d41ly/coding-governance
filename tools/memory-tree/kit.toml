@@ -88,9 +88,9 @@ mutates_index = true
 # able to refresh them, and went one vintage stale on every pull. `--render` skips the adoption guard,
 # requires the `gov:kit memory-tree@` marker instead, and writes those four and nothing else.
 #
-# GATED BY `GOVKIT_RERENDER`, like every block of this kind: with that flag unset the re-render step
-# is declined, so a `govkit update` refreshes nothing here and still relabels each moved `rendered`
-# row `re-rendered` before the flag is ever read. Reachable by hand at any time.
+# GATED BY `GOVKIT_RERENDER`, like every block of this kind: the step runs by default, and with
+# GOVKIT_RERENDER=0 exported a `govkit update` refreshes nothing here and still relabels each moved
+# `rendered` row `re-rendered` before the flag is ever read. Reachable by hand at any time.
 #
 # SAFE TO RE-RUN for the reason the mode was cut this narrow: it seeds no conf, writes no waiver
 # registry, creates no directory beyond a destination's own parent, and leaves a file whose render is

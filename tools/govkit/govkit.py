@@ -1995,8 +1995,10 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # ---- 7l: A KIT THAT DECLARES `[[regenerate]]` MAY NOT CLAIM THAT `update` RE-RENDERS WITHOUT
     #          NAMING THE FLAG THAT GATES IT, in the same sentence. Build dPolishedVitrine's round-1
     #          review, F5: five carriers said an update re-renders the kit's artifacts, or names it one
-    #          vintage stale, and with GOVKIT_RERENDER unset it does neither -- the regenerate is
-    #          declined in silence, by DEPL-dRetiredFork-3's byte-identical-output criterion. Every
+    #          vintage stale, and with GOVKIT_RERENDER=0 exported it does neither -- the regenerate
+    #          is declined, and every run that had not opted in was such a run until
+    #          DEPL-cMendedVintage-7 made the step the default. That flip narrowed the population
+    #          this arm protects; it did not empty it, because the value is still readable. Every
     #          kit that adds a block will want to write that sentence, so the CLASS is gated here,
     #          over each such kit's own tracked files and its descriptor, rather than one kit's copy.
     #
@@ -2063,7 +2065,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 if "GOVKIT_RERENDER" not in _s:
                     r.fail(f"'{_f}' (kit '{eid}', which declares [[regenerate]]) says `update` "
                            f"re-renders without naming GOVKIT_RERENDER in the same sentence, and "
-                           f"with that flag unset `update` declines the regenerate in silence: "
+                           f"with GOVKIT_RERENDER=0 exported `update` declines the regenerate: "
                            f"{_s[:200]}")
     r.note(f"re-render claims: {n_rr_claims} sentence(s) naming `update` and a re-render, and "
            f"{n_rr_silent} calling a flag-off run silent, across {n_rr_kits} kit(s) declaring "
@@ -7366,18 +7368,25 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ONE VINTAGE STALE on every update. Measured at one adopter: NINE rendered rows, including three
     # SKILL.md files and both binding protocols, plus the two CI jobs that byte-compare them.
     #
-    # GATED OFF BY DEFAULT, and that is this spec's own section 4 rather than caution added here:
-    # this is the first time `update` executes target-side code, so it ships dark and is flipped on
-    # after in-place verification against a fixture and then one adopter. The charter's dark-landing
-    # rule, applied to the deployer itself. With the flag off the output is byte-identical to before,
-    # which is what makes the first release safe to land.
+    # ON BY DEFAULT SINCE DEPL-cMendedVintage-7, and `GOVKIT_RERENDER=0` is the entire revert: no
+    # release, no code change, one exported value. It shipped dark under the charter's dark-landing
+    # rule — the first release to execute target-side code lands off and is flipped after in-place
+    # verification against a fixture — and both halves of this expression were run against a scratch
+    # install before the commit that moved it. Two preconditions had to be true first and were: the
+    # argv that destroyed an adopter file at any prefix but gov's own is fixed
+    # (DEPL-cMendedVintage-6), and every declared regenerate has been run for real.
+    #
+    # WHAT THE FLIP MOVED IS THE BLAST RADIUS, NOT THE TRUST BOUNDARY, and conflating the two would
+    # claim a safety property this default does not buy. The argv was gov's before and is gov's now;
+    # what changed is that it runs for every operator on every `--write` rather than only for one who
+    # opted in. A defect in any kit's regenerate now reaches all of them.
     #
     # THE ARGV IS ALWAYS GOV'S. It comes from a gov-authored descriptor and NEVER from the target's
     # `deploy.toml`. That is the trust boundary section 5 names: the code runs in the target's tree
     # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
     # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
     # trusted.
-    _rerender_on = os.environ.get("GOVKIT_RERENDER") == "1"
+    _rerender_on = os.environ.get("GOVKIT_RERENDER") != "0"
     _rr_ran: list[str] = []
     _rr_declined: list[tuple[str, str]] = []
     # DEPL-cMendedVintage-1 S1. A STRICT SUBSET OF `_rr_declined`, and the subset is the point: it
@@ -7429,7 +7438,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     _rr_stale[_eid] = _why_rr
                 continue
             if not _rerender_on:
-                _why_rr = ("the re-render step is OFF (set GOVKIT_RERENDER=1); "
+                _why_rr = ("the re-render step is OFF (GOVKIT_RERENDER=0 is exported); "
                            "its artifacts are one vintage stale until it is run")
                 _rr_declined.append((_eid, _why_rr))
                 _rr_stale[_eid] = _why_rr
@@ -7607,8 +7616,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     f"run gave it, and the receipt is NOT re-stamped, so the next run "
                     f"re-classifies these rows from the vintage they are actually at.\n\n"
                     f"WHAT TO FIX: the declined step, not the merge. Either declare a "
-                    f"[[regenerate]] argv for this kit, or run this update again with "
-                    f"GOVKIT_RERENDER=1 — whichever the sentence above names. Until the render is "
+                    f"[[regenerate]] argv for this kit, or run this update again with no "
+                    f"GOVKIT_RERENDER=0 in the environment, since the step is on by default — "
+                    f"whichever the sentence above names. Until the render is "
                     f"refreshed this kit's check stays red at every run.\n",
                     encoding="utf-8", newline="\n")
                 print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · DECLINED RED: not "

@@ -1012,7 +1012,8 @@ kit's own README.
 `update-declined-red-<kit>.md` means that kit's own `[check]` went green-to-red across this run and
 the cause was a render step **this run declined**, not the bytes it wrote: nothing was rolled back,
 the writes stand, the receipt is not re-stamped, and its first sentence names the declined step to
-fix — a missing `[[regenerate]]` argv, or `GOVKIT_RERENDER=1`. Its siblings are
+fix — a missing `[[regenerate]]` argv, or the `GOVKIT_RERENDER=0` that declined a step `update`
+otherwise runs by default. Its siblings are
 `update-rollback-<kit>.md`, where this run's writes really were reverted, and
 `update-preexisting-red-<kit>.md`, where the kit was red before the run started.
 
