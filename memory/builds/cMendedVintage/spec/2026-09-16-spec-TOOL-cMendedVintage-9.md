@@ -1,12 +1,14 @@
 # TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-TOOL-cMendedVintage-9-acceptance-ledger.md](../build/2026-09-16-build-TOOL-cMendedVintage-9-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 |
+| [2026-09-16-prompt-TOOL-cMendedVintage-9-2-build-brief.md](../prompts/2026-09-16-prompt-TOOL-cMendedVintage-9-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -182,8 +184,19 @@ entries in `.claude/settings.json` take the unchanged path.
 
 `kickoff-manifest ratchet` · `manifest-check self-test` · `scratch-guard self-test`
 
-New arm: skills/session-kickoff/manifest-check.test.sh · a `sleep`-held pipe on stdin with
-`--session` supplied, asserting the verb returns instead of reaching the suite's own wall · none
+New arm: skills/session-kickoff/manifest-check.test.sh · a fifo opened READ-WRITE on fd 9 holds
+stdin with no EOF and no holder process, `--session` supplied, `timeout 10` bounding the call so the
+verb's return is asserted instead of the suite's own wall · none
+
+A `sleep`-held pipe was the drafted mechanism and is still AC1's, where the command is run once by
+hand. It is the wrong one for a suite arm: bash waits on every member of a pipeline, so
+`sleep N | timeout B …` charges N seconds to the GREEN run as well as the red one, and N must exceed
+B or the pipe closes before the bound and the arm passes by EOF — the very case the arm exists to
+exclude. A fifo opened `<>` has a writer for as long as the fd is held, so it never reports EOF, and
+the arm costs its bound only when it fails. The mechanism is itself observed: a `timeout 2 cat <&9`
+liveness arm asserts 124 ahead of the verb arm, so a tree with no fifo support reds by name instead
+of returning fast for the wrong reason. Both arms were run against the real script and against a
+staged break with the `CARD_SID` term removed: green, then 124 at the bound.
 
 The `scratch-guard self-test` leg is named because two of its arms invoke the card writer with
 `--session` and `</dev/null`; they take the new short-circuit and must stay green.
@@ -201,6 +214,10 @@ none
   `FLOOR_ASSERTIONS` and AC6 grades it. M6: §10 claimed the change restores the order
   `KICK-aReplayedCard-1` §S2 documents, and source says that record documents stdin-first and
   `manifest-check.sh:129` implements it, so §10 now records a supersession.
+- rev-3 · 2026-09-16 · §7 · build-time divergence. S4's arm holds stdin with a read-write fifo
+  rather than the drafted `sleep`-held pipe, and gains a liveness arm asserting that holder reports
+  no EOF, so the suite pays the bound only on a red run and cannot pass by EOF. S4's assertion count
+  is therefore 2, and `FLOOR_ASSERTIONS` moved 174 → 176. AC1's own command is unchanged.
 
 ## 10. Reuse audit
 

@@ -119,13 +119,18 @@ cd "$ROOT" || exit 2
 # the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
 CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
 
-# The session id: the SessionStart hook hands `{"session_id": …}` on stdin; a hand invocation passes
-# --session. Neither is a refusal naming both, never a card under a guessed id; a separator, `..` or
+# The session id, in PRECEDENCE order: `--session` answers FIRST and SUPPRESSES the stdin read;
+# only a caller that passed none falls through to the `{"session_id": …}` JSON the SessionStart hook
+# hands on stdin. That order is the fix for TOOL-cMendedVintage-9 and supersedes the stdin-first one
+# KICK-aReplayedCard-1 §S2 recorded: `[ -t 0 ]` admits a terminal and the hook's closing pipe, and
+# not the third case — the never-closing pipe every tool-invoked shell hands its child — on which
+# the `sed` below blocks forever, including for a caller that had already answered by flag.
+# Neither channel is a refusal naming both, never a card under a guessed id; a separator, `..` or
 # any byte outside [A-Za-z0-9._-] is refused before it can be joined into a path. `--append` never
 # reads stdin here — stdin is the body it stores — so it takes `--session` alone.
 read_session_id() {
   local sid=""
-  [ "$CARD_VERB" = append ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  [ "$CARD_VERB" = append ] || [ -n "$CARD_SID" ] || [ -t 0 ] || sid=$(sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
   [ -n "$sid" ] || sid="$CARD_SID"
   if [ -z "$sid" ] && [ "$CARD_VERB" = append ]; then
     echo "MANIFEST env ERROR — --card --append has no session id: stdin is the body, so pass --session <sid>"; exit 2

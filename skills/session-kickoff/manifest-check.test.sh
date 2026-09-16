@@ -802,6 +802,24 @@ check_eq "AC3 the refused ids wrote nothing under orientation/" "$before" "$(ls 
 [ "$got" = 0 ] && [ -f "$CARD_HOME/$NONCE-t2.md" ] && { echo "ok   AC3 the session id is read from the hook's JSON on stdin"; pass=$((pass+1)); } \
   || { echo "FAIL AC3 the session id is read from the hook's JSON on stdin (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# TOOL-cMendedVintage-9 — stdin held OPEN across the call. `run_card` cannot serve: it feeds
+# /dev/null, and a stdin that is already at EOF is the case that passed before the fix. A fifo
+# opened READ-WRITE never reports EOF and needs no holder process, so a `sleep` that outlives the
+# bound does not charge its own wall to every green run. The liveness arm is first and is not
+# decoration: if the fifo is not open the verb returns for the wrong reason and the arm below
+# certifies the fix while observing nothing.
+mkfifo "$TMP/openstdin" 2>/dev/null
+exec 9<>"$TMP/openstdin"
+timeout 2 cat <&9 >/dev/null 2>&1; got=$?
+[ "$got" = 124 ] && { echo "ok   S4 liveness: the held stdin reports no EOF, so the arm below can fail"; pass=$((pass+1)); } \
+  || { echo "FAIL S4 liveness: the held stdin returned $got, not 124 — it is NOT open (no fifo support?), and the arm below would pass by finding nothing"; fail=$((fail+1)); }
+t0=$(date +%s)
+(cd "$CWT" && timeout 10 bash "$CHECK" --card --path --session "$NONCE-t9s" <&9 > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && grep -qF -- "/orientation/$NONCE-t9s.md" "$CARD_OUT" \
+  && { echo "ok   S4 --session returns with stdin held open (wall $(($(date +%s)-t0))s)"; pass=$((pass+1)); } \
+  || { echo "FAIL S4 --session blocked on an open stdin (exit $got; 124 = the bound fired) — read_session_id read stdin although --session had answered"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
+exec 9>&-; rm -f "$TMP/openstdin"
+
 # AC4 — the node cell: the real registry at HEAD, then the two fixtures, then no key at all.
 if [ "$CUSER" = daily-agent ]; then
   check_eq "AC4 node — resolves this node from the real AGENTS.md" "node — a · daily-agent" "$(read_cell node "$NONCE-t1")"
@@ -1116,8 +1134,11 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # exact tag against the real AGENTS.md, which the spec words as "on this node"); it announces its
 # skip elsewhere, and a floor that counted it would red the suite on b, c and d for an arm that is
 # not theirs to reach. KICK-aReplayedCard-1 (109), then the 56 append and check arms of
-# KICK-aReplayedCard-2, then the 9 arms of the closing review's round-1 fold (F1, F7, F8, F9).
-FLOOR_ASSERTIONS=174
+# KICK-aReplayedCard-2, then the 9 arms of the closing review's round-1 fold (F1, F7, F8, F9), then
+# the 2 arms of TOOL-cMendedVintage-9 (the held-open stdin and its liveness probe). RAISED in the
+# same commit as those arms: this floor and check-testsuite-counts.sh are both shrink-only, so an
+# unraised floor is the one thing that lets a later edit delete the arms and red nothing.
+FLOOR_ASSERTIONS=176
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced
