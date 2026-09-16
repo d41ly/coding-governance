@@ -102,3 +102,11 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T12:25:35Z rescope · item add TOOL-dLoggedFlight-15 · reason closing review round 2 NON-CONVERGENT, R2-H1 promoted: rows an owner act causes carry that act's time into the committed record
 
 2026-09-16T12:54:38Z review · item dLoggedFlight-spec-set-r4 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-16T13:11:09Z rescope · item add TOOL-dLoggedFlight-16 · reason spec audit round 1 of units 14 and 15 BOUNDED, B1 BLOCKER promoted: unit 14 withheld the transcript counts under partial, which unit 9 renders
+
+2026-09-16T13:11:10Z rescope · item add TOOL-dLoggedFlight-17 · reason spec audit round 1 of units 14 and 15 BOUNDED, H4 HIGH and H5 HIGH promoted: the independent refusal compared seconds and read no session on the shipped default
+
+2026-09-16T13:11:10Z rescope · item add TOOL-dLoggedFlight-18 · reason spec audit round 1 of units 14 and 15 BOUNDED, H1 HIGH and H2 HIGH promoted: the commitment last and a NONE gate line's window end carried a held line's time
+
+2026-09-16T13:11:11Z rescope · item add TOOL-dLoggedFlight-19 · reason spec audit round 1 of units 14 and 15 BOUNDED, H3 HIGH promoted: the class gate enumerated row kinds and missed every other UTC slot of the schema

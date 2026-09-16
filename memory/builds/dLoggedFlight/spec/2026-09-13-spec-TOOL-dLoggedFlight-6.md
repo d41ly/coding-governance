@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost
 
-**Status:** CLOSED · rev-8 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
+**Status:** CLOSED · rev-9 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -90,7 +90,11 @@ streamed, located through the session ids the driver recorded, and kept under th
 - **consumes-from** `TOOL-dLoggedFlight-5` — the redaction table, for classification and narration.
 - **hands-off** `TOOL-dLoggedFlight-8` — the run model joins these events, owner turns and usage into a
   run's timeline.
-- **hands-off** `TOOL-dLoggedFlight-14` — the extract format, which gains `extracted_at` there.
+- **hands-off** `TOOL-dLoggedFlight-14` — the extractor it runs in memory on a live transcript, and the
+  session tree it stats.
+- **hands-off** `TOOL-dLoggedFlight-16` — the extract format, which gains `extracted_at` there.
+- **hands-off** `TOOL-dLoggedFlight-17` — `resolve_session_tree` and `scan_owner_turns`, which the
+  owner-time refusal reads independently.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill prints narration through S6.
 
 ## 4. Design
@@ -321,6 +325,9 @@ New arm: `tools/runlog/selftest.py` · each rule staged RED on its fixture · fl
   never a path, and the driver bounds none.
 - rev-8 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-14` and `-15`, the units closing
   review round 2 promoted at its NON-CONVERGENT exit.
+- rev-9 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-16` and `-17`, units the spec audit of
+  units 14 and 15, round 1, promoted at its BOUNDED exit. The edge to `-14` now names what that unit
+  keeps, since `extracted_at` moved to `-16`.
 
 ## 10. Reuse audit
 

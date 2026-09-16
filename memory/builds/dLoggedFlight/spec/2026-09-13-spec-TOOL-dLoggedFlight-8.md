@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-12 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-13 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -280,7 +280,15 @@ sources actually support. Every later surface renders from this model rather tha
 - **hands-off** `TOOL-dLoggedFlight-11` — the push join by what was pushed, which lets the re-render
   after `--landed` see the landing push.
 - **hands-off** `TOOL-dLoggedFlight-14` — the session resolution and coverage it reads fresh.
-- **hands-off** `TOOL-dLoggedFlight-15` — the anomaly set and window end it holds away from owner turns.
+- **hands-off** `TOOL-dLoggedFlight-15` — the anomaly set it holds away from owner turns.
+- **hands-off** `TOOL-dLoggedFlight-16` — `resolve_run_sessions` and `COVERAGE_STATES`, which gain the
+  freshness test and the `stale` state.
+- **hands-off** `TOOL-dLoggedFlight-17` — the transcripts coverage block, which gains `read`, and
+  `derive_idle_gaps`' guard, which the refusal mirrors.
+- **hands-off** `TOOL-dLoggedFlight-18` — the window's end sources; the window gains `shown_end` and
+  keeps S2's bounding rule.
+- **hands-off** `TOOL-dLoggedFlight-19` — `derive_idle_gaps`, which holds the idle slots the class
+  gate classes.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill runs `model` and reads its
   coverage block.
 
@@ -693,6 +701,9 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   streaks, one of `--audit` and one mixed.
 - rev-12 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-14` and `-15`, the units closing
   review round 2 promoted at its NON-CONVERGENT exit.
+- rev-13 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-16` to `-19`, the units the spec audit
+  of units 14 and 15, round 1, promoted at its BOUNDED exit. The edge to `-15` drops the window end,
+  which moved to `-18`.
 
 ## 10. Reuse audit
 

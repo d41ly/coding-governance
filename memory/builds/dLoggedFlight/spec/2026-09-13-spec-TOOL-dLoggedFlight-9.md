@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-8 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-9 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -129,8 +129,14 @@ leg can prove nothing else got in.
 - **consumes-from** `TOOL-dLoggedFlight-8` — the model this record renders, and its run starts.
 - **hands-off** `TOOL-dLoggedFlight-10` — the schema leg that holds every committed record to S3 and S4.
 - **hands-off** `TOOL-dLoggedFlight-11` — the Skill step that renders, re-indexes and commits.
-- **hands-off** `TOOL-dLoggedFlight-14` — the owner-time refusal it gives an independent read.
-- **hands-off** `TOOL-dLoggedFlight-15` — the layout table and refusal it extends to owner-caused rows.
+- **hands-off** `TOOL-dLoggedFlight-16` — `COUNTED_STATES` and AC10, which it relies on unchanged,
+  and S4's coverage-state list, which gains `stale`.
+- **hands-off** `TOOL-dLoggedFlight-17` — `scan_owner_times`, `render_record` and `write_record`,
+  which gain the independently read owner turns.
+- **hands-off** `TOOL-dLoggedFlight-15` — the refusal it extends to held rows.
+- **hands-off** `TOOL-dLoggedFlight-18` — `build_summary_facts`, `measure_commitment` and
+  `check_commitment`, whose window fact and commitment times change and whose template does not.
+- **hands-off** `TOOL-dLoggedFlight-19` — `RECORD_SCHEMA`, whose `utc` slots the class gate reads.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill reads this record first.
 
 ## 4. Design
@@ -317,6 +323,9 @@ none
   `rc` only beside `exit=clean`.
 - rev-8 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-14` and `-15`, the units closing
   review round 2 promoted at its NON-CONVERGENT exit.
+- rev-9 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-16` to `-19`, the units the spec audit
+  of units 14 and 15, round 1, promoted at its BOUNDED exit. The edge to `-14` left with that unit's
+  S5, which moved to `-17`, and the edge to `-15` drops the layout table, which `-19` reads.
 
 ## 10. Reuse audit
 

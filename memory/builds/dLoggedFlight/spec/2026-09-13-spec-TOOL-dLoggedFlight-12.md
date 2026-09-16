@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts
 
-**Status:** CLOSED · rev-3 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 12
+**Status:** CLOSED · rev-4 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -62,6 +62,8 @@ text is treated as data.
 - **consumes-from** `TOOL-dLoggedFlight-8` — the `model` command, its cost section and its coverage
   block.
 - **consumes-from** `TOOL-dLoggedFlight-9` — the committed record, read first.
+- **hands-off** `TOOL-dLoggedFlight-16` — the Skill's paragraph on missing transcripts, which gains a
+  `stale` bullet.
 
 ## 4. Design
 
@@ -140,6 +142,8 @@ none
   section, which `TOOL-dLoggedFlight-8` now builds) and L2 (the edge to unit 8).
 - rev-3 · 2026-09-13 · S3 S5 · AC1 · folded round-3 spec audit M12 (the record's folder is named through
   the `{{MEMORY_ROOT}}` render token).
+- rev-4 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-16`, a unit the spec audit of units 14
+  and 15, round 1, promoted at its BOUNDED exit.
 
 ## 10. Reuse audit
 
