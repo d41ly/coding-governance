@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires
 
-**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 5
+**Status:** CLOSED · rev-4 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-DEPL-cMendedVintage-4-acceptance-ledger.md](../build/2026-09-16-build-DEPL-cMendedVintage-4-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-16-prompt-DEPL-cMendedVintage-4-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-4-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -63,6 +64,7 @@ away from rows nothing graded.
   bar and is blocked on this one, because reding an adopter for a state whose printed remedy is a
   no-op hands them a failure with no exit. After this unit the printed exit works.
 
+- **hands-off** `DEPL-cMendedVintage-20` — that unit grades the retired flag's absence under every spelling it has, which this unit's own AC3 grep cannot see.
 ## 4. Design
 
 ### Why `--re-adopt --write` cannot clear the rows
@@ -238,6 +240,7 @@ none
   while §4 and AC3 twice called it ten, three live occurrences were unlisted, and the Inventory
   claimed a module-level constant that is a local. S3 is now the single enumeration with no count
   beside it and names the command that re-derives it.
+- rev-4 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-20 naming this unit and never wrote the edge back; hygiene check 12 reds on a handoff one author declared and the other never saw. Recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 

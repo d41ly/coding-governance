@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-21 — the atomic write is one helper, and something fails when it is absent
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 30
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 23
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 25
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
 
 <!-- gen:spec-records -->
 

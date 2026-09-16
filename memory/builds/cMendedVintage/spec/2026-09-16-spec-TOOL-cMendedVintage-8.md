@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 24
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 

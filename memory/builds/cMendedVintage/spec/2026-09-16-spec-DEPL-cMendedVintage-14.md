@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the full path
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 21
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 24
 
 <!-- gen:spec-records -->
 

@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-6 — the fixture records are rendered per prefix, so nothing deletes them
 
-**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer+tooling · order 9
+**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer+tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-DEPL-cMendedVintage-6-acceptance-ledger.md](../build/2026-09-16-build-DEPL-cMendedVintage-6-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-16-prompt-DEPL-cMendedVintage-6-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-6-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -74,6 +75,7 @@ prefix, and let the adopter write them instead of renaming them.
   update after this lands reports the old engine rows as withdrawn, and the runbook step that
   disposes of those orders is theirs.
 
+- **hands-off** `DEPL-cMendedVintage-19` — that unit re-resolves a row's role at every schema, so a role move this unit relies on is reported rather than silent.
 ## 4. Design
 
 ### Data model
@@ -228,6 +230,7 @@ all, which predates this unit and is reported rather than widened into here.
   `review-harness` beside it, which is a three-kit setup rather than a check. What AC5 asks about is
   established one level up by AC1: at a foreign prefix gov's spelling is on no `write` row, so no
   update writes a file for a rename to clobber, and the rename is deleted.
+- rev-3 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-19 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-12 — `apply`'s CONFIGURE honours `deploy["inert"]`
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 19
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 21
 
 <!-- gen:spec-records -->
 

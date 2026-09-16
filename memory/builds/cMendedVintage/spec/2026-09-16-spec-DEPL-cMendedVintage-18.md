@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-18 — a withdrawn row whose path did not restore stays in the receipt
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 27
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 28
 
 <!-- gen:spec-records -->
 

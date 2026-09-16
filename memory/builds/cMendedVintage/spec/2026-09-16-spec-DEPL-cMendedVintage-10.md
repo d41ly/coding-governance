@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
 
 <!-- gen:spec-records -->
 
@@ -75,6 +75,9 @@ renormalize, so the pin block and the index normalization that depends on it lan
 - **hands-off** external — `WIRE-INTO-PROJECT.md`'s statement that `update` never edits
   `.gitattributes`, which stops being true and is corrected in the same commit.
 
+- **hands-off** `DEPL-cMendedVintage-15` — that unit makes the synthesized attributes entry restorable, closing the blocker the spec audit confirmed against the snapshot this unit adds.
+
+- **hands-off** `DEPL-cMendedVintage-17` — that unit stops a target whose pins were withdrawn reaching the empty-marker write this unit introduces.
 ## 4. Design
 
 ### Data model
@@ -254,6 +257,7 @@ refusal · the `govkit refusal join` anchor set gains that refusal's anchor.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-15, DEPL-cMendedVintage-17 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 

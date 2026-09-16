@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-11 — `cmd_check` grades the attributes row's block
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -55,6 +55,7 @@ a clean install. Admit that role to the loop the receipt already equips it for.
 - **hands-off** external — an adopter's own bar gains a real verdict on gov's pin block; nothing in
   this build consumes it.
 
+- **consumes-from** `DEPL-cMendedVintage-17` — that unit drops the receipt row and the region together, so a row it withdraws does not read here as a missing block.
 ## 4. Design
 
 ### Data model
@@ -185,6 +186,7 @@ field removed asserted to report rather than fail · no assertion floor to move.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-17 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-13 — `update --write` emits gate legs
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 22
 
 <!-- gen:spec-records -->
 
@@ -71,6 +71,7 @@ the ownership rules.
 - **hands-off** external — an adopter's bar gains gov's new legs on a safe verb; nothing else in
   this build consumes the emission.
 
+- **hands-off** `DEPL-cMendedVintage-21` — that unit makes the atomic write one helper with something that fails when it is absent, closing the criterion this unit names but cannot observe.
 ## 4. Design
 
 ### Where the call sits, and why there
@@ -250,6 +251,7 @@ further floor to move.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-21 naming this unit and never wrote the edge back; hygiene check 12 reds on a handoff one author declared and the other never saw. Recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 

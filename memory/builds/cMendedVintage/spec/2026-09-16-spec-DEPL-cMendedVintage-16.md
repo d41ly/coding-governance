@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-DEPL-cMendedVintage-16-acceptance-ledger.md](../build/2026-09-16-build-DEPL-cMendedVintage-16-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-16-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-16-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
