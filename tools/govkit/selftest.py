@@ -1031,11 +1031,24 @@ def main() -> int:
         ev = make_target(tmp / "u5a", DEPLOY_FULL)
         run("apply", "--target", str(ev), "--kits", "check-wiring")
         pc = run("check", "--target", str(ev))
+        # DEPL-dBackdatedFixture-3. THE EXPECTATION COMES FROM THE DESCRIPTOR (DEPL-aTetheredConvoy-5
+        # S11), never from the receipt or `install.sums`: those are what `check` reads, so a receipt
+        # that lost a row would move both sides together. These arms typed `2/2` until
+        # TOOL-aReplayedCard-2 gave the kit a third file, which is the literal going stale in place.
+        _g5 = govkit_module()
+        _w5 = _g5.resolve_entry(
+            govroot, _g5.load_toml(govroot / "tools" / "govkit" / "entries" / "check-wiring.kit.toml"),
+            _g5.canonical_ctx("check-wiring"))["writes"].values()
+        _n5 = sum(1 for w in _w5 if w["role"] == "engine")
+        _p5 = sum(1 for w in _w5 if w["role"] == "engine" and w["src"])
+        _h5 = sum(1 for w in _w5 if w["src"])
         check("a clean install reports a DERIVED integrity count, non-zero",
-              "integrity: 2/2" in pc.stdout, pc.stdout)
-        check("and a derived provenance count", "provenance: 2/2" in pc.stdout, pc.stdout)
+              _n5 > 0 and f"integrity: {_n5}/{_n5}" in pc.stdout, f"descriptor N={_n5} · {pc.stdout}")
+        check("and a derived provenance count",
+              _p5 > 0 and f"provenance: {_p5}/{_p5}" in pc.stdout, f"descriptor P={_p5} · {pc.stdout}")
         check("and compares the sidecar against the receipt, both counts named",
-              "sidecar: 2 line(s) compared against 2 hashed row(s)" in pc.stdout, pc.stdout)
+              _h5 > 0 and f"sidecar: {_h5} line(s) compared against {_h5} hashed row(s)" in pc.stdout,
+              f"descriptor H={_h5} · {pc.stdout}")
         check("a clean install exits 0 through those loops", pc.returncode == 0,
               pc.stdout + pc.stderr)
 
