@@ -135,6 +135,11 @@ ANCHOR_SCOPE=""
 # one of them. Pre-set EMPTY rather than to the default, because the default is written once, below,
 # in the derivation - a pre-set default plus a blank-normalisation writes the same literal twice.
 AUTH_PARAM=""
+# MEMORY_TREE_DIR's override is read from the ENVIRONMENT, captured before the conf is sourced so a
+# conf line cannot set it by accident: it is not a conf key, and check 22 of the kit gate reds a conf
+# that sets an undocumented one. The probe that uses it runs further down, after every refusal the
+# conf itself can cause.
+_MTD_OVERRIDE=${MEMORY_TREE_DIR:-}
 # shellcheck disable=SC1090
 . "$CONF"
 # The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
@@ -185,6 +190,48 @@ case "$AUTH_EFFECTIVE" in
       echo "  and each of those three characters ends one of them early."
       exit 2 ;;
 esac
+
+# MEMORY_TREE_DIR — the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
+# bug-class checklist names by path. PROBED, never derived from TOOL_ROOT: an adopter may install
+# that kit FLAT in its tool root, and both adopters measured when this was written do, so TOOL_ROOT
+# plus `memory-tree/` named a file neither of them had and the Skill told every run to execute it.
+# The first TRACKED of the nested and the flat spelling wins. Neither is a REFUSAL that names the
+# override, and nothing is written, because a guessed path renders a command that runs nothing and
+# reads exactly like a clean checklist. The review-harness kit's parity script probes the same way
+# for the same line in the build harness, so the two carriers of one command cannot disagree.
+#
+# The override is asserted exactly as a probe answer is. It is an ENVIRONMENT variable and a
+# hand-install channel only: `--check` re-derives on every run, so a tree whose bar needs the
+# override has to export it for the gate as well.
+check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
+MEMORY_TREE_DIR=""
+if [ -n "$_MTD_OVERRIDE" ]; then
+  _mtd=${_MTD_OVERRIDE%/}
+  case "$_mtd" in
+    *[!A-Za-z0-9._/+@-]*)
+      echo "unattended: MEMORY_TREE_DIR holds a character outside [A-Za-z0-9._/+@-]: $_mtd"
+      echo "  It is interpolated into a shell command in the rendered Skill, where a space splits it."
+      exit 2 ;;
+  esac
+  if check_tracked "$_mtd/gotchas.py"; then MEMORY_TREE_DIR="$_mtd"
+  else
+    echo "unattended: MEMORY_TREE_DIR is set to '$_MTD_OVERRIDE', and '$_mtd/gotchas.py' is not tracked"
+    echo "  in this repo. The Skill would tell every run to execute a checklist that does not exist."
+    exit 2
+  fi
+else
+  for _c in "${TOOL_ROOT}memory-tree/gotchas.py" "${TOOL_ROOT}gotchas.py"; do
+    if check_tracked "$_c"; then MEMORY_TREE_DIR=$(dirname "$_c"); break; fi
+  done
+  if [ -z "$MEMORY_TREE_DIR" ]; then
+    echo "unattended: cannot derive MEMORY_TREE_DIR — neither ${TOOL_ROOT}memory-tree/gotchas.py nor"
+    echo "  ${TOOL_ROOT}gotchas.py is tracked in this repo. The Skill names the memory-tree kit's"
+    echo "  bug-class checklist by path, and a guessed path is a command that runs nothing."
+    echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
+    echo "  gotchas.py> and re-run. Nothing was written."
+    exit 2
+  fi
+fi
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
@@ -239,6 +286,7 @@ render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gita
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MEMORY_TREE_DIR"}
   out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
   out=${out//\{\{LANDER\}\}/"$LANDER"}
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
@@ -326,6 +374,59 @@ if [ "$MODE" = "--check" ]; then
   if grep -qE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT"; then
     echo "unattended: $FIXTURE_REL still carries an unfilled placeholder"
     grep -nE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT" | head -5 | sed 's/^/    /'
+    exit 1
+  fi
+  # the SIXTH artifact (TOOL-aDeferredBar-3): the gate-guard hook is WIRED. The hook ships with the
+  # kit and is live only through an entry in .claude/settings.json; nothing else on the bar reads
+  # that file for this marker, so an adopter with the file and no entry has a guard that never
+  # fires and a --check that said "in sync". The marker is read from the kit's own fragment, never
+  # spelled here, and the remedy is the one merge command that writes the entry idempotently.
+  # The fragment is SHIPPED SURFACE (closing review F11): KIT_DIR is this script's own directory
+  # and the `**` engine rule ships the fragment beside it, so its absence is a broken copy and a
+  # refusal naming the file, like the five artifacts above — not the silent `in sync` it was.
+  GG_FRAG="$KIT_DIR/gate-guard.fragment.json"
+  [ -f "$GG_FRAG" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json is missing from the kit, so the gate-guard wiring cannot be checked and nothing else on the bar asserts the file — re-copy the kit"; exit 1; }
+  GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no marker, so the wiring arm has nothing to look for"; exit 1; }
+  GG_EVENT=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  GG_MATCHER=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  [ -n "$GG_EVENT" ] && [ -n "$GG_MATCHER" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in"; exit 1; }
+  # THE SETTINGS FILE IS RESOLVED THE WAY check-wiring.sh RESOLVES IT (closing review F5): a
+  # declared GOV_SETTINGS_JSON first, else the repo's own — an out-of-tree layout is a legitimate
+  # per-machine choice that resolver documents, and grepping the in-tree path alone redded it
+  # UNWIRED while the printed remedy would have created the in-tree decoy check-wiring warns about.
+  # And the marker must sit in a group under the fragment's EVENT with the fragment's MATCHER:
+  # an entry parked under PostToolUse, or under another matcher, passed the bare grep and never
+  # fired. Read without a JSON parser, as check-wiring's `matchers_of` reads it: flattened, each
+  # `{"matcher":` opens a group and its hooks array ends at the first `]`; the group's event is the
+  # last `"<Event>":[` key OTHER THAN `hooks` seen before it (closing round 2, R9: keeping only the
+  # last key of the lead and skipping when it was `hooks` let a matcherless first group hide its
+  # event, so a marker misfiled under `SessionStart` behind one read as wired under `PreToolUse`).
+  # A DECLARED settings file that is not a file is a REFUSAL in check-wiring's own words (R10),
+  # never UNWIRED: silently reading a different file than the operator named is the decoy class.
+  SJ=${GOV_SETTINGS_JSON:-$ROOT/.claude/settings.json}
+  if [ -n "${GOV_SETTINGS_JSON:-}" ] && [ ! -f "$GOV_SETTINGS_JSON" ]; then
+    echo "unattended: REFUSED — GOV_SETTINGS_JSON names $GOV_SETTINGS_JSON, which is not a file, so the gate-guard wiring cannot be read from the file the operator declared"
+    exit 1
+  fi
+  GG_WIRED=$( [ -f "$SJ" ] && tr -d ' \t\r\n' < "$SJ" | sed 's/{"matcher":/\n{"matcher":/g' \
+    | awk -v M="$GG_MARK" -v W="$GG_MATCHER" -v E="$GG_EVENT" '
+        { lead = prev; prev = $0
+          s = lead
+          while (match(s, /"[A-Za-z]+":\[/)) { key = substr(s, RSTART + 1, RLENGTH - 4); s = substr(s, RSTART + RLENGTH); if (key != "hooks") ev = key }
+          g = $0; sub(/\].*$/, "", g)
+          if (index(g, M) && ev == E && match(g, /^{"matcher":"[^"]*"/) && substr(g, 13, RLENGTH - 13) == W) print "wired"
+        }' | head -1 )
+  if [ "$GG_WIRED" != wired ]; then
+    echo "unattended: the gate-guard hook is UNWIRED — ${SJ#"$ROOT"/} carries no $GG_EVENT entry under matcher $GG_MATCHER naming $GG_MARK, so the hook that refuses a self-test suite inside a build pass never fires"
+    # The remedy names the file the check READ (R10): settings-merge.py takes it as a positional
+    # defaulting to the in-tree path, so an out-of-tree layout handed the bare remedy wrote the
+    # in-tree decoy check-wiring warns about while this arm kept reading the declared file.
+    if [ "$SJ" = "$ROOT/.claude/settings.json" ]; then
+      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json"
+    else
+      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json $SJ"
+    fi
     exit 1
   fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"

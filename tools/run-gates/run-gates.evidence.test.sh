@@ -18,6 +18,18 @@ set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "evidence-test: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-gates.sh"
+# The launcher is RESOLVED, not assumed, ONCE, for every python arm below: on Windows the bare name
+# `python` can be the Store stub that answers `command -v` and exits 9009, and an arm that dies on
+# the launcher would print FAIL and accuse the subject of a defect it never saw. `PYBIN=` overrides.
+DC_PY="${PYBIN:-}"
+if [ -z "$DC_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then
+  . "$ROOT/tools/lib/resolve-python.sh"
+  DC_PY=$(resolve_python 2>/dev/null)
+fi
+# NO BARE FALLBACK. The idiom ban this repo's own bar carries reads `DC_PY=python` as a launcher
+# invoked without being resolved, and it was right: on the Store-stub machine that name is the
+# one launcher guaranteed NOT to run. A resolver that answered nothing is a refusal, said aloud.
+[ -n "$DC_PY" ] || { echo "evidence-test: no python launcher resolves, so the ceiling arms cannot run"; exit 2; }
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 bad=0
 # the run-gates promotion spec's S11. The count is INCREMENTED where the assertions actually happen -- in the
@@ -599,7 +611,7 @@ if [ -f "$ROOT/tools/run-gates/profile_bar.py" ]; then
   ru_repo
   cp "$ROOT/tools/run-gates/profile_bar.py" "$RU_T/tools/run-gates/"
   ru_run GATE_FULL=1 >/dev/null
-  ru_out=$( cd "$RU_T" && "${PYBIN:-python}" $KIT_REL/profile_bar.py --width 2 2>&1 )
+  ru_out=$( cd "$RU_T" && "$DC_PY" $KIT_REL/profile_bar.py --width 2 2>&1 )
   # Matched on the word the tool uses for a REFUSAL, not on 'executed leg' — which appears in its
   # ordinary success line ('across N executed leg(s)') and made this arm fail on a healthy run.
   if printf '%s' "$ru_out" | grep -qi 'refus'; then
@@ -632,15 +644,6 @@ cp "$ROOT/tools/run-gates/derive-ceilings.py" "$ROOT/tools/run-gates/ceiling-mar
   || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
 DC_SCRIPT="$DC_T/tools/run-gates/derive-ceilings.py"
 DC_EV="$DC_T/tools/run-gates/ceiling-evidence.txt"
-# The launcher is RESOLVED, not assumed: this suite's other python arm falls back to a bare
-# `python`, and on Windows that name can be the Store stub that answers `command -v` and exits 9009.
-# An arm that dies on the launcher would print FAIL and accuse the subject of a defect it never saw.
-DC_PY="${PYBIN:-}"
-if [ -z "$DC_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then
-  . "$ROOT/tools/lib/resolve-python.sh"
-  DC_PY=$(resolve_python 2>/dev/null)
-fi
-[ -n "$DC_PY" ] || DC_PY=python
 # Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
 # third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
 # `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row

@@ -20,11 +20,13 @@ workflow-scripts = [
   "check-workflow-syntax.js",
   "drift-audit-code.js",
   "drift-audit-state.js",
+  "orient-counterfactual.js",
   "tier2-review.js",
+  "unattended-build.template.js",
 ]
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["degradation-known-but-unreported.md"]
+gotcha-classes = ["degradation-known-but-unreported.md", "node-check-is-not-a-syntax-gate.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -69,6 +71,25 @@ predicate, two callers.
 The three harnesses share a pipeline that is not shared code — primed lenses, batched skeptics
 defaulting to refute, one synthesis, joined on an integer the orchestrator assigns.
 
+**The unattended build harness is RENDERED, not shipped.** `unattended-build.template.js` is the
+source, and `check-protocol-parity.test.sh --render` writes `unattended-build.js` beside it with the
+kit's own directory, the tool root, and the memory-tree kit's directory filled in. Apply writes an
+engine file verbatim, so the four install paths the harness spells used to reach an adopter at
+another prefix naming files that adopter did not have. The third token is PROBED from the tracked
+tree rather than derived from the prefix, because an adopter may install that kit flat. The harness
+is claimed by the unattended dossier and its template here, because this kit renders it.
+
+**The build harness REQUIRES a `scratch` argument, and it is the one path that cannot be rendered.**
+The session scratchpad is in the caller's system prompt and nowhere a workflow script can read, and
+it changes with every session, so `args` is its only carrier. The parent refuses without it and
+refuses one that is not absolute by shape, folds backslashes to `/` once, spells it in `GROUND` —
+the preamble every agent it spawns reads — and hands it to every child in `dispatch.args` beside
+`repo`, `slug`, `mode`, `driver`, `ground` and `checklist`. `unattended-unit.js` refuses without it
+and refuses a `ground` that does not name it, so a hand-composed dispatch cannot hand a child a
+different root from the one its grounding sentence tells the agent to use (`TOOL-aProbedUnit-4`).
+`tier2-review.js` and the drift-audit siblings still tell their agents nothing about temporary
+files.
+
 ## Gaps
 
 - **The pipeline is still implemented three times, but the three now carry the same accounting.**
@@ -91,6 +112,13 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
   remains a gap is the other two harnesses, which still know only their own subject, and the fact
   that a kind is a parameter rather than a profile: adding a third would mean a third branch at each
   of the six sites, and the enforcement hook admits no registry that would collapse them.
+- **`blockers` and `highs` are COUNTED from ids, but the severities are still the synthesis's word.**
+  `TOOL-dMergedTally-1` stopped the synthesis agent typing the two integers: it returns `items`, each
+  a severity and the raw confirmed ids it merged, and the harness counts over raw ids and returns
+  null when an id sits in no item or in two. The typed integers had counted ITEMS against a
+  `confirmed` that counts raw findings, and the build harness's disposal guard subtracts one from the
+  other. What stays a prompt property is that the item list matches the table the same agent wrote
+  into the report: nothing re-reads the record.
 - **The two enforcement points AGREE now, and the modality gap is closed for one rule.**
   `TOOL-dTieredTribunal-14` lifted the ref-keyed-join ban into `tools/hooks/agent-cap.js` as its fifth
   rule and made `check-review-join.sh` delegate through `--only=join`, so both entry points share one
@@ -103,6 +131,17 @@ defaulting to refute, one synthesis, joined on an integer the orchestrator assig
   back to the current directory — the wrong-repository defect `tier2-review.js` was hardened against
   and neither sibling was. Deliberately out of scope for the port, and tracked as
   `TOOL-dTieredTribunal-4`.
+
+- **`orient-counterfactual.js` is a MEASUREMENT harness, not a review one, and it is the FIRST
+  file here to put the sequential-loop marker on a loop header.** `TOOL-aReplayedCard-5` shipped it: one stage-2
+  orientation arm per call, two kickoffs under `for (const i of RUNS)` with `gov:sequential-agents(2)`
+  over a marked two-element literal, tokens as `budget.spent()` deltas and wall as the agent's own
+  `date` readings, every run under a closed four-value `outcome`, and a single default-type fallback
+  spawn OUTSIDE the loop because the hook admits one marked loop per script. It carries no lens, no
+  skeptic and no synthesis, so none of the trust accounting above applies to it; what it shares
+  with its siblings is the `args` parse-then-refuse guard and the returns-a-record-writes-nothing
+  shape. Its agent definition ships beside it as `orient.agent.md`, which the inventory
+  does not key — a template the runner copies to `.claude/agents/` by hand is not a workflow script.
 
 ## Reuse affordance
 
@@ -117,3 +156,9 @@ necessarily spells the banned expression while documenting it.
 seam: agent-cap.js — reuse as the single predicate for any fan-out rule that must reach an inline
 script; extend by delegating from a file gate rather than re-implementing, the way
 check-verifier-fanout.sh already does.
+seam: check-protocol-parity.test.sh — reuse as this kit's ONLY renderer, and as the leg that grades
+what it rendered; extend by adding a `PAIRS` row and a `rendered` rule in `kit.toml`, never by
+writing a second renderer. A template in the kit dir with no row reds, so a new one cannot ship
+ungraded. A token only some templates carry is resolved PER PAIR: an unanswered probe skips, by name
+and out loud, only the pairs whose template needs it, so a new token cannot cost an install the
+pairs that never use it (`TOOL-dPolishedVitrine-1`, round 1 F3).

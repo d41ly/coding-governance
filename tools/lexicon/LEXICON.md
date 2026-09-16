@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.3 -->
+<!-- gov:kit lexicon@1.4 -->
 # LEXICON.md — how to write the table this gate reads
 
 The engine grades against `.lexicon.conf`. This file is how a human decides what goes in it. It is
@@ -110,15 +110,23 @@ computes it, and this page would be the copy nobody re-ran.
 element in the other, so one lexer mode necessarily mis-reads one of the two populations. There is
 no alias mechanism: an undeclared `tsx` is dark, and silently so.
 
-**The cells `--scaffold` seeds**, all four prescriptive and none of them read off your corpus:
-`ts.function` camel, `ts.type` pascal, `tsx.type` pascal, and `tsx.function` **`dark`**. That last
-one is a declared refusal rather than a gap. A `.tsx` function's case is decided by its ROLE — a
-React component is PascalCase and a plain helper is camelCase — and this kit reads no roles, so a
-single convention over that cell would red correct code whichever one it picked. Arm it if your tree
-has a rule the kit cannot see. **That reason is spelled twice on purpose, and this copy is the
-lesser one:** the scaffolder emits it as a comment directly beside the row, which is where an
-adopter meets it, and this page states it for a reader deciding whether to adopt at all — who has no
-conf yet. If the two ever disagree, the emitted comment is the one to trust.
+**The cells `--scaffold` seeds**, all prescriptive and none of them read off your corpus:
+`ts.function` camel, `ts.type` pascal, `tsx.type` pascal, `tsx.function` camel — and beneath that
+last one, when your tree holds a component at all, `tsx.function+returns:jsx` **pascal**. A `.tsx`
+function's case is decided by its ROLE — a React component is PascalCase and a plain helper is
+camelCase — and until kit 1.4 this kit read no roles, so that cell shipped `dark` as a declared
+refusal: a single convention over it would have redded correct code whichever one it picked, and
+the one adopter who armed it blind read a third of the cell as offenders — the dated figures are
+`parse_ts_source`'s header in `lexicon.py`, and nowhere else. The `returns:jsx` selector reads
+the role from the body — a declared function whose VALUE is an element is a component — and the
+pair grades helpers at camel and components at pascal, pinning what the reader cannot see: a
+component returning `null` or a portal stays in the parent, and a render helper returning an
+element is routed. The rule and each clause's measurement are `parse_ts_source`'s header in
+`lexicon.py`; the kit README's selector section is the reader-facing statement. **The reason is
+spelled beside the rows on purpose:** the scaffolder emits it as a comment directly above
+`tsx.function`, which is where an adopter meets it, and this page states it for a reader deciding
+whether to adopt at all — who has no conf yet. If the two ever disagree, the emitted comment is
+the one to trust.
 
 ### The six refusals, each beside what compensates for it
 

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.19 -->
+<!-- gov:kit unattended@1.24 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -70,6 +70,10 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
+- `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
+  open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
+  `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
+  the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
@@ -98,18 +102,31 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   distinguishes them by OVERLAP: a narrowing is a strict subset and always overlaps, so it stays
   refused; a disjoint set is a new pass. One that PARTLY overlaps is read as
   a narrowing and refused, which is the conservative direction and is stated here rather than
-  discovered.
+  discovered. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
+  an unattended build closes each unit spec in its own build commit, and this verb is the one point
+  that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
+  never a silent pass.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
-  `CONVERGING`, `CONVERGED`, `NON-CONVERGENT` or `CEILING`. The round is an append-only `review` line
-  in the parked region, a `history` kind, so it never inflates the count of decisions the owner must
-  be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY smaller than the
-  round before. At a TERMINAL exit — `NON-CONVERGENT` or `CEILING` — the round RECORDS which
-  disposition the run took, `fold` or `promote`: `--disposition` is REQUIRED there and REFUSED on any
-  round that is not one. Both values are legal, because the method admits folding a blocker back into
-  the specs it belongs to as readily as promoting it to a unit, and a record naming neither leaves the
-  gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a missing
-  subject or count, a terminal exit carrying no disposition, a disposition on a round that is not a
-  terminal exit, and a round on a subject whose loop has already ended.
+  `CONVERGING`, `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED`. The round is an append-only
+  `review` line in the parked region, a `history` kind, so it never inflates the count of decisions
+  the owner must be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY
+  smaller than the round before — and a subject that is NOT the build slug, a spec audit, takes at
+  most the declared `REVIEW_ROUNDS` rounds (kit default 1) before it exits `BOUNDED`; the build slug
+  is the closing diff review and its bound is the runaway ceiling, so it converges or backstops as it
+  always did. At a TERMINAL exit — `NON-CONVERGENT`, `CEILING` or `BOUNDED` — the round RECORDS its
+  disposition, and `promote` is the ONLY value a terminal exit can record: every such exit carries at
+  least one BLOCKER by construction, since a zero count is `CONVERGED`, and the severity rule the
+  Skill's exit bullet states promotes every blocker, so `--disposition promote` is REQUIRED there and
+  `fold` beside a standing blocker is REFUSED rather than written. `fold` survives as the reading of
+  a record that exited with nothing above MEDIUM, which the driver reaches only at `CONVERGED` with
+  no high, and that row needs no field. On `CONVERGED` an optional `--disposition promote` is
+  ACCEPTED, never required, for the round whose highs stood: it is the value that demands new unit
+  ids, and a mixed exit takes the value that demands something, so the gate counts the unit a high
+  became instead of reading the promotion as nothing. A record naming no value where one is owed
+  leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
+  set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
+  exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

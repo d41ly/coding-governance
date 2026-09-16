@@ -45,6 +45,26 @@ Nothing deletes an adopter's second copy. `govkit update --write-withdrawals` do
 and `check-wiring.sh` REPORTS a legacy copy rather than redding so that a half-migrated tree is told
 rather than blocked.
 
+**The fragment schema.** Five keys are required — `name`, `event`, `matcher`, `marker`,
+`hook_path` — and two are optional, added by `TOOL-aReplayedCard-2`: `interpreter` (`node` or
+`bash`, default `node`; a closed pair, because it is the first word of a command Claude Code runs)
+and `args` (a list of tokens, default empty, rendered UNQUOTED after the quoted path and held to a
+closed character class for that reason). A fragment carrying neither renders exactly as before. The
+`hook_path` names its script through one of two tokens: `{kit}`, two directories up from the
+fragment, for a kit that ships its directory; and `{here}`, the fragment's own directory, for a
+`kind = "flat"` kit whose engine and fragments ship side by side at `{prefix}/`. Both readers and
+the hook-destinations gate expand them identically, and the gate refuses when they do not. The
+`marker` must be a substring of the rendered command under the merger's plain view AND under
+`check-wiring.sh`'s whitespace-stripped view — space-free, therefore — and it may lead with a dash:
+the card fragments use `--write` and `--replay` — and BOTH readers join on the marker AND the hook's
+basename, so an adopter's own hook carrying `--write-log` is never taken for the card writer. A
+SessionStart fragment ALWAYS declares a matcher from `startup|resume|clear|compact`; the merger
+re-matches an entry it finds under the wrong one, and `check-wiring.sh`'s card arm reds on a CARD
+entry under a matcher that is not its fragment's, because a SessionStart hook that never fires looks
+exactly like one that is wired. The `check-wiring.sh --session` and process-monitor session entries
+are NOT graded by any arm: their matchers are re-matched on apply and never read afterwards, so a
+hand narrowing passes green (the aReplayedCard closing review, F12).
+
 ## What the hook DENIES, and how to satisfy it
 
 - A raw `parallel(` / `pipeline(` primitive. Route through a bounded helper instead —
@@ -134,6 +154,52 @@ out behind it. The slot budget is LIFETIME-PER-PROMPT, so it is the TOTAL and no
 bound, and a total is the wrong instrument for a dispatch sequence whose count is a function of the
 roster size. Count what carries no script; parse what does.
 
+## scratch-guard's second check: a `git commit` on an un-oriented card
+
+`scratch-guard.js` is the other hook in this home, on the `Bash|PowerShell` matcher, and after its
+scratch verdict it runs ONE more check, `checkOriented` (`TOOL-aReplayedCard-1`). A `git commit`
+issued by the main loop is refused, exit 2, while the session's orientation card — the file the
+kickoff kit's `manifest-check.sh --card --write` writes at session start under
+`<git-common-dir>/orientation/<session_id>.md` — still holds the writer's sentinel `READY — none yet`,
+or names a different tree than the commit targets. The deny names the card path, the condition and
+the remedy: `/session-kickoff`, or `cd <target-tree> && /session-kickoff` when the trees differ,
+because the kickoff's `--card --append` rewrites the card's `tree —` cell to the tree it runs in.
+
+**The grammar.** The command's string-blanked view must hold the argv token `git`, then any number of
+dash-prefixed tokens — `-C`, `-c`, `--git-dir`, `--work-tree`, `--namespace`, `--exec-path` and
+`--config-env` each take the one value token after them unless written `--x=v`, and a quoted value
+is one token — and then the whole token `commit` followed by whitespace or the end. So
+`git -C "C:/p q" commit -m y` and `git -c a=b commit` match; `git merge-base`, `git commit-tree`,
+`git log --grep commit`, a quoted `commit`, `merge` and `push` never do — the kickoff engine's own
+Step 1 is a `git merge --ff-only`, and a deny on it would refuse its own remedy. The toplevel is the
+`-C` target when there is one, else the payload `cwd`, both drive-folded through
+`buildComparablePath` BEFORE the walk up to the directory holding `.git`, and the card's tree cell
+is compared through the same fold — the writer prints `C:/…`, the harness hands `C:\…`, and the
+nodes type `/c/…`.
+
+**What ALLOWS, and what it prints.** A payload carrying `agent_id` (a subagent), or lacking
+`session_id` or `cwd`, allows silently. An unwalkable target, an ABSENT card, and a card whose
+header names `--card --replay` as its writer — one the replay wrote fresh for a session that started
+before the writer was wired — allow with ONE witness line on stderr. That line departs from the
+print-nothing protocol both hooks otherwise keep, and it reaches the debug log and the self-test
+only: the harness discards stderr on exit 0, so nothing reaches the session. A present `--write` card
+that passes prints nothing.
+
+**The exemption.** The commit that CREATES a build's authorization: a `README.md` directly under a
+`builds/<one>/` segment, NEW — staged as added, or untracked, which covers the single-call
+`git add … && git commit` form whose index is empty at PreToolUse — whose bytes carry
+`authorized-by:` with a value in the unattended driver's `SECOND_ANCHOR_MODES` (`prompt` or
+`recipe`, pinned by a parity arm rather than restated). The staged BLOB is read for a staged file.
+A folder already in HEAD exempts nothing, or every commit after a landed prompt-path build would be
+exempt forever. This is the only step that spawns git, so the common path pays no spawn.
+
+**The ceiling.** A commit made by a script, a heredoc or a non-git tool; a deleted, hand-written or
+refused card; a `cd`/`-C` target that is not a literal path or does not exist (the last `cd <dir>`
+before the git token IS read, and a target the shell would expand or that is absent from disk is a
+witness rather than a walk into an ancestor's `.git`); a session that started before the wiring and
+never restarted — all escape. The guard stops forgetting, not evasion. A READY line's PRESENCE is
+asserted, never its correctness, and there is no waiver.
+
 ## The authoring rule for kit files
 
 *Here because the charter template had no room for it: it sits within a few hundred bytes of its
@@ -165,3 +231,49 @@ ban list, in the pass that wants it. Those reasons survive later writes. A defin
 of the predicate — which necessarily makes many literals newly visible at once — goes through a
 separate re-baseline mode guarded by a declared predicate epoch, so it can be spent once per
 change to the predicate and never to absorb a literal.
+
+## scratch-guard — the write-target guard, and what it cannot see
+
+The second hook in this home, wired on `Bash|PowerShell`, reads each tool call's TEXT for write
+targets (redirects, `tee`/`touch`/`mkdir`, the last argument of `cp`/`mv`/`install`/`rsync`, and a
+`TMPDIR=`/`TMP=`/`TEMP=` assignment) and denies one that lands where agent scratch does not belong.
+Deny is stderr plus exit 2; allow prints nothing. The sanctioned roots are DERIVED, never authored:
+`TMPDIR`, `TEMP` and `TMP` at run time, `<home>/.claude`, and the CLI's own scratch base
+`<os.tmpdir()>/claude`. A target under one of those is allowed before any rule runs.
+
+**The five rules**, each a `kind` the deny message names in its own sentence:
+
+- `home` — a target under the operator's home directory that is not under a sanctioned root.
+- `drive-root` — a target that creates a NEW top-level entry at a drive root, `C:/gvi`; the
+  conventional names are `DRIVE_ROOT_CONVENTIONAL` in the hook.
+- `empty-var` — a target opening with `$TMPDIR`, `${TMP}`, `$TEMP` (any of the three, braced or
+  not) whose variable is empty or unset in the hook's environment, so the bytes land at the
+  filesystem root. A non-empty variable is expanded and grading continues on the result; a
+  `${TMPDIR:-default}` form expands to its default when the variable is empty; a variable the SAME
+  command assigns (`TMP=$(mktemp -d); echo x > $TMP/f`) is not graded, because its value is
+  unknowable textually.
+- `tmp` — a target at or under `/tmp`, denied by owner ruling on 2026-09-14 even on a Git-Bash host
+  where `/tmp` is a mount onto TEMP, because the habit is what is being ended. A temp variable
+  whose value is exactly `/tmp` contributes NO allowed root, or `TEMP=/tmp` would re-open every
+  write the rule closes; `/tmp/sub` as a value still does. `<os.tmpdir()>/claude` stays allowed
+  INSIDE the prefix, so a POSIX host whose scratchpad sits under `/tmp` keeps its one destination.
+- `posix-root` — a target that creates a new top-level entry at the POSIX root, `/mir/x`; the
+  conventional names are `POSIX_ROOT_CONVENTIONAL`, with `tmp` and `temp` deliberately absent so
+  the two rules cannot disagree about `/tmp`.
+
+**What the predicate does NOT catch, because it is textual and stays so.** Four shapes walk past
+it, and the upgrade path if they stop being rare is a real tokenizer rather than more regexes:
+
+- Variable indirection beyond the three temp spellings and `~`/`$HOME`: `D=/tmp; echo x > $D/f`
+  is graded as an unresolved token that misses every rule.
+- A `cd`: `cd /tmp && echo x > y` writes a relative path the hook reads as repo-relative.
+- A heredoc'd script: a Python `open('/tmp/x','w')` inside a `<<EOF` body is blanked before
+  scanning, so nothing inside it is a target.
+- A PowerShell variable spelling: `$env:TEMP\x` opens with `$env:`, which none of the three
+  spellings match; the corpus measurement that motivated the rules was Bash-shaped, so this is
+  stated rather than closed.
+
+The suite is `scratch-guard.test.sh`. Its arms hand every environment override to the hook from
+INSIDE node — a JavaScript prelude on `process.env`, the hook spawned as that node's child — because
+on a Git-Bash host the MSYS runtime rewrites a POSIX-shaped `TEMP=/tmp` on its way to native
+`node.exe`, and GNU `env` refuses `-u` after an assignment.

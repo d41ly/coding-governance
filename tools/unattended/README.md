@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.19 -->
+<!-- gov:kit unattended@1.24 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -20,6 +20,14 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
 two rendered ones do carry placeholders, and for them a render is the only correct install.
+
+**One Skill placeholder is probed rather than read.** The Skill tells a run to execute the
+memory-tree kit's bug-class checklist, so it names that kit's `gotchas.py` by path. An adopter may
+install the memory-tree kit flat in its tool root, so the adopter takes the first TRACKED of the
+nested and the flat spelling, and refuses when git tracks neither. Nothing is written in that case.
+`MEMORY_TREE_DIR=<dir>` in the environment overrides the probe, and it must name a directory whose
+`gotchas.py` is tracked. The review-harness kit's build harness carries the same command and fills
+it the same way.
 
 ## The fixture is rendered, and this is the one thing to know about it
 
@@ -46,6 +54,22 @@ Renaming without rewriting leaves each record describing a piece that does not e
 would still leave a rendered artifact on disk carrying a literal brace, and something reads that
 file before anything runs `--check`.
 
+## The act is refused at the tool call, not only forbidden
+
+`gate-guard.js` is a `PreToolUse` hook on `Bash|PowerShell`, wired by
+`gate-guard.fragment.json` through the settings merger the hooks kit ships, and `--check` reports
+it UNWIRED with the merge command as the remedy. While the run-state record on the CURRENT branch
+is in any phase before `VERIFYING`, it exits 2 on a command that would run the flagged bar
+(`GATE_FULL=` or `GATE_SELFTESTS=` with a non-empty value) or a self-test suite (a word ending
+`run-selftests.sh`, `run-unattended-gates.sh` or `.test.sh` at command position, `bash -c` bodies
+included). The read-only verbs — `--list`, `--check`, `--rank`, `--help`, `--render` — pass, the
+plain bar passes, and a quoted mention of any shape is invisible. It keys the record to the branch
+through the `run-branch:` fact `--preflight` writes on both anchors (protocol fact 13), falling
+back to `branch-ref:` for a record written before that fact existed, and it fails open on every
+unreadable input. Its suite, `gate-guard.test.sh`, is withheld like the others and runs at
+`VERIFYING`; the predicate's coverage over real usage is the corpus probe in the build record of
+`TOOL-aDeferredBar-3`.
+
 ## Two things the validity gate does not treat as playbooks
 
 `check-playbook.sh` grades every tracked markdown carrying a `step_selector` and a `toml` block,
@@ -58,7 +82,7 @@ existed.
 ## Running the kit's own checks
 
 ```
-adopt-unattended.sh --check      # the five artifacts are installed and in sync
+adopt-unattended.sh --check      # the five artifacts are installed and in sync, the hook wired
 check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced

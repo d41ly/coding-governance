@@ -137,6 +137,13 @@ memory/builds/aReapedSpinner/README.md
 memory/builds/aGradedDialect/README.md
 memory/builds/aLeakedHandle/README.md
 memory/builds/dMuffledSentinel/README.md
+memory/builds/dPolishedVitrine/README.md
 memory/builds/cGradedDebt/README.md
 memory/builds/cSpliceWarden/README.md
+memory/builds/aReplayedCard/README.md
+
 memory/builds/cWidenedNet/README.md
+memory/builds/aRatifiedRulings/README.md
+memory/builds/aProbedUnit/README.md
+memory/builds/aDeferredBar/README.md
+memory/builds/dMergedTally/README.md

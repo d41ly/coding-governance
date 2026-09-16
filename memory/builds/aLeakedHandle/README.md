@@ -92,5 +92,5 @@ Unordered: `TOOL-aLeakedHandle-3`.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [aRatifiedRulings](../aRatifiedRulings/README.md)
 <!-- /gen:build-edges -->

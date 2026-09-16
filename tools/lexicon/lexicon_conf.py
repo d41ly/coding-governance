@@ -60,11 +60,23 @@ _PSET_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 
 #: The selector kinds a `CELLS` row key may name (TOOL-aSurfacedLexicon-13). `prefix` is a literal
 #: leading-substring test over the NAME; `decorator` names one decorator and is a `parser`-mode
-#: capability, refused on any other mode by `check_declaration`. A CLOSED set, for the reason
-#: `SURFACES` is one: a typo'd kind would route nothing and report nothing, which is the shape a
-#: declaration must never be able to take by accident. There is deliberately no regex kind — a
-#: predicate language over names is a second grading language inside a naming gate.
-SELECTOR_KINDS = ("prefix", "decorator")
+#: capability, refused on any other mode by `check_declaration`; `returns` names a VALUE the
+#: definition's body yields — the one literal is `jsx`, and it is the role-derived kind
+#: TOOL-aGradedDialect-4 §8 deferred and TOOL-aGradedDialect-10 built, because a `.tsx`
+#: function's case follows whether it is a component and no name-based selector can see that.
+#: It is a capability of the `tsx-tokens` reader alone, refused elsewhere by `check_declaration`.
+#: A CLOSED set, for the reason `SURFACES` is one: a typo'd kind would route nothing and report
+#: nothing, which is the shape a declaration must never be able to take by accident. There is
+#: deliberately no regex kind — a predicate language over names is a second grading language
+#: inside a naming gate.
+SELECTOR_KINDS = ("prefix", "decorator", "returns")
+
+#: What a `returns` selector may name, and the pattern set that can answer it. Both closed, and
+#: the second is a LITERAL id rather than a lookup in `lexicon.PARSERS` because this module is
+#: imported by that one and cannot import it back; the kit's selftest asserts the id resolves
+#: there, so a renamed reader reds here before it strands a declaration.
+RETURNS_LITERALS = ("jsx",)
+RETURNS_PATTERN_SETS = ("tsx-tokens",)
 
 #: A selector literal carries NO DOT, and that is load-bearing rather than fussy: a `PINS` row key is
 #: `<cell>.<predicate>` split on the dot, so a dotted literal would make the pin row of the very cell
@@ -223,6 +235,12 @@ def parse_cell_key(rowkey: str, where: str = "") -> tuple[str, str, str | None, 
     if not _SEL_LIT_RE.match(lit):
         raise ConfError(f"{where}selector literal {lit!r} in {rowkey!r} is not `[A-Za-z0-9_]+`; a "
                         f"dot there would make this cell's own PINS row key unparseable")
+    if kind == "returns" and lit not in RETURNS_LITERALS:
+        raise ConfError(f"{where}a `returns` selector names what the body's value IS, and the closed "
+                        f"set is {' '.join(RETURNS_LITERALS)}; got {lit!r} in {rowkey!r}")
+    if kind == "returns" and parts[1] != "function":
+        raise ConfError(f"{where}a `returns` selector routes a definition by its VALUE, which only "
+                        f"the `function` surface has; got surface {parts[1]!r} in {rowkey!r}")
     return parts[0], parts[1], kind, lit
 
 
@@ -401,11 +419,22 @@ def check_declaration(conf: dict, p: Path, rowlines: dict) -> None:
     cells = conf.get("CELLS") or {}
     if cells:
         declared = {ext: mode for ext, _pset, mode in langs(conf)}
+        psets = {ext: pset for ext, pset, _mode in langs(conf)}
         for rowkey in cells:
             ext, _surface, kind, _lit = parse_cell_key(rowkey)
             if ext not in declared:
                 raise ConfError(f"{p}:{rowlines['CELLS'][rowkey]}: CELLS row {rowkey!r} names "
                                 f"extension {ext!r}, which LANGS does not declare")
+            # A `returns` SELECTOR IS A `tsx-tokens` CAPABILITY, for the same reason the decorator
+            # one is a `parser` capability and refused with the same shape: a `.ts` source cannot
+            # hold an element and no other reader emits the marker, so the subset would be EMPTY
+            # and the cell would report a clean zero at it forever.
+            if kind == "returns" and psets.get(ext) not in RETURNS_PATTERN_SETS:
+                raise ConfError(f"{p}:{rowlines['CELLS'][rowkey]}: CELLS row {rowkey!r} declares a "
+                                f"`returns` selector on extension {ext!r}, which LANGS reads with "
+                                f"{psets.get(ext) or 'no pattern set'!r}; only "
+                                f"{' '.join(RETURNS_PATTERN_SETS)} can see what a body returns, so "
+                                f"this row would route an EMPTY subset and grade nothing")
             # A DECORATOR SELECTOR IS A `parser` CAPABILITY, and this is the third cross-block
             # refusal for the same reason as the two beside it: a `probe` set is a regex over text
             # and knows nothing about decorators, so the subset would be EMPTY and the cell would

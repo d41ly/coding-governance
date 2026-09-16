@@ -1,0 +1,9 @@
+{
+  "name": "orientation-replay",
+  "event": "SessionStart",
+  "matcher": "resume|compact",
+  "marker": "--replay",
+  "hook_path": "{here}/manifest-check.sh",
+  "interpreter": "bash",
+  "args": ["--card", "--replay"]
+}
