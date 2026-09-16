@@ -69,11 +69,11 @@ ids DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3
 | [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
-Ids no record names: DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
