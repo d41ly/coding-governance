@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 14
+**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -49,8 +49,10 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   `tools/runlog/record.py:109` stays `("present", "partial")`. Under `stale`, the renderer's `known`
   test (`record.py:632`) writes the owner-turn, usage and attributed-call facts as `-`, and the
   model's `tr_state == "present"` test (`model.py:1598`) leaves idle gaps not judged. No new branch
-  is added to either file for this: one predicate decides every shape. Unit 9 S4's count rule and its
-  AC10 arm, `test_record_ac10_unknown_counts` (`selftest.py:4689`), stand unedited. Observed by AC4.
+  is added to either file for this: one predicate decides every shape. Unit 9 S4's count rule, and the
+  count assertions of its AC10 arm, `test_record_ac10_unknown_counts` (`selftest.py:4689`), stand
+  unedited. That arm's `--close` Timeline `rc` loop is `TOOL-dLoggedFlight-22`'s to retire with the verb
+  rows, and this unit pins nothing in it. Observed by AC4.
 - **S5** The three-shape arm. One self-test arm renders, through `render_record`, three models side
   by side. The first has a named session whose only source is a store extract with `extracted_at` one
   second before the window's end. The second has one whose extract carries no `extracted_at`. The
@@ -87,6 +89,8 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   a `stale` bullet.
 - **hands-off** `TOOL-dLoggedFlight-14` — the source order that decides when a store extract stands in
   at all, and the discovered-path arm that reads `stale`.
+- **hands-off** `TOOL-dLoggedFlight-22` — the `--close` Timeline `rc` loop of the AC10 arm, which that
+  unit retires with the verb rows; S4 and AC4 pin only the arm's count assertions.
 
 ## 4. Design
 
@@ -162,7 +166,8 @@ The fork is F1 in §8. Each option was tested against the two criteria B1 found 
   and renders those counts
   as integers. A fourth model holding one stale session and one missing session reads `stale`.
   Red when: a stale shape renders an integer or judges idle gaps, the missing-session shape renders
-  `-`, the mixed model reads `partial`, or `test_record_ac10_unknown_counts` needs an edit to pass.
+  `-`, the mixed model reads `partial`, or a count assertion of `test_record_ac10_unknown_counts` needs
+  an edit to pass.
 - **AC5** — When `bash tools/runlog/adopt-runlog.sh --check` runs after the template edit and the
   re-render, it passes, and the rendered Skill carries the word `stale` in its missing-source bullets.
   Red when: the check fails, or the rendered Skill does not name `stale`.
@@ -185,6 +190,10 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
 
 - rev-1 · 2026-09-16 · initial draft, promoted from B1 of the spec audit of units 14 and 15, round 1,
   at the loop's BOUNDED exit. `extracted_at` and the freshness test move here from unit 14 S2.
+- rev-2 · 2026-09-16 · S4 · AC4 · §3 · B2 of the spec audit of units 14, 16 and 20, round 1, promoted to
+  `TOOL-dLoggedFlight-22`. S4 and AC4 said the AC10 arm stands unedited, and that unit retires the arm's
+  verb-row loop, so the two could not both pass one bar run. "Unedited" now names the arm's count
+  assertions only, and the edge to `-22` says who edits the rest.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts
 
-**Status:** CLOSED · rev-4 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 12
+**Status:** CLOSED · rev-5 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -64,6 +64,9 @@ text is treated as data.
 - **consumes-from** `TOOL-dLoggedFlight-9` — the committed record, read first.
 - **hands-off** `TOOL-dLoggedFlight-16` — the Skill's paragraph on missing transcripts, which gains a
   `stale` bullet.
+- **hands-off** `TOOL-dLoggedFlight-20` — the Skill's description and its question table's
+  between-two-times row, which that unit routes to the local model first, since the committed record
+  carries no event times.
 
 ## 4. Design
 
@@ -144,6 +147,9 @@ none
   the `{{MEMORY_ROOT}}` render token).
 - rev-4 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-16`, a unit the spec audit of units 14
   and 15, round 1, promoted at its BOUNDED exit.
+- rev-5 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-20`, from M2 of the spec audit of units 14,
+  16 and 20, round 1: this unit's routing of a time question to the committed record first is reversed
+  there, by the owner's ruling of 2026-09-16.
 
 ## 10. Reuse audit
 

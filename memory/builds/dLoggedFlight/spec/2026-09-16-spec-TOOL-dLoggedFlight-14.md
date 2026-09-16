@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-14 — a session's live transcript is read before its store extract, on the named and the discovered path
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 15
+**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -149,8 +149,11 @@ passes it.
   local transcript, that session is not read: the Coverage `sessions` fact's extracted count excludes
   it, and the state is the one the run's own session gives. With that session's transcript local and
   its files last modified before the window's start, the arm's count of `extract_session` calls shows
-  it was not extracted.
-  Red when: the earlier session is read, turns the state `stale`, or is extracted.
+  it was not extracted. With that session's transcript local, its files last modified at or after the
+  window's start and every event before it, the count shows it extracted once, and the Coverage
+  `sessions` fact's extracted count excludes it.
+  Red when: the earlier session is read, turns the state `stale`, or is extracted while its files
+  precede the window, or the session with later-touched files and no in-window event is counted.
 
 ## 7. Gates
 
@@ -177,6 +180,10 @@ none
 - rev-3 · 2026-09-16 · §1 · S4 · S5 · §3 · the owner's ruling of 2026-09-16 (no journal or
   transcript time is committed) supersedes `TOOL-dLoggedFlight-15` and `-17` by `TOOL-dLoggedFlight-20`:
   S5 retires, and this unit keeps count correctness.
+- rev-4 · 2026-09-16 · AC7 · folded M3 of the spec audit of units 14, 16 and 20, round 1. S4's local
+  transcript rule has two clauses, and AC7 reached only the first. AC7 gains an arm for the second: a
+  session whose files were touched at or after the window's start and whose every event precedes it is
+  extracted and not counted.
 
 ## 10. Reuse audit
 

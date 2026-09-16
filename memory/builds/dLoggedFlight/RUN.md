@@ -122,3 +122,11 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T13:42:14Z rescope · item supersede TOOL-dLoggedFlight-19 -> TOOL-dLoggedFlight-20 · reason owner ruling 2026-09-16: no journal or transcript time is committed, so this per-path hold of such a time has nothing left to hold
 
 2026-09-16T14:07:07Z review · item dLoggedFlight-spec-set-r5 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition promote
+
+2026-09-16T14:17:32Z rescope · item add TOOL-dLoggedFlight-21 · reason spec audit round 1 of units 14, 16 and 20 BOUNDED, B1 BLOCKER promoted: unit 20 cut the commitment's first, which verify parses and recomputes from
+
+2026-09-16T14:17:33Z rescope · item add TOOL-dLoggedFlight-22 · reason spec audit round 1 of units 14, 16 and 20 BOUNDED, B2 BLOCKER promoted: unit 20 retired rows and a function four arms read, one of which unit 16 AC4 pins unedited
+
+2026-09-16T14:17:33Z rescope · item add TOOL-dLoggedFlight-23 · reason spec audit round 1 of units 14, 16 and 20 BOUNDED, H1 HIGH and H2 HIGH promoted: the population check read no duration token and its fixture need not reach the conditional slots
+
+2026-09-16T14:17:33Z rescope · item add TOOL-dLoggedFlight-24 · reason spec audit round 1 of units 14, 16 and 20 BOUNDED, H3 HIGH promoted: the Summary window was a third derivation of the run's window, open to HEAD for a build's last run

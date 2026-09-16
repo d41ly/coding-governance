@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-10 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-11 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -139,6 +139,14 @@ leg can prove nothing else got in.
 - **hands-off** `TOOL-dLoggedFlight-19` — `RECORD_SCHEMA`, whose `utc` slots the class gate reads.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill reads this record first.
 - **hands-off** `TOOL-dLoggedFlight-20` — `RECORD_SCHEMA` and the renderer, whose times it restricts to git and run-state sources.
+- **hands-off** `TOOL-dLoggedFlight-21` — S5's commitment, `measure_commitment` and `check_commitment`,
+  whose first and last timestamps that unit supersedes.
+- **hands-off** `TOOL-dLoggedFlight-22` — S4's journal-sourced Timeline layouts, its Anomalies and
+  Coverage time columns and its owner-time refusal, with the arms of AC4, AC6, AC9 and AC10 that read them.
+- **hands-off** `TOOL-dLoggedFlight-23` — `render_record` and `RECORD_SCHEMA`, whose every time token
+  that unit's population arm grades.
+- **hands-off** `TOOL-dLoggedFlight-24` — `build_summary_facts`' window, duration and provenance facts,
+  and the `opened-by` and `closed-by` vocabularies, which narrow.
 
 ## 4. Design
 
@@ -329,6 +337,12 @@ none
   S5, which moved to `-17`, and the edge to `-15` drops the layout table, which `-19` reads.
 - rev-10 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-20`: the owner's ruling of 2026-09-16
   keeps every journal and transcript time out of the committed record.
+- rev-11 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-21` to `-24`, the units the spec audit of
+  units 14, 16 and 20, round 1, promoted at its BOUNDED exit. Superseded by name: S5's first and last
+  timestamps and AC5's commitment shape by `-21`; S4's journal-sourced Timeline row layouts, its
+  Anomalies and Coverage time columns, its owner-time refusal with AC9, AC10's `--close` Timeline `rc`
+  half, and the members of AC4's vocabularies and classes no render reaches, by `-22`; S4's window,
+  duration and provenance facts, by `-24`. The text above is left as it was ratified.
 
 ## 10. Reuse audit
 

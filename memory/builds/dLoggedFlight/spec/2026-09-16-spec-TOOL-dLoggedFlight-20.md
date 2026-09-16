@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 20
+**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -21,36 +21,45 @@ source that is already public in git: a commit, or a row of the committed run-st
 time stays in the machine-local model and the runlog Skill's answers. That closes the class by
 construction, and it supersedes `TOOL-dLoggedFlight-15`, `-17`, `-18` and `-19`.
 
+The spec audit of units 14, 16 and 20, round 1, moved four halves of this unit out. The commitment went
+to `TOOL-dLoggedFlight-21` (B1). The journal rows, the time columns and the refusal, with every arm that
+reads them, went to `TOOL-dLoggedFlight-22` (B2). The population arm went to `TOOL-dLoggedFlight-23` (H1,
+H2). The Summary window, its duration and its provenance facts went to `TOOL-dLoggedFlight-24` (H3, with
+M1). What this unit still owns is the declaration every time slot's source is read from, the schema
+leg's source rule, the Skill's routing and the class record.
+
 ## 2. Scope (IN)
 
-- **S1** Declared sources. `RECORD_SCHEMA` in `tools/runlog/record.py` gives every `utc` and `duration`
-  slot a declared source, and the only sources a time may have are `git` and `run-state`. Observed by
-  AC1 and AC5.
-- **S2** The timeline. The Timeline table renders only rows whose source is `git` or `run-state`:
-  commits, merges, phase moves read from the run-state file's history, and its dispatch, brief and
-  review rows. Rows from the driver, gates and pushes journals and from transcripts are not rendered.
-  A Timeline fact renders their count per kind instead. The elided line's times come from the rows
-  kept. Observed by AC2.
-- **S3** The Summary. The window renders as the committer times of its first and last commits in the
-  run's era, and the duration as the difference between them. A window bound that came from a journal
-  line never renders. The commitment renders its digest and line count, never a line's time. Observed
-  by AC3.
-- **S4** Anomalies and coverage. The Anomalies table and the Coverage table carry no time column. An
-  anomaly renders its kind, sub-class and count. A journal's epoch stays in the local model. Observed
-  by AC4.
-- **S5** The refusal retires. `scan_owner_times` and the render's owner-time refusal are removed, since
-  no rendered time now comes from a source an owner act can set without the time already being public.
-  Idle gaps render as a count only. Observed by AC6.
-- **S6** The population check. A self-test arm renders a fixture model whose every journal and transcript
-  event carries a sentinel second. It reads EVERY `utc` token of the rendered markdown and the Data twin.
-  Each must equal a commit time or a run-state row time from the fixture, and none may equal a sentinel.
-  The population is the rendered text, never a named list, which is the narrowing three rounds found.
-  Observed by AC1.
+- **S1** Declared sources. `RECORD_SCHEMA` in `tools/runlog/record.py` gains `time_classes`, the
+  shaped classes that carry a time, `("utc", "duration")`, and `TIME_SOURCES`, `("git", "run-state")`.
+  `scan_time_slots(schema)` returns every slot of a class in `time_classes`: each placeholder of a fact
+  template, keyed by section, label and position; each Timeline row layout's column, keyed by row kind;
+  and each column of any other table, keyed by section, table and header. It holds no typed list of
+  slots. `RECORD_SCHEMA["sources"]` maps each such key to the non-empty set of sources its value may
+  come from, since the Timeline `elided` fact reads a `commit` row or a `dispatch` row alike. Then
+  `check_time_sources` refuses, naming the slot, a key `scan_time_slots` returns with no entry, a source
+  outside `TIME_SOURCES`, and an entry keyed to no slot. Observed by AC1.
+- **S2** Moved to `TOOL-dLoggedFlight-22` S1. NOT OBSERVED here: that unit's AC1 observes it.
+- **S3** Moved. The commitment went to `TOOL-dLoggedFlight-21` S1 to S4, and the window, the duration
+  and the two provenance facts went to `TOOL-dLoggedFlight-24` S1 to S3. NOT OBSERVED here: those
+  units' AC1 to AC4 observe it.
+- **S4** Moved to `TOOL-dLoggedFlight-22` S2. NOT OBSERVED here: that unit's AC2 observes it.
+- **S5** Moved to `TOOL-dLoggedFlight-22` S3. NOT OBSERVED here: that unit's AC3 observes it.
+- **S6** Moved to `TOOL-dLoggedFlight-23` S1 to S5. NOT OBSERVED here: that unit's AC1 to AC4 observe
+  it.
 - **S7** The schema leg. `check-records` refuses a committed record whose Timeline row has a source
-  other than `git` or `run-state`, or whose layout carries a time column S4 removed, naming the record,
-  the line and the rule. Observed by AC5.
-- **S8** The Skill. `tools/runlog/SKILL.template.md` says the committed record carries no event times,
-  and routes a question about when something happened to the local `model` answer. Observed by AC7.
+  other than `git` or `run-state`, or whose layout carries a time column `TOOL-dLoggedFlight-22` S2
+  removed, naming the record, the line and the rule. Observed by AC5.
+- **S8** The Skill. `tools/runlog/SKILL.template.md` says the committed record carries no event times.
+  Its question table's row for what a run did between two times reads first from the local `model`
+  timeline (`SKILL.template.md:61`). Its `description` (`SKILL.template.md:4-7`) no longer sends a
+  question about a time to the committed record first. `.claude/skills/runlog/SKILL.md` is re-rendered
+  by `tools/runlog/adopt-runlog.sh --scaffold`. Observed by AC7.
+- **S9** The class record. The fix section of
+  `memory/gotchas/withheld-value-recovered-from-a-derived-one.md`, which says `tools/runlog/record.py`
+  refuses the whole record on an owner-second match (line 46), is rewritten to the source rule: no
+  committed time comes from a journal or a transcript, held by `check_time_sources`, `check-records` and
+  `TOOL-dLoggedFlight-23`'s population arm. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -59,22 +68,34 @@ construction, and it supersedes `TOOL-dLoggedFlight-15`, `-17`, `-18` and `-19`.
   rest on.
 - Coarsening times into buckets. A bucket is still a clock time, and the ruling withholds the source,
   not the precision.
+- The commitment, the retired rows and columns with their readers, the population arm, and the Summary
+  window block. `TOOL-dLoggedFlight-21`, `-22`, `-23` and `-24` own them.
 
 ### Edges
 
-- **consumes-from** `TOOL-dLoggedFlight-8` — the model's timeline, window and anomaly set, with each
-  event's source.
-- **consumes-from** `TOOL-dLoggedFlight-9` — the renderer, `RECORD_SCHEMA` and the refusal this unit
-  retires.
+- **consumes-from** `TOOL-dLoggedFlight-8` — the model's timeline, with each event's source.
+- **consumes-from** `TOOL-dLoggedFlight-9` — `RECORD_SCHEMA` and the renderer, whose slots S1 declares.
 - **consumes-from** `TOOL-dLoggedFlight-10` — the schema leg this unit gives the source rule.
+- **consumes-from** `TOOL-dLoggedFlight-12` — the Skill's description and its question table, whose
+  time routing S8 changes.
 - **consumes-from** `TOOL-dLoggedFlight-14` — the counts the record keeps in place of the times.
+- **consumes-from** `TOOL-dLoggedFlight-21` — the commitment with no time, so S1 declares no slot for
+  it.
+- **consumes-from** `TOOL-dLoggedFlight-22` — the kept rows and columns, so every slot S1 declares has a
+  public source.
+- **consumes-from** `TOOL-dLoggedFlight-24` — the Summary window and duration, rendered from commit
+  times.
+- **hands-off** `TOOL-dLoggedFlight-23` — `time_classes`, `TIME_SOURCES` and `scan_time_slots`, which
+  the population arm reads.
 
 ## 4. Design
 
 The defect class was enumeration: each withholding rule ran over a narrower population than the leak.
 This unit changes what is withheld from values to sources. A source either is already public or is not,
-and that is decidable per slot, so there is no population to enumerate beyond the schema's own slots.
-S6 then checks the rendered text itself, so a slot that escapes the declaration still fails.
+and that is decidable per slot, so there is no population to enumerate beyond the schema's own slots,
+and `scan_time_slots` reads those from the schema rather than from a list.
+`TOOL-dLoggedFlight-23` then checks the rendered text against the same classes and slots, `duration`
+included, so a slot that escapes the declaration still fails.
 
 Commit times and run-state row times can sit near an owner turn, because an agent often commits right
 after the owner answers. They add nothing a reader cannot already get from `git log` on the public
@@ -85,12 +106,16 @@ remote, and that is why they are the kept sources.
 | identifier | kind | cell |
 |---|---|---|
 | `TIME_SOURCES` | constant | none |
+| `time_classes` | schema key | `RECORD_SCHEMA` |
+| `sources` | schema key | `RECORD_SCHEMA` |
+| `scan_time_slots` | function | `py.function`, led by `scan` |
 | `check_time_sources` | function | `py.function`, led by `check` |
 
 ### Files touched (estimate)
 
-`tools/runlog/{record.py,model.py,runlog.py,selftest.py,README.md,SKILL.template.md}`,
-`.claude/skills/runlog/SKILL.md`, `memory/map/features/runlog.md` and the regenerated map.
+`tools/runlog/{record.py,runlog.py,selftest.py,README.md,SKILL.template.md}`,
+`.claude/skills/runlog/SKILL.md`, `memory/gotchas/withheld-value-recovered-from-a-derived-one.md`,
+`memory/map/features/runlog.md` and the regenerated map.
 
 ### Alternatives rejected
 
@@ -103,45 +128,39 @@ remote, and that is why they are the kept sources.
 ## 5. Production-readiness checklist
 
 - security — closes the owner-time class by source, not by path.
-- perf / scale — the render does less; no git call is added.
-- error / empty / loading states — a run with no commits in its era renders its window as `-`.
-- observability — the per-kind counts replace the removed rows, so the record still says what happened.
+- perf / scale — the declaration is read once per check; no git call is added.
+- error / empty / loading states — a time slot added with no declared source is refused by name.
+- observability — a refusal names the slot and the rule.
 - risks — a reader of the committed record loses the order of journal events; the local model keeps it.
-- testing — each AC staged RED on its fixture, with S6's sentinel arm over the whole rendered text.
+- testing — each AC staged RED on its fixture or on a copy of the schema.
 - migration — records committed before this unit are re-rendered by their next placement.
-- user docs — the kit README's record section and the runlog Skill.
+- user docs — the kit README's record section, the runlog Skill and the class record.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `render_record` renders a fixture model whose every journal and transcript event carries
-  a sentinel second, every `utc` token in the markdown and the Data twin equals a fixture commit time or
-  run-state row time, and none equals a sentinel.
-  Red when: any rendered time equals a sentinel, or a time slot has a source other than `git` or
-  `run-state`.
-- **AC2** — When `render_record` renders the same fixture, the Timeline holds only rows whose source is
-  `git` or `run-state`, and its fact counts the withheld rows per kind.
-  Red when: a verb, gate, push, compaction, limit, idle or workflow row renders.
-- **AC3** — When `render_record` renders a run whose window ends at a journal line, the Summary window
-  reads the committer times of the era's first and last commits, and the commitment reads its digest and
-  line count only.
-  Red when: the window or the commitment carries a journal time.
-- **AC4** — When `render_record` renders anomalies and coverage, neither table has a time column.
-  Red when: either table carries a `utc` column.
+- **AC1** — When `check_time_sources` reads `RECORD_SCHEMA`, every key `scan_time_slots` returns has an
+  entry whose sources are all in `TIME_SOURCES`, and it refuses nothing. On a copy with `driver` added to
+  the Summary `window` slot's sources, and on a copy with the Decisions `rounds` table's `UTC` entry
+  removed from `sources`, it refuses naming that slot.
+  Red when: either staged copy passes, or a time slot has no entry.
 - **AC5** — When `check-records` reads a fixture record carrying a verb row with a time, it exits 1 naming
   the record, the line and the source rule.
   Red when: the record is accepted.
-- **AC6** — When `grep -n scan_owner_times tools/runlog/record.py` runs, it finds nothing, and a render
-  whose commit lands in the same second as an owner turn is not refused.
-  Red when: the refusal remains or fires on a public commit time.
-- **AC7** — When `grep -n 'no event times' .claude/skills/runlog/SKILL.md` runs, it finds the sentence
-  that routes a time question to the local model.
-  Red when: the Skill still tells a reader the committed record answers when something happened.
+- **AC7** — When `grep -n 'no event times' .claude/skills/runlog/SKILL.md` runs, it finds the sentence,
+  the question table's between-two-times row names the model's `timeline` as its first source, and the
+  description's routing does not put the committed record first for a question about a time.
+  Red when: the sentence is absent, the row still names the record's Timeline first, or the description
+  still routes a time question to the committed record first; staged RED against the current Skill with
+  the sentence added and the row and description left.
+- **AC8** — When `grep -n 'refuses the whole record' memory/gotchas/withheld-value-recovered-from-a-derived-one.md`
+  runs, it finds nothing, and the fix section names `check_time_sources`.
+  Red when: the gotcha still describes the refusal as present.
 
 ## 7. Gates
 
 `runlog selftest` · `runlog record schema` · `runlog skill wiring` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture, S6's sentinel arm over the whole render · floor raised by the arm count
+New arm: `tools/runlog/selftest.py` · AC1's two schema copies and AC7's half-amended Skill · floor raised by the arm count
 
 ## 8. Open questions
 
@@ -151,14 +170,26 @@ none
 
 - rev-1 · 2026-09-16 · initial draft, from the owner's ruling of 2026-09-16; supersedes
   `TOOL-dLoggedFlight-15`, `-17`, `-18` and `-19`.
+- rev-2 · 2026-09-16 · §1 · §3 · §4 · S1 S2 S3 S4 S5 S6 S8 S9 · AC1 AC2 AC3 AC4 AC6 AC7 AC8 · the
+  disposal of the spec audit of units 14, 16 and 20, round 1. Promoted: B1 to `TOOL-dLoggedFlight-21`,
+  which takes S3's commitment clause; B2 to `-22`, which takes S2, S4 and S5 with AC2, AC4 and AC6; H1
+  and H2 to `-23`, which takes S6 and AC1's sentinel arm; H3 to `-24`, which takes S3's window and
+  duration with AC3. S1 now spells `time_classes`, `sources` and `scan_time_slots`, which `-23` reads, so
+  AC1 observes the declaration itself. Folded: M1, the provenance facts S3 neither retired nor
+  redefined, is decided in `-24` S3 against that unit's window, as the audit asked, since the facts
+  describe it. M2: S8 and AC7 re-route the description and the question table as well as adding the
+  sentence, with a consumes-from edge to `TOOL-dLoggedFlight-12`. L1: S9 and AC8 rewrite the gotcha's fix
+  section, and Files touched names it. The order moves from 20 to 24, so `-21`, `-24` and `-22` land
+  first.
 
 ## 10. Reuse audit
 
-The seams are `RECORD_SCHEMA`, `render_record` and `scan_owner_times` in `tools/runlog/record.py`, and
-the schema leg `check-records` in `tools/runlog/runlog.py`, all this build's.
+The seams are `RECORD_SCHEMA` and `render_record` in `tools/runlog/record.py`, and the schema leg
+`check-records` in `tools/runlog/runlog.py`, all this build's.
 `tools/codebase-map/reuse_lookup.py "declare a source for every rendered time"` returned name-stem
 candidates only. Outside this kit they are codebase-map's `derive_source_paths`, memory-recall's
 `extract_declarations` and lexicon's `parse_ts_source`, unrelated name matches, and none declares a
-source per rendered time.
+source per rendered time. `scan_time_slots` reuses the slot enumeration `TOOL-dLoggedFlight-19` S1
+specified before that unit was superseded, widened from `utc` to every class in `time_classes`.
 
 Recall terms used: run-state RUN.md parked rows driver verb witness phase transcript session keepalive gate-ledger wrap-up telemetry

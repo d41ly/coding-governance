@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** CLOSED · rev-8 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** CLOSED · rev-9 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -101,6 +101,10 @@ schema, independently of the renderer.
   clean fixture comes from, with the run starts it reads from the model.
 - **hands-off** `TOOL-dLoggedFlight-11` — the leg that grades this run's own record before its landing.
 - **hands-off** `TOOL-dLoggedFlight-20` — the leg it gives the time-source rule.
+- **hands-off** `TOOL-dLoggedFlight-22` — the typed vocabulary list of AC1's arm, S5's UUID carrier and
+  AC2's `cell`, `uuid` and `data escape` carriers, which move off the retired rows.
+- **hands-off** `TOOL-dLoggedFlight-24` — `check_run_states`' git-only window, which the rendered Summary
+  window copies and that unit's AC1 compares.
 
 ## 4. Design
 
@@ -238,6 +242,9 @@ none
   adopter authors, which is the owner's turn.
 - rev-8 · 2026-09-16 · §3 · the edge to `TOOL-dLoggedFlight-20`: the owner's ruling of 2026-09-16
   keeps every journal and transcript time out of the committed record.
+- rev-9 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-22` and `-24`, units the spec audit of
+  units 14, 16 and 20, round 1, promoted at its BOUNDED exit. Superseded by name: AC1's typed vocabulary
+  list and the fixture carriers of S5 and AC2, by `-22`. The leg's rules and S6's windows do not change.
 
 ## 10. Reuse audit
 
