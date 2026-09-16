@@ -5475,6 +5475,58 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-ST2] AC1 ...and the run exits 0 rather than refusing the kit",
               _w2.returncode == 0, _w2.stdout[-900:] + _w2.stderr[-600:])
 
+        # ---- DEPL-cMendedVintage-3. THE COVERAGE TAIL JOINS EACH GAP TO ITS OWN REASON --------
+        # Staged on THIS fixture rather than a new one, because it already ends holding the harder
+        # of the two rows: the rename machinery DECIDED about `moved2.txt` above without refusing
+        # it, so that destination is in neither `_landed_new` nor `_refused_new` and it is exactly
+        # the residue AC2 grades. What it lacks is a gap carrying a real refusal, and an ordinary
+        # `.gitignore` in the target manufactures the one refusal site a fixture can reach: the
+        # file is written, `git add` exits non-zero, the bytes are removed, the destination stays
+        # untracked -- and it is therefore still an open gap when the coverage block runs.
+        (_ts2 / ".gitignore").write_text("tools/mvkit/ignored.txt\n", encoding="utf-8",
+                                         newline="\n")
+        settle(_ts2, "the target ignores a destination gov is about to ship")
+        (_ds2 / "ignored.txt").write_text("gov ships this and the target ignores it\n",
+                                          encoding="utf-8", newline="\n")
+        git(_gs2, "add", "-A")
+        git(_gs2, "commit", "-qm", "mvkit C: gov ships a destination the target ignores")
+        _w3 = run_in_gov(_gs2, "update", "--target", str(_ts2), "--write")
+        _gap3 = {ln.split("]", 1)[1].strip().split()[0]: ln
+                 for ln in _w3.stdout.splitlines() if "  GAP      [" in ln}
+
+        # THE ANTECEDENT, ASSERTED BEFORE THE JOIN IS GRADED. A fixture can stage a condition the
+        # tool does not actually refuse -- `-2` shipped one -- so this names the refusal SITE
+        # rather than settling for any non-zero exit, and asserts the GAP row exists before
+        # anything asks what it says. Without both, every arm below could pass over an absent line.
+        check("[-MV3] LIVENESS the ignored destination really took the STAGING refusal, and not "
+              "one of the seven other refusal sites",
+              any("REFUSED tools/mvkit/ignored.txt" in ln and "git refused to stage it" in ln
+                  for ln in _w3.stdout.splitlines()), _w3.stdout[-1600:])
+        check("[-MV3] LIVENESS ...and it is still an OPEN GAP, so the join has a row to annotate",
+              "tools/mvkit/ignored.txt" in _gap3, str(sorted(_gap3)))
+        check("[-MV3] AC1 the open gap carries the refusal reason this run already recorded for "
+              "that destination",
+              "refused: git refused to stage it" in _gap3.get("tools/mvkit/ignored.txt", ""),
+              _gap3.get("tools/mvkit/ignored.txt", "there is no GAP line for it at all"))
+        check("[-MV3] AC2 a gap the rename machinery decided about says NO reason was recorded — "
+              "never that it was resolved, and never the refused wording with an empty reason",
+              "no refusal reason was recorded" in _gap3.get("tools/mvkit/moved2.txt", "")
+              and "refused:" not in _gap3.get("tools/mvkit/moved2.txt", ""),
+              _gap3.get("tools/mvkit/moved2.txt", "there is no GAP line for it at all"))
+        check("[-MV3] AC5 the join ANNOTATES the gap set rather than filtering it: both rows still "
+              "print and the tally still counts them both",
+              len(_gap3) == 2 and "coverage: 2 undeclined gap(s) of 2" in _w3.stdout,
+              str(sorted(_gap3)) + " | " + _w3.stdout[-1200:])
+        check("[-MV3] AC5 ...and the unclaimed-source tally above it is untouched by this unit",
+              "unclaimed sources: 0 landed" in _w3.stdout, _w3.stdout[-1200:])
+        # AC3 — THE DELETION, GATED. The clause was deleted from the print and the paragraph
+        # repeating it from the comment ninety lines up; an arm reading only the printed output
+        # would leave the comment standing, which is the copy a reader reaches first.
+        check("[-MV3] AC3 the engine no longer claims anywhere that landing an unclaimed source is "
+              "a verb that does not exist",
+              "does not exist yet" not in GOVKIT.read_text(encoding="utf-8"),
+              "govkit.py still carries the clause this unit deleted")
+
         # ---- DEPL-dSealedTally-4. `index_read` ASSERTS GIT'S EXIT CODE ---------------------
         # Driven DIRECTLY, which is legitimate here rather than a shortcut: `index_read` is a
         # pure function of (target, paths), so the module-level call IS the subject. The verb

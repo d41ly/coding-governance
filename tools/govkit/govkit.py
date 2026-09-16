@@ -7864,11 +7864,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- `lexicon.py` imports it at MODULE level, so every entry point of that kit died for six
     # ---- days under a green bar.
     # ----
-    # ---- IT REPORTS, IT DOES NOT LAND. Landing a source with no receipt row means inventing the row
-    # ---- -- its role, its commit, its gov_oid, whether the target ever declined it -- and this verb
-    # ---- has evidence for none of those. `apply` is not the workaround either: it also runs the
-    # ---- kit's [adopt], which for a target holding a kit deliberately INERT is a posture flip.
-    # ----
     # ---- IT RUNS AFTER EVERY REFUSAL THIS VERB ALREADY MAKES, and the placement is a MEASURED
     # ---- correction rather than a preference. The first cut ran it right after `load_deploy`, and
     # ---- `planned_writes` raised on the `-11` escape fixture's out-of-tree prefix -- turning that
@@ -7908,11 +7903,33 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                              _gcommit, _gaps, _gr)
         for _p in _gr.problems:
             print(f"govkit update --   probe finding (NOT a verb failure): {_p}")
+        # DEPL-cMendedVintage-3. THE JOIN. The landing loop above already decided about most of
+        # these destinations and recorded WHY it refused each one; printing the gap set and the
+        # refusal set as two disjoint lists left the operator to pair them by eye. Keyed on `dest`,
+        # which is the same string both sides carry, so no normalisation is possible to get wrong.
+        # The reason is READ from the list rather than re-derived here: a second copy of the eight
+        # refusal strings is the prose-beside-its-source class, and it would drift from the one the
+        # operator actually saw on the REFUSED line below.
+        #
+        # `_landed_new` is deliberately NOT consulted. A landed destination was `git add`ed, so
+        # `coverage_rows` -- which filters on `dest not in tracked(target)` -- cannot return it, and
+        # a membership test that can never be true is the could-not-fail shape this file bans.
+        _refused = dict(_refused_new)
         _gap_open = [g for g in _gaps if _gap_declined.get((g["kit"], g["dest"])) is None]
         for _g in _gaps:
             _st = _gap_declined.get((_g["kit"], _g["dest"]))
             if _st is None:
-                print(f"govkit update --   GAP      [{_g['kit']}] {_g['dest']}   <- {_g['src']}")
+                # THE RESIDUE SAYS NOTHING IT DID NOT OBSERVE. A destination the rename machinery
+                # decided about, or one the landing loop's selection never reached, is in neither
+                # list -- and "already handled" for one of those would be exactly the invented
+                # claim this unit deletes from the closing line. No reason recorded is no reason
+                # recorded; the operator is pointed at the verb that can record one.
+                _why = _refused.get(_g["dest"])
+                print(f"govkit update --   GAP      [{_g['kit']}] {_g['dest']}   <- {_g['src']}   "
+                      + (f"refused: {_why}" if _why else
+                         "no refusal reason was recorded for this destination in this run — "
+                         "`govkit plan --coverage --emit-declines` prints a [[decline]] skeleton "
+                         "for it"))
             else:
                 # A DECLINED ROW PRINTS, never vanishes. A gap that disappears from a report without
                 # saying why is the exclusion-list shape DEPL-dCarriedReceipt-5 exists to prevent,
@@ -7923,8 +7940,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update -- coverage: {len(_gap_open)} undeclined gap(s) of {len(_gaps)} "
               f"across {len(_gap_selection)} claimed entr(y|ies)"
               + ("" if not _gap_open else " -- this install is INCOMPLETE: gov ships these and this "
-                                          "target does not hold them. This verb reports them; "
-                                          "landing them is a verb that does not exist yet"))
+                                          "target does not hold them, each for the reason on its "
+                                          "own GAP line above"))
     except Exception as _ge:
         # LIVENESS. A probe that cannot run SAYS SO rather than printing a reassuring zero, which is
         # the difference between "no gaps" and "the join never ran". It never changes this verb's

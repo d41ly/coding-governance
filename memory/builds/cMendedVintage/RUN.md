@@ -69,3 +69,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T17:54:56Z dispatch · item 03ba97f1 DEPL-cMendedVintage-2 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-2.md memory/LIVE.md
 
 2026-09-16T18:05:59Z dispatch · item 03ba97f1 DEPL-cMendedVintage-2 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-2.md memory/builds/cMendedVintage/README.md memory/LIVE.md
+
+2026-09-16T18:12:31Z dispatch · item 96cab2de DEPL-cMendedVintage-3 · reason tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-09-16T18:12:32Z brief · item DEPL-cMendedVintage-3 · reason 0b97a85037a7 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-3-2-build-brief.md
+
+2026-09-16T18:15:05Z dispatch · item 96cab2de DEPL-cMendedVintage-3 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-3.md
