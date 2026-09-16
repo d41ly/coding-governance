@@ -61,5 +61,41 @@ if g=$(gate_at tools/check-template-size.sh check-template-size.sh) &&
   bash "$g" || rc=1
 fi
 
+# codebase-map coverage + freshness — only when a staged path is a .py or .js file. The bar runs this
+# same command on every run (its leg in tools/gate-legs.json has no guard) and nothing before the push
+# boundary did, so a module-level def committed without a regen travelled until a closing review found
+# it — memory/gotchas/hand-named-gate-list-green-while-the-bar-reds.md records the builds it hit, and the
+# rest of the class this leg does not reach. About 1.5 s. Quiet on a pass except for the lines
+# the test prints that are not `ok` — its UNGRADED and skipped-tier announcements stay visible.
+# WHAT THIS LEG DOES NOT CHECK:
+# - Only .py and .js trigger it, the two populations the symbol tier reads. The map's other
+#   inventories (EXTRACTORS in map_extractors.py) and a dossier claim edit move its artifacts too,
+#   and a commit staging only those still reds first at the bar.
+# - It grades the WORKTREE, not the index, so an unstaged edit to a mapped file can move the verdict
+#   either way. The one mismatch it closes is its own remedy's: artifacts regenerated and not staged.
+if g=$(gate_at tools/codebase-map/test_codebase_map.py codebase-map/test_codebase_map.py) &&
+   git diff --cached --name-only -- '*.py' '*.js' | grep -q .; then
+  if ! r=$(gate_at tools/lib/resolve-python.sh) || ! . "$r" || ! py=$(resolve_python); then
+    echo "pre-commit: codebase-map leg cannot run $g — no python resolver or no usable launcher."
+    rc=1
+  elif ! out=$("$py" "$g" 2>&1); then
+    printf '%s\n' "$out"
+    echo "pre-commit: codebase-map gate failed. STALE artifact: run 'python ${g%/*}/gen_map.py --write',"
+    echo "  then stage what it rewrote. UNCLAIMED key: claim it in a dossier, as the failure above says."
+    rc=1
+  else
+    printf '%s\n' "$out" | grep -v '^ok ' || true
+    mr=$(. ./.codebase-map.conf >/dev/null 2>&1; printf '%s' "${MAP_ROOT:-}")
+    if [ -z "$mr" ] || [ ! -d "$mr/generated" ]; then
+      echo "pre-commit: codebase-map leg did NOT check for unstaged regenerated artifacts — no MAP_ROOT/generated from .codebase-map.conf."
+    elif unstaged=$(git diff --name-only -- "$mr/generated/") && [ -n "$unstaged" ]; then
+      echo "pre-commit: the codebase-map artifacts are fresh in the worktree but NOT staged, so this commit"
+      echo "  carries the stale copies. Stage them:"
+      printf '%s\n' "$unstaged" | sed 's/^/    /'
+      rc=1
+    fi
+  fi
+fi
+
 [ "$rc" = 0 ] || echo "pre-commit: a gate failed — fix or 'git commit --no-verify' to override deliberately."
 exit "$rc"
