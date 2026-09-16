@@ -1,12 +1,14 @@
 # DEPL-cMendedVintage-9 — no descriptor destination under `{memory_root}/project/`
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 13
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-9-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-9-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-9-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-9-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -162,10 +164,12 @@ declarations before anyone installs them, which is where a declaration defect be
   indistinguishable from a clean tree.
   figure: DERIVED — the count is printed by the note at observation time; the 269 in section 4 is
   PINNED to BASE `859daa67` as the reading that established the population is non-empty.
-- **AC4** — When `python tools/govkit/refusal_join.py` runs, it exits 0 with the new branch in its
-  anchor set and both shrink-only pins moved in the same commit.
+- **AC4** — When `python tools/govkit/refusal_join.py` runs, it exits 0 and BOTH shrink-only pins
+  have moved in the same commit, each carrying the number measured beside it.
   Red when: the predicate lands with no arm reaching it, which is exactly the unreached refusal
   branch that join exists to refuse.
+  figure: DERIVED — the counts are read off the run. See rev-2: the file enumerates no anchor set
+  and the join half does not execute, so an anchor-set membership assertion is not available here.
 - **AC5** — When `git grep -n 'report-reseed' -- WIRE-INTO-PROJECT.md` runs, the `## Maintenance`
   subsection names that override, the two adopters, and the manual step their receipt needs.
   Red when: the withdrawal ships with no note, so an adopter reads `current` over a row gov no longer
@@ -185,6 +189,33 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · AC4 restated, and three figures replaced by what was measured.
+
+  **AC4's anchor-set half is unbuildable and is withdrawn.** `refusal_join.py` enumerates NO anchor
+  set: its docstring names one, but the only membership assertion in the file runs against a
+  reached-set passed on argv, and nothing in the tree passes one — the file itself records that as
+  `TOOL-dUnstalledConvoy-36`. So there is no set for a new branch to join, and writing one is that
+  unit's work and not this one's. What AC4 now asserts is what the file actually holds: the run
+  exits 0 and BOTH shrink-only pins moved in this commit, with the new branch's arming stated beside
+  them. MEASURED, both sides: the matcher counted 250 refusal branches across 4 modules at base
+  `3ca2f144` and 251 at this tip, so `BRANCH_PIN` moves 217 -> 251 and not 217 -> 218. The pin was
+  33 behind the population before this unit wrote a line, and this file's own convention — a floor
+  that trails the population stops catching the matcher going blind — says raise it to the live
+  count. `FILE_PIN` moves 1 -> 4 for the same reason: four modules are discovered today and only the
+  engine carries a branch, which is exactly the scenario a branch count cannot see.
+
+  **S4's population is graded over `_bare_rows`, not `_bare_have`.** AC1's own red-when says so, and
+  section 4's table listed both; the number the note prints is therefore distinct (entry,
+  destination) pairs over every planned row, `missing` included, and not section 4's 269 non-missing
+  destinations. MEASURED: 274 graded and 0 under the prefix at this tip; 276 and 1 in a detached
+  tree at `3ca2f144^`, the last revision holding a live instance.
+
+  **AC1's and AC2's fixture is a purpose-built scratch gov tree**, not "a scratch copy of this tree"
+  — `build_scratch_gov_kit` in the suite already builds one, it is the shape `DEPL-cMendedVintage-8`
+  settled on one unit earlier, and a copy of this tree would stage the break inside a shipped
+  descriptor. The mechanism is carried onto the SHIPPED descriptors by the second observation
+  instead: the predicate as committed, run in a detached worktree at `3ca2f144^`, exits 1 naming
+  `gate-lint`'s `memory/project/substitution-fed-loops.txt`.
 
 ## 10. Reuse audit
 

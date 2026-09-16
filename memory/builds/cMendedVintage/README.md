@@ -121,7 +121,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-7 — `GOVKIT_RERENDER` defaults ON, and `=0` becomes the revert](spec/2026-09-16-spec-DEPL-cMendedVintage-7.md) | 10 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-8 — a descriptor shipping `rendered` rows must declare a regenerate](spec/2026-09-16-spec-DEPL-cMendedVintage-8.md) | 11 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [TOOL-cMendedVintage-2 — gate-lint stops seeding into the memory tree](spec/2026-09-16-spec-TOOL-cMendedVintage-2.md) | 12 | 2 | CLOSED | rev-2 | 2026-09-16 |
-| [DEPL-cMendedVintage-9 — no descriptor destination under `{memory_root}/project/`](spec/2026-09-16-spec-DEPL-cMendedVintage-9.md) | 13 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-9 — no descriptor destination under `{memory_root}/project/`](spec/2026-09-16-spec-DEPL-cMendedVintage-9.md) | 13 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [TOOL-cMendedVintage-3 — `check-wiring.sh`'s boundary walk can produce the empty prefix it declares legal](spec/2026-09-16-spec-TOOL-cMendedVintage-3.md) | 14 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix](spec/2026-09-16-spec-TOOL-cMendedVintage-4.md) | 15 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default](spec/2026-09-16-spec-TOOL-cMendedVintage-5.md) | 16 | 2 | SPECCED | rev-2 | 2026-09-16 |
@@ -141,7 +141,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-21 — the atomic write is one helper, and something fails when it is absent](spec/2026-09-16-spec-DEPL-cMendedVintage-21.md) | 30 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 4 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-15 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 

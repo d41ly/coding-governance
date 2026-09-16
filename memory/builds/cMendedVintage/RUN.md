@@ -137,3 +137,11 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T21:02:04Z dispatch · item 8295fb18 TOOL-cMendedVintage-2 · reason tools/gate-lint/sh_hygiene.py tools/gate-lint/kit.toml tools/gate-lint/README.md tools/gate-lint/substitution-fed-loops.template.txt memory/map/features/gate-lint.md memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-2.md memory/builds/cMendedVintage/build/2026-09-16-build-TOOL-cMendedVintage-2-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-16T21:05:43Z dispatch · item 8295fb18 TOOL-cMendedVintage-2 · reason tools/gate-lint/sh_hygiene.py tools/gate-lint/kit.toml tools/gate-lint/README.md tools/gate-lint/substitution-fed-loops.template.txt memory/map/features/gate-lint.md memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-2.md memory/builds/cMendedVintage/build/2026-09-16-build-TOOL-cMendedVintage-2-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-16T22:26:30Z brief · item DEPL-cMendedVintage-9 · reason 6a49b1430acc memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-9-2-build-brief.md
+
+2026-09-16T22:37:03Z dispatch · item 3ca2f144 DEPL-cMendedVintage-9 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py WIRE-INTO-PROJECT.md
+
+2026-09-16T22:44:13Z dispatch · item 3ca2f144 DEPL-cMendedVintage-9 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-9.md memory/LIVE.md memory/ledger
+
+2026-09-16T23:01:34Z dispatch · item 3ca2f144 DEPL-cMendedVintage-9 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-9.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-9-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger

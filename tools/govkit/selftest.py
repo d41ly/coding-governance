@@ -2609,6 +2609,66 @@ user_skills = "/tmp/gk-fake-skills"
             # with a ValueError, because that half resolved the repo-relative descriptor path
             # against the PROCESS CWD rather than against the tree being checked.
 
+            # ---- DEPL-cMendedVintage-9: NO PLANNED DESTINATION UNDER `{memory_root}/project/` ----
+            # The refusal has NO exerciser in gov's own tree and is meant never to have one again:
+            # `TOOL-cMendedVintage-2` withdrew the single live instance one commit before this
+            # landed, so a green run here is the steady state and these arms are the only thing
+            # standing between that green and a predicate that grades nothing.
+            #
+            # A fixture proves a mechanism only for the fixture's own values, so the predicate was
+            # ALSO run over the SHIPPED descriptors, in a detached tree at the commit before the
+            # withdrawal: it exited 1 there naming `gate-lint`'s
+            # `memory/project/substitution-fed-loops.txt`, the one real instance at the last
+            # revision that still had one. That run is in the build record; it cannot live here,
+            # because the tree it measured is the one this build repaired.
+            #
+            # TWO SPELLINGS OF ONE DESTINATION, and the pair is the point. The predicate grades the
+            # RESOLVED path, so the token form and a bare literal must refuse identically; a
+            # predicate reading the descriptor's source text would catch the first and miss the
+            # second, which is the cheaper implementation and the wrong one. The control one segment
+            # ABOVE the reserved prefix is what stops all this being a ban on `{memory_root}`.
+            # A `%s` template and not a helper: the only thing that varies is the destination, and
+            # the descriptor carries a literal `{kit}` that no brace-formatter would survive. The
+            # second rule claims the fixture's own non-rendered files on purpose — without it the
+            # tree reds on the per-file claim arm instead, and the control below would be green by a
+            # failure that never reached this predicate.
+            _mv_desc = ('id = "demo"\nhome = "tools/demo"\n'
+                        'version_from = { none = "fixture" }\n\n'
+                        '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "seed"\n'
+                        'to = "%s"\n\n'
+                        '[[files]]\ninclude = ["adopt-demo.sh", "kit.toml"]\nrole = "engine"\n\n'
+                        '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'
+                        'mutates_index = false\n')
+            _mv_hit = ("plans a file at 'memory/project/demo-registry.txt', under the reserved "
+                       "'memory/project/' prefix")
+            _mv_tok = run_in(build_scratch_gov_kit(
+                "reserved-token", _mv_desc % "{memory_root}/project/demo-registry.txt"))
+            check("AC1 a descriptor whose `to` resolves under `{memory_root}/project/` REDS",
+                  _mv_tok.returncode == 1 and _mv_hit in _mv_tok.stdout,
+                  _mv_tok.stdout + _mv_tok.stderr)
+            check("AC1 ...and the refusal names the closed-case-list reason, not just the path",
+                  "check 3 of their `check-memory-hygiene.sh`" in _mv_tok.stdout
+                  and "PROJECT_REGISTRY_EXTRA" in _mv_tok.stdout, _mv_tok.stdout)
+            _mv_lit = run_in(build_scratch_gov_kit(
+                "reserved-literal", _mv_desc % "memory/project/demo-registry.txt"))
+            check("AC2 the same destination spelled as a LITERAL refuses identically",
+                  _mv_lit.returncode == 1 and _mv_hit in _mv_lit.stdout,
+                  _mv_lit.stdout + _mv_lit.stderr)
+            # THE POPULATION IS ASSERTED ON BOTH SIDES. A hit count with no population beside it is
+            # indistinguishable from a predicate that ran over nothing, which is precisely the state
+            # this arm inherits from the withdrawal.
+            check("AC3 the note counts the destinations graded and the ones under the prefix",
+                  "3 planned destination(s) graded against the reserved "
+                  "`{memory_root}/project/` prefix, 1 under it" in _mv_lit.stdout, _mv_lit.stdout)
+            _mv_ok = run_in(build_scratch_gov_kit(
+                "reserved-control", _mv_desc % "{memory_root}/demo-registry.txt"))
+            check("AC3 CONTROL: one segment above the reserved prefix is GREEN, and the note "
+                  "prints its population on a clean run",
+                  _mv_ok.returncode == 0
+                  and "3 planned destination(s) graded against the reserved "
+                      "`{memory_root}/project/` prefix, 0 under it" in _mv_ok.stdout,
+                  _mv_ok.stdout + _mv_ok.stderr)
+
         # ========== DEPL-dCarriedReceipt-12: write preconditions and the outbox lock ==========
         # EVERY arm below was observed RED on a real scratch target before the engine moved. At the
         # base sha: in a LINKED WORKTREE both verbs walked straight through a live MERGE_HEAD,

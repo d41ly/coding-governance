@@ -1026,6 +1026,35 @@ vintage and will not re-offer the work. Where `git checkout-index` is the call t
 index was already reverted to the pre-run blob before it ran, so `git status` shows a change at that
 path you did not make.
 
+### `gate-lint` withdrew its seeded registry — a receipt already carrying that row keeps it silently
+
+The tree-scan leg used to read a registry gov SEEDED under `{memory_root}/project/`. That rule is
+gone: the leg's argv names no registry, and the scanner's registry argument is now optional — absent
+means an empty declaration, and a path that was supplied and does not resolve is a refusal. Check 3
+of the memory-tree hygiene gate treats that directory as a closed name set, so the seed was shipping
+a red gate to anyone who cannot widen their own case list, and a FORKED checker takes a widening
+never.
+
+**`update` will not tell you.** The row's role is `seed`, `UPDATE_ROLE` maps `seed` to
+`report-reseed`, and the seed branch in `update`'s disposition loop rewrites any surviving verdict to
+`current` or `patched`. Its only exemptions are `missing` and `renamed`, and a withdrawal grids to
+`withdrawn` — so a row gov no longer ships reads as `current` in every future run, and no order
+names it. That override is deliberate and this release does not change it: widening its exemption set
+re-adjudicates every seed row in every receipt, a verdict change on a population nothing here has
+measured.
+
+**So the step is manual, once, and only for a receipt written before this vintage.** That is inCMS
+core and NicoCares, the two trees carrying an installed copy of this kit.
+
+1. Pull the kit as usual.
+2. Delete `substitution-fed-loops.txt` from the `project/` directory under your `memory_root`, and
+   delete its row from `.governance/install.json`. Nothing reads either one from this vintage on.
+3. If you had rows in that registry they were always yours — the shipped copy was empty — so carry
+   them to wherever your scanner now reads its declaration from before you delete the file.
+4. Your own gate manifest still carries the old argv element naming that file. Leg rows arrive as an
+   order under `.governance/outbox/`, not as a write, so nothing removes it for you; drop it when you
+   apply that order, or the scan refuses a path that no longer resolves.
+
 ### The build harness is rendered from review-harness 1.8 — migrating a receipt that rows it as an engine file
 
 Before review-harness 1.8, `unattended-build.js` shipped as an engine file, so a receipt written

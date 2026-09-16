@@ -38,7 +38,22 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 217    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 251    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 217 -> 251 at DEPL-cMendedVintage-9. MEASURED, both sides: the matcher counted 250 over the four
+# modules at that unit's base `3ca2f144`, so the pin was 33 BEHIND the population before this unit
+# wrote a line, and this unit's ONE new refusal — the reserved-prefix predicate in selfcheck arm 7h,
+# which refuses a descriptor planning a file under `{memory_root}/project/` — carries it to 251.
+# Raised to the live count and not to 218, on the precedent of the 141 -> 161 entry below and for
+# its reason: a floor that trails the population stops catching the matcher going blind. The new
+# branch is armed by three arms on a scratch gov tree — the destination spelled through
+# `{memory_root}`, the same destination spelled as a literal, and a control one segment above it
+# that stays GREEN — and its failing case was observed TWICE. Once on those fixtures, and once over
+# the SHIPPED descriptors in a detached tree at the commit before the withdrawal, where it exited 1
+# naming `gate-lint`'s `memory/project/substitution-fed-loops.txt`: the real instance, at the last
+# revision that still had one. 1/1 armed.
+# NOTE what this raise does NOT buy, because the docstring above promises an anchor SET and this
+# file enumerates none: the join half still runs only when a reached-set is passed on argv, and
+# nothing in the tree passes one. That is TOOL-dUnstalledConvoy-36, unchanged by this unit.
 # 216 -> 217 at ROUND 4's fold. ONE new refusal, from the round's BLOCKER: the reserved-key guard in
 # `target_context`, which refuses a target `[answers]` or `[kit.<eid>]` key naming one of the three
 # tokens gov seeds for itself. Armed by SEVEN arms -- five doors, plus the liveness pair that proves
@@ -116,7 +131,12 @@ BRANCH_PIN = 217    # DERIVED on the first run over the real engine, not guessed
                     # 135 -> 141 at the origin/main reconcile: upstream's one plan/apply classifier
                     # adds refusal branches of its own. Raised rather than left slack, because a
                     # floor that trails the population stops catching the matcher going blind.
-FILE_PIN = 1        # 1 -> current: the deployer is one module today; a refactor may only grow this
+FILE_PIN = 4        # 1 -> 4 at DEPL-cMendedVintage-9. MEASURED at the same run: the discovered
+# population is four modules — the engine, `census.py`, `check_runbook_parity.py` and
+# `fixtures/make_incms_receipt.py` — and only the engine contributes a refusal branch, which is
+# exactly the scenario this pin exists for and the branch count cannot see. It sat at 1 while three
+# modules had already joined the scan, so a module dropping out of the glob was ungraded by both
+# pins at once. Shrink-only: a refactor may only grow this.
 
 
 def population(root: pathlib.Path) -> list[pathlib.Path]:

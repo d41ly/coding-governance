@@ -1904,9 +1904,50 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    f"this kit, and the receipt records no coverage for it. Ship the file (a `seed` "
                    f"rule is how a leg's data file travels), or take the path from an intake answer "
                    f"the operator supplies")
+        # ---- DEPL-cMendedVintage-9: NO PLANNED DESTINATION UNDER `{memory_root}/project/`.
+        #
+        # That directory is a CLOSED NAME SET at every target, and gov cannot widen it from here.
+        # Check 3 of a target's `check-memory-hygiene.sh` admits a hardcoded whitelist plus whatever
+        # that target declares in `PROJECT_REGISTRY_EXTRA`: the whitelist reaches them only on a
+        # later `update --kits memory-tree`, and a FORKED checker takes it never. So a descriptor
+        # landing a file there ships a RED gate to somebody else's repo, and this is the only place
+        # gov can catch it — before anyone installs anything.
+        #
+        # THE PREFIX IS RESOLVED, per entry, through the SAME context that resolved the rows. A
+        # literal `memory/project/` here would be a second spelling of a token the destinations were
+        # already resolved with, and a target declaring its own `memory_root` would be graded
+        # against gov's. THE DESTINATION IS THE FACT, never the descriptor's source text: a literal
+        # `memory/project/…` in a `to`, and a destination assembled from two tokens, both land there
+        # and neither is a grep hit for `{memory_root}/project`.
+        #
+        # GRADED OVER `_bare_rows` AND NOT `_bare_have`, which drops every `missing` row: a rule
+        # whose destination needs an intake answer the bare fixture cannot supply still lands under
+        # the reserved prefix at a real target, and grading the narrower set would leave exactly
+        # those ungraded. The population is counted in the note below, because after
+        # TOOL-cMendedVintage-2 the hit count is zero by design and a zero with no population beside
+        # it is indistinguishable from a predicate that ran over nothing.
+        #
+        # WHAT THIS DOES NOT CHECK: any other reserved name set, whether the memory tree is even
+        # adopted at the target, or whether the file gov would ship there is the right one.
+        _reserved = {_e: resolve_tokens("{memory_root}/project/",
+                                        target_context(_bare_t, _bare_deploy, _e, descs[_e][0]))[0]
+                     for _e in _bare_sel}
+        _dests = sorted({(x["kit"], x["dest"]) for x in _bare_rows})
+        _reserved_hits = [(k, d) for k, d in _dests if d.startswith(_reserved[k])]
+        for _eid, _dest in _reserved_hits:
+            r.fail(f"entry '{_eid}' plans a file at '{_dest}', under the reserved "
+                   f"'{_reserved[_eid]}' prefix. That directory is a closed NAME set at every "
+                   f"target: check 3 of their `check-memory-hygiene.sh` admits a hardcoded "
+                   f"whitelist plus whatever they declare in `PROJECT_REGISTRY_EXTRA`, and gov can "
+                   f"widen neither from here — a target takes the whitelist only on a later "
+                   f"`update --kits memory-tree`, and a forked checker takes it never. So this rule "
+                   f"ships a RED memory-hygiene gate to every adopter selecting this kit. Land the "
+                   f"file inside the entry's own home and point whatever reads it there")
         r.note(f"gate legs: {len(_bare_sel)} of {len(descs)} registry entries graded · "
                f"{_leg_argv} argv element(s) offered against a bare target · "
-               f"{len(_silent)} naming a path no rule produces")
+               f"{len(_silent)} naming a path no rule produces · "
+               f"{len(_dests)} planned destination(s) graded against the reserved "
+               f"`{{memory_root}}/project/` prefix, {len(_reserved_hits)} under it")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
