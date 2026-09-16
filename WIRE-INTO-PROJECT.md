@@ -1433,8 +1433,8 @@ regenerated, describes that vintage and no other.
 - A render whose kit declined its regenerate keeps the bytes of the vintage it was rendered at, so
   it stays unpinned. Pinned to the new vintage, it would record stale bytes as current, and the
   next update would grade it `patched` rather than `re-rendered`. Pinning it to the receipt's old
-  stamp is true only when that stamp is the vintage it was rendered at, which a flag-off update or
-  `--allow-ungraded` can break, so that is an assertion you make by hand and never a default.
+  stamp is true only when that stamp is the vintage it was rendered at, which a flag-off update can
+  break, so that is an assertion you make by hand and never a default.
 - A rendered destination is never pinned to a recorded commit. After a conflicted step 1 that
   commit predates the template, and `adopt` refuses a pin naming a base gov does not hold.
 - Block rows (`merged`, `attributes`) are left to `adopt`, which re-synthesizes them and prints no
@@ -1485,11 +1485,14 @@ receipt back.
 every row blocks 1 and 2 did not flag keeps the attribution it had. The next `update --write` writes
 nothing to the harness. It either re-stamps, or it withholds the stamp over exactly the rows block
 2's last line counted, and says how many. That withheld stamp is the migration's end state, not a
-fault in it. **Do not answer that message with the bare `adopt --re-adopt --write` it suggests.**
-That is the unpinned re-adopt, and it drops the harness's `pinned` evidence and every edited row's
-base. Re-running the migration does not clear the message either, because it measures the same
-rows the same way. Pass `--allow-ungraded` to `update` knowingly, or live with the
-withheld stamp. Every row of a kit outside the scope keeps its base, and the re-adopt stamps each
+fault in it. The message names `adopt --re-adopt --pin <path>=<rev> --write`, and that IS the form to
+run. **Do not answer it by dropping the `--pin`.** The bare `--re-adopt --write` is the unpinned
+re-adopt: it drops the harness's `pinned` evidence and every edited row's base, and it re-walks the
+same bytes to the same answer. Re-running the migration does not clear the message either, because it
+measures the same rows the same way. Pin the rows it counted, or live with the withheld stamp; there
+is no override, and `DEPL-cMendedVintage-4` retired the one there used to be, because its only
+effect was to advance the base those rows must be attributed FROM. Every row of a kit outside the
+scope keeps its base, and the re-adopt stamps each
 row with its kit's version at the vintage its bytes come from, so `update`'s per-kit delta still
 reads that kit behind rather than `level`. Before govkit's re-adopt did that, NicoCares' re-adopt
 stamped memory-tree's rows 2.69 over bytes at 2.68. Blocks 2 and 3 are run again only to recover

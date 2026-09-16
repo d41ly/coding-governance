@@ -14,6 +14,7 @@ Every fixture is a throwaway repo under `mktemp`-equivalent. Nothing is written 
 
 from __future__ import annotations
 
+import ast as _ast
 import hashlib
 import importlib.util
 import json
@@ -685,16 +686,36 @@ def main() -> int:
         rec = json.loads(rp_u.read_text(encoding="utf-8"))
         check("[dGV-8] update --write does NOT re-stamp while a row is unattributed",
               rec["gov_commit"] == OLD, rec["gov_commit"])
-        check("[dGV-8] the withheld stamp says why, and names the remedy that clears the rows",
-              "NOT re-stamped" in p.stdout and "--re-adopt" in p.stdout, p.stdout)
-        check("[dGV-8] and it names the override rather than leaving the operator stuck",
-              "--allow-ungraded" in p.stdout, p.stdout)
-        p = run("update", "--target", str(ung), "--write", "--allow-ungraded")
-        rec = json.loads(rp_u.read_text(encoding="utf-8"))
-        check("[dGV-8] --allow-ungraded advances the stamp",
-              rec["gov_commit"] != OLD, rec["gov_commit"])
-        check("[dGV-8] and the override states what it overrode, so the choice is on the record",
-              "ungraded row(s), --allow-ungraded" in p.stdout, p.stdout)
+        # --- DEPL-cMendedVintage-4 S1/S5. THE REMEDY IS RUN, NOT READ. The sentence this arm used
+        # --- to accept named `adopt --re-adopt --write`, which re-walks identical bytes against
+        # --- identical history to the identical answer — the operator ran it, nothing changed, and
+        # --- the one sentence that exists to stop them concluding the tool is broken had closed a
+        # --- loop on them. `--pin` is the only input that changes the outcome. So the arm lifts the
+        # --- command out of the printed sentence, fills its one placeholder, and runs THAT: a
+        # --- remedy corrected in the USAGE block and not here leaves this red.
+        # --- dGaugedVintage-8's two override arms are gone with the override itself.
+        check("[dGV-8/cMV-4] the withheld stamp says why, and names a remedy that can work",
+              "NOT re-stamped" in p.stdout and "--re-adopt" in p.stdout
+              and "--pin" in p.stdout and "--write" in p.stdout, p.stdout)
+        _cmv4 = _re.search(r"`govkit (adopt [^`]*--pin [^`]*)`", p.stdout)
+        check("[cMV-4] LIVENESS the remedy is a quotable command rather than prose about one",
+              _cmv4 is not None, p.stdout[-400:])
+        _row4 = json.loads(rp_u.read_text(encoding="utf-8"))["files"][0]
+        check("[cMV-4] LIVENESS ...and the row it is run over really is unattributed first",
+              _row4.get("evidence") == "unattributed", str(_row4))
+        settle(ung, "the withheld-stamp state the printed remedy is run against")
+        _p4 = run(*_cmv4.group(1).replace("<path>=<rev>", f"{_row4['path']}={OLD}").split(),
+                  "--target", str(ung))
+        check("[cMV-4] running exactly the command the verb printed exits 0",
+              _p4.returncode == 0, _p4.stdout[-400:] + _p4.stderr[-400:])
+        _got4 = [f for f in json.loads(rp_u.read_text(encoding="utf-8"))["files"]
+                 if f["path"] == _row4["path"]]
+        check("[cMV-4] ...and the row it named now carries evidence `pinned`, not `unattributed`",
+              len(_got4) == 1 and _got4[0].get("evidence") == "pinned", str(_got4))
+        _p4b = run("update", "--target", str(ung), "--write", "--allow-ungraded")
+        check("[cMV-4] the retired override is refused as an unknown argument, BY NAME",
+              _p4b.returncode == 2 and "--allow-ungraded" in _p4b.stderr
+              and "unknown or incomplete argument" in _p4b.stderr, _p4b.stderr[-300:])
 
         # --- DEPL-dGaugedVintage-9 S1. `update` REFRESHES A ROW'S `version`. It never did: every
         # --- `"version":` write lived in `apply` or `adopt`, and `_cmd_update` did not contain the
@@ -8382,11 +8403,40 @@ user_skills = "/tmp/gk-fake-skills"
 
         # D14: the remedy `update` prints named an invocation `adopt` always refuses, in the one
         # sentence that exists to stop an operator concluding the tool is broken.
-        _gk14 = govkit_module()
+        #
+        # DEPL-cMendedVintage-4 S4. THE CLASS, NOT THE INSTANCE. The arm here used to ask whether
+        # `--re-adopt --pin` appeared SOMEWHERE in this file and one broken spelling did not. Both
+        # held at BASE while TWO other operator-facing copies named the no-op form, because the arm
+        # graded the file's vocabulary rather than any particular sentence — it could not have gone
+        # red however many sentences were wrong. The predicate is one level up: every string literal
+        # naming both `unattributed` and `--re-adopt` must also name `--pin`.
+        #
+        # SCOPED ON `unattributed`, and that half is load-bearing. Two bare-`--re-adopt` remedies
+        # answer "a receipt already exists", where `--re-adopt` alone IS the fix; a predicate over
+        # `--re-adopt` would red those and get widened back into a grep that grades nothing.
+        #
+        # LITERALS VIA `ast`, not a line grep. The remedy is an implicitly-concatenated f-string, so
+        # `unattributed` and `--pin` sit on different SOURCE LINES of one string — a per-line grep
+        # cannot see them together. A `JoinedStr`'s own `Constant` children are excluded, or the
+        # group would also be graded in pieces none of which carries the whole sentence.
         _src14 = (HERE / "govkit.py").read_text(encoding="utf-8")
-        check("[-13] D14 the unattributed remedy names an invocation that can actually work",
-              "--re-adopt --pin" in _src14 and "adopt --pin <path>=<rev>` supplies one"
-              not in _src14, "the remedy still names the refusing form")
+        _t14 = _ast.parse(_src14)
+        _in14 = {id(v) for n in _ast.walk(_t14) if isinstance(n, _ast.JoinedStr)
+                 for v in n.values if isinstance(v, _ast.Constant)}
+        _lit14 = []
+        for _n14 in _ast.walk(_t14):
+            if isinstance(_n14, _ast.JoinedStr):
+                _lit14.append("".join(v.value for v in _n14.values
+                                      if isinstance(v, _ast.Constant) and isinstance(v.value, str)))
+            elif (isinstance(_n14, _ast.Constant) and isinstance(_n14.value, str)
+                  and id(_n14) not in _in14):
+                _lit14.append(_n14.value)
+        _pop14 = [s for s in _lit14 if "unattributed" in s and "--re-adopt" in s]
+        check("[-13/cMV-4] LIVENESS the class arm has a population to grade at all",
+              len(_pop14) > 0, f"{len(_lit14)} literals, {len(_pop14)} in population")
+        _bad14 = [s for s in _pop14 if "--pin" not in s]
+        check("[-13/cMV-4] D14 EVERY string naming `unattributed` and `--re-adopt` names `--pin`",
+              not _bad14, " || ".join(s[:180].replace("\n", " ") for s in _bad14))
 
         _S11_EXTRA = ('\n[[files]]\ninclude = "seed-one.py"\nrole = "seed"\n\n'
                       '[[files]]\ninclude = "block.txt"\nrole = "merged"\n'

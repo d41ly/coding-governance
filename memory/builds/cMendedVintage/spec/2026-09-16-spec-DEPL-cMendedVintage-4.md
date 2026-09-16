@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 5
+**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-4-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-4-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -21,25 +22,27 @@ away from rows nothing graded.
 
 ## 2. Scope (IN)
 
-- **S1** The remedy at `tools/govkit/govkit.py:7853` names `govkit adopt --re-adopt --pin <path>=<rev> --write`,
-  the same form the sibling remedy at `:6487` already names. Observed by AC1.
-- **S2** The `USAGE` sentence at `tools/govkit/govkit.py:8539` is corrected to the same form, so the
-  two operator-facing carriers agree. Observed by AC1 and AC4.
-- **S3** `--allow-ungraded` is removed entirely. The sites, as one enumeration with no count beside
-  it: the `USAGE` line at `tools/govkit/govkit.py:8522`, its sentence at `:8535`, the argv arm at
-  `:8601` with its assignment at `:8602`, the local default at `:8558`, the `parse_args` return
-  element at `:8637`, its unpack at `:8958`, the keyword pass at `:8993`, the two function parameters
-  at `:5930` and `:5940`, the inner call that passes them positionally at `:5934`, the
-  `and not allow_ungraded` at `:7847`, the remedy at `:7853` and the `over` clause at `:7866`. The
-  list is RE-DERIVED at build time with `grep -nE 'allow[_-]ungraded|ALLOW_UNGRADED'
-  tools/govkit/govkit.py`, because the underscore-only spelling is blind to the upper-case constant
-  and to every hyphenated operator-facing string. Observed by AC2 and AC3.
-- **S4** The prose-grep arm at `tools/govkit/selftest.py:8126` is replaced by two arms: one that runs
-  the remedy the verb printed and observes the rows clear, and one that asserts the CLASS — every
+- **S1** The withheld-stamp remedy in `_cmd_update` names `govkit adopt --re-adopt --pin <path>=<rev>
+  --write`, the same form the sibling `unattributed` remedy in the same file already names. Observed
+  by AC1.
+- **S2** The `USAGE` sentence is corrected to the same form, so the two operator-facing carriers
+  agree. Observed by AC1 and AC4.
+- **S3** `--allow-ungraded` is removed entirely, under EVERY spelling. The list is DERIVED at build
+  time with `grep -nE 'allow[_-]ungraded|ALLOW_UNGRADED' tools/govkit/govkit.py`, never read off this
+  spec, because the underscore-only spelling AC3 uses is blind to the upper-case local and to every
+  hyphenated operator-facing string. The sites, named rather than numbered: the `USAGE` synopsis line
+  and its prose sentence; the argv arm in `parse_args` with its assignment, its local default and its
+  comment; the `parse_args` return element, its unpack in `main` and the keyword pass to `cmd_update`;
+  the two `cmd_update`/`_cmd_update` parameters and the inner positional call between them; the
+  `and not allow_ungraded` conjunct on the withheld-stamp guard; and the `over` clause on the
+  re-stamp line, which reaching that line now proves can only render empty. Observed by AC2 and AC3.
+- **S4** The prose-grep arm in `tools/govkit/selftest.py` is replaced by two arms: one that runs the
+  remedy the verb printed and observes the row clear, and one that asserts the CLASS — every
   operator-facing string naming both `unattributed` and `--re-adopt` also names `--pin`. Observed by
   AC1 and AC4.
-- **S5** The two `--allow-ungraded` arms at `tools/govkit/selftest.py:691-697` are deleted with the
-  flag, and the arm at `:689` is kept and re-pointed at the corrected remedy string. Observed by AC2.
+- **S5** The two `--allow-ungraded` arms in the `dGV-8` ungraded-row block are deleted with the flag,
+  and the withheld-stamp arm beside them is kept and re-pointed at the corrected remedy string.
+  Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -167,8 +170,8 @@ which is a visible failure and not a silent one.
   `evidence` as `pinned`.
   Red when: the remedy is corrected in one carrier and the arm reads the other, or the printed
   command is run and the row is still `unattributed`, which is what the shipped sentence produces.
-  fixture: the ungraded-row fixture at `tools/govkit/selftest.py:689` already stages the state; this
-  arm extends it to execute the remedy.
+  fixture: the `dGV-8` ungraded-row fixture in `tools/govkit/selftest.py` already stages the state;
+  this arm extends it to execute the remedy.
 - **AC2** — When `python tools/govkit/govkit.py update --target <fixture> --write --allow-ungraded`
   runs, it is refused as an unknown argument.
   Red when: the flag is removed from `USAGE` and left in `parse_args`, so it keeps working while the
@@ -185,8 +188,8 @@ which is a visible failure and not a silent one.
   string without `--pin` — turns the arm RED.
   Red when: the predicate is scoped to `--re-adopt` alone, which reds the two legitimate bare-form
   remedies and gets widened back into a grep that grades nothing.
-- **AC5** — When the withheld-stamp arm at `tools/govkit/selftest.py:689` runs, it still asserts that
-  the receipt is NOT re-stamped and now asserts the corrected remedy string.
+- **AC5** — When the withheld-stamp arm in the `dGV-8` block runs, it still asserts that the receipt
+  is NOT re-stamped and now asserts the corrected remedy string.
   Red when: the two `--allow-ungraded` arms beside it are deleted and this one is deleted with them,
   which would remove the only coverage of the withholding itself.
 
@@ -212,6 +215,25 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-3 · 2026-09-16 · S1 · S2 · S3 · S4 · S5 · AC1 · AC5 · the build pass. (a) EVERY
+  `tools/govkit/govkit.py:<line>` and `tools/govkit/selftest.py:<line>` citation in rev-2 had drifted
+  — four units landed in that file after it was written — so the ones that read as instructions are
+  replaced by named sites. The prose citations surviving in §3, §4 and §10 are rev-1 narrative and
+  are equally stale; search for the text, never the number. (b) S3's derivation MEASURED, at base
+  859daa67, fifteen occurrences of the flag in `tools/govkit/govkit.py` across three spellings:
+  eight `allow_ungraded`, five `--allow-ungraded`, two `ALLOW_UNGRADED`, on fourteen lines. AC3's
+  grep sees the eight and is blind to the other seven, which is the weakness the brief warned about
+  and `DEPL-cMendedVintage-20` owns; this pass removed all fifteen and left AC3 as written. Outside
+  the engine: two in `WIRE-INTO-PROJECT.md`, both removed, and four in `tools/govkit/selftest.py`, of
+  which two were deleted with the override and two re-introduced as the arm asserting its refusal.
+  Re-derive with `grep -oE '\-\-allow-ungraded|allow_ungraded|ALLOW_UNGRADED'` over the BASE blob.
+  (c) The user-docs half derived to TWO `WIRE-INTO-PROJECT.md` paragraphs, not the one §4 estimated:
+  the render-pinning caveat and the dPolishedVitrine migration's Done paragraph, which told the
+  operator to pass the flag knowingly. (d) The retirement comment left in `_cmd_update` names the
+  retired flag in NEITHER spelling, so `-20` inherits an engine with zero occurrences to grade; the
+  reason it was retired lives here. (e) AC1's second half — that the printed command leaves the row
+  `pinned` — is observed only by the new selftest arm, which this pass did not run; it is owed to the
+  bar at close. AC2, AC3 and AC4 were observed directly, each after its RED.
 - rev-2 · 2026-09-16 · S3 · §4 · AC3 · folded spec-audit round 1 finding M2: S3 named nine sites
   while §4 and AC3 twice called it ten, three live occurrences were unlisted, and the Inventory
   claimed a module-level constant that is a local. S3 is now the single enumeration with no count
