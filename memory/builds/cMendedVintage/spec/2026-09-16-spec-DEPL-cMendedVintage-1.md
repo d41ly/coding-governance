@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-1 — no rollback over a render step this run declined
 
-**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 2
+**Status:** CLOSED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -244,6 +244,14 @@ disagrees means a refusal was added that this spec did not price.
   purpose-built gov tree, run against the unfixed engine FIRST (rollback order written, bytes
   reverted, no decline printed) and then against the fixed one; the equivalent arms are committed to
   `selftest.py` and are graded by the suite at the run's close, not in this pass.
+- rev-3 · 2026-09-16 · one write the spec did not price, found by
+  `gotchas.py --for-diff` naming `amendment-leaves-its-other-half-standing`.
+  `tools/workflows/README.md` — a SHIPPED kit doc, not a build record — stated that with the flag
+  unset `update` "declines that block without printing anything about it". S4 made that sentence
+  false, and a kit README asserting the opposite of the engine is worse than no README. It now names
+  the decline it prints, with the reason. The frozen `DEPL-dRetiredFork-3` acceptance ledger is
+  deliberately NOT touched: an append-only record is cited verbatim, and the supersession is carried
+  by §4 of this spec and by the comment at the un-gated print.
 
 ## 10. Reuse audit
 
