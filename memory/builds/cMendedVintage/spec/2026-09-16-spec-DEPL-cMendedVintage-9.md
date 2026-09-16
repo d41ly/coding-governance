@@ -39,9 +39,11 @@ refusing it in `selfcheck`, where gov grades its own descriptors before anyone i
   predicate graded. After `TOOL-cMendedVintage-2` the hit count is zero by design, and a zero with no
   population beside it is indistinguishable from a predicate that matched nothing because it ran
   over nothing. Observed by AC3.
-- **S5** `tools/govkit/selftest.py` gains the arm that stages the break and asserts the refusal, and
-  `tools/govkit/refusal_join.py`'s anchor set and shrink-only pins move to cover the new branch. A
-  refusal branch no arm reaches is what that join exists to refuse. Observed by AC4.
+- **S5** `tools/govkit/selftest.py` gains the arms that stage the break and assert the refusal, and
+  `tools/govkit/refusal_join.py`'s two shrink-only pins move to cover the new branch, each carrying
+  the number measured beside it. A refusal branch no arm reaches is what that join exists to refuse.
+  Observed by AC4. rev-2 struck "anchor set" from this item for the reason AC4 records: that file
+  enumerates none, so there is no set for a branch to be added to.
 - **S6** `WIRE-INTO-PROJECT.md`'s `## Maintenance` section gains a migration subsection for the
   residue: an adopter whose receipt already carries the gate-lint seed row gets NO withdrawal order,
   because `UPDATE_ROLE` maps `seed` to `report-reseed` and the override at
