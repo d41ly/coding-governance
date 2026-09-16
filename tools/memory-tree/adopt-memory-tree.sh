@@ -63,6 +63,22 @@ fi
 # which is a reader that fails to RUN rather than one that fails.
 READINESS_ROWS="${READINESS_ROWS:-}"
 . "$ROOT/.memory-tree.conf"
+# `--render` ANSWERS "IS THIS TREE EVEN RENDERED FROM THIS KIT?" FIRST, and the order is the whole
+# point of the arm. A repo can claim these rows in its receipt while holding its own hand-authored
+# docs — one of the two adopters measured this week does exactly that — and for it the honest answer
+# is "nothing here renders from me", not the READINESS_ROWS misconfiguration below, which is what it
+# reported when this check sat lower and which stopped that repo's whole update with a message about
+# a key it does not need. `gov:kit memory-tree@` in the rendered HYGIENE.md is the discriminator: a
+# tree that renders from this kit carries it, a fork does not.
+#
+# EXIT 3, not 1, and `kit.toml` declares it ACCEPTED. A fork is a legitimate steady state rather than
+# a failure, and it must stay distinguishable from the two real exit-1 refusals below and beneath.
+if [ "$MODE" = "--render" ]; then
+  if [ ! -f "$MEMORY_ROOT/HYGIENE.md" ] || ! grep -q 'gov:kit memory-tree@' "$MEMORY_ROOT/HYGIENE.md"; then
+    echo "memory-tree: --render has nothing to refresh — $MEMORY_ROOT/HYGIENE.md carries no 'gov:kit memory-tree@' marker, so this tree does not render its docs from this kit. Not a failure; run --scaffold if you meant to adopt."
+    exit 3
+  fi
+fi
 # An armed render with no declared row set would write a §5 holding one empty bullet. There is
 # one literal row set and it is the conf, so a blank here is a misconfiguration to say out loud
 # rather than a default to fall back on.
@@ -72,17 +88,13 @@ if [ -z "$READINESS_ROWS" ]; then
 fi
 M="$MEMORY_ROOT"
 
-# `--render` REFUSES AN UNADOPTED TREE, which is the mirror of the guard below rather than an
-# exemption from it: a refresh that would install into a tree nobody adopted is `--scaffold` wearing
-# another flag's name, and the two modes must not be able to stand in for each other.
-if [ "$MODE" = "--render" ]; then
-  if [ ! -f "$M/HYGIENE.md" ] || ! grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
-    echo "memory-tree: --render REFUSES this tree — $M/HYGIENE.md carries no 'gov:kit memory-tree@' marker, so there is no adopted install to refresh. Run --scaffold first." >&2
-    exit 1
-  fi
 # Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
 # foreign/half-scaffolded memory/ is refused with a recovery hint; otherwise fall through and scaffold.
-elif [ -d "$M" ]; then
+#
+# SCAFFOLD ONLY. `--render` reaches here having already proved the marker is present, and its whole
+# job is the refresh this no-op would skip — so running the converge for it would make the mode a
+# silent success that rendered nothing, which is the shape the render was added to end.
+if [ "$MODE" = "--scaffold" ] && [ -d "$M" ]; then
   if [ -f "$M/HYGIENE.md" ] && grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
     echo "$M/ already scaffolded by memory-tree — nothing to do."; exit 0
   fi

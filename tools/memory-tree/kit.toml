@@ -95,6 +95,18 @@ code = 1
 probe = { must_exist = "{memory_root}/HYGIENE.md" }
 means = "refused-foreign-tree"
 
+# `--render` ON A TREE THAT DOES NOT RENDER FROM THIS KIT, and it is ACCEPTED. A target can claim
+# these rendered rows in its receipt while holding its own hand-authored docs — measured at one of
+# the two adopters this kit shipped to this week — and for it there is nothing to refresh and nothing
+# wrong. Without this row the regenerate step of an `update` run with GOVKIT_RERENDER=1 read the
+# refusal as a wedge and told the operator to repair by hand a render that should never have run.
+# Exit 3 and NOT 1 so it stays
+# distinguishable from `refused-foreign-tree` above, which is `--scaffold` meeting a real conflict.
+[[outcome]]
+code = 3
+means = "not-rendered-here"
+ok = true
+
 [[gate_leg]]
 name = "memory hygiene"
 subject = "repo"
