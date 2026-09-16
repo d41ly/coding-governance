@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-2 — a failed restore keeps its receipt row forward, and the order names the path
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 3
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +27,11 @@ the file actually went back, and name the path that did not in the order.
   run only when every path of that snapshot entry that this run WROTE is in `restored`. Observed by
   AC2 and AC3.
 - **S3** The rollback order gains a fourth block naming every unrestored path, and its lead sentence
-  stops claiming that every path below was put back. Observed by AC4.
+  stops claiming that every path below was put back. The block's LINE is derived from the same
+  `_left` predicate that gates the revert, never from `unrestored` alone, so a path the gate did not
+  hold is never printed under a sentence claiming its row was left forward. The containment refusal
+  at `tools/govkit/govkit.py:7580` is that case and it takes its own sentence, named in §4. Observed
+  by AC4 and AC6.
 - **S4** That fourth block states the half-restored case explicitly: when `git checkout-index` is what
   failed, the index was already reverted, so the row's `sha256` matches the worktree and its `oid`
   does not. Observed by AC4.
@@ -114,6 +119,23 @@ index names the pre-run blob while the worktree holds this run's bytes and the r
 operator reading `git status` there sees a modification they did not make, and the order is the only
 place that explains it.
 
+### The containment case prints a different sentence
+
+The containment refusal at `tools/govkit/govkit.py:7580` runs BEFORE the `p not in written_paths`
+test at `:7584`, and its own header says it exists for a receipt row spelling `../../x` that the
+write loop refused — which is a path absent from `written_paths` by construction. So `_left` excludes
+it and the revert DOES run for its entry. Printing it under the sentence above would make two false
+claims at once: the bytes are not this run's, and the row did not stay forward.
+
+```
+NOT restored <path> — refused as outside the target; nothing was written for it and its receipt
+                      row was reverted with the rest of its entry
+```
+
+The block is therefore assembled per path from the predicate that decided that path's fate, not from
+`unrestored` as one list. That is the same rule §4's gate follows one paragraph up, applied to the
+document instead of to the receipt: the report and the revert read one predicate or they disagree.
+
 ### Inventory
 
 | Identifier | Kind | Where |
@@ -199,6 +221,15 @@ adopter's ordinary run changes behaviour.
   `restored` and every row still reverts.
   Red when: the gate is written so that it also fires on a clean rollback, which would leave every
   rolled-back row stamped forward and re-create the defect this gate's own neighbours were built for.
+- **AC6** — When a fixture receipt row spells a path outside the target and
+  `python tools/govkit/govkit.py update --target <fixture> --write` rolls that kit back, the order's
+  `NOT restored` line for that path says the write was refused and the row was reverted, and does not
+  claim the bytes are this run's.
+  Red when: the block is assembled from `unrestored` as one list, so the containment case takes the
+  restore branch's sentence and the one document written to explain a failed restore makes two false
+  claims about the only population that branch exists for.
+  fixture: the containment case needs only a hand-edited receipt row and no git refusal, so it is
+  cheaper to stage than the three plumbing branches beside it.
 
 ## 7. Gates
 
@@ -217,6 +248,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · S3 · §4 · AC6 · folded spec-audit round 1 finding M4: a path the containment
+  refusal rejects is excluded by the `_left` filter, so its row IS reverted, and printing it under
+  the restore branch's sentence made two false claims. The block is now derived per path from the
+  predicate that decided it, the containment case has its own sentence, and AC6 stages it.
 
 ## 10. Reuse audit
 

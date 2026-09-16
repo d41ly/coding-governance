@@ -1,12 +1,13 @@
 # DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 5
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
 
@@ -24,10 +25,15 @@ away from rows nothing graded.
   the same form the sibling remedy at `:6487` already names. Observed by AC1.
 - **S2** The `USAGE` sentence at `tools/govkit/govkit.py:8539` is corrected to the same form, so the
   two operator-facing carriers agree. Observed by AC1 and AC4.
-- **S3** `--allow-ungraded` is removed entirely: the `USAGE` line at `tools/govkit/govkit.py:8522`,
-  its sentence at `:8535`, the argv arm at `:8601`, the `parse_args` return element and its unpack at
-  `:8958`, the two function parameters at `:5930` and `:5940`, the `and not allow_ungraded` at
-  `:7847`, and the `over` clause at `:7866`. Observed by AC2 and AC3.
+- **S3** `--allow-ungraded` is removed entirely. The sites, as one enumeration with no count beside
+  it: the `USAGE` line at `tools/govkit/govkit.py:8522`, its sentence at `:8535`, the argv arm at
+  `:8601` with its assignment at `:8602`, the local default at `:8558`, the `parse_args` return
+  element at `:8637`, its unpack at `:8958`, the keyword pass at `:8993`, the two function parameters
+  at `:5930` and `:5940`, the inner call that passes them positionally at `:5934`, the
+  `and not allow_ungraded` at `:7847`, the remedy at `:7853` and the `over` clause at `:7866`. The
+  list is RE-DERIVED at build time with `grep -nE 'allow[_-]ungraded|ALLOW_UNGRADED'
+  tools/govkit/govkit.py`, because the underscore-only spelling is blind to the upper-case constant
+  and to every hyphenated operator-facing string. Observed by AC2 and AC3.
 - **S4** The prose-grep arm at `tools/govkit/selftest.py:8126` is replaced by two arms: one that runs
   the remedy the verb printed and observes the rows clear, and one that asserts the CLASS — every
   operator-facing string naming both `unattributed` and `--re-adopt` also names `--pin`. Observed by
@@ -100,13 +106,15 @@ not two.
 
 ### Inventory
 
-This unit MINTS nothing. It deletes one flag name, one `parse_args` return element, two function
-parameters and one module-level constant, and rewrites two strings. The new selftest arms are the
-only additions and they are test-local.
+This unit MINTS nothing. It deletes one flag name, one `parse_args` return element with its unpack
+and its keyword pass, two function parameters with the positional call that feeds them, and one local
+default, and it rewrites two strings. `ALLOW_UNGRADED` at `tools/govkit/govkit.py:8958` is a LOCAL:
+`main()` opens at `:8951`, so nothing here is module-level. The new selftest arms are the only
+additions and they are test-local.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` — about 25 lines, all deletions and two string rewrites, spread over the ten
+`tools/govkit/govkit.py` — about 25 lines, all deletions and two string rewrites, spread over the
 sites S3 enumerates. `tools/govkit/selftest.py` — two arms deleted, one re-pointed, two added.
 `WIRE-INTO-PROJECT.md` — the maintenance paragraph if it names the flag; derived at build time with
 `grep -rn 'allow-ungraded' --include='*.md' .` rather than pinned here.
@@ -166,10 +174,12 @@ which is a visible failure and not a silent one.
   Red when: the flag is removed from `USAGE` and left in `parse_args`, so it keeps working while the
   documentation says it does not exist.
 - **AC3** — When `grep -c 'allow_ungraded' tools/govkit/govkit.py` runs, it returns 0.
-  Red when: one of the ten sites S3 enumerates is missed — most likely the `parse_args` return
-  element, whose removal is the one that changes an unpack in a different function.
-  figure: DERIVED by that grep at observation time; the ten sites are enumerated in S3 and are
-  re-derived rather than trusted.
+  Red when: one of the sites S3 enumerates is missed — most likely the `parse_args` return element,
+  whose removal is the one that changes an unpack in a different function.
+  figure: DERIVED by that grep at observation time; the sites are enumerated in S3 and are re-derived
+  rather than trusted. This predicate is narrower than S3's derivation and cannot see the upper-case
+  or hyphenated spellings; `DEPL-cMendedVintage-20` is the unit that grades those, and this criterion
+  is deliberately left as written rather than widened here.
 - **AC4** — When the class arm runs over `tools/govkit/govkit.py`, every string literal containing
   both `unattributed` and `--re-adopt` also contains `--pin`, and staging a break — adding one such
   string without `--pin` — turns the arm RED.
@@ -202,6 +212,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · S3 · §4 · AC3 · folded spec-audit round 1 finding M2: S3 named nine sites
+  while §4 and AC3 twice called it ten, three live occurrences were unlisted, and the Inventory
+  claimed a module-level constant that is a local. S3 is now the single enumeration with no count
+  beside it and names the command that re-derives it.
 
 ## 10. Reuse audit
 

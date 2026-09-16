@@ -5,7 +5,7 @@ opened: 2026-09-16
 streams: deployer+tooling
 roster: DEPL+TOOL
 authorized-by: prompt
-ids: DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9
+ids: DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9
 ---
 
 # cMendedVintage — `update` gains an install-effect stage, and stops rolling kits back for work it declined to do
@@ -55,6 +55,15 @@ did not revert, and an outbox nothing drains.
   is a selftest arm over a fixture, never a live install. A unit whose criterion cannot be observed
   in this repo says so in its own §6.
 - **Classification at open**: all 23 MISSING; specced by the harness's SPEC stage.
+- **Spec-audit round 1 disposal, 2026-09-16, BUILD-METHOD M4 by severity.** The round exited BOUNDED
+  with 14 confirmed findings collapsing to 13 report rows, 1 blocker and 6 highs. Every blocker and
+  high was PROMOTED to a unit of its own — orders 24 through 30, each sequenced after the unit whose
+  finding it closes — and the six mediums were FOLDED as rev-2 bumps into `TOOL-cMendedVintage-1`,
+  `DEPL-cMendedVintage-4`, `TOOL-cMendedVintage-6`, `DEPL-cMendedVintage-2` and
+  `TOOL-cMendedVintage-9`. Nothing was parked, waived, retired or re-reviewed, and the seven
+  promotions are unreviewed by definition, so the next audit takes them as its subject.
+  `TOOL-cMendedVintage-5` also took a rev-2 for a hygiene check 12 red found while disposing; it is
+  not a review finding and is recorded in that spec's own §9.
 - **The memory gate is RED at BASE by construction and clears at the SPEC pass**: check 21 on the
   mandate record's `Serves:` line, check 14 on the cited-but-undefined ids. `RECORD_UNBOUND_PIN` is
   at its floor, so the record could not be written unbound. Observed before the push, not after.
@@ -90,24 +99,32 @@ did not revert, and an outbox nothing drains.
 | 21 | `TOOL-cMendedVintage-6` | OPEN | `check-receipt.sh`, the receipt-sync leg, and its row on gov's own bar |
 | 22 | `TOOL-cMendedVintage-7` | OPEN | that leg reports rows carrying `evidence: "unattributed"` |
 | 23 | `TOOL-cMendedVintage-8` | OPEN | process-monitor's empty-live-scope arm gets a code distinct from a conf refusal |
+| 24 | `DEPL-cMendedVintage-15` | OPEN | the synthesized `attributes` snapshot entry is restorable and leaves the orphan sweep |
+| 25 | `DEPL-cMendedVintage-16` | OPEN | the lexicon `[[outcome]]` cannot accept a failed first scaffold |
+| 26 | `DEPL-cMendedVintage-17` | OPEN | a withdrawn pin set takes its own verdict, never the empty-marker write |
+| 27 | `DEPL-cMendedVintage-18` | OPEN | a withdrawn row whose path did not restore stays in the receipt |
+| 28 | `DEPL-cMendedVintage-19` | OPEN | a row's role is re-resolved at every schema, so a role move is reported |
+| 29 | `DEPL-cMendedVintage-20` | OPEN | a retired flag's absence is graded under every spelling it has |
+| 30 | `DEPL-cMendedVintage-21` | OPEN | one atomic-write helper, with an observer that fails when it is absent |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 23 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
+**Build status:** SPECCED · 30 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
 ids DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13
-ids DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9
+ids DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5
+ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin](spec/2026-09-16-spec-TOOL-cMendedVintage-9.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin](spec/2026-09-16-spec-TOOL-cMendedVintage-9.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-1 — no rollback over a render step this run declined](spec/2026-09-16-spec-DEPL-cMendedVintage-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [DEPL-cMendedVintage-2 — a failed restore keeps its receipt row forward, and the order names the path](spec/2026-09-16-spec-DEPL-cMendedVintage-2.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-2 — a failed restore keeps its receipt row forward, and the order names the path](spec/2026-09-16-spec-DEPL-cMendedVintage-2.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-3 — the coverage tail joins each open gap to its own refusal reason](spec/2026-09-16-spec-DEPL-cMendedVintage-3.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires](spec/2026-09-16-spec-DEPL-cMendedVintage-4.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-4 — the unattributed remedy names a command that works, and the override retires](spec/2026-09-16-spec-DEPL-cMendedVintage-4.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-5 — `[[regenerate]]` for the three kits whose adopter already renders](spec/2026-09-16-spec-DEPL-cMendedVintage-5.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path](spec/2026-09-16-spec-TOOL-cMendedVintage-1.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path](spec/2026-09-16-spec-TOOL-cMendedVintage-1.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-6 — the fixture records are rendered per prefix, so nothing deletes them](spec/2026-09-16-spec-DEPL-cMendedVintage-6.md) | 8 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-7 — `GOVKIT_RERENDER` defaults ON, and `=0` becomes the revert](spec/2026-09-16-spec-DEPL-cMendedVintage-7.md) | 9 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-8 — a descriptor shipping `rendered` rows must declare a regenerate](spec/2026-09-16-spec-DEPL-cMendedVintage-8.md) | 10 | 2 | SPECCED | rev-1 | 2026-09-16 |
@@ -115,23 +132,29 @@ ids DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMen
 | [DEPL-cMendedVintage-9 — no descriptor destination under `{memory_root}/project/`](spec/2026-09-16-spec-DEPL-cMendedVintage-9.md) | 12 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [TOOL-cMendedVintage-3 — `check-wiring.sh`'s boundary walk can produce the empty prefix it declares legal](spec/2026-09-16-spec-TOOL-cMendedVintage-3.md) | 13 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix](spec/2026-09-16-spec-TOOL-cMendedVintage-4.md) | 14 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default](spec/2026-09-16-spec-TOOL-cMendedVintage-5.md) | 15 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default](spec/2026-09-16-spec-TOOL-cMendedVintage-5.md) | 15 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize](spec/2026-09-16-spec-DEPL-cMendedVintage-10.md) | 16 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-11 — `cmd_check` grades the attributes row's block](spec/2026-09-16-spec-DEPL-cMendedVintage-11.md) | 17 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-12 — `apply`'s CONFIGURE honours `deploy["inert"]`](spec/2026-09-16-spec-DEPL-cMendedVintage-12.md) | 18 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-13 — `update --write` emits gate legs](spec/2026-09-16-spec-DEPL-cMendedVintage-13.md) | 19 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the full path](spec/2026-09-16-spec-DEPL-cMendedVintage-14.md) | 20 | 2 | SPECCED | rev-2 | 2026-09-16 |
-| [TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar](spec/2026-09-16-spec-TOOL-cMendedVintage-6.md) | 21 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar](spec/2026-09-16-spec-TOOL-cMendedVintage-6.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [TOOL-cMendedVintage-7 — the receipt leg reports rows carrying `evidence: "unattributed"`](spec/2026-09-16-spec-TOOL-cMendedVintage-7.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal](spec/2026-09-16-spec-TOOL-cMendedVintage-8.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it](spec/2026-09-16-spec-DEPL-cMendedVintage-15.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-16 — the lexicon outcome block cannot accept a failed first scaffold](spec/2026-09-16-spec-DEPL-cMendedVintage-16.md) | 25 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write](spec/2026-09-16-spec-DEPL-cMendedVintage-17.md) | 26 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-18 — a withdrawn row whose path did not restore stays in the receipt](spec/2026-09-16-spec-DEPL-cMendedVintage-18.md) | 27 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported](spec/2026-09-16-spec-DEPL-cMendedVintage-19.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 29 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-21 — the atomic write is one helper, and something fails when it is absent](spec/2026-09-16-spec-DEPL-cMendedVintage-21.md) | 30 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 
-Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-1 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6
-DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9.
+Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -161,6 +184,13 @@ DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 TOOL-cMendedVi
 | 21 | `TOOL-cMendedVintage-6` | no |
 | 22 | `TOOL-cMendedVintage-7` | no |
 | 23 | `TOOL-cMendedVintage-8` | no |
+| 24 | `DEPL-cMendedVintage-15` | no |
+| 25 | `DEPL-cMendedVintage-16` | no |
+| 26 | `DEPL-cMendedVintage-17` | no |
+| 27 | `DEPL-cMendedVintage-18` | no |
+| 28 | `DEPL-cMendedVintage-19` | no |
+| 29 | `DEPL-cMendedVintage-20` | no |
+| 30 | `DEPL-cMendedVintage-21` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -27,3 +27,19 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T12:43:39Z decision · item The charter's §16 R1 requires an emitted micro-format to be a markdown list item ('- ' at column 0), but skills/session-kickoff/manifest-check.sh:478 counts READY lines with grep -c '^READY — ', anchored at column 0 with no list marker. A card body that follows the charter is read as carrying NO ready line: the append reports success, leaves the 'READY — none yet' sentinel in place, skips the tree-cell re-render, and the scratch-guard then blocks the session's next commit. · reason Two options and both change a governance carrier, which M3 veto 2 reserves to the owner. Either §16 R1 gains an explicit carve-out for a machine-read on-disk record, or manifest-check.sh accepts an optional leading '- ' on the lines it anchors. I will not pick: the charter is the carrier this repo is most careful about, and the fix is one line either way. Observed live this run — it cost 71 minutes and a refused commit.
 
 2026-09-16T12:43:51Z rescope · item add TOOL-cMendedVintage-9 · reason Building uncovered it: manifest-check.sh:128 resolves the session id by reading stdin for the SessionStart hook's JSON, guarded only by '[ -t 0 ]'. That covers the hook (pipe then EOF) and a human at a terminal, but not stdin being an open pipe that never sends EOF — which is what every tool-invoked shell has. --card --write then blocks in sed forever: measured 71 minutes at 4.4s CPU with no children, cleared instantly with '< /dev/null'. Passing --session does not avoid it, because the stdin read runs first and CARD_SID is only the fallback. The skill's own Step 5 prescribes this exact invocation as the card repair, so the documented remedy hangs. Strictly beneficial, no veto tripped (a kit engine, not a governance carrier), and it is a blocker between this run and its own landing.
+
+2026-09-16T16:08:37Z review · item cMendedVintage-spec-set-r1 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-16T16:12:01Z rescope · item add DEPL-cMendedVintage-15 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding B1 at severity blocker, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high
+
+2026-09-16T16:12:03Z rescope · item add DEPL-cMendedVintage-16 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding H1 at severity high, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high
+
+2026-09-16T16:12:06Z rescope · item add DEPL-cMendedVintage-17 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding H2 at severity high, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high
+
+2026-09-16T16:12:09Z rescope · item add DEPL-cMendedVintage-18 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding H3 at severity high, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high
+
+2026-09-16T16:12:11Z rescope · item add DEPL-cMendedVintage-19 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding H4 at severity high, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high
+
+2026-09-16T16:12:14Z rescope · item add DEPL-cMendedVintage-20 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding H5 at severity high, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high
+
+2026-09-16T16:12:16Z rescope · item add DEPL-cMendedVintage-21 · reason promoted from review record 2026-09-16-review-cMendedVintage-spec-set-spec-audit-round1 finding H6 at severity high, disposed by BUILD-METHOD M4 which admits no other route for a blocker or a high

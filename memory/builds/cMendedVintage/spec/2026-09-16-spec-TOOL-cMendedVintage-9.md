@@ -1,12 +1,13 @@
 # TOOL-cMendedVintage-9 — the card verbs resolve a session id without blocking on an open stdin
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 |
+| [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
 
@@ -28,7 +29,10 @@ answered the question by passing `--session`, so a card verb invoked from a harn
 - **S3** The comment block above `read_session_id` states the precedence the code now has, because
   the block as written says the two channels are read in the other order. Observed by AC5.
 - **S4** `skills/session-kickoff/manifest-check.test.sh` gains one arm that HOLDS stdin open and
-  asserts the verb returns, so the hang is in the suite rather than only in the fix. Observed by AC1.
+  asserts the verb returns, so the hang is in the suite rather than only in the fix. That suite's
+  `FLOOR_ASSERTIONS` is RAISED by the arm's assertion count in the same commit, because the floor is
+  shrink-only and an unraised floor makes a suite that never gained the arm red nothing. Observed by
+  AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -94,6 +98,14 @@ adds a condition to an existing branch and deletes no `exit 2`, so the branch an
 fall and the floor does not move. If a build-time reading disagrees, the floor is what moved and the
 change is wrong, not the pin.
 
+That pin is on the SCRIPT and not on the test file, which is the gap S4's floor raise closes. The
+suite carries its own `FLOOR_ASSERTIONS`, compared at
+`skills/session-kickoff/manifest-check.test.sh:1121`, and `tools/check-testsuite-counts.sh` derives
+its population from `tools/gate-legs.json`, which names that suite. Both instruments are shrink-only:
+they catch an arm that DISAPPEARS and neither can demand one that was never written. Raising the
+floor by the new arm's assertion count in the same commit is what converts "the arm exists" from a
+promise in this spec into something that reds when the arm is absent.
+
 ### Alternatives rejected
 
 - **A bounded read.** `sid=$(timeout 1 sed …)` or a `read -t 1` loop returns, but every harness
@@ -128,8 +140,9 @@ entries in `.claude/settings.json` take the unchanged path.
 - **risks** — the precedence change is the only one, and the table in §4 is its measurement. The
   residual is a future caller that passes both and expects stdin to win; S3's comment is what such a
   caller reads.
-- **testing** — four direct observations against the real script (AC1-AC4) plus one source assertion
-  (AC5), and one arm folded into the kit's own suite by S4.
+- **testing** — four direct observations against the real script (AC1-AC4), one source assertion
+  (AC5), and one arm folded into the kit's own suite by S4 whose presence AC6 grades through the
+  raised floor rather than through AC1, which passes with or without it.
 - **migration** — N/A, nothing stored changes.
 - **user docs** — `skills/session-kickoff/SKILL.md` describes the verbs and not the id channels, so
   no page changes. The comment block S3 rewrites is the documentation for this behaviour.
@@ -156,6 +169,14 @@ entries in `.claude/settings.json` take the unchanged path.
   comment block above `read_session_id`, that block states that `--session` suppresses the stdin read.
   Red when: the code changed and the block beside it still describes stdin as the first channel
   consulted, which is the prose-beside-the-source class this repo already gates elsewhere.
+- **AC6** — When `bash tools/check-testsuite-counts.sh` runs after S4 lands, it exits 0, and the
+  `FLOOR_ASSERTIONS` value in the kickoff kit's card suite — named without backticks here, because a
+  suite path in an acceptance bullet is what the spec-token bar join refuses — is higher than the one
+  at base `859daa67` by the new arm's assertion count.
+  Red when: the arm lands with the floor left where it was, in which case a later edit that deletes
+  the arm reds nothing and the only permanent coverage for this hang is a sentence in this spec.
+  figure: DERIVED — both values are read from the file, at BASE and at the tip, rather than pinned
+  here.
 
 ## 7. Gates
 
@@ -174,6 +195,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · S4 · §4 · §5 · AC6 · §10 · folded spec-audit round 1 findings M5 and M6. M5:
+  S4's suite arm named AC1 as its observer, and AC1's direct invocation passes with or without the
+  arm, so the arm's presence rested on a one-time manual run; S4 now raises the suite's own
+  `FLOOR_ASSERTIONS` and AC6 grades it. M6: §10 claimed the change restores the order
+  `KICK-aReplayedCard-1` §S2 documents, and source says that record documents stdin-first and
+  `manifest-check.sh:129` implements it, so §10 now records a supersession.
 
 ## 10. Reuse audit
 
@@ -183,10 +210,14 @@ existing "read one field from the hook's JSON" helper to extend — the `sed` at
 `skills/session-kickoff/manifest-check.sh:128` is the only such site in the kit. The seam this unit
 extends is therefore that line itself, and the short-circuit it already uses for `--append`: the fix
 adds a fourth term to an existing three-term guard rather than introducing a mechanism. Recall
-confirmed the surrounding design is `KICK-aReplayedCard-1` §S2 ("the `session_id` is read from the
-JSON the SessionStart hook hands on stdin, else from `--session <sid>`"), which states an ELSE this
-code does not implement — so the change restores the documented order rather than inventing one, and
-no prior record considered the never-EOF case.
+confirmed the surrounding design is `KICK-aReplayedCard-1` §S2, and verifying that record against
+source is what corrected this section: it reads "read from the JSON the SessionStart hook hands on
+stdin, else from `--session`" — stdin FIRST — and
+`skills/session-kickoff/manifest-check.sh:129` is `[ -n "$sid" ] || sid="$CARD_SID"`, which
+implements exactly that else. So this unit SUPERSEDES that record's precedence rather than restoring
+it, in the way `DEPL-cMendedVintage-1` §4 records its amendment of `DEPL-dRetiredFork-3` AC6, and §4
+above is the correct statement of the behaviour change. No prior record considered the never-EOF
+case.
 
 Recall terms used: `kickoff manifest card session orientation stdin hook SessionStart sid terminal
 pipe blocking read refusal`

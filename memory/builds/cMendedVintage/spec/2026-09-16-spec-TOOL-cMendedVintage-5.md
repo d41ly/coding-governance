@@ -1,12 +1,13 @@
 # TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 15
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
 
@@ -61,9 +62,9 @@ bump the predicate epoch, rebaseline once, and confirm the widened predicate red
   at BASE are the `${smerge:-tools/settings-merge.py}` tails that unit deletes. The rebaseline is
   ONE-SHOT and blesses whatever is in the tree, so landing this unit first records those eight as
   carried and makes the class invisible again with no second rebaseline available.
-- **hands-off** external — the two occurrences that survive `TOOL-cMendedVintage-4` are argv
-  defaults in gov's own checkers and are recorded by S4 rather than fixed. Draining them is a
-  follow-up nobody in this build carries.
+- **hands-off** external — the two occurrences that survive the settings-merge retirement named in
+  the bullet above are argv defaults in gov's own checkers and are recorded by S4 rather than fixed.
+  Draining them is a follow-up nobody in this build carries.
 
 ## 4. Design
 
@@ -179,6 +180,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · §3 · the `hands-off` external edge named a sibling unit id in backticks, which
+  hygiene check 12 reads as a joinable edge written as an unjoinable one. The sibling is already
+  joined by the `consumes-from` bullet above it, so the reference is now spelled without the id. Not
+  a review finding — found by running the gate over the spec set while disposing round 1.
 
 ## 10. Reuse audit
 

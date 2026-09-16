@@ -1,12 +1,13 @@
 # TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 21
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +26,7 @@ of that verb runs on every adopter's merge bar with no gov checkout present.
   when the file is missing and reds when its sha256 differs from `row["sha256"]`. The repo root is
   DERIVED from the file's own location through git, never spelled, and one optional positional
   argument names a different tree — which is what makes a fixture observable from the command line.
-  Observed by AC3 and AC4.
+  Observed by AC3, AC4 and AC7.
 - **S2** With no receipt on disk the run prints a line whose head is the literal word `SKIP`, names
   the path it looked for, and exits 0. It is written as a skip and never as a pass. Observed by AC1.
 - **S3** The run carries its own liveness: a receipt that parses but yields ZERO graded rows reds
@@ -191,12 +192,21 @@ they grade.
   parse reds naming the parse error rather than being treated as absent.
 - observability — one summary line per run naming the schema, the number of rows read and the number
   graded, both DERIVED. Every finding is its own line carrying the path.
-- risks — a receipt written before the D9 fold stamped the INDEX blob into `sha256`, so on a clone
-  with `core.autocrlf=true` this leg would red on rows nothing is wrong with. The summary line names
-  the schema so the reading is available at the point of failure. Not mitigated in code: gating on
-  schema would make the leg silently skip the trees most likely to have drifted, which is the
-  green-by-absence shape. Second risk: the leg is new on adopters' bars and any pre-existing drift
-  surfaces as a red on their next pull. That is the leg working.
+- risks — the false-red population is ANY CLONE THAT IS NOT THE INSTALL MACHINE, for any
+  receipt-covered path no claimed `[[lf_pin]]` covers. Finding 36 of
+  `memory/builds/aSealedCaravan/reviews/2026-08-10-review-TOOL-aSealedCaravan-1-1.md` measured it:
+  the receipt hashes WORKING-TREE bytes, so the hash is machine-local. The D9 fold did not remove
+  that — it made two readers agree on a population and left the hash clone-dependent — so confining
+  the risk to pre-D9 receipts, as this row previously did, named the wrong set. gov's
+  `.gitattributes` is `* text=auto` with `eol=lf` pinned on `*.sh`, `gate-legs.json`,
+  `*.fragment.json` and a handful of named files, so shipped `.py` and `.md` engine rows re-expand on
+  any clone with `core.autocrlf=true`, and this leg is `subject = "repo"` and runs on every such
+  clone. Not mitigated in code, and the two mitigations are refused for stated reasons rather than
+  omitted: gating on schema makes the leg skip the trees most likely to have drifted, and hashing
+  normalized content changes what the leg asserts from "these bytes" to "these bytes modulo an
+  assumption". AC7 MEASURES the residue instead of asserting it away. Second risk: the leg is new on
+  adopters' bars and any pre-existing drift surfaces as a red on their next pull. That is the leg
+  working.
 - testing — the four fixture arms (S4) are the permanent coverage and run on every invocation. AC3
   and AC4 observe the failing cases before the unit closes, which is §7's rule that a gate is not
   landed until its failing case has been seen.
@@ -243,6 +253,16 @@ the whole life of the spec. Each criterion carries a witness that exists.
   pin row.
   Red when: only two of the three declarations move, which is the state the brief's own edit list
   would have produced.
+- **AC7** — When the fixture tree from AC3 is re-cloned under the run's scratchpad with
+  `core.autocrlf=true` and check-receipt.py is given that clone as its positional argument, the
+  reported finding count is recorded in the run's output, and whatever that count is, the run's own
+  summary line names the schema so the reading is available at the point of failure.
+  Red when: the residue is asserted rather than measured, which is how §5's risk row came to name a
+  population — pre-D9 receipts — that the fold had already stopped being the right one.
+  figure: DERIVED — the finding count comes from the run, and this criterion deliberately pins no
+  expected value, because the number is what the observation exists to establish.
+  fixture: a second clone of the AC3 fixture with a different `core.autocrlf`; it does not exist
+  today and the arm creates it.
 
 ## 7. Gates
 
@@ -274,6 +294,11 @@ leg off a bar.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · S1 · §5 · AC7 · folded spec-audit round 1 finding M3: §5 confined the
+  false-red class to pre-D9 receipts, which is the wrong population — the receipt hashes worktree
+  bytes, so every clone that is not the install machine is at risk. The row now names that population
+  and cites finding 36 of the aSealedCaravan record, and AC7 measures the residue on a CRLF-expanded
+  clone rather than asserting it away.
 
 ## 10. Reuse audit
 

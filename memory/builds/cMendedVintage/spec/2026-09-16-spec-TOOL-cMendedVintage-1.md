@@ -1,12 +1,13 @@
 # TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +26,11 @@ guard, re-renders those four files and nothing else, and declare that mode as th
   own header comment name both. Observed by AC1.
 - **S2** The four `render_doc` calls that write `HYGIENE.md`, `TEMPLATE-SPEC.md`,
   `guides/BUILD-METHOD.md` and `guides/ANNOTATION-STYLE.md` move into one function called by both
-  modes, so the render set is written once and cannot diverge between them. Observed by AC2.
+  modes, so the render set is written once and cannot diverge between them. The extraction does NOT
+  carry the scaffold's create-from-nothing fallback into `--render`: the `else` at
+  `tools/memory-tree/adopt-memory-tree.sh:109`, which writes a one-line `HYGIENE.md` stub when
+  `$HERE/HYGIENE.template.md` is absent, becomes a refusal under `--render` and keeps its create
+  behaviour under `--scaffold` alone. Observed by AC2 and AC6.
 - **S3** `--render` runs after the existing `.memory-tree.conf` and `READINESS_ROWS` refusals and
   after the placeholder derivations, requires the adoption marker — a `gov:kit memory-tree@` line in
   the tree's `HYGIENE.md` — and exits 1 naming `--scaffold` when the marker is absent. It creates no
@@ -126,7 +131,13 @@ already names the `--render` shape as the cheapest one, from the same measuremen
   `--scaffold` already prints.
 - risks — the real risk is a `--render` that quietly renders a SUBSET of the rows the descriptor
   declares, leaving one artifact permanently stale while every verb reports success. S2's single
-  render set is the structural answer, and AC2 observes the four files together.
+  render set is the structural answer, and AC2 observes the four files together. The second risk is
+  the mirror of it and was found by review: the shared render set would otherwise carry the
+  scaffold's create-from-nothing `else` into `--render`, where the destination already holds the
+  adopter's committed rules and the `gov:kit memory-tree@` marker S3's guard reads. Overwriting it
+  wedges the tree in both directions — `--render` then refuses for a missing marker, and `--scaffold`
+  refuses at `tools/memory-tree/adopt-memory-tree.sh:74` because the root exists without one. S2
+  makes that branch a refusal under `--render` and AC6 stages it.
 - testing — AC1 through AC3 run the script directly against a scratch tree; AC4 reads the descriptor
   through `selfcheck`.
 - migration — none.
@@ -159,6 +170,13 @@ already names the `--render` shape as the cheapest one, from the same measuremen
 - **AC5** — When `bash tools/check-kit-versions.sh` runs, `KIT_MEMORY_TREE_VERSION` is present,
   well-formed and agrees with the marker in the document this kit ships.
   Red when: the engine constant moves and the doc marker does not, which that gate calls a drift.
+- **AC6** — When `HYGIENE.template.md` is moved aside in the kit directory and
+  `bash tools/memory-tree/adopt-memory-tree.sh --render` is run against an adopted scratch tree, the
+  run refuses, writes nothing, and the tree's `HYGIENE.md` is byte-identical afterwards.
+  Red when: the shared render set keeps the scaffold's `else`, so `--render` replaces the adopter's
+  committed rule set with a one-line stub and takes the marker with it.
+  fixture: the same scratch copy of this repo's `memory/` tree AC1 names, with one template moved
+  aside under the run's scratch root.
 
 ## 7. Gates
 
@@ -182,6 +200,10 @@ three refusals are observed once, by AC1 through AC3, on the fixture those crite
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-16 · S2 · §5 · AC6 · folded spec-audit round 1 finding M1: the shared render set
+  would have carried the scaffold's create-from-nothing `else` into `--render`, where it overwrites
+  an adopter's committed `HYGIENE.md`. S2 makes that branch a refusal under `--render`, §5 records
+  the class, and AC6 stages an absent template.
 
 ## 10. Reuse audit
 
