@@ -1075,6 +1075,32 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                        f"({', '.join(sorted(ROLE_KINDS))}) — `plan` and `apply` both read that "
                        f"table, so an unlisted role has no defined outcome in either verb")
 
+    # ---- 3b-ii: A KIT SHIPPING A `rendered`/`generated` ROW DECLARES A `[[regenerate]]` ARGV.
+    #          `update` already REPORTS the gap, per kit, per run — and reporting it at the adopter
+    #          is reporting it to the one person who cannot fix it. TOOL-dRetiredFork-29 sat open
+    #          while six kits and twelve rows carried it, and what the adopters actually saw was
+    #          their own parity legs going red on artifacts a vintage stale, twice rolling the kit
+    #          back mid-update. Gated HERE because gov is where a descriptor is authored and a
+    #          missing declaration is a one-line fix; the class recurs the moment kit seven ships a
+    #          rendered row, which is precisely what an instance-level fix would not catch.
+    for eid, (d, _dpath) in sorted(descs.items()):
+        # `rendered` ONLY, and `generated` deliberately NOT: the same predicate `update`'s own
+        # decline uses. A `generated` row is a target-owned MEASUREMENT seeded empty — the two
+        # waiver registries and the carried-prefix ratchet say so in their own notes — and gov
+        # regenerating one would overwrite the adopter's rows with gov's. A first cut of this rule
+        # read both kinds and reported exactly those three as defects; they are the counter-example
+        # the predicate is narrowed against.
+        _rendered = [rule for rule in d.get("files", [])
+                     if rule.get("role") == "rendered"]
+        if _rendered and not (d.get("regenerate") or []):
+            r.fail(f"entry '{eid}' ships {len(_rendered)} `rendered` row(s) and "
+                   f"declares no `[[regenerate]]` argv, so `update` has nothing to run with "
+                   f"GOVKIT_RERENDER=1 and every one of them goes a vintage stale in every adopter "
+                   f"tree on every update — the "
+                   f"kit's own drift check then reds on a file the adopter never edited. Declare a "
+                   f"narrow re-render entrypoint; the adopter's `[adopt]` argv is NOT one, it "
+                   f"no-ops or refuses on an already-adopted tree")
+
     # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
     #          closed enum. DEPL-dCarriedReceipt-10 S5.
     #

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """census.py — one bounded read of the process table, or a refusal.
 
-gov:kit process-monitor@0.1
+gov:kit process-monitor@0.2
 
 Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md
 

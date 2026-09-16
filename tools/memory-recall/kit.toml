@@ -61,6 +61,14 @@ required_keys_render = ["MEMORY_ROOT", "FAMILIES"]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
 mutates_index = false
 
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. `--scaffold` is the render here and the
+# adopter's own closing instruction already says so — "re-run --scaffold after any FAMILIES or
+# MEMORY_ROOT edit; --check reds until you do" — so a template that moved under the adopter needs
+# the same re-run and nothing else. `--with-hook` is deliberately NOT passed: wiring a hook is a
+# posture flip, and a refresh does not make one (TOOL-dRetiredFork-29).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
+
 [check]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 

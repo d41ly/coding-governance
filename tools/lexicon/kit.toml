@@ -82,6 +82,14 @@ owner = "lexicon"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--scaffold"]
 mutates_index = false
 
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. `.claude/skills/lexicon/SKILL.md` is this
+# kit's one `rendered` row and its own `--check` byte-compares it against a fresh render, so an
+# update that moved the template and ran no render left the check red at every adopter — measured at
+# two, where it rolled the whole kit back (TOOL-dRetiredFork-29). `--render` already existed for the
+# hand path, because `--scaffold` refuses an existing declaration; this block is what runs it.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-lexicon.sh", "--render"]
+
 [check]
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 

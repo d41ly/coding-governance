@@ -41,7 +41,15 @@ DISCIPLINES="architecture deployment blocks design performance"   # demo default
 FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 
-[ "${1:-}" = "--scaffold" ] || { echo "usage: $0 --scaffold"; exit 2; }
+# `--render` EXISTS BECAUSE `--scaffold` CANNOT DO THIS JOB, and TOOL-dRetiredFork-29 is the
+# measurement: on an adopted tree the converge guard below prints "already scaffolded" and exits 0,
+# so every `rendered` row this kit owns went one vintage stale on every `govkit update` — with
+# GOVKIT_RERENDER=1 as much as without it, because that flag runs a `[[regenerate]]` block and this
+# kit declared none — and the adopter's own parity gate reds on it. A regenerate argv needs a narrow
+# entrypoint with no adoption guard to trip over; this is that entrypoint, and `[[regenerate]]` in
+# kit.toml is what runs it.
+MODE="${1:-}"
+case "$MODE" in --scaffold|--render) ;; *) echo "usage: $0 --scaffold | --render"; exit 2 ;; esac
 
 # .memory-tree.conf is REQUIRED — never silently scaffold the built-in DEMO disciplines into a real repo.
 if [ ! -f "$ROOT/.memory-tree.conf" ]; then
@@ -64,9 +72,17 @@ if [ -z "$READINESS_ROWS" ]; then
 fi
 M="$MEMORY_ROOT"
 
+# `--render` REFUSES AN UNADOPTED TREE, which is the mirror of the guard below rather than an
+# exemption from it: a refresh that would install into a tree nobody adopted is `--scaffold` wearing
+# another flag's name, and the two modes must not be able to stand in for each other.
+if [ "$MODE" = "--render" ]; then
+  if [ ! -f "$M/HYGIENE.md" ] || ! grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
+    echo "memory-tree: --render REFUSES this tree — $M/HYGIENE.md carries no 'gov:kit memory-tree@' marker, so there is no adopted install to refresh. Run --scaffold first." >&2
+    exit 1
+  fi
 # Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
 # foreign/half-scaffolded memory/ is refused with a recovery hint; otherwise fall through and scaffold.
-if [ -d "$M" ]; then
+elif [ -d "$M" ]; then
   if [ -f "$M/HYGIENE.md" ] && grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
     echo "$M/ already scaffolded by memory-tree — nothing to do."; exit 0
   fi
@@ -114,6 +130,13 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
 # The annotation-style guide rides the same seam. It is a WRITING convention for comments that cite
 # a record: nothing grades it, which is why it is a rendered guide and not a gate.
 if [ -f "$HERE/ANNOTATION-STYLE.template.md" ]; then render_doc "$HERE/ANNOTATION-STYLE.template.md" > "$M/guides/ANNOTATION-STYLE.md"; fi
+# THE RENDER IS THE WHOLE OF `--render`. Everything below this line writes the tree's AUTHORED
+# files — indexes, registries, backlog shards — which an adopted tree owns and a refresh must never
+# touch. Stopping here is what keeps this mode a refresh instead of a second scaffolder.
+if [ "$MODE" = "--render" ]; then
+  echo "memory-tree: re-rendered $M/HYGIENE.md, $M/TEMPLATE-SPEC.md, $M/guides/BUILD-METHOD.md, $M/guides/ANNOTATION-STYLE.md from $KIT_REL"
+  exit 0
+fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
   echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards ($KIT_REL/gen_build_index.py)."; echo

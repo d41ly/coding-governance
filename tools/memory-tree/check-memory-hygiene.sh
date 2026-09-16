@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.78   # gov:kit memory-tree@2.78 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.79   # gov:kit memory-tree@2.79 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -517,6 +517,13 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # other than this one.
   F:spec-token-waivers.txt|F:readme-contract.txt) ;;
   F:stale-header-waiver.txt) ;;
+  # THE gate-lint REGISTRY, named here because a KIT SHIPS IT. Its kit.toml resolves the seed to
+  # `{memory_root}/project/substitution-fed-loops.txt` at EVERY target, so every adopter receives a
+  # file this check refused — measured at two, where it blocked the whole update at the pre-commit
+  # hook. Gov's own tree passed only because gov had put the name in its LOCAL
+  # `PROJECT_REGISTRY_EXTRA`, which is the escape for a registry a PROJECT adds; using it for a
+  # kit-shipped one hides the defect at the one repo positioned to notice it.
+  F:substitution-fed-loops.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what NicoCares carved this file out to do.
   #
