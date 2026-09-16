@@ -212,6 +212,56 @@ def settle(t: pathlib.Path, msg: str = "fixture") -> None:
     git(t, "commit", "-qm", msg)
 
 
+def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
+                          vintage: str) -> tuple[list[str], list[str]]:
+    """Rewrite an applied target into an install LANDED AT `vintage`. Returns (kept, dropped) paths.
+
+    DEPL-dBackdatedFixture-1. A row whose source gov did NOT ship at `vintage` is DROPPED -- from the
+    receipt, and from the target's index and worktree -- never given an identity there. No install
+    landed at that vintage could hold it. The two inline loops this replaces rewound EVERY row, so
+    when `TOOL-aReplayedCard-2` gave check-wiring a file `24f39915` never had, they recorded the
+    empty blob's id as its `gov_oid` and `update`'s S9 preamble (`DEPL-dCarriedReceipt-7`) refused
+    the whole receipt at exit 2. Thirty arms went red, and the refusal sat on stderr where none of
+    their details looked. A dropped row is what an adopter who installed before the file existed
+    really holds, and `update --write` lands it as an unclaimed source (DEPL-dRatifiedSeam-1 S3).
+
+    BOTH identities come from the SAME vintage, or the row is S9's corruption rather than an older
+    install -- and through the engine's own helpers, so the fixture and the thing it grades cannot
+    disagree about what a blob is named. A row with no `source` is left as `apply` wrote it; no row
+    writer emits one today, so nothing observes that branch. The arms that grade this helper read
+    the target's STATE against the descriptor, never this return value.
+    """
+    gk = govkit_module()
+    rp = target / ".governance" / "install.json"
+    rec = json.loads(rp.read_text(encoding="utf-8"))
+    rec["gov_commit"] = vintage
+    rows: list[dict] = []
+    kept: list[str] = []
+    dropped: list[str] = []
+    for f in rec["files"]:
+        src = f.get("source")
+        if not src:
+            rows.append(f)
+            continue
+        shipped = subprocess.run(["git", "-C", str(govroot), "cat-file", "-e", f"{vintage}:{src}"],
+                                 capture_output=True).returncode == 0
+        if not shipped:
+            git(target, "rm", "-q", "-f", "--", f["path"])
+            dropped.append(f["path"])
+            continue
+        b = subprocess.run(["git", "-C", str(govroot), "show", f"{vintage}:{src}"],
+                           capture_output=True).stdout
+        f["commit"] = vintage
+        f["sha256"] = gk._sha(b)
+        f["gov_oid"] = gk.blob_oid(b)
+        (target / f["path"]).write_bytes(b)
+        rows.append(f)
+        kept.append(f["path"])
+    rec["files"] = rows
+    rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+    return kept, dropped
+
+
 def make_target(tmp: pathlib.Path, deploy: str | None) -> pathlib.Path:
     t = tmp / "target"
     t.mkdir(parents=True, exist_ok=True)
@@ -615,28 +665,50 @@ def main() -> int:
         def stale_target(name: str) -> pathlib.Path:
             t = make_target(tmp / name, DEPLOY_FULL)
             run("apply", "--target", str(t), "--kits", "check-wiring")
-            rp = t / ".governance" / "install.json"
-            rec = json.loads(rp.read_text(encoding="utf-8"))
-            rec["gov_commit"] = OLD
-            for f in rec["files"]:
-                f["commit"] = OLD
-                b = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{f['source']}"],
-                                   capture_output=True).stdout
-                f["sha256"] = __import__("hashlib").sha256(b).hexdigest()
-                # AND `gov_oid`, or this fixture is not "landed at an older vintage" — it is a row
-                # whose `commit` came from one vintage and whose `gov_oid` came from another, which
-                # is EXACTLY the corruption `-7` S9 refuses. Measured: nine arms went red on that
-                # refusal, and they were right to. The engine's own helper, so the fixture and the
-                # thing it grades cannot disagree about what a blob is named.
-                f["gov_oid"] = govkit_module().blob_oid(b)
-                (t / f["path"]).write_bytes(b)
-            rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
-            # -12 S4: `apply` staged every row, and the loop above then rewound their bytes in
+            # BOTH identities from OLD, and no row OLD never shipped: `write_vintage_receipt`'s
+            # header says why each half is load-bearing. Measured before either: nine arms red on
+            # a mixed-vintage row, and thirty on a row invented at a vintage that lacked its file.
+            write_vintage_receipt(govroot, t, OLD)
+            # -12 S4: `apply` staged every row, and the rewind then changed their bytes in
             # the worktree. Both halves are dirty by that definition, so the fixture commits
             # the stale state it just built — the target is legitimately AT an older vintage,
             # which is a committed fact about it and not an operator's work-in-progress.
             settle(t, "landed at the older vintage")
             return t
+
+        # --- DEPL-dBackdatedFixture-1. THE FIXTURE IS AN INSTALL `OLD` COULD HAVE PRODUCED, graded
+        # --- BEFORE any arm consumes it. Expectation from the DESCRIPTOR split by `ls-tree` at OLD,
+        # --- never from the helper's return value or the receipt it wrote. The acceptance arm carries
+        # --- stderr: on 4cf0944d this builder's fixture was refused there, and every consumer arm's
+        # --- stdout-only detail pointed at the measurer's UNVERIFIED line instead.
+        bf = stale_target("bf")
+        _gbf = govkit_module()
+        _bf_writes = _gbf.resolve_entry(
+            govroot, _gbf.load_toml(govroot / "tools" / "govkit" / "entries" / "check-wiring.kit.toml"),
+            _gbf.canonical_ctx("check-wiring"))["writes"]
+        _bf_old = set(run_gov_git(govroot, "ls-tree", "-r", "--name-only", OLD).splitlines())
+        _bf_drop = {d for d, w in _bf_writes.items() if w["src"] and w["src"] not in _bf_old}
+        _bf_keep = set(_bf_writes) - _bf_drop
+        _bf_rows = json.loads((bf / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]
+        _bf_ids = [f for f in _bf_rows if f.get("commit") and f.get("gov_oid")]
+        check("[dBF] AC1 every rewound row's gov_oid is gov's own blob at its commit, by rev-parse",
+              len(_bf_ids) > 0
+              and all(run_gov_git(govroot, "rev-parse", f"{f['commit']}:{f['source']}") == f["gov_oid"]
+                      for f in _bf_ids),
+              json.dumps([(f["path"], str(f.get("commit"))[:8], str(f.get("gov_oid"))[:8])
+                          for f in _bf_rows]))
+        check("[dBF] AC2 LIVENESS the descriptor ships a file OLD did not, so the drop is exercised",
+              len(_bf_drop) > 0, f"descriptor writes {sorted(_bf_writes)}, none absent at {OLD[:8]}")
+        check("[dBF] AC2 the receipt holds exactly the rows OLD shipped",
+              {f["path"] for f in _bf_rows} == _bf_keep,
+              f"receipt {sorted(f['path'] for f in _bf_rows)} · expected {sorted(_bf_keep)}")
+        check("[dBF] AC2 a row OLD did not ship is gone from the target's index as well",
+              not (_bf_drop & set(run_gov_git(bf, "ls-files").split())),
+              f"dropped {sorted(_bf_drop)} · index {run_gov_git(bf, 'ls-files')}")
+        _pbf = run("update", "--target", str(bf))
+        check("[dBF] AC3 update ACCEPTS the stale_target fixture: exit 0, no REFUSING on stderr",
+              _pbf.returncode == 0 and "REFUSING" not in _pbf.stderr,
+              f"rc {_pbf.returncode} · stderr: {_pbf.stderr[-900:]} · stdout: {_pbf.stdout[-600:]}")
 
         up = stale_target("u2a")
         p = run("update", "--target", str(up))
@@ -3757,20 +3829,10 @@ user_skills = "/tmp/gk-fake-skills"
             """
             t = make_target(tmp / name, DEPLOY_FULL)
             run("apply", "--target", str(t), "--kits", "check-wiring")
-            rp = t / ".governance" / "install.json"
-            rec = json.loads(rp.read_text(encoding="utf-8"))
-            rec["gov_commit"] = V8[0]
-            for f in rec["files"]:
-                if not f.get("source"):
-                    continue
-                b = gblob(V8[0], f["source"])
-                f["commit"] = V8[0]
-                # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption
-                # rather than an older install, and every run below refuses before it classifies.
-                f["sha256"] = GK8._sha(b)
-                f["gov_oid"] = GK8.blob_oid(b)
-                (t / f["path"]).write_bytes(b)
-            rp.write_text(json.dumps(rec, indent=2), encoding="utf-8", newline="\n")
+            # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption rather
+            # than an older install, and every run below refuses before it classifies. The SAME
+            # helper as `stale_target`, which also drops a row V8[0] never shipped.
+            write_vintage_receipt(govroot, t, V8[0])
             settle(t, "landed at the oldest vintage")
             (t / CWS).write_bytes((t / CWS).read_bytes() + MINE8)
             settle(t, "the operator's line, committed")
@@ -3778,6 +3840,13 @@ user_skills = "/tmp/gk-fake-skills"
 
         def mine_count(t: pathlib.Path) -> int:
             return (t / CWS).read_bytes().count(MINE8.strip())
+
+        # DEPL-dBackdatedFixture-1 AC3, for THIS builder, before its first consumer arm below.
+        _bf8 = delta_target("d8-bf")
+        _pbf8 = run("update", "--target", str(_bf8))
+        check("[dBF] AC3 update ACCEPTS the delta_target fixture: exit 0, no REFUSING on stderr",
+              _pbf8.returncode == 0 and "REFUSING" not in _pbf8.stderr,
+              f"rc {_pbf8.returncode} · stderr: {_pbf8.stderr[-900:]} · stdout: {_pbf8.stdout[-600:]}")
 
         # ---- AC1: the sequence that destroyed the edit. Staged red twice over — see the header.
         t8 = delta_target("d8-ac1")
