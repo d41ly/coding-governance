@@ -118,11 +118,11 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLogg
 | [TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced](spec/2026-09-16-spec-TOOL-dLoggedFlight-20.md) | 20 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20.
+Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 
-Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20.
+Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

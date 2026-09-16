@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-16-review-TOOL-dLoggedFlight-20-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-20-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-20 |
 
 <!-- /gen:spec-records -->
 

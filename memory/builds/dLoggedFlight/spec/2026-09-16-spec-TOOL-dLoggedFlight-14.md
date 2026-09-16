@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-review-TOOL-dLoggedFlight-14-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-14-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-15 |
+| [2026-09-16-review-TOOL-dLoggedFlight-20-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-20-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 |
 
 <!-- /gen:spec-records -->
 
