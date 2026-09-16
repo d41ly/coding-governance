@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-19 — authority only from an owner-committed README
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 19
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
@@ -79,12 +79,14 @@ add to it, and the leg says so when something tries.
 - **consumes-from** `TOOL-dDerivedDocket-17` — the run's-own-commits function the cross-run arm
   calls.
 - **consumes-from** `TOOL-dDerivedDocket-2` — the prepared merge whose first parent is the
-  advertised tip, which is why excluding that tip leaves exactly the run's commits.
+  advertised tip, which is why excluding that tip leaves exactly the run's commits, and its
+  `merge: <slug> — land onto` subject, by which the terminal-record exclusion recognises it on a
+  witness's single-parent tail.
 - **hands-off** `TOOL-dDerivedDocket-20` — the Skill and protocol text for the authority rule, which
   this spec's §5 places with the carriers unit.
 - **hands-off** `TOOL-dDerivedDocket-22` — the cross-run arm's endpoint for a derived-LANDED record,
-  which that unit's `landing_commit_of` finds, and the unattended-suite arms its AC13 run executes
-  first.
+  which that unit's `landing_commit_of` finds; the terminal-record exclusion function that unit's S17
+  applies to that landing commit; and the unattended-suite arms its AC13 run executes first.
 
 ## 4. Design
 
@@ -121,12 +123,25 @@ recorded state:
 - a record in a working phase or HELD: endpoint HEAD, base the recorded BASE, exclusion the default
   branch's advertised tip as the leg already observes it for check 7 (`ADV_HEAD`); with the tip
   unobserved, the local default-branch ref, announced as the weaker reading;
-- a terminal record: endpoint its recorded witness, exclusion the witness's first parent when the
-  witness is a two-parent commit (the primary lander's `--no-ff` landing); the local arm's witness is
-  the run branch's own tip, whose history since BASE is the run's; a terminal record with no witness
-  fact is skipped by name, never passed;
+- a terminal record: endpoint its recorded witness. The exclusion is computed by one function in
+  `tools/unattended/lib-unattended.sh`, which this unit adds beside the arm, and a terminal record
+  with no witness fact is skipped by name, never passed. The function works through three cases,
+  first match wins:
+  1. **A prepared merge on the witness's tail.** Walk the witness's first-parent chain through
+     single-parent commits only. If that walk reaches a two-parent commit T whose subject begins
+     with unit 2's `merge: <slug> — land onto` naming this record's own slug, or the witness is T
+     itself, the exclusion is T's first parent. This is the in-place shape. The close commit, and any
+     record commit after it, sit on T, so the witness has one parent while its history since BASE
+     runs through T's first parent into every default-branch commit landed since BASE. The shape
+     covers a record unit 22's `--preflight` rotated, whose witness is the landing commit, and an
+     in-place run aborted after its close.
+  2. **A two-parent witness with no such T.** The exclusion is the witness's first parent: the
+     primary lander's `--no-ff` landing.
+  3. **Otherwise** there is no exclusion. The witness is the run branch's own tip, whose history
+     since BASE is the run's.
 - a LANDING record whose landing commit is on the advertised tip (derived LANDED, D12-i2): unit 22
-  supplies the endpoint and the exclusion;
+  supplies the endpoint, its landing commit. The exclusion is this function applied to that commit,
+  so the record's range does not change when it is rotated or made terminal;
 - a committed LANDING record whose landing commit is not yet on the advertised tip, or whose tip is
   unobserved: read as the first case (endpoint HEAD, the advertised tip excluded), because a landing
   that has not reached the tip can still gain commits after a refused push, and ending the walk at the
@@ -134,9 +149,17 @@ recorded state:
 
 It reads the diff, never the run's own claim. A grant a person types on the default branch reaches a
 run's tree only through a default-branch commit, which the exclusion removes, so the arm never reds
-the channel D12-j keeps open. Stated residual: a primary-mode run that merged the default branch
-plainly into its own branch keeps those commits in its range; under in-place landing unit 2 S3
-refuses such a branch at `--land`.
+the channel D12-j keeps open.
+
+Stated residual: a record whose witness reaches no prepared merge, and whose run merged the default
+branch plainly into its own branch, keeps those commits in its range, because a plain reconcile does
+not carry the prepared-merge subject. That population is a primary-mode run, and an in-place run
+aborted before `--prepare`. Under in-place landing, unit 2 S3 refuses a plain reconcile made in
+place of the prepared merge at `--land`. A reconcile made before `--prepare` sits on T's
+second-parent side, and T's first parent already holds the commits it brought in, so a record that
+reaches T is not in the residual. The function recognises T by its subject and its single-parent
+tail, which a commit forged to carry that subject would also satisfy; like the anchor's own limit in
+§3, the arm closes the kit's route, not a deliberate forgery.
 
 ### Fail codes
 
@@ -155,6 +178,8 @@ honest absence. The fixtures carry the coverage.
 - two driver refusal codes, numbers allocated at build time;
 - the grant-token normalising function in `tools/unattended/lib-unattended.sh` (S3), shared by the
   driver and the leg;
+- the terminal-record exclusion function in `tools/unattended/lib-unattended.sh`, which recognises a
+  prepared merge by unit 2's subject and single-parent tail, shared with unit 22's S17;
 - one `memory/DECISIONS.md` row under this unit's own id.
 
 Any new shell function is named through `python tools/lexicon/lexicon.py --suggest <identifier>
@@ -231,14 +256,24 @@ least five units of this build; this unit's net growth there is at most 600 B.
 - **AC5** — When a fixture record in `prompt` mode carries `may:` other than `none`, check 19 reds.
   Red when: the arm grades only `slug` records.
 - **AC6** — When a commit among a fixture run's own commits adds a `may:` line to another build's
-  README, `bash tools/unattended/check-unattended.sh` reds check 19 naming the commit and the README;
-  when an owner commit on the fixture's default branch after BASE adds `may:` to a build README and
-  reaches the run branch through a prepared merge whose first parent is the advertised tip, check 19
-  does not red; nor does it for a terminal primary-mode record whose witness is the `--no-ff` landing
-  merge over the same owner commit.
+  README, `bash tools/unattended/check-unattended.sh` reds check 19 naming the commit and the README.
+  Take an owner commit on the fixture's default branch, made after BASE, that adds `may:` to a build
+  README and reaches the run branch through a prepared merge whose first parent is the advertised
+  tip. Check 19 does not red in any of three records:
+  - a live record;
+  - a terminal primary-mode record whose witness is the `--no-ff` landing merge over the same owner
+    commit;
+  - a terminal in-place record whose witness is the single-parent close commit on that prepared
+    merge, where a `may:` commit the run made before `--prepare` still reds.
+
+  On a terminal record whose witness's tail meets a plain `git merge` reconcile, no exclusion is
+  taken from that reconcile, so a `may:` commit the run made before it reds.
   Red when: the arm reads only the run's own README, so the cross-run grant passes; or it walks
   `BASE..HEAD` or `BASE..witness`, so the owner's default-branch grant reds a run that then cannot
-  land, and once archived reds the bar for ever.
+  land, and once archived reds the bar for ever; or the terminal row takes an exclusion only from a
+  two-parent witness, so an in-place record's single-parent close commit ranges over every
+  default-branch commit landed since BASE; or it takes one from any two-parent commit on the tail,
+  so a plain reconcile's first parent, a run commit, hides the run's earlier grant.
 - **AC7** — When a fixture `BACKLOG.md` carries a `SCOPE` row with a `may` clause, the backlog
   verdicts report V13 naming the row.
   Red when: V13 grades only the clause grammar and admits the label.
@@ -271,7 +306,7 @@ least five units of this build; this unit's net growth there is at most 600 B.
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `kit/dogfood doc parity` · `build-method size` · `build-index selftest` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a `slug` README with `may:`, a `prompt` and a `recipe` README with `may:`, a malformed grant, a grant in both spellings · `ARMS_FLOORS` for `tools/unattended/unattended.sh`
-New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, and an owner commit reaching the run through a prepared merge · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, an owner commit reaching the run through a prepared merge, a terminal in-place record whose witness is the close commit on that prepared merge, and a terminal record whose tail meets a plain reconcile · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
 ## 8. Open questions
 
@@ -309,6 +344,22 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   (b) never grades a commit made after a refused push, which is exactly when a run keeps writing, so
   it covers less. RESOLVED (agent, 2026-09-14, delegated): (a), the more complete survivor; unit 22
   needs no endpoint for this population.
+- **F8 — what does the terminal-record row exclude when the witness sits on a prepared merge?**
+  Options:
+  - (a) rev-2: the witness's first parent only when the witness has two parents;
+  - (b) route a record carrying unit 22's `landed-derived` fact to unit 22 before the two-parent
+    test;
+  - (c) one exclusion function keyed on graph shape: the first parent of the prepared merge the
+    witness reaches through single-parent commits, recognised by unit 2's subject for the record's
+    slug, else the two-parent test, else none.
+
+  (a) ranges an in-place record's single-parent close commit over every default-branch commit landed
+  since BASE, so an owner's grant reds the archive for ever (spec audit G1 round 2, B2). (b) keys on
+  a fact only a rotation writes, so an in-place run aborted after its close keeps that defect, and it
+  needs a second rule for the primary reconcile (M4). RESOLVED (agent, 2026-09-16, delegated): (c).
+  It needs no fact, covers rotated, aborted and derived-LANDED records with one function, and gives a
+  primary record the same range before and after `--landed`. F7 is unchanged, because its population
+  is a LANDING record not yet on the advertised tip.
 
 ## 9. Revision log
 
@@ -327,6 +378,19 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   M5: the unattended-suite arms run first in unit 22's attributed run (§8 F6). G3 M23: AC11 reads the
   carrier sentence and both byte budgets. G3 L4: a `recipe` arm and the grant token grammar (§8 F5),
   the normalising function joining Inventory and Files touched.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G1 B2 (1) with M4 (7, 35), from the G1 round-2
+  record.
+  - §4's terminal-record bullet excludes the first parent of a prepared merge the witness reaches
+    through single-parent commits, recognised by unit 2's subject, before the two-parent test.
+  - The derived-LANDED bullet applies the same function to unit 22's landing commit.
+  - The stated residual names the subject recognition. Fold verification scoped its population: a
+    record whose witness reaches no prepared merge, which includes an in-place run aborted before
+    `--prepare`, while unit 2 S3's refusal covers only a plain reconcile made in place of `--prepare`.
+  - The Inventory gains the function.
+  - AC6 gains the in-place terminal arm and the plain-reconcile arm, and §7's arm list names both.
+  - The consumes-from edge to unit 2 names the subject, and the hands-off edge to unit 22 names the
+    function (§8 F8).
+  - F7 is kept: its population is a LANDING record not yet on the advertised tip.
 
 ## 10. Reuse audit
 

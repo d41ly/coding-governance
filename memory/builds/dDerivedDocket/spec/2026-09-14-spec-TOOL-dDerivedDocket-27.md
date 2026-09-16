@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 27
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -96,8 +96,9 @@ fits, instead of reporting all three like a red leg.
 - **consumes-from** `TOOL-dDerivedDocket-25` — exit 3, TREE MOVED, which S5 re-runs once.
 - **consumes-from** `TOOL-dDerivedDocket-26` — exit 4 and the `gate queue: acquired` line, without
   which a kill in the queue cannot be told from a kill in a leg.
-- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" reading of the unattended suites
-  under `--attribute` against BASE, which this unit's final criterion (AC10) uses.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the attributed verdict of the unattended suites under
+  `--attribute` against BASE, read as `verdict clean` with every inherited suite filed, which this
+  unit's final criterion (AC10) uses.
 - **consumes-from** `TOOL-dDerivedDocket-23` — the attribution pass run inside the runner's wall,
   without which a healthy red bar outlives the backstop and reads as never-returned.
 - **consumes-from** `TOOL-dDerivedDocket-24` — the age and bisection runs, inside the runner's wall,
@@ -223,10 +224,13 @@ the rendered Skill.
   Red when: HOST reads as a red leg, so the run fixes a subject that is not at fault.
 - **AC8** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over the
   rendered tree, the Skill's Close section routes a `hold` line to a commit of the staged records, a
-  branch push and then `--hold`, in that order, and never to `--override`.
+  branch push and then `--hold`, in that order, and never to `--override`. It also names
+  `platform-unavailable` as the hold when that branch push fails because the remote does not answer.
   Red when: the render routes the line to an override, which spends the one check on a host fault;
   or `--hold` comes before the push, which the HELD unit refuses under `ANCHOR_SCOPE=published`; or
-  before the commit, which the HELD unit's clean-tree precondition refuses.
+  before the commit, which the HELD unit's clean-tree precondition refuses; or the Close section
+  gives a branch push the remote does not answer no hold, so the run's only documented ending is
+  refused under `ANCHOR_SCOPE=published`.
 - **AC9** — When `tools/unattended/unattended.test.sh` runs `gates-green` with a stub bar that sleeps
   past `GATE_BOUND` and past `LEASE_STALE_AFTER`, both set low in the fixture conf, but stays inside
   the pinned `gate-backstop`, then `--status` from a second worktree of the fixture repository prints
@@ -236,8 +240,14 @@ the rendered Skill.
   fixture: a second WORKTREE, not a second clone, because the lease lives under the git common dir,
   which a clone does not share.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, it reports no NEW failure.
-  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
+  its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it; or the run is
+  read by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or
+  pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
+  filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
 - **AC11** — When the stub prints `gate queue: acquired` and then hangs past the backstop, the item
@@ -248,12 +258,19 @@ the rendered Skill.
   `GATE_WALL=7`. With `GATE_WALL` blank, the variable is unset in the stub's environment and the
   driver announces the profile wall as the default.
   Red when: the driver never exports it, which gov's equal conf and profile walls cannot show.
-- **AC13** — When `tools/unattended/unattended.test.sh` gives `gates-green` a stub gate that exits 1
-  and writes, under the pinned run id, an attribution record reading every red leg INHERITED and not
-  aged, the item is MET with a `gates-inherited` fact under `land` at R, and UNMET printing
-  `hold · inherited-red · until probe gate` under `park`.
+- **AC13** — `tools/unattended/unattended.test.sh` gives `gates-green` a stub gate that exits 1 and
+  writes, under the pinned run id, an attribution record.
+  - When that record reads every red leg INHERITED and not aged, the item is MET with a
+    `gates-inherited` fact under `land` at R, and UNMET printing
+    `hold · inherited-red · until probe gate` under `park`.
+  - When the record reads one leg INHERITED and one leg MIXED, the item is UNMET under `land`. It
+    prints the attribution lines and no `hold ·` line.
+
+  The MIXED arm is staged RED by a table copy that tests whether ANY red is INHERITED.
   Red when: the table ends in "anything else is UNMET as a red bar" with no attribution arm, so an
-  inherited-only red under `land` reads UNMET, reversing D12-i4 for unattended runs.
+  inherited-only red under `land` reads UNMET, reversing D12-i4 for unattended runs; or the arm's
+  quantifier is existential, so a record holding a MIXED red beside an INHERITED one commits LANDING
+  over a new red that only the push boundary then stops.
   permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
 
 ## 7. Gates
@@ -298,6 +315,12 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
   G4 H5: S5's closed table carries the inherited-red policy's exit-1 attribution arm, and the park
   line takes this unit's `hold ·` shape (F4, AC13). Adds consumes-from units 1, 23 and 24, the last
   carrying the exit-1 attribution arm, and a hands-off to unit 32 for `ceiling_max` (G5 M10).
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 M10 (12): AC13 gains a MIXED-beside-INHERITED arm under `land`, staged RED against an
+    existential test.
+  - G1 L6 (21): AC8 observes S7's `platform-unavailable` fallback in the rendered Close section.
+  - G1 H1 (2, 24): AC10 reads `verdict clean` and the inherited-suite filing, and the consumes-from
+    edge to unit 1 is updated.
 
 ## 10. Reuse audit
 

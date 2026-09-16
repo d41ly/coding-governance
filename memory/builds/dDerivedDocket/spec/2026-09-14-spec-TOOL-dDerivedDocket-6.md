@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-6 — ask parser and status fold
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -47,7 +47,7 @@ unit wires it in, and nothing in this repo's output moves.
   live evidence, CLOSED beats WONTDO, a non-`unit` closing spec reading WONTDO contributes nothing,
   and a hold releases automatically when its target goes terminal. Every status is a function of
   sets alone, never of dates, file order or row order. Observed by AC4, AC5 and AC7; AC4 stages the
-  hold release, the `UNRESOLVED` placeholder and a hold cycle's true tokens.
+  hold release for R5 and R6, the `UNRESOLVED` placeholder and a hold cycle's true tokens.
 - **S7** REOPEN (owner ruling D4): a `REOPEN · <id> · of <record>` row cancels exactly the closing or
   declining records it names. Re-citing a cancelled record stays cancelled; new evidence re-closes.
   Observed by AC6.
@@ -294,12 +294,14 @@ its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.e
 - **AC4** — When `backlog.py --selftest` folds one fixture per rule R1 to R7, each ask derives that
   rule's token and its Decided-by names the evidence; an ask with a CLOSED row and a live closing spec
   derives CLOSED; one with CLOSED and WONTDO evidence derives CLOSED; an ask whose only hold is a
-  `BLOCKED` row on a target that folds CLOSED derives OPEN; an ask whose only hold names a target that
-  is neither a filed ask nor a spec H1 renders `UNRESOLVED` beside V6; and two live asks each
-  `BLOCKED` on the other both derive BLOCKED, their true token, while V6 names the cycle.
+  `BLOCKED` row on a target that folds CLOSED derives OPEN, and so does an ask whose only hold is a
+  `DEFERRED` row whose `until` target folds CLOSED; an ask whose only hold names a target that is
+  neither a filed ask nor a spec H1 renders `UNRESOLVED` beside V6; and two live asks each `BLOCKED`
+  on the other both derive BLOCKED, their true token, while V6 names the cycle.
   Red when: rules are evaluated live-first, so a stale SPECCED spec hides a recorded closure; or R5
-  drops 'has a live target', so a released hold stays BLOCKED after its blocker closes and neither
-  unit 11's prediction nor unit 34's AC3 can tell.
+  or R6 drops 'has a live target', so a released hold stays BLOCKED or DEFERRED after its target
+  closes, against ruling D5's release-id meaning, and neither unit 11's prediction nor unit 34's AC3
+  can tell.
 - **AC5** — When a non-`unit` ask's only closing spec reads WONTDO, the ask derives OPEN; when a
   `unit` ask's same-id spec reads WONTDO, it derives WONTDO.
   Red when: a WONTDO closing spec declines an ask it was only one attempt at.
@@ -381,6 +383,8 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rul
   supersession row is unit 34's, recorded as a non-goal and a hands-off to 34, an edge the brief's
   table does not list. G2 M8's unit-6 end: the hands-off to 9 names the `BACKLOG_MODE` config-key
   entry.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L8 (17): AC4 stages a DEFERRED hold whose `until`
+  target folds CLOSED and names R6 in its Red-when; S6 says both rules are staged.
 
 ## 10. Reuse audit
 

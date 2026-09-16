@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-3 — the run's landing path
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -28,17 +28,19 @@ landing that cannot complete ending HELD instead of on local main.
 - **S1** `LANDER_MODE`, a closed set `primary|in-place` in `.unattended.conf`, blank reading as
   `primary` and announced as a default. Gov's conf sets `in-place`; the kit's conf example documents
   both. The driver and the kit gate validate it. The kit gate prints the effective `LANDER_MODE`
-  and whether it was declared or defaulted, and each `SELFTESTS_OWED_PATHS` entry it resolved.
-  Observed by AC5, AC9 and AC13.
-- **S2** Under `in-place`, `--preflight` runs `$LANDER --carry --slug <slug>` once as a liveness
-  probe of the declared lander. An exit of 2 refuses preflight naming `LANDER_MODE`, because the
-  lander rejected a flag it does not implement. An exit of 3 refuses naming the lander's observation
-  failure, never `LANDER_MODE`. Exits 0 and 1 both mean a lander that implements the mode. Observed
-  by AC5.
+  and whether it was declared or defaulted, and each `SELFTESTS_OWED_PATHS` entry it resolved,
+  printing that the list is empty when it is. Observed by AC5, AC9 and AC13.
+- **S2** Under `in-place`, `--preflight` runs `$LANDER --carry --slug <slug>` and
+  `$LANDER --prepared --slug <slug>` once each, as liveness probes of the declared lander. On either
+  probe, an exit of 2 refuses preflight naming `LANDER_MODE`, because the lander rejected a flag it
+  does not implement, and an exit of 3 refuses naming the lander's observation failure, never
+  `LANDER_MODE`. Exits 0 and 1 both mean a lander that implements the mode. Observed by AC5.
 - **S3** Under `in-place`, `gates-green` refuses, numbered, unless `$LANDER --prepared --slug <slug>`
-  exits 0, and otherwise runs `$GATE_CMD` with `GATE_FULL=1` exported, plus `GATE_SELFTESTS=1` when
-  the landing range touches a path the new `SELFTESTS_OWED_PATHS` key lists. It runs before
-  `--close` writes anything. Under `in-place`, `gates-green` also refuses, numbered and before
+  exits 0, mapping its exits as S2 maps them: 1 names `{{LANDER}} --prepare`, 2 names `LANDER_MODE`,
+  and 3 names the lander's observation failure and never `--prepare`; and otherwise runs
+  `$GATE_CMD` with `GATE_FULL=1` exported, plus `GATE_SELFTESTS=1` when the landing range touches a
+  path the new `SELFTESTS_OWED_PATHS` key lists. It runs before `--close` writes anything. Under
+  `in-place`, `gates-green` also refuses, numbered and before
   running, when `git status --porcelain` is non-empty, untracked files included, naming the
   full-green stamp's clean-tree precondition (`tools/run-gates/run-gates.sh:1114-1119` and
   `:1855-1857`). Observed by AC1, AC2, AC10 and AC12.
@@ -53,13 +55,16 @@ landing that cannot complete ending HELD instead of on local main.
   (`tools/unattended/unattended.sh:1590-1591`), and the test comment at
   `tools/unattended/unattended.test.sh:2477` stop giving 'no verb commits' as the reason the archive
   name derives from the bytes. The reason that still holds is that two runs can honestly share a
-  witness. Observed by AC3, AC7 and AC14.
+  witness. A re-close whose write changes no byte commits nothing and says so. Observed by AC3, AC7,
+  AC14 and AC15.
 - **S6** The Skill's Close and Land sections and protocol §6 carry the in-place sequence —
   attestations and their commit, then `{{LANDER}} --prepare`, then `--close`, then
   `{{LANDER}} --land`, then `--landed` — with reconcile only from the remote's default branch onto
   the run branch, never through local main. A landing the lander could not complete pushes the
-  branch and holds, and never merges into local main. When the remote answers nothing at all, it
-  holds over the unpublished tip under `platform-unavailable`. Observed by AC4 and AC8.
+  branch and holds with `--reaped` naming the keepalive the close's attestation reaped, and never
+  merges into local main. When the remote answers nothing at all, it holds over the unpublished tip
+  under `platform-unavailable`. A `--close` refused on the lander's observation failure takes the
+  same hold. Observed by AC4 and AC8.
 - **S7** Under `primary`, every verb behaves as at BASE. Observed by AC9.
 - **S8** Arms in `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`,
   run once at the unit's end under attribution. Observed by AC11.
@@ -80,8 +85,8 @@ landing that cannot complete ending HELD instead of on local main.
 
 ### Edges
 
-- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" criterion for the unattended suites
-  this unit runs once at its end.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion for the unattended suites this
+  unit runs once at its end: `verdict clean`, with every inherited suite filed.
 - **consumes-from** `TOOL-dDerivedDocket-2` — `--prepare`, `--land`, `--carry` and `--prepared`,
   their refusal texts and exit codes, and the definition of a prepared merge, which `gates-green`
   asks `--prepared` about.
@@ -92,6 +97,9 @@ landing that cannot complete ending HELD instead of on local main.
 - **hands-off** `TOOL-dDerivedDocket-22` — the LANDING record committed on the prepared merge, from
   which that unit derives LANDED once the remote carries it, and the in-place mode `--landed` must
   refuse the local arm under.
+- **hands-off** `TOOL-dDerivedDocket-34` — the in-place landing sequence S6 carries, a reconcile from
+  the remote's default branch onto the run branch and then `--prepare`, `--close`, `--land` and
+  `--landed`, into which the switch-over's landing reconcile puts its steps before `--prepare`.
 
 ## 4. Design
 
@@ -122,9 +130,15 @@ never, announced, which is the charter's "owed by a DoD only for KIT work" with 
 declared rather than guessed. Gov declares its kit roots. Nothing here runs the unattended kit's
 own suites, which live in no manifest; `GATE_SELFTESTS=1` runs only held manifest legs.
 
-A refusal of the precondition is a numbered failure that names `{{LANDER}} --prepare`, never an
-unmet item: an unmet `gates-green` invites an override, and an override here would land an ungraded
-merge.
+A refusal of the precondition is a numbered failure, never an unmet item. An unmet `gates-green`
+invites an override, and an override here would land an ungraded merge. The refusal is keyed on
+`--prepared`'s exit:
+- 1 names `{{LANDER}} --prepare`;
+- 2 names `LANDER_MODE`;
+- 3 names the observation the lander could not make.
+
+A remote outage at close is therefore reported as an outage, and the run takes the incomplete-landing
+route below rather than re-preparing into the same failure.
 
 ### `--close` under `in-place`
 
@@ -136,9 +150,14 @@ merge.
    2 refuses as a lander that does not implement the mode. Exit 3 refuses as an observation the
    lander could not make.
 3. The LANDING phase and its facts are written.
-4. The run-state change is committed with the subject in S5, bounded, and the commit's own hooks run
-   as for any commit. The subject names the slug and no unit id, so `build_commit` never takes it
-   for a unit's build commit.
+4. When the stage holds a change to the run-state file, it is committed with the subject in S5,
+   bounded, and the commit's own hooks run as for any commit. The subject names the slug and no unit
+   id, so `build_commit` never takes it for a unit's build commit. When the stage holds no change,
+   which happens on a re-close over a record already LANDING after a re-prepare, no commit is made.
+   The verb prints that the close record is already committed, naming the commit that last changed
+   the run-state file, and exits 0. That is this unit's own read: the derived-terminal unit's shared
+   helper, which reads the same commit, is ordered after this one. The prepared merge the bar just
+   graded is then HEAD, and `--land` pushes it.
 
 Under `primary`, step 2 does not run and step 4 stays a stage, exactly as at BASE.
 
@@ -146,12 +165,16 @@ Under `primary`, step 2 does not run and step 4 stays a stage, exactly as at BAS
 
 The lander's `unreachable` and exhausted-race outcomes are not a reason to merge anywhere. The run
 pushes its branch, so the prepared merge and the committed close survive the session, then runs
-`--hold --code platform-unavailable --until after <now + 30 minutes>` with the lander's last line as
-the reason. When that branch push fails because the remote does not answer, the same `--hold` is
-taken over the unpublished tip, which the HELD unit accepts for this code alone and records. There
-is no other route, and no route merges anywhere. The lander's `red` outcome is a red push-boundary
-bar; it holds under the same code only when the red is the bound firing, and is otherwise a
-fix-and-re-prepare, because a red the run caused is the run's work.
+`--hold --code platform-unavailable --until after <now + 30 minutes> --reaped <recorded id>` with the
+lander's last line as the reason, naming the keepalive the close's attestation already reaped. When
+that branch push fails because the remote does not answer, the same `--hold` is taken over the
+unpublished tip, which the HELD unit accepts for this code alone and records. There is no other
+route, and no route merges anywhere. The lander's `red` outcome is a red push-boundary bar; it holds
+under the same code only when the red is the bound firing, and is otherwise a fix-and-re-prepare,
+because a red the run caused is the run's work.
+
+A `--close` refused because `--prepared` exited 3 takes the same route. The prepared merge is
+committed and the close wrote nothing, so the branch push and the hold are all that remain.
 
 ### Where the text goes
 
@@ -194,7 +217,8 @@ and Skill.
 - risks — until the declared-wall unit lands, the landing bar runs under `GATE_BOUND`, and gov's
   full bar with self-tests may outlast it; the bound's own message then names the kill rather than a
   leg. The derived term `SELFTESTS_OWED_PATHS` can under-declare a kit root; the kit gate reds a
-  declared path that resolves to nothing, not one that is missing.
+  declared path that resolves to nothing, not one that is missing; AC13 compares gov's own list
+  against the kit roots the tree declares.
 - testing — driver and kit-gate arms over a scratch repository with a bare remote, each staged RED,
   run once at the unit's end under attribution.
 - migration — adopters stay `primary` until their own deployer builds adopt the in-place lander.
@@ -207,8 +231,12 @@ and Skill.
   `gates-green` unmet after `--prepare`.
   Red when: the bar grades the bare branch tip, which is green.
 - **AC2** — When `--close` runs under `in-place` with HEAD on an unprepared branch tip, it refuses
-  with a numbered message naming `--prepare` and writes nothing.
-  Red when: the missing merge is reported as an unmet item, which an override can then pass.
+  with a numbered message naming `--prepare` and writes nothing. With a lander stub whose
+  `--prepared` exits 3, it refuses naming the observation failure, not `--prepare`, and writes
+  nothing.
+  Red when: the missing merge is reported as an unmet item, which an override can then pass; or any
+  non-zero `--prepared` exit names `--prepare`, so a remote outage sends the run to re-prepare into
+  the same failure.
 - **AC3** — When the fixture closes under `in-place` and then lands with `--land`, the push prints
   the hook's `scoped gate` line naming the prepared merge as the full green one commit back.
   Red when: the stamp is written outside the run's git dir, so the hook prints `FULL gate`.
@@ -219,8 +247,9 @@ and Skill.
   render passes, and the skill-wiring check reds a render that drifted from its template.
   Red when: the arm reads a section the render never emits, so it passes over nothing.
 - **AC5** — When `--preflight` runs under `in-place` with a lander stub that exits 2 on `--carry`, it
-  refuses naming `LANDER_MODE`; with a stub exiting 1 it proceeds; with a stub exiting 3 it refuses
-  naming the observation and not `LANDER_MODE`.
+  refuses naming `LANDER_MODE`, and so does a stub that exits 2 on `--prepared`. With a stub exiting
+  1 on both, it proceeds. With a stub exiting 3 on either, it refuses naming the observation and not
+  `LANDER_MODE`.
   Red when: preflight trusts the declaration, and the first refusal arrives at landing time; or an
   exit of 3 is reported as a mode misdeclaration.
 - **AC6** — When the lander stub's `--carry` exits 1 listing a sha, `--close` under `in-place`
@@ -231,10 +260,14 @@ and Skill.
   `tools/unattended/lib-unattended.sh` returns the same commit per unit as before the close.
   Red when: the close stages without committing, which is TOOL-dUnstalledConvoy-24's defect.
 - **AC8** — When the lander stub reports `unreachable`, the Skill's documented next act is a branch
-  push and `--hold` under `platform-unavailable`, including the case where that branch push fails,
-  and no rendered sentence in the Land section directs a merge into local main.
+  push and a `--hold` under `platform-unavailable` that passes `--reaped`. That includes the case
+  where the branch push fails. The rendered Skill documents the same next act for a `--close`
+  refused because `--prepared` exited 3. No rendered sentence in the Land section directs a merge
+  into local main.
   Red when: the fallback text survives from the primary path, which lands through local main; or
-  the Land section gives a failed branch push no next act.
+  the Land section gives a failed branch push no next act; or the Land section's `--hold` omits
+  `--reaped`, so the HELD unit refuses the run at its only ending; or a close refused on the
+  lander's observation failure has no documented next act, so S6's route exists only in this spec.
 - **AC9** — When `LANDER_MODE` is blank, `--close` and `gates-green` over the fixture produce the
   BASE driver's output and exit, including no commit and no carry probe.
   Red when: an in-place branch runs in primary mode.
@@ -244,8 +277,14 @@ and Skill.
   Red when: the term is exported unconditionally or never; or `GATE_FULL=1` is not exported, so
   gov's guarded manifest grades the landing merge by guard, which is the i28 and i29 shape.
 - **AC11** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, it reports no NEW failure.
-  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
+  its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it; or the run is
+  read by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or
+  pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
+  filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the brief lists this unit among those allowed to run the unattended suites.
 - **AC12** — When `--close` runs under `in-place` over a prepared merge with one untracked file in
@@ -254,15 +293,28 @@ and Skill.
   Red when: the only cleanliness test is `--prepare`'s `-uno` check, so the bar runs GREEN and
   writes no stamp, and the push then pays a second full bar or scopes against an older stamp.
 - **AC13** — When `bash tools/unattended/check-unattended.sh` runs on the real tree after this unit,
-  it prints `LANDER_MODE in-place` as declared, and every `SELFTESTS_OWED_PATHS` entry resolves to a
-  tracked directory under `tools/`.
+  it prints `LANDER_MODE in-place` as declared, and prints a non-empty list of
+  `SELFTESTS_OWED_PATHS` entries, each resolving to a tracked path. Two populations are compared
+  against that list:
+  - the directory of every file `git ls-files 'tools/*/kit.toml'` lists;
+  - every path `git grep -h '^sentinel = ' -- 'tools/govkit/entries/*.kit.toml'` names.
+
+  Each member of both starts with some printed entry.
   Red when: gov's conf leaves `LANDER_MODE` blank, so the in-place path ships inert in the one
-  repository that dogfoods it while every fixture criterion stays green.
+  repository that dogfoods it while every fixture criterion stays green; or the key is blank or
+  misses a kit root, so an in-place landing of kit work runs without `GATE_SELFTESTS=1`, the kit DoD
+  `AGENTS.md` states.
 - **AC14** — When `grep -c 'verb here commits' tools/unattended/PROTOCOL.template.md` runs, it
   prints 0 (1 at BASE, where the premise wraps after `because no`), and so does
   `grep -c 'NO driver verb commits' tools/unattended/unattended.sh`; the rotation paragraph still
   names a shared witness as the reason.
   Red when: the shipped protocol keeps a premise the committing close falsifies in gov's own mode.
+- **AC15** — The fixture closes under `in-place`, the lander stub's push reports `red`, the fixture
+  commits a fix and re-runs `--prepare`, and `--close` then runs again over the LANDING record. The
+  second close exits 0 and names the existing close commit. `git rev-parse HEAD` equals the
+  re-prepared merge, and `git status --porcelain` is empty.
+  Red when: step 4 commits unconditionally, so the re-close refuses on an empty commit after
+  `gates-green` has already paid a full bar, and both documented re-prepare paths wedge.
 
 ## 7. Gates
 
@@ -289,6 +341,12 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
 - **F4 — the landing shape and the charter exception.** RESOLVED (owner, 2026-09-13): D12-i1 in
   place; D12-i3 keeps the charter's attended rule and puts the unattended exception's rule in the
   protocol.
+- **F5 — what does a re-close after a re-prepare do?** Options:
+  - (a) commit only a non-empty stage, and otherwise report the existing close commit and exit 0;
+  - (b) state that a re-prepared landing skips `--close` and goes straight to `--land`.
+
+  (b) lands a re-prepared merge that no `gates-green` graded, which is the ungraded merge this unit
+  exists to prevent. RESOLVED (agent, 2026-09-16, delegated): (a).
 
 ## 9. Revision log
 
@@ -306,6 +364,22 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
   premise's unwrapped half, because the full phrase wraps at BASE and would print 0 before any edit.
   S6 names AC8, which observes its new unpublished-tip clause. The kit version marker leaves Files
   touched, because the build's one move is the held-suite baseline unit's.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 M9 (43): §4 step 4 commits only a non-empty stage, and a re-close after a re-prepare reports
+    the existing close commit (S5, F5, AC15). Fold verification: step 4 names that commit as the one
+    that last changed the run-state file, not through the derived-terminal unit's helper, which is
+    ordered after this unit.
+  - G1 M13 (11): AC13 requires a non-empty `SELFTESTS_OWED_PATHS` covering every `kit.toml`
+    directory and govkit sentinel. S1 prints an empty list, and §5 is updated.
+  - G1 L1 (18, 37): S2 probes `--prepared` too. S3 and §4 map `--prepared`'s exits 1, 2 and 3 as
+    `--carry`'s are mapped, and an observation failure at close takes the incomplete-landing route
+    (S6, AC2, AC5). Fold verification: AC8 also observes that route in the rendered Skill, since
+    S6 names AC8 and no other criterion read it.
+  - G1 L3 (36): the route and the Land section pass `--reaped` (S6, AC8).
+  - G1 H1 (2, 24): AC11 reads `verdict clean` and the inherited-suite filing, and the §3
+    consumes-from edge to unit 1 is updated.
+  - G5 round-2 H1 (21, 36, 52), unit-3 end: §3 hands-off 34 names the in-place sequence the
+    switch-over's landing reconcile runs before `--prepare`.
 
 ## 10. Reuse audit
 

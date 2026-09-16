@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-10 — driver refuses shard-into-view
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 10
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -160,7 +160,8 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
 ### Files touched (estimate)
 
 `tools/memory-tree/merge-rows.py` · `tools/memory-tree/merge-rows.test.sh` · `tools/gate-legs.json` ·
-`tools/govkit/registry.toml` · `memory/map/features/memory-tree-merge-driver.md` ·
+`tools/govkit/registry.toml` · `tools/govkit/subject-pins.tsv` (regenerated with
+`python tools/govkit/govkit.py selfcheck --write`) · `memory/map/features/memory-tree-merge-driver.md` ·
 `memory/map/generated/`.
 
 ### Alternatives rejected
@@ -235,10 +236,12 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
   reason, and `govkit selfcheck` passes.
   Red when: the leg ships guarded on the kit directory, so an edit elsewhere that breaks the view
   header never re-runs it.
-- **AC9** — When each of AC1 to AC7's fixes is unstaged in turn, its arm in
+- **AC9** — When each of AC1 to AC7's, AC10's and AC11's fixes is unstaged in turn, its arm in
   `tools/memory-tree/merge-rows.test.sh` or its `--check` observation turns red, and restoring the fix
   turns it green.
-  Red when: an arm passes with its fix removed, which is an arm grading nothing.
+  Red when: an arm passes with its fix removed, which is an arm grading nothing; or the range stops
+  at AC7, so a refusal keyed on either side being a view, or a mis-rooted `BACKLOG.md` selector, sits
+  behind arms nobody has seen red.
 - **AC10** — When `bash tools/memory-tree/merge-rows.test.sh` merges two branches that each
   re-rendered one fixture view with adjacent row changes, the driver takes its key path with no
   refusal, and `gen_build_index.py --write` then exits 0 with the view byte-equal to a fresh render;
@@ -292,6 +295,9 @@ New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-drive
   re-rendered views and two shards over a view base, S1 cites it and §7's replay arm line names
   both; with M3 (45) AC10 re-renders after the merge and §4 "The refusal" points at unit 7 S8. M20
   (22): AC11 grades the builds-mode `BACKLOG.md` population, S5 cites it.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L6 (10): AC9's mutation sweep covers AC1 to AC7,
+  AC10 and AC11. The record's class item 1 applied: Files touched names the regenerated
+  `tools/govkit/subject-pins.tsv` for the new leg.
 
 ## 10. Reuse audit
 

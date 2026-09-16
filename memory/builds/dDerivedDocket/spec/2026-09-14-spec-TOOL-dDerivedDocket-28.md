@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 28
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -56,6 +56,9 @@ rule: nothing kills a process this run did not start.
   `TOOL-dDerivedDocket-1` S9 makes once for the build. NOT OBSERVED by a criterion here:
   `kit version markers` grades the final tree's constant-marker agreement.
 - **S10** The unattended suites run once at the unit's end under attribution. Observed by AC10.
+- **S11** The ledger's removal. At a terminal write and at an in-place `--landed`'s successful
+  observation, `<slug>.procs` is removed when no recorded process is alive. It is kept, with a line
+  naming each live pid, when one is. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -75,8 +78,9 @@ rule: nothing kills a process this run did not start.
   whose directory the ledger shares, and the `--status` line the orphan count joins.
 - **consumes-from** `TOOL-dDerivedDocket-25` — the runner re-executed through its absolute path,
   without which the fence refuses to reap a runner whose parent is gone.
-- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" reading of the unattended suites
-  under `--attribute` against BASE, which this unit's final criterion (AC10) uses.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the attributed verdict of the unattended suites under
+  `--attribute` against BASE, read as `verdict clean` with every inherited suite filed, which this
+  unit's final criterion (AC10) uses.
 - **consumes-from** `TOOL-dDerivedDocket-22` — the in-place removal point, since an in-place landing
   writes no terminal until a rotation that may never come.
 
@@ -124,9 +128,8 @@ Appends are single short lines. Pruning rewrites the ledger by tmp-then-rename a
 the four reaping verbs, each of which holds the slug's lease when it reaps. `--resume` reaps only on
 a row that holds it. So the rewrite cannot race an append from another session, and no reaper call
 runs where `run_bounded`'s lease refresh would write a lease the verb does not hold. A record is
-pruned when its process is gone or its token no longer matches. At a terminal write, and at an
-in-place `--landed`'s successful observation, the ledger is removed when no recorded process is
-alive, and kept with a line saying so when one is.
+pruned when its process is gone or its token no longer matches. The ledger's removal at a terminal
+write and at an in-place `--landed` is S11's.
 
 ### Inventory
 
@@ -203,16 +206,31 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   Red when: `--resume` reaps or prunes on a row that does not hold the lease, which races the
   holder's appends and writes a lease it does not hold.
 - **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, it reports no NEW failure.
-  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
+  its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it; or the run is
+  read by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or
+  pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
+  filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
-- **AC11** — When a fixture driver is killed while its stub bar sleeps and the same slug's
-  `gates-green` then runs, the orphan is reaped before the new stub bar starts. The same holds for
-  `--preflight`. After either verb, a ledger record whose process has exited is gone from the
-  ledger.
+- **AC11** — A fixture driver is killed while its stub bar sleeps. When the same slug's `gates-green`
+  then runs, the orphan is reaped before the new stub bar starts. The same holds for `--preflight`.
+  When `--hold` then runs over a fresh orphan left the same way, it reaps that orphan and proceeds.
+  After each verb, a ledger record whose process has exited is gone from the ledger.
   Red when: only `--resume` reaps, although i26's run reaches `gates-green` again without passing
-  through `--resume`.
+  through `--resume`; or `--hold` never reaps, so its S7 precondition refuses a hold over a bar whose
+  driver is already dead.
+- **AC12** — When `--abort` runs on a fixture whose `<slug>.procs` ledger exists and records only
+  processes that have exited, the ledger is gone from the git common dir's `unattended` directory
+  afterwards. The same holds after `--landed` observes a derived LANDED under `in-place`, over a
+  ledger that existed before it ran. When one recorded process is still alive at `--abort`, the
+  ledger file remains and the verb's output names that pid. Each arm asserts the ledger exists before
+  the verb runs, so an absent ledger cannot pass for a removed one.
+  Red when: no verb removes the ledger, so every finished slug leaves one behind; or removal ignores
+  live records, so a running process loses the only record that lets a later reap find it.
 
 ## 7. Gates
 
@@ -245,6 +263,13 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   (AC9). Reaping by `gates-green` and `--preflight`, and pruning, are observed (AC11). The ledger is
   removed at an in-place `--landed` as well as at a terminal. S9 rides the held-suite baseline unit's
   version move. Adds consumes-from units 1 and 22.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 L5 (20, 33): AC11 observes `--hold` reaping an orphan.
+  - The ledger's removal becomes S11, observed by AC12 after `--abort` and after in-place
+    `--landed`, and §4 points at it. Fold verification: each AC12 arm asserts the `<slug>.procs`
+    ledger exists before the verb, so a ledger never created cannot pass as removed.
+  - G1 H1 (2, 24): AC10 reads `verdict clean` and the inherited-suite filing, and the consumes-from
+    edge to unit 1 is updated.
 
 ## 10. Reuse audit
 

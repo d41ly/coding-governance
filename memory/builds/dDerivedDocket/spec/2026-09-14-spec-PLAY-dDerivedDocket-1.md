@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams playbook · order 37
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams playbook · order 37
 
 <!-- gen:spec-records -->
 
@@ -59,9 +59,12 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 - **S8** §1 Landing's explicit-ask substitute bullet, inside the first `kit:unattended` fence, says
   the build folder the run did not create is the DEFAULT-BRANCH anchor's property and that the
   protocol names what its second anchor weakens. It stays one line of at most 450 characters, names
-  no lander verb or mode, and keeps S7's net byte budget negative. Gov's authored Conventions bullet
-  in `AGENTS.md` stops restating the property and points at §1 Landing's substitute. Observed by AC9
-  and AC11.
+  no lander verb or mode, and keeps S7's net byte budget negative. Gov's authored `AGENTS.md` stops
+  stating the unqualified property in all three places outside the region that state it: the
+  Conventions bullet on merging and pushing points at §1 Landing's substitute, and the `unattended/`
+  entry under "What ships here" and the protocol bullet under "Two protocols are BINDING" each read
+  "a committed standing mandate, §1 Landing's one substitute" in place of "a committed standing
+  mandate it ASSERTS and cannot have written" (§8 F7). Observed by AC9 and AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -74,7 +77,8 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   auto-resume unit records that as a DECISIONS row.
 - No memory-tree kit prose, no HYGIENE or TEMPLATE-SPEC text, and no kickoff-manifest claim. The
   memory-tree docs unit and the switch-over own those; this unit only re-stamps the manifest.
-- No runbook edit. The runbook's §2 sentence about the unattended blocks is handed off.
+- No runbook edit. The runbook's §2 sentence about the unattended blocks, and its kit list's missing
+  kickoff-manifest bullet, are handed off.
 - No template version bump and no high-water bump (§8 F6).
 - No `when:` block and no new `drop_blocks` name. The fence reuses the `kit:` namespace as it is.
 - The root `README.md` is untouched: its memory-tree line stays true, because shards is the kit's
@@ -87,7 +91,9 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   re-verifies are the ones that commit rewrote.
 - **hands-off** `DEPL-dDerivedDocket-1` — the runbook's §2 sentence on what selecting the unattended
   kit keeps in §1, which after this unit is two fenced blocks carrying the landing pointer and the
-  protocol contract as well as the ask substitute. Added by this spec, not in the brief's table.
+  protocol contract as well as the ask substitute; and the new `kit:kickoff-manifest` fence around
+  §1's kickoff-manifest merge exception, which a target that deselects that kit now loses, and which
+  the runbook's §2 kit list does not name at BASE. Added by this spec, not in the brief's table.
 - **hands-off** external — offering the in-place landing merge's carry-set check to attended
   landings as an opt-in, which D12-i3's consequences name as possible and nothing in this build owes.
 
@@ -106,6 +112,8 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 | `AGENTS.md:78`-`:472`, the `gov:playbook` region | the BASE render | a fresh render |
 | `AGENTS.md:52`-`:53`, the layout line | `backlog/<FAMILY>.md` listed after the GENERATED pair | listed as the third GENERATED member |
 | `AGENTS.md:70`-`:71`, the node-registry paragraph | "backlogs shard per family at `memory/backlog/<FAMILY>.md`" | asks filed per build, and the family file their generated view |
+| `AGENTS.md:36`-`:38`, the `unattended/` entry under What ships here | "a committed standing mandate it ASSERTS and cannot have written" | "a committed standing mandate, §1 Landing's one substitute" (S8) |
+| `AGENTS.md:558`-`:559`, the protocol bullet under Two protocols are BINDING | the same clause | the same replacement (S8) |
 | `AGENTS.md:581`-`:582`, the Conventions bullet on merging and pushing | "— or a committed build folder the run did not create" | "— or §1 Landing's one substitute" (S8) |
 | `memory/DECISIONS.md`, `## PLAY — playbook` | one row | a second row, this unit's |
 | `memory/guides/SESSION-KICKOFF.md` audit block | the switch-over's stamp | re-stamped |
@@ -176,8 +184,9 @@ markers are stripped, and was not rendered.
 | S3 §6 bullet | +34 | +34 |
 | total | −45, so 48,840 of 49,152 | −155 |
 
-The authored `AGENTS.md` passages in S4 add about 63 bytes and S8's Conventions clause saves 21, so
-the charter moves from 64,347 to about 64,234 of its 64,512 ceiling. The switch-over and the
+The authored `AGENTS.md` passages in S4 add about 63 bytes, S8's Conventions clause saves 21 and its
+two mandate clauses about 10 more, so the charter moves from 64,347 to about 64,224 of its 64,512
+ceiling. The switch-over and the
 remote-CI unit may change `AGENTS.md` before this unit runs; AC1 and AC4 grade the commit rather
 than trusting this sum.
 
@@ -195,7 +204,7 @@ selects it, so gov's region keeps the exception.
 
 1. Reground, and confirm the switch-over unit reads CLOSED.
 2. Edit the template, then run `bash tools/playbook/adopt-playbook.sh --target .`.
-3. Edit the two authored `AGENTS.md` passages and add the DECISIONS row.
+3. Edit the authored `AGENTS.md` lines S4 and S8 name and add the DECISIONS row.
 4. Re-read the manifest's §B claims the template feeds, then re-stamp `last-audit` by the stamp rule
    the manifest states.
 5. Make the §6 observations, then commit with a delta line for the re-stamp in the message.
@@ -218,7 +227,7 @@ selects it, so gov's region keeps the exception.
 
 - security — no new authority and no new write path. The explicit-ask substitute is unchanged, the
   landing bullet grants nothing, and the fence narrows what a target without the kit receives.
-- perf / scale — N/A: prose. Gov's charter, read every session, gets about 110 bytes shorter.
+- perf / scale — N/A: prose. Gov's charter, read every session, gets about 120 bytes shorter.
 - error / empty / loading states — a target that did not select the unattended kit now receives
   neither unattended block. The renderer refuses an unknown fence name, and `unattended` is known.
 - observability — the size gate's `template-size OK` line for both subjects, the render check's
@@ -302,12 +311,14 @@ selects it, so gov's region keeps the exception.
   Red when: the bullet quotes the consequence text's "in-place landing", which is false for an
   adopter whose lander mode is the kit default and restates the protocol's rule in the charter.
 - **AC11** — When `grep -c 'default-branch anchor'` runs over the first `kit:unattended` fence of
-  `coding-governance-agents.template.md`, it prints 1, and
-  `grep -n 'folder the run did not create' AGENTS.md` finds no hit outside the `gov:playbook`
-  region.
+  `coding-governance-agents.template.md`, it prints 1; `grep -n 'folder the run did not create' AGENTS.md`
+  finds no hit outside the `gov:playbook` region; and `grep -c 'cannot have written' AGENTS.md`
+  prints 0.
   Red when: the bullet keeps "a committed build folder the run did not create" unqualified, which is
   false for every run the second anchor authorizes, this build's own prompt-mode run among them; or
-  the Conventions bullet keeps restating it, which the grep finds at BASE's `AGENTS.md:582`.
+  the Conventions bullet keeps restating it, which the grep finds at BASE's `AGENTS.md:582`; or the
+  `unattended/` entry or the protocol bullet keeps "a committed standing mandate it ASSERTS and
+  cannot have written", which the last grep finds at BASE's `AGENTS.md:38` and `:559`.
 
 ## 7. Gates
 
@@ -348,6 +359,13 @@ an observation made once in the unit pass. The bar runs once, on the landing mer
   Neither. `git log -S'Template **v3.0**'` shows the string set once, at the convergence commit, and
   every later rule change kept it; a high-water bump records growth, and this unit shrinks the file.
   RESOLVED (agent, 2026-09-14, delegated): (b).
+- **F7** — Which authored lines stop stating the unqualified authorization property? (a) The
+  `AGENTS.md` Conventions bullet only, as rev-2. (b) All three authored `AGENTS.md` lines that state
+  it: the Conventions bullet, the `unattended/` entry under What ships here and the protocol bullet
+  under Two protocols are BINDING. (c) (b) plus the root `README.md:56`. (a) leaves the charter
+  giving both answers, the contradiction design §19.8 gives this unit to remove; (c) edits the root
+  README, which §3 keeps untouched and no unit of this build scopes. RESOLVED (agent, 2026-09-16,
+  delegated): (b); the README line is left to the owner, in the run's parked decisions.
 - The rulings this unit carries out and does not revisit: D1, adopt per-build asks with a derived
   view, and D12-i3, keep local-first for attended landings with an unattended exception, both
   RESOLVED (owner, 2026-09-13).
@@ -366,6 +384,13 @@ an observation made once in the unit pass. The bar runs once, on the landing mer
   L4 (28): AC2 greps the heading note away and AC6 reads the layout line. Byte accounting
   re-measured: the template's net is −45, not −107, and the region's −155; AC9 names the 392-character
   bullet.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G5 M15 (17, 33): S8 reaches the two further authored
+  `AGENTS.md` lines stating the unqualified property, `:38` and `:559` at BASE; §4 edits table and
+  byte accounting; AC11 greps `cannot have written` to 0; §10 records the root `README.md:56` line
+  left to the owner; §8 F7. G5 L6 (34), PLAY end: hands-off DEPL names the `kit:kickoff-manifest`
+  fence; §3 Non-goals. Fold verification: §4 Rollout step 3 edits every authored line S4 and S8
+  name, not two passages; §5 perf restates the saving as about 120 bytes, the byte accounting's
+  64,347 to 64,224.
 
 ## 10. Reuse audit
 
@@ -396,6 +421,10 @@ Where the design and the source disagree at BASE, re-verified here:
   that shape at the charter's convergence into one file.
 - Design §19.8 assigns U6 the stale authorization sentence at `AGENTS.md:129`; D12-a dropped E2 but
   not prompt mode, so the sentence is still false on the second anchor (S8).
+- The same unqualified property sits in two more authored `AGENTS.md` lines outside the region,
+  `:38` and `:559`, which S8 now reaches, and in the root `README.md:56`, which §3 keeps untouched
+  and no unit of this build scopes; that line is recorded as a parked decision rather than edited
+  (§8 F7).
 - The finding that prescribed fencing both halves — the kickoff-manifest exception as well as the
   unattended block — is F2 of
   `memory/builds/aScouredKit/reviews/2026-08-31-review-TOOL-aScouredKit-2-wave3-lens-behaviour.md`

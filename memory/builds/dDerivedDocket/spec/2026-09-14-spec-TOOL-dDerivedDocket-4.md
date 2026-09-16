@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -31,10 +31,12 @@ lists among this unit's closes.
 - **S1** HELD joins `PHASES_CORE` as a non-terminal phase, placed after LANDING. `CORE_FLOOR` in
   gov's `.unattended.conf` and in the kit's conf example moves from `12:12` to `13:12`; the DoD
   half moves later with the asks-disposed unit. Observed by AC9.
-- **S2** A verb `--hold <slug> --code <c> --until <cond> --reason <text>`, with a closed code set
-  plus `HOLD_CODES_EXTRA`, and a closed condition grammar. A required, shrink-only `HOLD_FLOOR`,
-  declared in gov's conf as the core count and in the kit's conf example, is validated by the leg
-  against the driver's `HOLD_CODES_CORE`, as `HALT_FLOOR` is for the halt codes.
+- **S2** A verb
+  `--hold <slug> --code <c> --until <cond> --reason <text> (--reaped <id> | --keepalive-unreachable <node>)`,
+  with a closed code set plus `HOLD_CODES_EXTRA`, and a closed condition grammar. A required,
+  shrink-only `HOLD_FLOOR`, declared in gov's conf as the core count and in the kit's conf example,
+  is validated by the leg against the driver's `HOLD_CODES_CORE`, as `HALT_FLOOR` is for the halt
+  codes.
   `tools/unattended/kit.toml` gains a `hold-floor` hole shaped like `directives-floor`, with its
   discharge probe. Observed by AC1, AC2, AC9, AC11 and AC16.
 - **S3** `--hold` refuses, numbered and before any write, unless: the record is live and not HELD;
@@ -46,29 +48,40 @@ lists among this unit's closes.
   that answers still requires the push, and no other code is excepted. Observed by AC2, AC14 and
   AC15.
 - **S4** The checkpoint is DERIVED by `--status` from the hold facts on every read, never stored as
-  a second copy. Every gate claim in it is a pointer to a run record. Observed by AC3.
-- **S5** `--resume` on a HELD record performs, in order: the condition test; re-verifying
-  authorization at the pinned BASE; naming interrupted acts; taking the lease; reaping the run's own
-  orphans, a seam the process-ledger unit fills; accepting a new `--keepalive-id`; returning to the
-  held-from phase. Every refusal comes before the lease is taken, so a refused resume writes
-  nothing, and an unmet condition prints `still held` and writes nothing. A stale or leaseless
-  working-phase take-over runs the same steps without the condition test. Observed by AC1, AC4, AC6
-  and AC18.
-- **S6** A lease at `<git-common-dir>/unattended/<slug>.lease`, taken at `--preflight` and at a
-  take-over; refreshed by every writing verb, at the start of `run_bounded`, and by a `--resume`
-  passing the lease's own keepalive id, which is how the keepalive tick refreshes it; released by
-  `--hold`; removed at a terminal, and at an in-place `--landed`'s successful observation, which the
-  derived-terminal unit adds. A holder replaces its keepalive with
-  `--resume --keepalive-id <new> --replaces <old>`, which is accepted only when `<old>` is the
-  lease's id. Observed by AC6, AC7, AC17 and AC20.
+  a second copy. Every gate claim in it is a pointer to a run record. Observed by AC3 and AC15.
+- **S5** `--resume` on a HELD record performs, in order:
+  1. the condition test;
+  2. refusing a missing `--keepalive-id`;
+  3. re-verifying authorization at the pinned BASE;
+  4. naming interrupted acts;
+  5. taking the lease, naming that id;
+  6. reaping the run's own orphans, a seam the process-ledger unit fills;
+  7. recording the id in the `keepalive` fact;
+  8. returning to the held-from phase.
+
+  Every refusal comes before the lease is taken, so a refused resume writes nothing. An unmet
+  condition prints `still held` and writes nothing. A missing id prints the `--status` block, then
+  refuses, numbered, naming `--keepalive-id`. A stale or leaseless working-phase take-over runs the
+  same steps without the condition test. Observed by AC1, AC4, AC6, AC18 and AC21.
+- **S6** A lease at `<git-common-dir>/unattended/<slug>.lease`, taken at `--preflight`, at a
+  take-over, and by a leaseless working record's holder resuming with its recorded keepalive;
+  refreshed by every writing verb past its own write gate; at the start of `run_bounded`, only when
+  the lease reads `taken` naming the keepalive its calling verb acts for; and by a `--resume` passing
+  the lease's own keepalive id, which is how the keepalive tick refreshes it; released by `--hold`;
+  removed at a terminal; rewritten as `released <iso> landed` at an in-place `--landed`'s successful
+  observation, with the matrix row that reads it, both of which the derived-terminal unit adds. A
+  holder replaces its keepalive with `--resume --keepalive-id <new> --replaces <old>`, which is
+  accepted only when `<old>` is the lease's id. Observed by AC6, AC7, AC10, AC17, AC20 and AC22.
 - **S7** `presumed-stopped` is derived by `--status` when a working-phase lease is older than the
   bound. It is also derived when a working-phase record has no lease and the newest commit touching
   its build folder is older than the bound. `--resume` then takes the run over. It is announced,
-  never a refusal. Observed by AC7 and AC19.
+  never a refusal. A leaseless record resumed with the id its `keepalive` fact records is its
+  holder's, and takes the lease instead. Observed by AC7, AC19 and AC22.
 - **S8** Two phase readers, `derived_phase` and `recorded_phase`. Every read of the `phase` fact
   outside the phase writers goes through one of them, as the call-site table in §4 classifies it.
   `refuse_if_terminal` takes a `--recorded` mode, and only `--landed` passes it, because that verb's
-  own postcondition is a terminal. Observed by AC8.
+  own postcondition is a terminal. The arm's exemption is the `set_fact <file> phase` line, never the
+  function containing it. Observed by AC8.
 - **S9** HELD blocks `--close`, `--landed` and `--phase`; only `--resume` leaves it, and only
   `--landed` and `--abort` still write a terminal. HELD is PRODUCER-ONLY: `--phase` refuses it as a
   target, numbered and beside its LANDING refusal, because only `--hold` writes the hold facts.
@@ -100,15 +113,16 @@ lists among this unit's closes.
 
 ### Edges
 
-- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" criterion for the unattended suites
-  this unit is allowed to run once at its end.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion for the unattended suites
+  this unit is allowed to run once at its end: `verdict clean`, with every inherited suite filed.
 - **hands-off** `TOOL-dDerivedDocket-3` — `derived_phase()` and the HELD refusals, which the landing
   path's `--close` and Land steps rely on, plus the companion guide the landing text may overflow
   into, including `--hold`'s unpublished-tip exception for `platform-unavailable`.
 - **hands-off** `TOOL-dDerivedDocket-5` — the lease, the hold facts and the resume contract that a
   scheduled resume invokes.
-- **hands-off** `TOOL-dDerivedDocket-22` — `derived_phase()`, inside which the LANDED derivation
-  from the advertised tip goes, and the call-site table that derivation must respect.
+- **hands-off** `TOOL-dDerivedDocket-22` — `derived_phase()`, inside which the LANDED derivation from
+  the advertised tip goes; the call-site table that derivation must respect; and the lease matrix,
+  to which that unit adds the `released <iso> landed` row.
 - **hands-off** `TOOL-dDerivedDocket-27` — the `host-degraded` code and the `probe gate` condition
   that a kill before `acquired` holds with, and the lease's stale-bound formula, whose first term
   that unit moves to the pinned backstop.
@@ -190,13 +204,14 @@ the whole bar.
 
 | Record | Lease | `--resume` |
 |---|---|---|
-| HELD | released, stale or absent | take-over: the steps in S5 |
+| HELD | released, stale or absent | take-over: the steps in S5; with no `--keepalive-id`, prints the `--status` block, then refuses, numbered, naming `--keepalive-id`, and writes nothing |
 | HELD | fresh and taken | refuses, numbered: another session already resumed it |
 | working phase | fresh, taker equals the `--keepalive-id` passed | orientation, as today; refreshes the lease and reaps the run's orphans at the process-ledger unit's seam |
 | working phase | fresh, a different `--keepalive-id` passed | refuses, numbered: a live session drives this slug; unless `--replaces <old>` names the lease's id, which records the new id in the lease and the `keepalive` fact |
 | working phase | fresh, no id passed | prints the `--status` block, then refuses, numbered: a live session drives this slug; a session whose own scheduler lists the lease's keepalive passes it as `--keepalive-id`; writes nothing |
-| working phase | stale | `presumed-stopped`: take-over |
-| working phase | absent | `presumed-stopped` once the newest commit touching the build folder is older than the bound, announced: take-over; inside the bound, refuses, numbered, naming that commit's age |
+| working phase | stale | `presumed-stopped`: take-over; with no `--keepalive-id`, prints the `--status` block, then refuses, numbered, naming `--keepalive-id`, and writes nothing |
+| working phase | absent, and the `--keepalive-id` passed equals the record's `keepalive` fact | orientation that TAKES the lease naming that id, whatever the build folder's age: the holder of a run that predates the lease |
+| working phase | absent, any other id or none | `presumed-stopped` once the newest commit touching the build folder is older than the bound, announced, and taken over, refusing a missing id as the stale row does; inside the bound, prints the `--status` block, then refuses, numbered, naming that commit's age and `--keepalive-id` |
 | terminal | any | unchanged: nothing to resume, and never a re-drive of the lander |
 
 The keepalive id is the identity because the scheduler store is SESSION-scoped: a session can list
@@ -206,13 +221,22 @@ which a second session can be stopped (KF7; design §22.1 records under D12-i9 t
 resume refuse while a live session holds the slug). The refusal prints the `--status` block first,
 so a session regrounding by the build method's no-id spelling still reads its phase and witness. It
 then resumes with its own keepalive id, which it takes from its own scheduler's listing and never
-from the `LEASE` line. Refresh sources: `--preflight` and a take-over TAKE the lease, and every
-writing verb, the start of `run_bounded`, and a `--resume` whose id matches the lease REFRESH it.
-The keepalive tick refreshes it through that last row: the Skill names the tick's first act, once a
-run-state file exists, as `--resume <slug> --keepalive-id <own id>`. The driver cannot observe the
-tick itself. The protocol's resume rule — reap the recorded job, then schedule a replacement — is
-kept, and the take-over now records the replacement id instead of leaving the `keepalive` fact
-naming the old job.
+from the `LEASE` line. Refresh sources: `--preflight`, a take-over, and a leaseless holder's
+orientation TAKE the lease, and every writing verb past its own write gate, the start of
+`run_bounded` under the rule below, and a `--resume` whose id matches the lease REFRESH it.
+
+A refresh is a WRITE, so it obeys the rule every other write obeys. `run_bounded` refreshes a lease
+only when it reads `taken` naming the keepalive the calling verb acts for: that verb's
+`--keepalive-id` when it takes one, else the record's `keepalive` fact. A released, absent or foreign
+lease is never written by `run_bounded`. Preflight's precondition half runs bounded probes such as
+`WIRING_CHECK` before its gate, so a refused preflight cannot renew a lease it does not hold. Every
+refresh rewrites only the `refreshed` line.
+
+The keepalive tick refreshes the lease through the matching-id `--resume` row: the Skill names the
+tick's first act, once a run-state file exists, as `--resume <slug> --keepalive-id <own id>`. The
+driver cannot observe the tick itself. The protocol's resume rule — reap the recorded job, then
+schedule a replacement — is kept, and the take-over now records the replacement id instead of
+leaving the `keepalive` fact naming the old job.
 
 ### Take-over, named acts and authorization
 
@@ -228,8 +252,9 @@ The Skill's Resume section is rewritten; §5's user-docs row names the Skill lin
 "The record cannot be corrected in place… costs more than the stale field does." becomes the
 take-over rule:
 
-> Run `--status <slug>` first. If your own scheduler lists the keepalive its `LEASE` line names, you
-> hold the lease: resume with `--resume <slug> --keepalive-id <that id>` and do not reap it.
+> Run `--status <slug>` first. If your own scheduler lists the keepalive its `LEASE` line names, or,
+> when no `LEASE` line prints, the keepalive the record's `keepalive` fact names, you hold the lease:
+> resume with `--resume <slug> --keepalive-id <that id>` and do not reap it.
 > Otherwise you are taking over: reap the recorded job and read the result back, schedule a new one,
 > then run `--resume <slug> --keepalive-id <new id>`, which records the new id. Replace your own job
 > only through `--resume <slug> --keepalive-id <new> --replaces <old>`.
@@ -249,9 +274,12 @@ covers that job." Its "reap before schedule" measurement is kept.
 
 ```
 held · code <c> · until <cond> · since <iso> · from <phase>
-checkpoint · witness <sha8> · next <unit> · last bar <path of the newest gate-logs record> · parked <n>
+checkpoint · witness <sha8> · next <unit> · last bar <path of the newest gate-logs record> · parked <n>[ · unpushed <sha8>]
 reason · "<hold-reason>"
 ```
+
+The `unpushed` field prints only when the record carries `hold-unpushed`. A take-over over such a
+hold prints the branch push of that tip as its first line, before any other output.
 
 The bar is a PATH and never a verdict word. The reason sits on its own line, quoted, and is never
 parsed. That is the dCarriedReceipt class: a prose reason there stated a gate verdict, and a reader
@@ -269,18 +297,24 @@ LANDED.
 |---|---|---|---|
 | `refuse_if_terminal` | `unattended.sh:1613` | derived; recorded under `--recorded` | KF15; only `--landed` passes `--recorded` |
 | `verb_preflight`, rotation test | `:2568` | derived | KF15 |
-| `verb_preflight`, phase-absent guard | `:2749` | recorded | a writer's own guard: RUNNING goes only into a record with no phase |
+| `verb_preflight`, phase-absent guard | `:2749` | direct, exempt | the read shares the line of the `set_fact … phase RUNNING` it guards |
 | `verb_resume` | `:2883` | derived | KF15 |
 | `verb_status` | `:2795` | derived | KF15, and the derived-terminal unit's S3 |
 | `check_single_live` | `:1283`, `:1324` | derived | the driver's twin of leg check 7's exclusion |
-| `archive_name_of` | `:1604` | recorded | names the archive by what the record says; rotation writes the terminal first |
+| `archive_name_of` | `:1604` | recorded | names the archive by what the bytes it is handed say; the derived-terminal unit's rotation hands it a copy already carrying the terminal, before the write gate |
 | `verb_landed` | `:2270`, `:2282` | recorded | its own postcondition is a terminal; `:2282` reads another worktree's uncommitted copy |
 | `verb_phase` | new in this unit | derived | HELD's exit refusal (S9) |
 
-A WRITER is a function containing a `set_fact <file> phase` site, and the arm derives that set by
-scanning. Outside `derived_phase`, `recorded_phase` and the writers, a direct read of the `phase`
-fact reds, and so does a call to `recorded_phase` from a function the table does not list, and so
-does a table row naming a function that no longer reads the phase.
+The exemption is a LINE, never a function. The arm scans for `set_fact <file> phase` sites, and a
+read that shares a line with one is a writer's own guard and is exempt. Everything else is graded:
+- Outside `derived_phase` and `recorded_phase`, every other direct read of the `phase` fact reds,
+  whatever function contains it. At BASE, `verb_preflight`'s rotation test at `:2568` is such a
+  read, inside a function that also writes the phase.
+- A call to `recorded_phase` reds unless its function's row names recorded.
+- A table row naming a function that no longer reads the phase reds.
+
+Before the arm is wired, its predicate runs over BASE's driver and prints hits and near-misses
+(charter §7). `:2568` must appear as a hit.
 
 `derived_phase <file>` is called as a plain command and never inside `$(...)`, which would lose what
 it sets (the `status-set-in-a-subshell` class). It sets two globals, the effective phase and a
@@ -335,7 +369,7 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   dir. The reason text is stored and printed, never interpreted. No command from a record executes.
 - perf / scale — one small file read per verb; the lease write is one rename.
 - error / empty / loading states — every refusal is numbered and writes nothing; an absent lease
-  reads as released on a HELD record; on a working phase it follows the matrix's absent row; a
+  reads as released on a HELD record; on a working phase it follows the matrix's two absent rows; a
   malformed lease is a numbered refusal naming the file, never a free pass.
 - observability — the checkpoint lines, the `LEASE` line and `presumed-stopped` in `--status`.
 - risks — a stale-lease take-over while the original session is merely slow. The bound's first term
@@ -346,7 +380,9 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
 - testing — `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`
   arms, each staged RED; run once at the unit's end under `--attribute` against BASE.
 - migration — `CORE_FLOOR` moves in gov's conf in the same commit as the phase; adopters move it in
-  their own deployer builds. An existing record carries no hold facts and reads exactly as before.
+  their own deployer builds. An existing record carries no hold facts. A working record in flight
+  when this unit lands has no lease, and its holder's first `--resume` passing the recorded
+  keepalive takes one.
 - user docs — the companion guide, the two protocol rows, the verb carrier entry and the Skill line.
 
 ## 6. Acceptance criteria
@@ -380,11 +416,14 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   Red when: staleness is read from the run-state file's mtime or the last commit time instead of the
   lease, for a record that has one.
 - **AC8** — When `bash tools/unattended/check-unattended.sh` grades a copy of the driver in which
-  `--status` reads the `phase` fact directly, it reds naming that call site. A copy in which
-  `verb_resume` calls `recorded_phase` reds naming the function, and so does a copy whose allow-list
-  names a function that no longer reads the phase.
+  `--status` reads the `phase` fact directly, it reds naming that call site. It also reds naming the
+  site for a copy whose `verb_preflight` rotation test reads the fact directly although that
+  function writes the phase. A copy in which `verb_resume` calls `recorded_phase` reds naming the
+  function, and so does a copy whose allow-list names a function that no longer reads the phase.
   Red when: the structural arm greps a population that excludes the verbs, so it passes on nothing;
-  or the allow-list has no staleness test, so a stale row silently widens it.
+  or the allow-list has no staleness test, so a stale row silently widens it; or the exemption
+  covers a whole writer function, so five of the table's nine rows can read the fact directly and
+  never red.
 - **AC9** — When `HELD` is deleted from `PHASES_CORE` in a fixture copy of the driver,
   `bash tools/unattended/check-unattended.sh` reds on the `CORE_FLOOR` of `13:12`; and when
   `inherited-red` is deleted from `HOLD_CODES_CORE` in a fixture copy, the leg reds on `HOLD_FLOOR`.
@@ -393,21 +432,33 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
 - **AC10** — When `--preflight` runs twice with the same `--keepalive-id` over a working-phase
   fixture record, with the record committed between the two runs, the second run exits 0 and the
   `keepalive` and anchor facts are unchanged. With a different `--keepalive-id` it refuses with a
-  numbered message naming `--resume`, and the `keepalive` fact is unchanged. Over a HELD fixture it
-  refuses naming `--resume`.
+  numbered message naming `--resume`; the `keepalive` fact is unchanged, and so is the lease file,
+  byte for byte, although the fixture conf's `WIRING_CHECK` stub ran through `run_bounded` in
+  preflight's precondition half. Over a HELD fixture whose lease reads `released … held`, it refuses
+  naming `--resume`, and the lease file is byte-unchanged.
   Red when: a re-preflight rewrites the `keepalive` fact, as TOOL-aBranchedMandate-8 records, or a
-  HELD record is re-preflighted.
+  HELD record is re-preflighted; or `run_bounded` refreshes any lease it finds, so a refused
+  preflight renews a dead session's lease and that session's own `--resume` is refused for the whole
+  bound.
 - **AC11** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over
   the rendered tree, `--hold` is declared in the driver, carried by the verb guide, invoked in the
   Skill, and the companion guide renders byte-identical to its template; the Skill's Resume section
   passes `--keepalive-id` on every `--resume` it spells, and its keepalive section names
-  `--resume <slug> --keepalive-id` as the tick's first act.
+  `--resume <slug> --keepalive-id` as the tick's first act. The verb guide's `--hold` entry lists
+  `--reaped` and `--keepalive-unreachable`.
   Red when: the Skill never invokes `--hold`, so no agent following it would ever pause a run; or
   the Skill's Resume step still spells `--resume <slug>` with no id, so every holder is refused and
-  every follower of the Skill takes the refusal for a stop.
-- **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at
-  the unit's end, it reports no NEW failure.
-  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  every follower of the Skill takes the refusal for a stop; or the synopsis omits the keepalive
+  flags, so a route spelled from it is refused at its only ending.
+- **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
+  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
+  its file path in a filed backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it; or the run is
+  read by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or
+  pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
+  filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: D12-i8 lifts the do-not-run instruction for this unit.
 - **AC13** — When `--phase <slug> HELD --witness <sha>` runs on a working-phase fixture, it refuses
@@ -426,28 +477,40 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
 - **AC15** — When `--hold --code platform-unavailable` runs under `ANCHOR_SCOPE=published` on a
   fixture whose `origin` names a missing path, it holds and records `hold-unpushed` naming HEAD. The
   same call with `--code host-degraded` refuses, and with an answering remote and an unpushed tip it
-  refuses naming the push.
+  refuses naming the push. `--status` on that record prints `unpushed` with HEAD's short sha on its
+  `checkpoint ·` line. `--resume --keepalive-id C` taking it over prints the branch push of that tip
+  as its first line.
   Red when: the published-tip clause stays unconditional, so a sustained outage has no clean end;
-  or the exception reaches another code, or a remote that answers.
+  or the exception reaches another code, or a remote that answers; or the checkpoint omits the
+  unpushed tip, so the one signal that held work exists only on this node is hidden.
 - **AC16** — When `--hold` runs with `--code bogus`, and again with `--until 'after tomorrow'`, each
   refuses with a numbered message and writes nothing; a code declared in `HOLD_CODES_EXTRA` is
   accepted.
   Red when: an unvalidated condition reaches the auto-resume unit's fire-instant computation, or a
   pause is recorded under a code outside the effective hold set.
 - **AC17** — When `tools/unattended/unattended.test.sh` runs `--preflight` on a fixture, the lease
-  file reads `taken` with the preflight's keepalive. A following `--phase` advances `refreshed`,
-  `--hold` rewrites the file to `released … held`, and `--abort` removes it.
+  file reads `taken` with the preflight's keepalive. Then, in order:
+  1. `--resume --keepalive-id <that id>` advances `refreshed`, leaves the `taken` line and the
+     run-state file byte-unchanged, and exits 0;
+  2. `--phase` advances `refreshed` again;
+  3. `--hold` rewrites the file to `released … held`;
+  4. `--abort` removes it.
+
+  The first step is staged RED by dropping the refresh from the matching-id row.
   Red when: a verb in that sequence skips its lease write, so a live working-phase record reads as
-  released or `presumed-stopped` to a second session.
+  released or `presumed-stopped` to a second session; or the holder's own orientation does not
+  refresh, so an idle holder's lease goes stale and a second session takes the slug over while its
+  holder is alive.
 - **AC18** — When `--resume` runs on a HELD fixture whose mandate no longer verifies at the pinned
   BASE, it refuses with a numbered message, and the run-state file and the lease file are
   byte-unchanged.
   Red when: the take-over skips `trusted_base` and `check_authorization`, so a revoked mandate keeps
   being driven by unwatched scheduled sessions until `--close`.
-- **AC19** — When `--status` runs over a leaseless BUILDING fixture whose newest build-folder commit
-  is older than the bound, it prints `presumed-stopped` and names that the record had no lease, and
-  `--resume --keepalive-id C` takes it over and records C. With that commit inside the bound,
-  `--resume` refuses with a numbered message naming the age.
+- **AC19** — Take a leaseless BUILDING fixture whose `keepalive` fact names A. When `--status` runs
+  over it with its newest build-folder commit older than the bound, it prints `presumed-stopped` and
+  names that the record had no lease, and `--resume --keepalive-id C` takes it over and records C.
+  With that commit inside the bound, `--resume --keepalive-id C` refuses with a numbered message
+  naming the age.
   Red when: a leaseless working record is taken over with no age test, or never surfaced at all,
   which is the population the backlog row records.
 - **AC20** — When a fixture session holding the lease runs `--resume --keepalive-id B --replaces A`,
@@ -457,13 +520,28 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   Red when: only a take-over records a new id, so after the first in-session replacement the lease
   and the `keepalive` fact name a reaped job, and `--reaped` accepts the stale id while the live one
   keeps firing into the HELD run.
+- **AC21** — When `--resume` with no `--keepalive-id` runs on a HELD fixture whose `hold-until`
+  condition is met, and again on a working-phase fixture whose lease is stale, each prints the
+  `--status` block and refuses with a numbered message naming `--keepalive-id`. The run-state file
+  and the lease file are byte-unchanged.
+  Red when: a take-over row accepts a missing id and writes `taken <iso> keepalive` with a blank id,
+  so the session's own later `--resume --keepalive-id <id>` meets the fresh different-id row,
+  `--replaces` cannot name a blank id, and nobody can drive the slug until the lease goes stale.
+- **AC22** — Take a leaseless BUILDING fixture whose newest build-folder commit is inside the bound
+  and whose `keepalive` fact names A. `--resume --keepalive-id A` exits 0 and the lease file then
+  reads `taken … keepalive A`. The same fixture resumed with `--keepalive-id B` prints the `--status`
+  block and refuses, with a numbered message naming the commit's age and `--keepalive-id`, and the
+  run-state file stays byte-unchanged with no lease file created.
+  Red when: the absent row cannot tell the holder from a second session, so every run in flight when
+  this unit lands stalls for the whole bound and the Resume rule sends its holder down the take-over
+  path to reap its own keepalive.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `playbook validity gate` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `line length` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a HELD fixture record with an unmet `after`, a dirty tree, and a fresh foreign lease · none
-New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading the phase fact outside `derived_phase()`, one with HELD deleted from the core set, and a driver copy whose `verb_phase` accepts HELD · the core phase floor, 12 to 13
+New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading the phase fact outside `derived_phase()`, one whose writer function `verb_preflight` reads it directly at its rotation test, one with HELD deleted from the core set, and a driver copy whose `verb_phase` accepts HELD; the predicate first run over BASE's driver with hits and near-misses printed, `unattended.sh:2568` a live hit · the core phase floor, 12 to 13
 
 ## 8. Open questions
 
@@ -517,6 +595,34 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
 - **F10 — does the hold vocabulary carry a floor?** Options: (a) a required, shrink-only
   `HOLD_FLOOR`; (b) none, with a reason. Every other conf-extendable core set in the kit carries one.
   RESOLVED (agent, 2026-09-14, delegated): (a).
+- **F11 — how does the holder of a run that predates the lease resume?** Options:
+  - (a) a matrix row: a leaseless working record resumed with the id its `keepalive` fact records
+    takes the lease as an orientation, and the Resume rule reads that fact when no `LEASE` line
+    prints;
+  - (b) the holder re-preflights to take the lease;
+  - (c) the holder waits out the bound, like any leaseless record.
+
+  (c) stalls every run in flight at landing for up to 7200 s, this build's own run included. (b) is
+  not what the Skill's Resume rule routes to, so a holder following it still reaps its own keepalive.
+  RESOLVED (agent, 2026-09-16, delegated): (a). The identity is the same session-scoped keepalive id
+  the lease already keys on, and taken from the session's own scheduler, so it widens nothing F3
+  rejected.
+- **F12 — what does a take-over row do without `--keepalive-id`?** Options:
+  - (a) refuse, numbered and before any write, after printing the `--status` block;
+  - (b) take the lease with a blank keepalive, for the first ticking resume to fill in.
+
+  (b) wedges the slug: the fresh different-id row refuses the holder's own next resume, and
+  `--replaces` cannot name a blank id. RESOLVED (agent, 2026-09-16, delegated): (a). It is the
+  fresh no-id row's behaviour, so the parked BUILD-METHOD M7 fallback in `RUN.md` now holds on every
+  row a regrounding resume can reach. Unit 5's scheduled prompt passes the session's own id.
+- **F13 — when does `run_bounded` refresh the lease?** Options:
+  - (a) whenever it starts;
+  - (b) only after the calling verb's own write gate;
+  - (c) only when the lease reads `taken` naming the keepalive the calling verb acts for.
+
+  (a) lets a refused verb's bounded probes renew a dead session's lease. (b) never refreshes during
+  the bar `--close` runs while evaluating its DoD, before its write gate, and that bar is the long
+  silence the refresh source exists for. RESOLVED (agent, 2026-09-16, delegated): (c).
 
 ## 9. Revision log
 
@@ -538,6 +644,25 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   so. `HOLD_FLOOR` is added (F10). AC14 and AC16 to AC18 cover `--hold`'s preconditions, the code
   set, the lease lifecycle, and re-authorization at a take-over. G3 H4: hands-off 16's reason is now
   that unit's report-only claim label.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 M1 (4): the structural arm exempts the `set_fact … phase` line, not the function, and the
+    `:2749` guard row reads direct and exempt (§4 table, S8, AC8, §7).
+  - G1 M2 (5): a leaseless working record resumed with its recorded keepalive takes the lease, and
+    the Resume rule reads that fact (§4 matrix, S6, S7, F11, AC22, §5).
+  - G1 M5 (27): every take-over row refuses a missing `--keepalive-id` before any write (S5, F12,
+    AC21).
+  - G1 M6 (44): `run_bounded` refreshes only a `taken` lease naming the calling verb's keepalive
+    (§4 The lease, S6, F13, AC10).
+  - G1 M7 (13): AC17 observes the matching-id refresh.
+  - G1 L4 (14): the checkpoint carries `unpushed`, and a take-over prints the push first (S4, AC15).
+  - G1 L3 (36): S2's synopsis lists `--reaped` and `--keepalive-unreachable` (AC11).
+  - G1 M3 (6, 29) and B1 (40): S6, the §3 hands-off edge to unit 22 and the `archive_name_of` row
+    agree with unit 22's lease rewrite and rotation order.
+  - G1 H1 (2, 24): AC12 reads `verdict clean`, and the §3 consumes-from edge to unit 1 is updated.
+  - Fold verification, following M2 and M6: AC19's fixture pins its `keepalive` fact to A, and both
+    its resumes pass C, so the new leaseless-holder row cannot read either as the holder. §4 The
+    lease's refresh-sources sentence states S6's write-gate and `run_bounded` conditions, and §5
+    names the matrix's two absent rows.
 
 ## 10. Reuse audit
 

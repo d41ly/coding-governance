@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 12
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,8 @@ audit can count, and refuses to finish while any change is unaccounted.
   confirmation (§4). Observed by AC1, AC9 and AC15.
 - **S2** The classification table in §4 maps every delta entry to records: a new ask row in its id's
   slug folder, a disposition in the `--as` folder, a path repoint of the ask text (ruling D9), a
-  mechanical drop, or NEEDS-HUMAN, under the policy set §4 names for the verb. Observed by AC1, AC2
-  and AC11.
+  mechanical drop, or NEEDS-HUMAN, under the policy set §4 names for the verb. Observed by AC1, AC2,
+  AC11 and AC17.
 - **S3** Provenance (design A4). Every delta entry gets exactly one
   `- RELOCATED · <id> · by <sha> · kept|dropped|amended: <why>` row in the `--as` folder's
   `BACKLOG.md`, where `<sha>` is the change commit unit 9's delta names. After writing, the verb
@@ -51,9 +51,13 @@ audit can count, and refuses to finish while any change is unaccounted.
   checkout for a straggler nobody will revisit, under the straggler set. The LANDING form is admitted
   only when `<ref>` is the default tip resolved as §4 "Straggler inventory" resolves it, that tip's
   `.memory-tree.conf` blob reads shards and HEAD's reads builds; it runs the migration set with
-  `--signed` and `--triage-ask`, and prints the re-derived `ASK_CUTOFF` (§4). Both take the delta of
-  `<ref>` against HEAD with no merge commit, through unit 9's no-merge delta, whether or not a merge
-  of `<ref>` is in progress, and write only per-build files. Observed by AC5 and AC14.
+  `--signed` and `--triage-ask`, and prints the re-derived `ASK_CUTOFF` (§4). Both take unit 9's
+  no-merge delta `delta(ours=<ref>, theirs=HEAD)`, positional as unit 9 S13 binds it, before a merge
+  of `<ref>` or while one is in progress, and write only per-build files. Once HEAD contains `<ref>`,
+  the landing form is admitted only on a concluded merge whose second parent is `<ref>` and whose
+  first parent does not contain it, and then takes `delta(ours=<ref>, theirs=HEAD^1)`; every other
+  containment, and every containment under the straggler form, exits 2 naming the condition and
+  `--repair` (§8 F9). Observed by AC5, AC14 and AC16.
 - **S7** `--repair <merge-sha> --as <slug>`, run from any builds-mode checkout for a transition that
   hygiene check 25 reports. It plans only the entries not already accounted at `HEAD`, so a second
   run plans nothing. Observed by AC4.
@@ -63,7 +67,9 @@ audit can count, and refuses to finish while any change is unaccounted.
   line with refs examined, and exits 1 as a DEAD PROBE on zero refs or a shallow repository.
   Observed by AC6.
 - **S9** `--dry-run` on the three writing verbs prints the plan and the conservation table, touches
-  neither the worktree nor the index, and exits 0 only when the plan would write. Observed by AC7.
+  neither the worktree nor the index, and exits 0 only when the plan would write; on the landing form
+  of `--ingest` it also prints the `ASK_CUTOFF=<date>` line a write would print. Observed by AC7 and
+  AC14.
 - **S10** `--recipe` prints the relocation recipe of design §18r.4 from the one constant unit 7 keeps
   in `backlog.py`, holding no copy of its own. The kit selftest compares that output with the recipe
   block in the view header the generator renders and in the row driver's shard-into-view banner,
@@ -121,10 +127,14 @@ audit can count, and refuses to finish while any change is unaccounted.
   on a pre-flip BASE to park with, because a run never relocates (design A10).
 - **hands-off** `TOOL-dDerivedDocket-34` — the engine's two policy sets (§4): the migration set
   `--write` drives, its `--signed` adjudication input and its `--triage-ask` value for holds naming no
-  id; the landing form of `--ingest` (S6), which the landing reconcile runs; `--stragglers` for the
-  inventory before the write; and `--dry-run` for the reconcile rehearsal.
+  id, with a hold on an ask the plan itself files kept verbatim (P3); the landing form of `--ingest`
+  (S6), which the landing reconcile runs, taking `delta(ours=<tip>, theirs=HEAD)` before or during the
+  reconcile merge and the merge's first parent in place of HEAD once it is concluded (§8 F9), and
+  replacing the switch-over's own unedited record where the tip flips its target (§8 F10);
+  `--stragglers` for the inventory before the write; and `--dry-run` for the reconcile rehearsal,
+  which prints the cutoff line (S9).
 - **hands-off** `DEPL-dDerivedDocket-1` — `--stragglers` and `--recipe`, which the adopter runbook's
-  migrate steps name.
+  steps name, and the landing form of `--ingest` (S6), which its landing step names.
 
 ## 4. Design
 
@@ -148,10 +158,11 @@ engine (S13):
 - **P2, provenance.** Written by every verb except `--write`, because a linear switch-over is no
   transition.
 - **P3, unnamed hold.** Two values: `needs-human` under the straggler set, and `hold-on <id>` under
-  the migration set, the id supplied by `--triage-ask <id>`. A hold names an id when its target is a
-  filed ask or a spec H1 at the target tree, and under `--write` every census id counts as filed —
-  unit 11 S7's test, adopted verbatim; a shorthand such as `-4`, a decision id, or anything else
-  names none.
+  the migration set, the id supplied by `--triage-ask <id>`. A hold names an id when its target is an
+  ask the target tree files, an ask the plan itself writes a row for, or a spec H1 at the target
+  tree. That is unit 11 S7's census semantics: under `--write` the plan writes a row for every census
+  id, so every census id counts, and a delta that files ask X and a hold on X keeps that hold in every
+  form. A shorthand such as `-4`, a decision id, or anything else names none.
 - **P4, signed adjudication, migration set only.** The signed same-id record sets `unit` on each new
   ask row it signs `unit`. The signed triage record's verdict is written for every id it lists that
   the target tree does not already dispose in any file; an id already disposed plans nothing, which
@@ -175,12 +186,12 @@ conf.
 | `--relocate --from <ref>` | straggler | S5 confirmation |
 | `--repair` | straggler | S5 confirmation |
 | `--ingest`, straggler form | straggler | S5 confirmation |
-| `--ingest`, landing form | migration | S5 confirmation; `--signed` and `--triage-ask` admitted |
+| `--ingest`, landing form, before or during the merge of the tip, or on a concluded merge whose second parent is the tip | migration | S5 confirmation; `--signed` and `--triage-ask` admitted |
 | `--write` | migration | no provenance; the signed records as its adjudication |
 
 One selftest arm per row: AC1 runs the three `--relocate` side resolutions, AC15 the `--from` form's
-confirmation, AC3 `--repair` and the straggler-form `--ingest`, AC14 the landing form, and AC12 and
-AC13 the migration set `--write` drives, whose own `--write` fixtures are unit 34's.
+confirmation, AC3 `--repair` and the straggler-form `--ingest`, AC14 and AC16 the landing form, and
+AC12 and AC13 the migration set `--write` drives, whose own `--write` fixtures are unit 34's.
 
 ### Classification
 
@@ -188,9 +199,9 @@ AC13 the migration set `--write` drives, whose own `--write` fixtures are unit 3
 |---|---|---|
 | new id, legacy token OPEN | ask row in `builds/<slug(id)>/BACKLOG.md` | `kept: new ask` |
 | new id with a terminal or held token | ask row, plus the disposition the flip rows below give | `kept: new ask` |
-| flip to CLOSED | `- CLOSED · <id> · by <change sha> · …` in the `--as` file | `kept: flip to CLOSED` |
+| flip to CLOSED | `- CLOSED · <id> · by <change sha> · …` in the P1 home: the `--as` file under the straggler set, the ask owner's file under the migration set | `kept: flip to CLOSED` |
 | flip to WONTDO or WITHDRAWN | `- WONTDO · <id> · <the row's own reason, or "withdrawn">` | `kept: flip to WONTDO` |
-| flip to BLOCKED or DEFERRED naming an id (it names an id when the target is a filed ask or a spec H1 at the target tree; under `--write` every census id counts as filed; unit 11 S7's test) | `- BLOCKED · <id> · on <X>` or `- DEFERRED · <id> · until <X>` | `kept: hold` |
+| flip to BLOCKED or DEFERRED naming an id (it names an id when the target is an ask the target tree files, an ask this plan writes a row for, or a spec H1 at the target tree: P3, unit 11 S7's census semantics) | `- BLOCKED · <id> · on <X>` or `- DEFERRED · <id> · until <X>` | `kept: hold` |
 | flip between live tokens | none; the status is derived now | `kept: live flip, derived` |
 | text change confined to path tokens | the ask text in its home file repointed (D9) | `amended: path repoint` |
 | any other text change; a flip to a live token from a terminal one | NEEDS-HUMAN | via `--drop` only |
@@ -202,9 +213,13 @@ AC13 the migration set `--write` drives, whose own `--write` fixtures are unit 3
 id, taken from the commit list the delta walk already read. The ask body is the legacy body minus
 the status slot, joined onto one physical line where the parser declared a wrap.
 
-A planned disposition for a target the `--as` file already disposes is NEEDS-HUMAN, because one
-file carries one disposition per target. An entry already accounted at the target tree plans
-nothing, which is what makes every verb idempotent.
+A planned disposition for a target that its P1 home file already disposes is NEEDS-HUMAN, because
+one file carries one status row per target (unit 6 V4). One exception, in the landing form of
+`--ingest` only: when the existing status row equals, byte for byte, the record the migration set
+writes from the id's row version at every merge base the delta names — the switch-over's own
+transfer, unedited since — the planned record REPLACES it, and the table lists the replacement. The
+migration wrote that row, and a writer changes its mind by editing its own row (§8 F10). An entry
+already accounted at the target tree plans nothing, which is what makes every verb idempotent.
 
 ### Confirmation, and which forms it binds
 
@@ -236,9 +251,14 @@ The default tip is resolved as `.githooks/pre-push:91-110` resolves it: the obse
 wins and `GOV_DEFAULT_BRANCH` only cross-checks it, because the recall hit `TOOL-aStandingWrit-5`
 records an environment value that disabled a guard by naming the branch already checked out.
 
-Candidates come from ONE walk, `git log --source` over the selected refs excluding the default
-tip's history and limited to the backlog and archive paths, so a ref with no such commit costs no
-delta at all. Each candidate ref then gets its delta against the default tip. An entry held by the
+Candidates come from two processes, whatever the ref count: one `git log --format=%H` over the
+selected refs, excluding the default tip's history and limited to the backlog and archive paths,
+names the flagged commits, and one `git rev-list --parents` over the same refs gives the graph. A ref
+is a candidate when its tip reaches a flagged commit in that graph, computed in memory, so a ref with
+no such commit costs no delta at all, and two refs sharing a straggler's commits are both candidates.
+`git log --source` is not used: it labels each commit with only the first ref that reached it, so a
+pushed copy or a fork of a straggler would never be listed (§8 F11). Each candidate ref then gets its
+delta against the default tip. An entry held by the
 default tip's history (design A6) or accounted by a `RELOCATED` row at that tip does not count; that
 is CONTENT, not ancestry, so an ingested but unmerged ref stops being listed once the records land.
 Before the flip nothing is accounted, so the listing is design §9 step 1's drain inventory.
@@ -280,11 +300,17 @@ line for the new modes, if unit 11 created one.
   unit 9's pinned dereference. The landing form's owner-folder writes are reachable only while the
   default tip is in shards mode, which after a switch-over lands is never, so the migration's
   cross-folder write stays bounded to the switch-over and its landing.
-- perf / scale — one delta walk per verb; `--stragglers` pays one narrowing walk for every ref and a
-  delta only per candidate ref, and `--local` bounds the session-start call to local branches.
+- perf / scale — one delta walk per verb; `--stragglers` pays one narrowing walk and one parent graph
+  for every ref together and a delta only per candidate ref, and `--local` bounds the session-start
+  call to local branches.
 - error / empty / loading states — refusal with nothing written on NEEDS-HUMAN or CONFIRM; exit 2
-  with the recipe on a shards-mode target, a missing merge and no `--from`, a malformed `--as`, or a
-  shallow repository; DEAD PROBE on zero refs.
+  with the recipe where a straggler-set verb meets shards mode: `--relocate` when the other side's
+  `.memory-tree.conf` blob reads shards, and `--repair` or the straggler form of `--ingest` when
+  HEAD's does (AC9); exit 2 on a missing merge and no `--from`, a malformed `--as`, a shallow
+  repository, or a landing form whose admission fails (S6, AC14, AC16); DEAD PROBE on zero refs. The
+  migration set carries no mode guard of its own: `--write` runs over the pre-flip tree whose conf
+  still reads shards, and the landing form requires a shards-mode default tip under a builds-mode
+  HEAD.
 - observability — the conservation table on every verb: id, kind, classification, records, file,
   and the status before and after.
 - risks — a text change on a continuation line of a wrapped legacy row is invisible to anchor keying
@@ -293,8 +319,9 @@ line for the new modes, if unit 11 created one.
   confirmation is demanded (§4).
 - testing — S12's arms, each staged RED with its fix unstaged; the selftest is a held kit leg, so the
   landing bar owes `GATE_FULL=1 GATE_SELFTESTS=1`.
-- migration — none of its own; the modes are inert until the default branch is in builds mode, and
-  `--stragglers` is read-only in both modes.
+- migration — none of its own. The straggler set is inert until the default branch is in builds
+  mode; the migration set runs before that, `--write` over the pre-flip tree and the landing form
+  over a shards-mode default tip; `--stragglers` is read-only in both modes.
 - user docs — the module header and the recipe; the memory-tree README section is unit 36's.
 
 ## 6. Acceptance criteria
@@ -333,9 +360,12 @@ line for the new modes, if unit 11 created one.
   Red when: the inventory judges by ancestry, so an ingested ref is listed until someone merges it.
 - **AC6** — When `migrate_backlog.py --stragglers` runs over a fixture holding a local straggler, a
   remote-tracking straggler and a clean ref, it prints `examined 3` and lists two; with `--local` it
-  lists one; with no ref, and in a `git clone --depth 1`, it exits 1 as a DEAD PROBE.
+  lists one; over a second fixture holding a local straggler, a second local branch at the same tip
+  and a third branch forked from it with no backlog commit of its own, it lists all three; with no
+  ref, and in a `git clone --depth 1`, it exits 1 as a DEAD PROBE.
   Red when: the default walk skips `refs/remotes`, so a pushed straggler on another node reads as
-  none.
+  none; or candidates come from one ref label per commit, so the second and third branches are never
+  listed.
 - **AC7** — When any writing verb runs with `--dry-run`, it prints the plan and the table and
   `git status --porcelain` is unchanged, including no new filing-home folder.
   Red when: the restore of S11 runs under `--dry-run` and stages view paths.
@@ -345,7 +375,10 @@ line for the new modes, if unit 11 created one.
   Red when: one carrier drifts by a byte and no arm reds.
 - **AC9** — When `--relocate` runs where the other side's `.memory-tree.conf` blob is in shards mode,
   or with no `MERGE_HEAD`, no merge `HEAD` and no `--from`, it exits 2 naming the missing condition
-  and prints the recipe; an `--as` value outside the slug shape exits 2.
+  and prints the recipe; `migrate_backlog.py --repair <merge-sha> --as <slug>` run from a checkout
+  whose `.memory-tree.conf` reads shards exits 2 naming HEAD's mode, and so does
+  `migrate_backlog.py --ingest <ref> --as <slug>` from that checkout, which is the straggler form
+  because the landing form needs a builds-mode HEAD; an `--as` value outside the slug shape exits 2.
   Red when: the verb writes `BACKLOG.md` files into a shards-mode tree, which the mode guard then
   reds as a half-migration.
 - **AC10** — When `migrate_backlog.py --selftest` runs, it prints its
@@ -360,40 +393,83 @@ line for the new modes, if unit 11 created one.
   accounts the flip once and removes the archive path the default side does not carry.
   Red when: the archive stays tracked, which the tracked-archive verdict reds after the flip (D8).
 - **AC12** — When the selftest runs the engine over one fixture corpus holding a DEFERRED row naming
-  nothing and a BLOCKED row naming an EXMP decision id, once under the straggler set and once under
-  the migration set with `--triage-ask EXMP-aFoo-9`, the straggler run plans NEEDS-HUMAN for both and
-  writes nothing, and the migration run writes `- DEFERRED · <id> · until EXMP-aFoo-9` and
-  `- BLOCKED · <id> · on EXMP-aFoo-9` in the ask owners' folders.
+  nothing, a BLOCKED row naming an EXMP decision id, and a new ask `EXMP-aFoo-3` BLOCKED on
+  `EXMP-aFoo-2`, an ask new in the same corpus, once under the straggler set with a builds-mode HEAD
+  and once under the migration set with a shards-mode HEAD and `--triage-ask EXMP-aFoo-9`, the
+  straggler run plans NEEDS-HUMAN for the first two, plans the third's ask row with
+  `- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-2` and never NEEDS-HUMAN, and writes nothing, because the
+  plan holds a NEEDS-HUMAN entry; and the migration run writes `- DEFERRED · <id> · until EXMP-aFoo-9`,
+  `- BLOCKED · <id> · on EXMP-aFoo-9` and `- BLOCKED · EXMP-aFoo-3 · on EXMP-aFoo-2` in the ask
+  owners' folders.
   Red when: the names-an-id test is dropped from the classification table, so the decision-id hold
-  is written verbatim and reds V6.
+  is written verbatim and reds V6; or the test reads only asks the target tree already files, so the
+  hold on an ask the same delta files is re-targeted at the triage ask under the migration set and
+  parks under the straggler set.
   fixture: the same corpus unit 11 AC5 reads, so the planner and the engine cannot drift on it.
-- **AC13** — When the selftest runs the migration set over a fixture holding one legacy CLOSED row
+- **AC13** — When the selftest runs the migration set over a fixture whose HEAD `.memory-tree.conf`
+  reads shards, as `--write` meets it before the flip, holding one legacy CLOSED row
   and a signed triage record listing one OPEN ask on a finished build and one ask already disposed at
   the target, the CLOSED disposition lands in its owner's folder, the triage verdict in the `--as`
   folder, and the already-disposed id plans nothing.
   Red when: the triage verdict is written in the ask owner's folder, the one-writer breach unit 33
-  §8 F4 rejected.
+  §8 F4 rejected; or a mode guard refuses the migration set over that shards-mode HEAD, so `--write`
+  cannot migrate the tree it exists for.
 - **AC14** — When the selftest stages the landing shape — a builds-mode HEAD and a shards-mode default
-  tip carrying one new ask on a finished build, one flip to CLOSED and one text amendment —
-  `--ingest <tip> --as <slug> --signed <fixture records> --dry-run` lists the new ask, the flip under
-  CONFIRM and the amendment under NEEDS-HUMAN and writes nothing. With the amendment removed and
-  `--confirm <flip id>`, it writes the ask in its slug folder, the flip in its owner's folder, the
-  triage verdict and one `RELOCATED` row per entry in the `--as` folder, and prints `ASK_CUTOFF=` the
-  day after the new ask's `filed`. The same command with a builds-mode tip, or with `--signed` on the
-  straggler form, exits 2 naming the form.
+  tip carrying one new ask on a finished build, a second new ask BLOCKED on the first, one flip to
+  CLOSED and one text amendment — `--ingest <tip> --as <slug> --signed <fixture records> --dry-run`
+  lists the two new asks, the flip under CONFIRM and the amendment under NEEDS-HUMAN, prints the
+  `ASK_CUTOFF=` line, exits 1 and writes nothing. With the amendment removed and
+  `--confirm <flip id>`, it writes both asks in their slug folders, the hold on the first ask verbatim
+  and the flip in their owners' folders, the triage verdict and one `RELOCATED` row per entry in the
+  `--as` folder, and prints `ASK_CUTOFF=` the day after the newer ask's `filed`; with HEAD's
+  `.memory-tree.conf` carrying an `ASK_CUTOFF` later than that day, it prints that current value
+  unchanged. The same command with a builds-mode tip, or with `--signed` on the straggler form, exits
+  2 naming the form.
   Red when: the reconcile's command is `--relocate`, whose side resolution reads HEAD as the
-  straggler and exits 2 on the shards-mode other side (AC9).
+  straggler and exits 2 on the shards-mode other side (AC9); or the cutoff printed is always the day
+  after the newest `filed`, so a landing lowers the cutoff and V9 and V12 fire on migrated asks, which
+  only the later-cutoff case can see.
+  fixture: the new asks' `filed` days and HEAD's cutoff are distinct days, so a wrong source cannot
+  coincide with the right one.
 - **AC15** — When a fixture HEAD carries a REOPEN for an id that `<ref>` closed,
   `migrate_backlog.py --relocate --from <ref> --as <slug>` exits 1 naming the id, its status before
   and after, and `--confirm`; with `--confirm <id>` it writes.
   Red when: the `--from` form writes CLOSED over the reopen unconfirmed, which is lab case e09b
   through a sibling write path.
+- **AC16** — When the selftest stages AC14's landing shape with the amendment removed, merges the tip
+  into HEAD and concludes that merge with `git commit` before ingesting,
+  `migrate_backlog.py --ingest <tip> --as <slug> --signed <fixture records> --confirm <flip id>`
+  writes records byte-identical to AC14's write before any merge; run instead inside
+  `git merge --no-ff --no-commit <tip>`, before that merge is committed, the same command writes the
+  same bytes; with one more commit on top of the concluded merge, or with HEAD a merge whose FIRST
+  parent is the tip, the same command exits 2 naming the condition and `--repair`; and the straggler
+  form over a HEAD that contains its ref exits 2 the same way.
+  Red when: the form keeps `theirs=HEAD` after the merge is concluded, so the merge base is the tip
+  itself, the plan is empty and the command exits 0 writing nothing, which only the byte comparison
+  with AC14 can see; or the call binds `ours=HEAD`, so every id the switch-over turned into a view
+  reads REMOVED and parks as NEEDS-HUMAN; or the in-progress merge, the state unit 34's landing
+  reconcile ingests in, is refused or read as a concluded one, so the routine landing stops at that
+  reconcile's ingest step.
+  fixture: AC14's; in both merge states a conflicted view path takes HEAD's side before the ingest,
+  as unit 34's reconcile step 1 does, and the merge is concluded with no hooks wired, so no
+  commit-time audit intervenes.
+- **AC17** — When the selftest stages the landing shape with a HEAD whose owner's folder carries
+  `- BLOCKED · EXMP-aFoo-4 · on EXMP-aFoo-9`, the record the migration set writes for that id's
+  merge-base row naming no id, and a tip that flips `EXMP-aFoo-4` to CLOSED,
+  `migrate_backlog.py --ingest <tip> --as <slug> --signed <fixture records> --triage-ask EXMP-aFoo-9 --confirm EXMP-aFoo-4`
+  replaces that hold with `- CLOSED · EXMP-aFoo-4 · by <change sha>` in the same file, leaving one
+  status row for the id, and `gen_build_index.py --check` names no V4; with that hold's text edited
+  so it no longer equals the migration's record, the same command exits 1 listing the id under
+  NEEDS-HUMAN and writes nothing.
+  Red when: the collision rule reads only the `--as` file, so the CLOSED lands beside the hold and V4
+  reds at the reconcile's `--check`; or the replacement reaches a row the receiving branch edited and
+  overwrites its wording, lab case e09b's class.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `testsuite counts (every bar self-test prints one)` · `codebase-map coverage + freshness` · `build-index selftest` · `row-keyed merge driver replay`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, `--dry-run`, the recipe parity, every row of §4's entry-path table, the two policy sets over one shared hold fixture, the per-class disposition home · the selftest's assertion floor
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, two refs at one straggler tip and a fork, `--dry-run`, the recipe parity, every row of §4's entry-path table, the landing form's in-progress and concluded-merge states and its refusals, the straggler form of `--ingest` from a shards-mode HEAD, the two policy sets over one shared hold fixture, the per-class disposition home, the landing form's replacement of the migration's own record and its NEEDS-HUMAN twin · the selftest's assertion floor
 
 ## 8. Open questions
 
@@ -425,8 +501,9 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
 - **F7 — which verb carries the switch-over's landing reconcile?** Options: (a) a new mode for an
   in-progress merge whose MERGE_HEAD is the shards side; (b) `--ingest <tip>` before the merge, as
   its own commit; (c) a landing form of `--ingest`, admitted only for a shards-mode default tip under
-  a builds-mode HEAD, run during or after the landing merge. (a) is a mode the ratified design does
-  not name (M3 veto 2, as unit 33 §8 F1 reads it); (b) races the tip between two commits. RESOLVED
+  a builds-mode HEAD, run during or after the landing merge, with after bounded by F9. (a) is a mode
+  the ratified design does not name (M3 veto 2, as unit 33 §8 F1 reads it); (b) races the tip
+  between two commits. RESOLVED
   (agent, 2026-09-14, delegated): (c); S5's per-id confirmation is unchanged, and unit 34 §4 states
   which ids its caller confirms.
 - **F8 — does `--relocate --from <ref>` take S5's confirmation?** Options: (a) no, like the
@@ -434,6 +511,30 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   `--ingest` without its gate; (c) removes the form for a branch that no longer carries its merge.
   RESOLVED (agent, 2026-09-14, delegated): (b); the recipe's one-command line is the MERGE_HEAD form,
   which stays unconfirmed.
+- **F9 — which states admit `--ingest` once a merge of `<ref>` is concluded?** Options: (a) none;
+  refuse by name whenever HEAD contains `<ref>`; (b) the landing form only, on a concluded merge whose
+  second parent is `<ref>` and whose first parent does not contain it, taking
+  `delta(ours=<ref>, theirs=HEAD^1)`, with every other containment refused by name naming `--repair`.
+  (a) stops a landing whose reconcile merge was clean, because a clean merge concludes itself before
+  the ingest step runs, and leaves a conflicted one concluded early no migration-set path, since
+  `--repair` runs the straggler set. The straggler form takes no post-merge state because `--repair`
+  (S7) already covers a concluded straggler merge. RESOLVED (agent, 2026-09-16, delegated): (b); the
+  pre-merge and in-progress states keep `theirs=HEAD`, and the unit-9 binding is positional in every
+  consumer spec.
+- **F10 — what does a planned disposition do when its P1 home already disposes the target?**
+  Options: (a) NEEDS-HUMAN in every case; (b) in the landing form, REPLACE an existing status row
+  that equals the migration set's own record for the id's merge-base row, and keep NEEDS-HUMAN for
+  any other; (c) replace any existing row. (a) parks the landing whenever main flips an id the
+  switch-over held, and its only exit, `--drop`, loses the flip; (c) overwrites a receiving-side
+  act, lab case e09b's class. RESOLVED (agent, 2026-09-16, delegated): (b); the migration wrote the
+  replaced row, a writer changes its mind by editing its own row (unit 6 §4), and the write stays
+  inside the landing form's bound (§5 security). Unit 34 §4 names the replacement in its confirmation
+  paragraph.
+- **F11 — how are candidate refs found?** Options: (a) one `git log --source` walk, as rev-2; (b) the
+  flagged commits, then `git for-each-ref --contains` per commit; (c) the flagged commits and one
+  parent graph over the selected refs, with reachability computed in memory. (a) labels each commit
+  with one ref, so a pushed copy or a fork of a straggler is never a candidate; (b) spends a process
+  per flagged commit. RESOLVED (agent, 2026-09-16, delegated): (c).
 
 ## 9. Revision log
 
@@ -457,6 +558,24 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   S12 and §7's arm line name every entry path and both policy sets. G2 H1's unit-12 end:
   consumes-from 9 names `delta(ours, theirs)` and `accounted(entries, tip)`, which unit 9 S13 now
   carries, closing the rev-1 line's cross-read note.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 M1 (2, 28, 44): §4 P3 and the classification hold
+  row count an ask the plan itself writes as filed, unit 11 S7's census semantics; AC12 and AC14
+  stage a hold on an ask new in the same delta. G2 M2 (20, 13): S6 binds `delta(ours=<ref>, theirs=HEAD)`
+  positionally and admits a concluded reconcile merge whose second parent is `<ref>`, refusing every
+  other containment; §4 entry-path row, hands-off 34, new AC16, §8 F7 and new F9. G2 M3 (18): §5's
+  error and migration lines scope the shards-mode refusal to the straggler set; AC9 stages `--repair`
+  from a shards-mode checkout; AC12 and AC13 pin their HEAD modes. G2 M4 (19): §4's CLOSED row and
+  collision rule read the P1 home, the landing form replaces the switch-over's own unedited record;
+  S2, new AC17, §8 F10. G2 L1 (12): S9's landing dry run prints the cutoff; AC14 stages a later
+  current cutoff and the dry run's exit 1. G2 L2 (43): §4 "Straggler inventory" finds candidates by
+  reachability over one parent graph, and §5 perf counts that graph; AC6's second fixture, §8 F11.
+  §7's arm line names the new cases. G5 M17 (58), unit-12 end: hands-off DEPL names the landing form
+  of `--ingest` the runbook's landing step follows. Fold verification: §5's error line cited AC9 for
+  the straggler form of `--ingest` on a shards-mode HEAD, which AC9 did not stage, so AC9 now runs
+  it; S6 admits the in-progress merge, the state unit 34's reconcile ingests in under
+  `git merge --no-ff --no-commit <tip>`, and no criterion staged it, so AC16 runs the landing form
+  inside that merge and its fixture line resolves a conflicted view to HEAD's side; §7's arm line
+  names both; two over-long lines rewrapped.
 
 ## 10. Reuse audit
 

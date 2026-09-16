@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling+kickoff · order 34
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling+kickoff · order 34
 
 <!-- gen:spec-records -->
 
@@ -36,7 +36,7 @@ necessary, so no gate reads a half-switched tree.
   signed triage dispositions. After the conservation proof passes, and only then, it removes the
   authored shard files from the worktree and the index, so the first builds-mode render writes the
   views into absent paths (§4 Rollout, §8 F9). Its refusals are §5's, each observed by AC17. Observed
-  by AC1, AC2, AC3, AC16, AC18 and AC19.
+  by AC1, AC2, AC3, AC16, AC18, AC19 and AC26.
 - **S2** Conservation. Every id the planner's census collected has exactly one ask row, and its text
   equals the legacy text apart from the declared normalizations in §4. Observed by AC2.
 - **S3** The family views are rendered by `gen_build_index.py --write` for all four declared
@@ -57,12 +57,13 @@ necessary, so no gate reads a half-switched tree.
   `GENERATED_INDEXES` pairs, one per renderer file. Observed by AC8.
 - **S9** Recall's durable-home pattern admits `builds/<slug>/BACKLOG.md`, the recall cache version
   bumps because extraction changed, and the recall floor is measured before and after the switch.
-  Observed by AC9 and AC23.
+  The memory-recall kit version and its README marker move once here. Observed by AC9, AC23 and
+  AC27.
 - **S10** Drift-audit: `backlog_rows_outliving_closed_specs` and its pin retire; the live-rows signal
   is re-pointed at `gen_build_index.py --asks --json` with its watermark re-measured through
-  `RATCHETS`; the terminal-status tuple reads the derived output; three report-only signals are
-  added, each with a liveness assertion. Under `shards` the live-rows signal keeps reading the
-  authored shards, and the three new signals report not-asked with `gateable: False`, as
+  `RATCHETS`; three report-only signals are added, each with a liveness assertion. Under `shards`
+  the live-rows signal keeps reading the authored shards through `_TERMINAL_STATUSES`, which stays
+  that reading's filter only (§8 F14), and the three new signals report not-asked with `gateable: False`, as
   `signal_closed_specs_untraceable` does; they also report not-asked while no `BACKLOG.md` is
   tracked. One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, records
   that `unit` and `advances` supersede DEPL-dGaugedVintage-13's stance ("COUNTED, NEVER REFUSED"),
@@ -81,9 +82,10 @@ necessary, so no gate reads a half-switched tree.
   repository shaped as the landing and against the current remote tip. The landing merge is a
   transition whenever the tip's lineage carries a shards-mode backlog commit since the fork (unit 9
   S3's predicate), and the rows main gains during the build, with the triage its finished builds now
-  owe, must be carried across it. Observed by AC15 and AC20.
+  owe, must be carried across it. Observed by AC15, AC20, AC24 and AC25.
 - **S16** The per-id status report: after the switch, each id's derived status equals the status the
-  planner's per-id report predicts under the signed tables. Observed by AC3.
+  planner's per-id report predicts under the signed tables. The two writes outside the
+  prediction, S11's disposal and S17's triage ask, are named exceptions. Observed by AC3.
 - **S17** The triage ask. The orchestrator mints `<triage-id>` at this pass (charter §2: a fan-out
   child never mints) and records it in the pass's journal line before `--write` runs. The writer
   files it in this build's `BACKLOG.md` with `filed` set to the commit's day and text naming every
@@ -91,7 +93,7 @@ necessary, so no gate reads a half-switched tree.
   `- KEEP · <triage-id> · awaits the owner's triage of <n> legacy holds that named no id`. Every such
   hold is written on it. It stays live at this build's close, where the KEEP satisfies V10 and unit
   35 S9. Given with zero such holds, the writer files nothing and prints `triage ask: 0 holds`.
-  Observed by AC16.
+  Observed by AC16 and AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -126,27 +128,43 @@ necessary, so no gate reads a half-switched tree.
   view, which is what makes the kept attribute worth keeping.
 - **consumes-from** `TOOL-dDerivedDocket-11` — the census the conservation proof counts against, and
   the per-id report the status proof compares with, and the placeholder `TRIAGE-ASK`, for which
-  S17's id is substituted in AC3; and `--plan` over a worktree of the remote tip, which reconcile
-  step 2 runs (its S1). Added by this spec, not in the brief's edge table.
+  S17's id is substituted in AC3; and `--plan` at the switch-over's parent, which rollout step 5
+  re-runs, and over a worktree of the remote tip, which reconcile step 2 runs (its S1). Added by
+  this spec, not in the brief's edge table.
 - **consumes-from** `TOOL-dDerivedDocket-12` — the delta engine in its migration set (the owner's
   folder for transferred tokens, the `--as` folder for signed triage verdicts, a hold on the
   `--triage-ask` id for a hold naming no id), the provenance row shape, the landing form of
   `--ingest` the reconcile runs, and `--stragglers`.
+- **consumes-from** `TOOL-dDerivedDocket-2` — `push-main.sh --prepare --slug <slug>`, whose conflict
+  refusal names `git merge <remote>/<def>` on the run branch as the reconcile to do first; the
+  landing reconcile's step 1 is that merge, and its step 8 runs `--prepare` over a branch that
+  already contains the tip. Added by this spec, not in the brief's edge table.
+- **consumes-from** `TOOL-dDerivedDocket-3` — the in-place landing sequence of its S6, a reconcile
+  onto the run branch and then `--prepare`, `--close`, `--land` and `--landed`, into which the
+  landing reconcile's steps fit before `--prepare`. Added by this spec, not in the brief's edge
+  table.
 - **consumes-from** `TOOL-dDerivedDocket-15` — verdict V13, which S13 stages on the real tree. Added
   by this spec, not in the brief's edge table.
 - **consumes-from** `TOOL-dDerivedDocket-20` — the two-key refusal AC8 reads; without it AC8 passes by
   absence.
-- **consumes-from** `TOOL-dDerivedDocket-33` — the two signed records, and the signer's landing
-  re-run (its S11), which reconcile step 3 runs over the worksheets step 2 recomputes at the tip.
-- **hands-off** `TOOL-dDerivedDocket-35` — a builds-mode tree to arm the ask-driven path against, and
-  the triage ask with its KEEP, which unit 35 S9's read lists.
+- **consumes-from** `TOOL-dDerivedDocket-33` — the two signed records; the signer's `--tail switch`
+  re-run (its S11) over the worksheets rollout step 5 re-plans, whose records `--write` applies;
+  and the signer's `--tail landing` re-run, which reconcile step 3 runs over the worksheets step 2
+  recomputes at the tip.
+- **hands-off** `TOOL-dDerivedDocket-35` — a builds-mode tree to arm the ask-driven path against;
+  the triage ask with its KEEP, which unit 35 S9's read lists; and every other ask the writer
+  transfers into this build's `BACKLOG.md` as a live ask with no status row, which that read
+  disposes or names.
 - **hands-off** `TOOL-dDerivedDocket-36` — the kit README, agent carriers and backlog dossier that
   describe the switched tree.
 - **hands-off** `PLAY-dDerivedDocket-1` — the charter wording the switched tree contradicts.
-- **hands-off** `DEPL-dDerivedDocket-1` — the adopter runbook's migrate step and added attribute, and
-  the argument shape S1 pins for `--write`, which the runbook's switch step spells.
+- **hands-off** `DEPL-dDerivedDocket-1` — the adopter runbook's migrate step and added attribute;
+  the argument shape S1 pins for `--write`, which the runbook's switch step spells; and the landing
+  reconcile in §4, which the runbook's landing step follows for an adopter whose default branch
+  moved during its switch build.
 - **hands-off** external — the landing reconcile in §4, which runs at the landing, after the closing
-  review and outside any unit pass; its verb is unit 12's landing form of `--ingest`.
+  review and outside any unit pass; its verb is unit 12's landing form of `--ingest`, and it
+  concludes before `--prepare` runs.
 
 ## 4. Design
 
@@ -154,12 +172,12 @@ necessary, so no gate reads a half-switched tree.
 
 | Group | Change | Why it cannot wait for a later commit |
 |---|---|---|
-| records | every `builds/<slug>/BACKLOG.md`, the rendered views, the regenerated README regions; the authored shard bodies removed by the writer before the views are rendered at their paths | the views are check 9's byte-compare subject from this commit |
+| records | every `builds/<slug>/BACKLOG.md`, the rendered views, the regenerated README regions; the authored shard bodies removed by the writer before the views are rendered at their paths; rollout step 5's re-planned census and worksheets and its two `-switch` signed records | the views are check 9's byte-compare subject from this commit |
 | deletions | `memory/archive/TOOL.2026-08-14.md`, `TOOL.2026-08-17.md`, `TOOL.2026-08-17b.md`; the curation-debt row at `memory/project/curation-debt.txt:54` | the archives are second definitions of migrated ids; the debt row would red its stale guard |
 | carriers of the deletion | the archive basenames at `.memory-tree.conf:387`, `tools/memory-tree/.memory-tree.conf.example:201`, `tools/memory-tree/check-memory-hygiene.sh:1057`, `tools/memory-tree/README.md:133`, `tools/memory-tree/row_grammar.py:167` and `:630`, reworded to describe the same-day suffix without naming a deleted file | `tools/check-dead-paths.sh` derives its needles from git and reds any carrier outside `memory/` naming them |
 | conf | `BACKLOG_MODE`, `ASK_CUTOFF`; the two `.unattended.conf` lines at `.unattended.conf:206` and `:207`; the added attribute line beside `.gitattributes:65` | the mode is what every builds-mode verdict keys on |
-| recall | the durable-home alternative beside `tools/memory-recall/extract.py:144`; `CACHE_VERSION` at `tools/memory-recall/query.py:134`; the memory-recall kit version | an old cache would serve anchors from files this commit deletes |
-| drift | the pin at `tools/drift-audit/drift_signals.py:260` and its signal retire; the live-rows watermark at `:288` re-measured; `_TERMINAL_STATUSES` at `tools/drift-audit/drift_report.py:1324` reads the derived output; three new signals; the drift-audit kit version; the DECISIONS row recording the supersession | a retired signal left one commit reports a reassuring zero |
+| recall | the durable-home alternative beside `tools/memory-recall/extract.py:144`; `CACHE_VERSION` at `tools/memory-recall/query.py:134`; `KIT_MEMORY_RECALL_VERSION` and its `gov:kit memory-recall@` README marker, moved once here as the earliest unit to change that kit's shipped bytes | an old cache would serve anchors from files this commit deletes |
+| drift | the pin at `tools/drift-audit/drift_signals.py:260` and its signal retire; the live-rows watermark at `:288` re-measured; `_TERMINAL_STATUSES` at `tools/drift-audit/drift_report.py:1324` stays the shards-mode filter only; three new signals, whose drift-audit bytes ride unit 21 S8's one move of that kit's version; the DECISIONS row recording the supersession | a retired signal left one commit reports a reassuring zero |
 | disposal | WONTDO for `TOOL-aWeighedCompass-3`, superseded by this unit | its split-or-shorten call dissolves with the shard |
 | manifest | the rotation-union trap at `memory/guides/SESSION-KICKOFF.md:200`, the check-8 trap at `:251`, the pointer-map rows at `:114`-`:117` and the governing-docs line at `:67`, then the re-stamp | the manifest's staged leg refuses a watched-file change without a re-stamp, and the re-stamp asserts the claims were re-verified |
 
@@ -229,45 +247,101 @@ and the branch is post-switch, so that merge is a transition whenever the tip's 
 the fork (unit 9 S3). Whenever the tip's shards moved since the branch's merge-base, the row driver
 refuses the shard-into-view merge on each view it touches, by design.
 
+The lander cannot make that merge. `push-main.sh --prepare --slug <slug>` checks the advertised tip
+out detached and merges the branch onto it, so the tip's pre-switch attributes and driver would run
+it, and on any conflict it aborts, restores the branch and refuses, naming `git merge <remote>/<def>`
+on the branch as the reconcile to do first (unit 2 §4 `--prepare` steps 4 to 6, and its S2). The
+reconcile below is that merge, made with the run branch checked out, so the post-switch attributes
+govern it and the view refusal applies (unit 10 S2). Only after it is concluded does `--prepare`
+run, over a branch that already contains the tip. That is the order unit 3 S6 sequences, a
+reconcile onto the run branch and then `--prepare`, before the run's `--close`, `--land` and
+`--landed` (§8 F15).
+
 The reconcile's verb is unit 12's LANDING FORM of `--ingest` (its S6). It is admitted only when
 `<tip>` is the resolved default tip, resolved as that unit's straggler inventory resolves it (the
 observed `origin/HEAD` wins), when that tip's `.memory-tree.conf` blob reads shards, and when HEAD's
-reads builds. It needs no MERGE_HEAD: during a conflicted merge the tip is MERGE_HEAD, and after a
-clean one it is HEAD^2, and every step names it by sha. It takes unit 9's no-merge
-`delta(ours=HEAD, theirs=<tip>)` (its S13), writes only per-build files, runs the migration set and
-prints the re-derived cutoff. The reconcile is then:
+reads builds. It needs no MERGE_HEAD: during the reconcile merge the tip is MERGE_HEAD, once that
+merge is concluded it is HEAD^2, and every step names it by sha. It takes unit 9's no-merge
+`delta(ours=<tip>, theirs=HEAD)` (its S13) during the merge, and the concluded merge's first parent
+in place of HEAD after it (unit 12 §8 F9); any other state in which HEAD contains the tip, a later
+commit on top of the reconcile merge or `--prepare`'s merge whose first parent is the tip among
+them, refuses by name, so the ingest runs before `--prepare`. It writes only per-build files, runs
+the migration set and prints the re-derived cutoff. A hold on an ask the tip files in the build
+window is kept verbatim, because the engine counts an ask its own plan writes as filed (unit 12 §4
+P3), which is also what unit 11's plan over the tip predicts. The reconcile is then:
 
-1. `push-main.sh --prepare` merges the tip in place. When the tip's shards or backlog archives moved
-   since the fork, the row driver refuses on each view and the merge stops conflicted. Take the
-   branch's side of every conflicted view path and every backlog-archive path.
+1. Merge. With the run branch checked out and its tree clean, run
+   `git merge --no-ff --no-commit <tip>`, the reconcile unit 2's refusal names. When the tip's
+   shards or backlog archives moved since the fork, the row driver refuses on each view and the
+   merge stops conflicted: take the branch's side of every conflicted view path and every
+   backlog-archive path, and resolve any other conflicted path as an ordinary merge. Steps 2 to 7
+   run inside this merge whether or not it conflicted.
 2. Plan at the tip. Run `git worktree add --detach <scratch> <tip>`, then run the branch's
    `migrate_backlog.py --plan --record <run-tree>/memory/builds/dDerivedDocket/build --record-as TOOL-dDerivedDocket-34`
-   inside that worktree, then remove the worktree.
-3. Sign. Run the signer's landing re-run (unit 33 S11) over that worksheet pair with its landing
-   tail; its `--check` exits 0.
+   inside that worktree, then remove the worktree. Its records carry the tip's commit day; on the
+   day rollout step 5's re-plan records carry, they replace those worksheets at the same paths,
+   and the switch-over's signed records still name each by blob sha, which the switch-over commit
+   keeps.
+3. Sign. Run the signer's landing re-run (unit 33 S11), `--worksheets <that pair> --tail landing`.
+   It reads each row's text at the tree sha the worksheet records, never in this tree, where step 1
+   replaced the shards with views. Its `--check` exits 0.
 4. Ingest. Run
    `migrate_backlog.py --ingest <tip> --as dDerivedDocket --signed <landing same-id record> <landing triage record> --triage-ask <triage-id>`
-   with `--dry-run`, and confirm per the rule below. Any park condition stops the landing with the
-   recipe; otherwise re-run without `--dry-run`.
+   with `--dry-run`, which exits 1 while any CONFIRM or NEEDS-HUMAN entry stands and prints the
+   cutoff line, and confirm per the rule below. Any park condition stops the landing with the
+   recipe; otherwise re-run without `--dry-run`, passing `--confirm` for each qualifying id.
 5. Write the `ASK_CUTOFF` the ingest printed into `.memory-tree.conf` (§4 "ASK_CUTOFF").
-6. Run `gen_build_index.py --write`, then `--check`, which exits 0 with no V6, V9, V10, V12 or V14.
-   Conclude the merge, or commit the follow-up after a clean merge. Check 25 reads the merge
-   accounted when it is a transition, and prints `transitions examined 0` when the tip's shards did
-   not move.
+6. Re-stamp. When `git diff --name-only HEAD` names a path on the kickoff manifest's `watch:` line,
+   because the cutoff moved or the tip changed a watched file, re-verify the §B claims those files
+   feed, update any the merge made stale, and re-stamp `last-audit` in
+   `memory/guides/SESSION-KICKOFF.md` by the manifest's stamp rule, with a delta line for the merge
+   commit's message. That is the charter's post-merge fresh audit for a merge that brings in
+   watch-touching commits, bundled into the merge commit because the manifest's staged leg refuses
+   a watched change without it. The read covers the working tree as well as the index: step 5 writes
+   `.memory-tree.conf` unstaged, so an index-only read misses the routine landing, where main filed
+   asks and touched no watched file. With no watched path changed, the manifest is not touched.
+7. Run `gen_build_index.py --write`, then `--check`, which exits 0 with no V4, V6, V9, V10, V12 or
+   V14. Stage every path steps 1 to 6 wrote and conclude the merge with `git commit`, whose
+   pre-commit hook runs the manifest's staged leg. Check 25 reads the merge accounted when it is a
+   transition, and prints `transitions examined 0` when the tip's shards did not move.
+8. Prepare. Confirm that `git ls-remote` still advertises the tip step 1 merged, then run
+   `push-main.sh --prepare --slug dDerivedDocket`. It merges clean, because the branch contains the
+   tip, and it prints that tip as the prepared merge's first parent, which `--prepared` then grades
+   (unit 3 S3).
 
-A moved tip is re-reconciled from step 1. Every step is idempotent, because accounted entries and
-already-disposed ids plan nothing.
+A moved tip is re-reconciled from step 1, including a tip that moves before step 8. Every step is
+idempotent, because accounted entries and already-disposed ids plan nothing.
 
 **Confirmation, with design A6 kept rather than relaxed.** Unit 12 S5 is unchanged: every
-status-changing record needs `--confirm <id>`. The reconcile passes `--confirm` for exactly the
-CONFIRM-listed ids that the receiving branch never acted on since the fork, which means two things
-hold for the id. First, its legacy row at the switch-over commit's first parent equals its row at
-the merge-base, so there was no pre-switch branch edit. Second, no line added on the branch after
-the switch-over commit names it. Any other CONFIRM id parks the landing with the recipe, the design
-A10 class, and so does every NEEDS-HUMAN entry: a text amendment, a flip to a live token from a
-terminal one, or a planned record colliding with an existing record for its target in its file.
-This squares with lab case e09b, which overwrote a deliberate act on the RECEIVING side after the
-fact: this rule never confirms an id the receiving side acted on (§8 F7).
+status-changing record needs `--confirm <id>`. Two commits anchor the rule, and both are derived.
+`<switch>` is the switch-over commit: the oldest commit listed by
+`git rev-list --topo-order --reverse HEAD --not <tip>` whose `.memory-tree.conf` reads builds while
+its first parent's reads shards, unit 9's mode boundary. It is not read off HEAD's first-parent
+chain: after step 8 the branch sits at `--prepare`'s merge, whose first parent is a shards-mode tip,
+so that chain would take the prepared merge for the switch-over and empty condition 2's range.
+`<fork>` is `git merge-base <switch> <tip>`, the point the branch forked from, which an earlier
+reconcile merge does not move, where the current merge-base would already be that earlier tip. The
+reconcile passes `--confirm` for exactly the CONFIRM-listed ids the receiving branch never acted on
+since `<fork>`, which means both of these hold for the id:
+
+1. No pre-switch edit. The id's legacy row, as unit 11's legacy parser reads the shard and
+   backlog-archive paths of `git show <fork>:<path>`, equals its row read the same way from
+   `git show <switch>^1:<path>`. An id absent from both reads as equal.
+2. No post-switch act. No record added in `<switch>..HEAD` to a `memory/builds/*/BACKLOG.md`, read
+   through unit 6's parser over the added lines of `git diff <switch> HEAD`, targets the id: an ask
+   row for it, a status row naming it, a REOPEN of it, or a SEV row naming it. A record whose
+   commit also adds a `RELOCATED` row for the id is a landing reconcile's transfer of the tip's own
+   act and does not count. A line that names the id anywhere else, in the acceptance ledger, a
+   rehearsal record, a worksheet, a journal or a spec, is not an act.
+
+Any other CONFIRM id parks the landing with the recipe, the design A10 class, and so does every
+NEEDS-HUMAN entry: a text amendment, a flip to a live token from a terminal one, or a planned record
+colliding with an existing status row for its target in its P1 home file, other than the
+switch-over's own unedited record, which the landing form replaces (unit 12 §4 Classification, §8
+F10). Such a replaced id still needs `--confirm`, and it qualifies by the two conditions above: its
+step-6 record was added AT `<switch>`, which condition 2's range excludes. This squares with lab
+case e09b, which overwrote a deliberate act on the RECEIVING side after the fact: this rule never
+confirms an id the receiving side acted on (§8 F7).
 
 ### Rollout
 
@@ -275,16 +349,26 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
 2. Take the straggler inventory and record it.
 3. Measure the recall floor standalone.
 4. Mint `<triage-id>` and record it in the pass journal (S17).
-5. Run the signer's `--check`, gov's operator step, then
-   `migrate_backlog.py --write --as dDerivedDocket --signed <signed same-id record> <signed triage record> --triage-ask <triage-id>`;
-   the writer re-checks staleness itself (§5), and it removes the authored shard files after its
-   conservation proof, so the render step writes the views into absent paths.
+5. Re-plan, re-sign, then write. At the switch-over's parent, run
+   `migrate_backlog.py --plan --record memory/builds/dDerivedDocket/build --record-as TOOL-dDerivedDocket-34`,
+   with `--design-named` given once for each id unit 11's triage worksheet header records. Run the
+   signer over that pair, `--worksheets <same-id worksheet> <triage worksheet> --tail switch`
+   (unit 33 S11), and its `--check`, gov's operator step. Then run
+   `migrate_backlog.py --write --as dDerivedDocket --signed <switch same-id record> <switch triage record> --triage-ask <triage-id>`.
+   Every pass between unit 11's and this one can move the planner's output: a shard line shifts
+   the triage `source` column, a filed row joins the census, and a pass commit naming an ask moves
+   the `commit-names-ask` basis. `--write` refuses a stale worksheet (§5), so the records it applies
+   are the ones planned at this tree, and a diff of the two triage records against unit 33's shows
+   only the rows whose evidence moved (unit 33 S8; §8 F13). The writer re-checks staleness itself,
+   and it removes the authored shard files after its conservation proof, so the render step writes
+   the views into absent paths.
 6. Apply the conf, attribute, recall, drift, deletion, carrier, disposal and manifest changes.
 7. Render with `gen_build_index.py --write`, then run `--check`.
 8. Confirm the per-id report, the conservation table, the recall floor and `drift_report.py --check`.
 9. Commit, with the pre-commit hook's timeout raised to 600000 ms.
 10. Stage and remove the four breaks.
-11. Rehearse the landing reconcile (AC15 in scratch, AC20 against the live tip).
+11. Rehearse the landing reconcile: AC15, AC24 and AC25 in a scratch repository, and AC20 against
+    the live tip inside a scratch worktree of the run branch, removed afterwards.
 12. Commit the acceptance ledger and the status flip.
 
 ### Inventory
@@ -310,11 +394,12 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
 | `.memory-tree.conf`, `.unattended.conf`, `.gitattributes` | as above |
 | `tools/memory-tree/migrate_backlog.py` | `--write`, and its selftest's `--write` fixtures |
 | `tools/memory-tree/` carriers | five comment or prose lines reworded |
-| `tools/memory-recall/extract.py`, `query.py`, `recall_conf.py` | durable alternative, cache version, kit version |
-| `tools/drift-audit/drift_report.py`, `drift_signals.py` | retire, re-point, add, kit version |
+| `tools/memory-recall/extract.py`, `query.py`, `recall_conf.py`, `README.md` | durable alternative, cache version, kit version and its marker |
+| `tools/drift-audit/drift_report.py`, `drift_signals.py` | retire, re-point, add; no version move, which is unit 21's |
 | `tools/drift-audit/selftest.py` | the shards-mode and dead-probe fixtures AC21 runs |
 | `memory/DECISIONS.md` | one row under the TOOL heading |
 | `memory/builds/*/README.md` | generated regions re-rendered |
+| `memory/builds/dDerivedDocket/build/` | new: the census summary and three worksheets recorded as `TOOL-dDerivedDocket-34`, and the two `-switch` signed records (§4 Rollout step 5) |
 
 ### Alternatives rejected
 
@@ -340,7 +425,8 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
   over that many new files needs the raised hook timeout.
 - error / empty / loading states — the writer refuses when a signed record's header does not name
   the tracked worksheet's current blob sha; when that worksheet's data rows differ from what
-  `--plan`'s own functions compute at this tree; when a header cell `Ask`, `Verdict` or `Field` is
+  `--plan`'s own functions compute at this tree, computed with the `--design-named` ids the
+  worksheet's header records (unit 11 §4); when a header cell `Ask`, `Verdict` or `Field` is
   missing; on an id with no single chosen copy; on any row it cannot parse; when `--triage-ask` is
   missing while a hold names no id, naming those holds; on a `--triage-ask` id whose slug is not
   `--as`'s; and on a `--triage-ask` id equal to a spec H1. Each check is kit-local, so an adopter
@@ -349,8 +435,8 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
   the straggler inventory, the three new signals' examined counts, and the landing triage
   population's size, printed by the rehearsal (AC20).
 - risks — the flip lands through a merge it cannot fully rehearse, because the tip keeps moving. The
-  landing reconcile is rehearsed (AC15 in scratch, AC20 against the live tip), and the entries it
-  cannot classify or confirm park rather than guess. Between this commit and the landing merge,
+  landing reconcile is rehearsed (AC15, AC24 and AC25 in scratch, AC20 against the live tip in a
+  scratch worktree), and the entries it cannot classify or confirm park rather than guess. Between this commit and the landing merge,
   check 25 prints `transitions examined 0` and passes, because the switch-over commit is a mode
   boundary (unit 9 S7); any DEAD PROBE there is a real fault, such as the two conf readers
   disagreeing. No bar runs in that window.
@@ -368,18 +454,24 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
   Red when: a family view is missing or stale against its render, which check 9's byte-compare reds.
   cost: seconds.
 - **AC2** — When the conservation table `migrate_backlog.py --write` prints is read, the number of ask
-  rows equals the planner census's distinct-id count, plus one when the writer filed the triage ask,
+  rows equals the distinct-id count of the census rollout step 5's re-plan filed, plus one when the writer filed the triage ask,
   no id has two ask rows, and every text difference falls in one of the five declared normalizations.
   Red when: a row is dropped because it matched no parser shape, which leaves the count one short
   while every surviving row looks correct.
   figure: DERIVED from the census at flip time; design §9's 592 is the 2026-09-13 measurement and is
   not pinned here.
 - **AC3** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs after the
-  switch, every id's derived status and hold target equal the planner's prediction under the signed
-  tables, with `<triage-id>` substituted for `TRIAGE-ASK`, and the comparison prints zero differing
-  ids.
+  switch, every id's derived status and hold target equal the prediction
+  `migrate_backlog.py --plan --signed <switch same-id record> <switch triage record>` prints at the
+  switch-over's parent, with `<triage-id>` substituted for `TRIAGE-ASK`, and the comparison prints
+  zero differing ids outside two named exceptions, each a write this commit makes outside the
+  predicted set, each printed on its own line: `TOOL-aWeighedCompass-3` compares against WONTDO
+  decided by S11's disposition in this build's `BACKLOG.md`, where the prediction, from which
+  unit 33's rule T1 excluded it, reads its legacy OPEN; and `<triage-id>`, which no prediction row
+  carries, compares against a live OPEN status beside its S17 KEEP row in this build's `BACKLOG.md`.
   Red when: a `unit` marker is written for a pair the signed record says `not-unit`, which closes
-  that ask through its spec and shows as one differing id.
+  that ask through its spec and shows as one differing id; or an exception is taken for any id
+  beyond those two, so a real difference is waved through by hand at the flip's status proof.
 - **AC4** — When `.memory-tree.conf` is read on the switch-over commit it declares
   `BACKLOG_MODE="builds"` and an `ASK_CUTOFF` equal to the day after the latest `filed` date over
   every ask row in the tree, recomputed from the written `BACKLOG.md` rows independently of the
@@ -409,12 +501,13 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
 - **AC9** — When `python3 tools/memory-recall/check-recall.py` runs before and after the switch, the
   `records` floor after is equal or better.
   Red when: the switch loses a backlog-row fixture id's record, which drops the floor.
-  cost: minutes, for the cache rebuild the version bump forces.
+  cost: minutes, for the throwaway extraction `check-recall.py` builds on every run; it never reads
+  the query cache, so AC27 observes the cache bump.
 - **AC10** — When `python tools/drift-audit/drift_report.py --check` runs after the switch, it exits 0,
   prints no `backlog_rows_outliving_closed_specs` line, and prints an examined count above zero for
   each of `backlog_asks_contested`, `backlog_evidence_sha` and `backlog_asks_unlabelled`; the
   live-rows signal's reading equals the count of live asks in `gen_build_index.py --asks --json`,
-  which also shows the terminal-status tuple reading the derived output.
+  read from the projection with no status filter of drift's own.
   Red when: a new signal reads a field the JSON projection does not emit and reports zero examined;
   AC21 stages that zero and observes the DEAD PROBE.
 - **AC11** — When `python tools/memory-tree/gen_build_index.py --asks TOOL-aWeighedCompass-3` runs, it
@@ -437,29 +530,52 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
   `git for-each-ref refs/remotes` lists at least one ref, and the inventory is recorded in this
   unit's journal.
   Red when: only local branches are walked, so a pushed straggler on another node reads as none.
-- **AC15** — When the landing reconcile's six steps run to completion in a scratch repository holding
-  a builds-mode branch (after its own switch-over) and a shards-mode default tip carrying one new ask
-  homed on a finished build and filed after the branch's cutoff, one flip to CLOSED of an untouched
-  id, one flip of an id the branch REOPENed after its switch-over, and one text amendment, the
-  reconcile parks naming the amendment and the REOPENed id with the recipe and writes nothing. With
-  those two removed it completes: `gen_build_index.py --check` exits 0 with no V6, V9, V10, V12 or
-  V14, the flip is a CLOSED disposition in its owner's folder, the new ask carries a signed triage
-  disposition in the `--as` file, `ASK_CUTOFF` is the day after the new ask's `filed`, and check 25
-  reads the merge accounted.
-  Red when: a step is skipped — each is staged skipped in turn — or step 4 names `--relocate`, which
-  exits 2 on the shards-mode tip.
-  cost: minutes. fixture: a scratch repository built in the pass; it writes nothing outside it.
+- **AC15** — When the landing reconcile runs in a scratch repository whose local bare remote's
+  default branch is a shards-mode tip and whose clone holds a builds-mode branch after its own
+  switch-over, `push-main.sh --prepare --slug <scratch-slug>` run first exits 1, leaves the branch
+  at its sha and names `git merge <remote>/<def>`. The tip carries one new ask homed on a finished
+  build and filed after the branch's cutoff, a second new ask BLOCKED on the first, one flip to
+  CLOSED of an untouched id, one flip to CLOSED of an id whose legacy row at the fork was a hold
+  naming no id, one flip of an id the branch REOPENed after its switch-over, one flip of an id whose
+  legacy row the branch edited before its switch-over, one text amendment, and one new ask on a
+  finished build whose row text records a withdrawal, at a `source` line that the branch's view
+  fills with another ask's row. Steps 1 to 4 park naming the amendment, the REOPENed id and the
+  pre-switch-edited id with the recipe, and the ingest writes nothing. With those three removed from
+  the tip, steps 1 to 8 complete: `gen_build_index.py --check` exits 0 with no V4, V6, V9, V10, V12
+  or V14; the untouched flip is a CLOSED disposition in its owner's folder; the hold-origin flip's
+  step-6 hold on the triage ask is replaced by its CLOSED disposition, leaving one status row for
+  that id; the second new ask's hold is written verbatim in its owner's folder, not re-targeted at
+  the triage ask; the withdrawal ask is signed WONTDO under unit 33's rule T4; each new ask deriving
+  OPEN on a finished build carries a signed triage disposition in the `--as` file, which the held
+  second ask, deriving BLOCKED, does not need; `ASK_CUTOFF` is the day after the newest new ask's
+  `filed`; check 25 reads the merge accounted; and step 8's `--prepare --slug <scratch-slug>` exits
+  0 printing the tip as the prepared merge's first parent.
+  Red when: step 1 is `push-main.sh --prepare`, which merges the branch onto the tip and aborts on
+  the very conflict step 1 resolves, so steps 2 to 7 have no merge; or step 4 names `--relocate`,
+  which exits 2 on the shards-mode tip; or a step is skipped — each is staged skipped in turn; or
+  the first confirmation condition is not computed, so the pre-switch-edited id is confirmed over a
+  receiving-side act, lab case e09b's class; or the signer reads the withdrawal row's `source` line
+  in the branch's view, so it signs KEEP or signs from another ask's text.
+  cost: minutes. fixture: a scratch repository with a local bare remote, built in the pass; it
+  writes nothing outside it.
 - **AC16** — When `python tools/memory-tree/gen_build_index.py --asks <triage-id>` runs on the
   switch-over commit, it prints the ask with its KEEP in this build's `BACKLOG.md`,
   `--asks --all --json` shows every legacy hold that named no id held on it, and
   `grep -c TRIAGE-ASK memory/builds/*/BACKLOG.md` prints 0 for every file.
   Red when: the placeholder is written verbatim, which reds V6 and fails AC1.
-- **AC17** — When `migrate_backlog.py --selftest` runs its `--write` fixtures — a signed record whose
-  worksheet was edited after signing, a worksheet stale against a shard that gained a row after
-  planning, two live copies of one id, and one unparseable row — each writes nothing, leaves
-  `git status --porcelain` unchanged and exits non-zero naming its cause.
+- **AC17** — When `migrate_backlog.py --selftest` runs its `--write` fixtures, one per §5 refusal —
+  a signed record whose worksheet was edited after signing; a worksheet stale against a shard that
+  gained a row after planning; a signed record missing its `Ask`, `Verdict` or `Field` header cell;
+  two live copies of one id; one unparseable row; a hold naming no id with `--triage-ask` absent; a
+  `--triage-ask` whose slug is not `--as`'s; and a `--triage-ask` equal to a spec H1 — each writes
+  nothing, leaves `git status --porcelain` unchanged and exits non-zero naming its cause, the
+  missing-`--triage-ask` fixture naming each such hold; and a ninth fixture holding no hold that
+  names no id, given `--triage-ask`, exits 0, files no ask and prints `triage ask: 0 holds`.
   Red when: staleness is judged by the signer's `--check`, a build-folder script an adopter does not
-  have, so an adopter's `--write` applies a stale record.
+  have, so an adopter's `--write` applies a stale record; or a `--triage-ask` refusal is dropped, so
+  a writer that writes an empty `on ` target, files the triage ask in a foreign folder or holds on a
+  spec H1 passes AC16 on gov's corpus, which has holds, and first meets an adopter at its own
+  switch-over commit.
   cost: one kit selftest run; it is held, so it binds at the landing bar under `GATE_SELFTESTS=1`,
   and each arm's RED is observed by hand in the pass.
 - **AC18** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs on the
@@ -474,20 +590,29 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
   written.
   Red when: the writer leaves a shard in place, so the guard reads its 460 id-leading lines and the
   flip's render exits 1 with every view unwritten.
-- **AC20** — When the reconcile's step 4 runs with `--dry-run` against the current remote tip, it
+- **AC20** — When the reconcile's steps 2 to 4 are rehearsed against the current remote tip inside a
+  scratch worktree of the run branch, `git worktree add --detach <scratch> HEAD`, so that step 2's
+  census summary and worksheets and step 3's `-landing` records land there, step 4 with `--dry-run`
   prints a non-zero classified count, each entry as new, flipped, CONFIRM, already present or
   NEEDS-HUMAN, the size of the landing triage population steps 2 and 3 compute, and the
-  `ASK_CUTOFF` it would write.
+  `ASK_CUTOFF` it would write; after the scratch worktree is removed, `git status --porcelain` in the
+  run tree is unchanged, and the journal records the counts and the cutoff and no id.
   Red when: a text amendment is classified as a flip, which writes a disposition over another
-  session's wording at the landing.
-  cost: minutes; it writes nothing. fixture: the remote tip at the moment of the rehearsal, which
-  will have moved again by the landing, so this observes the classifier and not the final delta.
+  session's wording at the landing; or the rehearsal writes its six records into the run tree, where
+  untracked they dirty the tree unit 35 AC7 and the landing's `gates-green` read, and committed they
+  are landing records computed at a tip that will move.
+  cost: minutes; it writes nothing in the run tree. fixture: the remote tip at the moment of the
+  rehearsal, which will have moved again by the landing, so this observes the classifier and not
+  the final delta.
 - **AC21** — When `python tools/drift-audit/selftest.py` runs, a shards-mode fixture reads its
   live-rows count from the shards and prints the three new signals as not-asked with no DEAD PROBE
-  line, and a builds-mode fixture whose `--asks --json` projection lacks each new signal's field in
-  turn prints that signal's DEAD PROBE.
+  line; a builds-mode fixture tracking no `BACKLOG.md` prints the three new signals as not-asked
+  with no DEAD PROBE line; and a builds-mode fixture whose `--asks --json` projection lacks each new
+  signal's field in turn prints that signal's DEAD PROBE.
   Red when: the re-point reads `--asks --json` under shards, so every shards-mode adopter loses its
-  live-rows count and prints four DEAD PROBE lines while `--check` stays green.
+  live-rows count and prints four DEAD PROBE lines while `--check` stays green; or a builds-mode tree
+  with no `BACKLOG.md` yet, the state right after an adopter sets the mode, prints three DEAD PROBE
+  lines nobody staged.
 - **AC22** — When `memory/DECISIONS.md` is read on the switch-over commit, its TOOL heading carries
   one row keyed `TOOL-dDerivedDocket-34` that names DEPL-dGaugedVintage-13 as superseded, cites
   design §4.4, and fits the entry budget.
@@ -502,13 +627,66 @@ fact: this rule never confirms an id the receiving side acted on (§8 F7).
   (`tools/memory-recall/extract.py:674`).
   figure: "ten of twelve" is PINNED as measured 2026-09-14 at BASE against
   `tools/memory-recall/recall-fixture.json`.
+- **AC24** — When AC15's completing fixture is extended so that the branch, after its switch-over,
+  commits an acceptance ledger copying a staged RED verbatim that names the untouched flip's id,
+  and a rehearsal journal naming every census id, the reconcile still confirms that flip and parks
+  nothing for those lines; and when, after that reconcile and its step 8, the bare remote gains a
+  second tip carrying a flip to CLOSED of a further untouched pre-existing id, a flip to CLOSED of
+  the first tip's new ask, and a flip of the id the branch REOPENed after its switch-over, the
+  reconcile re-run from step 1 on the branch as step 8 left it confirms the first two and parks the
+  third with the recipe, with `<switch>` resolving to the switch-over commit and `<fork>` computed as
+  `git merge-base <switch> <tip>`; with the third removed from the second tip, the re-run completes
+  and `gen_build_index.py --check` exits 0.
+  Red when: the second condition greps every added line for the id, so the ledger's verbatim RED
+  parks the flip it exists to confirm, which is F5's option (a) arriving by another road; or the
+  first condition compares against the current merge-base, the first tip, so an id main flipped
+  before it fails after any push race; or a record the first reconcile transferred counts as the
+  branch's act, so the second tip's flip of an ask main filed parks; or `<switch>` is read off
+  HEAD's first-parent chain, which after step 8 runs through the prepared merge to the first tip, so
+  that merge is taken for the switch-over and the REOPENed id is confirmed over the branch's act.
+  cost: minutes. fixture: AC15's.
+- **AC25** — When AC15's completing fixture carries `memory/guides/SESSION-KICKOFF.md` and
+  `.githooks/pre-commit` with `core.hooksPath` set, and its tip both moves the cutoff and changes a
+  file on the manifest's `watch:` line, step 7's `git commit` is accepted with step 6's re-stamp
+  staged and a delta line in its message; with step 6 skipped, the same commit exits non-zero with
+  the manifest check's check 5 naming the watched files, and nothing is committed; over a tip that
+  moves the cutoff and changes no watched file, step 6 still re-stamps and step 7's commit is
+  accepted; and over a tip that changes no watched file and leaves the cutoff where it was, step 6
+  leaves the manifest untouched.
+  Red when: the reconcile writes `.memory-tree.conf` and concludes the merge with no re-stamp,
+  which pre-commit refuses outside any unit pass and after the closing review; or step 6 reads only
+  the index, which misses the conf step 5 wrote unstaged, so the routine landing, where main filed
+  asks and touched no watched file, has its commit refused; or it re-stamps with no watched change,
+  a stamp asserting a re-verification nothing required.
+  cost: minutes, for the pre-commit hook. fixture: AC15's.
+- **AC26** — When, for a sample of census ids holding every id whose chosen copy sits in a backlog
+  archive, every id whose legacy row was wrapped, and at least ten others, each ask row's `filed` is
+  compared with the author day of the oldest commit
+  `git log --format=%ad --date=short -G '^- <id> · ' -- memory/backlog memory/archive` lists,
+  derived without the writer's code, every pair is equal, and the comparison prints the sample size
+  and zero differing ids.
+  Red when: the writer stamps every row with the flip date, or an archived row with its rotation
+  commit's date, which AC2 to AC4 cannot see, because AC4's cutoff follows whatever `filed` dates
+  were written, and each ask's permanent filing date is lost at the one commit that writes it.
+- **AC27** — When
+  `git diff HEAD^ HEAD -- tools/memory-recall/query.py tools/memory-recall/recall_conf.py tools/memory-recall/README.md tools/drift-audit/drift_report.py`
+  runs on the switch-over commit, it shows `CACHE_VERSION` moved, `KIT_MEMORY_RECALL_VERSION` moved
+  together with its `gov:kit memory-recall@` README marker, and `KIT_DRIFT_AUDIT_VERSION` unmoved,
+  because unit 21 S8 moves that constant once for the landing range; and
+  `bash tools/check-kit-versions.sh` exits 0.
+  Red when: extraction changes with no `CACHE_VERSION` bump, which neither `check-recall.py`, whose
+  extraction never reads the query cache, nor `extract.py` can see, so a warm cache serves anchors
+  from files this commit deletes; or the drift-audit constant moves a second time in one landing
+  range, against the build's one-owner rule.
+  permission: the diff is read in the pass; `bash tools/check-kit-versions.sh` is the
+  `kit version markers` leg and binds at the one post-build bar.
 
 ## 7. Gates
 
-`memory hygiene` · `recall floor` · `drift-audit records` · `dead-path carriers (deleted files still named)` · `kickoff-manifest ratchet` · `unattended kit gate` · `codebase-map coverage + freshness` · `drift-audit selftest`
+`memory hygiene` · `recall floor` · `drift-audit records` · `dead-path carriers (deleted files still named)` · `kickoff-manifest ratchet` · `unattended kit gate` · `codebase-map coverage + freshness` · `drift-audit selftest` · `kit version markers`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the `backlog migration selftest` leg `TOOL-dDerivedDocket-11` adds · `--write` fixtures for each §5 refusal, the triage ask's filing and refusals, and the shard removal · the selftest's floor moves in the same commit
-New arm: `python tools/drift-audit/selftest.py` on the `drift-audit selftest` leg · the shards-mode fixture and one builds-mode fixture per new signal with its field removed (AC21) · none; it is a held kit leg, so it runs at the landing bar under `GATE_SELFTESTS=1`
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the `backlog migration selftest` leg `TOOL-dDerivedDocket-11` adds · `--write` fixtures for each of §5's eight refusals, the triage ask's filing, its zero-holds arm, and the shard removal · the selftest's floor moves in the same commit
+New arm: `python tools/drift-audit/selftest.py` on the `drift-audit selftest` leg · the shards-mode fixture, the builds-mode fixture with no `BACKLOG.md`, and one builds-mode fixture per new signal with its field removed (AC21) · none; it is a held kit leg, so it runs at the landing bar under `GATE_SELFTESTS=1`
 
 The verdicts this unit stages are armed by the units that built them; this unit observes them live on
 the real tree for the first time.
@@ -545,7 +723,10 @@ the real tree for the first time.
   parent, and no line added after the switch-over naming it. (a) re-opens lab case e09b on the
   receiving side. RESOLVED (agent, 2026-09-14, delegated): (b); every other CONFIRM id parks with the
   recipe, so A6's protection is restated, not relaxed. The verb is unit 12's landing form of
-  `--ingest` (its §8 F7).
+  `--ingest` (its §8 F7). Made precise at rev-3 in §4 Confirmation: the merge-base is `<fork>`,
+  `git merge-base <switch> <tip>`, which an earlier reconcile merge does not move, and 'acted on' is
+  a record added after `<switch>` to a `BACKLOG.md` targeting the id, never a line naming it
+  elsewhere, with a landing transfer that carries its `RELOCATED` row excluded.
 - **F8** — How is the triage a tip-added or newly finished ask owes at the landing produced and
   written? (a) The planner at the tip in a scratch worktree, the signer's landing re-run, and
   `--ingest --signed` writing each verdict not already disposed. (b) The signer over the merged
@@ -571,6 +752,25 @@ the real tree for the first time.
   the record DEPL-dGaugedVintage-13 took? (a) Unit 6, which builds the replacing model. (b) This
   unit, which retires the signal. Under (a) the row would claim a supersession while the stance is still
   enforced, for every unit up to this one. RESOLVED (agent, 2026-09-14, delegated): (b).
+- **F13** — How does the flip meet its own staleness refusal (F11)? (a) Re-plan and re-sign at
+  rollout step 5, every time, at the switch-over's parent, the worksheets recorded as this unit and
+  the records under the signer's `switch` tail. (b) Re-plan only when `--write` refuses. (c) Re-file
+  unit 11's worksheet pair and overwrite unit 33's records in place. (b) makes which records the
+  flip applied depend on whether a refusal fired; (c) rewrites records serving two CLOSED units from
+  a later pass and loses the first signing, against which a diff shows the rows whose evidence
+  moved. RESOLVED (agent, 2026-09-16, delegated): (a); the tail's name is unit 33 §8 F8.
+- **F14** — Does the terminal-status tuple read the derived output? (a) No: the tuple stays the
+  shards-mode live-rows filter, and the builds-mode count reads `--asks --json` unfiltered. (b) Yes:
+  the builds-mode signal reads `--asks --all --json` and filters it with the tuple. (b) is a second
+  liveness fold beside the generator's, which §4 forbids for every signal reading the projection.
+  RESOLVED (agent, 2026-09-16, delegated): (a).
+- **F15** — How does the landing reconcile's merge conclude? (a) `git merge --no-ff <tip>`, which
+  concludes itself when clean, so the later steps commit a follow-up. (b)
+  `git merge --no-ff --no-commit <tip>`, every later step running inside the merge and step 7
+  concluding it. (a) forks the procedure on whether the merge conflicted and puts the cutoff, render
+  and re-stamp in a commit apart from the merge they belong to. RESOLVED (agent, 2026-09-16,
+  delegated): (b); unit 12 F9 still admits a merge concluded early by hand, and `--prepare` runs
+  only after step 7.
 - The rulings this unit executes and does not revisit: D1 adopt, D3 no hard view cap, D6 closeout
   gated from this commit, D8 delete the archives, D9 check 15 keeps grading asks, D11-c direct-push
   landing — all RESOLVED (owner, 2026-09-13). The delegated signatures, and the replacement of the
@@ -599,6 +799,39 @@ the real tree for the first time.
   AC14 compares the remote-ref walk with `--local`. G5 M23 (19): AC10 reads the live-rows count and
   the terminal tuple. G5 M24 (59): AC9 split, AC23 grades the durable home. G5 L2 (21): AC12 greps
   all four manifest claims. G3 M6 (42): consumes-from unit 20, the two-key refusal AC8 reads.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G5 round 2, and the unit-34 halves of G2 round 2.
+  G5 H1 (21, 36, 52): §4 "The landing reconcile" makes step 1 the manual
+  `git merge --no-ff --no-commit <tip>` unit 2's `--prepare` refusal names and adds step 8,
+  `push-main.sh --prepare --slug dDerivedDocket`, over a branch containing the tip; consumes-from 2
+  and 3 added; AC15 stages `--prepare`'s refusal first; §8 F15. G5 H2 (22) with M6 (9): §4
+  Confirmation derives `<switch>` and `<fork>` and names a command for each condition, "acted on"
+  becomes a `BACKLOG.md` record targeting the id, never a line naming it, a `RELOCATED`-carrying
+  transfer excluded; F7 made precise; AC15 gains the pre-switch-edited park entry; new AC24 (a
+  ledger line and a second tip). G5 M2 (28, 54): new reconcile step 6 re-stamps the manifest when a
+  watched path changed; new AC25. G5 M3 (29) with G2 M2 (13, 20): the delta reads
+  `delta(ours=<tip>, theirs=HEAD)`, and the concluded merge's first parent after it (unit 12 F9).
+  G5 M5 (27): AC20 rehearses in a scratch worktree and records counts; Rollout step 11, §5 risks.
+  G5 M1 (56) with G2 M12 (7): Rollout step 5 re-plans at the switch-over's parent and re-signs
+  under `--tail switch`; §5's staleness clause passes the recorded `--design-named` ids; records
+  row and Files touched; consumes-from 11 and 33; AC2; §8 F13. G5 H3 (23): AC3 names the
+  `TOOL-aWeighedCompass-3` and `<triage-id>` exceptions; S16. G5 M7 (8, 30): AC17 stages all eight
+  §5 refusals and the zero-holds arm; S17; §7 arm line. G5 M8 (11): the memory-recall version and
+  README marker move here, the drift-audit bytes ride unit 21 S8; §4 rows, Files touched, S9, AC9's
+  cost line, new AC27, §7 `kit version markers`. G5 L4 (10): new AC26 compares `filed` with an
+  independent `git log -G` derivation; S1. G5 L5 (12): the tuple clause leaves S10, §4 and AC10;
+  AC21 gains the no-`BACKLOG.md` fixture; §7 arm line; §8 F14. G2 M1 (2, 28, 44): the reconcile
+  keeps a hold on a tip-filed ask verbatim, and AC15 stages it. G2 M4 (19): the confirmation
+  paragraph names the landing form's replacement of the switch-over's own record, and AC15 stages
+  it. G2 L1 (12): step 4's dry run exits 1 on a standing entry and prints the cutoff line. G5 H4
+  (53), unit-34 end: hands-off 35 names the transferred asks. G5 M17 (58), unit-34 end: hands-off
+  DEPL names the landing reconcile. Fold verification: reconcile step 6 reads `git diff --name-only HEAD`,
+  not the index alone, because step 5 writes the watched conf unstaged, and AC25 gains the
+  cutoff-only arm that tells the two apart; AC15's triage expectation covers only new asks deriving
+  OPEN, since the added BLOCKED second ask is outside the triage population, and its cutoff reads
+  the newest of three new asks; §4 Confirmation finds `<switch>` as the oldest mode boundary in
+  `git rev-list --topo-order --reverse HEAD --not <tip>`, not on HEAD's first-parent chain, which
+  after step 8 runs through the prepared merge, and AC24's second tip adds a REOPENed id's flip that
+  must park.
 
 ## 10. Reuse audit
 

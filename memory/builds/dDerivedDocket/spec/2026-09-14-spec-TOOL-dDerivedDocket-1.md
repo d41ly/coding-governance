@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-1 — held-suite failure baseline
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -21,8 +21,9 @@ build did not cause (TOOL-aHoistedPass-36, TOOL-aHoistedPass-38, TOOL-aQuenchedH
 that is allowed to run them (D12-h, D12-i8) therefore cannot reach GREEN, and a red run tells it
 nothing about its own change. Give the on-demand self-test runners a baseline mode that runs each
 selected suite at a named base R as well as at the working tree L, and reports NEW, INHERITED and
-FIXED failure sets. "No NEW FAIL" then becomes the verification criterion every later self-test
-unit in this build uses. Built first, by owner ruling D12-i11.
+FIXED failure sets. The runner's attributed verdict then becomes the verification criterion every
+later self-test unit in this build uses. That verdict is `verdict clean`: no NEW FAIL, no DEAD PROBE
+at L, and no OVER BUDGET at L. It is stated once, in S10. Built first, by owner ruling D12-i11.
 
 ## 2. Scope (IN)
 
@@ -34,14 +35,19 @@ unit in this build uses. Built first, by owner ruling D12-i11.
   vary between two runs of an unchanged suite. Observed by AC1.
 - **S3** A suite that exits non-zero on a side while its FAIL set on that side is empty is a DEAD
   PROBE on that side, with or without a count line (KF14, as the red-attribution unit applies it).
-  `N` counts only suites with a verdict on both sides. Observed by AC2 and AC9.
+  `N` counts only suites with a verdict on both sides. A DEAD PROBE at R alone gives S(R) no members.
+  Every line of S(L) then reads NEW, exactly as for `absent`, and nothing on that suite reads
+  INHERITED. Observed by AC2, AC9 and AC12.
 - **S4** The R-side set is cached per (R, suite, suite-file blob at R), written only after an R run
   that completed. Observed by AC4.
-- **S5** Exit status under `--attribute`: 1 when any NEW FAIL, any DEAD PROBE, or an L-side OVER
-  BUDGET verdict exists, else 0. INHERITED and FIXED are reported and never fail. The R side carries
-  no budget verdict (F3). The summary line names each cause separately, so a reader can tell a cost
-  verdict from a NEW failure. The no-flag mode's output and exit are unchanged. Observed by AC1, AC2,
-  AC3, AC8 and AC10.
+- **S5** Exit status under `--attribute`: 1 when any NEW FAIL, any DEAD PROBE at L, or any OVER
+  BUDGET verdict at L exists, else 0. A DEAD PROBE at L exits 1 whatever R shows, a suite dead on
+  both sides included. A DEAD PROBE at R alone never exits 1. INHERITED and FIXED are reported and
+  never fail. The R side carries no budget verdict (F3). The summary line names each cause
+  separately, with DEAD counted per side, so a reader can tell a cost verdict from a NEW failure and
+  an inherited abort from one this tree caused. The line ends in `verdict clean` or `verdict red`,
+  which always agrees with the exit status. The no-flag mode's output and exit are unchanged.
+  Observed by AC1, AC2, AC3, AC8, AC10 and AC12.
 - **S6** `tools/unattended/run-unattended-gates.sh --attribute <R>` forwards the flag to its
   delegated self-test half and prints one line saying its `--checks` half is not attributed.
   Observed by AC6.
@@ -51,13 +57,22 @@ unit in this build uses. Built first, by owner ruling D12-i11.
   it. The second, TOOL-aHoistedPass-36, records its stop (1) as fixed by it and stays OPEN for its
   stop (2). NOT OBSERVED by a criterion: these are records, and check 13 and the row grammar grade
   their shape.
-- **S8** The compensating-check wording moves from "a GREEN verdict" to "no NEW FAIL against the
-  build's BASE, and every INHERITED FAIL named by a filed backlog row", in the three places that
-  state it: the `tools/unattended/kit.toml` self-test block and both runner headers. Observed by
-  AC7.
+- **S8** The compensating-check wording moves from "a GREEN verdict" to the S10 criterion. The new
+  wording is: "`--attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD
+  PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at
+  R is named by a filed backlog record". It lands in the four places that state the old wording: the
+  `tools/unattended/kit.toml` self-test block, both runner headers, and the DoD sentence in
+  `.githooks/gate-env.sh`. Observed by AC7.
 - **S9** The run-gates and unattended kit version markers move, because shipped bytes change in
-  both kits. NOT OBSERVED by a criterion here: the `kit version markers` leg grades it. This is the
-  build's one move for each of the two kits: every later unit's bytes in either kit ride it.
+  both kits. Observed by AC11: the `kit version markers` leg grades only presence and pair agreement,
+  which BASE's values already satisfy. This is the build's one move for each of the two kits: every
+  later unit's bytes in either kit ride it.
+- **S10** The criterion this unit hands every self-test unit, stated once. When the unit's single
+  `--attribute <BASE>` run is read, its summary reads `verdict clean`, and every suite it reports
+  with INHERITED lines or `DEAD PROBE at R` is named by its file path in a filed backlog row or ask
+  that is not CLOSED, as `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'`
+  shows. A consumer reads the verdict token and never the NEW count alone, and never the exit of a
+  wrapper that also runs unattributed checks. Observed by AC7, where the carriers name it, and AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -78,30 +93,34 @@ unit in this build uses. Built first, by owner ruling D12-i11.
 
 - **consumes-from** external — a pinned base sha supplied by the caller, normally the run's BASE.
   This unit never chooses R.
-- **hands-off** `TOOL-dDerivedDocket-2` — the "no NEW FAIL" criterion over the held push-main
-  self-test suite, read through `--attribute` against this build's BASE.
-- **hands-off** `TOOL-dDerivedDocket-3` — the same criterion over the unattended suites that unit
-  is allowed to run once at its end.
-- **hands-off** `TOOL-dDerivedDocket-4` — the same criterion over the unattended suites.
-- **hands-off** `TOOL-dDerivedDocket-5` — the same criterion over the unattended suites.
-- **hands-off** `TOOL-dDerivedDocket-16` — the same criterion over the unattended suites that unit
-  runs once at its end.
-- **hands-off** `TOOL-dDerivedDocket-17` — the same criterion over the unattended suites that unit
-  runs once at its end.
-- **hands-off** `TOOL-dDerivedDocket-18` — the same criterion over the unattended suites that unit
-  runs once at its end.
-- **hands-off** `TOOL-dDerivedDocket-22` — the "no NEW FAIL" criterion over the unattended suites
-  that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-2` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the held push-main self-test suite, read through `--attribute` against this
+  build's BASE.
+- **hands-off** `TOOL-dDerivedDocket-3` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-4` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-5` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-16` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-17` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-18` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-22` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
 - **hands-off** `TOOL-dDerivedDocket-23` — the FAIL-line normaliser and the detached scratch
   worktree runner at R, which that unit reuses to re-run a red bar leg at R.
-- **hands-off** `TOOL-dDerivedDocket-24` — the "no NEW FAIL" criterion over the unattended suites
-  that unit runs once at its end.
-- **hands-off** `TOOL-dDerivedDocket-27` — the "no NEW FAIL" criterion over the unattended suites
-  that unit runs once at its end.
-- **hands-off** `TOOL-dDerivedDocket-28` — the "no NEW FAIL" criterion over the unattended suites
-  that unit runs once at its end.
-- **hands-off** `TOOL-dDerivedDocket-30` — `--attribute`, under which that unit runs the unattended
-  suites once, since they are red at BASE and "no NEW failure" is the only criterion they can meet.
+- **hands-off** `TOOL-dDerivedDocket-24` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-27` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-28` — the S10 criterion, `verdict clean` with every inherited
+  suite filed, over the unattended suites that unit runs once at its end.
+- **hands-off** `TOOL-dDerivedDocket-30` — `--attribute` and the S10 criterion, `verdict clean` with
+  every inherited suite filed, under which that unit runs the unattended suites once, since they are
+  red at BASE.
 - **hands-off** `TOOL-dDerivedDocket-32` — both runner headers as S8 leaves them, whose "nothing
   runs automatically" sentence that unit corrects, and the run-gates and unattended version moves
   (S9) its header edits ride.
@@ -132,10 +151,12 @@ attr  <suite name>  NEW <n> · INHERITED <n> · FIXED <n> · R <sha8> fresh|cach
         FIXED      <normalised line>
 attr  <suite name>  DEAD PROBE at L|R — exit <rc>, no FAIL line
 attr  <suite name>  OVER BUDGET at L — <n>s against <budget>s
-attributed N of M suite(s) against <sha8> · NEW <n> · INHERITED <n> · FIXED <n> · DEAD <n> · OVER <n>
+attributed N of M suite(s) against <sha8> · NEW <n> · INHERITED <n> · FIXED <n> · DEAD L <n> · DEAD R <n> · OVER <n> · verdict clean|red
 ```
 
 `absent` means the suite does not exist at R, so all of S(L) is NEW, and the line says so.
+A `DEAD PROBE at R` reads the same way for that suite: S(R) has no members, all of S(L) is NEW, and
+the block says so. `verdict clean` requires NEW 0, DEAD L 0 and OVER 0.
 
 ### The normaliser
 
@@ -181,7 +202,7 @@ and carries no verdict. With the cache, each (R, suite) is paid once per build, 
 `tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` ·
 `tools/unattended/run-unattended-gates.sh` · `tools/unattended/kit.toml` ·
 `memory/backlog/TOOL.md`, for the two dispositions · the two kit version markers · the run-gates
-dossier prose.
+dossier prose · `.githooks/gate-env.sh`, its DoD comment only.
 
 ### Alternatives rejected
 
@@ -201,9 +222,9 @@ dossier prose.
   is no new input surface. An unresolvable R refuses rather than running anything.
 - perf / scale — a cache miss doubles a suite's wall clock; the cache bounds it to once per
   (R, suite). The help text states it, and the R side carries no cost verdict.
-- error / empty / loading states — DEAD PROBE on either side; an unresolvable R exits 2; a `--kit`
-  filter matching nothing keeps its existing refusal; a failed `worktree add` refuses naming the
-  path.
+- error / empty / loading states — a DEAD PROBE at L fails, and one at R is reported with every L
+  failure read as NEW; an unresolvable R exits 2; a `--kit` filter matching nothing keeps its
+  existing refusal; a failed `worktree add` refuses naming the path.
 - observability — one block per suite, the R sha, fresh or cached, and the `attributed N of M`
   summary whose shortfall is visible.
 - risks — a flaky arm reads as NEW or FIXED noise, and the legend says so. A fresh worktree
@@ -222,10 +243,12 @@ dossier prose.
   Red when: the normaliser is dropped, so A's line carries the scratch path at R and the working
   path at L and reads NEW; or sets are replaced by counts.
 - **AC2** — When the fixture suite exits non-zero at L before printing any count line or FAIL line,
-  its block reads `DEAD PROBE at L`, the summary's N excludes it, and the run exits 1.
+  its block reads `DEAD PROBE at L`, the summary's N excludes it, and the run exits 1 with the summary
+  reading `DEAD L 1` and `verdict red`.
   Red when: the abort is read as an empty FAIL set, so the suite reads clean.
 - **AC3** — When `bash tools/run-gates/run-selftests.sh --attribute <R>` runs over a fixture suite
-  that fails arm A at both R and L, it prints `INHERITED 1` and `NEW 0` and exits 0.
+  that fails arm A at both R and L, it prints `INHERITED 1` and `NEW 0`, the summary reads
+  `verdict clean`, and the run exits 0.
   Red when: the exit derives from S(L) being non-empty, as the no-flag loop's `st=1` does, so every
   inherited failure fails the unit that inherited it.
 - **AC4** — When a fixture's R run is killed by a short bound and `--attribute <R>` is then run
@@ -239,9 +262,14 @@ dossier prose.
 - **AC6** — When `bash tools/unattended/run-unattended-gates.sh --attribute <R>` runs, attribution
   blocks appear for the self-test half and one line states that the checks half is not attributed.
   Red when: the flag is accepted and not forwarded, so the half runs unattributed and says nothing.
-- **AC7** — When `tools/unattended/kit.toml` and the headers of both runners are read, each names
-  `--attribute` and the "no NEW FAIL" criterion, and none states a GREEN verdict as the DoD.
-  Red when: one of the three keeps the GREEN wording, which leaves two answers to one question.
+- **AC7** — When `git grep -n -e 'GREEN verdict' -e 'prints GREEN' -- tools .githooks` runs, it prints
+  nothing; at BASE it prints four lines. `git grep -c 'verdict clean'` over
+  `tools/unattended/kit.toml`, `tools/run-gates/run-selftests.sh`,
+  `tools/unattended/run-unattended-gates.sh` and `.githooks/gate-env.sh` counts at least one line in
+  each. Each of those four names `--attribute`, `DEAD PROBE` and `OVER BUDGET` beside the criterion.
+  Red when: one of the four keeps the GREEN wording, which leaves two answers to one question; or
+  the wording names NEW alone, so a consumer reading it passes a suite that aborted or broke its
+  budget.
 - **AC8** — When `bash tools/run-gates/run-selftests.sh --kit <dir>` runs without `--attribute` over
   the fixture population, its stdout and exit status equal the BASE runner's.
   Red when: any attribution code path executes in the default mode.
@@ -250,9 +278,27 @@ dossier prose.
   Red when: the rule also requires the count line to be absent, so a suite that prints its count and
   then dies reads as an empty set, which is green by absence.
 - **AC10** — When a fixture suite whose budget row is below its runtime runs under `--attribute`,
-  its L block reads `OVER BUDGET`, NEW reads 0, and the run exits 1.
+  its L block reads `OVER BUDGET`, NEW reads 0, and the run exits 1 with `verdict red`.
   Red when: attribute mode drops the budget verdict, so "a runner REDS on breach" stops holding in
   the mode this build's self-test units verify with.
+- **AC11** — When `tools/run-gates/run-gates.sh` is read with `git show` at `abac6d59` and at this
+  unit's build commit, `KIT_RUN_GATES_VERSION` at the build commit is greater, compared as a dotted
+  version one integer component at a time, so `1.20` follows `1.19`. The same holds for
+  `KIT_UNATTENDED_VERSION` in `tools/unattended/unattended.sh`.
+  `bash tools/check-kit-versions.sh` exits 0 at the build commit.
+  Red when: the move is skipped and each marker still agrees with its constant at BASE's values, so
+  `kit version markers` stays green over shipped bytes that changed in both kits; or the two values
+  are compared as decimals, which reads BASE's `1.19` to `1.20` move as a decrease.
+- **AC12** — Three fixture suites run under `--attribute <R>`.
+  1. A suite that exits non-zero with no FAIL line at R and passes clean at L: its block reads
+     `DEAD PROBE at R`, the summary reads `DEAD R 1` and `verdict clean`, and the run exits 0.
+  2. The same suite failing arm A at L: A reads NEW, never INHERITED, and the run exits 1.
+  3. A suite aborting with no FAIL line on both sides: its block reads `DEAD PROBE at L`, and the run
+     exits 1 with `verdict red`.
+
+  Red when: a DEAD PROBE at R exits 1, so the unit that fixes an abort present at BASE can never
+  verify its own fix; or an L failure over a dead R reads INHERITED, which is KF14's blocker; or a
+  suite dead on both sides exits 0, so a consumer passes with its own arms never run.
 
 ## 7. Gates
 
@@ -279,6 +325,27 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
 - **F4 — does an L-side budget breach fail under `--attribute`?** Options: (a) yes, reported apart
   from NEW; (b) no, reported only. (b) suspends charter §7's rule that a runner reds on breach.
   RESOLVED (agent, 2026-09-14, delegated): (a).
+- **F5 — does a DEAD PROBE at R fail the run?** Options:
+  - (a) any DEAD PROBE exits 1;
+  - (b) only a DEAD PROBE at L exits 1, and a dead R gives S(R) no members, so every L failure reads
+    NEW;
+  - (c) additionally, a suite dead on both sides exits 0 as an inherited abort.
+
+  (c) fails AC2 and design U16's acceptance 2, and KF14 reads an empty set on both sides as a DEAD
+  PROBE: a consumer would pass with its own arms never executed. (a) leaves the unit that fixes an
+  abort present at BASE unable ever to verify its fix. RESOLVED (agent, 2026-09-16, delegated): (b).
+  A suite dead at BASE and still dead at L fails every consumer until the abort is fixed, which is
+  correct, because none of their arms ran.
+- **F6 — what do consumers read, and how is "every INHERITED FAIL filed" observed?** Options:
+  - (a) the runner's exit status, with the filing term dropped;
+  - (b) a `verdict clean|red` token on the summary line, plus a suite-grain filing check a reader can
+    run;
+  - (c) the summary fields, with a line-grain filing check.
+
+  (a) conflates the unattributed `--checks` half's exit and drops design U16's filing term. (c) needs
+  backlog rows that quote normalised FAIL lines, which no unit builds. RESOLVED (agent, 2026-09-16,
+  delegated): (b), stated once as S10. The token rides every hands-off bullet, so unit 37's token
+  join reds a consumer that does not spell it.
 
 ## 9. Revision log
 
@@ -295,6 +362,17 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
   5 (rev-1), to unit 30 (rev-1, previously unlisted), and to units 22, 24, 27 and 28 (added here).
   G3 H9 adds hands-off to units 16, 17 and 18, which read `--attribute <BASE>`. G5 L1 adds a
   hands-off to unit 32, which corrects both runner headers S8 leaves and rides S9's version moves.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 H1 (2, 24): the handed-off criterion is stated once as S10, `verdict clean` with every
+    inherited suite filed. S5 exits 1 on a DEAD PROBE at L whatever R shows, and never on one at R
+    alone, whose S(L) then reads NEW (F5, AC12). The summary gains `DEAD L`, `DEAD R` and the verdict
+    token (F6). §1, S3, §4 output block and §5 follow. AC2, AC3 and AC10 read the token. Every
+    criterion-carrying hands-off bullet names `verdict clean`.
+  - G1 M11 (3): AC11 observes S9's version move against `abac6d59`, comparing the markers as dotted
+    versions, component by component (fold verification: BASE's unattended marker is `1.19`, which
+    a decimal comparison would read as greater than `1.20`).
+  - G1 L8 (47): S8 and AC7 cover the fourth copy in `.githooks/gate-env.sh`, which Files touched
+    now lists, and AC7 greps the whole `tools` and `.githooks` population.
 
 ## 10. Reuse audit
 

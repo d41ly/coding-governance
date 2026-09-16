@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 18cf0c1b7b1a0dc26b15cedb6307707364f77b1e
-phase: REVIEWING
+witness: 282e0a6bafe2f4979a02297b9d1904f4c68b349e
+phase: FOLDING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
@@ -52,3 +52,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-16T11:19:34Z review · item dDerivedDocket-specs-g2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-09-16T11:19:35Z review · item dDerivedDocket-specs-g5 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-16T13:42:16Z decision · item Should this build correct the root README.md:56 sentence that an unattended run replaces the explicit-ask checkpoint with a committed standing mandate it ASSERTS and cannot have written, which is false for a run the protocol's second (published) anchor authorizes? · reason Options: (i) PLAY-dDerivedDocket-1 extends S8 to README.md:56 and drops its Non-goal that the root README is untouched; (ii) leave the line to the owner. Refused: (i) contradicts a written Non-goal and changes a carrier no unit scopes for that line (veto 2). Folded meanwhile: (ii); PLAY F7 corrects the two AGENTS.md lines carrying the same claim. It blocks nothing.
+
+2026-09-16T13:42:40Z review · item dDerivedDocket-specs-g6 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

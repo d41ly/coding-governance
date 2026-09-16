@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-8 — hygiene engine in builds mode
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -206,10 +206,12 @@ each way would be a cycle. No third conf reader is written.
   fixture's cutoff and anchors its id in a second build folder, check 13 names the collision; the same
   shape for an ask filed before the cutoff raises nothing; and that pre-cutoff id is not reported as an
   orphan by check 14; with the fixture's cutoff set to `2026-9-30`, check 13 skips every ask row and
-  its one line names V16.
+  its one line names V16; and with `ASK_CUTOFF=""` in a builds-mode fixture it skips every ask row
+  and its one line names V15.
   Red when: the skip is taken for every ask row regardless of date, which is the blanket skip D12-g
   replaced; or a malformed cutoff is compared as a raw string, so a post-cutoff collision is skipped
-  silently.
+  silently; or a blank cutoff is compared as the empty string, so every ask reads as filed after it
+  and the legacy foreign anchors red, F2's rejected option (a).
 - **AC6** — When a builds-mode fixture ask cites a dead backticked path, check 15 names it; the same
   token in a view is not graded; in the shards fixture a dead path in a shard is still named.
   Red when: the present corpus drops `backlog/` without adding `BACKLOG.md`, so 227 graded ask path
@@ -286,6 +288,8 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
   (47) and M2 (7): S6, F2's premise and AC5 name V15 and V16. G2 M11 (58): S14 and AC14 convert the
   two `corpus_ids.py` install-prefix waivers to in-line markers, and §7 gains
   `install-prefix (shipped surface)`.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L7 (11, 30): AC5 stages a blank `ASK_CUTOFF`,
+  naming V15, beside the malformed one naming V16.
 
 ## 10. Reuse audit
 

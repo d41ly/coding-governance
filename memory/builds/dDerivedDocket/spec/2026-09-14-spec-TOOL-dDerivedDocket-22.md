@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 22
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -37,14 +37,23 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   the observation's refusal. Observed by AC1, AC2 and AC5.
 - **S3** `--status` prints the derived phase with its evidence, or the reason it stays LANDING.
   Observed by AC1 and AC5.
-- **S4** `--preflight` on a derived-LANDED record ROTATES it (KF15). In one write it sets
-  `phase: LANDED`, `witness: <C>` and `landed-derived: <C> <advertised tip>`, C being the landing
-  commit. It then retires the record to the name `archive_name_of` derives from those bytes,
-  `RUN.LANDED.<blob8>.md`. No record is edited after it is retired. Before any write, the rotation
-  refuses with a number when the record lacks a fact that the landed fact-set arm (S10) would
-  require of the retired copy, and it names `--landed` under `primary`, so a rotation never freezes a
-  record the leg reds. The predicate is one function in `tools/unattended/lib-unattended.sh`, shared
-  with S10. Observed by AC6 and AC12.
+- **S4** `--preflight` on a derived-LANDED record ROTATES it (KF15), in three steps that keep BASE's
+  split between the precondition half and the write half.
+  (1) In the precondition half, before the write gate, it copies the record to a scratch file under
+  the git dir and applies three fact edits there: `phase: LANDED`, `witness: <C>` and
+  `landed-derived: <C> <advertised tip>`, C being the landing commit. `archive_name_of` derives
+  `RUN.LANDED.<blob8>.md` from that copy, hashing it with `git hash-object --path=<record path>` so
+  the record path's attributes apply exactly as they do in place. Both fail-28 collision tests
+  compare that copy against the derived name. The rotation refuses with a number when the copy lacks
+  a fact the landed fact-set arm (S10) would require of it, and it names `--landed` under `primary`,
+  so a rotation never freezes a record the leg reds. The predicate is one function in
+  `tools/unattended/lib-unattended.sh`, shared with S10.
+  (2) After the gate, it copies the scratch bytes over the record and stages the record. It then
+  asserts that the staged blob, `git rev-parse :<record path>`, is the one the name was derived from.
+  On a mismatch it restores the record from HEAD, which `landing_commit_of` guaranteed equals the
+  record, and refuses under code 29 with nothing moved.
+  (3) Only then does `GIT mv -f` retire it, so the move carries the staged LANDED blob.
+  No record is edited after it is retired. Observed by AC6 and AC12.
 - **S5** `--resume` on a derived-LANDED record reports nothing to resume and never invokes the
   lander. Observed by AC6.
 - **S6** Under `LANDER_MODE=in-place`, `--close` writes `units-at-landing`, and `asks-at-landing`
@@ -69,7 +78,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   `git log --follow --diff-filter=A`, as `DISPOSITION_CUTOFF` does, so a rotation does not re-date a
   pre-cutoff record into the graded set. The driver's twin of that exclusion, `check_single_live`
   (`tools/unattended/unattended.sh:1260-1306`), reads the same S1 commit, so preflight and the leg
-  agree about one record. Observed by AC6, AC8 and AC9.
+  agree about one record. Observed by AC6, AC8, AC9 and AC18.
 - **S10** A leg arm for the weak form of TOOL-aBoundedCeiling-11, graded BY MODE. Every record is
   dated by its first commit, read with `git log --follow --diff-filter=A`, against a new
   `LANDED_FACTS_CUTOFF`: blank turns the arm off, announced, and gov sets the landing date. There are
@@ -89,7 +98,10 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
 - **S12** Protocol §6 states the derived terminal in one sentence citing D12-i2, and the rest goes to
   the companion stops guide; the Skill's Land section names the in-place `--landed` as an
   observation. Protocol §2's rotation paragraph states that a derived-LANDED record is written
-  LANDED with its evidence before it is retired. It keeps the rule that no retired record is edited,
+  LANDED with its evidence before it is retired. Its sentence that `git mv` puts both sides in the
+  index in one operation gains the precondition that makes it true for an edited record: the terminal
+  bytes are staged before the move, because `git mv` carries the STAGED blob, and an unstaged edit
+  would ride the move as the old one. The paragraph keeps the rule that no retired record is edited,
   and the rule that an archived non-terminal phase reds. Observed by AC11.
 - **S13** No unattended version constant moves here: this unit's bytes ride the move
   `TOOL-dDerivedDocket-1` S9 makes once for the build. NOT OBSERVED by a criterion here:
@@ -102,13 +114,28 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   `landing_commit_of` finds. It does so in the same commit that moves the freeze. Under `primary` the
   arm keeps grading recorded LANDED only. A record S4 rotated says LANDED and is graded as before.
   Observed by AC14.
-- **S16** Under `in-place`, `--landed`'s successful observation removes the slug's lease file. It
-  lives under the git common dir, so the tree stays clean. The process-ledger unit removes its
-  ledger at the same point. Observed by AC15.
-- **S17** For a LANDING record whose landing commit (S1) is an ancestor of the advertised tip, the
-  run's-own-commits function (unit 17) takes that landing commit as its endpoint and, as its
-  exclusion, the first parent of the first two-parent commit on that commit's first-parent chain
-  (unit 2's prepared merge). Unit 19's cross-run arm and unit 17's T4 read it. Observed by AC17.
+- **S16** Under `in-place`, `--landed`'s successful observation rewrites the slug's lease file as
+  `released <iso> landed`. The file lives under the git common dir, so the tree stays clean. This
+  unit adds the lease matrix row that reads it: a LANDING record whose lease reads
+  `released … landed` is never `presumed-stopped`, `--status` names the observation, and `--resume`
+  reports nothing to resume and never invokes the lander. The lease is not a phase source, so the
+  phase is still derived from the advertised tip. The process-ledger unit removes its ledger at the
+  same point, observed by that unit's AC12. The lease half is observed by AC15.
+- **S17** For a LANDING record whose landing commit C (S1) is an ancestor of the advertised tip, the
+  run's-own-commits function (unit 17) takes C as its endpoint. Its exclusion is the one unit 19's
+  terminal-record exclusion function computes from C:
+  - when C is unit 2's prepared merge T, or reaches T through single-parent commits only, and T's
+    subject is `merge: <slug> — land onto` naming this record's slug, the exclusion is T's first
+    parent;
+  - otherwise, when C has two parents, it is C's first parent;
+  - otherwise there is none.
+
+  Under `primary`, C sits on the run branch. The range is then unit 19's terminal reading with its
+  stated residual for a plain mid-run reconcile, which is the same range the record keeps once
+  `--landed` makes it terminal. A record S4 rotated is a terminal record whose witness is C, so unit
+  19's terminal row grades it by the same function and reaches the same range. The function reads
+  the commit graph only, never the remote. Unit 19's cross-run arm and unit 17's T4 read it.
+  Observed by AC6 and AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -121,8 +148,8 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   reads no marker; the primary path keeps the shared one, whose race still fails closed.
 - **ABORTED records' fact set.** TOOL-aBoundedCeiling-11 is about LANDED, and so is S10.
 - **`derived_phase()` itself, HELD and the lease.** They are the HELD unit's; this unit adds one
-  branch inside the function and relies on the call sites the HELD unit classifies, including
-  `refuse_if_terminal --recorded` for `--landed`.
+  branch inside the function and one lease-matrix row (S16), and relies on the call sites the HELD
+  unit classifies, including `refuse_if_terminal --recorded` for `--landed`.
 - **The close commit and the prepared merge.** The landing-path and in-place lander units own both.
 - **`asks-at-landing` as a fact.** The asks-disposed unit defines it; this unit moves where it is
   written under in-place, exactly as that unit's hand-off asks.
@@ -133,17 +160,20 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   `LANDER_MODE=in-place`. Without it the in-place path has no landing commit to find, and `--landed`
   has no in-place mode to be an observation under.
 - **consumes-from** `TOOL-dDerivedDocket-4` — `derived_phase`, `recorded_phase` and the call-site
-  table that classifies every phase read, inside which S2 goes, the resume row that never re-drives
-  the lander, and the stops companion guide S12 writes into.
+  table that classifies every phase read, inside which S2 goes; the resume row that never re-drives
+  the lander; the lease matrix, to which S16 adds its `released <iso> landed` row; and the stops
+  companion guide S12 writes into.
 - **consumes-from** `TOOL-dDerivedDocket-17` — `asks-at-landing`, whose write moves to `--close`
   beside `units-at-landing` under in-place landing, and the run's-own-commits function S17 extends.
-- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" reading of the unattended suites
-  under `--attribute` against BASE, which this unit's final criterion (AC13) uses.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the attributed verdict of the unattended suites under
+  `--attribute` against BASE, read as `verdict clean` with every inherited suite filed, which this
+  unit's final criterion (AC13) uses.
 - **consumes-from** `TOOL-dDerivedDocket-18` — the freeze-presence arm (S4 there), whose population
   S15 extends to a committed in-place LANDING record.
 - **consumes-from** `TOOL-dDerivedDocket-19` — the cross-run arm whose derived-LANDED endpoint S17
-  supplies, and the unattended-suite arms that unit added, which this unit's AC13 run executes
-  first.
+  supplies; the terminal-record exclusion function S17 applies to the landing commit, which
+  recognises unit 2's prepared merge by its `merge: <slug> — land onto` subject; and the
+  unattended-suite arms that unit added, which this unit's AC13 run executes first.
 - **consumes-from** `TOOL-dDerivedDocket-20` — the unattended-suite arms that unit added, which this
   unit's AC13 run executes first.
 - **hands-off** `TOOL-dDerivedDocket-28` — the in-place removal point, `--landed`'s successful
@@ -156,8 +186,8 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
 ```
 RUN.md facts   units-at-landing: <ids>           written by --close under in-place (S6)
                landed-derived: <landing sha> <advertised tip sha>   written by --preflight only,
-                                                  with phase LANDED and witness <landing sha>, in
-                                                  the one write before the rotation (S4)
+                                                  with phase LANDED and witness <landing sha>,
+                                                  staged before the rotation's move (S4)
 --status       unattended: <slug> · phase LANDED (derived: <C8> on <aref> at <tip8>) · ...
                unattended: <slug> · phase LANDING (not on the remote: <why>) · ...
 .unattended.conf  LANDED_FACTS_CUTOFF="<landing date>"   blank = the S10 arm is off, announced
@@ -201,16 +231,31 @@ its reason in the second global. Every caller then reads LANDING, the writing ve
 | the leg's check 15 | reads `landed-derived` | a rotated derived record says LANDED and names its landing commit (S4, S9) |
 | the freeze-presence arm (check 15) | committed LANDING under in-place, plus recorded LANDED | the freeze is due at close under in-place (S15) |
 | the leg's S10 fact-set arm | by mode: recorded LANDED, rotated derived LANDED, and committed LANDING under in-place | the facts are due at close under in-place and at `--landed` under primary |
-| `archive_name_of` | no, recorded | S4 writes LANDED before the name is derived, so the recorded phase is the terminal |
-| the leg's check 19 cross-run arm (unit 19) | yes | a landed record's range must end at its landing commit, or the owner's default-branch grant reds it |
+| `archive_name_of` | no, recorded | it reads the bytes it is handed; S4 hands it a scratch copy already carrying the terminal, before the write gate, so the name derives from the post-write bytes |
+| the leg's check 19 cross-run arm (unit 19) | yes, and a rotated record by its witness | a landed record's range ends at its landing commit and excludes the prepared merge's first parent; otherwise the owner's default-branch grant reds it, and reds the archived record for ever |
 | `gen_build_index.py` and `memory/LIVE.md` | no | KF5: committed and freshness-gated |
 
 ### In-place `--landed`
 
 It stays in the Skill's four-step sequence because it is the one step that confirms the push carried
-the record. It writes nothing, so no LANDED commit follows the push and TOOL-aBoundedCeiling-9's
-mechanism has no instance. The two refusals are one new code, allocated at build time as the next
-integer above the driver's highest, because other units of this build allocate codes concurrently.
+the record. It writes nothing to the tree, so no LANDED commit follows the push, and the mechanism
+of TOOL-aBoundedCeiling-9 has no instance. Its one write is the clone-local lease, below (S16). The
+two refusals are one new code, allocated at build time as the next integer above the driver's
+highest, because other units of this build allocate codes concurrently.
+
+### The lease after an in-place landing
+
+`--landed` observed the record on the advertised tip, and a later reader may not be able to: the
+remote may not answer, or this clone may lack the tip's object. So the observation is kept where the
+lease matrix reads it, as `released <iso> landed`.
+
+A LANDING record under that lease reads, in `--status`, `phase LANDING (not on the remote: <why>)`
+followed by `landed · observed by --landed at <iso>`, and never `presumed-stopped`. `--resume` prints
+that nothing is left to resume and that the rotation waits for the advertised tip. The next
+`--preflight` that takes the slug's lease overwrites it.
+
+Keying the exemption on `landing_commit_of` instead was rejected (F9). A run that committed its close
+and died before `--land` also has a landing commit, and it must stay recoverable by take-over.
 
 ### Check 34 under `primary`
 
@@ -308,11 +353,27 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   write exits 1.
 - **AC6** — When `--resume` runs on a derived-LANDED fixture record, it prints nothing to resume and
   the lander stub records no invocation. When `--preflight` then runs, the record is retired to a
-  `RUN.LANDED.` name whose `phase:` reads LANDED and which carries `witness` and `landed-derived`
-  naming the landing commit. `bash tools/unattended/check-unattended.sh` over the rotated tree then
-  reports no check 4 or check 15 failure for it.
-  Red when: the archive keeps `phase: LANDING`, so check 4 reds a frozen record forever; or preflight
-  refuses the record as a live run or overwrites it; or the resume re-drives the lander.
+  `RUN.LANDED.` name:
+  - `git show :<archive>` reads `phase: LANDED` and carries `witness` and `landed-derived`, both
+    naming the landing commit;
+  - the archive's index blob, read with `git ls-files -s <archive>`, begins with the `blob8` its
+    name encodes;
+  - `git diff --quiet -- <archive>` exits 0.
+
+  The fixture's default branch gained an owner commit adding `may:` to another build's README after
+  BASE and before `--prepare`. The WHOLE leg, `bash tools/unattended/check-unattended.sh` over the
+  rotated tree, reports no check 4, check 15 or check 19 failure for the record. In a second
+  fixture, where the run's own commit added that `may:` line, check 19 reds on the archive naming
+  the commit.
+  Red when: any of the following holds.
+  - the archive keeps `phase: LANDING`, so check 4 reds a frozen record forever;
+  - the name derives before the edit, so it reads `RUN.LANDING.`;
+  - the LANDED edit rides the move unstaged, so the committed archive says LANDING under a LANDED
+    name on every other clone;
+  - check 19 grades the rotated record's single-parent witness with no exclusion, so an owner's
+    grant landed during the run reds the archive for ever;
+  - preflight refuses the record as a live run, or overwrites it;
+  - the resume re-drives the lander.
 - **AC7** — When `--landed` runs under `primary` on a `--no-ff` landing whose record commit is already
   on the advertised tip, whose marker names the merge commit, and whose witness is that merge's second
   parent, it succeeds and writes `phase: LANDED`. With a marker naming a commit the remote does not
@@ -349,10 +410,16 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   Red when: the rotation retires a record that the fact-set arm then reds, and no verb can repair it
   once it is archived.
 - **AC13** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, it reports no NEW failure, and every arm units 19 and 20 added to the unattended suites
-  passes; a NEW failure in one of those arms names its owning unit, whose fix lands before this unit
-  closes.
-  Red when: an arm this unit added fails, or an existing arm newly fails because of it.
+  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  no `OVER BUDGET at L`. Every arm units 19 and 20 added to the unattended suites passes. A NEW
+  failure in one of those arms names its owning unit, whose fix lands before this unit closes. Every
+  suite reported with INHERITED lines or `DEAD PROBE at R` is named by its file path in a filed
+  backlog row or ask that is not CLOSED, as
+  `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
+  Red when: an arm this unit added fails, or an existing arm newly fails because of it; or the run is
+  read by its NEW count alone, so a suite this unit's change aborted before its first FAIL line, or
+  pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
+  filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
 - **AC14** — When the leg grades a fixture under `LANDER_MODE=in-place` holding a committed LANDING
@@ -361,9 +428,15 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   Red when: the arm grades only records whose recorded phase is LANDED, which in gov's mode are none
   until a rotation, so the second opinion never fires.
 - **AC15** — When `--landed` observes a derived LANDED under `in-place` in the fixture, the slug's
-  lease file is gone and `git status --porcelain` is empty.
-  Red when: no verb removes the lease after an in-place landing, so an unanswered remote later reads
-  a landed run as `presumed-stopped` and offers a take-over.
+  lease file reads `released <iso> landed` and `git status --porcelain` is empty. Then the fixture's
+  `origin` is pointed at a missing path and its commits are aged past the lease bound. `--status`
+  prints no `presumed-stopped` and names the landed observation, and
+  `--resume --keepalive-id C` prints nothing to resume, writes nothing, and leaves the lander stub
+  with no recorded invocation.
+  Red when: the lease is removed or left `taken`, so a landed record whose tip this clone cannot
+  observe falls to the absent or stale row, reads `presumed-stopped` and is offered for take-over;
+  or the criterion stops at the lease file, which is the verb's output rather than the reader that
+  produced the break.
 - **AC16** — When the leg runs over a fixture whose conf declares `LANDER_MODE=in-place`, holding a
   hand-committed LANDING record that was first committed after `LANDED_FACTS_CUTOFF` and carries no
   `units-at-landing`, it reds naming the fact and prints the arm's graded count per population. Over
@@ -371,11 +444,23 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   LANDED is reported naming `--landed` and does not red.
   Red when: the arm grades only records that SAY LANDED, so in gov's own mode its population is
   empty and it passes on nothing.
-- **AC17** — When check 19's cross-run arm grades a derived-LANDED in-place fixture record while an
-  unpushed owner commit on the default branch adds `may:` to a build README, it does not red; a
-  `may:` line added by that run's own commit reds.
-  Red when: the arm reads the derived-LANDED record as live, so its range becomes whatever the
-  graded tree has not pushed and the owner's push is blocked.
+- **AC17** — When check 19's cross-run arm grades a derived-LANDED in-place fixture record, and an
+  owner commit on the default branch, landed after BASE and before `--prepare`, adds `may:` to a
+  build README, the arm does not red. A `may:` line added by that run's own commit reds.
+  Under `primary`, take a run branch that merged the default branch plainly mid-run. A `may:` commit
+  the run made BEFORE that reconcile reds on the derived-LANDED record, which is graded with no
+  exclusion taken from the reconcile.
+  Red when: the arm reads the derived-LANDED record as live, so its range becomes whatever the graded
+  tree has not pushed, and the owner's push is blocked; or S17 takes the first two-parent commit on
+  the chain whatever its subject, so under `primary` a plain reconcile's first parent, a run commit,
+  is excluded and the run's earlier grant goes ungraded.
+- **AC18** — When `bash tools/unattended/check-unattended.sh` grades a `RUN.LANDED.` fixture record
+  whose `witness` is on the bare remote's advertised tip and whose `landed-derived` names a commit
+  that tip does not contain, check 15 reds naming the record and the `landed-derived` commit. The
+  same record naming a commit on the tip passes. The witness is pinned on the tip because the
+  witness ancestry test check 15 already runs would otherwise red the record by itself.
+  Red when: check 15 accepts any `landed-derived` line as anchor evidence, so a hand-written archive
+  meets the anchor rule without ever having landed.
 
 ## 7. Gates
 
@@ -383,7 +468,7 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 
 New arm: tools/unattended/unattended.test.sh · a pushed and an unpushed LANDING record, a lander killed after its push, an in-place local-arm landing, and `--landed` in each mode with the record commit already on the advertised tip · none
 New arm: tools/unattended/check-unattended.test.sh · a record whose witness was pushed and record was not, and a LANDED record missing a fact after the cutoff · none
-New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight, then graded by the leg through one helper every archive-producing arm calls · none
+New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row drops the prepared-merge branch · none
 New arm: tools/unattended/check-unattended.test.sh · a pre-cutoff LANDED record, anchorless and without the landing facts, rotated after the cutoff · none
 New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` first-commit date without `--follow` under `tools/unattended/`, the predicate run over the tree with hits and near-misses printed before it is wired (charter §7); `check-unattended.sh:1276` is a live hit at BASE · none
 
@@ -412,6 +497,44 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   leg second-opinions unit, at its own order; (b) this unit, in the commit that moves the freeze to
   `--close`. Under (a) the grader's population precedes its producer by four units. RESOLVED (agent,
   2026-09-14, delegated): (b), which that unit's §3 already anticipated.
+- **F7 — in what order does the rotation derive the name, write, stage and move?** Options:
+  - (a) BASE's order: derive the name from the unedited record, then edit.
+  - (b) Edit, then `GIT mv -f`, then stage the archive.
+  - (c) Derive the name from a scratch copy before the gate, then write, stage, assert the staged
+    blob, and move.
+
+  (a) names the archive `RUN.LANDING.` and leaves the LANDED edit unstaged, because `GIT mv -f`
+  carries the old staged blob. (b) edits a retired record, and a failure after its move leaves a
+  half-rotated build. RESOLVED (agent, 2026-09-16, delegated): (c). Every refusal still precedes the
+  gate, and a blob mismatch is caught before the move, where restoring the record from HEAD leaves
+  nothing moved.
+- **F8 — which exclusion does a landing commit that sits on a prepared merge take?** Options:
+  - (a) rev-2's first two-parent commit on the chain, with unit 19's terminal row routing a record
+    carrying `landed-derived` here;
+  - (b) a third `landed-derived` field that records the exclusion;
+  - (c) one function in unit 19's terminal row, keyed on unit 2's prepared-merge subject and the
+    single-parent tail, and applied here to the landing commit.
+
+  (a) excludes a run commit under `primary` whenever the run merged the default branch plainly, and
+  it needs a second routing rule for rotated records. (b) is an authored exclusion that a
+  hand-written archive can widen to hide its own commits, and it cannot cover an ABORTED record.
+  RESOLVED (agent, 2026-09-16, delegated): (c). It fixes three cases: the rotated record, the primary
+  reconcile, and an in-place run aborted after its close. It also gives a primary record the same
+  range before and after `--landed`. Where no prepared merge is found, the fallback is unit 19's
+  terminal reading, not unit 17's advertised-tip exclusion. For a landed record that tip already
+  contains the landing commit, so the range would be empty (unit 19 §8 F8).
+- **F9 — what does in-place `--landed` leave in the lease?** Options:
+  - (a) exempt from both `presumed-stopped` rows any LANDING record for which `landing_commit_of`
+    returns a commit;
+  - (b) rewrite the lease as `released <iso> landed`, with a matrix row that reads it as nothing to
+    resume;
+  - (c) remove the lease, as rev-2 does.
+
+  (c) sends a landed record whose tip is unobservable to the absent-lease row. (a) strands a run
+  that committed its close and died before `--land`, because that run has a landing commit and would
+  have no take-over. RESOLVED (agent, 2026-09-16, delegated): (b). It writes the same file S16
+  already wrote, keeps take-over for every record that has not landed, and is never a phase source,
+  so it is not D12-i2's rejected landed fact.
 
 ## 9. Revision log
 
@@ -435,6 +558,24 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   derived-LANDED endpoint of unit 17's run's-own-commits function, and the readers table gains the
   cross-run arm (AC17). G3 M5: AC13's run is the first execution of units 19's and 20's
   unattended-suite arms. Adds consumes-from units 1, 18, 19 and 20, and a hands-off edge to unit 28.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 B1 (40): S4 derives the archive name from a scratch copy before the gate, then writes,
+    stages, asserts the staged blob and moves (F7). S12 states the staging precondition. The readers
+    table's `archive_name_of` row is corrected. AC6 reads the index copy and asserts an empty diff.
+  - G1 B2 (1) with M4 (7, 35): S17's exclusion is unit 19's terminal-record function over the
+    landing commit, which recognises the prepared merge by unit 2's subject; a rotated record
+    reaches the same range through unit 19's terminal row (F8). AC6 runs the whole leg, check 19
+    included, over a default branch that gained an owner grant. AC17 gains the primary
+    plain-reconcile arm. The consumes-from edge to unit 19 and the check 19 readers row are updated.
+  - G1 M3 (6, 29): S16 rewrites the lease as `released <iso> landed`, with a matrix row reading it
+    (F9, new §4 subsection); AC15 runs that reader over an unanswered remote.
+  - G1 L5 (20, 33): S16's ledger observed-by names unit 28's AC12.
+  - G1 L7 (22): AC18 is check 15's reject arm.
+  - G1 H1 (2, 24): AC13 reads `verdict clean` and the inherited-suite filing, and the consumes-from
+    edge to unit 1 is updated.
+  - Fold verification: §4 "In-place `--landed`" says it writes nothing to the tree, its one write
+    being S16's lease. AC18's fixture pins the `witness` on the advertised tip, so check 15's existing
+    witness ancestry test cannot red the record in the new test's place.
 
 ## 10. Reuse audit
 

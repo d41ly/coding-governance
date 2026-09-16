@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-2 — in-place landing merge
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -75,9 +75,9 @@ D12-i1.
 
 ### Edges
 
-- **consumes-from** `TOOL-dDerivedDocket-1` — the "no NEW FAIL" reading of the held push-main
-  suite at the post-build bar, so a red there is attributed against BASE before it is called this
-  unit's.
+- **consumes-from** `TOOL-dDerivedDocket-1` — the attributed verdict of the held push-main suite at
+  the post-build bar, read as `verdict clean` with every inherited suite filed, so a red there is
+  attributed against BASE before it is called this unit's.
 - **hands-off** `TOOL-dDerivedDocket-3` — the four flags, `--prepared` among them as the one
   spelling of the prepared-merge test, their refusal texts and the prepared-merge shape, which the
   run's landing path calls from the Skill, grades at `gates-green` and asks through `--carry` at
@@ -85,7 +85,12 @@ D12-i1.
 - **hands-off** `TOOL-dDerivedDocket-17` — the prepared merge's first-parent shape, which the
   run's-own-commits function relies on.
 - **hands-off** `TOOL-dDerivedDocket-19` — the prepared merge's first-parent shape the cross-run
-  arm's exclusion relies on.
+  arm's exclusion relies on, and its `merge: <slug> — land onto` subject and single-parent tail, by
+  which that unit's terminal-record exclusion recognises the merge on a recorded witness.
+- **hands-off** `TOOL-dDerivedDocket-34` — `--prepare`'s conflict refusal, which names
+  `git merge <remote>/<def>` on B as the reconcile to do first, and its clean merge over a branch
+  that already contains the tip; the switch-over's landing reconcile makes that merge itself, with
+  the branch checked out so its own attributes govern, and only then runs `--prepare --slug <slug>`.
 
 ## 4. Design
 
@@ -236,9 +241,12 @@ quotes the usage line.
   clean, and the message names `git merge <remote>/<def>`.
   Red when: the abort path leaves HEAD detached at R or B pointing at a half merge.
 - **AC9** — When the post-build bar runs `tools/push-main.test.sh` with the self-tests included, the
-  arms for AC1 to AC8 and AC10 to AC13 are present and pass, and `run-selftests.sh --attribute`
-  against BASE reports no NEW failure for that suite.
-  Red when: an arm was wired without its failing case having been observed.
+  arms for AC1 to AC8 and AC10 to AC13 are present and pass. `run-selftests.sh --attribute` against
+  BASE over that suite reads `verdict clean`. If the suite reports INHERITED lines or
+  `DEAD PROBE at R`, `git grep -n 'tools/push-main.test.sh' -- memory/backlog 'memory/builds/*/BACKLOG.md'`
+  shows a filed record naming it that is not CLOSED.
+  Red when: an arm was wired without its failing case having been observed; or the attributed run is
+  read by its NEW count alone, so a suite that aborted before its first FAIL line reads as clean.
   permission: the suite is a gate leg, so only the one post-build bar runs it.
 - **AC10** — When a single-parent records commit sits on top of T, `--land` accepts it and pushes
   HEAD; when a second merge sits there, `--land` refuses; and `--carry --slug tFix` over AC2's
@@ -256,10 +264,18 @@ quotes the usage line.
   exits 1.
   Red when: attribution fails open on an unknown commit, or refuses every non-empty carry set, so a
   branch that merged its own attended commits cannot land.
-- **AC13** — When `--carry --slug tFix` runs in a fixture whose `origin/HEAD` is unset and whose
-  `GOV_DEFAULT_BRANCH` is blank, it exits 3 and not 2.
+- **AC13** — The fixture runs `--carry --slug tFix` twice.
+  1. With `origin/HEAD` unset and `GOV_DEFAULT_BRANCH` blank, it exits 3 and not 2.
+  2. With HEAD on a merge `--prepare` made, `GOV_DEFAULT_BRANCH` naming the fixture's default branch,
+     and the fixture's `origin` URL then pointed at a missing path, `--carry --slug tFix` and
+     `--prepared --slug tFix` each exit 3 and not 2, and push nothing.
+
   Red when: an observation failure shares exit 2 with an argument refusal, so the driver reports a
-  network fault as a `LANDER_MODE` misdeclaration.
+  network fault as a `LANDER_MODE` misdeclaration; or a new flag reuses the attended path's fetch
+  refusal, which exits 2 at BASE (`tools/push-main.sh:78`); or the second arm leaves the default
+  branch undeterminable, so it exits 3 for the first arm's cause, or runs over a HEAD with no
+  prepared merge, so `--prepared` can exit 1 on the local shape; either way it never reaches the
+  remote.
 
 ## 7. Gates
 
@@ -300,6 +316,17 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   argument refusal and gives an observation failure exit 3 (AC13); the no-flag path keeps BASE's
   codes. AC9's arm list names the new criteria. G3 M1/H7: hands-off units 17 and 19, whose
   run's-own-commits function excludes the advertised tip that is the prepared merge's first parent.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold.
+  - G1 L2 (17): AC13 gains the unreachable-`origin` arm, in which `--carry` and `--prepared` each
+    exit 3 (S7). Fold verification: that arm pins `GOV_DEFAULT_BRANCH` and runs over a prepared
+    merge, so its exit 3 comes from the remote and not from the first arm's undeterminable default
+    branch or a local-shape exit 1.
+  - G1 B2 (1): the §3 hands-off edge to unit 19 names the `merge: <slug> — land onto` subject its
+    terminal-record exclusion recognises.
+  - G1 H1 (2, 24): AC9 reads `verdict clean` and the inherited-suite filing, and the §3
+    consumes-from edge to unit 1 is updated.
+  - G5 round-2 H1 (21, 36, 52), unit-2 end: §3 hands-off 34 names `--prepare`'s conflict refusal and
+    the reconcile the switch-over's landing makes before `--prepare --slug <slug>`.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-32 — remote CI on every push
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 32
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
@@ -37,22 +37,28 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   `bash tools/memory-tree/check-memory-hygiene.sh` over the full clone, which carries check 9 and the
   transition audit's check 25, with its output `tee`d to a file, then asserts that its output carries
   a line beginning `memory-hygiene: check 25 ` (unit 9 S7), dormant or examined. A job that never
-  reached check 25 cannot pass. Observed by AC3.
+  reached check 25 cannot pass. Observed by AC3 and AC13.
 - **S3** Job `bar`, on every push to the default branch: after the autocrlf step, a plain anonymous
   `git clone` of the repository to `C:/projects/coding-governance` — the path every recorded green was
   earned at and the one the rendered charter records — then `git checkout -B main <sha>`; it runs
   `GATE_FULL=1 bash tools/run-gates/run-gates.sh` there with `GATE_WALL` inside the window AC4
   states, so the runner's wall fires and names the outstanding legs before the platform kills the
   job. The job's conclusion is the per-sha verdict, and its run record is uploaded as S8 states.
-  Observed by AC4, AC10 and AC12.
+  Observed by AC4, AC10, AC12 and AC13.
 - **S4** Jobs `held-plan` and `held`, on a daily schedule and on `workflow_dispatch`. The plan job
   runs `bash tools/run-gates/run-selftests.sh --list`, the resolved population, and emits one matrix
-  entry per suite row: its name, its budget and its full resolved argv. It refuses — red, naming the
-  row — when a row does not parse, when the parsed count differs from the `row(s)` figure `--list`
-  prints, when `run-selftests.sh --kit "<argv>" --list` selects anything but that one row, or when
-  the entries exceed the platform's 256-entry matrix limit. Each `held` job runs
-  `bash tools/run-gates/run-selftests.sh --kit "<argv>" --sweep` for its one suite and uploads its
-  output as `held-<sha>-<suite name made path-safe>`. Observed by AC5 and AC11.
+  entry per suite row: its name, its budget, its full resolved argv and the bound S9 derives. It
+  refuses — red, naming the row — when a row does not parse, when the parsed count differs from the
+  `row(s)` figure `--list` prints, when `run-selftests.sh --kit "<argv>" --list` selects anything but
+  that one row, or when the entries exceed the platform's 256-entry matrix limit. Each `held` job runs
+  its one suite as the sweep runs a suite (`tools/run-gates/run-selftests.sh:571`), without calling
+  `--sweep`, whose scratch root holds each suite's output and is deleted on exit: it resolves a
+  launcher by sourcing `tools/lib/resolve-python.sh`, rewrites a leading `python` or `python3` in the
+  argv to it as the bar runner does for a leg (`tools/run-gates/run-gates.sh:1369`), and runs
+  `timeout -k 5 <bound> bash -c "<argv>"` under a private `TMPDIR` with `set -o pipefail`, its
+  combined output piped through `tee` into the workspace file its upload names. The step's exit
+  status is the suite's verdict, 124 or 137 read as a kill at its bound. It uploads that file as
+  `held-<sha>-<suite name made path-safe>`. Observed by AC5, AC11, AC13 and AC14.
 - **S5** The file's contract, observed before landing by hand and recorded in the unit's journal:
   every checkout carries `fetch-depth: 0`; every `uses:` is an `actions/` action pinned by a 40-hex
   sha; `permissions` grants `contents: read` and nothing more; the bar job's `GATE_WALL` is at least
@@ -60,10 +66,12 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   below its `timeout-minutes` in seconds, and `timeout-minutes` is at most 360; every
   `actions/checkout` carries `persist-credentials: false`; the autocrlf step precedes each checkout
   and the `bar` job's clone; every job carries `runs-on: windows-latest` and `shell: bash`; the `bar`
-  job's clone URL carries no credential and no `secrets` reference; and every checkout is followed by
-  `git remote set-head origin main`. Each observation is a staged break on a scratch copy of the
-  file, confirmed to fail, then removed. No permanent gate grades the file (§8 F2). Observed by AC1,
-  AC2 and AC4.
+  job's clone URL carries no credential and no `secrets` reference; every checkout is followed by
+  `git remote set-head origin main`; and the `on:` block names `push` restricted to `main`,
+  `schedule` and `workflow_dispatch` and no `pull_request` or `pull_request_target` event, with each
+  job's `if:` routing it to its own triggers. Each observation is a staged break on a scratch copy of
+  the file, confirmed to fail, then removed. No permanent gate grades the file (§8 F2). Observed by AC1,
+  AC2, AC4 and AC13.
 - **S6** The declarations the new file owes: `.github/workflows/*.yml` pinned to LF in
   `.gitattributes`, and `yml::dark` added to `LANGS` in `.lexicon.conf`, whose undeclared-extension
   refusal would otherwise red. The file sits outside `tools/govkit/registry.toml`'s declared surface
@@ -78,19 +86,22 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   replaced by one naming the workflow, its jobs, and that it detects after landing and is no
   required check. The headers of `tools/run-gates/run-selftests.sh` and
   `tools/unattended/run-unattended-gates.sh` stop saying nothing runs the held suites automatically,
-  and name the daily CI schedule, each beside the compensating-check wording unit 1 S8 leaves there.
-  The run-gates and unattended version moves these edits ride are the landing range's single ones,
-  NOT OBSERVED by a criterion here: `kit version markers` grades them. Observed by AC8.
-- **S8** Every upload names its files and runs after a failure. The `bar` job's `if: always()` step
-  copies `<git-dir>/gate-logs/` and, when present, `<git-dir>/gate-last-failure.txt` from the clone
-  into the workspace, and the `held` job's sweep output is `tee`d to a workspace file as it runs.
-  Every `actions/upload-artifact` step carries `if: always()` and `if-no-files-found: error`.
-  Observed by AC10.
-- **S9** The plan job prints each suite's derived sweep bound, its budget times the declared
-  `sweep-ceiling-factor`, and marks `platform-bounded` every suite whose bound exceeds the held job's
-  `timeout-minutes` in seconds. Every held job declares `timeout-minutes: 360` and captures the
-  sweep's output to a file as it runs, so a platform cancellation still uploads what ran. Observed by
-  AC11.
+  the unattended runner's line 2 stops saying they run 'on demand and nowhere else', and each header
+  names the daily schedule in `remote-ci.yml`, beside the compensating-check wording unit 1 S8 leaves
+  there. The run-gates and unattended version moves these edits ride are the landing range's single
+  ones, NOT OBSERVED by a criterion here: `kit version markers` grades them. Observed by AC8.
+- **S8** Every upload names its files and runs after a failure. The `bar` job's step that copies
+  `<git-dir>/gate-logs/` and, when present, `<git-dir>/gate-last-failure.txt` from the clone into the
+  workspace carries `if: always()`, and the `held` job's run step writes its output through `tee` into
+  the file its upload names as the suite runs (S4). Every `actions/upload-artifact` step carries
+  `if: always()` and `if-no-files-found: error`. Observed by AC10.
+- **S9** The plan job prints each suite's derived bound, its budget times the declared
+  `sweep-ceiling-factor`. Every held job declares `timeout-minutes: 360`, and the plan job marks
+  `platform-bounded` every suite whose bound exceeds the cap, `timeout-minutes` times 60 less 600
+  seconds, so no suite runs uncapped between the cap and the job limit. A `platform-bounded` suite
+  runs under the cap instead of its bound, so `timeout` kills it by name with ten minutes left for
+  its upload step, and its partial output is published as a named kill (§8 F7). Observed by AC11 and
+  AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -102,7 +113,9 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   a local re-run at the remote tip is a later change to that unit.
 - No pull-request trigger and no feature-branch trigger. Neither is in D11-b's scope.
 - No third-party action and no installed tool beyond what the runner image carries. `bash`, `git`,
-  `node` and a Python the repo's resolver can run are all on `windows-latest`.
+  `node` and a Python the repo's resolver can run are all on `windows-latest`. No held row depends
+  on a literal `python3` existing there: its leading `python` or `python3` is rewritten to the
+  launcher the resolver runs (S4).
 - No change to the kickoff manifest. Remote CI is not a command a session runs, and none of the files
   this unit touches is in its `watch:` list.
 - No permanent gate over the workflow file's text. A new gate is a separate unit under the build
@@ -154,20 +167,22 @@ workspace to reach.
 |---|---|---|---|
 | `history-audit` | push to the default branch | `bash tools/memory-tree/check-memory-hygiene.sh` | the check run on the sha |
 | `bar` | push to the default branch | `GATE_FULL=1 bash tools/run-gates/run-gates.sh` in a clone at `C:/projects/coding-governance` | the check run, and the run record as artifact `bar-<sha>` |
-| `held-plan`, `held` | daily cron, `workflow_dispatch` | `run-selftests.sh --kit <argv> --sweep` per suite | one artifact `held-<sha>-<suite>` per suite |
+| `held-plan`, `held` | daily cron, `workflow_dispatch` | each suite's argv under `timeout`, as the sweep runs it, output `tee`d | one artifact `held-<sha>-<suite>` per suite |
 
 The history audit is its own job even though the bar holds the same leg. D11-b names it, it is what
 an owner would mark required, and its verdict must not depend on a bar that can red for a host
 reason. It costs one engine run per push.
 
-`--sweep` is the right mode for the held run because it issues no cost verdict: the per-suite
-budgets in `tools/run-gates/selftest-budgets.txt` were measured on this repo's nodes, and a runner
-with a different clock would red them on cost with nothing wrong in the tree. `--sweep` still
-bounds each suite by a hang bound derived from its budget, at the budget times the
-`sweep-ceiling-factor` the budget file declares. One suite's bound exceeds the hosted job's 21600 s:
-`unattended gate selftest`, 13600 s times 2 is 27200 s (PINNED, measured 2026-09-14). For such a
-suite the platform, not the sweep, bounds the job, so its cancellation is published as a partial
-output rather than as a named kill (S9).
+The held run issues no cost verdict: the per-suite budgets in `tools/run-gates/selftest-budgets.txt`
+were measured on this repo's nodes, and a runner with a different clock would red them on cost with
+nothing wrong in the tree. It keeps the sweep's hang bound, the budget times the
+`sweep-ceiling-factor` the budget file declares, and runs each suite as `--sweep` does, without
+calling it: the sweep writes each suite's output under a `mktemp -d` root its EXIT trap deletes and
+prints only verdict lines, at most four for a FAIL (`tools/run-gates/run-selftests.sh:492-493` and
+`:681`), so a `tee` of the sweep captures a header and not what ran (§8 F7). One suite's bound exceeds
+the hosted job's 21600 s: `unattended gate selftest`, 13600 s times 2 is 27200 s (PINNED, measured
+2026-09-14). Such a suite runs under the cap S9 states, so its kill is named and its partial output
+is published.
 
 The held population is split by suite because it does not fit one job. `run-selftests.sh --list`
 at BASE declares 62 rows and 55710 leg-seconds, with one suite budgeted at 13600 s, against a hosted
@@ -186,13 +201,14 @@ schedule by joining the declaration, with no list typed into the workflow.
   shallow and full clones alike, so until unit 34 lands A9 is held by every checkout's
   `fetch-depth: 0` (AC1) and not by the audit.
 - `bar` inherits the runner's own liveness: a run with no verdict line is RED at the hook and here.
-- `held` reds when its key selects no suite. `run-selftests.sh` already refuses a filter that
-  matches nothing, and the plan job refuses any key that selects other than its one row (S4).
+- `held` reds on an empty argv and on the suite's own exit status, and the plan job refuses any key
+  that selects other than its one row (S4), so a matrix entry cannot name a suite the population
+  does not hold.
 
 ### Security
 
 The token GitHub issues to the jobs is read-only and is not left in the clone's git config. No job
-uses a secret, writes to the repository, or runs on an event a fork can trigger. Pinning each action
+uses a secret, writes to the repository, or runs on an event a fork can trigger (AC13). Pinning each action
 by commit sha makes a moved tag unable to change what runs. These are the only GitHub-owned actions
 used, `actions/checkout` and `actions/upload-artifact`, and they are part of the Actions platform the
 owner authorized; any other action would be a new external dependency, which S5's observation
@@ -239,6 +255,9 @@ holds A9 until unit 34 lands.
 - **Directory keys for the held matrix, or an exact selector added to `run-selftests.sh`.**
   Directories do not partition the population under a substring filter, and an exact selector is a
   new run-gates surface and a second version move in this landing range (§8 F6).
+- **Capturing `--sweep`'s output, or a sweep option that keeps each suite's output.** The first
+  captures verdict lines only; the second is a new run-gates surface and a second version move in
+  this landing range (§8 F7).
 
 ## 5. Production-readiness checklist
 
@@ -258,8 +277,10 @@ holds A9 until unit 34 lands.
   which silences the held run; the charter line names the file, and its absence of runs is visible
   on the Actions page. Before landing, only the commands AC12 names were run in a runner-shaped
   clone; an unguarded leg that bakes another node fact shows first on the live run, and is filed as
-  an ask. A `platform-bounded` suite on a runner slower than its recorded reading is cancelled by the
-  platform; its partial output is published and the cancellation is filed as an ask. The window this
+  an ask. A `platform-bounded` suite on a runner slower than its recorded reading is killed at its cap by
+  name; its partial output is published and the kill is filed as an ask. A runner image with no
+  Python the resolver can run reds every held job naming the resolver's refusal, which is a host red
+  and is filed as one. The window this
   leaves for `GATE_WALL` runs from `ceiling_max` to just under the hosted job's 21600 s. Whether a
   `GATE_FULL=1` bar at the runner's width finishes inside it is unmeasured before the first live
   run; a wall breach there is filed as an ask naming the choice it raises, a narrower bar or a
@@ -276,16 +297,23 @@ holds A9 until unit 34 lands.
   `grep -c 'actions/checkout@'` run over `remote-ci.yml`, the three counts are equal and non-zero;
   each checkout and the `bar` job's clone step is preceded in its job by the `core.autocrlf false`
   step and each checkout is followed by `git remote set-head origin main`; every job declares
-  `runs-on: windows-latest` and `shell: bash`; and the `bar` job's clone URL holds no `secrets.`
-  reference. On a scratch copy, one break per property — a deleted `fetch-depth` line, a deleted
-  `persist-credentials` line, the autocrlf step moved after a checkout, one job on `ubuntu-latest`,
-  one `set-head` step deleted — makes its check fail, and the journal records each reading.
+  `runs-on: windows-latest` and `shell: bash`, and carries a step running
+  `git symbolic-ref refs/remotes/origin/HEAD` before any bar command; and the `bar` job's clone URL
+  holds no `secrets.` reference. On a scratch copy, one break per property — a deleted `fetch-depth`
+  line, a deleted `persist-credentials` line, the autocrlf step moved after a checkout, one job on
+  `ubuntu-latest`, one `set-head` step deleted, one job's `shell: bash` deleted, a
+  `${{ secrets.X }}` reference put in the clone URL, and one job's `symbolic-ref` assertion step
+  deleted — makes its check fail, and the journal records each reading.
   Red when: only the first job's checkout is full-history or credential-free, so a second job runs
-  shallow or leaves the token in the clone's git config, or a job runs on a runner F1 rejected.
+  shallow or leaves the token in the clone's git config, or a job runs on a runner F1 rejected; or a
+  job loses its symref assertion, so a missing `set-head` fails later inside a bar leg for a host
+  reason.
 - **AC2** — When `grep -nE 'uses:'` runs over the workflow file, every line names `actions/` and
-  ends in a 40-hex sha followed by its tag comment; on a scratch copy naming a tag instead, the same
-  pattern test fails, and the journal records both.
-  Red when: the pin test accepts any hex string, so a short prefix a tag can shadow passes.
+  ends in a 40-hex sha followed by its tag comment; on a scratch copy naming a tag instead, and on one
+  naming a non-`actions/` action pinned by a 40-hex sha, the same pattern test fails, and the journal
+  records the three readings.
+  Red when: the pin test accepts any hex string, so a short prefix a tag can shadow passes; or the
+  test reads only the pin, so a third-party action pinned by sha passes as a GitHub-owned one.
 - **AC3** — When the history-audit job's steps run by hand in a full clone of the branch,
   `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 and the liveness step finds a line beginning
   `memory-hygiene: check 25 `; in a `git clone --depth 1 file://<clone>` of the same shards-mode
@@ -305,11 +333,13 @@ holds A9 until unit 34 lands.
   `GATE_FULL=1 bash tools/run-gates/run-gates.sh --print-profile` prints and below `timeout-minutes`
   times 60, `timeout-minutes` is at most 360, and `permissions` reads `contents: read` with no other
   grant; on a scratch copy with `GATE_WALL` below
-  `ceiling_max`, and on one with `GATE_WALL` at the timeout, the same comparison fails, and the
-  journal records both.
+  `ceiling_max`, on one with `GATE_WALL` at the timeout, on one adding a job-level
+  `permissions: contents: write`, and on one with `timeout-minutes: 361`, the matching read fails, and
+  the journal records the four readings.
   Red when: the wall sits below the largest leg ceiling the full bar runs, so it kills a healthy leg
   on every push, or at or above the timeout, so the platform kills the job before the runner can
-  name a leg.
+  name a leg; or the grant read has never been seen to fail, so a job-level write grant, which
+  overrides the workflow level, passes the unit's one security bound.
 - **AC5** — When the `held-plan` derivation runs by hand, the union of its entries by row name
   equals the population `bash tools/run-gates/run-selftests.sh --list` prints, with no name twice,
   and each entry's `--kit "<argv>" --list` selects exactly its own row; on a scratch copy of the
@@ -326,37 +356,75 @@ holds A9 until unit 34 lands.
 - **AC8** — When `bash tools/playbook/adopt-playbook.sh --target . --check` runs, the rendered
   charter names the workflow file `remote-ci.yml` and is current, and `AGENTS.md` no longer calls
   remote CI a follow-up; `grep -c '^ci_file' .governance/deploy.toml` prints 0; a scratch render
-  with `.github/workflows/` removed refuses naming `CI_FILE`, recorded in the journal; and
-  `grep -ci 'nothing runs the self-tests automatically\|nothing runs these automatically'` over both
-  runner headers prints 0.
+  with `.github/workflows/` removed refuses naming `CI_FILE`, recorded in the journal;
+  `grep -ci 'nothing runs the self-tests automatically\|nothing runs these automatically\|nowhere else'`
+  over both runner headers prints 0; and `grep -c 'remote-ci.yml'` prints at least 1 over each runner
+  header and over `AGENTS.md`'s merge-bar section, and `grep -c 'no NEW FAIL'` at least 1 over each
+  runner header.
   Red when: the `ci_file` answer is left in place, so deleting the workflow later revives "none
   yet" silently instead of refusing the render; or one runner header still says nothing runs its
-  suites automatically after the schedule does.
+  suites automatically after the schedule does; or a header's whole 'WHAT IS THEREFORE NOT COVERED'
+  paragraph, or the `AGENTS.md` sentence, is deleted rather than rewritten, which passes every
+  absence grep and removes the compensating-check sentence unit 1 S8 rewrote.
 - **AC9** — When `python tools/drift-audit/drift_report.py --check` runs after the `LANGS` edit, it
   exits 0 with `signal_lexicon_ratified_stale` at its pin; on a scratch copy with the `ratified=`
   line reverted, the same command reds naming that signal, and the journal records both.
   Red when: `yml::dark` lands without the re-stamp, which the unguarded `drift-audit records` leg
   reds on the landing bar and on the CI bar job while every unit-pass observation stays green.
 - **AC10** — When `grep -c 'uses: actions/upload-artifact@'` runs over the workflow file, it equals
-  the count of `if: always()` lines on those steps and the count of `if-no-files-found: error`, and
-  the `bar` job's copy step names `gate-logs`; on a scratch copy with one upload's `if: always()`
-  deleted the counts differ, and the journal records both.
-  Red when: an upload runs under the default `success()` condition, so a red bar, the one run whose
-  record matters, publishes nothing.
+  the count of `if: always()` lines on those steps and the count of `if-no-files-found: error`; the
+  `bar` job's copy step names `gate-logs` and carries `if: always()`; and each `held` job's run step
+  pipes through `tee` into the path its upload step names. On scratch copies with one upload's
+  `if: always()` deleted, with the copy step's `if: always()` deleted, and with the held step's `tee`
+  removed, the corresponding read fails, and the journal records the three readings.
+  Red when: an upload, or the step that writes its files, runs under the default `success()`
+  condition, so a red bar, the one run whose record matters, publishes nothing and the upload then
+  fails on `if-no-files-found: error`; or the held output goes only to the log, so a killed suite
+  leaves nothing to upload.
 - **AC11** — When the plan job's derivation runs by hand, each printed bound equals the suite's
   `--list` budget times the `sweep-ceiling-factor` line of `tools/run-gates/selftest-budgets.txt`,
-  and the `platform-bounded` set equals the suites whose bound exceeds 21600 s; every `held` job in
-  the workflow declares `timeout-minutes: 360`.
-  Red when: a suite whose bound exceeds the job limit is left unmarked, so its platform cancellation
-  is read as a hang in the tree, or a held job runs at the platform's default limit.
+  the `platform-bounded` set equals the suites whose bound exceeds the 21000 s cap, and each of those
+  is emitted with a run bound of 21000 s; every `held` job in the workflow declares
+  `timeout-minutes: 360`.
+  Red when: a suite whose bound exceeds the job limit is left unmarked or uncapped, so the platform
+  cancels it unnamed and whether its output uploads rests on an unverified platform behaviour; or a
+  suite whose bound lies between 21000 s and 21600 s runs uncapped, leaving its upload step no time;
+  or a held job runs at the platform's default limit.
 - **AC12** — When a runner-shaped clone of the branch is made at a second path — `git clone` there,
   then `git remote set-head origin --delete` — `bash tools/playbook/adopt-playbook.sh --target . --check`
-  prints DRIFT naming `PRIMARY_TREE_A`, and `python tools/drift-audit/drift_report.py --check` exits 2
-  naming the unresolved default branch; after `git remote set-head origin main` the report no longer
-  refuses on its base ref. The journal records the three readings, and the
+  run in it prints `render-playbook: DRIFT — the charter region differs from a fresh render`;
+  `python tools/playbook/render_playbook.py --target .` run in the same clone, without `--check`,
+  prints `derived   PRIMARY_TREE_A = <second path>`, and `git diff AGENTS.md` there shows changed
+  lines only where they carry the second path; `python tools/drift-audit/drift_report.py --check`
+  exits 2 naming the unresolved default branch; and after `git remote set-head origin main` the
+  report no longer refuses on its base ref. The journal records the four readings, and the
   workflow's `bar` job clones to `C:/projects/coding-governance`.
   Red when: the bar job runs in `actions/checkout`'s workspace, so the per-sha verdict is red on
-  every push for a host reason and reads as noise.
+  every push for a host reason and reads as noise; or a node fact other than the clone path also
+  drifts on the runner, which the bare DRIFT line cannot tell apart and the write-mode diff shows as a
+  changed line that does not carry the second path.
+- **AC13** — When the workflow file's `on:` block and each job's `if:` are read, `on:` names `push`
+  with `branches: [main]`, `schedule` and `workflow_dispatch`, and no event whose name begins
+  `pull_request`; `history-audit` and `bar` run only on `push`, and `held-plan` and `held` only on
+  `schedule` and `workflow_dispatch`. On scratch copies with `branches: [master]`, with an added
+  `pull_request_target`, and with the `bar` job's `if:` deleted, the read fails each time, and the
+  journal records the three readings.
+  Red when: a branch-filter typo or an event filter that never matches passes every other criterion,
+  so D11-b's per-push audit never runs and the first sign is the wrap-up's missing live run; or a
+  fork-triggerable event is added, which §4's security claim states and nothing else reads.
+- **AC14** — When the `held` job's run step is executed by hand in a Git-Bash shell over two
+  synthetic matrix entries, never a real suite — one whose argv is `python3 -c "print('held-probe')"`,
+  and one whose argv prints a line and then sleeps past a bound replaced by 5 seconds — with
+  `python3` shadowed on `PATH` by a stub that exits 9009, the first exits 0 under the resolved
+  launcher with `held-probe` in the workspace file, the second exits 124 with its printed line in the
+  workspace file, and on a scratch copy of the step with the argv rewrite removed the first fails on
+  the stub. The journal records the three readings.
+  Red when: the step tees `run-selftests.sh --sweep`, so the file holds the sweep's header and a
+  verdict line instead of what ran, and a killed suite uploads nothing a reader can use; or argv[0]
+  is run unresolved, so every literal-`python3` row reds daily for a host reason and reads as a tree
+  failure.
+  cost: seconds. permission: synthetic argv only, because unit passes run no gate legs; the held
+  suites first run on the live schedule.
 
 ## 7. Gates
 
@@ -397,6 +465,15 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   existing substring filter, the plan job refusing a key that selects other than one row. (a) is a
   new run-gates surface and a second version move in this landing range. RESOLVED (agent,
   2026-09-14, delegated): (b); (a) is recorded as an ADD candidate.
+- **F7 — how the held job runs a suite and captures what ran.** Options: (a) `tee` the output of
+  `run-selftests.sh --kit "<argv>" --sweep`, as rev-2; (b) run the row's argv as the sweep does,
+  under `timeout -k 5 <bound>` with its output piped through `tee`, resolving the launcher and
+  rewriting a leading `python` or `python3` as the bar runner does; (c) a sweep option that streams
+  or keeps each suite's output. (a) captures the sweep's header and at most four lines of a FAIL,
+  because the sweep deletes each suite's output on exit, and runs a literal `python3` unresolved;
+  (c) is a new public run-gates surface and a second version move in this landing range, which veto
+  2 reserves. RESOLVED (agent, 2026-09-16, delegated): (b), with a `platform-bounded` suite capped at
+  `timeout-minutes` times 60 less 600 seconds, so its kill is named and its upload runs.
 - The adoption of remote CI, its detection-after-landing timing and its held-suite schedule are
   RESOLVED (owner, 2026-09-13) as D11-b, D11-c and D12-i12, and the push of the workflow file as the
   owner's 2026-09-14 answer that the credential has scope.
@@ -417,14 +494,29 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   refusing render. G5 L1 (73): S7 corrects both runner headers, consumes-from 1, §7 gains
   `kit version markers`. Adds two edges the brief's table does not list, consumes-from units 1 and
   27.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G5 H5 (1, 39): AC12 keeps the bare DRIFT line and
+  attributes the drift in write mode, `derived   PRIMARY_TREE_A` and a diff whose every changed line
+  carries the second path. G5 M10 (37) with M12 (38): the held job runs the row's argv as the sweep
+  does, under `timeout`, `tee`d, the launcher resolved and a leading `python3` rewritten; a
+  `platform-bounded` suite capped at 21000 s; S4, S8, S9, §3 runner bullet, §4 triggers row, held-run
+  paragraph, liveness bullet and alternatives, §5 risks, AC11, new AC14; §8 F7. G5 M11 (2): AC10
+  reads the copy step's `if: always()` and the held `tee`, with two more staged breaks. G5 M13 (3):
+  AC1, AC2 and AC4 stage the five unstaged S5 properties and the symref assertion. G5 M14 (4): S5
+  adds the triggers, new AC13 reads `on:` and each job's `if:`, S2, S3, §4 Security. G5 L1 (5) and
+  L2 (32): S7 names line 2's clause, AC8 greps positive content and `nowhere else`. Fold
+  verification: S9 and AC11 mark `platform-bounded` every suite over the 21000 s cap rather than the
+  21600 s limit, so none runs uncapped between them; §10 describes the held run as F7 decides it,
+  not as `--sweep`.
 
 ## 10. Reuse audit
 
 Nothing here builds a gate engine: every job runs a command the bar already owns. The history audit is
 `tools/memory-tree/check-memory-hygiene.sh` as the `memory hygiene` leg runs it; the per-sha verdict is
 `tools/run-gates/run-gates.sh` with `GATE_FULL=1` and its existing `GATE_WALL` override at
-`run-gates.sh:422`; the held run is `tools/run-gates/run-selftests.sh --sweep`, whose usage text
-already states that it answers only whether any suite failed. The charter line is derived by
+`run-gates.sh:422`; the held run is each suite's own argv, run the way
+`tools/run-gates/run-selftests.sh --sweep` runs one suite and with the launcher rewrite
+`tools/run-gates/run-gates.sh` applies to a leg, without calling the sweep, whose scratch root
+deletes the output the held job exists to publish (§8 F7). The charter line is derived by
 `derive_ci_file` in `tools/playbook/render_playbook.py`. `python tools/codebase-map/reuse_lookup.py
 "run the merge bar and the history audit on a remote CI runner for every push to main"` returned
 name-stem neighbours only, `run` and `merge` among them, and it reports `.sh` as an unscanned layer;

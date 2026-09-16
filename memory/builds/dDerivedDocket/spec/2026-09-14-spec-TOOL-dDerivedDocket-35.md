@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 35
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 35
 
 <!-- gen:spec-records -->
 
@@ -32,11 +32,14 @@ against the fixture.
 - **S2** One scratch clone of this unit's commit, whose `origin` is a local bare repository seeded
   from that commit, and whose `merge.rows.driver` is set to the value this node carries, since a
   clone copies no local config. The clone's PRIMARY tree stays on its default branch. Its
-  `core.hooksPath` is written by running the clone's own post-switch `tools/check-wiring.sh`. The
-  topology is built with the fixture helper unit 13's suite uses for its linked-worktree case, so
-  the two cannot drift. Every staged break below runs there, so the corpus a break is graded against
-  is this repo's real post-switch content, and nothing a break writes can reach the repository or its
-  remote. The clone's `.memory-tree.conf` declares one extra family, `EXMP`, used by the scratch
+  `core.hooksPath` is written by running the clone's own post-switch
+  `bash tools/check-wiring.sh --fix`, the mode that writes the relative `.githooks` value when the
+  path is unset; the bare form is `--check`, which prints `UNWIRED hooks` and writes nothing. The
+  topology is built by `straggler-guard.test.sh --topology <clone> <branch>`, the helper unit 13's
+  suite builds its linked-worktree case through (its S8), so the two cannot drift; that mode sets no
+  hooks path, so the clone's own `tools/check-wiring.sh --fix` still writes the value S6 measures.
+  Every staged break below runs there, so the corpus a break is graded against is this repo's real
+  post-switch content, and nothing a break writes can reach the repository or its remote. The clone's `.memory-tree.conf` declares one extra family, `EXMP`, used by the scratch
   fixtures alone, so every id a RED prints is either a real id the corpus defines or an `EXMP` id.
   The two scratch READMEs of S3 and S4 are committed and pushed to the scratch remote's default
   branch BEFORE the hooks path is set, so neither landing meets the pre-push boundary and no bypass
@@ -63,8 +66,9 @@ against the fixture.
   ABSOLUTE `core.hooksPath` `config.worktree` override naming the primary scratch tree's `.githooks`,
   the configuration under which the layer reaches a straggler and the one most live worktrees on this
   node carry, set explicitly for this arm and named as a fixture setting in the ledger, where it must
-  observe the refusal. Once under the relative value `tools/check-wiring.sh` writes, where it records
-  the documented inertness and the `hooks own-tree` note (§8 F5). Observed by AC5.
+  observe the refusal. Once under the relative value `tools/check-wiring.sh --fix` writes, where it
+  records the documented inertness, and `bash tools/check-wiring.sh --session` run in the primary
+  scratch tree prints the `hooks own-tree` note (§8 F5). Observed by AC5.
 - **S7** The transition audit's RED: that branch commits, in the linked worktree, a shard row change
   with `--no-verify`, and is merged into the scratch default branch with `git merge --no-ff` in the
   primary scratch tree. The row driver stops the merge
@@ -76,10 +80,19 @@ against the fixture.
   removed afterwards with its read-only git objects cleared first. The real tree carries only this
   unit's declared writes. Observed by AC7.
 - **S9** This build's own asks after arming. Its close is the first one graded with `ASKS_CMD` set,
-  so every ask homed in `memory/builds/dDerivedDocket/BACKLOG.md` must already be terminal or carry
-  a disposition row there, and the unit records the list it read. The list names `<triage-id>`,
-  which unit 34 S17 files with a KEEP in this build's `BACKLOG.md` and which stays live by design.
-  Observed by AC8.
+  so every ask homed in `memory/builds/dDerivedDocket/BACKLOG.md` must be terminal or carry a
+  disposition row there. The unit reads the folder's asks through
+  `gen_build_index.py --asks --all --json`. For each live ask there with no status row whose own
+  text records its decline under the unattended protocol's section 11, the trail §11 files for a
+  declined discovery, it writes
+  `- KEEP · <id> · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal`
+  in that file, the record design §19.6 gives a declined discovery. It writes no other row: a live
+  ask with neither a disposition nor a recorded decline is left for AC8 to red by name. The list the
+  unit records names `<triage-id>`, which unit 34 S17 files with a KEEP and which stays live by
+  design, and the two asks this build's round-1 spec-audit fold filed as declined discoveries, the
+  ids TOOL-dDerivedDocket-38 and TOOL-dDerivedDocket-39, the whole population
+  `grep -n 'dDerivedDocket-[0-9]* · OPEN' memory/backlog/*.md` measured at spec time (§8 F6).
+  Observed by AC7 and AC8.
 - **S10** The kickoff manifest's `last-audit` is re-stamped in the same commit, with a delta line in
   the commit message, because `.unattended.conf` is in its `watch:` list and the staged leg refuses a
   watched change without one. The §B claims that file feeds are re-read first. Observed by AC9.
@@ -100,7 +113,8 @@ against the fixture.
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-34` — a builds-mode tree with rendered views and filed asks,
-  and the triage ask with its KEEP (its S17). Without it `ASKS_CMD` has no `BACKLOG.md` to read and
+  the triage ask with its KEEP (its S17), and the asks its writer transfers into this build's
+  `BACKLOG.md` with no status row, which S9 disposes or names. Without it `ASKS_CMD` has no `BACKLOG.md` to read and
   every break below grades an empty corpus.
 - **consumes-from** `TOOL-dDerivedDocket-16` — the `ASKS_CMD` contract, its conf-example entry and
   property P5 at preflight, which S1 spells gov's value against and S3 stages. Added by this spec;
@@ -109,8 +123,9 @@ against the fixture.
   stages on a scratch run.
 - **consumes-from** `TOOL-dDerivedDocket-18` — the folder-wide anchor ban, which S5 stages.
 - **consumes-from** `TOOL-dDerivedDocket-13` — the pre-commit refusal on a pre-switch branch, which
-  S6 stages, and the linked-worktree topology helper `straggler-guard.test.sh` builds, and the
-  hooks-path value that unit's rev-2 settles.
+  S6 stages, and the linked-worktree topology helper, `straggler-guard.test.sh` in its `--topology`
+  mode (unit 13 S8), the hooks-path value that unit's rev-2 settles, which
+  `tools/check-wiring.sh --fix` writes, and the `hooks own-tree` note `--session` prints (its S5).
 - **consumes-from** `TOOL-dDerivedDocket-9` — check 25 and the `commit-msg` carrier, which S7
   stages. Added by this spec; the brief's roster note for this unit names it.
 - **hands-off** external — the first ask-driven pilot: the owner lands a README with
@@ -141,7 +156,7 @@ instead of an empty fixture.
 | ask driver | `asks:` names an id no `BACKLOG.md` files | `unattended.sh --preflight <scratch-slug> --keepalive-id <id>` | P5 and the id |
 | asks-disposed | a mandated ask filed, undisposed, unclosed | `unattended.sh --close <scratch-slug>` | `asks-disposed` and the ask |
 | leg second opinions | a table row whose backticked first cell is a foreign ask id | `bash tools/unattended/check-unattended.sh` | the anchor ban and the id |
-| straggler hook | a pre-switch branch, in a linked worktree, staging a shard edit | `git commit` in the linked worktree on the pre-switch branch | the recipe's `--relocate` line, or the recorded inertness S6 names |
+| straggler hook | a pre-switch branch, in a linked worktree, staging a shard edit | `git commit` in the linked worktree on the pre-switch branch | the recipe's `--relocate` line, or the recorded inertness and the `--session` note S6 names |
 | transition audit | an unaccounted shard change merged into the default | `git merge --no-ff`, `git commit`, then `check-memory-hygiene.sh` | at `commit-msg`, the unaccounted id; at the audit, the merge sha, the id, the change commit |
 
 Two scratch builds are needed, both landed on the scratch remote's default branch before any
@@ -164,12 +179,15 @@ that meets an inherited red under `INHERITED_RED=land` writes an ask into the ru
 
 ### This build's own close
 
-With `ASKS_CMD` set, `asks-disposed` evaluates this build at its close. The build carries no
-`asks:` fact, so its term is T0 when nothing is homed in its folder and T3 over F otherwise. After the
-switch-over, this build's `BACKLOG.md` holds the signed triage dispositions and the superseding
-disposal, and any ask this run filed as a discovery. S9 reads the folder's asks through
-`gen_build_index.py --asks --all --json` at this unit's commit and records each with its status, so
-the close cannot be the first place an undisposed ask of this run is noticed.
+With `ASKS_CMD` set, `asks-disposed` evaluates this build at its close. The build carries no `asks:`
+fact, so its term is T0 when nothing is homed in its folder and T3 over F otherwise, and D12-c's
+KEEP restriction, which binds a mandated ask only (unit 17 T3 end state 3), binds no ask here. After
+the switch-over, this build's `BACKLOG.md` holds the signed triage dispositions, the superseding
+disposal, the triage ask with its KEEP, and every ask a fold or pass of this run filed under its
+slug as a declined discovery before the switch-over, which the writer transferred as a live ask
+with no status row. S9 writes a KEEP for each of those, reads the folder's asks through
+`gen_build_index.py --asks --all --json` at this unit's commit, and records each with its status,
+so the close cannot be the first place an undisposed ask of this run is noticed.
 
 ### Inventory
 
@@ -188,18 +206,21 @@ in S6 and S7 are real ids the corpus already defines, so citing them is a citati
 
 ### Files touched (estimate)
 
-`.unattended.conf` · `memory/guides/SESSION-KICKOFF.md` (the stamp) · this unit's acceptance-ledger
-journal under `memory/builds/dDerivedDocket/build/`.
+`.unattended.conf` · `memory/guides/SESSION-KICKOFF.md` (the stamp) ·
+`memory/builds/dDerivedDocket/BACKLOG.md` (S9's KEEP rows) · this unit's acceptance-ledger journal
+under `memory/builds/dDerivedDocket/build/`.
 
 ### Rollout
 
 1. Reground, and confirm units 9, 13, 16, 17, 18 and 34 read CLOSED.
-2. Set `ASKS_CMD`, re-read the manifest's claims, re-stamp, and commit.
+2. Set `ASKS_CMD`, write S9's KEEP rows in this build's `BACKLOG.md`, re-read the manifest's
+   claims, re-stamp, and commit.
 3. Clone that commit into the scratch directory with a bare remote; land the two scratch READMEs
-   (S2); run the clone's `tools/check-wiring.sh` to set the hooks path; create the linked worktree
+   (S2); run the clone's `bash tools/check-wiring.sh --fix` to set the hooks path; create the linked worktree
    for S6 and S7.
 4. Stage each break in the order of the table, confirm its RED, and copy it into the ledger.
-5. Read this build's own asks, record them, and remove the scratch clone.
+5. Read this build's own asks at that commit, record each with its status and deciding row, and
+   remove the scratch clone.
 
 ### Alternatives rejected
 
@@ -212,7 +233,8 @@ journal under `memory/builds/dDerivedDocket/build/`.
 
 ## 5. Production-readiness checklist
 
-- security — the only repository write is one conf value and the manifest stamp. Every break writes
+- security — the only repository writes are one conf value, the manifest stamp, and S9's KEEP rows
+  in this build's own `BACKLOG.md`, the file design §19.6 lets a pass of the build write. Every break writes
   inside the scratch clone, and its remote is a local bare repository, so no break can push anywhere
   real. `PROBE_ALLOW` stays empty, so no filed `seen` command becomes executable.
 - perf / scale — one clone of the repository and five short commands; the hygiene run is the
@@ -253,12 +275,16 @@ journal under `memory/builds/dDerivedDocket/build/`.
   with a shard edit staged, while the primary scratch tree stays on its default branch: under an
   absolute `core.hooksPath` `config.worktree` override naming the primary scratch tree's `.githooks`,
   it is refused and the output carries the recipe's `migrate_backlog.py --relocate` line; under the
-  relative value `tools/check-wiring.sh` wrote, the ledger records the commit landing with no recipe
-  and the `hooks own-tree` note, and AC6 carries the binding RED.
-  Red when: the clone's `core.hooksPath` is unset, so no hook runs and the commit lands silently; or
+  relative value `bash tools/check-wiring.sh --fix` wrote, the ledger records the commit landing with
+  no recipe, and `bash tools/check-wiring.sh --session` run afterwards in the primary scratch tree
+  prints one `note` line naming the straggler with `hooks own-tree`, which the ledger records; AC6
+  carries the binding RED.
+  Red when: the clone's `core.hooksPath` is unset, so no hook runs and the commit lands silently,
+  which is what the bare `tools/check-wiring.sh`, the `--check` mode that writes nothing, leaves; or
   the straggler is checked out in the primary scratch tree, so the branch guard or BASE's own hooks
   answer first and no recipe prints; or the absolute arm is skipped, so the one configuration under
-  which the layer reaches a straggler is never observed.
+  which the layer reaches a straggler is never observed; or the relative arm records no
+  `--session` note, so its landing commit cannot be told from an unset path.
 - **AC6** — When the scratch straggler is merged with `git merge --no-ff` and the conflict is
   resolved to the default branch's view, `git commit` is refused by `.githooks/commit-msg`;
   concluded with `--no-verify`, `bash tools/memory-tree/check-memory-hygiene.sh` exits 1 naming the
@@ -274,8 +300,14 @@ journal under `memory/builds/dDerivedDocket/build/`.
   defined nowhere.
 - **AC8** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs at this unit's
   commit, every ask homed in this build's `BACKLOG.md` is terminal or carries a disposition row
-  there, and the journal lists each.
-  Red when: an ask this run filed is left undisposed, which this build's own close would then red.
+  there: `<triage-id>` its KEEP from unit 34, and
+  the asks TOOL-dDerivedDocket-38 and TOOL-dDerivedDocket-39 the KEEP S9 wrote citing section 11;
+  `git diff HEAD^ HEAD` over this build's `BACKLOG.md` adds only KEEP rows, each naming an ask whose
+  text records that decline; and the journal lists each ask with its status and
+  deciding row.
+  Red when: an ask this run filed is left undisposed, which `asks-disposed` T3 reds at this build's
+  close and V10 at the landing bar once every unit is CLOSED; or S9 writes a KEEP for a live ask
+  whose text records no decline, declaring an in-goal item outside the goal with every read green.
 - **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
   passes with the re-stamped `last-audit`.
   Red when: the conf moves with no re-stamp, which the staged leg refuses at the commit.
@@ -317,6 +349,20 @@ observes them on real content.
   configuration most live worktrees on this node carry. RESOLVED (agent, 2026-09-14, delegated): (b),
   the more feature-rich survivor; the override is named in the ledger as a fixture setting, so the
   RED does not claim to prove gov's own wiring.
+- **F6** — Who disposes the asks this run filed as declined discoveries before the switch-over?
+  The writer transfers each into this build's `BACKLOG.md` as a live ask with no status row, and
+  nothing disposes it: unit 11 S7 turns only terminal tokens and holds into dispositions, unit 33
+  triages only asks on finished builds, and unit 34 S17 files a KEEP only for the triage ask.
+  Options: (a) unit 34's writer files a KEEP for every census ask homed in the `--as` file that
+  derives OPEN; (b) this unit writes a KEEP for each live ask homed here whose text records its
+  section 11 decline; (c) the shard rows get a disposing legacy token before the switch-over; (d)
+  unit 33 triages this build's own asks. (a) has the kit writer originate dispositions no signed
+  record carries, for every adopter's switch build, beyond the data surface that unit priced; (c)
+  has no legal token, since a shard row cannot carry KEEP, a DEFERRED naming no release id breaks
+  owner ruling D5, and WONTDO misstates a decline; (d) widens D6's finished-build population to a
+  build that is not finished when it signs. RESOLVED (agent, 2026-09-16, delegated): (b), design
+  §19.6's KEEP for a declined discovery, written by a pass of the build in its own file before the
+  last closing commit. D12-c does not reach it: this build names no mandated ask.
 
 ## 9. Revision log
 
@@ -332,6 +378,13 @@ observes them on real content.
   the term label and one witness row per scoped id. G5 B1 via the c2 fold: S9's read names the triage
   ask unit 34 S17 files with a KEEP, and consumes-from unit 34 names it. Orchestrator: consumes-from
   unit 13 names `straggler-guard.test.sh`, the file that unit's hands-off names for the helper.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G5 H6 (13): S2 and Rollout step 3 set the hooks
+  path with `tools/check-wiring.sh --fix`; S6's relative arm and AC5 read the `hooks own-tree` note
+  `--session` prints; the breaks table's straggler row; consumes-from 13. G2 L3 (14), unit-35 end: S2
+  and consumes-from 13 name `straggler-guard.test.sh --topology` (unit 13 S8). G5 H4 (53): S9 writes
+  a KEEP for each live ask homed here whose text records its section 11 decline, and names
+  the asks TOOL-dDerivedDocket-38 and TOOL-dDerivedDocket-39 beside `<triage-id>`; §4 "This build's
+  own close", Files touched, Rollout steps 2 and 5, §5 security, AC8, consumes-from 34; §8 F6.
 
 ## 10. Reuse audit
 

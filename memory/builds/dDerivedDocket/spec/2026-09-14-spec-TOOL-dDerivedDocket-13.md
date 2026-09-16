@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 13
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -65,17 +65,33 @@ before a merge rather than as a repair after one.
   `tools/govkit/registry.toml`), each with the design §18.5 reason; an `[[exempt_leg]]` row for the
   new leg with the same reason, as `branch-guard self-test` has; `pre-rebase` added to
   `GOV_WIRING_HOOKS`; both `git-hooks` keys and the new leg claimed in
-  `memory/map/features/memory-tree-hygiene.md` with the map regenerated. Observed by AC9.
+  `memory/map/features/memory-tree-hygiene.md` with the map regenerated, and
+  `tools/govkit/subject-pins.tsv` regenerated for the new leg; and the frozen install-prefix waiver
+  row `.githooks/pre-commit:48`, the `gate_at` dual-spelling probe that S2's new lines shift,
+  converted to an in-line `# gov:root-fixture — <reason>` marker on the probe's line, its row leaving
+  `tools/install-prefix-waivers.txt` in the same commit, as unit 8 S14 does for its two (§8 F7).
+  Observed by AC9.
 - **S8** A repo-subject suite, `straggler-guard.test.sh`, on a new leg in chunk `declarations`, so it
   is not held like a kit self-test. One fixture repo whose default branch is in builds mode, one arm
   per hook behaviour above, and a parity arm comparing the library's recipe with the bytes
   `migrate_backlog.py --recipe` prints. It prints `PASS (<n> assertions)`. The leg sits in chunk
-  `declarations` with subject `repo`, guarded on `.githooks/`, `tools/memory-tree/` and
-  `tools/lib/`, and declares a `ceiling` in `tools/gate-legs.json`: 300 s, the branch-guard
-  sibling's, until the post-build bar's first reading re-declares it at that reading times 1.5 with
-  its basis (§8 F6). Observed by AC10.
+  `declarations` with subject `repo`, guarded on `.githooks/`, `tools/check-wiring.sh`, `tools/lib/`,
+  `tools/memory-recall/` and `tools/memory-tree/`, every path its arms run, and declares a `ceiling`
+  in `tools/gate-legs.json`: 300 s, the branch-guard sibling's, until the post-build bar's first
+  reading re-declares it as `tools/run-gates/ceiling-margin.txt` sizes it over that reading, recorded
+  through `derive-ceilings.py --write` (§8 F6). The suite also has a `--topology <repo> <branch>`
+  mode, the linked-worktree topology helper: it adds a linked worktree of `<branch>` beside the
+  primary tree of `<repo>`, prints the worktree's path, sets no `core.hooksPath` and runs no arm.
+  AC12's arm builds its linked worktree through the same function, and unit 35's scratch clone runs
+  the mode (§8 F8). Observed by AC10 and AC14.
 - **S9** Arms for S5 in `tools/check-wiring.test.sh` and for S6 in `tools/drift-audit/selftest.py`,
   each observed RED with its fix unstaged. Observed by AC6 and AC8.
+- **S10** The `core.hooksPath` premise is corrected in the five carriers §4 names, with no change in
+  line count in `tools/check-wiring.sh`. Each comment carrier and the gotcha body carries the sentence
+  §4 pins, its phrase "unless a worktree's config.worktree sets its own" on one physical line; the
+  note at `tools/check-wiring.sh:234` says the value in effect names another checkout, which supplies
+  the hook; the gotcha's description drops the premise, and `memory/gotchas/INDEX.md` is regenerated
+  with `python tools/memory-tree/gotchas.py --write`. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -97,18 +113,18 @@ before a merge rather than as a repair after one.
 
 - **consumes-from** `TOOL-dDerivedDocket-9` — `transition_audit.py --at <sha> --expect-builds`
   (S14), which the pre-push block runs over an integrated feature tip before a squash can erase its
-  transition, and the both-ways hook-list arm in `tools/check-wiring.test.sh` (S12) that
-  `pre-rebase` joins.
+  transition, and the both-ways real-tree hook-list arm in `transition-audit.test.sh` (its S16), which
+  reds until `pre-rebase` joins `GOV_WIRING_HOOKS`.
 - **consumes-from** `TOOL-dDerivedDocket-12` — `--stragglers`, which the session step and the drift
   signal read, and `--recipe`, which the parity arm compares.
 - **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of the pre-commit refusal
   against a scratch pre-flip branch, once the default branch is in builds mode; the linked-worktree
-  topology helper `straggler-guard.test.sh` builds for AC12, which that unit's scratch clone reuses
-  so the two cannot drift; and the hooks-path value settled here (§8 F5): under the relative
-  `.githooks` that `tools/check-wiring.sh` writes, a straggler in a linked worktree runs its own
-  hooks and is not refused — the documented inert case, with the `hooks own-tree` note — and under
-  an absolute `config.worktree` override naming the primary tree's `.githooks` it is refused; AC12
-  builds both.
+  topology helper, `straggler-guard.test.sh` in its `--topology` mode (S8), through which AC12 builds
+  its worktree and which that unit's scratch clone runs, so the two cannot drift; and the hooks-path
+  value settled here (§8 F5): under the relative `.githooks` that `tools/check-wiring.sh` writes, a
+  straggler in a linked worktree runs its own hooks and is not refused — the documented inert case,
+  with the `hooks own-tree` note — and under an absolute `config.worktree` override naming the
+  primary tree's `.githooks` it is refused; AC12 builds both.
 - **hands-off** `DEPL-dDerivedDocket-1` — the gov-only library and `pre-rebase` hook, which the
   adopter runbook names as the reference an adopter copies in its own deployer build.
 
@@ -116,10 +132,11 @@ before a merge rather than as a repair after one.
 
 ### Why a library beside the hooks, and what it may read
 
-`core.hooksPath` is repo-global, but WHICH hook files run depends on its VALUE. An absolute value —
-this repo's shared config does not hold one, but a `config.worktree` override does, on seven of nine
-live worktrees on node `d` (PINNED, measured 2026-09-14) — makes every worktree run the files of the
-one checkout it names, the primary tree's. The relative `.githooks` that `tools/check-wiring.sh:259`
+The shared `core.hooksPath` applies unless a worktree's `config.worktree` sets its own, and WHICH hook
+files run depends on the VALUE in effect. An absolute value — this repo's shared config does not hold
+one, but a `config.worktree` override does, on seven of nine live worktrees on node `d` (PINNED,
+measured 2026-09-14) — makes each worktree it governs run the files of the one checkout it names, the
+primary tree's. The relative `.githooks` that `tools/check-wiring.sh:259`
 writes resolves against the worktree running the hook, so a linked worktree runs its OWN hook files,
 and a pre-flip branch's are pre-flip copies with no library. Design §18.1's "absolute" was measured
 from a worktree carrying an override (§9, §10). The library therefore reaches a straggler only under
@@ -130,13 +147,16 @@ cannot live in any kit the hook resolves through `$top`, the way `.githooks/pre-
 the hygiene engine, and it cannot be sourced from `$top` the way `.githooks/pre-push:59-61` sources
 `gate-env.sh`.
 
-The four carriers that state the old premise — the `.githooks/pre-push` header (lines 6-9),
-`tools/check-wiring.sh:188-190`, `tools/check-wiring.test.sh:811` and
-`memory/gotchas/hookspath-resolves-into-another-checkout.md` — are corrected in this unit's commit to
-one sentence: "`core.hooksPath` is repo-global; under an ABSOLUTE value every worktree runs the hooks
-of the checkout it names, and under the relative `.githooks` check-wiring writes, each worktree runs
-its own." The gotcha's description gains "when the value is absolute", and its body names the
-configuration each measurement was taken under.
+Five carriers state the old premise, and S10 corrects them: the `.githooks/pre-push` header (lines
+6-9), the comment at `tools/check-wiring.sh:188-190` and the note check H prints at `:234`, the
+comment at `tools/check-wiring.test.sh:811`, and `memory/gotchas/hookspath-resolves-into-another-checkout.md`.
+The comment carriers and the gotcha body carry one sentence: "The shared `core.hooksPath` applies
+unless a worktree's config.worktree sets its own, and the value in effect decides which hook files
+run: an ABSOLUTE value runs the hooks of the checkout it names, the relative `.githooks` check-wiring
+writes runs each worktree's own." The gotcha's description drops the premise, which regenerates its
+index row, and its body names the configuration each measurement was taken under. `AGENTS.md`'s
+merge-bar sentence states the same premise and is parked for the owner in this build's `RUN.md`; it
+is not a carrier here.
 
 The library reads the default branch's conf blob, commit conf blobs through one `cat-file --batch`,
 merge bases, one `rev-list` over the lineage, and the staged name list. It never runs a python kit
@@ -187,6 +207,11 @@ step is a function defined and called below line 621, and it reaches the memory-
 directory derived from `KIT_REL` with the file name joined at run time. Its line uses the `note`
 severity, which the script reserves for a true condition that is not dormant wiring (its header).
 
+`.githooks/pre-commit` carries one row in the same frozen registry, `.githooks/pre-commit:48`, its
+`gate_at` probe, and S2's refusal sits above it, outside the shipped `govkit:branch-guard` block. The
+row is therefore converted to an in-line `gov:root-fixture` marker on the probe line in this commit
+(S7, §8 F7), which no line added above it can unpin.
+
 ### The drift signal
 
 `backlog_stragglers` follows the report-only shape of `build_live_backlog_rows`
@@ -208,13 +233,18 @@ inventory; after it, the stragglers left, until zero.
 ### Files touched (estimate)
 
 `.githooks/straggler-guard.sh` (new) · `.githooks/pre-rebase` (new) ·
-`.githooks/straggler-guard.test.sh` (new) · `.githooks/pre-commit` · `.githooks/pre-push` ·
-`tools/check-wiring.sh` · `tools/check-wiring.test.sh` · `tools/drift-audit/drift_report.py` ·
-`tools/drift-audit/selftest.py` · `tools/gate-legs.json` · `tools/govkit/registry.toml` ·
+`.githooks/straggler-guard.test.sh` (new) · `.githooks/pre-commit` (S2, and the `gov:root-fixture`
+marker, S7) · `.githooks/pre-push` (S4, and its header, S10) · `tools/check-wiring.sh` (S5, and the
+comment at 188-190 and the note at 234, S10) · `tools/check-wiring.test.sh` (S9, and the comment at
+811, S10) · `tools/install-prefix-waivers.txt` (one row leaves, S7) ·
+`tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · `tools/gate-legs.json` ·
+`tools/govkit/registry.toml` · `tools/govkit/subject-pins.tsv` (regenerated, S7) ·
 `memory/map/features/memory-tree-hygiene.md` · `memory/map/generated/` ·
-`memory/gotchas/hookspath-resolves-into-another-checkout.md` · the check-wiring and drift-audit
-version constants where `kit version markers` requires a move. `tools/check-wiring.sh` lines 188-190
-are reworded in place with no change in line count; every new line sits below line 621.
+`memory/gotchas/hookspath-resolves-into-another-checkout.md` and the generated
+`memory/gotchas/INDEX.md` (S10). This unit moves no kit version constant: its check-wiring bytes ride
+unit 9's move of `KIT_CHECK_WIRING_VERSION` (unit 9 S17), and its drift-audit bytes ride unit 21's
+(unit 21 S8), under the build's one-owner rule. `tools/check-wiring.sh` lines 188-190 and 234 are
+reworded in place with no change in line count; every new line sits below line 621.
 
 ### Alternatives rejected
 
@@ -258,7 +288,7 @@ are reworded in place with no change in line count; every new line sits below li
   staged, `.githooks/pre-commit` does not refuse.
   Red when: the relocation merge is refused, so the recipe's own last step cannot complete.
 - **AC3** — When the fixture runs `git rebase` onto the builds-mode default, and `git pull --rebase`,
-  on a HAS-DELTA branch, `.githooks/pre-rebase` refuses both with the recipe; a branch with no
+  on a HAS-DELTA branch, the `pre-rebase` hook refuses both with the recipe; a branch with no
   backlog commit rebases, and `git rebase --no-verify` bypasses; a PRE-FLIP branch whose only change
   under `memory/archive/` is a decision-log archive rebases with no refusal, and its commits print
   the merge-first notice and never the recipe.
@@ -291,11 +321,15 @@ are reworded in place with no change in line count; every new line sits below li
 - **AC9** — When `python tools/govkit/govkit.py selfcheck` and
   `python3 tools/codebase-map/test_codebase_map.py` run, both pass with the library, `pre-rebase`,
   `straggler-guard.test.sh` and the new leg tracked and declared; `bash tools/check-install-prefix.sh`
-  passes with no new waiver; and the both-ways hook-list arm in `bash tools/check-wiring.test.sh`
-  (unit 9 S12) passes with `pre-rebase` tracked.
+  passes with no new waiver, `grep -c 'githooks/pre-commit' tools/install-prefix-waivers.txt` prints
+  0, and the `gate_at` probe line in `.githooks/pre-commit` carries `gov:root-fixture` with a reason;
+  and the both-ways real-tree hook-list arm in `transition-audit.test.sh` (unit 9 S16) passes with
+  `pre-rebase` tracked.
   Red when: a new tracked `.githooks/` path or the new leg passes without its own `[[exempt]]` or
   `[[exempt_leg]]` row, or `pre-rebase` is tracked and absent from `GOV_WIRING_HOOKS`, or a line added
-  above check-wiring's waived lines unpins them.
+  above check-wiring's waived lines unpins them; or S2's refusal lines shift the pre-commit probe
+  while its position-keyed row stays, which `install-prefix` reds as a stale waiver and an unwaived
+  hit at the post-build bar.
 - **AC10** — When `bash tools/check-testsuite-counts.sh` runs, the new suite prints its
   `PASS (<n> assertions)` line at or above its floor, including an arm that fails when the library's
   recipe differs by one byte from `migrate_backlog.py --recipe`.
@@ -321,12 +355,27 @@ are reworded in place with no change in line count; every new line sits below li
   Red when: the fixture sets `core.hooksPath` by hand in a single-tree clone, so the suite reads
   green over a topology this repo's wiring never produces; or the relative case is refused, which
   would mean the arm ran the primary's hooks and measured nothing.
+- **AC13** — When `git grep -n -i 'repo-global' -- .githooks/pre-push tools/check-wiring.sh tools/check-wiring.test.sh memory/gotchas/`
+  runs, it prints nothing; and `git grep -c "unless a worktree's config.worktree sets its own" -- .githooks/pre-push tools/check-wiring.sh tools/check-wiring.test.sh memory/gotchas/hookspath-resolves-into-another-checkout.md`
+  prints exactly one hit for each of the four files.
+  Red when: a carrier keeps BASE's repo-global premise, so the next reader of the hook header, check
+  H, its test or the gotcha believes one shared value governs every worktree, including the seven on
+  node `d` that override it; or the correction lands in fewer carriers than §4 names, which no other
+  criterion reads.
+- **AC14** — When `straggler-guard.test.sh --topology <fixture> <branch>` runs over a fixture whose
+  primary tree is on its default branch, it exits 0 printing one path that
+  `git -C <fixture> worktree list` lists on `<branch>`, prints no `PASS` line, and leaves
+  `git -C <fixture> config --get core.hooksPath` as it found it; and `grep -n` of the helper's
+  function name in the suite shows its definition, the mode's dispatch and the AC12 arm's call.
+  Red when: AC12 inlines its own topology, so unit 35's clone and this suite build two topologies
+  that can drift, which the edge to unit 35 exists to prevent; or the mode sets a hooks path, so unit
+  35's clone no longer measures the value `tools/check-wiring.sh` writes.
 
 ## 7. Gates
 
-`memory hygiene` · `branch-guard self-test` · `pre-push self-test` · `check-wiring self-test` · `drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `install-prefix (shipped surface)` · `kit version markers` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `branch-guard self-test` · `pre-push self-test` · `check-wiring self-test` · `drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `install-prefix (shipped surface)` · `kit version markers` · `leg ceilings clear their evidenced maximum` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `straggler-guard.test.sh` on a new repo-subject leg · a builds-mode default with a pre-flip branch staging a shard edit, a rebase, two feature pushes, a relocation merge, a recipe byte flipped, a remote-only builds default and an unresolvable one, a decision-log rotation, a broken conf reader on push, a linked worktree under an absolute and a relative hooks path · the new suite's own floor
+New arm: `straggler-guard.test.sh` on a new repo-subject leg · a builds-mode default with a pre-flip branch staging a shard edit, a rebase, two feature pushes, a relocation merge, a recipe byte flipped, a remote-only builds default and an unresolvable one, a decision-log rotation, a broken conf reader on push, a linked worktree under an absolute and a relative hooks path, the `--topology` mode · the new suite's own floor
 New arm: `tools/check-wiring.test.sh` · a builds-mode fixture with one local straggler · the suite's floor
 New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-tracking stragglers, and one with none · none
 
@@ -358,6 +407,16 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   `declarations`, unheld, guarded on the directories its inputs live in. The recipe-parity arm grades
   two tracked texts that drift with nobody editing a hook, which is the repository-state class the
   merge bar keeps. RESOLVED (agent, 2026-09-14, delegated): (ii).
+- **F7 — how does S2's refusal avoid unpinning the frozen `.githooks/pre-commit:48` waiver?** Options:
+  (a) every new pre-commit line sits below line 48; (b) the row becomes an in-line
+  `gov:root-fixture — <reason>` marker on the probe line and leaves the registry, as unit 8 S14 does.
+  (a) keeps a position hazard for every later edit of the hook and puts a refusal after the legs it
+  should precede. RESOLVED (agent, 2026-09-16, delegated): (b).
+- **F8 — what entry point does the linked-worktree topology helper have?** Options: (a) a
+  `--topology <repo> <branch>` mode of `straggler-guard.test.sh`; (b) a function in a new sourced
+  fixture file. (b) adds a tracked `.githooks/` path owing its own `[[exempt]]` row and has unit 35
+  source a test file. RESOLVED (agent, 2026-09-16, delegated): (a); the mode sets no hooks path, so
+  each caller sets the value it measures.
 
 ## 9. Revision log
 
@@ -377,6 +436,20 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   AC11. G2 L6 (37): AC3 stages a decision-log rotation. G2 L7 (38): AC9 reads the both-ways
   hook-list arm. G5 H6: hands-off 35 names the linked-worktree helper and the settled hooks-path
   value.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 M6's unit-13 end (34, 49): consumes-from 9 and AC9
+  read the real-tree hook-list arm in `transition-audit.test.sh`, unit 9 S16. G2 M9 (24): S7 converts
+  the `.githooks/pre-commit:48` install-prefix waiver to an in-line `gov:root-fixture` marker; §4 the
+  session step; AC9; §8 F7. G2 M10 (8, 27): new S10 corrects five carriers, the `:234` note among
+  them, with a sentence naming the per-worktree override; §4; new AC13. G2 M13's unit-13 end (56):
+  Files touched says the check-wiring bytes ride unit 9 S17 and the drift-audit bytes unit 21 S8. G2
+  L3 (14): S8's `--topology` mode; hands-off 35; new AC14; §7 arm line; §8 F8. G2 L4 (15, 45): S8's
+  guard gains `tools/check-wiring.sh` and `tools/memory-recall/`. G2 L5 (53): S8's ceiling is sized by
+  `tools/run-gates/ceiling-margin.txt`. The record's class item 1 applied: S7 and Files touched name
+  the regenerated `tools/govkit/subject-pins.tsv`. Consequential, not a finding id: §4's opening
+  sentence drops its own "repo-global" premise so it agrees with the sentence S10 pins.
+  Fold verification: AC3 names the `pre-rebase` hook by basename, the file this unit creates; §7
+  gains `leg ceilings clear their evidenced maximum`, the leg that grades S8's ceiling, as unit 9's
+  §7 does for its S11.
 
 ## 10. Reuse audit
 

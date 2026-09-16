@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-7 — generated family view
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -107,7 +107,7 @@ does not move until the switch-over.
 - **hands-off** `TOOL-dDerivedDocket-10` — the view-recognition predicate and the recipe constant,
   which the row driver's shard-into-view refusal reads and prints.
 - **hands-off** `TOOL-dDerivedDocket-11` — collect's spec index and build-status map under `builds`,
-  and the view renderer the planner measures prospective views with.
+  and the view renderer the planner's census sizes each prospective family view with (its S3).
 - **hands-off** `TOOL-dDerivedDocket-12` — `--write` and its data-loss guard, which the relocation
   engine satisfies by restoring the views before it renders, and the recipe constant, which that
   unit's `--recipe` prints rather than holding a second copy.
@@ -229,7 +229,8 @@ DEAD PROBE. stdout holds that object and nothing else.
 - security — no execution, no network; the only new write refusal protects authored content, and
   the guard writes nothing into the view it refuses.
 - perf / scale — one extra pass over the tracked `BACKLOG.md` files; the TOOL view was measured at
-  50,067 B for 324 live rows at excerpt 72 (design §5.3, 2026-09-13), against a 359,423 B shard.
+  50,067 B for 324 live rows at excerpt 72 (design §5.3, 2026-09-13), against a 359,423 B shard; the
+  planner's census re-derives each family view's size before the flip (unit 11 S3).
 - error / empty / loading states — an empty family renders `*No live ask.*`; an undecidable status
   renders `UNRESOLVED`; the guard names lines; shards mode announces itself instead of printing a
   clean zero.
@@ -385,6 +386,8 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixt
   hands-off unit 16. G3 L5 (49): hands-off unit 20. Orchestrator: the hands-off to unit 11 no longer
   names `--asks --json`; the per-id comparison against it is unit 34's status proof, and the
   hands-off to 34 already names the verb.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L9's view end (26): hands-off 11, §5 perf and §10
+  cite unit 11 S3, which now sizes each prospective family view (unit 11 §8 F7).
 
 ## 10. Reuse audit
 
@@ -401,7 +404,8 @@ shape this repeats one family at a time.
 Where the design and BASE disagree, re-read at `abac6d59`: every line the design cites in the
 generator still holds its content, and design §7's "no merge attribute on views" is superseded by
 amendment A2, which this spec follows. The design's size measurement is PINNED at 2026-09-13; the
-TOOL shard has since grown, and the planner re-measures the view at flip time.
+TOOL shard has since grown, and the planner's census re-measures each family view before the flip
+(unit 11 S3).
 
 M12 losses are the design's tested rejections, carried in §4 Alternatives rejected with the
 measurement that rejected each.

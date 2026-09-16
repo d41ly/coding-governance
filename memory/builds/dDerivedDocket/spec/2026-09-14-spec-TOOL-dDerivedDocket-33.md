@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 33
+**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -37,7 +37,7 @@ later reader re-derives by re-running one script over the planner's recorded out
 - **S3** The triage rules T1 to T6 in §4 decide one disposition for every ask the planner lists as
   deriving OPEN on a finished build after the migration's own dispositions. CLOSED and WONTDO are
   signed only with evidence the script re-reads itself. A row no rule decides is signed KEEP, and its
-  reason names the rule that could not decide it. Observed by AC4 and AC5.
+  reason names the rule that could not decide it. Observed by AC4, AC5 and AC15.
 - **S4** `TOOL-aWeighedCompass-3` is excluded from the triage by rule T1, because the flip disposes
   it as superseded and one file may carry only one disposition per target. Observed by AC6.
 - **S5** No severity is signed. Every triage row records `unlabelled`, and the record's header
@@ -50,26 +50,31 @@ later reader re-derives by re-running one script over the planner's recorded out
 - **S7** One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, records that
   both tables were signed under delegation and points at the two signed records. Observed by AC9.
 - **S8** A verdict depends only on its own row's evidence, so re-running the script over a worksheet
-  recomputed at a later tree changes only the rows whose evidence moved. The flip's landing
-  reconcile relies on this when it re-signs a worksheet pair the planner recomputed at the remote tip
-  (S11). Observed by AC10.
+  recomputed at a later tree changes only the rows whose evidence moved. The switch-over's re-sign
+  and its landing reconcile rely on this when they re-sign a worksheet pair the planner recomputed at
+  the switch-over's parent or at the remote tip (S11). Observed by AC10.
 - **S9** The script prints one liveness line counting what it signed per verdict, and refuses an
   empty worksheet or a row it cannot parse instead of skipping it. Observed by AC11.
 - **S10** Every triage disposition is to be written in this build's own `BACKLOG.md`, the signer's
   file, which the closeout rule accepts from any file (owner ruling D6 as amended in design §17.2).
   NOT OBSERVED here: this unit writes no `BACKLOG.md`. The write is `TOOL-dDerivedDocket-34`'s,
   through the relocation engine's per-class disposition home, and unit 34 AC18 observes it.
-- **S11** The landing re-run. `--worksheets <same-id> <triage>` names a worksheet pair, by default
-  the pair `TOOL-dDerivedDocket-11` filed, and `--tail landing` writes the two records with unit
-  tails `signed-same-id-landing` and `signed-triage-landing`, leaving the switch-over's records
-  byte-unchanged. Each landing record's header names its worksheets' paths and blob shas and the tree
-  sha they were computed at. The rules and every other property are S2 to S9's. Observed by AC13.
+- **S11** The re-runs. `--worksheets <same-id> <triage>` names a worksheet pair, by default the pair
+  `TOOL-dDerivedDocket-11` filed, and `--tail <landing|switch>` writes the two records with unit
+  tails `signed-same-id-<tail>` and `signed-triage-<tail>`, leaving this unit's default records
+  byte-unchanged. `switch` is the switch-over's re-sign over the worksheets unit 34 re-plans at its
+  parent (unit 34 §4 Rollout step 5), whose records `--write` applies; `landing` is the landing
+  reconcile's re-sign over the worksheets the planner recomputes at the remote tip. Each tailed
+  record's header names its worksheets' paths and blob shas and the tree sha they were computed at.
+  The rules and every other property are S2 to S9's, and in every run, default or tailed, T4 and T5
+  read a triage row's own text with `git show <sha>:<file>` at the sha the worksheet's `#` line
+  records, never from the tree the script runs in (§4). Observed by AC13 and AC15.
 
 ## 3. Non-goals (OUT)
 
 - No `BACKLOG.md` row, view or disposition is written. The signed records are inputs to the flip,
-  which applies them exactly. The landing records are applied by the relocation engine's `--ingest`
-  landing form, not here.
+  which applies them exactly. The `-switch` records are applied by the switch-over's `--write`, and
+  the `-landing` records by the relocation engine's `--ingest` landing form, not here.
 - No planner logic. Evidence that needs a history walk, such as "born in its spec's own commit", is
   consumed from the planner's worksheet and never re-derived here; a second walk would be a second
   answer to one question.
@@ -86,9 +91,11 @@ later reader re-derives by re-running one script over the planner's recorded out
   planner files as build records, with the evidence fields §4 lists, and the header cells `Ask`,
   `Verdict` and `Field` its §4 pins, which `--plan --signed` reads (AC12). Without them there is
   nothing to sign, and the script refuses.
-- **hands-off** `TOOL-dDerivedDocket-34` — the two signed records, applied exactly by the flip; and
-  the landing re-run (S11), which the landing reconcile runs over the worksheets the planner
-  recomputes at the remote tip, and whose records the reconcile's `--ingest --signed` applies.
+- **hands-off** `TOOL-dDerivedDocket-34` — the two signed records; the `--tail switch` re-run (S11),
+  which the switch-over's rollout runs over the worksheets it re-plans at its parent and whose
+  records its `--write` applies; and the `--tail landing` re-run, which the landing reconcile runs
+  over the worksheets the planner recomputes at the remote tip, and whose records the reconcile's
+  landing form of `--ingest` applies.
 - **hands-off** `TOOL-dDerivedDocket-36` — the signed records' shape, header cells and columns,
   which the kit README's signed-records row states.
 
@@ -106,7 +113,7 @@ the planner's spec spells them differently, the M2 interface cross-read decides 
 | same-id | ask id, same-id spec path, legacy token | U1-U4 |
 | same-id | evidence class: `specced-in-place`, `born-in-spec-commit` or `none`, with its sha | U1 |
 | same-id | the planner's low-overlap flag | U3 |
-| triage | ask id, home slug, the row's file and line, legacy token | T1-T6 |
+| triage | ask id, home slug, the row's file and line, read at the tree sha the worksheet's `#` line records, legacy token | T1-T6 |
 | triage | the status the fold derives after the migration's own dispositions | population |
 | triage | the planner's proposal: a verdict and its evidence (a spec id, a sha, or a hold target) | T2-T5 |
 
@@ -163,8 +170,8 @@ decides.
 | T1 | excluded | the ask is `TOOL-aWeighedCompass-3`, which the flip disposes as superseded (design §14) |
 | T2 | CLOSED by a spec | the proposal names a spec whose status header the script re-reads as CLOSED at the signing tree, AND that spec's body names the ask id |
 | T3 | CLOSED by a sha | the proposal names a sha that `git cat-file -e` resolves to a commit, AND that commit's message names the ask id |
-| T4 | WONTDO | the row's own text records a withdrawal, cited by file and line |
-| T5 | BLOCKED or DEFERRED | the proposal carries a hold target the row's own text names, the target is a filed ask or a spec H1, it is live at the signing tree, and DEFERRED additionally needs the row's legacy token to read DEFERRED |
+| T4 | WONTDO | the row's own text, read with `git show <sha>:<file>` at the worksheet's recorded sha, records a withdrawal, cited by file and line |
+| T5 | BLOCKED or DEFERRED | the proposal carries a hold target the row's own text, read at the worksheet's recorded sha, names, the target is a filed ask or a spec H1, it is live at the signing tree, and DEFERRED additionally needs the row's legacy token to read DEFERRED |
 | T6 | KEEP | otherwise; the reason names the first of T2 to T5 that the row came closest to, or "no evidence" |
 
 What each rule refuses on purpose:
@@ -207,6 +214,8 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
 | the signed triage record | build record, unit tail `signed-triage` | same folder | recording-file grammar, check 5 |
 | the landing same-id record | build record, unit tail `signed-same-id-landing` | same folder | recording-file grammar, check 5 |
 | the landing triage record | build record, unit tail `signed-triage-landing` | same folder | recording-file grammar, check 5 |
+| the switch-over same-id record | build record, unit tail `signed-same-id-switch` | same folder | recording-file grammar, check 5 |
+| the switch-over triage record | build record, unit tail `signed-triage-switch` | same folder | recording-file grammar, check 5 |
 | `--worksheets`, `--tail` | options of the signing script | the script | not graded: a build-folder script |
 | rule ids U1-U4, T1-T6 | labels inside the records | the two records | none |
 | the decision row | one `memory/DECISIONS.md` row, keyed by this unit's id | TOOL heading | entry budget, check 7 |
@@ -306,16 +315,38 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
   over the two signed records after the signing, it exits 0 and reports both records applied.
   Red when: a header cell is spelled otherwise, such as `ask id` or `by/on/until`, which the planner
   refuses, so the mismatch first shows at the flip.
-- **AC13** — When the script runs with `--worksheets <pair> --tail landing`, `<pair>` being a copy of
-  the worksheet pair whose triage worksheet carries one added row, it writes two `-landing` records
-  whose rows equal the switch-over records' rows plus that one row, and `git status --porcelain` shows the switch-over's two records unchanged.
-  Red when: the landing run overwrites the switch-over's records, so the signatures the flip applied
-  are no longer the ones tracked.
+- **AC13** — When the script runs with `--worksheets <pair> --tail switch` and then with
+  `--worksheets <pair> --tail landing`, `<pair>` being a copy of the worksheet pair whose triage
+  worksheet's `#` line names a commit built with `git commit-tree` and no ref, whose shard at one
+  cited line holds an ask row recording a withdrawal while the working tree's same file and line hold
+  another ask's row, and which carries that one added row, the first run writes two `-switch` records
+  and the second two `-landing` records, each pair's rows equal to this unit's default records' rows
+  plus that one row, signed WONTDO under T4; each tailed header names both worksheet paths, their blob
+  shas and a tree sha equal to the one on the worksheet's own `#` line; the two `-switch` records are
+  byte-identical before and after the landing run; `git status --porcelain` shows this unit's two
+  default records unchanged; and once the four tailed records are removed, `git status --porcelain`
+  shows the tree as it was before the runs.
+  Red when: a tailed run overwrites this unit's default records or the other tail's records, so the
+  signatures an earlier moment filed, the `-switch` pair the switch-over's `--write` applies among
+  them, are no longer the ones tracked; or T4 reads the row's text from the tree the script runs in,
+  where the landing's step 1 has replaced the shards with views, so the added row signs KEEP or is
+  signed from another ask's text; or a header omits the tree sha, so a tailed record cannot be tied
+  to the tree it was planned at; or the fixture's records stay in the tracked folder, naming a
+  scratch worksheet path and an id nothing defines, which check 14 reds at the bar.
 - **AC14** — When the script signs synthetic same-id worksheet rows — a `specced-in-place` row
   carrying the low-overlap flag, a row whose spec path does not exist, and a row whose spec's H1 lacks
   the ask id, the last two also carrying `specced-in-place` evidence and no flag — each signs
   `not-unit`, the first under U3 and the other two under U4.
   Red when: U3 or U4 is dropped, so a low-overlap pair signs `unit` and closes an ask nobody answered.
+- **AC15** — When the script signs synthetic triage worksheet rows — a proposed WONTDO whose cited
+  file and line, read at the worksheet's recorded sha, record no withdrawal; a proposed BLOCKED whose
+  target the row's text does not name; a proposed BLOCKED whose target is not live at the signing
+  tree; and a proposed DEFERRED whose legacy token reads OPEN — each signs `KEEP`, and its reason
+  names T4 for the first and T5 for the other three.
+  Red when: T4 or T5 copies the planner's proposal through on its word, so a withdrawal nobody wrote
+  or a dependency judgment the row's author never made is signed, and the flip applies it exactly
+  (unit 34 AC18).
+  fixture: synthetic rows in a copy of the triage worksheet, as AC14's same-id rows are.
 
 ## 7. Gates
 
@@ -358,6 +389,12 @@ this unit's pass and again by the flip before it applies the records.
   (c) Nothing; park when the population is non-empty. (b) carries no proposal, text or pointer, so
   only KEEP could be signed; (c) parks the routine landing. RESOLVED (agent, 2026-09-14, delegated):
   (a).
+- **F8** — What does the switch-over's re-sign write? (a) Records under a second tail, through one
+  option `--tail <landing|switch>`. (b) This unit's default records, overwritten. (c) Records under
+  the `landing` tail. (b) rewrites the delegated signing's first reading from a later pass and
+  breaks AC13's unchanged-records property; (c) gives two re-signs one record name, so the landing
+  replaces the switch-over's records. RESOLVED (agent, 2026-09-16, delegated): (a),
+  `signed-same-id-switch` and `signed-triage-switch`.
 - The rulings this unit executes and does not revisit: D2, legacy same-id pairs not linked by
   default; D6, the closeout is a gate from the switch-over, retroactive, sweep first; D7, severity
   now and forward-only — all RESOLVED (owner, 2026-09-13). The delegation of both signatures to this
@@ -376,6 +413,18 @@ this unit's pass and again by the flip before it applies the records.
   with `anchor_at`. M2 (15, 37): S10 points at unit 34 AC18. M15's unit-33 end: hands-off 36, the
   record shape the kit README states. Orchestrator: AC12 names the planner by basename, because its
   path is untracked until unit 11 lands and the spec-tokens paths arm reds a full untracked path.
+- rev-3 · 2026-09-16 · spec-audit round 2 fold. G5 M1 (56), unit-33 half: S11's `--tail` takes
+  `landing` or `switch`, the switch-over's re-sign over the worksheets unit 34 re-plans at its
+  parent; §3 Non-goals, hands-off 34, §4 Inventory's two `-switch` rows; §8 F8. G5 M4 (26, 51):
+  every run reads a triage row's text at the worksheet's recorded sha, S11, §4 Inputs, T4 and T5.
+  G5 L3 (7) with M4: AC13's added row is decided by T4 from a `git commit-tree` fixture, its headers'
+  paths, blob shas and tree sha are read, and its records are removed. G5 M9 (6): new AC15 stages T4
+  and T5 over four synthetic rows; S3. Fold verification: AC13 compared its rows with "the
+  switch-over records", which rev-3's Inventory names the `-switch` records and which do not exist in
+  this unit's pass, and no criterion ran `--tail switch`; AC13 now runs `--tail switch` then
+  `--tail landing`, compares both with this unit's default records, and reads each tail's records
+  unchanged by the other run. S8 names the switch-over's re-sign beside the landing's, as unit 34
+  Rollout step 5 cites it.
 
 ## 10. Reuse audit
 
