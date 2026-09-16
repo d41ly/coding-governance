@@ -61,6 +61,22 @@ required_keys_render = ["MEMORY_ROOT", "FAMILIES"]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
 mutates_index = false
 
+# THE RE-RENDER an `update` runs when GOVKIT_RERENDER=1 is exported. It rewrites the one `rendered`
+# row above from `SKILL.template.md` plus the shared memory-tree conf, which is the only artifact in
+# this entry whose content is derived rather than copied.
+#
+# `--scaffold` IS THE RENDER MODE HERE, unlike the sibling kit whose scaffold refuses once a
+# declaration exists: this one owns no conf of its own, reads the memory-tree kit's, and renders
+# unconditionally every time it is run. The optional hook wiring is a separate flag that this argv
+# does not pass, so re-running writes that one destination and nothing else.
+#
+# NO `[[outcome]]` PAIR, deliberately. This argv exits 1 when the shared conf is unreadable, and the
+# `[adopt]` argv above exits 1 on the same state — so declaring it an accepted stop would also change
+# what `apply` accepts, for a state no unit has re-adjudicated. It stays a loud failure naming this
+# kit, which is what the same exit already does at adopt time.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-recall.sh", "--scaffold"]
+
 [check]
 argv = ["bash", "{kit}/adopt-memory-recall.sh", "--check"]
 

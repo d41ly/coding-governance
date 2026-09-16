@@ -81,3 +81,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T18:26:00Z brief · item DEPL-cMendedVintage-4 · reason 8c9d217fb319 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-4-2-build-brief.md
 
 2026-09-16T18:28:57Z dispatch · item 30352c6a DEPL-cMendedVintage-4 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-4.md memory/LIVE.md
+
+2026-09-16T18:46:26Z dispatch · item 7941c2dd DEPL-cMendedVintage-5 · reason tools/lexicon/kit.toml tools/drift-audit/kit.toml tools/memory-recall/kit.toml
+
+2026-09-16T18:46:27Z brief · item DEPL-cMendedVintage-5 · reason 4300ebe58773 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-5-2-build-brief.md
+
+2026-09-16T18:50:15Z dispatch · item 7941c2dd DEPL-cMendedVintage-5 · reason tools/lexicon/kit.toml tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/LEXICON.md tools/lexicon/README.md .claude/skills/lexicon/SKILL.md tools/drift-audit/kit.toml tools/drift-audit/drift_report.py tools/drift-audit/adopt-drift-audit.sh tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/README.md tools/drift-audit/selftest.py tools/workflows/drift-audit-code.js tools/workflows/drift-audit-state.js tools/memory-recall/kit.toml tools/memory-recall/recall_conf.py tools/memory-recall/README.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-5.md
