@@ -62,7 +62,9 @@ MERGED_SUBCLASSES = ("refused-landing", "retired-unit", "surfaced-park", "no-row
 CONFORMANCE_ITEMS = ("brief-before-build", "phases-walked", "green-at-close", "keepalive-reaped",
                      "review-exited")
 CONFORMANCE_STATES = ("MET", "UNMET", "UNJUDGEABLE")
-COVERAGE_STATES = ("present", "absent", "partial", "dead", "not-local")
+# `stale` is the transcripts' alone (TOOL-dLoggedFlight-16 S3): a session read from a store extract
+# made before the window's end. The record's `COUNTED_STATES` does not hold it, so it withholds.
+COVERAGE_STATES = ("present", "absent", "partial", "dead", "not-local", "stale")
 OWNER_POSITIONS = ("launch", "pre-run", "in-window", "post-close")
 SOURCE_NAMES = ("run-state", "driver", "gates", "pushes", "git", "transcripts", "build-folder")
 LEDGER_SOURCES = ("decision", "abort", "override", "waiver", "rescope-retire", "rescope-supersede",
@@ -689,11 +691,26 @@ def derive_journal_join(invs, runs) -> tuple:
 
 # ---------------------------------------------------------------------------------- sessions
 
-def resolve_run_sessions(sids, slug, store=None, projects=None) -> tuple:
+def check_extract_covers(data, window) -> bool:
+    """Whether a store extract covers the run's window (TOOL-dLoggedFlight-16 S2): its `extracted_at`
+    is an integer epoch second at or after `window["end"]`. An extract without the field, or with any
+    other value in it, a string, a float or a bool, never covers, so every extract written before the
+    field existed reads short until it is extracted again."""
+    at = data.get("extracted_at") if isinstance(data, dict) else None
+    return isinstance(at, int) and not isinstance(at, bool) and at >= window["end"]
+
+
+def resolve_run_sessions(sids, slug, window, store=None, projects=None) -> tuple:
     """`(extracts, state, note)`: each session's structural extract, from the store where one was
     written, else extracted in memory where its transcript is on this machine. With no session named
-    by the journal, the store's extracts attributed to the slug stand in, heuristically."""
-    extracts, note = {}, ""
+    by the journal, the store's extracts attributed to the slug stand in, heuristically.
+
+    Every session read from a STORE extract, named or discovered, is held to `window` through
+    `check_extract_covers`; one extracted in memory here covers by construction, since it was extracted
+    during this read. One short session makes the state `stale`, which outranks `partial`: a stale
+    extract is indistinguishable from a complete one unless it says so, and a missing session is
+    already named by the note. The note counts the short sessions and names none of them."""
+    extracts, notes, short = {}, [], set()
     store_dir = pathlib.Path(store) if store else None
     discovered = False
     if store_dir is not None and not sids:
@@ -706,8 +723,10 @@ def resolve_run_sessions(sids, slug, store=None, projects=None) -> tuple:
             if slug in (data.get("slugs") or []) and ex.SID_RE.fullmatch(str(data.get("sid", ""))):
                 extracts[data["sid"]] = data
                 discovered = True
+                if not check_extract_covers(data, window):
+                    short.add(data["sid"])
     for sid in sids:
-        data = None
+        data, stored = None, False
         if store_dir is not None:
             p = store_dir / ex.SESSIONS_DIR / f"{sid}.json"
             if p.is_file():
@@ -715,6 +734,7 @@ def resolve_run_sessions(sids, slug, store=None, projects=None) -> tuple:
                     data = json.loads(p.read_bytes())
                 except (OSError, ValueError):
                     data = None
+                stored = data is not None
         if data is None and projects is not None:
             try:
                 tree = ex.resolve_session_tree(sid, projects)
@@ -724,19 +744,27 @@ def resolve_run_sessions(sids, slug, store=None, projects=None) -> tuple:
                 data = ex.extract_session(tree, "driver", [slug])
         if data is not None:
             extracts[sid] = data
+            if stored and not check_extract_covers(data, window):
+                short.add(sid)
     named = len(sids)
     found = sum(1 for s in sids if s in extracts)
     if discovered:
-        state, note = "present", "sessions discovered by slug in the store, heuristically"
+        state = "present"
+        notes.append("sessions discovered by slug in the store, heuristically")
     elif named and found == named:
         state = "present"
     elif found:
-        state, note = "partial", f"{named - found} of {named} sessions have no local transcript"
+        state = "partial"
+        notes.append(f"{named - found} of {named} sessions have no local transcript")
     else:
         state = "not-local"
-        note = ("the run's journal names no session" if not named
-                else "no named session has a transcript or an extract on this machine")
-    return extracts, state, note
+        notes.append("the run's journal names no session" if not named
+                     else "no named session has a transcript or an extract on this machine")
+    if short:
+        state = "stale"
+        notes.append(f"{len(short)} of {len(extracts)} sessions read have a store extract made before the "
+                     "window's end")
+    return extracts, state, "; ".join(notes)
 
 
 # ---------------------------------------------------------------------------------- the blocks
@@ -1567,7 +1595,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                              "line": row["line"]})
 
     # ---- sessions, from the extractor where local
-    extracts, tr_state, tr_note = resolve_run_sessions(sids, slug, store, projects)
+    extracts, tr_state, tr_note = resolve_run_sessions(sids, slug, window, store, projects)
     tools, turns = [], []
     for sid, data in sorted(extracts.items()):
         events = data.get("events", [])

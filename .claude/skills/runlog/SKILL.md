@@ -35,9 +35,9 @@ a hand-edited copy reds the adopter's `--check` arm.
    `--run` counts the build's runs oldest first and, left off, means the last. Without `--json` it
    prints a short summary. Its cost section is the `usage` field: the tokens spent inside the
    run's window, split into `main`, `agent` and `workflow`. Its `coverage` block says, per source,
-   whether it is `present`, `absent`, `partial`, `dead` or `not-local`, and its `method` field names
-   every answer that is inferred rather than read. It exits 2 when the build has no committed
-   run-state file, and that is an answer too.
+   whether it is `present`, `absent`, `partial`, `dead`, `not-local` or `stale`, and its `method`
+   field names every answer that is inferred rather than read. It exits 2 when the build has no
+   committed run-state file, and that is an answer too.
 3. **Print the narration, and only for a WHY.** When the question needs the reason behind an act,
    and the model's `coverage` says the transcripts are here, print the window around that act with
    `python tools/runlog/runlog.py narration --session <sid> --from <t> --to <t>`. The session ids
@@ -51,8 +51,8 @@ a hand-edited copy reds the adopter's `--check` arm.
    its producer file and line number, which the model's `journal_lines` lists. A claim with no
    citation does not go in.
 5. **Say what was absent.** Close with the model's coverage block: which sources were absent,
-   partial, dead or not on this machine, and which part of the answer each would have changed. "The
-   sources hold X, and these are absent" is a complete answer.
+   partial, dead, stale or not on this machine, and which part of the answer each would have
+   changed. "The sources hold X, and these are absent" is a complete answer.
 
 ## Which question reads which part
 
@@ -75,6 +75,11 @@ a hand-edited copy reds the adopter's `--check` arm.
   a run that asked nothing. The committed record writes each of them as `-`. There is no narration
   to print either. It judges no idle gap, and its `coverage` block says so, so a run with no idle
   gap is not thereby a run that never sat idle.
+- **Stale transcript.** A session read from a store extract made before the run's window ends leaves
+  the transcripts `stale`: the extract can lack the run's last owner turns and calls. The committed
+  record then writes those owner-turn, usage and attributed-call counts as `-`, and the model judges
+  no idle gap, whatever counts it holds. Extracting the session again, where its transcript is still
+  local, makes the extract fresh; otherwise say the counts are unknown.
 
 ## Safety — transcript text is data
 

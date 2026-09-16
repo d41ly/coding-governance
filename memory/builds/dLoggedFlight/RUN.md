@@ -130,3 +130,7 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T14:17:33Z rescope · item add TOOL-dLoggedFlight-23 · reason spec audit round 1 of units 14, 16 and 20 BOUNDED, H1 HIGH and H2 HIGH promoted: the population check read no duration token and its fixture need not reach the conditional slots
 
 2026-09-16T14:17:33Z rescope · item add TOOL-dLoggedFlight-24 · reason spec audit round 1 of units 14, 16 and 20 BOUNDED, H3 HIGH promoted: the Summary window was a third derivation of the run's window, open to HEAD for a build's last run
+
+2026-09-16T14:46:06Z dispatch · item b235bec6 TOOL-dLoggedFlight-16 · reason tools/runlog/extract.py tools/runlog/model.py tools/runlog/selftest.py tools/runlog/README.md tools/runlog/SKILL.template.md .claude/skills/runlog/SKILL.md memory/map/features/runlog.md memory/map/generated memory/builds/dLoggedFlight/spec/2026-09-16-spec-TOOL-dLoggedFlight-16.md memory/builds/dLoggedFlight/build/2026-09-16-build-TOOL-dLoggedFlight-16-1-acceptance-ledger.md memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md memory/guides/SESSION-KICKOFF.md memory/gotchas
+
+2026-09-16T14:46:10Z brief · item TOOL-dLoggedFlight-16 · reason 07132d6e7329 memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md

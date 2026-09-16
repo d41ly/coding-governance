@@ -563,6 +563,16 @@
       "file": "tools/lexicon/canon.py"
     },
     {
+      "id": "build_fresh_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_fresh_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_front_variant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -1131,6 +1141,11 @@
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_extract_covers",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "check_fact_value",
@@ -6156,6 +6171,21 @@
       "id": "test_floor_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_fresh_ac1_extracted_at",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_fresh_ac2_ac3_covers_window",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_fresh_ac4_three_shapes",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_gate_coverage_fails_on_an_uncompared_artifact",

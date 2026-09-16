@@ -80,7 +80,7 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 13 | `TOOL-dLoggedFlight-13` | CLOSED | drift-audit reports run records left non-terminal after their build merged |
 | 14 | `TOOL-dLoggedFlight-14` | SPECCED | a session's live transcript is read before its store extract, on the named and the discovered path |
 | 15 | `TOOL-dLoggedFlight-15` | WONTDO | a row an owner act can cause carries no time that places the act |
-| 16 | `TOOL-dLoggedFlight-16` | MISSING | an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning |
+| 16 | `TOOL-dLoggedFlight-16` | CLOSED | an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning |
 | 17 | `TOOL-dLoggedFlight-17` | WONTDO | the owner-time refusal re-reads every session the model read, and holds an idle row to the model's own guard |
 | 18 | `TOOL-dLoggedFlight-18` | WONTDO | an owner-causable journal line sets neither the window's rendered end nor the commitment's times |
 | 19 | `TOOL-dLoggedFlight-19` | WONTDO | every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes |
@@ -113,7 +113,7 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLogg
 | [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | CLOSED | rev-7 | 2026-09-16 |
 | [TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts](spec/2026-09-13-spec-TOOL-dLoggedFlight-12.md) | 12 | 2 | CLOSED | rev-5 | 2026-09-16 |
 | [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | CLOSED | rev-6 | 2026-09-16 |
-| [TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning](spec/2026-09-16-spec-TOOL-dLoggedFlight-16.md) | 14 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-dLoggedFlight-16 — an extract short of the window reads `stale`, and `partial` keeps its lower-bound meaning](spec/2026-09-16-spec-TOOL-dLoggedFlight-16.md) | 14 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-14 — a session's live transcript is read before its store extract, on the named and the discovered path](spec/2026-09-16-spec-TOOL-dLoggedFlight-14.md) | 15 | 2 | SPECCED | rev-4 | 2026-09-16 |
 | [TOOL-dLoggedFlight-17 — the owner-time refusal re-reads every session the model read, and holds an idle row to the model's own guard](spec/2026-09-16-spec-TOOL-dLoggedFlight-17.md) | 16 | 2 | WONTDO | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-15 — a row an owner act can cause carries no time that places the act](spec/2026-09-16-spec-TOOL-dLoggedFlight-15.md) | 17 | 2 | WONTDO | rev-2 | 2026-09-16 |
@@ -126,7 +126,7 @@ ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLogg
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 25 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 

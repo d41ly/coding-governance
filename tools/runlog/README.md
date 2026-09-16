@@ -142,7 +142,9 @@ store is `RUNLOG_STATE_DIR`, else `%LOCALAPPDATA%\runlog` on Windows,
 elsewhere. A missing root
 refuses by name, and so does a relative `RUNLOG_STATE_DIR`, which would put extracts inside a tree
 git can commit. The repo key is the first 16 hex of the sha256 of the normalised git common dir, so
-every worktree of one clone shares one store.
+every worktree of one clone shares one store. Every extract carries `extracted_at`, the integer epoch
+second its extraction started, which is what the run model reads to tell a stale extract from a
+complete one.
 
 **How it reads.** Streamed, one file at a time and one parsed record per open file, holding only
 compact tuples between records. A duplicated `uuid` keeps its FIRST copy, since later copies carry
@@ -256,6 +258,15 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   otherwise none is reported, and the coverage block's `idle` entry says it was not judged. A gap
   with an owner turn inside it, or within `IDLE_OWNER_GUARD_S` of either end, is kept out and counted
   there, because its endpoints would place that turn.
+- **A store extract made before the window's end reads `stale`.** `check_extract_covers` passes an
+  extract only when its `extracted_at` is an integer at or after the window's end; a missing field or
+  any other value never passes, so an extract written before the field existed is stale until it is
+  extracted again. Every session read from the store is held to it, named or discovered, and one
+  extracted in memory from its local transcript covers by construction. One short session makes the
+  transcripts `stale`, which outranks `partial`, and the coverage note counts the short sessions
+  without naming them. A stale extract looks complete unless it says so, which is why it has a state
+  of its own rather than a flag beside `present`: the record withholds under it through the same
+  count test that withholds under `not-local`, and the model judges no idle gap under it.
 
 ## The committed record
 
@@ -302,7 +313,8 @@ data.
 **An unknown value is `-`, never the zero that reads clean.** The owner turns, the usage lines and
 the attributed calls come from the transcripts, so each is `-` unless those read `present` or
 `partial`. The model counts zero of what it never read, and an `in-window 0` would say the run never
-asked. A Timeline `rc` is written only beside an END that reads `exit=clean`, since a killed verb's
+asked. A `stale` extract is not one of those states: its counts can be short by exactly the owner
+turns the run's last stretch held, and nothing in them says so. A Timeline `rc` is written only beside an END that reads `exit=clean`, since a killed verb's
 `rc` is its EXIT trap's `$?`.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
@@ -405,6 +417,9 @@ prefix and root, and hold the render to an independent one.
 - **Whether the model's inferences are right.** The build commit, the owner's decision-log rows, an
   unmet acceptance line, a close's head and a session's attribution are heuristics, and `method` says
   so.
+- **Whether an extract made at or after the window's end is whole.** `extracted_at` says when the
+  extraction started, not that the transcript it read was complete. Its `tree_bytes` is not compared
+  with the transcript's size, which is unreadable exactly when no transcript is local.
 - **Idleness where a session's transcript is missing.** A run whose transcripts are not all local
   reports no idle gap at all, and its coverage says idleness was not judged, rather than reading the
   missing source as idle time.

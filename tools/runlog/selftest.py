@@ -111,7 +111,10 @@ from collections import Counter  # noqa: E402
 # RAISED 1289 -> 1291 at the second origin/main reconcile, where main's stall probe `--audit` became the
 # keepalive tick: two stalled streaks, one of `--audit` and one mixed with `--status`. AC20's fixture
 # gains an `--audit` call from the primary tree, which its existing blind-verb check now requires.
-ASSERTION_FLOOR = 1291
+# RAISED 1291 -> 1317 by TOOL-dLoggedFlight-16, extract freshness: AC6's stale fixture, one check; the
+# fresh fixture's own liveness check; and three new functions, AC1 with two checks, AC2 and AC3 with six
+# and AC4's shapes with seven, whose decoy checks move it by nine.
+ASSERTION_FLOOR = 1317
 
 PASS = []
 FAIL = []
@@ -1874,6 +1877,10 @@ def test_extract_decoy_catches_a_forgotten_root():
 # from each producer's data model, and the key sets below hold every fixture line to those models.
 
 MODEL_T0 = 1789293600          # 2026-09-13T10:00:00Z, every model fixture's clock origin
+# A hand-typed store extract's default `extracted_at` (TOOL-dLoggedFlight-16 S1): one day past the
+# origin, where every model fixture's window ends within its first three hours, so no arm that does not
+# grade freshness reads a short extract.
+FX_EXTRACTED_AT = MODEL_T0 + 86400
 FX_SLUG = "xFixtureRun"
 FX_OTHER = "xOtherBuild"
 FX_WT_RUN, FX_WT_PRIMARY, FX_WT_OTHER = "fixture-wt-run", "fixture-wt-primary", "fixture-wt-other"
@@ -2099,12 +2106,17 @@ def write_journals(base, driver=(), gates=(), pushes=()):
     return root
 
 
-def write_extract(store, sid, events, slug=FX_SLUG):
+def write_extract(store, sid, events, slug=FX_SLUG, extracted_at=FX_EXTRACTED_AT):
+    """A store extract typed by hand. `extracted_at` defaults to `FX_EXTRACTED_AT`, at or after every
+    window the suite builds, so an arm that does not grade freshness reads its extract as covering;
+    an arm that does backdates it, types another value, or passes None to omit the field."""
     target = pathlib.Path(store) / "sessions" / f"{sid}.json"
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(json.dumps({"schema": 1, "sid": sid, "attribution": "driver", "slugs": [slug],
-                                   "tree_bytes": 0, "engine_versions": {}, "coverage": {},
-                                   "events": events}).encode("ascii"))
+    data = {"schema": 1, "sid": sid, "attribution": "driver", "slugs": [slug]}
+    if extracted_at is not None:
+        data["extracted_at"] = extracted_at
+    data.update({"tree_bytes": 0, "engine_versions": {}, "coverage": {}, "events": events})
+    target.write_bytes(json.dumps(data).encode("ascii"))
 
 
 def build_session_events(acts, sid=FX_SID):
@@ -2959,9 +2971,17 @@ def test_model_ac6_coverage():
     check("model AC6: a fixture with no local transcript reads not-local",
           absent["transcripts"]["state"], "not-local")
     seen["no transcript"] = absent["transcripts"]["state"]
-    _x, state, _n = rl_model.resolve_run_sessions([FX_SID], FX_SLUG, store=base / "no-store", projects=None)
+    window = {"start": 0, "end": 1}
+    _x, state, _n = rl_model.resolve_run_sessions([FX_SID], FX_SLUG, window, store=base / "no-store",
+                                                  projects=None)
     check("model AC6: ...and so does a named session with neither an extract nor a transcript here",
           state, "not-local")
+    write_extract(base / "short-store", FX_SID, [], extracted_at=0)
+    _x, state, _n = rl_model.resolve_run_sessions([FX_SID], FX_SLUG, window, store=base / "short-store",
+                                                  projects=None)
+    seen["a store extract made before the window's end"] = state
+    check("model AC6: a named session whose only source is a store extract made before the window's end "
+          "reads stale (TOOL-dLoggedFlight-16)", state, "stale")
     check("model AC6: every member of COVERAGE_STATES has a fixture, and every fixture's state is a "
           "member", sorted(set(seen.values())), sorted(rl_model.COVERAGE_STATES))
 
@@ -4277,7 +4297,7 @@ def build_class_model():
                       for i, k in enumerate(rl_model.ANOMALY_KINDS)]
     m["anomalies"] += [{"kind": "nonterminal-merged", "subclass": s, "t": None, "evidence": "x"}
                        for s in rl_model.MERGED_SUBCLASSES]
-    for name, state in zip(("gates", "pushes", "driver"), ("dead", "absent", "partial")):
+    for name, state in zip(("gates", "pushes", "driver", "git"), ("dead", "absent", "partial", "stale")):
         m["coverage"][name]["state"] = state
     m["merged"] = False
     m["sessions"] = [FX_SID]
@@ -4736,6 +4756,170 @@ def test_record_ac10_unknown_counts():
                 if len(r) == 7 and r[2] == "verb" and r[3] == "--close"]
         check(f"record AC10: a --close END reading rc=0 and exit={exit_} renders rc {want} on the Timeline",
               [r[5] for r in rows], [want])
+
+
+# ================================================================ extract freshness (TOOL-dLoggedFlight-16)
+#
+# A store extract made before its run's window ends is indistinguishable from a complete one unless the
+# model grades it. Every arm here derives the window's end from a first build of its fixture with no
+# store, never types it, and backdates or strips `extracted_at` through `write_extract`. The counts a
+# shape renders are graded against `COUNTED_STATES` read from the record module, beside the typed `-`
+# the acceptance criterion names, so neither a widened list nor a renderer branch can pass both.
+
+FRESH_FX = {}
+
+
+def build_fresh_fixture():
+    """The landed run with its `--landed` END one whole second long, so its window ends on a whole second
+    and an extract can be made exactly at that end; its journals alone, and with a second session named
+    that has no source; the real extractor's events for its named session; and the window's end, read
+    from a first build with no store. Built once for the arms below."""
+    if FRESH_FX:
+        return FRESH_FX
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    tail = fx["driver"][-2:]
+    check_true("fresh fixture: the landed fixture's last driver pair is its --landed START and END, the pair "
+               "given a whole-second duration here",
+               [(ln.get("verb"), ln.get("ev")) for ln in tail] == [("--landed", "start"), ("--landed", "end")],
+               str([(ln.get("verb"), ln.get("ev")) for ln in tail]))
+    driver = fx["driver"][:-2] + render_driver_lines(27, "--landed", phase_from="LANDING", phase_to="LANDED",
+                                                     wt=FX_WT_PRIMARY, dur=1.0)
+    other = render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
+                                sid=FX_SID_B, pid=4747)
+    j = write_journals(repo.parent, driver=driver, gates=fx["gates"], pushes=fx["pushes"])
+    j_two = write_journals(repo.parent, driver=driver + other, gates=fx["gates"], pushes=fx["pushes"])
+    bare = build_model(repo, journals=j)
+    acts = [("call", derive_minute(m) - 1, derive_minute(m) + 1) for m in (1, 3, 4, 6, 21, 27)]
+    events = build_session_events(acts + [("owner", float(derive_minute(12)) + 30)])
+    FRESH_FX.update(repo=repo, j=j, j_two=j_two, end=bare.window["end"],
+                    bare_state=bare.coverage["transcripts"]["state"], events=events)
+    return FRESH_FX
+
+
+def build_fresh_model(journals, extracted_at, name):
+    """One model of the fresh fixture whose named session's only source is a store extract carrying
+    `extracted_at`, None omitting the field, in a store of its own."""
+    fx = build_fresh_fixture()
+    store = pathlib.Path(tempfile.mkdtemp(prefix=f"runlog-fresh-{name}-", dir=fx["repo"].parent))
+    write_extract(store, FX_SID, fx["events"], extracted_at=extracted_at)
+    return build_model(fx["repo"], journals=journals, store=store)
+
+
+def test_fresh_ac1_extracted_at():
+    """AC1: the real extractor stamps `extracted_at` as an integer inside the epoch seconds read around
+    the call, and `write_session` stores it."""
+    base, projects = build_projects("runlog-fresh-ac1-")
+    sid = build_scenario(projects, "order")
+    tree = rx.resolve_session_tree(sid, projects)
+    before = int(time.time())
+    session = rx.extract_session(tree)
+    after = int(time.time())
+    stored = json.loads(rx.write_session(session, base / "store").read_bytes())
+
+    def check_stamp(value):
+        return isinstance(value, int) and not isinstance(value, bool) and before <= value <= after
+
+    check("fresh AC1: extract_session's object and the copy write_session stored each carry an integer "
+          "extracted_at between the epoch seconds read just before and just after the call",
+          (check_stamp(session.get("extracted_at")), check_stamp(stored.get("extracted_at"))), (True, True))
+    check_true("fresh AC1 liveness: the extract is a real one, holding events, and the stamp is not the "
+               "suite's own default", bool(session.get("events")) and session.get("extracted_at") != FX_EXTRACTED_AT,
+               str(session.get("extracted_at")))
+
+
+def test_fresh_ac2_ac3_covers_window():
+    """AC2 and AC3: a named session whose only source is a store extract reads `stale` one second before
+    the window's end and `present` at it, and `stale` with the field missing or holding the string "1".
+    The test itself, and the discovered path, are graded directly beside them."""
+    fx = build_fresh_fixture()
+    end = fx["end"]
+    check_true("fresh AC2 liveness: the window's end, read from a first build with no store, is a whole "
+               "second, and that build read the transcripts not-local", isinstance(end, (int, float))
+               and float(end).is_integer() and fx["bare_state"] == "not-local", str((end, fx["bare_state"])))
+    at = int(end)
+    got = {name: build_fresh_model(fx["j"], value, name).coverage["transcripts"]["state"]
+           for name, value in (("short", at - 1), ("at-end", at))}
+    check("fresh AC2: an extract made one second before the window's end reads stale, and one made at the "
+          "end reads present", got, {"short": "stale", "at-end": "present"})
+    got = {name: build_fresh_model(fx["j"], value, name).coverage["transcripts"]["state"]
+           for name, value in (("field-less", None), ("string", "1"))}
+    check("fresh AC3: an extract with no extracted_at, and one holding the string \"1\", each read stale",
+          got, {"field-less": "stale", "string": "stale"})
+    window = {"start": 0.0, "end": float(at)}
+    table = {"an integer at the end": at, "an integer one second after it": at + 1,
+             "an integer one second before it": at - 1, "the end as a string": str(at),
+             "the end as a float": float(at), "a bool": True, "null": None}
+    check("fresh AC2: check_extract_covers answers True for an integer at or after the end and False for "
+          "every other value", {k: rl_model.check_extract_covers({"extracted_at": v}, window)
+                                for k, v in table.items()},
+          {k: k in ("an integer at the end", "an integer one second after it") for k in table})
+    check("fresh AC3: an extract without the field, and a value that is not an object, never cover",
+          (rl_model.check_extract_covers({}, window), rl_model.check_extract_covers(None, window)), (False, False))
+    got = {}
+    for name, value in (("short", at - 1), ("at-end", at)):
+        store = pathlib.Path(tempfile.mkdtemp(prefix=f"runlog-fresh-disc-{name}-", dir=fx["repo"].parent))
+        write_extract(store, FX_SID, fx["events"], extracted_at=value)
+        extracts, state, note = rl_model.resolve_run_sessions([], FX_SLUG, window, store=store, projects=None)
+        got[name] = (sorted(extracts), state)
+    check("fresh AC2: on the discovered path a short store extract reads stale and one made at the end "
+          "present, the session read either way", got,
+          {"short": ([FX_SID], "stale"), "at-end": ([FX_SID], "present")})
+
+
+def test_fresh_ac4_three_shapes():
+    """AC4, spec S5: the three shapes rendered side by side through `render_record` — a named session
+    whose only source is a short extract, one whose extract has no `extracted_at`, and a fresh session
+    beside a named session with no source — with the fourth model holding one short session and one
+    missing, and a fresh one alone as the near miss that shows each probe can move."""
+    fx = build_fresh_fixture()
+    at = int(fx["end"])
+    shapes = (("short", fx["j"], at - 1), ("field-less", fx["j"], None), ("missing", fx["j_two"], at),
+              ("mixed", fx["j_two"], at - 1), ("fresh", fx["j"], at))
+    models, counts, idle, rows = {}, {}, {}, {}
+    for name, journals, value in shapes:
+        model = build_fresh_model(journals, value, name)
+        text = rl_record.render_record(model, "memory")
+        models[name] = model
+        counts[name] = sorted({c for label in TRANSCRIPT_FACTS for c in read_fact_counts(text, label)})
+        facts = parse_record_markdown(text).get("Coverage", {}).get("facts", {})
+        idle[name] = facts.get("idle gaps", "").split(" · ")[0]
+        rows[name] = [r[2] for r in scan_record_rows(text) if len(r) == 6 and r[1] == "transcripts"]
+    states = {name: m.coverage["transcripts"]["state"] for name, m in models.items()}
+    check("fresh AC4: the short, field-less and mixed models read stale, the one with a session missing "
+          "partial, and the fresh one present",
+          states, {"short": "stale", "field-less": "stale", "missing": "partial", "mixed": "stale",
+                   "fresh": "present"})
+    check("fresh AC4: each record's Sources row for the transcripts carries its model's state",
+          rows, {name: [state] for name, state in states.items()})
+
+    def derive_kind(cells):
+        return "-" if cells == ["-"] else ("int" if cells and all(c.isdigit() for c in cells) else str(cells))
+
+    check("fresh AC4: every owner-turn, usage and attributed-call count renders -, for each stale shape, "
+          "and as an integer for the shape with a session missing",
+          {name: derive_kind(counts[name]) for name in ("short", "field-less", "mixed", "missing")},
+          {"short": "-", "field-less": "-", "mixed": "-", "missing": "int"})
+    check("fresh AC4: ...and every shape renders those counts exactly as its state's membership of the "
+          "record's COUNTED_STATES says", {name: derive_kind(counts[name]) for name in states},
+          {name: "int" if state in rl_record.COUNTED_STATES else "-" for name, state in states.items()})
+    check("fresh AC4: the Coverage idle-gaps fact reads judged no for all four, and judged yes only for the "
+          "fresh near miss", idle, {"short": "judged no", "field-less": "judged no", "missing": "judged no",
+                                    "mixed": "judged no", "fresh": "judged yes"})
+    check_true("fresh AC4 liveness: every model read the extract and holds a non-zero owner turn and non-zero "
+               "calls, and every window ends where the first build's did, so each - is the renderer's "
+               "decision and each boundary is the derived one",
+               all(m.owner_positions["counts"]["in-window"] == 1 and m.attribution["calls"] > 0
+                   and m.window["end"] == fx["end"] for m in models.values()),
+               str({n: (m.owner_positions["counts"], m.attribution["calls"], m.window["end"])
+                    for n, m in models.items()}))
+    notes = {name: models[name].coverage["transcripts"].get("note", "") for name in ("short", "mixed")}
+    check("fresh AC4: the coverage note counts the short sessions, beside the missing one where there is "
+          "one, and names no session",
+          {name: ("1 of 1 sessions read have a store extract made before the window's end" in note,
+                  "1 of 2 sessions have no local transcript" in note, FX_SID in note or FX_SID_B in note)
+           for name, note in notes.items()},
+          {"short": (True, False, False), "mixed": (True, True, False)})
 
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)
@@ -5685,7 +5869,7 @@ def test_skill_copied_names():
             ("a verb the CLI does not have", f"{cli} extract", f"{cli} explain", "`explain`"),
             ("a flag its verb does not take", "model <slug> --json", "model <slug> --jsonl", "`--jsonl`"),
             ("a record heading renamed", "sections are Summary,", "sections are Overview,", "sections"),
-            ("a coverage state renamed", "`dead` or", "`stale` or", "coverage states"),
+            ("a coverage state renamed", "`not-local` or", "`remote` or", "coverage states"),
             ("a usage split renamed", "and `workflow`", "and `workflows`", "usage splits"),
             ("a model field renamed", "`journal_lines`", "`journal_rows`", "`journal_rows`"),
             ("the archive name spelled another way", "RUN.<PHASE>.<8 hex>.md", "RUN.<phase>.<key>.md",

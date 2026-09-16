@@ -7,7 +7,7 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
   "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9",
-  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12"]
+  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-16"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
@@ -164,11 +164,11 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
 - The consumers — the extractor, the run model and the committed record, units 6, 8 and 9 — import
   `runlog_lib` rather than re-parsing. The extractor, `TOOL-dLoggedFlight-6`, shipped first: it
   reads session ids off the driver journal's `start` lines through `read_journal`, runs driver
-  command heads and printed narration through `render_redacted`, and persists no free text at all.
+  command heads and printed narration through `render_redacted`, and persists no free text.
   The run model, `TOOL-dLoggedFlight-8`, shipped next: it joins the journals, the extracts, git and
   the run-state file into one run. The committed record, `TOOL-dLoggedFlight-9`, shipped after it: it
   renders from the model and reads its run key, its attributed journal lines, its workflow runs and its
-  anomaly times rather than re-deriving any of them. The question-answering Skill,
+  anomaly times rather than re-deriving any of them. The Skill,
   `TOOL-dLoggedFlight-12`, shipped last: it names the `model` and `narration` verbs and the record's
   folder, and adds no verb of its own.
 - `RECORD_SCHEMA` is shared as data with the record schema leg, `TOOL-dLoggedFlight-10`, which shipped
@@ -208,8 +208,9 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
 - **The run model infers, and says which answers are inferred.** The build commit, the owner's
   decision-log rows, an unmet acceptance line, a close's head and a call's attribution are heuristics
   named in its `method` field. It reads only history reachable from HEAD. It judges idle gaps only
-  where every session's transcript is local, and keeps out any gap beside an owner turn. Two runs
-  that claim one tree in the same stretch both hold it, so a bar made there joins both. The spec-mark
+  where every session's transcript is local, and keeps out any gap beside an owner turn. A store
+  extract made before the window's end reads `stale`. Two runs claiming one tree in the same stretch
+  both hold it, so a bar there joins both. The spec-mark
   split still reads each spec at the era's end, not the window's. With none of a run's own driver
   lines here, its empty journals read `not-local`.
 - **A moved memory root reds the schema leg.** The move adds every record, so a rotated build's runs

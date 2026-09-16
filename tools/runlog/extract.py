@@ -838,7 +838,13 @@ def _build_events(items, usage, cron_items) -> list:
 
 def extract_session(tree: SessionTree, attribution="given", slugs=()) -> dict:
     """One session's structural extract: the data model the kit README states. Never raises on a
-    transcript's contents: a torn line, an unknown type or a missing file lands in `coverage`."""
+    transcript's contents: a torn line, an unknown type or a missing file lands in `coverage`.
+
+    `extracted_at` is the integer epoch second at which this extraction STARTED, floored, read before
+    the first file is opened (TOOL-dLoggedFlight-16 S1), so a stamp at or after a run's window end
+    says every file was read after that window closed. It does not say the transcript was whole; the
+    kit README's non-checks say so. The model's `check_extract_covers` is the one reader of the field."""
+    extracted_at = int(time.time())
     cov = _build_coverage(tree)
     versions: dict = {}
     items, cron_items = [], []
@@ -914,6 +920,7 @@ def extract_session(tree: SessionTree, attribution="given", slugs=()) -> dict:
                        "tokens": _derive_int(flow.get("totalTokens"))}))
     cov["wf_missing"] = len(wf_runs - present)
     return {"schema": SCHEMA, "sid": tree.sid, "attribution": attribution, "slugs": sorted(set(slugs)),
+            "extracted_at": extracted_at,
             "tree_bytes": tree_bytes, "engine_versions": dict(sorted(versions.items())),
             "coverage": cov, "events": _build_events(items, usage, cron_items)}
 
