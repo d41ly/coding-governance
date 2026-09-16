@@ -1,6 +1,6 @@
 # DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor
 
-**Status:** INPROGRESS · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 3
+**Status:** CLOSED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 3
 
 <!-- gen:spec-records -->
 

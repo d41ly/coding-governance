@@ -1,6 +1,6 @@
 # DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed
 
-**Status:** INPROGRESS · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 2
+**Status:** CLOSED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 2
 
 <!-- gen:spec-records -->
 

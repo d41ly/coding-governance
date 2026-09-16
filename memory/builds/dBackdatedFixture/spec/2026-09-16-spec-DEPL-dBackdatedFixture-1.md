@@ -1,6 +1,6 @@
 # DEPL-dBackdatedFixture-1 — the vintage fixtures drop rows the old vintage never shipped
 
-**Status:** INPROGRESS · rev-5 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
+**Status:** CLOSED · rev-5 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
 
 <!-- gen:spec-records -->
 

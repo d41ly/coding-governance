@@ -51,22 +51,22 @@ invent an identity for it. `update`'s S9 integrity check refuses that receipt, a
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `DEPL-dBackdatedFixture-1` | OPEN | one vintage-rewind helper for both backdating fixtures, and a fixture-acceptance arm per builder |
-| 2 | `DEPL-dBackdatedFixture-2` | OPEN | the `[dGV-9]` arms grade only rows the receipt held before the write (audit B1, promoted) |
-| 3 | `DEPL-dBackdatedFixture-3` | OPEN | the `u5a` check arms take their expected figures from the descriptor (audit H1, promoted) |
+| 1 | `DEPL-dBackdatedFixture-1` | CLOSED | one vintage-rewind helper for both backdating fixtures, and a fixture-acceptance arm per builder |
+| 2 | `DEPL-dBackdatedFixture-2` | CLOSED | the `[dGV-9]` arms grade only rows the receipt held before the write (audit B1, promoted) |
+| 3 | `DEPL-dBackdatedFixture-3` | CLOSED | the `u5a` check arms take their expected figures from the descriptor (audit H1, promoted) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-09-16 · streams deployer
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-09-16 · streams deployer
 ids DEPL-dBackdatedFixture-1 DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dBackdatedFixture-1 — the vintage fixtures drop rows the old vintage never shipped](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | INPROGRESS | rev-5 | 2026-09-16 |
-| [DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed](spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-16 |
-| [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | INPROGRESS | rev-2 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-1 — the vintage fixtures drop rows the old vintage never shipped](spec/2026-09-16-spec-DEPL-dBackdatedFixture-1.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-2 — the `[dGV-9]` version-refresh arms grade only the rows the write refreshed](spec/2026-09-16-spec-DEPL-dBackdatedFixture-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-16 |
+| [DEPL-dBackdatedFixture-3 — the `u5a` check arms take their expected figures from the descriptor](spec/2026-09-16-spec-DEPL-dBackdatedFixture-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 3 record folder(s).
