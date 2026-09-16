@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 14
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 

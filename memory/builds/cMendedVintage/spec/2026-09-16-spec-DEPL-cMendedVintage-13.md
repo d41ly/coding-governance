@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-13 — `update --write` emits gate legs
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 19
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 

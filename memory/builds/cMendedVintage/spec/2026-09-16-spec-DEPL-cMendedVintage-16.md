@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-16 — the lexicon outcome block cannot accept a failed first scaffold
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 25
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 

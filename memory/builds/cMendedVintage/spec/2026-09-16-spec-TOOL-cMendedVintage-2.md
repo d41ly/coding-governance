@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-2 — gate-lint stops seeding into the memory tree
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 11
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 

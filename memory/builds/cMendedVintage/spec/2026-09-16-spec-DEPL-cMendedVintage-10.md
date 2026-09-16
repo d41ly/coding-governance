@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 16
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
 
 <!-- gen:spec-records -->
 

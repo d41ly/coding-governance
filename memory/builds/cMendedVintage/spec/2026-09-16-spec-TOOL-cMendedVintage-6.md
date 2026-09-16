@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 21
+**Status:** SPECCED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 

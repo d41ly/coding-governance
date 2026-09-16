@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-9 — no descriptor destination under `{memory_root}/project/`
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 12
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 13
 
 <!-- gen:spec-records -->
 

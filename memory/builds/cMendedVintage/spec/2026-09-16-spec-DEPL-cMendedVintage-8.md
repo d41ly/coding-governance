@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-8 — a descriptor shipping `rendered` rows must declare a regenerate
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 10
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 11
 
 <!-- gen:spec-records -->
 

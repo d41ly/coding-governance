@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-1 — `adopt-memory-tree.sh --render`, the one adopter with no render path
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-6 — the fixture records are rendered per prefix, so nothing deletes them
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer+tooling · order 8
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer+tooling · order 9
 
 <!-- gen:spec-records -->
 

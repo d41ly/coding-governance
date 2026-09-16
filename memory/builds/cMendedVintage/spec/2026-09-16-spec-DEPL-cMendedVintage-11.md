@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-11 — `cmd_check` grades the attributes row's block
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
 
 <!-- gen:spec-records -->
 
