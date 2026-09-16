@@ -5643,6 +5643,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "write_vintage_receipt",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "zero_record_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"

@@ -1,11 +1,13 @@
 # DEPL-dBackdatedFixture-1 — the vintage fixtures model an install the old vintage could have produced
 
-**Status:** INPROGRESS · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
+**Status:** INPROGRESS · rev-4 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md](../build/2026-09-16-build-DEPL-dBackdatedFixture-1-acceptance-ledger.md) | journal | DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3 |
+| [2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round1.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-closing-diff-round1.md) | diff-review | DEPL-dBackdatedFixture-2 DEPL-dBackdatedFixture-3 |
 | [2026-09-16-review-DEPL-dBackdatedFixture-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-dBackdatedFixture-1-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -39,7 +41,8 @@ labels are `check` arms that type `2/2`; they are `DEPL-dBackdatedFixture-3`.
   No arm is weakened: the ones whose population S1 widens are named in §4 with the reason each still
   grades its target, and the one that would not is `DEPL-dBackdatedFixture-2`. Observed by AC4.
 - **S4** — A row with no `source` is left untouched by `write_vintage_receipt`, which is what
-  `delta_target` already did. NOT OBSERVED: every row writer in `govkit.py` sets `source`, so no fixture
+  `delta_target` already did. NOT OBSERVED: `apply` and `adopt` emit a source-less `attributes` row
+  only when the selection declares an `lf_pin`, and check-wiring declares none, so neither builder
   holds such a row and no arm can see the branch.
 
 ## 3. Non-goals (OUT)
@@ -122,7 +125,8 @@ then printed `provenance: 2/2 resolved`.
 - observability — S2's arms put stderr in the detail, which is the diagnostic this incident lacked.
 - risks — AC2's liveness half reds if `check-wiring` ever stops shipping a file `24f39915` lacked. That
   is the `[-8]` fixture's "ASSERTED FIRST" precedent.
-- testing — every new arm is observed RED on a staged break named in §7.
+- testing — every new arm is observed RED on a staged break named in §7. The AC2 liveness arm reads
+  only the descriptor and `ls-tree`, so it has its own break.
 - migration — N/A — no receipt schema, data or adopter change.
 - user docs — N/A — no user-facing surface.
 
@@ -149,9 +153,10 @@ then printed `provenance: 2/2 resolved`.
 
 ## 7. Gates
 
-`govkit selftest` · `lexicon naming predicates`
+`govkit selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness`
 
-New arm: tools/govkit/selftest.py · `[dBF]` AC1 and AC2 arms, staged RED by making `write_vintage_receipt` rewind an absent source instead of dropping it · none
+New arm: tools/govkit/selftest.py · `[dBF]` AC1 and the two AC2 state arms, staged RED by making `write_vintage_receipt` rewind an absent source instead of dropping it · none
+New arm: tools/govkit/selftest.py · `[dBF]` AC2 LIVENESS, staged RED by removing `check-wiring.fragment.json` from the check-wiring descriptor's `include` and `claims` · none
 New arm: tools/govkit/selftest.py · `[dBF]` AC3 acceptance arms, staged RED by that same break · none
 
 ## 8. Open questions
@@ -172,6 +177,10 @@ none
   than folded: rev-2's S4/AC5 move to `DEPL-dBackdatedFixture-2` and its S2/AC3 to
   `DEPL-dBackdatedFixture-3`, each audited as a spec. The remaining items renumber S1-S4 and AC1-AC4.
   The medium and low folds stay as rev-2 wrote them.
+- rev-4 · 2026-09-16 · S4 · §5 · §7 · folded closing diff review round 1 (BLOCKED, 8 confirmed of 11).
+  B1: the new module-level function needs `gen_map.py --write`, so `codebase-map coverage + freshness`
+  joins §7. M1: the AC2 liveness arm gets its own break, the descriptor no longer shipping the
+  fragment. L2: S4's NOT OBSERVED reason names the `attributes` row `apply` and `adopt` do emit.
 
 ## 10. Reuse audit
 

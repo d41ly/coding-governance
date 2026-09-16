@@ -214,22 +214,30 @@ def settle(t: pathlib.Path, msg: str = "fixture") -> None:
 
 def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
                           vintage: str) -> tuple[list[str], list[str]]:
-    """Rewrite an applied target into an install LANDED AT `vintage`. Returns (kept, dropped) paths.
+    """Rewind an applied target's receipt and bytes to `vintage`. Returns (kept, dropped) paths.
 
     DEPL-dBackdatedFixture-1. A row whose source gov did NOT ship at `vintage` is DROPPED -- from the
     receipt, and from the target's index and worktree -- never given an identity there. No install
     landed at that vintage could hold it. The two inline loops this replaces rewound EVERY row, so
     when `TOOL-aReplayedCard-2` gave check-wiring a file `24f39915` never had, they recorded the
     empty blob's id as its `gov_oid` and `update`'s S9 preamble (`DEPL-dCarriedReceipt-7`) refused
-    the whole receipt at exit 2. Thirty arms went red, and the refusal sat on stderr where none of
-    their details looked. A dropped row is what an adopter who installed before the file existed
-    really holds, and `update --write` lands it as an unclaimed source (DEPL-dRatifiedSeam-1 S3).
+    the whole receipt at exit 2. Twenty-seven arms over the two builders went red, and most of their
+    details were stdout-only, so the first FAIL lines named the measurer instead of the refusal. A
+    dropped row is what an adopter who installed before the file existed really holds, and
+    `update --write` lands it as an unclaimed source (DEPL-dRatifiedSeam-1 S3).
 
-    BOTH identities come from the SAME vintage, or the row is S9's corruption rather than an older
-    install -- and through the engine's own helpers, so the fixture and the thing it grades cannot
-    disagree about what a blob is named. A row with no `source` is left as `apply` wrote it; no row
-    writer emits one today, so nothing observes that branch. The arms that grade this helper read
-    the target's STATE against the descriptor, never this return value.
+    WHAT IS REWOUND, AND WHAT IS NOT. `commit`, `sha256` and `gov_oid` move to `vintage`, and BOTH
+    identities from the SAME vintage, or the row is S9's corruption rather than an older install --
+    through the engine's own helpers, so the fixture and the thing it grades cannot disagree about
+    what a blob is named. `version` and `oid` stay as `apply` wrote them at HEAD, so `update`'s
+    per-kit delta over this fixture reads `level` where a real install at `24f39915` reads DIFFERS.
+    No arm grades either field over these fixtures today; one that does must rewind them first.
+
+    A row with no `source` is left as `apply` wrote it. `apply` and `adopt` emit one -- the
+    synthesized `attributes` row -- whenever the selection declares an `lf_pin`; check-wiring declares
+    none, so neither builder holds one and no arm observes the branch. Keep the guard: without it
+    `cat-file -e <vintage>:None` fails and `.gitattributes` would be `git rm`'d. The arms that grade
+    this helper read the target's STATE against the descriptor, never this return value.
     """
     gk = govkit_module()
     rp = target / ".governance" / "install.json"
@@ -667,7 +675,7 @@ def main() -> int:
             run("apply", "--target", str(t), "--kits", "check-wiring")
             # BOTH identities from OLD, and no row OLD never shipped: `write_vintage_receipt`'s
             # header says why each half is load-bearing. Measured before either: nine arms red on
-            # a mixed-vintage row, and thirty on a row invented at a vintage that lacked its file.
+            # a mixed-vintage row, and 27 on a row invented at a vintage that lacked its file.
             write_vintage_receipt(govroot, t, OLD)
             # -12 S4: `apply` staged every row, and the rewind then changed their bytes in
             # the worktree. Both halves are dirty by that definition, so the fixture commits
@@ -676,11 +684,12 @@ def main() -> int:
             settle(t, "landed at the older vintage")
             return t
 
-        # --- DEPL-dBackdatedFixture-1. THE FIXTURE IS AN INSTALL `OLD` COULD HAVE PRODUCED, graded
-        # --- BEFORE any arm consumes it. Expectation from the DESCRIPTOR split by `ls-tree` at OLD,
+        # --- DEPL-dBackdatedFixture-1. THE FIXTURE HOLDS ONLY ROWS `OLD` SHIPPED, with their identities
+        # --- at OLD, graded BEFORE any arm consumes it (`version` and `oid` are not rewound; the
+        # --- helper's header says so). Expectation from the DESCRIPTOR split by `ls-tree` at OLD,
         # --- never from the helper's return value or the receipt it wrote. The acceptance arm carries
-        # --- stderr: on 4cf0944d this builder's fixture was refused there, and every consumer arm's
-        # --- stdout-only detail pointed at the measurer's UNVERIFIED line instead.
+        # --- stderr: on 4cf0944d this builder's fixture was refused there, and most consumer arms'
+        # --- stdout-only details pointed at the measurer's UNVERIFIED line instead.
         bf = stale_target("bf")
         _gbf = govkit_module()
         _bf_writes = _gbf.resolve_entry(
