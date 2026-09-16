@@ -8981,7 +8981,7 @@ user_skills = "/tmp/gk-fake-skills"
                         'version_from = { file = "seedy.sh", pattern = "^SEEDY_VERSION=" }\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                        '[[files]]\ninclude = ["loops.template.txt"]\nrole = "seed"\n'
+                        '[[files]]\ninclude = ["loops.seed.txt"]\nrole = "seed"\n'
                         'to = "{memory_root}/project/seedy-loops.txt"\n\n'
                         '[adopt]\nargv = []\nmutates_index = false\n')
         _pvCHURN_SH = ('d=$(dirname "$0")\nrm -f "$d/gone.txt"\n'
@@ -9036,7 +9036,7 @@ user_skills = "/tmp/gk-fake-skills"
                                            ("keep.txt", "keep v1\n"), ("gone.txt", "gone\n"),
                                            ("edit.txt", "edit\n"))),
                                 ("seedy", (("kit.toml", _pvSEEDY_KIT), ("seedy.sh", "SEEDY_VERSION=1.0\n"),
-                                           ("loops.template.txt", "a site gov's own tree carries\n")))):
+                                           ("loops.seed.txt", "a site gov's own tree carries\n")))):
                 (g / "tools" / _kd).mkdir(parents=True, exist_ok=True)
                 for _name, _body in _files:
                     (g / "tools" / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
