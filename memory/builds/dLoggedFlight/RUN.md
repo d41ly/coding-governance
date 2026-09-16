@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 8335f5a69431619af73d5e49d84a378c20f69acc
-phase: VERIFYING
+witness: 7bc83866a6a0b1e4c42581e1d1c8befee13bce9d
+phase: SPECCING
 branch-sha: a4007553c89f244136b3783b3a0b1bd3223f25ab
 branch-ref: refs/heads/branch/unattended-build-transparency-ea83a5
 mode: prompt
@@ -96,3 +96,7 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-16T12:24:19Z review · item dLoggedFlight · reason verdict BLOCKED · blockers 1
 
 2026-09-16T12:24:19Z review · item dLoggedFlight · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition promote
+
+2026-09-16T12:25:34Z rescope · item add TOOL-dLoggedFlight-14 · reason closing review round 2 NON-CONVERGENT, R2-B1 promoted: a stale store extract reads present, so the owner-time guard runs on turns the extract lacks
+
+2026-09-16T12:25:35Z rescope · item add TOOL-dLoggedFlight-15 · reason closing review round 2 NON-CONVERGENT, R2-H1 promoted: rows an owner act causes carry that act's time into the committed record

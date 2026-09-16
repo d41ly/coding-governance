@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-8 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -129,6 +129,8 @@ leg can prove nothing else got in.
 - **consumes-from** `TOOL-dLoggedFlight-8` — the model this record renders, and its run starts.
 - **hands-off** `TOOL-dLoggedFlight-10` — the schema leg that holds every committed record to S3 and S4.
 - **hands-off** `TOOL-dLoggedFlight-11` — the Skill step that renders, re-indexes and commits.
+- **hands-off** `TOOL-dLoggedFlight-14` — the owner-time refusal it gives an independent read.
+- **hands-off** `TOOL-dLoggedFlight-15` — the layout table and refusal it extends to owner-caused rows.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill reads this record first.
 
 ## 4. Design
@@ -313,6 +315,8 @@ none
   against a coverage state is content, so AC10 grades the renderer instead. M3's render half: the
   Timeline showed a killed verb's `rc`, which is its EXIT trap's `$?` and often 0, so S4 writes an
   `rc` only beside `exit=clean`.
+- rev-8 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-14` and `-15`, the units closing
+  review round 2 promoted at its NON-CONVERGENT exit.
 
 ## 10. Reuse audit
 

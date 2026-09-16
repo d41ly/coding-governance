@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost
 
-**Status:** CLOSED · rev-7 · 2026-09-14 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
+**Status:** CLOSED · rev-8 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -90,6 +90,7 @@ streamed, located through the session ids the driver recorded, and kept under th
 - **consumes-from** `TOOL-dLoggedFlight-5` — the redaction table, for classification and narration.
 - **hands-off** `TOOL-dLoggedFlight-8` — the run model joins these events, owner turns and usage into a
   run's timeline.
+- **hands-off** `TOOL-dLoggedFlight-14` — the extract format, which gains `extracted_at` there.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill prints narration through S6.
 
 ## 4. Design
@@ -318,6 +319,8 @@ New arm: `tools/runlog/selftest.py` · each rule staged RED on its fixture · fl
   now one constant in `runlog_lib`, spelled the driver's way, and AC7 grades it against the driver's
   own function. The 64-character bound goes with the old spelling: the slug is a store field and
   never a path, and the driver bounds none.
+- rev-8 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-14` and `-15`, the units closing
+  review round 2 promoted at its NON-CONVERGENT exit.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-11 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-12 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -279,6 +279,8 @@ sources actually support. Every later surface renders from this model rather tha
   run starts.
 - **hands-off** `TOOL-dLoggedFlight-11` — the push join by what was pushed, which lets the re-render
   after `--landed` see the landing push.
+- **hands-off** `TOOL-dLoggedFlight-14` — the session resolution and coverage it reads fresh.
+- **hands-off** `TOOL-dLoggedFlight-15` — the anomaly set and window end it holds away from owner turns.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill runs `model` and reads its
   coverage block.
 
@@ -689,6 +691,8 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   tick now runs. It reads the record like `--status`, so it claims no tree, and it is a heartbeat
   for `stalled`. The AC20 fixture takes it from `TREE_BLIND_VERBS`, and AC5 gains two stalled
   streaks, one of `--audit` and one mixed.
+- rev-12 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-14` and `-15`, the units closing
+  review round 2 promoted at its NON-CONVERGENT exit.
 
 ## 10. Reuse audit
 
