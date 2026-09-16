@@ -112,16 +112,28 @@ means = "adopted"
 # `ok = true` here `outcome_accepted` refuses the exit, the receipt is not re-stamped, and a kit that
 # correctly declined is reported as an unaccepted failure — the rollback-by-decline class.
 #
-# WHAT THIS PROBE DOES NOT TELL APART, said here rather than left for the next reader to discover: a
-# FAILED FIRST SCAFFOLD is shape-identical to the accepted state. `--scaffold` also exits 1 with the
-# conf still absent when the derivation fails, because the conf is precisely what the failing run was
-# trying to write, so this block reads that failure as the unconfigured posture and accepts it. The
-# probe is also not scoped to one step: `classify_outcome` reads this list for every argv this
-# descriptor declares, so the CONFIGURE step consults it too. Narrowing it is DEPL-cMendedVintage-16,
-# which was moved to run immediately after the unit that added this block for exactly that reason.
+# THE `must_exist` TERM IS WHAT MAKES THIS A POSTURE AND NOT A CRASH, and it is here because without
+# it a FAILED FIRST SCAFFOLD was shape-identical to the accepted state: `--scaffold` also exits 1
+# with the conf still absent when the derivation fails, because the conf is precisely what the
+# failing run was trying to write. An acceptance declared by an ABSENCE alone is satisfied by every
+# run that died before writing. The Skill is the discriminator that exists: `apply` never lands it
+# (`rendered` is not a LANDABLE role), so only the adopter writes it, and it is written in the same
+# `--scaffold` run as the conf. Skill present with no conf therefore means a declaration that was
+# REMOVED after a successful adopt, which is the posture; neither present means the adopter never
+# got through, which is a fault. DEPL-cMendedVintage-16, over the block DEPL-cMendedVintage-5 added.
+#
+# WHAT IT DELIBERATELY DOES NOT COVER: a target that holds this kit and has never run the adopter at
+# all — a `cp -r` copy-install, or a run whose CONFIGURE never happened — declines the same way and
+# is now REFUSED rather than accepted. That state is byte-identical to the failed install, so no file
+# probe can separate them, and this block chooses to red the rarer one. Under `govkit apply` it is
+# not reachable anyway: this kit declares no `blocks_adopt` hole, so CONFIGURE always runs.
+#
+# AND THE PROBE IS STILL NOT SCOPED TO ONE STEP: `classify_outcome` reads this list for every argv
+# this descriptor declares, so `apply`'s CONFIGURE consults it too. That is why the narrowing had to
+# happen here rather than only on the re-render path — the hole was open on an adopter-facing verb.
 [[outcome]]
 code = 1
-probe = { must_not_exist = ".lexicon.conf" }
+probe = { must_exist = ".claude/skills/lexicon/SKILL.md", must_not_exist = ".lexicon.conf" }
 means = "no-project-layer"
 ok = true
 

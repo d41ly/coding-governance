@@ -122,10 +122,74 @@ def shape(tmp: pathlib.Path, name: str, *, lang: str = "none", hook: str | None 
     return g
 
 
+def check_outcome_probes(tmp: pathlib.Path) -> None:
+    """AN ACCEPTED NON-ZERO STOP MUST NAME SOMETHING THAT EXISTS — the class, then its instance.
+
+    `[[outcome]] ok = true` says "this adopter exited non-zero ON PURPOSE". A block that declares
+    that meaning through an ABSENCE alone is satisfied by every run that DIED BEFORE WRITING,
+    because what an adopter was writing is exactly what is absent after it fails. Measured, not
+    theorised: `DEPL-cMendedVintage-5` shipped lexicon's `must_not_exist = ".lexicon.conf"`, and the
+    failed first scaffold that block could not tell from the posture is the conf's own writer. So an
+    accepted stop declared by an absence must also declare a PRESENCE. The two other shipped blocks
+    (memory-tree, codebase-map) already carried one; lexicon's is what this arm was written for.
+
+    THE CLASS, NOT THE ENTRY. Naming lexicon in the assertion would certify the one block that
+    exists and say nothing about the next kit to declare the same shape, which is the could-not-fail
+    shape one level up. The second half then grades lexicon's own two states, because a class rule
+    over descriptors cannot show that the engine reaches the same verdict.
+
+    WHAT IT DOES NOT CHECK: whether the entry's adopter actually WRITES the path its `must_not_exist`
+    names — that would need a reading of a shell script, and no static rule gets it. The presence
+    term is the cheap sufficient condition: with one declared, a run that wrote nothing cannot match.
+    # ponytail: shape rule over the descriptors, not an argv analysis — widen only if a block ever
+    # earns an exemption from it.
+    """
+    rep = govkit.Report()
+    descs = govkit.read_descriptors(ROOT, govkit.load_toml(
+        ROOT / "tools" / "govkit" / "registry.toml"), rep)
+    stops = [(eid, b) for eid, (d, _p) in sorted(descs.items())
+             for b in d.get("outcome", []) if b.get("ok")]
+    # THE LIVENESS ASSERTION. Quantifying over an empty set prints nothing but ok lines, and a probe
+    # that cannot move is not a green one.
+    check("accepted stops: the registry declares at least one to grade", bool(stops),
+          "no [[outcome]] carries ok = true, so the arm below graded nothing")
+    for eid, b in stops:
+        probe = b.get("probe") or {}
+        check("accepted stops: '%s' %r names a file that must EXIST" % (eid, b.get("means")),
+              bool(probe.get("must_exist")),
+              "probe declares only %s, so a run that died before writing satisfies it"
+              % sorted(probe))
+
+    # AND THE ENGINE AGREES, over the shipped lexicon descriptor and the two states it has to
+    # separate. Both have no `.lexicon.conf`; only one has the Skill the adopter renders beside it.
+    g = tmp / "outcome-probe"
+    (g / ".governance").mkdir(parents=True, exist_ok=True)
+    (g / ".governance" / "deploy.toml").write_text(DEPLOY, encoding="utf-8", newline=NL)
+    deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
+    d, _p = descs["lexicon"]
+    ctx = govkit.target_context(g, deploy, "lexicon", d)
+    skill = g / ".claude" / "skills" / "lexicon" / "SKILL.md"
+    skill.parent.mkdir(parents=True, exist_ok=True)
+    for label, rendered, want in (("a failed first scaffold", False, False),
+                                  ("a declaration removed after one", True, True)):
+        if rendered:
+            skill.write_text("x" + NL, encoding="utf-8", newline=NL)
+        elif skill.exists():
+            skill.unlink()
+        oc = govkit.classify_outcome(g, d, ctx, 1)
+        got = govkit.outcome_accepted(1, oc, govkit.declares_outcome_for(d, 1))
+        check("lexicon exit 1 after %s is %s" % (label, "ACCEPTED" if want else "REFUSED"),
+              got is want, "means=%r accepted=%s" % (oc.get("means") if oc else None, got))
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         shapes = 0
+
+        # The descriptor-shaped arms first: they need no install, so a registry that has re-opened
+        # the accepted-stop hole says so in milliseconds rather than after five scratch installs.
+        check_outcome_probes(tmp)
 
         # SHAPE 1 — a fresh, empty repository.
         # EXPECTED: the install COMPLETES and the receipt exists. This is the base case and every

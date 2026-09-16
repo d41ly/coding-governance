@@ -642,6 +642,13 @@ it moves. Before the closing review the seed emitted no matrix at all, so a fres
 Pins are MEASURED against the adopting corpus at scaffold and are never inherited: a pin copied from
 a larger tree is either vacuous or permanently red.
 
+**Deployed through `govkit`,** this kit's descriptor declares one accepted non-zero stop: a
+declaration REMOVED after an adopt is a posture, and `apply` and `update` report it as one rather
+than as a failure. It deliberately does not cover a tree that never got through `--scaffold` at all,
+because that is indistinguishable on disk from a FAILED first scaffold, so both red. The terms are
+the `[[outcome]]` block in `tools/lexicon/kit.toml`, which is where they are read from and the only
+place they are spelled.
+
 ### Expanding — the second and last supported transition
 
 `--scaffold` refuses once a declaration exists, so an adopter who later needs a concept the seed

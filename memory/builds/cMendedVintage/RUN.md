@@ -87,3 +87,11 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T18:46:27Z brief · item DEPL-cMendedVintage-5 · reason 4300ebe58773 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-5-2-build-brief.md
 
 2026-09-16T18:50:15Z dispatch · item 7941c2dd DEPL-cMendedVintage-5 · reason tools/lexicon/kit.toml tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/LEXICON.md tools/lexicon/README.md .claude/skills/lexicon/SKILL.md tools/drift-audit/kit.toml tools/drift-audit/drift_report.py tools/drift-audit/adopt-drift-audit.sh tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/README.md tools/drift-audit/selftest.py tools/workflows/drift-audit-code.js tools/workflows/drift-audit-state.js tools/memory-recall/kit.toml tools/memory-recall/recall_conf.py tools/memory-recall/README.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-5.md
+
+2026-09-16T19:10:19Z dispatch · item 9597176f DEPL-cMendedVintage-16 · reason tools/govkit/govkit.py tools/lexicon/kit.toml tools/govkit/matrix.py
+
+2026-09-16T19:10:21Z brief · item DEPL-cMendedVintage-16 · reason c0f4066d3aa6 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-16-2-build-brief.md
+
+2026-09-16T19:18:43Z dispatch · item 9597176f DEPL-cMendedVintage-16 · reason tools/lexicon/kit.toml tools/govkit/matrix.py tools/lexicon/README.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-16.md memory/LIVE.md
+
+2026-09-16T19:24:45Z dispatch · item 9597176f DEPL-cMendedVintage-16 · reason tools/lexicon/kit.toml tools/govkit/matrix.py tools/lexicon/README.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-16.md memory/builds/cMendedVintage/README.md
