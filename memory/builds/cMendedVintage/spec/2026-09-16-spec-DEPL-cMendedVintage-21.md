@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-21 — the atomic write is one helper, and something fails when it is absent
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 24
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-21-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-21-acceptance-ledger.md) | journal | DEPL-cMendedVintage-13 |
 | [2026-09-17-prompt-DEPL-cMendedVintage-21-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-21-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -93,6 +94,12 @@ assertion reads source, the injection reads behaviour, and no single edit satisf
 because a set derived from a glob would grow silently and the assertion's whole value is that adding
 a member is a deliberate act.
 
+**What `ADOPTER_BAR_PATHS` actually holds** (rev-2, measured): not paths, but the SOURCE SPELLINGS
+this engine writes a destination through. Every path an adopter's whole bar reads is target-supplied
+— the gate-leg manifest is whatever that target's `[gate_runner].file` names — so there is no literal
+path available to declare, and a declaration by literal would grade nothing. The routing assertion
+follows each declared spelling through the names it is assigned into.
+
 ### Migration
 
 None. No file's CONTENT changes, only how its bytes reach disk. A target mid-way through a crashed
@@ -149,17 +156,24 @@ failure mode deliberately.
 ## 6. Acceptance criteria
 
 - **AC1** — When the arm stages a raise between the temp write and the replace and
-  `python tools/govkit/govkit.py apply --target <fixture> --write` runs, the fixture's runner file is
+  `python tools/govkit/govkit.py apply --target <fixture>` runs, the fixture's runner file is
   byte-identical to what it held before the run and the directory holds no temp sibling.
   Red when: the write is in place, so the file on disk is truncated at the raise and the adopter's
   whole bar reads a manifest that is not JSON.
   fixture: a scratch fixture target under the run's scratch root built with `intake` then `apply`;
   this repo keeps no `.governance/` receipt of its own.
+  rev-2, and it is not optional: the arm carries a CONTROL run of the UNBROKEN engine against the
+  same fixture, asserting that engine DOES move the runner. Without it the arm passes for a run that
+  refused before it ever reached the write, which is green-by-absence inside the one arm written to
+  close an ungraded mitigation.
 - **AC2** — When the routing assertion runs over `tools/govkit/govkit.py`, no direct `write_text` or
   `open` in write mode names a destination in the declared set, and staging one turns it RED.
   Red when: the assertion is written against the two call sites by line number, which certifies the
   sites that exist and is silent on the third.
-- **AC3** — When `python tools/govkit/govkit.py apply --target <fixture> --write` runs normally, the
+  rev-2: two LIVENESS halves, not one. The declared set must still reach a destination in the engine,
+  AND `write_atomic` must be CALLED on one of them — a negative over an empty population passes
+  identically to a negative over a routed one.
+- **AC3** — When `python tools/govkit/govkit.py apply --target <fixture>` runs normally, the
   runner file it produces is byte-identical to what the same command produced before this unit landed.
   Red when: the helper writes a trailing newline the in-place write did not, or drops one, which reds
   an adopter's byte-comparing parity leg and is invisible to every behavioural arm.
@@ -184,6 +198,21 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §2 §4 §6 · FOUR AMENDMENTS, measured during the build, no scope changed.
+  S1 is LIFTED rather than written twice: `DEPL-cMendedVintage-13` S6 already wrote the temp-sibling
+  write and the `os.replace` inline, and this unit extracts that body into `write_atomic` instead of
+  minting a second mechanism beside it.
+  AC1 and AC3 spelled the command `apply --target <fixture> --write`; `apply` writes unconditionally
+  and `--write` is `update`'s flag, inert here. The arms spell the verb's real invocation.
+  AC1 gains a CONTROL run of the unbroken engine, because an arm that only watches a broken run pass
+  over a file cannot tell a survived write from a write that never happened.
+  AC2 gains a second LIVENESS half: the helper must be CALLED on a declared destination, or the
+  routing negative is satisfied by a destination nothing writes.
+  S2's derived set is MEASURED and is one member. The candidate predicate was run over the real tree
+  before it was wired: 34 write sites, 1 hit, 33 near-misses, and an earlier draft that propagated
+  through any RHS mentioning a destination pulled in three innocent names by way of
+  `existing = json.loads(rf.read_text(...))`. The shipped rule propagates through path-shaped
+  derivations only.
 
 ## 10. Reuse audit
 

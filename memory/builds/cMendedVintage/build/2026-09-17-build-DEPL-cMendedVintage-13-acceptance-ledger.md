@@ -108,6 +108,10 @@ continuation belongs to no line and its criterion grades as answered by nothing.
   pass fails when it is absent, so the byte-identity arms above would pass over a plain `write_text`
   too. `DEPL-cMendedVintage-21` is the unit that makes the atomic write one helper with something
   that fails when it is not used, and it is later in this roster. Recorded OWED rather than claimed.
+  **Discharged 2026-09-17 by `DEPL-cMendedVintage-21`**, whose ledger carries the `**Evidences:**`
+  block: that unit extracts this write-back into `write_atomic` and stages a raise between the temp
+  write and the replace, so the mitigation now has a failing case. AC6 itself is unchanged and was
+  not re-graded — this note records the second half arriving, not a criterion moving.
 - **The gate-side encoding of every criterion.** Thirty-one arms tagged `[-13]` land in this
   unit's write set and only the govkit self-test suite can execute them in place. That suite is a
   merge-bar leg and no gate, suite or bar ran in this pass. They are NOT asserted by construction:

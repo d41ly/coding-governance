@@ -11092,6 +11092,160 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-13] ...and the target's own row is left exactly where the target had it",
               "demo leg" in read_legs13(_t13i), str(read_legs13(_t13i)))
 
+        # ========= DEPL-cMendedVintage-21 — THE ATOMIC WRITE IS ONE HELPER, AND OBSERVED =========
+        # The mitigation above (`-13` S6) was implemented and UNGRADED. `-13` AC6 compares the
+        # runner two runs of `apply` produce, and an ordinary in-place `write_text` produces those
+        # bytes identically — so the one mitigation that unit's Rollout elevates above every other
+        # could have been dropped silently and the build would still have closed green. These arms
+        # are what fails when it is absent.
+        #
+        # TWO OBSERVATIONS AND NEITHER ALONE. The injected raise reads BEHAVIOUR: it catches a
+        # helper that is absent, or whose cleanup leaks the temp file, or that replaces before the
+        # write completes. The routing assertion reads SOURCE: it catches a second write site that
+        # never calls the helper, which no injected raise can see because a raise only ever reaches
+        # the site it was staged into. No single edit satisfies both by accident, which is the
+        # charter's rule that a guard sharing state with the thing it guards is not a guard.
+
+        # ---- AC1. THE INJECTED RAISE. Staged into a COPY of the engine at the one line between
+        # ---- the temp write and the replace. The arm asserts BOTH halves: the previous runner
+        # ---- survives byte-identical, AND no temp sibling is left in the directory. An arm
+        # ---- checking only the first passes for a helper that leaks a temp file on every failure.
+        _SWAP21 = "        os.replace(tmp, dest)"
+        _g21 = build_gov13("m21")
+        # A row gov never emits, so no leg name collides and the refusal path is not what is being
+        # graded here. These are the bytes the dying run must not damage.
+        _OWN21 = json.dumps([{"name": "the target's own leg", "argv": ["true"]}], indent=2) + NL13
+
+        def build_runner21(tag: str) -> pathlib.Path:
+            """A fixture target whose runner already holds a row the target wrote itself."""
+            t = build_target13(tag)
+            (t / "scripts" / "gate-legs.json").write_text(_OWN21, encoding="utf-8", newline="")
+            settle(t, "a runner the target wrote itself")
+            return t
+
+        # THE CONTROL, and it is not optional. Without it this arm passes for a run that refused
+        # before it ever reached the write — the green-by-absence class, in the one arm written to
+        # close an ungraded mitigation. The UNBROKEN engine must move this fixture's runner.
+        _t21c = build_runner21("m21-control")
+        _p21c = run_gov13(_g21, "apply", "--target", str(_t21c))
+        check("[-21] AC1 LIVENESS the unbroken engine really does rewrite this fixture's runner, "
+              "so the broken run below is grading a write that would otherwise have happened",
+              (_t21c / "scripts" / "gate-legs.json").read_text(encoding="utf-8") != _OWN21,
+              (_p21c.stdout + _p21c.stderr)[-900:])
+
+        _gsrc21 = GOVKIT.read_text(encoding="utf-8")
+        _broken21 = _gsrc21.replace(
+            _SWAP21, "        raise RuntimeError('govkit selftest: staged mid-write break')", 1)
+        check("[-21] AC1 LIVENESS the staged break matched the line it names, so a renamed or "
+              "reindented replace call reds here rather than staging nothing",
+              _broken21 != _gsrc21, "the engine does not spell " + _SWAP21.strip())
+        (_g21 / "tools" / "govkit" / "govkit.py").write_text(_broken21, encoding="utf-8",
+                                                             newline="")
+        git(_g21, "add", "-A")
+        git(_g21, "commit", "-qm", "a raise staged between the temp write and the replace")
+        _t21 = build_runner21("m21")
+        _p21 = run_gov13(_g21, "apply", "--target", str(_t21))
+        check("[-21] AC1 the run dies where the break was staged, rather than passing over it",
+              _p21.returncode != 0
+              and "staged mid-write break" in (_p21.stdout + _p21.stderr),
+              (_p21.stdout + _p21.stderr)[-900:])
+        check("[-21] AC1 S1 the PREVIOUS runner file survives the raise byte-identical",
+              (_t21 / "scripts" / "gate-legs.json").read_text(encoding="utf-8") == _OWN21,
+              repr((_t21 / "scripts" / "gate-legs.json").read_text(encoding="utf-8")[:300]))
+        _sib21 = sorted(p.name for p in (_t21 / "scripts").iterdir()
+                        if p.name.startswith("gate-legs.json") and p.name != "gate-legs.json")
+        check("[-21] AC1 S1 ...and no temp sibling is left in the directory, which is the half an "
+              "arm grading only the surviving file would pass over",
+              not _sib21, str(_sib21))
+
+        # ---- AC2. THE ROUTING ASSERTION, over SOURCE. The declared destination set is the
+        # ---- ENGINE's own constant, read rather than restated: a second copy here would keep
+        # ---- passing against the harness's idea of what an adopter's bar reads, which is the
+        # ---- two-spellings class this file's header names.
+        def read_bar_writes21() -> tuple[set, list, list]:
+            """Walk the engine's syntax and return its derived adopter-bar destination NAMES, the
+            direct writes to one of them, and the sites already routed through `write_atomic`.
+
+            PATH-SHAPED DERIVATIONS ONLY, and this half was measured over the real tree before it
+            was wired. A rule propagating through any RHS that MENTIONS a destination pulled in
+            `existing = json.loads(rf.read_text(...))` and everything derived from that — three
+            innocent names a later direct write would have redded for no reason. A read is not a
+            derivation.
+            """
+            mk = tuple(govkit_module().ADOPTER_BAR_PATHS)
+            src = GOVKIT.read_text(encoding="utf-8")
+            tree = _ast.parse(src)
+            pathcall = ("with_name", "with_suffix", "joinpath", "resolve", "absolute", "expanduser")
+
+            def read_segment21(node) -> str:
+                return _ast.get_source_segment(src, node) or ""
+
+            rows = []
+            for n in _ast.walk(tree):
+                if not isinstance(n, (_ast.Assign, _ast.AnnAssign)):
+                    continue
+                tg = n.targets if isinstance(n, _ast.Assign) else [n.target]
+                names = [x.id for x in tg if isinstance(x, _ast.Name)]
+                v = n.value
+                if not names or v is None:
+                    continue
+                if not (isinstance(v, (_ast.Name, _ast.Subscript))
+                        or (isinstance(v, _ast.BinOp) and isinstance(v.op, _ast.Div))
+                        or (isinstance(v, _ast.Attribute) and v.attr == "parent")
+                        or (isinstance(v, _ast.Call) and isinstance(v.func, _ast.Attribute)
+                            and v.func.attr in pathcall)):
+                    continue
+                rows.append((names, read_segment21(v)))
+            dests: set[str] = set()
+            for _ in range(8):       # a fixpoint: an alias of an alias is still a destination
+                grew = len(dests)
+                for names, rhs in rows:
+                    if any(m in rhs for m in mk) or any(
+                            _re.search(r"\b%s\b" % _re.escape(d), rhs) for d in dests):
+                        dests.update(names)
+                if len(dests) == grew:
+                    break
+
+            def read_declared21(seg: str) -> bool:
+                return any(m in seg for m in mk) or any(
+                    _re.search(r"\b%s\b" % _re.escape(d), seg) for d in dests)
+
+            direct, routed = [], []
+            for n in _ast.walk(tree):
+                if not isinstance(n, _ast.Call):
+                    continue
+                f, d = n.func, None
+                if isinstance(f, _ast.Attribute) and f.attr in ("write_text", "write_bytes"):
+                    d = read_segment21(f.value)
+                elif (isinstance(f, _ast.Attribute) and f.attr == "open" and n.args
+                        and isinstance(n.args[0], _ast.Constant) and "w" in str(n.args[0].value)):
+                    d = read_segment21(f.value)
+                elif (isinstance(f, _ast.Name) and f.id == "open" and len(n.args) > 1
+                        and isinstance(n.args[1], _ast.Constant) and "w" in str(n.args[1].value)):
+                    d = read_segment21(n.args[0])
+                elif (isinstance(f, _ast.Attribute) and f.attr == "open"
+                        and isinstance(f.value, _ast.Name) and f.value.id in ("io", "os")
+                        and len(n.args) > 1 and isinstance(n.args[1], _ast.Constant)
+                        and "w" in str(n.args[1].value)):
+                    d = read_segment21(n.args[0])
+                elif (isinstance(f, _ast.Name) and f.id == "write_atomic" and n.args
+                        and read_declared21(read_segment21(n.args[0]))):
+                    routed.append(n.lineno)
+                if d is not None and read_declared21(d):
+                    direct.append((n.lineno, d.replace(chr(10), " ")[:80]))
+            return dests, direct, routed
+
+        _dest21, _direct21, _routed21 = read_bar_writes21()
+        check("[-21] AC2 LIVENESS the declared set still reaches a destination in this engine, so "
+              "a renamed `[gate_runner].file` read reds here rather than emptying the population",
+              bool(_dest21), "ADOPTER_BAR_PATHS matched no assignment at all")
+        check("[-21] AC2 LIVENESS ...and the helper is CALLED on one, so the negative below is not "
+              "passing over a destination nothing writes",
+              bool(_routed21), "no write_atomic call names a declared destination")
+        check("[-21] AC2 S4 no direct write_text/write_bytes/open-for-write names a declared "
+              "adopter-bar destination — every one routes through the helper",
+              not _direct21, str(_direct21))
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

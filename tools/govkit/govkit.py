@@ -2521,6 +2521,56 @@ def silenced_legs(descs: dict[str, tuple[dict, str]], selection: list[str], targ
     return hits
 
 
+# ---- THE DECLARED ADOPTER-BAR DESTINATION SET (DEPL-cMendedVintage-21 S2) --------------------
+# WHAT THESE ARE: not paths, but the SOURCE SPELLINGS this engine writes a destination through.
+# Every path an adopter's whole bar reads is TARGET-supplied — the gate-leg manifest is whatever
+# that target's `[gate_runner].file` names — so there is no literal path here to declare, and a
+# declaration by literal would grade nothing.
+#
+# A DECLARED POPULATION, never a glob. The routing assertion in the self-test walks this module's
+# own syntax, follows every name assigned from one of these spellings through its path-shaped
+# derivations, and refuses a direct write to any of them. It grades THE DECLARED MEMBERS ONLY: a
+# destination nobody added here is a destination nobody grades, and the assertion would read as
+# coverage it does not have. Adding a member is meant to be a deliberate act.
+ADOPTER_BAR_PATHS = ('gr["file"]',)
+
+
+def write_atomic(dest: pathlib.Path, text: str) -> None:
+    """Persist `text` at `dest` through a sibling temp file and `os.replace`, so a run that dies
+    mid-write leaves the PREVIOUS file rather than a truncated one (DEPL-cMendedVintage-21 S1).
+
+    THE ONE WRITER for every destination `ADOPTER_BAR_PATHS` declares, which today is the gate-leg
+    manifest an adopter's whole bar reads. Two verbs write that file since DEPL-cMendedVintage-13,
+    and an exception between opening it and finishing it would hand the adopter a manifest that is
+    not JSON — every leg of their bar, gone, on a deployer step that was only adding one.
+
+    WHAT THIS DOES NOT CLAIM. No fsync and no directory sync, so this is not crash consistency:
+    what it closes is a half-written file left by an EXCEPTION mid-write. Power loss is out of
+    scope and always was.
+
+    The temp file is a SIBLING, inside the destination's own directory. Two reasons, and both are
+    load-bearing: `os.replace` raises across a filesystem boundary, which a shared temp root makes
+    reachable and a sibling makes impossible; and a shared root is writable by principals the
+    destination's directory is not, so the file to be renamed into place could be swapped before
+    the rename. A stale sibling from a crashed run of an earlier vintage is overwritten here rather
+    than swept, because an unknown temp file of unknown vintage is not this engine's to delete.
+    """
+    tmp = dest.with_name(dest.name + ".govkit-new")
+    try:
+        tmp.write_text(text, encoding="utf-8", newline="\n")
+        os.replace(tmp, dest)
+    finally:
+        # THE CLEANUP RUNS ON THE SUCCESS PATH TOO, where `os.replace` has already consumed `tmp`
+        # and this raises FileNotFoundError — an OSError, swallowed. Swallowed rather than
+        # re-raised because this sits in a `finally`: an exception thrown from here REPLACES the
+        # one that brought us here, and the caller would be told the temp file could not be
+        # removed instead of why the write failed.
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+
+
 def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     descs: dict[str, tuple[dict, str]], selection: list[str],
                     receipt: dict | None, have: set[str], r: Report,
@@ -2706,14 +2756,16 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                           f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
         if len(r.problems) == _legs_problems_before:
             rf.parent.mkdir(parents=True, exist_ok=True)
-            # S6. TEMP FILE PLUS `os.replace`, so a crash mid-write leaves the PREVIOUS manifest
-            # rather than a truncated one. Two verbs now write a file an adopter's whole bar reads,
-            # and the failure mode disappears rather than gaining a recovery procedure. The sibling
-            # path keeps the rename atomic on both platforms this engine runs on.
-            _rf_new = rf.with_name(rf.name + ".govkit-new")
-            _rf_new.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
-                               encoding="utf-8", newline="\n")
-            os.replace(_rf_new, rf)
+            # S6, AND SINCE DEPL-cMendedVintage-21 IT IS ONE HELPER RATHER THAN THIS SITE'S OWN
+            # THREE LINES. A crash mid-write leaves the PREVIOUS manifest rather than a truncated
+            # one. Two verbs now write a file an adopter's whole bar reads, and the failure mode
+            # disappears rather than gaining a recovery procedure.
+            #
+            # NOT A STYLE CHOICE, and this is the point of the extraction: written in place here,
+            # the mitigation passes every byte-comparing criterion identically, so it could be
+            # dropped and nothing would go red. `write_atomic` has the self-test's routing
+            # assertion over it, which reds the moment this line becomes a direct write again.
+            write_atomic(rf, json.dumps(existing, indent=2, ensure_ascii=False) + "\n")
             subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
                            capture_output=True, check=False)
             print(f"govkit {verb} — gate legs: emitted {len(emitted)} into {gr['file']}")
