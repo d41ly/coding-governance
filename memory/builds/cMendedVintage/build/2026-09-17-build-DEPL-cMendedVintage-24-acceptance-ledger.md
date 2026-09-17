@@ -60,16 +60,15 @@ sentence the code stopped implementing, and all three moved in the same commit:
   absent from both the index and the worktree. The fixture now CREATES the shadow instead of
   uncaching one, which is the state the refusal is actually about, and it runs over nine rows.
 
-## The comparison carve-out, and what it is not
+## What the carve-out was measured against
 
-Carve-out 4 strips gov's marked region from HEAD's blob, the index blob and the worktree bytes and
-clears the path when the stripped forms agree. Each side is folded to LF through `derive_lf` first,
-and that fold is a correction rather than a convenience: the two blobs come out of the object
-database raw while the worktree copy has been through the target's own checkout filter, so on a CRLF
-clone the carve-out would never fire for anybody on Windows — while `git diff`, which decided the
-path was dirty in the first place, applies those filters and sees nothing. The ceiling is stated in
-the helper's own docstring: an operator whose only uncommitted change outside the region is a line
-ending is cleared here.
+**The argument for the LF fold is the spec's section 4 and the helper's own docstring, and it is not
+repeated here** — two copies of one reasoning is the class this build has already paid for twice.
+What the ledger owes is the observation, and it is AC2's: on a post-apply fixture the path is
+flagged by BOTH halves of git's own dirty test, asserted by its own liveness arm, and the run then
+proceeds — so carve-out 4 fired rather than the path never having been graded. The same was
+confirmed outside the fixture govs, on a real `memory-tree` install, where an uncommitted post-apply
+target still exits 0 with no dirty refusal.
 
 **Evidences:** DEPL-cMendedVintage-24
 
