@@ -130,7 +130,7 @@ failure mode deliberately.
 
 | Path | Change |
 |---|---|
-| `tools/govkit/govkit.py` | the helper, the declared destination set, both call sites routed through it |
+| `tools/govkit/govkit.py` | the helper, the declared destination set, and the ONE manifest write routed through it |
 | `tools/govkit/selftest.py` | the injection arm and the routing assertion |
 
 ## 5. Production-readiness checklist
@@ -208,6 +208,10 @@ none
   over a file cannot tell a survived write from a write that never happened.
   AC2 gains a second LIVENESS half: the helper must be CALLED on a declared destination, or the
   routing negative is satisfied by a destination nothing writes.
+  §4's files-touched row said "both call sites routed through it", which reads true until you ask
+  whose code it describes: `DEPL-cMendedVintage-13` already collapsed the two verbs onto ONE shared
+  body, so there is one write to route and both verbs reach it through that body. Corrected, because
+  a row implying two edits is a second answer to how many writers this file has.
   S2's derived set is MEASURED and is one member. The candidate predicate was run over the real tree
   before it was wired: 34 write sites, 1 hit, 33 near-misses, and an earlier draft that propagated
   through any RHS mentioning a destination pulled in three innocent names by way of
