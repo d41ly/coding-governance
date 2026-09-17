@@ -3714,6 +3714,29 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
 # the resolution, not of the apply verb, and spelling it twice is the defect this file exists to end.
 
 
+def render_order_slug(path: str) -> str:
+    """One receipt path -> the filename component an outbox order is keyed on.
+
+    DEPL-cMendedVintage-14 S1. The writers used to key on the path's BASENAME, so two conflicting
+    rows both called `kit.toml` produced ONE order and the second write silently overwrote the
+    first — observed as the missing order's CONTENT, never as an exit code, because overwriting a
+    file is not an error.
+
+    THE DIGEST IS WHAT MAKES THE KEY INJECTIVE, not the slug. A 60-character cap on the slug alone
+    re-opens the same collision one level along: two deep paths sharing a 60-character prefix
+    collapse exactly as two basenames do. The readable half in front of it is what keeps the file
+    identifiable by a human reading the outbox listing, and is worth nothing on its own.
+
+    WHAT IT STILL CANNOT DO, measured rather than reasoned: two paths differing only in case DO get
+    distinct filenames, on a case-insensitive filesystem included — the digests differ, so the names
+    differ by more than case and Windows keeps both. What survives is the 32 bits: two distinct
+    paths whose lowercased 60-character slugs AND whose first 8 hex both agree still collide, and
+    nothing here detects it. Widening the digest is the fix if that ever stops being theoretical.
+    """
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", path).strip("-").lower()[:60]
+    return f"{slug}-{hashlib.sha256(path.encode('utf-8')).hexdigest()[:8]}"
+
+
 # ------------------------------------------------------------------------ the merged-region writer
 CR = "\r"
 
@@ -7009,6 +7032,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # fixture whose own attributes pin `*.md`, which is the shape any target with a docs pin has.
     # `--ignore-unmatch`, because an UNCOMMITTED outbox is the ordinary case and is not an error.
     _reaped: set[str] = set()
+    # DEPL-cMendedVintage-14 S3. EVERY CONFLICT ORDER THIS RUN WRITES, collected at the write sites
+    # and read once by the reap at the end of the verb. It is the run's own output and not a
+    # listing of the outbox: keying the reap on the orders that EXIST would make nothing ever stale.
+    _orders_written: set[pathlib.Path] = set()
     _stale_order = outbox / "update-pins.md"
     if _stale_order.is_file():
         _stale_order.unlink()
@@ -7351,8 +7378,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                            resolve_row_needles(needles, row)))
                 if merged is None:
                     conflicts += 1
-                    (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md"
-                     ).write_text(
+                    _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
+                    _orders_written.add(_order)
+                    _order.write_text(
                         f"# update conflict — {row['path']} (gov RENAMED this file)\n\n"
                         f"gov moved  {row.get('source')} -> {new_src}\n"
                         f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
@@ -7435,7 +7463,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     "NOTHING was deleted. `update` no longer removes a tracked file from a "
                     "repository gov does not own on the strength of a verdict alone. Re-run with "
                     "--write-withdrawals if this file really should go.")
-            (outbox / f"update-withdrawn-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
+            # RE-KEYED WITH THE OTHER TWO, and NOT collected into `_orders_written`: this writer had
+            # the identical basename collision, and the reap below can never reach its output.
+            (outbox / f"update-withdrawn-{render_order_slug(row['path'])}.md").write_text(
                 f"# gov no longer ships {row['path']}\n\n"
                 f"source {row.get('source')}\n"
                 f"last gov commit {row.get('commit')}\n"
@@ -7481,7 +7511,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                        resolve_row_needles(needles, row)))
             if merged is None:
                 conflicts += 1
-                (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
+                _order = outbox / f"update-conflict-{render_order_slug(row['path'])}.md"
+                _orders_written.add(_order)
+                _order.write_text(
                     f"# update conflict — {row['path']}\n\n"
                     f"carry  {c['carry'] or '(none — the difference is a local delta)'}\n"
                     f"base   {base_commit} sha {_sha(c['base'])}\n"
@@ -8368,6 +8400,63 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
           f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting} · "
           f"declined red {n_declined_red}")
+
+    # ---- DEPL-cMendedVintage-14 S3 + S4 + S5. THE REAP. Nothing has ever removed a conflict order,
+    # ---- so an operator who resolved a conflict kept reading the order saying it was still open.
+    # ----
+    # ---- AT THE END, AFTER THE WRITE LOOP, and the ordering IS the migration rather than tidiness.
+    # ---- An order written by an earlier vintage carries the old key, so it is not in this run's set
+    # ---- and is reaped — and where its conflict is still live the loop above has ALREADY rewritten
+    # ---- it under the new key, so the target is never without one. Reaping first reaches the same
+    # ---- end state through a window in which the target has no order at all, and a run can die
+    # ---- inside that window.
+    # ----
+    # ---- NO `if write:` GUARD, for the reason the gate-leg step below records about its own
+    # ---- absence: the read-only run RETURNS at the preview hundreds of lines above, so the
+    # ---- condition cannot be false and a could-not-fail branch is the shape this file bans. The
+    # ---- case it would be guarding against is real and would be silent — a read-only run wrote no
+    # ---- order, so its set is empty and every order in the outbox is "stale" to it.
+    # ----
+    # ---- THE GLOB IS THE GUARD, not a filter, and it is scoped to `update-conflict-*.md` alone. A
+    # ---- CONFLICT order records a STATE that every run re-derives, which is exactly what makes its
+    # ---- absence information. A WITHDRAWAL order records an ACTION that happened or was withheld,
+    # ---- and its row then LEAVES the receipt, so no later run can re-derive it — the property
+    # ---- `update-rollback-` and `update-preexisting-red-` share. `apply`'s machine and hole orders
+    # ---- are recorded in the receipt's own `orders` list, which `check` asserts against disk, so
+    # ---- reaping one would red the target's install check. Only the first kind is reapable.
+    if kits:
+        # A SCOPED RUN CLASSIFIED A SUBSET OF THE RECEIPT'S ROWS, so an order belonging to a row
+        # outside the scope is not stale — it is UNEXAMINED. Deleting it destroys the only record
+        # that that row is still conflicted, silently, in a repository gov does not own.
+        print(f"govkit update — reap: SKIPPED, this run is scoped to {len(kits)} kit(s) and an "
+              f"order it did not write may belong to a row it never classified")
+    else:
+        _reap_names, _reap_failed = [], []
+        for _stale in sorted(outbox.glob("update-conflict-*.md")):
+            if _stale in _orders_written:
+                continue
+            try:
+                _stale.unlink()
+            except OSError as _reap_err:
+                # REPORTED BY NAME, never fatal. A stale order left on disk is the state the target
+                # was already in, and failing the run over it would withhold the receipt re-stamp
+                # for a file whose only reader is a human.
+                _reap_failed.append(f"{_stale.name} ({_reap_err})")
+                continue
+            _reap_names.append(_stale.name)
+            # THE INDEX IS UNSTAGED WITH THE FILE, for the reason the `update-pins.md` reap above
+            # records in full: a target that COMMITS its outbox otherwise hands the renormalize
+            # below a pinned path missing from the worktree, and gov refuses over its own deletion.
+            _reaped.add(f".governance/outbox/{_stale.name}")
+            subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached",
+                            "--ignore-unmatch", "--", f".governance/outbox/{_stale.name}"],
+                           capture_output=True, check=False)
+        # THE ZERO PRINTS TOO. A silent reap is indistinguishable from a reap that never ran.
+        print(f"govkit update — reap: removed {len(_reap_names)} stale conflict order(s)"
+              + (": " + " ".join(_reap_names) if _reap_names else ""))
+        for _f in _reap_failed:
+            print(f"govkit update — reap: could NOT remove {_f} — left on disk, which is the state "
+                  f"this target was already in")
 
     # ---- DEPL-cMendedVintage-10 S3 + S4. THE RENORMALIZE, which is the other half of the pin write
     # ---- rather than a separate feature: a newly pinned path whose INDEX blob is CRLF keeps it, and

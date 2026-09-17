@@ -1040,6 +1040,25 @@ a block that is not there. Nothing outside the marked region is read or rewritte
 `.gitattributes` you also maintain by hand keeps every line of its own, byte for byte. A read-only
 run says `REMOVED` in so many words before any of it happens.
 
+**`update-conflict-*.md` orders are REAPED, and they are the only family that is.** A conflict order
+records a STATE — this row still conflicts — which every run re-derives from scratch, so an order
+left standing after the conflict is resolved is a lie the operator keeps reading. An unscoped
+`update --write` therefore removes every conflict order it did not itself write this run, unstages
+each one from your index alongside the file, and prints the count and the names. The count prints
+even when it is zero. Nothing else is touched: a withdrawal, rollback, preexisting-red or
+declined-red order records an ACTION, and the row it belongs to has LEFT the receipt, so no later run
+could re-derive it — and `apply`'s machine and hole orders are recorded in your receipt's `orders`
+list, which `check` asserts against disk.
+
+**A run carrying `--kits` reaps NOTHING and says so in one line.** A scoped run classifies only the
+named kits' rows, so an order belonging to a row it never looked at is not stale — it is unexamined,
+and removing it would destroy the only record that that row is still conflicted. Widen the scope, or
+run unscoped, if you want the outbox tidied.
+
+The first unscoped `--write` after you pull this vintage will remove every conflict order written by
+an earlier one, because those carry the old filename key. Any whose conflict is still open is
+rewritten by the same run under the new key before the reap runs, so you are never left without one.
+
 A rollback order that names `.gitattributes` among its restored paths is not a mistake. Where this
 run rewrote govkit's own LF-pin block, that block goes back with ANY kit's rollback, because it is
 rendered from every claimed kit's pins at once and so belongs to no single one of them. A run that

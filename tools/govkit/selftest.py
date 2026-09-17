@@ -11246,6 +11246,174 @@ user_skills = "/tmp/gk-fake-skills"
               "adopter-bar destination — every one routes through the helper",
               not _direct21, str(_direct21))
 
+        # ===== DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the path ====
+        #
+        # THE MEASURED RED, on this block's own fixture against the engine at the parent commit:
+        # THREE rows conflicted — `tools/demo/one/conf.txt`, `tools/demo/two/conf.txt` and
+        # `tools/sib/conf.txt` — and the outbox held ONE file, `update-conflict-conf.txt.md`. The
+        # run exited 1 and named all three conflicts on stderr, so the LOSS is invisible to an exit
+        # code: two of the three orders were overwritten by the third, and the only symptom is the
+        # missing CONTENT. Every arm below is written against that observation.
+        #
+        # The fixtures reuse `-14`'s builders rather than growing a second pair. Each kit's rows
+        # share a BASENAME across directories, which is the whole collision, and the adopter edits
+        # the SAME line gov moves, so `git merge-file` really conflicts instead of merging clean.
+
+        _14R_A = "# conf\nVALUE=a\nfiller one\nfiller two\n"
+        _14R_B = _14R_A.replace("VALUE=a", "VALUE=b")
+        _14R_T = _14R_A.replace("VALUE=a", "VALUE=t")
+
+        def read_orders14r(t: pathlib.Path, pat: str) -> list[str]:
+            return sorted(p.name for p in (t / ".governance" / "outbox").glob(pat))
+
+        def read_order_bodies14r(t: pathlib.Path, pat: str) -> str:
+            return "\n".join(p.read_text(encoding="utf-8")
+                             for p in (t / ".governance" / "outbox").glob(pat))
+
+        def read_reap_lines14r(out: str) -> list[str]:
+            return [ln for ln in out.splitlines() if "— reap:" in ln]
+
+        _g14r, _ = build_verify_gov("reap", {
+            "demo": {"files": {"one/conf.txt": _14R_A, "two/conf.txt": _14R_A}},
+            "sib": {"files": {"conf.txt": _14R_A}},
+        })
+        _t14r = build_verify_target(_g14r, "reap-t", ["demo", "sib"])
+        _14R_ROWS = ("tools/demo/one/conf.txt", "tools/demo/two/conf.txt", "tools/sib/conf.txt")
+        for _rel in _14R_ROWS:
+            (_t14r / _rel).write_text(_14R_T, encoding="utf-8", newline="\n")
+        settle(_t14r, "the adopter edits all three rows on the line gov is about to move")
+        for _rel in _14R_ROWS:
+            (_g14r / _rel).write_text(_14R_B, encoding="utf-8", newline="\n")
+        git(_g14r, "add", "-A")
+        git(_g14r, "commit", "-qm", "B")
+
+        _w14r = run_in_gov(_g14r, "update", "--target", str(_t14r), "--write")
+        check("[-14R] LIVENESS all three rows really CONFLICT, or every arm below grades a fixture "
+              "that never triggered the rule",
+              _w14r.stdout.count("three-way conflicts") == 3, _w14r.stdout[-1800:])
+
+        # ---- AC2: two conflicts over two files both called `conf.txt` leave TWO orders. Asserted
+        # ---- on the BODIES, because the defect this closes is a file silently overwritten and the
+        # ---- count alone would pass over an order whose content belongs to the other row.
+        _o14r = read_orders14r(_t14r, "update-conflict-*.md")
+        _b14r = read_order_bodies14r(_t14r, "update-conflict-*.md")
+        check("[-14R] AC2 three conflicting rows leave THREE conflict orders",
+              len(_o14r) == 3, str(_o14r))
+        check("[-14R] AC2 ...and each names its own FULL path, so no write overwrote another",
+              all(p in _b14r for p in _14R_ROWS), str(_o14r))
+        check("[-14R] AC2 ...and nothing is keyed on the bare basename any more",
+              "update-conflict-conf.txt.md" not in _o14r, str(_o14r))
+        settle(_t14r, "commit the orders, so the reap's index unstage is exercised too")
+
+        # ---- AC5: a READ-ONLY run removes nothing. The runtime half of this is cheap and the
+        # ---- STRUCTURAL half below is the one that matters: the reap sits under no `if write:`
+        # ---- because the read-only branch RETURNS before the outbox is even bound, and a guard
+        # ---- that cannot be false is the shape this engine bans. If that return ever moves, the
+        # ---- reap becomes a preview that empties the outbox — so the ordering is asserted, not
+        # ---- assumed.
+        _ro14r = run_in_gov(_g14r, "update", "--target", str(_t14r))
+        check("[-14R] AC5 a read-only run leaves every conflict order on disk",
+              read_orders14r(_t14r, "update-conflict-*.md") == _o14r,
+              str(read_orders14r(_t14r, "update-conflict-*.md")))
+        _src14r = GOVKIT.read_text(encoding="utf-8")
+        _fn14r = _src14r[_src14r.index("def _cmd_update("):]
+        _fn14r = _fn14r[:_fn14r.index("\ndef ")]
+        # THE LAST GUARD BEFORE THE BIND, not the first `if not write:` in the function — there are
+        # three, and `index` finds one that does not return. Keyed that way the arm passed while
+        # reading the wrong branch entirely, which is the could-not-fail shape one level up.
+        _bind14r = _fn14r.index('    outbox = target / ".governance" / "outbox"')
+        _guard14r = _fn14r.rfind("    if not write:", 0, _bind14r)
+        check("[-14R] AC5 STRUCTURAL the read-only branch returns BEFORE the outbox is bound, "
+              "which is why the reap needs no guard that could never be false",
+              _guard14r > 0 and "        return r.emit()" in _fn14r[_guard14r:_bind14r], "")
+        check("[-14R] AC5 STRUCTURAL ...and `write` is never rebound between, so that return is "
+              "the only thing standing between a preview and an emptied outbox",
+              not _re.search(r"\n\s+write\s*=[^=]", _fn14r), "")
+
+        # ---- AC4: a SCOPED run reaps NOTHING. A scoped run classifies a subset of the receipt's
+        # ---- rows, so an order belonging to an out-of-scope row is not stale — it is UNEXAMINED,
+        # ---- and deleting it destroys the only record that that row is still conflicted.
+        _sc14r = run_in_gov(_g14r, "update", "--target", str(_t14r), "--write", "--kits", "demo")
+        check("[-14R] AC4 a --kits run leaves the OUT-OF-SCOPE kit's order standing",
+              read_orders14r(_t14r, "update-conflict-*.md") == _o14r,
+              str(read_orders14r(_t14r, "update-conflict-*.md")) + " | " + _sc14r.stdout[-900:])
+        check("[-14R] AC4 ...and says in ONE line that it reaped nothing because it was scoped",
+              [ln for ln in read_reap_lines14r(_sc14r.stdout) if "SKIPPED" in ln]
+              and len(read_reap_lines14r(_sc14r.stdout)) == 1,
+              str(read_reap_lines14r(_sc14r.stdout)))
+        settle(_t14r, "after the scoped run")
+
+        # ---- AC1: resolve ONE row, re-run unscoped. Its order is gone and the run says so; the
+        # ---- other two are REWRITTEN by the same run, which is the migration in miniature.
+        (_t14r / "tools" / "demo" / "one" / "conf.txt").write_text(_14R_B, encoding="utf-8",
+                                                                   newline="\n")
+        settle(_t14r, "the operator resolves demo/one")
+        _w14r2 = run_in_gov(_g14r, "update", "--target", str(_t14r), "--write")
+        _o14r2 = read_orders14r(_t14r, "update-conflict-*.md")
+        check("[-14R] AC1 the resolved row's order is REAPED and only it",
+              len(_o14r2) == 2 and not any("one-conf" in n for n in _o14r2),
+              str(_o14r2) + " | " + _w14r2.stdout[-900:])
+        check("[-14R] AC1 ...and the run reports the count AND the name it removed",
+              any("removed 1 stale conflict order(s)" in ln and "one-conf" in ln
+                  for ln in read_reap_lines14r(_w14r2.stdout)),
+              str(read_reap_lines14r(_w14r2.stdout)))
+        check("[-14R] AC1 ...and the two still-open conflicts were REWRITTEN this run rather than "
+              "merely spared, which is what makes an earlier vintage's key migrate safely",
+              _w14r2.stdout.count("three-way conflicts") == 2, _w14r2.stdout[-1200:])
+        check("[-14R] AC1 ...and the INDEX entry went with the file, or the next renormalize "
+              "refuses over a pinned path gov itself deleted",
+              not any("one-conf" in p for p in
+                      gout(_t14r, "ls-files", "--", ".governance/outbox").split()),
+              gout(_t14r, "ls-files", "--", ".governance/outbox"))
+
+        # ---- S3's SCOPING IS THE GUARD. Every other order family planted in the same outbox, so
+        # ---- the claim that the glob cannot reach them is observed rather than argued.
+        _14R_PLANT = ["update-rollback-demo.md", "update-preexisting-red-demo.md",
+                      "update-declined-red-demo.md", "demo-tools-demo-machine.md", "hole-demo.md"]
+        for _n in _14R_PLANT:
+            (_t14r / ".governance" / "outbox" / _n).write_text("planted\n", encoding="utf-8",
+                                                               newline="\n")
+        settle(_t14r, "plant one of every other order family")
+        _w14r3 = run_in_gov(_g14r, "update", "--target", str(_t14r), "--write")
+        check("[-14R] S3 the `update-conflict-*.md` glob reaches NO other order family",
+              all((_t14r / ".governance" / "outbox" / _n).is_file() for _n in _14R_PLANT),
+              str(read_orders14r(_t14r, "*.md")))
+        check("[-14R] the ZERO prints too — a silent reap is indistinguishable from one that never "
+              "ran, so the line is emitted on every unscoped write run",
+              any("removed 0 stale conflict order(s)" in ln
+                  for ln in read_reap_lines14r(_w14r3.stdout)),
+              str(read_reap_lines14r(_w14r3.stdout)))
+
+        # ---- AC3: the WITHDRAWAL writer had the same collision and is re-keyed with the other
+        # ---- two — three call sites, not two. Its orders are NOT reapable: a withdrawal records
+        # ---- an ACTION whose row then LEAVES the receipt, so no later run can re-derive it, while
+        # ---- a conflict records a STATE every run re-derives. Its own fixture, because a withdrawn
+        # ---- row is gone from gov's tree and cannot also be conflicting.
+        _g14w, _ = build_verify_gov("reapw", {
+            "demo": {"files": {"one/gone.txt": "one\n", "two/gone.txt": "two\n",
+                               "keep.txt": "keep\n"}},
+        })
+        _t14w = build_verify_target(_g14w, "reapw-t", ["demo"])
+        for _rel in ("tools/demo/one/gone.txt", "tools/demo/two/gone.txt"):
+            (_g14w / _rel).unlink()
+        (_g14w / "tools" / "demo" / "keep.txt").write_text("keep\nmore\n", encoding="utf-8",
+                                                           newline="\n")
+        git(_g14w, "add", "-A")
+        git(_g14w, "commit", "-qm", "B")
+        _w14w = run_in_gov(_g14w, "update", "--target", str(_t14w), "--write")
+        _o14w = read_orders14r(_t14w, "update-withdrawn-*.md")
+        check("[-14R] AC3 LIVENESS both rows really WITHDRAW, or the arm below counts nothing",
+              _w14w.stdout.count("withdrawn          [") == 2, _w14w.stdout[-1500:])
+        check("[-14R] AC3 two withdrawn rows sharing a basename leave TWO withdrawal orders",
+              len(_o14w) == 2, str(_o14w))
+        check("[-14R] AC3 ...each naming its own full path",
+              all(p in read_order_bodies14r(_t14w, "update-withdrawn-*.md")
+                  for p in ("tools/demo/one/gone.txt", "tools/demo/two/gone.txt")), str(_o14w))
+        check("[-14R] S5 ...and the reap did NOT take them with it",
+              any("removed 0 stale conflict order(s)" in ln
+                  for ln in read_reap_lines14r(_w14w.stdout)) and len(_o14w) == 2,
+              str(read_reap_lines14r(_w14w.stdout)))
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")
