@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-18 — a withdrawn row whose path did not restore stays in the receipt
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 29
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 29
 
 <!-- gen:spec-records -->
 
@@ -160,8 +160,9 @@ failed, so no ordinary run changes behaviour.
 ## 6. Acceptance criteria
 
 - **AC1** — When a scratch fixture target carries one withdrawn row, a directory is planted at that
-  row's worktree path, and `python tools/govkit/govkit.py update --target <fixture> --write
-  --write-withdrawals` rolls the kit back, the post-run receipt still carries a row for that path.
+  row's worktree path, and the run is
+  `python tools/govkit/govkit.py update --target <fixture> --write --write-withdrawals`
+  rolling the kit back, the post-run receipt still carries a row for that path.
   Red when: the removal stays inside the `_left` gate, so the row is dropped from the receipt for a
   file the run neither deleted nor restored.
   fixture: built by this unit from `DEPL-cMendedVintage-2`'s technique — a directory at the worktree
@@ -217,6 +218,12 @@ none
   writes none of the six `ROLLBACK_FIELDS` keys, so this run's values and the pre-run ones are equal
   and the revert's placement cannot be read off the receipt. Every line number dropped for its
   symbol. S1 also notes that the hoisted statement retires the `attributes` branch's own copy of it.
+
+- rev-3 · 2026-09-17 · editorial, no criterion moved. AC1's command span WRAPPED across a line
+  break, so the criterion offered no whole backticked token on any single line and hygiene check
+  23's join arm reported the ledger answer as sharing nothing with it. The span now sits whole on
+  its own line and the join resolves. The rule the wrap broke is the one this build has now
+  tripped on twice from the other side, in a ledger rather than a spec.
 
 ## 10. Reuse audit
 
