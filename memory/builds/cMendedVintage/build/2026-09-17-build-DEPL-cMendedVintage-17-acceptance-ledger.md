@@ -66,41 +66,28 @@ of its own outside gov's block, which is the target this whole unit is about.
 
 **Evidences:** DEPL-cMendedVintage-17
 
-- AC1 — OBSERVED —
-  `pins-moved`
-  — before the change all three fixture shapes printed it; after, all three print
-  `pins-withdrawn     [attributes   ] .gitattributes`
-  and the tally reads
-  `pins-withdrawn 1`.
-  A read-only run of the same fixture prints the verdict and then the sentence naming the block as
+*Every token below sits on its own bullet's FIRST physical line, deliberately: hygiene check 23
+joins an answer's backticked tokens to the criterion's per PHYSICAL line, so a token pushed onto a
+continuation belongs to no line and its criterion grades as answered by nothing.*
+
+- AC1 — OBSERVED — `pins-moved` — before the change every fixture shape printed it. After the change
+  every one prints the withdrawal verdict instead, and the closing tally counts it in its own slot.
+  A read-only run of the same fixture prints that verdict and then a sentence naming the block as
   REMOVED rather than rewritten, and writes nothing.
-- AC2 — OBSERVED —
-  `.gitattributes`
-  — the fixture whose own rules carry a blank line exited 2 before the change with the marker-pair
-  refusal and exits 0 after it, with no refusal in the output. AMENDED in the same revision: the
-  criterion asked for two blank lines outside gov's block when one of the two is the file's own
-  trailing newline, logged at §9 rev-2.
-- AC3 — OBSERVED —
-  `attributes`
-  — after the run gov's marked region is absent from the file, the surviving text equals the pre-run
-  bytes minus that region computed by the same locator, and the receipt's row list filtered on role
-  `attributes`
-  is empty. Measured on all three shapes.
-- AC4 — OBSERVED —
-  `.gitattributes`
-  — a fixture built from a gov declaring no pin at all writes no
-  `.gitattributes`
-  at apply, and the following
-  `update --write`
-  exits 0, prints neither pin verdict, and still leaves no such file. Liveness: that run reports
-  `wrote 1,`
-  so it is not a report on an update that never happened.
-- AC5 — OBSERVED —
-  `patterns`
-  — the fixture with no blank line of its own is the one BASE completed at exit 0 over. After the
-  change its receipt carries no attributes row at all, so the empty
-  `patterns`
-  list and the sha256 of the empty string are both unreachable rather than merely unlikely.
+- AC2 — OBSERVED — `.gitattributes` — the fixture whose own rules carry a blank line exited 2 before
+  the change with the marker-pair refusal, and exits 0 after it with no refusal anywhere in its
+  output. AMENDED in the same revision and logged at §9 rev-2: the criterion asked for two blank
+  lines outside gov's block when one of the two is supplied by the file's own trailing newline.
+- AC3 — OBSERVED — `attributes` — after the run gov's marked region is absent from the file, the
+  surviving text equals the pre-run bytes minus that region computed by the same locator, and the
+  receipt's rows filtered on that role are empty. Measured on all three shapes.
+- AC4 — OBSERVED — `.gitattributes` — a fixture built from a gov declaring no pin writes none at
+  apply, and the write run that follows exits 0, prints neither pin verdict, and still leaves no
+  such file. Liveness: that run reports one file written, so it is not a report on an update that
+  never happened.
+- AC5 — OBSERVED — `patterns` — the fixture with no blank line of its own is the one BASE completed
+  at exit 0 over. After the change its receipt carries no attributes row at all, so both the empty
+  list and the sha256 of the empty string are unreachable rather than merely unlikely.
 
 ## OWED
 

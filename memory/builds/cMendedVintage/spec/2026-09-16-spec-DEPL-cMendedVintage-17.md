@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -30,7 +30,7 @@ non-empty pin set and give the withdrawal state its own verdict.
 - **S3** The withdrawal verdict's remedy is the removal of gov's own block: under `--write` the run
   deletes the marked region it previously wrote, leaving the rest of the target's `.gitattributes`
   untouched, and drops the `attributes` receipt row. A block gov wrote for a claim it no longer makes
-  is gov's to withdraw. Observed by AC3.
+  is gov's to withdraw. Observed by AC3, and by AC5 on the shape BASE completes at exit 0 over.
 - **S4** A target that never declared a pin keeps BASE behaviour exactly: no `attributes` row, no
   verdict, no write. `DEPL-cMendedVintage-10` §8 Q2 reasons about that case and this unit does not
   move it. Observed by AC4.
@@ -153,7 +153,7 @@ unit closes is one the write stage creates and the two are never separately ship
   gov removes only what gov's own record says gov wrote. Second: a target mid-way through dropping
   kits sees the withdrawal and then, on re-adding the kit, a fresh `apply`-style write — which is
   correct and is stated so it is not read as churn.
-- testing — AC1 through AC4 against scratch fixture targets. Gov keeps no receipt of its own, so no
+- testing — AC1 through AC5 against scratch fixture targets. Gov keeps no receipt of its own, so no
   criterion here is observable against this repo.
 - migration — §4; one-way and self-completing.
 - user docs — `WIRE-INTO-PROJECT.md`'s pin section gains one sentence on what happens when the last
@@ -196,9 +196,11 @@ unit closes is one the write stage creates and the two are never separately ship
 
 `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix`
 
-New arm: `tools/govkit/selftest.py` · a fixture whose `attributes` row survives a claimed set that
-declares no pin, with two blank lines planted outside gov's block, asserted to complete and to leave
-the surrounding lines untouched · no assertion floor to move.
+New arms: `tools/govkit/selftest.py` · TWO fixture targets whose `attributes` row survives a claimed
+set that declares no pin — one carrying a blank line of its own outside gov's block, which is the
+shape BASE refuses on, and one carrying none, which is the shape BASE completes at exit 0 over —
+each asserted to complete, to leave the surrounding lines untouched, and to end with no `attributes`
+row · plus a never-pinned fixture for AC4 · no assertion floor to move.
 
 ## 8. Open questions
 
@@ -214,6 +216,10 @@ none
   the trailing empty field is itself a blank line. AC2 reworded to name the blank line the target
   supplies rather than a count the trailing newline already half-fills, and AC5 added for the
   exit-0 shape, which is the one that ships silently and which a suite watching exit codes misses.
+- rev-3 · 2026-09-17 · rev-2's amendment stops leaving its other half standing. §7's new-arm line
+  still asked for "two blank lines planted outside gov's block", which is the wording AC2 had just
+  been corrected away from; §5's testing line still counted to AC4; and S3 named no observer for the
+  new criterion. No design moved — three sentences that only made sense under the old wording.
 
 ## 10. Reuse audit
 

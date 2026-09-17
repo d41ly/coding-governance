@@ -129,7 +129,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize](spec/2026-09-16-spec-DEPL-cMendedVintage-10.md) | 17 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it](spec/2026-09-16-spec-DEPL-cMendedVintage-15.md) | 18 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [TOOL-cMendedVintage-10 — a superseded dispatch declaration is not an open pass](spec/2026-09-17-spec-TOOL-cMendedVintage-10.md) | 19 | 2 | CLOSED | rev-3 | 2026-09-17 |
-| [DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write](spec/2026-09-16-spec-DEPL-cMendedVintage-17.md) | 20 | 2 | CLOSED | rev-2 | 2026-09-17 |
+| [DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write](spec/2026-09-16-spec-DEPL-cMendedVintage-17.md) | 20 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-11 — `cmd_check` grades the attributes row's block](spec/2026-09-16-spec-DEPL-cMendedVintage-11.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-12 — `apply`'s CONFIGURE honours `deploy["inert"]`](spec/2026-09-16-spec-DEPL-cMendedVintage-12.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-13 — `update --write` emits gate legs](spec/2026-09-16-spec-DEPL-cMendedVintage-13.md) | 23 | 2 | SPECCED | rev-2 | 2026-09-16 |
