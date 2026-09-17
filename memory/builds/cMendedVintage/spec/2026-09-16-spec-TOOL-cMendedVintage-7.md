@@ -38,10 +38,10 @@ receipt leg so the count reaches an adopter's own bar, as a NOTE rather than a f
 
 ## 3. Non-goals (OUT)
 
-- The note does not fail the leg, and does not become a failure in this build. Reding an adopter for
-  a state whose printed remedy is a no-op hands them a failure with no exit; the remedy only works
-  after `DEPL-cMendedVintage-4`, and this unit lands the note in the release that fixes the remedy,
-  not the release that fixes the remedy AND reds on it.
+- The note does not fail the leg, and does not become a failure in this build. `DEPL-cMendedVintage-4`
+  has already landed, so the remedy is live rather than a no-op — and the reason to stay advisory is
+  the other one: an adopter pulling this release has had no EARLIER release in which to clear their
+  rows, so the release that fixes a remedy must not also be the release that starts redding on it.
 - No change to `govkit check`, which needs the gov checkout and is invoked automatically by nothing.
   A count added there never reaches an adopter's bar, which is the reason this loop is here.
 - No change to `_cmd_update`'s own withholding of the `gov_commit` re-stamp, and no change to the
@@ -210,7 +210,9 @@ none
     `govkit.py:8723` already carries the `--pin` spelling. The consequence for this unit is only
     good news: the remedy the note prints is live in this release rather than one unit away. The
     §3 argument for keeping this a NOTE is untouched by that, because it rests on adopters having
-    had no RELEASE in which to clear their rows, not on the remedy being broken.
+    had no RELEASE in which to clear their rows, not on the remedy being broken. §3's own bullet was
+    rewritten to lean on that reason rather than on the no-op one, because leaving the old half
+    standing beside an amended claim is how one rule starts returning two verdicts.
 
 ## 10. Reuse audit
 

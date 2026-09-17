@@ -132,6 +132,15 @@ returns a value in disguise. The shipped function is `print_unattributed` and it
 verb and the signature agree; the two new arms capture stdout to grade it, which is the shape a print
 verb forces and is why they do not read a return value.
 
+**Arm 6 would pass under a loop that stopped looking, and arm 5 is its control.** An arm asserting
+empty output is green both when the silence branch is right and when the whole function returns
+early for every input. Arm 5 is what makes the pair honest: it demands a non-zero count and the
+literal
+`2 row(s)`
+so the two cannot both be green while the loop counts nothing. Observed rather than reasoned — the
+key-presence and truthiness breaks each failed both arms at once, which is only possible because one
+of them insists on finding something.
+
 **The arms grade a rows list that went through the receipt on disk.** Both new arms build their
 fixture with the harness's own writer and then read the rows back out of the written JSON, so a row
 shape that `json` would never round-trip cannot pass them. That is deliberate consistency with the
