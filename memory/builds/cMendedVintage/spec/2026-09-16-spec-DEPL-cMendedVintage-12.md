@@ -96,7 +96,9 @@ with a declared verb and satisfying the cell's convention. The neighbours rev-1 
 that kit's configure phase was skipped THIS RUN, and its docstring says the scoping is deliberate. An
 inert kit's configure phase is skipped this run, by the operator's own declaration, so the existing
 window is exactly the right one and a second set would be a second answer to the same question. The
-hole-blocked skip eleven lines above already puts its kit there for the same reason.
+hole-blocked skip DIRECTLY BELOW the decline already puts its kit there for the same reason — below
+rather than above, because an inert kit that is also hole-blocked must print the posture S4 owes its
+operator rather than the hole.
 
 ### Why OBSERVE needs its own set
 
@@ -206,7 +208,7 @@ does not run and that the same fixture without the key does run it · no asserti
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
-- rev-2 · 2026-09-17 · §2 §3 §4 §5 §6 §8 §10 · AMENDED BY THE BUILD, after measuring. The design does not move; seven things about how it is written down do. The reader is renamed `read_inert_kits`, because the naming declaration was asked and refused `inert` as a leading verb — rev-1 would have landed a verb offender and moved a two-sided pin, and its stated precedent turned out to be two offenders rather than two precedents. S2 names the hole-blocked skip as well as the argv resolution, because the decline sits ahead of BOTH: a kit that is inert and hole-blocked must still print the line S4 requires. The §5 user-docs bullet is withdrawn with its reason: nothing shipped in this repo spells the key. AC4 gains the precondition its fixture actually needs, measured — backdating the receipt's `gov_commit` alone leaves every row current and the decline loop empty. Every `path:line` reference is stripped in the same pass: four units edited that file after rev-1 and all four numbers were stale, which is the trap the build brief names.
+- rev-2 · 2026-09-17 · §2 §3 §4 §5 §6 §8 §10 · AMENDED BY THE BUILD, after measuring. The design does not move; seven things about how it is written down do. The reader is renamed `read_inert_kits`, because the naming declaration was asked and refused `inert` as a leading verb — rev-1 would have landed a verb offender and moved a two-sided pin, and its stated precedent turned out to be two offenders rather than two precedents. S2 names the hole-blocked skip as well as the argv resolution, because the decline sits ahead of BOTH: a kit that is inert and hole-blocked must still print the line S4 requires. The §5 user-docs bullet is withdrawn with its reason: nothing shipped in this repo spells the key. AC4 gains the precondition its fixture actually needs, measured — backdating the receipt's `gov_commit` alone leaves every row current and the decline loop empty. The `configure_skipped` rationale in §4 stops locating the hole-blocked skip by line distance and names it as the branch below the decline, which is where the ordering S2 gained actually puts it. Every `path:line` reference is stripped in the same pass: four units edited that file after rev-1 and all four numbers were stale, which is the trap the build brief names.
 
 ## 10. Reuse audit
 
