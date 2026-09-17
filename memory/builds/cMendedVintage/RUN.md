@@ -197,3 +197,5 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T02:17:40Z brief · item TOOL-cMendedVintage-10 · reason a08ddb800b79 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-TOOL-cMendedVintage-10-2-build-brief.md
 
 2026-09-17T02:26:05Z dispatch · item 0d84fa62 TOOL-cMendedVintage-10 · reason tools/unattended/unattended.sh memory/builds/cMendedVintage/spec/2026-09-17-spec-TOOL-cMendedVintage-10.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-10-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T02:38:27Z dispatch · item c7fcb8eb DEPL-cMendedVintage-17 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-17.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-17-acceptance-ledger.md
