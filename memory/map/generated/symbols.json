@@ -2808,6 +2808,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_unattributed",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "profile_symbols",
       "kind": "function",
       "file": "tools/govkit/census.py"

@@ -1,11 +1,12 @@
 # TOOL-cMendedVintage-7 — the receipt leg reports rows carrying `evidence: "unattributed"`
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 27
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-7-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-7-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-17-prompt-TOOL-cMendedVintage-7-2-build-brief.md](../prompts/2026-09-17-prompt-TOOL-cMendedVintage-7-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -24,9 +25,9 @@ receipt leg so the count reaches an adopter's own bar, as a NOTE rather than a f
 - **S1** `tools/run-gates/check-receipt.py` gains one loop over every receipt row with
   `f.get("evidence") == "unattributed"`, keyed on that exact string and never on field absence —
   absence is the synthesized-class state and is not a synonym. Observed by AC1.
-- **S2** With one or more such rows the run prints one line naming the DERIVED count and the remedy
-  `govkit adopt --re-adopt --pin <path>=<rev> --write`, and the exit status is unchanged by the
-  loop. Observed by AC1 and AC3.
+- **S2** With one or more such rows the run prints the NOTE §4 spells — two lines, the first naming
+  the DERIVED count and the second the remedy `govkit adopt --re-adopt --pin <path>=<rev> --write`
+  — and the exit status is unchanged by the loop. Observed by AC1 and AC3.
 - **S3** With zero such rows the loop prints nothing. A line that always appears carries no
   information and trains a reader to skip it. Observed by AC2.
 - **S4** A fifth built-in fixture arm covers the populated case and a sixth covers the empty case,
@@ -65,7 +66,7 @@ receipt leg so the count reaches an adopter's own bar, as a NOTE rather than a f
 
 ### Data model
 
-`EVIDENCE_STATES` at `govkit.py:7888` is the closed set `("apply", "vintage-match", "pinned",
+`EVIDENCE_STATES` at `govkit.py:8765` is the closed set `("apply", "vintage-match", "pinned",
 "unattributed")`, and the comment above it names ABSENCE as a fifth state that is deliberately NOT a
 synonym for `"unattributed"`. The loop therefore compares the value and never tests for the key.
 
@@ -75,25 +76,26 @@ synonym for `"unattributed"`. The loop therefore compares the value and never te
 | `evidence` is `apply`, `vintage-match` or `pinned` | nothing |
 | `evidence` is `"unattributed"` | counted |
 
-The count is over EVERY row, not only engine rows. `govkit.py:7846` counts the same way
+The count is over EVERY row, not only engine rows. `govkit.py:8723` counts the same way
 (`sum(1 for f in receipt.get("files", []) if f.get("evidence") == "unattributed")`) and it is that
 count which decides whether the re-stamp is withheld, so a differently scoped count here would
 report a number the operator's own `update` run disagrees with.
 
 ### The line
 
-One line, printed after the integrity findings and before the summary, so a real failure stays at
-the top of the output. Its text names the count and the working remedy:
+Two lines, printed after the integrity findings and before the summary, so a real failure stays at
+the top of the output. Their text names the count and the working remedy, and the count below is an
+ILLUSTRATION taken from the historical inCMS reading — the shipped code derives its own:
 
 ```
 check-receipt: NOTE - 47 row(s) carry evidence "unattributed"; govkit update will not re-stamp
 check-receipt: NOTE - clear them with: govkit adopt --re-adopt --pin <path>=<rev> --write
 ```
 
-`--pin` is what sets `evidence = "pinned"` (`govkit.py:8179`). The bare `--re-adopt --write` form,
-which `govkit.py:7853` and the `USAGE` block at `:8535` both print today, walks the same bytes
-against the same history and leaves the row exactly as it found it. That is
-`DEPL-cMendedVintage-4`'s finding and this unit prints only the corrected form.
+`--pin` is what sets `evidence = "pinned"` (`govkit.py:9056`). The bare `--re-adopt --write` form
+walks the same bytes against the same history and leaves the row exactly as it found it. That is
+`DEPL-cMendedVintage-4`'s finding, and that unit has already landed: `govkit.py:8723` now prints the
+corrected `--pin` spelling itself. This unit prints the same corrected form, so the two agree.
 
 ### Inventory
 
@@ -192,6 +194,23 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · S2 · §4 · §10 · built and closed. THREE amendments, all from reading the
+  source at build time rather than from a decision.
+  - **S2 said "one line" and §4 spells two.** The Inventory row calls `print_unattributed` "the loop
+    and its two lines", so two was already the design in every place but that one sentence. S2 now
+    points at §4 rather than restating a count beside it, which is the rule this spec broke.
+  - **Every line citation in §4 and §10 was stale by roughly nine hundred lines.** `EVIDENCE_STATES`
+    is at `govkit.py:8765` and not `:7888`, the count this loop must agree with is at
+    `govkit.py:8723` and not `:7846`, and `--pin` sets `evidence = "pinned"` at `govkit.py:9056` and
+    not `:8179`. The SUBSTANCE of all three claims re-verified exactly as written — the closed set,
+    the whole-receipt scope of the count, the comment that names ABSENCE as a fifth state that is
+    not a synonym — so the design is unchanged and only the addresses moved.
+  - **§4's claim that `govkit.py` "prints today" the bare `--re-adopt --write` form is false.**
+    `DEPL-cMendedVintage-4` landed earlier in this build and the withheld-re-stamp message at
+    `govkit.py:8723` already carries the `--pin` spelling. The consequence for this unit is only
+    good news: the remedy the note prints is live in this release rather than one unit away. The
+    §3 argument for keeping this a NOTE is untouched by that, because it rests on adopters having
+    had no RELEASE in which to clear their rows, not on the remedy being broken.
 
 ## 10. Reuse audit
 
@@ -202,9 +221,10 @@ and `kit` and nothing else. No existing seam fits for a reader outside `tools/go
 evidence is structural rather than a search result: `grep -n unattributed tools/govkit/govkit.py`
 returns every reader of the field and all of them are inside that one file, which does not ship to a
 target. The seam this unit extends is therefore the file `TOOL-cMendedVintage-6` creates,
-`tools/run-gates/check-receipt.py`, by path. Verified against source at writing time:
-`govkit.py:7846` is the count this loop must agree with, `govkit.py:7888` is the closed
-`EVIDENCE_STATES` tuple with its explicit note that absence is a fifth state, and `govkit.py:8179`
+`tools/run-gates/check-receipt.py`, by path. Re-verified against source at BUILD time, addresses
+corrected per rev-2:
+`govkit.py:8723` is the count this loop must agree with, `govkit.py:8765` is the closed
+`EVIDENCE_STATES` tuple with its explicit note that absence is a fifth state, and `govkit.py:9056`
 is where `--pin` sets `evidence = "pinned"`.
 
 Recall terms used: `--terms "govkit receipt install.json install.sums engine row sha256 integrity

@@ -261,3 +261,7 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T06:14:35Z dispatch · item 8b40e1d1 TOOL-cMendedVintage-7 · reason tools/run-gates/check-receipt.py memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-7.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-7-acceptance-ledger.md
 
 2026-09-17T06:14:36Z brief · item TOOL-cMendedVintage-7 · reason 345a85634b58 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-TOOL-cMendedVintage-7-2-build-brief.md
+
+2026-09-17T06:19:42Z dispatch · item 39ca476a TOOL-cMendedVintage-7 · reason tools/run-gates/check-receipt.py memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-7.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-7-acceptance-ledger.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T06:26:30Z dispatch · item 39ca476a TOOL-cMendedVintage-7 · reason tools/run-gates/check-receipt.py memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-7.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-7-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/LIVE.md memory/ledger/2026-09.md

@@ -19,7 +19,12 @@ everyone who did not write it.
     while its real contract is only the marked block, which needs the extractor and the marker table.
   - No `.governance/install.sums`. The sidecar is written from EVERY row carrying `sha256`, seed rows
     included, so verifying it reds the population the bullet above deliberately exempts.
-  - No `evidence` state is read or reported.
+  - No VERDICT on the `evidence` state, though it is now READ. Rows carrying `unattributed` are
+    counted and printed as a NOTE, and that count never moves the exit status: the remedy the note
+    prints only began working in this same release, so redding on it here would hand an adopter a
+    failure they have had no release in which to clear. The follow-up that turns the note into a
+    leg failure is the release AFTER adopters have had one. Until then this arm only reports, and
+    the integrity arm above is the only one that decides.
   - And it does not know whether a recorded hash is RIGHT, only whether the bytes still match it.
     The hash is of WORKING-TREE bytes on the machine that installed, so a clone whose end-of-line
     filters differ from that machine's reds here for any path no line-ending pin covers. That is a
@@ -31,7 +36,9 @@ a skip that looks like a pass is indistinguishable from coverage. gov's own tree
 that is the path this takes on gov's bar, and the fixture arms below are what give the leg a verdict
 here rather than a permanent silence.
 """
+import contextlib
 import hashlib
+import io
 import json
 import pathlib
 import subprocess
@@ -87,6 +94,28 @@ def check_engine_rows(tree, rows):
     return findings, graded
 
 
+def print_unattributed(rows):
+    """A NOTE naming how many rows `govkit update` will never grade, or silence when there are none.
+
+    Keyed on the exact value and NEVER on the key being absent. Absence is the synthesized-row
+    state and is a different reading rather than a synonym, so widening this to field-absence would
+    report a number the operator's own `update` run disagrees with — and that run's withheld
+    re-stamp is the thing this note exists to predict. For the same reason the count is over EVERY
+    row rather than over the engine rows this file grades.
+
+    Silent on zero, deliberately, and that silence is not a skipped arm: the loop ran and found
+    nothing. A line printed on every run carries no information and trains a reader straight past
+    the one run where it says something.
+    """
+    count = sum(1 for row in rows if row.get("evidence") == "unattributed")
+    if not count:
+        return
+    print(f'check-receipt: NOTE - {count} row(s) carry evidence "unattributed"; '
+          "govkit update will not re-stamp")
+    print("check-receipt: NOTE - clear them with: "
+          "govkit adopt --re-adopt --pin <path>=<rev> --write")
+
+
 def write_fixture(base, name, rows, body=b"engine bytes\n", drop_file=False):
     """One fixture tree under `base`, with its receipt rows written and its engine file placed.
 
@@ -107,7 +136,7 @@ def write_fixture(base, name, rows, body=b"engine bytes\n", drop_file=False):
 
 
 def check_fixtures():
-    """The four built-in arms, over receipts written into a temporary directory.
+    """The six built-in arms, over receipts written into a temporary directory.
 
     They run on EVERY invocation and not only under the selftest flag. In a tree that holds no
     receipt the only other behaviour of this file is an announced skip, and a leg whose sole live
@@ -141,6 +170,25 @@ def check_fixtures():
         findings, graded = check_engine_rows(tree, json.loads((tree / RECEIPT).read_text())["files"])
         results.append(("a receipt of seed and merged rows alone grades nothing",
                         not findings and graded == 0))
+
+        tree = write_fixture(base, "ungraded", [{"path": "a.txt", "evidence": "unattributed"},
+                                                {"path": "b.txt", "evidence": "unattributed"},
+                                                {"path": "c.txt", "evidence": "apply"},
+                                                {"path": "d.txt"}])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            print_unattributed(json.loads((tree / RECEIPT).read_text())["files"])
+        out = buf.getvalue()
+        results.append(("two `unattributed` rows count 2, with `apply` and an ABSENT field ignored",
+                        "NOTE" in out and "2 row(s)" in out and "--pin" in out
+                        and "--re-adopt --write" not in out))
+
+        tree = write_fixture(base, "attributed", [{"path": "a.txt", "evidence": "apply"},
+                                                  {"path": "b.txt"}])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            print_unattributed(json.loads((tree / RECEIPT).read_text())["files"])
+        results.append(("no `unattributed` row prints nothing at all", buf.getvalue() == ""))
 
     for label, ok in results:
         print(f"ARM {'ok  ' if ok else 'FAIL'}  {label}")
@@ -196,6 +244,7 @@ def main(argv):
 
     for line in findings:
         print(line)
+    print_unattributed(rows)
     if findings:
         print(f"FAIL  {len(findings)} of {graded} graded engine row(s) no longer match the receipt")
         return 1
