@@ -6997,6 +6997,105 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-15] AC3 LIVENESS the claimed set was read and is non-empty, so the arm above "
               "quantified over something", bool(_claimed15), str(_claimed15))
 
+        # ====== DEPL-cMendedVintage-17 — A WITHDRAWN PIN SET NEVER REACHES THE EMPTY MARKER ======
+        #
+        # THE FIXTURE IS `-15`'s, ONE DESCRIPTOR EDIT ON, and nothing new is minted for it:
+        # `build_verify_gov` and `build_verify_target` build every part of it. What this unit needs
+        # that `-15` did not is a second vintage that RETIRES the pin rather than moving a conf, and
+        # TWO targets rather than one — because BASE took two different paths through the same
+        # defect and a suite watching either alone reports the other clean. Its own gov rather than
+        # `-15`'s, because the edit below is destructive to the pin every `-15` arm above depends on.
+        #
+        # THE RED, MEASURED BEFORE THE FIX AND WRITTEN DOWN BECAUSE THE SPEC'S FIRST TABLE HAD IT
+        # WRONG IN TWO ROWS OF THREE. BASE recomputed an empty pin set, kept the `pins-moved`
+        # verdict, and called the write with empty markers and empty text. The marker test compares
+        # each line against the empty string, so every blank line is an open marker AND a close
+        # marker. On `plain` — whose file holds only the empty field its own trailing newline
+        # leaves — that is exactly one pair: the splice replaced an empty line with an empty line,
+        # the run exited 0, and the receipt row came out claiming zero patterns and the sha256 of
+        # the empty string while gov's real block sat on disk claimed by nothing. On `roomy`, whose
+        # own rules carry a blank line, it was two pairs and the run died mid-write with the
+        # marker-pair Refusal. So `plain` is AC5's fixture and `roomy` is AC2's, and an exit code
+        # alone distinguishes neither from a clean run.
+        _g17, _ = build_verify_gov("pinout", {
+            "demo": {"extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+                              'why = "the fixture pin, so this target has a block to withdraw"\n\n',
+                     "files": {"conf.txt": _14_CONF_A}},
+        })
+        _om17, _cm17 = GK14.marker_pair("hash-comment", GK14.GA_BLOCK_ID)
+        _t17 = {}
+        for _n17, _own17 in (("plain", "# the target's own rules\n*.bin binary\n"),
+                             ("roomy", "# the target's own rules\n\n*.bin binary\n")):
+            _tt17 = build_verify_target(_g17, "pinout-" + _n17, ["demo"])
+            _gg17 = _tt17 / ".gitattributes"
+            _gg17.write_text(_own17 + read_text14(_gg17), encoding="utf-8", newline="\n")
+            settle(_tt17, "the install plus the target's own attributes rules")
+            _t17[_n17] = (_tt17, read_bytes14(_gg17))
+        check("[-17] LIVENESS both installs left a block carrying the engine's OWN marker pair, or "
+              "every arm below grades a target with no pin to withdraw",
+              all(GK14.find_block(_b.decode("utf-8"), _om17, _cm17) is not None
+                  for _t, _b in _t17.values()),
+              str({_n: _b for _n, (_t, _b) in _t17.items()}))
+        # THE ONE DESCRIPTOR EDIT: `demo` retires its pin between vintages. That is the whole
+        # reachable population — a descriptor that drops its own pin, or a kit dropped from the
+        # receipt's `kits` — and it is one line of a real descriptor rather than a hand-built
+        # receipt state no install could produce.
+        (_g17 / "tools" / "demo" / "kit.toml").write_text(
+            build_kit14("demo", "argv", "", "[]"), encoding="utf-8", newline="\n")
+        git(_g17, "add", "-A")
+        git(_g17, "commit", "-qm", "B — demo retires its lf_pin")
+        _to17 = gout(_g17, "rev-parse", "HEAD").strip()
+        for _n17, (_tt17, _b417) in sorted(_t17.items()):
+            _k17 = "AC5" if _n17 == "plain" else "AC2"
+            _u17 = run_in_gov(_g17, "update", "--target", str(_tt17), "--to", _to17, "--write")
+            _o17 = _u17.stdout + _u17.stderr
+            _now17 = read_text14(_tt17 / ".gitattributes")
+            _rec17 = json.loads(
+                (_tt17 / ".governance" / "install.json").read_text(encoding="utf-8"))
+            _att17 = [f for f in _rec17.get("files") or [] if f.get("role") == "attributes"]
+            check(f"[-17] AC1 the {_n17} target reports `pins-withdrawn`, never `pins-moved`",
+                  "pins-withdrawn" in _o17 and "pins-moved" not in _o17, _o17[-1200:])
+            check(f"[-17] {_k17} the {_n17} run completes and raises no marker-pair refusal",
+                  _u17.returncode == 0 and "expected exactly one marker pair" not in _o17,
+                  f"rc={_u17.returncode} " + _o17[-1200:])
+            check(f"[-17] AC3 gov's marked region is gone from the {_n17} target",
+                  GK14.find_block(_now17, _om17, _cm17) is None, _now17)
+            # THE SURVIVING BYTES ARE DERIVED FROM WHAT THE FIXTURE RECORDED, never from a literal
+            # written here: the pre-run file minus the region the same locator finds in it. A
+            # hand-written expectation would grade the fixture rather than the run, and it would
+            # have to be re-typed every time the block's own body changes.
+            _pre17 = _b417.decode("utf-8").split("\n")
+            _sp17 = GK14.find_block(_b417.decode("utf-8"), _om17, _cm17)
+            _want17 = "\n".join(_pre17[:_sp17[0]] + _pre17[_sp17[1] + 1:]) if _sp17 else None
+            check(f"[-17] AC3 every line outside that region survives the {_n17} run "
+                  f"byte-identical", _want17 is not None and _now17 == _want17,
+                  "want=%r got=%r" % (_want17, _now17))
+            check(f"[-17] AC3/{_k17} the {_n17} receipt carries no `attributes` row afterwards",
+                  not _att17, str(_att17))
+
+        # AC4. A target that NEVER declared a pin keeps BASE behaviour exactly, and the arm is not
+        # ceremony: this unit's own red-when for it is a reachable shape. Keying the withdrawal on
+        # the empty pin set ALONE, rather than on the `attributes` receipt row that only a pinning
+        # install synthesizes, would put every unpinned target on a removal path on every run.
+        _g17n, _ = build_verify_gov("nopin", {"demo": {"files": {"conf.txt": _14_CONF_A}}})
+        _t17n = build_verify_target(_g17n, "nopin", ["demo"])
+        check("[-17] AC4 LIVENESS a never-pinned install writes no .gitattributes at all, or the "
+              "arm below grades an absence this run did not cause",
+              not (_t17n / ".gitattributes").is_file(), read_text14(_t17n / ".gitattributes"))
+        (_g17n / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+                                                           newline="\n")
+        git(_g17n, "add", "-A")
+        git(_g17n, "commit", "-qm", "B")
+        _u17n = run_in_gov(_g17n, "update", "--target", str(_t17n), "--to",
+                           gout(_g17n, "rev-parse", "HEAD").strip(), "--write")
+        _o17n = _u17n.stdout + _u17n.stderr
+        check("[-17] AC4 a never-pinned target reports no pin verdict and grows no .gitattributes",
+              _u17n.returncode == 0 and "pins-withdrawn" not in _o17n and "pins-moved" not in _o17n
+              and not (_t17n / ".gitattributes").is_file(),
+              f"rc={_u17n.returncode} " + _o17n[-1200:])
+        check("[-17] AC4 LIVENESS that run really wrote something, so the arm above is not a "
+              "report on an update that never happened", "wrote 1," in _o17n, _o17n[-900:])
+
         # ============================================================ DEPL-dCarriedReceipt-13
         # `govkit adopt` — the receipt bootstrap. Every arm below runs against a SCRATCH gov with a
         # real multi-commit history, because attribution is a question about history and a

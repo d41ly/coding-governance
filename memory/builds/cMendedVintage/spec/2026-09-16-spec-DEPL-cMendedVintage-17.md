@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-17-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-17-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-17-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-17-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -65,13 +66,26 @@ a run that reaches the `pins` arm. The middle term is the one that happens — a
 `receipt["kits"]`, or a kit whose descriptor retired its pin between vintages. It is not
 hypothetical and it is not common, which is why it survived both the spec and its first review.
 
-The three outcomes of the shipped call, so the severity is not taken on trust:
+The three outcomes of the shipped call, MEASURED at build time on this unit's own fixture rather
+than reasoned about. rev-1's table was wrong in two of its three rows, and the correction makes the
+defect worse in the common shape rather than milder.
+
+The term rev-1 missed: a `.gitattributes` that `write_block` produced always ends in a newline, so
+`text.split("\n")` always yields a trailing empty field. Every such file already holds ONE blank
+line before the target adds any of its own.
 
 | the target's `.gitattributes` holds | `write_block(cur, "", "", "", "append")` does |
 |---|---|
-| two or more blank lines | raises the "expected exactly one marker pair" Refusal, mid-run |
-| exactly one blank line | splices gov's empty region over it |
-| no blank line | appends a stray line to a file gov does not own |
+| a trailing newline and no other blank line | `find_block` returns that one trailing blank line; the splice replaces it with the empty block's single empty line, so THE FILE IS BYTE-IDENTICAL and the run exits 0 — while the receipt's `attributes` row is rewritten to `mode: spliced`, `patterns: []` and the sha256 of the empty string, and gov's real block stays on disk claimed by nothing |
+| a trailing newline and any further blank line | raises `expected exactly one marker pair, found 2 open and 2 close`, mid-run, after the verdict table and after the snapshot; exit 2, and the receipt is not re-stamped |
+| no trailing newline at all | appends one blank line; unreachable through any file `apply` or `update` wrote, because both end their write with a newline |
+
+So the red is not bytes landing at an arbitrary blank line. The splice really does fire at an
+arbitrary blank line, and because an empty block renders as exactly one empty line, the bytes it
+lands there are the bytes already there. What is destroyed is the RECEIPT: a target with an ordinary
+`.gitattributes` has its `attributes` row silently rewritten to claim a block that is not there, on
+every run, at exit 0. A target whose `.gitattributes` carries one blank line of its own — the shape
+a hand-maintained one almost always has — has its update aborted mid-write instead, on every run.
 
 ### The verdict, and why a fourth one
 
@@ -154,9 +168,10 @@ unit closes is one the write stage creates and the two are never separately ship
   state the write stage then acts on.
   fixture: a scratch fixture target under the run's scratch root built with `intake` then `apply`;
   this repo keeps no `.governance/` receipt and can host no criterion in this section.
-- **AC2** — When that fixture's `.gitattributes` is given two blank lines outside gov's block and
-  `python tools/govkit/govkit.py update --target <fixture> --write` runs, the run completes and no
-  "expected exactly one marker pair" refusal is raised.
+- **AC2** — When that fixture's `.gitattributes` is given a blank line of the target's own outside
+  gov's block — which with the file's own trailing newline makes the two blank lines BASE refuses on
+  — and `python tools/govkit/govkit.py update --target <fixture> --write` runs, the run completes and
+  no "expected exactly one marker pair" refusal is raised.
   Red when: the write stage is gated on the verdict name rather than on the recomputed pin set, so a
   later verdict rename reopens the empty-marker call.
 - **AC3** — When that same `--write` run finishes, gov's marked region is gone from the fixture's
@@ -169,6 +184,13 @@ unit closes is one the write stage creates and the two are never separately ship
   the file is byte-identical afterwards.
   Red when: the withdrawal path is keyed on the empty pin set alone rather than on the pin set AND
   the receipt row, which makes every unpinned target take a removal path on every run.
+- **AC5** — When the withdrawal fixture's `.gitattributes` carries NO blank line of the target's own,
+  which is the shape BASE completes at exit 0 over, the same `--write` run leaves no `attributes` row
+  in the receipt and removes gov's marked region; the receipt never records a `patterns` list that is
+  empty.
+  Red when: only the refusing shape is graded. BASE exits 0 on this one and rewrites the row to claim
+  the sha256 of the empty string, so a suite that watches exit codes alone reports this target clean
+  while its receipt describes a block that is not on disk.
 
 ## 7. Gates
 
@@ -185,6 +207,13 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §4's outcome table replaced by MEASUREMENT. Two of its three rows were wrong:
+  the one-blank-line row is byte-identical rather than a splice of foreign bytes, because an empty
+  block renders as one empty line over one empty line — what it destroys is the receipt row, at exit
+  0; and the no-blank-line row is unreachable, because every writer ends the file with a newline and
+  the trailing empty field is itself a blank line. AC2 reworded to name the blank line the target
+  supplies rather than a count the trailing newline already half-fills, and AC5 added for the
+  exit-0 shape, which is the one that ships silently and which a suite watching exit codes misses.
 
 ## 10. Reuse audit
 

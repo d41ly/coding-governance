@@ -1017,6 +1017,15 @@ otherwise runs by default. Its siblings are
 `update-rollback-<kit>.md`, where this run's writes really were reverted, and
 `update-preexisting-red-<kit>.md`, where the kit was red before the run started.
 
+When the LAST kit declaring an `[[lf_pin]]` leaves a target — dropped from `kits`, or its descriptor
+retired the pin between vintages — `update` reports `pins-withdrawn` rather than `pins-moved`, and
+under `--write` it REMOVES gov's marked region from your `.gitattributes` and drops the matching row
+from the receipt. Both halves go together on purpose: the region without the row leaves gov's bytes
+in a repository gov no longer claims, and the row without the region leaves the next `check` reading
+a block that is not there. Nothing outside the marked region is read or rewritten, so a
+`.gitattributes` you also maintain by hand keeps every line of its own, byte for byte. A read-only
+run says `REMOVED` in so many words before any of it happens.
+
 A rollback order that names `.gitattributes` among its restored paths is not a mistake. Where this
 run rewrote govkit's own LF-pin block, that block goes back with ANY kit's rollback, because it is
 rendered from every claimed kit's pins at once and so belongs to no single one of them. A run that

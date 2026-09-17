@@ -6405,6 +6405,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # for a row reading `pins-moved`, or None. It replaces `-2`'s `pins_order`, which carried the
     # block text alone because an order only ever printed it.
     pins_write: tuple[dict, str, str, str, list[str]] | None = None
+    # DEPL-cMendedVintage-17 S1/S2. THE OTHER HALF OF THE SAME QUESTION: the receipt row whose pin
+    # set has been WITHDRAWN, or None. Two names rather than a flag on one, because the two states
+    # have opposite remedies — one rewrites the block, one deletes it — and a single carrier read by
+    # a `len(...) == 0` test is the ambiguity this unit exists to remove, re-introduced one layer
+    # down. They are mutually exclusive by construction: one `attributes` row, one arm, one exit.
+    pins_drop: dict | None = None
     for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
@@ -6475,14 +6481,46 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how == "pins":
             _pins = lf_pins(descs, [e for e in claimed if e in descs],
                             lambda e, dd: target_context(target, deploy, e, dd))
-            _om, _cm, _text = lf_pin_block(_pins) if _pins else ("", "", "")
+            # DEPL-cMendedVintage-17 S1/S2. THE EMPTY PIN SET LEAVES HERE, above every line that
+            # builds a marker, and that placement IS the gate rather than a tidy early return.
+            # `-10` put a WRITE under `pins-moved`, and BASE fell through to it with
+            # `("", "", "")`: `find_block`'s marker test compares a line against the empty string,
+            # so every blank line in the target's file is an open marker AND a close marker.
+            # MEASURED on this unit's fixture, because the spec's first table reasoned it wrong in
+            # two of three rows. A `.gitattributes` any writer here produced ends in a newline, so
+            # `split("\n")` always yields a trailing empty field and every such file already holds
+            # one blank line. With that one alone the splice replaces an empty line with an empty
+            # line — the bytes do not move, the run exits 0, and the receipt row is rewritten to
+            # `mode: spliced`, `patterns: []` and the sha256 of the empty string while gov's real
+            # block sits on disk claimed by nothing. With one more blank line anywhere, the marker
+            # test finds two pairs and the run dies mid-write with the "expected exactly one marker
+            # pair" Refusal, after the snapshot and before the re-stamp.
+            #
+            # GATED ON THE PIN SET, never on the verdict word. `pins_write` is assigned below this
+            # exit and `lf_pin_block` over a non-empty list always emits both markers, so renaming
+            # the verdict cannot reopen the empty-marker call.
+            if not _pins:
+                v = "pins-withdrawn"
+                tally[v] = tally.get(v, 0) + 1
+                print(f"  {v:<18} [{role:<13}] {row['path']}")
+                if not write:
+                    # REMOVED, not rewritten. `pins-moved` promises `--write` will fix the block;
+                    # of a withdrawal that sentence is false, and an operator told a rewrite is
+                    # coming when a deletion is has been told the wrong thing by a correct tool.
+                    print(f"govkit update — no kit this receipt claims declares an lf_pin any "
+                          f"more, so gov's block in {row['path']} would be REMOVED rather than "
+                          f"rewritten and its receipt row dropped with it: "
+                          f"{len(row.get('patterns') or [])} pin(s) go away")
+                pins_drop = row
+                continue
+            _om, _cm, _text = lf_pin_block(_pins)
             _ga = target / row["path"]
             _cur = _ga.read_text(encoding="utf-8", errors="replace") if _ga.is_file() else ""
             # LINE indices, inclusive of both markers -- not character offsets. Slicing the string
             # with them silently produced a prefix that never matched, so the `current` arm could
             # not fire and every target read `pins-moved` forever. Caught by observing the arm on a
             # target whose block was known to be correct.
-            _span = find_block(_cur, _om, _cm) if _pins else None
+            _span = find_block(_cur, _om, _cm)
             _held = "\n".join(
                 _cur.split("\n")[_span[0]:_span[1] + 1]) if _span else None
             v = "current" if (_held is not None and _held.strip() == _text.strip()) else "pins-moved"
@@ -6833,9 +6871,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # `kit` IS None. `"(govkit)"` is the row's own value and is not in `claimed`, so carrying it here
     # would make `orphan_kits` below report a govkit-attributed kit as unverifiable on every run that
     # moves a pin — a printed finding about a kit that does not exist.
+    #
+    # DEPL-cMendedVintage-17 S3. THE WITHDRAWAL IS SNAPSHOTTED BY THE SAME LINE, because a deletion
+    # needs a pre-run state at least as badly as a rewrite does. The two carriers are exclusive, so
+    # one entry covers both and there is no ordering between them to get wrong.
     _pins_snap: dict | None = None
-    if pins_write is not None:
-        _pins_row = pins_write[0]
+    _pins_row = pins_write[0] if pins_write is not None else pins_drop
+    if _pins_row is not None:
         _pins_snap = {"kit": None, "row": _pins_row, "paths": [_pins_row["path"]],
                       "origin": "attributes", "fields": dict(_pins_row)}
         snap_rows.append(_pins_snap)
@@ -6884,7 +6926,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- kept — the verify pass keys on the TRANSITION, so a baseline taken after a write cannot
     # ---- see one. Above the write loop, because that is where `apply` puts it and for `apply`'s
     # ---- reason: the block is what every later checkout filter reads.
+    # DEPL-cMendedVintage-17 S3. HOISTED, one block early. The withdrawal below drops its receipt
+    # row through this list — the mechanism `update` already owns for a row it removes — and the
+    # rollback's un-drop reads the same list, so declaring it here is what lets the deletion reuse
+    # both instead of minting a second removal channel beside them.
+    withdrawn_rows: list[dict] = []
+    # TWO FLAGS, and the second is not a synonym. `_ga_written` means "gov put a pin block on disk",
+    # which is the only state the renormalize below may run for; `_ga_removed` means "the file's
+    # bytes moved", which is what the rollback's `written_paths` needs. Folding the withdrawal into
+    # the first would renormalize a population the target no longer pins — §3 refuses exactly that,
+    # and a target carrying eol rules of its OWN outside gov's block is where it would bite.
     _ga_written = False
+    _ga_removed = False
     if pins_write is not None:
         _pw_row, _pw_om, _pw_cm, _pw_text, _pw_pats = pins_write
         _pw_path = target / _pw_row["path"]
@@ -6906,7 +6959,48 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update — wrote the lf-pin block [{_pw_mode}] into {_pw_row['path']}: "
               f"{len(_pw_pats)} pin(s)")
 
-    withdrawn_rows: list[dict] = []
+    # ---- DEPL-cMendedVintage-17 S3. THE WITHDRAWAL, PERFORMED. A block gov wrote for a claim gov
+    # ---- no longer makes is gov's to take back, and the two halves go together or not at all: the
+    # ---- marked region leaves the file and the receipt row leaves the receipt. Dropping the region
+    # ---- alone leaves gov's bytes in a repository gov no longer claims; dropping the row alone
+    # ---- leaves the next run reading a block that is not there.
+    # ----
+    # ---- THE MARKERS ARE `lf_pin_block`'s OWN, recomputed rather than read off the row. They do
+    # ---- not depend on the pin set — that function derives them from `GA_BLOCK_ID` before it looks
+    # ---- at a single pin — so recomputing them is the one construction rather than a second, and a
+    # ---- row whose `block_id` an older vintage spelled differently is one this deletion should
+    # ---- miss rather than guess at.
+    # ----
+    # ---- NOTHING OUTSIDE THE REGION IS READ OR REWRITTEN, and nothing is normalized: the surviving
+    # ---- lines are the file's own, rejoined. `find_block` raising here is left to raise, exactly
+    # ---- as it does for `apply`: two gov blocks in one file is a state to refuse over, not to pick
+    # ---- a winner from.
+    if pins_drop is not None:
+        _pd_path = target / pins_drop["path"]
+        _pd_om, _pd_cm, _ = lf_pin_block([])
+        _pd_cur = _pd_path.read_text(encoding="utf-8", errors="replace") \
+            if _pd_path.is_file() else None
+        _pd_span = find_block(_pd_cur, _pd_om, _pd_cm) if _pd_cur is not None else None
+        if _pd_span is not None:
+            _pd_lines = _pd_cur.split("\n")
+            _pd_path.write_text("\n".join(_pd_lines[:_pd_span[0]] + _pd_lines[_pd_span[1] + 1:]),
+                                encoding="utf-8", newline="\n")
+            subprocess.run(["git", "-C", str(target), "add", "--", pins_drop["path"]],
+                           capture_output=True, check=False)
+            _ga_removed = True
+        # THE ROW GOES EITHER WAY. A target whose markers are already gone — hand-deleted, or lost
+        # with the whole file — still holds a receipt row claiming a block, and leaving that row
+        # standing because there were no bytes to remove is the half-done state this block exists to
+        # prevent, arriving through the empty case instead of the full one.
+        withdrawn_rows.append(pins_drop)
+        print(f"govkit update — "
+              + (f"removed gov's lf-pin block from {pins_drop['path']} and dropped its receipt row"
+                 if _pd_span is not None else
+                 f"dropped the lf-pin receipt row for {pins_drop['path']}: gov's markers were "
+                 f"already gone from the file, so there was nothing to remove")
+              + f"; no kit this receipt claims declares an lf_pin any more "
+                f"({len(pins_drop.get('patterns') or [])} pin(s) withdrawn)")
+
     for a in acted:
         row, c, v = a["row"], a["c"], a["verdict"]
 
@@ -7704,8 +7798,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # any snapshot path that is not in this set — correctly, because a path this run never touched
     # has nothing to undo — so leaving `.gitattributes` out would make its snapshot entry decorative:
     # recorded, carried through the whole verb, and stepped over at the one moment it is for.
+    # DEPL-cMendedVintage-17 S3. AND WHEN THE WITHDRAWAL REMOVED IT, for the same reason: a path
+    # missing from this set is stepped over by the rollback loop, and a removal the rollback steps
+    # over is a block gov deleted from a repository whose kit then rolled back.
     written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
-                     | ({_pins_snap["paths"][0]} if _ga_written and _pins_snap else set()))
+                     | ({_pins_snap["paths"][0]}
+                        if (_ga_written or _ga_removed) and _pins_snap else set()))
     n_verified = n_unverified = n_rolled = n_preexisting = n_declined_red = 0
     for eid in touched_kits:
         d, _ = descs[eid]
@@ -7960,6 +8058,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # dict by identity and rebinding the name would leave the receipt at this run's
                 # values.
                 if s["origin"] == "attributes":
+                    # DEPL-cMendedVintage-17 S3. AND IT COMES BACK OUT OF THE WITHDRAWAL SET FIRST.
+                    # The withdrawal path drops this row by appending it here, and the filter that
+                    # consumes the list runs long after this loop — so restoring the dict's contents
+                    # without also un-dropping it would put the block back on disk and still delete
+                    # the row that says gov owns it. The generic branch below does this for a
+                    # `table` row and returns before reaching it, which is why the line is repeated
+                    # rather than shared.
+                    if s["row"] in withdrawn_rows:
+                        withdrawn_rows.remove(s["row"])
                     s["row"].clear()
                     s["row"].update(s["fields"])
                     continue
