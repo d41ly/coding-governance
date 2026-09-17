@@ -287,3 +287,7 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T07:29:41Z brief · item DEPL-cMendedVintage-19 · reason f8cfbe0b5a4e memory/builds/cMendedVintage/prompts/2026-09-17-prompt-DEPL-cMendedVintage-19-2-build-brief.md
 
 2026-09-17T07:39:57Z dispatch · item b1621f59 DEPL-cMendedVintage-19 · reason tools/govkit/govkit.py tools/govkit/matrix.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-19.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-19-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/map/generated/symbols.json
+
+2026-09-17T07:55:38Z dispatch · item b52b5d80 DEPL-cMendedVintage-20 · reason tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-20.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-20-acceptance-ledger.md
+
+2026-09-17T07:55:39Z brief · item DEPL-cMendedVintage-20 · reason 138a06b56888 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-DEPL-cMendedVintage-20-2-build-brief.md
