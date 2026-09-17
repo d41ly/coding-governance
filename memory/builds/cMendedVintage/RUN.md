@@ -341,3 +341,7 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T17:40:28Z dispatch · item 7d248049 TOOL-cMendedVintage-11 · reason tools/process-monitor/selftest.py memory/builds/cMendedVintage/spec/2026-09-17-spec-TOOL-cMendedVintage-11.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-11-acceptance-ledger.md
 
 2026-09-17T17:40:30Z brief · item TOOL-cMendedVintage-11 · reason 5f7de4de80a7 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-TOOL-cMendedVintage-11-2-build-brief.md
+
+2026-09-17T17:45:05Z dispatch · item 7f3eb6f6 TOOL-cMendedVintage-11 · reason tools/process-monitor/selftest.py,memory/builds/cMendedVintage/spec/2026-09-17-spec-TOOL-cMendedVintage-11.md,memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-11-acceptance-ledger.md,memory/builds/cMendedVintage/README.md,memory/LIVE.md,memory/ledger/2026-09.md,memory/map/generated/symbols.json
+
+2026-09-17T17:58:12Z dispatch · item 7f3eb6f6 DEPL-cMendedVintage-25 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-25.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-25-acceptance-ledger.md memory/LIVE.md

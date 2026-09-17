@@ -1,11 +1,12 @@
 # TOOL-cMendedVintage-11 — the census arm resolves its launcher instead of trusting the name
 
-**Status:** SPECCED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 36
+**Status:** CLOSED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 36
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-11-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-11-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-TOOL-cMendedVintage-11-2-build-brief.md](../prompts/2026-09-17-prompt-TOOL-cMendedVintage-11-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

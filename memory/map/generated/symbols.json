@@ -798,6 +798,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "check_git_split_parses",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_guarded",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -3821,6 +3826,11 @@
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
+    },
+    {
+      "id": "resolve_launcher",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "resolve_measurer_currency",
