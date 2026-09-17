@@ -43,6 +43,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [git-rm-cached-refuses-a-diverged-index-blob](git-rm-cached-refuses-a-diverged-index-blob.md) | class | 2 |  | `git rm --cached` refuses a path whose index blob differs from both HEAD and the worktree, so a fixture cleanup without `-f` silently leaves the file staged and the next arm measures the wrong fixture |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
+| [hand-named-gate-list-green-while-the-bar-reds](hand-named-gate-list-green-while-the-bar-reds.md) | class | 6 |  | a spec names the legs its author expects the change to move, the unit is green on exactly those, and the bar is red on an unguarded leg the list never named |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 5 |  | core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out |
 | [id-matched-as-a-substring](id-matched-as-a-substring.md) | class | 3 |  | every id ending in a 1-up sequence is a prefix of nine others, so an unanchored match joins the wrong record |
@@ -85,6 +86,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-70 record(s): 70 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+71 record(s): 71 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->
