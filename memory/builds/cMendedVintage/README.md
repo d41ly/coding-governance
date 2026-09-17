@@ -151,9 +151,9 @@ ids TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMend
 | [DEPL-cMendedVintage-25 — the renormalize cleanliness guard reads paths, not whitespace tokens](spec/2026-09-17-spec-DEPL-cMendedVintage-25.md) | 35 | 2 | SPECCED | rev-1 | 2026-09-17 |
 <!-- /gen:build-units -->
 
-Records: 70 bound to this build, across 4 record folder(s).
+Records: 71 bound to this build, across 4 record folder(s).
 
-Ids no record names: DEPL-cMendedVintage-24 DEPL-cMendedVintage-25.
+Ids no record names: DEPL-cMendedVintage-25.
 
 Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25
 TOOL-cMendedVintage-10.
