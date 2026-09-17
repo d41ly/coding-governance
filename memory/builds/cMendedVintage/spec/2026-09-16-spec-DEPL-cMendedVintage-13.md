@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-13 — `update --write` emits gate legs
 
-**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 23
+**Status:** CLOSED · rev-4 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 23
 
 <!-- gen:spec-records -->
 
@@ -93,7 +93,14 @@ the ownership rules.
 - **hands-off** external — an adopter's bar gains gov's new legs on a safe verb; nothing else in
   this build consumes the emission.
 
-- **hands-off** `DEPL-cMendedVintage-21` — that unit makes the atomic write one helper with something that fails when it is absent, closing the criterion this unit names but cannot observe.
+- **hands-off** `DEPL-cMendedVintage-21` — that unit makes the atomic write one helper with
+  something that fails when it is absent, closing the criterion this unit names but cannot
+  observe.
+- **hands-off** `DEPL-cMendedVintage-22` — this unit made `update` a second caller of the
+  emission, so the drift guard inside it became reachable from two verbs rather than one. That
+  unit repairs the guard; nothing this unit designed changes, and the widening is what made the
+  repair a blocker rather than a latent defect.
+
 ## 4. Design
 
 ### Where the call sits, and why there
@@ -303,6 +310,12 @@ further floor to move.
   `[gate_runner]` before emitting, which rev-2 never said and which `[gate_runner].file`'s own escape
   history requires of any verb that joins it onto the target root and writes. §4's call-site
   sentence loses its line number and gains the renormalize, both measured on this tree.
+
+- rev-4 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The closing review
+  adjudicated the drift guard inside this unit's extracted function a BLOCKER and adopted
+  `DEPL-cMendedVintage-22` to repair it; that spec names this one as what widened the defect's
+  reach, and the edge was never written back. The `-21` bullet beside it is rewrapped in the
+  same pass — the disposal appended it as one long line butted against the next heading.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize
 
-**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
+**Status:** CLOSED · rev-4 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
 
 <!-- gen:spec-records -->
 
@@ -82,7 +82,15 @@ renormalize, so the pin block and the index normalization that depends on it lan
 
 - **hands-off** `DEPL-cMendedVintage-15` — that unit makes the synthesized attributes entry restorable, closing the blocker the spec audit confirmed against the snapshot this unit adds.
 
-- **hands-off** `DEPL-cMendedVintage-17` — that unit stops a target whose pins were withdrawn reaching the empty-marker write this unit introduces.
+- **hands-off** `DEPL-cMendedVintage-17` — that unit stops a target whose pins were withdrawn
+  reaching the empty-marker write this unit introduces.
+- **hands-off** `DEPL-cMendedVintage-23` — the pin write this unit added joins a
+  receipt-supplied path onto the target root, and that unit is what grades the join.
+- **hands-off** `DEPL-cMendedVintage-24` — the `git add` this unit put on the pin write is
+  what made the dirty-path refusal's carve-out for that row unsafe, and that unit closes it.
+- **hands-off** `DEPL-cMendedVintage-25` — the renormalize this unit added is the consumer of
+  the cleanliness guard whose path parsing that unit repairs.
+
 ## 4. Design
 
 ### Data model
@@ -263,6 +271,13 @@ refusal · the `govkit refusal join` anchor set gains that refusal's anchor.
 - rev-1 · 2026-09-16 · initial draft.
 - rev-3 · 2026-09-17 · §2 S4, §3, §5 · TWO CORRECTIONS, both measured at build time, neither changing a criterion. FIRST: rev-2's `hands-off external` edge and its §5 user-docs line both said `WIRE-INTO-PROJECT.md` states that `update` never edits `.gitattributes`. It does not: `grep -n gitattributes WIRE-INTO-PROJECT.md` returns four hits and every one of them is about the ADOPTING repo's own EOL rules for the hygiene checker. The three shipped carriers of the never-writes claim are `tools/govkit/govkit.py`'s two comments in the pins arm and at the order site, both rewritten by this unit, and `skills/deploy-governance/SKILL.md`'s honest-limits line, which is about `apply` and was already false at BASE. A doc correction owed to a sentence that does not exist is a correction nobody can make, so the edge is withdrawn rather than left as a red handoff. SECOND: S4 enumerated this run's own writes as `changed` + `renamed` + `deleted` + `.gitattributes`, omitting the LANDED destinations. Those are `git add`ed by the landing loop, so every run that lands an unclaimed source into an lf-pinned path would have found its own landing in `git diff --name-only HEAD` and refused its own renormalize — the exact defect AC5's own `Red when` names one set over. S4 now names `written_paths`, the set the verify pass already derives for precisely this question. THIRD, editorial only: AC1's invocation span was wrapped across two lines, which put every backtick after it on the wrong parity and made hygiene check 23 read AC1 as carrying no token at all. Reflowed onto its own line; no word of the criterion changed.
 - rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-15, DEPL-cMendedVintage-17 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
+
+- rev-4 · 2026-09-17 · §3 · RECIPROCAL EDGES, no scope or criterion changed. The closing review
+  adjudicated three findings against code this unit introduced — the uncontained pin write, the
+  dirty-path carve-out its `git add` made unsafe, and the renormalize guard's path parsing —
+  and adopted `DEPL-cMendedVintage-23`, `-24` and `-25` for them. Each names this unit and none
+  was named back. The `-15` and `-17` bullets are rewrapped in the same pass; the disposal had
+  appended them as single long lines, one of them butted against the next heading.
 
 ## 10. Reuse audit
 
