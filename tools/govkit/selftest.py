@@ -5709,14 +5709,18 @@ user_skills = "/tmp/gk-fake-skills"
               "tools/demo/low.txt" in _files_after
               and any(f["path"] == "tools/demo/low.txt" for f in json.loads(
                   (_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]), "")
+        # DEPL-cMendedVintage-14 re-keyed every outbox order on the FULL path plus a digest, so a
+        # literal filename here would be a second copy of that rule and would strand on the next
+        # change to it. Derive it from the engine's own renderer, which is what the writer calls.
+        _wd11 = f"update-withdrawn-{GK9.render_order_slug('tools/demo/low.txt')}.md"
         check("[-11] S8 ...with an ORDER naming the file, its last gov commit and why nothing was deleted",
-              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").is_file()
+              (_t11 / ".governance" / "outbox" / _wd11).is_file()
               and "NOTHING was deleted" in (_t11 / ".governance" / "outbox"
-                                            / "update-withdrawn-low.txt.md").read_text(encoding="utf-8")
+                                            / _wd11).read_text(encoding="utf-8")
               and _A11 in (_t11 / ".governance" / "outbox"
-                           / "update-withdrawn-low.txt.md").read_text(encoding="utf-8"),
-              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").read_text(encoding="utf-8")
-              if (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").is_file() else "no order")
+                           / _wd11).read_text(encoding="utf-8"),
+              (_t11 / ".governance" / "outbox" / _wd11).read_text(encoding="utf-8")
+              if (_t11 / ".governance" / "outbox" / _wd11).is_file() else "no order")
 
         _status11 = gout(_t11, "status", "--porcelain")
         check("[-11] AC2 the target's own git sees an R entry for the clean rename",
@@ -6195,10 +6199,10 @@ user_skills = "/tmp/gk-fake-skills"
               not any(f["path"] == "tools/demo/low.txt" for f in json.loads(
                   (_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]), "")
         check("[-11] AC4 ...and an order is written under .governance/outbox/ either way",
-              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").is_file()
+              (_t11 / ".governance" / "outbox" / _wd11).is_file()
               and "It WAS deleted" in (_t11 / ".governance" / "outbox"
-                                       / "update-withdrawn-low.txt.md").read_text(encoding="utf-8"),
-              (_t11 / ".governance" / "outbox" / "update-withdrawn-low.txt.md").read_text(encoding="utf-8"))
+                                       / _wd11).read_text(encoding="utf-8"),
+              (_t11 / ".governance" / "outbox" / _wd11).read_text(encoding="utf-8"))
         check("[-11] AC6 LIVENESS the count DID fall on the run that was allowed to delete — the predicate "
               "above measures a guard, not an inert fixture",
               len(_files_post_wd) < len(_files_pre_wd),
