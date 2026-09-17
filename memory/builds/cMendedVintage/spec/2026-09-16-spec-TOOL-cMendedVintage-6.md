@@ -133,7 +133,11 @@ The leg name carries no digit-bearing parenthetical, which `govkit selfcheck`'s 
 name because the emitter writes leg names into a target where a count nobody maintains is worse
 than no name.
 
-### The three declarations, and why they are one commit
+### The declarations, and why they are one commit
+
+*Headed "the three declarations" through rev-3. Build-time measurement found a fourth and a fifth, so
+the heading no longer states a count — the list below is the population, and the next unit to add a
+leg will find it one short again, which is the whole shape of this bug class.*
 
 `govkit selfcheck`'s 7h arm asserts the descriptor set and `tools/gate-legs.json` agree in BOTH
 directions: a descriptor row naming a leg the manifest lacks reds, and a manifest leg no descriptor
@@ -152,6 +156,15 @@ consequence — `apply` would withhold the leg and exit 1 at every target select
 `git add` is not bookkeeping ahead of the commit, it is the fourth declaration, and a unit that
 writes the other three and stages nothing sees a refusal whose text names neither the manifest nor
 the pins.
+
+**And a FIFTH: the leg NAME is an inventory key.** `tools/codebase-map/test_codebase_map.py` reds
+with the new name UNCLAIMED until a feature dossier claims it — `memory/map/features/run-gates.md`
+here — and the generated map artifacts regenerate in the same commit. §7 below named neither this leg
+nor the kickoff-manifest ratchet, which fires too: `tools/gate-legs.json` is a watched file, so the
+manifest owes a re-stamped `last-audit` even when no front-loaded claim moved. Both are the named
+class `memory/gotchas/a-new-leg-trips-a-growing-set-of-meta-gates.md`, whose whole point is that the
+set is discovered by RUNNING it and is never enumerable from memory — so this list records what fired
+here and is not a promise to the next unit that adds a leg.
 
 `subject = "repo"` because a failure of this leg means THIS repository's installed files no longer
 match its own record — the criterion stated at the `subject` field declaration in
@@ -314,7 +327,11 @@ leg off a bar.
   and cites finding 36 of the aSealedCaravan record, and AC7 measures the residue on a CRLF-expanded
   clone rather than asserting it away.
 - rev-4 · 2026-09-17 · §4 · built and closed. THREE amendments, all from measurement at build time
-  and none changing a design decision. (a) The three-declarations subsection gains a FOURTH, observed
+  and none changing a design decision. Amended again the same day after the post-commit bug-class
+  checklist: the subsection gains a FIFTH declaration (the leg name is a codebase-map inventory key,
+  claimed in the run-gates dossier) plus the kickoff-manifest ratchet, and its heading no longer
+  states a count, because a heading that counts a population this bug class grows is the other half
+  an amendment leaves standing. (a) The three-declarations subsection gains a FOURTH, observed
   rather than predicted: `selfcheck` reds on a leg whose argv names an UNTRACKED path, because the
   `**` engine rule's pool is the tracked surface, so staging the file is itself a declaration. Every
   earlier revision, and the brief, named three. (b) The Inventory table gains `write_fixture`, a

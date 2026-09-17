@@ -106,9 +106,10 @@ guard = []
 #
 # NO GUARD, and that is the deliberate half. A guard scopes a run to commits touching some path, and
 # the drift this leg looks for arrives from a commit touching NOTHING here — an eol filter, a stray
-# editor save, a partial merge. It is also cheap enough that scoping it would buy nothing: measured
-# at a quarter of a second against an empty receipt on a loaded four-core node, and one sha256 per
-# engine row after that.
+# editor save, a partial merge. It is also cheap enough that scoping it would buy nothing: the work
+# is one sha256 per engine row and nothing else. NO FIGURE IS WRITTEN HERE: the recorded seconds are
+# owned by this kit's own ceiling evidence, which the runner refreshes, and a number typed beside it
+# in a comment is the copy that rots.
 [[gate_leg]]
 name = "receipt sync (installed files match the receipt)"
 subject = "repo"

@@ -78,6 +78,7 @@
       "python resolver (behaviour + inline parity + idiom ban)",
       "recall floor",
       "recall floor arms",
+      "receipt sync (installed files match the receipt)",
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",

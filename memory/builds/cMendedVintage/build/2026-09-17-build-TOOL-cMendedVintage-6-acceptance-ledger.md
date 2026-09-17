@@ -33,12 +33,27 @@ defensible from the measurement AND consistent with its neighbours. Note the tra
 legs in this chunk carry a 60 s ceiling, which is BELOW the floor the margin rule imposes and will
 red the moment a run puts evidence beside them.
 
-**A fourth declaration exists and no earlier revision named it.** Logged as rev-4. With the
-descriptor row, the manifest row and the file all present in the worktree but the file UNSTAGED,
-`selfcheck` reds with the leg's argv naming a path that "NO rule in any descriptor writes, seeds,
-orders or produces" — because the `**` engine rule's pool is the TRACKED surface. Staging the file is
-itself a declaration, and a unit that moves the three documented ones and stages nothing gets a
-refusal whose text mentions neither the manifest nor the pins.
+**The brief promised four declarations. Six fired.** The named bug class
+`a-new-leg-trips-a-growing-set-of-meta-gates.md`
+says the set is discovered by RUNNING it and is never enumerable from memory, and this unit is one
+more reading of exactly that. Logged as rev-4. Beyond the four the brief named:
+
+- **A fifth — staging the file.** With the descriptor row, the manifest row and the file all present
+  in the worktree but the file UNSTAGED, `selfcheck` reds with the leg's argv naming a path that "NO
+  rule in any descriptor writes, seeds, orders or produces", because the `**` engine rule's pool is
+  the TRACKED surface. So the `git add` is not bookkeeping ahead of the commit, it is a declaration,
+  and its refusal text mentions neither the manifest nor the pins.
+- **A sixth — the leg NAME is a codebase-map inventory key.** The map gate redded `UNCLAIMED` on it.
+  Claimed in `memory/map/features/run-gates.md`, with a prose paragraph added on the same touch, and
+  the three generated map artifacts regenerated in the same commit.
+- **And the kickoff-manifest ratchet**, a meta-gate on the same edit by a different route:
+  `tools/gate-legs.json` is a watched file, so `last-audit` owed a re-stamp. Re-verified rather than
+  assumed — the manifest front-loads no leg count, says outright that the leg list is single-sourced
+  from that file, and its ceiling and `GATE_FULL` claims all hold for the new row. Datetime advanced,
+  sha unchanged, because the merge-base is still the one already stamped.
+
+Each was caught by a machine and none by reading the spec: the fifth by `selfcheck`, the sixth by the
+post-commit bug-class checklist, the ratchet by the pre-commit hook.
 
 **Evidences:** TOOL-cMendedVintage-6
 
@@ -117,6 +132,17 @@ which no direct check in this pass covers. `every held leg is budgeted, every bu
 runs through `run-selftests.sh`, named in the ban list by file; the risk it covers is low for this
 unit specifically, because the new leg declares `subject = "repo"` and is therefore not held and owes
 no budget row, but that reasoning is an argument and not an observation.
+
+**The staged break and the real drift are different mutations, and both were observed.** AC3 altered
+the RECEIPT's recorded hash; AC7's clone altered the FILE's bytes. That pairing matters because a
+break staged only on the receipt side proves the comparison for a synthetic input — the class
+`staged-break-substitutes-a-synthetic-value.md`
+— and the CRLF clone is the same red reached from the direction drift actually arrives from.
+
+**Arm 4 is the liveness arm and would pass under a broken no-op loop.** It asserts zero graded rows,
+which is also what a loop that stopped looking would report. Arms 1 to 3 are its control: each
+demands a non-zero graded count, so the four cannot all be green while the loop grades nothing. Said
+here rather than left implicit, because an arm that passes by finding nothing is its own bug class.
 
 **One thing measured and not acted on.** The spec's files-touched estimate put the new file at
 "roughly 60 lines"; it landed at 207, almost all of it the header stating what the checker does NOT

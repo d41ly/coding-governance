@@ -778,6 +778,11 @@
       "file": "tools/lexicon/lexicon_conf.py"
     },
     {
+      "id": "check_engine_rows",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -786,6 +791,11 @@
       "id": "check_fences",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_fixtures",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "check_guarded",
@@ -811,6 +821,11 @@
       "id": "check_ours",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "check_outcome_probes",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
     },
     {
       "id": "check_packing",
@@ -2365,6 +2380,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
@@ -3083,6 +3103,11 @@
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
     },
     {
+      "id": "read_inert_kits",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3131,6 +3156,11 @@
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_receipt",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
     },
     {
       "id": "read_registry",
@@ -3533,6 +3563,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_order_slug",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "render_pin_rows",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3701,6 +3736,11 @@
       "id": "resolve_cell",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "resolve_declaration",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "resolve_declaration_paths",
@@ -5623,7 +5663,22 @@
       "file": "tools/process-monitor/procmon-hook.js"
     },
     {
+      "id": "write_atomic",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "write_block",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_fixture",
+      "kind": "function",
+      "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "write_gate_legs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
