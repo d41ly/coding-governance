@@ -3658,6 +3658,24 @@ def check_target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
     return got >= SUBJECT_FLOOR_RUN_GATES
 
 
+def read_inert_kits(deploy: dict) -> set[str]:
+    """The entry ids this target declared INERT: land the kit's bytes, do not run its adopter.
+
+    THE ONE READER, which is the whole reason this is a function rather than two comprehensions.
+    `update`'s re-render decline and `apply`'s CONFIGURE decline are two consumers of ONE
+    declaration the target wrote down, and two spellings of one question is the defect this engine
+    has paid for before: the moment either is edited they disagree, and the posture is then honoured
+    by one verb and flipped by the other. That is not hypothetical — it is the state this function
+    was written to end, in which the only reader was `update` and `apply` ran the adopter anyway.
+
+    IT DOES NOT VALIDATE. A member naming an entry outside the selection never matches, and a
+    non-list value raises exactly as it raised in the comprehension this replaced. Refusing a
+    mistyped list is a judgement about the TARGET's descriptor and belongs beside the other
+    descriptor refusals; widening it here would put a refusal inside a reader.
+    """
+    return {str(x) for x in (deploy.get("inert") or [])}
+
+
 def read_gate_verdicts(target: pathlib.Path, gr: dict) -> dict[str, str]:
     """Parse the target's runner output into leg name -> green|red|skipped.
 
@@ -4947,6 +4965,8 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     orders: list[dict] = []
     configure_skipped: set[str] = set()
     stopped_ok: set[str] = set()   # kits whose adopter stopped at a DECLARED, accepted outcome
+    inert_declined: set[str] = set()   # kits whose adopter was NOT RUN, by the target's own posture
+    inert = read_inert_kits(deploy)
     for eid in selection:
         d, _p = descs[eid]
         ctx = target_context(target, deploy, eid, d)
@@ -4989,6 +5009,28 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                     encoding="utf-8", newline="\n")
                 orders.append({"kind": "machine", "id": name[:-3], "path":
                                f".governance/outbox/{name}", "destination": resolved, "kit": eid})
+        if eid in inert:
+            # THE TARGET DECLARED THIS POSTURE and `apply` used to flip it. `apply` is the verb every
+            # runbook recommends as the fallback, so "just run apply" re-ran the adopter of a kit its
+            # owner had written down as inert — the one reader of that declaration was `update`, and
+            # this phase never asked. AHEAD OF THE ARGV RESOLUTION, deliberately: a decline printed
+            # after the adopter has already run reads green on stdout while the posture was flipped.
+            #
+            # BEFORE THE HOLE SKIP, because both reach the same place and the operator's own
+            # declaration is the more informative of the two reasons to name.
+            #
+            # THE BYTES STILL LAND. `inert` has never meant "do not install" in this engine's output;
+            # a target that wants none of the kit's bytes drops it from its selection.
+            #
+            # `configure_skipped` AND NOT A SECOND EXEMPTION SET. `exempt_leg` grants its exemption
+            # only for a leg declaring `red_after_land` and only while that kit's configure was
+            # skipped THIS RUN. An inert kit's configure was skipped this run, by the operator, so
+            # the existing window is exactly the right one and a second set would be a second answer.
+            print(f"govkit apply — CONFIGURE {eid}: DECLINED — the target holds this kit INERT, so "
+                  "its adopter is not run and its bytes land unconfigured")
+            configure_skipped.add(eid)
+            inert_declined.add(eid)
+            continue
         if blocked and not resume:
             print(f"govkit apply — CONFIGURE {eid}: skipped, blocked by hole "
                   f"'{blocked[0].get('id')}' — landed but inert")
@@ -5040,12 +5082,18 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         n_rendered += 1
         dp = target / row["path"]
         if not dp.is_file():
-            if row.get("kit") in stopped_ok:
-                # Its adopter stopped at a DECLARED, accepted outcome, so it never reached the render.
-                # Reporting the absence here would be reporting the accepted stop a second time,
-                # under a name that reads like a defect.
+            if row.get("kit") in stopped_ok or row.get("kit") in inert_declined:
+                # TWO LEGITIMATE REASONS A RENDER CAN BE ABSENT, ONE BRANCH, TWO SENTENCES.
+                # `stopped_ok` means the adopter RAN and stopped at a declared, accepted outcome, so
+                # it never reached the render; reporting the absence as a defect would report that
+                # accepted stop a second time under a name that reads like a failure. An inert kit's
+                # adopter did not run AT ALL, which is a different fact — folding the two would make
+                # one message name an accepted stop that never happened. What they share is that the
+                # absence is REPORTED and not failed, and that is the part worth writing once.
+                why = ("stopped at an accepted outcome" if row.get("kit") in stopped_ok
+                       else "is held INERT by this target, so its adopter never ran")
                 print(f"govkit apply — OBSERVE {row['path']}: not rendered — "
-                      f"'{row['kit']}' stopped at an accepted outcome")
+                      f"'{row['kit']}' {why}")
                 continue
             r.fail(f"'{row['path']}' is declared `rendered` by kit '{row['kit']}' and is absent "
                    f"after its adopter ran — the adopter owns those bytes and did not write them")
@@ -7697,7 +7745,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # S3 non-goal — A KIT THE TARGET HOLDS DELIBERATELY INERT IS NOT RUN, and the run says
             # so. Running its adopter is a POSTURE FLIP, which is exactly why "just run apply" was
             # never the workaround for any of this.
-            if _eid in {str(x) for x in (deploy.get("inert") or [])}:
+            if _eid in read_inert_kits(deploy):
                 _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
                                            "would flip a posture the target chose"))
                 continue

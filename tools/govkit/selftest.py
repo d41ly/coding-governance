@@ -1093,6 +1093,37 @@ user_skills = "/tmp/gk-fake-skills"
               "seed-and-stop" in pa.stdout or "refused-foreign-tree" in pa.stdout
               or "unclassified" in pa.stdout, pa.stdout)
 
+        # ===== DEPL-cMendedVintage-12: CONFIGURE honours the posture the target declared =====
+        # MEASURED BEFORE THE CHANGE, on a scratch fixture: a target declaring `inert = ["memory-tree"]`
+        # produced output byte-identical to one declaring nothing, seeded `.memory-tree.conf`, and
+        # exited 0. `apply` is the verb every runbook recommends as the fallback, and it flipped the
+        # posture its owner had written down — the declaration had exactly one reader and it was in
+        # `update`.
+        #
+        # BOTH DIRECTIONS, because the failing one is what nobody tests: a predicate that matched on an
+        # EMPTY declaration would silently stop configuring every adopter in the fleet, and the arms
+        # asserting the decline would all still be green.
+        _in12 = make_target(tmp / "u12a", DEPLOY_FULL.replace(
+            'kits = ["memory-tree"]', 'kits = ["memory-tree"]\ninert = ["memory-tree"]'))
+        _pi12 = run("apply", "--target", str(_in12), "--write")
+        check("[-12] apply DECLINES a kit the target holds inert, and names the posture",
+              "CONFIGURE memory-tree: DECLINED" in _pi12.stdout and "INERT" in _pi12.stdout,
+              _pi12.stdout)
+        # THE OBSERVABLE IS THE TREE, not the line. A decline printed AFTER the argv resolution would
+        # satisfy the arm above while the adopter had already run, which is this criterion's red-when.
+        check("[-12] and the adopter does not run: the conf it seeds is absent from the fixture",
+              not (_in12 / ".memory-tree.conf").is_file(), _pi12.stdout)
+        check("[-12] a render absent because its adopter was DECLINED is reported, not failed",
+              "is held INERT by this target" in _pi12.stdout and _pi12.returncode == 0,
+              _pi12.stdout)
+        check("[-12] and that report does not claim an accepted stop that never happened",
+              "stopped at an accepted outcome" not in _pi12.stdout, _pi12.stdout)
+        _no12 = make_target(tmp / "u12b", DEPLOY_FULL)
+        _pn12 = run("apply", "--target", str(_no12), "--write")
+        check("[-12] the same fixture WITHOUT the key still runs that kit's adopter",
+              (_no12 / ".memory-tree.conf").is_file() and "DECLINED" not in _pn12.stdout,
+              _pn12.stdout)
+
         # The two selfcheck arms this unit adds, with their liveness halves.
         ps = run("selfcheck")
         check("selfcheck reports how many shipped scripts the wiring arm READ",

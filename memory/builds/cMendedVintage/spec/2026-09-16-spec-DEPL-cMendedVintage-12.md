@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-12 — `apply`'s CONFIGURE honours `deploy["inert"]`
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 22
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 22
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-12-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-12-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-17-prompt-DEPL-cMendedVintage-12-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-12-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -22,14 +23,16 @@ exists.
 
 ## 2. Scope (IN)
 
-- **S1** A one-function reader, `inert_kits(deploy)`, returns `{str(x) for x in (deploy.get("inert")
-  or [])}`. The set comprehension at `tools/govkit/govkit.py:7389` is replaced by a call to it, so
-  the two consumers cannot answer the question differently. Observed by AC1 and AC4.
-- **S2** In `_cmd_apply`'s CONFIGURE loop, ahead of the argv resolution at
-  `tools/govkit/govkit.py:4889`, a kit in that set is declined: one printed line naming the kit and
+- **S1** A one-function reader, `read_inert_kits(deploy)`, returns `{str(x) for x in
+  (deploy.get("inert") or [])}`. The set comprehension inside `update`'s re-render decline is
+  replaced by a call to it, so the two consumers cannot answer the question differently. The reader
+  is the SECOND thing this scope buys; the first is that there is exactly one of it. Observed by AC1
+  and AC4.
+- **S2** In `_cmd_apply`'s CONFIGURE loop, ahead of the argv resolution and ahead of the
+  hole-blocked skip beside it, a kit in that set is declined: one printed line naming the kit and
   the posture, the kit added to `configure_skipped`, and `continue`. The adopter is not resolved and
   not run. Observed by AC1 and AC2.
-- **S3** An `inert_declined` set feeds the OBSERVE phase at `tools/govkit/govkit.py:4935`. A
+- **S3** An `inert_declined` set feeds the OBSERVE phase. A
   `rendered` destination absent because its adopter was declined is REPORTED with that reason, not
   failed — the existing branch does the same for a kit that stopped at an accepted outcome, and this
   is the second reason a render can be legitimately absent. Observed by AC3.
@@ -43,8 +46,7 @@ exists.
   what "landed but inert" has meant in this engine's own output since the hole-blocked skip was
   written. A target that wants no bytes removes the kit from its selection.
 - No new key, no new spelling, no `--force-inert`. The key exists and is declared by targets today.
-- No change to `update`'s re-render decline at `tools/govkit/govkit.py:7387`. That branch is
-  correct, and `DEPL-cMendedVintage-1` depends on it staying out of the render-staleness set; this
+- No change to `update`'s re-render decline. That branch is correct, and `DEPL-cMendedVintage-1` depends on it staying out of the render-staleness set; this
   unit only makes it share its reader.
 - No repair of `apply`'s unconditional engine-byte overwrite. That is the other half of why "just
   run apply" is not a safe remedy, it is recorded against `DEPL-dRetiredFork-2`, and it is a
@@ -53,8 +55,8 @@ exists.
   question about one verb, answered by a fixture, not by a predicate over declarations.
 
 This unit takes nothing from, and leaves nothing for, any other unit in this build. It touches one
-phase of one verb no other unit in the roster edits, and its only shared line —
-`tools/govkit/govkit.py:7389` — is rewired rather than moved.
+phase of one verb no other unit in the roster edits, and its only shared line — the set comprehension
+inside `update`'s re-render decline — is rewired rather than moved.
 
 ### Edges
 
@@ -78,16 +80,19 @@ one.
 
 | identifier | kind | where |
 |---|---|---|
-| `inert_kits` | module-level function | `tools/govkit/govkit.py`, beside `check_target_reads_subject` |
+| `read_inert_kits` | module-level function | the engine module, beside `check_target_reads_subject` |
 | `inert_declined` | local set in `_cmd_apply` | beside `configure_skipped` and `stopped_ok` |
 
-The lexicon cell for a Python module-level function in this repo grades the leading verb; `inert_kits`
-is a noun-shaped accessor of a declared set and matches the spelling `lf_pins` and `tracked` already
-use in this file, both of which are name-shaped readers rather than verbs.
+The lexicon cell for a Python module-level function in this repo grades the LEADING VERB against a
+closed table, which `inert` is not in — so rev-1's `inert_kits` would have landed as a verb offender
+and moved a two-sided equality pin. The declaration was ASKED rather than reasoned with: `--suggest`
+called `inert` a scoping question with no canon cluster, and answered `read_inert_kits` as leading
+with a declared verb and satisfying the cell's convention. The neighbours rev-1 cited, `lf_pins` and
+`tracked`, are offenders that predate the table rather than precedents for a new one.
 
 ### Why `configure_skipped` and not a new exemption
 
-`exempt_leg` at `tools/govkit/govkit.py:3582` grants a `red_after_land` leg its exemption only while
+`exempt_leg` grants a `red_after_land` leg its exemption only while
 that kit's configure phase was skipped THIS RUN, and its docstring says the scoping is deliberate. An
 inert kit's configure phase is skipped this run, by the operator's own declaration, so the existing
 window is exactly the right one and a second set would be a second answer to the same question. The
@@ -122,8 +127,8 @@ asked for.
 
 | Path | Change |
 |---|---|
-| `tools/govkit/govkit.py` | the reader, the CONFIGURE decline, the OBSERVE branch, `:7389` rewired |
-| `tools/govkit/selftest.py` | the arms §7 names |
+| the engine module | the reader, the CONFIGURE decline, the OBSERVE branch, `update`'s comprehension rewired |
+| its self-test suite | the arms §7 names |
 
 ## 5. Production-readiness checklist
 
@@ -143,8 +148,9 @@ asked for.
 - testing — AC1 through AC4 on scratch fixture targets; gov keeps no receipt of its own, so none is
   observable against this repo.
 - migration — none. No schema, no floor, no re-adoption.
-- user docs — `WIRE-INTO-PROJECT.md` documents the key and which verbs honour it; the sentence
-  naming the reader is corrected in the same commit.
+- user docs — WITHDRAWN, measured: no shipped document in this repo spells the `inert` key at all,
+  so there is no sentence naming the reader to correct. Documenting a key the deployer runbook has
+  never mentioned is a doc unit with its own scope, not a line this behaviour change smuggles in.
 
 ## 6. Acceptance criteria
 
@@ -168,7 +174,9 @@ asked for.
   adopter stop that never happened and leaves the two facts indistinguishable in the output.
 - **AC4** — When the same fixture is taken through
   `python tools/govkit/govkit.py update --target <fixture> --write`, its re-render decline still
-  names that kit, showing both consumers read one reader.
+  names that kit, showing both consumers read one reader. The fixture must first make the run MOVE a
+  path that kit owns, because the decline loop iterates `touched_kits` and a target whose rows are
+  all current is not in it.
   Red when: only one call site is rewired, leaving the second comprehension in place — the two then
   disagree the moment either is edited, which is the defect the helper exists to prevent.
 
@@ -189,9 +197,8 @@ does not run and that the same fixture without the key does run it · no asserti
   scope rather than undecidable within it.
 - **Q2 — FACT-QUESTION · is `configure_skipped` the right set for a declined kit, or does the leg
   exemption it grants over-reach?**
-  RESOLVED (agent, 2026-09-16, delegated): it is the right set. The probe is reading `exempt_leg` at
-  `tools/govkit/govkit.py:3582` and its one `configure_skipped` consumer at
-  `tools/govkit/govkit.py:3649`: the exemption is granted only for a leg declaring
+  RESOLVED (agent, 2026-09-16, delegated): it is the right set. The probe is reading `exempt_leg` and
+  its one `configure_skipped` consumer: the exemption is granted only for a leg declaring
   `red_after_land`, and only for the run in which that kit's configure was skipped. The probe can
   produce a negative — an unscoped or permanent exemption would have forced a separate set — and
   the docstring plus the consumer both show the window is per-run.
@@ -199,11 +206,11 @@ does not run and that the same fixture without the key does run it · no asserti
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §2 §3 §4 §5 §6 §8 §10 · AMENDED BY THE BUILD, after measuring. The design does not move; seven things about how it is written down do. The reader is renamed `read_inert_kits`, because the naming declaration was asked and refused `inert` as a leading verb — rev-1 would have landed a verb offender and moved a two-sided pin, and its stated precedent turned out to be two offenders rather than two precedents. S2 names the hole-blocked skip as well as the argv resolution, because the decline sits ahead of BOTH: a kit that is inert and hole-blocked must still print the line S4 requires. The §5 user-docs bullet is withdrawn with its reason: nothing shipped in this repo spells the key. AC4 gains the precondition its fixture actually needs, measured — backdating the receipt's `gov_commit` alone leaves every row current and the decline loop empty. Every `path:line` reference is stripped in the same pass: four units edited that file after rev-1 and all four numbers were stale, which is the trap the build brief names.
 
 ## 10. Reuse audit
 
-The seam this unit extends is the re-render decline at `tools/govkit/govkit.py:7387`, read from
-source: it is the only reader of `deploy["inert"]` in the engine, and this unit turns its inline set
+The seam this unit extends is `update`'s re-render decline, read from source: it is the only reader of `deploy["inert"]` in the engine, and this unit turns its inline set
 into the shared reader both phases call. `python tools/codebase-map/reuse_lookup.py "emit gate legs
 into the target gate runner manifest"` was the closest probe run for this build's govkit units and
 returned no seam for a posture reader — its rows are name-token neighbours such as `target_context`
