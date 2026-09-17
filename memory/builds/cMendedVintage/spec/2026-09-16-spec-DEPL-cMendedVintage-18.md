@@ -1,38 +1,47 @@
 # DEPL-cMendedVintage-18 — a withdrawn row whose path did not restore stays in the receipt
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 29
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 29
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-18-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-18-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-18-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-18-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-`DEPL-cMendedVintage-2` S2 gates the `withdrawn_rows.remove(s["row"])` at
-`tools/govkit/govkit.py:7666` together with the `ROLLBACK_FIELDS` revert, on the assumption that no
-snapshot entry is also a withdrawn row. `_touching` at `tools/govkit/govkit.py:6692` admits
-`withdrawn` whenever `--write-withdrawals` is passed, so on those runs a withdrawn row IS a snapshot
-entry. `withdrawn_rows` is the DELETE list consumed at `:7818`, so skipping the removal drops the row
-from the receipt entirely for a path the run could not restore. Split the two effects.
+`DEPL-cMendedVintage-2` S2 gates the `withdrawn_rows.remove(s["row"])` in `update`'s per-entry
+rollback tail together with the `ROLLBACK_FIELDS` revert, on the assumption that no snapshot entry is
+also a withdrawn row. `_touching` admits `withdrawn` whenever `--write-withdrawals` is passed, so on
+those runs a withdrawn row IS a snapshot entry. `withdrawn_rows` is the DELETE list — the filter
+below the write loop strips every row still in it from the receipt — so skipping the removal drops
+the row from the receipt entirely for a path the run could not restore. Split the two effects.
+
+*Every site is named by SYMBOL here. rev-1 keyed three of them to line numbers that eight later units
+had already moved, and a line-keyed read in code that decides what gets deleted is not a mistake the
+reader notices.*
 
 ## 2. Scope (IN)
 
-- **S1** The `_left` gate covers the `ROLLBACK_FIELDS` revert ALONE. The `withdrawn_rows.remove` at
-  `tools/govkit/govkit.py:7666` moves outside it and runs whenever the entry reached the tail, so a
-  row whose path the rollback could not return is never deleted from the receipt. Observed by AC1.
+- **S1** The `_left` gate covers the `ROLLBACK_FIELDS` revert ALONE. The `withdrawn_rows.remove`
+  moves ABOVE it and runs for every entry that reached the tail, so a row whose path the rollback
+  could not return is never deleted from the receipt. One hoisted statement serves the `attributes`
+  branch too, which carried its own copy of the same line and sat below the same gate. Observed by
+  AC1.
 - **S2** A withdrawn-and-unrestored row keeps this run's field values rather than reverting to its
   pre-run ones, matching the landed branch's rule and `DEPL-cMendedVintage-2`'s own invariant that the
-  row describes the bytes on disk. Observed by AC2.
+  row describes the bytes on disk. For a `withdrawn` verdict those two sets of values are EQUAL over
+  every `ROLLBACK_FIELDS` key, because the write loop never touches them — see AC2. Observed by AC2.
 - **S3** That path is reported in the order's `NOT restored` block with a sentence stating what is
-  true of it — the withdrawal did not complete, the row was kept, and the file is still there.
-  Observed by AC3.
+  true of it — the withdrawal did not complete and the row was kept, with the per-path reason above
+  it saying how far the restore got. Observed by AC3.
 - **S4** `tools/govkit/selftest.py` gains the invariant one level up: over every arm that exercises a
-  rollback, no path may end the run both absent from the receipt's `files[]` and present in the
-  worktree. Observed by AC4.
+  rollback, no path may end the run both absent from the receipt's `files[]` and PRESENT IN THE
+  TARGET — worktree file or staged index entry, because the reachable case leaves the bytes in the
+  index and a worktree-only reading stays green over it. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -41,7 +50,7 @@ from the receipt entirely for a path the run could not restore. Split the two ef
   narrowing it would trade this defect for an unrestorable deletion.
 - No retry of the withdrawal, no second `unlink`, no fallback delete. `DEPL-cMendedVintage-2` §3
   refuses a retry on the restore path and the same argument holds here.
-- No change to the landed branch at `tools/govkit/govkit.py:7627`, which already gates its own row
+- No change to the landed branch and its `_left_landed`, which already gates its own row
   removal on its own predicate. This unit makes the withdrawn branch agree with it rather than
   rewriting either.
 - No repair of a receipt already missing a row. Nothing knows which rows those are; the operator's
@@ -58,31 +67,45 @@ from the receipt entirely for a path the run could not restore. Split the two ef
 
 ### Why skipping the removal deletes the row
 
-`withdrawn_rows` is not a keep-list, it is the delete-list: `:7818` strips every row still in it from
-the receipt before serialisation. So `remove(s["row"])` is what SAVES a row, and gating it behind
-`_left` inverts its meaning. The sentence in `DEPL-cMendedVintage-2` §2 reads as though the removal
+`withdrawn_rows` is not a keep-list, it is the delete-list: the filter below the write loop strips
+every row still in it from the receipt before serialisation. So `remove(s["row"])` is what SAVES a
+row, and gating it behind `_left` inverts its meaning. The sentence in `DEPL-cMendedVintage-2` §2 reads as though the removal
 and the revert are two halves of one restoration; they are opposites, and the gate that is right for
 one is exactly wrong for the other.
 
 | the run | the revert | the removal from `withdrawn_rows` |
 |---|---|---|
 | restored every written path | correct: the row goes back to its pre-run values | correct: the row survives |
-| could not restore a written path | skipped: the row stays forward | must ALSO run, or the row is deleted for a file still on disk |
+| could not restore a written path | skipped: the row stays forward | must ALSO run, or the row is deleted while the target still holds those bytes |
 
 ### The reachable case, and how it is manufactured
 
-The fixture technique is `DEPL-cMendedVintage-2`'s own: a directory planted at the worktree path
-makes `git checkout-index -f` refuse. The withdrawn arm's own `dp.unlink()` is guarded by
-`is_file()`, so a directory is skipped there and still reaches `deleted` and then `written_paths` at
-`tools/govkit/govkit.py:7502`. One fixture, both branches, no git mock.
+**rev-1's fixture does not reach the branch, measured.** A directory planted at the withdrawn
+worktree path is DIRTY against the index, and `DEPL-dCarriedReceipt-12`'s claimed-path guard refuses
+the whole run before a byte moves; committing the directory instead takes the blob OUT of the index,
+which sends the rollback down its `entry is None` branch, where the unlink is skipped for a
+non-file and the path is reported RESTORED. Either way the arm would have graded a rollback that
+succeeded. `DEPL-cMendedVintage-2`'s own block says the same thing in its header for its own path.
+
+The technique that reaches it is `DEPL-cMendedVintage-2`'s OTHER one: the kit's own `[check]` runs
+between the write and the rollback, so it installs a `required` filter whose smudge command fails and
+names the withdrawn path. `git checkout-index -f` then refuses that one path. The withdrawal itself
+runs normally — the file is unlinked, the path reaches `deleted` and then `written_paths`, and the
+row reaches `withdrawn_rows`.
 
 ### What the receipt then says
 
-The row stays, carrying this run's values, describing a file that is still in the worktree. That is
-the invariant `DEPL-cMendedVintage-2` states and this unit is the second half of: a receipt that
-agrees with the tree and re-offers nothing beats a receipt that disagrees, and a receipt with no row
-at all for a path that exists is the worst of the three — the next `update` cannot classify it, and
-`check` reports it as an unclaimed source.
+The row stays, carrying this run's values, describing bytes the target still holds. MEASURED, on the
+engine with this unit not landed: the post-run receipt carried no row for the withdrawn path while
+`git ls-files` still named it, because the rollback's `update-index` had already re-staged the
+pre-run blob before `checkout-index` refused. So the residue is in the INDEX rather than the
+worktree — which is why S4's invariant reads both, and why a worktree-only reading of it would have
+been an assertion about nothing.
+
+That is the invariant `DEPL-cMendedVintage-2` states and this unit is the second half of: a receipt
+that agrees with the tree and re-offers nothing beats a receipt that disagrees, and a receipt with no
+row at all for a path the target still holds is the worst of the three — the next `update` cannot
+classify it, and `check` reports it as an unclaimed source.
 
 ### Inventory
 
@@ -99,7 +122,7 @@ keeps on one branch, adds one order sentence and one suite invariant.
 ### Alternatives rejected
 
 - **Take the row out of `withdrawn_rows` and let the withdrawal stand as recorded.** That records a
-  deletion that did not happen: the file is on disk and the receipt would say gov removed it.
+  deletion that did not happen: the pre-run blob is staged and the receipt would say gov removed it.
 - **Restore the withdrawn path instead.** The path was not withdrawn — the `unlink` was skipped — so
   there is nothing to restore, and `checkout-index` refuses for the same reason it refused the first
   time.
@@ -141,19 +164,29 @@ failed, so no ordinary run changes behaviour.
   file the run neither deleted nor restored.
   fixture: built by this unit from `DEPL-cMendedVintage-2`'s technique — a directory at the worktree
   path the receipt names as a file; this repo keeps no `.governance/` receipt of its own.
-- **AC2** — When that run finishes, the kept row carries this run's field values and not the pre-run
-  ones.
-  Red when: the revert is hoisted out with the removal, so the row describes bytes that never came
-  back — the defect `DEPL-cMendedVintage-2` exists to close, arriving through the withdrawn branch.
+- **AC2** — When that run finishes, the kept row's `ROLLBACK_FIELDS` values equal the ones the
+  receipt held before the run, which for a `withdrawn` verdict ARE this run's values: the write loop
+  appends the row to `withdrawn_rows` and writes none of the six keys. Amended in rev-2 — rev-1 asked
+  for this run's values "and not the pre-run ones", which measurement says is a distinction the
+  receipt cannot carry. The only key the run adds is `carry`, and `carry` is not in
+  `ROLLBACK_FIELDS`, so hoisting the revert out with the removal would produce a byte-identical
+  receipt and rev-1's red-when could not fire.
+  Red when: the two sets of values diverge at all, which would mean the write loop had started
+  writing a withdrawn row's own fields and S2 had become observable after all.
 - **AC3** — When the order file from AC1 is read, the path appears under `NOT restored` with a
-  sentence saying the withdrawal did not complete and the row was kept.
-  Red when: the withdrawn case takes the restore branch's sentence, which tells the operator the
-  bytes are this run's when the file was never rewritten.
+  sentence saying this run withdrew it, the rollback could not finish putting it back, and the row
+  was KEPT rather than dropped.
+  Red when: the withdrawn case takes the rewrite branch's sentence, which tells the operator the row
+  was left at this run's values when the run's value for a withdrawal was the file's absence.
 - **AC4** — When the cross-arm invariant S4 adds runs over every arm that exercises a rollback, no
-  path ends a run both absent from the receipt's `files[]` and present in the worktree, and staging
-  the shipped gate as written turns it RED.
+  path that a rollback order names ends a run both absent from the receipt's `files[]` and present in
+  the target — worktree file or staged index entry. Amended in rev-2: rev-1 said "present in the
+  worktree", and the reachable case leaves the bytes in the INDEX with no worktree file, so the
+  rev-1 wording stayed green over the defect this unit closes. Graded against a target built by the
+  unlanded engine, which the predicate reds, and against one built by the landed engine, which it
+  passes.
   Red when: the invariant is asserted only on this unit's own fixture, which certifies the arm that
-  was written to pass it and says nothing about the six that already exist.
+  was written to pass it and says nothing about the ones that already exist.
 
 ## 7. Gates
 
@@ -172,6 +205,15 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · built. Four divergences, all measured. §4's fixture technique replaced: a
+  directory at the withdrawn path is refused by the dirty-claimed-path guard, and committing it
+  routes the rollback down its `entry is None` branch and restores cleanly — the smudge-filter
+  sabotage is what reaches the refusal. S4 and AC4 widened from "present in the worktree" to
+  "present in the target", because the reachable case leaves the pre-run blob in the INDEX with no
+  worktree file and the rev-1 wording stayed green over it. AC2 amended: a `withdrawn` verdict
+  writes none of the six `ROLLBACK_FIELDS` keys, so this run's values and the pre-run ones are equal
+  and the revert's placement cannot be read off the receipt. Every line number dropped for its
+  symbol. S1 also notes that the hoisted statement retires the `attributes` branch's own copy of it.
 
 ## 10. Reuse audit
 

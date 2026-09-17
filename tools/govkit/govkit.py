@@ -8159,6 +8159,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # anyway. The list is (path, why) rather than a bare path because the order prints the
             # refusing operation, and a second lookup to recover it is a second place to get wrong.
             unrestored: list[tuple[str, str]] = []
+            # DEPL-cMendedVintage-18 S3. THE WITHDRAWN PATHS WHOSE ROW WAS KEPT ANYWAY, so the order
+            # can say what is true of them. The `unrestored` sentence below is written for a path
+            # this run REWROTE; a path this run DELETED and could not put back is a different fact
+            # and gets a different sentence, read off the same predicate that decided the row.
+            kept_withdrawn: set[str] = set()
             # DEPL-cMendedVintage-10 S2. THE ATTRIBUTES ENTRY JOINS EVERY KIT'S ROLLBACK, because it
             # belongs to no kit: the block gov wrote is the UNION over every claimed kit, so there is
             # no one kit whose rollback owns it. A second restore is idempotent — the same pre-run
@@ -8281,8 +8286,25 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # which costs the operator a re-offer they will not get -- stated in the order,
                 # because a receipt that agrees with the tree beats one that re-offers work over an
                 # unrepaired path.
+                # DEPL-cMendedVintage-18 S1. THE REMOVAL IS NOT THE REVERT, and `-2` gated the two
+                # together on the assumption that no snapshot entry is also a withdrawn row.
+                # `_touching` admits `withdrawn` whenever `--write-withdrawals` is passed, so on
+                # those runs the assumption is false. `withdrawn_rows` is the DELETE list — the
+                # filter far below STRIPS every row still in it from the receipt — so taking the row
+                # OUT of it is what SAVES the row, and the gate that is right for the revert is
+                # exactly wrong for this. MEASURED on a `--write-withdrawals` run whose rollback
+                # `checkout-index` a required smudge filter refused: the row vanished from the
+                # receipt while `update-index` had just re-staged the pre-run blob at that path, so
+                # the target carried gov's bytes and its receipt admitted to none of them. It now
+                # runs for every entry that reached this tail, whatever the path loop decided.
+                _was_withdrawn = s["row"] in withdrawn_rows
+                if _was_withdrawn:
+                    withdrawn_rows.remove(s["row"])
+
                 _left = [p for p in s["paths"] if p in written_paths and p not in restored]
                 if _left:
+                    if _was_withdrawn:
+                        kept_withdrawn.update(_left)
                     continue
 
                 # DEPL-cMendedVintage-10 S2. THE SYNTHESIZED ROW GOES BACK WHOLE. The three fields
@@ -8297,11 +8319,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     # The withdrawal path drops this row by appending it here, and the filter that
                     # consumes the list runs long after this loop — so restoring the dict's contents
                     # without also un-dropping it would put the block back on disk and still delete
-                    # the row that says gov owns it. The generic branch below does this for a
-                    # `table` row and returns before reaching it, which is why the line is repeated
-                    # rather than shared.
-                    if s["row"] in withdrawn_rows:
-                        withdrawn_rows.remove(s["row"])
+                    # the row that says gov owns it. DEPL-cMendedVintage-18 hoisted that un-drop
+                    # above the `_left` gate, where one statement now serves this branch and the
+                    # table one alike; this branch carried its own copy of it until then.
                     s["row"].clear()
                     s["row"].update(s["fields"])
                     continue
@@ -8315,8 +8335,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         s["row"][k] = s["fields"][k]
                     else:
                         s["row"].pop(k, None)
-                if s["row"] in withdrawn_rows:
-                    withdrawn_rows.remove(s["row"])
 
             # The three lists are what the closing line counts, and a rolled-back path is not a
             # write that stands. Both spellings of a restored rename leave `renamed` together, so
@@ -8348,9 +8366,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # reverted with the rest of its entry -- printing it under the sentence below would
                 # claim the bytes are this run's and that the row stayed forward, and both are
                 # false. The report and the revert read one predicate or they disagree.
+                # DEPL-cMendedVintage-18 S3. A THIRD SENTENCE, because a path this run DELETED is
+                # not a path this run REWROTE and the restore sentence is false of it: nothing was
+                # left "at this run's values" -- the run's value for a withdrawal was the file's
+                # absence, and the row it would have dropped is the only record of the bytes still
+                # staged there.
                 + "".join(
                     f"NOT restored {p} — {_why_u}; "
-                    + ("the rollback did not return it, so its receipt row was LEFT at this run's "
+                    + ("this run WITHDREW it and the rollback could not finish putting it back, so "
+                       "its receipt row was KEPT rather than dropped — the reason above says how "
+                       "far the restore got, and that row is the only thing still naming this "
+                       "path\n"
+                       if p in kept_withdrawn else
+                       "the rollback did not return it, so its receipt row was LEFT at this run's "
                        "values rather than claiming a pre-run state the tree does not have\n"
                        if p in written_paths else
                        "nothing was written for it and its receipt row was reverted with the rest "

@@ -6761,6 +6761,75 @@ user_skills = "/tmp/gk-fake-skills"
               == _row2a["tools/demo/conf.txt"].get("sha256"),
               str(_row2b.get("tools/demo/conf.txt"))[:400])
 
+        # ---- DEPL-cMendedVintage-18. A WITHDRAWAL THE ROLLBACK COULD NOT UNDO. `-2` gated the
+        # ---- `withdrawn_rows` removal together with the `ROLLBACK_FIELDS` revert, on the
+        # ---- assumption that no snapshot entry is also a withdrawn row. `--write-withdrawals`
+        # ---- makes that assumption false, and `withdrawn_rows` is the DELETE list rather than a
+        # ---- keep-list, so the shared gate DELETED the receipt row for a path the rollback could
+        # ---- not return.
+        # ----
+        # ---- THE MEASURED RED, on this fixture against the engine with this unit not landed: the
+        # ---- post-run receipt carried NO row for `tools/demo/gone.txt` while `git ls-files` still
+        # ---- named it, because the rollback's `update-index` had already re-staged the pre-run
+        # ---- blob before `checkout-index` refused. Gov's bytes, staged in the target, claimed by
+        # ---- nothing — `-15`'s shape one layer down.
+        # ----
+        # ---- THE SPEC'S OWN FIXTURE DOES NOT REACH IT and was not used. A directory planted at the
+        # ---- withdrawn path is DIRTY against the index, which `-12`'s claimed-path guard refuses
+        # ---- before a byte moves; committing the directory instead takes the blob out of the
+        # ---- index, which sends the rollback down its `entry is None` branch and it restores
+        # ---- cleanly. The smudge sabotage `-2` measured is what reaches the branch.
+        _18_GUARD = _2_GUARD_SABOTAGE.replace("victim.txt", "gone.txt")
+        assert "gone.txt filter=boom" in _18_GUARD, "the sabotage must name the WITHDRAWN path, or " \
+                                                    "the arms below grade a rollback that succeeded"
+        _g18, _ = build_verify_gov("withdrawn", {
+            "demo": {"guard": _18_GUARD,
+                     "files": {"conf.txt": _14_CONF_A, "gone.txt": "gov ships this, for now\n"}},
+        })
+        _t18 = build_verify_target(_g18, "withdrawn-t", ["demo"])
+        (_t18 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+                                                          newline="\n")
+        settle(_t18, "the adopter edits LEGACY")
+        (_g18 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+                                                          newline="\n")
+        (_g18 / "tools" / "demo" / "gone.txt").unlink()
+        git(_g18, "add", "-A")
+        git(_g18, "commit", "-qm", "B")
+        _row18a = {f["path"]: dict(f) for f in json.loads(
+            (_t18 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]}
+        _w18 = run_in_gov(_g18, "update", "--target", str(_t18), "--write", "--write-withdrawals")
+        _row18b = {f["path"]: dict(f) for f in json.loads(
+            (_t18 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]}
+        _ord18 = read_text14(_t18 / ".governance" / "outbox" / "update-rollback-demo.md")
+        check("[-18] LIVENESS the fixture really WITHDRAWS a row and really reaches the "
+              "`checkout-index` refusal — without both, every arm below grades a rollback that "
+              "never failed over a row that was never in the delete list",
+              "withdrawn          [" in _w18.stdout
+              and "`git checkout-index` could not write the worktree file"
+              in (_w18.stdout + _w18.stderr),
+              _w18.stdout[-1500:] + _w18.stderr[-1500:])
+        check("[-18] AC1 the row for the withdrawn path the rollback could not return is STILL in "
+              "the receipt — the removal from the delete list is not the revert and no longer "
+              "shares its gate",
+              "tools/demo/gone.txt" in _row18b, str(sorted(_row18b)))
+        check("[-18] AC1 ...and the pre-run blob really is staged at that path, which is what the "
+              "kept row names: dropping the row left gov's bytes in the target claimed by nothing",
+              "tools/demo/gone.txt" in gout(_t18, "ls-files").split(), gout(_t18, "ls-files"))
+        check("[-18] AC2 the kept row carries this run's values over every ROLLBACK_FIELDS key, "
+              "and for a withdrawal those ARE the pre-run ones: the run writes none of the six, so "
+              "the revert is a no-op here and its placement cannot be read off the receipt at all "
+              "(measured; spec rev-2 amends AC2 to say so)",
+              all(_row18b.get("tools/demo/gone.txt", {}).get(_k)
+                  == _row18a["tools/demo/gone.txt"].get(_k) for _k in GK14.ROLLBACK_FIELDS),
+              str(_row18b.get("tools/demo/gone.txt"))[:400])
+        check("[-18] AC3 the order says the withdrawal did not complete and the row was KEPT, "
+              "rather than the rewrite branch's sentence about bytes that were never rewritten",
+              "NOT restored tools/demo/gone.txt" in _ord18 and "this run WITHDREW it" in _ord18
+              and "receipt row was KEPT rather than dropped" in _ord18, _ord18)
+        check("[-18] AC3 ...and the rewrite sentence appears nowhere in this order, because the "
+              "only path it could describe is the one the third branch just took",
+              "LEFT at this run's values" not in _ord18, _ord18)
+
         # ---- AC6: ONLY TOUCHED KITS RUN, TWICE EACH. Three claimed kits, one moving rows. The arm
         # ---- fails both against a draft that baselines every claimed kit — six subprocesses, the
         # ---- whole-bar behaviour §3 refuses — and against one that skips the baseline, which is
@@ -11413,6 +11482,62 @@ user_skills = "/tmp/gk-fake-skills"
               any("removed 0 stale conflict order(s)" in ln
                   for ln in read_reap_lines14r(_w14w.stdout)) and len(_o14w) == 2,
               str(read_reap_lines14r(_w14w.stdout)))
+
+        # ---- DEPL-cMendedVintage-18 S4. THE INVARIANT ONE LEVEL UP, over every arm above that
+        # ---- produced a rollback order rather than over this unit's own fixture. No path may end
+        # ---- a run both absent from the receipt's `files[]` and still PRESENT in the target: the
+        # ---- next `update` cannot classify those bytes and `check` reports them as an unclaimed
+        # ---- source, which is the shape `-15` closed for the `.gitattributes` block and `-2` left
+        # ---- behind for a withdrawal. Asserting it on the one fixture written to satisfy it would
+        # ---- certify that fixture and say nothing about the arms that already existed.
+        # ----
+        # ---- PRESENT MEANS THE INDEX TOO, and that half is what does the work rather than a
+        # ---- second read for symmetry. MEASURED on this unit's own fixture: `update-index`
+        # ---- re-staged the pre-run blob and `checkout-index` then refused, so the WORKTREE file
+        # ---- was absent and the bytes sat in the index. A worktree-only invariant stays green
+        # ---- over the exact defect this unit closes.
+        # ----
+        # ---- THE POPULATION IS DISCOVERED, never listed: every rollback order under every target
+        # ---- this suite built, and the paths graded are the ones that order itself names. A new
+        # ---- arm that rolls anything back is covered without being added to anything.
+        _18_ORDERS = [_q for _d in ("", "*/", "*/*/", "*/*/*/")
+                      for _q in tmp.glob(_d + ".governance/outbox/update-rollback-*.md")]
+        check("[-18] S4 LIVENESS the sweep found rollback orders to grade at all — over an empty "
+              "population it would report a reassuring zero indistinguishable from a clean run",
+              len(_18_ORDERS) >= 3, f"{len(_18_ORDERS)} order(s) under the scratch root")
+        _18_VERBS = ("NOT restored ", "left alone ", "restored ", "removed ")
+        _18_LOSS: list[str] = []
+        _18_SKIP: list[str] = []
+        for _o18 in _18_ORDERS:
+            _tg18 = _o18.parents[2]
+            _rc18 = _tg18 / ".governance" / "install.json"
+            if not _rc18.is_file():
+                _18_SKIP.append(f"{_tg18.name}: no receipt")
+                continue
+            try:
+                _cl18 = {_f.get("path") for _f
+                         in json.loads(_rc18.read_text(encoding="utf-8")).get("files", [])}
+            except ValueError:
+                # An arm that deliberately corrupted its own receipt. Announced below rather than
+                # skipped quietly: a skip that looks like a pass is indistinguishable from coverage.
+                _18_SKIP.append(f"{_tg18.name}: receipt is not JSON")
+                continue
+            for _ln18 in _o18.read_text(encoding="utf-8").splitlines():
+                _vb18 = next((_v for _v in _18_VERBS if _ln18.startswith(_v)), None)
+                if _vb18 is None:
+                    continue
+                _fs18 = _ln18[len(_vb18):].split(" — ")[0].split()
+                if not _fs18 or _fs18[0] in _cl18:
+                    continue
+                if (_tg18 / _fs18[0]).exists() or gout(_tg18, "ls-files", "--", _fs18[0]).strip():
+                    _18_LOSS.append(f"{_tg18.name}/{_o18.name}: {_fs18[0]}")
+        check("[-18] AC4 over EVERY rollback order this suite produced, no path that order names "
+              "ends absent from the receipt while the target still holds it in the worktree or the "
+              "index", not _18_LOSS, "; ".join(_18_LOSS[:8]))
+        # NOT a `check`: an arm whose condition is a constant is green by construction and this is a
+        # REPORT, not an assertion. The row above is only as wide as this line says it is.
+        print(f"     [-18] S4 sweep: {len(_18_ORDERS)} order(s) graded, ungradable — "
+              + ("; ".join(_18_SKIP) or "none"))
 
     print()
     if FAILURES:

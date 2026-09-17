@@ -1074,6 +1074,12 @@ vintage and will not re-offer the work. Where `git checkout-index` is the call t
 index was already reverted to the pre-run blob before it ran, so `git status` shows a change at that
 path you did not make.
 
+Where the path was one this run WITHDREW — a `--write-withdrawals` run, whose rollback then could not
+put the deleted file back — the line says so instead, and says that its receipt row was KEPT rather
+than dropped. A completed withdrawal drops the row; one the rollback left half-undone must not,
+because that row is then the only thing naming bytes the target still holds. Expect the path to
+appear in `git status` and expect the next `update` to classify it from where it actually is.
+
 ### `gate-lint` withdrew its seeded registry — a receipt already carrying that row keeps it silently
 
 The tree-scan leg used to read a registry gov SEEDED under `{memory_root}/project/`. That rule is
