@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-10 — a superseded dispatch declaration is not an open pass
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 19
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
@@ -21,9 +21,9 @@ that abandoned row still names. Close a row that a later row for the same unit s
 
 ## 2. Scope (IN)
 
-- **S1** In `check_pass_open`, a dispatch row is CLOSED when a later dispatch row exists for the same
-  `(group, unit)` pair. The superseding row is then the one whose openness decides the pass, by the
-  predicate that already exists. Observed by AC1.
+- **S1** In `check_pass_open`, a dispatch row is CLOSED when a dispatch row carrying a DIFFERENT set
+  follows it for the same `(group, unit)` pair. The last such row is then the one whose openness
+  decides the pass, by the predicate that already exists. Observed by AC1.
 - **S2** The announcement that fires when the sibling set is empty keeps firing on the same
   condition, so a proof over nobody still says so. A row closed by S1 is not a sibling. Observed by
   AC3.
@@ -79,9 +79,9 @@ Supersession is structural — a second declaration exists or it does not.
   `check_pass_open` reads the run-state file it is already handed.
 - perf / scale — one extra scan of the dispatch rows per row examined, over a file that holds tens of
   rows in the largest build this repo has run. No new process and no new read.
-- error / empty / loading states — a row with no later sibling behaves exactly as at BASE, including
-  the unresolvable-anchor case that leaves a pass OPEN by choice. A run-state file holding a single
-  dispatch row is the ordinary case and is unchanged.
+- error / empty / loading states — a row nothing supersedes behaves exactly as at BASE, including the
+  unresolvable-anchor case that leaves a pass OPEN by choice. A run-state file holding a single
+  dispatch row is the ordinary case and is unchanged, and so is one holding only repeats of one set.
 - observability — the existing empty-sibling announcement is the observable, and S2 keeps it firing
   on the same condition so a proof over nobody still says so.
 - risks — the real risk is closing a row that nothing supersedes, which would let two genuinely
@@ -130,6 +130,10 @@ Supersession is structural — a second declaration exists or it does not.
   criterion as written had no true premise on any tree it would ever be graded against. The
   disagreement it exists to catch is per-unit and was reproduced per-unit on
   `DEPL-cMendedVintage-15`. No scope item, gate or other criterion moved.
+- rev-3 · 2026-09-17 · editorial, from this unit's own bug-class checklist run. S1 and section 5's
+  empty-states bullet still read "a LATER row" and "no later sibling", which rev-2's section 4
+  falsifies for the identical re-declaration: a later row exists and supersedes nothing. Both now
+  spell the condition section 4 implements. No criterion, gate or non-goal moved.
 
 ## 10. Reuse audit
 
