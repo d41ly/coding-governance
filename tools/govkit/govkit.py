@@ -29,6 +29,7 @@ EVERY REFUSAL PRINTS ITS OWN MESSAGE AND IS COUNTED. Exit 0 clean, 1 findings, 2
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import io
 import json
@@ -1032,6 +1033,111 @@ class Report:
 
 
 # ------------------------------------------------------------------------------------- selfcheck
+# ---- DEPL-cMendedVintage-23 S3. THE MUTATORS, and they are a closed list rather than a guess.
+# ---- Every name here moves or destroys bytes at the path it is called on. `open` is deliberately
+# ---- absent: its read mode is the common case here, and a predicate that reds a read is the
+# ---- predicate that gets waived rather than fixed.
+ROOT_JOIN_MUTATORS = ("write_text", "write_bytes", "unlink", "mkdir", "touch", "rename",
+                      "replace", "rmdir", "symlink_to", "hardlink_to", "chmod")
+# ---- Module-level functions that WRITE the path handed to them. `write_block` is not one: it
+# ---- returns a string and the caller does the writing, so listing it would grade the wrong line.
+ROOT_JOIN_WRITERS = ("write_atomic",)
+
+
+def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
+    """Every join of the target root onto a mapping value that reaches a write ungraded.
+
+    WHAT THIS ASSERTS, exactly: a statement binding a name to `target / <mapping>[<key>]`, where
+    that name then reaches a mutating call before anything rebinds it, and where the joined
+    expression carries no containment check in either of the two spellings this engine uses — the
+    helper by name, or the inline resolve-and-compare on the bound name. Returns one row per
+    offender as `(line, bound name, operand source)`; an empty list is the clean state.
+
+    WHAT THIS DOES NOT ASSERT, stated here because a structural check that oversells itself is
+    worse than no check. It is silent about every write whose destination is not a root-join on a
+    mapping subscript — a join on a local, a join built in pieces, a path handed in as an argument.
+    It does not assert that the engine contains every write; it asserts one shape, which is the
+    shape the escape this arm was written for arrived in, twice.
+
+    AND IT PROVES REACHABILITY, NOT DOMINANCE. The containment evidence is searched module-wide, so
+    a join whose expression is graded in a DIFFERENT function counts as guarded. That is a
+    deliberate width: one live call site grades its expression from the caller's own pre-write pass,
+    and scoping the evidence to the enclosing function would red it — correct code, on the arm's
+    first run, which is how a structural arm gets waived instead of obeyed.
+
+    THE WIDTH WAS MEASURED BEFORE IT WAS WIRED, over this engine's own source. Grading every
+    `target / <non-literal>` join reds 31 of 33 correct sites. Grading every subscript join reds 7
+    of 10 — among them the write loop's own containment, which is spelled inline and would be
+    reported for not naming the helper. Requiring the bound name to reach a write leaves four sites
+    graded, two of them the finding this arm was written for and no false red.
+    """
+    tree = ast.parse(src)
+
+    def read_join(node: ast.AST) -> ast.AST | None:
+        """The right operand of a `target / X` join, through any trailing attribute calls."""
+        while isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            node = node.func.value
+        if (isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div)
+                and isinstance(node.left, ast.Name) and node.left.id == "target"):
+            return node.right
+        return None
+
+    def read_segment(node: ast.AST) -> str:
+        return ast.get_source_segment(src, node) or ""
+
+    funcs = [n for n in ast.walk(tree) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    # The GRADED expressions, module-wide, each reduced through one wrapping call so that
+    # `demand_contained_dest(str(gr["file"]), ...)` grades `gr["file"]`.
+    graded: set[str] = set()
+    for n in ast.walk(tree):
+        if (isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                and n.func.id == "demand_contained_dest" and n.args):
+            arg = n.args[0]
+            graded.add(read_segment(arg))
+            if isinstance(arg, ast.Call) and arg.args:
+                graded.add(read_segment(arg.args[0]))
+
+    out: list[tuple[int, str, str]] = []
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Assign) and len(node.targets) == 1
+                and isinstance(node.targets[0], ast.Name)):
+            continue
+        operand = read_join(node.value)
+        if not isinstance(operand, ast.Subscript):
+            continue
+        name, op_src = node.targets[0].id, read_segment(operand)
+        fn = max((f for f in funcs if f.lineno <= node.lineno <= (f.end_lineno or f.lineno)),
+                 key=lambda f: f.lineno, default=None)
+        if fn is None:
+            continue
+        # THE BINDING'S OWN WINDOW, not the whole function body. One function here binds `dp` five
+        # times over as many loops; crediting every `dp.write_text` in it to every binding reported
+        # three read-only probes as unguarded writes. The window ends at the next rebinding.
+        stop = fn.end_lineno or node.lineno
+        for n in ast.walk(fn):
+            lines = [t.lineno for t in getattr(n, "targets", []) if isinstance(t, ast.Name)
+                     and t.id == name] if isinstance(n, ast.Assign) else []
+            tgt = getattr(n, "target", None) if isinstance(n, (ast.For, ast.comprehension)) else None
+            if isinstance(tgt, ast.Name) and tgt.id == name:
+                lines.append(getattr(n, "lineno", stop))
+            for ln in lines:
+                if node.lineno < ln < stop:
+                    stop = ln
+        writes, inline = False, False
+        for n in ast.walk(fn):
+            if not (isinstance(n, ast.Call) and node.lineno <= getattr(n, "lineno", 0) < stop):
+                continue
+            f = n.func
+            if isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id == name:
+                writes = writes or f.attr in ROOT_JOIN_MUTATORS
+                inline = inline or f.attr == "relative_to"
+            elif isinstance(f, ast.Name) and f.id in ROOT_JOIN_WRITERS:
+                writes = writes or any(isinstance(a, ast.Name) and a.id == name for a in n.args)
+        if writes and not inline and op_src not in graded:
+            out.append((node.lineno, name, op_src))
+    return sorted(out)
+
+
 def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r = Report()
     reg_path = root / "tools" / "govkit" / "registry.toml"
@@ -2192,6 +2298,27 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
 
     r.note(f"surface {len(surface)} tracked path(s) · {len(descs)} entr(y|ies) · "
            f"{len(exempt_paths)} exemption(s) · {len(unowned)} unclaimed")
+
+    # ---- 9: DEPL-cMendedVintage-23 S3. NO WRITE LEAVES THE TARGET ON A RECEIPT-SUPPLIED PATH.
+    #         The finding this closes was two joins of the target root onto a value read out of the
+    #         target's own committed receipt, written with no containment check while the ROLLBACK
+    #         for the same row had one. Two calls close those two sites and say nothing about the
+    #         next write site somebody adds; this arm is the half that outlives them.
+    #
+    #         OVER THIS FILE'S OWN SOURCE, derived from the module rather than named by a literal,
+    #         so an installed copy grades the copy that will actually run. The predicate, its two
+    #         admitted spellings of a containment check, and the widths it was measured against are
+    #         `scan_uncontained_writes`'s own docstring, which also states what it does NOT cover.
+    #         The count is DERIVED at every run; no figure for it is written anywhere.
+    _self_src = pathlib.Path(__file__).resolve().read_text(encoding="utf-8")
+    _escapes = scan_uncontained_writes(_self_src)
+    for _ln, _nm, _op in _escapes:
+        r.fail(f"line {_ln} joins the target root onto the receipt-supplied `{_op}`, binds it to "
+               f"`{_nm}` and writes through it with no containment check — a value this engine does "
+               f"not own reaching a write is how gov's bytes land outside the repository the "
+               f"operator named. Grade it with `demand_contained_dest` before the join, or resolve "
+               f"and compare against the target root before the write")
+    r.note(f"root-join writes on receipt-supplied values: {len(_escapes)} ungraded")
     return r.emit()
 
 
@@ -6655,6 +6782,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # a `len(...) == 0` test is the ambiguity this unit exists to remove, re-introduced one layer
     # down. They are mutually exclusive by construction: one `attributes` row, one arm, one exit.
     pins_drop: dict | None = None
+    # DEPL-cMendedVintage-23 S2. THE ONE JOIN, carried. This row's path was joined onto the target
+    # root THREE times in this verb — once to classify, once to rewrite, once to withdraw — and two
+    # of the three were unguarded. The duplication was the defect's carrier rather than an
+    # incidental untidiness: a containment check added at one join says nothing about the other two.
+    # The classification arm below grades the path and joins it exactly once, here; both write sites
+    # read this name. Non-None whenever `pins_write` or `pins_drop` is, because all three are set in
+    # that one arm below the one guard.
+    pins_path: pathlib.Path | None = None
     # DEPL-cMendedVintage-19 S1. THE RE-RESOLUTION'S MEMO, one entry per kit, because un-gating it
     # below moves the call from "once per row of a schema-1 receipt" to "once per row of every
     # receipt". The resolution depends on the kit and on nothing else in the row, and a target with
@@ -6752,6 +6887,33 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # write phase, where `--write` has already been tested. A write here would put bytes on disk
         # during a read-only preview, which is the one thing this verb's default exists to prevent.
         if how == "pins":
+            # DEPL-cMendedVintage-23 S1. GRADED FIRST, above every line that reads or joins, and
+            # above the empty-pin exit two branches down. `row["path"]` comes off the target's own
+            # committed, hand-editable, text-merged receipt, and this verb joins it onto the target
+            # root and WRITES there. With `../../evil` in that field `find_block` finds no marker
+            # pair, the verdict reads `pins-moved`, and `write_block` creates a file outside the
+            # repository the operator named, at exit 0. The rollback for this exact row already
+            # calls this helper, so the engine guarded the undo of a write it did not guard.
+            #
+            # HERE AND NOT AT THE JOIN. The withdrawal branch sets its carrier and `continue`s
+            # ABOVE the join, so a guard written where the join sits — the obvious placement —
+            # covers the rewrite and misses the withdrawal entirely. And not in the receipt-wide
+            # preamble either: a rule whose role is not landable takes a receipt row whose
+            # destination legitimately sits outside the target, so grading every row would refuse an
+            # adopter whose configuration is correct. The `pins` disposition is the narrowest scope
+            # that holds the whole defect.
+            #
+            # BEFORE THE CLASSIFICATION READ, not merely before the write, and on the read-only
+            # preview as well. The read below is what DECIDES whether a write happens; a guard that
+            # lets the decision be computed from bytes in another tree and only stops the
+            # consequence is placed one step too late, and the preview an operator approves would
+            # still report a confident verdict about a file gov was never pointed at.
+            #
+            # THE `where` NAMES THE RECEIPT. The helper's own refusal text ends by blaming a
+            # `prefix` in the target's deploy.toml, which is false for this caller; this argument is
+            # the part that sends the operator to the file actually carrying the value.
+            demand_contained_dest(row["path"], "the `attributes` row of the target's own receipt")
+            pins_path = target / row["path"]
             _pins = lf_pins(descs, [e for e in claimed if e in descs],
                             lambda e, dd: target_context(target, deploy, e, dd))
             # DEPL-cMendedVintage-17 S1/S2. THE EMPTY PIN SET LEAVES HERE, above every line that
@@ -6787,8 +6949,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 pins_drop = row
                 continue
             _om, _cm, _text = lf_pin_block(_pins)
-            _ga = target / row["path"]
-            _cur = _ga.read_text(encoding="utf-8", errors="replace") if _ga.is_file() else ""
+            _cur = pins_path.read_text(encoding="utf-8", errors="replace") \
+                if pins_path.is_file() else ""
             # LINE indices, inclusive of both markers -- not character offsets. Slicing the string
             # with them silently produced a prefix that never matched, so the `current` arm could
             # not fire and every target read `pins-moved` forever. Caught by observing the arm on a
@@ -7231,11 +7393,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     _ga_removed = False
     if pins_write is not None:
         _pw_row, _pw_om, _pw_cm, _pw_text, _pw_pats = pins_write
-        _pw_path = target / _pw_row["path"]
-        _pw_cur = _pw_path.read_text(encoding="utf-8", errors="replace") \
-            if _pw_path.is_file() else None
+        # DEPL-cMendedVintage-23 S2. `pins_path`, not a second join. The classification arm above
+        # graded this row's path and joined it once; re-joining it here is how this write site came
+        # to be unguarded while the rollback for the same row was not.
+        _pw_cur = pins_path.read_text(encoding="utf-8", errors="replace") \
+            if pins_path.is_file() else None
         _pw_new, _pw_mode = write_block(_pw_cur, _pw_om, _pw_cm, _pw_text, "append")
-        _pw_path.write_text(_pw_new, encoding="utf-8", newline="\n")
+        pins_path.write_text(_pw_new, encoding="utf-8", newline="\n")
         subprocess.run(["git", "-C", str(target), "add", "--", _pw_row["path"]],
                        capture_output=True, check=False)
         # THE RECEIPT ROW FOLLOWS THE BYTES. `mode` and `block_sha256` describe what is on disk, and
@@ -7267,15 +7431,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- as it does for `apply`: two gov blocks in one file is a state to refuse over, not to pick
     # ---- a winner from.
     if pins_drop is not None:
-        _pd_path = target / pins_drop["path"]
+        # DEPL-cMendedVintage-23 S2. The withdrawal's own join is gone for the same reason as the
+        # rewrite's, and this is the branch that made the guard's PLACEMENT load-bearing: the arm
+        # above sets `pins_drop` and leaves before it would have reached a guard written at a join.
         _pd_om, _pd_cm, _ = lf_pin_block([])
-        _pd_cur = _pd_path.read_text(encoding="utf-8", errors="replace") \
-            if _pd_path.is_file() else None
+        _pd_cur = pins_path.read_text(encoding="utf-8", errors="replace") \
+            if pins_path.is_file() else None
         _pd_span = find_block(_pd_cur, _pd_om, _pd_cm) if _pd_cur is not None else None
         if _pd_span is not None:
             _pd_lines = _pd_cur.split("\n")
-            _pd_path.write_text("\n".join(_pd_lines[:_pd_span[0]] + _pd_lines[_pd_span[1] + 1:]),
-                                encoding="utf-8", newline="\n")
+            pins_path.write_text("\n".join(_pd_lines[:_pd_span[0]] + _pd_lines[_pd_span[1] + 1:]),
+                                 encoding="utf-8", newline="\n")
             subprocess.run(["git", "-C", str(target), "add", "--", pins_drop["path"]],
                            capture_output=True, check=False)
             _ga_removed = True

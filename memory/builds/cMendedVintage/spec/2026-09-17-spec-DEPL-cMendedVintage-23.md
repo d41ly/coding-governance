@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-23 — the lf-pin write is contained before the receipt path reaches the root
 
-**Status:** SPECCED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 33
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 33
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-23-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-23-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-23-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-23-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -120,9 +121,14 @@ and they do not behave alike.
 
 | Width | Population | Hits | False reds |
 |-------|-----------|------|------------|
-| 1 — any `target /` join with a non-literal operand | 34 | 33 | 31 |
+| 1 — any `target /` join with a non-literal operand | 33 | 33 | 31 |
 | 2 — operand is a mapping subscript | 10 | 9 | 7 |
-| 3 — subscript operand whose bound name reaches a write | 3 | 2 | 0 |
+| 3 — subscript operand whose bound name reaches a write | 4 | 2 | 0 |
+
+*rev-2 corrects two figures in this table against a RE-MEASUREMENT on the tree this unit actually
+landed in. Width 1's population is 33, not 34 — rev-1 counted a wrapped join twice, because a walk
+of the syntax tree meets `(target / X).resolve()` as both a call and a join. Width 3's population is
+four, not three, and that correction is section 9's second line.*
 
 Width 1 is not a predicate, it is a rewrite. Its population holds `target / prefix`,
 `target / dest` and `target / p`, whose operands are locals a reader cannot resolve to a
@@ -138,16 +144,37 @@ different function and against the string rather than the joined path. `u["dest"
 graded upstream by `demand_contained_rows` at `:5046`. The remaining four are read-only existence and
 digest probes in `cmd_check` and `cmd_apply`, where nothing is written and a refusal buys nothing.
 
-Width 3 is what S3 adopts. Its population is three: `:2636`, whose `rf` reaches `write_atomic` at
-`:2768` and which passes because `gr["file"]` is graded at `:3964`; and `:7209` and `:7245`, which
-fail. Two hits, both of them this finding, no false red. It would have reddened this diff.
+Width 3 is what S3 adopts. **rev-2: its population is FOUR, not three, and rev-1 named the wrong
+reason for the fourth.** `:2636`, whose `rf` reaches `write_atomic` and which passes because
+`gr["file"]` is graded in the pre-write pass; `:7209` and `:7245`, which fail; and the write loop's
+own `dp`, which rev-1 claimed leaves the population because "the loop's writes travel under other
+names". They do not. That binding reaches `dp.unlink()` some 250 lines further down the same loop
+with nothing rebinding it in between, so it STAYS in the population and PASSES on its inline
+resolve-and-compare. Two hits, both of them this finding, no false red. It would have reddened this
+diff.
+
+The correction is favourable and is the reason both spellings of the check had to count: the arm
+covers that loop's unlink rather than being silent about it, and a predicate keyed on the helper's
+NAME would have reported the one join in this verb that already does the right thing.
+
+**rev-2 also records where the evidence is searched, because that is the arm's real limit.** It is
+searched MODULE-WIDE, not within the enclosing function. `:2636`'s join and the call that grades its
+operand sit in different functions, so a function-scoped rule reds correct code on the arm's first
+run — which is how a structural arm gets waived rather than obeyed. The price is that the arm proves
+the expression is graded SOMEWHERE in the engine, not that the grading dominates the write. That is
+written into the predicate's own docstring rather than left for a reader to discover.
 
 What width 3 does NOT see, stated plainly because a structural arm that oversells itself is worse
 than no arm: it is silent about every write whose destination is not a root-join on a mapping
-subscript. `:7276` leaves the population because `dp` is bound only to be containment-tested and the
-loop's writes travel under other names, so the arm proves nothing about that loop in either
-direction — what covers it is the inline check itself. The arm asserts one shape. It does not assert
-that the engine contains every write, and its own header says so.
+subscript — a join on a local, a join built in pieces, a path handed in as an argument. The arm
+asserts one shape. It does not assert that the engine contains every write, and its own header says
+so.
+
+**The first draft of this predicate was wrong in the way `DEPL-cMendedVintage-21`'s was**, and the
+run-it-over-the-real-tree rule is what caught it. Crediting every mutating call in a function to
+every binding of that name reported three read-only probes as unguarded writes, because one function
+binds `dp` five times across as many loops. The window has to end at the next rebinding. Both lists
+— the hits and the near-misses at every width — are in this unit's acceptance ledger.
 
 ### Alternatives rejected
 
@@ -216,7 +243,7 @@ retargeted. `tools/govkit/selftest.py` — two fixture arms. No other file.
 - **AC4** — When
   `python tools/govkit/govkit.py selfcheck`
   runs over this repository, the structural arm reports zero unguarded write-reaching root-joins, and
-  it reports two when a bare `target / row["path"]` write join is staged back in. Red when: the arm
+  it reports two when the two bare write joins this unit deleted are staged back in. Red when: the arm
   is written at width 2, where it reds `tools/govkit/govkit.py:7276` for spelling its containment
   inline — a red on correct code, which is the outcome that gets a structural arm waived rather than
   fixed.
@@ -248,6 +275,17 @@ branch and mints no new refusal site.
 - rev-1 · 2026-09-17 · initial draft, authored mid-build after the closing review adjudicated finding
   B2 a BLOCKER. Adopted under the protocol's discovery rule as a blocker between this run and its own
   landing.
+- rev-2 · 2026-09-17 · four corrections, every one from a measurement taken during the build rather
+  than from re-reading rev-1. (a) Section 4's width-1 population is 33, not 34: rev-1 double-counted
+  a join it met twice while walking the syntax tree. (b) Width 3's population is FOUR, not three, and
+  rev-1's stated reason for excluding the fourth — the write loop's own `dp`, said to be "bound only
+  to be containment-tested" — is false: that binding reaches an `unlink` 250 lines later and passes
+  on its inline check. (c) Section 4 now records that the containment evidence is searched
+  module-wide, with the reason and the price, because a function-scoped search reds a correct site.
+  (d) AC4's staged-red names the two joins this unit deleted rather than a `row["path"]` operand that
+  is not what either of them spells. None of the four changes the design: the guard, its placement,
+  the deleted joins and the arm's width are all as rev-1 specified, and the fix was measured to
+  behave exactly as section 5's risk row predicted.
 
 ## 10. Reuse audit
 

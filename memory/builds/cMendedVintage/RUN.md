@@ -315,3 +315,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T15:36:13Z dispatch · item fe780ac3 DEPL-cMendedVintage-23 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-23.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-23-acceptance-ledger.md
 
 2026-09-17T15:36:14Z brief · item DEPL-cMendedVintage-23 · reason 78b0db934718 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-DEPL-cMendedVintage-23-2-build-brief.md
+
+2026-09-17T15:45:49Z dispatch · item 58744686 DEPL-cMendedVintage-23 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-23.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-23-acceptance-ledger.md memory/LIVE.md
+
+2026-09-17T16:15:26Z dispatch · item 58744686 DEPL-cMendedVintage-23 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-23.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-23-acceptance-ledger.md memory/builds/cMendedVintage/README.md
+
+2026-09-17T16:18:42Z dispatch · item 58744686 DEPL-cMendedVintage-23 · reason tools/govkit/govkit.py tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-23.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-23-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/map/generated/symbols.json

@@ -146,12 +146,12 @@ ids TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMend
 | [DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported](spec/2026-09-16-spec-DEPL-cMendedVintage-19.md) | 30 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 31 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [DEPL-cMendedVintage-22 — the gate-leg drift guard compares the target, not gov against itself](spec/2026-09-17-spec-DEPL-cMendedVintage-22.md) | 32 | 2 | CLOSED | rev-2 | 2026-09-17 |
-| [DEPL-cMendedVintage-23 — the lf-pin write is contained before the receipt path reaches the root](spec/2026-09-17-spec-DEPL-cMendedVintage-23.md) | 33 | 2 | SPECCED | rev-1 | 2026-09-17 |
+| [DEPL-cMendedVintage-23 — the lf-pin write is contained before the receipt path reaches the root](spec/2026-09-17-spec-DEPL-cMendedVintage-23.md) | 33 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write](spec/2026-09-17-spec-DEPL-cMendedVintage-24.md) | 34 | 2 | SPECCED | rev-1 | 2026-09-17 |
 | [DEPL-cMendedVintage-25 — the renormalize cleanliness guard reads paths, not whitespace tokens](spec/2026-09-17-spec-DEPL-cMendedVintage-25.md) | 35 | 2 | SPECCED | rev-1 | 2026-09-17 |
 <!-- /gen:build-units -->
 
-Records: 69 bound to this build, across 4 record folder(s).
+Records: 70 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-24 DEPL-cMendedVintage-25.
 

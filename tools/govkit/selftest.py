@@ -15,8 +15,10 @@ Every fixture is a throwaway repo under `mktemp`-equivalent. Nothing is written 
 from __future__ import annotations
 
 import ast as _ast
+import contextlib
 import hashlib
 import importlib.util
+import io
 import json
 import os
 import pathlib
@@ -26,6 +28,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 
 HERE = pathlib.Path(__file__).resolve().parent
 
@@ -1837,6 +1840,161 @@ user_skills = "/tmp/gk-fake-skills"
         pc = run("check", "--target", str(g11f))
         check("[-11] a row DEPL-cMendedVintage-17 withdrew does not read here as a missing block",
               "REMOVED" not in pc.stdout and "attributes blocks:" not in pc.stdout, pc.stdout)
+
+        # ===== DEPL-cMendedVintage-23, the receipt path GRADED before it reaches the root =====
+        # The `attributes` row's `path` is joined onto the target root and WRITTEN, and it comes off
+        # a committed, hand-editable, text-merged file in a repository gov does not own. With `..`
+        # in that field gov wrote outside the operator's repository at exit 0, while the rollback
+        # for the same row was already guarded.
+        #
+        # THE RED IS A FILE OUTSIDE THE FIXTURE, never an exit code. Both branches of the pins arm
+        # exited 0 before the guard landed, so an arm grading the code alone would have passed on
+        # the defect. Every arm below asserts on bytes at a path OUTSIDE the target, and the staged
+        # break beside it is what keeps the assertion from being one nothing could fail.
+        def build_escaping_target(name: str, drop_kit: bool = False) -> pathlib.Path:
+            """A graded target whose `attributes` row points one level ABOVE its own root."""
+            g = build_graded_target(name)
+            _rp = g / ".governance" / "install.json"
+            _d = json.loads(_rp.read_text(encoding="utf-8"))
+            for _f in _d["files"]:
+                if _f.get("role") == "attributes":
+                    _f["path"] = "../ESCAPED-23-" + name
+            if drop_kit:
+                # The SECOND withdrawal shape, as `-11` uses above: a kit dropped from the
+                # receipt's own `kits`, so the arm needs no second gov vintage.
+                _d["kits"] = ["pytest-parallel-guardrails"]
+                _d["files"] = [_f for _f in _d["files"] if _f.get("kit") != "run-gates"]
+                (g / ".governance" / "install.sums").write_text(
+                    "".join(f"{_f['sha256']}  {_f['path']}" + NLp
+                            for _f in _d["files"] if "sha256" in _f),
+                    encoding="utf-8", newline=NLp)
+            _rp.write_text(json.dumps(_d, indent=2), encoding="utf-8", newline=NLp)
+            git(g, "add", "-A"); git(g, "commit", "-qm", "an escaping attributes row")
+            return g
+
+        def run_ungraded_update(*args: str) -> str:
+            """`update`, run against THIS engine with the containment call removed.
+
+            THE LIVENESS OF EVERY ARM BELOW. An assertion that a file is absent afterwards is
+            satisfied by an engine that never writes at all, by a fixture whose receipt was not
+            really edited, and by a verb that refused for some unrelated reason — three ways to pass
+            while grading nothing. Removing exactly the one call and watching the escape LAND tells
+            those apart, and it is the only thing that proves the guard is what stops it.
+
+            IN PROCESS, with `__file__` left pointing at the real engine so the module still finds
+            its own registry. A copy placed anywhere else resolves no root and refuses before it
+            reaches the branch under test — measured, not assumed.
+            """
+            _src = GOVKIT.read_text(encoding="utf-8")
+            _guard = [ln for ln in _src.split(NLp) if "demand_contained_dest(row[" in ln]
+            if len(_guard) != 1:
+                return f"STAGE FAILED: {len(_guard)} candidate guard lines"
+            _mod = types.ModuleType("govkit_ungraded")
+            _mod.__file__ = str(GOVKIT)
+            exec(compile(_src.replace(_guard[0] + NLp, "", 1), str(GOVKIT), "exec"),
+                 _mod.__dict__)
+            _buf = io.StringIO()
+            with contextlib.redirect_stdout(_buf), contextlib.redirect_stderr(_buf):
+                try:
+                    _mod.main([*args, "--to", GOV_PIN])
+                except SystemExit:
+                    pass
+            return _buf.getvalue()
+
+        # ---- AC1 / AC2: the REWRITE branch. The escaped path does not exist, so `find_block` finds
+        # ---- no marker pair, the verdict reads `pins-moved`, and `write_block` CREATES the file.
+        g23a = build_escaping_target("u23a")
+        _land23 = tmp / "ESCAPED-23-u23a"
+        _row23 = [f["path"] for f in json.loads(
+            (g23a / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]
+            if f.get("role") == "attributes"]
+        check("[-23] LIVENESS the fixture's receipt really carries the escaping path, or every arm "
+              "below grades an ordinary target",
+              _row23 == ["../ESCAPED-23-u23a"], str(_row23))
+        check("[-23] LIVENESS ...and it really resolves OUTSIDE the target root",
+              not str((g23a / _row23[0]).resolve()).startswith(str(g23a.resolve()) + os.sep),
+              str((g23a / _row23[0]).resolve()))
+        # THE REAL RUNS GO FIRST and the staged break last, because the staged break is the only
+        # thing here that moves bytes: running it first would leave every arm below grading a
+        # fixture the defect had already written to.
+        pu = run("update", "--target", str(g23a))
+        check("[-23] AC2 the READ-ONLY preview refuses an escaping receipt path rather than "
+              "printing a verdict it computed from a file in another tree",
+              pu.returncode != 0 and "leaves the target repository" in pu.stderr
+              and "pins-moved" not in pu.stdout, (pu.stdout + pu.stderr)[-600:])
+        check("[-23] AC2 ...and the refusal names the RECEIPT, not the `prefix` the helper's own "
+              "message blames — an operator sent to the wrong file has been told nothing",
+              "`attributes` row of the target's own receipt" in pu.stderr, pu.stderr[-400:])
+        pu = run("update", "--target", str(g23a), "--write")
+        check("[-23] AC1 `--write` refuses the same row", pu.returncode != 0
+              and "leaves the target repository" in pu.stderr, (pu.stdout + pu.stderr)[-600:])
+        check("[-23] AC1 ...and NOTHING landed outside the fixture target, which is the assertion "
+              "no exit code and no diff of the target can make",
+              not _land23.exists(), str(_land23))
+        _staged23 = run_ungraded_update("update", "--target", str(g23a), "--write")
+        check("[-23] LIVENESS with the containment call staged OUT, that same run really writes "
+              "gov's block outside the target — the defect reproduced rather than argued, and the "
+              "only thing that tells the two arms above from a verb that writes nothing at all",
+              _land23.is_file() and "govkit:lf-pins" in _land23.read_text(encoding="utf-8"),
+              _staged23[-600:])
+
+        # ---- AC3: the WITHDRAWAL branch, which leaves the arm ABOVE the classification join. A
+        # ---- guard written where the join sits passes AC1 and never runs here.
+        g23c = build_escaping_target("u23c", drop_kit=True)
+        _keep23path = tmp / "ESCAPED-23-u23c"
+        _keep23 = ("# govkit:lf-pins" + NLp + "*.sh text eol=lf" + NLp
+                   + "# /govkit:lf-pins" + NLp + "SENTINEL" + NLp)
+        _keep23path.write_text(_keep23, encoding="utf-8", newline=NLp)
+        pu = run("update", "--target", str(g23c), "--write")
+        check("[-23] AC3 the withdrawal branch refuses the escaping path too, so the guard sits "
+              "above the empty-pin exit rather than at the join",
+              pu.returncode != 0 and "leaves the target repository" in pu.stderr
+              and "pins-withdrawn" not in pu.stdout, (pu.stdout + pu.stderr)[-600:])
+        check("[-23] AC3 ...and the file outside the fixture still holds gov's marker pair and its "
+              "sentinel line, byte for byte",
+              _keep23path.read_text(encoding="utf-8") == _keep23,
+              _keep23path.read_text(encoding="utf-8"))
+        _staged23 = run_ungraded_update("update", "--target", str(g23c), "--write")
+        check("[-23] LIVENESS with the call staged out the withdrawal really SPLICES that same "
+              "outside file — this branch destroys an operator's bytes rather than creating any, "
+              "which no assertion about the target could ever have seen",
+              _keep23path.read_text(encoding="utf-8") != _keep23, _staged23[-600:])
+
+        # ---- AC4: the STRUCTURAL arm, the half that outlives the two calls above. Fed the engine's
+        # ---- own source directly rather than through a scratch tree, because the predicate is a
+        # ---- pure function of text and a fixture repo would only add ways for the arm to pass.
+        _gk23 = govkit_module()
+        _src23 = GOVKIT.read_text(encoding="utf-8")
+        check("[-23] AC4 no write in this engine joins the target root onto a receipt-supplied "
+              "value ungraded",
+              _gk23.scan_uncontained_writes(_src23) == [],
+              str(_gk23.scan_uncontained_writes(_src23)))
+        # THE TWO SITES THE REVIEW CITED, staged back in verbatim. Both write sites now read one
+        # contained name; re-introducing their own joins is the break this arm exists for.
+        _b23 = _src23.replace("        pins_path.write_text(_pw_new,",
+                              '        _pw_path = target / _pw_row["path"]' + NLp
+                              + "        _pw_path.write_text(_pw_new,", 1)
+        _key23 = "_pd_lines[:_pd_span[0]] + _pd_lines[_pd_span[1] + 1:]"
+        _i23 = _b23.find(_key23)
+        if _i23 > 0:
+            _ls23 = _b23.rindex(NLp, 0, _i23) + 1
+            _ln23 = _b23[_ls23:_b23.index(NLp, _i23)]
+            _b23 = (_b23[:_ls23] + " " * 12 + '_pd_path = target / pins_drop["path"]' + NLp
+                    + _ln23.replace("pins_path.write_text", "_pd_path.write_text")
+                    + _b23[_b23.index(NLp, _i23):])
+        check("[-23] AC4 LIVENESS both staged joins really went into the source, or the arm below "
+              "grades text this unit never broke",
+              _b23.count("_pw_path") == 2 and _b23.count("_pd_path") == 2, str(len(_b23)))
+        _hits23 = _gk23.scan_uncontained_writes(_b23)
+        check("[-23] AC4 ...and the arm reports exactly those two, by line and by operand",
+              [h[2] for h in _hits23] == ['_pw_row["path"]', 'pins_drop["path"]'], str(_hits23))
+        # AC4's RED-WHEN, asserted positively. A predicate keyed on the helper's NAME reds the write
+        # loop's own containment, which is spelled inline — a red on correct code, which is how a
+        # structural arm gets waived instead of obeyed.
+        check("[-23] AC4 RED-WHEN the inline resolve-and-compare counts as a containment check, so "
+              "the one join in this verb that already does the right thing is not reported",
+              "dp" not in [h[1] for h in _gk23.scan_uncontained_writes(_src23)],
+              str(_gk23.scan_uncontained_writes(_src23)))
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
