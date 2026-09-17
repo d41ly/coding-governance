@@ -1800,7 +1800,7 @@ user_skills = "/tmp/gk-fake-skills"
             input=b"target-owned\r\n", capture_output=True).stdout.decode().strip()
         git(ap, "update-index", "--add", "--cacheinfo", f"100644,{_crlf_oid},notes.md")
 
-        def _eol_of(t: pathlib.Path, path: str) -> str:
+        def read_eol(t: pathlib.Path, path: str) -> str:
             """The `i/…` field `git ls-files --eol` reports for one path, or the empty string."""
             for ln in subprocess.run(["git", "-C", str(t), "ls-files", "--eol"],
                                      capture_output=True, text=True).stdout.splitlines():
@@ -1809,7 +1809,7 @@ user_skills = "/tmp/gk-fake-skills"
             return ""
 
         check("[-2] AC2 the fixture really carries a CRLF index blob before the run",
-              _eol_of(ap, "notes.md") == "i/crlf", _eol_of(ap, "notes.md"))
+              read_eol(ap, "notes.md") == "i/crlf", read_eol(ap, "notes.md"))
 
         # ---- AC3. THE READ-ONLY RUN FIRST, and it has to be first: it is the only arm that can
         # ---- tell a write placed in the write phase from one placed in the classification loop,
@@ -1821,7 +1821,7 @@ user_skills = "/tmp/gk-fake-skills"
               p.stdout)
         check("[-2] AC3 ...and writes NO byte of .gitattributes", _ga.read_bytes() == _before, "")
         check("[-2] AC3 ...and does not renormalize either",
-              _eol_of(ap, "notes.md") == "i/crlf", p.stdout)
+              read_eol(ap, "notes.md") == "i/crlf", p.stdout)
 
         # ---- THE TWO ARMS DEPL-cMendedVintage-10 FLIPPED. They asserted that `update` NEVER edits
         # ---- `.gitattributes` and that it writes an ORDER instead, which was `-2`'s ratified
@@ -1847,7 +1847,7 @@ user_skills = "/tmp/gk-fake-skills"
               and "removed a stale" in p.stdout, p.stdout)
         check("[-2] AC2 the renormalize ran", "renormalize: re-staged" in p.stdout, p.stdout)
         check("[-2] AC2 ...and the forced CRLF index blob is LF afterwards",
-              _eol_of(ap, "notes.md") == "i/lf", p.stdout)
+              read_eol(ap, "notes.md") == "i/lf", p.stdout)
         # THE RECEIPT FOLLOWS THE BYTES. The block on disk is read back through the engine's own
         # `find_block`, so this compares the row against what is THERE rather than against a second
         # render — a render-versus-render comparison would agree even if nothing had been written.
