@@ -60,49 +60,43 @@ red a target's own install check, and the glob cannot reach them.
 
 **Evidences:** DEPL-cMendedVintage-14
 
-- AC1 — OBSERVED. A scratch fixture was conflicted on three rows, the orders committed, then
-  `tools/demo/one/conf.txt` was resolved to gov's own blob and committed, and the run
+*Every bullet below carries its backticked witness on the bullet's FIRST physical line, however long
+that line runs. Hygiene check 23 joins an answer to its criterion by the backticked tokens it finds
+on one physical line, so a token pushed onto a continuation belongs to no line and the criterion
+grades as answered by nothing — the class `ledger-token-wrapped-across-a-line-joins-nothing` records,
+and the reason the prose here wraps after the token and never before it.*
 
-  `python tools/govkit/govkit.py update --target <fixture> --write`
-
-  was repeated. Its order was gone, the other two stood, and the run printed
-  `govkit update — reap: removed 1 stale conflict order(s): update-conflict-tools-demo-one-conf-txt-8be1d155.md`.
-  The same run re-emitted the two still-open conflicts, which is the migration in miniature. The
-  RED named in the criterion was reached by the emptied-set break above, which reaps on existence
-  rather than on this run's set and takes the live orders with it.
-- AC2 — OBSERVED. Two receipt rows sharing the basename `conf.txt` conflicted in one
-
-  `python tools/govkit/govkit.py update --target <fixture> --write`
-
-  run, and the outbox held two conflict orders naming `tools/demo/one/conf.txt` and
-  `tools/demo/two/conf.txt` in their bodies. The criterion's RED is the measured one: the same
-  fixture against `HEAD` left one file for three live conflicts.
-- AC3 — OBSERVED. Its own fixture, because a withdrawn row is gone from gov's tree and cannot also
-  conflict. Two rows sharing the basename `gone.txt` were withdrawn in one
-
-  `python tools/govkit/govkit.py update --target <fixture> --write`
-
-  run and the outbox held two withdrawal orders, each naming its own full path. Against `HEAD` the
-  same fixture left one, `update-withdrawn-gone.txt.md` — so the withdrawal writer really was the
-  third call site and re-keying only the two conflict writers would have been an instance fix.
-- AC4 — OBSERVED. With a sibling kit's conflict order on disk, the run
-
-  `python tools/govkit/govkit.py update --target <fixture> --write --kits <one-kit>`
-
-  left every order untouched and printed one line:
-  `govkit update — reap: SKIPPED, this run is scoped to 1 kit(s) and an order it did not write may belong to a row it never classified`.
-  The criterion's RED was staged: with the scope guard neutered the out-of-scope order was deleted.
-- AC5 — OBSERVED, in two forms, because the runtime form alone is nearly vacuous. Runtime: with a
-  conflict order and a withdrawal order on disk,
-
-  `python tools/govkit/govkit.py update --target <fixture>`
-
-  with no `--write` left both. Structural: the reap carries no `if write:` guard, because the
-  read-only branch RETURNS before the outbox is bound and a condition that cannot be false is the
-  shape this engine bans. The committed arm asserts that ordering on the source — the last
-  `if not write:` before the outbox bind returns, and `write` is never rebound — so the arm reds if
-  that return ever moves. The criterion's RED was staged directly by emptying the collection set,
-  which is the state a read-only run would arrive in.
+- AC1 — OBSERVED by `python tools/govkit/govkit.py update --target <fixture> --write`, run twice.
+  A scratch fixture was conflicted on three rows and the orders committed; `tools/demo/one/conf.txt`
+  was then resolved to gov's own blob, committed, and the command repeated. Its order was gone, the
+  other two stood, and the run printed `reap: removed 1 stale conflict order(s)` followed by the
+  name `update-conflict-tools-demo-one-conf-txt-8be1d155.md`. The same run re-emitted the two
+  still-open conflicts, which is the migration in miniature. The RED the criterion names was reached
+  by the emptied-set break above: keyed on the orders that EXIST, it takes the live ones too.
+- AC2 — OBSERVED by `python tools/govkit/govkit.py update --target <fixture> --write` on one run.
+  Two receipt rows sharing the basename `conf.txt` conflicted in it, and the outbox afterwards held
+  two conflict orders naming `tools/demo/one/conf.txt` and `tools/demo/two/conf.txt` in their
+  bodies. The criterion's RED is the measured one and not an argued one: the same fixture against
+  the parent commit left ONE file for three live conflicts.
+- AC3 — OBSERVED by `python tools/govkit/govkit.py update --target <fixture> --write` on its own
+  fixture, because a withdrawn row is gone from gov's tree and cannot also be conflicting. Two rows
+  sharing the basename `gone.txt` were withdrawn in one run and the outbox held two withdrawal
+  orders, each naming its own full path. Against the parent commit the same fixture left one,
+  `update-withdrawn-gone.txt.md` — so the withdrawal writer really was a third call site, and
+  re-keying only the two conflict writers would have been an instance fix.
+- AC4 — OBSERVED by `python tools/govkit/govkit.py update --target <fixture> --write --kits <one-kit>`.
+  With a sibling kit's conflict order on disk, the run left every order untouched and printed one
+  line: `reap: SKIPPED, this run is scoped to 1 kit(s) and an order it did not write may belong to a
+  row it never classified`. The criterion's RED was staged rather than reasoned about: with the
+  scope guard neutered, the out-of-scope order was deleted by a run that never classified its kit.
+- AC5 — OBSERVED by `python tools/govkit/govkit.py update --target <fixture>` with no `--write`, and
+  a second time structurally, because the runtime form alone is nearly vacuous. Runtime: a conflict
+  order and a withdrawal order were on disk and both survived. Structural: the reap carries no
+  `if write:` guard, because the read-only branch RETURNS before the outbox is bound and a condition
+  that cannot be false is the shape this engine bans. The committed arm asserts that ordering on the
+  source — the last `if not write:` before the outbox bind returns, and `write` is never rebound —
+  so the arm reds if that return moves rather than the outbox emptying. The criterion's RED was
+  staged directly by emptying the collection set, which is the state a read-only run arrives in.
 
 ## Owed
 

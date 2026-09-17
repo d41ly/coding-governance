@@ -67,8 +67,11 @@ none
 ### Data model
 
 Nothing is persisted. The reap's state is one `set[pathlib.Path]` local to `_cmd_update`, populated
-at the three write sites and read once at the end of the run. The filename is the only durable
-artifact and its grammar is S1's.
+at the TWO conflict write sites and read once at the end of the run. rev-3 corrects rev-2's "three":
+all three writers are re-keyed, but the withdrawal writer's output is outside the reap's glob, so
+collecting it would put a path in the set that the reap can never consider — a membership test that
+cannot matter, which reads to the next reader as though withdrawal orders were reapable and merely
+spared. The filename is the only durable artifact and its grammar is S1's.
 
 ### Why the digest, and what it still cannot do
 
