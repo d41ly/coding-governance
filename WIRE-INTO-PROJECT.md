@@ -1017,6 +1017,12 @@ otherwise runs by default. Its siblings are
 `update-rollback-<kit>.md`, where this run's writes really were reverted, and
 `update-preexisting-red-<kit>.md`, where the kit was red before the run started.
 
+A rollback order that names `.gitattributes` among its restored paths is not a mistake. Where this
+run rewrote govkit's own LF-pin block, that block goes back with ANY kit's rollback, because it is
+rendered from every claimed kit's pins at once and so belongs to no single one of them. A run that
+rolled one kit of six back therefore restores a block the other five still want; the fix is the next
+`update --write`, which re-renders it from the pin set that survived.
+
 A `NOT restored <path>` line in a rollback order means your git refused the call that would have put
 that path back — the line names which call — so the rollback is PART done and its receipt row was
 deliberately left at this run's values rather than reverted, because a row claiming a pre-run state

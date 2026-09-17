@@ -1,41 +1,54 @@
 # DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-15-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-15-acceptance-ledger.md) | journal | DEPL-cMendedVintage-10 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-15-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-15-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-`apply` stamps the `.gitattributes` receipt row with the synthetic kit id `(govkit)`
-(`tools/govkit/govkit.py:4626` and `:8246`), which no registry entry claims. Both consumers of a
-snapshot entry's `kit` key reject that value: the restore loop selects
-`[x for x in snap_rows if x["kit"] == eid]` inside `for eid in touched_kits` over claimed ids
-(`tools/govkit/govkit.py:7504` and `:7569`), and `orphan_kits` (`:6730`) sweeps every snapshot entry
-whose kit is not in `claimed`. Give the entry a restore stage that reaches it, and take it out of the
-orphan sweep.
+**rev-1's premise is false at BASE, and rev-2 says so before anything else.** rev-1 was drafted
+against a PREDICTION of what `DEPL-cMendedVintage-10` would ship: a snapshot entry stamped with the
+synthetic kit id
+`(govkit)`,
+which no registry entry claims, rejected by both consumers of a snapshot entry's `kit` key. What
+`-10` actually landed one commit before this unit ran is the same repair by a different mechanism —
+the entry is attributed to NO kit at all, the restore loop reaches it by `origin`, and the orphan
+sweep is scoped to `origin == "table"`. Rev-1's three code changes are therefore already in the tree
+in another spelling, and re-applying any of them would be a second answer to one question.
+
+What was NOT in the tree is any execution of it. `-10` recorded its own AC4 OWED because no fixture
+could produce a pin block and a green-to-red kit at once, so every line of that repair was built and
+unobserved — which is the state this unit's own audit note calls a mechanism nobody has seen move.
+So the goal of rev-2 is the one thing rev-1's premise did not cover: OBSERVE both halves on a single
+run, and leave a gate behind that reds if either is undone.
 
 ## 2. Scope (IN)
 
-- **S1** The snapshot entry `DEPL-cMendedVintage-10` S2 takes for `.gitattributes` carries
-  `kit = "(govkit)"` explicitly, spelled at the site that builds it rather than inherited from a
-  neighbouring row, so the entry agrees with the receipt row `apply` writes at
-  `tools/govkit/govkit.py:4626`. Observed by AC1.
-- **S2** The rollback pass gains one kit-independent restore stage over snapshot entries whose
-  `origin` is `"attributes"`, placed after the `for eid in touched_kits` loop and reached whenever
-  that loop rolled any kit back. It performs the same index-and-worktree restore the per-kit loop
-  performs and reports under the same three lists. Observed by AC2.
-- **S3** `orphan_kits` at `tools/govkit/govkit.py:6730` excludes the synthetic id, so a run that
-  rewrote the pin block prints no `verify (govkit): NOT VERIFIED` line at `:7714`. The exclusion is
-  written against the one synthetic id this engine mints and refuses to generalise to "any id with
-  parentheses". Observed by AC3.
-- **S4** `tools/govkit/matrix.py` shape 5 gains one arm over a target with a written pin block and one
-  kit staged to fail verify, asserting both halves at once: the pre-run `.gitattributes` bytes return,
-  and the run's output carries no `NOT VERIFIED` line naming a kit the registry does not claim.
-  Observed by AC2 and AC3.
+- **S1** *(DISCHARGED AT BASE, by `-10`, not by this unit.)* The snapshot entry for
+  `.gitattributes` carries `kit = None` rather than the synthetic id, with its reason on the site
+  that builds it: carrying the id would put a kit no registry entry claims into the population the
+  orphan sweep reports on. Verified as landed rather than re-written. Observed by AC1.
+- **S2** *(DISCHARGED AT BASE, by `-10`.)* The per-kit restore loop selects
+  `x["kit"] == eid or x["origin"] == "attributes"`, so the entry is reached by every rolled-back
+  kit rather than by a stage after the loop. The all-or-nothing rule rev-1 argued for holds either
+  way, and a second restore of one path is idempotent: the same pre-run index entry, put back again.
+  Observed by AC2.
+- **S3** *(DISCHARGED AT BASE, by `-10`.)* The orphan sweep is scoped to `origin == "table"`, the
+  only origin it was ever about — a RECEIPT row attributed to a kit the receipt's own list does not
+  claim. Scoping by origin rather than excluding one id is what rev-1 asked for and stronger than it:
+  it needs no sentinel to stay correct if the id is ever renamed. Observed by AC3.
+- **S4** *(THIS UNIT'S ONLY CODE.)* `tools/govkit/selftest.py` gains one arm group beside the
+  `-14` rollback block: a second scratch gov whose rolled-back kit also declares an `[[lf_pin]]`,
+  a target whose block is tampered inside the marker pair so the run rewrites it, and one
+  `update --write` asserting both halves at once — the pre-run `.gitattributes` bytes return, and no
+  `NOT VERIFIED` line names a kit the receipt does not claim. Observed by AC2 and AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -43,6 +56,13 @@ orphan sweep.
   already on disk carries it; renaming it would be a receipt migration for a string.
 - No generalised synthetic-id namespace, no `kit` sentinel table, no `is_synthetic` predicate. One id
   exists, one exclusion closes it, and a namespace invented for a population of one is plumbing.
+- No repair of the THIRD consumer this unit's own fixture surfaced. The per-kit version-delta table
+  groups RECEIPT rows by `kit`, so a target with a pin block prints
+  `(govkit)                     gov side unresolvable — no comparison is possible`
+  on every `update`. It is a noise row, not a false verdict and not a restore that cannot run, it
+  predates this whole build, and closing it means either changing what `apply` stamps — the non-goal
+  directly above — or a second filter in a report this unit was not scoped to touch. Recorded in the
+  ledger instead of widened into here.
 - No restore of an `attributes` entry on a run that rolled nothing back. The stage is reached from
   inside the rollback pass, so a clean run never enters it.
 - No change to the `pins` classification arm, to `lf_pin_block`, or to where gov's block sits in the
@@ -57,41 +77,33 @@ orphan sweep.
 
 ## 4. Design
 
-### Why the per-kit loop cannot be widened instead
+### Why rev-1's own alternative is what shipped, and why that is fine
 
-The obvious smaller edit is to add `(govkit)` to `touched_kits`. It is wrong for a reason worth
-writing down: every consumer of that list treats a member as a CLAIMED kit. `:7722` computes
-`not_run = [e for e in claimed if e not in touched_kits]`, the baseline loop at `:7504` demands a
-baseline per member and refuses when one is missing (`:7515`), and the verify pass runs each member's
-`[check]`. A synthetic id has no descriptor, no baseline and no check, so widening the list buys one
-restore and three new refusals. The second stage is the smaller change to the code that has to be
-correct.
+rev-1 rejected "bind the entry to the kits whose pins produced the block" for needing an ordering
+rule. `-10` shipped neither that nor rev-1's after-the-loop stage: it left the entry unattributed and
+made the per-kit loop's SELECTION origin-aware. The all-or-nothing rule survives — any rolled-back
+kit restores the block — and the ordering objection never arises, because there is nothing to order:
+the second restore writes the same pre-run index entry the first one did. rev-1's argument against
+widening `touched_kits` still holds and is still the reason no synthetic id is in that list; what
+changed is that the entry is reached without being in any kit-keyed population at all.
 
-### The stage, and where it sits
+### The fixture, which is the whole of this unit
 
-| # | site | what it does |
+| # | piece | why it is shaped that way |
 |---|---|---|
-| 1 | `for eid in touched_kits` at `tools/govkit/govkit.py:7504` | the per-kit restore, unchanged |
-| 2 | immediately after that loop | the `origin == "attributes"` restore, run when the loop rolled anything back |
-| 3 | `orphan_kits` at `:6730` | the synthetic id filtered out of the population it builds |
-
-Site 2 is after site 1 because the decision to roll back is the per-kit loop's, and the attributes
-block is not any one kit's: it is rendered from every claimed kit's `[[lf_pin]]`, so restoring it for
-one rolled-back kit and not another is not a state that exists. The rule is therefore all-or-nothing
-and it is stated rather than derived — a run that rolled ANY kit back puts the block back, because
-the block gov wrote describes a claimed set the run no longer stands behind.
+| 1 | a SECOND scratch gov, not an `[[lf_pin]]` on the `-14` roll gov | pinning that gov puts a `.gitattributes` under every `-14` arm, all written against a target with none |
+| 2 | the pin declared on the kit that ROLLS BACK | the run must both write the block and enter the restore stage, and one kit doing both is the shortest fixture that reaches it |
+| 3 | the block tampered INSIDE the marker pair, then committed | the `pins` arm reads `pins-moved` only against a block that differs from a fresh render; an untouched target reads `current`, writes nothing, and AC2 then passes over an absence |
+| 4 | both halves asserted from ONE run | each alone is satisfied by an incoherent engine — the block comes back while a line still calls it an orphan, or the line goes quiet while the block stays staged |
 
 ### Inventory
 
-| identifier | kind | where |
-|---|---|---|
-| `_attr_snap` | local list in `_cmd_update` | the `origin == "attributes"` entries, beside `snap_rows` |
-| `SYNTHETIC_KIT` | module-level constant | `tools/govkit/govkit.py`, the one id `apply` stamps, read by `:4626`, `:6730` and `:8246` |
-
-`SYNTHETIC_KIT` is minted rather than left as three string literals because the exclusion in S3 and
-the two write sites must agree, and three copies of a sentinel is how they stop agreeing. The
-lexicon cell for a module-level Python constant is `py.const`, which declares `UPPER` and no verb
-table.
+No new identifier, in either file. The arm adds no `def`: it reuses `build_verify_gov`,
+`build_verify_target`, `build_kit14`'s existing `extra` parameter, `settle`, `read_bytes14`,
+`read_text14`, `run_in_gov` and `gout`, all already in scope beside the `-14` block, and it locates
+the block through the engine's own `marker_pair` and `find_block` rather than by sniffing for a line.
+That is deliberate beyond laziness: the standing ban this build has now tripped twice landed both
+times in a test-side helper nobody thought to check, and an arm that defines nothing cannot trip it.
 
 ### Migration
 
@@ -123,8 +135,12 @@ current behaviour is a restore that silently does not run, and a default-OFF gat
 
 | Path | Change |
 |---|---|
-| `tools/govkit/govkit.py` | the constant, the explicit `kit` on the snapshot entry, the second restore stage, the orphan filter |
-| `tools/govkit/matrix.py` | one shape-5 arm |
+| `tools/govkit/selftest.py` | one arm group beside the `-14` rollback block |
+| `WIRE-INTO-PROJECT.md` | one paragraph in the rollback-orders section |
+
+rev-1 estimated `tools/govkit/govkit.py` and `tools/govkit/matrix.py`. Neither is touched: the engine
+change was already landed by `-10`, and the arm went where its fixture builders already live rather
+than into a file that would have had to grow a second copy of them.
 
 ## 5. Production-readiness checklist
 
@@ -138,43 +154,47 @@ current behaviour is a restore that silently does not run, and a default-OFF gat
 - observability — the restored path is reported in the same `restored` list the order prints, so the
   block appears in the rollback record rather than being restored silently.
 - risks — the sharp one is the all-or-nothing rule: a run that rolls back one kit of six restores a
-  block the other five still want. That is correct and it is also surprising, so §4 states it and the
-  order names the path. Second: a future second synthetic id would need its own decision, which is
-  why S3 refuses to generalise the filter.
+  block the other five still want. That is correct and it is also surprising, so §4 states it, the
+  order names the path, and rev-2 puts it in the operator runbook. Second: the sweep's scope is an
+  ORIGIN rather than an id, so a future synthetic id inherits the right answer instead of needing a
+  new exclusion — which is why rev-2 records the landed shape as stronger than rev-1's.
 - testing — AC1 through AC3 against scratch fixture targets. Gov keeps no `.governance/` receipt of
   its own, so no criterion here is observable against this repo.
 - migration — none; §4 states why.
-- user docs — `WIRE-INTO-PROJECT.md`'s rollback paragraph gains one sentence saying the pin block
-  comes back with any rollback.
+- user docs — `WIRE-INTO-PROJECT.md`'s rollback-orders section gains one paragraph: the pin block
+  comes back with ANY kit's rollback, why, and what the operator does about a block restored out from
+  under five kits that still wanted it.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a scratch fixture target with a written pin block is taken through
-  `python tools/govkit/govkit.py update --target <fixture> --write` and the run's snapshot is read,
-  the `.gitattributes` entry carries `kit` equal to the value the receipt row at
-  `tools/govkit/govkit.py:4626` spells.
-  Red when: the entry is built with whatever `kit` the enclosing row carries, so the snapshot and the
-  receipt disagree and the new stage selects nothing.
-  fixture: a scratch fixture target built under the run's scratch root with `intake` then `apply`;
-  this repo carries no receipt of its own and can host no criterion in this section.
-- **AC2** — When one kit's `[check]` is staged green-to-red on that fixture and
-  `python tools/govkit/govkit.py update --target <fixture> --write` rolls it back, the fixture's
+- **AC1** — *(rewritten at rev-2; rev-1 asserted the opposite of what shipped.)* When the fixture's
+  snapshot entry for `.gitattributes` is read, its `kit` is `None` and the restore reaches it by
+  `origin` rather than by that key — asserted through the two OBSERVABLE consequences, since the
+  snapshot is a run-local structure no verb prints: the entry is restored (AC2) and it is not swept
+  (AC3).
+  Red when: the entry is attributed to any kit id at all, in which case one of the two arms below
+  fires — a claimed id would make the sweep silent and the restore doubled, and an unclaimed one
+  brings back the spurious line.
+  fixture: a scratch target built under the run's scratch root by the real `apply`; this repo keeps
+  no receipt of its own and can host no criterion in this section.
+- **AC2** — When one kit's `[check]` is staged green-to-red on a fixture whose block this run
+  rewrote, and `update --target <fixture> --write` rolls that kit back, the fixture's
   `.gitattributes` holds the bytes it held before the run.
-  Red when: the restore is left inside the per-kit loop, where no `eid` equals the synthetic id, so
-  the run reports a successful rollback with gov's new block still on disk.
+  Red when: the restore selection is keyed on `x["kit"] == eid` alone, where no `eid` matches an
+  unattributed entry, so the run reports a successful rollback with gov's new block still on disk.
 - **AC3** — When that same run's output is read, no line matching `NOT VERIFIED` names a kit absent
   from the fixture's `install.json` claimed set.
-  Red when: the orphan filter is written against the literal parentheses rather than against the
-  minted constant, so a later rename of the synthetic id restores the spurious line.
+  Red when: the sweep is not scoped by origin, in which case the unattributed entry is swept and the
+  run prints a `NOT VERIFIED` line for `(no kit)` on every run that rewrites the block.
   figure: DERIVED — the claimed set is read from the fixture's receipt at observation time.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix`
 
-New arm: `tools/govkit/matrix.py` · a shape-5 target with a written pin block and one kit staged to
-fail verify, asserting both the returned bytes and the absent orphan line · no assertion floor to
-move.
+New arm: `tools/govkit/selftest.py` · a second rollback fixture whose rolled-back kit declares an
+`[[lf_pin]]`, asserting the returned bytes, the reported restore and the absent orphan line · no
+assertion floor to move.
 
 ## 8. Open questions
 
@@ -183,6 +203,16 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · **Written by the build pass, before its code, because rev-1's premise did not
+  survive contact with the tree.** `-10` landed the repair one commit earlier by a different
+  mechanism than rev-1 predicted, so S1, S2 and S3 are recorded DISCHARGED AT BASE with the shape
+  actually in the tree, and the goal is re-stated as the one thing left: executing it. S4 moves from
+  `tools/govkit/matrix.py` to `tools/govkit/selftest.py`, where the rollback fixture builders it
+  needs already live — putting it in the matrix would have meant a second copy of them, and §12's
+  build-once rule points the other way. AC1 is rewritten: it asserted a `kit` value that is the
+  opposite of what shipped, and now asserts the unattributed entry through its two observable
+  consequences. §3 gains a non-goal for a third consumer the fixture surfaced. §4's site table and
+  inventory are replaced — no constant is minted and no `def` is added.
 
 ## 10. Reuse audit
 
@@ -200,3 +230,12 @@ why this unit adds a stage rather than widening the loop.
 Recall terms used: `--terms "govkit rollback snapshot attributes receipt row kit orphan restore
 touched_kits claimed verify outcome regenerate"`, with the question "what decided how govkit rollback
 selects snapshot entries by kit and what owns the synthetic attributes row".
+
+**rev-2's own audit, over the thing rev-1 did not have to find: a fixture.** The reuse was read from
+source rather than searched for, because the seam is one file over. `build_verify_gov`,
+`build_verify_target` and `build_kit14` in `tools/govkit/selftest.py` already build a scratch gov
+whose kit goes green-to-red across an `update`, and `build_kit14` already takes an `extra` parameter
+that appends descriptor rows — so declaring an `[[lf_pin]]` on the rolled-back kit is a dict key, not
+a builder. The matrix's shape 5 has no such fixture and no builder for one; putting the arm there
+would have meant a second implementation of three functions that already exist, which is the
+alternative §12 names by name. Nothing new was written, which is why §4's inventory is empty.

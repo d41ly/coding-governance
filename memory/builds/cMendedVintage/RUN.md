@@ -175,3 +175,13 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T01:07:52Z brief · item DEPL-cMendedVintage-10 · reason cd5d20be687b memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-10-2-build-brief.md
 
 2026-09-17T01:15:03Z dispatch · item 8df90a64 DEPL-cMendedVintage-10 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-10.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-10-acceptance-ledger.md
+
+2026-09-17T01:41:05Z dispatch · item 3f73181f DEPL-cMendedVintage-15 · reason tools/govkit/govkit.py tools/govkit/matrix.py
+
+2026-09-17T01:41:06Z brief · item DEPL-cMendedVintage-15 · reason df7e5b169b53 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-15-2-build-brief.md
+
+2026-09-17T01:45:23Z dispatch · item 3f73181f DEPL-cMendedVintage-15 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/matrix.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-15.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-15-acceptance-ledger.md WIRE-INTO-PROJECT.md
+
+2026-09-17T01:57:44Z dispatch · item 3f73181f DEPL-cMendedVintage-15 · reason tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-15.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-10.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-15-acceptance-ledger.md WIRE-INTO-PROJECT.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T02:01:10Z dispatch · item 3f73181f DEPL-cMendedVintage-15 · reason tools/govkit/selftest.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-15.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-10.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-15-acceptance-ledger.md memory/builds/cMendedVintage/README.md WIRE-INTO-PROJECT.md

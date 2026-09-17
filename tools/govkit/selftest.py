@@ -6917,6 +6917,86 @@ user_skills = "/tmp/gk-fake-skills"
               "govkit check — demo:" in _ac8_now.stdout and len(_ac8_now.stdout) > 100,
               _ac8_now.stdout)
 
+        # ============= DEPL-cMendedVintage-15 — THE PIN BLOCK COMES BACK WITH ANY ROLLBACK =======
+        #
+        # `-10` recorded its AC4 OWED and said exactly why: no fixture in this file could produce a
+        # pin block AND a green-to-red kit at once, so the restore it wired was built and never
+        # executed. This block is that fixture. It is a SECOND one rather than an `[[lf_pin]]` added
+        # to the roll gov above, because giving that gov a block would put a `.gitattributes` under
+        # every `-14` arm, all of which were written against a target that has none.
+        #
+        # WHAT IT GRADES, stated before the code rather than read off it. The synthesized attributes
+        # entry is attributed to NO kit, so the two consumers of a snapshot entry's `kit` have to
+        # disagree about it on purpose: the restore reaches it by ORIGIN, and the orphan sweep is
+        # scoped to `table` and must not name it. Both halves are asserted from ONE run, because
+        # each alone is satisfied by a run that restored nothing and printed nothing — the block
+        # comes back while a `NOT VERIFIED` line still calls it an orphan, or the line goes quiet
+        # while gov's block stays staged in a repository gov does not own.
+        _g15, _ = build_verify_gov("pinroll", {
+            "demo": {"guard": _14_GUARD_CONFLICT,
+                     "extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+                              'why = "the fixture pin, so this target has a block to lose"\n\n',
+                     "files": {"conf.txt": _14_CONF_A}},
+            "sib": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
+        })
+        _t15 = build_verify_target(_g15, "pinroll-t", ["demo", "sib"])
+        _ga15 = _t15 / ".gitattributes"
+        _om15, _cm15 = GK14.marker_pair("hash-comment", GK14.GA_BLOCK_ID)
+        _txt15 = read_text14(_ga15)
+        _span15 = GK14.find_block(_txt15, _om15, _cm15)
+        check("[-15] LIVENESS the install left a block carrying the engine's OWN marker pair, or "
+              "every arm below grades a target with nothing to restore",
+              _span15 is not None and _span15[1] - _span15[0] >= 2, _txt15)
+        # TAMPERED INSIDE THE MARKER PAIR, at the line above the close marker, which is the last
+        # pin's own pattern at any pin count. The `pins` arm reads `pins-moved` only when the held
+        # block differs from a fresh render — an untouched target reads `current`, writes nothing,
+        # and then there is no attributes entry at all and AC2 passes over an absence.
+        if _span15 is not None:
+            _l15 = _txt15.split("\n")
+            _l15[_span15[1] - 1] = "# tampered by the fixture"
+            _ga15.write_text("\n".join(_l15), encoding="utf-8", newline="\n")
+        # AND THE ADOPTER'S EDIT, committed rather than staged, for `-12` S4's reason: a writing
+        # verb refuses over a dirty claimed path, so an uncommitted edit makes the update refuse and
+        # every arm below grades a run that never happened.
+        (_t15 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+                                                          newline="\n")
+        settle(_t15, "the adopter edits demo's conf and the block moves")
+        _before15 = read_bytes14(_ga15)
+
+        # gov's second vintage: one hunk in each kit's conf. `demo`'s merges CLEAN against the
+        # adopter's own hunk and the merged file then breaks `demo`'s own rule, which is the whole
+        # green-to-red transition the rollback keys on.
+        (_g15 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+                                                          newline="\n")
+        (_g15 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+                                                         newline="\n")
+        git(_g15, "add", "-A")
+        git(_g15, "commit", "-qm", "B")
+        _w15 = run_in_gov(_g15, "update", "--target", str(_t15), "--to",
+                          gout(_g15, "rev-parse", "HEAD").strip(), "--write")
+        _o15 = _w15.stdout + _w15.stderr
+        check("[-15] LIVENESS the run WROTE the block, so there is a write to undo",
+              "wrote the lf-pin block" in _o15, _o15[-900:])
+        check("[-15] LIVENESS ...and a kit really rolled back, so the restore stage was entered",
+              "rolled back 1" in _o15, _o15[-900:])
+        check("[-15] AC2 the target's .gitattributes holds the bytes it held BEFORE the run",
+              read_bytes14(_ga15) == _before15,
+              "before=%r after=%r" % (_before15[-300:], read_bytes14(_ga15)[-300:]))
+        check("[-15] §5 the restored path is REPORTED, not put back silently",
+              any(".gitattributes" in ln for ln in _o15.split("\n") if "ROLLED BACK" in ln),
+              _o15[-900:])
+        # AC3's population is DERIVED at observation time from the fixture's own receipt, never
+        # listed here: a hand-written claimed set would grade this arm against a fixture rather than
+        # against what the run actually installed.
+        _claimed15 = json.loads((_t15 / ".governance" / "install.json").read_text(
+            encoding="utf-8")).get("kits") or []
+        _orph15 = [ln for ln in _o15.split("\n")
+                   if "NOT VERIFIED" in ln and not any(f" {c}:" in ln for c in _claimed15)]
+        check("[-15] AC3 no `NOT VERIFIED` line names a kit the receipt does not claim",
+              not _orph15, "claimed=%s offending=%s" % (_claimed15, _orph15))
+        check("[-15] AC3 LIVENESS the claimed set was read and is non-empty, so the arm above "
+              "quantified over something", bool(_claimed15), str(_claimed15))
+
         # ============================================================ DEPL-dCarriedReceipt-13
         # `govkit adopt` — the receipt bootstrap. Every arm below runs against a SCRATCH gov with a
         # real multi-commit history, because attribution is a question about history and a
