@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 30
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-19-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-19-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-19-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-19-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -13,22 +14,27 @@
 ## 1. Goal
 
 `DEPL-cMendedVintage-6` §4 Migration says an adopter's two stale engine rows "report as withdrawn with
-an order written to the outbox". The engine cannot produce that: `withdrawn` is the grid cell
-`("equal", "absent")` at `tools/govkit/govkit.py:5379`, `t_state` is decided by whether gov's source
-blob exists at `to_commit` (`classify_row`, `:5781` and `:5787`), and that unit keeps both records
-tracked in gov's tree. Meanwhile the role re-resolution at `:6331` is gated on `schema < 2`, so a
+an order written to the outbox". The engine cannot produce that: `withdrawn` is the `VERDICT_GRID`
+cell `("equal", "absent")`, `t_state` is decided by whether gov's source blob exists at `to_commit`
+(`classify_row`), and that unit keeps both records tracked in gov's tree. Meanwhile the role
+re-resolution inside `cmd_update`'s row loop is gated on `schema < 2`, so a
 schema-3 row keeps `engine` and takes the full `table` disposition against a rule that now declares
 `project-owned` and supplies no bytes. Re-resolve at every schema and report the move.
 
+*rev-2: every line number this section used to cite was stale before the unit was built — nine units
+had edited the engine since it was written. They are replaced by the symbols that own the code, which
+cannot rot the same way.*
+
 ## 2. Scope (IN)
 
-- **S1** The re-resolution block at `tools/govkit/govkit.py:6331` loses its `schema < 2` guard and runs
+- **S1** The re-resolution block in `cmd_update`'s row loop loses its `schema < 2` guard and runs
   for every schema, against the descriptor's current resolution for that row's kit. Observed by AC1.
 - **S2** A row whose recorded role and current resolution DISAGREE takes a new `role-moved`
   disposition instead of the recorded role's table row: the run reports the old role, the new role and
   the path, writes nothing for that row, and does not count it as a change. A disagreement is a
   descriptor transition, not a byte question. Observed by AC2 and AC3.
-- **S3** The `r.fail` at `:6325`'s sibling — the schema-1 disagreement refusal — is kept for
+- **S3** The schema-1 disagreement refusal — the `r.fail` whose text ends "a role a schema-1 receipt
+  cannot be trusted about" — is kept for
   `schema < 2` alone, because a schema-1 role is UNTRUSTED for a different reason and refusing is
   still correct there. S2's disposition is the schema-2-and-up answer, and the two are written as two
   branches rather than one widened one. Observed by AC4.
@@ -66,9 +72,9 @@ schema-3 row keeps `engine` and takes the full `table` disposition against a rul
 | the row | `role` recorded | descriptor now says | what `update` does |
 |---|---|---|---|
 | gov's fixture record, schema 3 | `engine` | `project-owned` | `UPDATE_ROLE["engine"]` is `table`, so the full verdict table runs |
-| the same row, at `schema < 2` | `engine` | `project-owned` | re-resolved at `:6331`, disagreement refused |
+| the same row, at `schema < 2` | `engine` | `project-owned` | re-resolved in the row loop, disagreement refused |
 
-`UPDATE_ROLE["project-owned"]` is `skip` (`:5438`), so the NEW rule supplies nothing to compare
+`UPDATE_ROLE["project-owned"]` is `skip`, so the NEW rule supplies nothing to compare
 against and the OLD rule's table is what runs. An adopter's renamed-away copy then grades `missing`
 and is restored, which is the clobber `DEPL-cMendedVintage-6` exists to stop, surviving that unit
 because the row's role never moved.
@@ -125,7 +131,13 @@ after it.
 |---|---|
 | `tools/govkit/govkit.py` | the guard removed, the two branches split, the new disposition and its tally |
 | `tools/govkit/matrix.py` | the aged-receipt arm |
-| `memory/backlog/DEPL.md` | `DEPL-dPolishedVitrine-1`'s first clause struck, the row left OPEN for the other two |
+| `WIRE-INTO-PROJECT.md` | one Maintenance paragraph on what a `role-moved` line means |
+
+*rev-2: `memory/backlog/DEPL.md` was in this table and is NOT touched by the build. The unattended
+driver's `--dispatch` verb refuses a declared write set naming a path under the project's declared
+shared mutable records, and the backlog is one — so the pass could not legally declare it. Striking
+`DEPL-dPolishedVitrine-1`'s first clause is left to the run's landing, and the row stays OPEN
+regardless, because this unit takes one of its three clauses.*
 
 ## 5. Production-readiness checklist
 
@@ -162,7 +174,9 @@ after it.
 - **AC2** — When that fixture's descriptor is edited to claim the row's destination as
   `project-owned` and `python tools/govkit/govkit.py update --target <fixture> --write` runs, the run
   reports `role-moved` naming both roles and the path, and the file on disk is byte-identical
-  afterwards.
+  afterwards. Amended at rev-2: the fixture carries TWO such destinations, one the adopter edited in
+  place and one the adopter RENAMED AWAY, because only the second reaches the restore this criterion's
+  Red-when describes. Both are asserted.
   Red when: the guard is left at `schema < 2`, so the row keeps `engine`, takes the table disposition
   and is restored from gov's bytes over the target's own copy.
 - **AC3** — When that same run finishes, the fixture's receipt row still records `engine` and the run
@@ -184,6 +198,12 @@ claim that destination as `project-owned`, asserted to report and not to write �
 `tools/govkit/refusal_join.py` `BRANCH_PIN` floor is re-derived in the same commit if the branch split
 moves the live count.
 
+*rev-2, the conditional DECLINED with its measurement: `BRANCH_PIN` stays at 255. The count was read
+off that file's own `enumerate_branches` at both ends — 255 over four modules at base `b1621f59`, 255
+on the tree this unit leaves. The split adds a REPORT, not a refusal, so the refusal population is
+the same one; raising a shrink-only pin over an unmoved population would assert a relation that is
+false.*
+
 ## 8. Open questions
 
 none
@@ -191,6 +211,20 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · §6 AC2, §1, §2 S1/S3, §4 · three changes, one of them a real finding.
+  **AC2's Red-when is not reachable by the fixture AC2 describes.** A destination the adopter edited
+  IN PLACE grids to `patched`, which writes nothing even with the guard left at `schema < 2` — so an
+  arm built on that row alone stays green over the restore the criterion exists to stop. Measured
+  both ways against the engine as BASE has it, not reasoned: the same fixture with the destination
+  RENAMED AWAY grids to `missing`, which is a raw-write verdict, and at BASE gov puts its own bytes
+  back at a path the adopter deliberately emptied. The arm carries both destinations now and
+  asserts both, and it was observed RED on six arms against the BASE engine. This is the
+  fixture-passes-by-finding-nothing class arriving inside an acceptance criterion, which is where
+  the sibling unit one pass ago found its own. **The line numbers in §1, §2 and §4 were stale before
+  a line of this unit was written** and are replaced by the symbols that own the code; no design
+  moved with them. **`memory/backlog/DEPL.md` leaves §4's table**: the driver's `--dispatch` refuses
+  a declared write set naming a shared mutable record, so this pass may not touch the backlog at
+  all. S1 through S4, AC1, AC3, AC4 and every non-goal are unchanged.
 
 ## 10. Reuse audit
 

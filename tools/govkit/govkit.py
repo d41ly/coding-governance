@@ -6630,6 +6630,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # a `len(...) == 0` test is the ambiguity this unit exists to remove, re-introduced one layer
     # down. They are mutually exclusive by construction: one `attributes` row, one arm, one exit.
     pins_drop: dict | None = None
+    # DEPL-cMendedVintage-19 S1. THE RE-RESOLUTION'S MEMO, one entry per kit, because un-gating it
+    # below moves the call from "once per row of a schema-1 receipt" to "once per row of every
+    # receipt". The resolution depends on the kit and on nothing else in the row, and a target with
+    # ninety rows across a dozen kits would otherwise pay ninety glob expansions for twelve answers.
+    _role_res: dict[str, dict] = {}
     for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
@@ -6638,20 +6643,44 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                    f"update dispatch — refusing rather than classifying it from an absent field")
             continue
 
-        # A schema-1 receipt's ROLE is untrusted: unit 1 measured that such a receipt stamps
-        # `engine` on a file its descriptor declares project-owned. Re-resolve and refuse a
-        # disagreement rather than acting on either answer.
-        if schema < 2 and row.get("kit") in descs:
-            d, _ = descs[row["kit"]]
-            ctx = target_context(target, deploy, row["kit"], d)
-            res = resolve_entry(root, d, ctx)
+        # DEPL-cMendedVintage-19 S1. THE RE-RESOLUTION RUNS AT EVERY SCHEMA. It used to be gated on
+        # `schema < 2`, so a schema-3 row whose descriptor had since moved its destination to
+        # another role kept the RECORDED role and took that role's whole disposition — which for a
+        # row recorded `engine` against a rule now declaring `project-owned` means the full verdict
+        # table runs against a rule that supplies no bytes, and the adopter's own copy is graded
+        # `missing` and restored. The role a row landed under is a fact about the past; what gov
+        # claims about that destination NOW is a fact about this run, and only the second one can
+        # decide what this run may do.
+        if row.get("kit") in descs:
+            if row["kit"] not in _role_res:
+                d, _ = descs[row["kit"]]
+                _role_res[row["kit"]] = resolve_entry(
+                    root, d, target_context(target, deploy, row["kit"], d))
+            res = _role_res[row["kit"]]
             w = res["writes"].get(row["path"])
             now = w["role"] if w else next(
                 (u["role"] for u in res["unlanded"] if u["dest"] == row["path"]), None)
             if now and now != role:
-                r.fail(f"row '{row['path']}' is recorded as '{role}' and its descriptor now resolves "
-                       f"it as '{now}' — refusing this row rather than acting on a role a schema-1 "
-                       f"receipt cannot be trusted about")
+                # S3. TWO BRANCHES, NEVER ONE WIDENED. A schema-1 receipt's ROLE is untrusted for a
+                # different reason: unit 1 measured that such a receipt stamps `engine` on a file
+                # its descriptor declares project-owned, so NEITHER answer may be acted on and
+                # refusing the row is still the correct handling. Merging the two would demote that
+                # refusal into a report and let the run act on a role the receipt is known to get
+                # wrong. From schema 2 the recorded role is trustworthy, both answers are, and they
+                # describe two different vintages — which is a transition, not a corruption.
+                if schema < 2:
+                    r.fail(f"row '{row['path']}' is recorded as '{role}' and its descriptor now "
+                           f"resolves it as '{now}' — refusing this row rather than acting on a "
+                           f"role a schema-1 receipt cannot be trusted about")
+                    continue
+                # S2. A DESCRIPTOR TRANSITION IS NOT A BYTE QUESTION. Nothing is written for this
+                # row, it is not counted as a change, and it never reaches `acted` — so no snapshot
+                # entry, no rollback field and no re-stamp of its role. The role stays as recorded
+                # until the operator's next `apply` re-records it, which is the verb that owns a
+                # role change. The path is the line's LAST field, because the row shape is parsed by
+                # name elsewhere and a trailing clause there has broken a reader before.
+                tally["role-moved"] = tally.get("role-moved", 0) + 1
+                print(f"  {'role-moved':<18} [{role:<13}] -> {now:<13} {row['path']}")
                 continue
 
         if how == "block":
@@ -6831,6 +6860,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update — {tally['unattributed']} row(s) matched no gov vintage at adoption, "
               f"so there is no base to write against and none was written. "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write` supplies one")
+
+    # DEPL-cMendedVintage-19 S2. The operator-facing half of `role-moved`, said ONCE. The row above
+    # names the two roles and the path; a reader who has only ever seen the other verdicts would
+    # reasonably assume a verdict means something is pending, and the whole point of this one is
+    # that nothing is. So it says what happened, what is true of their tree afterwards, and which
+    # verb ends it — rather than naming a disposition and stopping.
+    if tally.get("role-moved"):
+        print(f"govkit update — {tally['role-moved']} row(s) landed under one role and gov's "
+              f"descriptor now declares that destination under another. NOTHING was written for "
+              f"them and their receipt rows are unchanged: the two rules disagree about who owns "
+              f"those bytes, and choosing between them is not gov's to do on your behalf. Those "
+              f"files are exactly as you left them and there is nothing to undo. "
+              f"`govkit apply --target <this target>` re-records each row under the role its "
+              f"descriptor declares today, which is the verb a role change belongs to")
 
     # DEPL-dGaugedVintage-9 S2/S3/S4. THE PER-KIT VERSION DELTA, which nothing in gov reported.
     # Every row has carried a `version` since schema 2 and no reader ever joined it to gov's own

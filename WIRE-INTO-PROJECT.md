@@ -1040,6 +1040,22 @@ a block that is not there. Nothing outside the marked region is read or rewritte
 `.gitattributes` you also maintain by hand keeps every line of its own, byte for byte. A read-only
 run says `REMOVED` in so many words before any of it happens.
 
+### `role-moved` — gov changed its mind about who owns a file
+
+A row lands under a role, and a later vintage of gov's descriptor can declare that same destination
+under a different one — most often moving a file gov used to supply into your project's own keeping.
+`update` re-resolves every row's role against the descriptor as it stands, at every receipt schema,
+and prints `role-moved` naming the role the row landed under, the role gov declares today and the
+path. **Nothing is written for such a row and nothing in your receipt changes.** The two rules
+disagree about who owns those bytes, so the file on disk is exactly as you left it — including a
+destination you have edited or emptied, which an older gov would have restored from its own copy.
+There is nothing to undo and no order to read. `govkit apply` re-records the row under the role the
+descriptor declares now, which is the verb a role change belongs to, and the line stops appearing.
+
+One exception, and it is deliberate: on a receipt still at schema 1 the same disagreement REFUSES
+the row instead. A schema-1 receipt is known to stamp roles its own descriptor contradicts, so
+neither answer can be trusted there and acting on either would be a guess.
+
 **`update-conflict-*.md` orders are REAPED, and they are the only family that is.** A conflict order
 records a STATE — this row still conflicts — which every run re-derives from scratch, so an order
 left standing after the conflict is resolved is a lie the operator keeps reading. An unscoped

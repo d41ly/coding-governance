@@ -868,6 +868,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "check_role_move",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "check_root_shape",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
