@@ -57,6 +57,12 @@ a clean install. Admit that role to the loop the receipt already equips it for.
 - No repair. `check` reports; `DEPL-cMendedVintage-10` is what writes the block back.
 - No change to the merged loop's CR handling, its `find_block` refusal catch or its extraction.
   They are reused unmodified, and reusing them is the unit.
+  AMENDED rev-3, because S3's guard went role-blind and a non-goal left standing beside it would
+  return a second verdict on the same question. ONE merged-loop behaviour does change: a `merged`
+  row carrying no `block_sha256` is now reported ungradeable instead of failed. That is the same
+  false accusation S3 names, reached by the same rows through the same comparison, and a guard
+  written for one caller of a shared loop leaves its sibling caller broken. The three mechanisms
+  this bullet actually protects are untouched.
 - No new receipt field and no floor. Every field this reads has been written by `apply` since the
   `attributes` row existed.
 
@@ -187,8 +193,9 @@ one release: the verdict and the verb that clears it.
   it. `0/1 intact` over a row nothing could grade reads as a failure, which is the accusation
   S3 exists to prevent, arriving through the denominator instead of through the comparison.
 - **AC4** — When a fixture carrying both a `merged` row and an `attributes` row is checked with
-  `python tools/govkit/govkit.py check --target <fixture>`, stdout carries `merged blocks: 1/1
-  intact` unchanged alongside the separate pin-block note.
+  `python tools/govkit/govkit.py check --target <fixture>`, stdout carries
+  `merged blocks: 1/1 intact`
+  unchanged alongside the separate pin-block note.
   Red when: the two roles share one counter, which makes the existing string report 2/2 and flips
   the shipped arms that assert it verbatim.
   figure: DERIVED — the counts come from the run's own output; `1/1` is the fixture's shape, not a
@@ -221,7 +228,7 @@ field removed asserted to report rather than fail · no assertion floor to move.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
-- rev-3 · 2026-09-17 · §2 §4 §5 §6 §10 · AMENDED BY THE BUILD, after measuring. Six changes and none of them moves the design. S3's guard goes role-blind, because the sibling caller carried the same defect. S4's role rides after the block id, because a shipped arm asserts the prefix. The counters become two role-keyed dicts. The new note is guarded by a non-empty population instead of printing a standing zero. AC1 names the fixture's selection, because the obvious one cannot answer whether the verb exits 0. AC3 puts an ungradeable row outside the graded population rather than at 0/1. The §5 user-docs bullet is withdrawn with its reason. Every `path:line` reference is stripped in the same pass: three units edited that file after rev-1 and every number in it was stale, which is the trap the build brief names.
+- rev-3 · 2026-09-17 · §2 §3 §4 §5 §6 §10 · AMENDED BY THE BUILD, after measuring. Six changes and none of them moves the design. S3's guard goes role-blind, because the sibling caller carried the same defect. S4's role rides after the block id, because a shipped arm asserts the prefix. The counters become two role-keyed dicts. The new note is guarded by a non-empty population instead of printing a standing zero. AC1 names the fixture's selection, because the obvious one cannot answer whether the verb exits 0. AC3 puts an ungradeable row outside the graded population rather than at 0/1. The §5 user-docs bullet is withdrawn with its reason, and §3's merged-loop non-goal gains the one behaviour the role-blind guard does change, so the amendment does not leave its other half standing. Every `path:line` reference is stripped in the same pass: three units edited that file after rev-1 and every number in it was stale, which is the trap the build brief names.
 - rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-17 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
