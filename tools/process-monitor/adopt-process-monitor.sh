@@ -82,6 +82,13 @@ KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix 2>/dev/null)"
 KIT_REL="${KIT_REL%/}"
 [ -n "$KIT_REL" ] || {
   echo "process-monitor: cannot derive this kit's directory relative to $ROOT" >&2; exit 2; }
+# THE TOOL ROOT, derived exactly as `adopt-unattended.sh` derives it and for the same reason: the
+# settings merger lives BESIDE this kit rather than inside it. The wiring remedy below used to spell
+# it under a hardcoded `$ROOT/tools/` prefix, which names nothing in a root install and disagreed
+# with the fragment paths on the two lines above it, which this same file already derives from
+# `KIT_REL`. One file, one route, two answers. TOOL-cMendedVintage-4.
+TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 
 PY=$(resolve_python "${GOV_PYTHON:-}" 2>/dev/null) || PY=""
 CONF="$ROOT/.process-monitor.conf"
@@ -216,7 +223,7 @@ if [ "$MODE" = "--check" ]; then
     _missing=""
     [ "$_hook_post" -eq 0 ] && _missing="$_missing PostToolUse (--fragment $KIT_REL/procmon-hook.fragment.json)"
     [ "$_hook_start" -eq 0 ] && _missing="$_missing SessionStart (--fragment $KIT_REL/procmon-session.fragment.json)"
-    add_problem "the engine is configured but the HOOK IS NOT WIRED for:$_missing — nothing will report a hung process on that event. Wire each with: $PY $ROOT/tools/settings-merge.py <that --fragment>"
+    add_problem "the engine is configured but the HOOK IS NOT WIRED for:$_missing — nothing will report a hung process on that event. Wire each with: $PY $ROOT/${TOOL_ROOT}settings-merge.py <that --fragment>"
     print_note "wiring NOT ok — the hook is absent from .claude/settings.json for:$_missing"
     exit 1
   fi

@@ -356,7 +356,14 @@ rm -f "$_sj_err"
 AGENTCAP_MATCHER='Workflow|Agent'
 # The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
 # resolve it each; one spelling is one fewer carried literal per arm that names it.
-SMERGE=$(first_of tools/settings-merge.py settings-merge.py)
+# DERIVED, and NEVER EMPTY. This file sits directly under the tool root, so its own KIT_REL IS that
+# root. The remedies below used to fall back to the merger under a literal `tools/` prefix, which names
+# nothing at any install prefix but gov's own — an operator at `scripts/gov/` was handed a command
+# that cannot start, and TOOL-cMendedVintage-3 made a root install REACH that line for the first
+# time. With the fallback derived, every tail collapses to the bare variable and the literal is
+# deleted rather than repathed, which is what removes the class instead of moving it.
+SMERGE_DEFAULT="${KIT_REL:+$KIT_REL/}settings-merge.py"
+SMERGE=$(first_of "$SMERGE_DEFAULT" settings-merge.py); SMERGE=${SMERGE:-$SMERGE_DEFAULT}
 check_agentcap() {
   local smerge found shipped; smerge=$SMERGE
   # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
@@ -417,7 +424,7 @@ check_agentcap() {
     # withdrawn path satisfies the marker test and loads nothing, which is precisely the silent
     # unwiring this unit's migration ordering exists to prevent.
     if ! grep -q "$shipped" "$(settings_json)" 2>/dev/null; then
-      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY ${smerge:-tools/settings-merge.py}"
+      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY $smerge"
       unwired=$((unwired+1))
       return
     fi
@@ -426,9 +433,9 @@ check_agentcap() {
   fi
   found=$(matchers_of "agent-cap.js" | paste -sd, - 2>/dev/null || matchers_of "agent-cap.js" | tr '\n' ',')
   if [ -n "$found" ]; then
-    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY ${smerge:-tools/settings-merge.py}"
+    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY $smerge"
   else
-    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py}"
+    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY $smerge"
   fi
   unwired=$((unwired+1))
 }
@@ -476,9 +483,9 @@ check_scratch_guard() {
   # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
   found=$(matchers_of "$marker" | paste -sd, - 2>/dev/null || matchers_of "$marker" | tr '\n' ',')
   if [ -n "$found" ]; then
-    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY $smerge --fragment $frag"
   else
-    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY $smerge --fragment $frag"
   fi
   unwired=$((unwired+1))
 }
@@ -524,7 +531,7 @@ check_recall_opened() {
   if wired "$marker" "$rmatcher"; then
     echo "ok       recall    — recall-opened PostToolUse hook wired in $(render_settings_path)"
   else
-    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY $smerge --fragment $frag"
     unwired=$((unwired+1))
   fi
 }
@@ -582,9 +589,9 @@ check_card() {
     # wired, and the card is gone after the first compaction.
     found=$(matchers_of "$marker" "$(basename "$hooksh")" | paste -sd, - 2>/dev/null || matchers_of "$marker" "$(basename "$hooksh")" | tr '\n' ',')
     if [ -n "$found" ]; then
-      echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
+      echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY $SMERGE --fragment $frag"
     else
-      echo "UNWIRED  card      — $hooksh present but the $name entry ($marker) is not in settings.json. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
+      echo "UNWIRED  card      — $hooksh present but the $name entry ($marker) is not in settings.json. Fix: $PY $SMERGE --fragment $frag"
     fi
     unwired=$((unwired+1))
   done

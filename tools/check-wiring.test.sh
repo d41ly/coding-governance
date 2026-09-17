@@ -985,6 +985,22 @@ git add -A; git commit -q -m "ship agent-cap.js at the root install"
 out=$(bash ./check-wiring.sh --check 2>&1)
 ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" \
    "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && echo 1 || echo 0)"
+# TOOL-cMendedVintage-4 — AND THE REMEDY IT PRINTS HAS TO BE RUNNABLE WHERE IT IS PRINTED. `SMERGE`
+# used to fall back to a hardcoded `tools/` prefix, so an install at any other prefix with no merger
+# beside it handed the operator a command naming a file their tree does not contain. The two-segment
+# install is the discriminating one: the old spelling and the new differ in both directions here, so
+# the second assertion is not a restatement of the first — it reds if the literal comes back beside
+# a derived one. No merger is installed anywhere in this fixture, which is the fallback's own case.
+# That second pattern deliberately stops before the extension: spelled whole it would be a carried
+# `tools/` literal in this file's own bytes and would RAISE the install-prefix row, which the ratchet
+# cannot absorb. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
+mkdir -p scripts/gov/hooks; printf '// stub\n' > scripts/gov/hooks/agent-cap.js
+git add -A; git commit -q -m "ship agent-cap.js at the two-segment install"
+out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
+ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \
+   "$(printf '%s' "$out" | grep -q 'scripts/gov/settings-merge.py' && echo 1 || echo 0)"
+ck "prefix: no remedy in that install still names the dead tools/ merger" \
+   "$(printf '%s' "$out" | grep -q 'tools/settings-merge' && echo 0 || echo 1)"
 cleanup
 
 echo "---- $pass passed, $fail failed ----"

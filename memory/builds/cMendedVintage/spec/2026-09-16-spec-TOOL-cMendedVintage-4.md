@@ -1,11 +1,12 @@
 # TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 15
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-4-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-4-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-16-prompt-TOOL-cMendedVintage-4-2-build-brief.md](../prompts/2026-09-16-prompt-TOOL-cMendedVintage-4-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -202,6 +203,17 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-3 · 2026-09-17 · §4 · TWO FACTUAL CORRECTIONS, no criterion and no design changed. (a) The
+  Inventory paragraph said shell variables are graded by a `shell` naming cell and are checked with
+  `--as <cell>`. There is no such cell: `.lexicon.conf` declares `sh.function` and nothing else for
+  shell, and `--suggest SMERGE_DEFAULT --as shell` answers with a malformed-key refusal. Variables
+  are ungraded here, so both names were chosen by reuse from
+  `tools/unattended/adopt-unattended.sh` rather than by the tool. (b) The Data model and Migration
+  tables pin `tools/check-wiring.sh` line numbers — `353` for the resolution site and `414` through
+  `581` for the eight tails — that were correct at BASE `859daa67` and had moved six lines down by
+  the time this unit ran, `TOOL-cMendedVintage-3` having landed between. The site is `359` and the
+  tails are `420` through `594`. The COUNTS in the Migration table are untouched and were measured
+  correct to the occurrence: 3 -> 2, 8 -> 6, 5 -> 5, the last because `:219` is `/`-preceded.
 - rev-2 · 2026-09-16 · §6 · TOKEN SPELLING, no criterion changed. AC1, AC3 and AC4 named the scratch fixture's installed files with a literal scripts/ prefix. `tools/check-spec-tokens.py` reds on a backticked path-shaped token `git ls-files` cannot resolve, and it is right to: those are paths inside a fixture the arms build, not paths in this tree. `--dispatch` refuses every unit of the build while that checker is red, so nothing could be dispatched. They now read `<prefix>/…`, because `check_path_shaped`'s `NOT_A_TOKEN` excludes a token opening `<` — an escape by SHAPE rather than a waiver, and a truer statement of the criterion, which must hold at any install prefix that is not the tool root rather than at one spelling of it. The waiver registry was deliberately not used: it is shrink-only so a new hit cannot be waived away quietly, which is the property that forced the real fix.
 
 ## 10. Reuse audit

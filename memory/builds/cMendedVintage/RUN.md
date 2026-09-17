@@ -157,3 +157,7 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T00:16:47Z dispatch · item d019bf9c TOOL-cMendedVintage-4 · reason tools/check-wiring.sh tools/process-monitor/adopt-process-monitor.sh tools/memory-recall/adopt-memory-recall.sh tools/install-prefix-carried.txt
 
 2026-09-17T00:16:48Z brief · item TOOL-cMendedVintage-4 · reason a925a5aa2977 memory/builds/cMendedVintage/prompts/2026-09-16-prompt-TOOL-cMendedVintage-4-2-build-brief.md
+
+2026-09-17T00:22:07Z dispatch · item 961fc402 TOOL-cMendedVintage-4 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/process-monitor/adopt-process-monitor.sh tools/memory-recall/adopt-memory-recall.sh tools/install-prefix-carried.txt tools/install-prefix-waivers.txt memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-4.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-4-acceptance-ledger.md memory/LIVE.md
+
+2026-09-17T00:34:18Z dispatch · item 961fc402 TOOL-cMendedVintage-4 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/process-monitor/adopt-process-monitor.sh tools/memory-recall/adopt-memory-recall.sh tools/install-prefix-carried.txt tools/install-prefix-waivers.txt memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-4.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-4-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md

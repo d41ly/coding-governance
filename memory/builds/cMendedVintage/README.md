@@ -123,7 +123,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [TOOL-cMendedVintage-2 — gate-lint stops seeding into the memory tree](spec/2026-09-16-spec-TOOL-cMendedVintage-2.md) | 12 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-9 — no descriptor destination under `{memory_root}/project/`](spec/2026-09-16-spec-DEPL-cMendedVintage-9.md) | 13 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [TOOL-cMendedVintage-3 — `check-wiring.sh`'s boundary walk can produce the empty prefix it declares legal](spec/2026-09-16-spec-TOOL-cMendedVintage-3.md) | 14 | 2 | CLOSED | rev-2 | 2026-09-16 |
-| [TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix](spec/2026-09-16-spec-TOOL-cMendedVintage-4.md) | 15 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-cMendedVintage-4 — the three settings-merge remedies resolve at the install prefix](spec/2026-09-16-spec-TOOL-cMendedVintage-4.md) | 15 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default](spec/2026-09-16-spec-TOOL-cMendedVintage-5.md) | 16 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize](spec/2026-09-16-spec-DEPL-cMendedVintage-10.md) | 17 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it](spec/2026-09-16-spec-DEPL-cMendedVintage-15.md) | 18 | 2 | SPECCED | rev-1 | 2026-09-16 |
@@ -141,7 +141,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 30 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 4 record folder(s).
+Records: 33 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-15 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 
