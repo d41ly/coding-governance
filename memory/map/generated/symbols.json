@@ -868,6 +868,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "check_retired_flags",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_role_move",
       "kind": "function",
       "file": "tools/govkit/matrix.py"

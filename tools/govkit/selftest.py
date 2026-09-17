@@ -192,6 +192,71 @@ def check(label: str, cond: bool, detail: str = "") -> None:
         print(f"FAIL {label}{(' — ' + detail) if detail else ''}")
 
 
+# ================= DEPL-cMendedVintage-20 — A RETIRED FLAG, GRADED BY CLASS ==================
+# One row per flag this engine has retired: the name, the date it went, and the unit that retired
+# it. A retirement with no row here is a retirement nothing grades, so the ROW — not the arm — is
+# what the next retirement has to add. The provenance rides the row because a bare name is
+# indistinguishable from something somebody typed in, and a name nobody can attribute is the name
+# that gets deleted to clear a red.
+RETIRED_FLAGS = (
+    ("allow-ungraded", "2026-09-16", "DEPL-cMendedVintage-4"),
+)
+
+
+def check_retired_flags(module_path: pathlib.Path = GOVKIT) -> None:
+    """Assert every name in `RETIRED_FLAGS` survives under NO spelling in ONE module's text.
+
+    WHAT THIS DOES NOT CHECK, said here because a structural check reads as a semantic one to
+    everybody who did not write it. It reads the SINGLE module it is handed and nothing else: the
+    same flag re-introduced in this harness, in a rendered document or in a sibling tool is
+    invisible to it. And it grades SPELLING, never BEHAVIOUR — whether the flag still WORKS is the
+    argv-refusal arm's job — so a green row says only that no operator can read the name in that
+    module's text, and never that the flag is gone from the product.
+
+    THE PATH IS A PARAMETER so the failing case can be staged against a scratch copy. A checker
+    that can only ever read one hard-coded file has no negative case anything can reach, which is
+    the defect in the criterion this arm exists because of, one level in.
+
+    The population is the WHOLE file — the usage block, every string literal, every identifier —
+    and never a section of it. A pattern scoped to argv parsing would be that same blindness again:
+    the shipped criterion this replaces matched `allow_ungraded` alone and was blind to the usage
+    line, the usage sentence, the `over` clause, the argv arm and the `parse_args` unpack.
+    """
+    lines = module_path.read_text(encoding="utf-8").splitlines()
+    check("[-20] S2 LIVENESS the retired-flag declaration names at least one flag — over an empty "
+          "one every assertion below is vacuously true and this arm is a DEAD PROBE reporting a "
+          "clean pass over nothing", bool(RETIRED_FLAGS), "RETIRED_FLAGS is empty")
+    for name, date, unit in RETIRED_FLAGS:
+        parts = name.replace("_", "-").split("-")
+        # A name this engine does not spell the way it spells the others reds NAMING THE ROW, rather
+        # than being quietly narrowed to whatever survives the derivation.
+        spellable = all(p.isalnum() for p in parts)
+        check(f"[-20] S2 the declared name {name!r} is one the derived pattern can express",
+              spellable, f"{name!r}, declared by {unit}")
+        check(f"[-20] AC3 the {name!r} row carries the date and the unit id that retired it",
+              bool(_re.match(r"\d{4}-\d{2}-\d{2}$", date))
+              and bool(_re.match(r"[A-Z]+-[A-Za-z]+-\d+$", unit)),
+              f"date {date!r}, unit {unit!r}")
+        if not spellable:
+            # NO absence row for a name the derivation just refused. Whatever that pattern matched
+            # is not this flag, so a green there would be a skip wearing coverage's clothes.
+            print(f"     [-20] {name} — no absence assertion, the name above was refused")
+            continue
+        # DERIVED from the declared name, so a new row supplies a name and never a regex. Case is
+        # FOLDED rather than alternated, which covers the upper-case constant spelling and anything
+        # else between the two without a second pattern to keep in step with the first.
+        pattern = "[_-]".join(parts)
+        hit = _re.compile(pattern, _re.I)
+        sites = [f"{n}:{ln.strip()[:70]}" for n, ln in enumerate(lines, 1) if hit.search(ln)]
+        # Both figures are DERIVED by this pass and neither is read from a number anybody wrote
+        # down; the sites are printed so a red names the line the spelling survived on.
+        print(f"     [-20] {name} — /{pattern}/i over {module_path.name} — "
+              f"{len(sites)} matching line(s) of {len(lines)}")
+        check(f"[-20] AC1 the retired flag {name!r} survives under NO spelling anywhere in "
+              f"{module_path.name} — not the usage block, not a string, not an identifier",
+              not sites, "; ".join(sites[:6]))
+
+
 def git(cwd: pathlib.Path, *args: str) -> None:
     subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True, check=False)
 
@@ -271,6 +336,10 @@ def main() -> int:
     # blew the 600 s ceiling. Off for the whole suite; the probe's own arms drive the function
     # directly instead, so turning it off here costs no coverage.
     os.environ["GOVKIT_NO_REMOTE_PROBE"] = "1"
+
+    # DEPL-cMendedVintage-20. Source-level and fixture-free, so it runs before the scratch root
+    # exists and costs one file read.
+    check_retired_flags()
 
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)

@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 31
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 31
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-20-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-20-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-20-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-20-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -25,6 +26,8 @@ depend on a criterion's pattern being written correctly.
 - **S1** `tools/govkit/selftest.py` gains a class arm that reads a DECLARED list of retired flag names
   and, for each, asserts zero occurrences in `tools/govkit/govkit.py` under a pattern covering the
   underscore spelling, the hyphen spelling and the upper-case constant spelling of the same name.
+  The module it reads is a PARAMETER defaulting to the derived path, so the failing case is staged
+  against a scratch copy and the tracked file is never edited to observe a red (rev-2).
   Observed by AC1 and AC2.
 - **S2** The retired list lives in `tools/govkit/selftest.py` beside the arm as one literal per retired
   flag, seeded with `allow-ungraded` and carrying the date and the unit id that retired each.
@@ -64,10 +67,16 @@ depend on a criterion's pattern being written correctly.
 Both figures below were derived in this worktree against the blob the spec audit pinned, and both are
 re-derivable by the arm rather than trusted from here.
 
-| pattern | count |
+| pattern | matching lines |
 |---|---|
 | `allow_ungraded` | 8 |
 | `allow[_-]ungraded` or `ALLOW_UNGRADED` | 14 |
+
+AMENDED AT REV-2: the unit is MATCHING LINES and not occurrences. Both figures came from `grep -c`,
+which counts lines, and rev-1 wrote them down as occurrences. They differ here: one line reads
+`allow_ungraded=ALLOW_UNGRADED` and carries the name twice, so the widened pattern has 15
+occurrences on those 14 lines. The arm counts lines, which is the unit the criterion it grades was
+measured in, and prints the offending lines beside the count so a red names the survivor.
 
 The six the criterion cannot see are the two USAGE carriers, the `over … --allow-ungraded` clause in
 the withheld-stamp message, the argv arm's `elif`, and the `parse_args` unpack's upper-case constant.
@@ -84,13 +93,19 @@ provenance is indistinguishable from a name somebody typed in.
 ### The pattern, spelled once
 
 ```
-allow[_-]ungraded | ALLOW_UNGRADED
+allow[_-]ungraded   case-folded
 ```
 
-Derived from the flag name by the arm — lower-case with either separator, plus the upper-case
-constant spelling with underscores — so a new row supplies a name and never a regex. A row whose name
-needs a hand-written pattern is a name this engine does not spell the way it spells the others, and
-that is worth a refusal rather than a special case.
+AMENDED AT REV-2. The pattern was spelled as two alternatives joined, `allow[_-]ungraded` beside
+`ALLOW_UNGRADED`; it is now ONE alternation matched case-insensitively, which is a superset of that
+pair and of every mixed-case spelling between them. Measured both ways against the blob this build
+bases on: 14 matching lines either way, so the widening costs nothing here and removes the second
+pattern that would have had to be kept in step with the first. Derived from the flag name by the
+arm — the separators become a character class and case stops mattering — so a new row supplies a
+name and never a regex. A row whose name needs a hand-written pattern is a name this engine does not
+spell the way it spells the others, and that is worth a refusal naming the row rather than a special
+case; the arm makes no absence assertion for a row it refused, because a green there is a skip
+wearing coverage's clothes.
 
 ### Inventory
 
@@ -149,20 +164,25 @@ not a defect. There is no flag: an arm gated dark is an arm nobody runs.
 ## 6. Acceptance criteria
 
 - **AC1** — When the `check_retired_flags` arm runs after `DEPL-cMendedVintage-4` has landed, it
-  reports 0 occurrences for `allow-ungraded`, and re-adding one `ALLOW_UNGRADED` occurrence to
-  `tools/govkit/govkit.py` turns it RED.
+  reports 0 matching lines for `allow-ungraded`, and re-adding one `ALLOW_UNGRADED` occurrence turns
+  it RED naming the line that occurrence sits on.
+  AMENDED AT REV-2: the re-introduction is staged on a COPY under the run's scratch root, never on
+  the tracked module. The arm takes its target as a parameter for exactly this, and a checker that
+  can only read one hard-coded path has no negative case anything can reach.
   Red when: the pattern is written as the underscore spelling alone, which is the shipped criterion's
   defect reproduced in the arm that was built to close it.
-  figure: DERIVED — the count comes from the arm's own pass over the tracked file, never from a number
-  written in this spec.
-- **AC2** — When the same arm runs against the tree at this build's BASE, it reports 14 occurrences
-  and is RED.
+  figure: DERIVED — the count comes from the arm's own pass over the file it is handed, never from a
+  number written in this spec.
+- **AC2** — When `check_retired_flags` runs against the tree at this build's BASE, it reports 14
+  matching lines and is RED.
+  AMENDED AT REV-2: rev-1 said "14 occurrences". The figure is a LINE count — see the §4 table — and
+  the same pattern has 15 occurrences on those 14 lines.
   Red when: the arm's pattern cannot see the upper-case constant, in which case it reports 8 at BASE
   and the six blind sites are still blind.
   figure: DERIVED by the arm at observation time; 14 is the count measured in this worktree at the
   blob `DEPL-cMendedVintage-4` was audited at, and the arm re-derives it rather than trusting it.
-- **AC3** — When the declared list is read, its `allow-ungraded` row carries a date and
-  `DEPL-cMendedVintage-4` as the unit that retired it.
+- **AC3** — When the declared list `RETIRED_FLAGS` is read, its `allow-ungraded` row carries a date
+  and `DEPL-cMendedVintage-4` as the unit that retired it.
   Red when: the list holds bare names, so a later reader cannot tell a retirement from a typo and the
   row is deleted to clear a red.
 - **AC4** — When the `check_retired_flags` header is read, it names the one module the arm reads and
@@ -184,6 +204,18 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · S1 and AC1: the arm's target module is a PARAMETER defaulting to the derived
+  path, and the re-introduction is staged on a copy under the scratch root. The tracked module is not
+  in this unit's write set, `DEPL-cMendedVintage-19` landed in it minutes before this pass, and a
+  re-introduced flag left behind would surface in the closing review; the parameter also gives the
+  checker the negative case a one-path checker cannot have.
+- rev-2 · 2026-09-17 · §4 and AC2: the unit of both figures is MATCHING LINES, not occurrences. Both
+  came from `grep -c`, which counts lines; measured here, the widened pattern has 15 occurrences on
+  14 lines because `allow_ungraded=ALLOW_UNGRADED` carries the name twice. The arm counts lines, the
+  unit the criterion it grades was measured in.
+- rev-2 · 2026-09-17 · §4: the pattern is one case-folded alternation rather than two spellings
+  joined. Measured 14 either way at BASE, so it is a superset at no cost, and there is no second
+  pattern to keep in step with the first.
 
 ## 10. Reuse audit
 

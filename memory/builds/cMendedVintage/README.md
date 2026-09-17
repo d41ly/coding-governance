@@ -102,7 +102,7 @@ did not revert, and an outbox nothing drains.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 31 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
+**Build status:** CLOSED · 31 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
 ids DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13
 ids DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5
 ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10
@@ -140,10 +140,10 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal](spec/2026-09-16-spec-TOOL-cMendedVintage-8.md) | 28 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-18 — a withdrawn row whose path did not restore stays in the receipt](spec/2026-09-16-spec-DEPL-cMendedVintage-18.md) | 29 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported](spec/2026-09-16-spec-DEPL-cMendedVintage-19.md) | 30 | 2 | CLOSED | rev-2 | 2026-09-17 |
-| [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 31 | 2 | CLOSED | rev-2 | 2026-09-17 |
 <!-- /gen:build-units -->
 
-Records: 64 bound to this build, across 4 record folder(s).
+Records: 65 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
