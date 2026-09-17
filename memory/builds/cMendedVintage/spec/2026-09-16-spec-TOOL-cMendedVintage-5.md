@@ -1,12 +1,14 @@
 # TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 16
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-5-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-5-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-TOOL-cMendedVintage-5-2-build-brief.md](../prompts/2026-09-16-prompt-TOOL-cMendedVintage-5-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -45,9 +47,11 @@ bump the predicate epoch, rebaseline once, and confirm the widened predicate red
   populations differ and the widening's size there is unmeasured. It is a real follow-up and the
   first thing that follow-up owes is that measurement; guessing it here would put an unmeasured
   number beside a predicate.
-- `/` stays in the exclusion class. MEASURED: dropping it takes the occurrence count from 1307 to
-  1511, and the addition is dominated by CORRECT `<gov>/tools/…` spellings that name gov's own
-  checkout in runbook and adopter prose. The ban would then red on the one spelling that is right.
+- `/` stays in the exclusion class. MEASURED at BASE: dropping it takes the occurrence count from
+  1307 to 1511. RE-MEASURED at the build commit, per rev-3: 1148 to 1351. The reading moved and the
+  verdict did not, because the addition is dominated in both readings by CORRECT `<gov>/tools/…`
+  spellings that name gov's own checkout in runbook and adopter prose. The ban would then red on the
+  one spelling that is right.
 - No draining of the rows the widening raises. This unit changes the PREDICATE; fixing the sites it
   newly sees is separate work, and S4 is how each one is recorded rather than absorbed.
 - No `--write-ratchet` run. That mode may lower a count and may not raise one, which is the ban this
@@ -180,6 +184,28 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-3 · 2026-09-17 · §3, §4 and §7 · TWO CORRECTIONS, no criterion and no design changed. §3's
+  `/` non-goal is the OTHER HALF of correction (a) and moved with it: it stated the BASE reading in
+  the present tense, so amending §4 alone would have left one measurement answering in two figures.
+  Its verdict is unchanged under both readings, which is the point of recording both.
+  (a) The Data model table's ABSOLUTE figures no longer describe the tree. Re-measured at the build
+  commit by re-running the gate's own population derivation and all three regexes over it, the
+  population is still 229 shipped source paths and the occurrence counts are 1148 as shipped, 1150
+  with `-` dropped and 1351 with `/` dropped. So the live deltas are +2 and +203, against the +10
+  and +204 the table recorded at BASE. The table's absolute numbers are a reading of a tree fifteen
+  units old and are wrong for this one; its PREDICTION was right to the occurrence, and the two
+  survivors are the two it named. Both are the argv defaults: line `54` of
+  `tools/check-agent-cap-restatement.sh`
+  and line `49` of
+  `tools/check-line-length.sh`,
+  which is the whole live delta and the whole of what S4 records. The brief this unit was written
+  from claimed 11 and claimed that dropping `/` adds roughly 240; the first is a BASE figure and the
+  second is an estimate, and neither reproduced.
+  (b) §7 declares ONE new arm. Two were written, because this suite's own header requires a green
+  control over the same mechanism for every red arm, and an arm asserting only that the widened
+  predicate reds cannot tell "the gate caught the default" from "the gate rejects everything". The
+  control is the `/`-preceded spelling the `/` non-goal deliberately keeps excluded, so it is also
+  the arm that reds if a later pass widens the class again. No assertion floor moved.
 - rev-2 · 2026-09-16 · §3 · the `hands-off` external edge named a sibling unit id in backticks, which
   hygiene check 12 reads as a joinable edge written as an unjoinable one. The sibling is already
   joined by the `consumes-from` bullet above it, so the reference is now spelled without the id. Not
