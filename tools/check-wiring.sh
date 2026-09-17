@@ -20,7 +20,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.3   # gov:kit check-wiring@1.3 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.4   # gov:kit check-wiring@1.4 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -350,7 +350,17 @@ rm -f "$_sj_err"
 AGENTCAP_MATCHER='Workflow|Agent'
 # The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
 # resolve it each; one spelling is one fewer carried literal per arm that names it.
-SMERGE=$(first_of tools/settings-merge.py settings-merge.py)
+# THE PREFIX IS DERIVED, not spelled `tools/`. This resolution knew two layouts — a `tools/` install
+# and a root one — and named neither the prefix this very file was installed under, so at every
+# adopter whose prefix is anything else (`scripts/`, measured at two) `SMERGE` resolved EMPTY and
+# each remedy below printed its root-install fallback verbatim: an instruction naming a file that
+# does not exist in the tree the operator is standing in. `KIT_REL` is this script's own
+# directory relative to the repo root, already derived at the top of this file for exactly this
+# class of question, so the answer travels with the install instead of being guessed here.
+SMERGE=$(first_of ${KIT_REL:+"$KIT_REL/settings-merge.py"} tools/settings-merge.py settings-merge.py)
+# The remedy fallback, for when the merger is ABSENT and `SMERGE` is therefore empty: still the path
+# it WOULD be installed at here, never another repo's prefix.
+SMERGE_HINT="${KIT_REL:+$KIT_REL/}settings-merge.py"
 check_agentcap() {
   local smerge found shipped; smerge=$SMERGE
   # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
@@ -411,7 +421,7 @@ check_agentcap() {
     # withdrawn path satisfies the marker test and loads nothing, which is precisely the silent
     # unwiring this unit's migration ordering exists to prevent.
     if ! grep -q "$shipped" "$(settings_json)" 2>/dev/null; then
-      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY ${smerge:-tools/settings-merge.py}"
+      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY ${smerge:-$SMERGE_HINT}"
       unwired=$((unwired+1))
       return
     fi
@@ -420,9 +430,9 @@ check_agentcap() {
   fi
   found=$(matchers_of "agent-cap.js" | paste -sd, - 2>/dev/null || matchers_of "agent-cap.js" | tr '\n' ',')
   if [ -n "$found" ]; then
-    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY ${smerge:-tools/settings-merge.py}"
+    echo "UNWIRED  agent-cap — the hook is wired under matcher '$found', not '$AGENTCAP_MATCHER'; it never fires for a direct Agent spawn, which is the modality the arity rule was blind to. Fix: $PY ${smerge:-$SMERGE_HINT}"
   else
-    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py}"
+    echo "UNWIRED  agent-cap — agent-cap.js present but hook not in settings.json. Fix: $PY ${smerge:-$SMERGE_HINT}"
   fi
   unwired=$((unwired+1))
 }
@@ -470,9 +480,9 @@ check_scratch_guard() {
   # hook plainly present in the file concludes the checker is broken. Same reasoning as agent-cap.
   found=$(matchers_of "$marker" | paste -sd, - 2>/dev/null || matchers_of "$marker" | tr '\n' ',')
   if [ -n "$found" ]; then
-    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  scratch   — the guard is wired under matcher '$found', not '$smatcher'; it never fires for the shells the fragment declares. Fix: $PY ${smerge:-$SMERGE_HINT} --fragment $frag"
   else
-    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  scratch   — $hookjs present but the guard is not in settings.json. Fix: $PY ${smerge:-$SMERGE_HINT} --fragment $frag"
   fi
   unwired=$((unwired+1))
 }
@@ -518,7 +528,7 @@ check_recall_opened() {
   if wired "$marker" "$rmatcher"; then
     echo "ok       recall    — recall-opened PostToolUse hook wired in $(render_settings_path)"
   else
-    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-tools/settings-merge.py} --fragment $frag"
+    echo "UNWIRED  recall    — $hookjs present but hook not in settings.json. Fix: $PY ${smerge:-$SMERGE_HINT} --fragment $frag"
     unwired=$((unwired+1))
   fi
 }
@@ -576,9 +586,9 @@ check_card() {
     # wired, and the card is gone after the first compaction.
     found=$(matchers_of "$marker" "$(basename "$hooksh")" | paste -sd, - 2>/dev/null || matchers_of "$marker" "$(basename "$hooksh")" | tr '\n' ',')
     if [ -n "$found" ]; then
-      echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
+      echo "UNWIRED  card      — the $name entry ($marker) is wired under matcher '$found', not '$cmatcher'; it never fires for the events the fragment declares. Fix: $PY ${SMERGE:-$SMERGE_HINT} --fragment $frag"
     else
-      echo "UNWIRED  card      — $hooksh present but the $name entry ($marker) is not in settings.json. Fix: $PY ${SMERGE:-tools/settings-merge.py} --fragment $frag"
+      echo "UNWIRED  card      — $hooksh present but the $name entry ($marker) is not in settings.json. Fix: $PY ${SMERGE:-$SMERGE_HINT} --fragment $frag"
     fi
     unwired=$((unwired+1))
   done
