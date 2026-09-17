@@ -1648,6 +1648,16 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             if (o, t) not in VERDICT_GRID:
                 r.fail(f"the verdict grid has no cell for (ours={o}, theirs={t}) — every pair must "
                        f"name a verdict, including the one where both sides are gone")
+    # DEPL-cMendedVintage-24 S6. AND THE DECLARED WRITING SET IS A SUBSET OF WHAT THAT TABLE MAPS TO.
+    # Two preconditions and `update`'s closing tally all take their population from this set; a
+    # member misspelled here matches no row, empties all three populations at once, and every one of
+    # them reports a clean run. A member that no role maps to is either that typo or a disposition
+    # somebody removed, and both are states to red on rather than to grade nothing under.
+    for _wd in WRITING_DISPOSITIONS:
+        if _wd not in set(UPDATE_ROLE.values()):
+            r.fail(f"the declared writing set names disposition '{_wd}', which `update`'s dispatch "
+                   f"maps no role to — so it selects nothing, and the guards reading that set grade "
+                   f"an empty population while reporting a clean run")
 
     # ---- 7i: DEPL-dCarriedReceipt-8 S4/AC5. THE NO-CLOBBER GUARANTEE, asserted STRUCTURALLY over
     #          the grid rather than behaviourally over the one row that exposed it. `differs` on the
@@ -4842,12 +4852,13 @@ def demand_index_resolved(target: pathlib.Path, verb: str) -> None:
 
 
 def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
-                        landed_oids: dict[str, str] | None = None) -> list[str]:
+                        landed_oids: dict[str, str] | None = None,
+                        region_owned: dict[str, tuple[str, str]] | None = None) -> list[str]:
     """S4, and the DEFINITION of dirty for this whole build, implemented in one place.
 
     A claimed path is dirty when it differs index-versus-HEAD or worktree-versus-index — `git diff
     --cached` and `git diff` over that path, and deliberately NOT `git status --porcelain`, which
-    also flags `??`. THREE carve-outs, and each of them is a state another unit owns:
+    also flags `??`. FOUR carve-outs, and each of them is a state another unit owns:
 
     - Absent from BOTH the index and the worktree: dirty when HEAD still carries it, because that
       is a STAGED deletion and a staged deletion is an operator decision. NOT dirty when HEAD has
@@ -4860,6 +4871,13 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
       index-versus-HEAD, and whose index blob is the exact oid the receipt recorded landing there,
       was staged by this tool and by nothing else. `landed_oids` supplies those, and a path absent
       from it takes no carve-out.
+    - GOV OWNS A MARKED REGION OF SOME PATHS AND NOT THE PATH. `region_owned` names those and gives
+      each one its marker pair; where every difference vanishes once that region is stripped from
+      HEAD's blob, the index blob and the worktree bytes alike, nothing outside gov's own block
+      moved and the path is not dirty. This is DEPL-cMendedVintage-24 S2, and without it S1's
+      widened population would make every target refuse straight after `apply` over the one path
+      that has no `oid` for the carve-out above to compare — the `-12` burden arriving through a
+      different door.
 
     THAT THIRD ONE IS AN OWNER RULING (2026-08-26) AND IT CLOSES A HOLE S4 DUG UNDER ITSELF. `apply`
     STAGES everything it lands, so the instant a successful apply finished, every receipt-claimed
@@ -4873,9 +4891,23 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
     gov-owned path produces a DIFFERENT index blob and stays dirty, which is the case S4 exists for.
     An unstaged worktree edit is untouched by this and stays dirty too.
 
+    THE FOURTH IS THE CALLER'S DECISION, not this function's. Nothing here knows what
+    `.gitattributes` is, or that gov keeps a pin block in it; the caller supplies the paths and the
+    markers, so a second region-owned path costs a dict entry rather than a branch in here. That
+    placement is DEPL-cMendedVintage-24 Q1: this docstring calls itself the one definition of dirty
+    for the build, and a post-filter in the caller would be a second definition living one call up.
+
+    WHAT THE FOURTH DOES NOT BUY, because a structural carve-out reads as a semantic one to
+    everybody who did not write it. It says nothing about the bytes INSIDE gov's region — gov
+    rewrites those on every run, and an uncommitted edit there is not work this guard can preserve.
+    It clears an operator whose only uncommitted change outside the region is a line ending, for the
+    reason the fold below states. And it reaches only paths the caller named: a region-owned path
+    the caller forgets to name is graded by the plain test, which is the safe direction.
+
     Four git calls over the whole population rather than four per path: a hundred-row receipt would
     otherwise pay four hundred process creations, and on the node that measured it every exec costs
-    about 22 ms whatever it does. The fifth read only happens when a carve-out could apply.
+    about 22 ms whatever it does. The fifth read only happens when a carve-out could apply, and the
+    region reads only for a path that the plain test has ALREADY flagged and the caller named.
     """
     claimed = [c for c in dict.fromkeys(claimed) if c]
     if not claimed:
@@ -4905,6 +4937,65 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
         _idx, _ = index_read(target, sorted(ours))
         ours = {p for p in ours if _idx.get(p, (None, None))[1] == landed_oids[p]}
 
+    region = region_owned or {}
+
+    def derive_outside_region(data: bytes | None, om: str, cm: str) -> str | None:
+        """One side's text with gov's marked region taken out of it, line endings folded to LF.
+
+        `None` says the region could NOT be located unambiguously — two marker pairs in one file, or
+        a close before its open — and the caller reads that as "not eligible for the carve-out",
+        never as "clean". That is the same direction the write path takes for the same state. A side
+        that is absent altogether is the empty string: a file that is not there holds nothing
+        outside gov's region either.
+
+        A HEAD copy carrying a block under an older marker spelling strips to nothing, so that block
+        counts as the operator's content and the path reads dirty rather than being guessed at.
+
+        THE FOLD IS DELIBERATE AND IT HAS A CEILING. The HEAD and index blobs come out of the object
+        database raw while the worktree copy has been through the target's own checkout filter, so
+        on a CRLF clone the two differ by line endings alone and this carve-out would never fire for
+        anybody on Windows — while `git diff`, which decided the path was dirty in the first place,
+        applies those filters and sees nothing. What the fold gives up is the operator whose ONLY
+        uncommitted change outside the region is a line ending; it is the same direction the `eol`
+        carry rung takes across the whole receipt.
+        """
+        if data is None:
+            return ""
+        text = derive_lf(data).decode("utf-8", "replace")
+        try:
+            span = find_block(text, om, cm)
+        except Refusal:
+            return None
+        if span is None:
+            return text
+        lines = text.split("\n")
+        return "\n".join(lines[:span[0]] + lines[span[1] + 1:])
+
+    def check_region_only(path: str, om: str, cm: str) -> bool:
+        """Does every difference at this path vanish once gov's marked region is stripped?
+
+        The index side is read through the ENTRY rather than off the disk, because the whole
+        question is whether the operator's own bytes differ from what is staged. A path that reaches
+        here is in the index by construction, so an index blob that will not read is a state to
+        report DIRTY rather than to guess at.
+
+        The HEAD side joins only where there IS a HEAD, for the reason the batched read above gives:
+        index-versus-HEAD is unanswerable before the first commit, so the worktree-versus-index half
+        is the half that answers there.
+        """
+        idx_one, _ = index_read(target, [path])
+        oid = (idx_one.get(path) or ("", ""))[1]
+        data = index_blob(target, oid) if oid else None
+        if data is None:
+            return False
+        sides = [derive_outside_region(data, om, cm),
+                 derive_outside_region((target / path).read_bytes()
+                                       if (target / path).is_file() else None, om, cm)]
+        if has_head:
+            sides.append(derive_outside_region(
+                blob_at(target, "HEAD", path) if path in in_head else None, om, cm))
+        return None not in sides and len(set(sides)) == 1
+
     dirty: list[str] = []
     for path in claimed:
         if path not in in_index:
@@ -4916,8 +5007,27 @@ def dirty_claimed_paths(target: pathlib.Path, claimed: list[str],
         if path in ours:
             continue                            # carve-out 3 — gov staged exactly this blob
         if path in staged or path in unstaged:
+            if path in region and check_region_only(path, *region[path]):
+                continue                        # carve-out 4 — only gov's own region differs
             dirty.append(path)
     return dirty
+
+
+def derive_graded_rows(receipt: dict | None) -> list[dict]:
+    """The receipt rows a writing verb can actually put bytes at — ONE definition, three readers.
+
+    The dirty-path precondition below, `update`'s untracked-shadow refusal and that verb's closing
+    tally all have to agree about this population, and two of the three used to spell the membership
+    test for themselves. DEPL-cMendedVintage-24: that is how DEPL-cMendedVintage-10 could teach this
+    verb to write `.gitattributes` while the guard standing in front of it went on grading a
+    population that row was not in. The set is `WRITING_DISPOSITIONS` and it is declared beside the
+    table it reads, not here.
+
+    A row whose `role` is absent reads `engine`, and a role with no row in the dispatch grades as
+    not-writing here — the refusal for that state is the dispatch's own, which names the role.
+    """
+    return [row for row in ((receipt or {}).get("files") or [])
+            if UPDATE_ROLE.get(row.get("role", "engine")) in WRITING_DISPOSITIONS]
 
 
 def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | None) -> None:
@@ -4928,17 +5038,9 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
     """
     # A ROW THIS VERB CANNOT WRITE CANNOT MEET S4'S HAZARD. S4 refuses because "a write onto an
     # uncommitted local change is indistinguishable afterwards from a change you made" -- so the
-    # population is the rows a writing verb can actually write. `UPDATE_ROLE["attributes"]` is
-    # `pins`, documented in that table as `recompute, compare, report; never write`, so a
-    # `.gitattributes` row can never be that write.
+    # population is the rows a writing verb can actually write, and that question is answered ONCE,
+    # by `derive_graded_rows` over the declared set, rather than by a membership test spelled here.
     #
-    # IT IS ALSO THE ONE ROW THE `-12` CARVE-OUT CANNOT REACH, which is how this was found rather
-    # than reasoned to: `-7` S9 requires an `attributes` row to carry NEITHER identity, so it has no
-    # `oid`, so the carve-out has nothing to compare and `.gitattributes` stayed DIRTY after every
-    # apply -- leaving `update --write` refusing straight after `apply` over exactly one path, which
-    # is the burden the ruling was taken to remove. Excluding it here needs no new field and breaks
-    # no criterion, and it is the same reasoning the owner already applied to `-7` S4: scope the
-    # refusal to where the hazard is.
     # ROUND 4's H2 and M1, which are one defect. This excluded `pins` ALONE, and every other
     # non-writing disposition fell through it. A `merged` row is the live case: `apply` stages its
     # destination and deliberately gives it no `oid` (`ROLE_KINDS["merged"]` is `blocked`, so neither
@@ -4950,15 +5052,39 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
     # remove. Three shipped descriptors declare `merged`; the ruling-A arms use `memory-tree`, which
     # declares none, so the class passed by finding nothing.
     #
-    # SCOPED TO `table` NOW, which is the same narrowing this diff already made for `_cmd_update`'s
-    # shadow guard, and for the same stated reason: `block`, `report`, `skip`, `adopter` and `pins`
-    # can no more meet S4's raw-write hazard than each other. NOT by stamping `oid` on merged rows --
-    # making that stamp role-blind regressed `-7` S9's exactly-one-identity shape and cost a round.
-    _rows = [row for row in ((receipt or {}).get("files") or [])
-             if UPDATE_ROLE.get(row.get("role", "engine")) == "table"]
+    # DEPL-cMendedVintage-24. THE `attributes` ROW IS BACK IN, and the paragraph that argued it out
+    # is DELETED rather than qualified. That paragraph read `UPDATE_ROLE["attributes"]` off the table
+    # and concluded a `.gitattributes` row "can never be that write"; `DEPL-cMendedVintage-10` made
+    # that false in the same diff by moving the pin write onto `update --write`, and `-17` added the
+    # withdrawal beside it. What the exclusion then cost is not a refusal that failed to fire: gov
+    # STAGED an operator's uncommitted `.gitattributes` on every ordinary run, and a green-to-red
+    # rollback restored the pre-run index entry over it through `checkout-index -f`, which unlinks
+    # first. The hole sat exactly where the new write landed.
+    #
+    # THE `-12` MEASUREMENT IS KEPT AND ITS CONCLUSION IS REPLACED. `-7` S9 requires an `attributes`
+    # row to carry NEITHER identity, so it has no `oid`, so carve-out 3 has nothing to compare and
+    # the row read DIRTY after every apply -- which is why excluding it looked like the cheap answer
+    # at the time. That missing `oid` is the CONSTRAINT this unit designs around rather than a reason
+    # to exclude the row: carve-out 4 compares what gov does NOT own in that file instead, so the
+    # post-apply steady state stays clean and the burden ruling A removed stays removed. NOT by
+    # stamping `oid` on the row -- making that stamp role-blind regressed `-7` S9's exactly-one-
+    # identity shape and cost a round.
+    #
+    # THE REST OF THE NARROWING STANDS: `block`, `report`, `skip` and `adopter` can no more meet
+    # S4's raw-write hazard than each other, and the same declared set scopes `_cmd_update`'s
+    # untracked-shadow refusal, so the two carve-outs no longer point at each other across a row
+    # neither one covers.
+    _rows = derive_graded_rows(receipt)
+    # THE MARKERS ARE `lf_pin_block`'s OWN, recomputed over an empty pin set and never read off the
+    # row -- that function derives the pair from `GA_BLOCK_ID` before it looks at a single pin, which
+    # is the same construction the withdrawal uses. A row whose `block_id` an older vintage spelled
+    # differently is one this carve-out should MISS rather than guess at.
+    _om, _cm, _ = lf_pin_block([])
     dirty = dirty_claimed_paths(
         target, [row.get("path") for row in _rows],
-        {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")})
+        {row["path"]: row["oid"] for row in _rows if row.get("path") and row.get("oid")},
+        {row["path"]: (_om, _cm) for row in _rows
+         if row.get("path") and UPDATE_ROLE.get(row.get("role", "engine")) == "pins"})
     if dirty:
         raise Refusal(
             f"{len(dirty)} path(s) this target's receipt claims are DIRTY: " + ", ".join(dirty)
@@ -5901,7 +6027,11 @@ UPDATE_ROLE = {
     "generated": "skip",
     "rendered": "adopter",      # re-run the adopter, compare, CAP at report
     "merged": "block",          # compare the BLOCK hash; never a three-way
-    "attributes": "pins",       # DEPL-dCarriedReceipt-2: recompute, compare, report; never write
+    # `-2` wrote this row as `recompute, compare, report; never write` and DEPL-cMendedVintage-10
+    # made the last clause false: under `--write` the pin block is rewritten and staged, and `-17`
+    # added the withdrawal beside it. Corrected here rather than left standing, because that gloss
+    # is what the dirty-path guard's own header read to argue this row out of its population.
+    "attributes": "pins",       # recompute, compare, report; REWRITE or WITHDRAW under --write
     "gate-leg": "report",       # DEPL-dCarriedReceipt-2: one row each, tallied, no r.fail
     "ci": "report",             # DEPL-dCarriedReceipt-2: ditto -- `-6` owns emitting them
     # DEPL-dCarriedReceipt-10 S4, the `report` disposition's SECOND consumer. A forked row prints
@@ -5912,6 +6042,23 @@ UPDATE_ROLE = {
     # that target exit non-zero and never re-stamp its receipt.
     "forked": "report",
 }
+
+# DEPL-cMendedVintage-24 S1. THE DISPOSITIONS A WRITING VERB CAN PUT BYTES AT, declared once, beside
+# the table it selects from, and read by every guard that has to know. It is DECLARED rather than
+# derived because nothing in this module states which arm of the dispatch writes — the answer is in
+# the shape of the write loop, not in a value — and `selfcheck` arm 7g asserts every member is a
+# disposition the table above actually maps a role to, because a typo here would empty the graded
+# population of two preconditions and of the closing tally at once and all three would report a
+# clean run.
+#
+# WHY THESE AND NOT MORE, measured off the write loop rather than reasoned. Every row whose `how` is
+# not `table` leaves that loop at its `!= "table"` guard without writing, so `table` IS the raw-write
+# arm. The pin block's rewrite and its withdrawal are the only other bytes this verb puts at a path a
+# receipt CLAIMS, and both are the `pins` disposition. `adopter` is deliberately OUTSIDE: a kit's
+# declared `[[regenerate]]` argv writes under its own authority, keyed on the kit rather than on a
+# receipt row, and its destinations are outside `written_paths` for the same reason — so this set
+# does not reach them and the tally below cannot see them either.
+WRITING_DISPOSITIONS = ("table", "pins")
 
 
 def _sha(b: bytes | None) -> str | None:
@@ -6607,22 +6754,28 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- operator has there. Evaluated HERE, in the preamble: it is a whole-run refusal and must
     # ---- not depend on which rows the loop has already reached.
     #
-    # ---- SCOPED TO ROWS THE DISPATCH SENDS TO THE TABLE, by owner ruling (2026-08-26). The
+    # ---- SCOPED TO ROWS THE DISPATCH SENDS TO A WRITING ARM, by owner ruling (2026-08-26). The
     # ---- predicate was unqualified by role and this unit parked that: the raw-write hazard the
-    # ---- paragraph above NAMES is reachable only from the `table` disposition, so a `generated`,
+    # ---- paragraph above NAMES is reachable only from a writing disposition, so a `generated`,
     # ---- `project-owned`, `rendered` or `gate-leg` row whose destination happened to be present
     # ---- but untracked refused the ENTIRE run for a write that could never have happened — and
     # ---- the operator's only route back to green was `git add` on a file gov will never write.
     # ---- Nothing in this build's fixtures tripped it, so nothing would have warned first.
     # ----
     # ---- This is a NARROWING and it is worth being plain about what it gives up: an untracked file
-    # ---- shadowing a non-table row now passes unremarked, exactly as it did before `-7` landed.
+    # ---- shadowing a non-writing row now passes unremarked, exactly as it did before `-7` landed.
     # ---- What it buys is that the refusal fires only where the hazard is, which is the difference
     # ---- between a guard and a tax.
+    # ----
+    # ---- DEPL-cMendedVintage-24 S3. THE SAME DECLARED SET AS THE DIRTY-PATH PRECONDITION, through
+    # ---- the same derivation, because this predicate and that one were two spellings of one rule
+    # ---- and only one of them was widened when `update` learned to write the pin block. Left narrow
+    # ---- this would keep the two carve-outs pointing at each other across a row neither covers:
+    # ---- `dirty_claimed_paths` hands the untracked case to THIS refusal by name, and the rollback's
+    # ---- absent-entry arm unlinks a file the operator wrote.
     index0, index_present = index_read(target, [w["path"] for w in rows_all])
-    shadowed = sorted(w["path"] for w in rows_all
-                      if UPDATE_ROLE.get(w.get("role", "engine")) == "table"
-                      and w["path"] not in index_present and (target / w["path"]).is_file())
+    shadowed = sorted(w["path"] for w in derive_graded_rows(receipt)
+                      if w["path"] not in index_present and (target / w["path"]).is_file())
     if shadowed:
         raise Refusal(
             "these receipt-claimed path(s) are present in the target's WORKTREE and absent from its "
@@ -8273,6 +8426,34 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
                      | ({_pins_snap["paths"][0]}
                         if (_ga_written or _ga_removed) and _pins_snap else set()))
+
+    # DEPL-cMendedVintage-24 S5. THE CLASS LEFT-SHIFT, and the reason this unit is not just one more
+    # name in a list. The defect it closes was a hand-maintained membership test that had to be
+    # re-derived every time a verb learned to write a role it previously only read, with no signal at
+    # all when nobody did. This asks the question the other way round: every path this run actually
+    # wrote that the receipt CLAIMS must have been in the population the precondition graded. It reds
+    # on the next such widening, whoever forgets the guard, and it reds inside the run that did it.
+    #
+    # SCOPED TO RECEIPT-CLAIMED PATHS, and that is not a softening. `_landed_new` holds destinations
+    # the receipt does not name BY CONSTRUCTION — the landing gate refuses one the target already
+    # holds — and a `renamed` row contributes a destination minted during this run. Unqualified, this
+    # would red on every landing and every rename, which is a guard nobody can leave armed. A write
+    # at a path OUTSIDE the receipt is outside this guard's population, which is the shipped rule the
+    # refusal message itself ends with.
+    #
+    # WHAT IT DOES NOT SEE: a kit's declared `[[regenerate]]` argv writes target-side under its own
+    # authority, keyed on the kit rather than on a receipt row, and its destinations never enter
+    # `written_paths` — so this tally is silent about them and so is the precondition.
+    _graded_paths = {row.get("path") for row in derive_graded_rows(receipt)}
+    _ungraded = sorted(p for p in written_paths
+                       if p in _receipt_paths and p not in _graded_paths)
+    if _ungraded:
+        r.fail(f"this run WROTE receipt-claimed path(s) that its own dirty-path precondition never "
+               f"graded: " + ", ".join(_ungraded) + " — the declared writing set and what this verb "
+               f"actually writes have come apart, so an operator's uncommitted work at those paths "
+               f"was staged without being checked and a rollback would restore over it. Add the "
+               f"disposition that writes them to the declared set, or stop writing them")
+
     n_verified = n_unverified = n_rolled = n_preexisting = n_declined_red = 0
     # DEPL-cMendedVintage-13 S3. WHICH KITS THIS RUN REVERTED, by name rather than by count. The
     # gate-leg emission below subtracts them: a leg emitted for a kit whose engine this run put back

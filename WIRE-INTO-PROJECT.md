@@ -1050,6 +1050,13 @@ a block that is not there. Nothing outside the marked region is read or rewritte
 `.gitattributes` you also maintain by hand keeps every line of its own, byte for byte. A read-only
 run says `REMOVED` in so many words before any of it happens.
 
+**Uncommitted edits to `.gitattributes` outside gov's marked region now stop a write.** Both writing
+verbs already refuse when a path your receipt claims is uncommitted, and that file is one it claims:
+gov writes its pin block there, stages it, and a rollback restores the pre-run index entry over it,
+so an uncommitted line of your own would go with it. Commit or stash that edit and re-run. Edits
+INSIDE gov's block are not counted — gov rewrites that region on every run and reports it as
+`pins-moved` — so the ordinary state straight after an `apply` still proceeds.
+
 ### `role-moved` — gov changed its mind about who owns a file
 
 A row lands under a role, and a later vintage of gov's descriptor can declare that same destination

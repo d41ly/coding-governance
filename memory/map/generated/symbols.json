@@ -1428,6 +1428,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_graded_rows",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_id_families",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

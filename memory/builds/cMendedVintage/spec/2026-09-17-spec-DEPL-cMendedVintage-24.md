@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write
 
-**Status:** SPECCED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 34
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 34
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-24-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-24-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-24-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-24-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -42,10 +43,20 @@ carries no `oid`, and remove the prose that argues the old case.
   harmless dispositions loses `pins`. NOT OBSERVED — a string check over a comment grades spelling
   and not truth, which is the round `DEPL-cMendedVintage-20` spent on a retired flag's absence, and
   what keeps this block honest is S5 reddening on the behaviour the block describes.
-- **S5** The closing tally asserts that every path in `written_paths` was a member of the population
-  the precondition graded, and `r.fail`s naming any that was not. This is the class left-shift: it
-  reds the next time a verb learns to write a role it previously only read, whoever forgets the
-  guard. Observed by AC4.
+- **S5** The closing tally asserts that every path in `written_paths` THE RECEIPT CLAIMS was a
+  member of the population the precondition graded, and `r.fail`s naming any that was not. This is
+  the class left-shift: it reds the next time a verb learns to write a role it previously only read,
+  whoever forgets the guard. Observed by AC4.
+  rev-2 scoped it to receipt-claimed paths after reading the set's own members: `_landed_new` holds
+  destinations the receipt does not name BY CONSTRUCTION — the landing gate refuses one the target
+  already holds — and a `renamed` row contributes a destination minted during this run. An
+  unqualified assertion would therefore red on every landing and every rename, which is a guard
+  nobody can leave armed. What it gives up is named rather than implied: a write at a path outside
+  the receipt is outside this guard's population, which is the shipped rule the refusal message
+  already states.
+- **S6** The declared writing set is asserted by `selfcheck` arm 7g to hold only dispositions
+  `UPDATE_ROLE` actually maps a role to. A typo there would empty the population of two guards and
+  of S5's tally at once, and all three would report a clean run. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -61,6 +72,11 @@ carries no `oid`, and remove the prose that argues the old case.
 - No new receipt field. `DEPL-cMendedVintage-7` S9 requires an `attributes` row to carry neither
   identity, and stamping an `oid` onto it to make carve-out 3 apply is the move that regressed the
   exactly-one-identity shape once already.
+- No grading of what a kit's own `[[regenerate]]` argv writes. That step runs target-side code keyed
+  on the KIT rather than on a receipt row, gov does not know its write set, and its destinations are
+  outside `written_paths` too — so `adopter` stays out of the declared set and S5 cannot see those
+  bytes. Said here rather than left for a reader to find, because a guard's header owes what it does
+  NOT cover; closing it is a different unit about a different population. (rev-2.)
 - No widening of the refusal to differences INSIDE gov's block. Gov rewrites that region on every
   run with or without a rollback, so an uncommitted edit there is not work this guard can preserve,
   and the `pins` disposition already reports it as `pins-moved`.
@@ -101,6 +117,16 @@ are all the operator's original content, so the path is clean and the burden sta
 operator's edit to any other line of `.gitattributes` survives the strip on one side only, so the
 path is dirty and the run refuses, which is the hazard this unit exists to close.
 
+The three sides are not read the same way, and rev-2 adds the fold that makes them comparable. The
+HEAD blob and the index blob come out of the object database raw; the worktree copy has been through
+the target's own checkout filter. On a `core.autocrlf=true` clone the two differ by line endings
+alone, every comparison reports an operator edit nobody made, and the carve-out never fires for
+anybody on Windows — while `git diff` itself, which decided the path was dirty in the first place,
+applies those filters and sees nothing. So each side is folded to LF through `derive_lf`, which is
+the one spelling of that rule this file already has. The ceiling is stated rather than discovered
+later: an operator whose ONLY uncommitted change outside gov's region is a line ending is cleared
+here, which is the same direction the `eol` carry rung takes across the whole receipt.
+
 Three behaviours of that strip are deliberate. `find_block` raises when a file holds two marker
 pairs; the guard treats a raise as "not eligible for the carve-out" and lets the path read dirty,
 which is the same direction the write path takes for that state. A file whose HEAD copy carries a
@@ -134,8 +160,9 @@ same one-definition ground, and is the fork §8 records.
 ### Files touched (estimate)
 
 `tools/govkit/govkit.py` — the two predicates, the declared set beside `UPDATE_ROLE`, carve-out 4
-inside `dirty_claimed_paths`, the returned graded population, the tally assertion, and the comment
-block. `tools/govkit/selftest.py` — four arms. No other file.
+inside `dirty_claimed_paths`, the returned graded population, the tally assertion, the `selfcheck`
+subset arm, and the comment block. `tools/govkit/selftest.py` — the arms section 7 declares.
+`WIRE-INTO-PROJECT.md` — the sentence section 5 names. No other file.
 
 ## 5. Production-readiness checklist
 
@@ -193,12 +220,25 @@ block. `tools/govkit/selftest.py` — four arms. No other file.
   this run wrote and never graded. Red when: the assertion compares the graded population against
   itself, or is only ever exercised on a receipt carrying no attributes row, in which case both sets
   are empty and it cannot fail.
-- **AC5** — When the AC1 fixture is run at BASE `859daa67` with a kit forced green-to-red, the
-  operator's uncommitted `.gitattributes` bytes are GONE after the rollback, and the same fixture
-  after this change never reaches the rollback because the run refuses first. Red when: only the
-  post-fix half is written. It passes because the refusal fired and proves nothing about the
-  destruction, which is the green-by-absence shape this build has already paid for once.
-  cost: the BASE half needs a second checkout of the fixture harness at that sha.
+- **AC5** — When one fixture carrying an uncommitted `.gitattributes` edit outside gov's region is
+  run twice with a kit forced green-to-red by
+  `python tools/govkit/govkit.py update --target <fixture> --write`
+  — once with the engine as it stood at `a2f840b2`, and
+  once with this change — the operator's bytes are GONE after the first run's rollback and
+  BYTE-IDENTICAL after the second, which refuses before the write. Red when: only the post-fix half
+  is written. It passes because the refusal fired and proves nothing about the destruction, which is
+  the green-by-absence shape this build has already paid for once.
+  rev-2 replaced BASE `859daa67` with `a2f840b2` after measuring the engine at BASE: `update` there
+  does not write the pin block AT ALL — `DEPL-cMendedVintage-10` landed at `8f1f9b51`, inside this
+  same diff — so `.gitattributes` is not in that engine's `written_paths`, its rollback steps over
+  the path, and the arm would have passed over an absence while proving nothing. The defect's
+  carrier is HEAD, not BASE. The cost line went with it: the pre-fix engine is swapped into a copied
+  scratch gov exactly as the `-14` AC8 arm already does it, so no second checkout of the harness is
+  needed and the fixture is the same one on both runs.
+- **AC6** — When `python tools/govkit/govkit.py selfcheck` runs over this repository it exits 0, and
+  when the declared writing set is edited to name a disposition `UPDATE_ROLE` maps no role to, arm
+  7g `r.fail`s naming that member. Red when: the arm asserts the set is non-empty and nothing more,
+  in which case a typo that renames one member passes and empties the graded population silently.
 
 ## 7. Gates
 
@@ -213,6 +253,13 @@ the branch count moves.
 
 New arm: `tools/govkit/selftest.py` · the declared writing set edited to drop `pins`, asserted to make
 the closing tally fail naming the ungraded path · no floor moves.
+
+New arm: `tools/govkit/selftest.py` · one fixture run twice, once under the engine at `a2f840b2` and
+once under this one, asserting the operator's uncommitted bytes are destroyed by the first and
+survive the second · no floor moves.
+
+New arm: `tools/govkit/govkit.py` · `selfcheck` arm 7g gains the subset assertion over the declared
+writing set · no floor moves.
 
 ## 8. Open questions
 
@@ -229,6 +276,19 @@ the closing tally fail naming the ungraded path · no floor moves.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-17 · node c, by the pass that built the unit, and every move is a MEASUREMENT of
+  the tree rather than a preference. **AC5** now names `a2f840b2` instead of BASE `859daa67`, and
+  drops the second-checkout cost line: `git show 859daa67:tools/govkit/govkit.py` holds no pin
+  write, because `DEPL-cMendedVintage-10` landed at `8f1f9b51` inside this diff, so the BASE half
+  could not have observed a destruction and would have passed over an absence. **AC6** is new and
+  observes the new **S6**, the subset assertion `selfcheck` arm 7g gains over the declared set.
+  **S5** is scoped to receipt-claimed paths, because `_landed_new` and a `renamed` destination are
+  outside the receipt by construction and an unqualified assertion reds on every landing. **§4**
+  gains the LF fold and its ceiling, because the index blob is raw and the worktree copy is
+  filtered. **§2 S1** is confirmed unchanged and NOT amended: the write loop leaves every row at
+  `if a["how"] != "table": continue`, and the pin rewrite and withdrawal are the only other bytes
+  this verb puts at a receipt-claimed path, so the declared set is accurate and the class form is
+  what shipped.
 - rev-1 · 2026-09-17 · initial draft, authored mid-build after the closing review adjudicated finding
   B3 a BLOCKER. Every line the finding cites was re-opened at HEAD before designing against it: the
   predicate has moved to `tools/govkit/govkit.py:4799`, the pin writes to `:7213` and `:7252`, and
