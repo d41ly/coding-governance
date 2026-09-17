@@ -25,8 +25,8 @@ place this engine word-splits git.
 ## 2. Scope (IN)
 
 - **S1** Both renormalize guards invoke `git diff --name-only -z HEAD` and split the answer on NUL,
-  dropping the empty tail. `tools/govkit/govkit.py:8560` is `update`'s and `:5491` is `apply`'s, and
-  both were re-opened at HEAD `4c4d42fe` and still read as the review quoted them. Observed by AC1
+  dropping the empty tail. The sites are `_cmd_update`'s and `_cmd_apply`'s renormalize guards —
+  BY SYMBOL, because the line numbers rev-1 carried had already moved when this was built. Observed by AC1
   and AC2.
 - **S2** A permanent class arm in `tools/govkit/selftest.py` refuses any git invocation in
   `govkit.py` whose stdout reaches a record-splitting read — a bare `.split()` OR a `.split("\0")`
@@ -116,10 +116,12 @@ drifting further is a check that grades both, and that is S2.
 predicate over `govkit.py` with `ast` imported and a declared row table, and S2's arm is its sibling
 rather than a new mechanism. It parses the module, finds every `subprocess` call whose first
 argument is a list literal beginning `git`, records whether that argv carries `-z`, and then finds
-every bare `.split()` taking the `stdout` of one — inline on the call, or through the name the call
-was assigned to. A hit is a red naming the line. The one exemption is declared as a row carrying its
+every record-splitting read of the `stdout` of one — a bare `.split()` or a `.split("\0")`, inline
+on the call or through the name the call was assigned to, resolved in the NEAREST ENCLOSING FUNCTION
+scope. Amended per rev-2 S2; the one-spelling form is what could not fail. A hit is a red naming the line. The one exemption is declared as a row carrying its
 reason, not written into the predicate: a `--format=` argv whose placeholders cannot produce a path,
-which today is the `%H` read at `:8879`. The next such format supplies a row, exactly as the next
+which today is `derive_attribution`'s commit walk — named by SYMBOL, because three units landed
+in this file while this one was specced and every line number the finding cites is wrong. The next such format supplies a row, exactly as the next
 retired flag supplies a row rather than a regex.
 
 AMENDED rev-2 — the helper set. Section 4 described the walker without naming its helpers, and two

@@ -261,8 +261,8 @@ def check_retired_flags(module_path: pathlib.Path = GOVKIT) -> None:
 
 
 # ============ DEPL-cMendedVintage-25 — A WORD-SPLIT GIT READ, GRADED BY CLASS ================
-# One row per git invocation whose stdout may reach a bare `.split()` WITHOUT `-z`. The row is an
-# argv constant that identifies the call, plus why the whitespace split is safe there, plus who
+# One row per git invocation whose stdout may reach a record-splitting read WITHOUT `-z`. The row
+# is an argv constant identifying the call, plus why the split is safe there anyway, plus who
 # said so and when. A row, never a pattern in the predicate: the next such call supplies a row
 # exactly as the next retired flag supplies a name, and an exemption whose argv constant has left
 # the engine stops matching and takes its licence with it rather than silently widening.
