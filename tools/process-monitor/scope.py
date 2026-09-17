@@ -21,6 +21,15 @@ directory admits every agent session in every repository on the box.
 WHAT THIS CANNOT DO, and it is a limit rather than a bug: a process whose command line names no
 declared root AND whose ancestry is dead is UNATTRIBUTABLE. The count is reported. On the build
 machine that population was real — a 7.5-hour `sleep 27200` and three `tail -f /tmp/...`.
+
+EXIT CODES, because three outcomes shared one integer until they were written down here:
+
+  0  the question was answered — for `--check-conf`, the declared roots admit live work.
+  1  REFUSED. The declaration is unusable, or the census could not run. A fault somebody must fix.
+  3  `--check-conf` only: the declaration is WELL FORMED and nothing live matches it right now.
+     Machine state, not a fault — a quiet machine, a session that has not started yet, or roots
+     spelled in a form this census does not carry. Callers that roll a kit back on a red must not
+     roll back on this one, which is the whole reason it is not 1.
 """
 import os
 import re
@@ -271,9 +280,12 @@ def main(argv):
     if "--check-conf" in argv:
         if not scope:
             sys.stderr.write(
-                "scope: REFUSED — the declared roots admit NOTHING on this machine. A conf whose "
-                "roots match no live process is one nobody can tell from a quiet machine.\n")
-            return 1
+                "scope: EMPTY — the declared roots admit NOTHING on this machine AT THIS MOMENT. "
+                "The conf parsed and its roots are well formed, so this is MACHINE STATE and not a "
+                "bad declaration: exit 3, not the 1 a refusal carries. A conf whose roots match no "
+                "live process is still one nobody can tell from a quiet machine, so re-run it while "
+                "work is running before concluding the roots are right.\n")
+            return 3
         print("scope: conf admits %(in_scope)d of %(census)d row(s) from %(roots)d root(s)"
               % counts)
         return 0

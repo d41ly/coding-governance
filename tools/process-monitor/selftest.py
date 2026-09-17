@@ -15,6 +15,7 @@ Exit 0 = every arm passed · 1 = an arm failed.
 import os
 import subprocess
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -459,6 +460,36 @@ def test_live_scope_is_not_empty():
                                scope.build_self_chain(rows, os.getpid()))
     check_true("test_live_scope_is_not_empty", len(sc) > 0,
                "(the shipped conf admits NOTHING on this machine)")
+
+
+def test_empty_live_scope_exits_three_not_one():
+    """`main` graded through its EXIT STATUS, because that integer is the entire unit.
+
+    A well-formed declaration nothing live matches is MACHINE STATE, and a caller that rolls a kit
+    back on any non-zero must be able to tell it from a fault. The arm above is this one's control:
+    it asserts the shipped conf still admits work, so a census that cannot move fails there rather
+    than passing here.
+
+    THE FIXTURE CANNOT BECOME THE BUG IT TESTS. The declared root is created microseconds before the
+    census runs, under a name no live command line on this machine carries, so "nothing matches it"
+    is a property of the directory and not a claim about how loaded the box is. A dead census raises
+    and returns 1, so this arm cannot pass by the probe being unable to move either.
+    """
+    if not sys.platform.startswith("win"):
+        print("  SKIP test_empty_live_scope_exits_three_not_one (windows-join backend only)")
+        return
+    tree, quiet = tempfile.mkdtemp(), tempfile.mkdtemp()
+    with open(os.path.join(tree, ".process-monitor.conf"), "w") as fh:
+        fh.write('PROCMON_ROOTS="%s"\n' % quiet)
+    prior = os.environ.get("PROCMON_ROOT")
+    os.environ["PROCMON_ROOT"] = tree
+    try:
+        check("test_empty_live_scope_exits_three_not_one", scope.main(["--check-conf"]), 3)
+    finally:
+        if prior is None:
+            del os.environ["PROCMON_ROOT"]
+        else:
+            os.environ["PROCMON_ROOT"] = prior
 
 
 # ================================================================ classify (unit 3)

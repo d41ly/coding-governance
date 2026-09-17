@@ -4773,6 +4773,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_empty_live_scope_exits_three_not_one",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_empty_read_refuses_rather_than_reporting_zero",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"

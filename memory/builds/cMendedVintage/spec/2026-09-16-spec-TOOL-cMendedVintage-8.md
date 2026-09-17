@@ -1,11 +1,12 @@
 # TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 28
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-8-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-8-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-9 |
 | [2026-09-17-prompt-TOOL-cMendedVintage-8-2-build-brief.md](../prompts/2026-09-17-prompt-TOOL-cMendedVintage-8-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -208,10 +209,15 @@ the thing that is false.
   fixture: the adopter suite's `run_against` helper builds a scratch repo today and deliberately
   copies ONLY the adopter, so the engine is absent and the branch is never reached. The arm needs a
   variant that copies the engine too. The suite is named in section 7, where it is a declaration.
-- **AC4** — When that scratch repo's conf instead declares a root that is not a directory, the same
+- **AC4** — When that scratch repo's conf instead carries TWO `PROCMON_ROOTS=` assignments, the same
   adopter invocation exits 1.
   Red when: the `case` routes an unrecognised status to the skip arm, so a real declaration fault
   reports as machine state.
+  amended rev-3: the fault was "a root that is not a directory", which the adopter's own root rules
+  refuse several sections BEFORE the delegation, so the arm never reached the `case` it claims to
+  grade and would have stayed green with the `*` arm deleted outright. A duplicate assignment is a
+  fault only the ENGINE sees — the shell sources the conf and the later assignment wins — so it is
+  the one shape that arrives at the `case` carrying status 1.
 - **AC5** — When the head of `tools/process-monitor/scope.py` is read, it states the three exit codes
   and what each means.
   Red when: the code is changed and the contract is not written down, leaving the next reader of the
@@ -250,6 +256,16 @@ two files disagree.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-3 · 2026-09-17 · §6 AC4 · the staged fault changed from a non-directory root to a duplicate
+  `PROCMON_ROOTS=` assignment, and nothing else moved. Measured at build time: the adopter refuses a
+  non-directory root in its own section 3, long before the delegation, so the criterion as written
+  graded a branch that is not this unit's and would have stayed green with the `case`'s `*` arm
+  deleted. That is the fixture-passes-by-finding-nothing class the brief names, arriving inside an
+  acceptance criterion instead of inside a fixture. A duplicate assignment is visible only to
+  `read_roots` — the shell sources the conf and takes the last value — so it is the only ordinary
+  fault that reaches the `case` carrying status 1. Both forms were run: the non-directory root is
+  refused by the adopter with no engine call at all, the duplicate reaches the engine and returns 1.
+  §4's table, S3, S4 and every other criterion are unchanged.
 - rev-2 · 2026-09-16 · §8 · SHAPE REPAIR, no decision changed. The fork items were written as bare `**F1 — …**` bold paragraphs; the classifier at `tools/unattended/unattended.sh:1797` counts an item only when the line opens `- `, `* ` or `### `, and with zero items it takes a branch that never consults the resolution mark and accepts only a `none` opening line. So a section carrying a conforming `RESOLVED (agent, …)` mark graded FORKED and the unit could not be dispatched. Ten sibling specs in this build use the `- ` bullet and all grade READY, so the house shape is the bullet and these two were the outliers. The reader errs toward FORKED, which is the safe direction, so this is a defect in the spec and not in the classifier. The resolution text, the chosen option and every criterion are byte-identical; the round-1 spec audit that reviewed this design still names this id and is not invalidated by a non-semantic reshape.
 
 ## 10. Reuse audit

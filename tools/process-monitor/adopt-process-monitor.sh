@@ -232,12 +232,18 @@ if [ "$MODE" = "--check" ]; then
   # readers of one file is the class this repo gates against everywhere else, so the roots question
   # is delegated to the engine's own reader, which also gives `--check-conf` its first caller.
   if [ -f "$KIT_DIR/scope.py" ] && [ -n "$PY" ]; then
-    if PROCMON_ROOT="$ROOT" "$PY" "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1; then
-      print_note "the engine's own reader agrees, and those roots admit live work on this machine"
-    else
-      print_note "the engine's reader REFUSES this conf, or its roots admit nothing live here — run: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf"
-      exit 1
-    fi
+    # THE STATUS IS READ, NOT COLLAPSED INTO true/false. The engine separates a declaration fault
+    # (1) from a well-formed declaration nothing live matches (3), and folding those back together
+    # here is how a correctly installed kit gets rolled back for the time of day. `set -e` is not in
+    # force, so capturing `$?` on the next line is the whole mechanism.
+    PROCMON_ROOT="$ROOT" "$PY" "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1
+    _scope_rc=$?
+    case "$_scope_rc" in
+      0) print_note "the engine's own reader agrees, and those roots admit live work on this machine" ;;
+      3) print_note "SKIP: the engine's reader ACCEPTED this conf and nothing live matches those roots right now — the live-admission arm went UNEXERCISED, not passed. Re-run while this repo's own work is running: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf" ;;
+      *) print_note "the engine's reader REFUSES this conf — run: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf"
+         exit 1 ;;
+    esac
   else
     print_note "NOT CHECKED: whether those roots admit this repo's own work — no engine or no runnable python here, so the declaration is all this can grade."
   fi
