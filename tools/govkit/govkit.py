@@ -2726,7 +2726,32 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
                 if nm in by_name:
                     prev = next((e for e in owned and prior if e["name"] == nm), None)
-                    if prev and (prev.get("argv") != argv or prev.get("guard", []) != guards):
+                    # DEPL-cMendedVintage-22. THE SUBJECT OF THIS COMPARISON IS THE TARGET, and for
+                    # two vintages it was not: this compared `prev`, the receipt's record of what
+                    # gov last wrote, against `argv`/`guards`, this run's fresh resolution of GOV's
+                    # OWN descriptor. Both operands came from gov and the target's row was assigned
+                    # on the line below and read by nothing, so the check was wrong in both
+                    # directions at once and both were reproduced on scratch fixtures first.
+                    #
+                    # Wrong on the way IN: a target's hand-edit of a row gov owns went undetected
+                    # and the line below silently overwrote it — the class this message reports.
+                    #
+                    # Wrong on the way OUT, and this is the one that wedged adopters: any gov-side
+                    # argv change made the predicate true on a manifest BYTE-IDENTICAL to what gov
+                    # wrote, the `continue` withheld the whole manifest for every healthy leg, the
+                    # withheld path re-stamped the receipt with the same prior rows, and the next
+                    # run compared identically. `apply` reaches this with the same operands, so the
+                    # documented fallback did not clear it either. Measured, on both verbs.
+                    #
+                    # `prev` stays the OWNERSHIP record and stops being the comparison subject. A
+                    # target that never touched the row compares equal however far gov's descriptor
+                    # has moved, so the wedge cannot form and gov's fresh `row` lands — which is
+                    # what a new vintage means. NOT all three operands: a run that refuses whenever
+                    # any pair disagrees cannot tell a new vintage from a tampered row, which is
+                    # this defect one level up rather than a stricter version of the fix.
+                    tgt = existing[by_name[nm]]
+                    if prev and (tgt.get("argv") != prev.get("argv")
+                                 or tgt.get("guard", []) != prev.get("guard", [])):
                         r.fail(f"leg '{nm}' in the target differs from what the receipt recorded — "
                                f"reporting drift rather than replacing it; ownership of the NAME is "
                                f"not ownership of the ROW")

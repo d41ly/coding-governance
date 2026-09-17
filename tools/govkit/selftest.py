@@ -1380,12 +1380,15 @@ user_skills = "/tmp/gk-fake-skills"
         # recorded". That is a problem raised INSIDE the step, which is exactly and only what the
         # fixed guard reacts to — an earlier step's problem must NOT withhold, and that half is
         # covered by every other apply arm in this suite passing with problems recorded elsewhere.
-        # THE RECEIPT IS THE OPERAND, not the runner file. The drift check reads
-        # `prev.get("argv") != argv`, where `prev` is the RECEIPT's row and `argv` is this run's
-        # fresh resolve — so tampering the RUNNER changes neither side and apply silently repairs
-        # it, which is what the first cut of this fixture did and why it measured nothing. The
-        # message's own wording ("in the target differs from what the receipt recorded") points at
-        # the runner and the comparison does not; that gap is why this took two attempts.
+        # EITHER SIDE MOVING IS DRIFT, since DEPL-cMendedVintage-22, so this fixture's RECEIPT edit
+        # is drift for exactly the reason a runner edit is and the arms below are unchanged by that
+        # unit. What is no longer true is the sentence this comment used to carry — that tampering
+        # the RUNNER changes neither side and apply silently repairs it. It did, because the check
+        # took both of its operands from gov: the receipt's row against gov's own fresh resolve,
+        # with the target's row assigned and read by nothing. That was the defect the message's own
+        # wording had been describing all along, filed here as a fixture inconvenience for two
+        # vintages. The runner side is armed in the `-22` block further down, on a fixture gov whose
+        # descriptor argv this file writes.
         _rcpt_path = gt / ".governance" / "install.json"
         _tamper = next((e for e in (_pre_rcpt.get("gate_runner") or {}).get("emitted", [])
                         if e.get("name") in _pre_owned), None)
@@ -9456,6 +9459,112 @@ user_skills = "/tmp/gk-fake-skills"
               "ls-files beside it",
               'tracked_target = set(tracked(target))' in _g6src
               and 'tracked_target = set(subprocess.run' not in _g6src, "inline reader still present")
+
+        # ============================================================= DEPL-cMendedVintage-22
+        # THE GATE-LEG DRIFT GUARD, armed in both of the directions it was wrong in. It compared the
+        # receipt's row against gov's own fresh resolution of gov's own descriptor — two derived
+        # values, both gov's — while the target's row, the thing its message names, was assigned and
+        # read by nothing.
+        #
+        # The `u4a` withheld arms above tamper the RECEIPT and so exercise neither case, which is
+        # why this block sits on the `-6` fixtures instead: those hand this file a scratch GOV whose
+        # descriptor argv it writes, so a new vintage is a real descriptor edit rather than a
+        # fixture mimicking one.
+        #
+        # A NEW VINTAGE COMES OUT OF THE SAME GOV CHECKOUT. Applying from one scratch gov and
+        # updating from a second refuses upstream of this step — the receipt records the gov commit
+        # it was applied from, and a sha from another clone does not resolve — so every arm here
+        # would grade a run that never reached the legs step: three passing vacuously and the rest
+        # red for a reason with nothing to do with gate legs. Measured on the first cut of these
+        # fixtures, which is why it is written down rather than implied.
+        _V22 = '["bash", "{prefix}/demo/present-engine.sh", "--vintage-one"]'
+
+        def read_leg_row22(t: pathlib.Path, nm: str) -> dict | None:
+            return next((e for e in json.loads(
+                (t / "scripts" / "gate-legs.json").read_text(encoding="utf-8"))
+                if e.get("name") == nm), None)
+
+        def read_emitted_rows22(t: pathlib.Path) -> list[dict]:
+            _rc = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+            return (_rc.get("gate_runner") or {}).get("emitted", [])
+
+        # ---- AC2: A GOV-SIDE ARGV CHANGE IS A NEW VINTAGE, NOT THE TARGET'S DRIFT. This is the
+        # ---- wedge, and it was reproduced end to end on this fixture before the fix: the update
+        # ---- refused, the WHOLE manifest was withheld, the receipt was re-stamped with the same
+        # ---- prior rows, the next run compared identically, and `apply` reached the same operands
+        # ---- so the documented fallback did not clear it either.
+        _g22 = a6_gov("v22", _V22)
+        _t22 = a6_target("vintage")
+        _a22 = run_in_gov(_g22, "apply", "--target", str(_t22), "--kits", "demo")
+        _r22 = read_leg_row22(_t22, "demo leg")
+        check("[-22] AC2 PRECONDITION the target holds gov's OWN row, so what follows is about a "
+              "manifest byte-identical to what gov wrote rather than about an edited one",
+              _a22.returncode == 0 and _r22 is not None and len(_r22["argv"]) == 3
+              and _r22["argv"] == next((e["argv"] for e in read_emitted_rows22(_t22)
+                                        if e["name"] == "demo leg"), None),
+              f"rc {_a22.returncode} row {_r22}\n" + _a22.stdout[-700:] + _a22.stderr[-400:])
+        settle(_t22, "applied at vintage one")
+        # GOV SHIPS THE NEW VINTAGE: the third element leaves the descriptor. That is the shape this
+        # build itself shipped, and it is what wedged every adopter who had applied the older one.
+        (_g22 / "tools" / "demo" / "kit.toml").write_text(
+            a6_kit('["bash", "{prefix}/demo/present-engine.sh"]'), encoding="utf-8", newline="\n")
+        settle(_g22, "gov drops the third element from the leg's argv")
+        _u22 = run_in_gov(_g22, "update", "--target", str(_t22), "--write")
+        check("[-22] AC2 a GOV-side argv change is DELIVERED, never reported as the target's drift",
+              "differs from what the receipt recorded" not in _u22.stdout
+              and "gate legs: WITHHELD" not in _u22.stdout,
+              _u22.stdout[-1400:] + _u22.stderr[-500:])
+        check("[-22] AC2 ...and the new row actually lands in the target's manifest — an arm "
+              "asserting only the absence of a refusal passes for a run that emitted nothing",
+              (read_leg_row22(_t22, "demo leg") or {}).get("argv")
+              == ["bash", "scripts/demo/present-engine.sh"], str(read_leg_row22(_t22, "demo leg")))
+        check("[-22] AC2 ...and the receipt records the vintage that is now on disk, or the next "
+              "run compares against rows no file holds",
+              next((e["argv"] for e in read_emitted_rows22(_t22) if e["name"] == "demo leg"), None)
+              == ["bash", "scripts/demo/present-engine.sh"], str(read_emitted_rows22(_t22)))
+
+        # ---- AC1 + AC3: THE TARGET'S OWN HAND-EDIT, which is the class the message has always
+        # ---- claimed to report and which was silently overwritten instead. Its own gov, still at
+        # ---- the first vintage, so the ONLY thing that moved is the target's file.
+        _g22t = a6_gov("v22t", _V22)
+        _t22t = a6_target("tamper")
+        _a22t = run_in_gov(_g22t, "apply", "--target", str(_t22t), "--kits", "demo")
+        check("[-22] AC1 PRECONDITION the target holds both gov-owned rows before the edit",
+              _a22t.returncode == 0 and read_leg_row22(_t22t, "demo leg") is not None
+              and read_leg_row22(_t22t, "demo sibling") is not None,
+              f"rc {_a22t.returncode}\n" + _a22t.stdout[-700:] + _a22t.stderr[-400:])
+        settle(_t22t, "applied")
+        _mf22 = _t22t / "scripts" / "gate-legs.json"
+        _rows22 = json.loads(_mf22.read_text(encoding="utf-8"))
+        for _e22 in _rows22:
+            if _e22.get("name") == "demo leg":
+                _e22["argv"] = list(_e22.get("argv", [])) + ["--hand-edited"]
+        # THE SIBLING ROW GOES TOO, and it is what keeps AC3 from being vacuous. The receipt still
+        # claims that row, so a refusal narrowed into a per-leg skip would APPEND it here while the
+        # whole-manifest withhold cannot. Re-serialised at an indent the emitter never produces for
+        # the same reason: a rewrite that happened to change no row is then still visible bytewise,
+        # and without that a per-leg skip and a withhold are indistinguishable on this fixture.
+        _rows22 = [e for e in _rows22 if e.get("name") != "demo sibling"]
+        _mf22.write_text(json.dumps(_rows22, indent=4) + "\n", encoding="utf-8", newline="\n")
+        settle(_t22t, "the operator hand-edits a row gov owns")
+        _pre22 = _mf22.read_text(encoding="utf-8")
+        _pre22e = read_emitted_rows22(_t22t)
+        _u22t = run_in_gov(_g22t, "update", "--target", str(_t22t), "--write")
+        check("[-22] AC1 a row the TARGET edited away from what the receipt recorded REFUSES, "
+              "naming the leg — it used to be overwritten in silence",
+              _u22t.returncode == 1 and "demo leg" in _u22t.stdout
+              and "differs from what the receipt recorded" in _u22t.stdout,
+              _u22t.stdout[-1400:] + _u22t.stderr[-500:])
+        check("[-22] AC3 ...and NO leg in that run reached the manifest: it is byte-identical to "
+              "the file the target tampered with, down to its indent",
+              _mf22.read_text(encoding="utf-8") == _pre22, _mf22.read_text(encoding="utf-8"))
+        check("[-22] AC3 ...including the healthy sibling the receipt claims, which a per-leg skip "
+              "would have appended — a manifest half-graded against a tampered file is worse than "
+              "one not written",
+              read_leg_row22(_t22t, "demo sibling") is None, _mf22.read_text(encoding="utf-8"))
+        check("[-22] AC3 ...and the receipt carries the PREVIOUS emitted rows, so ownership is "
+              "neither blanked nor advanced to rows no file holds",
+              read_emitted_rows22(_t22t) == _pre22e, str(read_emitted_rows22(_t22t)))
 
         # ---- BUILD dPolishedVitrine, ROUNDS 1 TO 3. THE ENGINE-TO-RENDERED MOVE, END TO END ---------
         # A kit shipped a file as an ENGINE row and then made it `rendered`, keeping its own render

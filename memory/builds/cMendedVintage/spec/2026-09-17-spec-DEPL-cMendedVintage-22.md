@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-22 — the gate-leg drift guard compares the target, not gov against itself
 
-**Status:** SPECCED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 32
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 32
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-22-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-22-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-22-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-22-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -115,13 +116,23 @@ from a tampered row, which is the defect one level up rather than a stricter ver
 
 New arm: `tools/govkit/selftest.py` · a fixture whose manifest row is tampered, asserted to refuse,
 beside a fixture whose gov-side argv moved, asserted to emit · the `BRANCH_PIN` floor in
-`tools/govkit/refusal_join.py` is re-derived only if the branch count moves.
+`tools/govkit/refusal_join.py` is re-derived only if the branch count moves. Nothing here adds or
+removes a refusal branch, so that floor does not move.
+
+Two fixture constructions are load bearing and were found by building them wrong first. The new
+vintage must come out of the SAME scratch gov checkout: applying from one and updating from a second
+refuses upstream of this step, because the receipt's recorded gov commit does not resolve in another
+clone, and every arm then grades a run that never reached the legs step — measured, three of them
+passing vacuously and the rest red for a reason with nothing to do with gate legs. And the tamper fixture
+must also DELETE a sibling row the receipt still claims and re-serialise the file at an indent the
+emitter never produces — without both, a per-leg skip and a whole-manifest withhold leave identical
+bytes and AC3 grades nothing.
 
 ## 8. Open questions
 
-- **Q1 — should the tamper refusal name a remedy?** RESOLVED (main loop, 2026-09-17): not in this
-  unit. The existing message names the leg and the file, which is what an operator needs to find the
-  edit; a remedy sentence that recommends a verb is the shape that wedged adopters in the first
+- **Q1 — should the tamper refusal name a remedy?** RESOLVED (agent, 2026-09-17, delegated): not in
+  this unit. The existing message names the leg and the file, which is what an operator needs to find
+  the edit; a remedy sentence that recommends a verb is the shape that wedged adopters in the first
   place, and it belongs with whoever writes the release note.
 
 ## 9. Revision log
@@ -129,6 +140,17 @@ beside a fixture whose gov-side argv moved, asserted to emit · the `BRANCH_PIN`
 - rev-1 · 2026-09-17 · initial draft, authored mid-build by the main loop after the closing review
   adjudicated finding B1 a BLOCKER. Adopted under the protocol's discovery rule as a blocker between
   this run and its own landing.
+- rev-2 · 2026-09-17 · §7 §8 · closed by the build pass. No criterion changed and none was amended.
+  §7 gains the two fixture constructions the arms turned out to need, both found by writing them
+  wrong and measuring the result: the new vintage must come out of the SAME scratch gov checkout, and
+  the tamper fixture must delete a sibling row and re-serialise at a foreign indent or AC3 cannot
+  tell a per-leg skip from a withhold.
+  §8's Q1 mark is re-spelled to the resolver form the template's closed pair allows. The decision is
+  untouched; `main loop` is not one of the two resolvers, and this run is delegated by a standing
+  mandate rather than owner-signed, so `agent … delegated` is the truthful one.
+  §5's user-docs line is discharged as a short subsection rather than the single sentence it named —
+  same content, plus the remedy an adopter needs, in the runbook rather than in the refusal message
+  Q1 rules on.
 
 ## 10. Reuse audit
 

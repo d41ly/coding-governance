@@ -763,6 +763,16 @@ write — so a first install is not warned about being new.
 
 If you see one, it is gov's to fix: either the leg is withdrawn or the file starts shipping.
 
+### The leg rows gov emits are gov's to rewrite
+
+A gov-side change to a leg — a new `argv`, a different guard — is a new vintage and is **delivered**,
+not refused, however far it has moved from what you hold. Do not answer a newly red leg by editing
+its row in your own manifest: that row's NAME is one the receipt claims, so the next `apply` or
+`update --write` compares your row against what the receipt records, reports drift naming the leg,
+and withholds the whole manifest rather than writing half of it against a file it cannot grade. Put
+the row back as gov wrote it, and take the argument you wanted through the leg's own flags or through
+a leg of your own under a name gov does not emit.
+
 ### Before any of that: how much of each kit did this tree actually take?
 
 `adopt` measures the files a target HOLDS. It says nothing about the ones it never took, and the

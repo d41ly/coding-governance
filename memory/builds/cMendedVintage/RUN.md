@@ -307,3 +307,7 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T13:43:16Z dispatch · item 51cd24fd DEPL-cMendedVintage-22 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-22.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-22-acceptance-ledger.md
 
 2026-09-17T13:43:18Z brief · item DEPL-cMendedVintage-22 · reason 202316fd8330 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-DEPL-cMendedVintage-22-2-build-brief.md
+
+2026-09-17T13:55:16Z dispatch · item f132e79c DEPL-cMendedVintage-22 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-22.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-22-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T14:18:33Z dispatch · item f132e79c DEPL-cMendedVintage-22 · reason tools/govkit/govkit.py tools/govkit/selftest.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-17-spec-DEPL-cMendedVintage-22.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-22-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
