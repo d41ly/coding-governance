@@ -38,7 +38,25 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 252    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 252 -> 255 at DEPL-cMendedVintage-13, READ OFF this engine's own output at both ends rather than
+# predicted: 252 over the four modules at that unit's base `a47c286b`, taken from a clean export of
+# that tree, and 255 on the tree it left. The NET is three and the SITES are five, and the
+# difference is the whole record. Four are new, all of them on the update path and all of them the
+# same rule — a refusal that is correct in `apply`, which has written nothing when it reaches the
+# gate-leg step, is a wedge in `update`, whose bytes are already on disk. They are the
+# malformed-runner `r.fail` (S5), the pair that grade the target's `[gate_runner]` before the
+# emission writes through it (one for the validator's findings, one for the containment refusal it
+# raises), and the catch-all that converts every OTHER refusal the emission can raise — the live one
+# is a leg whose name the target's runner carries and its receipt does not claim. One went away: the
+# extraction of `write_gate_legs` merged `apply`'s two `raise Refusal` spellings of "that runner file
+# is not a list of rows" into one, because the update path needs the message as a VALUE before it
+# decides whether to raise it at all. The moved branches are count-neutral, which is what Q2's probe
+# predicted and what these two measurements confirm. 4/4 new sites armed, all in `selftest.py`: the
+# malformed-runner arm asserts the report and the absent traceback, the escaping
+# `[gate_runner].file` arm reaches both grading sites in one run, and the dropped-claim arm reaches
+# the catch-all. Each failing case was observed on a scratch fixture against a staged break before
+# the arm was written.
 # 251 -> 252 at DEPL-cMendedVintage-10. MEASURED both sides: the matcher counted 251 at this unit's
 # base and 252 with its ONE new refusal — the renormalize's dirty-population guard in `_cmd_update`,
 # which refuses to re-stage when a pinned path this run did not write is dirty relative to HEAD. It

@@ -510,8 +510,8 @@ exits 0, so an installed-but-undeclared kit is a legal state rather than a red.
    byte-compares, so an edit nobody re-rendered reds.
 4. `bash <project>/tools/lexicon/adopt-lexicon.sh --check` — the drift mode, green when the conf
    parses, the stamp is present and the Skill is in sync. `govkit apply` emits two gate legs
-   (`lexicon naming predicates`, `lexicon wiring`); a `cp -r` install wires them into your own gate
-   runner by hand.
+   (`lexicon naming predicates`, `lexicon wiring`), and so does `govkit update --write`; a `cp -r`
+   install wires them into your own gate runner by hand.
 5. Commit `tools/lexicon/`, `.lexicon.conf`, the two waiver registries and
    `.claude/skills/lexicon/SKILL.md` as one landing. Pin the Skill to LF — it is a rendered artifact
    its own gate byte-compares.
@@ -991,11 +991,25 @@ it.
 ### A check your project needs and gov does not have
 
 Do not edit a kit engine. Write the check as your own script, in your own tree, and register it as a
-leg in your gate manifest — `govkit apply` leaves a leg it does not own alone.
+leg in your gate manifest — `govkit apply` leaves a leg it does not own alone, and so does
+`govkit update --write`.
 
 Measured, not assumed: a fixture whose manifest held one project-authored leg came out of `apply`
 holding 23, the project's row byte-identical. The run reports nothing about it, so silence is the
 success case.
+
+### Gate legs arrive on the safe verb too
+
+`update --write` emits them, from the same implementation `apply` uses. That closes the gap where a
+leg gov newly declared over a file you already hold reached you only when you re-ran the verb that
+overwrites engine bytes unconditionally — the population is the kits your receipt claims, narrowed
+by `--kits`, so a kit whose bytes did not move this run still gets its legs. Two exceptions, both
+deliberate: a kit whose writes the verify pass rolled back gets none, because its engine went back
+with them; and a read-only `update` emits nothing at all, because it wrote nothing else either.
+
+If your runner file is malformed when the step is reached — hand-edited, or truncated by something
+else — the run says so by name and emits nothing, keeps every byte it already wrote, and does not
+re-stamp the receipt. Restore that file from your own history and re-run.
 
 Two limits worth knowing before you hit them. Give the leg a **ceiling**, because the runner reds one
 that arrives without it. And pick a name gov does not use: a collision makes `apply` exit 2 *after*

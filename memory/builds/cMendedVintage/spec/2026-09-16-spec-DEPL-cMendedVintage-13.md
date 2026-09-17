@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-13 — `update --write` emits gate legs
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 23
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 23
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-13-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-13-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-17-prompt-DEPL-cMendedVintage-13-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-13-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-14 |
@@ -38,11 +39,24 @@ the ownership rules.
   rows for in-scope kits UNION the previous receipt's rows for every kit outside the scope. A scoped
   run that replaced the whole list would revoke gov's claim on an out-of-scope leg, after which every
   later run refuses the leg gov itself wrote. Observed by AC2.
+  The union rule lives in the shared function and the CALLER selects it, because the two verbs keep
+  different receipts. `update` narrows which rows it classifies and leaves the receipt's `kits` list
+  whole, so an out-of-scope kit is still claimed and its ownership must survive. `apply` rewrites
+  `kits` and `files` to its own selection, so carrying rows for kits its receipt no longer claims
+  would make `emitted` name kits `kits` does not — a new inconsistency, and a behaviour change in
+  the verb S1 exists to leave alone. `apply` therefore passes no carry set and is unchanged.
 - **S5** A target runner file that is absent, unparseable or not a JSON list is an `r.fail` in the
   update path, never a `Refusal`. `apply` raises, and raising is correct there because nothing has
   been written yet; in `update` the bytes are already on disk, so an abort would leave the target
   updated with an un-restamped receipt and no emission — the wedge shape twice recorded against this
   step. Observed by AC4.
+  S5 IS A CLASS, not that one branch, and the difference was measured during the build. The shared
+  function raises on a second condition the spec never named: a leg whose NAME the target's runner
+  carries and this receipt does not claim, which any hand-edit made after the install can produce.
+  In `apply` that raise is correct for S5's own reason; in `update` it is the identical wedge. So the
+  update call site catches every `Refusal` the emission can raise and reports it verbatim with the
+  bytes kept and the receipt un-restamped, and the named `r.fail` above survives for the one case
+  whose message is worth writing. Gating one branch and leaving its sibling is the shape §7 names.
 - **S6** The manifest write-back is `write_text` to a sibling temp path followed by `os.replace`, in
   the shared function, so both verbs stop being able to leave a truncated runner file. Observed by
   AC6.
@@ -82,7 +96,11 @@ index and this run's own writes must count as present; its own comment records t
 predicate at preflight would red every first install. `update` inherits the constraint and adds one:
 the verify pass can revert a kit's writes, and a leg emitted for a reverted kit records coverage for
 files that are no longer there. So the call site is after both, immediately before the coverage tail
-at `tools/govkit/govkit.py:7797`, and its `have` argument is a fresh index read taken at that point.
+that `TOOL-aWeldedTribunal-6` introduced — and after the renormalize as well, which rev-2 did not
+say and which the build measured: `git add --renormalize` refuses when the pinned population is
+dirty relative to HEAD, so a manifest written above it is gov refusing its own write. Its `have`
+argument is a fresh index read taken at that point. Located by SYMBOL, never by line: rev-1 and rev-2
+both carried a line number here and five units moved the file underneath it.
 
 ### Data model
 
@@ -102,11 +120,23 @@ vintages, which is a rename this engine handles elsewhere and must not undo here
 
 | identifier | kind | where |
 |---|---|---|
-| `emit_gate_legs` | module-level function | `tools/govkit/govkit.py`, beside `silenced_legs` |
-| `_legs_scope` | local set in `_cmd_update` | the claimed-minus-rolled-back population |
+| `write_gate_legs` | module-level function | `tools/govkit/govkit.py`, beside `silenced_legs` |
+| `_legs_scope` | local list in `_cmd_update` | the claimed-minus-rolled-back population |
+| `_rolled_kits` | local set in `_cmd_update` | the kits the verify pass reverted this run |
 
-`emit_gate_legs` leads with a verb, which is the cell this repo's lexicon grades for a module-level
-Python function, and `emit` is the verb the receipt field and both existing call sites already spell.
+The name is `write_gate_legs` and NOT `emit_gate_legs`. `emit` is the verb the receipt field and both
+call sites spell in prose, and it is in no row of `.lexicon.conf`'s table, so a definition leading
+with it raises `VERB_OFFENDER_PIN` — a two-sided equality, which is a red rather than a drift.
+`python tools/lexicon/lexicon.py --suggest write_gate_legs --as py.function` answers OK; the same
+question asked about `emit_gate_legs` routes to `print`, which is wrong for a function whose job is a
+file. `write` is the table's own row for persisting to a store, which is what this does.
+
+`update` also validates the target's `[gate_runner]` through `validate_gate_runner` before calling,
+against a throwaway `Report`, and reports rather than emits when that validation has anything to
+say. `apply` validates in its pre-write pass; `update` never did, and `[gate_runner].file` is a
+target-supplied path this function joins onto the target root and WRITES — the escape site that
+function's own header records. The throwaway report is `update`'s established shape for a probe that
+must not fail a verb after its bytes have landed.
 
 ### Migration
 
@@ -253,6 +283,17 @@ further floor to move.
 
 - rev-1 · 2026-09-16 · initial draft.
 - rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-21 naming this unit and never wrote the edge back; hygiene check 12 reds on a handoff one author declared and the other never saw. Recording it completes the record rather than changing the design.
+- rev-3 · 2026-09-17 · §2 §4 · FOUR AMENDMENTS, measured during the build, no criterion changed.
+  S5 is widened from one branch to its CLASS: the shared function raises on a second condition this
+  spec never named, and gating one branch while its sibling stays is the failure §7 names by name.
+  The extracted function is `write_gate_legs`: `emit` is in no row of the declared verb table and a
+  definition leading with it reds two unguarded merge-bar legs, which rev-2's inventory asserted the
+  opposite of. S4's union is caller-selected rather than unconditional, because `apply` rewrites its
+  receipt's `kits` list to its own selection and carrying out-of-scope rows there would be a
+  behaviour change in the verb this unit must not touch. And `update` validates the target's
+  `[gate_runner]` before emitting, which rev-2 never said and which `[gate_runner].file`'s own escape
+  history requires of any verb that joins it onto the target root and writes. §4's call-site
+  sentence loses its line number and gains the renormalize, both measured on this tree.
 
 ## 10. Reuse audit
 

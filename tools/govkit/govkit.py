@@ -2521,6 +2521,292 @@ def silenced_legs(descs: dict[str, tuple[dict, str]], selection: list[str], targ
     return hits
 
 
+def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
+                    descs: dict[str, tuple[dict, str]], selection: list[str],
+                    receipt: dict | None, have: set[str], r: Report,
+                    orders: list[dict] | None = None,
+                    carry_out_of_scope: bool = False,
+                    refuse_bad_runner: bool = True) -> tuple[list[dict], bool]:
+    """Resolve the selected kits' gate legs and either write them into the target's runner or
+    withhold them, returning `(emitted, legs_withheld)` for the caller's receipt
+    (DEPL-cMendedVintage-13 S1).
+
+    ONE IMPLEMENTATION, TWO VERBS. `apply` called this inline and `update` never emitted at all, so
+    every `[[gate_leg]]` gov started shipping reached an adopter only on the verb that overwrites
+    engine bytes unconditionally. The ownership rules here have been got wrong twice in this
+    engine's recorded history — once by blanking `emitted` on the withheld path, once on the
+    non-manifest branch — and a second copy would be a third occasion.
+
+    WHAT THE CALLER DECIDES, and why each one is a parameter rather than a branch on `verb`:
+
+    `have` is the caller's index read, exactly as `silenced_legs` takes one. `apply` reads it after
+    its stage step so this run's own writes count as present; `update` reads it after its write loop
+    AND after its verify pass, so a kit whose writes were reverted is graded against the tree that
+    actually survived.
+
+    `refuse_bad_runner` splits on WHAT HAS ALREADY HAPPENED. `apply` raises, and raising is right
+    there because nothing has been written when this step is reached. In `update` the bytes are
+    already on disk, so an abort would leave the target updated with an un-restamped receipt and no
+    emission — a wedge recorded against this step twice.
+
+    `carry_out_of_scope` is S4, and the two verbs need different answers because they keep different
+    receipts. `update` narrows which rows it classifies and leaves its receipt's `kits` list whole,
+    so an out-of-scope kit is still claimed and its ownership rows must survive this run. `apply`
+    rewrites `kits` and `files` to its own selection, so carrying rows for kits its receipt no
+    longer claims would make `emitted` name kits `kits` does not.
+
+    `orders` is `apply`'s list and `update` passes None: the non-manifest branch writes the same
+    order at the same path either way, and `update` maintains no `orders` list at BASE. Minting one
+    here would put a second writer on a field `apply` owns.
+    """
+    prior = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
+    emitted: list[dict] = []
+    # Set on the WITHHELD path below, and recorded in the receipt so a later reader can tell a run
+    # that wrote its legs from one that carried the previous run's rows forward. Without it the two
+    # receipts are byte-identical and the withheld fact lives only in stdout nobody kept.
+    _legs_withheld = False
+    # TOOL-aScouredKit-11. The write-back below used to be guarded on the GLOBAL `r.problems`,
+    # accumulated since step 1, while LEGS is step 9 — so ANY earlier problem, including a by-design
+    # one, withheld the manifest for every kit in the run. Measured: a `--all` install recorded 57
+    # emitted legs in the receipt and wrote no manifest anywhere, which is zero gate coverage under
+    # a receipt claiming full coverage. This snapshot is what makes the guard mean "did THIS step
+    # fail", which is the question the comment at the loop below already thought it was asking.
+    _legs_problems_before = len(r.problems)
+    # D7, from the aScouredKit closing review. `-6`'s bar was built INSIDE the manifest branch, so
+    # the `else:` below — taken whenever `[gate_runner].kind` is `none` or absent, which is the
+    # normal state of a target that has not promoted a runner — looped the same legs and wrote every
+    # one into the outbox order as a written INSTRUCTION to the adopter, unfiltered and with no
+    # finding anywhere. On a manifest target the same leg reds and is withheld. That is
+    # `gate the CLASS, not the instance` broken one branch over from the unit that closed the class,
+    # and no `-6` arm could see it because every fixture declared `kind = "manifest"`.
+    _silenced = {(eid, nm): bad for eid, nm, bad in
+                 silenced_legs(descs, selection, target, deploy, have)}
+    _silenced_found: list[str] = []
+    if gr.get("kind") == "manifest":
+        rf = target / gr["file"]
+        _bad_runner = None
+        try:
+            existing = json.loads(rf.read_text(encoding="utf-8")) if rf.is_file() else []
+        except json.JSONDecodeError:
+            existing, _bad_runner = [], f"the declared runner file {gr['file']} is not valid JSON"
+        if _bad_runner is None and not isinstance(existing, list):
+            _bad_runner = f"the declared runner file {gr['file']} is not a JSON list"
+        if _bad_runner is not None:
+            # S5. THE ONE PLACE THE TWO VERBS CANNOT SHARE A DISPOSITION, for the reason the
+            # docstring gives: `apply` has written nothing yet and `update` has written everything.
+            # The residue S6's atomic write cannot reach is a runner malformed for some OTHER reason
+            # — hand-edited, or truncated by a prior vintage of this code — and this is that case,
+            # reported by name with both remedies rather than aborted over.
+            if refuse_bad_runner:
+                raise Refusal(_bad_runner)
+            r.fail(f"{_bad_runner} — no gate leg was emitted this run. The bytes this run wrote are "
+                   f"KEPT and the receipt is NOT re-stamped, so the next run reclassifies from the "
+                   f"vintage these rows are actually at. Restore that file from this target's own "
+                   f"history, or repair it by hand, and re-run")
+            return prior, False
+        owned = {e["name"] for e in prior}
+        by_name = {e.get("name"): i for i, e in enumerate(existing)}
+        # S1/S2. THE BAR RUNS AFTER THE CALLER'S OWN WRITE STEP AND NOWHERE EARLIER, and the
+        # placement is load-bearing rather than incidental: the index `have` carries already
+        # includes this run's own writes. The identical predicate at preflight would red every
+        # first install at every adopter.
+        #
+        # THE FINDINGS ARE HELD AND RAISED AFTER THE WRITE-BACK, which is guarded by the
+        # problem-count comparison below. Calling `r.fail` inside the loop suppressed the manifest
+        # write for EVERY leg, so one defective leg silently took the healthy ones with it — the
+        # install "stood" while the target's runner stayed empty.
+        for eid in selection:
+            d, _p = descs[eid]
+            ctx = target_context(target, deploy, eid, d)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                argv, miss = [], []
+                for a in leg.get("argv", []):
+                    s, m = resolve_tokens(a, ctx)
+                    argv.append(s)
+                    miss += m
+                if miss:
+                    r.fail(f"leg '{nm}' argv still carries {miss[0]} after rendering — a leg wired "
+                           f"to an unresolved token is broken forever; a dropped GUARD only costs "
+                           f"an unnecessary run, which is why the two are not symmetric")
+                    continue
+                # S2. The SILENCED-LEG bar, doing exactly what the sibling branch below does: name
+                # the kit, the leg and every offending element, then `continue` without writing the
+                # row. NOT a `Refusal` — the condition is a defect in a GOV-authored descriptor, and
+                # aborting the adopter's whole install over it hands them a failure with no local
+                # fix. `r.fail` already yields a named problem and exit 1 with the install intact.
+                _bad = _silenced.get((eid, nm))
+                if _bad:
+                    _silenced_found.append(
+                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
+                        f"{', '.join(_bad)}, which this target does not hold — emitting it would "
+                        f"record coverage in the receipt for a leg that cannot run. The leg is "
+                        f"NOT written; the rest of the install stands")
+                    continue
+                guards, dropped = [], []
+                for g in leg.get("guard", []) or []:
+                    s, m = resolve_tokens(g, ctx)
+                    if m:
+                        dropped.append((g, f"unresolved token '{m[0]}'"))
+                    elif not any(t == s.rstrip("/") or t.startswith(s.rstrip("/") + "/")
+                                 for t in have if t):
+                        dropped.append((s, "matches no tracked path in the target"))
+                    else:
+                        guards.append(s)
+                if nm in by_name and nm not in owned:
+                    raise Refusal(f"the target's runner already has a leg named '{nm}' and this "
+                                  f"target's receipt does not claim it — overwriting a leg the "
+                                  f"target wrote silently deletes their own coverage")
+                # SUBJECT TRAVELS. Without this the field never reaches an adopter and the whole
+                # mechanism stops at this repo's edge — a target would receive every kit self-test as
+                # an ordinary bar leg, which is the defect the unit exists to remove.
+                # Defaulted to `repo`, because an undeclared leg belongs ON the bar: the other
+                # default silently removes a leg the descriptor never spoke about.
+                # SUBJECT IS EMITTED ONLY WHERE THE TARGET CAN READ IT. The leg manifest has a
+                # PINNED key set, asserted by the `run-gates canary` leg that the run-gates
+                # kit ships and that runs on every adopter's bar — and that pin did not carry
+                # `subject` before this build. Writing the key into a tree whose run-gates predates
+                # it reds their canary as a side effect of a routine scoped install, which is the
+                # deployer breaking a target's gate while installing something else.
+                # The floor is read from the TARGET's installed runner, not assumed.
+                row = {"name": nm, "argv": argv}
+                if check_target_reads_subject(target, deploy):
+                    row["subject"] = leg.get("subject") or "repo"
+                if guards:
+                    row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
+                if nm in by_name:
+                    prev = next((e for e in owned and prior if e["name"] == nm), None)
+                    if prev and (prev.get("argv") != argv or prev.get("guard", []) != guards):
+                        r.fail(f"leg '{nm}' in the target differs from what the receipt recorded — "
+                               f"reporting drift rather than replacing it; ownership of the NAME is "
+                               f"not ownership of the ROW")
+                        continue
+                    existing[by_name[nm]] = row
+                else:
+                    existing.append(row)
+                # THE RECEIPT CARRIES SUBJECT TOO, and not only so the caller's summary can count
+                # it. The receipt is what a later run reads to decide what this deployer owns; a
+                # field that reaches the target's manifest but not the receipt is a field no drift
+                # check can ever see move. The first draft omitted it and the summary silently
+                # counted zero — an `if n_kit:` that is never true prints nothing and reads exactly
+                # like a kit with no self-tests. TOOL-dUnstalledConvoy-26.
+                emitted.append({"name": nm, "kit": eid, "argv": argv, "guard": guards,
+                                # .get, NOT a subscript. TOOL-aBoundedCeiling-5 S6: the key three
+                                # lines up is set CONDITIONALLY on check_target_reads_subject, and
+                                # was read here UNCONDITIONALLY -- so `govkit apply` raised
+                                # KeyError against any target below the version floor. It survived
+                                # because selftest.py exercises the predicate directly and never
+                                # runs a full apply on a below-floor fixture. Found by the spec
+                                # audit of a unit that was about to copy this seam verbatim.
+                                "subject": row.get("subject"),
+                                "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
+                                "history_depth": leg.get("history_depth")})
+                if dropped and not guards:
+                    print(f"govkit {verb} — gate leg '{nm}': UNGUARDED "
+                          f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
+        if len(r.problems) == _legs_problems_before:
+            rf.parent.mkdir(parents=True, exist_ok=True)
+            # S6. TEMP FILE PLUS `os.replace`, so a crash mid-write leaves the PREVIOUS manifest
+            # rather than a truncated one. Two verbs now write a file an adopter's whole bar reads,
+            # and the failure mode disappears rather than gaining a recovery procedure. The sibling
+            # path keeps the rename atomic on both platforms this engine runs on.
+            _rf_new = rf.with_name(rf.name + ".govkit-new")
+            _rf_new.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
+                               encoding="utf-8", newline="\n")
+            os.replace(_rf_new, rf)
+            subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
+                           capture_output=True, check=False)
+            print(f"govkit {verb} — gate legs: emitted {len(emitted)} into {gr['file']}")
+            # S4, AND IT IS THE LAST THING THAT HAPPENS TO THIS LIST, so the count printed above
+            # stays "what this run built". Keyed on the KIT and not on the leg name: a row whose kit
+            # is outside this run's scope is carried through untouched, while keying on the name
+            # would silently drop a leg whose kit was renamed between vintages — a rename this
+            # engine handles elsewhere and must not undo here. A prior row with no `kit` at all is
+            # carried too, which is the safe direction: this run cannot prove it owns one.
+            if carry_out_of_scope:
+                _scope = set(selection)
+                emitted = [e for e in prior if e.get("kit") not in _scope] + emitted
+        else:
+            # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
+            # and a receipt claiming N emitted legs it never wrote.
+            print(f"govkit {verb} — gate legs: WITHHELD from {gr['file']} — "
+                  f"{len(r.problems) - _legs_problems_before} problem(s) were raised while "
+                  f"resolving legs, so the {len(emitted)} leg(s) this step built are NOT written. "
+                  f"Fix those problems and re-run; earlier steps' problems no longer suppress this.")
+            # THE RECEIPT KEEPS THE PREVIOUS RUN'S ROWS, and does NOT get this run's discarded list
+            # and does NOT get blanked. Both wrong answers were written before this comment was.
+            #
+            # `emitted` is OWNERSHIP OF A NAME, not a claim about this run: `owned` at the top of
+            # this branch derives from it, and a leg name present in the target's runner but absent
+            # from `owned` raises "the target's runner already has a leg named X and this target's
+            # receipt does not claim it". So blanking it WEDGES the target permanently — every
+            # later apply refuses the legs this deployer itself wrote, and `--re-adopt` carries the
+            # blanked receipt forward. Caught by the aScouredKit closing review, one round after
+            # the spec that asked for the blanking.
+            #
+            # Carrying THIS run's built list forward would be the other error: it would claim rows
+            # that are not in any file. The manifest on disk is exactly what the last successful
+            # run left, so the previous receipt's rows are the true ownership set.
+            emitted = list(prior)
+            _legs_withheld = True
+    else:
+        (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
+        lines = ["# gate legs — ORDERED, not emitted", ""]
+        _withheld: list[str] = []
+        for eid in selection:
+            d, _p = descs[eid]
+            ctx = target_context(target, deploy, eid, d)
+            for leg in d.get("gate_leg", []):
+                nm = leg.get("name")
+                _argv = ' '.join(resolve_tokens(a, ctx)[0] for a in leg.get("argv", []))
+                # D7. The SAME bar the manifest branch runs. Writing a leg into an adopter's ORDER
+                # is telling them to wire it by hand; doing that for a leg whose engine gov never
+                # ships is worse than emitting it into a runner, because a human then does the work.
+                _bad = _silenced.get((eid, nm))
+                if _bad:
+                    _withheld.append(f"- {nm}: {_argv}\n  WITHHELD — names {', '.join(_bad)}, "
+                                     f"which this target does not hold and no kit ships here")
+                    _silenced_found.append(
+                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
+                        f"{', '.join(_bad)}, which this target does not hold — ordering it would "
+                        f"tell the adopter to wire a leg that cannot run. It is listed under "
+                        f"WITHHELD in the order rather than as an instruction")
+                    continue
+                lines.append(f"- {nm}: {_argv}")
+        lines += ["", "Nothing in this target runs these yet."]
+        if _withheld:
+            # LISTED, never dropped. An order that silently omits a leg is indistinguishable from a
+            # kit that declares none, and the adopter is the one who has to notice.
+            lines += ["", "## WITHHELD — gov does not ship the engine these run", ""] + _withheld
+        (target / ".governance" / "outbox" / "gate-legs.md").write_text(
+            "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+        # S7. `apply` RECORDS THE ORDER AND `update` DOES NOT. The path is unchanged, so a row a
+        # previous `apply` recorded stays true and this refresh costs the reader nothing; a second
+        # writer on a list one verb owns would cost them the ability to tell who wrote it.
+        if orders is not None:
+            orders.append({"kind": "gate-legs", "id": "gate-legs",
+                           "path": ".governance/outbox/gate-legs.md"})
+        # OWNERSHIP IS CARRIED FORWARD HERE TOO. This branch writes no legs, so it must not
+        # REVOKE the receipt's claim on legs a previous manifest-kind run wrote. `emitted` is
+        # initialized empty, and leaving it empty means a target whose `[gate_runner].kind` is
+        # flipped to `none` and back — an operator action, not a rare one — comes back with an
+        # empty `owned` and refuses its own legs. That is the same wedge the withheld path had,
+        # one branch over, and it was left standing when that one was fixed.
+        emitted = list(prior)
+        print(f"govkit {verb} — gate legs: ORDERED, not emitted — "
+              + ("[gate_runner] declares kind = \"none\"" if gr.get("kind") == "none"
+                 else "this target's deploy.toml declares no [gate_runner]")
+              + " (see .governance/outbox/gate-legs.md)")
+
+    # RAISED HERE, outside the kind split, so BOTH branches report. Deferred past the manifest
+    # write-back deliberately: that write is guarded on the problem count, and failing inside the
+    # loop suppressed the manifest for every leg — one defective leg silently taking the healthy
+    # ones with it. The order branch has no such guard, but the findings belong in one place.
+    for _f in _silenced_found:
+        r.fail(_f)
+    return emitted, _legs_withheld
+
+
 def coverage_rows(root: pathlib.Path, target: pathlib.Path, deploy: dict,
                   descs: dict[str, tuple[dict, str]], selection: list[str],
                   r: Report, rows: list[dict] | None = None) -> list[dict]:
@@ -5215,184 +5501,21 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- own prefix and memory root, and a guard is DROPPED on tracked-ness rather than existence:
     # ---- the runner's predicate is a diff over a pathspec, and a pathspec matching nothing diffs
     # ---- clean, so a guard naming an existing-but-UNTRACKED path skips its leg forever at exit 0.
-    emitted: list[dict] = []
-    # Set on the WITHHELD path below, and recorded in the receipt so a later reader can tell a run
-    # that wrote its legs from one that carried the previous run's rows forward. Without it the two
-    # receipts are byte-identical and the withheld fact lives only in stdout nobody kept.
-    _legs_withheld = False
+    # ----
+    # ---- THE BODY IS `write_gate_legs`, shared with `update` since DEPL-cMendedVintage-13. What
+    # ---- stays here is what is this verb's alone: the step announcement, the index read, the
+    # ---- kit-subject advice below, and the before/after verdict maps around them. `orders` is
+    # ---- passed because the non-manifest branch's order row is `apply`'s to record.
+    # ----
+    # ---- S6, and the index is read ONCE for this step and handed to both consumers inside it.
+    # ---- `tracked(target)` is correct for BOTH kind branches: the stage step above has already
+    # ---- run in either case. Round 2's L6 measured the cost of forgetting that — a second full
+    # ---- `ls-files` walk standing beside a comment asserting there was only one.
     step(STEP_LEGS, gr.get("kind", "absent"))
-    # TOOL-aScouredKit-11. The write-back below used to be guarded on the GLOBAL `r.problems`,
-    # accumulated since step 1, while LEGS is step 9 — so ANY earlier problem, including a by-design
-    # one, withheld the manifest for every kit in the run. Measured: a `--all` install recorded 57
-    # emitted legs in the receipt and wrote no manifest anywhere, which is zero gate coverage under
-    # a receipt claiming full coverage. This snapshot is what makes the guard mean "did THIS step
-    # fail", which is the question the comment at the loop below already thought it was asking.
-    _legs_problems_before = len(r.problems)
-    # D7, from this build's closing review. `-6`'s bar was built INSIDE the manifest branch, so the
-    # `else:` below — taken whenever `[gate_runner].kind` is `none` or absent, which is the normal
-    # state of a target that has not promoted a runner — looped the same legs and wrote every one
-    # into `.governance/outbox/gate-legs.md` as a written INSTRUCTION to the adopter, unfiltered and
-    # with no finding anywhere. On a manifest target the same leg reds and is withheld. That is
-    # `gate the CLASS, not the instance` broken one branch over from the unit that closed the class,
-    # and no `-6` arm could see it because every fixture declared `kind = "manifest"`.
-    #
-    # HOISTED so both branches read ONE answer. `tracked(target)` is correct for both: the stage
-    # step above has already run in either case.
-    #
-    # S6, and it now covers the bar too. The index is read ONCE for this whole function and handed
-    # to both consumers. Round 2's L6: the hoist above re-introduced the second full `ls-files` walk
-    # that S6's own comment three lines below claims does not exist, so the comment described a
-    # state the code had stopped holding. Nothing between them mutates the index, so this is wall
-    # clock and a misinforming comment rather than a correctness bug — but a comment asserting `ONE
-    # index reader` beside two of them is the class this build keeps finding.
-    tracked_target = set(tracked(target))
-    _silenced = {(eid, nm): bad for eid, nm, bad in
-                 silenced_legs(descs, selection, target, deploy, tracked_target)}
-    _silenced_found: list[str] = []
+    emitted, _legs_withheld = write_gate_legs(
+        "apply", target, deploy, gr, descs, selection, receipt, set(tracked(target)), r,
+        orders=orders)
     if gr.get("kind") == "manifest":
-        rf = target / gr["file"]
-        try:
-            existing = json.loads(rf.read_text(encoding="utf-8")) if rf.is_file() else []
-        except json.JSONDecodeError:
-            raise Refusal(f"the declared runner file {gr['file']} is not valid JSON")
-        if not isinstance(existing, list):
-            raise Refusal(f"the declared runner file {gr['file']} is not a JSON list")
-        owned = {e["name"] for e in ((receipt or {}).get("gate_runner") or {}).get("emitted", [])}
-        by_name = {e.get("name"): i for i, e in enumerate(existing)}
-        # S6. ONE index reader for the bar and for the guard branch, hoisted above the kind split
-        # so this branch READS it rather than taking it again. This was an inline `ls-files`
-        # splitting on newlines beside a `tracked()` that already existed — two spellings of one
-        # question, in the one function where they have to agree.
-        # S1/S2. THE BAR RUNS AFTER THE STAGE STEP AND NOWHERE EARLIER, and the placement is load-
-        # bearing rather than incidental: `apply` stages everything it wrote above, so the index
-        # already includes this run's own writes. The identical predicate at preflight would red
-        # every first install at every adopter.
-        #
-        # THE FINDINGS ARE HELD AND RAISED AFTER THE WRITE-BACK, which is guarded by
-        # `if not r.problems:` below. Calling `r.fail` inside the loop suppressed the manifest write
-        # for EVERY leg, so one defective leg silently took the healthy ones with it — the install
-        # "stood" while the target's runner stayed empty.
-        for eid in selection:
-            d, _p = descs[eid]
-            ctx = target_context(target, deploy, eid, d)
-            for leg in d.get("gate_leg", []):
-                nm = leg.get("name")
-                argv, miss = [], []
-                for a in leg.get("argv", []):
-                    s, m = resolve_tokens(a, ctx)
-                    argv.append(s)
-                    miss += m
-                if miss:
-                    r.fail(f"leg '{nm}' argv still carries {miss[0]} after rendering — a leg wired "
-                           f"to an unresolved token is broken forever; a dropped GUARD only costs "
-                           f"an unnecessary run, which is why the two are not symmetric")
-                    continue
-                # S2. The SILENCED-LEG bar, doing exactly what the sibling branch above does: name
-                # the kit, the leg and every offending element, then `continue` without writing the
-                # row. NOT a `Refusal` — the condition is a defect in a GOV-authored descriptor, and
-                # aborting the adopter's whole install over it hands them a failure with no local
-                # fix. `r.fail` already yields a named problem and exit 1 with the install intact.
-                _bad = _silenced.get((eid, nm))
-                if _bad:
-                    _silenced_found.append(
-                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
-                        f"{', '.join(_bad)}, which this target does not hold — emitting it would "
-                        f"record coverage in the receipt for a leg that cannot run. The leg is "
-                        f"NOT written; the rest of the install stands")
-                    continue
-                guards, dropped = [], []
-                for g in leg.get("guard", []) or []:
-                    s, m = resolve_tokens(g, ctx)
-                    if m:
-                        dropped.append((g, f"unresolved token '{m[0]}'"))
-                    elif not any(t == s.rstrip("/") or t.startswith(s.rstrip("/") + "/")
-                                 for t in tracked_target if t):
-                        dropped.append((s, "matches no tracked path in the target"))
-                    else:
-                        guards.append(s)
-                if nm in by_name and nm not in owned:
-                    raise Refusal(f"the target's runner already has a leg named '{nm}' and this "
-                                  f"target's receipt does not claim it — overwriting a leg the "
-                                  f"target wrote silently deletes their own coverage")
-                # SUBJECT TRAVELS. Without this the field never reaches an adopter and the whole
-                # mechanism stops at this repo's edge — a target would receive every kit self-test as
-                # an ordinary bar leg, which is the defect the unit exists to remove.
-                # Defaulted to `repo`, because an undeclared leg belongs ON the bar: the other
-                # default silently removes a leg the descriptor never spoke about.
-                # SUBJECT IS EMITTED ONLY WHERE THE TARGET CAN READ IT. `tools/gate-legs.json`
-                # has a PINNED key set, asserted by the `run-gates canary` leg that the run-gates
-                # kit ships and that runs on every adopter's bar — and that pin did not carry
-                # `subject` before this build. Writing the key into a tree whose run-gates predates
-                # it reds their canary as a side effect of a routine `apply --kits memory-tree`,
-                # which is the deployer breaking a target's gate while installing something else.
-                # The floor is read from the TARGET's installed runner, not assumed.
-                row = {"name": nm, "argv": argv}
-                if check_target_reads_subject(target, deploy):
-                    row["subject"] = leg.get("subject") or "repo"
-                if guards:
-                    row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
-                if nm in by_name:
-                    prev = next((e for e in owned and
-                                 ((receipt or {}).get("gate_runner") or {}).get("emitted", [])
-                                 if e["name"] == nm), None)
-                    if prev and (prev.get("argv") != argv or prev.get("guard", []) != guards):
-                        r.fail(f"leg '{nm}' in the target differs from what the receipt recorded — "
-                               f"reporting drift rather than replacing it; ownership of the NAME is "
-                               f"not ownership of the ROW")
-                        continue
-                    existing[by_name[nm]] = row
-                else:
-                    existing.append(row)
-                # THE RECEIPT CARRIES SUBJECT TOO, and not only so the summary below can count it.
-                # The receipt is what a later apply reads to decide what this deployer owns; a
-                # field that reaches the target's manifest but not the receipt is a field no drift
-                # check can ever see move. The first draft omitted it and the summary silently
-                # counted zero — an `if n_kit:` that is never true prints nothing and reads exactly
-                # like a kit with no self-tests. TOOL-dUnstalledConvoy-26.
-                emitted.append({"name": nm, "kit": eid, "argv": argv, "guard": guards,
-                                # .get, NOT a subscript. TOOL-aBoundedCeiling-5 S6: the key three
-                                # lines up is set CONDITIONALLY on check_target_reads_subject, and
-                                # was read here UNCONDITIONALLY -- so `govkit apply` raised
-                                # KeyError against any target below the version floor. It survived
-                                # because selftest.py exercises the predicate directly and never
-                                # runs a full apply on a below-floor fixture. Found by the spec
-                                # audit of a unit that was about to copy this seam verbatim.
-                                "subject": row.get("subject"),
-                                "guard_dropped": [{"spec": a, "why": b} for a, b in dropped],
-                                "history_depth": leg.get("history_depth")})
-                if dropped and not guards:
-                    print(f"govkit apply — gate leg '{nm}': UNGUARDED "
-                          f"({len(dropped)} guard(s) dropped: {dropped[0][1]})")
-        if len(r.problems) == _legs_problems_before:
-            rf.parent.mkdir(parents=True, exist_ok=True)
-            rf.write_text(json.dumps(existing, indent=2, ensure_ascii=False) + "\n",
-                          encoding="utf-8", newline="\n")
-            subprocess.run(["git", "-C", str(target), "add", "--", gr["file"]],
-                           capture_output=True, check=False)
-            print(f"govkit apply — gate legs: emitted {len(emitted)} into {gr['file']}")
-        else:
-            # WITHHELD IS SAID OUT LOUD. Silence here is what let a target end up with no manifest
-            # and a receipt claiming N emitted legs it never wrote.
-            print(f"govkit apply — gate legs: WITHHELD from {gr['file']} — "
-                  f"{len(r.problems) - _legs_problems_before} problem(s) were raised while "
-                  f"resolving legs, so the {len(emitted)} leg(s) this step built are NOT written. "
-                  f"Fix those problems and re-run; earlier steps' problems no longer suppress this.")
-            # THE RECEIPT KEEPS THE PREVIOUS RUN'S ROWS, and does NOT get this run's discarded list
-            # and does NOT get blanked. Both wrong answers were written before this comment was.
-            #
-            # `emitted` is OWNERSHIP OF A NAME, not a claim about this run: `owned` at the top of
-            # this branch derives from it, and a leg name present in the target's runner but absent
-            # from `owned` raises "the target's runner already has a leg named X and this target's
-            # receipt does not claim it". So blanking it WEDGES the target permanently — every
-            # later apply refuses the legs this deployer itself wrote, and `--re-adopt` carries the
-            # blanked receipt forward. Caught by this build's own closing review, one round after
-            # the spec that asked for the blanking.
-            #
-            # Carrying THIS run's built list forward would be the other error: it would claim rows
-            # that are not in any file. The manifest on disk is exactly what the last successful
-            # run left, so the previous receipt's rows are the true ownership set.
-            emitted = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
-            _legs_withheld = True
         # THE KIT-SUBJECT LEGS ARE HELD, and an adopter has to be told twice: once here, where
         # they can run them for the first time against the kit they just installed, and once as
         # the standing way to ask. Without this line the legs are simply absent from their bar
@@ -5424,57 +5547,6 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             print(f"govkit apply — GATE_FULL=1 does NOT run them: it ignores every guard, and a "
                   f"kit's own tests are not a guard. A green bar without that variable says "
                   f"nothing about the kits themselves.")
-    else:
-        (target / ".governance" / "outbox").mkdir(parents=True, exist_ok=True)
-        lines = ["# gate legs — ORDERED, not emitted", ""]
-        _withheld: list[str] = []
-        for eid in selection:
-            d, _p = descs[eid]
-            ctx = target_context(target, deploy, eid, d)
-            for leg in d.get("gate_leg", []):
-                nm = leg.get("name")
-                _argv = ' '.join(resolve_tokens(a, ctx)[0] for a in leg.get("argv", []))
-                # D7. The SAME bar the manifest branch runs. Writing a leg into an adopter's ORDER
-                # is telling them to wire it by hand; doing that for a leg whose engine gov never
-                # ships is worse than emitting it into a runner, because a human then does the work.
-                _bad = _silenced.get((eid, nm))
-                if _bad:
-                    _withheld.append(f"- {nm}: {_argv}\n  WITHHELD — names {', '.join(_bad)}, "
-                                     f"which this target does not hold and no kit ships here")
-                    _silenced_found.append(
-                        f"entry '{eid}' declares gate leg '{nm}' whose argv names "
-                        f"{', '.join(_bad)}, which this target does not hold — ordering it would "
-                        f"tell the adopter to wire a leg that cannot run. It is listed under "
-                        f"WITHHELD in the order rather than as an instruction")
-                    continue
-                lines.append(f"- {nm}: {_argv}")
-        lines += ["", "Nothing in this target runs these yet."]
-        if _withheld:
-            # LISTED, never dropped. An order that silently omits a leg is indistinguishable from a
-            # kit that declares none, and the adopter is the one who has to notice.
-            lines += ["", "## WITHHELD — gov does not ship the engine these run", ""] + _withheld
-        (target / ".governance" / "outbox" / "gate-legs.md").write_text(
-            "\n".join(lines) + "\n", encoding="utf-8", newline="\n")
-        orders.append({"kind": "gate-legs", "id": "gate-legs",
-                       "path": ".governance/outbox/gate-legs.md"})
-        # OWNERSHIP IS CARRIED FORWARD HERE TOO. This branch writes no legs, so it must not
-        # REVOKE the receipt's claim on legs a previous manifest-kind run wrote. `emitted` is
-        # initialized empty, and leaving it empty means a target whose `[gate_runner].kind` is
-        # flipped to `none` and back — an operator action, not a rare one — comes back with an
-        # empty `owned` and refuses its own legs. That is the same wedge the withheld path had,
-        # one branch over, and it was left standing when that one was fixed.
-        emitted = list(((receipt or {}).get("gate_runner") or {}).get("emitted", []))
-        print("govkit apply — gate legs: ORDERED, not emitted — "
-              + ("[gate_runner] declares kind = \"none\"" if gr.get("kind") == "none"
-                 else "this target's deploy.toml declares no [gate_runner]")
-              + " (see .governance/outbox/gate-legs.md)")
-
-    # RAISED HERE, outside the kind split, so BOTH branches report. Deferred past the manifest
-    # write-back deliberately: that write is guarded on `not r.problems`, and failing inside the
-    # loop suppressed the manifest for every leg — one defective leg silently taking the healthy
-    # ones with it. The order branch has no such guard, but the findings belong in one place.
-    for _f in _silenced_found:
-        r.fail(_f)
 
     # ---- AFTER. The same function, the same regime, so the two maps are comparable.
     after_map: dict[str, str] = {}
@@ -7877,6 +7949,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                      | ({_pins_snap["paths"][0]}
                         if (_ga_written or _ga_removed) and _pins_snap else set()))
     n_verified = n_unverified = n_rolled = n_preexisting = n_declined_red = 0
+    # DEPL-cMendedVintage-13 S3. WHICH KITS THIS RUN REVERTED, by name rather than by count. The
+    # gate-leg emission below subtracts them: a leg emitted for a kit whose engine this run put back
+    # records coverage for files that are no longer there. `n_rolled` alone cannot answer that — it
+    # is arithmetic, and the question is membership. DECLINED RED and PRE-EXISTING RED are
+    # deliberately NOT in here: their writes STAND, so their legs belong in the population.
+    _rolled_kits: set[str] = set()
     for eid in touched_kits:
         d, _ = descs[eid]
         ctx_v = target_context(target, deploy, eid, d)
@@ -7975,6 +8053,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                        f"under .governance/outbox/")
                 continue
             n_rolled += 1
+            _rolled_kits.add(eid)
             # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
             # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
             # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
@@ -8288,6 +8367,75 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             else:
                 print("govkit update — renormalize: the pin block governs no tracked path in this "
                       "target, so there is nothing to re-stage")
+
+    # ---- DEPL-cMendedVintage-13 S2 + S3. THE GATE LEGS, emitted by this verb for the first time.
+    # ---- Until this landed they arrived on `apply` and on `adopt` and nowhere else, so every
+    # ---- `[[gate_leg]]` gov started shipping reached an adopter only when they re-ran the verb
+    # ---- that overwrites engine bytes unconditionally.
+    # ----
+    # ---- AFTER THE WRITE LOOP AND AFTER THE VERIFY PASS, and both halves are load-bearing. The
+    # ---- silenced-leg bar reads the target's index and this run's own writes must count as
+    # ---- present, which is why `apply` puts the same call after its stage step. And a kit the
+    # ---- verify pass REVERTED must not have its legs recorded by the run that reverted them.
+    # ---- After the renormalize too: that re-stages a population wider than anything this run
+    # ---- wrote and refuses when the pinned set is dirty, so a manifest written above it would be
+    # ---- gov refusing its own write.
+    # ----
+    # ---- THE POPULATION IS A DECLARATION AND NOT A FILE SET: the receipt's claimed kits, narrowed
+    # ---- by this run's `--kits` scope, minus what this run rolled back. A claimed kit whose bytes
+    # ---- did not move is STILL in it, and that case is the whole reason this step exists — a leg
+    # ---- gov newly declares over a file the target already holds reaches nobody otherwise.
+    # ----
+    # ---- NO `if write:` GUARD, and its absence is measured rather than assumed: the read-only run
+    # ---- RETURNS at the preview above, hundreds of lines before this point, so a guard here would
+    # ---- be a condition that cannot be false — the could-not-fail shape this file bans. The
+    # ---- preview's own closing line already says nothing was written.
+    #
+    # `apply` validates the declaration in its PRE-WRITE pass and this verb never validated it at
+    # all — while `[gate_runner].file` is a TARGET-supplied path the emission joins onto the target
+    # root and WRITES, which is the escape that validator's own header records. Graded against a
+    # THROWAWAY report, the shape this verb already uses for the coverage probe below: a declaration
+    # defect that predates this run is REPORTED, and never allowed to abort a verb whose bytes have
+    # already landed.
+    _legs_r = Report()
+    try:
+        _legs_gr = validate_gate_runner(deploy, _legs_r)
+    except Refusal as _legs_err:
+        _legs_r.fail(str(_legs_err))
+        _legs_gr = {}
+    if _legs_r.problems:
+        r.fail("this target's [gate_runner] declaration does not validate, so no gate leg was "
+               "emitted this run and the bytes this run wrote stand: "
+               + "; ".join(_legs_r.problems))
+    else:
+        _legs_scope = [e for e in claimed
+                       if (not kits or e in set(kits)) and e not in _rolled_kits]
+        # S5 IS A CLASS AND NOT ONE BRANCH, and the `except` is the half that makes it one. The
+        # named `r.fail` inside the emission covers the malformed runner, which is the case with a
+        # message worth writing; this covers EVERY OTHER refusal that function can raise on this
+        # verb — the leg whose name the target's runner carries and this receipt does not claim is
+        # the live one, reachable by any hand-edit made after the install. Each of them aborts
+        # `apply` correctly, because `apply` has written nothing when it reaches the step. Here the
+        # bytes are already on disk, and an abort leaves the target updated with an un-restamped
+        # receipt and no emission: the wedge this unit exists to not ship, one branch over from the
+        # branch the spec named. Nothing is swallowed — the message is the refusal's own, verbatim.
+        try:
+            _legs_emitted, _legs_withheld = write_gate_legs(
+                "update", target, deploy, _legs_gr, descs, _legs_scope, receipt,
+                set(tracked(target)), r, carry_out_of_scope=True, refuse_bad_runner=False)
+            # THE RECEIPT'S OWN SHAPE, written the way `apply` writes it rather than patched in
+            # place: a receipt from a vintage predating the field has no `gate_runner` key at all,
+            # and an in-place edit of that is a KeyError inside a repository gov does not own.
+            receipt["gate_runner"] = {"kind": _legs_gr.get("kind", "absent"),
+                                      "file": _legs_gr.get("file"),
+                                      "emitted": _legs_emitted,
+                                      "legs_withheld": _legs_withheld}
+        except Refusal as _legs_stop:
+            # THE RECEIPT IS LEFT EXACTLY AS IT WAS, which is the correct ownership answer: no
+            # manifest was written, so the rows the last successful run left are still the true set.
+            r.fail(f"the gate-leg step refused and no leg was emitted this run: {_legs_stop}. The "
+                   f"bytes this run wrote are KEPT and the receipt is NOT re-stamped, so the next "
+                   f"run reclassifies from the vintage these rows are actually at")
 
     # ---- TOOL-aWeldedTribunal-6. THE GAP SET: what gov SHIPS for a kit this target claims and this
     # ---- target does not hold. The classification loop above iterates the RECEIPT, so a file gov

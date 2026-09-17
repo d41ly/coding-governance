@@ -10744,6 +10744,354 @@ user_skills = "/tmp/gk-fake-skills"
                   "this fixture, so the over-reach direction went UNGRADED (not passed)",
                   True, _qm.stdout + _qm.stderr)
 
+        # ============ DEPL-cMendedVintage-13 — `update --write` EMITS THE GATE LEGS ============
+        # Until this landed, gate legs arrived on `apply` and on `adopt` and on nothing else, so a
+        # `[[gate_leg]]` gov started shipping reached an adopter only when they re-ran the verb that
+        # overwrites engine bytes unconditionally. The emission core is now one function both verbs
+        # call; these arms grade the half that is NEW and the two shapes that lose data quietly.
+        #
+        # AC6's REAL CRITERION IS NOT OBSERVABLE FROM HERE, and it is not pretended to be: it
+        # compares the runner this engine writes against the one the PRE-extraction engine wrote,
+        # and the suite has no pre-extraction engine to run. That comparison was made during the
+        # build, over three shapes of scratch fixture — the manifest write path, the silenced-leg
+        # withheld path and the non-manifest order path — and the diffs were empty; the ledger
+        # records it. What IS gradeable here is the idempotence arm below, which reds on the same
+        # class: an extraction that changed row order or dropped a field.
+        M13_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+                   '[selection]\ndefault = ["demo", "demo2"]\n\n'
+                   '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
+                   '[[entry]]\nid = "demo2"\ndescriptor = "tools/demo2/kit.toml"\n\n'
+                   '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+        # The runner lives under the target's OWN prefix, which is not this repo's — the same
+        # choice the `-6` fixtures above make, and for the same reason: a fixture that spells gov's
+        # layout grades gov's layout.
+        M13_DEPLOY = (
+            'gov_source = "local"\nprefix = "scripts"\nkits = ["demo", "demo2"]\n\n'
+            '[gate_runner]\nkind = "manifest"\nfile = "scripts/gate-legs.json"\n'
+            'grammar = "json-array"\ndedupe_key = "name"\n'
+            'command = ["bash", "scripts/run-gates.sh"]\n'
+            'run_all_env = { GATE_FULL = "1" }\n'
+            'observed_ran = ["GATE ok    {name}"]\n'
+            'observed_failed = ["GATE FAIL  {name}"]\n')
+        M13_DEPLOY_NONE = ('gov_source = "local"\nprefix = "scripts"\n'
+                           'kits = ["demo", "demo2"]\n\n[gate_runner]\nkind = "none"\n')
+        NL13 = chr(10)
+
+        def build_kit13(eid: str, leg: str, engine_rel: str, with_check: bool) -> str:
+            """One fixture kit: an engine pool, one gate leg, and optionally its own `[check]`."""
+            chk = ('[check]\nargv = ["bash", "{prefix}/' + eid + '/check.sh"]\n\n') if with_check \
+                  else '[check]\nnone = "a fixture kit"\n\n'
+            return ('id = "%s"\nhome = "tools/%s"\n' % (eid, eid)
+                    + 'version_from = { none = "fixture" }\n\n' + chk
+                    + '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    + '[[gate_leg]]\nname = "%s"\nsubject = "repo"\n' % leg
+                    + 'argv = ["bash", "{prefix}/%s"]\nguard = []\n\n' % engine_rel
+                    + '[adopt]\nargv = []\nmutates_index = false\n')
+
+        def build_gov13(tag: str, leg_engine: str = "demo/engine.sh",
+                        with_check: bool = False, check_rc: int = 0) -> pathlib.Path:
+            """A scratch gov carrying TWO kits, because every ownership arm needs a second one.
+
+            The engine COPY is taken here, at fixture-build time, for the reason the `-10` builder
+            above records: a break staged into this repo's engine after the copy runs the unpatched
+            one and the arm reports on nothing.
+            """
+            g = tmp / ("m13-gov-" + tag)
+            (g / "tools" / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            (g / "tools" / "govkit" / "registry.toml").write_text(M13_REG, encoding="utf-8",
+                                                                  newline="\n")
+            for eid, leg, eng, chk in (("demo", "demo leg", leg_engine, with_check),
+                                       ("demo2", "demo2 leg", "demo2/engine.sh", False)):
+                (g / "tools" / eid).mkdir(parents=True, exist_ok=True)
+                (g / "tools" / eid / "kit.toml").write_text(build_kit13(eid, leg, eng, chk),
+                                                            encoding="utf-8", newline="\n")
+                (g / "tools" / eid / "engine.sh").write_text("exit 0\n", encoding="utf-8",
+                                                             newline="\n")
+            if with_check:
+                (g / "tools" / "demo" / "check.sh").write_text("exit %d\n" % check_rc,
+                                                               encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "config", "core.autocrlf", "false")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "A")
+            return g
+
+        def build_target13(tag: str, deploy: str = M13_DEPLOY) -> pathlib.Path:
+            t = tmp / ("m13-t-" + tag)
+            t.mkdir(parents=True)
+            git(t, "init", "-q", "-b", "main")
+            git(t, "config", "user.email", "t@e")
+            git(t, "config", "user.name", "t")
+            git(t, "config", "core.autocrlf", "false")
+            (t / ".governance").mkdir()
+            (t / ".governance" / "deploy.toml").write_text(deploy, encoding="utf-8", newline="\n")
+            if "manifest" in deploy:
+                (t / "scripts").mkdir()
+                (t / "scripts" / "gate-legs.json").write_text("[]\n", encoding="utf-8",
+                                                              newline="\n")
+            (t / "README.md").write_text("t\n", encoding="utf-8", newline="\n")
+            git(t, "add", "-A")
+            git(t, "commit", "-qm", "base")
+            return t
+
+        def write_vintage13(g: pathlib.Path, msg: str = "B") -> None:
+            """gov's NEXT vintage. `update` refuses a run that is not moving forward, so every arm
+            below needs one byte to have moved — and it is deliberately the OTHER kit's byte, so
+            the kit whose leg is under test moves nothing at all."""
+            (g / "tools" / "demo2" / "engine.sh").write_text("exit 0\n# moved\n",
+                                                             encoding="utf-8", newline="\n")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", msg)
+
+        def run_gov13(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+                                   *args], capture_output=True, text=True)
+
+        def read_legs13(t: pathlib.Path) -> list[str]:
+            f = t / "scripts" / "gate-legs.json"
+            if not f.is_file():
+                return []
+            try:
+                return [str(e.get("name")) for e in json.loads(f.read_text(encoding="utf-8"))]
+            except json.JSONDecodeError:
+                return ["(the runner file is not JSON)"]
+
+        def read_receipt13(t: pathlib.Path) -> dict:
+            p = t / ".governance" / "install.json"
+            return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
+
+        def read_owned13(t: pathlib.Path) -> list:
+            return [(e.get("name"), e.get("kit"))
+                    for e in (read_receipt13(t).get("gate_runner") or {}).get("emitted", [])]
+
+        def remove_leg13(t: pathlib.Path, name: str) -> None:
+            """Delete one row from the target's runner BY HAND — the drift this unit repairs."""
+            f = t / "scripts" / "gate-legs.json"
+            rows = [e for e in json.loads(f.read_text(encoding="utf-8"))
+                    if e.get("name") != name]
+            f.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+        # ---- AC1. THE CASE THIS UNIT EXISTS FOR. The kit whose leg is missing moves NO byte in
+        # ---- this run, so a population keyed on the rows the run WROTE emits nothing and the leg
+        # ---- stays missing. A leg is a DECLARATION, not a file.
+        _g13 = build_gov13("ac1")
+        _t13 = build_target13("ac1")
+        _a13 = run_gov13(_g13, "apply", "--target", str(_t13))
+        check("[-13] the fixture applies and both kits' legs reach the runner",
+              _a13.returncode == 0 and read_legs13(_t13) == ["demo leg", "demo2 leg"],
+              f"rc {_a13.returncode} legs {read_legs13(_t13)}" + NL13 + _a13.stdout[-900:])
+        settle(_t13, "after apply")
+        remove_leg13(_t13, "demo leg")
+        settle(_t13, "the demo leg row deleted by hand")
+        check("[-13] AC1 LIVENESS the row really is gone before the update runs, so the arm below "
+              "is not asserting that nothing happened",
+              read_legs13(_t13) == ["demo2 leg"], str(read_legs13(_t13)))
+        write_vintage13(_g13)
+        _u13 = run_gov13(_g13, "update", "--target", str(_t13), "--write")
+        check("[-13] AC1 `update --write` puts the deleted leg row back",
+              _u13.returncode == 0 and "demo leg" in read_legs13(_t13),
+              f"rc {_u13.returncode} legs {read_legs13(_t13)}" + NL13 + _u13.stdout[-1400:])
+        check("[-13] AC1 ...and names what it emitted rather than emitting silently",
+              "gate legs: emitted 2" in _u13.stdout, _u13.stdout[-1400:])
+        check("[-13] S3 LIVENESS that run moved exactly ONE file and it belongs to the OTHER kit, "
+              "so the population really is the declaration and not the write set",
+              "wrote 1," in _u13.stdout, _u13.stdout[-900:])
+
+        # ---- AC2 / S4. OWNERSHIP IS MERGED, NEVER REPLACED. A scoped run that rewrote the whole
+        # ---- `emitted` list revokes gov's claim on the out-of-scope leg, and every later run then
+        # ---- refuses the leg gov itself wrote — the target wedges with no event to notice.
+        _g13b = build_gov13("ac2")
+        _t13b = build_target13("ac2")
+        run_gov13(_g13b, "apply", "--target", str(_t13b))
+        settle(_t13b, "after apply")
+        remove_leg13(_t13b, "demo leg")
+        settle(_t13b, "the demo leg row deleted by hand")
+        write_vintage13(_g13b)
+        _u13b = run_gov13(_g13b, "update", "--target", str(_t13b), "--write", "--kits", "demo")
+        check("[-13] AC2 a scoped run restores the IN-scope kit's leg",
+              "demo leg" in read_legs13(_t13b),
+              str(read_legs13(_t13b)) + NL13 + _u13b.stdout[-1200:])
+        check("[-13] AC2 ...leaves the out-of-scope kit's leg standing in the runner",
+              "demo2 leg" in read_legs13(_t13b), str(read_legs13(_t13b)))
+        check("[-13] AC2 S4 ...and does NOT revoke the receipt's claim on it",
+              ("demo2 leg", "demo2") in read_owned13(_t13b), str(read_owned13(_t13b)))
+        check("[-13] AC2 LIVENESS the run really was scoped, so nothing passed by doing everything",
+              "gate legs: emitted 1" in _u13b.stdout, _u13b.stdout[-1200:])
+
+        # ---- AC3. The silenced-leg bar reaches this verb too, and one defective leg does not take
+        # ---- the healthy ones with it — the measured shape this step already had once.
+        _g13c = build_gov13("ac3", leg_engine="demo/absent-engine.sh")
+        _t13c = build_target13("ac3")
+        run_gov13(_g13c, "apply", "--target", str(_t13c))
+        settle(_t13c, "after apply")
+        write_vintage13(_g13c)
+        _u13c = run_gov13(_g13c, "update", "--target", str(_t13c), "--write")
+        check("[-13] AC3 a leg naming an engine gov does not ship is reported by `update` too",
+              _u13c.returncode == 1 and "which this target does not hold" in _u13c.stdout,
+              _u13c.stdout[-1400:])
+        check("[-13] AC3 ...the defective leg is NOT written",
+              "demo leg" not in read_legs13(_t13c), str(read_legs13(_t13c)))
+        check("[-13] AC3 ...and the healthy sibling IS",
+              "demo2 leg" in read_legs13(_t13c), str(read_legs13(_t13c)))
+
+        # ---- AC4 / S5. THE SHAPE THAT WEDGES A TARGET. `apply` raises here and is right to:
+        # ---- nothing is written when it reaches this step. In `update` the bytes are already on
+        # ---- disk, so an abort leaves the target updated, the receipt un-restamped and no
+        # ---- emission — recorded against this step twice.
+        _g13d = build_gov13("ac4")
+        _t13d = build_target13("ac4")
+        run_gov13(_g13d, "apply", "--target", str(_t13d))
+        settle(_t13d, "after apply")
+        _stamp13d = read_receipt13(_t13d).get("gov_commit")
+        (_t13d / "scripts" / "gate-legs.json").write_text("this is not a JSON list\n",
+                                                          encoding="utf-8", newline="\n")
+        settle(_t13d, "the runner file clobbered by hand")
+        write_vintage13(_g13d)
+        _u13d = run_gov13(_g13d, "update", "--target", str(_t13d), "--write")
+        check("[-13] AC4/S5 a malformed runner is REPORTED by name, never raised",
+              _u13d.returncode == 1 and "is not valid JSON" in _u13d.stdout,
+              _u13d.stdout[-1400:] + _u13d.stderr[-600:])
+        check("[-13] AC4 ...with no traceback anywhere: an abort here is the wedge",
+              "Traceback" not in (_u13d.stdout + _u13d.stderr),
+              (_u13d.stdout + _u13d.stderr)[-900:])
+        check("[-13] AC4 ...the bytes this run wrote are KEPT",
+              (_t13d / "scripts" / "demo2" / "engine.sh").read_text(encoding="utf-8")
+              == "exit 0" + NL13 + "# moved" + NL13,
+              repr((_t13d / "scripts" / "demo2" / "engine.sh").read_text(encoding="utf-8")))
+        check("[-13] AC4 ...and the receipt is NOT re-stamped",
+              read_receipt13(_t13d).get("gov_commit") == _stamp13d,
+              str(read_receipt13(_t13d).get("gov_commit")) + " want " + str(_stamp13d))
+
+        # ---- AC5 / S2. THE ORDER THAT IS EASY TO GET BACKWARDS. A kit the verify pass reverted
+        # ---- must not have its legs recorded by the run that reverted them, or the target's bar
+        # ---- runs a leg whose engine went back three lines later.
+        _g13e = build_gov13("ac5", with_check=True)
+        _t13e = build_target13("ac5")
+        run_gov13(_g13e, "apply", "--target", str(_t13e))
+        settle(_t13e, "after apply")
+        remove_leg13(_t13e, "demo leg")
+        settle(_t13e, "the demo leg row deleted by hand")
+        (_g13e / "tools" / "demo" / "check.sh").write_text("exit 1\n", encoding="utf-8",
+                                                            newline="\n")
+        git(_g13e, "add", "-A")
+        git(_g13e, "commit", "-qm", "B: the demo kit's own check goes red")
+        _u13e = run_gov13(_g13e, "update", "--target", str(_t13e), "--write")
+        check("[-13] AC5 LIVENESS the verify pass really did roll that kit back",
+              "ROLLED BACK" in _u13e.stdout, _u13e.stdout[-1400:])
+        check("[-13] AC5 S2 a rolled-back kit's leg is NOT emitted by the run that reverted it",
+              "demo leg" not in read_legs13(_t13e), str(read_legs13(_t13e)))
+        check("[-13] AC5 ...while the kit whose writes stood keeps its leg",
+              "demo2 leg" in read_legs13(_t13e), str(read_legs13(_t13e)))
+
+        # ---- AC6, the half a suite can reach. A re-`apply` is an idempotent rewrite of the same
+        # ---- rows, so the extraction changing row order or dropping a field reds HERE rather than
+        # ---- at an adopter's byte-comparing parity leg.
+        _g13f = build_gov13("ac6")
+        _t13f = build_target13("ac6")
+        run_gov13(_g13f, "apply", "--target", str(_t13f))
+        _bytes13f = (_t13f / "scripts" / "gate-legs.json").read_bytes()
+        settle(_t13f, "after apply")
+        _a13f = run_gov13(_g13f, "apply", "--target", str(_t13f))
+        check("[-13] AC6 a re-`apply` through the extracted function leaves the runner "
+              "BYTE-identical",
+              _a13f.returncode == 0
+              and (_t13f / "scripts" / "gate-legs.json").read_bytes() == _bytes13f,
+              f"rc {_a13f.returncode}" + NL13 + _a13f.stdout[-1000:])
+        check("[-13] AC6 LIVENESS ...over a manifest that really carries rows",
+              len(_bytes13f) > 40, repr(_bytes13f[:80]))
+
+        # ---- AC7 / S7. The non-manifest branch. `apply` records the order row and `update`
+        # ---- refreshes the file without touching that list — one writer on a field one verb owns.
+        _g13g = build_gov13("ac7")
+        _t13g = build_target13("ac7", M13_DEPLOY_NONE)
+        run_gov13(_g13g, "apply", "--target", str(_t13g))
+        settle(_t13g, "after apply")
+        _order13 = _t13g / ".governance" / "outbox" / "gate-legs.md"
+        check("[-13] AC7 LIVENESS the apply left an order naming the vintage-A engine",
+              "demo/engine.sh" in _order13.read_text(encoding="utf-8"),
+              _order13.read_text(encoding="utf-8"))
+        (_g13g / "tools" / "demo" / "kit.toml").write_text(
+            build_kit13("demo", "demo leg", "demo/engine-v2.sh", False),
+            encoding="utf-8", newline="\n")
+        (_g13g / "tools" / "demo" / "engine-v2.sh").write_text("exit 0\n", encoding="utf-8",
+                                                                newline="\n")
+        (_g13g / "tools" / "demo" / "engine.sh").unlink()
+        git(_g13g, "add", "-A")
+        git(_g13g, "commit", "-qm", "B: the demo leg's engine is renamed")
+        _u13g = run_gov13(_g13g, "update", "--target", str(_t13g), "--write")
+        check("[-13] AC7 a non-manifest target's order is REFRESHED by `update --write`",
+              "demo/engine-v2.sh" in _order13.read_text(encoding="utf-8"),
+              _order13.read_text(encoding="utf-8") + NL13 + _u13g.stdout[-1000:])
+        check("[-13] AC7 ...and the run names the branch it took",
+              "ORDERED, not emitted" in _u13g.stdout, _u13g.stdout[-1000:])
+        check("[-13] AC7 S7 ...while the receipt's `orders` keeps exactly the one row `apply` "
+              "recorded",
+              [o for o in (read_receipt13(_t13g).get("orders") or [])
+               if o.get("id") == "gate-legs"]
+              == [{"kind": "gate-legs", "id": "gate-legs",
+                   "path": ".governance/outbox/gate-legs.md"}],
+              json.dumps(read_receipt13(_t13g).get("orders")))
+
+        # ---- THE DECLARATION IS VALIDATED BEFORE IT IS WRITTEN THROUGH. `apply` grades
+        # ---- `[gate_runner]` in its pre-write pass and this verb never graded it at all, while
+        # ---- the declared file is a TARGET-supplied path the emission joins onto the target root
+        # ---- and WRITES. Reported rather than raised, for AC4's reason: the bytes already landed.
+        _g13h = build_gov13("escape")
+        _t13h = build_target13("escape")
+        run_gov13(_g13h, "apply", "--target", str(_t13h))
+        settle(_t13h, "after apply")
+        (_t13h / ".governance" / "deploy.toml").write_text(
+            M13_DEPLOY.replace('file = "scripts/gate-legs.json"', 'file = "../../ESCAPED.json"'),
+            encoding="utf-8", newline="\n")
+        settle(_t13h, "an escaping [gate_runner].file, planted by hand")
+        write_vintage13(_g13h)
+        _u13h = run_gov13(_g13h, "update", "--target", str(_t13h), "--write")
+        check("[-13] an escaping [gate_runner].file is refused by NAME on the update path",
+              _u13h.returncode == 1 and "[gate_runner].file" in _u13h.stdout,
+              _u13h.stdout[-1400:] + _u13h.stderr[-600:])
+        check("[-13] ...reported, never raised: this run's own bytes still landed",
+              "Traceback" not in (_u13h.stdout + _u13h.stderr)
+              and (_t13h / "scripts" / "demo2" / "engine.sh").read_text(encoding="utf-8")
+              == "exit 0" + NL13 + "# moved" + NL13,
+              (_u13h.stdout + _u13h.stderr)[-900:])
+        check("[-13] ...and nothing was written outside the target",
+              not (_t13h.parent / "ESCAPED.json").exists()
+              and not (_t13h.parent.parent / "ESCAPED.json").exists(),
+              "a file escaped the target root")
+
+        # ---- S5 IS A CLASS, AND THIS IS THE BRANCH THE SPEC DID NOT NAME. A leg whose NAME the
+        # ---- target's runner carries and this receipt does not claim is a refusal `apply` is right
+        # ---- to raise: it has written nothing when it reaches the step. On this verb the bytes are
+        # ---- already on disk, so the identical raise is the wedge S5 exists to prevent, one branch
+        # ---- over. Reachable by any hand-edit made after the install, which is what this stages.
+        _g13i = build_gov13("conflict")
+        _t13i = build_target13("conflict")
+        run_gov13(_g13i, "apply", "--target", str(_t13i))
+        settle(_t13i, "after apply")
+        _rcpt13i = read_receipt13(_t13i)
+        _rcpt13i["gate_runner"]["emitted"] = [e for e in _rcpt13i["gate_runner"]["emitted"]
+                                              if e.get("name") != "demo leg"]
+        (_t13i / ".governance" / "install.json").write_text(
+            json.dumps(_rcpt13i, indent=2) + NL13, encoding="utf-8", newline="\n")
+        settle(_t13i, "the receipt's claim on one leg dropped by hand")
+        write_vintage13(_g13i)
+        _u13i = run_gov13(_g13i, "update", "--target", str(_t13i), "--write")
+        check("[-13] a leg the runner carries and the receipt does not claim is REPORTED by "
+              "`update`, never raised out of it",
+              _u13i.returncode == 1 and "the gate-leg step refused" in _u13i.stdout
+              and "does not claim it" in _u13i.stdout,
+              _u13i.stdout[-1400:] + _u13i.stderr[-600:])
+        check("[-13] ...with no traceback, and this run's own bytes still landed",
+              "Traceback" not in (_u13i.stdout + _u13i.stderr)
+              and (_t13i / "scripts" / "demo2" / "engine.sh").read_text(encoding="utf-8")
+              == "exit 0" + NL13 + "# moved" + NL13,
+              (_u13i.stdout + _u13i.stderr)[-900:])
+        check("[-13] ...and the target's own row is left exactly where the target had it",
+              "demo leg" in read_legs13(_t13i), str(read_legs13(_t13i)))
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")
