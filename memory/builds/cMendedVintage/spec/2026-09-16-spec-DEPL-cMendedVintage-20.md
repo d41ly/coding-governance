@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 30
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 31
 
 <!-- gen:spec-records -->
 

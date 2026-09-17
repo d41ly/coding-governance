@@ -1,6 +1,6 @@
 # TOOL-cMendedVintage-7 — the receipt leg reports rows carrying `evidence: "unattributed"`
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 26
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 

@@ -1,10 +1,12 @@
 # DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 19
+**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-16-prompt-DEPL-cMendedVintage-17-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-17-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
