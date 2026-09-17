@@ -85,6 +85,7 @@ pytest-guardrails self-test	kit	selftests
 python resolver (behaviour + inline parity + idiom ban)	kit	wiring
 recall floor	repo	declarations
 recall floor arms	repo	selftests
+receipt sync (installed files match the receipt)	repo	declarations
 review-join ban (no ref-keyed join)	repo	declarations
 review-join self-test	kit	selftests
 review-protocol parity (kit vs dogfood)	repo	declarations

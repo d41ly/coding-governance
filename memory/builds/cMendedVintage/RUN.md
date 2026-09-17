@@ -247,3 +247,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T05:46:57Z dispatch · item 8f6514e7 TOOL-cMendedVintage-6 · reason tools/run-gates/check-receipt.py tools/run-gates/kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv .gitattributes memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-6.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-6-acceptance-ledger.md
 
 2026-09-17T05:46:58Z brief · item TOOL-cMendedVintage-6 · reason 7c160411d6a2 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-TOOL-cMendedVintage-6-2-build-brief.md
+
+2026-09-17T05:50:59Z dispatch · item 069d6ad0 TOOL-cMendedVintage-6 · reason tools/run-gates/check-receipt.py tools/run-gates/kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv tools/run-gates/README.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-6-acceptance-ledger.md memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-6.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T06:00:49Z dispatch · item 069d6ad0 TOOL-cMendedVintage-6 · reason tools/run-gates/check-receipt.py tools/run-gates/kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv tools/run-gates/README.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-6-acceptance-ledger.md memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-6.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T06:04:19Z dispatch · item 069d6ad0 TOOL-cMendedVintage-6 · reason tools/run-gates/check-receipt.py tools/run-gates/kit.toml tools/gate-legs.json tools/govkit/subject-pins.tsv tools/run-gates/README.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-6-acceptance-ledger.md memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-6.md memory/builds/cMendedVintage/README.md memory/guides/SESSION-KICKOFF.md memory/LIVE.md memory/ledger/2026-09.md

@@ -1,11 +1,12 @@
 # TOOL-cMendedVintage-6 — the receipt-sync leg, and its row on gov's own bar
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 26
+**Status:** CLOSED · rev-4 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-6-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-6-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-17-prompt-TOOL-cMendedVintage-6-2-build-brief.md](../prompts/2026-09-17-prompt-TOOL-cMendedVintage-6-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -125,6 +126,7 @@ Minted by this unit, with the cell that grades each name. `.lexicon.conf` declar
 | `read_receipt` | `py.function` | parse the receipt, or return nothing when it is absent |
 | `check_engine_rows` | `py.function` | the hash and existence loop; returns the findings |
 | `check_fixtures` | `py.function` | the four built-in arms |
+| `write_fixture` | `py.function` | one fixture tree on disk; added at build time, rev-4 |
 | `receipt sync (installed files match the receipt)` | gate-leg name | the leg, in both declarations |
 
 The leg name carries no digit-bearing parenthetical, which `govkit selfcheck`'s 7h arm refuses by
@@ -139,6 +141,17 @@ claims reds. Its 7h2 arm then asserts every manifest leg has a `<name>\t<subject
 `tools/govkit/subject-pins.tsv`, and a NEW leg with no pin row reds by that fact. So the three files
 move together or the bar is red on an incomplete landing. The brief this unit was written from named
 two of the three; the pin file is the third and is not optional.
+
+**There is a FOURTH, measured at build time and unnamed by any earlier revision of this section:
+the file must be TRACKED.** `selfcheck` resolves every declared leg's argv against the paths the
+descriptors actually write, and an untracked file is claimed by no rule — including by this kit's own
+`[[files]] include = "**"`, whose pool is the tracked surface. Observed: with the descriptor row, the
+manifest row and the file all in the worktree but the file unstaged, `selfcheck` reds with the leg's
+argv naming a path that "NO rule in any descriptor writes, seeds, orders or produces", and states the
+consequence — `apply` would withhold the leg and exit 1 at every target selecting this kit. So the
+`git add` is not bookkeeping ahead of the commit, it is the fourth declaration, and a unit that
+writes the other three and stages nothing sees a refusal whose text names neither the manifest nor
+the pins.
 
 `subject = "repo"` because a failure of this leg means THIS repository's installed files no longer
 match its own record — the criterion stated at the `subject` field declaration in
@@ -300,6 +313,20 @@ leg off a bar.
   bytes, so every clone that is not the install machine is at risk. The row now names that population
   and cites finding 36 of the aSealedCaravan record, and AC7 measures the residue on a CRLF-expanded
   clone rather than asserting it away.
+- rev-4 · 2026-09-17 · §4 · built and closed. THREE amendments, all from measurement at build time
+  and none changing a design decision. (a) The three-declarations subsection gains a FOURTH, observed
+  rather than predicted: `selfcheck` reds on a leg whose argv names an UNTRACKED path, because the
+  `**` engine rule's pool is the tracked surface, so staging the file is itself a declaration. Every
+  earlier revision, and the brief, named three. (b) The Inventory table gains `write_fixture`, a
+  fixture-tree helper the four arms share; `--suggest` cleared it for `py.function` before it was
+  written, as the table's own sentence requires. (c) §5's false-red row is CONFIRMED and, if
+  anything, understated: AC7's clone was built with `core.autocrlf=false` and STILL came back
+  CRLF, because `* text=auto` plus a native `core.eol` normalizes on checkout regardless — so the
+  population really is every clone that is not the install machine, and not merely the ones that opt
+  into `autocrlf`. No wording changed, because the row already names that population. One stale
+  citation noted and not repaired here: §10 cites the integrity loop at `govkit.py:3074-3092` and it
+  now sits near `:3511`; the file it names is right and the line numbers move with every commit,
+  which is why the reuse audit is evidence of a reading rather than a live pointer.
 - rev-3 · 2026-09-16 · §8 · SHAPE REPAIR, no decision changed. The fork items were written as bare `**F1 — …**` bold paragraphs; the classifier at `tools/unattended/unattended.sh:1797` counts an item only when the line opens `- `, `* ` or `### `, and with zero items it takes a branch that never consults the resolution mark and accepts only a `none` opening line. So a section carrying a conforming `RESOLVED (agent, …)` mark graded FORKED and the unit could not be dispatched. Ten sibling specs in this build use the `- ` bullet and all grade READY, so the house shape is the bullet and these two were the outliers. The reader errs toward FORKED, which is the safe direction, so this is a defect in the spec and not in the classifier. The resolution text, the chosen option and every criterion are byte-identical; the round-1 spec audit that reviewed this design still names this id and is not invalidated by a non-semantic reshape.
 
 ## 10. Reuse audit

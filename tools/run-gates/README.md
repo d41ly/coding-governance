@@ -64,6 +64,7 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 | `run-gates.turnstile.test.sh` | the turnstile arms: peak occupancy, reaping, FIFO order, release on every signal |
 | `adopt-run-gates.sh` | `--check` asserts a target's `[gate_runner]` declaration still matches this runner's output strings |
 | `adopt-run-gates.test.sh` | the adopter e2e, gated on EFFECTS rather than exit codes |
+| `check-receipt.py` | the leg `receipt sync (installed files match the receipt)`: every engine row of `.governance/install.json` still on disk and still hashing to its recorded sha256. The INTEGRITY half only — it reads no `source`, `commit` or `gov_oid`, because those resolve against a gov checkout an adopter does not have, and it grades no `seed`, `merged`, `attributes` or `forked` row. A tree with no receipt is an announced `SKIP`, and four built-in fixture arms run on every invocation so the leg has a verdict there too |
 | `kit.toml` | this entry, declared as data |
 
 ## Reuse, and the baseline a guard diffs against
