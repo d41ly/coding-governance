@@ -46,7 +46,7 @@ when `DEPL-cMendedVintage-4` landed at order 5 of this same build.
 
 **Evidences:** TOOL-cMendedVintage-7
 
-- AC1 — OBSERVED. Run with
+- AC1 — `--selftest` — OBSERVED. Run with
   `--selftest`
   the fifth arm reports
   `ARM ok`
@@ -64,7 +64,7 @@ when `DEPL-cMendedVintage-4` landed at order 5 of this same build.
   discriminates against both.
   figure: DERIVED — the 2 is the fixture's own row count, read out of the printed line by the arm
   rather than asserted anywhere.
-- AC2 — OBSERVED. In the same
+- AC2 — `--selftest` — OBSERVED. In the same
   `--selftest`
   run the sixth arm reports
   `ARM ok`
@@ -74,12 +74,12 @@ when `DEPL-cMendedVintage-4` landed at order 5 of this same build.
   `NOTE`
   line would fail it and not merely look odd. Observed RED by disabling the silence branch on a
   scratchpad copy, which drops the harness to 5 of 6.
-- AC3 — OBSERVED. The line the populated case prints is
+- AC3 — `check-receipt: NOTE - clear them with: govkit adopt --re-adopt --pin <path>=<rev> --write` — OBSERVED. The line the populated case prints is
   `check-receipt: NOTE - clear them with: govkit adopt --re-adopt --pin <path>=<rev> --write`
   which contains `--pin` and does not contain `--re-adopt --write` as a contiguous string. The fifth
   arm asserts both halves, so this is a graded property and not a read one. Observed RED by
   substituting the bare form into a scratchpad copy, which fails that arm alone.
-- AC4 — OBSERVED, and the figure is DERIVED at both ends as the criterion demands. Run with
+- AC4 — `--selftest` — OBSERVED, and the figure is DERIVED at both ends as the criterion demands. Run with
   `--selftest`
   the harness now prints
   `fixtures: 6/6 arm(s) ok`
@@ -87,7 +87,7 @@ when `DEPL-cMendedVintage-4` landed at order 5 of this same build.
   `fixtures: 4/4 arm(s) ok`
   the preceding unit's AC2 recorded. Two higher, and the count is printed from the length of the
   results list, so an arm written but never appended would leave the number where it was.
-- AC5 — OBSERVED. The head of the file carries, inside the section that says out loud what this
+- AC5 — `evidence` — OBSERVED. The head of the file carries, inside the section that says out loud what this
   checker does NOT check, a bullet reading "No VERDICT on the `evidence` state, though it is now
   READ", which states that such rows are counted and printed as a
   `NOTE`

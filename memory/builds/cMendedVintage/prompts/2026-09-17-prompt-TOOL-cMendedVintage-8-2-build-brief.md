@@ -75,6 +75,18 @@ that class has landed twice in this build, both times in a test-side helper. Spe
 
 Write the acceptance ledger at
 `memory/builds/cMendedVintage/build/<date>-build-TOOL-cMendedVintage-8-acceptance-ledger.md` per
-`memory/HYGIENE.md`. Record any criterion only a suite can reach as OWED. Keep every backticked span
-whole on its own line — check 23 is HELD under `--staged`. Re-declare with `--dispatch` if your write
-set grows; it refuses a declaration naming `RUN.md`. Bound every command at 900s or more.
+`memory/HYGIENE.md`. Record any criterion only a suite can reach as OWED.
+
+**The ledger bullet shape, spelled out, because my last two briefs got it wrong and both units
+redded.** `memory/HYGIENE.md` gives the canonical form as `- AC1 — ``<token>`` — what was observed`:
+the backticked witness sits on the bullet's FIRST line, immediately after the label. Check 23 reads
+form from that first line only, so a bullet whose witness sits on a continuation line below it is
+graded `bad` however tidy it looks. Earlier briefs in this build said "keep every backticked span
+whole on its own line", which two builders correctly read as *put it on a line of its own* — and
+eleven criteria across their two ledgers failed. The real constraint is narrower: the witness is on
+the first line, and no backticked span wraps across a line break. The token must also share content
+with the criterion's own backticked token, case-folded, either way round.
+
+Check 23 is HELD under `--staged`, so the commit hook will not tell you. Re-declare with
+`--dispatch` if your write set grows; it refuses a declaration naming `RUN.md`. Bound every command
+at 900s or more.

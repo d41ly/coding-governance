@@ -269,3 +269,5 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T06:31:43Z dispatch · item 3aca9092 TOOL-cMendedVintage-8 · reason tools/process-monitor/scope.py tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/selftest.py tools/process-monitor/adopt-process-monitor.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-8.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-8-acceptance-ledger.md
 
 2026-09-17T06:31:44Z brief · item TOOL-cMendedVintage-8 · reason bfe38277c71c memory/builds/cMendedVintage/prompts/2026-09-17-prompt-TOOL-cMendedVintage-8-2-build-brief.md
+
+2026-09-17T06:34:50Z brief · item TOOL-cMendedVintage-8 · reason bc9bc77e4216 memory/builds/cMendedVintage/prompts/2026-09-17-prompt-TOOL-cMendedVintage-8-2-build-brief.md

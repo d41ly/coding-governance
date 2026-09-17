@@ -57,17 +57,17 @@ post-commit bug-class checklist, the ratchet by the pre-commit hook.
 
 **Evidences:** TOOL-cMendedVintage-6
 
-- AC1 — OBSERVED. Bare invocation in this worktree, which holds no
+- AC1 — `install.json` — OBSERVED. Bare invocation in this worktree, which holds no
   `install.json`
   under `.governance/`, prints a line whose head is the literal word `SKIP` naming the full path it
   looked for, and exits 0. The line says in its own words that it is a skip and not a pass.
-- AC2 — OBSERVED. Run with
+- AC2 — `--selftest` — OBSERVED. Run with
   `--selftest`
   it prints one `ARM ok` line per arm followed by
   `fixtures: 4/4 arm(s) ok`
   and exits 0. The arm count is printed from the length of the results list, so the figure is
   DERIVED by the run and asserted nowhere in this document or in the code.
-- AC3 — OBSERVED RED. A fixture git repo was built under this run's scratchpad with one engine row
+- AC3 — `seed` — OBSERVED RED. A fixture git repo was built under this run's scratchpad with one engine row
   and one `seed` row, its
   `sha256`
   filled in from the bytes actually written. Altering the first character of that hash and passing
@@ -76,7 +76,7 @@ post-commit bug-class checklist, the ratchet by the pre-commit hook.
   and exit 1, naming the row's `path`. The engine row deliberately carries NO `role` key in the
   second fixture arm, which is what proves the absent-key default is read as engine rather than
   skipped.
-- AC4 — OBSERVED RED. The same tree with that engine file deleted gives
+- AC4 — `MISSING   shipped.py — in the receipt and not on disk` — OBSERVED RED. The same tree with that engine file deleted gives
   `MISSING   shipped.py — in the receipt and not on disk`
   and exit 1. The row's `path` is reported as missing and not as a hash mismatch, so the remedy the
   line names is the right one.
@@ -87,7 +87,7 @@ post-commit bug-class checklist, the ratchet by the pre-commit hook.
   `DEAD PROBE`
   with a refusal to call the tree verified, exiting 1. Two rows were read and none was graded, which
   is precisely the state a clean report would have misrepresented.
-- AC6 — OBSERVED, both reds and the green. With the manifest row present and no descriptor claiming
+- AC6 — `selfcheck` — OBSERVED, both reds and the green. With the manifest row present and no descriptor claiming
   it, `selfcheck` reds: the leg "is claimed by no descriptor and carried by no `[[exempt_leg]]`".
   With both declarations present and the pin file stale it reds: the leg "has no row in
   `tools/govkit/subject-pins.tsv`". After
@@ -95,7 +95,7 @@ post-commit bug-class checklist, the ratchet by the pre-commit hook.
   regenerated the pins — one added row,
   `receipt sync (installed files match the receipt)	repo	declarations`
   — the same command exits 0 over 26 entries and 68 tracked paths with 0 unclaimed.
-- AC7 — OBSERVED, and the figure is DERIVED as the criterion demands. The AC3 fixture was cloned under
+- AC7 — `core.autocrlf=true` — OBSERVED, and the figure is DERIVED as the criterion demands. The AC3 fixture was cloned under
   the scratchpad with
   `core.autocrlf=true`
   and graded through the positional argument. The finding count is **1 of 1 graded engine rows**, so
