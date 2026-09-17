@@ -1405,8 +1405,12 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # mutates a scratch fixture. It is noise in a deployer's grep, not a wrong claim.
     _mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
     _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
-    _tracked_gov = subprocess.run(["git", "-C", str(root), "ls-files"],
-                                  capture_output=True, text=True).stdout.split()
+    # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
+    # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
+    # repository over — gov's own tree today has no such path, which is exactly why it would rot.
+    _tracked_gov = [f for f in subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z"],
+        capture_output=True, text=True).stdout.split("\0") if f]
     _claimed: dict[str, set[str]] = {}
     for eid, (d, dpath) in descs.items():
         pref = entry_members(root, eid, d, dpath)
@@ -4726,10 +4730,13 @@ def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
     §8 F1: a row with no existing index entry in the target takes THIS mode rather than a literal
     `100644`. A hook that lands non-executable is a hook that does not run.
     """
-    out = subprocess.run(["git", "-C", str(root), "ls-tree", commit, "--", path],
+    out = subprocess.run(["git", "-C", str(root), "ls-tree", "-z", commit, "--", path],
                          capture_output=True, text=True, check=False)
     if out.returncode != 0 or not out.stdout.strip():
         return None
+    # `-z` MOVES THE TERMINATOR AND THE QUOTING, NOT THE FIELD ORDER — measured on git 2.55: the
+    # record is still `<mode> blob <oid>\t<path>`, so field 0 is still the mode over a path carrying
+    # a space. The flag is here so a quoted path can never reach this read, not for this field.
     mode = out.stdout.split()[0]
     return mode if mode in ("100644", "100755", "120000") else None
 
@@ -5773,9 +5780,17 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # the WHOLE diff and intersecting in python has neither bound: one process, no
             # command line, and the filter is visible instead of being git's.
             _lfset = set(lf_paths)
-            _alldiff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD"],
-                                      capture_output=True, text=True)
-            dirty = [p for p in _alldiff.stdout.split() if p in _lfset and p not in ours]
+            # `-z` AND A NUL SPLIT. `.split()` splits on ARBITRARY WHITESPACE, and this answer is a
+            # list of paths: a dirty `a b.txt` arrived as two tokens and a non-ASCII name arrived
+            # C-quoted under git's default `core.quotePath`, so neither was ever a member of
+            # `_lfset` — which `eol_population` fills from `git ls-files -z` and therefore holds
+            # RAW. The guard passed and the renormalize below folded the operator's uncommitted
+            # content into an index gov does not own, which is verbatim what the refusal refuses.
+            # Measured on git 2.55: `-z` disables the quoting as well as the terminator, so
+            # `core.quotepath=false` beside it would be inert and is deliberately not here.
+            _alldiff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z",
+                                       "HEAD"], capture_output=True, text=True)
+            dirty = [p for p in _alldiff.stdout.split("\0") if p and p in _lfset and p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
                 r.fail(f"the pinned population is not clean relative to HEAD "
@@ -5790,14 +5805,21 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
         # so `idx` was "" on every run, `bad` was [] for every input, and the r.fail below became
         # unreachable while the step still printed its reassuring count. A green-by-absence hole
         # opened by the build whose subject was green-by-absence.
-        _idxr = subprocess.run(["git", "-C", str(target), "ls-files", "--eol"],
+        # AND `-z` HERE, which the class arm in the harness does NOT reach: it grades a bare split
+        # and a NUL split, and the path here is taken by a TAB split, which a space never breaks.
+        # The hazard that reaches this one is the QUOTING half alone — measured, git prints
+        # `"caf\303\251.txt"` for a non-ASCII name and `_lfset2` holds the raw bytes, so a pinned
+        # path with one was silently dropped from `bad` and this post-condition went vacuous for
+        # exactly the population the guard above exists to protect. `-z` also moves the record
+        # terminator, hence the NUL split below; measured, the fields stay tab-separated.
+        _idxr = subprocess.run(["git", "-C", str(target), "ls-files", "--eol", "-z"],
                                capture_output=True, text=True) if lf_paths else None
         if _idxr is not None and _idxr.returncode != 0:
             r.fail(f"`git ls-files --eol` exited {_idxr.returncode} in {as_posix_p(target)}, so the "
                    f"LF-index verification could not run. Refusing to report it clean")
         _lfset2 = set(lf_paths)
         idx = _idxr.stdout if (_idxr is not None and _idxr.returncode == 0) else ""
-        bad = [ln.split("\t")[-1] for ln in idx.splitlines()
+        bad = [ln.split("\t")[-1] for ln in idx.split("\0")
                if ln and ln.split("\t")[-1] in _lfset2 and "i/lf" not in ln.split()[0]]
         for b in bad:
             r.fail(f"'{b}' is pinned eol=lf and its INDEX blob is not LF after the renormalize")
@@ -8221,7 +8243,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # `oid` is the blob the TARGET's index holds, which does not exist until the stage
             # above — the same ordering `_cmd_apply`'s producer documents, and the reason that
             # field is filled after staging rather than beside `gov_oid`.
-            _idx0 = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "--", _dest],
+            # `-z` for the reason `gov_tree_mode` records: it moves the terminator and the quoting and
+            # not the field order, so field 1 is still the oid over a `_dest` carrying a space.
+            _idx0 = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "-z", "--", _dest],
                                    capture_output=True, text=True).stdout.split()
             if len(_idx0) >= 2:
                 receipt["files"][-1]["oid"] = _idx0[1]
@@ -8936,10 +8960,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # `git diff` rejects `--pathspec-from-file` and a large population as argv is a
             # `WinError 206` on a real adopter. One process, no command line, python does the join.
             _rn_set = set(_rn_lf)
-            _rn_diff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD"],
-                                      capture_output=True, text=True)
-            _rn_dirty = [p for p in _rn_diff.stdout.split()
-                         if p in _rn_set and p not in _rn_ours]
+            # `-z` AND A NUL SPLIT, for the reason `_cmd_apply`'s copy of this read records: a
+            # whitespace split over a list of paths loses a spaced name to tokenisation and a
+            # non-ASCII one to git's C-quoting, and `_rn_set` holds neither spelling.
+            _rn_diff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "-z",
+                                       "HEAD"], capture_output=True, text=True)
+            _rn_dirty = [p for p in _rn_diff.stdout.split("\0")
+                         if p and p in _rn_set and p not in _rn_ours]
             # `deleted` IS REMOVED FROM THE ABSENCE TEST, and this is where this spelling departs
             # from `apply`'s. A path withdrawn under `--write-withdrawals` is legitimately gone from
             # the worktree, so `apply`'s "pinned and missing" reading would refuse the renormalize

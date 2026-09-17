@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-25 — the renormalize cleanliness guard reads paths, not whitespace tokens
 
-**Status:** SPECCED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 35
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 35
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-25-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-25-acceptance-ledger.md) | journal | — |
 | [2026-09-17-prompt-DEPL-cMendedVintage-25-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-25-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -28,14 +29,29 @@ place this engine word-splits git.
   both were re-opened at HEAD `4c4d42fe` and still read as the review quoted them. Observed by AC1
   and AC2.
 - **S2** A permanent class arm in `tools/govkit/selftest.py` refuses any git invocation in
-  `govkit.py` whose stdout reaches a bare `.split()` without `-z` in its argv. It takes the module
+  `govkit.py` whose stdout reaches a record-splitting read — a bare `.split()` OR a `.split("\0")`
+  — without `-z` in its argv. It takes the module
   path as a parameter so its own failing case can be staged against a scratch copy rather than
   against the shipped engine. Observed by AC3 and AC4.
+  AMENDED rev-2: the specified predicate graded the BARE form alone, and after S1 both fixed sites
+  NUL-split, so deleting `-z` from either left it green — measured by staging exactly that break.
+  A NUL split over a newline-terminated answer yields ONE element and every membership test below
+  it goes quietly false, which is this unit's own defect wearing the repaired code's clothes. The
+  arm also EXCLUDES a git call whose argv carries a `*splice`, and prints how many it excluded: the
+  first run over the real tree reddened `dirty_claimed_paths`'s `_names` closure, which is correct
+  because all four of its callers pass `-z` through the splice.
 - **S3** The three remaining bare-split git reads conform rather than being exempted: `:1296` reads
   gov's own `git ls-files` and is the same defect one repository over, and `:4564` and `:7874` take
   a fixed field out of `ls-tree` and `ls-files -s`. Measured in a scratch repo: `-z` changes the
   terminator and not the field order, so both field reads return the same mode and the same oid over
   a spaced path. Observed by AC4.
+  AMENDED rev-2: a FOURTH site conforms, and the predicate does not reach it. `_cmd_apply`'s
+  post-renormalize LF verification reads `git ls-files --eol` and takes its path by a TAB split,
+  which a space never breaks — so it is outside S2's population and stayed outside it. The QUOTING
+  half still reached it: measured, git prints `"caf\303\251.md"` and the set it is tested against
+  holds the raw bytes, so a pinned non-ASCII path was silently dropped and that post-condition went
+  vacuous for exactly the population the guard above protects. Found by reading the near-miss list
+  S2's first real-tree run printed, which is the whole reason that list is printed.
 - **S4** Fixture arms for both verbs, one with a pinned path named with a space and one with a
   non-ASCII name, each left dirty and each asserted to produce the refusal NAMING that path. Two
   spellings, because the two failures reach the guard by different routes — one splits, the other
@@ -106,6 +122,12 @@ reason, not written into the predicate: a `--format=` argv whose placeholders ca
 which today is the `%H` read at `:8879`. The next such format supplies a row, exactly as the next
 retired flag supplies a row rather than a regex.
 
+AMENDED rev-2 — the helper set. Section 4 described the walker without naming its helpers, and two
+of the obvious names lead with verbs `.lexicon.conf` does not declare. What shipped is ONE
+`_extract_git_argv`, returning `None` for a non-git call, a sentinel for one whose argv it cannot
+read, and the constant list otherwise; the split test is inline at the loop. "Is it git" and "can I
+read its argv" are one question asked once, and two functions answering it would drift.
+
 The arm asserts its own liveness before it asserts anything else, because a walker that resolves no
 calls reports a clean pass over nothing and that is indistinguishable from coverage. It derives and
 prints both figures — git invocations found, split sites found — and never reads a count anybody
@@ -158,6 +180,9 @@ a list literal at the call, and never whether the guard reading those paths is c
   deleted from one git invocation, it FAILS naming the line it was deleted from. Red when: the
   predicate matches on the literal `-z` anywhere in the call's source text rather than in its argv
   list, which a comment mentioning the flag would then satisfy.
+  AMENDED rev-2: the break is staged at `_cmd_update`'s renormalize diff, whose comment block SPELLS
+  `-z` and is left in place, so the red-when is exercised by the same run rather than reasoned about.
+  As first written this criterion could not fail at all — see S2.
 - **AC4** — When `check_git_split_parses` runs over the shipped `tools/govkit/govkit.py`, it reports
   zero hits and prints a derived, non-zero count of both git invocations and split sites. Red when:
   the walker resolves no calls at all — a renamed import or an argv built outside the call would do
@@ -176,19 +201,31 @@ behavioural ones, one per verb · no floor moves, and the `BRANCH_PIN` floor in
 
 ## 8. Open questions
 
-- **Q1 — exempt the two field-indexed reads, or conform them?** RESOLVED (node c, 2026-09-17):
+- **Q1 — exempt the two field-indexed reads, or conform them?** RESOLVED (agent, 2026-09-17, delegated):
   conform them. A per-site exemption list is a second population to keep true, and this repo already
   records that an exemption naming a site that has moved silently widens the surface it was written
   to narrow. Measured: `-z` on `ls-tree` and on `ls-files -s` changes the record terminator and not
   the field order, so `split()[0]` still yields the mode and `[1]` still yields the oid over a path
   with a space. Two characters each is cheaper than a row each.
-- **Q2 — does the arm belong in `selfcheck` rather than in the selftest?** RESOLVED (node c,
-  2026-09-17): the selftest. `selfcheck` is the registry-and-surface ratchet and its leg is
+- **Q2 — does the arm belong in `selfcheck` rather than in the selftest?** RESOLVED (agent, 2026-09-17,
+  delegated): the selftest. `selfcheck` is the registry-and-surface ratchet and its leg is
   deliberately unguarded, so putting a `govkit.py` source lint there would run it on every bar to
   grade a file that had not moved. The selftest leg is guarded on `tools/govkit/`, which is exactly
   the condition under which this predicate can newly fail.
 
 ## 9. Revision log
+
+- rev-2 · 2026-09-17 · node c · amended mid-build, after measuring. Four divergences, all in S2/S3
+  and all recorded above: the predicate grades two split spellings rather than one, because the
+  specified one could not fail at either site this unit fixes; a spliced argv is excluded and
+  counted, because the specified one reddened a correct read on its first run over the real tree; a
+  fourth git read conforms, found in that run's near-miss list rather than by the predicate; and the
+  helper set is one `extract` rather than three functions, two of which led with undeclared verbs.
+  Section 4's `core.quotePath` measurement was re-run independently on node c under git 2.55.0 and
+  REPRODUCED: `-z` disables the quoting as well as the terminator, so `core.quotepath=false` beside
+  it stays specified OUT.
+  §8 moved too, in shape and not in substance: both forks were marked with a resolver the
+  machine does not read, which the hygiene gate named the moment the header went terminal.
 
 - rev-1 · 2026-09-17 · initial draft, authored mid-build after the closing review adjudicated finding
   H1 a HIGH found independently by four lenses. Every line the finding cites was re-opened at HEAD

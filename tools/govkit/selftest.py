@@ -260,6 +260,179 @@ def check_retired_flags(module_path: pathlib.Path = GOVKIT) -> None:
               not sites, "; ".join(sites[:6]))
 
 
+# ============ DEPL-cMendedVintage-25 — A WORD-SPLIT GIT READ, GRADED BY CLASS ================
+# One row per git invocation whose stdout may reach a bare `.split()` WITHOUT `-z`. The row is an
+# argv constant that identifies the call, plus why the whitespace split is safe there, plus who
+# said so and when. A row, never a pattern in the predicate: the next such call supplies a row
+# exactly as the next retired flag supplies a name, and an exemption whose argv constant has left
+# the engine stops matching and takes its licence with it rather than silently widening.
+GIT_SPLIT_EXEMPT = (
+    ("--format=%H", "the format has ONE placeholder and it is a commit sha — this argv cannot "
+                    "emit a path, so there is nothing for quoting or a space to break",
+     "2026-09-17", "DEPL-cMendedVintage-25"),
+)
+
+
+SPLICED = "spliced"
+
+
+def _extract_git_argv(node: _ast.AST) -> list | str | None:
+    """The argv list-literal constants of a `subprocess.run/Popen(["git", …])` call.
+
+    `None` for anything that is not one, `SPLICED` for one whose argv this cannot read,
+    else the list. A sentinel rather than a second predicate, because "is it git" and
+    "can I read its argv" are one question asked once, and two functions answering it
+    would drift.
+
+    LITERAL AT THE CALL is the whole population this predicate can see, and section 5's
+    observability row says so rather than leaving a reader to infer coverage that is not there:
+    an argv assembled into a variable first, or a `git` spawned through a helper, is invisible.
+
+    AN ARGV CARRYING A `*splice` IS NOT LITERAL and returns None, because the flag may be in the
+    splice: `dirty_claimed_paths`'s `_names` closure takes `-z` from every one of its four callers
+    and the list at the call shows none. Grading it reddened a correct read on the first run over
+    the real tree, which is the false-positive half of §7's rule about trying a predicate before
+    wiring it. Excluded from the graded population and COUNTED, never silently dropped — the arm
+    prints how many it could not see, because a skip that looks like a pass is not coverage.
+    """
+    if not isinstance(node, _ast.Call):
+        return None
+    f = node.func
+    if not (isinstance(f, _ast.Attribute) and f.attr in ("run", "Popen")
+            and isinstance(f.value, _ast.Name) and f.value.id == "subprocess"):
+        return None
+    if not node.args or not isinstance(node.args[0], _ast.List):
+        return None
+    elts = node.args[0].elts
+    if not elts or not (isinstance(elts[0], _ast.Constant) and elts[0].value == "git"):
+        return None
+    if any(isinstance(e, _ast.Starred) for e in elts):
+        return SPLICED
+    return [e.value for e in elts if isinstance(e, _ast.Constant) and isinstance(e.value, str)]
+
+
+def check_git_split_parses(module_path: pathlib.Path = GOVKIT) -> None:
+    """Refuse any record-splitting read of a `git` call's stdout that did not ask for `-z`.
+
+    WHY THIS IS A CLASS AND NOT TWO LINES. `.split()` splits on arbitrary whitespace; git's answers
+    are lists of PATHS. A name carrying a space arrives as two tokens, and a name carrying a
+    non-ASCII byte arrives C-quoted under the default `core.quotePath` — measured on git 2.55,
+    `"caf\\303\\251.txt"`. Either way the reader compares bytes that are not on disk, and a guard
+    that compares the wrong bytes passes. `-z` disables the quoting AND the terminator at once,
+    which is why one flag answers both spellings and why `core.quotepath=false` beside it is inert.
+
+    WHAT THIS DOES NOT CHECK, said here because a structural check reads as a semantic one to
+    everybody who did not write it.
+      - ONE MODULE, the one it is handed. The same defect in this harness, in `matrix.py` or in a
+        sibling kit is invisible to it; there are live instances in this file today.
+      - TWO SPLIT SPELLINGS, per the split pair the loop below names, and no others. A `.splitlines()`, a
+        `.split("
+")` or a TAB split is not in this population even though a non-ASCII name still
+        reaches those quoted. The `ls-files --eol` post-condition in the engine is exactly that
+        shape and was repaired by hand, not by this.
+      - The ARGV AS WRITTEN AT THE CALL, per `_extract_git_argv`. It never runs git and never decides
+        whether the guard reading those paths is correct — only that it can see whole names.
+
+    THE PATH IS A PARAMETER so the failing case can be staged against a scratch copy. A checker
+    that can only read one hard-coded file has no negative case anything can reach.
+
+    THE NAME BINDING IS SCOPED TO THE NEAREST ENCLOSING FUNCTION, and this is not a detail: the
+    first draft of this predicate walked the module as one scope and credited every git call ever
+    assigned to `out` to every `out.stdout.split()` in the file — thirty hits over six real ones.
+    Run over the real tree before wiring, per §7, and the first run is why this paragraph exists.
+    A name rebound to two git calls INSIDE one function is still credited with both; that is
+    deliberate and conservative, since a bare split on such a name is wrong for whichever binding
+    reaches it.
+    """
+    tree = _ast.parse(module_path.read_text(encoding="utf-8"))
+
+    owner: dict = {}
+
+    def bind_scopes(node: _ast.AST, scope) -> None:
+        for ch in _ast.iter_child_nodes(node):
+            owner[ch] = scope
+            bind_scopes(ch, ch if isinstance(
+                ch, (_ast.FunctionDef, _ast.AsyncFunctionDef)) else scope)
+
+    bind_scopes(tree, None)
+
+    calls = [n for n in _ast.walk(tree) if isinstance(_extract_git_argv(n), list)]
+    spliced = [n for n in _ast.walk(tree) if _extract_git_argv(n) == SPLICED]
+    binds: dict = {}
+    for n in _ast.walk(tree):
+        if not isinstance(n, _ast.Assign):
+            continue
+        gits = [s for s in _ast.walk(n.value) if isinstance(_extract_git_argv(s), list)]
+        for t in n.targets:
+            if gits and isinstance(t, _ast.Name):
+                binds.setdefault((owner.get(n), t.id), []).extend(gits)
+
+    hits, splits, exempted = [], 0, []
+    for n in _ast.walk(tree):
+        # THE TWO SPLIT SPELLINGS THAT REQUIRE `-z` UPSTREAM, and the pair is the whole point.
+        # A bare split needs the flag because git quotes and because names carry spaces. A NUL
+        # split needs it because without it git terminates records with a NEWLINE, so the whole
+        # answer arrives as ONE element and every membership test below goes quietly false —
+        # this unit's own defect wearing the repaired code's clothes. Grading only the bare
+        # form was the SPECIFIED predicate and it could not fail at either site this unit
+        # fixed; observed by staging the break and watching it pass, not reasoned.
+        if not (isinstance(n, _ast.Call) and isinstance(n.func, _ast.Attribute)
+                and n.func.attr == "split" and not n.keywords
+                and (not n.args or (len(n.args) == 1 and isinstance(n.args[0], _ast.Constant)
+                                    and n.args[0].value == "\0"))):
+            continue
+        recv = n.func.value
+        if not (isinstance(recv, _ast.Attribute) and recv.attr == "stdout"):
+            continue
+        source = []
+        if isinstance(_extract_git_argv(recv.value), list):
+            source = [recv.value]
+        elif isinstance(recv.value, _ast.Name):
+            sc = owner.get(n)
+            while True:
+                if (sc, recv.value.id) in binds:
+                    source = binds[(sc, recv.value.id)]
+                    break
+                if sc is None:
+                    break
+                sc = owner.get(sc)
+        if not source:
+            continue
+        splits += 1
+        for c in source:
+            argv = _extract_git_argv(c)
+            if "-z" in argv:
+                continue
+            row = next((r for r in GIT_SPLIT_EXEMPT if r[0] in argv), None)
+            if row:
+                exempted.append(f"{n.lineno} via {row[0]} ({row[3]})")
+            else:
+                hits.append(f"{module_path.name}:{n.lineno} record-splits `git "
+                            f"{' '.join(argv[1:])}` (:{c.lineno})")
+
+    # BOTH FIGURES ARE DERIVED HERE and neither is read from a number anybody typed. A walker that
+    # resolves nothing reports a clean pass over nothing, which is indistinguishable from coverage.
+    print(f"     [-25] {module_path.name} — {len(calls)} git invocation(s), {splits} "
+          f"record-splitting read(s) of one, {len(exempted)} exempt by row: "
+          f"{'; '.join(exempted) or 'none'} — and {len(spliced)} git call(s) UNGRADED at "
+          f"line(s) {', '.join(str(n.lineno) for n in spliced) or '(none)'}, argv spliced")
+    check("[-25] S2 LIVENESS the walker resolved at least one git invocation AND at least one "
+          "record-splitting read of the stdout of one — over zero of either every assertion below is "
+          "vacuously true and this arm is a DEAD PROBE reporting a clean pass over nothing",
+          bool(calls) and splits > 0, f"{len(calls)} call(s), {splits} split(s)")
+    for _argv, why, date, unit in GIT_SPLIT_EXEMPT:
+        check(f"[-25] the {_argv!r} exemption carries the date and the unit id that granted it",
+              bool(_re.match(r"\d{4}-\d{2}-\d{2}$", date))
+              and bool(_re.match(r"[A-Z]+-[A-Za-z]+-\d+$", unit)) and bool(why),
+              f"date {date!r}, unit {unit!r}")
+        # AN EXEMPTION NAMING A CALL THAT HAS MOVED silently widens the surface it narrows, so the
+        # row itself REDS when nothing in the module matches it any more.
+        check(f"[-25] AC4 the {_argv!r} exemption still names a git invocation in "
+              f"{module_path.name}", any(_argv in _extract_git_argv(c) for c in calls), _argv)
+    check(f"[-25] AC3/AC4 no `.split()` or `.split(NUL)` reads the stdout of a git invocation in "
+          f"{module_path.name} that did not ask for `-z`", not hits, "; ".join(hits[:6]))
+
+
 def git(cwd: pathlib.Path, *args: str) -> None:
     subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True, check=False)
 
@@ -343,6 +516,9 @@ def main() -> int:
     # DEPL-cMendedVintage-20. Source-level and fixture-free, so it runs before the scratch root
     # exists and costs one file read.
     check_retired_flags()
+
+    # DEPL-cMendedVintage-25. Source-level and fixture-free, same reason as the line above.
+    check_git_split_parses()
 
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -2298,6 +2474,69 @@ user_skills = "/tmp/gk-fake-skills"
               _UR["ci"] == "report", str(_UR))
         check("[-2] and no role is left on the refuse disposition by accident",
               "refuse" not in _UR.values(), str(_UR))
+
+        # ====== DEPL-cMendedVintage-25 S4 — A PINNED PATH GIT CANNOT HAND BACK AS ONE TOKEN =====
+        # TWO SPELLINGS, one per verb, because they reach the same guard by different routes: a
+        # SPACE survives git's quoting and arrives as two whitespace tokens, a NON-ASCII byte
+        # arrives as ONE token that is C-quoted (`"caf\303\251.md"`, measured on git 2.55)
+        # and matches nothing either. `eol_population` holds RAW names, so under the old
+        # `.split()` both missed the membership test, the guard passed, and `git add --renormalize`
+        # folded the operator's uncommitted content into an index gov does not own.
+        #
+        # THE VERDICT IS THE INDEX BLOB, never the exit code. The run that folds exits 0 and reports
+        # its re-stage as a success, so an arm reading the refusal text alone would also pass
+        # against an engine that refused AFTER staging. Measured at BASE: all four of these reds.
+        def read_index_bytes(t: pathlib.Path, path: str) -> bytes:
+            """The bytes the INDEX holds for one path, or the absence marker."""
+            _o = subprocess.run(["git", "-C", str(t), "ls-files", "-s", "-z", "--", path],
+                                capture_output=True, text=True).stdout
+            if not _o.strip():
+                return b"<absent>"
+            return subprocess.run(["git", "-C", str(t), "cat-file", "blob", _o.split()[1]],
+                                  capture_output=True).stdout
+
+        EDIT = "committed\nAN OPERATOR EDIT\n"
+
+        # ---- AC1: `update --write` over a pinned path named with a SPACE.
+        _sp = make_target(tmp / "gs25a", DEPLOY_FULL)
+        check("[-25] AC1 fixture: apply installs cleanly before anything is dirtied",
+              run("apply", "--target", str(_sp)).returncode == 0, "")
+        settle(_sp, "applied")
+        (_sp / "memory").mkdir(parents=True, exist_ok=True)
+        (_sp / "memory" / "a b.md").write_text("committed\n", encoding="utf-8", newline="\n")
+        settle(_sp, "a pinned path whose name carries a space")
+        # `update`'s guard is reached only on a run that WRITES the pin block, so the block is
+        # moved to force that; without this the verb never gets as far as the renormalize.
+        _gs = _sp / ".gitattributes"
+        _gs.write_text(_gs.read_text(encoding="utf-8").replace(
+            "# /govkit:lf-pins", "# TAMPERED\n# /govkit:lf-pins"), encoding="utf-8", newline="\n")
+        settle(_sp, "the block moved")
+        (_sp / "memory" / "a b.md").write_text(EDIT, encoding="utf-8", newline="\n")
+        check("[-25] AC1 fixture LIVENESS: the operator's edit is NOT in the index before the run",
+              b"AN OPERATOR EDIT" not in read_index_bytes(_sp, "memory/a b.md"), "")
+        p = run("update", "--target", str(_sp), "--write")
+        check("[-25] AC1 the refusal names the spaced path IN FULL, not a fragment of it",
+              "pinned population is not clean" in (p.stdout + p.stderr)
+              and "memory/a b.md" in (p.stdout + p.stderr), p.stdout + p.stderr)
+        check("[-25] AC1 ...and the operator's uncommitted content did NOT reach the index",
+              b"AN OPERATOR EDIT" not in read_index_bytes(_sp, "memory/a b.md"), p.stdout)
+
+        # ---- AC2: `apply` over a pinned path carrying a NON-ASCII byte. A DIFFERENT VERB and a
+        # ---- different route into the same guard, which is why it is not the same fixture.
+        _na = make_target(tmp / "gs25b", DEPLOY_FULL)
+        _bad = _na / "memory" / "caf\u00e9.md"
+        _bad.parent.mkdir(parents=True, exist_ok=True)
+        _bad.write_text("committed\n", encoding="utf-8", newline="\n")
+        settle(_na, "a pinned path whose name carries a non-ASCII byte")
+        _bad.write_text(EDIT, encoding="utf-8", newline="\n")
+        check("[-25] AC2 fixture LIVENESS: the operator's edit is NOT in the index before the run",
+              b"AN OPERATOR EDIT" not in read_index_bytes(_na, "memory/caf\u00e9.md"), "")
+        p = run("apply", "--target", str(_na))
+        check("[-25] AC2 the refusal names the non-ASCII path",
+              "pinned population is not clean" in (p.stdout + p.stderr)
+              and "memory/caf\u00e9.md" in (p.stdout + p.stderr), p.stdout + p.stderr)
+        check("[-25] AC2 ...and the operator's uncommitted content did NOT reach the index",
+              b"AN OPERATOR EDIT" not in read_index_bytes(_na, "memory/caf\u00e9.md"), p.stdout)
 
         # ============ DEPL-dCarriedReceipt-1: {relpath} in the seam that WRITES ============
         # `rule_relpath` resolves {relpath} against the RULE'S BASE; `resolve_dests` took the

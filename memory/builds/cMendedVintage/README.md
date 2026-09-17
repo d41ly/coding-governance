@@ -153,7 +153,7 @@ ids TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMend
 | [TOOL-cMendedVintage-11 — the census arm resolves its launcher instead of trusting the name](spec/2026-09-17-spec-TOOL-cMendedVintage-11.md) | 36 | 2 | CLOSED | rev-1 | 2026-09-17 |
 <!-- /gen:build-units -->
 
-Records: 75 bound to this build, across 4 record folder(s).
+Records: 76 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
