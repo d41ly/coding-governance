@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
 
 <!-- gen:spec-records -->
 
@@ -63,16 +63,18 @@ run, and leave a gate behind that reds if either is undone.
   predates this whole build, and closing it means either changing what `apply` stamps — the non-goal
   directly above — or a second filter in a report this unit was not scoped to touch. Recorded in the
   ledger instead of widened into here.
-- No restore of an `attributes` entry on a run that rolled nothing back. The stage is reached from
-  inside the rollback pass, so a clean run never enters it.
+- No restore of an `attributes` entry on a run that rolled nothing back. The landed selection sits
+  inside the per-kit rollback branch, so a clean run never reaches it, and the fixture asserts that
+  it was reached by requiring `rolled back 1` before it compares any bytes.
 - No change to the `pins` classification arm, to `lf_pin_block`, or to where gov's block sits in the
   target's file. Those are `DEPL-cMendedVintage-10`'s and `DEPL-dSettledRoster-1`'s.
 
 ### Edges
 
-- **consumes-from** `DEPL-cMendedVintage-10` — that unit creates the snapshot entry and the write
-  whose rollback this unit makes reachable. Without it there is no entry to restore and no run that
-  rewrites the block, so this unit has no subject.
+- **consumes-from** `DEPL-cMendedVintage-10` — that unit creates the snapshot entry, the write, AND
+  (contrary to rev-1's prediction) the restore and the sweep scope that make it reachable. What it
+  could not do is execute any of it, so what this unit consumes is an unobserved mechanism rather
+  than a defect. Without that unit there is no entry, no run that rewrites the block, and no subject.
 - **hands-off** external — nothing else in this build reads the rollback pass's per-origin stages.
 
 ## 4. Design
@@ -144,10 +146,12 @@ than into a file that would have had to grow a second copy of them.
 
 ## 5. Production-readiness checklist
 
-- security — the restore writes only paths the snapshot recorded, through the same index and
-  worktree calls the per-kit loop already uses. No new path class and no target-supplied value.
-- perf / scale — one extra list comprehension per run and, on a rollback only, one `update-index`
-  plus one `checkout-index` for a single path.
+- security — nothing here reaches production bytes: rev-2 ships no engine change. The property this
+  unit ASSERTS about `-10`'s code is that the restore writes only paths the snapshot recorded,
+  through the same index and worktree calls the per-kit loop already uses.
+- perf / scale — the engine cost is `-10`'s and is one extra disjunct in a selection already being
+  evaluated. This unit's own cost is one more scratch install and one more `update` in a suite that
+  already builds several, paid only where that suite runs.
 - error / empty / loading states — a run with no `attributes` entry skips the stage; a run that rolled
   nothing back never reaches it; a restore that git refuses takes the same failure reporting
   `DEPL-cMendedVintage-2` builds for the per-kit loop.
@@ -213,6 +217,13 @@ none
   opposite of what shipped, and now asserts the unattributed entry through its two observable
   consequences. §3 gains a non-goal for a third consumer the fixture surfaced. §4's site table and
   inventory are replaced — no constant is minted and no `def` is added.
+- rev-3 · 2026-09-17 · **The other half of rev-2's own amendment, named by the bug-class checklist
+  after the commit.** `amendment-leaves-its-other-half-standing` was an anchored class on this diff
+  and it had three live instances, all of them clauses that only made sense while rev-1's engine
+  change was still this unit's to write: the §3 edge said this unit makes the rollback reachable,
+  a non-goal described a restore stage that was never built, and §5's security and perf bullets
+  priced an engine change rev-2 does not ship. All three now describe the landed code and say whose
+  it is. Editorial: no criterion, scope item or gate moves.
 
 ## 10. Reuse audit
 

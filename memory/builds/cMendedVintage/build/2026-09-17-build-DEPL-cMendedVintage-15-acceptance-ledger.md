@@ -116,7 +116,24 @@ reasoning rather than leaving it as an undocumented observation.
 
 ## What the bug-class checklist changed
 
-Recorded after the commit, from `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD`.
+Run after the commit, from `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD`. It named
+sixteen classes over eight changed files, and one of them landed on this commit's own bytes.
+
+`amendment-leaves-its-other-half-standing` had THREE live instances, all in the spec and all left by
+rev-2's own amendment. The section 3 edge still said this unit makes the rollback reachable; a
+non-goal still described the restore stage rev-1 asked for and nobody built; and section 5's security
+and perf bullets still priced an engine change rev-2 does not ship. Each was a clause that read as
+true until you asked whose code it described. All three now name the landed shape and say it is
+`-10`'s, logged as rev-3 and editorial — no criterion, scope item or gate moved.
+
+`ledger-token-wrapped-across-a-line-joins-nothing` was checked rather than assumed: every criterion
+line here carries its backticked token on the line that opens it, and no backticked span in this
+record is wrapped. The four odd-parity lines in the spec are section 10's, pre-date rev-2, and sit
+outside the acceptance section the token rule grades.
+
+`staged-break-substitutes-a-synthetic-value` is why the two breaks are what they are. Each replaces
+the shipped predicate with the spelling it had BEFORE `-10`, not with a simpler synthetic one, so
+what reds is the real regression rather than a weaker stand-in for it.
 
 `fixture-passes-by-finding-nothing` was the class this unit spent the most care on, and it changed
 the fixture twice. The block is TAMPERED rather than left as installed, because an untouched target
