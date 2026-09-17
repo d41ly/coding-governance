@@ -5,7 +5,10 @@
 *Node `c`, 2026-09-17, written by the pass that built the unit. No merge bar and no `*.test.sh` suite
 ran in this pass. Every line below was taken by replaying the criterion's own command at the shell,
 against scratch git repositories under this run's scratchpad, never inside the worktree. Every
-carrier was measured at BASE and at the tip, so each row has a RED behind it.*
+carrier was measured at BASE and at the tip, so each row has a RED behind it. Every observation was
+then REPLAYED against the committed tree with the worktree clean, because an observation taken before
+the last fold of the same commit is an observation of a tree the commit never held; all three
+fixtures returned byte-identical verdicts.*
 
 ## The one thing worth reading twice
 

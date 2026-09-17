@@ -78,7 +78,10 @@ each file already knows.
 
 ### Data model
 
-The carriers, each with the prefix it already knows and the exemplar that gets it right:
+The carriers, each with the prefix it already knows and the exemplar that gets it right. EVERY LINE
+NUMBER BELOW IS AT BASE `859daa67`, the same pin the Migration table carries, and so is every one in
+sections 1 and 2; rev-3 records the six-line shift `TOOL-cMendedVintage-3` put under the
+`tools/check-wiring.sh` rows before this unit ran, and the positions the build actually edited.
 
 | file | line | what it spells today | what it knows |
 |---|---|---|---|
