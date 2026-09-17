@@ -30,23 +30,24 @@ returned the same `c/Temp/kw3` on both sides. Amended at rev-2 rather than quiet
 **The consequence is security-shaped, and it was observed rather than argued.** With a real
 `hooks/agent-cap.js` shipped at the root of the scratch repository, the BASE script printed
 `skip     agent-cap — not adopted (no agent-cap.js at c/Temp/kw3/repo/hooks/ or .claude/hooks/)`
-over a hook that was sitting there. The fixed script prints `UNWIRED  agent-cap — agent-cap.js
-present but hook not in settings.json`. That is the false skip closing, on the fan-out guard.
+over a hook that was sitting there. The fixed script instead prints `UNWIRED  agent-cap` and names
+the settings-merge remedy. That is the false skip closing, on the fan-out guard.
 
 **Evidences:** TOOL-cMendedVintage-3
 
 - AC1 — `bash ./check-wiring.sh --check` with this unit's `tools/check-wiring.sh` copied to the ROOT
-  of a scratch git repository holding no `agent-cap.js`. Its agent-cap line reads `not adopted (no
-  agent-cap.js at hooks/ or .claude/hooks/)`. The same command against the BASE `859daa67` blob in
-  the same layout read `at c/Temp/kw3/repo/hooks/` — the RED, measured before a line was written.
+  of a scratch git repository holding no `agent-cap.js`. Its agent-cap line reads `at hooks/`, with
+  no prefix segment, in the full string `not adopted (no agent-cap.js at hooks/ or .claude/hooks/)`.
+  The same command against the BASE `859daa67` blob in the same layout read
+  `at c/Temp/kw3/repo/hooks/` — the RED, measured before a line of this unit was written.
 - AC2 — `bash tools/check-wiring.sh --check` in this worktree, run three times: against the BASE
   `859daa67` blob, against the `HEAD` blob, and against this tip. All three outputs are BYTE-IDENTICAL
   by `diff` and all three exit 1. Every rung that prints a probe path still names it under `tools/` —
   the agent-cap line reads `wired in .claude/settings.json at tools/hooks/agent-cap.js`. The exit 1
   is the pre-existing `UNWIRED  skill` row, a machine-local kickoff junction, present at BASE too.
 - AC3 — `bash ./scripts/gov/check-wiring.sh --check` with the same file placed at
-  `<repo>/scripts/gov/` in the scratch repository. Its agent-cap line reads `no agent-cap.js at
-  scripts/gov/hooks/ or .claude/hooks/`, both segments intact. Measured identical at BASE, which is
+  `<repo>/scripts/gov/` in the scratch repository. Its agent-cap line reads `at scripts/gov/hooks/`,
+  both segments intact, inside the same not-adopted skip. Measured identical at BASE, which is
   the point: this criterion asks that nothing moved, and the probe confirms the reorder did not
   collapse a two-segment prefix to one.
 - AC4 — `sed -n '41,43p' tools/check-wiring.sh` prints the rewritten comment. Line 42 carries

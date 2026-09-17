@@ -78,10 +78,11 @@ where a false skip has a security shape, and the file's own comment at `:369-375
 exact consequence being found once already — by the guard, not by the derivation the guard rests on.
 
 The reordered loop was run over the same four locations before being written into this spec. It
-returned `tools`, empty, empty and `a/b/c` for cases A, B, C and a two-segment nested install,
-which is every case the file can meet.
+returned `tools`, empty, the unchanged filesystem path and `a/b/c` for cases A, B, C and a
+two-segment nested install, which is every case the file can meet.
 
-**rev-2 corrects that sentence and case C's `wanted` cell — the build measured them wrong.** A
+**rev-2 rewrote the case C value in the sentence above and in the table's `wanted` cell. Both said
+`empty` at rev-1, and the build pass that measured the RED disproved it.** A
 reorder cannot empty case C, and did not: the walk outside a repository still runs to the filesystem
 root and accumulates every segment on the way, so the probe returned `c/Temp/kw3` both before and
 after, byte-identical. Only a `[ -n "$_KIT_ROOT" ] || KIT_REL=""` normalization would empty it, and
