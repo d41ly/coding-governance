@@ -958,5 +958,34 @@ ck "hooks: an untracked hook announces a skip" \
 ck "hooks: a tracked-pre-commit-only adopter still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 cleanup
 
+# TOOL-cMendedVintage-3 — THE INSTALL PREFIX IS DERIVED, and the ROOT install was the one case the
+# derivation could not reach. The `.git` boundary walk appended `basename "$_p"` to KIT_REL BEFORE it
+# tested the PARENT for `.git`, so `$_p` was never tested as the repo root: a root install walked
+# past the repository to the filesystem root and handed every rung a prefix of directories ABOVE the
+# tree. Measured RED against base 859daa67 with these three arms — the probe path read
+# `at c/Temp/kw3/repo/hooks/`, and with the guard actually shipped the arm still printed
+# `skip — not adopted` over it. The two-segment arm is the CONTROL: it is the case every other rung
+# in the file already depends on, and the reorder had to leave it exactly where it was. It is green
+# on BOTH sides of the fix, which is what makes the other two mean something.
+newrepo
+cp "$SCRIPT" ./check-wiring.sh
+mkdir -p scripts/gov; cp "$SCRIPT" scripts/gov/check-wiring.sh
+git add -A; git commit -q -m "installs at the root and at a two-segment prefix"
+out=$(bash ./check-wiring.sh --check 2>&1)
+ck "prefix: a ROOT install probes agent-cap at 'hooks/', carrying no prefix segment" \
+   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at hooks/ or' && echo 1 || echo 0)"
+out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
+ck "prefix: a two-segment install still carries both segments" \
+   "$(printf '%s' "$out" | grep -q 'no agent-cap.js at scripts/gov/hooks/ or' && echo 1 || echo 0)"
+# THE SECURITY SHAPE, which the path string on its own does not show: with the hook actually THERE, a
+# root install reported the fan-out guard as not adopted. A skip that reads as a pass, over the one
+# arm in this file where a false skip has a security shape.
+mkdir -p hooks; printf '// stub\n' > hooks/agent-cap.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+git add -A; git commit -q -m "ship agent-cap.js at the root install"
+out=$(bash ./check-wiring.sh --check 2>&1)
+ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" \
+   "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && echo 1 || echo 0)"
+cleanup
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

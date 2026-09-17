@@ -1,12 +1,14 @@
 # TOOL-cMendedVintage-3 — `check-wiring.sh`'s boundary walk can produce the empty prefix it declares legal
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 14
+**Status:** CLOSED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-3-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-3-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-TOOL-cMendedVintage-3-2-build-brief.md](../prompts/2026-09-16-prompt-TOOL-cMendedVintage-3-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -67,7 +69,7 @@ script and running it from three locations in a scratch git repository:
 |---|---|---|---|---|
 | A | `<repo>/tools/` | `<repo>` | `tools` | `tools` |
 | B | `<repo>/` | empty | `tmp/kw3/repo` | empty |
-| C | outside any repo | empty | `tmp/kw3` | empty |
+| C | outside any repo | empty | `tmp/kw3` | unchanged — see rev-2 |
 
 Case B is the live one: the same probe run through the REAL script in a scratch repo with the file
 at the repo root printed `skip agent-cap — not adopted (no agent-cap.js at tmp/kw3/repo/hooks/ or
@@ -78,6 +80,16 @@ exact consequence being found once already — by the guard, not by the derivati
 The reordered loop was run over the same four locations before being written into this spec. It
 returned `tools`, empty, empty and `a/b/c` for cases A, B, C and a two-segment nested install,
 which is every case the file can meet.
+
+**rev-2 corrects that sentence and case C's `wanted` cell — the build measured them wrong.** A
+reorder cannot empty case C, and did not: the walk outside a repository still runs to the filesystem
+root and accumulates every segment on the way, so the probe returned `c/Temp/kw3` both before and
+after, byte-identical. Only a `[ -n "$_KIT_ROOT" ] || KIT_REL=""` normalization would empty it, and
+section 3 already rules that out as a branch whose effect nothing can observe — verified live at
+BASE by running the real script outside any repository, which printed `skip — not a git repo` and
+exited 0 before a single `${KIT_REL:+…}` rung was read. The reordered loop actually returns `tools`,
+empty, `c/Temp/kw3` and `scripts/gov`. Cases A, B and D are what this unit is for; C is untouched by
+construction and out of scope by section 3.
 
 ### Inventory
 
@@ -161,6 +173,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-2 · 2026-09-17 · section 4's case C was wrong in both directions and the build pass measuring
+  the RED caught it: its `wanted` cell said `empty` and the paragraph beneath claimed the reordered
+  loop had returned empty there. Neither is true — a reorder cannot empty a walk that runs to the
+  filesystem root, and the lifted probe returned the same `c/Temp/kw3` before and after. The cell now
+  reads `unchanged` and the paragraph records the measurement and why section 3 already wanted it
+  that way. No acceptance criterion moved: none of AC1 to AC4 ever named case C.
 
 ## 10. Reuse audit
 

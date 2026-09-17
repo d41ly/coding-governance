@@ -32,14 +32,20 @@ set -u
 _HERE="$(cd "$(dirname "$0")" && pwd)"
 _KIT_ROOT=""; KIT_REL=""; _p="$_HERE"
 while : ; do
+  if [ -e "$_p/.git" ]; then _KIT_ROOT="$_p"; break; fi
   _parent="$(dirname "$_p")"
   [ "$_parent" = "$_p" ] && break
   KIT_REL="$(basename "$_p")${KIT_REL:+/$KIT_REL}"
-  if [ -e "$_parent/.git" ]; then _KIT_ROOT="$_parent"; break; fi
   _p="$_parent"
 done
 # KIT_REL is this file's own directory relative to the repo root — `tools` here, whatever an adopter
-# installs it under there. Empty is legal: a root install has no prefix segment.
+# installs it under there. Empty is legal AND reachable: TOOL-cMendedVintage-3 moved the `.git` test
+# ABOVE the append, so a ROOT install breaks on iteration one with no segment. It used to append
+# first and test the PARENT, so `$_p` was never tested as the root: a root install walked PAST the
+# repository to the filesystem root and handed every rung a prefix of directories ABOVE the tree —
+# measured as `c/Temp/kw3/repo`, and the agent-cap arm skipped `not adopted` over a hook that was
+# there. OUTSIDE a repo the walk still ends at the filesystem root with that same path in KIT_REL;
+# that is not fixed here because `--check` exits at `skip — not a git repo` before any rung reads it.
 KIT_REL=${KIT_REL:-}
 
 # ---- S1: the settings file is RESOLVED, never spelled --------------------------------------------

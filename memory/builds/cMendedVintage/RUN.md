@@ -145,3 +145,11 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-16T22:44:13Z dispatch · item 3ca2f144 DEPL-cMendedVintage-9 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-9.md memory/LIVE.md memory/ledger
 
 2026-09-16T23:01:34Z dispatch · item 3ca2f144 DEPL-cMendedVintage-9 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-9.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-9-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger
+
+2026-09-16T23:56:56Z dispatch · item f777a580 TOOL-cMendedVintage-3 · reason tools/check-wiring.sh
+
+2026-09-16T23:56:57Z brief · item TOOL-cMendedVintage-3 · reason 1d8b7f4949ae memory/builds/cMendedVintage/prompts/2026-09-16-prompt-TOOL-cMendedVintage-3-2-build-brief.md
+
+2026-09-16T23:59:34Z dispatch · item f777a580 TOOL-cMendedVintage-3 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-3.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-3-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-17T00:08:53Z dispatch · item f777a580 TOOL-cMendedVintage-3 · reason tools/check-wiring.sh tools/check-wiring.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-3.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-3-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
