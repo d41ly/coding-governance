@@ -94,9 +94,25 @@ nothing rather than passing quietly.
 ## What did not run, and why
 
 - **No merge bar and no `*.test.sh` suite ran in this pass.** The govkit self-test suite is this
-  unit's own gate and the pass was told to run it; its verdict is in the return. The brief spells
-  its invocation as a subcommand of the deployer, which the deployer rejects by name — it is a
-  program of its own, run directly.
+  unit's own gate and the pass was told to run it. The brief spells its invocation as a subcommand of
+  the deployer, which the deployer rejects by name — it is a program of its own, run directly.
+- **THE SUITE NEVER REACHES THIS UNIT'S ARMS, and that is a finding rather than a caveat.** It ran to
+  completion against the committed tree: 786 arms green, 32 red, then a hard
+  `TypeError`
+  that kills the process at the `[-11] AC4` withdrawal-order arm. Every arm after that line is
+  unreachable — about half the file, the whole `-6` fixture family and this unit's nine `-22` arms
+  among them. The break is not this unit's and is not environmental: `4c4d42fe`, three commits before
+  this one, replaced that arm's hard-coded order filename with the variable holding the update run's
+  `CompletedProcess`
+  and joined it onto a path. That expression cannot succeed under any input, so the arm has never
+  run once since it was written — the literal-swapped-for-the-wrong-name class, in the commit whose
+  subject says it derives the name it asserts. It needs its own adjudication; guessing which name
+  that arm meant would be this unit inventing another unit's criterion.
+- **The 32 reds that DO run are environmental, not behavioural.** Each names
+  `GOVKIT_NO_REMOTE_PROBE`
+  or a currency the run could not verify without a network, or is downstream of one that does. None
+  is in the gate-leg area. The gate-leg arms that run all pass, including the five `AC-withheld` and
+  two `AC-ordered` arms whose fixture this unit's change was most likely to disturb.
 - **`govkit selfcheck`, the refusal join and the acceptance matrix are OWED** and are named in the
   return. Nothing in this unit adds or removes a refusal branch, so the join's shrink-only pin does
   not move; nothing here changes the repo shapes the matrix drives.
