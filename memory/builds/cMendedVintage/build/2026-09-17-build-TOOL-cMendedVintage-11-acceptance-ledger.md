@@ -42,10 +42,10 @@ of the fix rather than a tidy-up.
   `(['the native python grandchild'], [], [])` and its report line named the three members it did
   see. Walked was 5, so the deleted `>= 4` count would have called that run green.
 - AC3 — `SKIP test_live_tree_dies_completely` — observed with the resolver forced to answer that
-  nothing resolved. The arm printed `SKIP test_live_tree_dies_completely (no candidate answered as a
-  POSIX shell the census can see; RAN bash, C:/Program Files/Git/usr/bin/bash.exe)` and returned with
-  `PASS` still empty, so the branch announces what it looked for and reports no pass. It is a
-  distinct line from the pre-existing platform skip, which is what AC3's red condition names.
+  nothing resolved. The arm printed this whole line:
+  `SKIP test_live_tree_dies_completely (no candidate answered as a POSIX shell the census can see; RAN bash, C:/Program Files/Git/usr/bin/bash.exe)`
+  and returned with `PASS` still empty, so the branch announces what it looked for and reports no
+  pass. It is a distinct line from the pre-existing platform skip, which is AC3's red condition.
 - AC4 — `the cleanup probe reported stray: none` — printed by every post-change run of the arm, as
   `cleanup probe through C:\Program Files\Git\usr\bin\bash.EXE` followed by the stray list. The probe
   now shells `ps -ef` and `kill -9` through the resolved launcher rather than a bare `bash`, and it
@@ -66,11 +66,28 @@ a second defect gets smuggled into a unit that had no business touching it.
 ## What ran, and what is owed
 
 `python tools/process-monitor/selftest.py` ran twice, green both times, and stands in for section 7's
-first gate `process-monitor census selftest`. `python tools/lexicon/lexicon.py --check` ran directly
-because the new function is the standing ban's target: it reports `P1 verb graded=2287 offenders=987`,
-equal to the declared pin, so the added `resolve_launcher` leads with a declared verb and moves
-nothing. `python tools/codebase-map/gen_map.py --write` regenerated the map artifacts; only
-`symbols.json` moved, by the single `resolve_launcher` row.
+first gate `process-monitor census selftest`. `python tools/codebase-map/gen_map.py --write`
+regenerated the map artifacts; only `symbols.json` moved.
+
+**A correction to this record, written after the unit's own commit.** An earlier revision of this
+paragraph read the `.lexicon.conf` pin off that file's historical narration and claimed
+`offenders=987, equal to the declared pin`. Both halves were wrong. The declared key is
+`VERB_OFFENDER_PIN="983"`, and `python tools/lexicon/lexicon.py --check` exits 1 on this tree with
+`lexicon: verb offenders 984 over pin 983`. The pin is the one number in that file its own header
+says must be READ OFF THE TOOL and never predicted, and the first draft of this ledger predicted it
+from prose sitting a hundred lines above the key. That is the `two-answers-to-one-question` class
+committed inside the record that lists it, which is why the correction is written out rather than
+quietly edited.
+
+**The overage is not this unit's, and the evidence is direct rather than inferred.**
+`python tools/lexicon/lexicon.py --list | grep tools/process-monitor/selftest.py` returns NOTHING, so
+this unit's one new function contributes zero offenders — `resolve_launcher` leads with `resolve`,
+which the VERBS table declares for turning a name into the thing it denotes, RUNNING the candidate
+where that is the only proof, which is exactly what it does. The count also moved from 987 to 984
+between two runs minutes apart while this unit's code sat unchanged, tracking the sibling unit's
+in-flight edits in the shared worktree; `tools/govkit/` carries 156 of the 984. Whoever lands that
+work owns the pin move. It is named here because the closing bar will red on it and should not spend
+the time re-attributing it.
 
 Section 7's second gate, `process-monitor adopter selftest`, is OWED to the bar this run closes with.
 It is `adopt-process-monitor.test.sh`, a `*.test.sh` this pass may not run. Its `FLOOR_ASSERTIONS`
@@ -116,9 +133,27 @@ green.
 `two-answers-to-one-question` was checked against the one place the fix does NOT spell the resolved
 launcher: the nested `bash -c` inside the staged body. That is deliberate — hard-coding the resolved
 path there would change the command line under test — and the residual is covered rather than
-ignored, because a nested shell that resolves to something the census cannot see makes `the nested
-shell` missing and the arm reds naming it.
+ignored, because a nested shell that resolves to something the census cannot see leaves
+`the nested shell` out of the walk and the arm reds naming it.
 
 `empty-field-collapses-unless-it-is-last` touches the cleanup probe's `line.split()` over `ps -ef`.
 It is untouched pre-existing parsing and the `isdigit()` guard already means a misparse skips rather
 than signals, so nothing was changed on that line beyond the launcher it runs under.
+
+The post-commit `--for-diff` run selected four more classes, and two of them found something.
+
+`ledger-token-wrapped-across-a-line-joins-nothing` was checked mechanically rather than by eye, by
+counting backticks per line over this file. It found TWO wrapped spans that a reading had missed —
+AC3's quoted skip line and a `the nested shell` broken over a line end — and both were repaired. The
+criterion tokens on every bullet's first line were already whole; the class still bit one line below
+them, which is the argument for counting rather than looking.
+
+`naming-leg-grades-what-python-named` says the naming leg's armed set follows `symbols.json`, so the
+lexicon checker was re-run AFTER the map regeneration rather than only before it. That second run is
+what surfaced the pin correction recorded above; the first run had graded a tree whose symbol
+inventory did not yet contain this unit's function.
+
+`amendment-leaves-its-other-half-standing` does not bite: no criterion was amended, the spec stays at
+rev-1 and only its status header moved. `record-without-serves-or-with-a-round-counter` is satisfied
+by this file's own `**Serves:** journal TOOL-cMendedVintage-11` line and a filename carrying no round
+counter.
