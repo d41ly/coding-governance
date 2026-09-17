@@ -109,23 +109,23 @@ classify it, and `check` reports it as an unclaimed source.
 
 ### Inventory
 
-This unit MINTS nothing. It moves one statement out of a conditional, changes which values a row
-keeps on one branch, adds one order sentence and one suite invariant.
+This unit MINTS nothing. It hoists one statement out of a conditional and deletes the duplicate of
+it the `attributes` branch carried, adds one order sentence and one suite invariant. It changes no
+row's values: rev-1 expected it to, and AC2 records the measurement that says otherwise.
 
 ### Files touched (estimate)
 
 | Path | Change |
 |---|---|
-| `tools/govkit/govkit.py` | the removal hoisted out of the gate, the withdrawn branch's field handling, one order sentence |
+| `tools/govkit/govkit.py` | the removal hoisted above the gate and its duplicate deleted, one order sentence |
 | `tools/govkit/selftest.py` | one fixture arm and the cross-arm invariant |
 
 ### Alternatives rejected
 
 - **Take the row out of `withdrawn_rows` and let the withdrawal stand as recorded.** That records a
   deletion that did not happen: the pre-run blob is staged and the receipt would say gov removed it.
-- **Restore the withdrawn path instead.** The path was not withdrawn — the `unlink` was skipped — so
-  there is nothing to restore, and `checkout-index` refuses for the same reason it refused the first
-  time.
+- **Retry the restore instead.** The rollback already tried it and the target's own git refused; a
+  second `checkout-index` refuses for the same reason the first did, and §3 refuses a retry outright.
 - **Scope withdrawals out of the rollback entirely.** That is the `_touching` narrowing §3 refuses. A
   run that deleted files and then rolled back must be able to bring them back.
 
@@ -144,16 +144,18 @@ failed, so no ordinary run changes behaviour.
 - perf / scale — no runtime cost; one statement changes position.
 - error / empty / loading states — a run with no withdrawn rows never reaches the branch; an entry
   whose every path restored takes the existing revert unchanged.
-- observability — the order's `NOT restored` block names the path and says the row was kept, so the
-  state appears in the durable record and not only in the run's findings.
+- observability — the order's `NOT restored` block names the path, says the withdrawal did not
+  complete and says the row was kept, so the state appears in the durable record and not only in the
+  run's findings.
 - risks — the sharp one is that the removal now runs on a branch where the revert does not, which is
   an asymmetry a later reader will want to re-merge. §4's table is written so it cannot be re-merged
   by mistake, and AC1 fails if it is.
 - testing — one fixture, four criteria, plus the cross-arm invariant in S4 which grades every
   existing rollback arm rather than only the new one.
 - migration — none; §4 states why.
-- user docs — `WIRE-INTO-PROJECT.md`'s maintenance section gains one sentence: a withdrawal that
-  could not complete leaves the row, and the file, in place.
+- user docs — `WIRE-INTO-PROJECT.md`'s maintenance section gains a short paragraph: a withdrawal the
+  rollback could not finish undoing keeps its receipt row, because that row is then the only thing
+  naming bytes the target still holds.
 
 ## 6. Acceptance criteria
 
@@ -192,11 +194,12 @@ failed, so no ordinary run changes behaviour.
 
 `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix`
 
-New arm: `tools/govkit/selftest.py` · a `--write-withdrawals` run whose withdrawn path is a directory,
-so the rollback cannot restore it, asserted to keep the receipt row · no assertion floor to move.
+New arm: `tools/govkit/selftest.py` · a `--write-withdrawals` run whose withdrawn path a required
+smudge filter keeps `checkout-index` from restoring, asserted to keep the receipt row · no assertion
+floor to move.
 
-New arm: `tools/govkit/selftest.py` · the cross-arm receipt-versus-worktree invariant over every arm
-that exercises a rollback · no assertion floor to move.
+New arm: `tools/govkit/selftest.py` · the cross-arm receipt-versus-target invariant, discovered from
+every rollback order the suite produces rather than listed · no assertion floor to move.
 
 ## 8. Open questions
 
