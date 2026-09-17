@@ -42,8 +42,7 @@ assert both.
   this criterion asks. figure: DERIVED at this tip. The CONTROL for it is a third fixture whose
   destination sits one segment ABOVE the reserved prefix, `{memory_root}/demo-registry.txt`: exit 0,
   note `3 … 0 under it`, so the refusal is not a ban on `{memory_root}` or on `seed` rows.
-- AC4 — `python tools/govkit/refusal_join.py`. Exit 0, printing `251 branch(es) across 4
-  module(s)`. Both shrink-only pins moved in this commit: `BRANCH_PIN` 217 -> 251 and `FILE_PIN`
+- AC4 — `python tools/govkit/refusal_join.py`. Exit 0, printing `251 branch(es) across 4 module(s)`. Both shrink-only pins moved in this commit: `BRANCH_PIN` 217 -> 251 and `FILE_PIN`
   1 -> 4, each carrying the measurement beside it in the source. MEASURED both sides with the
   file's own matcher: 250 branches over the four modules at base `3ca2f144`, 251 at this tip, so
   this unit's delta is exactly the one new branch. The anchor-set half of this criterion was
