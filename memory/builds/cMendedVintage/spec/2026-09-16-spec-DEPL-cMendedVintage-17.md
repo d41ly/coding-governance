@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write
 
-**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
+**Status:** CLOSED · rev-4 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -55,6 +55,10 @@ non-empty pin set and give the withdrawal state its own verdict.
 - **hands-off** `DEPL-cMendedVintage-11` — that unit grades the attributes row's block on `check`. A
   target whose row this unit drops must not then read as a missing block, which is why S3 drops the
   row and the region together rather than either alone.
+- **consumes-from** `TOOL-cMendedVintage-10` — that unit's repair is what let this one DECLARE
+  `tools/govkit/govkit.py` at all. Until it landed, check 49 refused the declaration on a superseded
+  sibling row that could never close. It changes no code this unit reads; what it supplies is the
+  ability to start.
 
 ## 4. Design
 
@@ -220,6 +224,11 @@ none
   still asked for "two blank lines planted outside gov's block", which is the wording AC2 had just
   been corrected away from; §5's testing line still counted to AC4; and S3 named no observer for the
   new criterion. No design moved — three sentences that only made sense under the old wording.
+
+- rev-4 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. `TOOL-cMendedVintage-10`
+  declares a `hands-off` to this unit and this unit declared nothing back; hygiene check 12 reds on a
+  handoff one author declared and the other never saw. The edge became a fact when that unit was
+  adopted, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 

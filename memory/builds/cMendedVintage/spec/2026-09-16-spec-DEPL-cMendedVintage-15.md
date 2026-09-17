@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it
 
-**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
+**Status:** CLOSED · rev-4 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 18
 
 <!-- gen:spec-records -->
 
@@ -75,6 +75,10 @@ run, and leave a gate behind that reds if either is undone.
   (contrary to rev-1's prediction) the restore and the sweep scope that make it reachable. What it
   could not do is execute any of it, so what this unit consumes is an unobserved mechanism rather
   than a defect. Without that unit there is no entry, no run that rewrites the block, and no subject.
+- **hands-off** `TOOL-cMendedVintage-10` — this unit's four NARROWING declarations are the live
+  instance that wedged the driver, and that unit exists to stop a superseded declaration holding a
+  pass open forever. Nothing it changes reaches this unit's code; what it consumes is the record
+  this unit left, not its mechanism.
 - **hands-off** external — nothing else in this build reads the rollback pass's per-origin stages.
 
 ## 4. Design
@@ -224,6 +228,12 @@ none
   a non-goal described a restore stage that was never built, and §5's security and perf bullets
   priced an engine change rev-2 does not ship. All three now describe the landed code and say whose
   it is. Editorial: no criterion, scope item or gate moves.
+
+- rev-4 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. `TOOL-cMendedVintage-10`
+  was adopted mid-build naming this unit, and the edge was never written back; hygiene check 12 reds
+  on a handoff one author declared and the other never saw. The `hands-off external` bullet stays
+  and is still true of the rollback stages it speaks about — the new edge is about this unit's
+  dispatch record, which is a different subject.
 
 ## 10. Reuse audit
 
