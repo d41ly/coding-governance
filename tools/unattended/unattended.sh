@@ -4897,7 +4897,30 @@ RESCOPED
 # already (it counted the declaration commit). Openness comes from `pass_commit` in the kit library,
 # which the gate leg calls too.
 check_pass_open() { # grp · unit · run-state file · declared set (space-separated)
-  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp
+  local _g="$1" _u="$2" _rel="$3" _decl="$4" _pcommit _wrote _hit _dp _wp _rows _r _n _at
+  # A SUPERSEDED ROW IS NOT AN OPEN PASS (TOOL-cMendedVintage-10). `--writes` is repeatable and the
+  # record is append-only, so a unit that re-declares — NARROWING, because it discovered it needs
+  # fewer files — leaves earlier rows naming paths no commit of its will ever write. Deciding on the
+  # commit alone reserves those paths forever and refuses every later unit declaring one, which
+  # rewards a pass for writing everything it declared and punishes one for finding it needs less.
+  # The live instance wedged this build: one unit's first row named an engine file it correctly never
+  # touched, and the next unit's declaration of that file was refused against a pass long finished.
+  #
+  # THE LAST ROW CARRYING THIS SET, not the first: a unit may re-declare an IDENTICAL set and those
+  # two rows supersede nothing. A set matching NO row is `--audit`'s union of a unit's same-anchor
+  # rows, which already spans through the last of them and is superseded by nothing — so an unmatched
+  # set falls through to the commit test unchanged. That is what keeps the stall clock reading the
+  # union it built rather than grading every re-declaring unit closed and never reporting it STALLED.
+  _rows=$(grep -F -- " dispatch · item $_g $_u · reason " "$_rel" 2>/dev/null || true)
+  _n=0; _at=0
+  while IFS= read -r _r; do
+    [ -n "$_r" ] || continue
+    _n=$((_n + 1))
+    [ "${_r#* · reason }" = "$_decl" ] && _at=$_n
+  done <<CPOROWS
+$_rows
+CPOROWS
+  [ "$_at" -gt 0 ] && [ "$_at" -lt "$_n" ] && return 1
   # An anchor this clone cannot resolve leaves the pass OPEN — `pass_commit` returns 1 for it.
   # Conservative by choice: the failure of a disjointness proof must be a refusal, never a pass.
   _pcommit=$(pass_commit "$_g" "$_u" "$_rel" || true)

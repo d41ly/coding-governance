@@ -1,10 +1,13 @@
 # TOOL-cMendedVintage-10 — a superseded dispatch declaration is not an open pass
 
-**Status:** SPECCED · rev-1 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 19
+**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-17-build-TOOL-cMendedVintage-10-acceptance-ledger.md](../build/2026-09-17-build-TOOL-cMendedVintage-10-acceptance-ledger.md) | journal | — |
+| [2026-09-17-prompt-TOOL-cMendedVintage-10-2-build-brief.md](../prompts/2026-09-17-prompt-TOOL-cMendedVintage-10-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,8 +28,8 @@ that abandoned row still names. Close a row that a later row for the same unit s
   condition, so a proof over nobody still says so. A row closed by S1 is not a sibling. Observed by
   AC3.
 - **S3** `--audit` and check 49 answer the same question through the same predicate. Today the audit
-  reports no unit dispatched and open while check 49 treats a superseded row as open; after S1 they
-  agree because there is one reading. Observed by AC2.
+  grades a re-declaring unit's pass closed while check 49 treats that unit's superseded row as open;
+  after S1 they agree about it because there is one reading. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
@@ -54,6 +57,17 @@ same `(group, unit)`, this row is superseded and the pass it describes is closed
 
 The rows are timestamped and append-only, so "later" is position in the file, which the existing
 readers already walk in order. No new state and no new file.
+
+WHICH ROW THE DECLARED SET NAMES is the part rev-1 left unsaid, and it decides whether this is a
+narrow fix or a wrecked stall clock. The function is handed a SET, not a row, so the test resolves
+the row by scanning that unit's rows at that group for the LAST one whose set is identical to the one
+handed in, and calls the row superseded when a further row follows it. Two consequences, both load
+bearing. A unit that re-declares the IDENTICAL set supersedes nothing, because both rows resolve to
+the same position — so the disjointness reservation survives the driver's own published repair for a
+pass that needs more paths. And a set matching NO row falls through to the commit test unchanged,
+which is what `--audit` hands in: the union of a unit's same-anchor rows, already spanning through
+the last of them. Without that fall-through the audit would grade every re-declaring unit closed and
+could never report one STALLED, which is a worse defect than the one being fixed.
 
 Why this is the narrow fix rather than closing a pass when its unit's spec reaches CLOSED: a spec
 status is authored, and a disjointness proof must not rest on a field a run can write about itself.
@@ -84,9 +98,9 @@ Supersession is structural — a second declaration exists or it does not.
 - **AC1** — When a unit has two dispatch rows and its commit wrote inside only the later one, a
   second unit declaring a path named ONLY by the earlier row is ACCEPTED by `--dispatch`. Red when:
   that declaration is refused by `check 49` naming the earlier row.
-- **AC2** — When `--audit` reports no unit dispatched and open, check 49 refuses no declaration on
-  the grounds of an open sibling. Red when: the two disagree on the same tree, which is the state at
-  BASE and is observable there.
+- **AC2** — For a unit `--audit` does not list as dispatched and open, check 49 refuses no
+  declaration on the grounds of that unit's open sibling row. Red when: the two disagree about the
+  same unit on the same tree, which is the state at BASE and is observable there.
 - **AC3** — When a unit's only dispatch row is its first, `no sibling pass is open` prints exactly
   as it does at BASE. Red when: `check_pass_open` closes a row that nothing supersedes.
 
@@ -107,6 +121,15 @@ Supersession is structural — a second declaration exists or it does not.
 - rev-1 · 2026-09-17 · initial draft, authored mid-build by the main loop after check 49 refused
   `DEPL-cMendedVintage-17`'s declaration. Adopted under the protocol's strictly-beneficial rule as a
   blocker between this run and its own landing.
+- rev-2 · 2026-09-17 · built. Section 4 gains the rule that resolves WHICH row a declared set names,
+  and the two behaviours that fall out of it — an identical re-declaration supersedes nothing, and a
+  set matching no row falls through unchanged. Both were implied by rev-1's design and neither was
+  stated; the second is the difference between this fix and one that silently disables the stall
+  clock. AC2 is AMENDED: rev-1 phrased it as `--audit` reporting no unit dispatched and open at all,
+  and by the time the unit was built the audit correctly listed THIS unit's own dispatch row, so the
+  criterion as written had no true premise on any tree it would ever be graded against. The
+  disagreement it exists to catch is per-unit and was reproduced per-unit on
+  `DEPL-cMendedVintage-15`. No scope item, gate or other criterion moved.
 
 ## 10. Reuse audit
 

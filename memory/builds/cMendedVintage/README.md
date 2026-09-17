@@ -128,7 +128,7 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [TOOL-cMendedVintage-5 — the carried predicate sees a `${VAR:-tools/…}` default](spec/2026-09-16-spec-TOOL-cMendedVintage-5.md) | 16 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize](spec/2026-09-16-spec-DEPL-cMendedVintage-10.md) | 17 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-15 — the synthesized attributes entry is restorable, and no orphan line names it](spec/2026-09-16-spec-DEPL-cMendedVintage-15.md) | 18 | 2 | CLOSED | rev-3 | 2026-09-17 |
-| [TOOL-cMendedVintage-10 — a superseded dispatch declaration is not an open pass](spec/2026-09-17-spec-TOOL-cMendedVintage-10.md) | 19 | 2 | SPECCED | rev-1 | 2026-09-17 |
+| [TOOL-cMendedVintage-10 — a superseded dispatch declaration is not an open pass](spec/2026-09-17-spec-TOOL-cMendedVintage-10.md) | 19 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [DEPL-cMendedVintage-17 — a target whose pins were withdrawn never reaches the empty-marker write](spec/2026-09-16-spec-DEPL-cMendedVintage-17.md) | 20 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [DEPL-cMendedVintage-11 — `cmd_check` grades the attributes row's block](spec/2026-09-16-spec-DEPL-cMendedVintage-11.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [DEPL-cMendedVintage-12 — `apply`'s CONFIGURE honours `deploy["inert"]`](spec/2026-09-16-spec-DEPL-cMendedVintage-12.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-16 |
@@ -143,9 +143,9 @@ ids TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMend
 | [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 40 bound to this build, across 4 record folder(s).
+Records: 42 bound to this build, across 4 record folder(s).
 
-Ids no record names: DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 TOOL-cMendedVintage-10.
+Ids no record names: DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21.
 
 Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 TOOL-cMendedVintage-10.
 <!-- /gen:build-index -->
