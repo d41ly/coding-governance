@@ -169,3 +169,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-17T00:48:50Z dispatch · item 2ec1d1d0 TOOL-cMendedVintage-5 · reason tools/check-install-prefix.sh tools/install-prefix-carried.txt tools/check-install-prefix.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-5.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-5-acceptance-ledger.md memory/LIVE.md
 
 2026-09-17T00:59:20Z dispatch · item 2ec1d1d0 TOOL-cMendedVintage-5 · reason tools/check-install-prefix.sh tools/install-prefix-carried.txt tools/check-install-prefix.test.sh memory/builds/cMendedVintage/spec/2026-09-16-spec-TOOL-cMendedVintage-5.md memory/builds/cMendedVintage/build/2026-09-17-build-TOOL-cMendedVintage-5-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md
+
+2026-09-17T01:07:51Z dispatch · item 8df90a64 DEPL-cMendedVintage-10 · reason tools/govkit/govkit.py tools/govkit/selftest.py
+
+2026-09-17T01:07:52Z brief · item DEPL-cMendedVintage-10 · reason cd5d20be687b memory/builds/cMendedVintage/prompts/2026-09-16-prompt-DEPL-cMendedVintage-10-2-build-brief.md
+
+2026-09-17T01:15:03Z dispatch · item 8df90a64 DEPL-cMendedVintage-10 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/govkit/refusal_join.py memory/builds/cMendedVintage/spec/2026-09-16-spec-DEPL-cMendedVintage-10.md memory/builds/cMendedVintage/build/2026-09-17-build-DEPL-cMendedVintage-10-acceptance-ledger.md

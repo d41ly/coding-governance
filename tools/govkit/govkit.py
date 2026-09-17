@@ -6400,8 +6400,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
     tally: dict[str, int] = {}
     acted: list[dict] = []
-    # S2's order, collected in the loop and written in the write phase below, where `outbox` exists.
-    pins_order: str | None = None
+    # DEPL-cMendedVintage-10 S1. WHAT THE WRITE PHASE NEEDS, collected here because the recomputation
+    # happens here and nowhere else: `(receipt row, open marker, close marker, block text, patterns)`
+    # for a row reading `pins-moved`, or None. It replaces `-2`'s `pins_order`, which carried the
+    # block text alone because an order only ever printed it.
+    pins_write: tuple[dict, str, str, str, list[str]] | None = None
     for row in rows_all:
         role = row.get("role", "engine")
         how = UPDATE_ROLE.get(role)
@@ -6465,8 +6468,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
         # DEPL-dCarriedReceipt-2 S2. The pins row is SYNTHESIZED by `apply`, not shipped by a kit,
         # so it has no gov blob and `classify_row` has nothing to compare. Recompute what `apply`
-        # would write now, and compare it against the block the target actually holds. This arm
-        # never merges and never edits `.gitattributes`: that destination belongs to `apply`.
+        # would write now, and compare it against the block the target actually holds. This arm still
+        # never merges, and it still writes NOTHING: DEPL-cMendedVintage-10 moved the write to the
+        # write phase, where `--write` has already been tested. A write here would put bytes on disk
+        # during a read-only preview, which is the one thing this verb's default exists to prevent.
         if how == "pins":
             _pins = lf_pins(descs, [e for e in claimed if e in descs],
                             lambda e, dd: target_context(target, deploy, e, dd))
@@ -6484,7 +6489,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             tally[v] = tally.get(v, 0) + 1
             print(f"  {v:<18} [{role:<13}] {row['path']}")
             if v == "pins-moved":
-                pins_order = _text
+                pins_write = (row, _om, _cm, _text, [p for p, _c, _w in _pins])
             continue
 
         # DEPL-dCarriedReceipt-13 S7. A BOOTSTRAPPED row that matched no gov vintage has no base,
@@ -6752,17 +6757,40 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # `changed` and `deleted` alone.
     renamed: list[str] = []
     withheld = 0
-    # DEPL-dCarriedReceipt-2 S2: an ORDER, not a write. `.gitattributes` is `apply`'s destination
-    # and DEPL-dSettledRoster-1 is an open ask about how it writes them, so this verb states what
-    # moved and stops. Written under `--write` only, matching every other order this verb emits.
-    if pins_order is not None:
-        (outbox / "update-pins.md").write_text(
-            "# gov's LF pins have moved\n\n"
-            "The govkit-owned block in this target's `.gitattributes` no longer matches what the\n"
-            "claimed kits declare at the requested vintage. `update` does NOT write that file:\n"
-            "the destination is `apply`'s. Re-run `govkit apply` to move the block.\n\n"
-            "The block gov would write now:\n\n```\n" + pins_order + "\n```\n",
-            encoding="utf-8", newline="\n")
+    # DEPL-cMendedVintage-10 S5. THE ORDER IS GONE AND A STALE ONE IS REAPED. `-2` wrote an order
+    # here whose entire body was one remedy: re-run the other verb. That remedy is destructive —
+    # it overwrites engine bytes unconditionally and reads `deploy["inert"]` nowhere, so it
+    # destroys exactly the local forks this verb's unattributed skip declined to touch — and with
+    # the write performed below there is nothing left for the order to say.
+    #
+    # THE UNLINK IS UNCONDITIONAL, never keyed on this run having written the block. Keying it on
+    # that is never true once the order stops being written, so every order left by an earlier
+    # govkit vintage would survive forever, on disk, instructing the operator to run the verb this
+    # unit exists to stop recommending.
+    #
+    # THE INDEX IS UNSTAGED WITH THE FILE, and it is not tidiness: a target that COMMITS its outbox
+    # leaves an index entry behind an unlinked path, and the renormalize at the end of this verb
+    # reads git's tracked set — so the order gov just reaped comes back as a pinned path missing from
+    # the worktree and refuses the renormalize this unit exists to perform. Measured on a scratch
+    # fixture whose own attributes pin `*.md`, which is the shape any target with a docs pin has.
+    # `--ignore-unmatch`, because an UNCOMMITTED outbox is the ordinary case and is not an error.
+    _reaped: set[str] = set()
+    _stale_order = outbox / "update-pins.md"
+    if _stale_order.is_file():
+        _stale_order.unlink()
+        _reaped.add(f".governance/outbox/{_stale_order.name}")
+        # `-f`, because the unlink above already removed the worktree copy: `git rm --cached` refuses
+        # a path whose index blob differs from BOTH HEAD and the worktree, and a stale order that was
+        # re-staged after its commit is exactly that path. Refusing silently here leaves the index
+        # entry standing and hands the renormalize below a pinned path missing from the worktree —
+        # the failure this whole unstage exists to prevent, arriving through the one input that
+        # cannot be tested by the absence of a diff. The file is gov's own output and gov has just
+        # deleted it, so there is nothing of the operator's to lose.
+        subprocess.run(["git", "-C", str(target), "rm", "-q", "-f", "--cached", "--ignore-unmatch",
+                        "--", f".governance/outbox/{_stale_order.name}"],
+                       capture_output=True, check=False)
+        print("govkit update — removed a stale .governance/outbox/update-pins.md: its remedy named "
+              "a verb that overwrites engine bytes, and the block is written by this verb now")
     # ---- DEPL-dCarriedReceipt-14 S2 + S3 + S4. THE PRE-WRITE SNAPSHOT AND THE BASELINE, in that
     # ---- order and BEFORE the first byte of any kit path moves. Everything below this block is a
     # ---- write; everything in it is a read.
@@ -6788,6 +6816,30 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                           "fields": {k: a["row"][k] for k in ROLLBACK_FIELDS
                                      if k in a["row"]}})
 
+    # DEPL-cMendedVintage-10 S2. THE `.gitattributes` ROW ENTERS THE SNAPSHOT BEFORE ITS BYTES MOVE,
+    # and the ordering is the whole point rather than tidiness: the write sits BELOW this block, so
+    # what is recorded here is the block the TARGET held. Taken after the write, the snapshot would
+    # record gov's new block as the state to restore — and the rollback would then put gov's block
+    # back, report a successful restore, and have restored nothing. This is the first row in this
+    # verb that can trigger that class, because it is the first write not keyed to a receipt verdict.
+    #
+    # `origin` IS ITS OWN VALUE, not `table`. The restore branch reverts a `table` row field by
+    # field over ROLLBACK_FIELDS, and NONE of the three fields this write refreshes — `mode`,
+    # `block_sha256`, `patterns` — is in that tuple, so the generic branch would put the bytes back
+    # and leave the row describing the block that was just removed. The whole row is snapshotted
+    # instead, which is also cheaper than enumerating a second field tuple that would go stale the
+    # first time the synthesized row gains a key.
+    #
+    # `kit` IS None. `"(govkit)"` is the row's own value and is not in `claimed`, so carrying it here
+    # would make `orphan_kits` below report a govkit-attributed kit as unverifiable on every run that
+    # moves a pin — a printed finding about a kit that does not exist.
+    _pins_snap: dict | None = None
+    if pins_write is not None:
+        _pins_row = pins_write[0]
+        _pins_snap = {"kit": None, "row": _pins_row, "paths": [_pins_row["path"]],
+                      "origin": "attributes", "fields": dict(_pins_row)}
+        snap_rows.append(_pins_snap)
+
     # THE INDEX SIDE IS `-7`'s READER, not a second one. `index0` is the batched read the preamble
     # already took over every receipt path; a rename DESTINATION is by definition not one of those,
     # so the only paths that need a second call are those, and they go through the same
@@ -6811,11 +6863,48 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # and the verify pass below would either skip it entirely or raise on a missing key.
     touched_kits = [e for e in claimed
                     if any(s["kit"] == e for s in snap_rows) or e in _landed_kits_pre]
-    orphan_kits = sorted({(s["kit"] or "(no kit)") for s in snap_rows if s["kit"] not in claimed})
+    # DEPL-cMendedVintage-10 S2. SCOPED TO `table`, which is the only origin this line was ever
+    # about: a RECEIPT row attributed to a kit the receipt's own `kits` list does not claim. The
+    # synthesized attributes row is attributed to no kit at all, so without the filter it would
+    # print `(no kit)` as an unverifiable kit on every run that moves a pin.
+    orphan_kits = sorted({(s["kit"] or "(no kit)") for s in snap_rows
+                          if s["origin"] == "table" and s["kit"] not in claimed})
     baseline: dict[str, tuple[str, str, int | None]] = {}
     for _eid in touched_kits:
         _d, _ = descs[_eid]
         baseline[_eid] = run_kit_check(_eid, _d, target_context(target, deploy, _eid, _d), target)
+
+    # ---- DEPL-cMendedVintage-10 S1. THE PIN BLOCK, WRITTEN. The same four calls `apply` makes, in
+    # ---- `apply`'s order and through `apply`'s helpers, so there is one construction and one
+    # ---- splice rather than a second spelling that drifts from it.
+    # ----
+    # ---- BELOW THE SNAPSHOT AND BELOW THE BASELINE, both deliberately. Above the snapshot, a
+    # ---- rollback restores gov's own new block and reports success (S2). Above the baseline, a kit
+    # ---- whose check reds BECAUSE of this write is recorded as already-red and its writes are then
+    # ---- kept — the verify pass keys on the TRANSITION, so a baseline taken after a write cannot
+    # ---- see one. Above the write loop, because that is where `apply` puts it and for `apply`'s
+    # ---- reason: the block is what every later checkout filter reads.
+    _ga_written = False
+    if pins_write is not None:
+        _pw_row, _pw_om, _pw_cm, _pw_text, _pw_pats = pins_write
+        _pw_path = target / _pw_row["path"]
+        _pw_cur = _pw_path.read_text(encoding="utf-8", errors="replace") \
+            if _pw_path.is_file() else None
+        _pw_new, _pw_mode = write_block(_pw_cur, _pw_om, _pw_cm, _pw_text, "append")
+        _pw_path.write_text(_pw_new, encoding="utf-8", newline="\n")
+        subprocess.run(["git", "-C", str(target), "add", "--", _pw_row["path"]],
+                       capture_output=True, check=False)
+        # THE RECEIPT ROW FOLLOWS THE BYTES. `mode` and `block_sha256` describe what is on disk, and
+        # a row left at `apply`'s values would claim a block this run just replaced — which is the
+        # receipt-disagrees-with-the-tree class every other write on this verb is built to avoid.
+        # `patterns` comes from the same `pins` value the block was rendered from, so the two cannot
+        # describe different pin sets.
+        _pw_row["mode"] = _pw_mode
+        _pw_row["block_sha256"] = hashlib.sha256(_pw_text.encode("utf-8")).hexdigest()
+        _pw_row["patterns"] = _pw_pats
+        _ga_written = True
+        print(f"govkit update — wrote the lf-pin block [{_pw_mode}] into {_pw_row['path']}: "
+              f"{len(_pw_pats)} pin(s)")
 
     withdrawn_rows: list[dict] = []
     for a in acted:
@@ -7611,7 +7700,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
     # path is classified untouched by the closing tally, which reports it as a file this run
     # never wrote -- while it sits staged in the adopter's index.
-    written_paths = set(changed) | set(renamed) | set(deleted) | set(_landed_new)
+    # DEPL-cMendedVintage-10 S2. AND THE PIN BLOCK, when this run wrote it. The rollback loop skips
+    # any snapshot path that is not in this set — correctly, because a path this run never touched
+    # has nothing to undo — so leaving `.gitattributes` out would make its snapshot entry decorative:
+    # recorded, carried through the whole verb, and stepped over at the one moment it is for.
+    written_paths = (set(changed) | set(renamed) | set(deleted) | set(_landed_new)
+                     | ({_pins_snap["paths"][0]} if _ga_written and _pins_snap else set()))
     n_verified = n_unverified = n_rolled = n_preexisting = n_declined_red = 0
     for eid in touched_kits:
         d, _ = descs[eid]
@@ -7732,7 +7826,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # anyway. The list is (path, why) rather than a bare path because the order prints the
             # refusing operation, and a second lookup to recover it is a second place to get wrong.
             unrestored: list[tuple[str, str]] = []
-            for s in [x for x in snap_rows if x["kit"] == eid]:
+            # DEPL-cMendedVintage-10 S2. THE ATTRIBUTES ENTRY JOINS EVERY KIT'S ROLLBACK, because it
+            # belongs to no kit: the block gov wrote is the UNION over every claimed kit, so there is
+            # no one kit whose rollback owns it. A second restore is idempotent — the same pre-run
+            # index entry, put back a second time — and each rolled-back kit's order then names the
+            # file, which is what an operator reading one order needs to see.
+            for s in [x for x in snap_rows
+                      if x["kit"] == eid or x["origin"] == "attributes"]:
                 for p in s["paths"]:
                     # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
                     # built from `acted` BEFORE the write loop's own containment check, and this
@@ -7852,6 +7952,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 if _left:
                     continue
 
+                # DEPL-cMendedVintage-10 S2. THE SYNTHESIZED ROW GOES BACK WHOLE. The three fields
+                # the pin write refreshes are `mode`, `block_sha256` and `patterns`, and none of
+                # them is in ROLLBACK_FIELDS — so the field-by-field revert below would put the
+                # bytes back and leave the row describing the block that was just removed. Cleared
+                # and re-filled in place rather than replaced, because `receipt["files"]` holds this
+                # dict by identity and rebinding the name would leave the receipt at this run's
+                # values.
+                if s["origin"] == "attributes":
+                    s["row"].clear()
+                    s["row"].update(s["fields"])
+                    continue
+
                 # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
                 # row stamped forward re-creates `-8` exactly — the next run reads the row as
                 # `equal` against bytes that were reverted — and restoring only some of the six is
@@ -7946,6 +8058,57 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
           f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting} · "
           f"declined red {n_declined_red}")
+
+    # ---- DEPL-cMendedVintage-10 S3 + S4. THE RENORMALIZE, which is the other half of the pin write
+    # ---- rather than a separate feature: a newly pinned path whose INDEX blob is CRLF keeps it, and
+    # ---- the only other verb that repairs one is the verb this unit exists to stop recommending.
+    # ---- The pin without it is a declaration nothing acts on.
+    # ----
+    # ---- LAST, AFTER THE ROLLBACK PASS. `git add --renormalize` re-stages a population far wider
+    # ---- than anything this run wrote, and the snapshot cannot undo a re-stage of a path it never
+    # ---- recorded. Before the write loop it would exclude every path this run is about to land,
+    # ---- which is precisely the set whose index blob can be wrong.
+    if _ga_written:
+        if r.problems:
+            print(f"govkit update — renormalize: SKIPPED, this run has {len(r.problems)} finding(s) "
+                  f"and re-staging a population wider than the snapshot is the one action the "
+                  f"rollback cannot undo")
+        else:
+            _rn_want = eol_population(target)
+            _rn_lf = sorted(p for p, v in _rn_want.items() if v == "lf")
+            # GOV'S OWN WRITES ARE NOT SOMEBODY'S WORK-IN-PROGRESS. `git diff HEAD` covers the index
+            # and this run has `git add`ed everything it moved, so without the subtraction every
+            # normal run finds its own writes and refuses its own renormalize — and the arm asserting
+            # the refusal then passes for the wrong reason. `written_paths` is the set the verify
+            # pass already derives for exactly this question, landings included; re-enumerating the
+            # four lists here would be a second answer that omits them.
+            _rn_ours = written_paths | _reaped
+            # NO PATHSPEC, FILTERED HERE, for the reason `git_pathspec`'s own header records:
+            # `git diff` rejects `--pathspec-from-file` and a large population as argv is a
+            # `WinError 206` on a real adopter. One process, no command line, python does the join.
+            _rn_set = set(_rn_lf)
+            _rn_diff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD"],
+                                      capture_output=True, text=True)
+            _rn_dirty = [p for p in _rn_diff.stdout.split()
+                         if p in _rn_set and p not in _rn_ours]
+            # `deleted` IS REMOVED FROM THE ABSENCE TEST, and this is where this spelling departs
+            # from `apply`'s. A path withdrawn under `--write-withdrawals` is legitimately gone from
+            # the worktree, so `apply`'s "pinned and missing" reading would refuse the renormalize
+            # for a removal this verb had just performed on purpose.
+            _rn_gone = set(deleted) | _reaped
+            _rn_missing = [p for p in _rn_lf
+                           if p not in _rn_gone and not (target / p).exists()]
+            if _rn_dirty or _rn_missing:
+                r.fail(f"the pinned population is not clean relative to HEAD "
+                       f"({', '.join(sorted(set(_rn_dirty + _rn_missing))[:4])}) — refusing the "
+                       f"renormalize rather than folding somebody's work-in-progress into an index "
+                       f"gov does not own")
+            elif _rn_lf:
+                git_pathspec(target, ["add", "--renormalize"], _rn_lf)
+                print(f"govkit update — renormalize: re-staged {len(_rn_lf)} pinned path(s)")
+            else:
+                print("govkit update — renormalize: the pin block governs no tracked path in this "
+                      "target, so there is nothing to re-stage")
 
     # ---- TOOL-aWeldedTribunal-6. THE GAP SET: what gov SHIPS for a kit this target claims and this
     # ---- target does not hold. The classification loop above iterates the RECEIPT, so a file gov

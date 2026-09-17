@@ -38,7 +38,14 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
-BRANCH_PIN = 251    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+BRANCH_PIN = 252    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 251 -> 252 at DEPL-cMendedVintage-10. MEASURED both sides: the matcher counted 251 at this unit's
+# base and 252 with its ONE new refusal — the renormalize's dirty-population guard in `_cmd_update`,
+# which refuses to re-stage when a pinned path this run did not write is dirty relative to HEAD. It
+# is the same refusal `apply` already makes one function over, moved onto the verb that now writes
+# the pin block, and it is ARMED by the selftest arm that leaves an unrelated pinned path dirty and
+# asserts the message. Its failing case was observed on a scratch fixture before the arm was
+# written. 1/1 armed.
 # 217 -> 251 at DEPL-cMendedVintage-9. MEASURED, both sides: the matcher counted 250 over the four
 # modules at that unit's base `3ca2f144`, so the pin was 33 BEHIND the population before this unit
 # wrote a line, and this unit's ONE new refusal — the reserved-prefix predicate in selfcheck arm 7h,

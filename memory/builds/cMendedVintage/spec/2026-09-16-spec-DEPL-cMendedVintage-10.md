@@ -1,12 +1,14 @@
 # DEPL-cMendedVintage-10 — `update --write` writes the `.gitattributes` block, with the renormalize
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 17
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-10-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-10-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
+| [2026-09-16-prompt-DEPL-cMendedVintage-10-2-build-brief.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-10-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
 
 <!-- /gen:spec-records -->
@@ -35,9 +37,10 @@ renormalize, so the pin block and the index normalization that depends on it lan
   renormalize: `eol_population(target)`, the whole-diff intersect against `git diff --name-only HEAD`
   with this run's own writes subtracted, a refusal when anything else is dirty, and otherwise
   `git_pathspec(target, ["add", "--renormalize"], lf_paths)`. Observed by AC2 and AC5.
-- **S4** This run's own writes, for that subtraction, are `changed`, both spellings in `renamed`,
-  `deleted`, and `.gitattributes` itself. `missing_wt` is computed over the population with
-  `deleted` removed, because a path this run withdrew under `--write-withdrawals` is legitimately
+- **S4** This run's own writes, for that subtraction, are the `written_paths` set the verify pass
+  already derives — `changed`, both spellings in `renamed`, `deleted` and the landed destinations —
+  plus `.gitattributes` itself. `missing_wt` is computed over the population with `deleted`
+  removed, because a path this run withdrew under `--write-withdrawals` is legitimately
   absent and `apply`'s spelling would refuse the renormalize for it. Observed by AC5.
 - **S5** `update-pins.md` is no longer written, and a stale one this run's write supersedes is
   unlinked. The order's entire body was the remedy that this unit removes; leaving it on disk leaves
@@ -72,8 +75,8 @@ renormalize, so the pin block and the index normalization that depends on it lan
   every adopter whose pins moved is red with only the destructive remedy.
 - **hands-off** `DEPL-cMendedVintage-13` — that unit emits gate legs on the write stage this unit
   establishes, and is sequenced after it for that reason.
-- **hands-off** external — `WIRE-INTO-PROJECT.md`'s statement that `update` never edits
-  `.gitattributes`, which stops being true and is corrected in the same commit.
+- **hands-off** external — none. `WIRE-INTO-PROJECT.md` was named here for a statement it does not
+  carry; the measurement is rev-3's §9 line.
 
 - **hands-off** `DEPL-cMendedVintage-15` — that unit makes the synthesized attributes entry restorable, closing the blocker the spec audit confirmed against the snapshot this unit adds.
 
@@ -181,15 +184,14 @@ already built would be ceremony with a cost.
 - testing — AC1 through AC6, each against a scratch fixture target; gov holds no `install.json` of
   its own, so none of them can be observed against this repo.
 - migration — none beyond the stale-order unlink described in §4.
-- user docs — `WIRE-INTO-PROJECT.md` states that `update` never edits `.gitattributes`; that sentence
-  is corrected in the same commit.
+- user docs — none owed. The claim rev-2 attributed to the runbook is not in it; see §9 rev-3.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When a scratch fixture target is installed with a kit declaring an `[[lf_pin]]`, its pin
-  block is tampered with INSIDE the marker pair, and `python tools/govkit/govkit.py update --target
-  <fixture> --write` runs, the file comes back byte-identical to what `lf_pin_block` renders and
-  stdout names the write.
+  block is tampered with INSIDE the marker pair, and
+  `python tools/govkit/govkit.py update --target <fixture> --write`
+  runs, the file comes back byte-identical to what `lf_pin_block` renders and stdout names the write.
   Red when: the write is placed inside the classification loop rather than the write phase, so a
   read-only run reaches it and a preview writes bytes.
   fixture: a scratch fixture target built under the run's scratch root with `intake` then `apply`;
@@ -257,6 +259,7 @@ refusal · the `govkit refusal join` anchor set gains that refusal's anchor.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-3 · 2026-09-17 · §2 S4, §3, §5 · TWO CORRECTIONS, both measured at build time, neither changing a criterion. FIRST: rev-2's `hands-off external` edge and its §5 user-docs line both said `WIRE-INTO-PROJECT.md` states that `update` never edits `.gitattributes`. It does not: `grep -n gitattributes WIRE-INTO-PROJECT.md` returns four hits and every one of them is about the ADOPTING repo's own EOL rules for the hygiene checker. The three shipped carriers of the never-writes claim are `tools/govkit/govkit.py`'s two comments in the pins arm and at the order site, both rewritten by this unit, and `skills/deploy-governance/SKILL.md`'s honest-limits line, which is about `apply` and was already false at BASE. A doc correction owed to a sentence that does not exist is a correction nobody can make, so the edge is withdrawn rather than left as a red handoff. SECOND: S4 enumerated this run's own writes as `changed` + `renamed` + `deleted` + `.gitattributes`, omitting the LANDED destinations. Those are `git add`ed by the landing loop, so every run that lands an unclaimed source into an lf-pinned path would have found its own landing in `git diff --name-only HEAD` and refused its own renormalize — the exact defect AC5's own `Red when` names one set over. S4 now names `written_paths`, the set the verify pass already derives for precisely this question. THIRD, editorial only: AC1's invocation span was wrapped across two lines, which put every backtick after it on the wrong parity and made hygiene check 23 read AC1 as carrying no token at all. Reflowed onto its own line; no word of the criterion changed.
 - rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-15, DEPL-cMendedVintage-17 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit

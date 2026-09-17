@@ -1749,6 +1749,32 @@ user_skills = "/tmp/gk-fake-skills"
         # verdict, and this one shipped broken once already: `find_block` returns LINE indices and
         # the first draft sliced the string with them, so `current` could never fire.
         _ga = ap / ".gitattributes"
+        # DEPL-cMendedVintage-10. THE TARGET'S OWN PIN, outside gov's block and covering a path gov
+        # neither ships nor claims. `eol_population` asks GIT which paths resolve to `eol=lf`, never
+        # gov's pattern strings, so without a rule like this one every pinned path in this fixture is
+        # receipt-claimed — and the dirty precondition would refuse before the renormalize's own
+        # guard could ever be reached. Measured: with only gov's pins, AC5's arm below graded the
+        # earlier refusal and the guard it names was unreachable. Appended AFTER the close marker,
+        # which leaves the block byte-identical and keeps `current` the right answer above.
+        #
+        # THE SECOND RULE ARMS THE SUBTRACTION. With `.gitattributes` itself inside the pinned
+        # population, gov's OWN write lands there — so a run that fails to subtract its own writes
+        # refuses its own renormalize, and the AC1/AC2 arms below go red instead of passing while
+        # the guard is broken. Observed both ways on a scratch fixture: with the subtraction removed
+        # the write run exits non-zero naming `.gitattributes`, with it in place every arm is green.
+        # ADDED AFTER `apply`, not before, because `apply`'s own `ours` set is its `staged` list and
+        # never carries this path, so a target holding this rule at install time makes `apply` refuse
+        # its own renormalize. That is `apply`'s defect and is left where it is rather than repaired
+        # from a unit scoped to move a write between verbs.
+        _ga.write_text(_ga.read_text(encoding="utf-8")
+                       + "*.md text eol=lf\n.gitattributes text eol=lf\n",
+                       encoding="utf-8", newline="\n")
+        (ap / "notes.md").write_text("target-owned\n", encoding="utf-8", newline="\n")
+        settle(ap, "a target-owned pin over a path gov does not claim")
+
+        # The OTHER arm of the same predicate. A verdict that can only ever read one way is not a
+        # verdict, and this one shipped broken once already: `find_block` returns LINE indices and
+        # the first draft sliced the string with them, so `current` could never fire.
         # INSIDE the marker pair. Appending after the close marker leaves the block itself
         # byte-identical, so `current` is the right answer and the arm proves nothing.
         _ga.write_text(
@@ -1758,15 +1784,107 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-2] the tamper really landed inside the block",
               "# TAMPERED" in _ga.read_text(encoding="utf-8"), "")
         settle(ap, "the tampered pin block")    # .gitattributes is a CLAIMED path — -12 S4
+
+        # DEPL-cMendedVintage-10 AC6. A STALE ORDER FROM AN EARLIER GOVKIT VINTAGE, planted so the
+        # unlink is graded on the only input it can ever meet: this verb stopped writing the order,
+        # so an unlink keyed on having written one would be dead the day it landed.
+        _obx = ap / ".governance" / "outbox"
+        _obx.mkdir(parents=True, exist_ok=True)
+        (_obx / "update-pins.md").write_text("a stale order\n", encoding="utf-8", newline="\n")
+        settle(ap, "a stale update-pins.md order")
+
+        # AC2's PRECONDITION, forced rather than hoped for: a CRLF INDEX blob under a pin, which is
+        # exactly the state `git diff --name-only HEAD` cannot see and only the renormalize repairs.
+        _crlf_oid = subprocess.run(
+            ["git", "-C", str(ap), "hash-object", "-w", "--stdin"],
+            input=b"target-owned\r\n", capture_output=True).stdout.decode().strip()
+        git(ap, "update-index", "--add", "--cacheinfo", f"100644,{_crlf_oid},notes.md")
+
+        def _eol_of(t: pathlib.Path, path: str) -> str:
+            """The `i/…` field `git ls-files --eol` reports for one path, or the empty string."""
+            for ln in subprocess.run(["git", "-C", str(t), "ls-files", "--eol"],
+                                     capture_output=True, text=True).stdout.splitlines():
+                if ln.split("\t")[-1] == path:
+                    return ln.split()[0]
+            return ""
+
+        check("[-2] AC2 the fixture really carries a CRLF index blob before the run",
+              _eol_of(ap, "notes.md") == "i/crlf", _eol_of(ap, "notes.md"))
+
+        # ---- AC3. THE READ-ONLY RUN FIRST, and it has to be first: it is the only arm that can
+        # ---- tell a write placed in the write phase from one placed in the classification loop,
+        # ---- and once the write run below has landed the block there is no moved block left to
+        # ---- preview. It grades BOTH halves of this unit — the bytes and the index.
         _before = _ga.read_bytes()
+        p = run("update", "--target", str(ap))
+        check("[-2] AC3 a read-only run still reports `pins-moved`", "pins-moved" in p.stdout,
+              p.stdout)
+        check("[-2] AC3 ...and writes NO byte of .gitattributes", _ga.read_bytes() == _before, "")
+        check("[-2] AC3 ...and does not renormalize either",
+              _eol_of(ap, "notes.md") == "i/crlf", p.stdout)
+
+        # ---- THE TWO ARMS DEPL-cMendedVintage-10 FLIPPED. They asserted that `update` NEVER edits
+        # ---- `.gitattributes` and that it writes an ORDER instead, which was `-2`'s ratified
+        # ---- design and is this unit's subject: the order's whole body was a remedy naming a verb
+        # ---- that overwrites engine bytes unconditionally. Rewritten rather than deleted, so the
+        # ---- inversion is visible in the diff instead of reading as lost coverage.
         p = run("update", "--target", str(ap), "--write")
         check("[-2] a moved block reports `pins-moved`", "pins-moved" in p.stdout, p.stdout)
         check("[-2] and still exits 0 rather than stranding the receipt", p.returncode == 0,
               p.stdout + p.stderr)
-        check("[-2] `update` NEVER edits .gitattributes -- that destination is apply's",
-              _ga.read_bytes() == _before, "")
-        check("[-2] it writes an ORDER instead",
-              (ap / ".governance" / "outbox" / "update-pins.md").is_file(), p.stdout)
+        check("[-2] AC1 `update --write` now WRITES .gitattributes -- the destination moved to this "
+              "verb", _ga.read_bytes() != _before, "")
+        check("[-2] AC1 ...and the run names the write rather than performing it silently",
+              "wrote the lf-pin block" in p.stdout, p.stdout)
+        check("[-2] AC1 ...and the tamper is gone from the block",
+              "# TAMPERED" not in _ga.read_text(encoding="utf-8"),
+              _ga.read_text(encoding="utf-8"))
+        check("[-2] AC1 ...and the target's OWN rule outside the block survived the splice",
+              "*.md text eol=lf" in _ga.read_text(encoding="utf-8"),
+              _ga.read_text(encoding="utf-8"))
+        check("[-2] AC6 it writes NO order, and reaps the stale one it found",
+              not (_obx / "update-pins.md").exists()
+              and "removed a stale" in p.stdout, p.stdout)
+        check("[-2] AC2 the renormalize ran", "renormalize: re-staged" in p.stdout, p.stdout)
+        check("[-2] AC2 ...and the forced CRLF index blob is LF afterwards",
+              _eol_of(ap, "notes.md") == "i/lf", p.stdout)
+        # THE RECEIPT FOLLOWS THE BYTES. The block on disk is read back through the engine's own
+        # `find_block`, so this compares the row against what is THERE rather than against a second
+        # render — a render-versus-render comparison would agree even if nothing had been written.
+        _gk2 = govkit_module()
+        _ga_text = _ga.read_text(encoding="utf-8")
+        _om2, _cm2 = _gk2.marker_pair("hash-comment", _gk2.GA_BLOCK_ID)
+        _i2, _j2 = _gk2.find_block(_ga_text, _om2, _cm2)
+        _ondisk = "\n".join(_ga_text.split("\n")[_i2:_j2 + 1])
+        _arow = [f for f in json.loads((ap / ".governance" / "install.json").read_text(
+            encoding="utf-8"))["files"] if f.get("role") == "attributes"][0]
+        check("[-2] the attributes row's block_sha256 follows the bytes this run wrote",
+              _arow.get("block_sha256")
+              == hashlib.sha256(_ondisk.encode("utf-8")).hexdigest(), str(_arow))
+        check("[-2] ...and its mode names the splice rather than apply's original create",
+              _arow.get("mode") == "spliced", str(_arow))
+
+        # ---- AC5. A PINNED PATH THIS RUN DID NOT WRITE, left dirty. The subtraction is what makes
+        # ---- this arm mean anything: without it every run above would have refused its own
+        # ---- renormalize and this one would pass for the wrong reason, which is the defect
+        # ---- `apply`'s own `ours` set was measured to have.
+        settle(ap, "after the pin-block write")
+        _ga.write_text(
+            _ga.read_text(encoding="utf-8").replace(
+                "# /govkit:lf-pins", "# TAMPERED-AGAIN\n# /govkit:lf-pins"),
+            encoding="utf-8", newline="\n")
+        settle(ap, "the block moved a second time")
+        (ap / "notes.md").write_text("target-owned\n# an operator edit\n",
+                                     encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(ap), "--write")
+        check("[-2] AC5 a dirty pinned path this run did not write REFUSES the renormalize",
+              "pinned population is not clean" in (p.stdout + p.stderr)
+              and "notes.md" in (p.stdout + p.stderr), p.stdout + p.stderr)
+        check("[-2] AC5 ...and that path was not re-staged",
+              "notes.md" not in subprocess.run(
+                  ["git", "-C", str(ap), "diff", "--cached", "--name-only"],
+                  capture_output=True, text=True).stdout.split(), p.stdout)
+        settle(ap, "the refused run")
 
         # S3/S4. The dispatch table is the unit's actual subject, and `selfcheck` already asserts it
         # covers the role enum -- this arm asserts WHICH disposition each of the three now takes, so
