@@ -31,14 +31,11 @@ writes, because one function binds `dp` five times across as many loops. Both li
 
 ## The predicate, measured over `tools/govkit/govkit.py` before wiring
 
-Every figure re-derived on this tree at this unit's tip. Widths 1 and 2 were run to price the
-alternatives the review's wording admits; only width 3 is wired.
-
-| Width | Population | Would red | False reds |
-|-------|-----------|-----------|------------|
-| 1 — any `target /` join with a non-literal operand | 33 | 33 | 31 |
-| 2 — operand is a mapping subscript | 10 | 9 | 7 |
-| 3 — subscript operand whose bound name reaches a write | 4 | 2 | 0 |
+Widths 1 and 2 were run to price the alternatives the review's wording admits; only width 3 is
+wired. **The three-row width summary lives in the spec's section 4 and is not repeated here** — two
+copies of one measurement is the class this build has paid for more than once. What follows is what
+the spec does not carry: the complete population, hit by hit and near-miss by near-miss, which is
+what the brief asked for.
 
 **Width 3, the wired one — the complete population, hits AND near-misses, all four rows.**
 
@@ -48,6 +45,12 @@ alternatives the review's wording admits; only width 3 is wired.
 | the lf-pin rewrite | `_pw_path = target / _pw_row["path"]` | `write_text` | **HIT** — this finding |
 | the lf-pin withdrawal | `_pd_path = target / pins_drop["path"]` | `write_text` | **HIT** — this finding |
 | the write loop's own row | `dp = (target / row["path"]).resolve()` | `unlink` | PASS — inline resolve-and-compare |
+
+**The table is the PRE-FIX tree**, which is the only state in which the arm has anything to find.
+After the fix the population is three, not four: the two hit rows are gone with their joins, and the
+classification read — a near-miss before, because it reached no write — becomes write-reaching under
+its new name and passes on the containment call placed above it. The arm reports zero either way it
+is read, and that is the point of it.
 
 **The near-misses that width 3 deliberately drops**, four more subscript joins that bind a name and
 reach no write at all: the two read-only probes in `check` (`row["path"]`, `order["path"]`), the
@@ -82,10 +85,12 @@ figures are corrected in the spec at rev-2.
 - AC2 — `python tools/govkit/govkit.py update --target <fixture>` over the same fixture, no
   `--write`. Exit 2 with the same refusal, and `pins-moved` never printed. With the call staged out
   the same preview exits 0 and prints `pins-moved` — a verdict derived from a file outside the
-  fixture, on the run an operator approves. The refusal's `Source:` field reads `the `attributes`
-  row of the target's own receipt`, which is the part this unit controls; the helper's own trailing
-  sentence still blames a `prefix` in the target's deploy.toml and is false for this caller, noted
-  in section 5 of the spec and left alone as the helper is out of scope.
+  fixture, on the run an operator approves. The refusal's Source field names the attributes row of
+  the target's own receipt, which is the part this unit controls; the helper's own trailing sentence
+  still blames a prefix in the target's deploy.toml and is false for this caller, noted in section 5
+  of the spec and left alone as the helper is out of scope. Nested backticks are avoided in this
+  bullet deliberately: the ledger check extracts backticked tokens with a non-greedy scan, so a
+  token containing a backtick splits into fragments that join to nothing.
 - AC3 — `python tools/govkit/govkit.py update --target <fixture> --write` over a fixture whose
   receipt names the escaping path AND drops the pinning kit, so the arm takes its withdrawal branch.
   Exit 2, the same refusal, `pins-withdrawn` never printed, and a marker-carrying file planted
@@ -109,10 +114,53 @@ figures are corrected in the spec at rev-2.
   same recipe: 14 ok, 0 failures. Replaying them rather than reading them is the point; the ordering
   was changed mid-build so the staged-break run comes LAST on each fixture, and the replay is what
   proved the real refusals still refuse on a fixture the break has not yet touched.
-- Their verdicts INSIDE the suite are OWED to the main loop's single bar. The suite run reported in
-  this unit's summary was launched before that reordering, so it graded a different sequence, and a
-  fresh full run did not fit this pass's bound.
+- Their verdicts INSIDE the suite are OWED to the main loop's single bar, and the run this pass did
+  make is reported below rather than claimed as one.
 - Nothing else. No criterion here needed a gate, a merge bar or a `*.test.sh` to observe.
+
+## The suite run this pass made, and why it is reported rather than claimed
+
+One full `selftest.py` run completed in this pass: **1365 ok, 43 FAIL**, against the brief's stated
+baseline of roughly 1352 green and 42 red, and it died in the same `-14` reap fixture with the same
+`FileNotFoundError` the brief describes. Thirteen of the fourteen new arms were green in it.
+
+**Two caveats, and neither is a detail.** The run was launched BEFORE the arms were reordered, so it
+compiled the sequence in which the staged-break run comes first on each fixture — and its one red is
+exactly the contamination that reordering exists to remove. `[-23] AC3` failed with
+`test-parallel-guardrails: not-run — this run moved no path this kit owns`, which is a DIFFERENT
+refusal from the containment one the arm asserts on: the staged break had already written to that
+fixture, and the real run that followed refused for an unrelated reason. The arm failed rather than
+passing for the wrong reason, which is the arm's own guard working, and the committed order passes
+it. Second, the run straddled this unit's commit. The suite pins gov's vintage at import and stamps
+fixtures from it, so a commit underneath it can invalidate arms that name the product rather than
+the change — the totals are consistent with the baseline, but this run is not a clean verdict and is
+not offered as one.
+
+**A second run, on the committed tree and in the committed order, graded all fourteen green.** Arms
+219 to 232 of that run, read off it directly:
+
+```
+ok [-23] LIVENESS the fixture's receipt really carries the escaping path
+ok [-23] LIVENESS ...and it really resolves OUTSIDE the target root
+ok [-23] AC2 the READ-ONLY preview refuses an escaping receipt path
+ok [-23] AC2 ...and the refusal names the RECEIPT
+ok [-23] AC1 `--write` refuses the same row
+ok [-23] AC1 ...and NOTHING landed outside the fixture target
+ok [-23] LIVENESS with the containment call staged OUT, that same run really writes outside
+ok [-23] AC3 the withdrawal branch refuses the escaping path too
+ok [-23] AC3 ...and the file outside the fixture is byte-identical
+ok [-23] LIVENESS with the call staged out the withdrawal really SPLICES that same outside file
+ok [-23] AC4 no write in this engine joins the target root onto a receipt-supplied value ungraded
+ok [-23] AC4 LIVENESS both staged joins really went into the source
+ok [-23] AC4 ...and the arm reports exactly those two, by line and by operand
+ok [-23] AC4 RED-WHEN the inline resolve-and-compare counts as a containment check
+```
+
+Nothing was committed underneath that run before those arms were graded, which is what makes them a
+verdict rather than a number. Its totals are not reported here: this unit's follow-up commit landed
+while it was still going, so from that point on it is the invalidated-by-a-commit case again and no
+figure taken after it is worth quoting. **The owed bar is the main loop's either way** — that is what
+grades the rest of the suite against a tree nobody is committing to.
 
 ## What this unit did NOT fix, deliberately
 

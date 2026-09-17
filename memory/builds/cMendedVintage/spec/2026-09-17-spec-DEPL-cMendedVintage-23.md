@@ -113,8 +113,11 @@ check nearby.
 
 ### The candidate predicate, run over the real tree
 
-Measured on node `c`, 2026-09-17, against `4c4d42fe` in this worktree. Every figure below is PINNED
-at that point and is re-derived on each run by the arm S3 adds; none of it is authored anywhere else.
+Measured on node `c`, 2026-09-17, in this worktree. rev-1 pinned these figures at `4c4d42fe` and
+rev-2 RE-MEASURED them on the tree this unit landed in, which is why two of them moved; the pin was
+stale the moment the fix changed the joins it counts. Only the width-3 figure is re-derived on each
+run, by the arm S3 adds. The other two rows priced alternatives nothing wires, so they are a dated
+measurement and are not claimed to be current.
 
 Three widths were run over `tools/govkit/govkit.py`, because the review's phrasing admits all three
 and they do not behave alike.

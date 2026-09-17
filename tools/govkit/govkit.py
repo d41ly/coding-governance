@@ -1065,11 +1065,18 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
     and scoping the evidence to the enclosing function would red it — correct code, on the arm's
     first run, which is how a structural arm gets waived instead of obeyed.
 
-    THE WIDTH WAS MEASURED BEFORE IT WAS WIRED, over this engine's own source. Grading every
-    `target / <non-literal>` join reds 31 of 33 correct sites. Grading every subscript join reds 7
-    of 10 — among them the write loop's own containment, which is spelled inline and would be
-    reported for not naming the helper. Requiring the bound name to reach a write leaves four sites
-    graded, two of them the finding this arm was written for and no false red.
+    THE WIDTH WAS MEASURED BEFORE IT WAS WIRED, over this engine's own source, and the two wider
+    predicates were rejected on what they RED rather than on taste. Grading every `target /` join
+    with a non-literal operand reds nearly all of them, because the operand is usually a local a
+    reader cannot resolve to a target-supplied value without following the binding. Grading every
+    subscript join still reds the majority, among them the write loop's own containment — spelled
+    inline, and reported only for not naming the helper, which is a red on correct code. Requiring
+    the bound name to reach a write is what leaves no false red.
+
+    No count from that measurement is written here. The populations are this file's own and move
+    with every commit to it, so a figure typed beside them would be wrong on the next one and
+    nobody would notice; the live figure is derived by the caller at every run, and the dated
+    measurement that chose the width is in the record that owns it.
     """
     tree = ast.parse(src)
 
