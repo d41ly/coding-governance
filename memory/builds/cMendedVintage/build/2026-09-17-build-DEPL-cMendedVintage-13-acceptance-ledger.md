@@ -133,8 +133,9 @@ continuation belongs to no line and its criterion grades as answered by nothing.
   both sides, naming registry entries with no anchored runbook section. It is not a leg in the
   manifest and this unit neither caused nor cleared it; recorded so a later reader does not attribute
   it to this diff.
-- **No read-only preview of the emission was built.** §3's non-goal says the preview "prints what it
-  would emit"; the read-only run RETURNS hundreds of lines above this step, so printing that would
-  mean resolving every leg on a path that writes nothing, for no criterion. Recorded as a deliberate
-  omission rather than an oversight, and the absence of an `if write:` guard at the call site is a
-  measurement of that return rather than an assumption about it.
+- **No read-only preview of the emission was built, and §3 was corrected rather than left standing.**
+  rev-2's non-goal said the preview "prints what it would emit"; the read-only run RETURNS hundreds
+  of lines above this step, so printing that would mean resolving every leg on a path that writes
+  nothing, for no criterion. The clause is withdrawn at rev-3 — an amendment that leaves its other
+  half in place is one rule returning two verdicts. The absence of an `if write:` guard at the call
+  site is a measurement of that same return rather than an assumption about it.

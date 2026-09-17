@@ -70,7 +70,12 @@ the ownership rules.
 - No fix for `TOOL-dRetiredFork-27`, the duplicate row a manifest whose `dedupe_key` is `name` keeps
   when the receipt already claims a name the target also carries. This unit gives that behaviour a
   second caller and does not widen it; the row is open and stays open.
-- No emission from a read-only `update`. The preview prints what it would emit and writes nothing.
+- No emission from a read-only `update`, and NO PREVIEW OF ONE EITHER. rev-1 and rev-2 said the
+  preview "prints what it would emit"; measured at rev-3, the read-only run RETURNS hundreds of
+  lines above where this step sits, and its own closing line already says nothing was written.
+  Printing a preview would mean resolving every leg on a path that writes nothing, for no criterion,
+  so the clause is withdrawn rather than half-built. The same measurement is why the call site
+  carries no `if write:` guard: that condition cannot be false there.
 - No new leg, no change to any shipped `[[gate_leg]]`, no change to `subject` defaulting or to
   `check_target_reads_subject`'s floor.
 - No receipt `orders` bookkeeping in `update`. `update` maintains no such list at BASE and minting
@@ -283,9 +288,11 @@ further floor to move.
 
 - rev-1 · 2026-09-16 · initial draft.
 - rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-21 naming this unit and never wrote the edge back; hygiene check 12 reds on a handoff one author declared and the other never saw. Recording it completes the record rather than changing the design.
-- rev-3 · 2026-09-17 · §2 §4 · FOUR AMENDMENTS, measured during the build, no criterion changed.
+- rev-3 · 2026-09-17 · §2 §3 §4 · FIVE AMENDMENTS, measured during the build, no criterion changed.
   S5 is widened from one branch to its CLASS: the shared function raises on a second condition this
   spec never named, and gating one branch while its sibling stays is the failure §7 names by name.
+  §3's read-only clause is WITHDRAWN rather than half-built, because the preview it describes returns
+  before this step and printing one would buy no criterion.
   The extracted function is `write_gate_legs`: `emit` is in no row of the declared verb table and a
   definition leading with it reds two unguarded merge-bar legs, which rev-2's inventory asserted the
   opposite of. S4's union is caller-selected rather than unconditional, because `apply` rewrites its
