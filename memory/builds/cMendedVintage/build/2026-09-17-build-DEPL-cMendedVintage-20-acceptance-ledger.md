@@ -75,6 +75,14 @@ runner.
   for it, which is the same could-not-fail shape one level in, so the loop now continues past a
   refused row.
 
+The two names were measured against the declaration rather than assumed.
+`python tools/lexicon/lexicon.py --suggest check_retired_flags --as py.function` answers `OK`, naming
+`check` as the verb it leads with. The constant has no cell at all: the same tool calls `py.const`
+malformed, because the closed surface set is `function type file constant`, and calls `py.constant`
+UNDECLARED, because the declared cells are `js.function py.function py.type sh.function`. Section 4's
+inventory claimed a `py.const` cell at `UPPER` and now records what the tool actually says — amended
+at rev-2, section 9.
+
 ## What did not run, and why — the OWED half
 
 The arm is wired into `main()` and nothing in this pass ran `main()`. `govkit selftest`,

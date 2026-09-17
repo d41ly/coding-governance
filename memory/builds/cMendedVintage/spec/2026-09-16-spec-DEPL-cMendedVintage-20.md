@@ -111,12 +111,18 @@ wearing coverage's clothes.
 
 | identifier | cell | what it is |
 |---|---|---|
-| `RETIRED_FLAGS` | `py.const` | the declared list, one row per retired flag with its date and unit id |
+| `RETIRED_FLAGS` | ungraded | the declared list, one row per retired flag with its date and unit id |
 | `check_retired_flags` | `py.function` | the arm |
 
 `check_retired_flags` leads with `check`, which is the verb this file's sibling arms already spell for
-an assertion loop; `.lexicon.conf` declares `py.function` at `snake` over a closed verb table and
-`py.const` at `UPPER`.
+an assertion loop. Asked about the committed name, `lexicon.py --suggest` answers `OK`.
+
+AMENDED AT REV-2: rev-1 gave the constant's cell as `py.const` at `UPPER`, and there is no such cell.
+Measured — the tool answers that `py.const` is malformed because the closed surface set is
+`function type file constant`, and that `py.constant` is UNDECLARED because the declared cells are
+`js.function py.function py.type sh.function`. Module constants in this corpus are graded by nothing,
+so the spelling is a convention this file follows rather than a rule anything enforces, and claiming
+otherwise would have been a second answer to a question the declaration already owns.
 
 ### Migration
 
@@ -146,7 +152,7 @@ not a defect. There is no flag: an arm gated dark is an arm nobody runs.
 ## 5. Production-readiness checklist
 
 - security — the arm reads one tracked file and writes nothing.
-- perf / scale — one read of `tools/govkit/govkit.py` and one regex pass per declared row.
+- perf / scale — one read of the module it is handed and one regex pass per declared row.
 - error / empty / loading states — an empty declared list is a DEAD PROBE and reds by that fact rather
   than reporting a clean pass over nothing; a row whose name contains a character the derived pattern
   cannot express reds naming the row.
@@ -195,7 +201,12 @@ not a defect. There is no flag: an arm gated dark is an arm nobody runs.
 `govkit selftest` · `govkit selfcheck` · `govkit acceptance matrix`
 
 New arm: `tools/govkit/selftest.py` · the retired-flag class arm, staged by re-adding one
-`ALLOW_UNGRADED` occurrence to `tools/govkit/govkit.py` · no assertion floor to move.
+`ALLOW_UNGRADED` occurrence to a COPY of the engine under the run's scratch root · no assertion floor
+to move.
+
+AMENDED AT REV-2, the other half of AC1's amendment: rev-1 staged the break in the tracked engine,
+which this unit does not write and which the pass after it reviews. The break goes on a copy, which
+is what the arm's path parameter is for.
 
 ## 8. Open questions
 
@@ -216,6 +227,13 @@ none
 - rev-2 · 2026-09-17 · §4: the pattern is one case-folded alternation rather than two spellings
   joined. Measured 14 either way at BASE, so it is a superset at no cost, and there is no second
   pattern to keep in step with the first.
+- rev-2 · 2026-09-17 · §7 and §5, the halves AC1's amendment left standing: §7 still staged the break
+  in the tracked engine and §5 still named it as the one file read. Both now say the copy and the
+  handed module. Caught by the `amendment-leaves-its-other-half-standing` class.
+- rev-2 · 2026-09-17 · §4 Inventory: rev-1 claimed `.lexicon.conf` declares `py.const` at `UPPER`. It
+  declares no such cell — measured, the surface set is `function type file constant` and the declared
+  cells are `js.function py.function py.type sh.function` — so module constants here are graded by
+  nothing and the row now says so.
 
 ## 10. Reuse audit
 
