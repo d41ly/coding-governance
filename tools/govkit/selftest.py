@@ -1596,6 +1596,145 @@ user_skills = "/tmp/gk-fake-skills"
         check("a pin resolving to no tracked path in the target is reported, by pattern and claimant",
               "resolves to no tracked path" in pa.stdout, pa.stdout)
 
+        # ===== DEPL-cMendedVintage-11, the pin block GRADED =====
+        # A SEPARATE fixture from `pg` above, and the difference is the whole point: these arms have
+        # to answer "does the run FAIL", so they need a selection whose `check` exits 0 on its own.
+        # `pg`'s selection reds on three undischarged holes that have nothing to do with a pin block,
+        # and an exit code that is 1 either way grades nothing.
+        # MEASURED on this exact fixture against the pre-change binary: deleting gov's whole marked
+        # region left `check` exiting 0 with no finding at all.
+        _K11 = "run-gates,pytest-parallel-guardrails"
+        _o11, _c11 = "# govkit:lf-pins", "# /govkit:lf-pins"
+
+        def build_graded_target(name: str) -> pathlib.Path:
+            """A target carrying BOTH a `merged` row and the synthesized `attributes` row."""
+            g = tmp / name
+            g.mkdir(parents=True, exist_ok=True)
+            (g / "README.md").write_text("t" + NLp, encoding="utf-8", newline=NLp)
+            (g / "pyproject.toml").write_text("[tool.other]" + NLp + "key = 1" + NLp,
+                                              encoding="utf-8", newline=NLp)
+            git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t"); git(g, "add", "-A"); git(g, "commit", "-qm", "b")
+            run("intake", "--target", str(g), "--kits", _K11, "--answer", "memory_root=memory")
+            git(g, "add", "-A"); git(g, "commit", "-qm", "intake")
+            run("apply", "--target", str(g), "--kits", _K11)
+            return g
+
+        g11 = build_graded_target("u11a")
+        _ga11 = g11 / ".gitattributes"
+        _rl11 = sorted(f["role"] for f in json.loads(
+            (g11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]
+            if f.get("role") in ("merged", "attributes"))
+        check("[-11] LIVENESS the fixture really carries one merged row AND one attributes row, or "
+              "every arm below grades a population of one",
+              _rl11 == ["attributes", "merged"], str(_rl11))
+        check("[-11] LIVENESS gov's marker pair is really in that target's attributes file",
+              _o11 in _ga11.read_text(encoding="utf-8").split(NLp),
+              _ga11.read_text(encoding="utf-8"))
+        pc = run("check", "--target", str(g11))
+        check("[-11] AC1 an untouched target exits 0", pc.returncode == 0, pc.stdout + pc.stderr)
+        check("[-11] AC1 ...and the new note reports the pin block intact",
+              "attributes blocks: 1/1 intact" in pc.stdout, pc.stdout)
+        check("[-11] AC4 ...beside `merged blocks: 1/1 intact`, unchanged",
+              "merged blocks: 1/1 intact" in pc.stdout, pc.stdout)
+        check("[-11] AC4 ...and the merged note did NOT absorb the pin row into its own count",
+              "merged blocks: 2/2" not in pc.stdout, pc.stdout)
+
+        # AC1's RED-WHEN, asserted positively. Hand the extractor the file's whole text instead of
+        # the marked span and every target reads as drifted, which makes the arm above pass by
+        # failing. An edit OUTSIDE the pair is what tells the two apart.
+        _ga11.write_text(_ga11.read_text(encoding="utf-8") + "*.md text eol=lf" + NLp,
+                         encoding="utf-8", newline=NLp)
+        pc = run("check", "--target", str(g11))
+        check("[-11] AC1 RED-WHEN an edit OUTSIDE the marker pair is not drift, so the extractor "
+              "reads the span rather than the file",
+              pc.returncode == 0 and "attributes blocks: 1/1 intact" in pc.stdout,
+              pc.stdout + pc.stderr)
+        check("[-11] AC2 RED-WHEN ...which is also why the tamper below goes INSIDE the pair: past "
+              "the close marker the block is byte-identical and `intact` is the right answer",
+              "DRIFT" not in pc.stdout and "REMOVED" not in pc.stdout, pc.stdout)
+
+        g11b = build_graded_target("u11b")
+        _lb = (g11b / ".gitattributes").read_text(encoding="utf-8").split(NLp)
+        _i11, _j11 = _lb.index(_o11), _lb.index(_c11)
+        check("[-11] AC2 LIVENESS the tamper lands strictly between the markers",
+              _i11 < _j11 - 1, str((_i11, _j11)))
+        _lb[_j11 - 1] = _lb[_j11 - 1] + "  # TAMPERED"
+        (g11b / ".gitattributes").write_text(NLp.join(_lb), encoding="utf-8", newline=NLp)
+        pc = run("check", "--target", str(g11b))
+        check("[-11] AC2 a line edited inside the pin block FAILS the verb, naming the block, the "
+              "file and the role that spoke",
+              pc.returncode == 1 and ".gitattributes" in pc.stdout
+              and "DRIFT: gov block 'govkit:lf-pins' (attributes)" in pc.stdout, pc.stdout)
+
+        g11c = build_graded_target("u11c")
+        _lc = (g11c / ".gitattributes").read_text(encoding="utf-8").split(NLp)
+        _i11, _j11 = _lc.index(_o11), _lc.index(_c11)
+        (g11c / ".gitattributes").write_text(NLp.join(_lc[:_i11] + _lc[_j11 + 1:]),
+                                             encoding="utf-8", newline=NLp)
+        pc = run("check", "--target", str(g11c))
+        check("[-11] AC2 deleting the whole region is REMOVED, a state distinct from drift",
+              pc.returncode == 1 and "has been REMOVED from .gitattributes" in pc.stdout
+              and "DRIFT" not in pc.stdout, pc.stdout)
+
+        # AC3. The guard tests for the KEY, never the truth of its value.
+        g11d = build_graded_target("u11d")
+        _rp11 = g11d / ".governance" / "install.json"
+        _rd11 = json.loads(_rp11.read_text(encoding="utf-8"))
+        for _f11 in _rd11["files"]:
+            if _f11.get("role") == "attributes":
+                _f11.pop("block_sha256", None)
+        _rp11.write_text(json.dumps(_rd11, indent=2), encoding="utf-8", newline=NLp)
+        pc = run("check", "--target", str(g11d))
+        check("[-11] AC3 a row carrying no block_sha256 is REPORTED ungradeable by name, and the "
+              "run does not fail on it",
+              pc.returncode == 0
+              and "UNGRADEABLE attributes block 'govkit:lf-pins'" in pc.stdout,
+              pc.stdout + pc.stderr)
+        check("[-11] AC3 ...and it leaves the graded population rather than counting as intact",
+              "attributes blocks:" not in pc.stdout, pc.stdout)
+
+        # AC3's RED-WHEN. A truthiness test swallows a legitimately EMPTY digest as well, which
+        # drops a real row out of the graded population and says nothing about it either way.
+        g11e = build_graded_target("u11e")
+        _rp11 = g11e / ".governance" / "install.json"
+        _re11 = json.loads(_rp11.read_text(encoding="utf-8"))
+        for _f11 in _re11["files"]:
+            if _f11.get("role") == "attributes":
+                _f11["block_sha256"] = ""
+        _rp11.write_text(json.dumps(_re11, indent=2), encoding="utf-8", newline=NLp)
+        pc = run("check", "--target", str(g11e))
+        check("[-11] AC3 RED-WHEN a legitimately EMPTY digest is still GRADED, never swallowed",
+              "UNGRADEABLE" not in pc.stdout
+              and "DRIFT: gov block 'govkit:lf-pins' (attributes)" in pc.stdout, pc.stdout)
+
+        # THE EDGE TO DEPL-cMendedVintage-17, measured rather than predicted: a row that unit
+        # withdraws must not then read here as a missing block. The fixture takes the SECOND of the
+        # two shapes that unit dispatches on — a kit dropped from the receipt's `kits` — so it needs
+        # no second gov vintage and no scratch gov of its own.
+        g11f = build_graded_target("u11f")
+        _rp11 = g11f / ".governance" / "install.json"
+        _rf11 = json.loads(_rp11.read_text(encoding="utf-8"))
+        _rf11["kits"] = ["pytest-parallel-guardrails"]
+        _rf11["files"] = [f for f in _rf11["files"] if f.get("kit") != "run-gates"]
+        _rp11.write_text(json.dumps(_rf11, indent=2), encoding="utf-8", newline=NLp)
+        (g11f / ".governance" / "install.sums").write_text(
+            "".join(f"{f['sha256']}  {f['path']}" + NLp
+                    for f in _rf11["files"] if "sha256" in f),
+            encoding="utf-8", newline=NLp)
+        git(g11f, "add", "-A"); git(g11f, "commit", "-qm", "drop the pinning kit")
+        pu = run("update", "--target", str(g11f), "--write")
+        _ga11f = g11f / ".gitattributes"
+        _gone11 = (not _ga11f.is_file()
+                   or _o11 not in _ga11f.read_text(encoding="utf-8").split(NLp))
+        check("[-11] LIVENESS the withdrawal really ran and gov's region really left the file, or "
+              "the arm below grades a target that never had a row to withdraw",
+              "pins-withdrawn" in (pu.stdout + pu.stderr) and _gone11,
+              (pu.stdout + pu.stderr)[-900:])
+        pc = run("check", "--target", str(g11f))
+        check("[-11] a row DEPL-cMendedVintage-17 withdrew does not read here as a missing block",
+              "REMOVED" not in pc.stdout and "attributes blocks:" not in pc.stdout, pc.stdout)
+
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
         (for_ / "tools").mkdir(parents=True, exist_ok=True)

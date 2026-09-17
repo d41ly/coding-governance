@@ -3243,11 +3243,31 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     # ---- MERGED-BLOCK DRIFT. The receipt hashes the BLOCK, never the file, so an edit OUTSIDE the
     # ---- block is invisible here BY CONSTRUCTION — the extractor only ever reads the marked lines.
     # ---- That is both of the contract's clauses satisfied by one mechanism rather than two.
-    n_blocks = n_blocks_ok = 0
+    # ---- DEPL-cMendedVintage-11. The `attributes` row is ADMITTED here rather than given a loop of
+    # ---- its own: it carries `block_id`, `marker_style` and `block_sha256` exactly as a merged row
+    # ---- does, and a second loop would spell the marker pair, the extraction, the CR strip and the
+    # ---- digest compare a second time — this repo's named defect class. Before it was admitted, a
+    # ---- target could delete gov's whole LF-pin region and `check` exited 0 with no finding at all;
+    # ---- MEASURED on a scratch fixture, not reasoned about.
+    # ---- The two roles are counted SEPARATELY. One counter over both populations would make the
+    # ---- merged note report a total it does not describe — `2/2` over one merged block and one pin
+    # ---- block is a false sentence, not a rounding.
+    seen = {"merged": 0, "attributes": 0}
+    intact = {"merged": 0, "attributes": 0}
     for row in rows:
-        if row.get("role") != "merged" or row.get("marker_style") == "json-pointer":
+        role = row.get("role")
+        if role not in seen or row.get("marker_style") == "json-pointer":
             continue
-        n_blocks += 1
+        # PRESENCE of the key, never the truth of its value. `not row.get(...)` would also swallow a
+        # legitimately empty digest and drop a real row out of the graded population silently, which
+        # is the failure this branch exists to prevent wearing the costume of the fix. A row minted
+        # before the field existed is an artefact of VINTAGE rather than of tampering, and comparing
+        # a digest against `None` prints `expected None` and reads as an accusation.
+        if "block_sha256" not in row:
+            r.note(f"UNGRADEABLE {role} block '{row.get('block_id')}' in {row.get('path')}: the "
+                   f"receipt row carries no block_sha256, so this row was REPORTED and not graded")
+            continue
+        seen[role] += 1
         dp = target / row["path"]
         if not dp.is_file():
             r.fail(f"the file carrying gov block '{row.get('block_id')}' is GONE: {row['path']}")
@@ -3265,12 +3285,16 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         got = "\n".join(dp.read_text(encoding="utf-8", errors="replace").split("\n")[i:j + 1])
         h = hashlib.sha256(got.replace(CR, "").encode("utf-8")).hexdigest()
         if h != row.get("block_sha256"):
-            r.fail(f"DRIFT: gov block '{row['block_id']}' in {row['path']} was edited "
+            # The role rides AFTER the block id, so the two loops are tellable apart without moving
+            # the prefix two shipped arms assert verbatim.
+            r.fail(f"DRIFT: gov block '{row['block_id']}' ({role}) in {row['path']} was edited "
                    f"(expected {str(row.get('block_sha256'))[:8]}, found {h[:8]})")
         else:
-            n_blocks_ok += 1
-    if n_blocks:
-        r.note(f"merged blocks: {n_blocks_ok}/{n_blocks} intact")
+            intact[role] += 1
+    if seen["merged"]:
+        r.note(f"merged blocks: {intact['merged']}/{seen['merged']} intact")
+    if seen["attributes"]:
+        r.note(f"attributes blocks: {intact['attributes']}/{seen['attributes']} intact")
 
     # ---- THE OUTBOX. The contract names it as an arm and the verb never opened it. Every order the
     # ---- receipt records must exist; an order for a hole no selected kit declares is stale.

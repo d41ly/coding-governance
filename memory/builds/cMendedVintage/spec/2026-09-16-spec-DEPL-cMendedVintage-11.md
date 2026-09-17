@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-11 — `cmd_check` grades the attributes row's block
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node c · Tier-2 · base 859daa67 · streams deployer · order 21
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-17-build-DEPL-cMendedVintage-11-acceptance-ledger.md](../build/2026-09-17-build-DEPL-cMendedVintage-11-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-DEPL-cMendedVintage-1-1-spec-briefs.md) | journal | DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 |
 | [2026-09-17-prompt-DEPL-cMendedVintage-11-2-build-brief.md](../prompts/2026-09-17-prompt-DEPL-cMendedVintage-11-2-build-brief.md) | journal | — |
 | [2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md](../reviews/2026-09-16-review-DEPL-cMendedVintage-1-spec-audit-round1.md) | spec-audit | TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 |
@@ -21,7 +22,8 @@ a clean install. Admit that role to the loop the receipt already equips it for.
 
 ## 2. Scope (IN)
 
-- **S1** The role gate at `tools/govkit/govkit.py:3164` admits `attributes` alongside `merged`. The
+- **S1** The role gate opening `cmd_check`'s merged-block drift loop admits `attributes`
+  alongside `merged`. The
   `json-pointer` exclusion beside it is unchanged; the `attributes` row's `marker_style` is
   `hash-comment`, which is the only style `marker_pair` synthesizes. Observed by AC1 and AC2.
 - **S2** The loop counts the two roles SEPARATELY and prints the existing `merged blocks:` note
@@ -31,15 +33,25 @@ a clean install. Admit that role to the loop the receipt already equips it for.
   AC4.
 - **S3** A row admitted by S1 that carries no `block_sha256` is REPORTED as ungradeable and named,
   never failed. Comparing a digest against `None` prints `expected None` and reads as drift.
-  Observed by AC3.
+  AMENDED rev-3: the guard is ROLE-BLIND and sits above the role branch, so it covers `merged`
+  too. A merged row with no digest had the identical false-accusation failure, one guard where
+  all rows already route through costs the same line count as one scoped to a role, and a guard
+  written per caller leaves the sibling caller broken. Observed by AC3.
 - **S4** The messages name the role. `gov block 'govkit:lf-pins' has been REMOVED from
   .gitattributes` is the pin case and reads correctly as written; the DRIFT message gains the role
-  so an operator can tell which of the two loops spoke. Observed by AC2.
+  so an operator can tell which of the two loops spoke.
+  AMENDED rev-3: the role rides AFTER the block id, as
+  `DRIFT: gov block '<id>' (<role>) in <path>`
+  because
+  `DRIFT: gov block 'govkit:branch-guard'`
+  is asserted verbatim by a shipped arm and any role inserted before the id flips it. Measured
+  on a fixture carrying both roles: the shipped prefix survives and the role is still legible.
+  Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
 - No grading of whether the PATTERNS still match what the claimed kits declare. That is a vintage
-  question and it belongs to `update`'s `pins` arm at `tools/govkit/govkit.py:6386`, which recomputes
+  question and it belongs to `update`'s `pins` arm, which recomputes
   from the descriptors at the requested commit. This loop asks a drift question: are gov's bytes
   still gov's bytes. The two are deliberately separate and neither is moved here.
 - No repair. `check` reports; `DEPL-cMendedVintage-10` is what writes the block back.
@@ -63,11 +75,11 @@ a clean install. Admit that role to the loop the receipt already equips it for.
 
 ### Data model
 
-No new fields. The join is over the row `apply` synthesizes at `tools/govkit/govkit.py:4627`:
+No new fields. The join is over the `attributes` row `apply` synthesizes in its ATTRIBUTES phase:
 
 | field | value | read by |
 |---|---|---|
-| `role` | `attributes` | the admitted gate at `:3164` |
+| `role` | `attributes` | the admitted gate |
 | `block_id` | `govkit:lf-pins` (`GA_BLOCK_ID`) | `marker_pair` |
 | `marker_style` | `hash-comment` | `marker_pair`, the only style it synthesizes |
 | `block_sha256` | sha256 of `lf_pin_block`'s marker-inclusive text | the comparison |
@@ -83,10 +95,14 @@ green against a digest taken over LF bytes, without a second normalization being
 
 | identifier | kind | where |
 |---|---|---|
-| `n_pins_blocks` / `n_pins_ok` | local counters in `cmd_check` | `tools/govkit/govkit.py`, beside `n_blocks` |
+| `seen` / `intact` | role-keyed counter dicts in `cmd_check` | at the drift loop, replacing `n_blocks` |
 | the ungradeable-row `r.note` text | report line | one new call site |
 
-The DRIFT and REMOVED refusal texts are edited, not added, so `tools/govkit/refusal_join.py`'s
+AMENDED rev-3: two dicts keyed by role, not four scalars. The same two populations, one
+increment site rather than a per-role branch at each of the two, and nothing outside this loop
+reads either name.
+
+The DRIFT and REMOVED refusal texts are edited, not added, so `refusal_join.py`'s
 anchor set gains nothing from S4; S3 adds a note, which is not a refusal channel. The anchor count
 is DERIVED by that engine and is not written here.
 
@@ -99,7 +115,7 @@ one release: the verdict and the verb that clears it.
 ### Alternatives rejected
 
 - **Rename the note to cover both roles.** One string, two populations, and the string is asserted
-  verbatim at `tools/govkit/selftest.py:1477`. Renaming it flips a shipped arm to buy a shorter
+  verbatim by two shipped arms. Renaming it flips a shipped arm to buy a shorter
   diff, and the sentence it would produce is less true than the two it replaces.
 - **A second loop for the attributes row.** It would spell `marker_pair`, `find_block`, the CR
   strip and the digest compare a second time, which is this repo's named defect class. The existing
@@ -123,14 +139,21 @@ one release: the verdict and the verb that clears it.
   reads.
 - error / empty / loading states — an absent file takes the existing GONE branch; an absent block
   takes the existing REMOVED branch; a `find_block` refusal is caught by the existing `except`.
-- observability — the new note prints on every run including the clean one, so a zero is
-  distinguishable from a loop that did not execute.
+- observability — AMENDED rev-3. The note is guarded by a NON-EMPTY population exactly as the
+  merged note is, so a target carrying no `attributes` row prints nothing rather than a
+  standing zero. A permanent `0/0` on every adopter's run is noise and not a liveness signal;
+  the liveness this bullet wanted is bought by AC1's arm, which asserts the note appears on a
+  fixture that has the row.
 - risks — this reds targets. The mitigation is the release ordering in §3, not a flag: a verdict
   that ships behind an opt-in grades the installs that were already careful.
 - testing — AC1 through AC4, each on a scratch fixture target; gov keeps no receipt of its own, so
   none of them is observable against this repo.
 - migration — none. No schema change, no floor, no re-adoption.
-- user docs — `WIRE-INTO-PROJECT.md`'s description of what `check` grades gains the pin block.
+- user docs — AMENDED rev-3: NO EDIT, and the reason is worth the line. That file carries no
+  enumeration of what `check` grades — the verb's own output is the enumeration — so there was
+  nothing to extend. It already tells an adopter that a withdrawn row left standing would leave
+  "the next `check` reading a block that is not there", a sentence
+  `DEPL-cMendedVintage-17` wrote while it was false. This unit makes it true.
 
 ## 6. Acceptance criteria
 
@@ -142,6 +165,12 @@ one release: the verdict and the verb that clears it.
   fixture: a scratch fixture target under the run's scratch root, built with `intake` then `apply`.
   This repo does not dogfood govkit and carries no receipt, so no criterion here is observable
   against it.
+  AMENDED rev-3 — THE SELECTION IS NAMED, because "a kit declaring an `[[lf_pin]]`" does not pin
+  one and the obvious choice cannot answer this criterion. `memory-recall` requires
+  `memory-tree`, whose three undischarged holes make `check` exit 1 for reasons that have
+  nothing to do with a pin block, so "it exits 0" is unanswerable on that selection. The
+  fixture selects `run-gates` — no dependency, no hole, three pins — beside
+  `pytest-parallel-guardrails`, which supplies AC4's `merged` row.
 - **AC2** — When one line INSIDE the marker pair of that fixture's pin block is edited and
   `python tools/govkit/govkit.py check --target <fixture>` runs, it fails naming `govkit:lf-pins`
   and the file; when the block is deleted entirely, the same command fails with the REMOVED wording
@@ -154,6 +183,9 @@ one release: the verdict and the verb that clears it.
   by name and the run does not fail on it.
   Red when: the guard tests the row's truthiness rather than the key's presence, which also swallows
   a legitimately empty digest and silently drops a real row from the graded population.
+  AMENDED rev-3: an ungradeable row LEAVES the graded population rather than counting against
+  it. `0/1 intact` over a row nothing could grade reads as a failure, which is the accusation
+  S3 exists to prevent, arriving through the denominator instead of through the comparison.
 - **AC4** — When a fixture carrying both a `merged` row and an `attributes` row is checked with
   `python tools/govkit/govkit.py check --target <fixture>`, stdout carries `merged blocks: 1/1
   intact` unchanged alongside the separate pin-block note.
@@ -175,8 +207,8 @@ field removed asserted to report rather than fail · no assertion floor to move.
 - **Q1 — FACT-QUESTION · does the existing extractor grade this row unmodified, or does the
   attributes row need its own comparator?**
   RESOLVED (agent, 2026-09-16, delegated): unmodified. The probe is reading the four fields
-  `apply` writes at `tools/govkit/govkit.py:4627` against what the loop at
-  `tools/govkit/govkit.py:3164` consumes, and `marker_pair`'s refusal for any style but
+  `apply` writes in its ATTRIBUTES phase against what the drift loop consumes, and
+  `marker_pair`'s refusal for any style but
   `hash-comment`. The probe can produce a negative — a row carrying a style `marker_pair` refuses,
   or a digest taken over marker-exclusive text, would each have forced a comparator — and neither
   is the case.
@@ -189,11 +221,12 @@ field removed asserted to report rather than fail · no assertion floor to move.
 ## 9. Revision log
 
 - rev-1 · 2026-09-16 · initial draft.
+- rev-3 · 2026-09-17 · §2 §4 §5 §6 §10 · AMENDED BY THE BUILD, after measuring. Six changes and none of them moves the design. S3's guard goes role-blind, because the sibling caller carried the same defect. S4's role rides after the block id, because a shipped arm asserts the prefix. The counters become two role-keyed dicts. The new note is guarded by a non-empty population instead of printing a standing zero. AC1 names the fixture's selection, because the obvious one cannot answer whether the verb exits 0. AC3 puts an ungradeable row outside the graded population rather than at 0/1. The §5 user-docs bullet is withdrawn with its reason. Every `path:line` reference is stripped in the same pass: three units edited that file after rev-1 and every number in it was stale, which is the trap the build brief names.
 - rev-2 · 2026-09-17 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The spec-audit disposal authored DEPL-cMendedVintage-17 naming this unit, and the edge was never written back — hygiene check 12 reds on a handoff one author declared and the other never saw. The edge is a fact about this build that became true when the promotion was created, so recording it completes the record rather than changing the design.
 
 ## 10. Reuse audit
 
-The seam this unit extends is the merged-block drift loop at `tools/govkit/govkit.py:3160`, read
+The seam this unit extends is the merged-block drift loop in `cmd_check`, read
 from source: it already synthesizes the marker pair through the one synthesizer, already catches
 `find_block`'s refusal, and already strips CR before hashing. Admitting a second role to it is the
 whole change. `python tools/codebase-map/reuse_lookup.py "write the govkit-owned gitattributes pin
