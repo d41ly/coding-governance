@@ -247,7 +247,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 740
+    "ceiling": 1800
   },
   {
     "name": "scratch-guard self-test",
@@ -290,7 +290,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 900
+    "ceiling": 4800
   },
   {
     "name": "row-keyed merge driver replay",
