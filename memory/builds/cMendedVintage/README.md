@@ -160,9 +160,9 @@ ids TOOL-cMendedVintage-12
 | [TOOL-cMendedVintage-12 — the brief reader stops waiting on a grandchild's write end](spec/2026-09-18-spec-TOOL-cMendedVintage-12.md) | 39 | 2 | CLOSED | rev-2 | 2026-09-18 |
 <!-- /gen:build-units -->
 
-Records: 80 bound to this build, across 4 record folder(s).
+Records: 81 bound to this build, across 4 record folder(s).
 
-Ids no record names: DEPL-cMendedVintage-27.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25
 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 TOOL-cMendedVintage-12.
