@@ -5,7 +5,7 @@ opened: 2026-09-16
 streams: deployer+tooling
 roster: DEPL+TOOL
 authorized-by: prompt
-ids: DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11
+ids: DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13 DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11
 ---
 
 # cMendedVintage — `update` gains an install-effect stage, and stops rolling kits back for work it declined to do
@@ -103,14 +103,16 @@ did not revert, and an outbox nothing drains.
 | 34 | `DEPL-cMendedVintage-24` | OPEN | the dirty-path refusal reaches the row this build taught `update` to write |
 | 35 | `DEPL-cMendedVintage-25` | OPEN | the git plumbing readers stop word-splitting a path |
 | 36 | `TOOL-cMendedVintage-11` | OPEN | the census arm resolves its launcher instead of trusting the name |
+| 37 | `DEPL-cMendedVintage-26` | OPEN | the scoped-index and rename halves of the dirty-path guard |
+| 38 | `DEPL-cMendedVintage-27` | OPEN | the role re-resolution keeps the three-way merge a rendered row still needs |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 36 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
+**Build status:** SPECCED · 38 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
 ids DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13
 ids DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25
-ids TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11
+ids DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -144,21 +146,23 @@ ids TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMend
 | [TOOL-cMendedVintage-7 — the receipt leg reports rows carrying `evidence: "unattributed"`](spec/2026-09-16-spec-TOOL-cMendedVintage-7.md) | 27 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [TOOL-cMendedVintage-8 — the empty-live-scope case gets a code distinct from a conf refusal](spec/2026-09-16-spec-TOOL-cMendedVintage-8.md) | 28 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-18 — a withdrawn row whose path did not restore stays in the receipt](spec/2026-09-16-spec-DEPL-cMendedVintage-18.md) | 29 | 2 | CLOSED | rev-3 | 2026-09-17 |
-| [DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported](spec/2026-09-16-spec-DEPL-cMendedVintage-19.md) | 30 | 2 | CLOSED | rev-2 | 2026-09-17 |
+| [DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported](spec/2026-09-16-spec-DEPL-cMendedVintage-19.md) | 30 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-20 — a retired flag's absence is graded under every spelling it has](spec/2026-09-16-spec-DEPL-cMendedVintage-20.md) | 31 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [DEPL-cMendedVintage-22 — the gate-leg drift guard compares the target, not gov against itself](spec/2026-09-17-spec-DEPL-cMendedVintage-22.md) | 32 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [DEPL-cMendedVintage-23 — the lf-pin write is contained before the receipt path reaches the root](spec/2026-09-17-spec-DEPL-cMendedVintage-23.md) | 33 | 2 | CLOSED | rev-2 | 2026-09-17 |
-| [DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write](spec/2026-09-17-spec-DEPL-cMendedVintage-24.md) | 34 | 2 | CLOSED | rev-2 | 2026-09-17 |
+| [DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write](spec/2026-09-17-spec-DEPL-cMendedVintage-24.md) | 34 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-25 — the renormalize cleanliness guard reads paths, not whitespace tokens](spec/2026-09-17-spec-DEPL-cMendedVintage-25.md) | 35 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [TOOL-cMendedVintage-11 — the census arm resolves its launcher instead of trusting the name](spec/2026-09-17-spec-TOOL-cMendedVintage-11.md) | 36 | 2 | CLOSED | rev-1 | 2026-09-17 |
+| [DEPL-cMendedVintage-26 — the scoped-index and rename halves of the dirty-path guard](spec/2026-09-18-spec-DEPL-cMendedVintage-26.md) | 37 | 2 | SPECCED | rev-1 | 2026-09-18 |
+| [DEPL-cMendedVintage-27 — the role re-resolution keeps the three-way merge a rendered row still needs](spec/2026-09-18-spec-DEPL-cMendedVintage-27.md) | 38 | 2 | SPECCED | rev-1 | 2026-09-18 |
 <!-- /gen:build-units -->
 
 Records: 76 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-cMendedVintage-26 DEPL-cMendedVintage-27.
 
 Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25
-TOOL-cMendedVintage-10 TOOL-cMendedVintage-11.
+TOOL-cMendedVintage-10 TOOL-cMendedVintage-11 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -201,6 +205,8 @@ TOOL-cMendedVintage-10 TOOL-cMendedVintage-11.
 | 34 | `DEPL-cMendedVintage-24` | no |
 | 35 | `DEPL-cMendedVintage-25` | no |
 | 36 | `TOOL-cMendedVintage-11` | no |
+| 37 | `DEPL-cMendedVintage-26` | no |
+| 38 | `DEPL-cMendedVintage-27` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-19 — a row's role is re-resolved at every schema, so a role move is reported
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 30
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 30
 
 <!-- gen:spec-records -->
 
@@ -65,6 +65,10 @@ cannot rot the same way.*
   build and the arm in S4 would be grading a hypothetical.
 - **hands-off** external — the two live adopters see the report on their first update after both
   units land; the disposition of their stale rows is theirs.
+- **hands-off** `DEPL-cMendedVintage-27` — un-gating the re-resolution sent a row recorded `engine`
+  whose descriptor now resolves `rendered` down `role-moved`, so it never reached the three-way
+  merge and the vintage-migration runbook lost the conflict path it exists to handle. That unit
+  restores the merge without retiring the re-resolution or the report.
 
 ## 4. Design
 
@@ -226,6 +230,11 @@ none
   moved with them. **`memory/backlog/DEPL.md` leaves §4's table**: the driver's `--dispatch` refuses
   a declared write set naming a shared mutable record, so this pass may not touch the backlog at
   all. S1 through S4, AC1, AC3, AC4 and every non-goal are unchanged.
+
+- rev-3 · 2026-09-18 · §3 · RECIPROCAL EDGE, no scope or criterion changed. The deployer suite's
+  attribution laid nine failures at this unit's schema gate, all in the migration harness, and
+  `DEPL-cMendedVintage-27` was adopted to repair them. Worth recording beside the edge: this unit
+  touched no arm in that suite at all, so nothing there could have shown it.
 
 ## 10. Reuse audit
 

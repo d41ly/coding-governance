@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 34
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 34
 
 <!-- gen:spec-records -->
 
@@ -92,6 +92,10 @@ carries no `oid`, and remove the prose that argues the old case.
 - **hands-off** external — the fix lands inside two preconditions and one tally; nothing else in
   this build reads either guard, and the behaviour an adopter sees is a refusal that did not fire
   before.
+- **hands-off** `DEPL-cMendedVintage-26` — two of this unit's predicates shipped regressions the
+  suite caught once it ran to completion: the scoped index read compared against an unscoped
+  receipt, and the closing self-audit reading a rename's old path as a row come apart. That unit
+  repairs both and keeps this unit's own guard closed.
 
 ## 4. Design
 
@@ -293,6 +297,11 @@ writing set · no floor moves.
   B3 a BLOCKER. Every line the finding cites was re-opened at HEAD before designing against it: the
   predicate has moved to `tools/govkit/govkit.py:4799`, the pin writes to `:7213` and `:7252`, and
   the justification paragraph reads as quoted at `:4770-4774`.
+
+- rev-3 · 2026-09-18 · §3 · RECIPROCAL EDGE, no scope or criterion changed. A read-only
+  attribution of the deployer suite, which ran to completion for the first time in this build, laid
+  25 of its 68 failures at this unit's two predicates; `DEPL-cMendedVintage-26` was adopted to repair
+  them and names this unit, which named nothing back.
 
 ## 10. Reuse audit
 
