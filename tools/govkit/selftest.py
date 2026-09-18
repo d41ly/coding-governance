@@ -348,13 +348,13 @@ def check_git_split_parses(module_path: pathlib.Path = GOVKIT) -> None:
 
     owner: dict = {}
 
-    def bind_scopes(node: _ast.AST, scope) -> None:
+    def scan_scopes(node: _ast.AST, scope) -> None:
         for ch in _ast.iter_child_nodes(node):
             owner[ch] = scope
-            bind_scopes(ch, ch if isinstance(
+            scan_scopes(ch, ch if isinstance(
                 ch, (_ast.FunctionDef, _ast.AsyncFunctionDef)) else scope)
 
-    bind_scopes(tree, None)
+    scan_scopes(tree, None)
 
     calls = [n for n in _ast.walk(tree) if isinstance(_extract_git_argv(n), list)]
     spliced = [n for n in _ast.walk(tree) if _extract_git_argv(n) == SPLICED]
