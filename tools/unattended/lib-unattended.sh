@@ -127,17 +127,41 @@ is_repo_root() {
 # construction, which is what keeps a post-hoc `--brief` from excusing a stray write. Selected on
 # the whole field with both separators, so `-1` is not a prefix of `-10`; parsed with
 # `check-brief-recorded.sh`'s own expansions, so a grammar change breaks every reader the same way.
-# The blob lands in a VARIABLE and the loop reads the variable through a heredoc: a substitution in
-# the heredoc body is the class `pass_commit` deadlocked on.
+# A FILE, NEVER A COMMAND SUBSTITUTION, for the reason `pass_commit`'s header states in full twenty
+# lines below. The blob used to land in a VARIABLE the loop then read through a heredoc, and the
+# variable was assigned from `$(GIT show …)`: a substitution reads until EOF, EOF arrives when the
+# LAST inherited write end closes, and `GIT` is a shell FUNCTION — so the substitution forks a
+# subshell which forks `git`, and the reader waits on a grandchild's write end. Same class, same
+# file, one function apart. `pass_commit` calls this once per commit in its window, so `--dispatch`
+# on this build's run inherited it a hundred-odd times per row and stopped completing at all: four
+# runs died without writing a row, the last on a one-hour bound at 11350 s. The walk therefore runs
+# in the CURRENT shell with its stdout redirected to a scratch file and the loop reads that file by
+# redirect. No pipe exists, so no EOF has to arrive.
+# `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` is the class. TOOL-cMendedVintage-12.
+#
+# WHY THE GATE DID NOT SEE IT, which is the half worth carrying: the `shell hygiene` leg refuses a
+# loop fed by a substitution repo-wide, and this loop was fed by a heredoc over a VARIABLE assigned
+# from one on the line above. The predicate did not follow the assignment, so the instance sat in
+# the blind spot of the check written to catch it. That predicate now follows one assignment.
+#
+# A SCRATCH FILE THAT CANNOT BE CREATED IS A NAMED REFUSAL, `pass_commit`'s rule for its reason: an
+# empty answer here MEANS "this pass declared no brief paths", which is a legitimate and common
+# state, so a broken TMPDIR answered with silence would read as a correct answer and forgive a write
+# nothing declared. The stderr line is the only thing that makes it visible.
 read_brief_paths() {  # commit · unit · run-state-path
-  _rb_run=$(GIT show "$1:$3" 2>/dev/null || true)
-  while IFS= read -r _rb_r; do
+  _rb_f=$(mktemp) || { printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
+  GIT show "$1:$3" >"$_rb_f" 2>/dev/null || :
+  # THE `|| [ -n … ]` REPLACES A GUARANTEE THE HEREDOC GAVE FREE. Command substitution stripped the
+  # trailing newlines and the heredoc put exactly one back, so every line was terminated; a FILE may
+  # end without one, and a bare `read` drops that last line. Without this the repair would silently
+  # return a smaller path set than the shape it replaced — which is the one way this change could
+  # move a disjointness verdict while claiming to fix a stall.
+  while IFS= read -r _rb_r || [ -n "$_rb_r" ]; do
     case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
     _rb_r=${_rb_r#* · reason }; _rb_r=${_rb_r#* }
     normpath "$_rb_r"; printf '\n'
-  done <<RBP
-$_rb_run
-RBP
+  done <"$_rb_f"
+  rm -f "$_rb_f"
 }
 
 # ------------------------------------------------------------- has this pass committed yet, once

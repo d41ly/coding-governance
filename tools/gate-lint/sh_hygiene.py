@@ -16,6 +16,16 @@ ends of its own pipe and no descendant alive. The remedy is a file — redirect 
 file and read the file — which keeps the loop in the current shell, so a `return` inside it still
 returns from the enclosing function.
 
+AND THE SAME CLASS ONE ASSIGNMENT AWAY, which is the widening and the reason it exists. A body
+spelled `$var`, where `var` took its value from a command substitution earlier in the file, is the
+identical defect written over two lines: the fork, the EOF dependency and the stall are all at the
+assignment, and the loop is only the shape that tells a reader the value had to be carried whole.
+The narrow predicate graded such a body as a substitution-free heredoc — a NEAR MISS — and on
+2026-09-18 that blind spot was found holding a live instance in this tree, in a reader called once
+per commit, which had already cost four runs of its own driver. A check that cannot fail for the one
+shape it most needed to reach is the failure this leg was written about. So a plain expansion in a
+loop-feeding body is now followed back ONE assignment, and a hit there is gated like any other.
+
 WHY THE LOOP-FEEDING FORMS ALONE. A command substitution that is an ARGUMENT (`x=$(cmd)`,
 `f "$(cmd)"`) has the same EOF dependency but a bounded consumer, and banning those would red every
 assertion helper in every test file here. Run over this tree before the ban was wired, the four
@@ -44,6 +54,21 @@ who did not write it:
     so an unterminated quote opened on a previous line leaves this one's tail reading as code.
     The failure direction is a MISS and never a false RED, which is the way round this leg needs
     it: it is `subject = repo` with no guard, so a red on an innocent file blocks every push.
+  * MORE THAN ONE assignment, and every scope rule a shell has. The follow is one hop, over a FLAT
+    per-file table keyed on the name: the latest assignment textually above the loop wins, an
+    assignment from anything but a substitution CLEARS the name, and a function boundary, a
+    subshell, a branch not taken and a same-name local are all invisible. Two directions, both
+    written down because a heuristic with an unstated blind spot is how the sibling scanner here
+    got its first one. A value that arrives through two hops (`a=$(cmd); b=$a`) is a MISS. A name
+    assigned from a substitution in one function and expanded in a loop in another is a false HIT,
+    and the registry is where one lands until someone drains it — so the widening is kept to one
+    hop deliberately, because each further hop buys misses back at a worse rate than it costs.
+  * `read var`, `mapfile`, `printf -v`, array elements and `${var:=$(cmd)}`. None of them is an
+    assignment this reader sees, so each is a MISS.
+  * A `;` inside quotes, which splits a line into segments the shell would not. The anchored
+    assignment pattern makes that mostly a miss, and the residue is a possible false HIT on a
+    fragment such as `msg="a; b=$(cmd)"`. It costs a registry row and never a wrong verdict about
+    behaviour, and the population this landed against was checked by hand and holds none.
 
 THE REGISTRY is a shrink-only declaration of the sites that predate the gate, one row per
 `<path>\t<delimiter>\t<count>\t<reason>`, keyed on the delimiter and NEVER on a line number — a
@@ -78,6 +103,14 @@ HERESTRING = "<<<"
 # A registry delimiter is a heredoc tag or the here-string operator. A line number matches neither,
 # which is what makes AC6's malformed-key arm a shape test rather than a convention.
 DELIMITER = re.compile(r"\A(<<<|[A-Za-z_][A-Za-z0-9_]*)\Z")
+# `name=value`, through any number of declaration keywords. Anchored at the start of a `;`-split
+# segment, so `a=$1; b=$(cmd)` is two assignments and a `foo --flag x=1` argument is none.
+ASSIGNMENT = re.compile(
+    r"\A[ \t]*(?:(?:local|export|declare|readonly|typeset)[ \t]+)*([A-Za-z_][A-Za-z0-9_]*)\+?=(.*)\Z",
+    re.S)
+# A parameter expansion's NAME. `${x#y}` and `$x` both yield `x`; `$1` and `$@` yield nothing, which
+# is right — a positional is not a name this scan can follow to an assignment.
+EXPANSION = re.compile(r"\$\{?([A-Za-z_][A-Za-z0-9_]*)")
 
 # The taxonomy, in report order. The first two are the failing population; the rest are printed so
 # the reader can tell "no hits" from "nothing was looked at", and so the process-substitution count
@@ -85,6 +118,8 @@ DELIMITER = re.compile(r"\A(<<<|[A-Za-z_][A-Za-z0-9_]*)\Z")
 CLASSES = [
     ("loop-heredoc-sub", "loop fed by a heredoc holding a command substitution", True),
     ("loop-herestring-sub", "loop fed by a here-string holding a command substitution", True),
+    ("loop-var-sub", "loop fed by a heredoc or here-string over a VARIABLE assigned from a "
+                     "command substitution — the same defect, one assignment away", True),
     ("loop-heredoc-plain", "loop fed by a heredoc with NO command substitution", False),
     ("heredoc-sub", "non-loop heredoc holding a command substitution", False),
     ("herestring-sub", "non-loop here-string holding a command substitution", False),
@@ -96,7 +131,7 @@ GATED = [key for key, _label, gated in CLASSES if gated]
 #: A printed count nothing reads is the same nothing as no count: this repository has shipped
 #: nine arms stranded past an unconditional exit while the suite printed a total and every
 #: other gate held. Raise it with the arms; it may never be lowered to fit a regression.
-FLOOR_ASSERTIONS = 27
+FLOOR_ASSERTIONS = 32
 
 
 def check_substitution(text: str) -> bool:
@@ -171,20 +206,41 @@ def scan_file(text: str) -> dict[str, list[tuple[int, str]]]:
 
     EVERY CLASSIFIER READS THE CODE HALF of the line and never the comment — `extract_code` says
     why. The BODY is read from `lines` untouched: a body is data, and a `#` in it is a character.
+
+    THE ONE-HOP FOLLOW is `forked`: the names whose latest assignment above this line took its value
+    from a command substitution. It is updated BEFORE the line is classified, so an opener sharing a
+    line with its own feeding assignment is graded — and a heredoc BODY never reaches it, because
+    the walk skips to the terminator, so a shell script written inside a fixture heredoc cannot
+    seed the table of the file that carries it.
     """
     lines = text.split("\n")
     found: dict[str, list[tuple[int, str]]] = {key: [] for key, _l, _g in CLASSES}
+    forked: set[str] = set()
     i = 0
     while i < len(lines):
         # A whole-line comment strips to its own indentation and matches no classifier, so the
         # skip that used to sit here is this call's tail case rather than a second predicate.
         line = extract_code(lines[i])
+        for segment in line.split(";"):
+            assigned = ASSIGNMENT.match(segment)
+            if not assigned:
+                continue
+            # A re-assignment from anything else CLEARS the name. Leaving it set would credit every
+            # later expansion of a common name to one long-dead substitution, which is the shape
+            # that makes a widened predicate red innocent files.
+            if check_substitution(assigned.group(2)):
+                forked.add(assigned.group(1))
+            else:
+                forked.discard(assigned.group(1))
         loop = bool(DONE.search(line))
         if loop and PROCESS_SUB.search(line):
             found["procsub"].append((i + 1, "<("))
         if HERESTRING in line:
-            if check_substitution(line.split(HERESTRING, 1)[1]):
+            tail = line.split(HERESTRING, 1)[1]
+            if check_substitution(tail):
                 found["loop-herestring-sub" if loop else "herestring-sub"].append((i + 1, HERESTRING))
+            elif loop and forked.intersection(EXPANSION.findall(tail)):
+                found["loop-var-sub"].append((i + 1, HERESTRING))
             i += 1
             continue
         match = HEREDOC.search(line)
@@ -193,9 +249,16 @@ def scan_file(text: str) -> dict[str, list[tuple[int, str]]]:
             continue
         dash, quote, tag = match.group(1), match.group(2), match.group(3)
         body, end = extract_heredoc_body(lines, i, dash, tag)
-        carries = not quote and check_substitution("\n".join(body))
-        if loop:
-            found["loop-heredoc-sub" if carries else "loop-heredoc-plain"].append((i + 1, tag))
+        text_body = "\n".join(body)
+        carries = not quote and check_substitution(text_body)
+        if loop and carries:
+            found["loop-heredoc-sub"].append((i + 1, tag))
+        elif loop and not quote and forked.intersection(EXPANSION.findall(text_body)):
+            # A QUOTED DELIMITER EXPANDS NOTHING, so `$var` in it is four characters of data and the
+            # `not quote` guard is what keeps this from reading them as a feed.
+            found["loop-var-sub"].append((i + 1, tag))
+        elif loop:
+            found["loop-heredoc-plain"].append((i + 1, tag))
         elif carries:
             found["heredoc-sub"].append((i + 1, tag))
         i = end if end > i else i + 1
@@ -370,6 +433,53 @@ def run_selftest() -> int:
              ["loop-heredoc-sub"]), 0)
     test("an unterminated heredoc still reports rather than swallowing the file",
          len(scan_file("while read x; do :; done <<NEVER\n$(ls)\n")["loop-heredoc-sub"]), 1)
+
+    # ---- the ONE-HOP FOLLOW, with its near misses in the same file ------------------------------
+    # The fixture carries the hit and every innocent neighbour that shares its shape, so an arm
+    # cannot pass by grading nothing: the same run must name two of these seven and not the others.
+    widened = "\n".join([
+        "v=$(git log --format=%H)",
+        "while IFS= read -r a; do echo $a; done <<VARHIT",
+        "$v",
+        "VARHIT",
+        "p=\"a literal\"",
+        "while IFS= read -r b; do echo $b; done <<VARPLAIN",
+        "$p",
+        "VARPLAIN",
+        "w=$(git ls-files)",
+        "w=$STATIC",
+        "while IFS= read -r c; do echo $c; done <<CLEARED",
+        "$w",
+        "CLEARED",
+        "while IFS= read -r d; do echo $d; done <<'VARQUOTED'",
+        "$v",
+        "VARQUOTED",
+        "cat <<VARNOTALOOP",
+        "$v",
+        "VARNOTALOOP",
+        "while IFS= read -r e; do echo $e; done <<< \"$v\"",
+        "two=$v",
+        "while IFS= read -r f; do echo $f; done <<TWOHOP",
+        "$two",
+        "TWOHOP",
+        "",
+    ])
+    widened_seen = scan_file(widened)
+    test("a loop fed over a variable assigned from a substitution is named, heredoc and here-string",
+         [d for _l, d in widened_seen["loop-var-sub"]], ["VARHIT", HERESTRING])
+    # THE CONTROL, and it is four claims in one list: a plain value is not followed, a name
+    # re-assigned from a literal is CLEARED, a quoted delimiter expands nothing, and a value two
+    # hops from its substitution is a documented MISS rather than a silent one.
+    test("the innocent neighbours in that same file stay near misses",
+         [d for _l, d in widened_seen["loop-heredoc-plain"]], ["VARPLAIN", "CLEARED", "VARQUOTED", "TWOHOP"])
+    test("a NON-loop heredoc over a forked variable is not gated — the loop is still the population",
+         widened_seen["heredoc-sub"], [])
+    test("an assignment sharing the opener's line still feeds it",
+         [d for _l, d in scan_file("x=$(ls); while read y; do :; done <<SAME\n$x\nSAME\n")
+          ["loop-var-sub"]], ["SAME"])
+    test("an assignment written INSIDE a heredoc body is data and seeds nothing",
+         scan_file("cat <<OUTER\nv=$(ls)\nOUTER\nwhile read x; do :; done <<INNER\n$v\nINNER\n")
+         ["loop-var-sub"], [])
 
     # ---- the FALSE-POSITIVE half, which shipped without one --------------------------------------
     # A false-positive arm alone passes when the scanner goes dark, so each of the two below is

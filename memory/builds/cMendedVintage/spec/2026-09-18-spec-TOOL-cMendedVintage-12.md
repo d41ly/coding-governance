@@ -1,11 +1,12 @@
 # TOOL-cMendedVintage-12 — the brief reader stops waiting on a grandchild's write end
 
-**Status:** SPECCED · rev-1 · 2026-09-18 · node c · Tier-2 · base 859daa67 · streams tooling · order 39
+**Status:** CLOSED · rev-2 · 2026-09-18 · node c · Tier-2 · base 859daa67 · streams tooling · order 39
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-18-build-TOOL-cMendedVintage-12-acceptance-ledger.md](../build/2026-09-18-build-TOOL-cMendedVintage-12-acceptance-ledger.md) | journal | — |
 | [2026-09-18-prompt-TOOL-cMendedVintage-12-2-build-brief.md](../prompts/2026-09-18-prompt-TOOL-cMendedVintage-12-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -103,9 +104,17 @@ S4 measures what else was hiding in the same blind spot.
 
 `unattended kit gate` · `unattended skill wiring` · `shell hygiene (a loop fed by a command substitution)`
 
-New arm: `tools/unattended/unattended.test.sh` · the function over a fixture run-state file, asserted
-to return the same set and to refuse on an unwritable scratch root · the shell-hygiene registry gains
-no row, because the repaired form is not a declared exception but an absence.
+New arms: the shell-hygiene checker's own `--selftest` · the one-hop follow in both directions over a
+fixture carrying the hit and its four innocent neighbours in one file, plus the same-line assignment
+and the heredoc-body-is-data case · the assertion floor rises with them.
+
+`lib-unattended.sh` gains NO registry row, because a repaired site is an absence and not a declared
+exception. The registry DOES gain the rows the widening made visible elsewhere — see rev-2.
+
+OWED, and owed to a pass that may run a suite: the permanent arm over `read_brief_paths` itself in
+this kit's suite. It was observed by hand here, both halves, but a pass forbidden to run any suite
+cannot watch a new arm fail, and an arm whose failing case nobody has seen is an assertion about
+nothing. Writing one blind would also have grown this unit's write set past what it declared.
 
 ## 8. Open questions
 
@@ -116,6 +125,20 @@ no row, because the repaired form is not a declared exception but an absence.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-18 · amended by the building pass, from measurement, in two places section 7 had
+  guessed. FIRST, the registry. The spec said it gains no row, and that is true of the repaired
+  function and false of the tree: running the widened predicate over the tracked population — S4's
+  whole point — surfaced sites in more than twenty files that the narrow predicate had graded as near
+  misses, every one of them the declared shape and none of them this unit's to drain. They are
+  REGISTERED with a reason naming this widening, and the registry header now records that the
+  population grew because the predicate did. Each was checked against the assignment it follows and
+  none was a name re-used across a scope boundary; the alternative was a leg red at the push boundary
+  for every session until a twenty-file drain lands, which is the steady-state red that gets a gate
+  bypassed. SECOND, the permanent arm. Section 7 declared one in this kit's suite; this pass is
+  forbidden to run any suite, so it could not watch that arm fail, and it is recorded OWED rather
+  than written blind. The arms that DID land are the checker's own, where the failing case was
+  observed. The left-shift is unharmed by the swap: the class is now gated repo-wide, which is a
+  wider net than one arm over one function.
 - rev-1 · 2026-09-18 · initial draft, authored mid-build by the main loop after `--dispatch` exited
   on a one-hour bound at 11350 seconds having written nothing, three attempts having died the same
   way. Adopted under the protocol's discovery rule as a blocker between this run and its own landing.

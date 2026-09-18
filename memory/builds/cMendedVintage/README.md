@@ -157,10 +157,10 @@ ids TOOL-cMendedVintage-12
 | [TOOL-cMendedVintage-11 — the census arm resolves its launcher instead of trusting the name](spec/2026-09-17-spec-TOOL-cMendedVintage-11.md) | 36 | 2 | CLOSED | rev-1 | 2026-09-17 |
 | [DEPL-cMendedVintage-26 — the scoped-index and rename halves of the dirty-path guard](spec/2026-09-18-spec-DEPL-cMendedVintage-26.md) | 37 | 2 | SPECCED | rev-1 | 2026-09-18 |
 | [DEPL-cMendedVintage-27 — the role re-resolution keeps the three-way merge a rendered row still needs](spec/2026-09-18-spec-DEPL-cMendedVintage-27.md) | 38 | 2 | SPECCED | rev-1 | 2026-09-18 |
-| [TOOL-cMendedVintage-12 — the brief reader stops waiting on a grandchild's write end](spec/2026-09-18-spec-TOOL-cMendedVintage-12.md) | 39 | 2 | SPECCED | rev-1 | 2026-09-18 |
+| [TOOL-cMendedVintage-12 — the brief reader stops waiting on a grandchild's write end](spec/2026-09-18-spec-TOOL-cMendedVintage-12.md) | 39 | 2 | CLOSED | rev-2 | 2026-09-18 |
 <!-- /gen:build-units -->
 
-Records: 78 bound to this build, across 4 record folder(s).
+Records: 79 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-27.
 
