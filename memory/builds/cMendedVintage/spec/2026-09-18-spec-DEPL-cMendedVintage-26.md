@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-26 — the scoped-index and rename halves of the dirty-path guard
 
-**Status:** SPECCED · rev-1 · 2026-09-18 · node c · Tier-2 · base 859daa67 · streams deployer · order 37
+**Status:** CLOSED · rev-2 · 2026-09-18 · node c · Tier-2 · base 859daa67 · streams deployer · order 37
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-18-build-DEPL-cMendedVintage-26-acceptance-ledger.md](../build/2026-09-18-build-DEPL-cMendedVintage-26-acceptance-ledger.md) | journal | — |
 | [2026-09-18-prompt-DEPL-cMendedVintage-26-2-build-brief.md](../prompts/2026-09-18-prompt-DEPL-cMendedVintage-26-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -30,14 +31,19 @@ what `-24` closed.
   it never asked git about. Observed by AC1.
 - **S2** The role widening `DEPL-cMendedVintage-24` S3 made STAYS. The membership test remains
   `WRITING_DISPOSITIONS` and is not re-narrowed to the literal `table`, so the `attributes` row that
-  unit put back into the population is still graded on an in-scope run. Observed by AC2.
+  unit put back into the population is still graded wherever the run can write it — which, measured,
+  is every UNSCOPED run and no scoped one, because that row carries the `(govkit)` attribution and
+  is therefore in no `--kits` set. Observed by AC2.
 - **S3** The closing tally's two sides read ONE vintage of the receipt. `_graded_paths` is derived
   where `_receipt_paths` already is, above the write loop, so neither side can be mutated by the run
   it is grading. Observed by AC4 and AC5.
 - **S4** `tools/govkit/selftest.py` gains the arms: a two-kit fixture updated under `--kits` asserted
-  to reach its verdict rows, a fixture whose in-scope writing row is untracked on disk asserted to
-  refuse, an uncommitted `.gitattributes` on a scoped run asserted to refuse, and a renaming vintage
-  asserted to finish clean. Observed by AC1, AC2, AC3 and AC4.
+  to reach its verdict rows, the same recipe with an untracked `.gitattributes` asserted to pass the
+  scoped run WITHOUT a pin write and to refuse the unscoped one, an uncommitted `.gitattributes` on a
+  scoped run asserted to refuse, and a renaming vintage asserted to finish clean. Every one of those
+  runs a PRE-FIX engine pinned at an immutable sha over its own copy of the fixture first, so each
+  half of the repair is observed failing before it is observed passing. Observed by AC1, AC2, AC3 and
+  AC4; AC5 is observed by the standing `[-24] AC4` arm, which this unit must not break and does not.
 
 ## 3. Non-goals (OUT)
 
@@ -84,6 +90,20 @@ The repair is to hand the comprehension the scoped list. The membership test is 
 — `derive_graded_rows` is the one definition `-24` gave three readers, and a fourth spelling is the
 defect that unit exists to prevent — so it is applied to the scoped rows rather than to the receipt,
 by passing it a receipt view over `rows_all`.
+
+### What the narrowing gives up, measured rather than reasoned
+
+The `attributes` row is written into the receipt carrying the literal `(govkit)` attribution, and
+`--kits` keeps a row only when its `kit` is in the requested set, which that value can never be. So
+the row is not in `rows_all` on ANY scoped run — rev-1's AC2 asked for a fixture whose "in-scope
+`attributes` row" is untracked and no such fixture exists. What follows is the correct behaviour
+rather than a hole, and it is the reason this narrowing is safe: the classification loop iterates
+`rows_all` too, so on a scoped run that row is never classified, `pins_write` and `pins_drop` both
+stay None, the pin block is not rewritten, no snapshot entry is taken for it and the rollback steps
+over it. The refusal and the write arm go quiet together. What does NOT go quiet is
+`demand_claimed_paths_clean`, which grades the whole receipt and still refuses on uncommitted bytes
+at that path under any scope — which is the half of `DEPL-cMendedVintage-24` that matters, and AC3
+asserts it on a scoped run.
 
 Restoring the BASE predicate verbatim is not the fix, and the reason is the half of `-24` that was
 right. BASE filtered on `UPDATE_ROLE.get(...) == "table"`, which excludes the `pins` disposition.
@@ -155,9 +175,12 @@ derivation is the same size of diff and closes the class.
 ## 5. Production-readiness checklist
 
 - security — both repairs affect whether gov writes over bytes it does not own. S1 STRICTLY relaxes a
-  refusal, so it is stated plainly: an untracked file shadowing an out-of-scope row stops being
-  refused over. That row is never written on this run, so nothing is exposed; the case that matters
-  stays covered by the precondition, which S1 deliberately leaves unscoped.
+  refusal, so it is stated plainly: on a scoped run, an untracked file shadowing an out-of-scope row
+  — including gov's own `.gitattributes`, which is out of scope on every such run — stops being
+  refused over. Those rows are never classified and never written on that run, so the relaxation and
+  the write arm move together and nothing is exposed; AC2 asserts that pairing rather than the
+  relaxation alone. The case that matters stays covered by the precondition, which S1 deliberately
+  leaves unscoped.
 - perf / scale — S1 removes an unscoped receipt walk on every run. S3 moves one derivation earlier
   and adds no read. Neither adds a git invocation.
 - error / empty / loading states — a receipt with no `files` list yields an empty population on both
@@ -187,11 +210,17 @@ derivation is the same size of diff and closes the class.
   passes for the reason it always did and the scoped defect goes unobserved.
   fixture: two kits in one receipt, at least one out-of-scope row committed and on disk; the tree
   holds no such fixture today and S4 builds it.
-- **AC2** — When the fixture's IN-SCOPE `attributes` row has an untracked file at its path, the same
-  `update --write` invocation REFUSES naming that path and exits non-zero. Red when: the repair
-  re-narrows the membership test to `table`, which drops the pins row from the population and reopens
-  what `DEPL-cMendedVintage-24` S3 closed — and which a fixture using only an engine row could never
-  tell apart from a correct run.
+- **AC2** — When the fixture's `.gitattributes` is present in the worktree and absent
+  from the index,
+  `python tools/govkit/govkit.py update --target <fixture> --kits <one-kit> --write`
+  neither refuses over that path NOR writes the pin block there, and the same recipe run UNSCOPED
+  REFUSES naming it and exits non-zero. Both halves are one criterion because either alone reports on
+  half a behaviour: the first says the narrowing does not leave a writable row unguarded, the second
+  says the wider role set is intact. Red when: the repair re-narrows the membership test to `table`,
+  which drops the pins row from the population and reopens what `DEPL-cMendedVintage-24` S3 closed —
+  the unscoped half reds on exactly that, and a fixture using only an engine row could never tell it
+  apart from a correct run. rev-1 asked for an "IN-SCOPE `attributes` row" and no such row can exist:
+  section 4 records the measurement.
 - **AC3** — When the operator has uncommitted bytes in `.gitattributes` at a path the receipt claims
   and the run passes `--kits` naming a kit that row does not belong to,
   `python tools/govkit/govkit.py update --target <fixture> --kits <other-kit> --write`
@@ -204,28 +233,38 @@ derivation is the same size of diff and closes the class.
   fixture's two blobs fall below the similarity floor, so the verdict is `withdrawn` rather than
   `renamed`, the tally is never handed an old spelling, and the arm passes without reaching the
   defect.
-  figure: the similarity the fixture must clear is DERIVED from `RENAME_SIMILARITY_PERCENT` at
-  fixture-build time, never pinned as a literal in the arm.
+  figure: rev-2 removes the figure rather than deriving it. The fixture renames with NO content edit,
+  so its similarity is 100% by construction and clears whatever `RENAME_SIMILARITY_PERCENT` declares
+  without reading it — which is strictly stronger than a fraction computed off that constant, and
+  pins no literal either. A liveness arm asserts the run really printed a `renamed` verdict, so the
+  red-when is closed by observation rather than by arithmetic.
 - **AC5** — When a staged break makes a writing arm write a receipt-claimed path whose role is NOT in
-  the declared set, the closing self-audit still `r.fail`s naming that path. Red when: the repair
-  widens `_graded_paths` to every receipt row instead of re-vintaging it, which makes the tally
-  unfalsifiable while looking exactly like a fix for the rename.
+  the declared set, `python tools/govkit/govkit.py update --target <fixture> --write` still has its
+  closing self-audit `r.fail` naming that path. Red when: the repair widens `_graded_paths` to every
+  receipt row instead of re-vintaging it, which makes the tally unfalsifiable while looking exactly
+  like a fix for the rename. No new arm: the standing `[-24] AC4` arm stages exactly this break and
+  reds on exactly that widening, so a second one would be a copy, and this unit's obligation is that
+  it still holds.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix`
 
 New arm: `tools/govkit/selftest.py` · a two-kit fixture updated under `--kits` with an out-of-scope
-tracked row, the same fixture with an untracked in-scope pins row, a dirty `.gitattributes` outside
-the scope, and a renaming vintage · no assertion floor moves, because nothing here adds or removes a
-refusal branch and the `BRANCH_PIN` floor in `tools/govkit/refusal_join.py` is re-derived only when
-the branch count changes.
+tracked row, the same recipe with an untracked `.gitattributes` run both scoped and unscoped, a dirty
+`.gitattributes` outside the scope, and a renaming vintage · every half also run under a PRE-FIX
+engine taken from an immutable sha, over its own copy of the fixture · no assertion floor moves,
+because nothing here adds or removes a refusal branch and the `BRANCH_PIN` floor in
+`tools/govkit/refusal_join.py` is re-derived only when the branch count changes.
 
-Two fixture constructions are load bearing. The scoped fixture's out-of-scope row must be COMMITTED
+Three fixture constructions are load bearing. The scoped fixture's out-of-scope row must be COMMITTED
 and present on disk: an untracked one reproduces the refusal for the honest reason, and an absent one
-fails the `is_file` conjunct, so either makes AC1 grade nothing. And AC5's break must be staged into
-the dispatch rather than into the tally — editing `_graded_paths` to reproduce the symptom tests the
-guard against itself, which is the shape §7 of the charter names as no guard at all.
+fails the `is_file` conjunct, so either makes AC1 grade nothing. The pre-fix engine is pinned to a
+literal sha and never to `HEAD`, for the reason `-14` AC8 records and `-24` paid for: written against
+`HEAD` these arms grade the fixed engine against itself the moment this unit's commit lands. And
+AC5's break must be staged into the dispatch rather than into the tally — editing `_graded_paths` to
+reproduce the symptom tests the guard against itself, which is the shape §7 of the charter names as
+no guard at all.
 
 ## 8. Open questions
 
@@ -235,17 +274,37 @@ guard against itself, which is the shape §7 of the charter names as no guard at
   already implies. The recommendation is NO for this unit: the print is a judgment about output
   volume on a verb an owner reads often, the repair does not depend on it, and adding it here couples
   a behaviour change to a regression fix.
+  RESOLVED (agent, 2026-09-18, delegated): NO, as recommended and for the reason given. The runbook
+  paragraph this unit adds carries the same fact to the reader who needs it at no per-run output
+  cost, which is what made the print easy to decline rather than merely deferred.
 - **Q2 — does the precondition's unscoped population deserve its own unit?** An adopter with
   uncommitted work in a kit they did not name is refused by a run that would not have touched it.
   That is a real over-refusal, it is not this defect, and section 3 rules it out of scope. The
   recommendation is to file it as a backlog row rather than to grow this unit, because deciding it
   needs the rollback's snapshot population read end to end and that is a separate reading.
+  RESOLVED (agent, 2026-09-18, delegated): NOT THIS UNIT, and not filed by this pass either — the
+  write set declared for it names no backlog file, and widening a declaration to carry an unrelated
+  row is the shape the dispatch gate exists to refuse. The durable record is section 3's non-goal
+  plus this question, both of which land in this commit; the build's wrap-up is where a row belongs.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-18 · initial draft, authored from the read-only attribution that reverted
   `DEPL-cMendedVintage-24`'s two predicates in a throwaway clone and measured 68 red falling to 45
   with no unrelated regressions.
+- rev-2 · 2026-09-18 · written by the build pass, after measuring. FOUR amendments, all from the
+  same reading. (1) AC2 asked for a fixture whose "IN-SCOPE `attributes` row" is untracked, and no
+  such fixture can be built: that row carries the `(govkit)` attribution, so it is in no `--kits`
+  set. AC2 becomes the PAIRED observation — a scoped run neither refuses over it nor writes the pin
+  block, and the unscoped run over the same recipe still refuses — which observes S2 and makes the
+  narrowing's give-up honest instead of unstated. Section 4 gains the measurement and section 5's
+  security bullet states the relaxation in the terms it actually has. (2) AC4's `figure:` is removed
+  rather than derived: the fixture renames with no content edit, so its similarity is 100% by
+  construction and clears any floor without reading one. (3) AC5 gets no new arm, because the
+  standing `[-24] AC4` arm stages exactly its break and reds on exactly its red-when; the obligation
+  is that it still holds, and it does. (4) S4 and section 7 record that every half also runs a
+  PRE-FIX engine pinned at `60bd6a4d` over its own copy of the fixture, so both defects are observed
+  FAILING before they are observed fixed.
 
 ## 10. Reuse audit
 

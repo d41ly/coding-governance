@@ -8074,6 +8074,180 @@ user_skills = "/tmp/gk-fake-skills"
               "fired on a write rather than on an empty set",
               "wrote the lf-pin block" in _o24x, _o24x[-1200:])
 
+        # ===== DEPL-cMendedVintage-26 — THE TWO PREDICATES `-24` HANDED THE WRONG POPULATION =====
+        #
+        # Both halves of `-24` shipped reading a population one step away from the one they grade,
+        # and both are shipped-behaviour regressions any adopter reaches rather than latent holes.
+        # The shadow refusal walked the WHOLE receipt while its index read covered only the
+        # `--kits`-scoped rows, so every scoped `update` refused naming files the target had tracked
+        # all along. The closing tally compared a POST-run receipt against a PRE-run snapshot, so a
+        # rename put the old spelling in one side and not the other and every renaming vintage
+        # exited 1 on a finding it invented about itself.
+        #
+        # ONE PRE-FIX ENGINE COVERS BOTH, because both defects sit in the same shipped blob, and it
+        # is pinned to an IMMUTABLE SHA for `-14` AC8's reason: written against `HEAD` these arms
+        # are true only until this unit's own commit lands and then grade the fixed engine against
+        # itself. `60bd6a4d` was this unit's parent. The liveness arm proves the blob carries both
+        # defects rather than trusting the sentence, and it proves the shipped engine carries
+        # neither — the second half is what stops this pair passing over an unchanged file.
+        _PRE26_SHA = "60bd6a4d12669a844b436cefc11f99ed5d2754d4"
+        _p26 = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+                               f"{_PRE26_SHA}:tools/govkit/govkit.py"], capture_output=True).stdout
+        _now26 = GOVKIT.read_bytes()
+        # THE TALLY HALF IS A POSITION, not a string: the defect is WHERE the derivation sits
+        # relative to the write loop, so the liveness test is an ordering over the two anchors and
+        # not the presence of a line either engine carries.
+        check("[-26] LIVENESS the pre-fix engine really came out of git and carries BOTH shipped "
+              "defects — the shadow comprehension walks the whole receipt, and the tally's graded "
+              "side is derived BELOW the write loop",
+              len(_p26) > 100000 and b"for w in derive_graded_rows(receipt)" in _p26
+              and _p26.index(b"_graded_paths") > _p26.index(b"written_paths = (set(changed)"),
+              str(len(_p26)))
+        check("[-26] LIVENESS ...and the engine under test carries NEITHER, or every arm below "
+              "grades two copies of one behaviour",
+              b"for w in derive_graded_rows(receipt)" not in _now26
+              and _now26.index(b"_graded_paths") < _now26.index(b"written_paths = (set(changed)"),
+              "")
+
+        # ---- AC1, AC2, AC3. ONE TWO-KIT RECIPE. The second kit is the whole fixture: with one kit
+        # ---- in the receipt a `--kits` run scopes to everything and the defect cannot appear.
+        _g26, _ = build_verify_gov("scope26", {
+            "demo": {"extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+                              'why = "the fixture pin, so the receipt carries an attributes row"\n\n',
+                     "files": {"conf.txt": _14_CONF_A}},
+            "sib": {"files": {"conf.txt": _14_CONF_A}},
+        })
+        (_g26 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+                                                          newline="\n")
+        (_g26 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_g26, "add", "-A")
+        git(_g26, "commit", "-qm", "B")
+        _to26 = gout(_g26, "rev-parse", "HEAD").strip()
+        _g26pre = tmp / "v26-scope-gov-pre"
+        shutil.copytree(_g26, _g26pre)
+        (_g26pre / "tools" / "govkit" / "govkit.py").write_bytes(_p26)
+
+        _t26p = build_verify_target(_g26, "scope26-pre", ["demo", "sib"])
+        _t26n = build_verify_target(_g26, "scope26-now", ["demo", "sib"])
+        _rec26 = json.loads(
+            (_t26n / ".governance" / "install.json").read_text(encoding="utf-8"))
+        _out26 = [f["path"] for f in _rec26.get("files") or [] if str(f.get("kit")) == "sib"]
+        # THE OUT-OF-SCOPE ROWS MUST BE COMMITTED AND ON DISK. An untracked one reproduces the
+        # refusal for the HONEST reason and an absent one fails the `is_file` conjunct, so either
+        # makes this arm grade nothing at all.
+        check("[-26] AC1 LIVENESS the out-of-scope rows are COMMITTED and present on disk, or the "
+              "pre-fix refusal below reproduces for a reason that is not this defect",
+              bool(_out26) and all((_t26n / p).is_file() for p in _out26)
+              and all(p in gout(_t26n, "ls-files").split() for p in _out26), str(_out26))
+        _u26p = run_in_gov(_g26pre, "update", "--target", str(_t26p), "--to", _to26,
+                           "--kits", "demo", "--write")
+        _o26p = _u26p.stdout + _u26p.stderr
+        check("[-26] AC1 the PRE-FIX engine REFUSES the scoped run, naming a path this target has "
+              "tracked all along — the finding, observed rather than asserted",
+              _u26p.returncode != 0 and "present in the target's WORKTREE" in _o26p
+              and any(p in _o26p for p in _out26), f"rc={_u26p.returncode} " + _o26p[-1500:])
+        _u26n = run_in_gov(_g26, "update", "--target", str(_t26n), "--to", _to26,
+                           "--kits", "demo", "--write")
+        _o26n = _u26n.stdout + _u26n.stderr
+        check("[-26] AC1 LIVENESS the run really was SCOPED, or it is the unscoped case where the "
+              "read and the row population already cover the same paths",
+              any(ln.startswith("govkit update — scope: --kits") for ln in _o26n.split("\n")),
+              _o26n[:1500])
+        check("[-26] AC1 this engine reaches its per-row verdicts and does NOT refuse",
+              _u26n.returncode == 0 and "present in the target's WORKTREE" not in _o26n
+              and "tools/demo/conf.txt" in _o26n, f"rc={_u26n.returncode} " + _o26n[-2000:])
+
+        # AC2 — THE ROLE WIDENING STAYS, and the narrowing's give-up is PAIRED with the write arm.
+        # The `attributes` row carries the `(govkit)` attribution, so it is in no `--kits` scope:
+        # after this repair a scoped run neither refuses over an untracked file at that path nor
+        # writes the pin block there, and those two facts are asserted together because either one
+        # alone would be a report on half a behaviour. The unscoped half is what reds if the repair
+        # re-narrows the membership test to `table` and reopens what `-24` S3 closed.
+        _t26s: dict[str, pathlib.Path] = {}
+        for _n26 in ("scoped", "unscoped"):
+            _tt = build_verify_target(_g26, "shadow26-" + _n26, ["demo", "sib"])
+            git(_tt, "rm", "-q", "--cached", ".gitattributes")
+            git(_tt, "commit", "-qm", "the operator untracks the attributes file")
+            check("[-26] AC2 LIVENESS the shadow fixture holds .gitattributes present in the "
+                  "worktree and absent from the index",
+                  (_tt / ".gitattributes").is_file()
+                  and ".gitattributes" not in gout(_tt, "ls-files").split(),
+                  gout(_tt, "status", "--porcelain"))
+            _t26s[_n26] = _tt
+        _u26s = run_in_gov(_g26, "update", "--target", str(_t26s["scoped"]), "--to", _to26,
+                           "--kits", "demo", "--write")
+        _o26s = _u26s.stdout + _u26s.stderr
+        check("[-26] AC2 a SCOPED run neither refuses over that untracked file nor writes the pin "
+              "block — the relaxation and the write arm move together",
+              "present in the target's WORKTREE" not in _o26s
+              and "wrote the lf-pin block" not in _o26s,
+              f"rc={_u26s.returncode} " + _o26s[-2000:])
+        _u26u = run_in_gov(_g26, "update", "--target", str(_t26s["unscoped"]), "--to", _to26,
+                           "--write")
+        _o26u = _u26u.stdout + _u26u.stderr
+        check("[-26] AC2 the UNSCOPED run over the same recipe still REFUSES naming it — the wider "
+              "role set `-24` put back is intact, and no block was written",
+              _u26u.returncode != 0 and "present in the target's WORKTREE" in _o26u
+              and ".gitattributes" in _o26u and "wrote the lf-pin block" not in _o26u,
+              f"rc={_u26u.returncode} " + _o26u[-2000:])
+
+        # AC3 — THE DIRTY-PATH PRECONDITION DOES NOT NARROW WITH THE REFUSAL. It asks a different
+        # question — has the operator uncommitted bytes where gov claims a path — and the answer
+        # matters beyond this run, because the rollback restores a pre-run index entry through a
+        # `checkout-index -f` that unlinks first. This arm reds if a builder makes the two agree.
+        _t26d = build_verify_target(_g26, "dirty26", ["demo", "sib"])
+        _ga26 = _t26d / ".gitattributes"
+        _own26 = "# the operator's own rule, uncommitted\n*.bin binary\n"
+        _ga26.write_text(read_text14(_ga26) + _own26, encoding="utf-8", newline="\n")
+        _b26 = read_bytes14(_ga26)
+        check("[-26] AC3 LIVENESS the attributes path is tracked AND genuinely dirty, or the "
+              "refusal below is about some other state",
+              ".gitattributes" in gout(_t26d, "diff", "--name-only"),
+              gout(_t26d, "status", "--porcelain"))
+        _u26d = run_in_gov(_g26, "update", "--target", str(_t26d), "--to", _to26,
+                           "--kits", "sib", "--write")
+        _o26d = _u26d.stdout + _u26d.stderr
+        _dl26 = [ln for ln in _o26d.split("\n") if "receipt claims are DIRTY" in ln]
+        check("[-26] AC3 a run scoped to a kit that row does NOT belong to still refuses on the "
+              "dirty path, its line names it, and the operator's bytes survive",
+              _u26d.returncode != 0 and len(_dl26) == 1 and ".gitattributes" in _dl26[0]
+              and "wrote the lf-pin block" not in _o26d and read_bytes14(_ga26) == _b26,
+              f"rc={_u26d.returncode} lines={_dl26} " + _o26d[-1500:])
+
+        # ---- AC4. THE RENAMING VINTAGE. The rename carries NO content edit, so its similarity is
+        # ---- 100% by construction and no floor this engine declares can turn the verdict into a
+        # ---- withdrawal — which is the criterion's red-when, closed by the fixture's shape rather
+        # ---- than by a figure copied out of a constant.
+        _g26r, _ = build_verify_gov("rename26", {
+            "demo": {"files": {"moved.txt": _14_MOVED, "conf.txt": _14_CONF_A}},
+        })
+        _t26rn = build_verify_target(_g26r, "rename26-now", ["demo"])
+        _t26rp = build_verify_target(_g26r, "rename26-pre", ["demo"])
+        git(_g26r, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+        git(_g26r, "add", "-A")
+        git(_g26r, "commit", "-qm", "B")
+        _to26r = gout(_g26r, "rev-parse", "HEAD").strip()
+        _g26rp = tmp / "v26-rename-gov-pre"
+        shutil.copytree(_g26r, _g26rp)
+        (_g26rp / "tools" / "govkit" / "govkit.py").write_bytes(_p26)
+        _u26rp = run_in_gov(_g26rp, "update", "--target", str(_t26rp), "--to", _to26r, "--write")
+        _o26rp = _u26rp.stdout + _u26rp.stderr
+        check("[-26] AC4 the PRE-FIX engine exits non-zero over a renaming vintage on the tally's "
+              "own `never graded` finding — a run reporting a defect about itself",
+              _u26rp.returncode != 0 and "never graded" in _o26rp,
+              f"rc={_u26rp.returncode} " + _o26rp[-2000:])
+        _u26rn = run_in_gov(_g26r, "update", "--target", str(_t26rn), "--to", _to26r, "--write")
+        _o26rn = _u26rn.stdout + _u26rn.stderr
+        _ro26 = [ln.split()[-1] for ln in _o26rn.split("\n")
+                 if ln.split() and ln.split()[0] == "renamed"]
+        check("[-26] AC4 LIVENESS the run really reported a rename, or the tally was never handed "
+              "an old spelling and the arm passes over an absence",
+              len(_ro26) >= 1, _o26rn[-2000:])
+        check("[-26] AC4 this engine exits 0 and its closing self-audit reports NO ungraded "
+              "receipt-claimed path",
+              _u26rn.returncode == 0 and "never graded" not in _o26rn,
+              f"rc={_u26rn.returncode} " + _o26rn[-2000:])
+
         # ============================================================ DEPL-dCarriedReceipt-13
         # `govkit adopt` — the receipt bootstrap. Every arm below runs against a SCRATCH gov with a
         # real multi-commit history, because attribution is a question about history and a

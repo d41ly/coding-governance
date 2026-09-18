@@ -155,12 +155,12 @@ ids TOOL-cMendedVintage-12
 | [DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write](spec/2026-09-17-spec-DEPL-cMendedVintage-24.md) | 34 | 2 | CLOSED | rev-3 | 2026-09-17 |
 | [DEPL-cMendedVintage-25 — the renormalize cleanliness guard reads paths, not whitespace tokens](spec/2026-09-17-spec-DEPL-cMendedVintage-25.md) | 35 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [TOOL-cMendedVintage-11 — the census arm resolves its launcher instead of trusting the name](spec/2026-09-17-spec-TOOL-cMendedVintage-11.md) | 36 | 2 | CLOSED | rev-1 | 2026-09-17 |
-| [DEPL-cMendedVintage-26 — the scoped-index and rename halves of the dirty-path guard](spec/2026-09-18-spec-DEPL-cMendedVintage-26.md) | 37 | 2 | SPECCED | rev-1 | 2026-09-18 |
+| [DEPL-cMendedVintage-26 — the scoped-index and rename halves of the dirty-path guard](spec/2026-09-18-spec-DEPL-cMendedVintage-26.md) | 37 | 2 | CLOSED | rev-2 | 2026-09-18 |
 | [DEPL-cMendedVintage-27 — the role re-resolution keeps the three-way merge a rendered row still needs](spec/2026-09-18-spec-DEPL-cMendedVintage-27.md) | 38 | 2 | SPECCED | rev-1 | 2026-09-18 |
 | [TOOL-cMendedVintage-12 — the brief reader stops waiting on a grandchild's write end](spec/2026-09-18-spec-TOOL-cMendedVintage-12.md) | 39 | 2 | CLOSED | rev-2 | 2026-09-18 |
 <!-- /gen:build-units -->
 
-Records: 79 bound to this build, across 4 record folder(s).
+Records: 80 bound to this build, across 4 record folder(s).
 
 Ids no record names: DEPL-cMendedVintage-27.
 

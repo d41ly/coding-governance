@@ -6795,8 +6795,32 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- this would keep the two carve-outs pointing at each other across a row neither covers:
     # ---- `dirty_claimed_paths` hands the untracked case to THIS refusal by name, and the rollback's
     # ---- absent-entry arm unlinks a file the operator wrote.
+    # ---- DEPL-cMendedVintage-26 S1. THE ROWS THIS GRADES ARE THE ROWS THE READ ABOVE COVERS.
+    # ---- `-24` moved the membership test onto the declared set and left the comprehension walking
+    # ---- the WHOLE receipt, while the read takes its path list from the `--kits`-narrowed
+    # ---- `rows_all`. So `index_present` only ever held scoped paths, `not in index_present` was
+    # ---- true for every out-of-scope writing row BY CONSTRUCTION, and a scoped `update` refused
+    # ---- naming files the target has tracked all along -- sending the operator to `git add` a file
+    # ---- that was already added. Measured at the commit boundary on a two-kit target: the parent
+    # ---- exits 0 over the same tree and `-24`'s own commit exits 2 over two committed paths.
+    # ----
+    # ---- NARROWING IS THE CORRECT DIRECTION AND NOT MERELY THE CHEAP ONE. The classification loop
+    # ---- below iterates `rows_all` too, so an out-of-scope row is never classified, never
+    # ---- dispatched and never written. This refusal asks whether the WRITE ARM would clobber an
+    # ---- untracked file, and the write arm cannot reach a row this list does not carry. Widening
+    # ---- the read instead would pay a second chunked `ls-files` on every scoped run to refuse over
+    # ---- a hazard that run cannot create, which is the tax the header above argues against.
+    # ----
+    # ---- WHAT IT GIVES UP, plainly: the `attributes` row carries the `(govkit)` attribution and so
+    # ---- is in NO `--kits` scope, so a scoped run no longer refuses over an untracked file at that
+    # ---- path. The same narrowing keeps the pin write out of that run, so the relaxation and the
+    # ---- write arm move together; the dirty-path precondition, which grades the whole receipt,
+    # ---- deliberately does NOT narrow with them.
+    # ----
+    # ---- `derive_graded_rows` IS STILL THE ONE DEFINITION: it is handed a receipt VIEW over the
+    # ---- scoped rows, never a fourth membership test spelled inline.
     index0, index_present = index_read(target, [w["path"] for w in rows_all])
-    shadowed = sorted(w["path"] for w in derive_graded_rows(receipt)
+    shadowed = sorted(w["path"] for w in derive_graded_rows({"files": rows_all})
                       if w["path"] not in index_present and (target / w["path"]).is_file())
     if shadowed:
         raise Refusal(
@@ -7524,6 +7548,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # DIFFERENT fact from "not looked up", which is why the lookup is materialised per row here
     # rather than deferred to a `.get` at restore time.
     _receipt_paths = {w["path"] for w in rows_all}
+    # DEPL-cMendedVintage-26 S3. THE CLOSING TALLY'S GRADED SIDE IS TAKEN HERE, beside the snapshot
+    # it is compared against, so both sides of that comparison speak ONE vintage of the receipt.
+    # `-24` derived it below the write loop, off the receipt as that loop left it. The rename arm
+    # rewrites `row["path"]` in place and puts BOTH spellings into `written_paths`, so the OLD path
+    # sat in this snapshot, in the written set, and absent from a post-run derivation -- which is
+    # precisely the conjunction the tally reports, so every renaming vintage exited 1 on a finding
+    # the run invented about itself. The precondition this tally grades AGAINST ran before the loop:
+    # asking it about a path the loop invented is asking a question it has no answer to.
+    _graded_paths = {row.get("path") for row in derive_graded_rows(receipt)}
     _extra = sorted({p for s in snap_rows for p in s["paths"] if p not in _receipt_paths})
     _index_extra: dict[str, tuple[str, str]] = {}
     if _extra:
@@ -8468,7 +8501,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # WHAT IT DOES NOT SEE: a kit's declared `[[regenerate]]` argv writes target-side under its own
     # authority, keyed on the kit rather than on a receipt row, and its destinations never enter
     # `written_paths` — so this tally is silent about them and so is the precondition.
-    _graded_paths = {row.get("path") for row in derive_graded_rows(receipt)}
+    # DEPL-cMendedVintage-26 S3. `_graded_paths` IS NOT DERIVED HERE. Both sides of this comparison
+    # are taken above the write loop, beside each other, for the reason recorded there.
     _ungraded = sorted(p for p in written_paths
                        if p in _receipt_paths and p not in _graded_paths)
     if _ungraded:

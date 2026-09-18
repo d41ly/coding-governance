@@ -1088,6 +1088,15 @@ named kits' rows, so an order belonging to a row it never looked at is not stale
 and removing it would destroy the only record that that row is still conflicted. Widen the scope, or
 run unscoped, if you want the outbox tidied.
 
+**A scoped run guards exactly the rows it can write, which is why it and a full run can disagree
+about one target.** The refusal over a file that is present in your worktree and missing from your
+index covers the named kits' rows only: a row outside the scope is never classified and never
+written, so nothing there can be clobbered and nothing there is refused over. Gov's own
+`.gitattributes` row belongs to no kit, so a scoped run neither rewrites its LF-pin block nor stands
+in front of it; run unscoped to get both. The separate refusal over **uncommitted bytes** at a
+claimed path is not scoped and never was — it protects work you have not committed, which a rollback
+can destroy whichever kits this run named.
+
 The first unscoped `--write` after you pull this vintage will remove every conflict order written by
 an earlier one, because those carry the old filename key. Any whose conflict is still open is
 rewritten by the same run under the new key before the reap runs, so you are never left without one.
