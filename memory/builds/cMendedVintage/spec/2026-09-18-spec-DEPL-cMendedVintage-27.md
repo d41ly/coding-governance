@@ -29,6 +29,13 @@ reconciliation and a move to `project-owned` keeps standing back.
   a disposition that puts no bytes at that destination in this run. A move whose current role routes
   to `adopter` — the kit's declared `[[regenerate]]` argv — does not stand back. Observed by AC1,
   AC2 and AC4.
+  rev-2: "CURRENT" here means the role gov's descriptor declares NOW, which is the `now` the
+  re-resolution just computed, and never the role the receipt recorded. Section 4 always meant that —
+  it enumerates `project-owned`, `generated` and `rendered`, which are the roles a row MOVES to — but
+  the word reads either way, and a reader taking it as the recorded role would write
+  `UPDATE_ROLE[role]`, which is `table` for every row this branch can reach and would stand back from
+  none of them. Said here rather than left to the design section, because this is the sentence an
+  implementer reads first.
 - **S2** A row that does not stand back keeps the disposition of the role it LANDED under, not the
   disposition of the role gov declares now. For the measured transition that is `table`, which is
   what reaches `classify_row`, the grid, the three-way and the `diverged and the three-way conflicts`

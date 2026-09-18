@@ -62,6 +62,15 @@ No refusal against the regenerate, and no gate on the worktree overwrite. Both a
 non-goal. Declining a kit's declared argv over a moved row removes the conflict path instead of
 restoring it, which is the state this unit exists to leave.
 
+**One other half is knowingly left standing, and this is where it is named.** The migration
+fixture's own header still predicts that the two `PRECONDITION` arms flip when the durable repair
+lands. They do not flip here, for the reason given above, so that sentence is now a stale claim a
+reader will trust. It is left because the file it sits in is a suite this pass is forbidden to run
+and whose arm population is itself gated by a count — a comment edit there is cheap to write and
+cannot be verified from inside this unit. The repair belongs in the unit that retires the migration,
+which is where the prediction finally comes true; until then the explanation lives in the spec's
+section 4 and in this ledger, and this paragraph is the pointer a reader who found the header needs.
+
 **Evidences:** DEPL-cMendedVintage-27
 
 - AC1 — `python tools/govkit/govkit.py update --target <fixture> --write` against a scratch target
