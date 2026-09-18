@@ -75,6 +75,10 @@ what `-24` closed.
 
 ### The two populations, and which one the write arm can reach
 
+*Every line number in this section is where the code sat at rev-1, which is BEFORE this unit's own
+diff. They are a reading aid for that vintage and are stale by construction the moment the repair
+lands; the symbol names beside them are what a later reader should grep for.*
+
 At `tools/govkit/govkit.py:6798` the index read takes its path list from `rows_all`, which the
 `--kits` block narrowed at about `:6697` and announced with the `scope:` line. The very next
 statement iterates `derive_graded_rows(receipt)`, which reads `receipt["files"]` and knows nothing
@@ -304,7 +308,11 @@ no guard at all.
   standing `[-24] AC4` arm stages exactly its break and reds on exactly its red-when; the obligation
   is that it still holds, and it does. (4) S4 and section 7 record that every half also runs a
   PRE-FIX engine pinned at `60bd6a4d` over its own copy of the fixture, so both defects are observed
-  FAILING before they are observed fixed.
+  FAILING before they are observed fixed. (5) Post-commit, from the diff's own bug-class checklist:
+  `demand_claimed_paths_clean`'s header claimed the two carve-outs "no longer point at each other
+  across a row neither one covers", which S1 makes half true — corrected in place rather than left,
+  because that sentence is the one a later reader will trust. Section 4's line numbers are marked as
+  a rev-1 reading aid, stale by construction the moment this repair lands.
 
 ## 10. Reuse audit
 

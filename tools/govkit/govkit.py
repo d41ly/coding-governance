@@ -5081,6 +5081,16 @@ def demand_claimed_paths_clean(target: pathlib.Path, verb: str, receipt: dict | 
     # S4's raw-write hazard than each other, and the same declared set scopes `_cmd_update`'s
     # untracked-shadow refusal, so the two carve-outs no longer point at each other across a row
     # neither one covers.
+    #
+    # DEPL-cMendedVintage-26. THAT LAST CLAUSE IS NOW HALF TRUE AND IS CORRECTED RATHER THAN LEFT.
+    # The two guards share a ROLE set and no longer share a ROW population: this one reads the whole
+    # receipt and that one reads the `--kits`-narrowed list, because it guards a WRITE ARM that reads
+    # the narrowed list too. So on a SCOPED run they do point past each other across gov's own
+    # `attributes` row -- carve-out 2 below hands the untracked case to that refusal, which no longer
+    # covers the row on that run. It is not a hole and the asymmetry is the reason: the same
+    # narrowing keeps the row out of the classification loop, so nothing writes it and there is
+    # nothing to clobber. On an UNSCOPED run, which is the one that writes the block, the original
+    # sentence holds unchanged.
     _rows = derive_graded_rows(receipt)
     # THE MARKERS ARE `lf_pin_block`'s OWN, recomputed over an empty pin set and never read off the
     # row -- that function derives the pair from `GA_BLOCK_ID` before it looks at a single pin, which
