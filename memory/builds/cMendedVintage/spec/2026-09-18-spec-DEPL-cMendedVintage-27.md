@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-27 — the role re-resolution keeps the three-way merge a rendered row still needs
 
-**Status:** SPECCED · rev-1 · 2026-09-18 · node c · Tier-2 · base 859daa67 · streams deployer · order 38
+**Status:** CLOSED · rev-2 · 2026-09-19 · node c · Tier-2 · base 859daa67 · streams deployer · order 38
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md](../build/2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md) | journal | — |
 | [2026-09-19-prompt-DEPL-cMendedVintage-27-2-build-brief.md](../prompts/2026-09-19-prompt-DEPL-cMendedVintage-27-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -96,6 +97,15 @@ the same vintage introduces the template as an unclaimed source, and that landin
 kit in the set. So the two halves are reliably in one run for exactly the case where the row is
 skipped.
 
+rev-2, MEASURED against the fixture rather than reasoned: the template does NOT put the kit in that
+set. It arrives as the `rendered` rule's own source, which is neither an acted row nor a landed one,
+and a fixture carrying nothing else built at HEAD ran no regenerate at all — so the row stood back
+AND the argv stayed silent, and the byte loss the goal describes never happened. What actually puts
+the kit in the set is any OTHER row of it that this vintage moves, which is the real shape: a
+vintage that re-roles one destination is a release that changes the kit. The permanent arm moves a
+second row of the same kit for exactly that reason, so it grades this unit's branch rather than the
+accident of which rows happened to act.
+
 ### What a row that does not stand back does
 
 It falls through to the disposition of the role it landed under. Routing it to the NEW role's
@@ -134,9 +144,17 @@ pre-migration state after a flag-off pull.
 | identifier | kind | where |
 |---|---|---|
 | `KIT_WRITING_DISPOSITIONS` | module constant | `tools/govkit/govkit.py`, beside `WRITING_DISPOSITIONS` |
+| `build_role_pair` | function | `tools/govkit/matrix.py` — rev-2 |
+| `read_verdict` | function | `tools/govkit/matrix.py` — rev-2 |
+| `run_in_gov` | function | `tools/govkit/matrix.py` — rev-2 |
 
-No function, method or type is minted. The lexicon's `py` cell grades function definitions and type
-suffixes, so no declared cell grades a module constant — stated rather than left as an absence.
+rev-2: the engine mints no function, method or type, and the line that said so for the whole unit is
+now wrong for the arm. The second fixture needs the same recipe as the first with three values
+changed, so the three closures `check_role_move` already carried were HOISTED to module level and
+take the difference as data — one fixture builder rather than two spellings of one. Each leads with
+a declared verb (`build`, `read`, `run`). The lexicon's `py` cell grades function definitions and
+type suffixes, so no declared cell grades the module constant above — stated rather than left as an
+absence.
 
 ### Alternatives rejected
 
@@ -193,24 +211,38 @@ suffixes, so no declared cell grades a module constant — stated rather than le
   that declares a regenerate, gov's descriptor now resolves that destination `rendered`, and the
   target's own copy carries an edit that conflicts with gov's bytes at the new vintage,
   `python tools/govkit/govkit.py update --target <fixture> --write`
-  refuses naming that path and the three-way conflict, and the file on disk is the target's own.
+  refuses naming that path and the three-way conflict, writes one conflict order for it, and leaves
+  the target's own bytes standing in the git directory for that path.
   Red when: the row still short-circuits at the branch, in which case the run exits 0, reports the
   move, and the kit's regenerate writes gov's render over the edit — the shipped defect, reproducible
   at HEAD before the change.
   fixture: a scratch fixture target under the run's scratch root; this repo keeps no `install.json`
   and can host no criterion in this section.
+  rev-2: the criterion used to end "and the file on disk is the target's own", which CANNOT hold and
+  is not what this unit buys. Measured on the fixture at both vintages: the kit's declared regenerate
+  runs after the row is graded and puts its render in the WORKTREE either way, so that clause is
+  green before the fix and green after it. What the fix moves is the git directory and the run's
+  own account of itself — gov writes nothing for a conflicted row, so the index entry is untouched,
+  and the run refuses, names the path and leaves an order where before it exited 0 saying nothing.
+  The worktree overwrite is the standing ceiling this unit's third non-goal declines to close, and
+  the permanent arm asserts it as a ceiling rather than leaving it unstated.
 - **AC2** — When the same fixture is built with no local edit,
   `python tools/govkit/govkit.py update --target <fixture> --write`
   takes the recorded role's raw write for that row and the target's INDEX holds gov's bytes for it
   afterwards.
   Red when: the fall-through is gated on a conflict having been found rather than on the role move,
   so an unedited row still stands back and the migration's block 1 stages nothing for it.
-- **AC3** — When the AC2 run finishes, exactly one printed line both opens with two spaces and ends
+- **AC3** — When the AC2 run of
+  `python tools/govkit/govkit.py update --target <fixture> --write`
+  finishes, exactly one printed line both opens with two spaces and ends
   with that row's path, and a further line names the role the row landed under, the role gov declares
   now and the path.
   Red when: the move is reported as a second row line, which shadows the row's own verdict for every
   reader keying on the path suffix — `read_verdict` returns the FIRST such line, and one suite arm
   asserts a single match.
+  rev-2: the criterion named its own observation only as "the AC2 run" and carried one backticked
+  token, the READER it protects, so nothing joined it to the command that makes the observation.
+  The command is now written into it.
 - **AC4** — When the existing aged fixture whose destination moved to `project-owned` is updated,
   the moved row still reports `role-moved`, gov does not put its bytes back at the destination the
   adopter emptied, and not one field of that receipt row is rewritten.
@@ -244,17 +276,35 @@ This unit adds a note and a gate on an existing branch and adds no refusal, so i
   of a `--kits`-scoped `update` through a consumer's hooks, and 103 of them were green at BASE
   (PINNED, 2026-09-18, node c). Retiring the runbook is `DEPL-dPolishedVitrine-1`'s remaining clause
   and owes a replacement for that coverage before it lands.
+  RESOLVED (agent, 2026-09-19, delegated): no. The recommendation is taken as written and the
+  migration ships. The build measured the consequence rather than assuming it: the two `PRECONDITION`
+  arms are un-flipped along with the seven, because a precondition asserting the state a live runbook
+  starts from must hold for as long as that runbook ships, and the fixture header's prediction had
+  both halves arriving together.
 - **FACT-QUESTION · Q2 — does any shipped descriptor move a destination from a landable role to one
   whose disposition is `block`?** A scan of the registry's descriptors against each adopter receipt
   decides it. RECOMMENDATION: leave the disposition test as specified, which handles such a move by
   standing back, and file the handling as a follow-up if the scan finds an instance. The test's
   answer for that pair is deliberate rather than accidental, and the scan only says whether anyone
   is living with it.
+  RESOLVED (agent, 2026-09-19, delegated): leave the test as specified, and the probe is NOT run
+  here rather than run and reported. It is defined against adopter receipts, and this repository
+  holds none — a scan of gov's descriptors alone answers a different question and would report a
+  reassuring zero for a population it never had. It runs in an adopter tree or not at all.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-18 · initial draft, authored from a read-only attribution that ran the suite at
   BASE in a throwaway clone and reverted `b52b5d80` surgically.
+- rev-2 · 2026-09-19 · built. Three corrections, each measured on the scratch fixtures rather than
+  reasoned. AC1's closing clause asked for a worktree state the kit's own regenerate makes
+  impossible at BOTH vintages, so it was rewritten onto the git directory, the refusal and the
+  order — the three things the fix actually moves — with the worktree overwrite recorded as the
+  standing ceiling the third non-goal already declines to close. Section 4's `touched_kits`
+  paragraph named the template as what puts the kit in the run's touched set; it does not, and a
+  fixture built on that claim ran no regenerate at all, so the paragraph now names the other moved
+  row and the arm moves one. The inventory's "no function is minted" became false when the second
+  fixture needed the first's recipe: three closures were hoisted to module level and are listed.
 
 ## 10. Reuse audit
 

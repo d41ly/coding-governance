@@ -369,3 +369,9 @@ base: 859daa67e728ae273d5278536fb462c04077f16f
 2026-09-18T21:17:11Z dispatch · item 434a414a DEPL-cMendedVintage-27 · reason tools/govkit/govkit.py tools/govkit/matrix.py memory/builds/cMendedVintage/spec/2026-09-18-spec-DEPL-cMendedVintage-27.md memory/builds/cMendedVintage/build/2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md
 
 2026-09-18T21:17:12Z brief · item DEPL-cMendedVintage-27 · reason efb902391f9a memory/builds/cMendedVintage/prompts/2026-09-19-prompt-DEPL-cMendedVintage-27-2-build-brief.md
+
+2026-09-18T21:25:02Z dispatch · item eff7a08f DEPL-cMendedVintage-27 · reason tools/govkit/govkit.py tools/govkit/matrix.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-18-spec-DEPL-cMendedVintage-27.md memory/builds/cMendedVintage/build/2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-18T21:43:39Z dispatch · item eff7a08f DEPL-cMendedVintage-27 · reason tools/govkit/govkit.py tools/govkit/matrix.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-18-spec-DEPL-cMendedVintage-27.md memory/builds/cMendedVintage/build/2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-18T21:52:42Z dispatch · item eff7a08f DEPL-cMendedVintage-27 · reason tools/govkit/govkit.py tools/govkit/matrix.py WIRE-INTO-PROJECT.md memory/builds/cMendedVintage/spec/2026-09-18-spec-DEPL-cMendedVintage-27.md memory/builds/cMendedVintage/build/2026-09-19-build-DEPL-cMendedVintage-27-acceptance-ledger.md memory/builds/cMendedVintage/README.md memory/LIVE.md memory/ledger/2026-09.md memory/map/generated/symbols.json

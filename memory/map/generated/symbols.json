@@ -543,6 +543,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_role_pair",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "build_rotated_re",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -3318,6 +3323,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "read_verdict",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
+    },
+    {
       "id": "read_waivers",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -4106,6 +4116,11 @@
       "id": "run_grep",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_in_gov",
+      "kind": "function",
+      "file": "tools/govkit/matrix.py"
     },
     {
       "id": "run_kill",

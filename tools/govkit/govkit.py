@@ -1662,6 +1662,16 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             r.fail(f"the declared writing set names disposition '{_wd}', which `update`'s dispatch "
                    f"maps no role to — so it selects nothing, and the guards reading that set grade "
                    f"an empty population while reporting a clean run")
+    # DEPL-cMendedVintage-27 S4. THE SAME ASSERTION OVER THE SECOND SET, written out rather than
+    # folded into the loop above, because the consequence of a typo differs and a shared message
+    # would name neither. Here an unmatched member does not empty a graded population: it empties the
+    # role-move branch's exception, so every moved row stands back again, the reconciliation this
+    # unit restored is gone, and the run that lost it reports exactly as clean as one that kept it.
+    for _kwd in KIT_WRITING_DISPOSITIONS:
+        if _kwd not in set(UPDATE_ROLE.values()):
+            r.fail(f"the declared kit-writing set names disposition '{_kwd}', which `update`'s "
+                   f"dispatch maps no role to — so no role move can match it, every moved row "
+                   f"stands back again, and a kit's own regenerate overwrites those rows unnamed")
 
     # ---- 7i: DEPL-dCarriedReceipt-8 S4/AC5. THE NO-CLOBBER GUARANTEE, asserted STRUCTURALLY over
     #          the grid rather than behaviourally over the one row that exposed it. `differs` on the
@@ -6092,6 +6102,27 @@ UPDATE_ROLE = {
 # does not reach them and the tally below cannot see them either.
 WRITING_DISPOSITIONS = ("table", "pins")
 
+# DEPL-cMendedVintage-27 S4. THE OTHER HALF OF THE SAME QUESTION, and the reason it is a SECOND name
+# rather than two more members of the set above: these dispositions put bytes at a destination in
+# this run WITHOUT any receipt row's write, so every guard that reads `WRITING_DISPOSITIONS` to mean
+# "rows this verb wrote" must keep excluding them, while the role-move branch — which asks the
+# opposite question, "will anything in this run write here anyway" — must include them.
+#
+# `adopter` is the whole membership today and the reason is the sentence directly above: a kit's
+# declared `[[regenerate]]` argv is keyed on the kit, not on a row, and standing back from the row
+# does not stand back from the argv. So a row whose descriptor has moved it to a role served by that
+# argv keeps the disposition it LANDED under: gov reconciles the operator's copy first and refuses
+# when it cannot, instead of skipping the row and letting its own regenerate overwrite the edit with
+# nothing in the run naming it. `skip`, `block`, `report` and the rest write nothing, so standing
+# back from those really does leave the file alone, which is what DEPL-cMendedVintage-19 built the
+# branch for.
+#
+# `selfcheck` arm 7g asserts every member is a disposition the dispatch maps a role to, for the same
+# reason it does above and with a sharper failure: a typo here matches no role, every moved row
+# stands back again, and the restored reconciliation disappears in silence on a run that reports
+# clean.
+KIT_WRITING_DISPOSITIONS = ("adopter",)
+
 
 def _sha(b: bytes | None) -> str | None:
     return hashlib.sha256(b).hexdigest() if b is not None else None
@@ -7049,15 +7080,41 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                            f"resolves it as '{now}' — refusing this row rather than acting on a "
                            f"role a schema-1 receipt cannot be trusted about")
                     continue
-                # S2. A DESCRIPTOR TRANSITION IS NOT A BYTE QUESTION. Nothing is written for this
-                # row, it is not counted as a change, and it never reaches `acted` — so no snapshot
-                # entry, no rollback field and no re-stamp of its role. The role stays as recorded
-                # until the operator's next `apply` re-records it, which is the verb that owns a
-                # role change. The path is the line's LAST field, because the row shape is parsed by
-                # name elsewhere and a trailing clause there has broken a reader before.
-                tally["role-moved"] = tally.get("role-moved", 0) + 1
-                print(f"  {'role-moved':<18} [{role:<13}] -> {now:<13} {row['path']}")
-                continue
+                # DEPL-cMendedVintage-27 S1. STANDING BACK ONLY PROTECTS BYTES NOTHING ELSE IN THIS
+                # RUN TOUCHES, and whether anything does is a property of the NEW role's own
+                # machinery rather than of the transition. `project-owned` and `generated` map to
+                # `skip`, so the file really is left alone; `rendered` maps to `adopter`, whose
+                # declared `[[regenerate]]` argv rewrites that same destination later in this run
+                # under the kit's authority. Skipping the row there does not save the operator's
+                # edit — it only removes gov's half of the run, the half that reconciles the edit and
+                # REFUSES when it cannot, so the edit is destroyed with no conflict, no order and no
+                # line naming it. Read off `UPDATE_ROLE` rather than written over role NAMES: a
+                # second role routed to the same argv would otherwise silently not follow, and a role
+                # whose disposition is `skip` would fall through and get gov's bytes put back at a
+                # destination gov's own rule says it never supplies.
+                if UPDATE_ROLE.get(now) not in KIT_WRITING_DISPOSITIONS:
+                    # S2. A DESCRIPTOR TRANSITION IS NOT A BYTE QUESTION. Nothing is written for this
+                    # row, it is not counted as a change, and it never reaches `acted` — so no
+                    # snapshot entry, no rollback field and no re-stamp of its role. The role stays
+                    # as recorded until the operator's next `apply` re-records it, which is the verb
+                    # that owns a role change. The path is the line's LAST field, because the row
+                    # shape is parsed by name elsewhere and a trailing clause there has broken a
+                    # reader before.
+                    tally["role-moved"] = tally.get("role-moved", 0) + 1
+                    print(f"  {'role-moved':<18} [{role:<13}] -> {now:<13} {row['path']}")
+                    continue
+                # S2/S3. IT FALLS THROUGH ON THE ROLE IT LANDED UNDER, and the move is said ONCE, on
+                # a note rather than on a row. Routing it to the NEW role's disposition would lose
+                # the conflict just as surely — the write loop caps `adopter` at report, so
+                # `diverged` and `stale` become `re-rendered` and nothing is written or named — and
+                # the recorded role is also the one whose inputs still resolve, since the row's
+                # `commit`, `source` and `gov_oid` are what the three-way reads. A second ROW line
+                # here would shadow the row's own verdict for every reader keying on the path
+                # suffix, which is how `read_verdict` and the suite arm beside it read a run.
+                r.note(f"row '{row['path']}' landed under role '{role}' and gov's descriptor now "
+                       f"declares that destination '{now}', whose own machinery writes it in this "
+                       f"run — so it is reconciled as '{role}', the role it landed under, rather "
+                       f"than stood back from. `govkit apply` is the verb that re-records the role")
 
         if how == "block":
             # The block's own hash, not the file's. `check` owns the drift verdict; `update` reports

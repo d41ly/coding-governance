@@ -110,7 +110,7 @@ did not revert, and an outbox nothing drains.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 39 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
+**Build status:** CLOSED · 39 unit(s) · node c · opened 2026-09-16 · streams deployer+tooling
 ids DEPL-cMendedVintage-1 DEPL-cMendedVintage-2 DEPL-cMendedVintage-3 DEPL-cMendedVintage-4 DEPL-cMendedVintage-5 DEPL-cMendedVintage-6 DEPL-cMendedVintage-7 DEPL-cMendedVintage-8 DEPL-cMendedVintage-9 DEPL-cMendedVintage-10 DEPL-cMendedVintage-11 DEPL-cMendedVintage-12 DEPL-cMendedVintage-13
 ids DEPL-cMendedVintage-14 DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25
 ids DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 TOOL-cMendedVintage-1 TOOL-cMendedVintage-2 TOOL-cMendedVintage-3 TOOL-cMendedVintage-4 TOOL-cMendedVintage-5 TOOL-cMendedVintage-6 TOOL-cMendedVintage-7 TOOL-cMendedVintage-8 TOOL-cMendedVintage-9 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11
@@ -156,11 +156,11 @@ ids TOOL-cMendedVintage-12
 | [DEPL-cMendedVintage-25 — the renormalize cleanliness guard reads paths, not whitespace tokens](spec/2026-09-17-spec-DEPL-cMendedVintage-25.md) | 35 | 2 | CLOSED | rev-2 | 2026-09-17 |
 | [TOOL-cMendedVintage-11 — the census arm resolves its launcher instead of trusting the name](spec/2026-09-17-spec-TOOL-cMendedVintage-11.md) | 36 | 2 | CLOSED | rev-1 | 2026-09-17 |
 | [DEPL-cMendedVintage-26 — the scoped-index and rename halves of the dirty-path guard](spec/2026-09-18-spec-DEPL-cMendedVintage-26.md) | 37 | 2 | CLOSED | rev-2 | 2026-09-18 |
-| [DEPL-cMendedVintage-27 — the role re-resolution keeps the three-way merge a rendered row still needs](spec/2026-09-18-spec-DEPL-cMendedVintage-27.md) | 38 | 2 | SPECCED | rev-1 | 2026-09-18 |
+| [DEPL-cMendedVintage-27 — the role re-resolution keeps the three-way merge a rendered row still needs](spec/2026-09-18-spec-DEPL-cMendedVintage-27.md) | 38 | 2 | CLOSED | rev-2 | 2026-09-19 |
 | [TOOL-cMendedVintage-12 — the brief reader stops waiting on a grandchild's write end](spec/2026-09-18-spec-TOOL-cMendedVintage-12.md) | 39 | 2 | CLOSED | rev-2 | 2026-09-18 |
 <!-- /gen:build-units -->
 
-Records: 81 bound to this build, across 4 record folder(s).
+Records: 82 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

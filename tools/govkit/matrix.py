@@ -202,6 +202,125 @@ ROLE_KIT = ('id = "demo"' + NL + 'home = "tools/demo"' + NL
 ROLE_KIT_MOVED = ROLE_KIT + (NL + "[[files]]" + NL + 'include = ["moved.txt", "gone.txt"]' + NL
                              + 'role = "project-owned"' + NL)
 
+#: THE SECOND AGED VINTAGE, and it moves the SAME destination the other way: out of the engine pool
+#: and into a `rendered` rule served by this kit's own declared regenerate. Spelled by DROPPING the
+#: file from the engine include rather than by adding a later rule, because a named include is not a
+#: `**` pool and nothing removes a source from one — which is exactly the shape the review-harness
+#: 1.8 vintage has, where a file that shipped as an engine copy became a render of a template.
+#:
+#: THE REGENERATE IS REAL AND IT WRITES THAT DESTINATION, which is the whole point of the pair: a row
+#: that stands back here is not protected, it is only ungraded, and this argv then puts its own bytes
+#: at the same path later in the same run. Python's own interpreter rather than a shell, so the
+#: fixture needs no shell on the host and no quoting dialect.
+REGEN_ARGV = ("import pathlib; pathlib.Path('tools/demo/moved.txt')"
+              ".write_text('the regenerate output' + chr(10), newline=chr(10))")
+ROLE_KIT_RENDERED = ('id = "demo"' + NL + 'home = "tools/demo"' + NL
+                     + "version_from = { none = \"fixture\" }" + NL + NL
+                     + "[check]" + NL + 'none = "a fixture kit"' + NL + NL
+                     + "[[files]]" + NL + 'include = ["kept.txt", "gone.txt"]' + NL
+                     + 'role = "engine"' + NL + NL
+                     + "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL
+                     + 'role = "rendered"' + NL + 'to = "{kit}/moved.txt"' + NL + NL
+                     + "[adopt]" + NL + "argv = []" + NL + "mutates_index = false" + NL + NL
+                     + "[[regenerate]]" + NL
+                     + 'argv = ["' + sys.executable.replace(chr(92), "/") + '", "-c", "'
+                     + REGEN_ARGV + '"]' + NL)
+
+ROLE_ENV = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
+#: The adopter's own copy, and the two gov vintages of a file whose bytes MOVE between them. The
+#: project-owned pair needs no such movement — it grades a row gov must not touch at all — but the
+#: rendered pair does: with gov's bytes equal at both vintages every verdict collapses to `current`
+#: or `patched`, neither of which writes, and the arm would grade the branch it is about with a row
+#: that could never have reached the three-way.
+ROLE_OWN = "the adopter's own edit" + NL
+ROLE_V1 = "gov's own bytes" + NL
+ROLE_V2 = "gov's second vintage" + NL
+
+
+def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+                          capture_output=True, text=True, env=ROLE_ENV)
+
+
+def read_verdict(out: str, path: str) -> str:
+    """The verdict `update` printed for ONE row, keyed on the path the line ENDS with."""
+    for ln in out.splitlines():
+        if ln.startswith("  ") and ln.rstrip().endswith(" " + path):
+            return ln[2:].split("[", 1)[0].strip()
+    return "(no row)"
+
+
+def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str, str | None],
+                    aged_kit: str, aged_blobs: dict[str, str]) -> tuple[pathlib.Path, pathlib.Path]:
+    """Install from one vintage, let the target edit its own copies, then AGE the descriptor under it.
+
+    ONE builder for both transitions, taking the difference as DATA. The two pairs disagree about
+    the aged descriptor, about which of gov's own blobs move with it, and about what the adopter did
+    to its copy — and about nothing else. A second copy of this recipe would be a second answer to
+    "what does an aged fixture look like", which is the question the arm below exists to settle once.
+
+    THE FIXTURE IS AGED, NOT FRESH, and that is the whole arm. A fresh install and the descriptor it
+    installed from agree by construction, so an arm built on one grades nothing and reports green —
+    the shape that passes by finding nothing. The disagreement exists because the receipt is older
+    than the rule, which is the only way it can exist at all.
+
+    THE COPY OF THE ENGINE IS TAKEN HERE, at fixture-build time, so the arm runs the engine as this
+    tree has it rather than whatever a later edit leaves behind.
+    """
+    g = tmp.resolve() / ("role-gov-" + tag)
+    (g / "tools" / "govkit").mkdir(parents=True, exist_ok=True)
+    (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+    (g / "tools" / "govkit" / "registry.toml").write_text(
+        '[surface]' + NL + 'globs = ["tools/*"]' + NL + NL
+        + '[selection]' + NL + 'default = ["demo"]' + NL + NL
+        + '[[entry]]' + NL + 'id = "demo"' + NL + 'descriptor = "tools/demo/kit.toml"' + NL + NL
+        + '[[exempt]]' + NL + 'path = "tools/govkit"' + NL + 'why = "the deployer itself"' + NL,
+        encoding="utf-8", newline=NL)
+    (g / "tools" / "demo" / "kit.toml").write_text(ROLE_KIT, encoding="utf-8", newline=NL)
+    for _n in ("kept.txt", "moved.txt", "gone.txt"):
+        (g / "tools" / "demo" / _n).write_text(ROLE_V1, encoding="utf-8", newline=NL)
+    git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
+    git(g, "config", "user.name", "t"); git(g, "config", "core.autocrlf", "false")
+    git(g, "add", "-A"); git(g, "commit", "-qm", "the vintage the target installs from")
+
+    t = tmp.resolve() / ("role-target-" + tag)
+    t.mkdir(parents=True, exist_ok=True)
+    (t / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
+    (t / ".governance").mkdir(exist_ok=True)
+    (t / ".governance" / "deploy.toml").write_text(
+        'gov_source = "local"' + NL + 'prefix = "tools"' + NL + 'kits = ["demo"]' + NL,
+        encoding="utf-8", newline=NL)
+    git(t, "init", "-q", "-b", "main"); git(t, "config", "user.email", "t@e")
+    git(t, "config", "user.name", "t"); git(t, "config", "core.autocrlf", "false")
+    git(t, "add", "-A"); git(t, "commit", "-qm", "base")
+    ap = run_in_gov(g, "apply", "--target", str(t), "--kits", "demo")
+    check("role move [%s]: the fixture installs at all" % tag,
+          (t / ".governance" / "install.json").is_file(), ap.stdout + ap.stderr)
+    # A `None` body is a destination the adopter RENAMED AWAY, which grids to `missing` — a
+    # raw-write verdict, so at BASE gov puts its own bytes back at a path emptied on purpose. An
+    # edit IN PLACE grids to `patched` against an unmoved gov blob, which writes nothing even at
+    # BASE, so an arm built on that alone stays green over the very restore it was written to stop.
+    for _n, _body in edits.items():
+        if _body is None:
+            (t / "tools" / "demo" / _n).unlink()
+        else:
+            (t / "tools" / "demo" / _n).write_text(_body, encoding="utf-8", newline=NL)
+    if edits:
+        git(t, "add", "-A"); git(t, "commit", "-qm", "the adopter works on its own copies")
+    rec = t / ".governance" / "install.json"
+    data = json.loads(rec.read_text(encoding="utf-8"))
+    if schema != data.get("schema"):
+        data["schema"] = schema
+        rec.write_text(json.dumps(data, indent=2) + NL, encoding="utf-8", newline=NL)
+    # THE AGEING. The descriptor moves AFTER the receipt was written, which is the one ordering
+    # that produces a disagreement at all.
+    for _n, _body in aged_blobs.items():
+        (g / "tools" / "demo" / _n).write_text(_body, encoding="utf-8", newline=NL)
+    (g / "tools" / "demo" / "kit.toml").write_text(aged_kit, encoding="utf-8", newline=NL)
+    git(g, "add", "-A"); git(g, "commit", "-qm", "gov's descriptor moves under the receipt")
+    return g, t
+
 
 def check_role_move(tmp: pathlib.Path) -> None:
     """A receipt row's role is RE-RESOLVED at every schema, and a disagreement is reported.
@@ -221,91 +340,21 @@ def check_role_move(tmp: pathlib.Path) -> None:
     SAME disagreement still REFUSES, because a schema-1 role is untrusted for a different reason and
     neither answer may be acted on there.
 
-    WHAT IT DOES NOT CHECK: any other pair of roles, and any real adopter's receipt. One transition,
-    end to end, on a fixture built for it.
+    TWO TRANSITIONS, AND THEY EXPECT OPPOSITE THINGS — DEPL-cMendedVintage-27. A move to
+    `project-owned` stands back, because that role's disposition writes nothing and the file really
+    is left alone. A move to `rendered` does NOT, because that role's disposition is this kit's own
+    declared regenerate, which writes the same destination later in the same run: standing back
+    there removes gov's reconciliation and leaves the overwrite, unreported. An arm carrying only
+    the first would pass over a branch that had swallowed every row in the second.
+
+    WHAT IT DOES NOT CHECK: any other pair of roles, and any real adopter's receipt. Two
+    transitions, end to end, on fixtures built for them.
     """
-    env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
-
-    def build_gov(tag: str) -> pathlib.Path:
-        """A scratch gov holding ONE `demo` entry plus a copy of the engine.
-
-        THE COPY IS TAKEN HERE, at fixture-build time, so the arm runs the engine as this tree has
-        it rather than whatever a later edit leaves behind.
-        """
-        g = tmp.resolve() / ("role-gov-" + tag)
-        (g / "tools" / "govkit").mkdir(parents=True, exist_ok=True)
-        (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-        shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-        (g / "tools" / "govkit" / "registry.toml").write_text(
-            '[surface]' + NL + 'globs = ["tools/*"]' + NL + NL
-            + '[selection]' + NL + 'default = ["demo"]' + NL + NL
-            + '[[entry]]' + NL + 'id = "demo"' + NL + 'descriptor = "tools/demo/kit.toml"' + NL + NL
-            + '[[exempt]]' + NL + 'path = "tools/govkit"' + NL + 'why = "the deployer itself"' + NL,
-            encoding="utf-8", newline=NL)
-        (g / "tools" / "demo" / "kit.toml").write_text(ROLE_KIT, encoding="utf-8", newline=NL)
-        (g / "tools" / "demo" / "kept.txt").write_text("gov's own bytes" + NL,
-                                                       encoding="utf-8", newline=NL)
-        (g / "tools" / "demo" / "moved.txt").write_text("gov's own bytes" + NL,
-                                                        encoding="utf-8", newline=NL)
-        (g / "tools" / "demo" / "gone.txt").write_text("gov's own bytes" + NL,
-                                                       encoding="utf-8", newline=NL)
-        git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
-        git(g, "config", "user.name", "t"); git(g, "config", "core.autocrlf", "false")
-        git(g, "add", "-A"); git(g, "commit", "-qm", "the vintage the target installs from")
-        return g
-
-    def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
-                              capture_output=True, text=True, env=env)
-
-    def read_verdict(out: str, path: str) -> str:
-        """The verdict `update` printed for ONE row, keyed on the path the line ENDS with."""
-        for ln in out.splitlines():
-            if ln.startswith("  ") and ln.rstrip().endswith(" " + path):
-                return ln[2:].split("[", 1)[0].strip()
-        return "(no row)"
-
-    OWN = "the adopter's own edit" + NL
-
-    def build_target(tag: str, schema: int) -> tuple[pathlib.Path, pathlib.Path]:
-        """Install, let the target edit one landed file, then AGE the descriptor under it."""
-        g = build_gov(tag)
-        t = tmp.resolve() / ("role-target-" + tag)
-        t.mkdir(parents=True, exist_ok=True)
-        (t / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
-        (t / ".governance").mkdir(exist_ok=True)
-        (t / ".governance" / "deploy.toml").write_text(
-            'gov_source = "local"' + NL + 'prefix = "tools"' + NL + 'kits = ["demo"]' + NL,
-            encoding="utf-8", newline=NL)
-        git(t, "init", "-q", "-b", "main"); git(t, "config", "user.email", "t@e")
-        git(t, "config", "user.name", "t"); git(t, "config", "core.autocrlf", "false")
-        git(t, "add", "-A"); git(t, "commit", "-qm", "base")
-        ap = run_in_gov(g, "apply", "--target", str(t), "--kits", "demo")
-        check("role move [%s]: the fixture installs at all" % tag,
-              (t / ".governance" / "install.json").is_file(), ap.stdout + ap.stderr)
-        # TWO SHAPES OF ADOPTER STATE, because one of them cannot reach the branch this arm is
-        # about. An edit IN PLACE grids to `patched`, which writes nothing even at BASE, so an arm
-        # built on that alone stays green over the very restore it was written to stop. A
-        # destination the adopter has RENAMED AWAY grids to `missing`, which is a raw-write verdict:
-        # at BASE gov puts its own bytes back at a path the adopter deliberately emptied. Measured
-        # both ways against the engine as BASE has it, not reasoned.
-        (t / "tools" / "demo" / "moved.txt").write_text(OWN, encoding="utf-8", newline=NL)
-        (t / "tools" / "demo" / "gone.txt").unlink()
-        git(t, "add", "-A"); git(t, "commit", "-qm", "the adopter edits one copy and moves one away")
-        rec = t / ".governance" / "install.json"
-        data = json.loads(rec.read_text(encoding="utf-8"))
-        if schema != data.get("schema"):
-            data["schema"] = schema
-            rec.write_text(json.dumps(data, indent=2) + NL, encoding="utf-8", newline=NL)
-        # THE AGEING. The descriptor moves AFTER the receipt was written, which is the one ordering
-        # that produces a disagreement at all.
-        (g / "tools" / "demo" / "kit.toml").write_text(ROLE_KIT_MOVED, encoding="utf-8", newline=NL)
-        git(g, "add", "-A"); git(g, "commit", "-qm", "the destination becomes the project's own")
-        return g, t
-
+    OWN = ROLE_OWN
     # ---- THE FIXTURE'S OWN PRECONDITION. A receipt that did not record `engine` for the moved row
     # ---- would make every assertion below pass for the wrong reason.
-    g3, t3 = build_target("s3", 3)
+    g3, t3 = build_role_pair(tmp, "s3", schema=3, aged_kit=ROLE_KIT_MOVED, aged_blobs={},
+                             edits={"moved.txt": OWN, "gone.txt": None})
     rows = {w["path"]: w for w in json.loads(
         (t3 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])}
     check("role move: the aged receipt really records the moved destination as `engine`",
@@ -355,13 +404,72 @@ def check_role_move(tmp: pathlib.Path) -> None:
           read_verdict(out, "tools/demo/kept.txt") == "current", out[-800:])
 
     # AC4 — the schema-1 branch SURVIVES. Same disagreement, untrusted role, still a refusal.
-    g1, t1 = build_target("s1", 1)
+    g1, t1 = build_role_pair(tmp, "s1", schema=1, aged_kit=ROLE_KIT_MOVED, aged_blobs={},
+                             edits={"moved.txt": OWN, "gone.txt": None})
     u1 = run_in_gov(g1, "update", "--target", str(t1))
     o1 = u1.stdout + u1.stderr
     check("role move: a schema-1 receipt carrying the same disagreement still REFUSES",
           "cannot be trusted about" in o1, o1[-800:])
     check("role move: ...and does NOT take the reporting path",
           read_verdict(o1, "tools/demo/moved.txt") != "role-moved", o1[-800:])
+
+    # ---- DEPL-cMendedVintage-27. THE OTHER DIRECTION, which the arms above cannot reach: the same
+    # ---- aged schema-3 receipt, but gov's descriptor now serves that destination from its own
+    # ---- declared regenerate. `kept.txt` moves with the vintage in both fixtures so the kit is in
+    # ---- the run's touched set on its own account — without that, the regenerate would fire only
+    # ---- because the moved row acted, and the arm could not tell a restored reconciliation from a
+    # ---- restored regenerate.
+    _aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}
+    gr, tr = build_role_pair(tmp, "rr-edited", schema=3, aged_kit=ROLE_KIT_RENDERED,
+                             aged_blobs=_aged_rr, edits={"moved.txt": OWN})
+    ur = run_in_gov(gr, "update", "--target", str(tr), "--write")
+    orr = ur.stdout + ur.stderr
+    check("role move to a rendered row: the run REFUSES rather than standing back",
+          ur.returncode != 0, orr[-500:])
+    check("role move to a rendered row: ...naming that path and the three-way conflict",
+          any("tools/demo/moved.txt" in ln and "diverged and the three-way conflicts" in ln
+              for ln in orr.splitlines()), orr[-900:])
+    # THE OPERATOR'S BYTES, IN THE GIT DIRECTORY AND NOT IN THE WORKTREE, and the distinction is the
+    # measurement rather than a convenience. gov writes nothing for a conflicted row, so the index
+    # entry is untouched — but this kit's regenerate runs afterwards under its own authority and
+    # puts its render at the same path. That overwrite is a standing ceiling, unchanged by this
+    # unit and refused as a non-goal by it; what changed is that the run now NAMES the row, refuses,
+    # and leaves an order, where before it exited 0 saying nothing.
+    _idx = git(tr, "show", ":tools/demo/moved.txt")
+    check("role move to a rendered row: ...and the adopter's bytes stand in the git directory",
+          _idx.stdout == OWN, repr(_idx.stdout))
+    _orders = sorted((tr / ".governance" / "outbox").glob("update-conflict-*.md"))
+    check("role move to a rendered row: ...and one conflict order names the row",
+          len(_orders) == 1 and "tools/demo/moved.txt" in _orders[0].read_text(encoding="utf-8"),
+          str([o.name for o in _orders]))
+    check("role move to a rendered row: CEILING — the worktree copy is the regenerate's, at BOTH "
+          "vintages; this arm records a ceiling and grades no repair",
+          (tr / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")
+          == "the regenerate output" + NL,
+          repr((tr / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")))
+
+    # AND THE SAME FIXTURE WITH NO LOCAL EDIT, which is the half the migration runbook's block 1
+    # depends on: the row takes the RECORDED role's raw write and gov's bytes are staged for it.
+    gc, tc = build_role_pair(tmp, "rr-clean", schema=3, aged_kit=ROLE_KIT_RENDERED,
+                             aged_blobs=_aged_rr, edits={})
+    uc = run_in_gov(gc, "update", "--target", str(tc), "--write")
+    oc = uc.stdout + uc.stderr
+    check("role move to a rendered row, unedited: the row takes the recorded role's raw write",
+          read_verdict(oc, "tools/demo/moved.txt") == "stale", oc[-900:])
+    _idxc = git(tc, "show", ":tools/demo/moved.txt")
+    check("role move to a rendered row, unedited: ...and the target's INDEX holds gov's bytes",
+          _idxc.stdout == ROLE_V2, repr(_idxc.stdout))
+    # THE MOVE IS STILL SAID, and said ONCE, OFF the row channel. A second row line would shadow the
+    # row's own verdict for every reader keying on the path suffix — `read_verdict` returns the
+    # FIRST such line, and this is the arm that would not notice.
+    check("role move to a rendered row: exactly one printed line opens with two spaces and ends "
+          "with that row's path",
+          sum(1 for ln in oc.splitlines()
+              if ln.startswith("  ") and ln.rstrip().endswith(" tools/demo/moved.txt")) == 1,
+          oc[-900:])
+    check("role move to a rendered row: ...and a further line names both roles and the path",
+          any("engine" in ln and "rendered" in ln and "tools/demo/moved.txt" in ln
+              and not ln.startswith("  ") for ln in oc.splitlines()), oc[-900:])
 
 
 def main() -> int:

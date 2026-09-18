@@ -1063,11 +1063,22 @@ A row lands under a role, and a later vintage of gov's descriptor can declare th
 under a different one — most often moving a file gov used to supply into your project's own keeping.
 `update` re-resolves every row's role against the descriptor as it stands, at every receipt schema,
 and prints `role-moved` naming the role the row landed under, the role gov declares today and the
-path. **Nothing is written for such a row and nothing in your receipt changes.** The two rules
-disagree about who owns those bytes, so the file on disk is exactly as you left it — including a
-destination you have edited or emptied, which an older gov would have restored from its own copy.
-There is nothing to undo and no order to read. `govkit apply` re-records the row under the role the
-descriptor declares now, which is the verb a role change belongs to, and the line stops appearing.
+path. **Nothing is written for such a row and nothing in your receipt changes**, with one exception
+named below. The two rules disagree about who owns those bytes, so the file on disk is exactly as
+you left it — including a destination you have edited or emptied, which an older gov would have
+restored from its own copy. There is nothing to undo and no order to read. `govkit apply` re-records
+the row under the role the descriptor declares now, which is the verb a role change belongs to, and
+the line stops appearing.
+
+**The exception is the move where standing back would protect nothing.** Where the role gov now
+declares is served by that kit's own re-render — the argv an `update` runs for every kit it touches —
+skipping the row does not stop that argv. It removes only gov's half of the same run, the half that
+compares your copy against both vintages and refuses when the three-way conflicts, so the render
+lands on your edit with nothing in the run naming it. Such a row therefore keeps the disposition it
+landed under: it is graded, reconciled and written like any other row of the role it landed under,
+and the move is said on a line of its own rather than in place of that row's verdict. A move to a
+role that writes nothing — your project's own keeping, a file your own tooling generates — stands
+back exactly as described above.
 
 One exception, and it is deliberate: on a receipt still at schema 1 the same disagreement REFUSES
 the row instead. A schema-1 receipt is known to stamp roles its own descriptor contradicts, so
@@ -1155,10 +1166,14 @@ core and NicoCares, the two trees carrying an installed copy of this kit.
 
 Before review-harness 1.8, `unattended-build.js` shipped as an engine file, so a receipt written
 then rows `<kit>/unattended-build.js` with role `engine`. From 1.8 it is `rendered` from
-`unattended-build.template.js`, and **`update` does not move the row**. It takes each row's role
-from the receipt and re-resolves it only below receipt schema 2, so on a schema-3 receipt it writes
-gov's own render, which spells gov's `tools/` layout, over yours. Every later run then grades that
-row as an engine file, and a correct render reads as a local edit. This needs govkit 1.11 or later,
+`unattended-build.template.js`, and **`update` does not move the row**. It re-resolves every row's
+role against the descriptor at every schema, but a destination whose NEW role is served by that
+kit's own re-render keeps the disposition it landed under — standing back would not stop the
+re-render, only gov's reconciliation of it. So on a schema-3 receipt the row is still graded as an
+engine file: with no local edit `update` writes gov's own render, which spells gov's `tools/`
+layout, over yours, and with one it reports a three-way conflict, leaves your copy in the index and
+writes an order. Every later run then grades that row as an engine file, and a correct render reads
+as a local edit. This needs govkit 1.11 or later,
 which lands a new template BEFORE it re-renders; an older govkit refuses the render with
 `missing shipped copy`.
 
