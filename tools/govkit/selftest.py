@@ -6926,6 +6926,11 @@ user_skills = "/tmp/gk-fake-skills"
                     + spec.get("guard", "exit 0\n"),
                     encoding="utf-8", newline="\n")
                 for rel, body in (spec.get("files") or {}).items():
+                    # `rel` may carry a subdirectory: DEPL-cMendedVintage-14's reap fixture declares
+                    # `one/conf.txt` and `two/conf.txt` under ONE kit, to get two rows whose BASENAMES
+                    # collide, which is that unit's whole subject. Without this the write raises
+                    # FileNotFoundError and kills the interpreter, taking every arm after it with it.
+                    (d / rel).parent.mkdir(parents=True, exist_ok=True)
                     (d / rel).write_text(body, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
