@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-18-prompt-TOOL-cMendedVintage-12-2-build-brief.md](../prompts/2026-09-18-prompt-TOOL-cMendedVintage-12-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
