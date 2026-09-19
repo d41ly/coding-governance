@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-24 — the dirty-path refusal still excludes the row this diff taught update to write
 
-**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 34
+**Status:** CLOSED · rev-4 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 34
 
 <!-- gen:spec-records -->
 
@@ -96,6 +96,10 @@ carries no `oid`, and remove the prose that argues the old case.
   suite caught once it ran to completion: the scoped index read compared against an unscoped
   receipt, and the closing self-audit reading a rename's old path as a row come apart. That unit
   repairs both and keeps this unit's own guard closed.
+- **hands-off** `DEPL-cMendedVintage-28` — widening the shadow refusal's population put the
+  `attributes` row in front of `DEPL-cMendedVintage-23`'s containment guard, so an escaping path is
+  answered with a remedy git cannot run. That unit reorders the two; this unit's own subject is
+  explicitly preserved.
 
 ## 4. Design
 
@@ -302,6 +306,10 @@ writing set · no floor moves.
   attribution of the deployer suite, which ran to completion for the first time in this build, laid
   25 of its 68 failures at this unit's two predicates; `DEPL-cMendedVintage-26` was adopted to repair
   them and names this unit, which named nothing back.
+
+- rev-4 · 2026-09-19 · §3 · RECIPROCAL EDGE, no scope or criterion changed. `DEPL-cMendedVintage-28` was adopted after a read-only attribution measured the two
+  guards colliding in `update`'s preamble; it names this unit and this unit named nothing
+  back.
 
 ## 10. Reuse audit
 

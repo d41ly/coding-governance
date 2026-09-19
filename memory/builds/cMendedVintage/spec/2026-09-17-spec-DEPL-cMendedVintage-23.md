@@ -1,6 +1,6 @@
 # DEPL-cMendedVintage-23 — the lf-pin write is contained before the receipt path reaches the root
 
-**Status:** CLOSED · rev-2 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 33
+**Status:** CLOSED · rev-3 · 2026-09-17 · node c · Tier-2 · base 859daa67 · streams deployer · order 33
 
 <!-- gen:spec-records -->
 
@@ -64,6 +64,9 @@ one join in the engine instead of three.
 - **hands-off** external — the dirty-path carve-out on the same row, and the `never write` paragraph
   in `demand_claimed_paths_clean`'s header that justifies it, are left standing for the unit that owns
   the closing review's third blocker. Nothing else in this build reads the containment change.
+- **hands-off** `DEPL-cMendedVintage-28` — the containment guard this unit added is unreachable on
+  the withdrawal branch, because a later unit's preamble refusal answers an escaping path first.
+  That unit restores the ordering; the guard itself is unchanged and was measured to hold.
 
 ## 4. Design
 
@@ -289,6 +292,10 @@ branch and mints no new refusal site.
   is not what either of them spells. None of the four changes the design: the guard, its placement,
   the deleted joins and the arm's width are all as rev-1 specified, and the fix was measured to
   behave exactly as section 5's risk row predicted.
+
+- rev-3 · 2026-09-19 · §3 · RECIPROCAL EDGE, no scope or criterion changed. `DEPL-cMendedVintage-28` was adopted after a read-only attribution measured the two
+  guards colliding in `update`'s preamble; it names this unit and this unit named nothing
+  back.
 
 ## 10. Reuse audit
 
