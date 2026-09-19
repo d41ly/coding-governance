@@ -6860,6 +6860,35 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ----
     # ---- `derive_graded_rows` IS STILL THE ONE DEFINITION: it is handed a receipt VIEW over the
     # ---- scoped rows, never a fourth membership test spelled inline.
+    # ---- DEPL-cMendedVintage-28 S1. CONTAINMENT IS ASKED FIRST, over the SAME rows the shadow
+    # ---- refusal below grades, and that order is the whole unit. A path that ESCAPES the target
+    # ---- root is in no index BY CONSTRUCTION, so once `DEPL-cMendedVintage-24` widened the shadow
+    # ---- population to every writing disposition the `attributes` row joined it, the shadow
+    # ---- predicate matched an escaping path, and the run died here with a remedy the operator
+    # ---- cannot run: `git add ../x` answers "outside repository". MEASURED rather than reasoned —
+    # ---- the collision needs the escaping path to be PRESENT on disk, which is the shadow
+    # ---- predicate's own `is_file()` term, and that is the withdrawal fixture's shape exactly.
+    # ----
+    # ---- TWO GUARDS, TWO QUESTIONS, AND ONLY ONE OF THEM IS ANSWERABLE HERE. An escaping path is a
+    # ---- defect in the RECEIPT, which is committed, hand-editable and text-merged; an untracked
+    # ---- shadow is a state of the operator's WORKTREE. A path outside the repository has no index
+    # ---- membership to report, so the shadow predicate's inputs are undefined for it, which is why
+    # ---- this is an ordering and not a preference.
+    # ----
+    # ---- THE POPULATION IS `derive_graded_rows`' AND NOT THE WHOLE RECEIPT. `DEPL-cMendedVintage-23`
+    # ---- argued a receipt-wide preamble guard out on the ground that a row whose role is not
+    # ---- landable may legitimately name a destination outside the target; that argument holds and
+    # ---- is not overturned — it simply does not reach this set, whose members are the rows a
+    # ---- writing disposition puts gov's bytes at, and one of those escaping is a defect by
+    # ---- definition. Same derivation as the shadow refusal below, so the two cannot disagree about
+    # ---- which rows they are talking about.
+    # ----
+    # ---- THE `where` NAMES THE ROW, in the spelling the helper's caller in the classification loop
+    # ---- already uses, because the helper's own text blames a `prefix` in the target's descriptor
+    # ---- and that is the wrong file for this caller.
+    for _cw in derive_graded_rows({"files": rows_all}):
+        _cwhere = f"the `{_cw.get('role', 'engine')}` row of the target's own receipt"
+        demand_contained_dest(_cw["path"], _cwhere)
     index0, index_present = index_read(target, [w["path"] for w in rows_all])
     shadowed = sorted(w["path"] for w in derive_graded_rows({"files": rows_all})
                       if w["path"] not in index_present and (target / w["path"]).is_file())
@@ -7175,6 +7204,16 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # destination legitimately sits outside the target, so grading every row would refuse an
             # adopter whose configuration is correct. The `pins` disposition is the narrowest scope
             # that holds the whole defect.
+            #
+            # DEPL-cMendedVintage-28. THE PREAMBLE NOW GRADES CONTAINMENT TOO, and the paragraph
+            # above is corrected rather than deleted because its reasoning is still right: what the
+            # preamble grades is the WRITING population and not every row, so the adopter it worried
+            # about is still not refused. That guard is the one an escaping path meets first, and it
+            # exists because the untracked-shadow refusal was answering ahead of this one and
+            # sending the operator to `git add` a path git calls outside the repository. This call
+            # stays: it is the narrowest scope, it is the one that survives a `--kits` narrowing of
+            # the preamble's own list, and a guard removed because another one covers it today is
+            # how the next reordering reopens the hole.
             #
             # BEFORE THE CLASSIFICATION READ, not merely before the write, and on the read-only
             # preview as well. The read below is what DECIDES whether a write happens; a guard that

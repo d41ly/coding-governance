@@ -1057,6 +1057,13 @@ so an uncommitted line of your own would go with it. Commit or stash that edit a
 INSIDE gov's block are not counted — gov rewrites that region on every run and reports it as
 `pins-moved` — so the ordinary state straight after an `apply` still proceeds.
 
+**A receipt path that leaves your repository is reported as a receipt defect, and there is nothing to
+stage.** `update` grades every path its receipt claims for containment before it asks anything about
+your index, so a row carrying `..` or a drive letter is refused by name, naming the row that supplied
+it. That refusal is the one you want: the untracked-shadow refusal above would tell you to `git add`
+the path, and git answers that a path outside the repository cannot be added. Fix the row in
+`.governance/install.json`, or the `prefix` in `.governance/deploy.toml` that produced it.
+
 ### `role-moved` — gov changed its mind about who owns a file
 
 A row lands under a role, and a later vintage of gov's descriptor can declare that same destination

@@ -1,11 +1,12 @@
 # DEPL-cMendedVintage-28 — a receipt path that escapes is answered before an operator's untracked file
 
-**Status:** SPECCED · rev-1 · 2026-09-19 · node c · Tier-2 · base 859daa67 · streams deployer · order 40
+**Status:** CLOSED · rev-2 · 2026-09-19 · node c · Tier-2 · base 859daa67 · streams deployer · order 40
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-19-build-DEPL-cMendedVintage-28-acceptance-ledger.md](../build/2026-09-19-build-DEPL-cMendedVintage-28-acceptance-ledger.md) | journal | — |
 | [2026-09-19-prompt-DEPL-cMendedVintage-28-2-build-brief.md](../prompts/2026-09-19-prompt-DEPL-cMendedVintage-28-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -77,6 +78,17 @@ unchanged; with both staged out the run exits 0 and mutates the file. The third 
 the second meaningful — it proves the fixture reaches the splice rather than passing by never getting
 there.
 
+rev-2. THE PRECONDITION THAT TABLE OMITS, and it decides which arms are red. The shadow predicate
+tests index membership AND presence on disk, so the collision needs the escaping path to exist in the
+worktree. It does on the WITHDRAWAL fixture, which writes real bytes there to prove the splice
+destroys them, and it does not on the creation fixture, whose whole assertion is that nothing
+appears. So the shipped engine already answered the creation branch with the containment refusal, and
+both red arms are the withdrawal branch's: the one asserting its refusal names containment, and the
+liveness arm beside it — which could no longer reach the splice at all, because staging the
+containment call out left the shadow refusal answering in its place. That second one is the sharper
+finding: the liveness helper has to defuse the shadow refusal as well, or the arm that reproduces the
+defect is reproducing a different refusal.
+
 ## 5. Production-readiness checklist
 
 - security — this changes which refusal an escaping path receives, never whether it is refused. The
@@ -99,10 +111,12 @@ there.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a fixture's receipt claims a path outside the target root, `update --write` refuses
-  naming `leaves the target repository` and the real bytes that exist there are byte-identical
-  afterwards. Red when: the run refuses with the untracked-shadow wording instead,
-  which is the shipped behaviour and is reproducible before the change.
+- **AC1** — When a fixture's receipt claims a path outside the target root AND real bytes exist
+  there, `update --write` refuses naming `leaves the target repository` and those bytes are
+  byte-identical afterwards. Red when: the run refuses with the untracked-shadow wording instead,
+  which is the shipped behaviour and is reproducible before the change. rev-2 adds the
+  bytes-exist precondition: without it the shadow predicate does not match, the shipped engine
+  answers with containment already, and the criterion grades nothing.
 - **AC2** — When a fixture's receipt claims an INSIDE path absent from the index, `update --write`
   still refuses with the untracked-shadow wording, and the operator's bytes are untouched. Red when: the reorder narrowed the shadow population, reopening
   the blocker `DEPL-cMendedVintage-24` closed.
@@ -119,7 +133,14 @@ there.
 
 New arm: `tools/govkit/selftest.py` · the ordering arm S4 names, beside the repaired `[-23]` AC3 and
 its sibling · the `BRANCH_PIN` floor in `tools/govkit/refusal_join.py` is re-derived only if the
-branch count moves.
+branch count moves — rev-2: it does not move, because this unit adds a CALL to an existing
+containment helper and no new `raise` of its own.
+
+rev-2. THE LIVENESS HELPER CHANGES WITH THE ARMS, and that was not foreseen. It staged out one
+containment call by line; it now takes the guard lines to stage as a parameter and defuses the
+untracked-shadow refusal alongside them, because an escaping path present on disk is caught by that
+refusal whatever the containment calls do — so the arm that reproduces the defect could not reach the
+splice. The ordering arm is the same helper with only the preamble call staged out.
 
 ## 8. Open questions
 
@@ -135,6 +156,15 @@ branch count moves.
   attribution measured the containment guard holding on bytes and traced the two red arms to a
   guard-ordering collision introduced at `d2de6795`. Adopted because the arms are this build's own
   and the diagnostic regression reaches every adopter.
+- rev-2 · 2026-09-19 · built. Three corrections, each measured against both engines on scratch
+  fixtures. Section 4's variant table omitted the precondition that decides which arms are red: the
+  shadow predicate also tests presence on disk, so the collision reaches the withdrawal fixture and
+  not the creation one, and AC1 gains that precondition rather than claiming a red-when its own
+  fixture cannot produce. Section 7 records that the liveness helper had to change with the arms —
+  staging the containment call out is no longer enough to reach the splice, because the shadow
+  refusal answers in its place, so the helper now takes the guard lines to stage and defuses that
+  refusal too. The `BRANCH_PIN` clause is answered rather than left open: the unit adds a call and
+  no new refusal, so the count does not move.
 
 ## 10. Reuse audit
 

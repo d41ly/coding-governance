@@ -2048,27 +2048,52 @@ user_skills = "/tmp/gk-fake-skills"
             git(g, "add", "-A"); git(g, "commit", "-qm", "an escaping attributes row")
             return g
 
-        def run_ungraded_update(*args: str) -> str:
-            """`update`, run against THIS engine with the containment call removed.
+        # DEPL-cMendedVintage-28. THE GUARD LINES THIS BLOCK STAGES, each as `(marker,
+        # replacement)` and each named by the thing it grades rather than by the helper it calls —
+        # `demand_contained_dest` is spelled at call sites all over this engine. The two containment
+        # sites delete; the shadow refusal is DEFUSED rather than deleted, because its refusal is a
+        # block and only its predicate is one line.
+        #
+        # THE SHADOW ENTRY IS WHY THIS PARAMETER EXISTS AT ALL. An escaping path is in no index by
+        # construction and this block's withdrawal fixture puts real bytes at it, so that refusal
+        # answers for the escaping row too — which means the liveness arms cannot reach the splice
+        # with containment alone staged out, and the arm that proved the defect went red the day the
+        # shadow population widened.
+        _GUARD_PREAMBLE = ("demand_contained_dest(_cw[", "")
+        _GUARD_PINS = ("demand_contained_dest(row[", "")
+        _GUARD_SHADOW = ("    if shadowed:", "    if False:  # staged out")
+
+        def run_ungraded_update(*args: str,
+                                stage: tuple = (_GUARD_PREAMBLE, _GUARD_PINS, _GUARD_SHADOW)
+                                ) -> str:
+            """`update`, run against THIS engine with the named guard line(s) staged out.
 
             THE LIVENESS OF EVERY ARM BELOW. An assertion that a file is absent afterwards is
             satisfied by an engine that never writes at all, by a fixture whose receipt was not
             really edited, and by a verb that refused for some unrelated reason — three ways to pass
-            while grading nothing. Removing exactly the one call and watching the escape LAND tells
-            those apart, and it is the only thing that proves the guard is what stops it.
+            while grading nothing. Staging exactly those lines out and watching the escape LAND
+            tells those apart, and it is the only thing that proves the guard is what stops it.
+
+            `stage` IS A PARAMETER BECAUSE THE ORDER IS ITSELF AN ASSERTION
+            (DEPL-cMendedVintage-28). The default is the liveness case: with every guard that could
+            answer first taken out, the escape lands. Staging out the PREAMBLE site alone is the
+            ordering case — the same fixture is then answered by the untracked-shadow refusal, which
+            names the guard that speaks when the first one is gone, and is the only thing that tells
+            a guard placed first from a guard first by accident.
 
             IN PROCESS, with `__file__` left pointing at the real engine so the module still finds
             its own registry. A copy placed anywhere else resolves no root and refuses before it
             reaches the branch under test — measured, not assumed.
             """
             _src = GOVKIT.read_text(encoding="utf-8")
-            _guard = [ln for ln in _src.split(NLp) if "demand_contained_dest(row[" in ln]
-            if len(_guard) != 1:
-                return f"STAGE FAILED: {len(_guard)} candidate guard lines"
+            for _mark, _repl in stage:
+                _guard = [ln for ln in _src.split(NLp) if _mark in ln]
+                if len(_guard) != 1:
+                    return f"STAGE FAILED: {len(_guard)} candidate lines for {_mark}"
+                _src = _src.replace(_guard[0] + NLp, (_repl + NLp) if _repl else "", 1)
             _mod = types.ModuleType("govkit_ungraded")
             _mod.__file__ = str(GOVKIT)
-            exec(compile(_src.replace(_guard[0] + NLp, "", 1), str(GOVKIT), "exec"),
-                 _mod.__dict__)
+            exec(compile(_src, str(GOVKIT), "exec"), _mod.__dict__)
             _buf = io.StringIO()
             with contextlib.redirect_stdout(_buf), contextlib.redirect_stderr(_buf):
                 try:
@@ -2108,7 +2133,7 @@ user_skills = "/tmp/gk-fake-skills"
               "no exit code and no diff of the target can make",
               not _land23.exists(), str(_land23))
         _staged23 = run_ungraded_update("update", "--target", str(g23a), "--write")
-        check("[-23] LIVENESS with the containment call staged OUT, that same run really writes "
+        check("[-23] LIVENESS with the containment calls staged OUT, that same run really writes "
               "gov's block outside the target — the defect reproduced rather than argued, and the "
               "only thing that tells the two arms above from a verb that writes nothing at all",
               _land23.is_file() and "govkit:lf-pins" in _land23.read_text(encoding="utf-8"),
@@ -2126,14 +2151,46 @@ user_skills = "/tmp/gk-fake-skills"
               "above the empty-pin exit rather than at the join",
               pu.returncode != 0 and "leaves the target repository" in pu.stderr
               and "pins-withdrawn" not in pu.stdout, (pu.stdout + pu.stderr)[-600:])
+        # DEPL-cMendedVintage-28 S3. THE REACH IS PART OF THE ASSERTION, and without it this arm was
+        # a skip wearing a pass: it was satisfied by ANY refusal, and for two vintages it was
+        # satisfied by one that never reached the branch it grades — the untracked-shadow refusal,
+        # which answered in the preamble because this fixture's escaping path is present on disk and
+        # a path outside the repository is in no index. Bytes alone cannot tell a guard that held
+        # from a run that stopped somewhere else entirely.
         check("[-23] AC3 ...and the file outside the fixture still holds gov's marker pair and its "
-              "sentinel line, byte for byte",
+              "sentinel line, byte for byte, on a run that REACHED the containment guard",
+              _keep23path.read_text(encoding="utf-8") == _keep23
+              and "leaves the target repository" in pu.stderr,
+              _keep23path.read_text(encoding="utf-8") + NLp + pu.stderr[-400:])
+
+        # DEPL-cMendedVintage-28 S4. THE ORDERING ARM. Containment is first, and until this arm it
+        # was first only because a spec said so — nothing observed it, so the reordering it asks for
+        # could be undone by any later edit with every arm still green. Stage the PREAMBLE call out
+        # alone and the same fixture is answered by the untracked-shadow refusal instead, which is
+        # the guard that answered for two vintages and the reason an operator was told to `git add`
+        # a path git calls outside the repository. The arm names WHICH guard spoke, in both
+        # directions, so a red here says what changed rather than only that something did.
+        _ord28 = run_ungraded_update("update", "--target", str(g23c), "--write",
+                                     stage=(_GUARD_PREAMBLE,))
+        check("[-23] AC4 ORDERING with the preamble's containment call staged out, the same "
+              "escaping row is answered by the untracked-shadow guard instead — so the order is "
+              "load-bearing rather than incidental, and the shipped arm above is what it grades",
+              "present in the target's WORKTREE" in _ord28
+              and "leaves the target repository" not in _ord28, _ord28[-700:])
+        check("[-23] AC4 ORDERING ...and the shadow guard's remedy is the impossible one, which is "
+              "why the order is a defect and not a preference: it sends the operator to `git add` "
+              "a path outside their repository",
+              "track it (`git add`)" in _ord28 and "../ESCAPED-23-u23c" in _ord28, _ord28[-700:])
+        check("[-23] AC4 ORDERING ...and the operator's bytes outside the fixture are still intact "
+              "under that staged engine, so this arm grades WHICH guard answered and never whether "
+              "one did",
               _keep23path.read_text(encoding="utf-8") == _keep23,
               _keep23path.read_text(encoding="utf-8"))
+
         _staged23 = run_ungraded_update("update", "--target", str(g23c), "--write")
-        check("[-23] LIVENESS with the call staged out the withdrawal really SPLICES that same "
-              "outside file — this branch destroys an operator's bytes rather than creating any, "
-              "which no assertion about the target could ever have seen",
+        check("[-23] LIVENESS with every answering guard staged out the withdrawal really SPLICES "
+              "that same outside file — this branch destroys an operator's bytes rather than "
+              "creating any, which no assertion about the target could ever have seen",
               _keep23path.read_text(encoding="utf-8") != _keep23, _staged23[-600:])
 
         # ---- AC4: the STRUCTURAL arm, the half that outlives the two calls above. Fed the engine's
