@@ -1,11 +1,12 @@
 # TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
+**Status:** CLOSED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-dLoggedFlight-25-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-dLoggedFlight-25-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
 | [2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 |
 
@@ -136,7 +137,8 @@ states are the only states a committed record is rendered in.
 
 The replay arm gates the class H3 names, a render reading committed history ahead of the commit it
 rides. It grades what differs against a declared set rather than what matches, so a new git-derived
-slot that lags reds until it is declared with its reason.
+Summary fact that lags reds until it is declared with its reason, and so does a new row in any of
+the four sections S5's scope covers.
 
 ### Inventory
 
@@ -253,13 +255,15 @@ New arm: `tools/runlog/selftest.py` · AC1's two renderer copies, AC3's era-boun
   a staged Units-item member; M4, S6 stops saying a dossier CLAIMS a Python symbol and states what
   the map leg actually grades; L1, AC2 reads `ASSERTION_FLOOR`'s comment and arithmetic the way
   `TOOL-dLoggedFlight-22` AC5 does for the same constant.
-- rev-3 · 2026-09-20 · S5 · §3 · AC4 · §4 Inventory · the build pass. S5's "fact by fact and table by
+- rev-3 · 2026-09-20 · S5 · §3 · §4 · AC4 · the build pass. S5's "fact by fact and table by
   table" was written over the whole record, and the close placement's replay moves one Timeline row
   that no membership of `PLACEMENT_LAG` should ever excuse: the commit a render rides is itself a
   record commit, so the window holds it as a phase row. Rather than widen a set AC4 pins at three
   members, S5 now DECLARES the compared scope — every Summary fact and the four sections whose items
   may never lag — and §3 states what is out with the measurement behind it. The Inventory gains the
-  two helpers and the two module constants the arms needed, none of which rev-2 named.
+  two helpers and the two further module constants the arms needed, neither named by rev-2, and §4's
+  sentence about a lagging slot is scoped to match S5 rather than left standing over the whole
+  record.
 
 ## 10. Reuse audit
 

@@ -5316,11 +5316,19 @@ def add_fixture_commit(repo, t, subject, paths):
     staged-but-uncommitted write, and the `pending` placement is nothing but a run with one. A
     committer time is settable only through the environment, so the two variables go in and come
     straight back out, since every git call in this suite must run free of them.
+
+    This is the suite's only `git commit`; every other fixture is imported. A commit READS the
+    machine it runs on, and three of those readings would reach in here: `core.hooksPath` is set
+    GLOBALLY on at least one node of this repository, so a fixture commit would run that
+    repository's hooks over a scratch tree; a machine with `commit.gpgsign` would try to sign one;
+    and `core.autocrlf` would rewrite the run-state bytes an arm is about to grade. All three are
+    pinned on the call, so the fixture is the fixture wherever it runs.
     """
     env = {"GIT_AUTHOR_DATE": f"{int(t)} +0000", "GIT_COMMITTER_DATE": f"{int(t)} +0000"}
     os.environ.update(env)
     try:
-        r = run_git(["-c", "core.autocrlf=false", "-c", "user.name=Fixture",
+        r = run_git(["-c", "core.autocrlf=false", "-c", "core.hooksPath=hooks-none-here",
+                     "-c", "commit.gpgsign=false", "-c", "user.name=Fixture",
                      "-c", "user.email=fixture@runlog.invalid", "commit", "-q", "--only", "-m",
                      subject, "--", *paths], repo)
     finally:
