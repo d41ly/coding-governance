@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-16-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-16-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-16-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-16-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 |
 

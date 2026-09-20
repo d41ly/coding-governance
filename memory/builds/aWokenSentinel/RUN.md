@@ -103,3 +103,19 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T18:57:27Z dispatch · item cc728357 TOOL-aWokenSentinel-3 · reason memory/map/generated/inventories.json memory/map/generated/MAP.md
 
 2026-09-20T19:02:19Z dispatch · item cc728357 TOOL-aWokenSentinel-3 · reason memory/map/features/unattended.md
+
+2026-09-20T19:10:40Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason tools/unattended/unattended.sh
+
+2026-09-20T19:10:53Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason tools/unattended/unattended.test.sh
+
+2026-09-20T19:11:06Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md
+
+2026-09-20T19:11:20Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason memory/builds/aWokenSentinel/README.md
+
+2026-09-20T19:11:34Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-16-1-acceptance-ledger.md
+
+2026-09-20T19:11:49Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason memory/LIVE.md
+
+2026-09-20T19:12:04Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason memory/ledger/2026-09.md
+
+2026-09-20T19:12:08Z brief · item TOOL-aWokenSentinel-16 · reason 7e2ccfcec72e memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-16-1-build-brief.md

@@ -2411,7 +2411,7 @@ WTS
   # own top, this verb read relative to ROOT - and could not be written AT ALL from a linked
   # worktree, where `.git` is a file rather than a directory. One resolution rule, spelled the same
   # way on both sides, and the key is now a bare name.
-  local _lm_head _lm_gcd _lm_path
+  local _lm_head _lm_gcd _lm_path _lm_line msha
   _lm_head=$(GIT rev-parse HEAD)
   # OBSERVE_ANCHOR STAYS MANDATORY ON BOTH ARMS. It is what supplies AREF - the local arm needs the
   # default branch's NAME and takes it from the remote's own advertisement, never from a local ref or
@@ -2507,8 +2507,41 @@ WTS
     # AGAINST THE WITNESS, not HEAD. They are the same commit on this arm, which is exactly why the
     # distinction is worth writing down: the gate is scoped to `remote` today, and a future arm that
     # validates something other than HEAD would silently start grading the wrong commit.
-    if ! grep -qF -- "$wit" "$_lm_path" 2>/dev/null; then
-      fail 34 "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted $wit, marker holds: $(tr -d '\r' < "$_lm_path" | head -1)"
+    #
+    # CONTAINMENT, NOT EQUALITY (TOOL-dUnstalledConvoy-38). The lander writes the commit it PUSHED,
+    # and under the `--no-ff` landing the charter mandates that is the merge, whose second parent is
+    # this worktree's HEAD - so a string compare refused every mandated landing from the tree the
+    # run lives in, and the only way through was to fast-forward the run branch onto the merge by
+    # hand. The predicate is three reads over the marker's commit: it exists here, it CONTAINS the
+    # witness, and the default branch the anchor observed REACHES it. A fast-forward landing passes
+    # both ancestry reads reflexively; a marker naming an EARLIER landing still refuses, because an
+    # earlier commit does not contain a later witness - the pass-by-finding-anything shape the
+    # equality was written against. The marker's commit is EVIDENCE and never the witness: the
+    # record keeps HEAD, the commit this arm validated against the advertisement.
+    #
+    # THE LIMIT. The predicate does not prove that the lander which wrote the marker is the one this
+    # project declares, and, against the concurrent-landing overwrite TOOL-aUnblockedFleet-7 records,
+    # the marker was written for THIS run - a later landing that merged this one's work overwrites
+    # the clone-shared marker and is accepted, correctly, because the work is on the default branch
+    # and a lander observed the push that carried it; the marker is written only inside the lander's
+    # push-succeeded branch, so the other ordering cannot arise. -7 stays OPEN for the lander that
+    # pushed and then failed to write.
+    _lm_line=$(tr -d '\r' < "$_lm_path" | head -1)
+    msha=$(printf '%s\n' "$_lm_line" | grep -oE '[0-9a-f]{40}' | head -1)
+    if [ -z "$msha" ]; then
+      fail 34 "the lander marker carries no commit sha, so it is a touched file and not evidence; fix what the lander writes. marker holds: $_lm_line"
+      return 1
+    fi
+    if ! GIT cat-file -e "$msha^{commit}" 2>/dev/null; then
+      fail 34 "the lander marker names a commit this clone does not hold, so nothing here can say whether it contains this landing; fetch the remote or re-run the lander. marker: $msha"
+      return 1
+    fi
+    if ! GIT merge-base --is-ancestor "$wit" "$msha" 2>/dev/null; then
+      fail 34 "the lander marker names a commit that does not contain the witness, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes. wanted $wit reachable from the marker's $msha"
+      return 1
+    fi
+    if ! GIT merge-base --is-ancestor "$msha" "$ASHA" 2>/dev/null; then
+      fail 34 "the lander marker names a commit the remote default branch does not reach, so the landing it records is not the one $AREF advertises; re-run the lander. marker $msha against $AREF at $ASHA"
       return 1
     fi
   fi

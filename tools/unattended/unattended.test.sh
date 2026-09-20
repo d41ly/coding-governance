@@ -4546,11 +4546,22 @@ sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 fixture
 git push -q -f origin HEAD:main 2>/dev/null
 
-# a marker naming an EARLIER commit — the arm a presence test cannot fail. The refusal names BOTH
-# shas, because "stale marker" and "HEAD moved since the push" are different faults with different
-# remedies and a message naming only the wanted one cannot tell them apart.
+# a marker naming a commit this clone does NOT HOLD — forty zeros is no commit anywhere, so the
+# predicate stops at its existence read and says so, rather than reporting a containment it could
+# not measure. TOOL-aWokenSentinel-16: this arm used to read the string-equality refusal.
 printf 'landed main at 0000000000000000000000000000000000000000 by a previous run\n' > "$GCD/tmarker"
-hit "$(run --landed tRun)" "the lander marker names a different commit, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes to name the commit this landing records. wanted"
+hit "$(run --landed tRun)" "the lander marker names a commit this clone does not hold, so nothing here can say whether it contains this landing; fetch the remote or re-run the lander. marker"
+
+# a marker naming an EARLIER commit that the remote DOES reach — the fixture's parent — which is
+# the pass-by-finding-anything class the equality was written against and the containment read
+# keeps refusing: an earlier commit does not contain a later witness. The refusal names BOTH shas,
+# because "stale marker" and "HEAD moved since the push" are different faults with different
+# remedies and a message naming only the wanted one cannot tell them apart.
+printf 'landed main at %s by push-main
+' "$(git rev-parse HEAD~1)" > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "the lander marker names a commit that does not contain the witness, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes. wanted"
+hit "$out" "wanted $(git rev-parse HEAD)"
 
 # ...and the marker naming THIS commit is ACCEPTED, which this fixture can finally prove. It used to
 # assert only that execution REACHED the ancestry check, because the unit branch sat one commit past
@@ -4560,7 +4571,7 @@ hit "$(run --landed tRun)" "the lander marker names a different commit, so it is
 printf 'landed main at %s by push-main
 ' "$(git rev-parse HEAD)" > "$GCD/tmarker"
 out=$(run --landed tRun)
-miss "$out" "the lander marker names a different commit"
+miss "$out" "the lander marker names a commit"
 miss "$out" "the lander wrote none"
 miss "$out" "HEAD is not an ancestor of the tip the remote advertises"
 same "the run reached LANDED with the marker accepted" "$(grep -c '^phase: LANDED' memory/builds/tRun/RUN.md)" "1"
@@ -4587,6 +4598,39 @@ git push -q -f origin HEAD:main 2>/dev/null
 out=$(run --landed tRun)
 miss "$out" "the project declares a lander marker and the lander wrote none"
 rm -f .git/tmarker
+
+# ---- THE `--no-ff` LANDING, FROM THE RUN WORKTREE (TOOL-aWokenSentinel-16, TOOL-dUnstalledConvoy-38).
+# ---- The charter's lander merges `--no-ff` and writes the MERGE to the marker; the run worktree's
+# ---- HEAD is that merge's second parent. The string equality refused every such landing and the
+# ---- only way through was to fast-forward the run branch onto the merge by hand. The predicate
+# ---- reads containment: the marker's commit CONTAINS the witness and the advertised default branch
+# ---- REACHES it. Observed RED first against the driver at this unit's base, where it refuses with
+# ---- `names a different commit`. The witness recorded is the run branch's HEAD, the commit this arm
+# ---- validated - never the merge, which nothing here examined.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+mkconf; printf 'LANDER_MARKER="tmarker"
+' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+fixture
+RUNTIP=$(git rev-parse HEAD)
+git checkout -q -B main "$BASE"
+git merge -q --no-ff -m "land the run" "$RUNTIP"
+MERGE=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main 2>/dev/null
+git checkout -q unit
+printf 'landed main at %s by push-main
+' "$MERGE" > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "phase LANDED"
+miss "$out" "the lander marker names a commit"
+same "the no-ff landing witnesses the run branch's HEAD, not the merge" \
+  "$(sed -n 's/^witness: //p' memory/builds/tRun/RUN.md)" "$RUNTIP"
+# ...and the marker names a DIFFERENT commit from HEAD, or the arm above is the fast-forward one.
+[ "$MERGE" != "$RUNTIP" ] \
+  || { echo "FAIL the no-ff fixture left the marker's commit equal to HEAD, so it cannot tell containment from equality"; st=1; }
+n=$((n+1))
+rm -f "$GCD/tmarker"
+git branch -f main "$BASE"; git push -q -f origin "$BASE":main 2>/dev/null
 reset_tree
 
 
@@ -5960,7 +6004,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=898
+FLOOR_ASSERTIONS=904
+# RAISED 898 -> 904 by TOOL-aWokenSentinel-16: the parent-commit marker arm (2) and the `--no-ff`
+# remote-arm fixture (4), in region two's lander-marker block, measured by running that block
+# alone over the sourced prologue: n 9 -> 15 on node `a`.
 # RAISED 824 -> 898 by TOOL-aWokenSentinel-2: the `--liveness` block plus one NOCONF assertion, in
 # region two beside the lease arms, measured by running that block alone over the sourced prologue:
 # n 26 -> 101 on node `a` (MSYS), of which 2 are the MSYS-only `tasklist`-stub arm, so the raise is
@@ -6010,7 +6057,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=702
+FLOOR_SHARD_2=708
+# +6 for the TOOL-aWokenSentinel-16 marker arms, in region two's lander-marker block.
 # +74 for the TOOL-aWokenSentinel-2 `--liveness` arms and the NOCONF line, in region two — see
 # FLOOR_ASSERTIONS above for the platform split.
 # +34 for the TOOL-aWokenSentinel-1 lease arms, in region two beside the `--audit` arms.
