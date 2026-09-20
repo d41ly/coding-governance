@@ -60,6 +60,18 @@ optional_keys = ["MEMORY_ROOT"]
 argv = ["bash", "{kit}/adopt-runlog.sh", "--scaffold"]
 mutates_index = false
 
+# THE RE-RENDER an update runs with GOVKIT_RERENDER=1, which govkit rule 3b-ii requires of a kit
+# shipping a `rendered` row — without it the rendered Skill goes a vintage stale in every adopter
+# tree on every update, and the kit's own `runlog skill wiring` leg then reds on a file the adopter
+# never edited. The argv is the adopter's `--scaffold` because that mode IS the re-render here: it
+# rewrites the Skill from the template and the target's conf whether or not one is already there.
+# The rule's message warns that an `[adopt]` argv is usually not a re-render, since it no-ops or
+# refuses on an adopted tree, so the claim was OBSERVED rather than assumed — a byte appended to the
+# rendered Skill made `--check` exit 1, `--scaffold` restored the shipped bytes exactly, and
+# `--check` came back 0. `memory-recall` declares the same pair for the same reason.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-runlog.sh", "--scaffold"]
+
 [check]
 argv = ["bash", "{kit}/adopt-runlog.sh", "--check"]
 
