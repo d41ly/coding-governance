@@ -282,7 +282,7 @@ from, the line does not go in.**
 | item | derived from |
 |---|---|
 | build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
-| decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted |
+| decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted + its commits' `Decided:` trailers (M10) |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
 | open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |
@@ -300,8 +300,11 @@ Three deltas, and no others. The contract — mandate, run state, phases, witnes
 - **Nobody reads the transcript**, which is `minimal-prose`. Speak only when it changes what happens
   next: a refusal, an abort, a park, the
   wrap-up. Anything you would have said goes to a file — a park to the run-state file, a decision to the spec, a
-  finding to a review record. **Never ask:** there is nobody to answer, so a question is a stall. The substitutes
-  are derive, ADOPT — `discoveries-adopted`, §11 — park and abort; the protocol's §13 says which one per exit.
+  finding to a review record, any other choice to a `Decided: <the choice> — <why>` line, one per choice, in the
+  commit's FINAL trailer block beside `Co-Authored-By:`, since git reads trailers nowhere else:
+  `Decided: ran two legs, not the bar — the push boundary runs it`. **Never ask:** there is nobody to answer,
+  so a question is a stall. The substitutes are derive, ADOPT — `discoveries-adopted`, §11 — park and abort;
+  the protocol's §13 says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
   Create it FIRST, reap it before the wrap-up. Both halves: protocol §5.
 - **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.24 -->
+<!-- gov:kit unattended@1.25 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -265,6 +265,14 @@ check grading them passes by finding nothing. Crossing the cap mid-flight reds t
 blocks `--close`, which leaves the override as the only exit: the spill exists so that never
 happens.
 
+**The run log is not this file, and nothing reads it back.** Every driver call but `--version` and
+`--plan` appends a START line and, from an EXIT trap, an END line to `runlog/driver.log` in the git
+COMMON dir: the driver's own exit code, `exit=clean` or `exit=unclean`, the refused checks and the
+phase after the verb. It is machine-local EVIDENCE as facts 5-7 are: no verb or gate branches on
+it, and a failed append prints one stderr line. `GOV_RUNLOG=0` turns it off, and
+`RUNLOG_SESSION_VARS` (§8) names the session. The committed record of a run is rendered from it by
+the Skill, never by a verb.
+
 ## 3. The phase vocabulary
 
 Kit-owned core, in run order:
@@ -486,6 +494,7 @@ where this document says it may:
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
+| `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.

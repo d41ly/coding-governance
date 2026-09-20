@@ -37,9 +37,17 @@ KIT = pathlib.Path(__file__).resolve().parent
 REPORT_REL = "drift-audit/drift_report.py"  # gov:root-fixture — scratch-repo path, never gov's own
 FAILS: list[str] = []
 SKIPS: list[str] = []
+EXECUTED: list[str] = []
+# TOOL-dLoggedFlight-13. The suite printed "all checks passed" with no count behind it, so an arm
+# stranded behind an early `return` passed by not running. This is the executed-check count measured
+# on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
+# one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
+# for a reason the floor cannot see.
+CHECK_FLOOR = 261
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
+    EXECUTED.append(label)
     if cond:
         print(f"  ok   {label}")
     else:
@@ -115,6 +123,8 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
         'TRAILING=spaced   \n'
         'export EXPORTED=exported\n'
         'INLINE=value   # a trailing comment bash does not put in the value\n'
+        'QUOTED_NOTE="noted"  # a note after a quoted value\n'
+        "SINGLE_NOTE='single' # a note after a single-quoted value\n"
     )
     p = tmp / ".memory-tree.conf"
     p.write_text(body, encoding="utf-8", newline="\n")
@@ -127,8 +137,10 @@ def test_conf_parser_matches_bash(tmp: pathlib.Path) -> None:
     if sh is None:
         skip("conf parser vs shell", "no POSIX shell here can source a file at this path")
         return
+    # TOOL-dLoggedFlight-13 R2-L5 — QUOTED_NOTE and SINGLE_NOTE: a quoted value followed by a comment
+    # kept its quotes, because the parser told quoted from unquoted by the value's last character.
     for key in ("MEMORY_ROOT", "DISCIPLINES", "QUOTED_SINGLE", "TRAILING",
-                "EXPORTED", "INLINE"):
+                "EXPORTED", "INLINE", "QUOTED_NOTE", "SINGLE_NOTE"):
         res = run([sh, "-c", f'set -a; . ./.memory-tree.conf; printf "%s" "${key}"'], tmp)
         if res.returncode != 0:
             check(f"{sh} could source the conf for {key}", False, res.stderr.strip()[:120])
@@ -2147,6 +2159,334 @@ def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
           ":(exclude)*.test-template.*" in globs,
           "the shipped EVIDENCE_GLOBS lost the exclusion the arm above only proves is honoured")
 
+
+# ---------------------------------------------------------------------------------------------
+# TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
+# ---------------------------------------------------------------------------------------------
+
+_RUN_SIG = "run_records_nonterminal_but_merged"
+
+
+def _write_run_record(r: pathlib.Path, rel: str, facts: dict, rows=()) -> str:
+    """A run-state file in the layout the driver leaves: its scaffold's header and generated region,
+    `## Run facts` with one `<key>: <value>` line per fact, then `## Parked` with every row on its own
+    line after a blank one, which is how `park` appends. A fact passed as None is absent, the way a
+    record reads when no verb ever wrote it. Returns `rel`, the repo-relative path."""
+    NL = chr(10)
+    p = r / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    body = [f"# {p.parent.name} - run state", "", "<!-- run:generated -->", "<!-- /run:generated -->",
+            "", "## Run facts"]
+    body += [f"{k}: {v}" for k, v in facts.items() if v is not None]
+    body += ["", "## Parked"]
+    for row in rows:
+        body += ["", row]
+    p.write_text(NL.join(body) + NL, encoding="utf-8", newline=NL)
+    return rel
+
+
+def _build_park_row(kind: str, item: str) -> str:
+    """One parked row, in the byte shape of the driver's `park`."""
+    return f"2026-01-01T00:00:00Z {kind} \u00b7 item {item} \u00b7 reason a fixture row"
+
+
+def _build_run_ctx(dr, r: pathlib.Path, base_ref: str = "main"):
+    """The four attributes the signal reads, over a fixture repo, and nothing the full `Ctx` would
+    derive from a charter or a family grammar this signal never consults."""
+    import types
+    return types.SimpleNamespace(root=r, memory_root=FIXTURE_MEMORY_ROOT, git=dr.Git(r, base_ref),
+                                 pins={})
+
+
+def _measure_git_calls(dr, r: pathlib.Path) -> int:
+    """How many git processes ONE call of the signal starts. Counted at the report module's own
+    `subprocess` binding, which both `Git.run` and the held-open batch resolve at call time, so no
+    other code in this process is touched and the binding is restored whatever happens."""
+    import types
+    real = dr.subprocess
+    calls: list = []
+
+    def run_counted(cmd, *a, **k):
+        if cmd and cmd[0] == "git":
+            calls.append(cmd)
+        return real.run(cmd, *a, **k)
+
+    def run_piped_counted(cmd, *a, **k):
+        if cmd and cmd[0] == "git":
+            calls.append(cmd)
+        return real.Popen(cmd, *a, **k)
+
+    proxy = types.SimpleNamespace(**{k: getattr(real, k) for k in dir(real) if not k.startswith("__")})
+    proxy.run, proxy.Popen = run_counted, run_piped_counted
+    dr.subprocess = proxy
+    try:
+        dr.build_nonterminal_merged_runs(_build_run_ctx(dr, r))
+    finally:
+        dr.subprocess = real
+    return len(calls)
+
+
+def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
+    """TOOL-dLoggedFlight-13 AC1 AC2 AC3 AC4: every row of the S3 table and every alternative in it,
+    the witness-to-base test in both stale directions, each other unjudgeable reason, the read at HEAD
+    and never the working tree, the report-only property, and the call count.
+
+    The value is asserted against THIS fixture and never against the tree the kit lives in, whose
+    count moves with every landing. Witnesses are real commits on and off `main`, so ancestry is
+    git's answer rather than a double of it.
+    """
+    print("run records left non-terminal after their build merged")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    NL = chr(10)
+    B = f"{FIXTURE_MEMORY_ROOT}/builds"
+    P = _build_park_row
+    r = make_repo(tmp, name="runrecords")
+
+    def run_commit(msg: str) -> None:
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def read_signal(base_ref: str = "main") -> dict:
+        return dr.build_nonterminal_merged_runs(_build_run_ctx(dr, r, base_ref))
+
+    # ---- S4, the two empty states. Nothing adopted is NOT ASKED; the kit's conf with no record is a
+    # population that may have gone blind, so it is DEAD. Neither may read as a clean zero.
+    empty = read_signal()
+    check("run records: none tracked and no .unattended.conf reads NOT ASKED, not a clean zero",
+          empty.get("not_asked") is True and empty["live"] is False, f"{empty}")
+    (r / ".unattended.conf").write_text("# the kit is adopted and no run has started" + NL,
+                                        encoding="utf-8", newline=NL)
+    run_commit("chore: adopt the unattended kit, with no run yet")
+    dead = read_signal()
+    check("run records: the conf with no record reads DEAD, not NOT ASKED",
+          dead["live"] is False and not dead.get("not_asked"), f"{dead}")
+
+    early = run(["git", "rev-list", "--max-parents=0", "main"], r).stdout.strip()
+    tip = run(["git", "rev-parse", "main"], r).stdout.strip()
+    side = run(["git", "rev-parse", "sidework"], r).stdout.strip()
+    check("run records: the fixture has a merged tip, its root and an unmerged side commit",
+          len({early, tip, side}) == 3 and all(len(s) == 40 for s in (early, tip, side)),
+          f"early={early!r} tip={tip!r} side={side!r}")
+
+    # ---- AC3, the S3 table. Every counted record has its witness AHEAD of its base on `main`, so only
+    # its last parked row decides its sub-class. One fixture per alternative, not per row: a table row
+    # listing four kinds is four ways to be wrong.
+    counted: dict = {}
+
+    def add_counted(slug: str, subclass: str, rows=(), phase: str = "BUILDING") -> None:
+        rel = _write_run_record(r, f"{B}/{slug}/RUN.md",
+                                {"phase": phase, "witness": tip, "base": early}, rows)
+        counted[rel] = (phase, subclass)
+
+    add_counted("tRetire", "retired-unit", [P("rescope", "retire TOOL-tRun-1")])
+    add_counted("tSupersede", "retired-unit", [P("rescope", "supersede TOOL-tRun-2 -> TOOL-tRun-3")])
+    add_counted("tRescopeAdd", "other", [P("rescope", "add TOOL-tRun-4")])
+    # The act is the item's FIRST word. A reader matching `retire` anywhere in the item reads this one
+    # as a retirement.
+    add_counted("tSecondWord", "other", [P("rescope", "add retire")])
+    for kind in ("decision", "abort", "override", "waiver"):
+        add_counted("tOwed" + kind.capitalize(), "surfaced-park", [P(kind, "a question refused")])
+    add_counted("tNoRows", "no-rows")
+    for kind in ("review", "dispatch", "brief", "proposal"):
+        add_counted("tHistory" + kind.capitalize(), "other", [P(kind, "a declaration")])
+    # LAST, not ANY: the same two rows in both orders, so a reader that asks "is there an owed row"
+    # passes one of these and fails the other.
+    add_counted("tOwedThenReview", "other", [P("decision", "asked first"), P("review", "then this")])
+    add_counted("tReviewThenOwed", "surfaced-park", [P("review", "this first"), P("decision", "then asked")])
+    # A kind the driver does not declare is not a parked row, so it cannot be the last one.
+    add_counted("tUndeclaredKind", "surfaced-park",
+                [P("decision", "asked"), P("heartbeat", "no driver writes this kind")])
+    add_counted("tLanding", "surfaced-park", [P("decision", "asked")], phase="LANDING")
+
+    # ---- AC3, the unjudgeable half: counted apart with the reason, never scored clean, never counted.
+    stale: dict = {}
+
+    def add_stale(slug: str, facts: dict, relation: str, why: str) -> None:
+        stale[_write_run_record(r, f"{B}/{slug}/RUN.md", facts)] = (relation, why)
+
+    add_stale("tClosedAtBase", {"phase": "LANDING", "witness": tip, "base": tip},
+              "equal", "witness not re-written since preflight")
+    add_stale("tBehindBase", {"phase": "LANDING", "witness": early, "base": tip},
+              "behind", "witness not re-written since preflight")
+    add_stale("tNoPhase", {"witness": tip, "base": early}, "unknown", "no phase: fact")
+    add_stale("tNoWitness", {"phase": "BUILDING", "base": early}, "unknown", "no witness: fact")
+    add_stale("tNamedWitness", {"phase": "BUILDING", "witness": "main", "base": early},
+              "unknown", "witness is not a sha")
+    add_stale("tGhostWitness", {"phase": "BUILDING", "witness": "0" * 40, "base": early},
+              "unknown", "witness does not resolve")
+    add_stale("tNoBase", {"phase": "BUILDING", "witness": tip}, "unknown", "no base: fact")
+    add_stale("tGhostBase", {"phase": "BUILDING", "witness": tip, "base": "f" * 40},
+              "unknown", "base does not resolve")
+    # Its witness IS behind this base in truth, which is exactly what one walk of `main` cannot see.
+    add_stale("tBaseOffMain", {"phase": "BUILDING", "witness": early, "base": side},
+              "unknown", "base is not on main")
+
+    # ---- Neither counted nor listed: terminal, archived, and unmerged.
+    quiet = [
+        _write_run_record(r, f"{B}/tLanded/RUN.md", {"phase": "LANDED", "witness": tip, "base": early},
+                          [P("decision", "asked")]),
+        _write_run_record(r, f"{B}/tArchived/RUN.ABORTED.0123abcd.md",
+                          {"phase": "ABORTED", "witness": tip, "base": early}),
+        _write_run_record(r, f"{B}/tUnmerged/RUN.md", {"phase": "BUILDING", "witness": side, "base": early}),
+        # AC1's HEAD-not-worktree pair, committed terminal here and edited live below.
+        _write_run_record(r, f"{B}/tWorktreeLive/RUN.md", {"phase": "LANDED", "witness": tip, "base": early}),
+    ]
+    # ...and its mirror, committed live here and edited terminal below.
+    add_counted("tWorktreeDone", "no-rows")
+    run_commit("chore: run records")
+
+    # AFTER the commit the working tree contradicts HEAD for two records, and a third record exists in
+    # the working tree alone. Every one of these is read at HEAD or not at all.
+    _write_run_record(r, f"{B}/tWorktreeLive/RUN.md", {"phase": "BUILDING", "witness": tip, "base": early})
+    _write_run_record(r, f"{B}/tWorktreeDone/RUN.md", {"phase": "LANDED", "witness": tip, "base": early})
+    untracked = _write_run_record(r, f"{B}/tUntracked/RUN.md",
+                                  {"phase": "BUILDING", "witness": tip, "base": early})
+
+    got = read_signal()
+    rows = {d.split(" ", 1)[0]: d for d in got["detail"] if not d.startswith("note")}
+    tracked = len(counted) + len(stale) + len(quiet)
+    check("run records: the population is every TRACKED record, the archive in and the untracked out",
+          got["of"] == tracked, f"of {got['of']}, wanted {tracked}")
+    check("run records: live over a non-empty population", got["live"] is True, f"live={got['live']}")
+    check("run records: the value is the counted fixtures and nothing else",
+          got["value"] == len(counted), f"value {got['value']}, wanted {len(counted)}: {got['detail']}")
+    check("run records: every unjudgeable fixture is counted apart",
+          got["unjudgeable"] == len(stale), f"unjudgeable {got['unjudgeable']}, wanted {len(stale)}")
+    for rel, (phase, sub) in sorted(counted.items()):
+        want = f"{rel} {phase} {tip[:8]} ahead {sub}"
+        check(f"run records: {rel.split('/')[2]} reads {sub}",
+              rows.get(rel) == want, f"got {rows.get(rel)!r}, wanted {want!r}")
+    for rel, (relation, why) in sorted(stale.items()):
+        row = rows.get(rel, "")
+        check(f"run records: {rel.split('/')[2]} is unjudgeable, {relation}, with its reason",
+              f" {relation} unjudgeable \u2014 {why}" in row, f"got {row!r}")
+    for rel in quiet + [untracked]:
+        check(f"run records: {rel.split('/')[2]} is neither counted nor listed",
+              rel not in rows, f"got {rows.get(rel)!r}")
+    check("run records: the refused-landing note closes the detail",
+          got["detail"][-1].startswith("note \u2014 a refused landing"), f"last {got['detail'][-1]!r}")
+
+    # ---- AC2, through the CLI: registered in SIGNALS, and `--check` exits 0 with the value above its
+    # pin, because nothing gates on a report-only signal. The premise is asserted first.
+    rep = report(r)
+    check("run records: the report registers the signal", _RUN_SIG in rep, f"signals {sorted(rep)}")
+    check("run records: the CLI reads what the in-process call read",
+          rep.get(_RUN_SIG, {}).get("value") == got["value"], f"cli {rep.get(_RUN_SIG)}")
+    chk = run([sys.executable, REPORT_REL, "--check"], r)
+    check("run records: --check exits 0 with the signal over its pin, because it is report-only",
+          chk.returncode == 0 and got["value"] > 0,
+          f"rc={chk.returncode} value={got['value']} stderr={chk.stderr.strip()[:200]}")
+
+    # ---- A walk that cannot happen is DEAD with its stage named, never a clean zero.
+    blind = read_signal("no-such-branch")
+    check("run records: a base ref the rev-list cannot walk reads DEAD, not a clean zero",
+          blind["live"] is False and blind["value"] == 0 and "rev-list" in str(blind["detail"]),
+          f"{blind}")
+
+    # ---- AC4, three git calls for five records and for fifty. A separate minimal repo, so the count
+    # is over a population the arm sets rather than over whatever the fixture above accumulated.
+    small = tmp / "runcalls"
+    small.mkdir()
+    run(["git", "init", "-q", "-b", "main"], small)
+    run(["git", "config", "user.email", "selftest@example.com"], small)
+    run(["git", "config", "user.name", "selftest"], small)
+    for name in ("base", "witness"):
+        (small / f"{name}.txt").write_text(name + NL, encoding="utf-8", newline=NL)
+        run(["git", "add", "-A"], small)
+        run(["git", "commit", "-q", "-m", name, "--no-verify"], small)
+    wit = run(["git", "rev-parse", "HEAD"], small).stdout.strip()
+    bas = run(["git", "rev-parse", "HEAD~1"], small).stdout.strip()
+    per_size = {}
+    for lo, hi in ((0, 5), (5, 50)):
+        for i in range(lo, hi):
+            _write_run_record(small, f"{B}/tCall{i}/RUN.md",
+                              {"phase": "BUILDING", "witness": wit, "base": bas}, [P("decision", "x")])
+        run(["git", "add", "-A"], small)
+        run(["git", "commit", "-q", "-m", f"{hi} records", "--no-verify"], small)
+        seen = dr.build_nonterminal_merged_runs(_build_run_ctx(dr, small))
+        per_size[hi] = (_measure_git_calls(dr, small), seen["value"])
+    for size, (calls, value) in sorted(per_size.items()):
+        check(f"run records: {size} records are all read and counted (the premise)",
+              value == size, f"value {value}")
+        check(f"run records: {size} records cost three git calls", calls == 3, f"{calls} calls")
+
+
+def _extract_driver_set(text: str, name: str):
+    """The members of one space-separated declaration in the driver, or None where it is absent."""
+    m = re.search(r"^" + name + r'="([^"]*)"', text, re.M)
+    return set(m.group(1).split()) if m else None
+
+
+def test_park_sets_match_the_driver(tmp: pathlib.Path) -> None:
+    """TOOL-dLoggedFlight-13 AC6: the engine's copies of the driver's four sets, held to the driver.
+
+    The engine SPELLS them because drift-audit runs in trees with no unattended kit; this arm is what
+    keeps a spelling from becoming a second vocabulary. The driver is reached by a path derived from
+    this kit's own directory, as the recall and workflow arms above reach theirs.
+    """
+    print("run-record sets vs the unattended driver's own declarations")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    driver = KIT.parent / "unattended" / "unattended.sh"
+    if not driver.exists():
+        skip("run-record sets equal the driver's", "no unattended driver beside this kit")
+        return
+    text = driver.read_text(encoding="utf-8", errors="replace")
+    pairs = (("PHASES_TERMINAL", dr._RUN_PHASES_TERMINAL), ("PARK_KINDS", dr._RUN_PARK_KINDS),
+             ("PARK_KINDS_OWED", dr._RUN_PARK_KINDS_OWED), ("PARK_ACTS_OWED", dr._RUN_PARK_ACTS_OWED))
+    for name, mine in pairs:
+        theirs = _extract_driver_set(text, name)
+        check(f"driver sets: {name} is declared where this arm reads it", bool(theirs),
+              "the declaration moved or emptied, so nothing below would compare anything")
+        if not theirs:
+            continue
+        check(f"driver sets: every {name} member the driver declares is in the engine",
+              not (theirs - set(mine)), f"engine lacks {sorted(theirs - set(mine))}")
+        check(f"driver sets: every {name} member the engine spells is the driver's",
+              not (set(mine) - theirs), f"driver lacks {sorted(set(mine) - theirs)}")
+
+    # THE CONTROL, so the comparison is seen to discriminate: the driver as it would read after gaining
+    # an owed kind the table lacks. The doctored copy is the real file with one member added, never a
+    # synthetic declaration, so the extraction it exercises is the one the checks above rely on.
+    doctored = re.sub(r'^PARK_KINDS_OWED="([^"]*)"', r'PARK_KINDS_OWED="\1 heartbeat"', text,
+                      count=1, flags=re.M)
+    grown = _extract_driver_set(doctored, "PARK_KINDS_OWED") or set()
+    check("driver sets: control — a driver that gains an owed kind reads unequal",
+          "heartbeat" in grown - set(dr._RUN_PARK_KINDS_OWED), f"extracted {sorted(grown)}")
+
+
+def test_version_carriers_agree(tmp: pathlib.Path) -> None:
+    """TOOL-dLoggedFlight-13 S6: every carrier of this kit's version agrees with the engine's constant.
+
+    The population is DERIVED: every file in this kit's directory that carries the marker, plus the
+    out-of-kit carriers its descriptor declares. A carrier that forgets the marker entirely drops out
+    of the first half, which is why the descriptor's declared list is required to resolve too.
+    """
+    print("drift-audit version carriers agree with the engine")
+    import tomllib
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    want = dr.KIT_DRIFT_AUDIT_VERSION
+    marker = re.compile(r"gov:kit drift-audit@([0-9][0-9.]*[0-9])")
+    in_kit = sorted(p for p in KIT.iterdir()
+                    if p.is_file() and marker.search(p.read_text(encoding="utf-8", errors="replace")))
+    desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
+    declared = [KIT.parent / c.split("/", 1)[1] for c in desc.get("marker_carriers", [])
+                if c.startswith("{prefix}/")]
+    check("versions: the kit dir holds carriers beyond the engine", len(in_kit) > 1,
+          f"found {[p.name for p in in_kit]}")
+    check("versions: the descriptor declares its out-of-kit carriers", bool(declared),
+          "marker_carriers is empty or no longer spelled with {prefix}")
+    for p in in_kit + declared:
+        text = p.read_text(encoding="utf-8", errors="replace") if p.exists() else ""
+        found = marker.findall(text)
+        check(f"versions: {p.name} carries the marker at {want}", bool(found) and set(found) == {want},
+              f"found {found}")
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -2168,13 +2508,22 @@ def main() -> int:
         test_source_cited_ids(tmp)
         test_report_only_signal_is_judged_against_its_pin(tmp)
         test_evidence_globs_exclude_test_templates(tmp)
+        test_nonterminal_merged_runs(tmp)
+        test_park_sets_match_the_driver(tmp)
+        test_version_carriers_agree(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")
+        print(f"drift-audit selftest: floor {CHECK_FLOOR} NOT compared — a skipped arm's checks are "
+              f"absent for a reason the floor cannot see")
+    elif len(EXECUTED) < CHECK_FLOOR:
+        FAILS.append("check floor")
+        print(f"drift-audit selftest: FAIL executed {len(EXECUTED)} checks, under the floor of "
+              f"{CHECK_FLOOR} — an arm went missing")
     if FAILS:
         print(f"drift-audit selftest: {len(FAILS)} FAILED — {', '.join(FAILS)}")
         return 1
-    print(f"drift-audit selftest: all checks passed"
+    print(f"drift-audit selftest: all checks passed ({len(EXECUTED)} executed, floor {CHECK_FLOOR})"
           + (f" ({len(SKIPS)} skipped, see above)" if SKIPS else ""))
     return 0
 

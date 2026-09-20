@@ -73,13 +73,15 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 
 ## Gaps
 
-- **There is no local cap to measure headroom against, since `TOOL-aHonedRuleset-6`.** The method
-  declared a byte and a line budget in its own opening prose, said in the same breath that no gate
-  enforced the pair, and the owner ruled the claim DELETED rather than made enforceable. What is
-  left is the hygiene class cap for `guides/`, a different constraint with a different owner. M1's
-  displacement discipline survives as a norm with no enforced figure. *(This bullet described the
-  pre-deletion state until `aHonedRuleset`'s closing review caught it, and it had also inverted the
-  axis: the deleted prose said the BYTE half bound first.)*
+- **Headroom is MEASURED, not recorded here.** The pair that used to sit in this bullet was wrong in
+  the measurement and in the caps it named, because both move and a number typed beside them does
+  not. The caps are declared on the method's own line 8; compare with
+  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. Which axis binds first is M1's to
+  state, and only the byte axis has a leg — `build-method size`, reading the
+  `tools/template-size-limits.txt` row. **`TOOL-aHonedRuleset-6` ruled that declaration DELETED
+  rather than made enforceable, and it is in the tree anyway:** `TOOL-aHoistedPass-3` gave the byte
+  half a leg the day before that ruling was built, and the merge landing `aHonedRuleset` restored the
+  passage without restoring the bullet that described its absence. Measure before citing either record.
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.
@@ -98,6 +100,11 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
   reader can check whether the call carries it. The obligation is still the method's least
   instrumented step, because nothing yet asserts that a spec audit HAPPENED.
+- **The `Decided:` trailer M10 routes a choice to is ungated, by design.** Whether a choice was made
+  is not observable, so nothing refuses a run that left none. M10's own example went through git's
+  trailer parser once, in the pass that wrote it (`TOOL-dLoggedFlight-7` AC3), and nothing grades a
+  later edit to it. How a run's trailers are harvested, and a line git did not parse counted, is the
+  run model's spec to say (`TOOL-dLoggedFlight-8`).
 - **A spec's gate list is authored. The bar's list is derived.** No check compares the two. Five builds
   closed a unit green on the legs their specs named while the unguarded codebase-map leg was red.
   The pre-commit hook now catches that one leg for staged `.py` and `.js` paths. For every other leg
