@@ -24,10 +24,10 @@
 #   STALE, under the cap, pid-alive yes   -> kill the tree, then the row below
 #   STALE, under the cap, logged in       -> append the attempt line, launch detached, resumed · attempt <n> · out <path>
 # The login row PRECEDES the kill row and the order is the point: a kill is useful only where a
-# launch will follow, so the probe that decides whether one can happen runs first, and a logged-out
-# node kills nothing (TOOL-aWokenSentinel-12 owns that ordering's proof). `--dry-run` prints the line
-# it would act on with ` (dry-run)` appended and does nothing else — no kill, no attempt line, no
-# launch, no login probe.
+# launch will follow, so the probe that decides whether one can happen runs first, and
+# a logged-out node kills nothing (TOOL-aWokenSentinel-12 owns that ordering's proof). `--dry-run`
+# prints the line it would act on with ` (dry-run)` appended and does nothing else — no kill, no
+# attempt line, no launch, no login probe.
 #
 # THE ATTEMPT CAP IS CONSECUTIVE, NOT LIFETIME. Only the sidecar lines newer than the run's last move
 # count against RESUME_ATTEMPTS, so a resume that produced a commit, a write or a transcript entry

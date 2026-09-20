@@ -150,6 +150,20 @@ seed_log() {
   local i; mkdir -p "$SIDECAR"
   for i in $(seq 1 "$1"); do printf '%s attempt %s session %s pid 999999999 pid-alive no out %s/resume.tRun.%s.out\n' "$2" "$i" "$SID" "$SIDECAR" "$i"; done >> "$SIDECAR/resume.tRun.log"
 }
+# derive_winpid <bash-pid> — the pid the tick's kill would take for a backgrounded `sleep`: under
+# MSYS its WINDOWS pid (ps's WINPID column, polled until the forked child has exec'd into `sleep`),
+# the bash pid elsewhere; empty when it never came, which every arm refuses to probe with.
+derive_winpid() {
+  local w="" i
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*)
+      for i in 1 2 3 4 5 6 7 8 9 10; do
+        w=$(ps -p "$1" | awk -v p="$1" 'NR>1 && $1==p && $NF ~ /sleep/ {print $4}'); [ -n "$w" ] && break; sleep 0.5
+      done ;;
+    *) w=$1 ;;
+  esac
+  printf '%s' "$w"
+}
 NOW_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 OLD_UTC=$(date -u -d "@$(( $(date -u +%s) - 7200 ))" +%Y-%m-%dT%H:%M:%SZ)
 UTC_RE='^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z '
@@ -260,16 +274,9 @@ run_tick_over "$TICK"
 check_hit "$OUT" "· resumed · attempt 6 · out " "AC3 five newer lines launch attempt 6"
 
 # ---- AC4: a LIVE recorded pid is killed with its tree before the launch. The arm's own background
-# ---- sleep, recorded by its WINDOWS pid under MSYS (ps's WINPID column, once the forked child has
-# ---- exec'd into `sleep`) and by $! elsewhere; gone from tasklist / kill -0 afterwards.
+# ---- sleep, recorded by the pid `derive_winpid` reads; gone from tasklist / kill -0 afterwards.
 sleep 300 & SLEEP_PID=$!
-case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*)
-    WPID=""; for i in 1 2 3 4 5 6 7 8 9 10; do
-      WPID=$(ps -p "$SLEEP_PID" | awk -v p="$SLEEP_PID" 'NR>1 && $1==p && $NF ~ /sleep/ {print $4}'); [ -n "$WPID" ] && break; sleep 0.5
-    done ;;
-  *) WPID=$SLEEP_PID ;;
-esac
+WPID=$(derive_winpid "$SLEEP_PID")
 if [ -n "$WPID" ]; then
   build_fixture "$WPID"
   run_tick_over "$TICK"
@@ -282,6 +289,30 @@ if [ -n "$WPID" ]; then
   esac
 else
   print_bad "AC4 fixture: no pid for the background sleep, so the kill arm would probe an empty value and prove nothing"
+fi
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
+
+# ---- U12 (TOOL-aWokenSentinel-12 AC1): a LOGGED-OUT node KILLS NOTHING. The login probe precedes
+# ---- the kill, so a STALE run with a LIVE recorded pid on a logged-out CLI is the announced skip:
+# ---- the sleep is still listed afterwards, the stub saw `auth status` and no `-p`, and no sidecar
+# ---- log exists. RED against a tick copy with the two calls swapped — the sleep is gone, which is
+# ---- a killed session with no resumer (`memory/gotchas/destructive-step-before-its-precondition`).
+sleep 300 & SLEEP_PID=$!
+WPID=$(derive_winpid "$SLEEP_PID")
+if [ -n "$WPID" ]; then
+  build_fixture "$WPID"
+  STUB_LOGGED_IN=false run_tick_over "$TICK"
+  check_same "U12 logged-out with a live pid exits 0" "$RC" "0"
+  check_hit "$OUT" "resume-tick: tRun · $FX · SKIP — the CLI is not logged in on this node; nothing can resume tRun" "U12 the logged-out skip is announced"
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*) check_same "U12 the sleep is still listed by tasklist" "$(tasklist //FI "PID eq $WPID" 2>/dev/null | grep -c 'sleep.exe')" "1" ;;
+    *) check_same "U12 the sleep is still alive" "$(kill -0 "$SLEEP_PID" 2>/dev/null && echo alive || echo gone)" "alive" ;;
+  esac
+  check_same "U12 the stub saw auth status" "$(grep -c 'argv auth status' "$STUB_LOG")" "1"
+  check_same "U12 the stub saw no -p" "$(grep -c 'argv -p' "$STUB_LOG")" "0"
+  check_same "U12 no sidecar log exists" "$([ -e "$SIDECAR/resume.tRun.log" ] && echo written || echo none)" "none"
+else
+  print_bad "U12 fixture: no pid for the background sleep, so the logged-out arm would probe an empty value and prove nothing"
 fi
 kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null; SLEEP_PID=""
 
@@ -311,11 +342,11 @@ check_same "AC12 two lines, one per tree" "$(printf '%s\n' "$OUT" | grep -c '')"
 
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Derived from
-# the seven arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20 (the pass that
-# wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, AC12 8 — 61
-# executed, pinned at ~10% headroom. The main loop's first green at VERIFYING confirms the executed
-# count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=55
+# the eight arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20 (the pass that
+# wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, U12 6,
+# AC12 8 — 67 executed, pinned at ~10% headroom. The main loop's first green at VERIFYING confirms
+# the executed count against this floor. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=61
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
