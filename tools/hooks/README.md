@@ -140,7 +140,11 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   same build), and a README it cannot read are each a deny naming the field or the path, and every
   throw inside it is returned as a deny because a hook that crashes at exit 1 admits. `kind` is
   compared as `String(kind)`, the callee's own derivation, so `["spec-audit"]` is a spec audit to
-  both; `repo` is folded from MSYS spelling (`/c/…`) before it is resolved. TWO LIMITS, stated
+  both; on Windows `repo` is folded from MSYS drive spelling (`/c/…`) before it is resolved, and a
+  repo under any other MSYS mount (`/tmp/…`) is not folded — it is denied by name, since Node cannot
+  place it. A subject that is absolute or `~`-rooted is denied too: a direct spec-audit subject is
+  repo-relative by the harness's contract, and a same-slug `builds/` folder in a second checkout is
+  otherwise indistinguishable from this one. TWO LIMITS, stated
   rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
   call and not a tool call, so the programmatic route is the unattended driver's to refuse
   (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README while that driver reads BASE, so

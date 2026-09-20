@@ -85,7 +85,7 @@ ids TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlinded
 | [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

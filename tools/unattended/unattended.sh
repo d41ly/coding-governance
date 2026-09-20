@@ -778,8 +778,12 @@ AUTH_GRAIN=""
 AUTH_RECORDS=""
 # TOOL-aBlindedTrial-2 - the `spec-audit: <date>` declaration, read from the same BASE blob and for
 # the same provenance property: a run cannot opt itself in or out by editing its working copy.
-# Empty is the ordinary case and means the pre-code audit is not owed by this build.
+# Empty is the ordinary case and means the pre-code audit is not owed by this build. That empty is
+# ALSO the value before check_authorization has run at all, so `AUTH_SPEC_AUDIT_DERIVED` says which
+# (round 2, R3): set to 1 on the line after the derivation, and a grader that finds it empty refuses
+# as NOT GRADABLE rather than printing a sentence about a README nobody read.
 AUTH_SPEC_AUDIT=""
+AUTH_SPEC_AUDIT_DERIVED=""
 observe_anchor() {
   local v names rem uf up nrem levers adv rc aref asha envd
   # ---- 22: git config supplied through the ENVIRONMENT. A check reading a config its own caller
@@ -1490,6 +1494,7 @@ check_authorization() { # slug · base
   # silent opt-out the sentence above forbids, one value narrower. Present-and-empty is shown as
   # `(empty)` so it takes the refusal; a README with no such line still falls through as not owed.
   AUTH_SPEC_AUDIT=$(printf '%s\n' "$_fm" | sed -n 's/^spec-audit=//p' | head -1)
+  AUTH_SPEC_AUDIT_DERIVED=1
   _sa_shown="$AUTH_SPEC_AUDIT"
   if [ -z "$AUTH_SPEC_AUDIT" ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then _sa_shown="(empty)"; fi
   case "$_sa_shown" in
@@ -2867,7 +2872,8 @@ verb_preflight() { # slug · keepalive-id
   fi
   # TOOL-aBlindedTrial-2 - the opt-in, pinned once and only when DECLARED, on the recipe facts'
   # terms: a blank fact would be a key that reads as configured while carrying nothing, and the
-  # `specs-audited` grader keys its term zero on the fact's presence.
+  # `specs-audited` grader compares the fact against the BASE derivation as evidence (fail 53 on a
+  # presence disagreement).
   if [ -n "${AUTH_SPEC_AUDIT:-}" ]; then
     [ -n "$(fact "$rel" spec-audit)" ] || set_fact "$rel" spec-audit "$AUTH_SPEC_AUDIT" || return 1
   fi
@@ -2904,8 +2910,9 @@ verb_preflight() { # slug · keepalive-id
 }
 
 # TOOL-aBlindedTrial-2 - the ONE line a reader learns the opt-in state from at the start of a run;
-# the other is the `specs-audited` item's own at --close. Reads the PINNED fact and never the
-# README, so it cannot disagree with the grader. Silent-at-zero is the house rule for the
+# the other is the `specs-audited` item's own at --close. Reads the PINNED fact; at --close the
+# grader re-derives from BASE and refuses (fail 53) if the two disagree on presence. Silent-at-zero
+# is the house rule for the
 # recommendation clause: a one-unit build with no open fork is what the trial measured the audit
 # buying nothing on, so the clause rides only where the build has two or more units in its
 # generated region or a tracked spec grades FORKED.
@@ -3810,9 +3817,11 @@ $_bcnon"
     specs-audited)
       # OWED ONLY WHEN DECLARED (TOOL-aBlindedTrial-2, on the owner's ruling TOOL-aBlindedTrial-6):
       # the pre-code spec audit is opt-in per build, and the build opts in with a dated `spec-audit:`
-      # key in its README at BASE, which --preflight pins as the `spec-audit` fact. Term zero below
-      # reads that fact; absent, the item is MET and announces that nothing was owed. The item stays
-      # in DOD_CORE so no adopter's CORE_FLOOR moves, which is why this is a term and not a set edit.
+      # key in its README at BASE, read by `authorization-reachable` into `AUTH_SPEC_AUDIT` in this
+      # same shell. Term zero below keys on THAT; the `spec-audit` fact --preflight pins is EVIDENCE
+      # compared against it, and a presence disagreement is fail 53. Derived absent, the item is MET
+      # and announces that nothing was owed. The item stays in DOD_CORE so no adopter's CORE_FLOOR
+      # moves, which is why this is a term and not a set edit.
       #
       # Where it IS owed: the spec audit is an `all`-scoped DIRECTIVE that no machine anywhere observed,
       # while the memory-tree index generator renders the exact gap into every build README and the run
@@ -3837,6 +3846,15 @@ $_bcnon"
       # false. That is the deleted-`base:`-line shape `trusted_base`'s header names, one key over, and
       # it takes the same cure: the recorded fact is EVIDENCE compared against the derivation, never
       # the input, and a disagreement on PRESENCE is a refusal. Never the worktree README either.
+      #
+      # NOT GRADABLE when the derivation never ran (round 2, R3): `authorization-reachable` returns
+      # early on an unreachable anchor or a missing README, the DoD loop grades every item regardless,
+      # and the global's "never set" and "derived absent" are the same bytes. The fail-53 sentence is
+      # printed only over a derivation that happened; this branch says the anchor is the cause.
+      if [ -z "${AUTH_SPEC_AUDIT_DERIVED:-}" ]; then
+        DOD_OUT="specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above), so whether this build opted in is unknown here"
+        return 1
+      fi
       _sa_fact=$(fact "$rel" spec-audit)
       if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
         fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"

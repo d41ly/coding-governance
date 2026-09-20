@@ -5646,6 +5646,19 @@ hit "$out" "so --close blocks: specs-audited"
 miss "$out" "declares no spec-audit: key"
 miss "$out" "close OK"
 
+# ---- R3 (closing review round 2): "derived absent" and "never derived" were the same empty bytes.
+# ---- Key at BASE, fact pinned, the anchor UNREACHABLE at --close: authorization-reachable returns
+# ---- before the README at BASE is read, the DoD loop grades every item anyway, and the term zero
+# ---- printed `at BASE: (none)` about a README nobody read. Now it says it could not grade, and why.
+bcopen; crfix; git add -A >/dev/null
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(run --close tRun $bcov)
+git remote set-url origin "$ORIGIN"
+hit "$out" "specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above)"
+miss "$out" "at BASE: (none)"
+miss "$out" "declares no spec-audit: key"
+miss "$out" "close OK"
+
 # ---- AC3 (aBlindedTrial-2): the epoch closes — main back to where tRun declares NO key — and a CLOSED
 # ---- unit with NO record closes with the item MET and ANNOUNCED, never blocked on it.
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main

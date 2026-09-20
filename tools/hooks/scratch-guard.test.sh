@@ -492,7 +492,7 @@ run_card "AC7 tool_use_id absent, session_id and cwd present, sentinel card -> d
 # The population is EXTRACTED from the engine file at run time, so a command the engine adds to its
 # orientation batch is fed here without anyone remembering to add an arm. The floor is PINNED at the
 # base measurement; an empty extraction is REFUSED rather than passed, the green-by-absence class.
-SG_SPAN_FLOOR=7   # measured 2026-09-14 at base c95fe32a: eight spans between `## Step 0` and `## Step 5`
+SG_SPAN_FLOOR=7   # 7 at main b7dee206 (was 8 at c95fe32a, 2026-09-14) — re-pin note below
 # RE-PINNED 8 -> 7 on 2026-09-20 (closing review of aBlindedTrial units 2–5, F7): `KICK-aReplayedCard-3`
 # restructured the engine's Steps and the count has read 7 at main b7dee206 and every commit since, so
 # this arm was red before that build opened and on `main` itself — a pre-existing red, not a lost

@@ -793,6 +793,41 @@ check_spec_audit "rule0: reviewDir climbing through .. into a declared build →
 SAM=$(printf '%s' "$SAJ" | sed 's|^\([A-Za-z]\):/|/\L\1/|')
 check_spec_audit "rule0: declared build, repo in MSYS /<drive>/ form → allow" 0 "" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAM\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# R1 (round 2) — containment must hold on the ROOT axis, not only the slug axis. A SECOND checkout
+# beside the first, same slug, no declaration: an ABSOLUTE or `~`-rooted subject spelling it was
+# admitted, because the walk found `builds/tSA` somewhere in the string and never asked whether the
+# path sits under `repo`. A direct spec-audit subject is repo-relative by the harness's own contract,
+# so every other spelling is denied by the same `subjects` sentence. The repo-relative allow above
+# is the control.
+SAREPO2="$TMP/sarepo2"; mkdir -p "$SAREPO2/memory/builds/tSA/spec"; printf -- '---\nslug: tSA\n---\n' > "$SAREPO2/memory/builds/tSA/README.md"
+SAJ2="$NODEDIR/sarepo2"; SAM2=$(printf '%s' "$SAJ2" | sed 's|^\([A-Za-z]\):/|/\L\1/|')
+check_spec_audit "rule0: declared reviewDir, an ABSOLUTE subject into a same-slug second checkout → deny naming subjects" 2 '`subjects`;;sarepo2/memory/builds/tSA/spec/s.md' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"$SAJ2/memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"}]}"
+check_spec_audit "rule0: ...the same subject in MSYS /<drive>/ form → deny naming subjects" 2 '`subjects`' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"$SAM2/memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"}]}"
+check_spec_audit "rule0: declared reviewDir, a ~-rooted subject → deny naming subjects" 2 '`subjects`;;~/memory/builds/tSA/spec/s.md' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"~/memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"}]}"
+# R2 (round 2) — the F5 fold corrects a WIN32 rule and must run there alone: on POSIX `/w/repo` is a
+# real root and the fold turned it into a cwd-relative `w:/repo` that ENOENTs. The hook exports
+# nothing, so the fold line is read out of the source and run under an overridden platform — the F1
+# pair arm's trick. A line that stops matching is a loud FAIL, never a silent pass.
+fold_line=$(grep -m1 '^[[:space:]]*const repo = ' "$HOOK")
+for plat_in_want in 'linux|/w/repo|/w/repo' 'win32|/w/repo|w:/repo' 'linux|C:/x/y|C:/x/y' 'win32|/tmp/x|/tmp/x'; do
+  IFS='|' read -r plat rin rwant <<<"$plat_in_want"
+  rgot=$(node -e "Object.defineProperty(process,'platform',{value:'$plat'}); const a={repo:'$rin'}; $fold_line; console.log(repo)" 2>/dev/null)
+  if [ -n "$fold_line" ] && [ "$rgot" = "$rwant" ]; then echo "ok   rule0: fold — on $plat repo $rin folds to $rwant"; pass=$((pass+1))
+  else echo "FAIL rule0: fold — on $plat repo $rin folded to '$rgot', want $rwant"; fail=$((fail+1)); fi
+done
+# ...and what the fold cannot reach ANNOUNCES itself: a repo under any other MSYS mount (`/tmp/…`)
+# used to resolve to `C:\tmp\…` and deny as a README that does not exist, hiding the spelling that
+# was tried. Win32 only — on POSIX `/tmp/x` is a real path and there is nothing to announce.
+if [ "$(node -p process.platform)" = win32 ]; then
+  case "$TMP" in /tmp/*) SAMOUNT="$TMP/sarepo" ;; *) SAMOUNT="/tmp/sarepo-msys-mount" ;; esac
+  check_spec_audit "rule0: declared build, repo under an MSYS mount other than /<drive>/ → deny naming repo + MSYS" 2 '`repo`;;MSYS' \
+    "{\"kind\":\"spec-audit\",\"repo\":\"$SAMOUNT\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+else
+  echo "skip rule0: MSYS-mount deny arm — not win32 (the fold and its residual are win32-only); the arm did NOT run"
+fi
 
 # ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
 # EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm

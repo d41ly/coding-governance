@@ -1733,10 +1733,16 @@ function scanJoinFindings(script) {
 // root-relative to the cwd's DRIVE, so `/c/projects/x` became `C:\c\projects\x` and a DECLARED build
 // was denied with ENOENT. No lowercasing: an fs read must not.
 
-// The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, or any `..`
-// segment. One walk for every subject so containment cannot be tested one way (closing review F2).
+// The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, any `..`
+// segment, or a spelling that is not repo-relative at all — absolute (`/…`, `X:…`) or `~`-rooted
+// (round 2, R1). A direct spec-audit subject is repo-relative by the harness's own contract, and a
+// slug walk over an absolute path answers the SLUG axis while a second checkout with the same slug
+// sits on the ROOT axis it never asked about. One walk for every subject so containment cannot be
+// tested one way (closing review F2).
 function extractBuildSlug(p) {
-  const parts = String(p).replace(/\\/g, '/').split('/')
+  const q = String(p).replace(/\\/g, '/')
+  if (q.startsWith('~') || /^([A-Za-z]:|\/)/.test(q)) return null
+  const parts = q.split('/')
   if (parts.indexOf('..') !== -1) return null
   const i = parts.indexOf('builds')
   return i === -1 || !parts[i + 1] ? null : parts[i + 1]
@@ -1772,7 +1778,15 @@ function checkSpecAuditDeclared(data) {
       }
     }
     const path = require('path')
-    const repo = a.repo.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/')
+    // The MSYS fold corrects a WIN32 rule and runs there alone (round 2, R2): on POSIX a one-letter
+    // first segment (`/w/repo`) is a real root, and the unguarded fold made it a cwd-relative
+    // `w:/repo` that ENOENTs. What the fold cannot reach — a repo under any OTHER MSYS mount, `/tmp/…`
+    // — is denied by name rather than resolved to `C:\tmp\…` and reported as a README that does not
+    // exist, which hid the spelling that was actually tried.
+    const repo = process.platform === 'win32' ? a.repo.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/') : a.repo
+    if (process.platform === 'win32' && repo.startsWith('/')) {
+      return renderDeny(`a spec-audit Workflow call whose \`repo\` (${JSON.stringify(a.repo)}) is an MSYS mount path other than /<drive>/… cannot be placed from Node on Windows; pass the Windows or /<drive>/ spelling.`)
+    }
     const root = path.resolve(data.cwd || process.cwd(), repo)
     readme = path.join(root, ...dir, 'README.md').split(path.sep).join('/')
     const bytes = require('fs').readFileSync(readme, 'utf8')
