@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-dLoggedFlight-30-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-dLoggedFlight-30-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 |
 
 <!-- /gen:spec-records -->
@@ -38,8 +39,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 ## 2. Scope (IN)
 
 - **S1** The absence. `test_record_known_replaced` reads the renderer module beside it, through the
-  `HERE` kit directory the suite already derives from its own `__file__`
-  (`tools/runlog/selftest.py:52`), and asserts the renderer defines no `derive_known` and holds no
+  `HERE` kit directory the suite already derives from its own `__file__` in
+  `tools/runlog/selftest.py` — cited by NAME, since rev-1's line number was off by one before a byte
+  of this unit landed — and asserts the renderer defines no `derive_known` and holds no
   `known = (cov` test, so the five Summary facts' slots are decided by the `count_sources` lookup
   `TOOL-dLoggedFlight-27` S2 declares and by nothing beside it. Observed by AC1.
 - **S2** The re-pointed source. On a schema copy whose `owner turns` slots are declared to come from
@@ -53,8 +55,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   renders byte-identical. That second reading is the equivalence H2 named, run rather than argued.
   Observed by AC2.
 - **S3** The unchanged behaviour. Over the same two models with the UNMODIFIED schema, the arm
-  expects the five Summary facts exactly as `test_record_ac10_unknown_counts`
-  (`tools/runlog/selftest.py:4792`) expects them, read from that arm's own model rather than typed,
+  expects the five Summary facts exactly as `test_record_ac10_unknown_counts` in
+  `tools/runlog/selftest.py` expects them — cited by NAME, since rev-1's line number had already
+  moved — read from that arm's own model rather than typed,
   so the replacement is evidenced by the re-pointing and never by a changed value. Observed by AC3.
 - **S4** The floor. `ASSERTION_FLOOR` rises by this unit's assertion count, with a RAISED comment
   naming this unit and the arithmetic that reaches the new value. Observed by AC4.
@@ -101,6 +104,13 @@ gone. What is new here is the target — the renderer, which none of unit 27's c
 | identifier | kind | cell |
 |---|---|---|
 | `test_record_known_replaced` | function | `py.function`, led by `test` |
+| `scan_replaced_spellings` | function | `py.function`, led by `scan` |
+| `read_summary_counts` | function | `py.function`, led by `read` |
+| `read_model_counts` | function | `py.function`, led by `read` |
+| `build_source_state_copy` | function | `py.function`, led by `build` |
+| `build_repointed_schema` | function | `py.function`, led by `build` |
+| `render_under_schema` | function | `py.function`, led by `render` |
+| `REPLACED_SPELLINGS` · `RENDERER_ANCHOR` | constants | `py.constant` |
 
 ### Files touched (estimate)
 
@@ -121,14 +131,16 @@ gone. What is new here is the target — the renderer, which none of unit 27's c
 ## 5. Production-readiness checklist
 
 - security — N/A — test code only, over synthetic fixtures.
-- perf / scale — one source read and four renders, two per schema state.
+- perf / scale — one source read, one fixture, and six renders: two per schema state and two more
+  under the staged break, which is graded against both states.
 - error / empty / loading states — the arm reds if the renderer module cannot be read from `HERE`,
   rather than treating an unreadable file as an absent spelling.
 - observability — a failure names the fact, the declared source, the coverage state and both values.
 - risks — an absence check passes when the renderer is renamed rather than replaced; S2's
   re-pointing is what makes the passing case mean the lookup decides the value.
-- testing — AC1 staged RED on a renderer copy that keeps the replaced test, AC2 on a renderer copy
-  that ignores `count_sources` for the Summary slots.
+- testing — AC1 staged RED on each of two copies of the renderer's own source, one per replaced
+  spelling cut back in; AC2 on a copy of the renderer that restores the replaced test over the five
+  Summary facts, graded both for redding AC2 and for leaving AC3 green.
 - migration — N/A — test code only.
 - user docs — the kit README's paragraph on unknown values.
 
@@ -137,8 +149,10 @@ gone. What is new here is the target — the renderer, which none of unit 27's c
 - **AC1** — When `test_record_known_replaced` reads the renderer module through the suite's `HERE`
   directory, that module defines no `derive_known` and holds no `known = (cov` test.
   Red when: either spelling is present, or the module cannot be read and the arm passes anyway.
-  Staged RED against a renderer copy that keeps `derive_known` beside the lookup, which must red
-  while every criterion of `TOOL-dLoggedFlight-27` still passes on that copy.
+  Staged RED against a copy of that source with a replaced spelling cut back in, one copy per
+  spelling. Every criterion of `TOOL-dLoggedFlight-27` passes on such a copy by construction, since
+  none of them reads a source at all, which is §1's finding; the copies are text and are never
+  imported or executed.
 - **AC2** — When the arm renders a model whose transcripts read a counted state and whose gates
   journal reads `dead`, against a schema copy declaring `owner turns` sourced from `gates`,
   `owner turns` reads `-` and `attributed calls` reads its counts; with the two coverage states
@@ -183,6 +197,12 @@ New arm: `tools/runlog/selftest.py` · AC1's two renderer copies keeping a repla
   staged copies are TEXT splices of the renderer's source that are never imported or executed, so
   "every criterion of `TOOL-dLoggedFlight-27` still passes on that copy" holds by construction
   rather than by a run — that unit's criteria read no source at all, which is §1's finding.
+  Then the four other halves those two amendments left standing, found by the
+  `amendment-leaves-its-other-half-standing` entry of the bug-class checklist over the code commit:
+  §5's testing line and its render count still described rev-1's single staged copy; the Inventory
+  named the arm alone and not the six helpers and two constants it arrives with; and S1 and S3 each
+  cited a `selftest.py` line number, one of which was off by one at rev-1 and the other of which had
+  already moved, so both now cite by NAME.
 
 ## 10. Reuse audit
 
