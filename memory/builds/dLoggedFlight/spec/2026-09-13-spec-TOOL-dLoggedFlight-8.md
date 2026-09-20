@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-15 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-16 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -250,8 +250,9 @@ sources actually support. Every later surface renders from this model rather tha
   agents. Observed by AC14.
 - **S11** The CLI `runlog.py model <slug> [--run <n>] --json` prints the model, and a local copy is
   written beside the extracts. `--journals <dir>` and `--transcripts <dir>` read another directory's
-  journals or transcripts. A session is read from its extract where one was written, and extracted in
-  memory where only its transcript is local. Observed by AC7.
+  journals or transcripts. A session whose transcript is local is extracted in memory from it, and
+  read from its store extract only where no transcript is, which `TOOL-dLoggedFlight-14` S1 made the
+  order and this line used to state the other way round. Observed by AC7.
 - **S12** Git cost: the model reads git in a number of calls that does not grow with the run's commit
   or record count. There are six: the run starts' one log (S1) and one ref listing, then one log over
   the own-commit range (S3) carrying bodies and trailers, one log over the build's run-state paths
@@ -390,7 +391,8 @@ the self-test at run time, so no new fixture file is tracked.
   sides of each boundary it names, and an allow-list is staged with its complement. Rotated fixtures are
   built the way the driver rotates, and run-state fixtures the way its verbs leave them.
 - migration — none.
-- user docs — the kit README's model section.
+- user docs — the kit README's model section, which points at `TREE_BLIND_VERBS` rather than
+  listing its members.
 
 ## 6. Acceptance criteria
 
@@ -714,6 +716,12 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
 - rev-15 · 2026-09-16 · §3 · the edges to `TOOL-dLoggedFlight-21` and `-24`, units the spec audit of
   units 14, 16 and 20, round 1, promoted at its BOUNDED exit. `journal_lines`, the model's `window` and
   S2's bounding rule do not change.
+- rev-16 · 2026-09-20 · S11 · §5 · folded R2-L4 of the closing diff review, round 2, and the staleness
+  `TOOL-dLoggedFlight-14`'s pass found in S11. R2-L4: the kit README twice and the map dossier once
+  listed three tree-blind verbs after rev-11 added `--audit` to the constant, so an adopter read that a
+  keepalive tick's `--audit` claims a tree. All three now point at `TREE_BLIND_VERBS`, the way
+  `METHOD["trees"]` already does, and no copy is left to gate. S11 stated the source order unit 14
+  inverted.
 
 ## 10. Reuse audit
 

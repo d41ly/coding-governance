@@ -228,9 +228,9 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   another run's, of this build or another, the call is that run's work and is unattributed, and a unit
   another run set is never this run's. The coverage block's call count is the model's tool calls.
 - **A run holds a tree from its first call there that claims it.** A preflight claims its tree, and
-  so does any other verb its START read before the close, except `--status`, `--resume` and
-  `--landed`. Those three can run from any tree, the primary tree included, and every run lands
-  from the primary tree. The hold ends at another run's first claim there after the run's last one,
+  so does any other verb its START read before the close, except the verbs `TREE_BLIND_VERBS`
+  names. Those read the record only, so they run from any tree, the primary tree included, and
+  every run lands from the primary tree. The hold ends at another run's first claim there after the run's last one,
   since a worktree outlives its run and is reused. So neither an owner's `--status` nor the run's own
   `--landed` makes another run's bar in the primary tree this run's.
 - **A close is an END reading `rc=0` and `exit=clean`.** An unclean END's `rc` is whatever `$?` its
@@ -462,9 +462,9 @@ prefix and root, and hold the render to an independent one.
   memory-tree grammar reads it, and not unit 6.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in
   alone. Two runs that claim one tree in the same stretch both hold it, so a bar there joins both.
-- **A tree the run worked in without claiming it.** A run whose only calls in a tree are
-  `--status`, `--resume` or `--landed`, or ones made after its close, holds no tree there, so a bar
-  it ran there joins only through a push that pinned it.
+- **A tree the run worked in without claiming it.** A run whose only calls in a tree are the verbs
+  `TREE_BLIND_VERBS` names, or ones made after its close, holds no tree there, so a bar it ran there
+  joins only through a push that pinned it.
 - **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
   can be wrong and still be an integer.
 - **Which line of a shifted prefix moved.** A line of the run that lands earlier than a hashed one

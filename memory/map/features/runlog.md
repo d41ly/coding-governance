@@ -112,7 +112,7 @@ commit and made `verify` report an unchanged journal; and the timeline listed co
 the run's calls ran in. The run's `--landed` runs in the primary tree, and an owner's `--status` can
 too, so every run's bar and push there became this run's for its whole window. The closing review's
 round 1 confirmed it as a HIGH. A tree is now held from the run's first call there that claims it,
-which no `--status`, `--resume` or `--landed` does and no call after the close does. The hold ends at
+which no verb in `TREE_BLIND_VERBS` does and no call after the close does. The hold ends at
 another run's first claim there, because a worktree outlives its run and gets reused. The class is
 claimed here as `join-key-widened-by-a-shared-location.md`.
 
