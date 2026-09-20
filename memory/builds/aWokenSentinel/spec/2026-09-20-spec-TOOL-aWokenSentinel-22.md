@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 22
+**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-22-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-22-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-22-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-22-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 |
 

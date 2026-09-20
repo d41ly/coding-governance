@@ -4787,6 +4787,41 @@ out=$(run --landed tRun)
 hit "$out" "the lander marker names a commit that does not contain the witness, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes. wanted"
 hit "$out" "wanted $(git rev-parse HEAD)"
 
+# ---- TOOL-aWokenSentinel-22: the two refusal branches unit 16 left unarmed, each observed RED first
+# ---- against the driver at 12513c25, where the equality compare reads both markers as `names a
+# ---- different commit`. The first `hit` of each pair quotes the branch's WHOLE signature as
+# ---- check-arms.py derives it — the longest literal run before the first interpolation, which runs
+# ---- past the sentence to `marker holds` and to `is not the one` — because a readable prefix reads
+# ---- as UNARMED (memory/gotchas/arm-literal-strands-on-message-edit.md).
+# the marker carries NO sha — a touched file, not evidence; and the refusal leaves the record where
+# it found it, the write-before-check property TOOL-dScaffoldedMirror-22 fixed.
+printf 'landed main at nothing by push-main\n' > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "the lander marker carries no commit sha, so it is a touched file and not evidence; fix what the lander writes. marker holds"
+hit "$out" "marker holds: landed main at nothing by push-main"
+same "no-sha marker leaves the record at LANDING" "$(grep -c '^phase: LANDING' memory/builds/tRun/RUN.md)" "1"
+
+# the marker names a commit that CONTAINS the witness but was never pushed. The scratch commit is
+# made over a TRACKED write: fixture() is `git add -A && git commit`, and on a clean tree it commits
+# nothing, exits 1 under set -u without set -e, and leaves HEAD where origin main already is.
+git branch -f tscratch HEAD; git checkout -q tscratch; printf 'scratch\n' > tscratch.txt; fixture; _unpushed=$(git rev-parse HEAD); git checkout -q -
+same "the scratch commit is not the run branch HEAD" "$([ "$_unpushed" != "$(git rev-parse HEAD)" ] && echo distinct)" "distinct"
+printf 'landed main at %s by push-main\n' "$_unpushed" > "$GCD/tmarker"
+out=$(run --landed tRun)
+hit "$out" "the lander marker names a commit the remote default branch does not reach, so the landing it records is not the one"
+hit "$out" "marker $_unpushed against refs/heads/main"
+same "unpushed marker leaves the record at LANDING" "$(grep -c '^phase: LANDING' memory/builds/tRun/RUN.md)" "1"
+# ...and pushed, the same marker is a LATER landing that contains this one — accepted: the
+# run-B-overwrites-run-A ordering TOOL-aUnblockedFleet-7 records, which spec 16 §4 tolerates.
+git push -q -f origin tscratch:main 2>/dev/null
+out=$(run --landed tRun)
+miss "$out" "does not reach"
+same "a later landing containing this one is accepted" "$(grep -c '^phase: LANDED' memory/builds/tRun/RUN.md)" "1"
+# THE CONTROL CONSUMED THE STATE: the record is LANDED and origin main is the scratch commit. The
+# accepting arm below establishes nothing of its own (TOOL-aWokenSentinel-26 makes it assert this),
+# so restore what the region's setup left — a committed LANDING, a clean tree, HEAD advertised.
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md; fixture; git push -q -f origin HEAD:main 2>/dev/null
+
 # ...and the marker naming THIS commit is ACCEPTED, which this fixture can finally prove. It used to
 # assert only that execution REACHED the ancestry check, because the unit branch sat one commit past
 # the anchor and `--landed` could never succeed here. Now that the marker gate is scoped to the
@@ -6228,7 +6263,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=961
+FLOOR_ASSERTIONS=970
+# RAISED 961 -> 970 by TOOL-aWokenSentinel-22: the no-sha marker arm (3), the unpushed-commit
+# marker arm with its scratch-commit guard (4) and its pushed control (2), region two's
+# lander-marker block, measured by running that block alone over the sourced prologue: n 15 -> 24
+# on node `a`.
 # RAISED 946 -> 961 by TOOL-aWokenSentinel-9: the `--status` keepalive-field arms (15) in region two
 # beside the `keepalive-reaped` read-back arms, measured by running that block alone over the sourced
 # prologue and the extraction block: n 23 -> 38 on node `a`.
@@ -6294,7 +6333,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=765
+FLOOR_SHARD_2=774
+# +9 for the TOOL-aWokenSentinel-22 no-sha and unpushed-commit marker arms with the pushed control,
+# in region two's lander-marker block beside the TOOL-aWokenSentinel-16 arms.
 # +15 for the TOOL-aWokenSentinel-9 `--status` keepalive-field arms, in region two beside the
 # `keepalive-reaped` read-back arms.
 # +29 for the TOOL-aWokenSentinel-7 `keepalive-reaped` read-back arms, in region two beside the

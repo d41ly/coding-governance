@@ -189,3 +189,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T23:14:51Z dispatch · item 1d8530e7 TOOL-aWokenSentinel-21 · reason tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/registry.toml tools/workflows/unattended-build.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-21-1-acceptance-ledger.md
 
 2026-09-20T23:14:52Z brief · item TOOL-aWokenSentinel-21 · reason 2b76fd627319 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-21-1-build-brief.md
+
+2026-09-20T23:24:20Z dispatch · item 98c3d290 TOOL-aWokenSentinel-22 · reason tools/unattended/unattended.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-22.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-22-1-acceptance-ledger.md
+
+2026-09-20T23:24:21Z brief · item TOOL-aWokenSentinel-22 · reason dce143db5632 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-22-1-build-brief.md
