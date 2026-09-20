@@ -1,10 +1,13 @@
 # TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial
 
-**Status:** INPROGRESS · rev-3 · 2026-09-20 · node a · Tier-1 · base d46d3ccb · streams tooling+playbook · order 1 · ratified 2026-09-20
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-1 · base d46d3ccb · streams tooling+playbook · order 1 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-build-TOOL-aBlindedTrial-1-briefs.md](../build/2026-09-20-build-TOOL-aBlindedTrial-1-briefs.md) | journal | — |
+| [2026-09-20-build-TOOL-aBlindedTrial-1-trial-report.md](../build/2026-09-20-build-TOOL-aBlindedTrial-1-trial-report.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -206,6 +209,10 @@ The scope menu, put to the owner 2026-09-20 and ratified at the recommended shap
   cell of tasks A and B passes 43/43 and 42/42 — so the edge-probe convergence measure is added
   over the open points the suites left unpinned. The suites stay frozen; the probe is a second
   instrument, not a rewrite of the first.
+- rev-4 · 2026-09-20 · §6 · CLOSED. All eleven criteria observed; the ledger is in the trial
+  report. 27 tools built, 27 pass their frozen suite, blind review confirms 21 / 21 / 19 defects for
+  B / P / S at 12.3× the output tokens for S; the report's §5 and §6 carry the verdict and its
+  limits.
 
 ## 10. Reuse audit
 

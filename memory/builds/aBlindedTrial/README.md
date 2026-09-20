@@ -47,7 +47,11 @@ run.
   replicates sequentially, and the audit is the shipped `tier2-review.js` harness.
 
 ## Parked decisions
-None yet.
+- **A fourth task with a deliberately vague brief.** Every brief here pins exit codes, tokens and
+  formats, so the case where a spec has the most room to help — a three-sentence owner brief — is
+  untested. Options: run the same three arms on one vague brief (≈60 agents), or accept the present
+  verdict as bounded to explicit briefs. Not the run's to decide: it is the trial's scope, ratified
+  at three tasks on 2026-09-20.
 
 <!-- roster:units -->
 
@@ -58,18 +62,18 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
+**Build status:** CLOSED · 1 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
 ids TOOL-aBlindedTrial-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | INPROGRESS | rev-3 | 2026-09-20 |
+| [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aBlindedTrial-1.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBlindedTrial-1.
 <!-- /gen:build-index -->
