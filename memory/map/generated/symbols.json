@@ -2218,6 +2218,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_window_bounds",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -7211,6 +7216,11 @@
       "id": "test_version_marker",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_window_ac1_ac4_git_only_bounds",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",

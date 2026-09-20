@@ -119,7 +119,11 @@ from collections import Counter  # noqa: E402
 # RAISED 1338 -> 1348 by TOOL-dLoggedFlight-21, the commitment: ONE new arm, the template pair, with
 # four checks, whose decoy checks move it by three; and AC5's inserted line with three more inside an
 # arm that already existed, which moves no decoy check. Two helpers arrive with neither.
-ASSERTION_FLOOR = 1348
+# RAISED 1348 -> 1358 by TOOL-dLoggedFlight-24, the Summary window: ONE new arm holding AC1 and AC4,
+# with seven checks — the equality against the leg's own call, its liveness that the two windows
+# differ, the rendered pair, the bounds against the fixture's committer times, the last-activity
+# closing time, AC4's absent field and its liveness — whose decoy checks move it by three.
+ASSERTION_FLOOR = 1358
 
 PASS = []
 FAIL = []
@@ -5221,6 +5225,57 @@ def test_source_ac7_discovered_reach():
     check("source AC7: with the earlier session's transcript local, its file last modified before the window's "
           "start leaves it unextracted, and modified at the start extracts it once and still counts it out",
           got, {"before the start": (0, "1 extracted", "present"), "at the start": (1, "1 extracted", "present")})
+
+
+# ================================================================ the Summary window (TOOL-dLoggedFlight-24)
+#
+# The ACn below are that unit's criteria, prefixed `window` so they never read as the record arms above.
+# Every figure is DERIVED at observation time: the two windows from the model and from the leg over one
+# landed fixture, and every committer time off that fixture's own history with `git log`, so no rendered
+# bound is graded against the code that rendered it.
+
+
+def test_window_ac1_ac4_git_only_bounds():
+    """AC1 and AC4: over one landed fixture the model's `record_window` IS the window the schema leg
+    derives for that run, the Summary renders that window's start and closing time with `duration` their
+    difference, and a model carrying no `record_window` renders both facts `-`."""
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    model = build_model(fx["repo"], journals=j)
+    runs = next(b for b in rl_record.check_records(fx["repo"])["run_state"]["builds"]
+                if b["slug"] == FX_SLUG)["runs"]
+    check("window AC1: the model's record_window is the window the schema leg derives for the run",
+          (len(runs), model.record_window), (1, runs[0][2]))
+    check_true("window AC1 liveness: the model's own journal-bounded window is NOT that window, so the "
+               "equality above compares two derivations and not one value twice",
+               model.window != model.record_window, str((model.window, model.record_window)))
+    # The fixture's own committer times, read off its history: a bound graded against the model that
+    # rendered it is one operand used twice.
+    times = {}
+    for line in run_git(["log", "--format=%H %ct", "--all"], fx["repo"]).stdout.split("\n"):
+        if line.split():
+            sha, ct = line.split()
+            times[sha] = int(ct)
+    start_t, close_t = times[fx["shas"][1]], times[fx["shas"][7]]
+    text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j))
+    facts = parse_record_markdown(text)["Summary"]["facts"]
+    check("window AC1: the Summary window is the start commit's time and the LANDED write's, and its "
+          "duration is their difference", (facts["window"], facts["duration"]),
+          (f"{rl_model.derive_iso(start_t)} to {rl_model.derive_iso(close_t)}", f"{close_t - start_t}s"))
+    check("window AC1: both rendered bounds are committer times of commits this fixture made",
+          [b for b in facts["window"].split(" to ") if rl_model.parse_iso(b) not in times.values()], [])
+    check("window AC1: a last-activity end closes at the closing commit's own time, the half-open "
+          "second taken back off", rl_record.derive_window_bounds(dict(model.record_window,
+                                                                      end_from="last-activity")),
+          (model.record_window["start"], model.record_window["end"] - 1.0))
+    bare = {k: v for k, v in dataclasses.asdict(model).items() if k != "record_window"}
+    without = parse_record_markdown(rl_record.render_record(bare, "memory"))["Summary"]["facts"]
+    check("window AC4: a model carrying no record_window renders the window and duration facts `-`",
+          (without["window"], without["duration"]), ("- to -", "-"))
+    check_true("window AC4 liveness: the same model WITH the field rendered a time in each bound, so the "
+               "`-` above is the field's absence and not the fixture's",
+               all(rl_model.parse_iso(b) is not None for b in facts["window"].split(" to ")),
+               facts["window"])
 
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)

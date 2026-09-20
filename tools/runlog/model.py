@@ -186,6 +186,11 @@ class RunModel:
     start_commit: str
     era: dict
     window: dict
+    # The window a fresh clone derives from GIT alone, the call the schema leg makes (spec S1 of
+    # TOOL-dLoggedFlight-24). The committed record renders its bounds from this field and never from
+    # `window` above, which is journal-bound and closes at a time no public source shows. It bounds
+    # nothing: `window` above still bounds every timed set.
+    record_window: dict
     phase: str
     terminal: bool
     facts: dict
@@ -1544,6 +1549,13 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
                      default=None)
     window = derive_window(w_start, w_from, phases_at, terminal, term_end, last_event)
     w_end = window["end"]
+    # THE GIT-ONLY WINDOW (spec S1 of TOOL-dLoggedFlight-24): the start commit's own time, and no
+    # `term_end` or `last_event`, both of which are journal-bound. This is the call `check_run_states`
+    # makes over the same `derive_record_commits` (record.py, TOOL-dLoggedFlight-10 S6), so the
+    # committed record's bounds and the window the schema leg grades are ONE derivation rather than
+    # two, and the record carries no bound that only this node's journals show. It reads no source
+    # the model has not already read and makes no git call of its own.
+    record_window = derive_window(float(pick["t"]), "git", phases_at, terminal)
     # The phase of the move that CLOSED the window: the terminal END's where one closed it, else the
     # first terminal write's. That move lies AT the end, which the half-open window never holds, so a
     # proof that IS that move is read here and not among the window's moves (spec S7). M2 of the
@@ -1791,7 +1803,8 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
 
     model = RunModel(
         slug=slug, run=k, runs=len(runs), runkey=pick["runkey"], record=pick["record"],
-        start_commit=pick["start"], era=era, window=window, phase=phase, terminal=terminal,
+        start_commit=pick["start"], era=era, window=window, record_window=record_window, phase=phase,
+        terminal=terminal,
         facts=facts, repairs=record["repairs"], worktrees=worktrees, sessions=sids,
         own_commits=[{"sha": c["sha"], "t": c["t"], "units": sorted(set(scan_unit_ids(id_re, c["subject"]))),
                       "merge": len(c["parents"]) > 1, "subject": c["subject"]} for c in own],

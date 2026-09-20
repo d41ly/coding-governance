@@ -345,6 +345,24 @@ def derive_yes_no(value) -> str | None:
     return "yes" if value else "no"
 
 
+def derive_window_bounds(window) -> tuple:
+    """`(start, closing time)` of a window as the record renders them (spec S2 of
+    TOOL-dLoggedFlight-24), each a commit's own committer time, or `(None, None)` for no window.
+
+    A window is HALF-OPEN, so a `last-activity` end is the last record commit's time plus the one
+    second that a commit time's resolution adds, and no public source shows that value. The closing
+    time takes that second back off, leaving the closing commit's own time: the first terminal
+    write's where the phase moved there, else the last record commit's. `terminal-end` never reaches
+    here, since `record_window` is derived with no `term_end`, and would be taken unchanged if it did:
+    it is a journal time, which the committed record does not carry.
+    """
+    w = window or {}
+    start, end = w.get("start"), w.get("end")
+    if any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in (start, end)):
+        return None, None
+    return start, (end - 1.0 if w.get("end_from") == "last-activity" else end)
+
+
 def build_matchers(slug, memory_root, own_ids) -> dict:
     """Every class of `RECORD_SCHEMA` as a predicate over text, bound to ONE build."""
     out = {}
@@ -628,9 +646,13 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
     pos = (m.get("owner_positions") or {}).get("counts") or {}
     usage = m.get("usage") or {}
     att = m.get("attribution") or {}
-    start, end = w.get("start"), w.get("end")
-    dur = f"{int(end - start)}s" if isinstance(start, (int, float)) and isinstance(end, (int, float)) \
-        and end >= start else None
+    # THE RENDERED WINDOW IS THE GIT-ONLY ONE (spec S2 of TOOL-dLoggedFlight-24): `record_window`,
+    # every bound of which is a commit's committer time, so the record states a window a fresh clone
+    # derives and the schema leg grades the derivation it renders. The model's journal-bounded
+    # `window` is read here for its provenance alone. A model without the field renders both facts
+    # `-`, the same as any other absent value.
+    start, close = derive_window_bounds(m.get("record_window"))
+    dur = f"{int(close - start)}s" if start is not None and close >= start else None
     present = sum(1 for s in mdl.SOURCE_NAMES if (cov.get(s) or {}).get("state") == "present")
     # AN UNKNOWN COUNT IS `-`, never the zero that reads clean (spec S4). The owner turns, the usage
     # lines and the attributed calls come from the transcripts, and the model counts zero of what it
@@ -648,7 +670,7 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
         "start": (m.get("start_commit"),),
         "phase": (m.get("phase") or None,),
         "terminal": (derive_yes_no(m.get("terminal")),),
-        "window": (mdl.derive_iso(start), mdl.derive_iso(end)),
+        "window": (mdl.derive_iso(start), mdl.derive_iso(close)),
         "window opened by": (w.get("start_from"),),
         "window closed by": (w.get("end_from"),),
         "duration": (dur,),

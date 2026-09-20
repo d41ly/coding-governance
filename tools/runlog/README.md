@@ -306,6 +306,14 @@ so no row leads with an id and the record defines none. Owner turns are counts p
 clock times, so the timeline carries none. The `Data` block is the markdown re-encoded as JSON, every
 fact and every shown row, one row per line.
 
+**The Summary's window is the GIT-ONLY one.** The model keeps two. Its `window` is journal-bounded and
+bounds every timed set it derives; its `record_window` is the window the schema leg below derives, from
+the start commit and the record commits alone. The record renders the second, so every bound it states
+is a commit's own committer time — the start commit's, and the first terminal write's or, where none
+has come, the last record commit's — and a fresh clone derives the same window from git. The one second
+a half-open end adds is taken back off, since no public source shows that value, and `duration` is the
+two bounds' difference. A model carrying no `record_window` renders both facts `-`.
+
 **No time in an owner turn's second.** A value derived from an owner turn is the same datum, so the
 render refuses the whole record, naming where and never what, when any UTC it would write, or any
 idle row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap

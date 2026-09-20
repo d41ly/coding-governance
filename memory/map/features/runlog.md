@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
   "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9",
   "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-14", "TOOL-dLoggedFlight-16",
-  "TOOL-dLoggedFlight-21"]
+  "TOOL-dLoggedFlight-21", "TOOL-dLoggedFlight-24"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
@@ -131,13 +131,14 @@ intact.
 by a merge or by a later renderer is exactly what a renderer's own discipline cannot vouch for, so
 `check_records` compiles `RECORD_SCHEMA` itself and grades staged bytes, in a number of git calls the
 self-test holds constant over the population. Its clean fixture is rendered, never typed. Which unit a
-spec defines is read through the model's `derive_spec_unit`, so the leg and the model share that rule. Building that arm found a real disagreement:
-the `label` class admits a lowercase UUID, so the absolute-path and UUID shapes became schema data the
-renderer withholds by and the leg refuses on. The leg also re-derives every run's start and window
-from git alone, reading the model's own `derive_record_commits` and `derive_window` rather than a
-copy. It hands `derive_window` its record commits and nothing else, so a non-terminal run's end in the
-leg is at or before the model's, which also reads the run's own commits and journals. No refusal of the
-leg reads that end, because a non-terminal run is always the last of its build. Staged against this
+spec defines is read through the model's `derive_spec_unit`, so neither can disagree. That arm found
+a real one: the `label` class admits a lowercase UUID, so the absolute-path and UUID shapes
+became schema data the renderer withholds by and the leg refuses on. The leg re-derives every run's
+start and window from git alone through the model's `derive_record_commits` and `derive_window`; the
+model keeps that result as `record_window`, what the committed record RENDERS, so its bounds are
+commit times a fresh clone reaches. It passes record commits alone, so a non-terminal end here is at
+or before the model's, which reads its commits and journals; no refusal reads it, since such a run
+is a build's last. Staged against this
 tree, the naive key and the unbounded era each red every rotated build it tracks, the two defects the
 round-2 and round-3 audits named.
 
