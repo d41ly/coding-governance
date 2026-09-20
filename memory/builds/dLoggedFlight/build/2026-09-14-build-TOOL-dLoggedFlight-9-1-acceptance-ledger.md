@@ -101,6 +101,15 @@ added AC10, whose line below that fold observed.
   its added push and verb events the `exit` the model copies from each END, so their `rc` cells still
   exercise the `int` class.
 
+- AC11 — `render_record` (`test_record_ac11_anomaly_sources`) — added at rev-12 by the render half of
+  the fold of R2-M2 of the closing diff review, round 2, and observed by it over the landed fixture
+  read both ways: with no local transcript the Coverage fact read `judged 9 of 12` beside
+  `anomalies 0`, the clean-looking zero the marker exists to mark, and with the session's extract
+  present it read `judged 12 of 12`. The kinds the local transcript adds are exactly those declaring
+  the transcripts or the idle judgement. The post-build suite run at `30212215` refuted this
+  criterion's LIVENESS, which had asked both renders to fall short of the closed list: spec rev-13
+  holds the not-local render short instead, and the arm then ran GREEN, 1543 passed, 0 failed.
+
 ## What else the pass carried
 
 - **Three model fields, each through `build_run_model`** (`test_record_model_fields`). `journal_lines`
