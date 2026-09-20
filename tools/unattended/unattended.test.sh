@@ -6202,7 +6202,12 @@ ip_base=$(git -C "$ip_dir" rev-parse main)
 ip_out=$(mktemp -d)
 # EVERY invocation runs with the scratch repo as its working directory, which is what makes the
 # driver resolve THAT tree; the script itself stays the one under test.
-iprun() { ( cd "$ip_dir" && GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
+# `env -u GATE_SELFTESTS` is not tidiness. The arms below read the BAR'S OWN environment for the
+# ABSENCE of that name, and the whole claim is about the DELTA this verb adds rather than about an
+# absolute. A developer who happened to export it would see those arms red against a correct
+# driver, which is a fixture inheriting ambient machine state. The one arm that WANTS it exported
+# sets it on its own invocation below and deliberately does not go through this helper.
+iprun() { ( cd "$ip_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" \n              bash "$SCRIPT" "$@" 2>&1 ); }
 ipgit() { git -C "$ip_dir" "$@"; }
 ipreset() {
   ipgit checkout -q --detach "$ip_unit" 2>/dev/null
