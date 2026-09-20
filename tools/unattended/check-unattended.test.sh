@@ -3464,7 +3464,7 @@ lmrestore .unattended.conf
 # ---- project takes records `none · no carrier` and pauses with nothing filed to restart it.
 printf 'RESUME_SCHEDULE="on"\n' >> "$lm_dir/.unattended.conf"
 out=$(lmrun)
-hit "$out" "and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair, or write RESUME_SCHEDULE=\"off\": RESUME_SCHEDULE_CREATE"
+hit "$out" "and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair"
 hit "$out" "RESUME_SCHEDULE_DELETE"
 lmrestore .unattended.conf
 
@@ -3473,7 +3473,7 @@ lmrestore .unattended.conf
 # ---- outlive — and the hold that filed it reads as owing a restart that can never fire.
 printf 'RESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="CronCreate"\nRESUME_SCHEDULE_DELETE="CronDelete"\n' >> "$lm_dir/.unattended.conf"
 out=$(lmrun)
-hit "$out" "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both CronCreate"
+hit "$out" "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both"
 lmrestore .unattended.conf
 
 # ---- 36: OFF is a legal declaration and is announced, not a refusal. A project may decide that

@@ -48,10 +48,10 @@ AC14, the attributed unattended run the main loop makes at VERIFYING.
   exits 1 naming the same placeholder in the render it just made; with `RESUME_SCHEDULE="off"` the
   render carries the fixed literal `not scheduled: RESUME_SCHEDULE is off` in place of both tool
   names and `--check` exits 0.
-- AC11 — `--close` — on a fixture whose history holds one hold row that owed a schedule, it prints
-  `the reap list this attestation is made over — keepalive kC · durable schedule
-  unattended-resume-trun`, and `--abort` prints the same line before it asks for the attestation. A
-  fixture whose holds owed none says so instead of naming a task nobody filed.
+- AC11 — `--close` — on a fixture whose history holds one hold row that owed a schedule, it prints the
+  reap list beside the keepalive id: `keepalive kC · durable schedule unattended-resume-trun`.
+  `--abort` prints the same line before it asks for the attestation, and a fixture whose holds owed
+  none says so instead of naming a task nobody filed.
 - AC12 — `memory/DECISIONS.md` — its TOOL heading carries one row keyed `TOOL-dDerivedDocket-5`
   recording the owner's on-everywhere ruling and the charter §9 override, 292 characters against the
   300-character entry budget.
@@ -69,4 +69,5 @@ AC14, the attributed unattended run the main loop makes at VERIFYING.
   sentences are in `tools/unattended/README.md`, and the `RECALL_CLI` and `MAP_CLI` cells keep their
   meaning and their OPTIONAL terms. The owed row arrived: `grep -c 'RESUME_SCHEDULE'` counts 0 at
   the parent and 1 here, one joined first cell. `UNATTENDED-STOPS.md` reads 23997 bytes and 377
-  lines, under both halves of the same cap. No cap was raised.
+  lines at the build commit and 24059 bytes and 377 lines after the checklist fold that follows it,
+  under both halves of the same cap either way. No cap was raised.

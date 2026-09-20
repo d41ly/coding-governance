@@ -276,8 +276,8 @@ instead. The protocol's section 5 points here and states none of it.*
 | `RESUME_SCHEDULE` | `on` or `off`. Absent or blank is `on`, announced as defaulted; any other value is a numbered refusal at conf load |
 | `RESUME_SCHEDULE_CREATE` | the DURABLE scheduler's create tool, named for the AGENT to call. REQUIRED while the switch is on |
 | `RESUME_SCHEDULE_DELETE` | its delete tool, on the same terms |
-| `RESUME_SCHEDULE_DELAY` | seconds, default 1800: how long after a `probe` hold its restart fires. OPTIONAL, announced when defaulted, refused when not a positive integer |
-| `RESUME_SCHEDULE_LIMIT` | holds, default 6: how many consecutive holds with no progress a run may take before it stops owing restarts. Same terms |
+| `RESUME_SCHEDULE_DELAY` | seconds: how long after a `probe` hold its restart fires. OPTIONAL, and the kit default is ANNOUNCED on stderr by the run that takes it rather than written here; not a positive integer is a refusal |
+| `RESUME_SCHEDULE_LIMIT` | holds: how many consecutive holds with no progress a run may take before it stops owing restarts. Same terms, same announcement |
 
 **The carrier may not be the keepalive's.** A `RESUME_SCHEDULE_CREATE` equal to `KEEPALIVE_CREATE` is
 a numbered refusal in the kit gate: that store is session-scoped by its own contract, so a restart
