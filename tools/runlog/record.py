@@ -110,8 +110,10 @@ RETIRED_SOURCES = {"verb": "driver", "push": "pushes", "push-refused": "pushes",
                    "workflow": "transcripts"}
 EXCLUDED_KINDS = tuple(k for k in mdl.PARK_KINDS if k not in mdl.PARK_KINDS_OWED)
 USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
-# The transcripts' coverage states under which a count the model derives from them is KNOWN (spec S4).
-# `partial` is a lower bound and says so in Coverage; under any other state the count is `-`.
+# The coverage states under which a count the model derives from a source is KNOWN (spec S4). It read
+# the transcripts alone until TOOL-dLoggedFlight-27 declared a source per count slot; it is the same
+# two states for every source. `partial` is a lower bound and says so in Coverage; under any other
+# state the count is `-`.
 COUNTED_STATES = ("present", "partial")
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 RECORD_NAME_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-[A-Za-z0-9]+-[0-9]+)-"

@@ -345,19 +345,19 @@ absolute path or a UUID, whatever class it passed: a path class's file segment a
 UUID. The schema leg below validates committed bytes against the same data.
 
 **An unknown value is `-`, never the zero that reads clean.** WHICH source each count comes from is
-declared, in `RECORD_SCHEMA["count_sources"]`, one entry per `{int}` slot of the facts whose source
-can read unknown: the owner turns, the usage lines, the attributed calls and the Coverage sessions
-from the transcripts, both journal-start counts from the driver journal, and every kind of the
-Timeline's `withheld rows` from the journal or the extract that timed it. A declared slot renders
-`-` unless its source's coverage state is `present` or `partial`. The model counts zero of what it
-never read, and an `in-window 0` would say the run never asked. A `stale` extract is not one of
-those states: its counts can be short by exactly the owner turns the run's last stretch held, and
-nothing in them says so. `idle` is the one entry naming a JUDGEMENT rather than a coverage state,
-and it is narrower by exactly that one: gaps are judged only where the transcripts read `present`,
-so an unjudged run's idle count would be a zero nobody measured. `check_count_sources` grades the
-declaration — a slot with no source, a source the model does not have, an entry keyed to no slot —
-and PRINTS every `{int}` slot outside it, so the counts that deliberately declare none are
-enumerated on every run rather than described by a sentence beside them.
+declared, one entry per `{int}` slot, in `RECORD_SCHEMA["count_sources"]`: the owner turns, the
+usage lines, the attributed calls, the Coverage session and journal-start counts, and every kind of
+the Timeline's `withheld rows`. The pairing is that declaration's own and is not copied here. A
+declared slot renders `-` unless its source's coverage state is `present` or `partial`. The model
+counts zero of what it never read, and an `in-window 0` would say the run never asked. A `stale`
+extract is not one of those states: its counts can be short by exactly the owner turns the run's
+last stretch held, and nothing in them says so. `idle` is the one entry naming a JUDGEMENT rather
+than a coverage state, and it is narrower by exactly that one: gaps are judged only where the
+transcripts read `present`, so an unjudged run's idle count would be a zero nobody measured.
+`check_count_sources` grades the declaration — a slot with no source, a source the model does not
+have, an entry keyed to no slot — and PRINTS every `{int}` slot outside it, so the counts that
+deliberately declare none are enumerated on every run rather than described by a sentence beside
+them.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
 `TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision
