@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-12 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-13 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -365,6 +365,11 @@ none
   kinds that WERE judged, and the marker was taken instead. The rendered Skill's missing-transcript
   paragraph names the two kinds, and that copy is held to the declaration by the Skill-copy arm, in
   order and in both directions, so it moves with the table rather than beside it.
+- rev-13 · 2026-09-20 · AC11 · the post-build suite run refuted AC11's liveness, which asked BOTH
+  renders to fall short of the closed anomaly list. With every source present the figure should reach
+  the whole list, and it does: `judged 12 of 12` against the not-local render's `judged 9 of 12`. The
+  liveness holds the NOT-LOCAL render short of the list while it still commits `anomalies 0`, which is
+  the clean-looking zero the marker exists to mark.
 
 ## 10. Reuse audit
 

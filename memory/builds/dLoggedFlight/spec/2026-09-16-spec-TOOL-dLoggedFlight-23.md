@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot
 
-**Status:** CLOSED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 28
+**Status:** CLOSED · rev-4 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -213,6 +213,12 @@ none
   the amendment had left standing — §3's edge to `TOOL-dLoggedFlight-9` and §5's perf and
   testing lines — and `naming-leg-grades-what-python-named`, which grades nested helpers, so
   the sentinel minter is `add_sentinel` rather than leading with a verb the table lacks.
+- rev-4 · 2026-09-20 · AC2 · the post-build suite run refuted the second half of AC2's staged RED.
+  It asserted that a range read from the model's UNFILTERED timeline ends on a sentinel, which held
+  while the journal rows were rendered; `TOOL-dLoggedFlight-22` retired them, so the two timelines
+  differ in length, the same edge lands on a git row and its time is public. The arm reds on a
+  correct renderer no more: what makes the unfiltered read a leak is that the range SPANS rows of
+  kinds the record retires, each one timed by a journal, and that is what the break asserts now.
 
 ## 10. Reuse audit
 

@@ -938,6 +938,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_spec_mark_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_spec_record_index",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -999,6 +1004,11 @@
     },
     {
       "id": "build_variant",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_visit_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -1171,6 +1181,11 @@
       "id": "checkUnwalkableTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "check_anomaly_sources",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "check_argv_of",
@@ -1401,6 +1416,11 @@
       "id": "check_rotation",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "check_run_call",
+      "kind": "function",
+      "file": "tools/runlog/model.py"
     },
     {
       "id": "check_run_states",
@@ -2091,6 +2111,11 @@
       "id": "derive_journal_join",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_judged_kinds",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "derive_layer_verdict",
@@ -4083,6 +4108,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_judged_kinds",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4253,6 +4283,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_spec_marks",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_stale_header_waiver",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4381,6 +4416,11 @@
       "id": "read_units",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_visit_facts",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_waivers",
@@ -6703,6 +6743,21 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_model_ac24_read_only_visit",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac25_visit_places_nothing",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_model_ac26_mark_split_at_the_window",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_model_ac2_own_commits",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6979,6 +7034,11 @@
     },
     {
       "id": "test_record_ac10_unknown_counts",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac11_anomaly_sources",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

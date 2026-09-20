@@ -6084,12 +6084,17 @@ def test_record_time_population():
                                 if t in {rl_model.derive_iso(s) for s in sent}]),
           (rl_record.TIMELINE_EDGE, True, []))
     wide = raw[edge:len(raw) - edge]
-    check("record AC2 RED: read from the model's unfiltered timeline the range differs, and names a "
-          "time no record carries",
+    # The second half asserted that a range read from the unfiltered timeline ENDS on a sentinel.
+    # That held while the journal rows were rendered; once `TOOL-dLoggedFlight-22` retired them the
+    # two timelines differ in LENGTH, so the same edge lands on a git row whose time is public, and
+    # the claim was false against a correct renderer (post-build run, 2026-09-20). What makes the
+    # unfiltered read a leak is the RANGE, not its ends: it spans rows of kinds the record retires,
+    # every one of them timed by a journal.
+    check("record AC2 RED: read from the model's unfiltered timeline the range differs, and spans "
+          "rows of kinds the record retires",
           ("%d events from %s to %s" % (len(wide), rl_model.derive_iso(wide[0]["t"]),
                                         rl_model.derive_iso(wide[-1]["t"])) != tlf.get("elided"),
-           any(rl_model.derive_iso(s) in (rl_model.derive_iso(wide[0]["t"]),
-                                          rl_model.derive_iso(wide[-1]["t"])) for s in sent)),
+           any(e.get("kind") in rl_record.RETIRED_EVENTS for e in wide)),
           (True, True))
     # AC3. Every slot the schema declares rendered a token, staged RED three ways.
     check("record AC3: every slot scan_time_slots returns rendered at least one token",
@@ -6327,10 +6332,15 @@ def test_record_ac11_anomaly_sources():
           sorted(read_judged_kinds(got["present"][0]) - read_judged_kinds(got["not-local"][0])),
           sorted(k for k in rl_model.ANOMALY_KINDS
                  if {"transcripts", "idle"} & set(rl_model.ANOMALY_SOURCES[k])))
-    check_true("record AC11 liveness: the two renders disagree, both fall short of the whole list, and "
-               "the not-local one commits `anomalies 0` — the clean-looking zero this fact marks",
+    # The liveness asked BOTH renders to fall short of the closed list, which is wrong in the
+    # direction that matters: with every source present the figure SHOULD reach the whole list, and
+    # it did (post-build run, 2026-09-20: `judged 12 of 12` against `judged 9 of 12`). What the
+    # liveness is for is that the not-local render falls short while still committing `anomalies 0`,
+    # so the marker has something to mark.
+    check_true("record AC11 liveness: the two renders disagree, the not-local one falls short of the "
+               "whole list, and it commits `anomalies 0` — the clean-looking zero this fact marks",
                got["not-local"][1] != got["present"][1]
-               and len(read_judged_kinds(got["present"][0])) < len(rl_model.ANOMALY_KINDS)
+               and len(read_judged_kinds(got["not-local"][0])) < len(rl_model.ANOMALY_KINDS)
                and not got["not-local"][0].anomalies,
                str({name: text for name, (_m, text) in got.items()}))
 
