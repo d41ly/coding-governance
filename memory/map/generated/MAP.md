@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 72 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 107 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 73 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -111,6 +111,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `tier2-review self-test` | review-harnesses |
 | `unattended kit gate` | unattended |
 | `unattended skill wiring` | unattended |
+| `unattended-build self-test` | UNCLAIMED |
 | `verdict epoch (kit version dates the engine)` | memory-tree-hygiene |
 | `verdict-epoch self-test` | memory-tree-hygiene |
 | `verifier fan-out` | agent-cap |
@@ -217,6 +218,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 8 �
 | `inline-marker-breaks-a-line-continuation.md` | install-prefix |
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `ledger-token-wrapped-across-a-line-joins-nothing.md` | memory-tree-hygiene |
+| `line-count-reads-empty-capture-as-one.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `msys-grep-counts-cr-on-every-line.md` | session-kickoff |
 | `naming-leg-grades-what-python-named.md` | lexicon |

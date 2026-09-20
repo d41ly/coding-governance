@@ -52,6 +52,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [inline-marker-breaks-a-line-continuation](inline-marker-breaks-a-line-continuation.md) | class | 5 |  | appending a per-line annotation to the lines a gate selected breaks any of them that ended in a backslash, and the result is valid shell that silently drops the rest of the command |
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 2 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
+| [line-count-reads-empty-capture-as-one](line-count-reads-empty-capture-as-one.md) | class | 4 |  | a line count over a captured variable that adds a newline before counting reads an EMPTY capture as one line, so a one-line assertion cannot fail on a command that wrote nothing |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 5 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
 | [msys-grep-counts-cr-on-every-line](msys-grep-counts-cr-on-every-line.md) | class | 3 |  | on an MSYS node `grep -c $'\r'` matches every line of an LF-only file, so a CR probe reports the whole file as CRLF and a clean tree as dirty |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
@@ -87,6 +88,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-72 record(s): 72 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+73 record(s): 73 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

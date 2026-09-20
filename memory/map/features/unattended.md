@@ -23,7 +23,7 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "spec-names-code-its-base-lacks.md", "two-guards-one-question-two-answers.md",
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
-  "destructive-step-before-its-precondition.md"
+  "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md"
 ]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
 backlog-shards = []
@@ -259,12 +259,11 @@ silently; re-derive this section whenever the feature is touched.*
   source: the handle-membership test is skipped on a TERMINAL record, because a frozen waiver graded
   against a moving directive set is a red wedge no verb can repair, and the git join is silent when
   the record has no committed blob.
-- **Both Definition-of-Done items shipped.** `build-complete` is a five-term conjunction over the
-  authored roster and the run-state file's copied region; `closing-review-recorded` joins the pinned
-  BASE to a tracked review record. `CORE_FLOOR` is `10:8`. The base needle is SEVEN characters, not
-  eight: git abbreviates to seven here, 29 of 48 tracked records spell it that way, and the
-  eight-char form shipped briefly and matched none of them — an item clearable only by an override
-  the run wrote for itself.
+- **The DoD core is `CORE_FLOOR` in `.unattended.conf`, never a count typed here** — this row
+  once said `10:8` and rotted. `closing-review-recorded` joins the pinned BASE to a tracked review
+  record. The base needle is SEVEN characters, not eight: git abbreviates to seven here, 29 of 48
+  tracked records spell it that way, and the eight-char form shipped briefly and matched none of
+  them — an item clearable only by an override the run wrote for itself.
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.
