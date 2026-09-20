@@ -66,6 +66,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [record-citing-a-foreign-id-defines-or-orphans-it](record-citing-a-foreign-id-defines-or-orphans-it.md) | class | 2 |  | writing another build's id into a record either DEFINES it or ORPHANS it, and the orphan count sees only one of those, so the obvious check passes on the worse half |
 | [record-without-serves-or-with-a-round-counter](record-without-serves-or-with-a-round-counter.md) | class | 7 |  | a new build record owes a Serves line and a filename that projects it, and a round counter in that filename mints an id nothing defines |
 | [reflowed-prompt-string-reads-as-a-deleted-stop](reflowed-prompt-string-reads-as-a-deleted-stop.md) | class | 2 |  | check 12 of the unattended gate greps the kickoff engine's READY prompt string as one fixed string on one physical line, so a reflow that wraps it at the house width reads as the READY stop having been deleted |
+| [retirement-inventory-misses-readers-by-value](retirement-inventory-misses-readers-by-value.md) | class | 2 |  | an inventory of what reads a retired thing, built by searching for its name, misses every assertion on a count or a value that thing carries, because those name nothing |
 | [row-driver-emits-a-plausible-file-with-rows-missing](row-driver-emits-a-plausible-file-with-rows-missing.md) | class | 6 |  | the backlog row driver never errors on a wrong input order or a two-sided rotation — it emits a well-formed shard with the other side's rows silently gone |
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
 | [settings-edit-takes-effect-mid-session](settings-edit-takes-effect-mid-session.md) | class | 1 |  | an edit to the hooks settings file is live on the next tool call, not at the next session, so a throwaway hook fires on the call that checks for it |
@@ -93,6 +94,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [withheld-value-recovered-from-a-derived-one](withheld-value-recovered-from-a-derived-one.md) | class | 2 |  | a schema withholds a value by name and still publishes one derived from it, so a reader recovers the withheld value from the rendered one by arithmetic |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-78 record(s): 78 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+79 record(s): 79 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

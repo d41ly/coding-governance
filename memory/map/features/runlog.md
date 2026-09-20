@@ -21,7 +21,8 @@ rendered-skills = ["runlog"]
 gotcha-classes = ["nt-against-a-missing-file-is-true.md",
   "trapped-signal-waits-for-the-foreground-child.md", "fixed-sleep-does-not-place-a-signal.md",
   "staged-break-runs-stale-bytecode.md", "withheld-value-recovered-from-a-derived-one.md",
-  "join-key-widened-by-a-shared-location.md"]
+  "join-key-widened-by-a-shared-location.md",
+  "retirement-inventory-misses-readers-by-value.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -76,7 +77,7 @@ push protection blocks a literal key; the self-test scans the kit's own tracked 
 so a literal credential committed anywhere in it reds. Each rule compiles alone, because one combined
 alternation was measured to change which rules match once inline flags go global. The prefilter's cost
 claim is a COUNT: over a generated population, the wrapped patterns' searches equal the hint-matched
-pairs, and the wall time is printed report-only.
+pairs.
 
 **The extractor keeps STRUCTURE and no free text, and it streams.** Transcripts hold the rest of a
 run — every call, owner turn, compaction, limit and token — but only on the node that ran it, and the
@@ -120,10 +121,10 @@ claimed here as `join-key-widened-by-a-shared-location.md`.
 `RECORD_SCHEMA` is data: shaped regexes and closed lists, the model's own lists by reference, with
 each section's fact templates and table columns declared, so the schema leg of `TOOL-dLoggedFlight-10`
 grades committed bytes against the same data rather than trusting the renderer. A value outside its
-class becomes `-` and is counted, so a model that grew a value the schema lacks says so in its record.
+class becomes `-` and is counted, so a model that grew a value the schema lacks says so.
 Owner turns stay counts, never clock times. The spec's first bounds measured over the cap once the
 JSON twin doubles every row, so `TIMELINE_EDGE` and `LIST_BOUND` fell, with a halving step for
-unusually wide cells; the figures live in those constants. The commitment is a digest and a count of
+wide cells; the figures live in those constants. The commitment is a digest and a count of
 the MODEL's attributed lines, no time (owner, 2026-09-16); only an append leaves verify's prefix
 intact.
 

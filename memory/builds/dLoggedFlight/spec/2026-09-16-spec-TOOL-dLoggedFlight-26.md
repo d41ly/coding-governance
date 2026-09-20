@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 24
+**Status:** CLOSED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 24
 
 <!-- gen:spec-records -->
 

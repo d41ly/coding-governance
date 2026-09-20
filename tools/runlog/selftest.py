@@ -132,7 +132,13 @@ from collections import Counter  # noqa: E402
 # both ways, its reasons, and per placement what moved, where the closer went, and that the record
 # compared was populated. Their decoy checks move it by 6, and the three assertions of the window
 # loop this unit retires come off: 20 + 8 + 6 - 3 = 31.
-ASSERTION_FLOOR = 1389
+# RAISED 1389 -> 1392 by TOOL-dLoggedFlight-26, the derived fixture counts: NO new arm, so no decoy
+# check moves, and three checks land inside record AC4 — the builder's placements counted against its
+# intruders, the liveness that the model holds the commit event the utc and sha are derived from, and
+# the liveness that the unmodified render carried the vocabulary member the block drops, without which
+# the count that block expects would be the placements alone. Every other change here replaces a typed
+# literal with a derivation and moves no count. Two helpers arrive with neither.
+ASSERTION_FLOOR = 1392
 
 PASS = []
 FAIL = []
@@ -4082,6 +4088,28 @@ def read_record_cells(text):
     return cells
 
 
+def measure_timeline_events(m):
+    """How many of `m`'s timeline entries the renderer writes a row for: those whose kind the Timeline
+    row layouts of the schema declare (TOOL-dLoggedFlight-26 S6). `owner` is deliberately absent from
+    those layouts, as is any kind the schema does not carry, which the renderer withholds instead."""
+    declared = rl_record.derive_table("Timeline", "events")["rows"]
+    return sum(1 for e in m.get("timeline") or [] if e.get("kind") in declared)
+
+
+def measure_class_cells(text, section, cls, value):
+    """How many cells of the class `cls` in `section`'s tables carry `value` (TOOL-dLoggedFlight-26 S4).
+    Each rendered table is matched to the schema table whose header it repeats, so the columns graded
+    are the schema's own rather than a second copy of them typed into an arm — a table that gains or
+    loses a column moves this count instead of stranding it."""
+    cols_by_header = {tuple(tb["header"]): tb.get("cols", ())
+                      for tb in rl_record.RECORD_SCHEMA["sections"][section]["tables"]}
+    seen = 0
+    for tb in (parse_record_markdown(text).get(section) or {}).get("tables") or []:
+        at = [i for i, c in enumerate(cols_by_header.get(tuple(tb["header"]), ())) if c == cls]
+        seen += sum(1 for row in tb["rows"] for i in at if i < len(row) and row[i] == value)
+    return seen
+
+
 def scan_record_rows(text):
     """Every table data row, as its cells: the population the first-cell rule grades."""
     rows = []
@@ -4277,7 +4305,14 @@ def test_record_ac3_shape():
 def build_class_model():
     """A REAL model, from the landed fixture, given one value of every class the schema declares and
     every member of every closed vocabulary a table carries, plus four intruders in fields the renderer
-    reads and more in fields it never reads."""
+    reads and more in fields it never reads.
+
+    Returns the PLACEMENTS as a fifth value (TOOL-dLoggedFlight-26 S2): one `(carrier, field)` entry
+    per intruder put on a field the renderer reads, appended at the line that places it. Every count an
+    arm asserts over this model is derived from that list instead of typed beside the builder, so a
+    retirement that moves a carrier moves the expectation with it. Each carrier is also a row kind or a
+    table TOOL-dLoggedFlight-22 keeps, so that retirement moves none of them.
+    """
     fx = build_landed_fixture()
     j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
     real = build_model(fx["repo"], journals=j)
@@ -4305,10 +4340,17 @@ def build_class_model():
     intruders = {"command": "git push --force origin main", "session": FX_SID,
                  "absolute path": "/".join(("", "home", "someone", "repo", "memory", "builds", FX_SLUG, "RUN.md:3")),
                  "free text": "the run skipped the bar because it was late"}
-    tl += [{"t": t + 40, "source": "driver", "kind": "verb", "verb": intruders["command"], "state": "ended",
-            "rc": "0", "exit": "clean", "checks": [], "phase_to": "BUILDING"},
+    # EVERY CARRIER IS A KEPT ROW KIND, and every placement is recorded here rather than counted by a
+    # reader (S1, S2). The command rides a commit's `units` and the free text a brief's `unit`, where
+    # they used to ride a `verb` and a `workflow` label: both of those retire with the journal rows, and
+    # an arm asserting a count over them would then be asserting which kinds survived a retirement
+    # rather than that the renderer withholds a read field.
+    read_placed = []
+    tl += [{"t": t + 40, "source": "git", "kind": "commit", "sha": "c" * 40,
+            "units": [intruders["command"]], "own": True},
            {"t": t + 41, "source": "run-state", "kind": "dispatch", "unit": intruders["session"]},
-           {"t": t + 42, "source": "transcripts", "kind": "workflow", "label": intruders["free text"]}]
+           {"t": t + 42, "source": "run-state", "kind": "brief", "unit": intruders["free text"]}]
+    read_placed += [("commit row", "units"), ("dispatch row", "unit"), ("brief row", "unit")]
     tl.sort(key=lambda e: e["t"])
     for i, status in enumerate(rl_record.UNIT_STATUSES, 2):
         m["units"].append({"id": f"X-{FX_SLUG}-{i}", "status": status, "order": i, "spec": "s",
@@ -4320,6 +4362,7 @@ def build_class_model():
     led["entries"] += [{"source": "review", "ref": f"memory/builds/{FX_SLUG}/reviews/r{i}.md:3", "verdict": v}
                        for i, v in enumerate(rl_record.REVIEW_VERDICTS)]
     led["entries"].append({"source": "decision", "ref": intruders["absolute path"]})
+    read_placed.append(("Decisions entries table", "ref"))
     led["counts"] = dict(Counter(e["source"] for e in led["entries"]))
     for i, (verdict, exit_) in enumerate((("CLEAN", "CONVERGED"), ("BLOCKED", "NON-CONVERGENT"),
                                           ("CLEAN WITH FIXES", "CEILING"), ("BLOCKED", None))):
@@ -4339,14 +4382,16 @@ def build_class_model():
     m["sessions"] = [FX_SID]
     m["worktrees"] = [intruders["absolute path"]]
     m["facts"]["note"] = intruders["free text"]
-    return m, intruders, j, fx
+    return m, intruders, j, fx, read_placed
 
 
 def test_record_ac4_classes():
     """AC4: one value of every class reaches the file and every member of every closed vocabulary a
-    table carries does; the four intruders in fields the renderer reads are withheld and counted, and
-    none of them, nor anything from a field it never reads, reaches the file."""
-    m, intruders, j, _fx = build_class_model()
+    table carries does; the intruders in fields the renderer reads are withheld and counted, and none of
+    them, nor anything from a field it never reads, reaches the file. Every count and every shaped value
+    this arm expects is DERIVED from what the builder placed (TOOL-dLoggedFlight-26 S3 and S5), so a
+    retirement that moves a carrier cannot leave a stale literal behind."""
+    m, intruders, j, _fx, placed = build_class_model()
     text = rl_record.render_record(m, "memory", rl_record.measure_commitment(m, j))
     cells = read_record_cells(text)
     sch = rl_record.RECORD_SCHEMA
@@ -4355,8 +4400,15 @@ def test_record_ac4_classes():
                  "review-exit", "unit-status", "yes-no", "owner-position"):
         missing = [v for v in sch["vocab"][name] if v not in cells]
         check(f"record AC4: every member of the {name} vocabulary reaches the file", missing, [])
-    shaped = {"utc": rl_model.derive_iso(float(derive_minute(12))), "int": "15", "duration": "960s",
-              "sha": "a" * 12, "digest": rl_record.measure_commitment(m, j)["sha256"], "verb": "--landed",
+    # The `utc` and the `sha` come from the model's first commit event, whose row the renderer writes
+    # (S5). They used to be the appended `push` rows' minute and the `gate` rows' head, typed here as a
+    # time and twelve `a`s: two literals standing for what a builder placed on rows that retire.
+    first_commit = next((e for e in m["timeline"] if e.get("kind") == "commit"), None)
+    check_true("record AC4 liveness: the model's timeline holds a commit event for the utc and sha "
+               "values to be derived from", first_commit is not None)
+    shaped = {"utc": rl_model.derive_iso(first_commit["t"]), "int": "15", "duration": "960s",
+              "sha": rl_record.derive_short_sha(first_commit["sha"]),
+              "digest": rl_record.measure_commitment(m, j)["sha256"], "verb": "--landed",
               "phase": "LANDING", "checks": "34,7", "label": "tier2-review", "unit": FX_UNIT1, "units": FX_UNIT1,
               "path": m["record"], "ref": f"{m['record']}:13"}
     check("record AC4: the fixture names one value of every shaped class", sorted(shaped), sorted(sch["shaped"]))
@@ -4366,21 +4418,32 @@ def test_record_ac4_classes():
     check("record AC4: none of the four intruders reaches the file", leaked, [])
     check_true("record AC4 liveness: each intruder IS in the model the renderer was handed",
                all(v in json.dumps(m) for v in intruders.values()))
-    check("record AC4: the four intruders in read fields are counted as withheld",
-          "- values withheld: 4" in text, True)
+    check("record AC4: the builder recorded one placement per intruder in a read field",
+          len(placed), len(intruders))
+    check("record AC4: every intruder in a read field is counted as withheld",
+          f"- values withheld: {len(placed)}\n" in text, True)
     owner_at = rl_model.derive_iso(float(MODEL_T0 + 11 * 60 + 30))
     check("record AC4: an owner turn's clock time reaches the file nowhere", owner_at in text, False)
     check_true("record AC4: ...though the model's timeline carried it",
                any(e.get("kind") == "owner" for e in m["timeline"]))
-    # A closed vocabulary missing a member refuses its value: the arm above must be able to fail.
-    keep = sch["vocab"]["push-decision"]
-    sch["vocab"]["push-decision"] = keep[:-1]
+    # A closed vocabulary missing a member refuses its value: the arm above must be able to fail. The
+    # member is the last `anomaly-kind`, a vocabulary the Anomalies table carries, so the block survives
+    # the journal rows' retirement; the count it expects is the placements plus however many cells of
+    # that class the unmodified render actually carried, read off that render (S4). The baseline render
+    # takes the same arguments as the dropped one, so the two agree on their bounds.
+    keep = sch["vocab"]["anomaly-kind"]
+    base = rl_record.render_record(m, "memory")
+    owed = measure_class_cells(base, "Anomalies", "anomaly-kind", keep[-1])
+    check_true("record AC4 liveness: the unmodified render carries the member the block drops, so the "
+               "count below is not the placements alone", owed > 0, str(owed))
+    sch["vocab"]["anomaly-kind"] = keep[:-1]
     try:
         dropped = rl_record.render_record(m, "memory")
     finally:
-        sch["vocab"]["push-decision"] = keep
+        sch["vocab"]["anomaly-kind"] = keep
     check("record AC4 liveness: a vocabulary short one member withholds that value",
-          (keep[-1] in read_record_cells(dropped), "- values withheld: 5" in dropped), (False, True))
+          (keep[-1] in read_record_cells(dropped),
+           f"- values withheld: {len(placed) + owed}\n" in dropped), (False, True))
 
 
 def build_big_model(n_timeline=500, n_units=60, n_anomalies=200, n_entries=300, wide=False):
@@ -4427,28 +4490,34 @@ def test_record_ac6_cap():
     """AC6: 500 timeline rows, 60 units, 200 anomalies and 300 ledger entries stay under the cap, every
     elision and aggregation stated, every anomaly kind kept, and the twin carrying the same counts and no
     row the markdown elided. A model whose every list sits at its bound with its widest values fits
-    through the halving step, which that model is seen to need."""
+    through the halving step, which that model is seen to need. Every count expected here is read off
+    the model rendered (TOOL-dLoggedFlight-26 S6), never typed beside the builder's arguments."""
     m = build_big_model()
     text = rl_record.render_record(m)
     size = len(text.encode("utf-8"))
     check_true(f"record AC6: the record is under the cap ({size} bytes)", size <= rl_record.RECORD_CAP_BYTES,
                str(size))
     md = parse_record_markdown(text)
+    events, edge = measure_timeline_events(m), rl_record.TIMELINE_EDGE
     check("record AC6: every elision and aggregation is stated",
           (md["Timeline"]["facts"].get("events"), md["Units"]["facts"].get("units"),
            md["Anomalies"]["facts"].get("anomalies"), md["Decisions"]["facts"].get("entries")),
-          ("500 · shown 60 · elided 440", "60 · shown 0 · aggregated yes", "200 · shown 0 · aggregated yes",
-           "300 · shown 0 · aggregated yes"))
+          (f"{events} · shown {2 * edge} · elided {events - 2 * edge}",
+           f"{len(m['units'])} · shown 0 · aggregated yes",
+           f"{len(m['anomalies'])} · shown 0 · aggregated yes",
+           f"{len(m['ledger']['entries'])} · shown 0 · aggregated yes"))
     kinds = {r[1] for tb in md["Anomalies"]["tables"] for r in tb["rows"]}
     check("record AC6: every anomaly kind that occurred is kept", sorted(kinds), sorted(rl_model.ANOMALY_KINDS))
     check("record AC6: ...with its count", sum(int(r[3]) for tb in md["Anomalies"]["tables"] for r in tb["rows"]),
-          200)
+          len(m["anomalies"]))
     twin = rl_record.parse_record(text)["sections"]
     check("record AC6: the twin carries the same counts", {k: v["facts"] for k, v in twin.items()},
           {k: md[k]["facts"] for k in twin})
     check("record AC6: the twin carries the same rows, and so no row the markdown elided",
           [len(t["rows"]) for t in twin["Timeline"]["tables"]], [len(t["rows"]) for t in md["Timeline"]["tables"]])
-    elided = rl_model.derive_iso(float(derive_minute(0)) + 250 * 7)
+    # The middle row of the model's own timeline, which the edges cannot reach while the gap is 440 rows
+    # wide, rather than a time recomputed from the builder's step.
+    elided = rl_model.derive_iso(m["timeline"][len(m["timeline"]) // 2]["t"])
     check("record AC6: a row from the elided middle is in neither copy", elided in text, False)
     check_true("record AC6 liveness: that row IS in the model",
                any(rl_model.derive_iso(e["t"]) == elided for e in m["timeline"]))
@@ -4465,9 +4534,10 @@ def test_record_ac6_cap():
     check_true(f"record AC6: the widest record fits after halving ({size} bytes)", size <= rl_record.RECORD_CAP_BYTES,
                str(size))
     shown = parse_record_markdown(text)["Timeline"]["facts"]["events"]
-    check_true("record AC6: ...and says how many rows it now shows", re.fullmatch(r"505 · shown ([0-9]+) · elided "
-                                                                               r"[0-9]+", shown) is not None
-               and int(shown.split("shown ")[1].split(" ")[0]) < 2 * rl_record.TIMELINE_EDGE, shown)
+    check_true("record AC6: ...and says how many rows it now shows",
+               re.fullmatch(rf"{measure_timeline_events(wide)} · shown ([0-9]+) · elided [0-9]+",
+                            shown) is not None
+               and int(shown.split("shown ")[1].split(" ")[0]) < 2 * edge, shown)
 
 
 def test_record_ac5_verify():
@@ -4575,7 +4645,7 @@ def test_record_template_pairs():
     markdown and in the Data twin, and a template that gains a field while its parser is left behind
     reds naming that fact. The render is given a commitment, so no mapped fact renders its `none`
     alternative here."""
-    m, _intruders, j, _fx = build_class_model()
+    m, _intruders, j, _fx, _placed = build_class_model()
     commitment = rl_record.measure_commitment(m, j)
     text = rl_record.render_record(m, "memory", commitment)
     check_true("record pairs: TEMPLATE_PARSERS maps at least one fact, so the arm has a population",
@@ -5569,10 +5639,12 @@ H2_BUILDS = ("aPacedTurnstile", "dUnstalledConvoy")
 def build_schema_fixture():
     """The class model's record, written by the renderer into its own fixture repo beside a spec for
     every unit it names, and staged. Built once; an arm that stages a variant restores the clean one.
-    None, after a failed check naming why, when the renderer wrote nothing: every arm then stops."""
+    None, after a failed check naming why, when the renderer wrote nothing: every arm then stops. The
+    builder's placements are kept beside the model, so an arm over this fixture derives its withheld
+    count from them too (TOOL-dLoggedFlight-26 S2)."""
     if SCHEMA_FX:
         return SCHEMA_FX
-    m, _intruders, j, fx = build_class_model()
+    m, _intruders, j, fx, placed = build_class_model()
     repo = fx["repo"]
     path = rl_record.write_record(repo, m, journal_root=j, date=RECORD_DATE)
     check_true("schema fixture: the renderer wrote the class model's record", path is not None,
@@ -5584,7 +5656,8 @@ def build_schema_fixture():
         if not spec.exists():
             spec.write_bytes(build_spec_text(u["id"], "a unit").encode("utf-8"))
     run_git(["-c", "core.autocrlf=false", "add", "--", "memory"], repo)
-    SCHEMA_FX.update(repo=repo, rel=path.relative_to(repo).as_posix(), clean=path.read_bytes(), m=m)
+    SCHEMA_FX.update(repo=repo, rel=path.relative_to(repo).as_posix(), clean=path.read_bytes(), m=m,
+                     placed=placed)
     return SCHEMA_FX
 
 
@@ -5661,8 +5734,10 @@ def test_schema_ac1_render_then_grade():
     held = rl_record.render_record(m, "memory")
     check_true("schema S5 liveness: the label class alone admits a lowercase UUID",
                re.fullmatch(sch["shaped"]["label"], FX_SID_B) is not None)
+    # The builder's placements plus the one carrier this arm adds above (TOOL-dLoggedFlight-26 S3): the
+    # count follows a placement the builder moves or drops, and the `+ 1` is the UUID label alone.
     check("schema S5: the renderer withholds a UUID-shaped label and counts it",
-          (FX_SID_B in held, "- values withheld: 5" in held), (False, True))
+          (FX_SID_B in held, f"- values withheld: {len(fx['placed']) + 1}\n" in held), (False, True))
     real = rl_record.build_forbidden
     rl_record.build_forbidden = lambda: ()
     try:

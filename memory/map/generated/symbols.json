@@ -3178,6 +3178,11 @@
       "file": "tools/workflows/orient-counterfactual.js"
     },
     {
+      "id": "measure_class_cells",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "measure_commitment",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -3251,6 +3256,11 @@
       "id": "measure_slot_sizes",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "measure_timeline_events",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "measure_tree",
