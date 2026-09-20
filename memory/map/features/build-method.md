@@ -97,7 +97,10 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   category assertion nothing could falsify, and it reached that state by losing its mechanism clause
   in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
   reader can check whether the call carries it. The obligation is still the method's least
-  instrumented step, because nothing yet asserts that a spec audit HAPPENED.
+  instrumented step, because nothing yet asserts that a spec audit HAPPENED. Since
+  `TOOL-aBlindedTrial-6` it is also OPT-IN: M4 owes the audit only where the build README's front
+  matter declares `spec-audit: <date>`, and undeclared it says none is owed — the blinded trial
+  measured no quality the audit bought on one-context units at 12× the tokens.
 - **A spec's gate list is authored. The bar's list is derived.** No check compares the two. Five builds
   closed a unit green on the legs their specs named while the unguarded codebase-map leg was red.
   The pre-commit hook now catches that one leg for staged `.py` and `.js` paths. For every other leg
