@@ -368,6 +368,12 @@ gates gov's OWN product template at the repo root. An adopter's instantiated pla
 """
 
 [[exempt_leg]]
+name = "govkit runbook parity"
+why = """
+the deployer grading THIS repo's runbook against THIS repo's own registry. Both sides of the comparison are gov-side: the registry is the deployer's declaration and never travels, and the runbook is gov's instructions for wiring the chain INTO a target rather than anything a target keeps. An adopter receives neither file, so there is nothing in their tree for the leg to compare.
+"""
+
+[[exempt_leg]]
 name = "govkit refusal join"
 why = """
 a gov-internal harness over gov's OWN deployer, which is itself a registry exemption because it never travels into a target. An adopter receives neither the deployer nor this join, so there is nothing in their tree for it to enumerate. The asymmetry with the two self-tests the runbook DOES prescribe for copy is deliberate and is the reason this row carries a sentence rather than a shrug.

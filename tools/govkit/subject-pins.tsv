@@ -38,6 +38,7 @@ extract-arms self-test	kit	selftests
 gotchas selftest	kit	selftests
 govkit acceptance matrix	repo	declarations
 govkit refusal join	repo	declarations
+govkit runbook parity	repo	declarations
 govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations

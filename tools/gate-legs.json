@@ -1157,6 +1157,16 @@
     "ceiling": 300
   },
   {
+    "name": "govkit runbook parity",
+    "argv": [
+      "python",
+      "tools/govkit/check_runbook_parity.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "govkit acceptance matrix",
     "argv": [
       "python",

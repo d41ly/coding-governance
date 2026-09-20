@@ -2723,6 +2723,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "parse_observed",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "parse_pin",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
