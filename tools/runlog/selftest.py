@@ -232,7 +232,14 @@ from collections import Counter  # noqa: E402
 # `stalled` and a stranger's moving nothing. Its decoy checks move it by 3, and the two helpers it
 # arrives with carry none.
 # 9 + 3 = 12
-ASSERTION_FLOOR = 1519
+# RAISED 1519 -> 1526 by TOOL-dLoggedFlight-8, folding R2-L1's visit that placed a run: ONE new arm
+# with 4 checks — the L2 journal set with a post-landing `--status` reading `not-local` for all three
+# journals with no proof; the same set with the run's own `--park` in that slot reading `dead` and
+# naming its proof; the staged RED with `READ_ONLY_VERBS` emptied, where the read reads `dead` again;
+# and the liveness that both staged pairs hold the same line count, lie outside the window, and carry
+# only their own verb. Its decoy checks move it by 3.
+# 4 + 3 = 7
+ASSERTION_FLOOR = 1526
 
 PASS = []
 FAIL = []
@@ -3076,8 +3083,9 @@ def test_model_ac6_coverage():
         notes[name] = cov["driver"].get("note", "")
         return cov
 
-    # `own` is the run's own driver lines over its segment: two, a `--status` pair after its window,
-    # where the run has none inside it, and none at all for a run made on another node.
+    # `own` is the run's own ACT lines over its segment: two, a `--park` pair after its window, where
+    # the run has none inside it, and none at all for a run made on another node. A read-only visit
+    # never counts here (R2-L1), which is the arm below this one.
     run_state("before the epoch", epoch - 900, epoch - 60, 0, "12 parked row(s) in the window")
     run_state("after it, with twelve parked rows and none of its lines", epoch + 60, epoch + 900, 0,
               "12 parked row(s) in the window")
@@ -3132,8 +3140,10 @@ def test_model_ac6_dead_through_model():
     only `present`.
 
     A dead writer is one on THIS node, which only the run's own driver lines show (L2 of the closing
-    review, round 1). Every dead case with none of the run's verbs therefore holds the owner's
-    `--status` after the landing, a line of the run's segment that is outside its window. Without it
+    review, round 1). Every dead case with none of the run's verbs therefore holds a `--park` of the
+    landing, a line of the run's segment that is outside its window. It is a `--park` and not a
+    `--status` because a read-only visit is not one of the run's own lines (R2-L1, AC25): a visit
+    places nothing, and AC25 stages this same journal with one. Without that line
     the same journals are a run made elsewhere, and read `not-local`. So is the second run of a build
     whose first run was driven here: its build's lines are on this node, and none of its own are."""
     fx = build_landed_fixture()
@@ -3143,7 +3153,7 @@ def test_model_ac6_dead_through_model():
     older_bar = [render_gate_line(-20, "20260913T090000Z-6001", "1" * 40, wt=FX_WT_OTHER)]
     older_verb = render_driver_lines(-25, "--status", slug=FX_OTHER, phase_from="BUILDING", phase_to="BUILDING",
                                      wt=FX_WT_OTHER, sid=FX_SID_B, pid=4343)
-    after = render_driver_lines(40, "--status", phase_from="LANDED", phase_to="LANDED", wt=FX_WT_PRIMARY,
+    after = render_driver_lines(40, "--park", phase_from="LANDED", phase_to="LANDED", wt=FX_WT_PRIMARY,
                                 pid=4344)
     cases = (
         ("pushes, with the terminal END closing the window", "pushes",
@@ -3173,7 +3183,7 @@ def test_model_ac6_dead_through_model():
            for s in rl_model.JOURNALS], [("not-local", 0, False)] * 3)
     here = build_model(repo, journals=write_journals(repo.parent, driver=older_verb + after, gates=older_bar,
                                                        pushes=older_push))
-    check("model AC6 through the model near miss: the same journals with the owner's --status after the "
+    check("model AC6 through the model near miss: the same journals with the run's own --park after the "
           "landing beside them read dead for each, so that one line of the run's own is all that differs",
           [(here.coverage[s]["state"], here.coverage[s]["lines"], "proof" in here.coverage[s])
            for s in rl_model.JOURNALS], [("dead", 0, True)] * 3)
@@ -4078,6 +4088,54 @@ def test_model_ac24_read_only_visit():
     check("model AC24: the same six from a session the run never named are visits: the end holds and "
           "no streak is the run's", (visits.window["end"], read_kinds(visits)),
           (live["push_end"] + 1.0, []))
+
+
+def test_model_ac25_visit_places_nothing():
+    """AC25 (R2-L1 of the closing review, round 2): only the run's own ACTS place it on this node. The
+    L2 shape — journals kept through the run holding nothing but another build's older lines — with a
+    post-landing `--status` made on the VIEWING node reads `not-local` for all three journals, where
+    the run's own `--park` in the same slot reads `dead`. Counted, that one read was the L2 symptom
+    reintroduced: a run that landed on another node read `dead` here for its driver, gates and
+    pushes."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    older_push = render_push_lines(-30, "1" * 40, lander="1", wt=FX_WT_OTHER, decision="skip-nondefault",
+                                   remote_ref="refs/heads/side", pid=6161)
+    older_bar = [render_gate_line(-20, "20260913T090000Z-6001", "1" * 40, wt=FX_WT_OTHER)]
+    older_verb = render_driver_lines(-25, "--status", slug=FX_OTHER, phase_from="BUILDING",
+                                     phase_to="BUILDING", wt=FX_WT_OTHER, sid=FX_SID_B, pid=4343)
+    made = {}
+    for name, verb in (("visit", "--status"), ("act", "--park")):
+        line = render_driver_lines(40, verb, phase_from="LANDED", phase_to="LANDED", wt=FX_WT_PRIMARY,
+                                   pid=4344)
+        made[name] = (line, write_journals(repo.parent, driver=older_verb + line, gates=older_bar,
+                                           pushes=older_push))
+    visited = build_model(repo, journals=made["visit"][1])
+    acted = build_model(repo, journals=made["act"][1])
+    check("model AC25: a post-landing --status made on the viewing node places the run nowhere, so all "
+          "three journals read not-local with no proof",
+          [(visited.coverage[s]["state"], visited.coverage[s]["lines"], "proof" in visited.coverage[s])
+           for s in rl_model.JOURNALS], [("not-local", 0, False)] * 3)
+    check("model AC25 near miss: the run's own --park in the same slot reads dead for each, naming its "
+          "proof, so the verb is all that differs",
+          [(acted.coverage[s]["state"], acted.coverage[s]["lines"], "proof" in acted.coverage[s])
+           for s in rl_model.JOURNALS], [("dead", 0, True)] * 3)
+    keep = rl_model.READ_ONLY_VERBS
+    rl_model.READ_ONLY_VERBS = ()
+    try:
+        wide = build_model(repo, journals=made["visit"][1])
+    finally:
+        rl_model.READ_ONLY_VERBS = keep
+    check("model AC25: RED — counted as one of the run's own lines, that single read reads dead for "
+          "each journal, which is L2's own symptom",
+          [wide.coverage[s]["state"] for s in rl_model.JOURNALS], ["dead"] * 3)
+    check_true("model AC25 liveness: both journals hold the same line count, the staged pair lies "
+               "outside the window, and the two files differ in the verb alone",
+               len(made["visit"][0]) == len(made["act"][0])
+               and float(made["visit"][0][0]["t"]) >= visited.window["end"]
+               and {ln["verb"] for ln in made["visit"][0]} == {"--status"}
+               and {ln["verb"] for ln in made["act"][0]} == {"--park"},
+               str((visited.window["end"], made["visit"][0][0]["t"])))
 
 
 def test_zz_model_idle_invariant():

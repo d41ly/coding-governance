@@ -866,7 +866,9 @@ def measure_coverage(journals, own_driver_lines, window, lines, activity, transc
     Both of those last two say a writer was live for the run on THIS node, and only the run's own
     driver lines place it here: journals never leave their clone, and no other producer's line names
     a run. `own_driver_lines` counts them over the run's whole journal segment, from its start to the
-    next run's, inside its window or after it. With none, a journal the window opens after, holding
+    next run's, inside its window or after it, and counts only its ACTS — a read-only visit is not
+    one of the run's own lines, whoever made it, or one `--status` on the viewing node would place
+    another node's run here (R2-L1). With none, a journal the window opens after, holding
     none of the run's lines, reads `not-local`: a run made on another node had read `dead` there (L2
     of the closing review, round 1). The count is the run's own and not any line naming its build,
     since an earlier run of the build made here would otherwise place a later one made elsewhere. A
@@ -1824,7 +1826,10 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         transcripts["note"] = tr_note
     # L2 (closing review, round 1): the run's own driver lines over its whole segment place it on this
     # node; none, and a journal holding none of its lines is not-local rather than dead.
-    own_driver = sum(len(i["lines"]) for i in seg)
+    # R2-L1 (round 2): a read-only VISIT is not one of the run's own lines. Counted, one `--status`
+    # made on the viewing node after another node's run landed put two lines in the segment, and the
+    # run's journals read `dead` there — the L2 symptom itself, reintroduced by one read.
+    own_driver = sum(len(i["lines"]) for i in seg if i["verb"] not in READ_ONLY_VERBS)
     coverage = measure_coverage(journals, own_driver, window, lines, activity, transcripts, record_state,
                                 "present" if (root / build).is_dir() else "absent")
     attribution = derive_attribution(all_invs, extracts, window, run=seg_own)

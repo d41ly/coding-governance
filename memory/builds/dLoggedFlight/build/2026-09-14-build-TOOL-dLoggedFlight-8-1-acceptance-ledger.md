@@ -381,6 +381,12 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   `join-key-widened-by-a-shared-location` for it: a `--status` is a visit and claims nothing. It is
   the parked session key's visit, below, met through the segment rather than the session, and it is
   left with that park rather than changing S2's segment inside a low's fold.
+  **CLOSED by the fold of R2-L1 of the closing diff review, round 2**, which confirmed it as the L2
+  symptom reintroduced by one read, and which the severity rule folds rather than parks. The count
+  is now the run's ACTS over that same segment, so the segment did not change and S2's session rule
+  answers both halves. AC25 stages the visit and the act in one slot of one journal set.
+  The first half of this residue stands: a writer broken for the whole of a run made here still
+  reads `not-local`, because the model has no node identity.
 - The fold of L5 reads a range the way the memory-tree grammar reads one. A subject that continues
   an id with bare numbers, as two of this build's own spec-audit folds spell `-1..4, 6, 8..13`,
   names units 1 to 4 alone; the grammar reads it the same, and `scan_unit_ids` says so.

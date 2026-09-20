@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-17 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-18 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -243,6 +243,13 @@ sources actually support. Every later surface renders from this model rather tha
     The key is the run's own lines and never a line naming its build, since a build's earlier run
     driven here would place a later one made elsewhere. A writer broken for the whole of a run made
     here reads the same, since the model has no node identity to tell the two apart.
+
+  The run's own lines here are its own ACTS, by S2's session rule: a call of `READ_ONLY_VERBS` is a
+  VISIT and places nothing, whatever session made it. Reading the whole segment, one `--status` made
+  on a viewing node after another node's run landed was two lines of it, and the run's driver, gates
+  and pushes all read `dead` there — the very symptom this state was added to remove. `--resume` and
+  `--landed` are acts and do place the run, which is right: a node that resumed or landed a run saw
+  it. Observed by AC25.
 
   The run-state file, git and the build folder read `present` or `absent`. The block also carries
   `idle`: whether idle gaps were judged (S6), how many fired, and how many were kept out near an
@@ -614,6 +621,13 @@ command.
   The same six from a session the run never named move nothing and fire nothing.
   Red when: a read-only visit names a session, moves a non-terminal end, or contributes an
   attribution point; or the run's own session-less heartbeats stop being its events.
+- **AC25** — When `build_run_model` reads the landed fixture whose three journals were kept through
+  the run and hold nothing but another build's older lines, plus one post-landing `--status` made on
+  the viewing node, every journal reads `not-local` with no proof. With the run's own `--park` in
+  that same slot, all three read `dead` and name their proof, so the verb is all that differs. With
+  `READ_ONLY_VERBS` emptied the read reads `dead` again, which is L2's own symptom. Both staged
+  pairs hold the same number of lines and lie outside the window.
+  Red when: a read-only visit places a run on this node, or an act stops placing one.
 
 ## 7. Gates
 
@@ -771,6 +785,16 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   blank, so that spelling would put a stalled run's heartbeats outside its own window and `stalled`
   could never fire; AC24 observes both halves. The park the unit 8 acceptance ledger left on this
   key is struck there, its first reason — that no review had confirmed it — spent.
+- rev-18 · 2026-09-20 · S7 · AC25 · folded R2-L1 of the closing diff review, round 2: a visit placed
+  another node's run here. Rev-10 keyed `not-local` on the run's own driver lines over its whole
+  journal segment, and counted every call in it. A read-only visit is not one of the run's own lines,
+  so a `--status` made on a viewing node after another node's run had landed put two lines in that
+  segment and made its driver, gates and pushes read `dead` — L2's own symptom, reintroduced by one
+  read, and lasting for ever because the last run of a build has an open segment. The count is now
+  the run's ACTS, by S2's rule, so `--resume` and `--landed` still place a run on the node that
+  resumed or landed it. The unit 8 acceptance ledger's residue on this is closed there, and the kit
+  README's sentence saying a `--status` made here places another node's run is REPLACED rather than
+  answered beside.
 
 ## 10. Reuse audit
 

@@ -253,8 +253,9 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   the half-open window never holds it.
 - **And only where this node saw the run.** Journals never leave their clone. So a journal the window
   starts after, holding none of the run's lines, reads `not-local` when this node's driver journal
-  holds none of the run's own lines either, over its whole segment: a run made on another node. The
-  key is the run's own lines, never any line naming its build, which an earlier run driven here holds.
+  holds none of the run's own ACT lines either, over its whole segment: a run made on another node.
+  The key is the run's own lines, never any line naming its build, which an earlier run driven here
+  holds — and never a read-only visit, which places nothing whoever made it.
 - **Every inferred answer is named** in the model's `method` field.
 - **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
   10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
@@ -558,8 +559,9 @@ prefix and root, and hold the render to an independent one.
   (`RUNLOG_SESSION_VARS`) closes it.
 - **A writer broken for the whole of a run made here.** With none of the run's own driver lines on
   this node, the model cannot tell that from a run made on another node, and reads `not-local`.
-  The reverse holds too: a `--status` made here inside another node's run is one of that run's
-  journal lines, and places it here.
+  A visit does not place a run: a `--status` or an `--audit` made here, inside or after another
+  node's run, is not one of that run's own lines. A `--resume` or a `--landed` is, and rightly so —
+  a node that resumed or landed a run saw it.
 - **A list that continues a unit id with bare numbers.** `X-<slug>-1..4, 6` names units 1 to 4, as the
   memory-tree grammar reads it, and not unit 6.
 - **Who ran a bar at the same minute.** A gate line with no pinned id joins by the tree it ran in
