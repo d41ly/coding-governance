@@ -221,7 +221,18 @@ from collections import Counter  # noqa: E402
 # closing check that the staging left the live schema, its declaration and the renderer's lookup as
 # they were. Its decoy checks move it by 3, and the six helpers it arrives with carry none.
 # 13 + 3 = 16
-ASSERTION_FLOOR = 1507
+# RAISED 1507 -> 1519 by TOOL-dLoggedFlight-8, folding R2-M1's read-only visit: ONE new arm with 9 checks — the two
+# constants held as a PROPER subset differing by the two acts; the visited model naming one session
+# and reading one extract; that model against one built over a store holding only the run's own
+# extract, equal field for field on sessions, owner positions, usage and attribution; the staged RED
+# with `READ_ONLY_VERBS` emptied, where the visitor joins and brings exactly the owner turns and calls
+# its own acts made, and the liveness that those acts exist and some of their calls are attributed;
+# the non-terminal end held against a foreign `--status` an hour late, and the same staged RED moving
+# it; and the two heartbeat streaks, the run's own session-less one reaching the window and firing
+# `stalled` and a stranger's moving nothing. Its decoy checks move it by 3, and the two helpers it
+# arrives with carry none.
+# 9 + 3 = 12
+ASSERTION_FLOOR = 1519
 
 PASS = []
 FAIL = []
@@ -3963,6 +3974,112 @@ def test_model_ac23_window_bound():
           (["RUNNING", "BUILDING"], (float(derive_minute(12)), "terminal-write"), ["MET"]))
 
 
+def build_visit_fixture():
+    """The landed run with a SECOND session's in-window `--status` in the journal, and two stores: one
+    holding the visitor's extract beside the run's own, one holding the run's alone. The visitor's
+    extract carries three tool calls and an owner turn, all inside the run's window, so a key that
+    takes its session takes them too."""
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    visit = render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING",
+                                wt=FX_WT_PRIMARY, sid=FX_SID_B, pid=4747)
+    j = write_journals(repo.parent, driver=fx["driver"] + visit, gates=fx["gates"], pushes=fx["pushes"])
+    mine = [("call", derive_minute(m) - 1, derive_minute(m) + 1) for m in (1, 3, 4, 6, 21, 27)]
+    theirs = [("call", derive_minute(m), derive_minute(m) + 2) for m in (9.5, 10.5, 11.5)]
+    theirs.append(("owner", float(derive_minute(10)) + 12))
+    both = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(both, FX_SID, build_session_events(mine))
+    write_extract(both, FX_SID_B, build_session_events(sorted(theirs, key=lambda a: a[1]), sid=FX_SID_B))
+    own = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    write_extract(own, FX_SID, build_session_events(mine))
+    # What the visitor brings, counted off the acts that made it rather than typed beside them.
+    brings = {kind: sum(1 for a in theirs if a[0] == kind) for kind in ("call", "owner")}
+    return fx, j, both, own, brings
+
+
+def read_visit_facts(model):
+    """The four facts a visiting session moves when the run's key takes it: its sessions, its
+    in-window owner turns, its counted calls and its attributed ones."""
+    return (model.sessions, model.owner_positions["counts"]["in-window"], model.attribution["calls"],
+            model.attribution["attributed"])
+
+
+def test_model_ac24_read_only_visit():
+    """AC24 (R2-M1 of the closing review, round 2): a read-only visit is not an act of the run. Another
+    session's in-window `--status` names no session of the run, so its owner turns, usage and tool
+    calls stay its own, and no read moves a non-terminal window's end past itself. The run's OWN
+    heartbeats still do, including the keepalive tick's `--audit`, which records no session on the
+    shipped default — which is why `READ_ONLY_VERBS` is a second constant and not `TREE_BLIND_VERBS`
+    again: naming a session and claiming a tree are different questions."""
+    blind, reads = set(rl_model.TREE_BLIND_VERBS), set(rl_model.READ_ONLY_VERBS)
+    check("model AC24: the read verbs are a PROPER subset of the tree-blind ones, the two acts apart",
+          (sorted(reads - blind), sorted(blind - reads)), ([], ["--landed", "--resume"]))
+    fx, j, both, own, brings = build_visit_fixture()
+    visited = build_model(fx["repo"], journals=j, store=both)
+    alone = build_model(fx["repo"], journals=j, store=own)
+    check("model AC24: the visitor's session is not the run's, and its extract is neither named nor read",
+          (visited.sessions, visited.coverage["transcripts"]["state"],
+           visited.coverage["transcripts"]["sessions"], visited.coverage["transcripts"]["extracts"]),
+          ([FX_SID], "present", 1, 1))
+    check("model AC24: ...so the model over a store holding the visitor's extract answers exactly the "
+          "model over one holding only the run's own",
+          (visited.sessions, visited.owner_positions, visited.usage, visited.attribution),
+          (alone.sessions, alone.owner_positions, alone.usage, alone.attribution))
+    keep = rl_model.READ_ONLY_VERBS
+    rl_model.READ_ONLY_VERBS = ()
+    try:
+        wide = build_model(fx["repo"], journals=j, store=both)
+    finally:
+        rl_model.READ_ONLY_VERBS = keep
+    check("model AC24: RED — with no verb a read, the visitor joins and brings exactly the owner turns "
+          "and calls its own acts made", read_visit_facts(wide)[:3],
+          ([FX_SID, FX_SID_B], visited.owner_positions["counts"]["in-window"] + brings["owner"],
+           visited.attribution["calls"] + brings["call"]))
+    check_true("model AC24 liveness: the visitor really carries those events inside the window, and "
+               "some of them are attributed, so the held model's counts are a refusal and not an "
+               "empty extract", brings["call"] > 0 and brings["owner"] > 0
+               and wide.attribution["attributed"] > visited.attribution["attributed"],
+               str((brings, read_visit_facts(wide))))
+    # A non-terminal window, where the visit always lands inside the end it moves.
+    live = build_live_fixture()
+    foreign = render_driver_lines(90, "--status", phase_from="BUILDING", phase_to="BUILDING",
+                                  wt=FX_WT_PRIMARY, sid=FX_SID_B, pid=4747)
+    j2 = write_journals(live["repo"].parent, driver=live["driver"] + foreign, gates=live["gates"],
+                        pushes=live["pushes"])
+    held = build_model(live["repo"], journals=j2)
+    check("model AC24: a foreign --status an hour after the run's last act moves no window end",
+          (held.window["end"], held.window["end_from"], held.sessions),
+          (live["push_end"] + 1.0, "last-activity", [FX_SID]))
+    rl_model.READ_ONLY_VERBS = ()
+    try:
+        moved = build_model(live["repo"], journals=j2)
+    finally:
+        rl_model.READ_ONLY_VERBS = keep
+    check("model AC24: RED — with no verb a read, that one visit stretches the window to itself and "
+          "names its session", (moved.window["end"] > held.window["end"], moved.sessions),
+          (True, [FX_SID, FX_SID_B]))
+    # The run's OWN heartbeats: the keepalive tick's `--audit`, which records no session because
+    # `RUNLOG_SESSION_VARS` is blank on the shipped default.
+    minutes = (40, 50, 60, 70, 80, 90)
+    beats = [ln for m in minutes for ln in render_driver_lines(
+        m, "--audit", phase_from="BUILDING", phase_to="BUILDING", sid=None)]
+    j3 = write_journals(live["repo"].parent, driver=live["driver"] + beats, gates=live["gates"],
+                        pushes=live["pushes"])
+    beat = build_model(live["repo"], journals=j3)
+    check("model AC24: the run's own session-less --audit heartbeats are its events, so the window "
+          "reaches them and stalled fires",
+          (beat.window["end"], beat.window["end_from"], read_kinds(beat)),
+          (float(MODEL_T0 + 90 * 60) + 0.05 + 1.0, "last-activity", ["stalled"]))
+    strangers = [ln for m in minutes for ln in render_driver_lines(
+        m, "--audit", phase_from="BUILDING", phase_to="BUILDING", sid=FX_SID_B, pid=4747)]
+    j4 = write_journals(live["repo"].parent, driver=live["driver"] + strangers, gates=live["gates"],
+                        pushes=live["pushes"])
+    visits = build_model(live["repo"], journals=j4)
+    check("model AC24: the same six from a session the run never named are visits: the end holds and "
+          "no streak is the run's", (visits.window["end"], read_kinds(visits)),
+          (live["push_end"] + 1.0, []))
+
+
 def test_zz_model_idle_invariant():
     """AC19's model invariant, over every model any arm built through `build_model`: no idle gap holds
     a tool call. This arm sorts last, so every other arm's models are in the count it grades."""
@@ -5899,8 +6016,10 @@ def test_record_ac10_unknown_counts():
     assertion here stands unedited, which is what TOOL-dLoggedFlight-16 AC4 pins."""
     fx = build_landed_fixture()
     repo = fx["repo"]
-    # An owner's heartbeat from a second session, in the primary tree, names a session with no extract.
-    other_session = render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING",
+    # A `--resume` from a second session, in the primary tree, names a session with no extract. It is a
+    # `--resume` and not a `--status` because a read names no session of the run (R2-M1, AC24), and
+    # this fixture needs a second session NAMED.
+    other_session = render_driver_lines(10, "--resume", phase_from="BUILDING", phase_to="BUILDING",
                                         wt=FX_WT_PRIMARY, sid=FX_SID_B, pid=4747)
     j = write_journals(repo.parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
     j_two = write_journals(repo.parent, driver=fx["driver"] + other_session, gates=fx["gates"], pushes=fx["pushes"])
@@ -6142,7 +6261,9 @@ def build_fresh_fixture():
                str([(ln.get("verb"), ln.get("ev")) for ln in tail]))
     driver = fx["driver"][:-2] + render_driver_lines(27, "--landed", phase_from="LANDING", phase_to="LANDED",
                                                      wt=FX_WT_PRIMARY, dur=1.0)
-    other = render_driver_lines(10, "--status", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
+    # `--resume`, not `--status`: a read names no session of the run (R2-M1, AC24), and the `missing`
+    # and `mixed` shapes below need a second session NAMED and not local.
+    other = render_driver_lines(10, "--resume", phase_from="BUILDING", phase_to="BUILDING", wt=FX_WT_PRIMARY,
                                 sid=FX_SID_B, pid=4747)
     j = write_journals(repo.parent, driver=driver, gates=fx["gates"], pushes=fx["pushes"])
     j_two = write_journals(repo.parent, driver=driver + other, gates=fx["gates"], pushes=fx["pushes"])

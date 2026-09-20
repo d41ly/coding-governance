@@ -362,7 +362,17 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   That next slice, the fold of M1, M4 and M5's timeline bound, narrowed it by the window and no
   further. A session whose only call on the run comes after the run's end is no longer one of its
   sessions, which AC23 observes. One that calls `--status` inside the window still joins, and its
-  calls after that `--status` END are attributed to the run, so the park stands.
+  calls after that `--status` END are attributed to the run.
+  **THE PARK IS STRUCK**, by the fold of R2-M1 of the closing diff review, round 2. Its first reason
+  is spent: round 2 confirmed the defect, sized it MEDIUM, and the severity rule leaves a MEDIUM no
+  park route. Its second is spent with it, since the facts M1's slice reworked are landed. Its third
+  is what a rev-N line and the next audit are for, and spec 8's rev-17 writes the rule S2 needed. The
+  first of the three options listed above is the one taken, with `--audit` beside `--status`: a
+  SECOND constant, `READ_ONLY_VERBS`, names the verbs that only read the record, and a session whose
+  every call on the run is one of those is not the run's. The same rule keeps a visit from moving a
+  non-terminal end and from being an attribution point. AC24 observes it, and observes that the run's
+  own session-less heartbeats are still its own events, which is where the second option — the tree
+  claim — would have gone wrong.
 - The fold of L2 leaves a writer broken for the whole of a run made here reading `not-local`, the
   same as a run made on another node. The model has no node identity, and only the run's own driver
   lines place it here. The kit README names it among what the kit does not check. The run's own

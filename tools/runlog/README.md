@@ -233,6 +233,16 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   every run lands from the primary tree. The hold ends at another run's first claim there after the run's last one,
   since a worktree outlives its run and is reused. So neither an owner's `--status` nor the run's own
   `--landed` makes another run's bar in the primary tree this run's.
+- **A run's sessions are the ones its own ACTS named, never the ones its visitors did.** The verbs
+  `READ_ONLY_VERBS` names only read the record, so a session whose every call on the run is one of
+  those is not one of its sessions: its owner turns, usage and tool calls stay its own, it
+  contributes no attribution point, and it never moves a non-terminal window's end past itself. That
+  is a second constant beside `TREE_BLIND_VERBS`, and a proper subset of it, because naming a session
+  and claiming a tree are different questions — `--resume` continues the run and `--landed` lands it,
+  so both are the run's own acts, and neither claims the tree it ran in. A read IS the run's own when
+  it names a session one of the run's acts named, or names none at all, which is what the keepalive
+  tick's `--audit` records while `RUNLOG_SESSION_VARS` is unset; otherwise a stalled run's own
+  heartbeats would fall outside its window.
 - **A close is an END reading `rc=0` and `exit=clean`.** An unclean END's `rc` is whatever `$?` its
   EXIT trap saw, often 0, so a `--close` killed mid-bar is no close. `green-at-close` is not judged at
   it, and it splits no owner turns. Every rule that decides on an END's `rc` reads its `exit` beside

@@ -91,6 +91,12 @@ UNIT_VERBS = ("--brief", "--dispatch", "--rescope", "--review")
 # `--audit`, main's stall probe and the call the keepalive tick runs, reads the record as `--status`
 # does, so it claims no tree either (the second origin/main reconcile, 2026-09-16).
 TREE_BLIND_VERBS = ("--status", "--resume", "--landed", "--audit")
+# The verbs that only READ the run's record, so a call of one is a VISIT and not an act of the run
+# (R2-M1 of the closing review, round 2). NAMING A SESSION AND CLAIMING A TREE ARE DIFFERENT
+# QUESTIONS, which is why this is a second constant and not a use of the one above, a PROPER subset
+# of which it is: `--resume` continues the run and `--landed` lands it, so both are the run's own
+# acts whatever session made them, while neither makes the tree it ran in the run's.
+READ_ONLY_VERBS = ("--status", "--audit")
 IDLE_GAP_S = 900
 # B1 (closing review, round 1): a stretch with an owner turn inside it, or within this many seconds of
 # either end, is kept out of the idle gaps and counted. Dropping the turn from the gap sequence is not
@@ -155,7 +161,8 @@ METHOD = {
              f"any verb but {', '.join(TREE_BLIND_VERBS)} read before the close, to another run's first "
              "claim there after the run's last",
     "window-end": "inferred for a non-terminal run: one second past its last journal line, record "
-                  "commit, own commit, or line of a tree it holds",
+                  "commit, own commit, or line of a tree it holds; a read-only visit another "
+                  "session made is none of those",
     "close-head": "inferred: the first parent of the commit recording the LANDING write, else HEAD",
     "attribution": "inferred: a call inside the window takes the most recent END of its session, of "
                    "any run, and is unattributed when that END is another run's",
@@ -167,9 +174,11 @@ METHOD = {
             "covers, a tool call covering its span and an owner turn covering nothing; judged only "
             "where the transcripts read present, and kept out within IDLE_OWNER_GUARD_S of an owner "
             "turn",
-    "sessions": "read from the run's START lines; heuristic when discovered by slug in the store, where "
-                "a session is kept only when it reaches the window; each read from its local transcript "
-                "before its store extract",
+    "sessions": "read from the START lines of the run's in-window calls, the verbs of "
+                f"{', '.join(READ_ONLY_VERBS)} excepted, which read the record and name no session of "
+                "the run; heuristic when discovered by slug in the store, where a session is kept only "
+                "when it reaches the window; each read from its local transcript before its store "
+                "extract",
 }
 
 GIT_CALLS = [0]
@@ -462,6 +471,21 @@ def check_in_hold(holds, wt, t) -> bool:
     """Whether a line made in tree `wt` at `t` falls inside the run's hold on that tree."""
     hold = holds.get(derive_path_key(wt)) if wt else None
     return hold is not None and t is not None and hold[0] <= t and (hold[1] is None or t < hold[1])
+
+
+def check_run_call(inv, own_sids) -> bool:
+    """Whether a call of the run's journal segment is an ACT of the run rather than a read-only VISIT
+    another session made (R2-M1 of the closing review, round 2).
+
+    Any verb outside `READ_ONLY_VERBS` is an act. A read is the run's own when its START named one of
+    `own_sids`, the sessions the run's acts named, or named no session at all. That last clause is
+    load-bearing: on the shipped default `RUNLOG_SESSION_VARS` is blank, so the keepalive tick's
+    `--audit` records no session, and a rule that dropped every read would put a stalled run's
+    heartbeats outside its own window and leave `stalled` unable to fire.
+    """
+    if inv["verb"] not in READ_ONLY_VERBS:
+        return True
+    return not inv["sids"] or bool(set(inv["sids"]) & set(own_sids))
 
 
 # ---------------------------------------------------------------------------------- the run-state file
@@ -944,8 +968,10 @@ def build_run_usage(extracts, window) -> dict:
 def derive_attribution(invs, extracts, window, run=None) -> dict:
     """Which unit and phase each tool call inside the window ran under, within ONE session (spec S8).
 
-    `invs` are every invocation the driver journal holds, of any build, and `run` this run's, all of
-    `invs` when None. A call takes the unit of the most recent unit-bearing END of its own session and
+    `invs` are every invocation the driver journal holds, of any build, and `run` this run's ACTS
+    inside its window, all of `invs` when None. An END from a session that only READ the record is not
+    among them (R2-M1), so a visiting session's `--status` attributes nothing to the run it looked at.
+    A call takes the unit of the most recent unit-bearing END of its own session and
     the phase of the most recent END's `phase_to`; a START with no END contributes its `phase_from`
     and no unit, and a verb carrying no unit leaves the unit where it was. The ENDs are every run's,
     so a later END supersedes whoever made it: a call whose most recent END or START is another run's
@@ -1506,6 +1532,10 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
             seg_end = u["t"]
             break
     seg = [i for i in invs if i["t"] >= seg_start and (seg_end is None or i["t"] < seg_end)]
+    # The sessions the run's own ACTS named, over its whole segment (R2-M1). Derived here, before the
+    # window, because the non-terminal end reads it and the window is what that end decides. A
+    # read-only visit by another session names none of them, so it is not one of the run's calls.
+    own_sids = {s for i in seg if i["verb"] not in READ_ONLY_VERBS for s in i["sids"]}
     # ---- the trees the run holds (spec S3, rev-7). H2 of the closing review, round 1: the key was
     # every tree any of the run's calls ran in, so a `--landed` or an owner's `--status` in the primary
     # tree made every other run's bar and push there this run's for its whole window.
@@ -1545,8 +1575,12 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         t = parse_float(s.get("t"))
         if check_tree_line(s.get("wt"), t):
             tree_ts += [v for v in (t, parse_float((inv.end.fields if inv.end else {}).get("t"))) if v is not None]
-    last_event = max([i["end"] or i["t"] for i in seg] + [float(c["t"]) for c in own_era] + tree_ts,
-                     default=None)
+    # R2-M1: a read-only visit is not one of the run's events either, so it never moves a non-terminal
+    # end past itself. Rev-7 took every call of the segment, and since such a visit always lands
+    # inside the window it moves, one `--status` days later stretched a stalled run's whole window to
+    # it — and then named its session, which is the same defect's other half.
+    last_event = max([i["end"] or i["t"] for i in seg if check_run_call(i, own_sids)]
+                     + [float(c["t"]) for c in own_era] + tree_ts, default=None)
     window = derive_window(w_start, w_from, phases_at, terminal, term_end, last_event)
     w_end = window["end"]
     # THE GIT-ONLY WINDOW (spec S1 of TOOL-dLoggedFlight-24): the start commit's own time, and no
@@ -1582,7 +1616,13 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     # The run's verbs inside its window. Its later ones, an owner's `--status` once it has landed say,
     # are not its events, and a session that only looked at it afterwards is not one of its sessions.
     seg_in = [i for i in seg if check_in_window(i["t"], window)]
-    sids = sorted({s for i in seg_in for s in i["sids"]})
+    # The run's SESSIONS: those its in-window acts named (R2-M1). A `--status` or an `--audit` is a
+    # read, and the session that made one is not thereby the run's — its owner turns, usage and tool
+    # calls are another session's work, and the in-window owner count is a committed fact.
+    sids = sorted({s for i in seg_in if i["verb"] not in READ_ONLY_VERBS for s in i["sids"]})
+    # The in-window calls that are attribution points: an END from a session that made only reads is
+    # not one of the run's (R2-M1, S8).
+    seg_own = [i for i in seg_in if check_run_call(i, own_sids)]
 
     # ---- timeline
     timeline = []
@@ -1787,7 +1827,7 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
     own_driver = sum(len(i["lines"]) for i in seg)
     coverage = measure_coverage(journals, own_driver, window, lines, activity, transcripts, record_state,
                                 "present" if (root / build).is_dir() else "absent")
-    attribution = derive_attribution(all_invs, extracts, window, run=seg_in)
+    attribution = derive_attribution(all_invs, extracts, window, run=seg_own)
     coverage["attribution"] = {k2: attribution[k2] for k2 in ("calls", "attributed", "share_calls",
                                                                "wall_s", "attributed_wall_s",
                                                                "share_wall")}

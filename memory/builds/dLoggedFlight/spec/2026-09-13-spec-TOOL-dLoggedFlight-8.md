@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-16 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-17 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -59,10 +59,14 @@ sources actually support. Every later surface renders from this model rather tha
     terminal phase on both of its lines and ends nothing;
   - for a terminal record, the first commit in its era that wrote a terminal `phase:`;
   - for a non-terminal record, one second after its last event. Its events here are its journal
-    lines, the commits in its era that touched `RUN.md`, its own commits (S3) as the era holds them,
+    lines, a read-only visit's excepted, the commits in its era that touched `RUN.md`, its own
+    commits (S3) as the era holds them,
     a merge naming one of its unit ids among them, and the gate and push lines made from a tree it
     holds (S3) before the next run's journal lines begin. The second is a commit time's resolution,
-    and it puts the run's last event inside its own half-open window. Three sources never move it.
+    and it puts the run's last event inside its own half-open window. Four sources never move it.
+    A read-only visit another session made does not, under the session rule below: such a visit
+    always lands inside the end it would move, so one `--status` made days later stretched a stalled
+    run's whole window to itself, and then named its own session.
     A merge naming only the slug does not, under the rule below for a commit that merely names it. A
     transcript event does not, because the run's session keeps working after the run and renders the
     record itself, so an end taken from the session would end at the render and move with every
@@ -85,6 +89,19 @@ sources actually support. Every later surface renders from this model rather tha
   either, and `end_from` says how the window closed. Two reads stay bounded by the era, as S1 and S4
   state them: the run-state history and the review records. Observed by AC1, AC9, AC15, AC16, AC18,
   AC21 and AC23.
+
+  A run's SESSIONS are the sessions its in-window ACTS named, never the ones its visitors did. The
+  verbs of `READ_ONLY_VERBS`, `--status` and `--audit`, only read the record, so a session whose
+  every call on the run is one of those is not one of its sessions, and its owner turns, usage and
+  tool calls are not the run's. That is a SECOND constant beside `TREE_BLIND_VERBS`, and a proper
+  subset of it, because naming a session and claiming a tree are different questions: `--resume`
+  continues the run and `--landed` lands it, so both are the run's own acts whatever session made
+  them, while neither makes the tree it ran in the run's. The same rule decides which calls move a
+  non-terminal end above and which ENDs are attribution points (S8). A read IS the run's own when its
+  START named a session one of the run's acts named, or named no session at all: on the shipped
+  default `RUNLOG_SESSION_VARS` is blank, so the keepalive tick's `--audit` records none, and a rule
+  that dropped every read would put a stalled run's heartbeats outside its own window and leave
+  `stalled` unable to fire. Observed by AC24.
 - **S3** The timeline. Observed by AC2, AC10, AC20 and AC22. It holds:
   - phase moves with their time and witness;
   - every driver verb with its rc, `exit` and checks;
@@ -234,10 +251,12 @@ sources actually support. Every later surface renders from this model rather tha
   and no unit. `--status`, `--resume` and every other verb that carries no unit leave the unit where
   it was. The ENDs read are every run's in the session, of any build, so a later END supersedes an
   earlier one whoever made it. An event whose most recent END or START belongs to another run is that
-  run's work and is unattributed, and a unit another run's END set is never this run's. An event
+  run's work and is unattributed, and a unit another run's END set is never this run's. An END from a
+  session that only READ the run's record is not one of the run's points either, by S2's session rule,
+  so a visiting session's `--status` attributes nothing to the run it looked at. An event
   before the session's first END is unattributed. The coverage block reports the share of calls and
   of wall time attributed, and its count of calls is the model's in-window tool calls. Observed by
-  AC17 and AC23.
+  AC17, AC23 and AC24.
 - **S9** Owner turns by position, each extractor owner turn classed by boundary events. Observed by AC13.
   - `launch`: the session's first owner turn, when it precedes the run's preflight START.
   - `pre-run`: any other turn before that START.
@@ -580,6 +599,19 @@ command.
   Red when: a call outside the window is counted, a call after another run's END is attributed, an
   event outside the window is on the timeline or counted as sharing a session, `phases-walked` stops
   judging a run by the write that ended it, or the two counts differ.
+- **AC24** — `READ_ONLY_VERBS` is a proper subset of `TREE_BLIND_VERBS`, the two differing by
+  `--landed` and `--resume`. When `build_run_model` reads the landed fixture whose journal holds a
+  second session's in-window `--status`, and a store holding that session's extract with three tool
+  calls and an owner turn inside the window, the run names one session, reads one extract, and answers
+  exactly as it does over a store holding only its own extract, on sessions, owner positions, usage and
+  attribution. With `READ_ONLY_VERBS` emptied the visitor joins and brings exactly the owner turns and
+  calls its own acts made. When the non-terminal fixture's journal holds a foreign `--status` an hour
+  after its last act, the window end does not move and the session is not named; emptied, that one
+  visit stretches the window to itself. Six `--audit` heartbeats of the run's own, recording no
+  session as the shipped default does, are its events: the window reaches them and `stalled` fires.
+  The same six from a session the run never named move nothing and fire nothing.
+  Red when: a read-only visit names a session, moves a non-terminal end, or contributes an
+  attribution point; or the run's own session-less heartbeats stop being its events.
 
 ## 7. Gates
 
@@ -722,6 +754,21 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   keepalive tick's `--audit` claims a tree. All three now point at `TREE_BLIND_VERBS`, the way
   `METHOD["trees"]` already does, and no copy is left to gate. S11 stated the source order unit 14
   inverted.
+- rev-17 · 2026-09-20 · S2 S8 · AC24 · folded R2-M1 of the closing diff review, round 2: a read-only
+  visit joined the run's sessions. Rev-11 made `--status`, `--resume`, `--landed` and `--audit` blind
+  for TREES and left all four naming SESSIONS, so another Claude session that ran `--status` on the
+  run became one of its sessions, and its owner turns, usage and tool calls became the run's — in the
+  facts that answer "what did it decide without asking me", with the in-window owner count committed.
+  For a non-terminal window the same visit moved the end past itself, so it always landed inside the
+  window it moved, and a stalled run visited days later stretched its whole window to the visit.
+  Naming a session and claiming a tree are different questions, so S2 declares a SECOND constant,
+  `READ_ONLY_VERBS`, a proper subset holding `--status` and `--audit`: `--resume` continues the run
+  and `--landed` lands it, and both are the run's own acts. S8's attribution points follow the same
+  rule. The review's finders proposed dropping every read from the end. A read with no session
+  recorded is the keepalive tick's `--audit` on the shipped default, where `RUNLOG_SESSION_VARS` is
+  blank, so that spelling would put a stalled run's heartbeats outside its own window and `stalled`
+  could never fire; AC24 observes both halves. The park the unit 8 acceptance ledger left on this
+  key is struck there, its first reason — that no review had confirmed it — spent.
 
 ## 10. Reuse audit
 
