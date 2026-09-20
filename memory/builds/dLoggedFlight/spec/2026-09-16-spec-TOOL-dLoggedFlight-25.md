@@ -213,7 +213,7 @@ regenerated map.
 
 `runlog selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC1's two renderer copies, AC3's era-bounded copy and AC4's committed-phase copy · floor moved by S4
+New arm: `tools/runlog/selftest.py` · AC1's two renderer copies, AC3's era-bounded copy, and AC4's committed-phase copy and its Units-item `PLACEMENT_LAG` copy · floor moved by S4, read by AC2
 
 ## 8. Open questions
 
@@ -232,7 +232,7 @@ New arm: `tools/runlog/selftest.py` · AC1's two renderer copies, AC3's era-boun
 - rev-1 · 2026-09-16 · initial draft, promoted from B1 and H3 of the spec audit of units 21 to 24,
   round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-24` rev-1 S3 and S4 with its AC2 and
   AC3.
-- rev-2 · 2026-09-20 · S2 · S6 · AC2 · AC4 · §3 · the disposal of the spec audit of units 25 to 27,
+- rev-2 · 2026-09-20 · S2 · S6 · AC2 · AC4 · §3 · §7 · the disposal of the spec audit of units 25 to 27,
   round 1. Promoted elsewhere: H1 to `TOOL-dLoggedFlight-29`, which returns each placement model
   beside the state it was built from, so S2 now names that unit for the construction discipline and
   §3 declares the handoff. Folded: M1, AC4 pins `PLACEMENT_LAG`'s membership in both directions with

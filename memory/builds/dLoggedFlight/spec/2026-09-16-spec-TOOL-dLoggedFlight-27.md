@@ -208,7 +208,7 @@ regenerated map.
 
 `runlog selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC2's renderer copy ignoring `gate`'s entry and AC4's four schema copies · floor raised by the arm count
+New arm: `tools/runlog/selftest.py` · AC2's renderer copy ignoring `gate`'s entry, AC2's copy mapping `idle` onto the transcripts coverage state, and AC4's four schema copies · floor raised by the arm count
 
 ## 8. Open questions
 
@@ -222,7 +222,7 @@ New arm: `tools/runlog/selftest.py` · AC2's renderer copy ignoring `gate`'s ent
 - rev-1 · 2026-09-16 · initial draft, promoted from H4 and H2 of the spec audit of units 21 to 24,
   round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-22` rev-2 S1's `withheld rows` clause,
   its AC1 count and its §5 empty-state line.
-- rev-2 · 2026-09-20 · S2 · S4 · S5 · S7 · §3 · §4 · §5 · AC2 · the disposal of the spec audit of
+- rev-2 · 2026-09-20 · S2 · S3 · S4 · S5 · S7 · §3 · §4 · §5 · §7 · AC2 · the disposal of the spec audit of
   units 25 to 27, round 1. Promoted elsewhere: H2 to `TOOL-dLoggedFlight-30`, which observes that the
   `known` test is gone from the renderer and re-points a declared source, so §3 declares the handoff.
   Folded: M2, S2 states that the `idle` judgement is narrower than `COUNTED_STATES` by one state and
