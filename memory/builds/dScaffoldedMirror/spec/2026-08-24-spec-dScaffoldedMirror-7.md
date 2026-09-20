@@ -221,6 +221,20 @@ number a later session can check. §4's first table puts that figure at 4.3% tod
 already one reading into its own refutation and the honest posture is that `-9` is on probation
 rather than merely queued.
 
+> **SUPERSEDED by `TOOL-aSurfacedLexicon-12`, 2026-09-05.** Quoted rather than edited, from the
+> paragraph above: "if the rate over files written fresh in the window stays at or below roughly 5%
+> across two further readings, the pressure chain ... should be abandoned", and "the plan is already
+> one reading into its own refutation". §6's AC8 further down asserts only that the docstring CARRIES
+> the rule, which is still true and is not superseded. The SOLE carrier of the kill-rule arithmetic is
+> now `build_lexicon_marginal_offense_rate`'s docstring in `tools/drift-audit/drift_report.py`
+> (owner ruling Q8, 2026-09-04); this spec's two copies are records of what was decided, not the
+> rule. And the reading has since gone the other way.
+> `python tools/drift-audit/drift_report.py --json` prints on the `lexicon_marginal_offense_rate`
+> signal's fresh-file arm `added 340`, `offenders 181`, `rate_pct 53.2`, ABOVE the roughly 5% bar.
+> So the abandon branch is BROKEN rather than one reading further along, and the branch the
+> docstring selects is the climb clause that promotes `-9` from probation to scheduled. The
+> "probation rather than merely queued" posture above is therefore too weak, not too strong.
+
 The converse binds too: a rate that CLIMBS in fresh files across two readings is the evidence `-9`
 was always missing, and it promotes the pressure chain from probation to scheduled. Either way the
 decision is a reading rather than an argument, which is what the plan lacked.

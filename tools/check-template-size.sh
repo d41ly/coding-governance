@@ -16,7 +16,13 @@
 #
 # Exit 0 = within budget (prints one line). Exit 1 = over budget. Exit 2 = file missing.
 # Exit 3 = the high-water record exists but this subject's row is not a number.
+# Exit 4 = --bump could not write the high-water record.
 # Exit 5 = the DECLARED limit for this subject is not a number.
+# Exit 6 = the subject states its own budget in prose and it disagrees with its declared row.
+#
+# THAT LIST IS THE FULL SET OF DISTINCT FAIL_CODE VALUES this file assigns, and it is stated here
+# because a gate's own header is where a reader learns what its exit codes mean. It omitted 4 for as
+# long as 4 existed, which is the checker-whose-record-does-not-describe-it class one level in.
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=.
 
@@ -100,6 +106,34 @@ HIGHWATER=${3:-${HIGHWATER:-"$ROOT/tools/template-size-highwater.txt"}}
 # smudge to CRLF must not inflate the count and spuriously fail the limit.
 bytes=$(tr -d '\r' < "$FILE" | wc -c | tr -d '[:space:]')
 name=$(basename "$FILE")
+
+# --- the PAIR TERM ------------------------------------------------------------------------------
+# A subject may state its own budget in its own prose. With the ceiling ALSO in a declaration that is
+# two spellings of one fact, and a value stated in prose beside the source that owns it rots between
+# changes. This branch is the pair: change both or neither.
+#
+# BEFORE the over-budget branch, deliberately. A disagreement makes the over-budget verdict ambiguous
+# — you cannot tell which ceiling you failed — so the disagreement is reported first.
+#
+# TWO GUARDS, NOT ONE. `[ -n "$declared" ]` keeps a subject with no declared row from being compared
+# against this script's hard default. `[ -n "$bline" ]` keeps the three subjects that carry no budget
+# line out of the comparison entirely; measured, only the two halves of one byte-compared pair carry
+# one at all, and a single guard would have compared the other three against an empty prose value.
+#
+# AN UNPARSEABLE BUDGET LINE REDS THROUGH THIS SAME BRANCH, and that is the point rather than a side
+# effect: `${prose:-…}` is empty when the line says `≤27 KB` instead of bytes, an empty string never
+# equals a declared row, so rewriting the prose back to a KB spelling cannot silently disarm the term.
+# One branch covers both cases, which also means one arm satisfies check-arms.py.
+bline=$(tr -d '\r' < "$FILE" | grep -m1 '^\*\*Budget:')
+if [ -n "$declared" ] && [ -n "$bline" ]; then
+  prose=$(printf '%s' "$bline" | sed -n 's/^\*\*Budget:[^0-9]*\([0-9][0-9]*\) bytes.*/\1/p')
+  if [ "$prose" != "$declared" ]; then
+    FAIL_CODE=6
+    fail 6 "the subject states its own budget and disagrees with its declaration: $name says
+  '${prose:-no bytes figure}', $LIMITS says $declared. Two spellings of one fact; change both or
+  neither. A budget line this gate cannot parse as bytes reads the same as a wrong one, deliberately."
+  fi
+fi
 
 if [ "$bytes" -gt "$MAX_BYTES" ]; then
   over=$((bytes - MAX_BYTES))

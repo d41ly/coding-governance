@@ -1,14 +1,17 @@
 # DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates
 
-**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7 · ratified 2026-09-02
+**Status:** CLOSED · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 7 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRetiredFork-3-1-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRetiredFork-3-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-DEPL-dRetiredFork-3-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRetiredFork-3-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -125,9 +128,15 @@ must remember is not a mechanism.
   the re-render flag ON, `python tools/govkit/govkit.py update --target C:/projects/nicocares/main
   --write` lands every stale row, re-renders every rendered row, runs every declared generator,
   re-stamps `gov_commit`, and the tree afterwards needs no hand merge — recorded in the acceptance
-  ledger. **inCMS's half of the done-condition is DEFERRED, and §3 says so**: no unit in this
-  roster repairs that receipt, so a criterion gated on the repair would be permanently neither
-  green nor red — worse than a missing one, because it looks covered.
+  ledger.
+  At NicoCares the done-condition depends on NO escape: `DEPL-dRetiredFork-1` S7 drives the
+  `evidence: "unattributed"` count to ZERO, so `tools/govkit/govkit.py:6566-6573` does not withhold
+  the `gov_commit` re-stamp and the pinned argv carries neither `--allow-ungraded` nor a preceding
+  `govkit adopt --re-adopt --write`. inCMS's half is DEFERRED, and when it is attempted it is
+  attempted with `--allow-ungraded`, which is a stated weakening and not a quiet one.
+  **§3 states the inCMS deferral**: no unit in this roster repairs that receipt, so a criterion
+  gated on the repair would be permanently neither green nor red — worse than a missing one,
+  because it looks covered.
 - **AC11** — `python tools/govkit/check_runbook_parity.py` exits `0`, and
   `WIRE-INTO-PROJECT.md`'s maintenance section is strictly SHORTER than at `b0108f13`,
   and every obligation it drops is carried by a `[[regenerate]]` block in a kit descriptor. §5
@@ -170,6 +179,10 @@ must remember is not a mechanism.
   writing now. 12: the `generated` non-goal contradicted S2 — it disclaims authorship, not
   invocation. 14: a stale arm count becomes a pointer. 23: AC11 lost its gate when `runbook
   parity` proved not to be a leg; it invokes the program directly. 28: AC8 sat after AC11.
+- rev-5 · 2026-09-02 · `DEPL-dRetiredFork-9` writes the ratified done-condition escape into AC10:
+  NO escape at NicoCares, since `DEPL-dRetiredFork-1` S7 now drives that count to zero, and
+  `--allow-ungraded` at inCMS when its deferred half is attempted. The sentence is shared verbatim
+  with `DEPL-dRetiredFork-1` AC6 so neither criterion can be read alone.
 
 ## 10. Reuse audit
 

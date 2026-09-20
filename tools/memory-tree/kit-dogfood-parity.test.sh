@@ -34,6 +34,11 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "kit-parity: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
+# TOOL-aJoinedCanon-9: PRESET above the conf source, and it is `set -u` safety rather than a
+# default — there is exactly ONE literal row set and it is the conf. Without this line every adopter
+# tree whose .memory-tree.conf predates the key ABORTS on an unbound variable inside render_doc,
+# which is a reader that fails to RUN rather than one that fails.
+READINESS_ROWS="${READINESS_ROWS:-}"
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 M="$MEMORY_ROOT"
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -50,7 +55,7 @@ TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 [ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"
 
 MODE="${1:---check}"
-PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md"
+PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md $M/guides/ANNOTATION-STYLE.md:$KITREL/ANNOTATION-STYLE.template.md"
 
 # NOT "byte-identical IN INTENT" any more, which is what the previous version of this comment
 # claimed while the two spellings sat in two files with two variable names and nothing comparing
@@ -77,6 +82,14 @@ render_doc() {
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
+  # sits INSIDE the marked block rather than in the callers, so the parity table already gating this
+  # block covers it too — a per-caller transform would be a second duplication nothing compares,
+  # because gov's live copy is written by the parity test and an adopter's by the adopter, so the
+  # two formatters never meet.
+  local rows=${READINESS_ROWS//|/$'
+'- }
+  out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
   printf '%s' "$out"
 }
 # <<< render_doc

@@ -4,17 +4,44 @@ id = "unattended"
 home = "tools/unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
-requires = ["memory-tree"]
+requires = ["memory-tree", "review-harness"]
 
 [[files]]
 include = "**"
 role = "engine"
 
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+[[files]]
+include = ["adopt-unattended.test.sh", "check-pass-order.test.sh", "check-playbook.test.sh", "check-unattended.test.sh", "cross-component.test.sh", "gate-guard.test.sh", "unattended.test.sh"]
+role = "project-owned"
+
+# `MEMORY_TREE_DIR` is the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
+# bug-class checklist names by path. The adopter PROBES the tracked tree for it rather than deriving
+# it from `TOOL_ROOT`, because an adopter may install that kit flat in its tool root, and it refuses
+# when neither spelling is tracked. The review-harness kit's build harness carries the same command
+# and fills it the same way, so the two carriers cannot disagree about where the checklist lives.
 [[files]]
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/unattended/SKILL.md"
-placeholders = ["KIT_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
 
 [[files]]
 include = ["PROTOCOL.template.md"]
@@ -40,18 +67,44 @@ role = "rendered"
 to = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
 placeholders = []
 
+# the playbook FIXTURE. RENDERED, not engine — and that role change is the whole unit. It shipped
+# verbatim with `{kit}` spelled out five times in its outputs, grain, records and legs, so
+# `check-playbook.sh` exited 1 for any adopter installed at another prefix and the suite above it
+# could not follow a variable the fixture did not have. TOOL-dScrubbedConduit-2.
+#
+# ONE token here, and the reason stands on its own ground: all five spellings in the FIXTURE sit
+# under the kit directory, so `KIT_DIR` covers every one of them. The clause this comment used to
+# carry - that `TOOL_ROOT` is computed only by the memory-tree adopter and declaring it would ship an
+# unresolved brace - was true when it was written and is false now: `adopt-unattended.sh` derives and
+# substitutes `TOOL_ROOT`, and the SKILL row above declares it. A stale premise is what the next
+# author reads before touching this rule.
+[[files]]
+include = ["playbook.fixture.template.md"]
+role = "rendered"
+to = "{kit}/playbook.fixture.md"
+placeholders = ["KIT_DIR"]
+
 [config]
 file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
 argv = ["bash", "{kit}/adopt-unattended.sh"]
 mutates_index = false
 requires_config_first = true
+
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. Every `rendered` row above is written by the
+# adopter, and without a regenerate block, or with this one and GOVKIT_RERENDER unset, `update` lands
+# the new templates, leaves the renders stale, and then fails its own post-write check on the Skill
+# and rolls the kit back. That is what happened at one adopter on 2026-09-11, and this block
+# prevents it only under the flag. The adopter re-renders unconditionally, so it is the whole argv;
+# its declared outcomes below classify its exit exactly as they do for `apply`.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-unattended.sh"]
 
 [check]
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]
@@ -111,6 +164,20 @@ red_after_land = true
 name = "pass-order history"
 subject = "repo"
 argv = ["bash", "{kit}/check-pass-order.sh"]
+guard = []
+red_after_land = true
+
+# the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
+# REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
+# to this kit dir would skip it on exactly the commits that add a brief row — a build commit that
+# touches no kit file at all. Its ceiling is declared in the leg manifest and copied from the
+# sibling's, whose own
+# measured cost already sits at 73% of it: when the graded population catches up, that ceiling is the
+# next thing to red, and re-declaring it with a reason is the right answer then rather than now.
+[[gate_leg]]
+name = "brief-recorded"
+subject = "repo"
+argv = ["bash", "{kit}/check-brief-recorded.sh"]
 guard = []
 red_after_land = true
 

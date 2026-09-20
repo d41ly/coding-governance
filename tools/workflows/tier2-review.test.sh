@@ -21,11 +21,12 @@
 # against a FLOOR: both exist because an arm block stranded past an early exit would otherwise
 # shrink this suite silently, which is the one failure a self-test cannot report about itself.
 
+KIT_REL="${KIT_REL:-tools/workflows}"
 set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "tier2-review-test: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-FILE="tools/workflows/tier2-review.js"
+FILE="$KIT_REL/tier2-review.js"
 [ -f "$FILE" ] || { echo "tier2-review-test: the subject $FILE is absent — a suite whose subject is missing must say so, not pass"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "tier2-review-test: node is not on PATH, so nothing can be evaluated — refusing rather than passing"; exit 2; }
 

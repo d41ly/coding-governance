@@ -35,7 +35,12 @@ const MARKER = /^\s*export\s+const\s+meta\s*=/m
 // .gitignore line.
 function discovered() {
   const out = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '--', '*.js'], { encoding: 'utf8' })
-  const seen = new Set(out.split('\n').filter((p) => p.startsWith('tools/') && p.endsWith('.js')))
+  // NO PREFIX FILTER, and this file is the ONE of the three where deleting it is correct
+  // rather than merely tempting. MARKER is applied to every candidate below, so the
+  // population is already `a file declaring workflow meta` and the prefix was doing nothing
+  // except spelling an install path. The other two gates apply no marker filter, so theirs
+  // had to be replaced rather than removed. TOOL-dRetiredFork-10.
+  const seen = new Set(out.split('\n').filter((p) => p.endsWith('.js')))
   return [...seen].sort()
 }
 
@@ -82,7 +87,7 @@ if (bad) {
 // A discovery run that found NOTHING is not a pass — it is a gate whose population evaporated
 // (a renamed directory, a dropped marker). Say so and fail rather than print a green line.
 if (!explicit && checked === 0) {
-  console.log('workflow-syntax: no workflow script found under tools/ — the population is empty, which is not a pass')
+  console.log('workflow-syntax: no file declaring workflow meta was found — the population is empty, which is not a pass')
   process.exit(1)
 }
 console.log(`workflow-syntax: ${checked} workflow script(s) parsed clean`)

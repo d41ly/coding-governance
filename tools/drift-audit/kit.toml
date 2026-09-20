@@ -16,6 +16,28 @@ requires = ["memory-tree"]
 include = "**"
 role = "engine"
 
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
+
 [[files]]
 include = ["drift_signals.py"]
 role = "project-owned"
@@ -40,6 +62,14 @@ required_keys_render = ["MEMORY_ROOT"]
 argv = ["bash", "{kit}/adopt-drift-audit.sh"]
 mutates_index = false
 
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. The adopter's no-flag mode IS the render:
+# on an adopted tree it leaves drift_signals.py alone by name and rewrites the SKILL, so it is
+# already the narrow refresh this block needs and no new mode was added for it. Without the block
+# the kit's one `rendered` row goes a vintage stale on every update, GOVKIT_RERENDER=1 included,
+# because that flag runs this block and there was no block (TOOL-dRetiredFork-29).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-drift-audit.sh"]
+
 [check]
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 
@@ -47,12 +77,6 @@ argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 code = 0
 probe = { must_exist = "{kit}/drift_signals.py" }
 means = "adopted"
-
-[[gate_leg]]
-name = "drift-audit selftest"
-subject = "kit"
-argv = ["python", "{kit}/selftest.py"]
-guard = ["{kit}/"]
 
 [[gate_leg]]
 name = "drift-audit records"
@@ -76,6 +100,14 @@ blocks_adopt = false
 blocks_gate = true
 why = "TRACE_CUTOFF ships empty and the engine then returns gateable:False for closed_specs_with_no_product_commit — correct on day one, and permanently inert if nobody ever fills it. Unlike drift-product-globs an unfilled hole here INVENTS nothing, it just never speaks: the adopter keeps a signal that reads 0 of 0 forever while the gate stays green, which is the dead-instrument class this kit exists to refuse."
 discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'TRACE_CUTOFF', '') or '').strip() else 1)"] }
+
+[[hole]]
+id = "drift-evidence-globs"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "EVIDENCE_GLOBS ships empty and the engine then falls back to PRODUCT_GLOBS, which is the UNNARROWED population signal 2 was corrected away from \u2014 so an unfilled hole leaves the adopter with the self-certifying oracle while the kit README records the correction as shipped. Same shape as drift-product-globs rather than drift-trace-cutoff: an unfilled hole here INVENTS an answer instead of staying silent, which is the worse of the two failure modes."
+discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'EVIDENCE_GLOBS', None) or []) else 1)"] }
 
 [[hole]]
 id = "drift-pins"

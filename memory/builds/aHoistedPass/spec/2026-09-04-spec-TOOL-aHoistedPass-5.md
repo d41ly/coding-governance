@@ -1,0 +1,559 @@
+# TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else
+
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-build-TOOL-aHoistedPass-5-1-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aHoistedPass-5-1-acceptance-ledger.md) | journal | — |
+| [2026-09-06-build-TOOL-aHoistedPass-1-1-landing.md](../build/2026-09-06-build-TOOL-aHoistedPass-1-1-landing.md) | journal | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md) | journal | — |
+| [2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md) | journal | — |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Land `tools/workflows/unattended-unit.js`, a workflow script that builds exactly ONE unit of an
+unattended build, oriented in that unit's spec and that unit's brief and never in the roster. Under
+the hoist the parent program ends after DISPOSAL and returns the ordered roster, and the run makes
+one main-loop `Workflow` call per unit against this file; without the file there is nothing to
+dispatch and the hoist has no callee.
+
+## 2. Scope (IN)
+
+- **S1** — the file at `tools/workflows/unattended-unit.js`, taken from the candidate at
+  `scratchpad/unattended-unit.candidate.js` (measured at this base: 110 lines, 6933 bytes), with the
+  corrections S6 and S8 below.
+- **S2** — the args contract. `repo`, `slug`, `unitId`, `specPath`, `briefPath`, `driver`, `ground`
+  and `checklist` are each refused by name with a reason, after a `JSON.parse` guard for the case
+  where the caller hands the tool a string.
+- **S3** — exactly one `agent()` call, under `UNIT_SCHEMA`, whose required keys are `committed`,
+  `sha`, `why` and `summary`. `why` is required on both outcomes, so an empty result carries a
+  reason rather than being indistinguishable from a clean pass over nothing.
+- **S4** — the prompt. Read the brief and the spec whole before touching code; change the spec first
+  where the build must diverge; declare the write set with `--dispatch … --writes`; record the brief
+  with `--brief`; commit; run the checklist command and act on what it names.
+- **S5** — the status flip, in the prompt: set this unit's spec status header to `CLOSED`, or to
+  `WONTDO` with a reason, IN THE SAME COMMIT as the code. §4 states why this is load-bearing.
+- **S6** — exactly ONE top-level definition, so the `kit-js` symbol layer has a symbol to index. This
+  is a correction to the design of record and it is measured in §4; the fork it opens is F1.
+- **S7** — the map claim. `"unattended-unit.js"` joins `workflow-scripts` in
+  `memory/map/features/unattended.md`, and `python tools/codebase-map/gen_map.py --write` re-runs in
+  the same commit so the generated artifacts land with the claim.
+- **S8** — the file header rewritten so that every property it declares names what actually holds it,
+  in the words §4's inventory settles on. The candidate's header is already close; two of its claims
+  are corrected by measurement here.
+
+## 3. Non-goals (OUT)
+
+- The parent. Deleting the BUILD `agent()`, the roster return, `resolvePathsWith`, `--plan --paths`
+  and the order-gate arm belong to the parent-and-driver unit (design U5). This unit adds a callee and
+  changes nothing that calls it.
+- Any Skill, protocol or BUILD-METHOD edit. The dispatch loop, the `scriptPath` pin, the per-dispatch
+  re-read step and the four `next:` branches are `TOOL-aHoistedPass-2`'s; this file is named by them,
+  never the other way round.
+- Widening the fan-out predicate. This unit takes `tools/hooks/agent-cap.js` exactly as it stands at
+  the run's BASE `e828f778`, AFTER `TOOL-aWeldedTribunal-1`'s widening — not as it stood at this
+  spec's own base. The move is PROVED rather than asserted:
+  `git log --oneline c4fcf5ad..e828f778 -- tools/hooks/agent-cap.js` returns eight commits
+  (`TOOL-aWeldedTribunal-1`, `-2`, `-3` and five follow-ups) and the file goes 1610 to 1814 lines
+  across them. Re-measured at BASE, `for await (…) { await agent(…) }` and
+  `do { await agent(…) } while (…)` BOTH exit 2, so the two loop spellings this unit was told to leave
+  alone have already landed; whatever remains for `TOOL-aHoistedPass-4` is that unit's to state. This
+  unit still widens nothing.
+- Teaching the codebase-map JS liveness floor about the export scan. That is F1 option (b) and it is
+  not taken here; it is a backlog row if the fork is ever reopened.
+- Concurrent dispatch of an `order` group. M6 will name the permission; nothing in this file or in
+  this build implements it.
+- A new govkit kit id for this file. It ships inside the `review-harness` kit's home
+  (`tools/workflows/kit.toml` declares `include = "**"`, role `engine`) and needs no entry of its own.
+
+## 4. Design
+
+### Data model
+
+`args` arrives as an object or as a JSON string. Eight keys, all required, none defaulted:
+
+| key | what it carries | why it is not defaulted |
+|---|---|---|
+| `repo` | the build root | defaulting it to the process cwd is how a sibling harness reviewed the wrong repository |
+| `slug` | the build slug | every driver verb in the prompt is slug-addressed |
+| `unitId` | the one unit | this script builds one unit and cannot pick it |
+| `specPath` | that unit's spec | a unit built without its spec is the defect the harness exists to close |
+| `briefPath` | that unit's brief | the brief is the only carrier the driver hashes |
+| `driver` | the driver invocation, spelled by the caller | so this file spells no install path |
+| `ground` | the grounding preamble the parent built | the child does not re-derive grounding |
+| `checklist` | the per-pass bug-class command | owed after every commit, and a sidechain agent does not inherit the unattended Skill |
+
+The return is `{committed, sha, why, summary}`, coerced from the agent's result so a missing field
+becomes an empty string rather than `undefined`.
+
+**No `roster` field, and no `reportPath`.** The child never receives the roster: the parent holds it
+and holds the order. Anything a unit must know beyond its spec goes into its BRIEF file, because that
+is the only carrier `--brief` hashes — it refuses an untracked path and hashes with `git hash-object`.
+Nothing hashes a prompt string.
+
+### Inventory — every declared property, and what actually holds it
+
+RE-MEASURED at BASE `e828f778` in this worktree, against the WIDENED `agent-cap.js` — the rev-1
+figures were taken at `c4fcf5ad` against the narrower predicate. The subject is the candidate
+verbatim, re-extracted from Appendix A of the design pass and checked at 110 lines and 6933 bytes,
+plus one appended construct per fixture. Each is handed to `node tools/hooks/agent-cap.js` on stdin
+as `{"tool_name":"Workflow","tool_input":{"script":…}}` and the exit code is read from the process's
+own status, never through a pipe. The pristine candidate exits 0 in `script` mode and in Windows-form
+`scriptPath` mode alike, so the two input modes still agree and the mode is not doing the work.
+
+Every agent-cap exit code below was re-observed at BASE, and every one reproduced its rev-1 value:
+the widening added loop SPELLINGS without moving a single figure this table already carried. Row 1's
+two arms were re-run too, on the extracted candidate — exit 0 with `1 workflow script(s) parsed
+clean`, and exit 1 with `SyntaxError: Unexpected token 'export'`. So were the three population
+counts, likewise unchanged: `check-workflow-syntax.js` and `check-verifier-fanout.sh` each still
+discover **4** scripts, `check-install-prefix.sh` still reports **180** shipped files, which is what
+AC1, AC3 and AC7 hang their deltas on.
+
+**Two things below were NOT re-run at BASE**, because observing either means STAGING the candidate at
+its real path and this revision may write only this spec: row 4's `181` and `UNRECORDED` arms, and the
+whole `codebase-map coverage + freshness` row. Both carry rev-1's readings, both are flagged where
+they sit, and `check-install-prefix.sh`, `map_lib.py` and `map_extractors.py` are byte-identical
+between `c4fcf5ad` and BASE — which is a reason to EXPECT those readings hold and is not an
+observation that they do.
+
+**The holders below are cited by NAME.** rev-1 cited them by line address, and 66 commits later every
+one of those addresses pointed at unrelated code; a named target survives the next shift. The BASE
+line is given once, as a convenience, and it is the part that will rot.
+
+| declared property | what holds it | measured |
+|---|---|---|
+| a BARE top-level script, never `export default` | **`workflow script syntax`**, on every bar | the candidate → exit 0, `1 workflow script(s) parsed clean`; the same file rewritten as `export default async function run()` → **exit 1**, `SyntaxError: Unexpected token 'export'` |
+| no spawn once per item — as a loop, or as an array-method receiver | **`fanoutFindings`, through `runBothViews`, per dispatch** (`agent-cap.js:1725` at BASE) | `for (const u of cfg.units) { await agent(…) }` → **exit 2**; `await Promise.all(cfg.units.map((u) => agent(…)))` → **exit 2**; `cfg.units.map((u) => agent(…))` alone → **exit 2**; and, new since `TOOL-aWeldedTribunal-1`, `for await (const u of cfg.units) { await agent(…) }` → **exit 2** and `do { await agent(…) } while (…)` → **exit 2** |
+| no raw `parallel(` / `pipeline(` | **`offendingLines`, through `runBothViews`, per dispatch** (`agent-cap.js:1766` at BASE) | `await parallel([agent(…), agent(…)])` → **exit 2** |
+| it spells no `tools/` literal | **`install-prefix (shipped surface)`**, on every bar, once the file is TRACKED | clean child staged → exit 0, `181 shipped files`; the same file plus one `bash tools/unattended/unattended.sh` literal → **exit 1**, `UNRECORDED  tools/workflows/unattended-unit.js	1`. Both arms are **rev-1's readings, NOT re-run at BASE** — they need the candidate staged. The `180 without it` half WAS re-derived at BASE and holds |
+| at least one top-level definition | **`codebase-map coverage + freshness`**, on every bar | see the next sub-head — the candidate as written REDS this leg. **rev-1's reading, NOT re-run at BASE**: observing it means staging the candidate to its real path. `map_lib.py` and `map_extractors.py` are byte-identical between `c4fcf5ad` and BASE, which is a reason to expect it holds and is not an observation that it does |
+| a plain loop, a `function`, a `=>`, a non-receiver `.map()`, a bare `Promise.all` | **NOTHING. A file-style rule with no gate.** | all five fixtures → **exit 0** |
+| exactly ONE `agent()` | **NOTHING.** The run holds it. | a second `agent()` with an unrelated prompt → **exit 0** |
+| it never NESTS | **NOTHING.** The run holds it. | `await workflow({scriptPath: …}, {})` appended → **exit 0**; and `grep -c "workflow(" tools/hooks/agent-cap.js` = **0**, so the hook contains no occurrence of the nesting call form at all. A nested call fired from inside this sidechain reaches no hook either (`agent-cap.js:9`) |
+| `export const meta` is present | **NOTHING. It SELECTS.** | deleting the declaration line drops the file out of BOTH marker-keyed legs at exit 0: `workflow script syntax` and `verifier fan-out` each report **4** scripts instead of 5. `check-review-join.sh:102-103` selects on path alone with no marker filter, so `review-join ban` keeps the file either way |
+| the prompt's content, between dispatches | **NOTHING.** The run holds it. | the second-`agent()` and rewritten-prompt fixtures both admit |
+
+Two of the nine rows are the whole of what the per-dispatch re-read buys, and they are ONE rule plus
+one: `fanoutFindings` catches a spawn once per item however it is spelled — a loop or an
+array-method receiver — and `offendingLines` catches the raw primitive. A loop with no spawn inside
+admits (**exit 0**, re-measured at BASE, and so do a bare `for await` and a bare `do`-block), so "no
+loop" is not the rule; "no spawn per item" is. `TOOL-aWeldedTribunal-1` widened WHICH spellings count
+as a loop and left that distinction intact. Rules 2 and 5 — `capFindings`, the unresolvable bound,
+and `scanJoinFindings`, the ref-keyed verdict join — are in the same scan and this file trips
+neither. All four holders are dispatched from adjacent `runBothViews(…)` calls, at
+`agent-cap.js:1725`, `:1745`, `:1766` and `:1797` at BASE.
+
+### The correction the design of record missed: the `kit-js` liveness floor
+
+The design names `workflow script syntax` and `verifier fan-out` as this unit's boundaries. A third
+unguarded leg runs on every bar and REDS on the candidate as written.
+
+`map_extractors.py:213` walks `tools/` with `map_lib.scan_js_definitions`, whose three rules
+(`map_lib.py:405-415`) recognise `function <id>`, `class <id>`, and `const|let|var <id> =` bound to a
+function or an arrow. The candidate has none of the three: every occurrence of `function`, `=>` and
+`Promise` in it sits inside a `//` comment, which the scanner strips. A file yielding zero symbols
+raises rather than indexing less — `map_lib.py:474`:
+
+> `kit-js: tools/workflows/unattended-unit.js yielded NO definition. A JS file with no top-level
+> function or class is either not what this layer is for, or a form these rules forgot — raising
+> rather than indexing less, which is how this layer went 30-to-3 unseen`
+
+Observed: with the candidate copied to its real path, `python3 tools/codebase-map/test_codebase_map.py`
+exits 1 on that `MapError` traceback. The floor is deliberate and fail-closed, and it is a LIVENESS
+assertion of exactly the kind §7 of the charter demands, so it is not a bug to route around.
+
+**S6 is the resolution: one top-level definition.** The candidate spends eight near-identical lines on
+`if (!cfg.<key>) throw new Error(…)`; one `function check(key, why)` replaces the seven that share a
+shape, satisfies rule 1 of `JS_DEFINITION_RULES`, and makes the file shorter. Observed with that one
+function added: the `MapError` is gone and the leg reports only its two ordinary obligations — the
+unclaimed key and the stale generated artifacts. With `"unattended-unit.js"` added to
+`workflow-scripts` in `memory/map/features/unattended.md` (which already claims `unattended-build.js`)
+and `gen_map.py --write` re-run, the leg exits **0**, all five of its tests `ok`.
+
+The cost is one clause of a style rule that nothing enforces: the file may no longer claim it holds no
+`function`. `function` ADMITS at the hook (measured, exit 0), so nothing about fan-out changes. F1
+records the alternative and why it was not taken.
+
+### The status flip, and why it is load-bearing
+
+`unattended.sh:2144` is the only thing that removes a unit from `next` candidacy:
+
+```sh
+case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
+```
+
+`$st` is the spec's status header. The candidacy branch immediately below (`:2147-2150`) sets `next`
+only for a state of exactly `THIN`, `FORKED` or `READY`, and the flip above rewrites all three to
+`DONE …`, which matches none of them. Under the hoist the run reads `--plan <slug> --paths` between
+dispatches, so a child that commits code without flipping the header leaves `--plan` naming the same
+unit `READY - build it` forever, and the run's own loop counter never advances. `--plan` reads the
+INDEX (`unattended.sh:2043`, `git ls-files "$dir/spec/*.md"`), so the flip must be STAGED in the same
+commit, not merely written.
+
+The same flip is load-bearing a second time downstream: `build-complete`'s non-terminal term at
+`--close` (`unattended.sh:3353`) refuses a build any of whose units is neither `CLOSED` nor `WONTDO`,
+and that term is the ONE thing catching an incomplete loop. Its only exit is a recorded
+`--override build-complete`.
+
+**No other carrier instructs the act.** The prompt is where it is instructed, and nothing enforces it:
+`--dispatch` does not require it, `--brief` does not, and `pass-order history` grades only units that
+already reached `CLOSED`. The run holds it until `--close`, where the refusal is overridable.
+
+### What the prompt may and may not say about `--dispatch`
+
+The prompt tells the agent to declare its write set and that a refusal is binding, and then states the
+verb's reach honestly, because the parent's own BUILD prompt shipped the opposite claim:
+
+- `unattended.sh:4604` refuses a unit no tracked spec under this build defines.
+- `:4609` refuses a unit whose spec grades `THIN`, and that is the only arm in its `case`.
+- The order gate runs only `if [ -n "$_d_ord" ]` (`:4630`) and skips any sibling with no verb
+  (`:4639`), so it is available only where BOTH units carry an `order` verb.
+- A sibling carrying a dispatch row stops blocking whether or not it was ever built (`:4647`), and
+  `--dispatch` writes that row itself.
+
+So the prompt says its silence is not a clearance, and that order is the parent roster this child was
+dispatched from rather than something the verb proves. `grep -c "THAT DISPATCH IS THE ORDER GATE"` over
+this file must stay **0**.
+
+### The version marker, stated for what it is
+
+`meta.version` carries `// gov:kit unattended-unit@1.0`, matching the sibling
+`unattended-build.js:3`. No branch of `check-kit-versions.sh` reads that id — its kit ids are a
+hard-coded list (`tier2-review`, `review-harness`, `agent-cap`, `run-gates`, `settings-merge`,
+`memory-tree`, `unattended`) — so the marker is documentation and not a graded contract. Matching the
+sibling beats inventing a third convention; the comment beside it says so rather than implying a
+versioning contract the file does not have.
+
+### Files touched (estimate)
+
+| path | change |
+|---|---|
+| `tools/workflows/unattended-unit.js` | NEW, ~110 lines |
+| `memory/map/features/unattended.md` | one key added to `workflow-scripts` |
+| `memory/map/generated/inventories.json` · `symbols.json` · `MAP.md` | regenerated, never hand-edited |
+
+### Alternatives rejected
+
+- **Put the loop back in the child.** A workflow script has no filesystem, cannot re-read `--plan` and
+  cannot verify a commit, and a `workflow()` call fired from inside a sidechain runs no hook at all
+  (`agent-cap.js:9`). The loop belongs to the run.
+- **Hand the child the roster so it can check its own order.** The order it would check is the order it
+  was handed; the parent holds both.
+- **Dispatch by `name:` instead of `scriptPath`.** Re-measured at BASE: `{tool_name:'Workflow',
+  tool_input:{name:'somewf'}}` → exit 0 with nothing read, at the `if (!script) process.exit(0)`
+  guard (`agent-cap.js:1723` at BASE). Every rule in the inventory above evaporates. The pin is
+  `TOOL-aHoistedPass-2`'s to write.
+- **Teach the codebase-map floor about the export scan.** F1 option (b); see §8.
+
+## 5. Production-readiness checklist
+
+- **security** — the child spawns one agent with a prompt built from `args`. It writes no file itself,
+  holds no credential, and spells no path; §9 of the charter's write-boundary rules do not apply. The
+  agent it spawns has the run's own authority, which nothing here bounds and §10 of the design says so.
+- **perf / scale** — one `agent()` per dispatch. N units cost N main-loop returns; the keepalive is
+  time-keyed so the returns cost it nothing. Whether N returns raise the stall rate is UNVERIFIED in
+  either direction and this unit asserts nothing about it.
+- **a11y** — N/A: no user interface.
+- **i18n** — N/A: agent-facing English, same as every sibling harness.
+- **error / empty / loading states** — eight named arg refusals plus the parse guard; `why` required on
+  both outcomes so `committed:false` always carries a reason.
+- **observability** — one `log()` line naming the unit, the commit flag and the sha. The run's own
+  `dispatch` and `brief` rows are the durable witness and they are written by the driver, not here.
+- **risks** — the loop-advance risk is the status flip (§4): a child that commits without it stalls the
+  run's counter. It is instructed and not enforced, and `build-complete` is the only downstream catch.
+  No concurrency risk: one dispatch at a time, and this unit builds no parallel path.
+- **testing + left-shift gates** — three standing legs already cover the file the day it lands
+  (`workflow script syntax`, `verifier fan-out`, `review-join ban`), plus
+  `codebase-map coverage + freshness` and `install-prefix (shipped surface)`. This unit adds NO new
+  gate; §6 names the breaks to stage against the ones it joins. The S2 args contract is covered by
+  NONE of them — `workflow script syntax` PARSES the file and never calls it — so AC14 and AC15 are
+  landing-time observations, held after that by review alone, the same standing as the three §4 rows
+  with no enforcer.
+- **migration / rollback** — additive. Deleting the file restores the tree, minus the map claim and the
+  regenerated artifacts, which come out in the same commit.
+- **user docs** — none. The file is agent-facing and reached only by a `Workflow` dispatch; the route
+  a reader follows to it is `TOOL-aHoistedPass-2`'s M6 sentence.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `node tools/workflows/check-workflow-syntax.js` runs in discovery mode with the file
+  landed, it exits 0 and reports `5 workflow script(s) parsed clean`, one more than the `4` measured at
+  this base. The count is the membership assertion; the exit code alone is not, because the marker
+  SELECTS the population.
+- **AC2** — When the same file is rewritten to `export default async function run()` and handed to
+  `node tools/workflows/check-workflow-syntax.js` explicitly, it exits **1** with
+  `SyntaxError: Unexpected token 'export'`. Staged, observed, unstaged — this is the shape the bare
+  top-level rule exists to exclude, and it has been observed RED at this base.
+- **AC3** — When `bash tools/workflows/check-verifier-fanout.sh` runs in discovery mode, it exits 0 and
+  reports `5 workflow script(s)`, and the same population re-derived by hand —
+  `git ls-files --cached --others --exclude-standard -- '*.js'` filtered by
+  `grep -qE '^[[:space:]]*export[[:space:]]+const[[:space:]]+meta[[:space:]]*='` — returns exactly one
+  entry the same re-derivation at `c4fcf5ad` did not, and that entry is the script this unit lands.
+- **AC4** — When the candidate plus `for (const u of cfg.units) { await agent(…) }` is fed to
+  `node tools/hooks/agent-cap.js` by `scriptPath`, it exits **2** naming
+  `a verify/fan-out stage spawns one agent per item`; when the pristine file is fed the same way it
+  exits **0**. Both observed at this base, exit codes captured without a pipe.
+- **AC5** — When `python3 tools/codebase-map/test_codebase_map.py` runs with the file landed, its
+  claim in `memory/map/features/unattended.md` present and `gen_map.py --write` re-run in the same
+  commit, it exits 0 with all five tests `ok`.
+- **AC6** — When the file is staged WITHOUT its top-level definition, the same leg exits **1** on
+  a `map_lib.MapError` reading `kit-js: <the staged script> yielded NO definition`. Staged,
+  observed, unstaged — already observed once at this base, and it is the reason S6 exists.
+- **AC7** — When the file is staged and `bash tools/check-install-prefix.sh` runs, it exits 0 and
+  reports `181 shipped files`, up from the `180` measured at this base; when one
+  `bash tools/unattended/unattended.sh` literal is appended to the staged file, the same command exits
+  **1** with an `UNRECORDED` row naming the staged script at count `1`. Both observed; the break is
+  unstaged before landing.
+- **AC8** — When `grep -c 'tools/'` runs over the landed script, it prints `0`, and
+  `memory/project/method-carriers.txt` gains no row, because the file names neither an install path nor
+  `BUILD-METHOD.md`.
+- **AC9** — When the landed file is scanned with its `//` comment lines removed, it holds exactly one
+  `agent(` and zero `workflow(`, and
+  `grep -cE '^[[:space:]]*export[[:space:]]+const[[:space:]]+meta[[:space:]]*='` over the landed script
+  prints `1`. A bare `grep -c 'export const meta'` prints `3` on this file and means nothing, because
+  two of the three occurrences are the header comments about the marker.
+- **AC10** — When the landed file's prompt string is read, it names the `CLOSED` / `WONTDO` flip AND
+  the same-commit requirement AND `--plan` as the reader that acts on it, and
+  `grep -c 'THAT DISPATCH IS THE ORDER GATE'` over the landed script prints `0`.
+- **AC11** — When the landed file's args are read, there is no `roster` key and no `reportPath` key,
+  and `UNIT_SCHEMA.required` is exactly `committed`, `sha`, `why`, `summary`.
+- **AC12** — When `bash tools/workflows/check-review-join.sh` runs with the file landed, it exits 0.
+  This leg selects by PATH (`check-review-join.sh:102-103`, no marker filter), so unlike AC1 and AC3
+  its coverage of this file does not depend on `export const meta` surviving.
+- **AC13** — When the file's own header is read after S8, no sentence claims an enforcer the inventory
+  in §4 does not name, and the `function` clause is gone. The header's `export const meta` paragraph
+  states that the marker SELECTS and does not require.
+- **AC14** — When the landed script is EVALUATED the way the runtime evaluates it — the export strip
+  `check-workflow-syntax.js:74` applies, then `new AsyncFunction(...HOOKS, body)` over the same
+  `HOOKS` list that file declares at `:26` — and called once per key with that key deleted from an
+  otherwise complete `args` and the rest present, each of the EIGHT runs throws, each message names
+  the omitted key, and the stub `agent` records that it was NEVER called. Eight runs, eight distinct
+  refusals, zero spawns. A run that proceeds on a defaulted value is a RED however green the schema
+  looks, and `repo` is the one that costs most: defaulting it to the process cwd is how a sibling
+  harness reviewed the wrong repository (§4). S2 is half of what this file IS, and AC11 asserts only
+  the ABSENCE of `roster` and `reportPath` — an absence cannot witness a refusal.
+- **AC15** — When `args` is handed to that same evaluation as a JSON STRING carrying all eight keys,
+  the script takes the `JSON.parse` path and reaches the `agent()` call; when it is handed a string
+  that is not JSON, it throws an error naming the parse failure and refusing to default, and reaches
+  no spawn. Both arms observed. Without the guard a string payload leaves every key reading
+  `undefined`, so AC14's eight refusals would fire on a request that was in fact complete — the
+  failure mode this criterion exists to distinguish from a genuinely missing key.
+
+- **AC16** — When the landed `tools/workflows/unattended-unit.js` is grepped, its PROMPT names each of
+  S4's five acts by name: the read-both-documents-whole step, the change-the-spec-first divergence
+  rule, `--dispatch` with `--writes`, `--brief`, and the checklist command token. **S4 had five acts
+  and no criterion until rev-5.** AC10 is the only other criterion that reads the prompt string and it
+  reads S5's status flip and `--plan`; section 7 states that no standing leg calls this file at all,
+  so a prompt shipped without the `--brief` instruction would have been observable nowhere — while
+  `TOOL-aHoistedPass-7`'s whole leg grades that a brief row exists at the build commit, and the only
+  thing that writes one is this prompt.
+
+## 7. Gates
+
+**`lexicon naming predicates`** — `python tools/lexicon/lexicon.py --check`, guard `tools/`, so the
+commit landing this file RUNS it. It is listed here because rev-4 omitted it while fold-confirming a
+`function` definition by name, and the verb pin has zero headroom: one definition outside the table
+reds the bar. Section 8 carries the measurement and the naming decision.
+
+Legs this unit must keep green, all read from `tools/gate-legs.json` at this base:
+
+- `workflow script syntax` — chunk `wiring`, subject `repo`, no guard. Every bar.
+- `verifier fan-out` — chunk `declarations`, subject `repo`, no guard. Every bar.
+- `review-join ban (no ref-keyed join)` — declared in `tools/workflows/kit.toml`, `guard = []`. Every bar.
+- `codebase-map coverage + freshness` — chunk `declarations`, subject `repo`, no guard. Every bar, and
+  the one this unit's shape actually collides with.
+- `install-prefix (shipped surface)` — every bar, once the file is tracked.
+- `govkit selfcheck` — every bar. Observed exit 0 at this base with the file staged; the new file needs
+  no descriptor because `tools/workflows/kit.toml` declares `include = "**"`.
+- `memory hygiene` — every bar, for this spec and the acceptance ledger it later answers.
+
+**This unit adds no gate.** Five legs already cover the file the day it lands, and three of the file's
+declared properties are covered by none of them, which §4 states and §8 does not pretend away.
+
+## 8. Open questions
+
+**F1 — who yields to the `kit-js` liveness floor: the child, or the floor?** The candidate declares no
+top-level `function` and no `=>`; `map_lib.py:474` raises on any `.js` under `tools/` yielding no
+definition, and `codebase-map coverage + freshness` runs unguarded on every bar. Both constraints are
+real and they are incompatible as written.
+
+- **(a) The child yields.** One top-level `function check(key, why)` replaces seven near-identical
+  argument refusals. Cost: one clause of a five-clause style rule that nothing enforces, and the file
+  header stops claiming it. Benefit: no edit to another kit, no widening of a fail-closed floor, and
+  the file gets shorter. Measured green end to end at this base.
+- **(b) The floor yields.** `_build_js_layer` (`map_extractors.py:198-218`) already unions
+  `enumerate_exports` with `scan_js_definitions`, and the child IS covered by the export scan through
+  `export const meta`. Moving the per-file liveness assertion up to the union — the shape `_live_py`
+  already uses for the Python layer — would stop calling a definition-free workflow script a hole. Cost:
+  an edit to a fail-closed floor in the codebase-map kit, its self-test arms, its version bump, and a
+  weakened floor for every future JS file that genuinely IS a hole.
+
+**Recommendation: (a).** The floor is a liveness assertion doing exactly its job, and the thing it
+collides with is the one clause of the child's style rule with neither an enforcer nor a consumer.
+Widening a fail-closed check so a style preference can survive is the trade this build exists to stop
+making. If the owner prefers (b), it is a separate unit against the codebase-map kit and this unit
+lands unchanged behind it.
+
+**THE DEFINITION IS NAMED `check` AND NOT `need`, and that is not style — it is the merge bar.**
+Measured in this worktree: `python tools/lexicon/lexicon.py --check` reports
+`P1 verb graded=1060 offenders=467` against `VERB_OFFENDER_PIN="467"`, which is EXACTLY AT ITS
+CEILING with zero headroom, and the checker reds when the count exceeds the pin. `.lexicon.conf`
+declares `js:js-regex:probe`, so the probe's functions pattern grades a `function <name>(` in this
+very file, and the leg `lexicon naming predicates` is guarded on `tools/`, which means the commit
+landing this file runs it and reaches 468. `--suggest need` answers that `need` is not in the
+declared table; `--suggest check` answers `OK — check leads with 'check', which the declaration
+carries`, and "assert a predicate and return a verdict" is exactly what the eight argument refusals
+do. So the name is the fix and no pin is raised. The alternative — raising
+`VERB_OFFENDER_PIN` 467 to 468 with the offender named and attributed — is REFUSED here: a pin
+raised so one function may keep a name outside the table is the table becoming a synonym list, which
+is the failure mode the lexicon's own rules name.
+
+RESOLVED (agent, 2026-09-05, delegated): **F1 — (a), the child yields.** One top-level `function check(key, why)` replaces the
+seven near-identical argument refusals, and the file header stops claiming a style rule it no longer
+keeps. Option (b) is discarded under M3 veto 2: it edits a fail-closed liveness floor in ANOTHER
+kit's public surface (`map_extractors.py`, `map_lib.py`), which is not this unit's ratified scope and
+is not a change the mandate delegates. The recommendation's own argument is the deciding one -
+widening a fail-closed check so a style preference can survive is the trade this build exists to stop
+making. If the owner prefers (b) it is a separate unit and this one lands unchanged behind it.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-04 · initial draft, written against `origin/main` = `c4fcf5ad` with every line number
+  re-opened locally and every exit code re-measured in this worktree. Five corrections to the design of
+  record, `build/2026-09-04-build-aHoistedPass-1-design-pass.md`:
+  1. **The design names two boundaries for this unit and there are five.** It lists `workflow script
+     syntax` and `verifier fan-out`; measured, the file also lands on `review-join ban (no ref-keyed
+     join)` (by PATH, not by marker), `install-prefix (shipped surface)` (once tracked), and
+     `codebase-map coverage + freshness`.
+  2. **The candidate REDS `codebase-map coverage + freshness` as written.** `map_lib.py:474` raises
+     `MapError` on a `.js` under `tools/` yielding no top-level definition, and the candidate has none.
+     Not mentioned anywhere in the design. S6 and F1 are the response.
+  3. **"No loop" is not the rule the hook enforces.** The design and the candidate header both read as
+     if a loop is denied. Measured: a loop with NO spawn inside admits at exit 0, and a `.map()` whose
+     callback spawns is denied — so the rule at `:1521` is "no spawn once per item", spelled as a loop
+     or as an array-method receiver, and the two are one rule rather than two.
+  4. **The "spells no paths" property HAS an enforcer.** The design records only that it owes no
+     install-prefix row and no `method-carriers.txt` row. Measured with the file tracked: an appended
+     `bash tools/unattended/unattended.sh` literal reds `check-install-prefix.sh` at exit 1 naming the
+     file. That moves the property out of the un-held column.
+  5. **`gov:kit unattended-unit@1.0` names an id no gate reads.** `check-kit-versions.sh` grades a
+     hard-coded list of kit ids and `unattended-unit` is not on it. The marker stays, matching
+     `unattended-build.js:3`, and §4 says plainly that it is documentation rather than a graded
+     contract instead of leaving a reader to infer one.
+
+  Design citations re-opened and CONFIRMED unchanged: `agent-cap.js:403`, `:1494`, `:1509`, `:1519`,
+  `:1521`, `:1541`, `:1562`, `:1593`, `:9`; `unattended.sh:2043`, `:2144`, `:3353`, `:4604`, `:4609`,
+  `:4630`, `:4639`, `:4647`; `check-workflow-syntax.js:30` and `:72`; `check-verifier-fanout.sh:86`;
+  `grep -c "workflow(" tools/hooks/agent-cap.js` = 0; the candidate at 110 lines / 6933 bytes with the
+  `export const meta` declaration at `:30`.
+- rev-2 · 2026-09-05 · six acceptance witnesses re-pointed, AC3 and AC6 through AC10. Each named the
+  script this unit lands, which does not exist until it lands, so each read as "this path will
+  exist" rather than as an observation. AC3 now asserts the DELTA against the same re-derivation at
+  `c4fcf5ad` — one entry this unit adds — which is the membership claim it was reaching for, and a
+  stronger one than a substring match on a path. AC6 and AC7 keep their diagnostic shapes,
+  `map_lib.MapError` and `UNRECORDED`, and describe the subject rather than spelling it. AC8, AC9
+  and AC10 keep their grep patterns verbatim, which is the load-bearing half, and run them over the
+  landed script instead of naming it as an operand. The §2 and §4 literals are untouched: the path is
+  still spelled once, where the unit declares what it builds. No criterion was weakened or dropped.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 marked RESOLVED at (a),
+  with veto 2 recorded as what discards (b) rather than leaving it a preference. Premise re-derived
+  at the run's BASE `e828f778`: `tools/workflows/unattended-unit.js` still does not exist, so this
+  unit still has a file to land and the hoist still has no callee without it.
+- rev-4 - 2026-09-05 - spec-audit findings 33 (high, §3 and §4) and 7 (medium, §2 against §6) folded.
+  Finding 33: §3 claimed this unit takes `agent-cap.js` "exactly as it stands at `c4fcf5ad`", an
+  unverified negative. `git log --oneline c4fcf5ad..e828f778 -- tools/hooks/agent-cap.js` returns
+  EIGHT commits - `TOOL-aWeldedTribunal-1`, `-2`, `-3` and five follow-ups - moving the file 1610 to
+  1814 lines, so every `agent-cap.js:<line>` in §4 had drifted onto unrelated code. §3 now names that
+  command as its evidence rather than asserting the negative. Eight anchors re-derived by opening the
+  file at BASE and re-cited by NAME, with the BASE line kept only as a convenience: `:1521` ->
+  `fanoutFindings` (`:1725`), `:1562` -> `offendingLines` (`:1766`), `:1541` -> `capFindings`
+  (`:1745`), `:1593` -> `scanJoinFindings` (`:1797`), `:1519` -> the `if (!script) process.exit(0)`
+  guard (`:1723`), `:1509` -> the `readFileSync(spath, 'utf8')` re-read (`:1713`), `:1494` -> the
+  `data.tool_name === 'Agent'` branch (`:1698`), `:403` -> `const MAX_VERIFIERS = 5` (`:435`). Only
+  `:9` survived unmoved. The last three appear at BASE solely in rev-1's citation list, which is
+  history and is left verbatim. Every fixture was RE-RUN at BASE against the widened hook, fed on
+  stdin as `{"tool_name":"Workflow","tool_input":{"script":…}}` with the exit code read from the
+  process status and not through a pipe, over the candidate re-extracted from Appendix A of the
+  design pass and checked at 110 lines / 6933 bytes. Observed: pristine 0; for-of around a spawn 2;
+  `Promise.all(map(spawn))` 2; bare `map(spawn)` 2; raw `parallel(` 2; plain loop with no spawn 0;
+  `function` 0; `=>` 0; non-receiver `.map()` 0; bare `Promise.all` 0; a second `agent()` 0; a nested
+  `workflow()` 0; a `name:`-only dispatch 0. NOT ONE EXIT CODE CHANGED from the value §4 already
+  claimed - the widening added spellings without moving a figure - and the two new spellings were
+  measured for the first time here: `for await` around a spawn 2, a `do`-block around a spawn 2, and
+  both of them with no spawn inside 0, which confirms the rule is still "no spawn per item" rather
+  than "no loop". The `scriptPath` mode rev-1 used and the `script` mode used here agree on the
+  pristine file, so the mode is not carrying the result. Row 1's two arms also re-run and also
+  unchanged: exit 0 with `1 workflow script(s) parsed clean`, exit 1 with
+  `SyntaxError: Unexpected token 'export'`. Three population counts re-derived at BASE and likewise
+  unchanged: 4 workflow scripts from `check-workflow-syntax.js`, 4 from `check-verifier-fanout.sh`,
+  180 shipped files from `check-install-prefix.sh`, so AC1, AC3 and AC7 keep their baselines.
+  COULD NOT VERIFY, and now flagged in place rather than read as measured: row 4's `181` and
+  `UNRECORDED` arms, and the whole `codebase-map coverage + freshness` row. Both need the candidate
+  STAGED at its real path and this revision may write only this file, so both keep rev-1's readings.
+  `check-install-prefix.sh`, `map_lib.py` and `map_extractors.py` are byte-identical between
+  `c4fcf5ad` and BASE, which is a reason to expect those readings hold and is not an observation that
+  they do. Also re-checked and unchanged between the two bases:
+  `check-review-join.sh`, `unattended.sh`, `check-workflow-syntax.js`, `check-verifier-fanout.sh`,
+  `check-install-prefix.sh`, so every non-`agent-cap` anchor in this file still resolves;
+  `unattended-build.js` moved by 368 lines but still carries its `gov:kit` marker at `:3`;
+  `gate-legs.json` moved by one `ceiling` value, touching no leg §7 names. Premise that MOVED and is
+  recorded rather than acted on: the two loop spellings §3 assigned to `TOOL-aHoistedPass-4` have
+  ALREADY landed under `TOOL-aWeldedTribunal-1`; §3 now says so and leaves what remains of that unit
+  for that unit to state. Finding 7: the S2 args contract - eight keys refused by name behind a
+  `JSON.parse` guard - had no acceptance criterion, AC11 observing only the absence of `roster` and
+  `reportPath` and the schema's required keys, so a child shipped with `repo` defaulted or the parse
+  guard missing passed all of §6. AC14 (eight omit-one runs, each refusing by name with the spawn
+  never reached) and AC15 (a JSON string parses and reaches the spawn; a non-JSON string refuses
+  naming the parse failure) are added, both spelled against the evaluation the runtime actually
+  performs - the export strip at `check-workflow-syntax.js:74` and `new AsyncFunction(...HOOKS, body)`
+  over the `HOOKS` list at `:26` - so they are runnable rather than aspirational; that harness shape
+  was exercised against the extracted candidate, which satisfies both today. §5's testing bullet now
+  states that no standing leg covers the args contract. NO kit-version bump is taken here and none is
+  proposed: the `review-harness` 1.6-to-1.7 move belongs to `TOOL-aHoistedPass-6` by fork resolution,
+  on the ground that this spec names no bump, and that stays true.
+
+- rev-5 - 2026-09-05 - folded round-2 spec-audit findings H11 and M1, both before the code pass.
+  **H11 is a guaranteed merge-bar RED that rev-4 created while resolving F1.** Its resolution
+  fold-confirmed `function need(key, why)` by name in three places, and `need` is not one of the
+  twenty-three verbs `.lexicon.conf` declares. Measured live: `lexicon.py --check` reports
+  `P1 verb graded=1060 offenders=467` against `VERB_OFFENDER_PIN="467"` - AT the ceiling, zero
+  headroom - and the leg is guarded on `tools/`, so the commit landing this file would have reached
+  468 and redded. Section 7 named the leg nowhere and the words "lexicon", "verb table" and "naming
+  predicates" appeared nowhere in the file. The definition is renamed `check`, which the table
+  carries and whose gloss is exactly what the eight refusals do; the leg is now listed with its
+  guard; and raising the pin is refused in writing, because a pin raised so one name may sit outside
+  the table turns the table into a synonym list. **M1** - S4 specifies five acts the prompt must
+  perform and no criterion read any of them; AC10 was the only criterion touching the prompt string
+  and it read S5's status flip plus `--plan`. Section 7 states that no standing leg calls this file
+  at all, so a prompt shipped without the `--brief` instruction was observable NOWHERE - while
+  `TOOL-aHoistedPass-7`'s entire leg grades that a brief row exists at the build commit, and the only
+  thing that writes one is this prompt. AC16 greps the landed prompt for each of the five acts by
+  name.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py "a workflow script that spawns one agent to build a single
+build unit from its spec and brief"` — exit 0 over a corpus of 645 symbols, 188 inventory keys, 19
+affordance seams and 20 dossiers. The seam this unit extends is the **`workflow-scripts` inventory
+under `memory/map/features/unattended.md`**, which the shortlist surfaced as
+`check-workflow-syntax.js [workflow-scripts]` and which already claims `unattended-build.js`; the
+sibling this file is modelled on is `tools/workflows/unattended-build.js` (the args-parse guard, the
+schema shape and the `meta` block are ported from it rather than re-invented). No new abstraction is
+introduced: the file is one more member of an existing declared population, selected by the marker two
+gates already read, and its dispatch contract is the same `scriptPath` shape `tier2-review.js` uses.
+The probe surfaced no helper this unit should route through instead — `guardAgentSpawn`
+(`tools/hooks/agent-cap.js`, fan-in 0) is the hook's own entrypoint and is not callable from a workflow
+script, and the `build_*` cluster it ranked highest is name-stem noise from `build` rather than a seam.
+
+Recall terms used: unattended-unit, workflow script, scriptPath dispatch, agent-cap, fan-out receiver,
+export const meta selector, sidechain, unit spec brief, status flip CLOSED WONTDO, --plan next
+candidacy, --dispatch write set, kit-js liveness floor, workflow-scripts inventory, roster hand-off.

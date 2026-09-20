@@ -8,13 +8,13 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history"]
+gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded"]
 kits = ["unattended"]
 git-hooks = []
-workflow-scripts = ["unattended-build.js"]
+workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
-gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
+gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mode-read-eats-a-bare-cr.md",
   "assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
   "bounded-through-a-pipe-is-unbounded.md",
@@ -37,19 +37,19 @@ globs = [
 
 ## Constraints & why
 
-**The checkpoint is replaced, not removed.** Every other kit here makes a rule enforceable. This one
-removes a rule — the explicit ask before a merge and a push — and its whole burden is to put
+**The checkpoint is replaced, not removed.** Every other kit makes a rule enforceable. This one
+removes a rule — the explicit ask before a merge and a push — and its burden is to put
 something machine-checkable in the vacated slot. That is why the mandate is ASSERTED rather than
 written by the run, and why reachability from the pinned BASE is part of the contract: a run that can
 author its own authorization has none, and every gate downstream would certify it.
 
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
-drives SPEC then AUDIT then BUILD as stages of one program, so BUILD is unreachable except through
-both and on a TERMINAL `--review` verdict — control flow, not a rule an agent remembers. It
-verifies nothing: a Workflow script has no filesystem, so every observation is a claim its own agent
-returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
-`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: each stage is
-ONE agent over the ordered list, and the convergence LOOP sits in the caller while the harness holds
+runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
+call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
+verdict — control flow, not a rule an agent remembers. It verifies nothing: a Workflow script
+has no filesystem, so every observation is a claim its own agent returned; the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
+`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: DISPOSAL is
+ONE agent over the whole set, and the convergence LOOP sits in the caller while the harness holds
 the GATE, its iteration count being data-dependent and so unboundable.
 
 **PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
@@ -62,25 +62,27 @@ asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its
 the graph remembers ORDER, which is why the second exists. The first parent and not the pinned BASE:
 the method REQUIRES a run to author a missing spec, so what this refuses is authoring it AFTERWARDS.
 `PASS_ORDER_CUTOFF` grandfathers earlier builds, and the leg's liveness line names all three
-populations it walks rather than only the two it grades.
+populations it walks rather than only the two it grades. `--dispatch` also runs the spec-token
+checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
+in its build commit, so no bar ever grades one (aDeferredBar F3).
 
 **The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
 pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the
-ref could not move without a push. That was false — `git update-ref` moves it offline — and it was
+ref could not move without a push. False — `git update-ref` moves it offline — and it was
 reproduced end to end: preflight printed OK over a base the run had authored, the leg agreed silently,
 and the push landed. The ref name and tip now come from what the remote advertises for its own HEAD,
-and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert rather than
-detected: neither value is read at all.
+and `GOV_DEFAULT_BRANCH` is a cross-check that can only refuse. Both routes are inert, not detected:
+neither value is read at all.
 
 **A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
 sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
 neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
 ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
-away from the repo. The two suppressions are not interchangeable and only the second stops a graft —
+away from the repo. The two suppressions are not interchangeable and only the second stops a graft;
 measured, not assumed.
 
 **The boundary is stated rather than implied.** A design panel broke four independent anchor
-mechanisms and converged on the reduction that a check running under the run's own uid cannot
+mechanisms and converged on the reduction that a check under the run's own uid cannot
 constitute authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
 shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
 run-state file at all — and names the only control that binds: re-running the same leg in a clone the
@@ -88,20 +90,18 @@ run never touched.
 
 **Nothing in a script can reach the scheduler.** The keepalive store is in-memory and session-scoped,
 so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
-therefore splits by actor — the agent schedules and reaps, the driver records an id and asserts a
-recorded reap — and the reaped item is labelled agent-attested wherever it is reported, so it never
-spends the `--close` override budget.
+splits by actor — the agent schedules and reaps, the driver records an id and asserts a recorded
+reap — and the reaped item is labelled agent-attested wherever it is reported, so it never spends
+the `--close` override budget. The tick runs `--audit`, the unit stall probe.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
 the leg READ them; a phase token or a DoD item spelled into a script is a defect. `AUTH_PARAM` lives
 in the same file and is read by NEITHER: it is consumed once, by `adopt-unattended.sh`, at render
-time, and its value reaches an agent only through the rendered Skill. Grouping it with the rest was
-round 1 L3 of `TOOL-aNamedGesture-1` — a prose claim about who reads a key, on a page whose own
-affordance section already said otherwise. The kit owns the
+time, and its value reaches an agent only through the rendered Skill. The kit owns the
 CORE of both sets and the project may only EXTEND them, asserted against a shrink-only floor —
 without that floor, deleting an item is a silent, reason-free override of everything keyed on it,
-and the fleet already has a recorded case of a pin RAISE being indistinguishable from a drain.
+and the fleet has a recorded case of a pin RAISE indistinguishable from a drain.
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
@@ -118,7 +118,11 @@ in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 conver
 the charter, so they now live in the charter's `kit:unattended` conditional block in §1 — dropped by
 the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
 body, both written to stay true for a non-adopting re-puller. A new universal-core section for an
-opt-in kit was rejected on both counts.
+opt-in kit was rejected on both counts. The Skill's `## Resume` section invokes `/session-kickoff`
+after the reap and the re-schedule (`TOOL-aReplayedCard-3`), so a session resumed after process
+death re-orients and its first commit is not denied on an un-oriented card; `check-unattended.sh`
+check 18 keeps the template's FIRST kickoff mention below its first `--preflight`, and the resume
+mention sits far under both.
 
 **A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
 driver's `DIRECTIVES_CORE` and in nothing else here, because this sentence has already been wrong
@@ -203,6 +207,10 @@ as a note.
   reused verbatim rather than re-implemented.
 - `tools/drift-audit/drift_report.py` — the judgeability discipline, reused for witness RESOLUTION
   and deliberately NOT for witness PRESENCE, which is its own refusal here.
+- `tools/settings-merge.py --fragment` + `tools/check-hook-destinations.sh` — wire `gate-guard.js`,
+  this kit's `PreToolUse` hook denying the flagged bar and every suite before `VERIFYING`, keyed to
+  the branch by `run-branch:`. Its `buildCommandView` is COPIED from `tools/hooks/scratch-guard.js`:
+  a `require` of a sibling kit is a literal the install-prefix ban refuses (`TOOL-aDeferredBar-3`).
 
 ## Reuse affordance
 
@@ -216,23 +224,12 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
-carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
-resume comment, all at the same time. Three carriers, three values, none of them counted by any gate, which is why the unit that added the twelfth fact enumerated the
-carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
-claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
-is touched.*
+*Re-derived 2026-08-20 against the tree, not carried forward. Dossier prose is ungated and rots
+silently; re-derive this section whenever the feature is touched.*
 
-- **A run has been driven end to end, and it exposed two defects rather than confirming the
-  design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.
-  It then could not be CLOSED, and its record sat non-terminal for three days. Both causes are
-  fixed in `cFinalBerth`: no verb produced a terminal phase at all, and `--close` refused every run
-  whose HEAD was already published. What a live run proved was that the pieces refusing correctly
-  in fixtures did not add up to a lifecycle.
 - **The junction arm of the adopter e2e is SKIPPED on node `a`**, which lacks the privilege to
   create a symlink. It reports the skip loudly rather than passing, but the shape this fleet
   actually installs with is therefore unexercised here and needs a run on a node that can link.
-- **No adopter has installed this kit.** The path exists and is gated; nothing has travelled it.
 - **A bug class this build DISCOVERED is now catalogued but only gated in one place.**
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a

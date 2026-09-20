@@ -2,7 +2,7 @@
 # Runnable check for the portable agent-cap.js Workflow fan-out guard — BOTH rules:
 #   rule 1  raw parallel()/pipeline() outside a `gov:bounded-fanout` line   (concurrency)
 #   rule 2  a verify stage that spawns one agent per item                    (verifier arity)
-# Run: bash hooks/agent-cap.test.sh   (exit 0 = all pass)
+# Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/agent-cap.js"
@@ -46,6 +46,157 @@ check "string mentions parallel() + a real raw parallel( → deny" 2 '{"tool_nam
 # fanned `D.map(d=>()=>agent(d.p))`, which rule 2 correctly denies. A fixture that the gate must
 # reject cannot double as the fixture proving it accepts.
 check "boundedParallel + marker → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"async function boundedParallel(t,cap=5){const o=[];for(let i=0;i<t.length;i+=cap)o.push(...await parallel(t.slice(i,i+cap))); // gov:bounded-fanout\nreturn o}\nconst LENSES = [1,2,3]\nconst r = await boundedParallel(LENSES.map(d=>()=>agent(d)),5)"}}'
+
+# ---- the LOOP KEYWORD SET (TOOL-aWeldedTribunal-1) ----------------------------------------------
+# Every loop-recognition path must see the SAME keyword set. Six sites in agent-cap.js used to hold
+# their own `for|while` regex, and two ordinary spellings matched none of them: `for await (` puts an
+# identifier between the keyword and the paren, and a `do { … } while (…)` block's opening line
+# carries no keyword at all. Both were MEASURED at exit 0 against the shipped hook before this unit.
+#
+# ARMS PER WALK, NOT PER KEYWORD. The same fan expressed as `for await (` must deny whether it is
+# reached through the BRACE walk or the OPENER walk — those are different predicates and the opener
+# walk needs the end-of-text form, so a single arm would certify coverage it does not have.
+check "for-await thunk array (brace walk) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const th = []\nfor await (const f of allFindings) { th.push(() => agent(f.claim)) }\nawait Promise.all(th.map(t=>t()))"}}'
+check "do-while thunk array (brace walk) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const th = []\nlet i = 0\ndo { th.push(() => agent(allFindings[i].claim)); i++ } while (i < allFindings.length)\nawait Promise.all(th.map(t=>t()))"}}'
+check "for-await inline agent (opener walk) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"for await (const f of allFindings) await agent(f.claim)"}}'
+check "do-block inline agent → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"let i = 0\ndo { await agent(allFindings[i].claim); i++ } while (i < allFindings.length)"}}'
+# THE NEGATIVE DIRECTION. A widened predicate that denies innocent files is the failure this pair
+# exists to catch; measured over all eight tracked *.js, ZERO lines match the widened form and not
+# the old one, so nothing legal may change verdict.
+check "bounded fan, no loop → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nawait boundedParallel(LENSES.map(L=>()=>agent(L)), 5)"}}'
+check "the words for-await inside a string → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const note = \"we never write for await (x of y) here\"\nawait boundedParallel(T, 5)"}}'
+
+# ---- a GROWN receiver loses its bound (TOOL-aWeldedTribunal-2) ----------------------------------
+# `const batches = []` counts zero elements and is blessed by the array-literal case; a later
+# `batches.push(...)` grows it to one entry per finding with the bound still standing. The arms
+# assert on the refusal TEXT, not just the exit code: an arm checking non-zero alone cannot tell
+# this rule's denial from the loop ban's, and a criterion that could not was this unit's own blocker.
+#
+# THE ADJACENCY IS THE POINT. The hook judges only lines containing `agent(`, and `push` is not an
+# ITER_CALL — so the agent call must sit lexically INSIDE the map receiver's parens for the iter arm
+# to be reached at all. `push` on one line and a detached `.map` on another is LEGAL and stays 0.
+check "grown-by-push receiver → deny, naming the mutation" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.push(f)\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+check "grown-by-unshift receiver → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.unshift(f)\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+check "grown-by-splice receiver → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.splice(0, 0, f)\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+# THE NEGATIVES. An empty literal nobody grows is legal, and so is a growth whose fan is not
+# adjacent — a non-mutating `.concat`/`.flat`/`.flatMap` must NOT take a bound back, which is what
+# the pre-wiring run over this tree refuted the first vocabulary for.
+check "empty literal never grown → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+check "grown but the fan is not adjacent → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const batches = []\nbatches.push(f)\nconst out = batches.map((b) => b())\nawait agent(\"one call\")"}}'
+check "concat does not grow the receiver → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst more = LENSES.concat(extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# ---- the closing diff review's fold. Every arm below FAILED before its fix, and each was
+# ---- reproduced by running the shipped hook rather than argued.
+# THE ACCEPTED RESIDUAL, and the arm states it as such rather than hiding it. A BLOCK comment
+# mentioning a growth REVOKES the bound and denies the script. Four review rounds went into trying
+# to strip comments out of the take-back view and each attempt bought a FAIL-OPEN instead, because
+# this file models no regex literal and every strip inherits that blindness in a new shape. The
+# strip is gone; the false deny is accepted, which is the fail-closed direction and the behaviour
+# that shipped before this build. Cost: one reworded comment. The alternative cost an agent burst.
+check "a block comment naming a push DENIES (accepted residual, fail-closed)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# A LINE comment is different and still allows: the lexed view breaks on `//` itself, so no strip
+# of ours is involved. Kept as an arm because the two comment forms now diverge, and a reader who
+# assumes they behave alike would be wrong.
+check "a line comment naming a push does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n// never do LENSES.push(x)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# A MEMBER CHAIN IS NOT THE TOP-LEVEL NAME. Without a left guard the regex captured the LAST segment,
+# so `state.lenses.push(x)` denied a script naming a variable nothing had touched.
+check "a member-chain push does not revoke an unrelated name → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst lenses = [1,2,3]\nstate.lenses.push(x)\nawait boundedParallel(lenses.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# A REMOVAL-ONLY SPLICE SHRINKS. Denying it states "was GROWN" about an array that got smaller.
+check "removal-only splice does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3,4,5]\nLENSES.splice(0, 2)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+check "a 3-argument splice INSERTS, so it still takes the bound back → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nLENSES.splice(0, 0, extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# THE TAKE-BACK CASCADES. A derivation is bounded only because its SOURCE was; when the source loses
+# its bound the derived name must lose it too, or an unbounded fan is admitted one `.filter()` away.
+# Two arms, one per sweep — the reassignment sweep had this hole before this build and now does not.
+check "push-then-derive: the derived name loses its bound too → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.push(f)\nconst groups = batches.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
+check "reassign-then-derive: the derived name loses its bound too → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nlet items = [1, 2]\nitems = allFindings\nconst groups = items.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
+check "derive from a source that KEEPS its bound → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst groups = LENSES.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
+
+# ---- THE FROZEN DENY CORPUS (TOOL-aWeldedTribunal-2, round 2 of the closing review) -------------
+# WHY THIS EXISTS, and it is the most useful thing in this file. The fold that fixed round 1's
+# false-DENY findings traded them for four fail-OPEN bound escapes, and this suite was 196 passed,
+# 0 failed while it happened — because every arm above pins the exact script a review reported and
+# none pins the CLASS. A green leg over a broken control is the shape the charter names, and it
+# happened here, in the file that enforces the fan-out cap.
+#
+# So: ONE GROWTH, spelled every way legal JavaScript allows, all of which must DENY. Adding a
+# spelling is one line; a view change or a regex tightening that blinds any of them reds. That is
+# the difference between gating an instance and gating a class.
+#
+# `LENSES` is bounded by its literal; each line grows it; the fan is bounded-looking and must
+# therefore be refused because the receiver is not.
+arm_growth_denies() { # $1 = label, $2 = the mutation line
+  check "deny-corpus: $1" 2 "$(node -e '
+    const m = process.argv[1]
+    const s = "export const meta={name:\"x\",description:\"y\"}\nconst MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n"
+            + m + "\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)\n"
+    process.stdout.write(JSON.stringify({tool_name:"Workflow",tool_input:{script:s}}))' "$2")"
+}
+arm_growth_denies "a plain push"                    'LENSES.push(x)'
+arm_growth_denies "an unshift"                      'LENSES.unshift(x)'
+arm_growth_denies "an inserting splice"             'LENSES.splice(0, 0, x)'
+arm_growth_denies "a splice with a spread"          'LENSES.splice(...more)'
+arm_growth_denies "inside a template interpolation" 'const s = `${LENSES.push(x)}`'
+arm_growth_denies "after a closing paren"           'if (x) LENSES.push(y)'
+arm_growth_denies "nested in another call"          'sink.push(LENSES.push(9))'
+arm_growth_denies "after a semicolon"               'let i = 0; LENSES.push(x)'
+arm_growth_denies "inside an arrow body"            'const f = () => LENSES.push(x)'
+arm_growth_denies "as an expression statement"      '(LENSES.push(x))'
+# THE VIEW AXIS, which is the one every fold of this build broke and the first corpus did not reach.
+# Round 3's blocker: the take-back view stripped block comments over the JOINED text, so a `/*` in a
+# regex literal — this file models none, by standing decision — opened a phantom comment that ate
+# every take-back down to the next real `*/`. Ten spellings of the MUTATION could not see it,
+# because the mutation was never what changed.
+arm_growth_denies "below a regex literal containing a comment opener" 'const re = /[/*]/
+LENSES.push(x)
+const t = 1 /* a later real closer */'
+arm_growth_denies "between two regex literals"      'const a = /[/*]/
+LENSES.push(x)
+const b = /[*/]/'
+arm_growth_denies "on the same line as a closed block comment" '/* note */ LENSES.push(x)'
+# ROUND 4's blocker: a regex literal and a REAL closer on the SAME line. Every strip this build
+# tried paired the two; there is no strip now, so the growth is simply visible.
+arm_growth_denies "regex literal and a real closer on one line" 'if (/[/*]/.test(s)) LENSES.push(x) /* ok */'
+arm_growth_denies "regex literal, growth and closer, all one line" 'const re = /[/*]/; LENSES.push(x); const t = 1 /* pad */'
+# ROUND 4's high: a comment in the argument list hid a top-level spread from the arity test. An
+# argument list carrying a comment is no longer graded at all.
+arm_growth_denies "a comment hiding a spread in splice args" 'LENSES.splice(0, /*
+*/ ...rest)'
+# The reassignment half of the same view, which round 3 found this fold had newly broken.
+check "deny-corpus: a reassignment below a regex-literal comment opener" 2 "$(node -e '
+  const s = "export const meta={name:\"x\",description:\"y\"}\nconst MAX_VERIFIERS = 5\nlet LENSES = [1,2,3]\n"
+          + "const re = /[/*]/\nLENSES = allFindings\nconst t = 1 /* closer */\n"
+          + "await boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)\n"
+  process.stdout.write(JSON.stringify({tool_name:"Workflow",tool_input:{script:s}}))')"
+# AND THE NEGATIVE HALF OF THE VIEW AXIS. A comment that MENTIONS a growth grows nothing, and a
+# spread NESTED in a removal-only splice's argument is not a spread argument.
+check "view axis: a single-line block comment mentioning a push DENIES (residual)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+check "view axis: a spread nested in a removal-only splice → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nLENSES.splice(0, Math.min(...ns))\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+
+# ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
+# The blanked view carries its mode ACROSS lines, correctly, because a template literal spans them.
+# That is also how one unterminated backtick blanked every line below it and the two rules reading
+# that view went blind under it. Both now fall back to a PER-LINE blanked render.
+#
+# ARMS PER RULE, not per view. Rule 3 and rule 5 read the same view through the same dispatcher, so
+# fixing one and pinning only that one certifies coverage that does not exist.
+#
+# THE RULE-3 FIXTURE IS ISOLATING BY CONSTRUCTION: a BOUNDED receiver with an OVER-CAP K, which only
+# rule 3 refuses. An unbounded receiver would be denied by rule 2 in both trees and prove nothing —
+# measured, and it is why the first draft of this arm was thrown away.
+check "rule3: over-cap K below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst note = `an unterminated template\nawait boundedParallel(LENSES.map((L) => () => agent(L)), 50)"}}'
+check "rule3: the same with the backtick terminated → deny (control)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst note = `a terminated template`\nawait boundedParallel(LENSES.map((L) => () => agent(L)), 50)"}}'
+check "rule5: a ref-keyed join below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nconst m = new Map()\nm.set(f.ref, v)"}}'
+# THE NARROWING SURVIVES THE FALLBACK. `TOOL-dTieredTribunal-14 S2` chose the blanked view for rule 5
+# so a banned pattern inside a STRING would not match; falling back to a view that keeps template
+# contents would regain that false-positive class, and `runBothViews` unions the views so either one
+# denying is a denial. The fallback is the same scan reset per line, so the narrowing holds.
+check "rule5: banned text in a single-line terminated template → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const p = `we never key a map by verdictByRef here`\nawait boundedParallel(T, 5)"}}'
+# THE RESIDUAL, pinned rather than left unstated. A per-line view cannot know a line CONTINUES a
+# template opened above it, so banned text on a continuation line reads as code and denies. It needs
+# an unterminated backtick AND banned text, and it errs fail-CLOSED. Measured 0 before this unit and
+# 2 after — an arm asserting the residual is how a trade stays priced instead of becoming folklore.
+check "rule5: banned text on a continuation line → deny (stated residual)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nwe never key a map by verdictByRef here"}}'
+check "rule5: a legal join under a terminated multi-line literal → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const p = `line one\nline two`\nconst m = new Map()\nm.set(f.id, v)"}}'
+check "a legal multi-line prompt with a bounded fan → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst prompt = `line one\nline two\nline three`\nawait boundedParallel(LENSES.map((L) => () => agent(prompt)), 5)"}}'
 
 # ---- rule 5: the ref-keyed verdict join -----------------------------------------------------------
 # TOOL-dTieredTribunal-14's section 4 declared these ten arms as what "the failing case has been
@@ -801,24 +952,53 @@ if [ -n "$ROOT" ]; then
   done
   # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
   if [ -z "$KITJS" ]; then
-    rel=$(git -C "$ROOT" ls-files -- '*/hooks/agent-cap.js' 'hooks/agent-cap.js' 2>/dev/null \
+    # The two globs sit in variables so the marked line carries no line continuation: a trailing
+    # backslash would escape the space before a comment rather than the newline, and the resulting
+    # break is valid shell that silently drops the rest of the command.
+    _g_prefixed='*/hooks/agent-cap.js'
+    _g_root='hooks/agent-cap.js'   # gov:root-fixture — a root install is half of what this searches
+    rel=$(git -C "$ROOT" ls-files -- "$_g_prefixed" "$_g_root" 2>/dev/null \
           | grep -v '^\.claude/' | head -1)
     [ -n "$rel" ] && KITJS="$ROOT/$rel"
   fi
 fi
+# SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.
+# This arm asserted TWO copies and hard-FAILED when the second was absent. That became the CORRECT
+# state the moment the kit stopped shipping a second destination, so the arm failed on the shipped
+# layout: not a parity check any more, just a stale assumption with a test around it.
+#
+# It now grades the population it actually finds:
+#   0 copies  -> REFUSE. A parity arm with no subject proves nothing, and saying "skip" there is the
+#                green-by-absence shape this repo has a catalogue entry for.
+#   1 copy    -> the single-copy layout. There is nothing to drift FROM, and that is a pass.
+#   2 or more -> the historical dual-ship. Every extra copy must match the kit copy byte for byte.
 if [ -n "$KITJS" ]; then
-  if [ ! -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
-    echo "FAIL the wired copy .claude/hooks/agent-cap.js is MISSING (parity must not be satisfiable by absence)"
-    fail=$((fail+1))
-  elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/agent-cap.js") <(sed 's/\r$//' "$KITJS") >/dev/null; then
-    echo "ok   the wired copy matches the kit copy"; pass=$((pass+1))
+  ac_extra=""
+  for ac_c in "$ROOT/.claude/hooks/agent-cap.js"; do
+    [ -f "$ac_c" ] && ac_extra="$ac_extra $ac_c"
+  done
+  ac_n=$(printf '%s' "$ac_extra" | wc -w | tr -d ' ')
+  if [ "$ac_n" = 0 ]; then
+    echo "ok   single-copy layout: ${KITJS#"$ROOT/"} is the only tracked copy, so there is nothing to drift from"
+    pass=$((pass+1))
   else
-    echo "FAIL .claude/hooks/agent-cap.js has drifted from ${KITJS#"$ROOT/"}"
-    echo "     fix: cp ${KITJS#"$ROOT/"} .claude/hooks/agent-cap.js"
-    fail=$((fail+1))
+    ac_drift=0
+    for ac_c in $ac_extra; do
+      if ! diff -q <(sed 's/\r$//' "$ac_c") <(sed 's/\r$//' "$KITJS") >/dev/null; then
+        echo "FAIL ${ac_c#"$ROOT/"} has drifted from ${KITJS#"$ROOT/"}"
+        echo "     fix: cp ${KITJS#"$ROOT/"} ${ac_c#"$ROOT/"}"
+        ac_drift=1
+      fi
+    done
+    if [ "$ac_drift" = 0 ]; then
+      echo "ok   all $((ac_n+1)) tracked copies of agent-cap.js agree"; pass=$((pass+1))
+    else
+      fail=$((fail+1))
+    fi
   fi
 else
-  echo "skip the two-copy parity arm — no kit copy of agent-cap.js is tracked in this tree (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/)"
+  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
+  fail=$((fail+1))
 fi
 
 

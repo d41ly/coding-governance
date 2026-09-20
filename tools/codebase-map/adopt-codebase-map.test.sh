@@ -15,6 +15,7 @@
 #  * A refusal arm asserts the WRITES DID NOT HAPPEN, not just that the script exited non-zero.
 #    "It refused" and "it refused before writing" are different claims and only one is useful.
 #  * `PASS` prints after the LAST arm.
+KIT_REL="${KIT_REL:-tools/codebase-map}"
 set -u
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -130,7 +131,7 @@ fi
 # could not stamp" is not enough on its own — a mangled write plus an honest note would still leave
 # a broken conf on disk. The last two prefixes are ordinary ones the conf grammar accepts, so the
 # stamping's HAPPY path is armed too and this loop cannot pass by only ever declining.
-DEFAULT_MDC='python codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run
+DEFAULT_MDC='python codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run; gov:root-fixture — the example default, pre-stamp
 i=0
 for prefix in 'R&D' 'a b' "x'y" 'ok-dir' 'ok.dir'; do
   i=$((i+1))
@@ -160,7 +161,7 @@ done
 # ---------------------------------------------------------------------------------------------
 # arm 4 (review H2) — the DOCUMENTED path: the operator copies the example conf FIRST, so the
 # adopter's create-branch stamp never fires. The digest command must still resolve, because the
-# scaffolded map README ships it. Before the fix that README named codebase-map/map_diff.py at a
+# scaffolded map README ships it. Before the fix that README named codebase-map/map_diff.py at a  # gov:root-fixture — quoting the defect that was fixed, not naming a live path
 # tools/-prefixed install, and `ls` on it said No such file.
 # ---------------------------------------------------------------------------------------------
 KD=$(mkrepo "$TMP/a4" "tools")
@@ -173,7 +174,7 @@ else
     [ -f "$TMP/a4/$tok" ] || dead="$dead $tok"
   done
   if [ -n "$dead" ]; then bad "4 documented-path: the scaffolded README names dead paths:$dead"
-  elif ! grep -q "tools/codebase-map/map_diff.py" "$TMP/a4/memory/map/README.md"; then
+  elif ! grep -q "$KIT_REL/map_diff.py" "$TMP/a4/memory/map/README.md"; then
     bad "4 documented-path: the README carries no prefixed digest command (arm proves nothing)"
   else
     good "4 documented-path: every path the scaffolded README prints resolves"
@@ -213,7 +214,7 @@ elif command -v cygpath >/dev/null 2>&1 && command -v cmd >/dev/null 2>&1; then
   [ -f "$TMP/a5-adopting/tools/codebase-map/map_lib.py" ] && link_made=2
 fi
 if [ "$link_made" != 0 ]; then
-  out=$(cd "$TMP/a5-adopting" && bash tools/codebase-map/adopt-codebase-map.sh --scaffold 2>&1); rc=$?
+  out=$(cd "$TMP/a5-adopting" && bash $KIT_REL/adopt-codebase-map.sh --scaffold 2>&1); rc=$?
   if [ -f "$TMP/a5-src/.codebase-map.conf" ]; then
     bad "5 symlinked-kit: adopted the LINK TARGET's repo"
   elif [ "$rc" = 0 ] || [ -f "$TMP/a5-adopting/.codebase-map.conf" ]; then

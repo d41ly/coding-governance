@@ -52,3 +52,35 @@ skills/session-kickoff/SKILL.md	18432
 #
 # The headroom's one known consumer is line-wrapping in the ruleset, which re-renders through here.
 AGENTS.md	64512
+
+# --- the build method, as rendered -------------------------------------------------------------
+# 27648 bytes = 27 KiB. SEEDED FROM THE MEASUREMENT PLUS THE WORK THIS BUILD FUNDS, 2026-09-05
+# (TOOL-aHoistedPass-3). The render measured 24553 CR-stripped at the commit that declared this row.
+# The arithmetic, so the number can be questioned rather than only obeyed: +742 for the M6 route
+# sentence TOOL-aHoistedPass-2 lands at order 3 (carried from that unit's design, which measured 764
+# in template form and ~22 less after substitution — the sentence is not in the tree, so it cannot be
+# re-derived here), +289 as a floor for its 17 backticked directive anchors (17 handles from
+# DIRECTIVES_CORE, 255 characters, plus 34 backticks; realistically 400-700 with joining words), and
+# ~300 for the rewritten budget line and its dated raise entry. That projects ≈26,100 at 500 bytes of
+# anchors, leaving ≈1,550 of headroom — roughly fifteen lines at this file's ~100 B prose line.
+#
+# THE SUBJECT IS THE RENDER, NOT THE TEMPLATE, and the reason is the budget's own stated reason: the
+# figure prices M7's re-read cost, and M7 re-reads the render. The template-minus-render delta is not
+# a constant that could stand in for it — four {{KIT_DIR}} grow by 6 each and five {{TOOL_ROOT}}
+# shrink by 7 each, a net -11 that a different install prefix flips.
+#
+# THIS ROW IS PAIRED WITH THE DOCUMENT'S OWN PROSE. `**Budget: ≤27648 bytes` is written in the file
+# itself, and check 6 of the gate reds when the two disagree — including when the prose is rewritten
+# to a spelling the gate cannot parse as bytes. Change both or neither.
+#
+# THE LEG IS `build-method size`, AND ITS IDENTITY LIVES HERE RATHER THAN IN THE DOCUMENT. The
+# subject is a RENDERED kit template: `tools/memory-tree/` ships BUILD-METHOD.template.md and ships
+# no size gate, so the leg is an `[[exempt_leg]]` in tools/govkit/registry.toml and reaches no
+# adopter. The template used to name this leg in its own M1, which made every adopter render assert
+# a checker it does not receive — the `a directive names a route that does not run` class. That
+# sentence was dropped on 2026-09-06 (aHoistedPass closing review, F5) and the byte figure stayed,
+# because the figure is a property of the document and the gate is a property of THIS repo.
+#
+# WHAT THE LEG DOES NOT COVER is the LINE half of that budget line. No checker reads it, so a
+# document that grew in lines without growing in bytes still passes — priced at TOOL-aHoistedPass-28.
+memory/guides/BUILD-METHOD.md	27648

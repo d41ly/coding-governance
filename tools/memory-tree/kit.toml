@@ -5,7 +5,7 @@ home = "tools/memory-tree"
 scope = "repo"
 version_from = { file = "check-memory-hygiene.sh", pattern = "^KIT_MEMORY_TREE_VERSION=" }
 requires = []
-requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"], why = "corpus_ids.py arms checks 13-15 on either of these pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged. Check 16 is NOT on this edge: it is structural since memory-tree 2.42 and reaches neither walk() nor the grammar, so it stays available to an adopter who took memory-tree alone" }]
+requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"], when_verb_used = ["--print-defined-ids"], why = "corpus_ids.py arms checks 13-15 on either of these pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged. Check 16 is NOT on this edge: it is structural since memory-tree 2.42 and reaches neither walk() nor the grammar, so it stays available to an adopter who took memory-tree alone. The `--print-defined-ids` verb (the kickoff kit's id-citation reader) is on this edge too, and it DEGRADES rather than raises: exit 3 with one line naming this kit, which the kickoff checker maps onto its 'id citations unchecked' branch — memory-tree + kickoff-manifest without memory-recall is supported, with id citations unchecked (the aReplayedCard closing review, F1). `when_verb_used` is documentation the selfcheck does not resolve; the mechanism is corpus_ids.py's exit 3" }]
 
 [[files]]
 path = "build-readme-slot-limits.txt"
@@ -21,6 +21,28 @@ why = "the advisory high-water per slot, rewritten by `gen_build_index.py --bump
 include = "**"
 role = "engine"
 
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+[[files]]
+include = ["check-memory-hygiene.test.sh", "check-method-carriers.test.sh", "check-verdict-epoch.test.sh", "hygiene-parity.test.sh", "merge-rows.test.sh"]
+role = "project-owned"
+
 [[files]]
 include = ["HYGIENE.template.md"]
 role = "rendered"
@@ -31,7 +53,7 @@ placeholders = ["KIT_DIR", "TOOL_ROOT"]
 include = ["SPEC-TEMPLATE.template.md"]
 role = "rendered"
 to = "{memory_root}/TEMPLATE-SPEC.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "READINESS_ROWS"]
 
 [[files]]
 include = ["BUILD-METHOD.template.md"]
@@ -39,12 +61,18 @@ role = "rendered"
 to = "{memory_root}/guides/BUILD-METHOD.md"
 placeholders = ["KIT_DIR", "TOOL_ROOT"]
 
+[[files]]
+include = ["ANNOTATION-STYLE.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/ANNOTATION-STYLE.md"
+placeholders = ["KIT_DIR", "TOOL_ROOT"]
+
 [config]
 file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
-required_keys_render = ["MEMORY_ROOT"]
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER"]
+required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"]
 defaults = { MEMORY_ROOT = "memory" }
 
@@ -66,6 +94,18 @@ ok = true
 code = 1
 probe = { must_exist = "{memory_root}/HYGIENE.md" }
 means = "refused-foreign-tree"
+
+# `--render` ON A TREE THAT DOES NOT RENDER FROM THIS KIT, and it is ACCEPTED. A target can claim
+# these rendered rows in its receipt while holding its own hand-authored docs — measured at one of
+# the two adopters this kit shipped to this week — and for it there is nothing to refresh and nothing
+# wrong. Without this row the regenerate step of an `update` run with GOVKIT_RERENDER=1 read the
+# refusal as a wedge and told the operator to repair by hand a render that should never have run.
+# Exit 3 and NOT 1 so it stays
+# distinguishable from `refused-foreign-tree` above, which is `--scaffold` meeting a real conflict.
+[[outcome]]
+code = 3
+means = "not-rendered-here"
+ok = true
 
 [[gate_leg]]
 name = "memory hygiene"
@@ -98,11 +138,22 @@ blocks_gate = false
 why = "every pin is measured against the target corpus; an inherited number is vacuous or permanently red. Blank means checks 13-15 are simply OFF, so the hygiene leg exits 0 with that hole wide open. Check 16 is NOT in this bargain: it is structural since memory-tree 2.42 and runs whatever the pins say."
 discharge = { command = ["bash", "-c", "for k in ORPHAN_ID_PIN DEAD_PATH_PIN; do grep -qE \"^${k}=\\\"[^\\\"]+\\\"\" .memory-tree.conf || exit 1; done; python {kit}/corpus_ids.py --check"] }
 
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. This kit owns FOUR `rendered` rows — the
+# hygiene rules, the spec template, the build method and the annotation style — and until this block
+# existed it declared no way to refresh any of them, so each went one vintage stale on every update
+# INCLUDING one run with GOVKIT_RERENDER=1, which had nothing here to run
+# and the adopter's own dogfood-parity leg reds on the gap (TOOL-dRetiredFork-29, measured at two
+# adopters). `--scaffold` cannot be that argv and the backlog row says why: on an adopted tree it
+# prints "already scaffolded" and exits 0. `--render` is the narrow entrypoint added for this, it
+# refuses an unadopted tree, and it stops before the authored files a refresh must never touch.
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-memory-tree.sh", "--render"]
+
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
 none = """
-the adopter accepts only `--scaffold`, measured. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
+the adopter's two modes are `--scaffold` and `--render`, measured, and neither is a verifier. Its verifiers default to a check mode but each is already this kit's own gate leg. Wiring one is a backlog row, not a silence
 """
 
 [[gate_leg]]
@@ -112,28 +163,10 @@ argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
 
 [[gate_leg]]
-name = "verdict-epoch self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-verdict-epoch.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "memory-hygiene self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-memory-hygiene.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "row-keyed merge driver replay"
-subject = "kit"
-argv = ["bash", "{kit}/merge-rows.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
 name = "kit/dogfood doc parity"
 subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
-guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{kit}/"]
+guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_root}/guides/BUILD-METHOD.md", "{memory_root}/guides/ANNOTATION-STYLE.md", "{kit}/"]
 # BUILD-METHOD.md is in the guard because the leg VALIDATES it — the pairs this test compares are
 # HYGIENE.md, TEMPLATE-SPEC.md and guides/BUILD-METHOD.md, and the third was missing from both this
 # descriptor and gov's own manifest row. A guard that omits a file the leg reads makes the leg skip
@@ -148,12 +181,6 @@ guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_
 name = "method carriers (every pointer declared)"
 subject = "repo"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
-guard = []
-
-[[gate_leg]]
-name = "method-carriers self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-method-carriers.test.sh"]
 guard = []
 
 [[gate_leg]]
@@ -228,3 +255,11 @@ why = "a sourced conf: a CR reaches the shell as part of the value"
 [[lf_pin]]
 pattern = "{kit}/.memory-tree.conf.example"
 why = "the adopter copies it verbatim into the line above"
+
+[[hole]]
+id = "stale-header-waiver"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = false
+why = "stale-header-waiver.txt ships with its header and NO rows, in gov and in every adopter. The rows a tree needs are the headers that actually corrupted in THAT tree, so a list measured on gov's corpus is vacuous anywhere else — the same reason measured-pins and slot-budget-ceilings ship unarmed. EMPTY IS THE EXPECTED STATE and the mechanism is inert until a header rots; a MISSING file stays a refusal, because a file nobody created is a decision nobody made. The generator names how many headers it tolerated on every run, so a tree that never armed this says so rather than reporting a clean bar."
+discharge = { command = ["grep", "-qvE", "^[[:space:]]*(#|$)", "{memory_root}/project/stale-header-waiver.txt"] }

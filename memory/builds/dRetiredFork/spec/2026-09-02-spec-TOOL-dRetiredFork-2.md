@@ -1,13 +1,15 @@
 # TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-03 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-prompt-TOOL-dRetiredFork-2-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-2-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -22,9 +24,14 @@ exported.
 
 ## 2. Scope (IN)
 
-- **S1** — Absorb `_GIT_ENV_LEAKS` and `_clean_git_env` from NicoCares
+- **S1** — Absorb the MECHANISM of `_GIT_ENV_LEAKS` and `_clean_git_env` from NicoCares
   `scripts/gen_build_index.py:199-222` into `tools/memory-tree/gen_build_index.py`, and pass the
-  cleaned mapping at the `run()` call site.
+  cleaned mapping at the `run()` call site. The builder is named `_build_git_env`, NOT nc's
+  spelling: gov's lexicon table declares no `clean` verb and its offender pin is shrink-only, so
+  absorbing the name verbatim would red the naming gate. `build` is declared as "create a new value
+  and return it", which is what it does. `TOOL-dRetiredFork-1` set the precedent — absorb the
+  mechanism, use gov's own helper and wording. The LEAK LIST is taken from `.githooks/pre-push:25`
+  rather than re-derived, so the two halves of one defect cannot disagree about what leaks.
 - **S2** — Absorb the three-line process-level pop from NicoCares
   `scripts/memory-recall/selftest.py:30-42` into `tools/memory-recall/selftest.py`, above the
   `sys.path` insert.
@@ -52,7 +59,20 @@ exported.
 
 `memory hygiene` · `build-index selftest` · `memory-recall kit selftest` · `kit version markers`.
 
+## 8. Open questions
+
+none - it is one defect at two legs and gov already carries the hook-side half, so the
+remaining half has the shape the absorbed half set. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.
+- rev-3 · 2026-09-03 · S1 names the builder `_build_git_env` rather than nc's `_clean_git_env`:
+  gov's lexicon declares no `clean` verb and the offender pin is shrink-only, so the verbatim
+  spelling would red the naming gate. The mechanism is unchanged and the leak list is now sourced
+  from gov's own hook-side scrub rather than re-derived.

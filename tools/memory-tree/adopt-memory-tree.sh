@@ -41,7 +41,15 @@ DISCIPLINES="architecture deployment blocks design performance"   # demo default
 FAMILIES="architecture:ARCH deployment:DEPLOY blocks:BLOCK design:DES performance:PERF"
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 
-[ "${1:-}" = "--scaffold" ] || { echo "usage: $0 --scaffold"; exit 2; }
+# `--render` EXISTS BECAUSE `--scaffold` CANNOT DO THIS JOB, and TOOL-dRetiredFork-29 is the
+# measurement: on an adopted tree the converge guard below prints "already scaffolded" and exits 0,
+# so every `rendered` row this kit owns went one vintage stale on every `govkit update` — with
+# GOVKIT_RERENDER=1 as much as without it, because that flag runs a `[[regenerate]]` block and this
+# kit declared none — and the adopter's own parity gate reds on it. A regenerate argv needs a narrow
+# entrypoint with no adoption guard to trip over; this is that entrypoint, and `[[regenerate]]` in
+# kit.toml is what runs it.
+MODE="${1:-}"
+case "$MODE" in --scaffold|--render) ;; *) echo "usage: $0 --scaffold | --render"; exit 2 ;; esac
 
 # .memory-tree.conf is REQUIRED — never silently scaffold the built-in DEMO disciplines into a real repo.
 if [ ! -f "$ROOT/.memory-tree.conf" ]; then
@@ -49,12 +57,44 @@ if [ ! -f "$ROOT/.memory-tree.conf" ]; then
   echo "created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES), then re-run." >&2
   exit 1
 fi
+# TOOL-aJoinedCanon-9: PRESET above the conf source, and it is `set -u` safety rather than a
+# default — there is exactly ONE literal row set and it is the conf. Without this line every adopter
+# tree whose .memory-tree.conf predates the key ABORTS on an unbound variable inside render_doc,
+# which is a reader that fails to RUN rather than one that fails.
+READINESS_ROWS="${READINESS_ROWS:-}"
 . "$ROOT/.memory-tree.conf"
+# `--render` ANSWERS "IS THIS TREE EVEN RENDERED FROM THIS KIT?" FIRST, and the order is the whole
+# point of the arm. A repo can claim these rows in its receipt while holding its own hand-authored
+# docs — one of the two adopters measured this week does exactly that — and for it the honest answer
+# is "nothing here renders from me", not the READINESS_ROWS misconfiguration below, which is what it
+# reported when this check sat lower and which stopped that repo's whole update with a message about
+# a key it does not need. `gov:kit memory-tree@` in the rendered HYGIENE.md is the discriminator: a
+# tree that renders from this kit carries it, a fork does not.
+#
+# EXIT 3, not 1, and `kit.toml` declares it ACCEPTED. A fork is a legitimate steady state rather than
+# a failure, and it must stay distinguishable from the two real exit-1 refusals below and beneath.
+if [ "$MODE" = "--render" ]; then
+  if [ ! -f "$MEMORY_ROOT/HYGIENE.md" ] || ! grep -q 'gov:kit memory-tree@' "$MEMORY_ROOT/HYGIENE.md"; then
+    echo "memory-tree: --render has nothing to refresh — $MEMORY_ROOT/HYGIENE.md carries no 'gov:kit memory-tree@' marker, so this tree does not render its docs from this kit. Not a failure; run --scaffold if you meant to adopt."
+    exit 3
+  fi
+fi
+# An armed render with no declared row set would write a §5 holding one empty bullet. There is
+# one literal row set and it is the conf, so a blank here is a misconfiguration to say out loud
+# rather than a default to fall back on.
+if [ -z "$READINESS_ROWS" ]; then
+  echo "adopt-memory-tree: REFUSING — READINESS_ROWS is not declared in .memory-tree.conf, so the §5 checklist would render as one empty bullet. Copy the line from .memory-tree.conf.example and edit it." >&2
+  exit 1
+fi
 M="$MEMORY_ROOT"
 
 # Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
 # foreign/half-scaffolded memory/ is refused with a recovery hint; otherwise fall through and scaffold.
-if [ -d "$M" ]; then
+#
+# SCAFFOLD ONLY. `--render` reaches here having already proved the marker is present, and its whole
+# job is the refresh this no-op would skip — so running the converge for it would make the mode a
+# silent success that rendered nothing, which is the shape the render was added to end.
+if [ "$MODE" = "--scaffold" ] && [ -d "$M" ]; then
   if [ -f "$M/HYGIENE.md" ] && grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"; then
     echo "$M/ already scaffolded by memory-tree — nothing to do."; exit 0
   fi
@@ -83,6 +123,14 @@ render_doc() {
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
+  # sits INSIDE the marked block rather than in the callers, so the parity table already gating this
+  # block covers it too — a per-caller transform would be a second duplication nothing compares,
+  # because gov's live copy is written by the parity test and an adopter's by the adopter, so the
+  # two formatters never meet.
+  local rows=${READINESS_ROWS//|/$'
+'- }
+  out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
   printf '%s' "$out"
 }
 # <<< render_doc
@@ -91,6 +139,16 @@ if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLAT
 # The build method joins the same rendered set: an adopter that receives the spec format and the
 # hygiene rules but not the method for using them has been handed two thirds of one contract.
 if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.template.md" > "$M/guides/BUILD-METHOD.md"; fi
+# The annotation-style guide rides the same seam. It is a WRITING convention for comments that cite
+# a record: nothing grades it, which is why it is a rendered guide and not a gate.
+if [ -f "$HERE/ANNOTATION-STYLE.template.md" ]; then render_doc "$HERE/ANNOTATION-STYLE.template.md" > "$M/guides/ANNOTATION-STYLE.md"; fi
+# THE RENDER IS THE WHOLE OF `--render`. Everything below this line writes the tree's AUTHORED
+# files — indexes, registries, backlog shards — which an adopted tree owns and a refresh must never
+# touch. Stopping here is what keeps this mode a refresh instead of a second scaffolder.
+if [ "$MODE" = "--render" ]; then
+  echo "memory-tree: re-rendered $M/HYGIENE.md, $M/TEMPLATE-SPEC.md, $M/guides/BUILD-METHOD.md, $M/guides/ANNOTATION-STYLE.md from $KIT_REL"
+  exit 0
+fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
   echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards ($KIT_REL/gen_build_index.py)."; echo
@@ -104,7 +162,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
   echo "## Directories"; echo
   echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
-  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches, method-carriers."; echo
+  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else. Read the directory rather than this line: it listed them by name until a seventh landed and the list did not."; echo
   echo "## Streams (the closed enum)"; echo
   echo "| Value | Family |"; echo "|---|---|"
   for d in $DISCIPLINES; do echo "| \`$d\` | \`$(FAMILY_of "$d")\` |"; done
@@ -123,10 +181,16 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/ — the gate's OWN waiver registries and nothing else. ALL SIX are written here, not two:
-# three of them are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py) and were created
-# by nothing, so an adopter met them as a missing file rather than as an empty ratchet. The gate reads
-# "absent" and "present and empty" identically, which is exactly what makes the omission invisible.
+# project/ — the gate's OWN waiver registries and nothing else. EVERY registry any gate reads is
+# written here: several are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py,
+# gen_build_index.py) and were created by nothing, so an adopter met them as a missing file rather
+# than as an empty ratchet. Most gates read "absent" and "present and empty" identically, which is
+# what makes an omission invisible — and where one does NOT, as the index generator does not, the
+# omission is worse: it refuses, and the tree never scaffolds.
+#
+# THE COUNT USED TO BE WRITTEN HERE ("ALL SIX") AND IT WENT STALE THE MOMENT A SEVENTH LANDED,
+# which is how `stale-header-waiver.txt` shipped missing. A number beside the thing it counts is
+# wrong on the next commit and nobody notices; the list below is the count.
 printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
 ' > "$M/project/legacy-files.txt"
 printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
@@ -230,6 +294,20 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
     fi
   done
 } > "$M/project/method-carriers.txt"
+
+# stale-header-waiver.txt — SEEDED WITH ITS HEADER AND NO ROWS, and it must exist or the tree does
+# not scaffold at all. `gen_build_index.py` REFUSES a missing one by design ("a file nobody created
+# is a decision nobody made"), and the memory-tree descriptor already tells every adopter that this
+# file ships with them — but nothing wrote it here, so `--scaffold` produced a tree whose very first
+# index render died. Caught by the closing bar of TOOL-dRetiredFork-17: the memory-hygiene self-test
+# is GREEN at the merge-base and red at HEAD, on the arm asserting a freshly scaffolded tree is
+# clean. A descriptor claiming a file ships and an adopter that does not write it are two answers to
+# one question, and this was the copy that was wrong.
+printf '# stale-header-waiver.txt — build README headers the index generator may leave stale.
+# EMPTY IS THE EXPECTED STATE: the rows a tree needs are the headers that actually rotted in THAT
+# tree, so a list measured on another corpus is vacuous here. The file must EXIST even so — the
+# generator refuses a missing one, because a file nobody created is a decision nobody made.
+' > "$M/project/stale-header-waiver.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")

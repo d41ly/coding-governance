@@ -21,8 +21,28 @@ need() { # label · file · extended-regex
 need "KIT_MEMORY_TREE_VERSION"    tools/memory-tree/check-memory-hygiene.sh "^KIT_MEMORY_TREE_VERSION=$V([[:space:]]|\$)"
 need "KIT_CODEBASE_MAP_VERSION"   tools/codebase-map/map_lib.py             "^KIT_CODEBASE_MAP_VERSION = \"$V\""
 need "KIT_AGENT_CAP_VERSION"      tools/hooks/agent-cap.js                  "KIT_AGENT_CAP_VERSION = '$V'"
-need "tier2-review meta.version"  tools/workflows/tier2-review.js           "version: '$V'"
+# The harness path, bound ONCE. It was spelled at three sites after TOOL-dRetiredFork-7 and the
+# install-prefix ratchet is shrink-only, so a literal per use is a regression an adopter pays
+# for: apply ships these bytes verbatim and a carried `tools/` path resolves to nothing at
+# another prefix.
+T2R="tools/workflows/tier2-review.js"
+need "tier2-review meta.version"  "$T2R"                                   "version: '$V'"
 need "KIT_MANIFEST_VERSION"       skills/session-kickoff/manifest-check.sh  "^KIT_MANIFEST_VERSION=\"$V\""
+
+# tier2-review.js carries THREE version tokens on one line: `meta.version`, a `gov:kit tier2-review@`
+# marker and a `gov:kit review-harness@` marker — BOTH ids, because the file ships under two kit
+# names. Only the first was paired. Found by TOOL-dRetiredFork-7's AC5, which required the gate to go
+# RED with the marker reverted rather than accepting a bare post-bump green: reverting
+# `review-harness@` alone left this gate at exit 0, so that carrier could drift a whole release
+# without anything noticing. An unpaired version marker is not a version carrier; it is a comment.
+for id in tier2-review review-harness; do
+  mk=$(grep -oE "gov:kit $id@$V" "$T2R" | head -1 | grep -oE "$V")
+  tv=$(grep -oE "version: '$V'" "$T2R" | head -1 | grep -oE "$V")
+  if [ -z "$mk" ] || [ "$mk" != "$tv" ]; then
+    echo "kit-versions: $T2R gov:kit $id@ marker (${mk:-unreadable}) != its meta.version (${tv:-unreadable})"
+    fails=$((fails+1))
+  fi
+done
 
 # The kickoff manifest format: the constant in the checker, and the marker in the SEED an adopter
 # instantiates from. Nothing forced these to agree before — this file had no entry for the constant
@@ -146,7 +166,7 @@ if [ -z "$uc" ]; then
   echo "kit-versions: KIT_UNATTENDED_VERSION is unreadable in unattended.sh, so no marker can be compared against it"
   fails=$((fails+1))
 else
-  for s in tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh; do
+  for s in tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh; do
     if ! grep -qE "^KIT_UNATTENDED_VERSION=$uc([^0-9.]|\$)" "$s"; then
       echo "kit-versions: $s KIT_UNATTENDED_VERSION != $uc — the driver and its leg disagree about which kit this is"
       fails=$((fails+1))
@@ -216,7 +236,24 @@ done
 
 need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
 need "KIT_GOVKIT_VERSION"          tools/govkit/govkit.py                    "^KIT_GOVKIT_VERSION = \"$V\""
-need "KIT_LEXICON_VERSION"         tools/lexicon/lexicon.py                  "^KIT_LEXICON_VERSION = \"$V\""
+# The kit dir, bound ONCE for the same reason `T2R` above is: a literal per use is a regression an
+# adopter pays for, and the carried-prefix ban counts every one of them.
+LXD="tools/lexicon"
+need "KIT_LEXICON_VERSION"         "$LXD/lexicon.py"                         "^KIT_LEXICON_VERSION = \"$V\""
+
+# lexicon: the constant was PRESENCE-checked alone, which is how a bump to 1.2 shipped with all four
+# `gov:kit lexicon@` markers left at 1.1 and only `govkit selfcheck` — at the push boundary — noticing.
+# Two checkers, one question, and the weaker one is the one a session reaches for. Paired here in the
+# shape the guardrails block below already uses, so the cheap branch-local run reds on this class.
+# The Skill is deliberately absent from the list: it is RENDERED from the constant and cannot drift.
+# TOOL-aSurfacedLexicon-10, round-2 review F1.
+lx=$(grep -oE "^KIT_LEXICON_VERSION = \"$V\"" "$LXD/lexicon.py" | head -1 | grep -oE "$V")
+for kept in lexicon.py canon.py README.md LEXICON.md; do
+  if [ -z "$lx" ] || ! grep -qE "gov:kit lexicon@$lx([^0-9.]|\$)" "$LXD/$kept"; then
+    echo "kit-versions: lexicon gov:kit marker in $kept != the constant (${lx:-unreadable})"
+    fails=$((fails+1))
+  fi
+done
 
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
 # hunt-then-remove diagnostic — the DEPLOYER-side version signal is the gov:kit marker in each

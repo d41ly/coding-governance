@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """corpus_ids.py — the corpus's id and path classifier: one grammar, one walk, every consumer.
 
-    python tools/memory-tree/corpus_ids.py --report              # the derived numbers
-    python tools/memory-tree/corpus_ids.py --check               # checks 13-16 as a gate
-    python tools/memory-tree/corpus_ids.py --measure             # print the pins to set in the conf
-    python tools/memory-tree/corpus_ids.py --selftest            # fixtures
+    python <kit>/corpus_ids.py --report             # the derived numbers
+    python <kit>/corpus_ids.py --check              # checks 13-16 as a gate
+    python <kit>/corpus_ids.py --measure            # print the pins to set in the conf
+    python <kit>/corpus_ids.py --print-defined-ids  # the id grammar, then every defined id
+    python <kit>/corpus_ids.py --selftest           # fixtures
 
 Every number a gate here quotes is DERIVED from one walk rather than written into a document. A
 classifier that lives in prose is a classifier nobody can check.
@@ -102,6 +103,84 @@ def read(path) -> str:
         return fh.read().decode("utf-8", "replace").replace("\r\n", "\n")
 
 
+def parse_conf_line(line: str):
+    """One `.memory-tree.conf` line -> `(key, value)`, or `None` for a line that declares nothing.
+
+    TOOL-aScouredKit-19. SIX readers in this kit held this body and the shell gate SOURCES the same
+    file in bash, so any spelling bash accepts and the python half mis-reads REMOVES coverage while
+    the gate stays green. Reproduced: `MEMORY_ROOT=memory   # note` took `gotchas.py --check` from
+    rc=1 to rc=0 over an identical planted violation, because the python half then walked a directory
+    that does not exist. Coverage removed, not failed closed.
+
+    TWO SPELLINGS BASH ACCEPTS THAT THE OLD BODY DID NOT, both measured against `set -a; . conf`:
+
+        MEMORY_ROOT=memory   # note   ->  memory        (an unquoted inline comment is stripped)
+        export FAMILIES="TOOL DEPL"   ->  TOOL DEPL     (the export prefix is not part of the key)
+
+    AND ONE IT MUST NOT BREAK, which is why the comment strip is not unconditional:
+
+        QUOTED="a # b"                ->  a # b         (a `#` inside quotes is DATA)
+
+    Stripping `#` unconditionally would turn that into `a`, a silent wrong value where today's bug is
+    at least a loud directory miss. So the strip runs BEFORE the quote peel and only on an unquoted
+    `#` that begins a word, which is bash's own rule.
+
+    NOT a general shell grammar, and deliberately: command substitution, parameter expansion, line
+    continuations and quoted whitespace are all legal bash and none is in scope. These two are the
+    spellings an adopter actually writes and the ones the kit's own example neither shows nor forbids.
+    """
+    line = line.strip()
+    if not line or line.startswith("#") or "=" not in line:
+        return None
+    k, _, v = line.partition("=")
+    k = k.strip()
+    if k.startswith("export ") or k.startswith("export\t"):
+        k = k[len("export"):].strip()
+    if not k:
+        return None
+    v = v.strip()
+    # A QUOTED VALUE AND AN UNQUOTED ONE NEED DIFFERENT SCANS, and the first cut of this function
+    # had only the second — so `KEY="v"  # note` kept both the comment AND a stray quote, which is
+    # live on five lines of this kit's own shipped `.memory-tree.conf.example`. Found by the closing
+    # diff review, reproduced against `set -a; . conf`.
+    #
+    # QUOTED: take the text between the opening quote and its MATCH, then treat only the remainder
+    # as comment territory. That is what makes `Q="a # b"` keep its `#` while `Q="a"  # note` loses
+    # its trailing one — the two directions this parser has to get right at once.
+    if v[:1] in ("'", '"'):
+        q = v[0]
+        end = v.find(q, 1)
+        if end >= 0:
+            return k, v[1:end]
+        # An UNTERMINATED quote is not something to guess at. Fall through to the unquoted scan,
+        # which is what the old body did for every value, so this is no worse than before for a
+        # spelling bash itself would reject.
+    # UNQUOTED: a `#` that begins a word starts a comment, including at position 0 — `X=   # note`
+    # is an empty value in bash, not the literal `# note`.
+    cut = -1
+    for i, ch in enumerate(v):
+        if ch == "#" and (i == 0 or v[i - 1].isspace()):
+            cut = i
+            break
+    if cut >= 0:
+        v = v[:cut].strip()
+    return k, v.strip('"').strip("'")
+
+
+def parse_conf(text: str, conf: dict) -> dict:
+    """Merge every declaration in `text` into `conf`, which carries the caller's OWN defaults.
+
+    The defaults stay per-reader on purpose: they differ (`CHARTER` and the pins for this module, the
+    universal budget for gotchas, the arms floors for check-arms), and one merged dict would give
+    every reader keys it has no use for and hide which reader depends on which.
+    """
+    for line in text.split("\n"):
+        kv = parse_conf_line(line)
+        if kv is not None:
+            conf[kv[0]] = kv[1]
+    return conf
+
+
 def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": DEFAULT_CHARTER,
@@ -110,12 +189,7 @@ def load_conf(root: str) -> dict:
     }
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
-        for line in read(p).split("\n"):
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            k, _, v = line.partition("=")
-            conf[k.strip()] = v.strip().strip('"').strip("'")
+        parse_conf(read(p), conf)
     return conf
 
 
@@ -130,10 +204,14 @@ def read_declared_keys(root: str) -> set:
     out = set()
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
+        # TOOL-aWeldedTribunal-5 S3b. THE SIXTH READER, and it must agree with `load_conf` on keys
+        # or the retired-key and undeclared-CHARTER checks disagree with the parser inside one file.
+        # The docstring above claims it "cannot drift from it — same file, same rule", which the
+        # `export ` handling would have made false the moment only one of the two learned it.
         for line in read(p).split("\n"):
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                out.add(line.partition("=")[0].strip())
+            kv = parse_conf_line(line)
+            if kv is not None:
+                out.add(kv[0])
     return out
 
 
@@ -643,6 +721,45 @@ def cmd_measure(root: str, conf: dict) -> int:
     return 0
 
 
+def _render_defined_ids(root: str, conf: dict) -> list:
+    """The `--print-defined-ids` output as a list, so the selftest can assert it (the `_measure_lines`
+    split, for the same reason). Line 0 is the id grammar as a POSIX ERE behind `# id-ere: `; every
+    line after is one DEFINED id — anchored by a spec H1, a backlog row or a decision row — sorted.
+
+    KICK-aReplayedCard-2. The kickoff checker's `--card --append` joins the ids a card cites against
+    this set in ONE spawn, and it cannot extract id-shaped tokens from the card without the grammar;
+    spelling the grammar in shell is the second-predicate class `TOOL-cSpliceWarden-6` closed, so the
+    one spawn carries it. The translation covers exactly the two Python-only constructs the grammar
+    builder in the memory-recall kit uses — `(?:` and `\\d` — and refuses if either survives, because
+    an ERE that `grep -E` reads differently from the reader would let the shell and the reader
+    disagree about what an id is, silently.
+    """
+    w = walk(root, conf)
+    ere = grammar(root).ID.replace("(?:", "(").replace(r"\d", "[0-9]")
+    if "(?" in ere or "\\d" in ere:
+        raise Problem("corpus_ids: the id grammar carries a construct this verb cannot translate to "
+                      "POSIX ERE: %s" % ere)
+    return ["# id-ere: " + ere] + sorted(w["defs"])
+
+
+def print_defined_ids(root: str, conf: dict) -> int:
+    """Print the id grammar, then every id this corpus DEFINES, one per line. Read-only; the pins do
+    not gate it — it is a set for a caller, not a check.
+
+    Exit 3 is a NAMED DEGRADATION, not a refusal: the grammar lives in the memory-recall kit, and a
+    tree holding memory-tree alone has no id set to print. The caller (`manifest-check.sh --card
+    --append`) maps 3 onto its "id citations unchecked" branch and still judges paths; before this
+    the grammar's Problem exited 1, the append refused every body, and the commit deny's printed
+    remedy re-ran the refusing append — a lockout (the aReplayedCard closing review, F1)."""
+    if not (GRAMMAR_DIR / "extract.py").is_file():
+        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s/extract.py "
+              "is not installed; adopt that kit to check id citations" % GRAMMAR_DIR)
+        return 3
+    for line in _render_defined_ids(root, conf):
+        print(line)
+    return 0
+
+
 # ----------------------------------------------------------------------------------------- selftest
 def _scratch(tmp: str, *, pins=True, extra=None):
     run("git", "init", "-q", ".", cwd=tmp)
@@ -729,6 +846,49 @@ def cmd_selftest() -> int:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
         arm("a clean corpus produces no finding", None, lambda: checks(walk(t, c)))
+        # KICK-aReplayedCard-2: the grammar line is a POSIX ERE that still recognises a defined id
+        # (it is valid Python too, which is what lets this arm run it), and the set follows it.
+        arm("--print-defined-ids leads with the grammar as an ERE and lists the defined id", "ok",
+            lambda: (lambda ls: "ok" if ls[0].startswith("# id-ere: ") and "(?" not in ls[0]
+                     and r"\d" not in ls[0] and re.fullmatch(ls[0][len("# id-ere: "):], "ARCH-tOne-1")
+                     and ls[1:] == ["ARCH-tOne-1"] else repr(ls))(_render_defined_ids(t, c)))
+        # The aReplayedCard closing review, F1: with no memory-recall kit beside this one the verb
+        # DEGRADES — exit 3, one line naming the kit — instead of raising the grammar's Problem.
+        # GRAMMAR_DIR is pointed at a directory that does not exist, then restored.
+
+        def _check_degraded():
+            import contextlib
+            saved, buf = globals()["GRAMMAR_DIR"], io.StringIO()
+            globals()["GRAMMAR_DIR"] = saved / "nowhere"
+            try:
+                with contextlib.redirect_stdout(buf):
+                    rc = print_defined_ids(t, c)
+            finally:
+                globals()["GRAMMAR_DIR"] = saved
+            return f"rc={rc} lines={len(buf.getvalue().splitlines())} {buf.getvalue().strip()}"
+        arm("--print-defined-ids with no memory-recall kit exits 3 with one line naming the kit",
+            "rc=3 lines=1 corpus_ids: no id set — the id grammar lives in the memory-recall kit", _check_degraded)
+
+        # ---- TOOL-aWeldedTribunal-5: the conf parser, graded against BASH rather than asserted.
+        # ---- bash is the reference because bash is what the format IS; the python half is the copy,
+        # ---- and six readers held an identical naive one. Each pair below was measured with
+        # ---- `set -a; . conf` before it was written here.
+        for _line, _want in [
+            ("MEMORY_ROOT=memory   # note", ("MEMORY_ROOT", "memory")),
+            ("export FAMILIES=\"TOOL DEPL\"", ("FAMILIES", "TOOL DEPL")),
+            # THE TWO DIRECTIONS THIS PARSER HAS TO GET RIGHT AT ONCE, and the closing diff review
+            # found the first cut got only one: a `#` INSIDE quotes is data, a `#` after the closing
+            # quote is a comment. Getting the first alone kept a trailing comment and a stray quote,
+            # live on five lines of this kit's own shipped conf example.
+            ("Q=\"a # b\"", ("Q", "a # b")),
+            ("R=\"v\"  # note", ("R", "v")),
+            ("T=   # empty", ("T", "")),
+            ("S=plain", ("S", "plain")),
+        ]:
+            arm("conf parse agrees with bash: %s" % _line, repr(_want),
+                (lambda ln=_line: repr(parse_conf_line(ln))))
+        arm("a blank line declares nothing", "None", lambda: repr(parse_conf_line("   ")))
+        arm("a full-line comment declares nothing", "None", lambda: repr(parse_conf_line("# x=1")))
 
         # 13 — two build folders claiming one id.
         t2 = os.path.join(base, "coll"); os.makedirs(t2)
@@ -1075,8 +1235,10 @@ def main(argv: list) -> int:
             return cmd_report(root, conf)
         if mode == "--measure":
             return cmd_measure(root, conf)
+        if mode == "--print-defined-ids":
+            return print_defined_ids(root, conf)
         if mode != "--check":
-            print("usage: corpus_ids.py [--check|--report|--measure|--selftest]")
+            print("usage: corpus_ids.py [--check|--report|--measure|--print-defined-ids|--selftest]")
             return 2
         # Check 16 runs ALWAYS. Checks 13-15 stay behind the pins, and the grammar stays unloaded
         # when they are blank — the cross-kit dependency is still conditional.

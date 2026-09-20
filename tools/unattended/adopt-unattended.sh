@@ -108,6 +108,14 @@ case "$KIT_REL" in
     exit 2 ;;
 esac
 
+# THE TOOL ROOT, derived exactly as `adopt-memory-tree.sh` derives it, and for the same reason: the
+# Skill names the harness scripts, which live BESIDE this kit rather than inside it. Spelled as a
+# literal they were `tools/workflows/…` in every render, which resolves to nothing in a root install
+# and disagreed with the build-method carrier that already spelled the same two paths through this
+# placeholder. Two carriers, one route, two answers. Closing-review F6.
+TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
+
 TEMPLATE="$KIT_DIR/SKILL.template.md"
 [ -f "$TEMPLATE" ] || { echo "unattended: SKILL.template.md is missing from the kit at $KIT_DIR"; exit 1; }
 
@@ -127,6 +135,11 @@ ANCHOR_SCOPE=""
 # one of them. Pre-set EMPTY rather than to the default, because the default is written once, below,
 # in the derivation - a pre-set default plus a blank-normalisation writes the same literal twice.
 AUTH_PARAM=""
+# MEMORY_TREE_DIR's override is read from the ENVIRONMENT, captured before the conf is sourced so a
+# conf line cannot set it by accident: it is not a conf key, and check 22 of the kit gate reds a conf
+# that sets an undocumented one. The probe that uses it runs further down, after every refusal the
+# conf itself can cause.
+_MTD_OVERRIDE=${MEMORY_TREE_DIR:-}
 # shellcheck disable=SC1090
 . "$CONF"
 # The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
@@ -178,6 +191,48 @@ case "$AUTH_EFFECTIVE" in
       exit 2 ;;
 esac
 
+# MEMORY_TREE_DIR — the directory holding the memory-tree kit's `gotchas.py`, which the Skill's
+# bug-class checklist names by path. PROBED, never derived from TOOL_ROOT: an adopter may install
+# that kit FLAT in its tool root, and both adopters measured when this was written do, so TOOL_ROOT
+# plus `memory-tree/` named a file neither of them had and the Skill told every run to execute it.
+# The first TRACKED of the nested and the flat spelling wins. Neither is a REFUSAL that names the
+# override, and nothing is written, because a guessed path renders a command that runs nothing and
+# reads exactly like a clean checklist. The review-harness kit's parity script probes the same way
+# for the same line in the build harness, so the two carriers of one command cannot disagree.
+#
+# The override is asserted exactly as a probe answer is. It is an ENVIRONMENT variable and a
+# hand-install channel only: `--check` re-derives on every run, so a tree whose bar needs the
+# override has to export it for the gate as well.
+check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
+MEMORY_TREE_DIR=""
+if [ -n "$_MTD_OVERRIDE" ]; then
+  _mtd=${_MTD_OVERRIDE%/}
+  case "$_mtd" in
+    *[!A-Za-z0-9._/+@-]*)
+      echo "unattended: MEMORY_TREE_DIR holds a character outside [A-Za-z0-9._/+@-]: $_mtd"
+      echo "  It is interpolated into a shell command in the rendered Skill, where a space splits it."
+      exit 2 ;;
+  esac
+  if check_tracked "$_mtd/gotchas.py"; then MEMORY_TREE_DIR="$_mtd"
+  else
+    echo "unattended: MEMORY_TREE_DIR is set to '$_MTD_OVERRIDE', and '$_mtd/gotchas.py' is not tracked"
+    echo "  in this repo. The Skill would tell every run to execute a checklist that does not exist."
+    exit 2
+  fi
+else
+  for _c in "${TOOL_ROOT}memory-tree/gotchas.py" "${TOOL_ROOT}gotchas.py"; do
+    if check_tracked "$_c"; then MEMORY_TREE_DIR=$(dirname "$_c"); break; fi
+  done
+  if [ -z "$MEMORY_TREE_DIR" ]; then
+    echo "unattended: cannot derive MEMORY_TREE_DIR — neither ${TOOL_ROOT}memory-tree/gotchas.py nor"
+    echo "  ${TOOL_ROOT}gotchas.py is tracked in this repo. The Skill names the memory-tree kit's"
+    echo "  bug-class checklist by path, and a guessed path is a command that runs nothing."
+    echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
+    echo "  gotchas.py> and re-run. Nothing was written."
+    exit 2
+  fi
+fi
+
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
 PROTO_SHIP="$KIT_DIR/PROTOCOL.template.md"
@@ -194,12 +249,22 @@ PBT_OUT="$ROOT/$PBT_REL"
 VERBS_SHIP="$KIT_DIR/VERBS.template.md"
 VERBS_REL="$MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
 VERBS_OUT="$ROOT/$VERBS_REL"
+# the FIFTH artifact (TOOL-dRetiredFork-12), and the only one besides the Skill that is RENDERED
+# rather than copied: it carries `{{KIT_DIR}}` five times. It also lands inside the kit directory
+# rather than under the memory root, because it is a fixture the kit's own validity gate reads.
+FIXTURE_SHIP="$KIT_DIR/playbook.fixture.template.md"
+FIXTURE_REL="$KIT_REL/playbook.fixture.md"
+FIXTURE_OUT="$KIT_DIR/playbook.fixture.md"
 
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
 # empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
 # truncation into a loud one. Escaping the values themselves is tracked separately.
-render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+  # The template is an ARGUMENT now, defaulting to the Skill's so every existing caller is
+  # unchanged. Two artifacts carry placeholders, and a second copy of this function is the last
+  # thing this file needs -- the escaping commentary below is the reason why.
+  local TEMPLATE=${1:-$TEMPLATE}
   # NO `sed`. Conf values are FREE PROSE, and unescaped they landed in `s|…|…|` where a `|` closes
   # the delimiter (sed exits 1, the trailing `tr` exits 0, so a ZERO-BYTE Skill was written and
   # `--check` certified it) and an `&` re-inserts the whole match. Two attempts to escape around that
@@ -220,6 +285,8 @@ render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MEMORY_TREE_DIR"}
   out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
   out=${out//\{\{LANDER\}\}/"$LANDER"}
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
@@ -283,6 +350,85 @@ if [ "$MODE" = "--check" ]; then
   if ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
     echo "unattended: $VERBS_REL has drifted from the shipped verb carrier; re-run $0"; exit 1
   fi
+  # the FIFTH artifact. RENDERED, so it is compared the way the Skill is and not the way the three
+  # copied ones are: re-render from the template and diff. This is the parity assertion that makes
+  # the role change safe -- at the default prefix the render must reproduce the committed bytes
+  # exactly. This leg is ON THE BAR, so a drifted fixture reds here rather than waiting for a kit
+  # self-test that no boundary runs.
+  if [ ! -f "$FIXTURE_OUT" ]; then
+    echo "unattended: $FIXTURE_REL is not rendered — run $0"; exit 1
+  fi
+  FTMP=$(mktemp) || exit 2
+  render "$FIXTURE_SHIP" > "$FTMP" || { echo "unattended: the fixture render FAILED — refusing to compare"; rm -f "$FTMP"; exit 1; }
+  [ -s "$FTMP" ] || { echo "unattended: the fixture render produced an EMPTY file — comparing it to an equally empty fixture is the green-by-absence shape this kit refuses"; rm -f "$FTMP"; exit 1; }
+  if ! diff -q <(tr -d '' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1; then
+    echo "unattended: $FIXTURE_REL is out of sync with playbook.fixture.template.md"
+    echo "  re-render with: $0"
+    diff <(tr -d '' < "$FIXTURE_OUT") "$FTMP" | head -20 | sed 's/^/    /'
+    rm -f "$FTMP"; exit 1
+  fi
+  rm -f "$FTMP"
+  # An UNRESOLVED token is a REFUSAL, never an emitted brace. Same rule as the Skill's, and it is
+  # asserted separately because a fixture in sync with its template can still carry a placeholder
+  # the conf declared nothing for -- in sync and useless, which is the whole value of the channel.
+  if grep -qE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT"; then
+    echo "unattended: $FIXTURE_REL still carries an unfilled placeholder"
+    grep -nE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT" | head -5 | sed 's/^/    /'
+    exit 1
+  fi
+  # the SIXTH artifact (TOOL-aDeferredBar-3): the gate-guard hook is WIRED. The hook ships with the
+  # kit and is live only through an entry in .claude/settings.json; nothing else on the bar reads
+  # that file for this marker, so an adopter with the file and no entry has a guard that never
+  # fires and a --check that said "in sync". The marker is read from the kit's own fragment, never
+  # spelled here, and the remedy is the one merge command that writes the entry idempotently.
+  # The fragment is SHIPPED SURFACE (closing review F11): KIT_DIR is this script's own directory
+  # and the `**` engine rule ships the fragment beside it, so its absence is a broken copy and a
+  # refusal naming the file, like the five artifacts above — not the silent `in sync` it was.
+  GG_FRAG="$KIT_DIR/gate-guard.fragment.json"
+  [ -f "$GG_FRAG" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json is missing from the kit, so the gate-guard wiring cannot be checked and nothing else on the bar asserts the file — re-copy the kit"; exit 1; }
+  GG_MARK=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  [ -n "$GG_MARK" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no marker, so the wiring arm has nothing to look for"; exit 1; }
+  GG_EVENT=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  GG_MATCHER=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$GG_FRAG" | head -1)
+  [ -n "$GG_EVENT" ] && [ -n "$GG_MATCHER" ] || { echo "unattended: $KIT_REL/gate-guard.fragment.json declares no event or no matcher, so the wiring arm cannot say which group the marker must sit in"; exit 1; }
+  # THE SETTINGS FILE IS RESOLVED THE WAY check-wiring.sh RESOLVES IT (closing review F5): a
+  # declared GOV_SETTINGS_JSON first, else the repo's own — an out-of-tree layout is a legitimate
+  # per-machine choice that resolver documents, and grepping the in-tree path alone redded it
+  # UNWIRED while the printed remedy would have created the in-tree decoy check-wiring warns about.
+  # And the marker must sit in a group under the fragment's EVENT with the fragment's MATCHER:
+  # an entry parked under PostToolUse, or under another matcher, passed the bare grep and never
+  # fired. Read without a JSON parser, as check-wiring's `matchers_of` reads it: flattened, each
+  # `{"matcher":` opens a group and its hooks array ends at the first `]`; the group's event is the
+  # last `"<Event>":[` key OTHER THAN `hooks` seen before it (closing round 2, R9: keeping only the
+  # last key of the lead and skipping when it was `hooks` let a matcherless first group hide its
+  # event, so a marker misfiled under `SessionStart` behind one read as wired under `PreToolUse`).
+  # A DECLARED settings file that is not a file is a REFUSAL in check-wiring's own words (R10),
+  # never UNWIRED: silently reading a different file than the operator named is the decoy class.
+  SJ=${GOV_SETTINGS_JSON:-$ROOT/.claude/settings.json}
+  if [ -n "${GOV_SETTINGS_JSON:-}" ] && [ ! -f "$GOV_SETTINGS_JSON" ]; then
+    echo "unattended: REFUSED — GOV_SETTINGS_JSON names $GOV_SETTINGS_JSON, which is not a file, so the gate-guard wiring cannot be read from the file the operator declared"
+    exit 1
+  fi
+  GG_WIRED=$( [ -f "$SJ" ] && tr -d ' \t\r\n' < "$SJ" | sed 's/{"matcher":/\n{"matcher":/g' \
+    | awk -v M="$GG_MARK" -v W="$GG_MATCHER" -v E="$GG_EVENT" '
+        { lead = prev; prev = $0
+          s = lead
+          while (match(s, /"[A-Za-z]+":\[/)) { key = substr(s, RSTART + 1, RLENGTH - 4); s = substr(s, RSTART + RLENGTH); if (key != "hooks") ev = key }
+          g = $0; sub(/\].*$/, "", g)
+          if (index(g, M) && ev == E && match(g, /^{"matcher":"[^"]*"/) && substr(g, 13, RLENGTH - 13) == W) print "wired"
+        }' | head -1 )
+  if [ "$GG_WIRED" != wired ]; then
+    echo "unattended: the gate-guard hook is UNWIRED — ${SJ#"$ROOT"/} carries no $GG_EVENT entry under matcher $GG_MATCHER naming $GG_MARK, so the hook that refuses a self-test suite inside a build pass never fires"
+    # The remedy names the file the check READ (R10): settings-merge.py takes it as a positional
+    # defaulting to the in-tree path, so an out-of-tree layout handed the bare remedy wrote the
+    # in-tree decoy check-wiring warns about while this arm kept reading the declared file.
+    if [ "$SJ" = "$ROOT/.claude/settings.json" ]; then
+      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json"
+    else
+      echo "  wire it with: python $ROOT/${TOOL_ROOT}settings-merge.py --fragment $KIT_REL/gate-guard.fragment.json $SJ"
+    fi
+    exit 1
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi
@@ -307,6 +453,61 @@ fi
 if [ ! -f "$VERBS_OUT" ] || ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$VERBS_SHIP" > "$VERBS_OUT"
   echo "unattended: installed $VERBS_REL"
+fi
+# the fifth artifact, RENDERED rather than copied. It is written into the kit directory itself, so
+# an adopter installed at any prefix gets a fixture whose paths name THEIR prefix -- which is the
+# entire point of the role change, and what lets check-playbook.sh run anywhere.
+FTMP=$(mktemp) || exit 2
+if render "$FIXTURE_SHIP" > "$FTMP" && [ -s "$FTMP" ]; then
+  # AN UNRESOLVED TOKEN EMITS NO FILE. Catching it at --check time would still leave a rendered
+  # artifact on disk carrying a literal brace, and something downstream reads that file before
+  # anything runs --check. Refusing here means the bad render never lands.
+  if grep -qE '[{][{][A-Z_]+[}][}]' "$FTMP"; then
+    echo "unattended: the fixture render left an unfilled placeholder — refusing to write $FIXTURE_REL" >&2
+    grep -nE '[{][{][A-Z_]+[}][}]' "$FTMP" | head -5 | sed 's/^/    /' >&2
+    rm -f "$FTMP"; exit 1
+  fi
+  if [ ! -f "$FIXTURE_OUT" ] || ! diff -q <(tr -d '' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1; then
+    cp "$FTMP" "$FIXTURE_OUT"
+    echo "unattended: rendered $FIXTURE_REL"
+  fi
+else
+  echo "unattended: the fixture render FAILED or was empty — refusing to write $FIXTURE_REL" >&2
+  rm -f "$FTMP"; exit 1
+fi
+rm -f "$FTMP"
+
+# THE FIXTURE RECORDS CARRY THE PREFIX IN THEIR FILENAMES, not in their bytes. Each is named for the
+# piece it describes with `/` written as `~`, so a record for `tools/unattended/fixture-pieces/one/
+# piece.md` is `tools~unattended~fixture-pieces~one~piece.md.md`. Rendering the fixture alone leaves
+# those names pointing at a tree that does not exist, and `check-playbook.sh` reports every one as an
+# ORPHAN RECORD -- coverage nobody has. Renaming them is therefore part of the same render, not a
+# separate tidy-up; inCMS had already done it by hand, which is what its two `engine`-declared
+# fixture-record forks actually were.
+_fx_want=$(printf '%s' "$KIT_REL" | tr '/' '~')
+if [ -d "$KIT_DIR/fixture-records" ]; then
+  for _r in "$KIT_DIR"/fixture-records/*~fixture-pieces~*.md; do
+    [ -e "$_r" ] || continue
+    _base=$(basename "$_r")
+    _tail=${_base#*~fixture-pieces~}
+    _new="${_fx_want}~fixture-pieces~${_tail}"
+    # THE BODY CARRIES THE PATH TOO, and fixing only the name leaves the record describing a piece
+    # that does not exist -- `check-playbook.sh` then reports it as an ORPHAN RECORD, which is
+    # coverage nobody has. The old prefix is recovered from the record's OWN name rather than
+    # assumed, so a record already at the right prefix is rewritten to itself and a record from any
+    # other prefix is still corrected.
+    _old_pref=$(printf '%s' "${_base%%~fixture-pieces~*}" | tr '~' '/')
+    if [ "$_old_pref" != "$KIT_REL" ]; then
+      _body=$( cat "$_r" || exit 1; printf X ) || exit 1
+      _body=${_body%X}
+      _body=${_body//"$_old_pref/fixture-pieces/"/"$KIT_REL/fixture-pieces/"}
+      printf '%s' "$_body" > "$_r"
+    fi
+    if [ "$_base" != "$_new" ]; then
+      mv "$_r" "$KIT_DIR/fixture-records/$_new"
+      echo "unattended: repathed fixture record $_base -> $_new"
+    fi
+  done
 fi
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2

@@ -16,13 +16,16 @@ agent-cap self-test	kit	selftests
 agent-instructions self-test	kit	selftests
 agent-instructions wiring	repo	wiring
 branch-guard self-test	repo	selftests
+brief-recorded	repo	declarations
 build README slot contract	repo	records
 build-index selftest	kit	selftests
+build-method size	repo	product
 charter size	repo	product
 check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests
 codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
+codebase-map gate coverage	repo	declarations
 codebase-map kit selftest	kit	selftests
 corpus-ids selftest	kit	selftests
 dead-path carriers (deleted files still named)	repo	declarations
@@ -30,18 +33,25 @@ dead-path carriers self-test	kit	selftests
 drift-audit records	repo	declarations
 drift-audit selftest	kit	selftests
 drift-audit wiring	repo	wiring
+every held leg is budgeted, every budget row resolves	repo	declarations
+extract-arms self-test	kit	selftests
 gotchas selftest	kit	selftests
 govkit acceptance matrix	repo	declarations
 govkit refusal join	repo	declarations
 govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations
+hook destinations (every declared hook path ships)	repo	product
+hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
 kickoff engine size <=18KiB	repo	product
 kickoff-manifest ratchet	repo	records
+kit placeholders (a declared token its adopter substitutes)	repo	declarations
 kit version markers	repo	declarations
+kit-placeholders self-test	kit	selftests
 kit/dogfood doc parity	repo	declarations
+leg ceilings clear their evidenced maximum	repo	declarations
 lexicon naming predicates	repo	declarations
 lexicon selftest	kit	selftests
 lexicon wiring	repo	wiring
@@ -66,6 +76,9 @@ playbook render selftest	kit	selftests
 playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
 pre-push self-test	repo	selftests
+process-monitor adopter selftest	kit	selftests
+process-monitor census selftest	kit	selftests
+process-monitor wiring	repo	records
 profile-bar selftest	kit	selftests
 push-main self-test	repo	selftests
 pytest-guardrails self-test	kit	selftests
@@ -83,8 +96,12 @@ run-gates evidence	kit	selftests
 run-gates gov canary	repo	selftests
 run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
+run-selftests self-test	kit	selftests
 scratch-guard self-test	kit	selftests
+selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
+shell hygiene (a loop fed by a command substitution)	repo	product
+shell-hygiene selftest	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests
 template size <=48KiB	repo	product

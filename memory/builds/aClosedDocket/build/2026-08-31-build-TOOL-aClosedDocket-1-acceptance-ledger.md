@@ -50,6 +50,7 @@ the label, so a duplicate is a criterion that cannot be evidenced at all. The se
 - AC7a — `grep -cE "^\s*(import subprocess|from subprocess|import os\.popen)"` — returns 0. The predicate is the IMPORT and not the word, which is the whole point of the criterion.
 - AC7b — `bash tools/check-install-prefix.sh` — exit 0 and the carried-prefix ratchet does not rise. Relabelled from a duplicated `AC7` at rev-5.
 - AC8 — `bash tools/check-kit-versions.sh` exits 0, and `bash tools/unattended/check-unattended.sh` reported `GATE ok unattended kit gate` in the merge-bar run at `d554ceea`, which is check 22's key-table join accepting `MAP_CLI`.
+  - **CORRECTION, 2026-09-05, by the aTunedCompass build, unit 11.** The second half of this line was FALSE when it was written. `MAP_CLI` appeared nowhere in the product: `grep -rn "MAP_CLI" tools/ .unattended.conf` returned nothing, so check 22's key-table join had no such key to accept and the merge-bar run it cites accepted the key set WITHOUT it. The gate ran and was green; what it was green ABOUT is not what this line claims. The `check-kit-versions.sh` half stands. This note SUPERSEDES rather than rewrites, because a ledger is evidence and annotating evidence is honest where editing it is not. The declaration and its reader landed on 2026-09-05.
 
 **Evidences:** TOOL-aClosedDocket-3
 - AC1 — amended rev-4 — NOT observed: two runs of a fifteen-minute suite, one deliberately under load. Neither was taken.

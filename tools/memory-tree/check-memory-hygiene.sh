@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.55   # gov:kit memory-tree@2.55 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.79   # gov:kit memory-tree@2.79 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -53,6 +53,27 @@ _SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback
 # every adopter tree whose .memory-tree.conf predates the key, which is a checker that fails to RUN
 # rather than one that fails. Its four siblings are preset above for exactly this reason.
 SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its reuse audit (check 12); blank = never required
+# The SIXTH cutoff, same semantics as the three RULE cutoffs and preset here for the same adopter
+# argument the paragraph above states (TOOL-aJoinedCanon-1).
+REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 entry a §n/Sn/ACn scope token (check 12); blank = never required
+# The SEVENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-3).
+SCOPE_JOIN_CUTOFF=""    # date; specs dated >= this must have every §2 scope item name an AC label or NOT OBSERVED (check 12); blank = never required
+# The EIGHTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-4).
+SPEC_FAILURE_MODE_CUTOFF="" # date; specs dated >= this must give every acceptance bullet a `Red when:` clause (check 12); blank = never required
+# TOOL-aJoinedCanon-6: two BRANCHES OF CHECK 23, never independent checks — the block they live in
+# opens on `[ "$STAGED" = 0 ] && [ -n "$alcut" ]`, so a blank ACCEPTANCE_LEDGER_CUTOFF disarms both
+# whatever their own keys say. Preset here for the same adopter argument as their siblings.
+LEDGER_LABEL_CUTOFF=""  # date; a ledger answer whose label the spec does not number is a finding (check 23); blank = never required
+LEDGER_TOKEN_CUTOFF=""  # date; a ledger answer must share a backticked token with its own criterion (check 23); blank = never required
+# The NINTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-8).
+SPEC_EDGES_CUTOFF=""    # date; Tier-2 specs dated >= this must carry a `### Edges` block in §3 (check 12); blank = never required
+# TOOL-aJoinedCanon-9. The §5 row set is DECLARED, and there is exactly ONE literal copy of it — the
+# conf. This preset is `set -u` safety and NOT a default: a blank value with the cutoff armed is a
+# REFUSAL below, because an armed rule with no row set grades nothing and would pass silently.
+READINESS_ROWS=""
+READINESS_ROWS_CUTOFF="" # date; Tier-2 specs dated >= this must carry every declared §5 row (check 12); blank = never required
+# The TENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-11).
+BASE_RESOLVE_CUTOFF=""  # date; a LIVE spec dated >= this must have its `base` sha resolve to a real commit (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -71,6 +92,24 @@ DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 # bytes: `length()` decides this verdict and whether it counts characters or bytes is a property of
 # the awk build and the ambient locale, which check 7 deliberately does not pin.
 ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
+
+# ---- FIVE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15 -------------------------------------------
+# Each was a literal in a check below, which is why NicoCares carries four carve-outs against this
+# one file. BLANK MEANS GOV'S CURRENT BEHAVIOUR for all five, so an adopter who never edits
+# .memory-tree.conf sees a byte-identical run.
+#
+# TWO OF THESE NARROW WHAT IS GRADED and are therefore validated below rather than merely read.
+# BUILD_SLUG_RE is a predicate and RECORD_SERVES_CUTOFF is a population filter: a bad value does not
+# red, it silently grades NOTHING and reports green. A regex matching the empty string admits every
+# folder name; a cutoff dated in the future excludes every record. That is the difference between a
+# declared key and a hole with a name.
+BUILD_SLUG_RE=""              # blank = ^[A-Za-z][A-Za-z0-9-]*$ ; must be anchored and must not match ""
+PROJECT_REGISTRY_EXTRA=""     # whitespace-separated extra filenames legal under <M>/project/
+RECORD_SERVES_CUTOFF=""       # blank = grade every record; else ISO date, records BEFORE it are exempt
+ENTRY_CAP_UNIT=""             # blank = today's locale-decided counting; or `chars` / `bytes`
+ROTATION_MODE=""              # blank = UNDECLARED; or `cut` / `snapshot`. PRESET for `set -u`: the
+                              # observability loop below reads it unguarded, so a conf predating the
+                              # key would abort the engine rather than run it.
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 : "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"   # see the declaration above: blank resolves forward, never off
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
@@ -94,6 +133,69 @@ for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_
   esac
 done
 [ -n "$_capbad" ] && { echo "HYGIENE — cannot run: size cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }
+
+# ---- AC0: THE TWO NARROWING KEYS ARE VALIDATED, and an invalid value ABORTS ----------------------
+# Blank and INVALID are different answers and must not collapse into one. Blank is "use gov's
+# behaviour"; invalid is "this configuration cannot be graded", and a checker that treats the second
+# as the first reports green over a population it silently emptied.
+_cfgbad=""
+if [ -n "$BUILD_SLUG_RE" ]; then
+  case "$BUILD_SLUG_RE" in
+    "^"*) ;; *) _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (not anchored at ^: an unanchored slug pattern matches inside any name)" ;;
+  esac
+  case "$BUILD_SLUG_RE" in
+    *"$") ;; *) _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (not anchored at \$: an unanchored slug pattern matches any suffix)" ;;
+  esac
+  # THE EMPTY-STRING TEST IS THE LOAD-BEARING ONE. A pattern that matches "" matches every folder
+  # name, so check 4 passes everything and reports a clean tree. Asked of awk, which is the engine
+  # that will actually apply it -- asking `grep` a question awk answers is two dialects and one
+  # assumption.
+  if printf '' | awk -v re="$BUILD_SLUG_RE" '{ } END { exit ("" ~ re) ? 0 : 1 }' 2>/dev/null; then
+    _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (matches the EMPTY string, so check 4 would admit every folder name)"
+  fi
+fi
+if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+  case "$RECORD_SERVES_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) _cfgbad="$_cfgbad RECORD_SERVES_CUTOFF='$RECORD_SERVES_CUTOFF' (not an ISO YYYY-MM-DD date)" ;;
+  esac
+  # A FUTURE CUTOFF EXEMPTS EVERY RECORD. It is the same silent-green shape as the empty regex, from
+  # the population side rather than the predicate side.
+  _today=$(date +%Y-%m-%d)
+  if [ "$RECORD_SERVES_CUTOFF" ">" "$_today" ]; then
+    _cfgbad="$_cfgbad RECORD_SERVES_CUTOFF='$RECORD_SERVES_CUTOFF' (dated after today, $_today: every record would be exempt)"
+  fi
+fi
+case "${ENTRY_CAP_UNIT:-}" in
+  ""|chars|bytes) ;;
+  *) _cfgbad="$_cfgbad ENTRY_CAP_UNIT='$ENTRY_CAP_UNIT' (not one of: chars bytes)" ;;
+esac
+# ROTATION_MODE is a CLOSED set, validated the way ENTRY_CAP_UNIT is. Blank is UNDECLARED and passes:
+# an adopter conf predating the key must not red on a kit upgrade, and `adopt-memory-tree.sh` never
+# back-fills. An unrecognised value is a DIFFERENT answer from a blank one and must not collapse into
+# it, which is this block's own rule three keys up -- so `cut ` or `Cut` aborts rather than reading as
+# undeclared. NOTE what this does NOT do: nothing here, and nothing anywhere in this engine, asserts
+# that a tree actually HONOURS its declared mode. The value is validated and then read by nobody.
+# TOOL-cSpliceWarden-1, and the grading check is filed rather than built.
+case "${ROTATION_MODE:-}" in
+  ""|cut|snapshot) ;;
+  *) _cfgbad="$_cfgbad ROTATION_MODE='$ROTATION_MODE' (not one of: cut snapshot)" ;;
+esac
+[ -n "$_cfgbad" ] && { echo "HYGIENE — cannot run: project key(s) declared in .memory-tree.conf are unusable:$_cfgbad"; exit 2; }
+
+# OBSERVABILITY: a divergent configuration is visible without opening the conf.
+# ON STDERR, and that is load-bearing rather than tidy. The PRINT MODES below write one VALUE to
+# stdout and siblings compile it: `corpus_ids.py` does `re.compile(ask_shell("--print-append-only-ere",
+# root).strip())` and `gotchas.py` the same. With these lines on stdout the compiled pattern was the
+# two notices PLUS the ERE, which matches no path at all — MEASURED on this repo 2026-09-13:
+# `append_only` matched none of `memory/DECISIONS.md`, `memory/decisions/x.md` or
+# `memory/archive/…`, so the append-only exemption had been silently dead for as long as any project
+# key was set. A print mode that prepends prose to its value is a delegate answering a question it
+# was not asked, and the consumer cannot tell. Found by the Tier-2 review of TOOL-cSpliceWarden.
+for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT ROTATION_MODE; do
+  eval "_dv=\${$_dk}"
+  [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)" >&2
+done
 # CONVERGED. This branch (TOOL-aRelaxedShard-1) built the same feature independently and arrived at
 # two byte-only keys with blank resolving FORWARD to a shipped default. main's scheme is kept because
 # it is strictly more general — both axes of every class — and because its validation caught a trap the
@@ -116,13 +218,57 @@ STAGED=0; [ "${1:-}" = "--staged" ] && STAGED=1
 status=0
 FILES=$(git ls-files "$M/")
 
-# --- PRINT MODES: this script OWNS two sets that a sibling gate needs, and a transcription of
-# --- either is the drift class the kit exists to remove. `corpus_ids.py` ASKS instead of copying.
+# --- PRINT MODES: this script OWNS three sets that a sibling gate needs, and a transcription of
+# --- any of them is the drift class the kit exists to remove. Siblings ASK instead of copying.
 # --- The dependency runs ONE WAY: these return before check 1, so nothing recurses back here.
 # --- The append-only set is check 2's exemption; the index set is check 6's byte-capped population.
 APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
+# A rotated archive: FLAT under archive/, named for the document it ROTATED — `DECISIONS` or a
+# DECLARED family — plus a date and an optional same-day disambiguator (two builds rotated to
+# 2026-08-17 and the second is the `b` one).
+#
+# THE TWO HALVES ARE A CONJUNCTION and each carries the other's weight. The date keeps a
+# family-named file that is not a rotation out; the stem keeps a dated file that is not a row
+# document out. Shipping the date half alone was caught by the cross-reader arm BEFORE it landed:
+# the shell selected a `NOTAFAMILY.<date>.md` fixture that the Python side correctly refused, which
+# is precisely the drift two copies of one rule produce.
+#
+# PRINTABLE because `row_grammar.py` enumerates the same set in Python for check 20, and two readers
+# of one rule are joined by an arm rather than by a promise. Check 10 adds RESOLUTION on top of this
+# — which live index should name the archive — and `row_docs` deliberately does not.
+#
+# The alternation is DERIVED from FAMILIES, never typed: a family added to the conf must join the id
+# grammar and this set together, or a rotated shard of it goes unscanned while its rows still key.
+# ARCH|DEPLOY|... for regexes. DEFINED HERE, above the print modes, because they return before the
+# body runs and `ROTATED_ARCHIVE_ERE` needs it. It used to sit below them, which is why this build
+# first added a SECOND derivation two lines up — two answers to one question, in the build that
+# added an arm to catch exactly that. One derivation, and every later consumer inherits its guards.
+# EVERY token is validated BEFORE the alternation is built, in the main shell. An `exit` inside the
+# `$( )` below would leave only the subshell and the script would carry on with the token silently
+# dropped — which is how the first cut of this guard returned rc=0 on `FAMILIES="a:ARCH nocolon"`.
+for _p in $FAMILIES; do
+  case "$_p" in
+    *:?*) ;;
+    *) echo "HYGIENE — cannot run: FAMILIES token '$_p' is not <discipline>:<FAMILY> with a non-empty family. Dropping it silently is not an option: this shell and row_grammar.py derive the family set by different expressions, and a malformed token makes them select DIFFERENT archives — a colon-less token is dropped by both, but a token with an empty family is dropped here and kept as an empty alternation branch there."; exit 2 ;;
+  esac
+done
+FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)
+# REFUSED, not defaulted, and for the same two reasons `derive_families()` refuses on the Python
+# side — one reader that raises and one that shrugs is the divergence this pair is built to avoid.
+# An EMPTY alternation renders `(DECISIONS|)`, whose empty branch widens the ERE; a token carrying an
+# ERE metacharacter renders e.g. `A+B`, which matches `AAB`. Python `re.escape`s each token, so the
+# shell must either escape too or refuse the input — refusing is the smaller and louder of the two,
+# because a family token outside this class is a conf defect rather than something to accommodate.
+case "$FAM_ALT" in
+  "") echo "HYGIENE — cannot run: FAMILIES declares no family, so the rotated-archive predicate would carry an empty alternation and match names it was never meant to"; exit 2 ;;
+esac
+case "$FAM_ALT" in
+  *[!A-Za-z0-9_\|]*) echo "HYGIENE — cannot run: a FAMILIES token carries a character that is an ERE metacharacter ('$FAM_ALT'); the rotated-archive predicate would silently widen. Family tokens are [A-Za-z0-9_]"; exit 2 ;;
+esac
+ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|$FAM_ALT)\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
+  --print-rotated-archive-ere) printf '%s\n' "$ROTATED_ARCHIVE_ERE"; exit 0 ;;
 esac
 LEGACY=$(grep -vE '^\s*(#|$)' "$M/project/legacy-files.txt" 2>/dev/null || true)
 DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
@@ -136,6 +282,40 @@ while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
+
+# --- THE CURATION-DEBT PARTITION. Checks 6, 7 and 8 used to drop a listed file out of their
+# --- population with `in_debt "$f" && continue`, which is why a row whose fault was fixed — or
+# --- whose cap was RAISED past it — stayed green forever. `memory/backlog/TOOL.md` was listed on
+# --- 2026-08-18 for a byte cap raised past it the same day, and outlived the fault by three weeks.
+# --- So the listed files stay IN the population and their findings are partitioned here instead:
+# --- the unwaived ones fail exactly as before, the waived ones are RECORDED, and the stale-entry
+# --- guard beside the tracked-path one below reds a row that recorded nothing. This is the shape the
+# --- testsuite-count waiver's own gate already spells for its registry, one tool root up.
+#
+# --- IT ASSIGNS TO A GLOBAL AND RETURNS NOTHING. A `$( )` capture or a `|` would run this in a
+# --- SUBSHELL and the DEBT_EARNED writes would be discarded at the closing paren, leaving a guard
+# --- that reds every listed row. Reading the array from a subshell is fine; only writes are lost.
+declare -A DEBT_EARNED
+_UNWAIVED=""
+derive_waived() { # check-number · findings → sets _UNWAIVED to the failing ones, records the rest
+  local _l _p
+  _UNWAIVED=""
+  [ -n "$2" ] || return 0
+  while IFS= read -r _l; do
+    [ -n "$_l" ] || continue
+    # Every one of the three finding formats leads with the path, closed by a space or a colon.
+    # A path holding a space would extract SHORT and match no registry key, which leaves the
+    # finding in the failing set — loud, not silent. The safe direction is structural here rather
+    # than a property of a corpus that happens to hold no such path.
+    _p=${_l%%[ :]*}
+    # Recorded at most ONCE per check: a file over the entry budget on five lines earns check 7
+    # once, not five times, and the report is a list of checks rather than a tally of findings.
+    if in_debt "$_p"; then
+      case " ${DEBT_EARNED[$_p]-}" in *" $1 "*) ;; *) DEBT_EARNED["$_p"]="${DEBT_EARNED[$_p]-}$1 " ;; esac
+    else _UNWAIVED="$_UNWAIVED$_l"$'\n'; fi
+  done <<<"$2"
+  _UNWAIVED=${_UNWAIVED%$'\n'}
+}
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
 # not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
@@ -175,7 +355,6 @@ resolve_python() {
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
-FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
 DISC_ALT=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)                   # the streams enum, for check 12
 # THE recording-name tail, in ONE place. A multi-unit build names its sub-specs
 # `<date>-spec-<slug>-<seq>-u6-indexed-join.md`, and both check 5's name grammar and check 12's
@@ -213,6 +392,18 @@ PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/BACKLOG\.md$|^$M/backlog/)" |
 # not there — which is exactly the mis-segmentation the guard exists to name. Extension-agnostic,
 # because one record in the corpus is a shell script.
 PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || true)
+# Check 6's precondition, and until TOOL-dRetiredFork-1 it had NONE — which is why arming that check
+# needed a scope item of its own rather than a one-line paste. `pop_guard` returns silently unless
+# its FOURTH argument is greater than zero, so an arming with no precondition is decoration.
+#
+# UN-SEGMENTED, like every sibling above: it asks what KIND of index-class file exists anywhere under
+# `$M/`, never where. A precondition that restated check 6's own `INDEX_SET` selector could never
+# differ from it, `pop_guard` would be unreachable, and the guard would be the very
+# could-not-fail shape it exists to catch — the same reasoning `PRE_BINDABLE` records one comment up.
+#
+# The KINDS are `index_set`'s members by name: the three memory roots, a ledger / backlog / guides /
+# map-features member at any depth, a build's README, STATUS or RUN record, and FOUNDATION.
+PRE_INDEXY=$(printf '%s\n' "$FILES" | grep -cE "/(LIVE|DECISIONS|FOUNDATION|STATUS|README)\.md$|/(ledger|backlog|guides|features)/[^/]+\.md$|/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -325,6 +516,35 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # method-carriers.txt above: a declared population asserted in both directions by a script
   # other than this one.
   F:spec-token-waivers.txt|F:readme-contract.txt) ;;
+  F:stale-header-waiver.txt) ;;
+  # THE gate-lint REGISTRY, named here because a KIT SHIPS IT. Its kit.toml resolves the seed to
+  # `{memory_root}/project/substitution-fed-loops.txt` at EVERY target, so every adopter receives a
+  # file this check refused — measured at two, where it blocked the whole update at the pre-commit
+  # hook. Gov's own tree passed only because gov had put the name in its LOCAL
+  # `PROJECT_REGISTRY_EXTRA`, which is the escape for a registry a PROJECT adds; using it for a
+  # kit-shipped one hides the defect at the one repo positioned to notice it.
+  F:substitution-fed-loops.txt) ;;
+  # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
+  # forking this whitelist, which is what NicoCares carved this file out to do.
+  #
+  # PLACED LAST ON PURPOSE. The first cut put this case ABOVE the named ones, where `F:*`
+  # matched every one of them and accepted it — check 3 stopped grading anything under
+  # project/ and still reported clean. A widening case has to sit where it can only widen.
+  #
+  # A NON-MATCH FALLS THROUGH TO THE SAME REFUSAL the catch-all gives, spelled here rather
+  # than reached by omission: a case that ends in `;;` accepts, and accepting is the one
+  # thing this branch must not do by accident.
+  F:*)
+    # THE CASE SUBJECT IS `$e`. `bp` is the variable this whole substitution is being ASSIGNED
+    # to, so it is unset in here -- and under `set -u` reading it killed the subshell, which
+    # emptied check 3 output entirely and reported a clean tree. Measured twice: this key
+    # disabled check 3 in two different ways before it widened it in the intended one.
+    _pok=0
+    for _px in $PROJECT_REGISTRY_EXTRA; do
+      if [ "$e" = "F:$_px" ]; then _pok=1; break; fi
+    done
+    if [ "$_pok" != 1 ]; then echo "$M/project/${e#*:}"; fi
+    ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then
@@ -358,11 +578,24 @@ $bad3"
 # express the run phases — the unattended leg owns validating those.
 BUILD_N=$(printf '%s\n' "$FILES" | awk -F/ -v m="$M" '$0 ~ "^" m "/builds/" && NF > 3 { print $3 }' | LC_ALL=C sort -u | grep -c .)
 pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
+# S4 — CHECK 4 CONSULTS THE GRANDFATHER REGISTRY, which check 5 has read at its `in_legacy`
+# line all along. A build root listed in legacy-files.txt was grandfathered by one check and
+# graded by the other, so a project with a pre-governance folder name had to carve out this
+# whole file to keep its own bar green. One registry, both checks — and it needs no new key.
+#
+# Passed as ONE binding and split in BEGIN rather than filtered by a shell loop: check 4 runs
+# over every tracked file under builds/, and a per-file `in_legacy` call would trade one awk
+# for thousands of subshells.
 bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
-  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" '
+  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" -v slugre="$BUILD_SLUG_RE" -v legacy="$LEGACY" '
       BEGIN {
         n_m = split(m, _seg, "/"); fidx = n_m + 2    # <m>/builds/<folder>
-        vre = "^[A-Za-z][A-Za-z0-9-]*$"              # the slug, alone
+        # S1 — the slug pattern is a PROJECT value now. Blank keeps the gov default. Any override was
+        # validated in the preset block before this ran: anchored at both ends, and NOT matching
+        # the empty string, because a pattern matching "" admits every folder name silently.
+        vre = (slugre != "") ? slugre : "^[A-Za-z][A-Za-z0-9-]*$"
+        _nleg = split(legacy, _lg, "\\n")
+        for (_i = 1; _i <= _nleg; _i++) if (_lg[_i] != "") LEG[_lg[_i]] = 1
         rre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-((" famalt ")-)?[A-Za-z0-9]+-[0-9]+\\.md$"
         # An ARCHIVED run-state file (2.18). A GRAMMAR, because the whitelist above it is string
         # equality and a family of names cannot be spelled that way. SHAPE, not vocabulary: a phase
@@ -376,7 +609,8 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
       function flush(   n,i,j,k,keys,tmp,type,name) {
         if (folder=="") return
         if (folder !~ vre) {
-          print m "/builds/" folder " (bad folder name — expected the slug alone, no date and no FAMILY prefix)"
+          if (!((m "/builds/" folder) in LEG))
+            print m "/builds/" folder " (bad folder name — expected the slug alone, no date and no FAMILY prefix)"
           folder=""; delete ent; return }
         n=0; for (k in ent) keys[++n]=k
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
@@ -456,7 +690,7 @@ case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac  
 # Batched wc: one `wc -c` + one `wc -l` over the whole selected set (was 2 forks PER index file).
 # Findings emit in index_set order (the -l stream's arg order); multi-file wc `total` lines are
 # skipped by name; `+0` coerces the counts.
-sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_scope "$f" || continue; printf '%s\n' "$f"; done)
 bad6=""
 if [ -n "$sel6" ]; then
   cbytes=$(printf '%s\n' "$sel6" | xargs -r wc -c)
@@ -505,8 +739,13 @@ if [ -n "$sel6" ]; then
               else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
   ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
 fi
+derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
+# TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out 5/20`. Eight sibling checks already
+# carry this; check 6 reported a clean zero over an empty population instead of refusing.
+pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
+  "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
 
 # 7 — entry budget, ENTRY_CAP_CHARS per class (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
 #     not index rows — builds/*/RUN.md, whose standing-mandate block is quoted prose reproduced
@@ -529,11 +768,21 @@ ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
 # today. Check 8 at the batched `LC_ALL=C xargs -r awk` seventeen lines below is NOT the pattern to
 # copy here — it sorts, it does not measure.
 sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
-  in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"
+  in_scope "$f" || continue; printf '%s\n' "$f"
 done)
 bad7=""
 if [ -n "$sel7" ]; then
-  bad7=$(awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" '
+  # S5 — ENTRY_CAP_UNIT. gov deliberately sets NO locale here, and its own comment says why:
+  # pinning one "would silently re-decide the cap on any adopter whose awk counts characters
+  # today". A DECLARED key with a blank default re-decides nothing, which is the difference.
+  # `bytes` forces C; `chars` asks for UTF-8 and gets whatever the platform supports, which is
+  # stated rather than promised; blank leaves the locale exactly as it is today.
+  _c7env=""
+  case "${ENTRY_CAP_UNIT:-}" in
+    bytes) _c7env="LC_ALL=C" ;;
+    chars) _c7env="LC_ALL=C.UTF-8" ;;
+  esac
+  bad7=$(env $_c7env awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" '
     { f = $0; if (f == "") next
       # PER-CLASS WIDTH, both declared. A build README is four rendered regions plus one authored
       # block, and its widest authored lines were MEASURED between 300 and 331 — that measurement is
@@ -567,6 +816,7 @@ if [ -n "$sel7" ]; then
       close(f)
     }' <<<"$sel7")
 fi
+derive_waived 7 "$bad7"; bad7="$_UNWAIVED"
 [ -n "$bad7" ] && fail 7 "index entry lines over their declared cap:
 $bad7"
 
@@ -585,10 +835,10 @@ $bad7"
 pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
 pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
 files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
-  [ -f "$f" ] || continue; in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
-bad8=""
+  [ -f "$f" ] || continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+bad8=""; rows8=0; shards8=0
 if [ -n "$files8" ]; then
-  bad8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
+  out8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
     function nmatch(s,   c,first,nc,ok) { c=0; first=1
       while (length(s)>0) {
         if (first) ok=match(s,/([·|]|^[[:space:]]*-)[[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
@@ -598,18 +848,31 @@ if [ -n "$files8" ]; then
         if (nc=="" || nc !~ /[A-Za-z0-9_]/) { c++; s=substr(s,RSTART+RLENGTH); first=0 }
         else { s=substr(s,RSTART+1); first=0 }
       } return c }
-    FNR==1 { uln=0; fence="" }
+    FNR==1 { uln=0; fence=""; shards++ }
     { line=$0; sub(/\r$/,"",line)
       if (line ~ /^[[:space:]]*(```|~~~)/) { m=(line ~ /^[[:space:]]*```/)?"```":"~~~"
         if (fence=="") { fence=m; next }
         if (m==fence) { fence=""; next } }
       if (fence!="") next
       uln++
-      if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/ && nmatch(line)!=1) print FILENAME ":" uln
-    }')
+      if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/) { rows++
+        if (nmatch(line)!=1) print FILENAME ":" uln }
+    }
+    # The GRADED-ROW population, on a sentinel line stripped below. `pop_guard` counts shard FILES,
+    # which is why a waiver over 438 of 499 rows read as a green check and printed no number at all.
+    # Emitted here rather than counted in a second pass: a second predicate over the same question
+    # is the class this engine keeps being bitten by. `#` cannot open a finding, which always
+    # leads with a path, and the two counts are SUMMED below because a long file list makes `xargs`
+    # invoke awk more than once and each invocation runs its own END.
+    END { printf "#rows %d %d\n", rows+0, shards+0 }')
+  rows8=$(printf '%s\n' "$out8" | awk '/^#rows /{r+=$2} END{printf "%d", r+0}')
+  shards8=$(printf '%s\n' "$out8" | awk '/^#rows /{s+=$3} END{printf "%d", s+0}')
+  bad8=$(printf '%s\n' "$out8" | grep -v '^#rows ' || true)
 fi
+derive_waived 8 "$bad8"; bad8="$_UNWAIVED"
 [ -n "$bad8" ] && fail 8 "backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
+[ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8 graded %s backlog row(s) across %s shard(s)\n' "$rows8" "$shards8"
 
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
 # PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
@@ -684,16 +947,57 @@ c21_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(build|prompts|revi
 pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
   "$(printf '%s\n' "$c21_sel" | grep -c . || true)" "$PRE_BINDABLE"
 if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
-  b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>/dev/null || true)
+  # THE PARSE'S EXIT STATUS AND ITS N ROW ARE PART OF ITS ANSWER (TOOL-dMuffledSentinel-1). This
+  # call read `2>/dev/null || true`, so a generator that could not answer handed every branch below
+  # an empty string, and an empty string is exactly what a clean corpus prints. Measured on an
+  # adopter whose forked generator never gained the mode: exit 2, and for the life of that fork the
+  # four population branches could not fire on any record. Every other delegate in this file already
+  # fails on its status (checks 9, 13-16, 17-19 and 20); this was the one that did not.
+  # The N row is the LIVENESS half. `--print-bindings` prints it on every run, so a zero exit without
+  # it is a mode that did nothing -- an unknown flag another generator reads as its default -- and it
+  # is refused the same way. stderr joins the capture because the branches below select their rows
+  # by a leading kind letter and a tab, so a stray line cannot become a finding.
+  b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>&1); _b21rc=$?
+  n21=$(printf '%s\n' "$b21" | sed -n 's/^N\t\([0-9]*\)$/\1/p' | head -1)
+  if [ "$_b21rc" -ne 0 ] || [ -z "$n21" ]; then
+    fail 21 "the bindings parse did not complete, so no record was graded and every branch below would read as a clean corpus — gen_build_index.py --print-bindings exited $_b21rc, ending:
+$(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
+    b21=""
+  fi
   miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
+  # predate the Serves grammar; NicoCares measured 549 of them. A cutoff is one value where a
+  # grandfather list would be 549 rows, and it matches the five cutoffs already in the conf.
+  #
+  # THIS NARROWS A POPULATION, which is why the preset block refuses a cutoff dated after
+  # today: a future date exempts every record and the check reports clean over nothing.
+  # Blank grades everything, which is what gov does.
+  if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+    miss21=$(printf '%s\n' "$miss21" | awk -v cut="$RECORD_SERVES_CUTOFF" '
+      # the record date is the basename prefix the naming grammar already pins. A row whose
+      # name carries no date is KEPT: unparseable is not the same answer as old, and only one
+      # of them is an exemption.
+      {
+        # LEADING SPACES COME OFF FIRST. The row is `  <path> — <detail>`, so cutting at the
+        # first space before trimming the indent leaves an EMPTY path and the filter matches
+        # nothing -- the cutoff then silently exempts no record while appearing to work.
+        p = $0; sub(/^ +/, "", p); sub(/ .*$/, "", p)
+        b = p; sub(/^.*\//, "", b)
+        if (b ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) {
+          d = substr(b, 1, 10)
+          if (d < cut) next
+        }
+        print
+      }' | grep . || true)
+  fi
   [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
 $miss21"
   bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
   [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
 $bad21"
   # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
-  # declaration and the number of them is the thing a reader is entitled to see bounded.
-  n21=$(printf '%s\n' "$b21" | sed -n 's/^N\t\([0-9]*\)$/\1/p' | head -1)
+  # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
+  # read above, where its absence is the parse's liveness test.
   pin21=${RECORD_UNBOUND_PIN-}
   if [ -z "$pin21" ]; then
     fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
@@ -739,14 +1043,68 @@ $over21"
 $proj21"
 fi
 
-# 10 — rotation note (always; cheap). FLAT (1.5): one archive at the memory root.
-bad10=$(printf '%s\n' "$FILES" | grep -E "^$M/archive/[^/]+\.[0-9]{4}-[0-9]{2}-[0-9]{2}\.md$" | while IFS= read -r a; do
-    base=${a##*/}; idx="$M/${base%%.*}.md"
-    [ -f "$idx" ] || continue
-    head -3 "$idx" | grep -qF "$base" || echo "$a (not referenced in lines 1-3 of $idx)"
+# 10 — rotation note (always; cheap). FLAT (1.5): one archive directory at the memory root.
+#
+# WHAT THIS CHECKS: that a rotated archive is ANNOUNCED by the index it was cut from. WHAT IT DOES
+# NOT: anything about the archive's CONTENTS. It does not read a row, a status or an id, so it is no
+# evidence that an archive holds what the declared ROTATION_MODE says it should — nothing in this
+# engine asserts that. A structural check reads as a semantic one to everybody who did not write it.
+#
+# THE LIVE INDEX IS RESOLVED BY BASENAME, anywhere under $M/ outside archive/ — not at the fixed path
+# `$M/<stem>.md`. TOOL-cTracedPromise-6 and TOOL-aBoundedVerdict-9 filed the same defect from two
+# angles: every backlog shard lives at `$M/backlog/<FAMILY>.md`, the old `[ -f ]` guard never found
+# one, and `continue` then exempted it in silence. MEASURED 2026-09-12 on this repo: of four rotated
+# archives the shipped check graded exactly ONE — DECISIONS, which happens to sit at the root — and
+# skipped all three TOOL cuts without a word. That is the reassuring-zero shape, on the check whose
+# whole job is catching a lost archive.
+#
+# TWO MORE, unfiled until TOOL-cSpliceWarden-2, and the second was found only by running the
+# candidate over the real tree before wiring it:
+#   * the name may carry a same-day DISAMBIGUATOR after the date — two builds rotated to 2026-08-17
+#     and the second is `TOOL.2026-08-17b.md` — and the old `<date>\.md$` anchor did not enumerate it.
+#   * the note is read from the index PREAMBLE, never a fixed `head -3`. This repo's own shard carries
+#     its rotation notes on lines 4 and 5, so widening the path resolution WITHOUT widening the window
+#     manufactures two false reds against notes that are plainly there.
+#     THE WINDOW IS A UNION, and it is deliberately not "the leading run of heading, blank and
+#     blockquote lines". That was the first cut and it was NARROWER than the `head -3` it replaced:
+#     an index whose line 2 is plain prose and whose note is on line 3 was accepted before and refused
+#     after — a widening that reds a tree which had been green. The window is everything before the
+#     first ROW, and never fewer than three lines. Strictly wider than both predecessors, so nothing
+#     that passed can start failing, and still bounded by the first row, so it cannot swallow one and
+#     cannot be outgrown by a third rotation.
+#
+# A stem resolving to NONE, or to SEVERAL, is a named finding and never a `continue`: a skipped
+# archive prints exactly what a referenced one prints, which is how this check went inert. The
+# membership test is a shell string compare rather than a regex, because the stem is a filename and a
+# `+` or `*` in one would silently widen a `grep -E` predicate.
+#
+# The enumeration here and `ROTATED`/`row_docs` in row_grammar.py are two readers of ONE rule. They
+# are joined by an arm in the row-grammar self-test, not by this comment.
+bad10=$(printf '%s\n' "$FILES" | grep -E "$ROTATED_ARCHIVE_ERE" | while IFS= read -r a; do
+    base=${a##*/}; stem=${base%%.*}
+    idx=$(printf '%s\n' "$FILES" | grep -v "^$M/archive/" | while IFS= read -r f; do
+        [ "${f##*/}" = "$stem.md" ] && printf '%s\n' "$f"
+      done)
+    n10=$(printf '%s\n' "$idx" | grep -c .)
+    if [ "$n10" -ne 1 ]; then
+      echo "$a (stem '$stem' resolves to $n10 live index(es) named $stem.md under $M/, expected exactly 1:$(printf '%s\n' "$idx" | tr '\n' ' '))"
+      continue
+    fi
+    awk 'NR <= 3 { print; next } /^[[:space:]]*[-*][[:space:]]/ { exit } { print }' "$idx" |
+      grep -qF "$base" || echo "$a (not referenced in the preamble of $idx)"
   done)
-[ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index (lines 1-3):
+[ -n "$bad10" ] && fail 10 "rotated archives not referenced from their live index preamble:
 $bad10"
+
+# 24 — the declared ROTATION_MODE is HONOURED. Delegated to row_grammar.py for the reason 13-20 are:
+# the assertion is a corpus walk over ROW DOCUMENTS, and this file must not spell a second row
+# grammar. The first cut of this check did exactly that and five of six evasions passed silently —
+# a bold-wrapped id among them, which `memory/DECISIONS.md` carries fifteen of. TOOL-cSpliceWarden-6.
+if [ "$STAGED" = 0 ]; then
+  if ! rotm=$("$_PY" "$HERE/row_grammar.py" --check-rotation 2>&1); then
+    printf '%s\n' "$rotm"; status=1
+  fi
+fi
 
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).
 for old in $TOMBSTONE_ROOTS; do
@@ -764,6 +1122,13 @@ done
 # section canon ("ceremony is conditional"). Pre-cutoff specs are grandfathered by FILENAME date;
 # legacy-named files never match the glob. NOTE (shared idiom with checks 6/7/8): reads WORKTREE
 # content in --staged mode, not the staged blob — CI's full run is the tree-wide truth.
+# TOOL-aJoinedCanon-9: an armed READINESS_ROWS_CUTOFF with NO declared row set grades nothing and
+# reports the same zero a clean tree does. There is one literal row set and it is the conf, so a
+# blank here is a misconfiguration rather than a default to fall back on.
+if [ -n "$READINESS_ROWS_CUTOFF" ] && [ -z "$READINESS_ROWS" ]; then
+  echo "HYGIENE REFUSING — READINESS_ROWS_CUTOFF is $READINESS_ROWS_CUTOFF but READINESS_ROWS is empty, so the §5 row arm would grade no row and report the same zero as a conforming tree."
+  status=1
+fi
 if [ -n "$SPEC_FORMAT_CUTOFF" ]; then
 SPEC_CANON='## 1. Goal
 ## 2. Scope (IN)
@@ -807,7 +1172,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -871,12 +1236,28 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- spec in the tree, which would have made the both-tiers claim decorative.
     # ---- SHAPE ONLY: this asserts a bullet NAMES something, never that the named thing exists or
     # ---- that the build satisfied it. memory/TEMPLATE-SPEC.md says so where an author reads it.
-    if (wcut != "" && fdate != "" && fdate >= wcut) {
-      inac = 0; lab = ""; acc = ""; wbad = ""; nwb = 0
+    # ---- TOOL-aJoinedCanon-4 HOISTED this loop out of the witness guard, and the hoist is the whole
+    # ---- reason the failure-mode arm below has ONE gate rather than two. Written the obvious way
+    # ---- its population would be the INTERSECTION of SPEC_WITNESS_CUTOFF and
+    # ---- SPEC_FAILURE_MODE_CUTOFF, silently — and worst in the tree that cannot see it, because
+    # ---- .memory-tree.conf.example ships the witness key BLANK, so an adopter arming only the new
+    # ---- key would receive an arm that never runs while its own key reads as armed.
+    # ---- Two liveness booleans, computed once from the same fdate. The loop runs when EITHER is
+    # ---- live and is skipped otherwise, so a tree with both keys blank pays what it pays today.
+    # ---- At each bullet close the SAME acc string answers two independent questions into two
+    # ---- independent lists, each under the predicate of its own arm alone. The union guard is COST,
+    # ---- never population: no verdict of either arm can depend on the other key.
+    wlive = (wcut != "" && fdate != "" && fdate >= wcut)
+    fmlive = (fmcut != "" && fdate != "" && fdate >= fmcut)
+    if (wlive || fmlive) {
+      inac = 0; lab = ""; acc = ""; wbad = ""; nwb = 0; fmbad = ""; nfm = 0
       for (i = 1; i <= n; i++) {
         L = body[i]
         if (L ~ /^## /) {
-          if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+          if (inac && lab != "") {
+            if (wlive && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+            if (fmlive && index(tolower(acc), "red when:") == 0) { nfm++; fmbad = (nfm == 1) ? lab : fmbad ", " lab }
+          }
           inac = (L ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/); lab = ""; acc = ""; continue
         }
         if (!inac) continue
@@ -891,15 +1272,77 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         # invented a phantom one, so a spec whose every criterion carried a witness could red
         # naming a label the file does not contain.
         if (L ~ /^([ 	]*(-|\*)[ 	]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/) {
-          if (lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+          if (lab != "") {
+            if (wlive && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+            if (fmlive && index(tolower(acc), "red when:") == 0) { nfm++; fmbad = (nfm == 1) ? lab : fmbad ", " lab }
+          }
           lab = L; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           acc = L; continue
         }
         if (lab != "") acc = acc " " L
       }
-      if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+      if (inac && lab != "") {
+        if (wlive && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+        if (fmlive && index(tolower(acc), "red when:") == 0) { nfm++; fmbad = (nfm == 1) ? lab : fmbad ", " lab }
+      }
       if (nwb > 0)
         print f " (acceptance bullets naming no backticked witness, required at/after SPEC_WITNESS_CUTOFF): " wcut " -- " wbad
+      # ---- TOOL-aJoinedCanon-4: every criterion names the BREAK that would turn it red. One marker,
+      # ---- one spelling, matched case-insensitively as a substring over the accumulated bullet, so
+      # ---- the clause may sit on a continuation line and there is no regex dialect surface at all.
+      # ---- No N/A and no second form, which is the ruling the acceptance ledger itself makes, one level up: a
+      # ---- third form is how an evidence field becomes a checkbox exercise. A criterion whose break
+      # ---- is merely its own negation costs one clause to write, and the author discovering that
+      # ---- the negation is all there is IS the finding.
+      if (nfm > 0)
+        print f " (acceptance bullets naming no failure mode, required at/after SPEC_FAILURE_MODE_CUTOFF " fmcut "): " fmbad
+    }
+    # ---- TOOL-aJoinedCanon-3: a §2 scope item names the criterion that OBSERVES it, spelled AC
+    # ---- followed by digits, or carries the marker NOT OBSERVED and a reason. ONE escape spelling,
+    # ---- deliberately not widened: a false red names its own remedy, a false pass is silent.
+    # ---- OUTSIDE the witness guard that closes on the brace above, at the same nesting level, and
+    # ---- reading jcut and no other key. Nested inside it this arm would grade the INTERSECTION of
+    # ---- two cutoffs, dead for any adopter arming this key while the witness key sits blank --
+    # ---- which is what the shipped example ships -- and dead invisibly, because this key would read
+    # ---- as armed. AC11 is the local witness; the corpus cannot show it, since both keys hold dates
+    # ---- every graded spec clears.
+    # ---- BOTH headings by TEXT, never by ordinal, and silent unless both are present. That is a
+    # ---- defect this corpus already paid for: two closed Tier-1 specs number their criteria under
+    # ---- §5 and carry Gates at §6, so an ordinal population reds a spec that is legal under the
+    # ---- format. The regexes are the sibling witness arm above, one phrase changed.
+    # ---- An ITEM is a column-0 bullet plus every following line to the next column-0 bullet, the
+    # ---- next `## ` or the next `### `, so an item may enumerate its criteria as SUB-bullets and
+    # ---- still be graded as one. Fenced lines never arrive: body[] is built by the fence machine.
+    if (jcut != "" && fdate != "" && fdate >= jcut) {
+      sj_hasS = 0; sj_hasA = 0
+      for (i = 1; i <= n; i++) {
+        if (body[i] ~ /^## [0-9]+[.] Scope \(IN\)[ 	]*$/) sj_hasS = 1
+        else if (body[i] ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/) sj_hasA = 1
+      }
+      if (sj_hasS && sj_hasA) {
+        sj_in = 0; sj_ni = 0; sj_open = 0
+        for (i = 1; i <= n; i++) {
+          L = body[i]
+          if (L ~ /^## /) { sj_in = (L ~ /^## [0-9]+[.] Scope \(IN\)[ 	]*$/); sj_open = 0; continue }
+          if (!sj_in) continue
+          if (L ~ /^### /) { sj_open = 0; continue }
+          if (L ~ /^(-|\*)[ 	]/) {
+            sj_ni++; sj_txt[sj_ni] = L; sj_open = 1
+            sj_l = L; sub(/^(-|\*)[ 	]*(\*\*)?/, "", sj_l)
+            if (sj_l ~ /^S[0-9]/) { sub(/[^A-Za-z0-9].*$/, "", sj_l); sj_lbl[sj_ni] = sj_l }
+            else sj_lbl[sj_ni] = "item " sj_ni
+          } else if (sj_open && sj_ni > 0) sj_txt[sj_ni] = sj_txt[sj_ni] " " L
+        }
+        sj_bad = ""; sj_nb = 0
+        for (i = 1; i <= sj_ni; i++) {
+          if (sj_txt[i] ~ /(^|[^A-Za-z0-9])AC[0-9]/) continue
+          if (index(sj_txt[i], "NOT OBSERVED") > 0) continue
+          sj_nb++; sj_bad = (sj_nb == 1) ? sj_lbl[i] : sj_bad ", " sj_lbl[i]
+        }
+        if (sj_nb > 0)
+          print f " (scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF " jcut "): " sj_bad
+        for (i = 1; i <= sj_ni; i++) { delete sj_txt[i]; delete sj_lbl[i] }
+      }
     }
     # ---- TOOL-cSettledDocket-3: these two run for EVERY TIER, so they sit ABOVE the Tier-1 cut.
     # ---- TEMPLATE-SPEC calls the fork rule machine-checked; it was checked on Tier-2 alone because
@@ -929,6 +1372,61 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       }
     }
     if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
+    # ---- TOOL-aJoinedCanon-11: the `base` sha resolves to a real commit. ABOVE the Tier-1 cut, in
+    # ---- the every-tier band, because `base` is a status-header field BOTH tiers carry. The section
+    # ---- canon sentinel sits below that cut and this arm deliberately does not copy the
+    # ---- placement: `next` is a PREFIX cut, so below it every Tier-1 spec would go unresolved while
+    # ---- this key still read as armed, and four of the eleven units in this build are Tier-1.
+    # ---- TERMINAL specs are excluded. A landed record is frozen and this repo does not rewrite one
+    # ---- to clear a hit, so the population is the specs a build can still change.
+    # ---- The arm RESOLVES NOTHING here: it emits a sentinel and the post-pass batches every sha
+    # ---- through ONE `git cat-file --batch-check`. A fork per spec is the shape this batched awk
+    # ---- was built to delete.
+    if (bcut != "" && fdate != "" && fdate >= bcut && hdr !~ /^\*\*Status:\*\* (CLOSED|WONTDO)/) {
+      bp = index(hdr, "· base "); bsha = ""
+      if (bp > 0) { bsha = substr(hdr, bp + length("· base ")); sub(/[^0-9a-fA-F].*$/, "", bsha) }
+      if (bsha != "" && stg == 0) print "	" f "	" bsha
+    }
+    # ---- TOOL-aJoinedCanon-1: a §9 entry names WHAT it moved. Sits here, at the same nesting depth
+    # ---- as the high-water walk above and so OUTSIDE every other guard, with revscopecut as its ONLY
+    # ---- date guard. Nesting it inside a sibling cutoff block would make its real population an
+    # ---- intersection of two keys while its own key still read as armed -- the class this build
+    # ---- exists to close, and the shape of both of its own audit blockers. Being above the
+    # ---- `hdr ~ /Tier-1/ next` cut makes it a both-tiers arm for free, as the two walks above are.
+    # ---- PER ENTRY, not per line: this corpus wraps §9 at its house width and puts the detail in the
+    # ---- wrap, so a line-oriented predicate marks about 30% of lines and reds half the specs that
+    # ---- already do the right thing. Folding continuations halves that. rev-1 is EXEMPT: a first
+    # ---- draft moved the whole document, so a scope list on it names everything and says nothing.
+    # ---- The section-sign half is index()+substr() rather than a regex because the byte is multibyte
+    # ---- and length() returns 2 on a byte-oriented awk and 1 on gawk in a UTF-8 locale; substr counts
+    # ---- in whatever unit length just returned, so the pair is consistent in either interpreter.
+    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
+    if (revscopecut != "" && fdate != "" && fdate >= revscopecut) {
+      rs_in9 = 0; rs_ne = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## [0-9]+[.] Revision log/) { rs_in9 = 1; continue }
+        if (rs_in9 && L ~ /^## /) rs_in9 = 0
+        if (!rs_in9) continue
+        # The optional list marker is what stops an INDENTED continuation opening a phantom entry --
+        # the same defect the acceptance-witness selector above records against its own label.
+        if (L ~ /^([ 	]*(-|\*)[ 	]*)?(\*\*)?rev-[0-9]+/) {
+          rs_ne++; rs_txt[rs_ne] = L
+          rs_v = L; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?rev-/, "", rs_v); sub(/[^0-9].*$/, "", rs_v)
+          rs_num[rs_ne] = rs_v + 0
+        } else if (rs_ne > 0 && L !~ /^[ 	]*$/) rs_txt[rs_ne] = rs_txt[rs_ne] " " L
+      }
+      rs_bad = ""; rs_nb = 0
+      for (i = 1; i <= rs_ne; i++) {
+        if (rs_num[i] < 2) continue
+        rs_E = rs_txt[i]; rs_p = index(rs_E, "§")
+        rs_has = (rs_p > 0 && substr(rs_E, rs_p + length("§"), 1) ~ /[0-9]/) || (rs_E ~ /(^|[^A-Za-z0-9])(S|AC)[0-9]/)
+        if (!rs_has) { rs_nb++; rs_bad = (rs_nb == 1) ? "rev-" rs_num[i] : rs_bad ", rev-" rs_num[i] }
+      }
+      if (rs_nb > 0)
+        print f " (revision entries naming no section, scope id or acceptance id, required at/after REV_SCOPE_CUTOFF " revscopecut "): " rs_bad
+      for (i = 1; i <= rs_ne; i++) { delete rs_txt[i]; delete rs_num[i] }
+    }
     # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
     # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
     # ---- when shorter than three lines because both deletes land inside it.
@@ -1024,6 +1522,103 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
 
     if (hdr ~ /Tier-1/) next
+    # ---- TOOL-aJoinedCanon-8: SIBLING EDGES. A `### Edges` sub-head inside §3, one bullet per edge
+    # ---- or the single word `none`. 94% of specs sit in multi-spec builds and the ONE cross-unit field the format has
+    # ---- is the optional `order`, which expresses SEQUENCE and never an EDGE — so
+    # ---- a criterion resting on something the unit does not build had nowhere to say so. The
+    # ---- measured case: one spec whose AC1, AC2, AC3 and AC5 all rested on a verb the owner cut
+    # ---- from its scope. Four criteria died in place and nothing had asked what they rested on.
+    # ---- Two of the four never spell the verb, which is why the join is DECLARED and not grepped.
+    # ---- BELOW the Tier-1 cut because this is a Tier-2 obligation, and OUTSIDE every cutoff guard
+    # ---- on the path: it carries its own edgecut liveness test and inherits no neighbour.
+    # ---- The marker bytes are ASCII on purpose: a multibyte dash crosses the writing tool, the
+    # ---- shell and the awk regex parser, and only the last has an opinion about encoding.
+    if (edgecut != "" && fdate != "" && fdate >= edgecut) {
+      # Four values, all read from what this pass already holds. Nothing re-reads a file.
+      eg_slug = f; sub(/\/spec\/.*$/, "", eg_slug); sub(/^.*\//, "", eg_slug)
+      eg_uid = ""
+      for (i = 1; i <= n; i++) if (body[i] ~ /^# [A-Z][A-Za-z0-9-]* /) {
+        eg_uid = body[i]; sub(/^# /, "", eg_uid); sub(/ .*$/, "", eg_uid); break
+      }
+      # A header carrying something order-shaped that does not conform reads as UNORDERED here, and
+      # that is safe rather than silent: gen_build_index.py REFUSES such a value and hygiene check 9
+      # runs it, so the tree cannot carry one past the bar.
+      eg_ord = ""; eg_p = index(hdr, "· order ")
+      if (eg_p > 0) {
+        eg_ord = substr(hdr, eg_p + length("· order "))
+        sub(/[^0-9].*$/, "", eg_ord)
+      }
+      eg_in3 = 0; eg_ined = 0; eg_has = 0; eg_n = 0; eg_bad = ""; eg_nb = 0; eg_none = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## /) { eg_in3 = (L ~ /^## [0-9]+[.] Non-goals/); eg_ined = 0; continue }
+        if (!eg_in3) continue
+        if (L ~ /^### /) { eg_ined = (L ~ /^### Edges[ 	]*$/); if (eg_ined) eg_has = 1; continue }
+        if (!eg_ined) continue
+        if (L ~ /^[ 	]*$/) continue
+        if (L ~ /^none[.]?[ 	]*$/) { eg_none = 1; continue }
+        if (L !~ /^(-|\*)[ 	]/) continue
+        eg_n++
+        # The two verbs, and nothing else. A bullet whose head is neither is a finding rather than
+        # a silent skip: a mis-spelled verb is exactly how a declared edge stops being declared.
+        if (L !~ /^(-|\*)[ 	]*\*\*(consumes-from|hands-off)\*\*[ 	]/) {
+          eg_nb++; eg_h = L; sub(/^(-|\*)[ 	]*/, "", eg_h); sub(/[ 	].*$/, "", eg_h)
+          eg_bad = (eg_nb == 1) ? eg_h : eg_bad ", " eg_h
+          continue
+        }
+        eg_v = L; sub(/^(-|\*)[ 	]*\*\*/, "", eg_v); sub(/\*\*.*$/, "", eg_v)
+        eg_t = L; sub(/^[^*]*\*\*[^*]*\*\*[ 	]*/, "", eg_t)
+        if (eg_t ~ /^`/) { sub(/^`/, "", eg_t); sub(/`.*$/, "", eg_t) }
+        else { sub(/[^A-Za-z0-9_-].*$/, "", eg_t) }
+        # ONE sentinel byte for all three join classes, with the class name as the first tab field.
+        # \001 is the canon-diff excerpt request and \002 is claimed by a sibling; three bytes would
+        # be three routes to write and nothing to buy.
+        # The bullet PROSE rides along, backtick-joined, so the external-payload arm can ask whether
+        # a bullet that says `external` names a sibling in its own words. Two of the four criteria in
+        # the measured case never spelled the verb they rested on, which is why that is a real shape.
+        eg_pr = ""; eg_rest = L
+        while (match(eg_rest, /`[^`]+`/)) {
+          eg_pr = eg_pr substr(eg_rest, RSTART + 1, RLENGTH - 2) "`"
+          eg_rest = substr(eg_rest, RSTART + RLENGTH)
+        }
+        if (stg == 0) print "\003\tE\t" eg_slug "\t" eg_uid "\t" eg_ord "\t" eg_v "\t" eg_t "\t" f "\t" eg_pr
+      }
+      if (!eg_has)
+        print f " (§3 carries no `### Edges` block, required at/after SPEC_EDGES_CUTOFF " edgecut "; write `none` when there are no edges)"
+      else if (eg_n == 0 && !eg_none)
+        print f " (§3 `### Edges` is empty; write `none` when there are no edges, so an absent declaration and a declared absence are different bytes)"
+      if (eg_nb > 0)
+        print f " (§3 `### Edges` bullets whose head is neither **consumes-from** nor **hands-off**): " eg_bad
+      # The pass REGISTERS this spec, so the joins below can tell "the sibling refused the edge" from
+      # "the sibling was never graded" — a Tier-1 spec is `next`-ed above and a grandfathered one
+      # never reaches here, and both are legitimate absences rather than disagreements.
+      if (stg == 0) print "\003\tU\t" eg_slug "\t" eg_uid "\t" eg_ord "\t\t\t" f
+    }
+    # ---- TOOL-aJoinedCanon-9: every DECLARED §5 row appears in the body. The row set is a
+    # ---- `|`-separated conf declaration rather than ten literals in the skeleton, so a project that
+    # ---- ships no user interface drops `a11y` and `i18n` by editing one string. The arm sits at the
+    # ---- SAME NESTING LEVEL as the §10 evidence arm and OUTSIDE its ecut guard, so its population is
+    # ---- its own key and never an intersection of two. Matching is a plain substring over the §5
+    # ---- body: the labels carry `/` and spaces, and a regex over author-supplied conf values is the
+    # ---- interpolated-into-a-regex class this tree has already paid for once.
+    if (rcut != "" && fdate != "" && fdate >= rcut) {
+      rr_in5 = 0; rr_body = ""
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## /) { rr_in5 = (L ~ /^## [0-9]+[.] Production-readiness checklist[ 	]*$/); continue }
+        if (rr_in5) rr_body = rr_body "\n" L
+      }
+      if (rr_in5 || rr_body != "") {
+        rr_nm = split(rrows, rr_a, "|")
+        rr_miss = ""; rr_nb = 0
+        for (i = 1; i <= rr_nm; i++) {
+          if (rr_a[i] == "") continue
+          if (index(rr_body, rr_a[i]) == 0) { rr_nb++; rr_miss = (rr_nb == 1) ? rr_a[i] : rr_miss ", " rr_a[i] }
+        }
+        if (rr_nb > 0)
+          print f " (§5 is missing declared READINESS_ROWS, required at/after READINESS_ROWS_CUTOFF " rcut "): " rr_miss
+      }
+    }
     # ---- Tier-2 body assertions ----
     ng = 0; got = ""
     for (i = 1; i <= n; i++) if (body[i] ~ /^## /) { got = (++ng == 1) ? body[i] : got "\n" body[i] }
@@ -1142,6 +1737,88 @@ case "$bad12_raw" in
     done) ;;
   *) bad12=$bad12_raw ;;
 esac
+# ---- TOOL-aJoinedCanon-8: the three EDGE JOINS, routed out of the \003 sentinel records the pass
+# ---- above emits. They are HELD under --staged and say so: c12_sel is the STAGED set there, so a
+# ---- developer committing one spec of a correctly declared pair would see the other end reported
+# ---- missing — a red on honest work. The per-file shape arm stays live under --staged, because a
+# ---- truncated corpus cannot change its answer about the one file it reads.
+# ---- TOOL-aJoinedCanon-11: resolve every emitted `base` sha in ONE batch. A `git cat-file -e` per
+# ---- spec would be one fork per live spec forever, which is the shape this batched awk exists to
+# ---- delete. `^{commit}` is the peel that stops an eight-hex prefix naming a tree or a blob from
+# ---- passing, and an ambiguous abbreviation answers on its own line rather than on stderr.
+base12=$(printf '%s\n' "$bad12_raw" | grep $'^\002\t' || true)
+bad12=$(printf '%s\n' "$bad12" | grep -v $'^\002\t' || true)
+if [ -n "$base12" ]; then
+  # THE PROBE THAT CANNOT MOVE. In a shallow clone every commit outside the fetch depth answers
+  # `missing`, so this arm would either red honestly-written specs or, written to ignore `missing`,
+  # pass on a clone where it can never fail. Announced on STDERR and skipped, rather than either.
+  if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = true ]; then
+    echo "memory-hygiene: the §base resolve arm is SKIPPED — this is a shallow repository, where every commit outside the fetch depth answers 'missing' and the arm could only red honest specs or pass on a tree it cannot grade." >&2
+  else
+    _bres=$(printf '%s\n' "$base12" | awk -F'\t' '{ print $3 }' | sort -u | sed 's/$/^{commit}/' \
+      | git cat-file --batch-check='%(objectname) %(objecttype)' 2>/dev/null || true)
+    _bbad=$(printf '%s\n' "$_bres" | awk '$2 != "commit" { s = $1; sub(/\^\{commit\}$/, "", s); print s }')
+    if [ -n "$_bbad" ]; then
+      basebad=$(printf '%s\n' "$base12" | awk -F'\t' -v bad="$(printf '%s\n' "$_bbad" | tr '\n' ' ')" '
+        BEGIN { n = split(bad, a, " "); for (i = 1; i <= n; i++) if (a[i] != "") m[a[i]] = 1 }
+        ($3 in m) { print $2 " (status header `base " $3 "` resolves to no commit in this object database, required at/after BASE_RESOLVE_CUTOFF)" }')
+      [ -z "$basebad" ] || bad12=$(printf '%s\n%s' "$bad12" "$basebad")
+    fi
+  fi
+fi
+edge12=$(printf '%s\n' "$bad12_raw" | grep $'^\003\t' || true)
+bad12=$(printf '%s\n' "$bad12" | grep -v $'^\003\t' || true)
+if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+  echo "memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind."
+elif [ -n "$edge12" ]; then
+  edgebad=$(printf '%s\n' "$edge12" | awk -F'\t' '
+    $2 == "U" { pop[$3 SUBSEP $4] = 1; ord[$3 SUBSEP $4] = $5; file[$3 SUBSEP $4] = $8; next }
+    $2 == "E" { k = ++ne; eslug[k] = $3; euid[k] = $4; eord[k] = $5; everb[k] = $6; etgt[k] = $7; efile[k] = $8
+                eprose[k] = $9
+                seen[$3 SUBSEP $4 SUBSEP $6 SUBSEP $7] = 1 }
+    END {
+      for (k = 1; k <= ne; k++) {
+        s = eslug[k]; u = euid[k]; v = everb[k]; t = etgt[k]
+        # EXTERNAL payload: legal, and the only check is that it is not a SIBLING wearing the wrong
+        # payload. An id in this build reached by `external` is a declared edge nobody can join, and
+        # both joins below would skip it silently — which is the shape this arm exists to refuse.
+        if (t == "external") {
+          np = split(eprose[k], pr, "`")
+          for (pi = 1; pi <= np; pi++) {
+            if (pr[pi] == "" || pr[pi] == u) continue
+            if ((s SUBSEP pr[pi]) in pop)
+              print "\003X\t" efile[k] " (§3 **" v "** external, and its prose names the sibling `" pr[pi] "` in this build; use **" v "** `" pr[pi] "` so the edge can be joined)"
+          }
+          continue
+        }
+        if (t == "") { print "\003E\t" efile[k] " (§3 `### Edges` bullet with no payload: name a sibling unit id in backticks, or the bare word `external`)"; continue }
+        # ABSENCE IS NOT DISAGREEMENT. A target outside the registered population is a Tier-1
+        # sibling or a grandfathered spec, and both are legitimate. Silent, and declared as such.
+        if (!((s SUBSEP t) in pop)) continue
+        mirror = (v == "hands-off") ? "consumes-from" : "hands-off"
+        if (!((s SUBSEP t SUBSEP mirror SUBSEP u) in seen))
+          print "\003R\t" efile[k] " (§3 declares **" v "** `" t "` and that unit declares no matching **" mirror "** `" u "` back)"
+        if (eord[k] != "" && ord[s SUBSEP t] != "") {
+          if (v == "consumes-from" && ord[s SUBSEP t] + 0 > eord[k] + 0)
+            print "\003O\t" efile[k] " (§3 **consumes-from** `" t "`, whose `order` " ord[s SUBSEP t] " is AFTER this unit at " eord[k] ")"
+          if (v == "hands-off" && ord[s SUBSEP t] + 0 < eord[k] + 0)
+            print "\003O\t" efile[k] " (§3 **hands-off** `" t "`, whose `order` " ord[s SUBSEP t] " is BEFORE this unit at " eord[k] ")"
+        }
+      }
+    }')
+  _er=$(printf '%s\n' "$edgebad" | grep $'^\003R\t' | sed $'s/^\003R\t//' || true)
+  _eo=$(printf '%s\n' "$edgebad" | grep $'^\003O\t' | sed $'s/^\003O\t//' || true)
+  _ee=$(printf '%s\n' "$edgebad" | grep $'^\003E\t' | sed $'s/^\003E\t//' || true)
+  _ex=$(printf '%s\n' "$edgebad" | grep $'^\003X\t' | sed $'s/^\003X\t//' || true)
+  [ -z "$_ex" ] || fail 12 "a §3 edge declares an external payload while its own prose names a sibling in this build, so a joinable edge was written as an unjoinable one:
+$_ex"
+  [ -z "$_er" ] || fail 12 "a §3 edge names a sibling that declares no matching edge back, so one author read the handoff and the other never saw it:
+$_er"
+  [ -z "$_eo" ] || fail 12 "a §3 edge runs against the build order its own status headers declare:
+$_eo"
+  [ -z "$_ee" ] || fail 12 "a §3 edge bullet carries no payload, so it names no sibling and declares nothing:
+$_ee"
+fi
 [ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
 $bad12"
 # ---- THE §10 EVIDENCE ARM ANNOUNCES A ZERO POPULATION. At adoption its cutoff is set strictly
@@ -1155,6 +1832,35 @@ if [ "$STAGED" = 0 ] && [ -n "$SPEC10_EVIDENCE_CUTOFF" ]; then
   _ev_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC10_EVIDENCE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_ev_n:-0}" -gt 0 ] || echo "memory-hygiene: the §10 reuse-evidence arm graded NO spec — SPEC10_EVIDENCE_CUTOFF is $SPEC10_EVIDENCE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §9 rev-scope arm (TOOL-aJoinedCanon-1). An arm that grades no
+# spec prints a silent green otherwise, which is indistinguishable from one that graded the corpus
+# and found nothing.
+if [ "$STAGED" = 0 ] && [ -n "$REV_SCOPE_CUTOFF" ]; then
+  _rs_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$REV_SCOPE_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_rs_n:-0}" -gt 0 ] || echo "memory-hygiene: the §9 rev-scope arm graded NO spec — REV_SCOPE_CUTOFF is $REV_SCOPE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §2 scope-join arm (TOOL-aJoinedCanon-3).
+if [ "$STAGED" = 0 ] && [ -n "$SCOPE_JOIN_CUTOFF" ]; then
+  _sj_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SCOPE_JOIN_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_sj_n:-0}" -gt 0 ] || echo "memory-hygiene: the §2 scope-join arm graded NO spec — SCOPE_JOIN_CUTOFF is $SCOPE_JOIN_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §6 failure-mode arm (TOOL-aJoinedCanon-4).
+if [ "$STAGED" = 0 ] && [ -n "$SPEC_FAILURE_MODE_CUTOFF" ]; then
+  _fm_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_FAILURE_MODE_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_fm_n:-0}" -gt 0 ] || echo "memory-hygiene: the §6 failure-mode arm graded NO spec — SPEC_FAILURE_MODE_CUTOFF is $SPEC_FAILURE_MODE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §3 edge arms (TOOL-aJoinedCanon-8). Load-bearing here rather
+# than a nicety: under the ratified cutoff the whole LIVE CORPUS is the grandfather case, so a green
+# with a graded population of zero and a green with a graded population of hundreds are the same
+# byte, and this line is the only thing that tells them apart.
+if [ "$STAGED" = 0 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+  _eg_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_EDGES_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_eg_n:-0}" -gt 0 ] || echo "memory-hygiene: the §3 edge arms graded NO spec — SPEC_EDGES_CUTOFF is $SPEC_EDGES_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures, not this corpus."
 fi
 fi
 
@@ -1207,6 +1913,49 @@ $badL"
   badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
   [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
 $badD"
+fi
+
+# curation-debt STALE-ENTRY guard, and the per-row report. Its sibling above grades whether a listed
+# path still EXISTS; this one grades whether it still HIDES anything, which is the question the
+# registry is actually about. Populated by `derive_waived` during checks 6, 7 and 8.
+#
+# HELD UNDER --staged: there the selection is the staged set, so a listed file nobody staged records
+# nothing and would read as stale. The same reason `pop_guard` holds.
+#
+# The REPORT is not a second verdict. A row silences all three checks whatever it earns, so a waiver
+# wider than its fault is real debt — but failing it needs a per-line or per-check waiver grammar
+# this registry does not have, and would red two rows on the day this lands, one of them the subject
+# of an open owner call. Naming the width costs a line and pre-empts nobody.
+if [ "$STAGED" = 0 ] && [ -n "$DEBT" ]; then
+  # TWO absences, and NEITHER is this guard's question. A path git no longer tracks is the SIBLING
+  # guard's finding. A path still in the INDEX but gone from the WORKTREE is in no check's population
+  # either — `index_set` and `files8` both end on `[ -f "$f" ]` — so it records nothing by being
+  # absent rather than by being compliant, and printing "delete the row" at it would drain a waiver
+  # that is still load-bearing the moment the file comes back. `TRACKED_SET` is in scope because a
+  # non-empty `$DEBT` is one of the two things that fills it.
+  staleD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
+    [ -n "${TRACKED_SET[$p]+x}" ] || continue
+    [ -f "$p" ] || continue
+    [ -n "${DEBT_EARNED[$p]+x}" ] || printf '%s\n' "$p"; done)
+  [ -n "$staleD" ] && fail 6 "curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived, so the row hides nothing and the registry has stopped shrinking — delete the row rather than re-justifying it:
+$staleD"
+  # The denominator is DERIVED, never the literal `6 7 8`. A build README is structurally outside
+  # check 8's population and a RUN.md outside check 7's, so a constant denominator reports a row
+  # whose waiver is exactly as wide as its fault as though it were two checks over-wide — which is
+  # the opposite of what this report is for. The three selections are still in scope.
+  printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
+    [ -n "${DEBT_EARNED[$p]+x}" ] || continue
+    _appl=""
+    grep -qxF "$p" <<<"$sel6"   && _appl="${_appl}6 "
+    grep -qxF "$p" <<<"$sel7"   && _appl="${_appl}7 "
+    grep -qxF "$p" <<<"$files8" && _appl="${_appl}8 "
+    printf 'memory-hygiene: curation-debt.txt — %s earns check(s) %sof the %sit is waived from\n' \
+      "$p" "${DEBT_EARNED[$p]}" "$_appl"
+  done
+else
+  # A skip that looks like a pass is indistinguishable from coverage, and this one is silent in the
+  # leg a pre-commit hook runs. Its two siblings in this same run announce their holds; so does this.
+  [ "$STAGED" = 1 ] && printf 'memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale\n'
 fi
 
 # ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.
@@ -1272,20 +2021,42 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # operand list would also make awk read stdin; an empty stream is a no-op. TOOL-aThawedCorpus-4.
   alledger=$(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null | awk '
     { f = $0; if (f == "") next
-      j = 0; u = ""                       # per-RECORD reset; the retired spelling got this free
+      j = 0; u = ""; pu = ""; plab = ""; pform = ""; ptok = ""   # per-RECORD reset
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
         sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
         $0 = line                         # attribute one record'"'"'s criteria to the next
         if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *journal/)
-        if ($0 ~ /^\*\*Evidences:\*\* /) { u = (j ? $2 : ""); continue }
-        if ($0 ~ /^#/) { u = ""; continue }
+        if ($0 ~ /^\*\*Evidences:\*\* /) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
+          u = (j ? $2 : ""); continue }
+        if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
+          u = ""; continue }
         if (u != "" && $0 ~ /^- *(\*\*)?AC[0-9]+/) {
+          if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           form = ($0 ~ /`[^`]+`/) ? "obs" : (($0 ~ /amended rev-[0-9]+/) ? "amd" : "bad")
-          print u " " lab " " form
+          pu = u; plab = lab; pform = form; ptok = altoks($0)
+          continue
         }
+        # TOOL-aJoinedCanon-6: the TOKEN list is BULLET-scoped where form is FIRST-LINE-scoped, and
+        # the asymmetry is deliberate rather than an oversight. Widening form would reclassify every
+        # landed answer whose backtick sits in the wrap, which is a verdict change no criterion here
+        # asks for; widening the token list is what lets an answer be joined to its criterion at all,
+        # because this corpus wraps and puts the naming half in the wrap.
+        if (pu != "" && $0 !~ /^[ 	]*$/) ptok = ptok altoks($0)
       }
+      if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
       close(f)
+    }
+    # Backticked tokens, backtick-JOINED. The extractor is `[^`]+` so a captured token cannot itself
+    # contain a backtick, which is what makes the separator safe without an escape.
+    function altoks(s,   r, t) {
+      r = ""
+      while (match(s, /`[^`]+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2)
+        r = r t "`"
+        s = substr(s, RSTART + RLENGTH)
+      }
+      return r
     }')
   alpop=0; algap=""; albad=""; alnolab=""
   alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null || true)
@@ -1309,6 +2080,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # to do — a build's own folder owns its own prose — so the exemption is declared, auditable and
   # shrink-only, with its reason beside it in the conf.
   alsel=$(printf '%s\n' "$alspecs" | grep . | awk -v cut="$alcut" \
+      -v lcut="$LEDGER_LABEL_CUTOFF" -v tcut="$LEDGER_TOKEN_CUTOFF" \
       -v grand=" ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " '
     { f = $0; seq++
       base = f; sub(/^.*\//, "", base)
@@ -1332,7 +2104,8 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
           lab = line
           sub(/^[ \t]*(-|\*)?[ \t]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           labs[++nlab] = lab
-        }
+          labt[nlab] = altoks(line)
+        } else if (nlab > 0 && line !~ /^[ \t]*$/) labt[nlab] = labt[nlab] altoks(line)
       }
       close(f)
       if (hdr !~ / CLOSED /) next
@@ -1340,33 +2113,97 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
       if (!hasac) next
       if (uid == "") next
       if (index(grand, " " uid " ") > 0) next    # grandfathered leaves the COUNT too, as it did
-      print "U\t" seq "\t" uid
-      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i]
+      # TOOL-aJoinedCanon-6: the two ERA flags ride the U row rather than the filename date, so the
+      # date comparison stays in awk beside the one alcut already does and bash reads booleans.
+      labera = (lcut != "" && substr(base, 1, 10) >= lcut) ? 1 : 0
+      tokera = (tcut != "" && substr(base, 1, 10) >= tcut) ? 1 : 0
+      print "U\t" seq "\t" uid "\t" labera "\t" tokera
+      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i] "\t" labt[i]
+    }
+    function altoks(s,   r, t) {
+      r = ""
+      while (match(s, /`[^`]+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2)
+        r = r t "`"
+        s = substr(s, RSTART + RLENGTH)
+      }
+      return r
     }')
   # The ledger as a MAP, built once. FIRST-WINS, because the retired lookup was `grep -m1` and a
   # bash associative array is last-wins; getting that backwards would silently reclassify a unit
   # whose ledger carries two lines for one criterion.
-  declare -A ALFORM
+  declare -A ALFORM ALTOK
   while IFS= read -r _al; do
     [ -n "$_al" ] || continue
-    _alk="${_al% *}"
-    [ -n "${ALFORM[$_alk]+x}" ] || ALFORM["$_alk"]="${_al##* }"
+    # TOOL-aJoinedCanon-6: the row is now `<unit> <label> <form>` TAB `<tokens>`. Split on the
+    # TAB first and then split the triple exactly as before, so the FIRST-WINS map semantics
+    # documented above are unchanged and a record with two lines for one criterion keeps the first.
+    IFS="	" read -r _altriple _altok <<<"$_al"
+    _alk="${_altriple% *}"
+    [ -n "${ALFORM[$_alk]+x}" ] || { ALFORM["$_alk"]="${_altriple##* }"; ALTOK["$_alk"]="$_altok"; }
   done <<<"$alledger"
   alU=$(printf '%s\n' "$alsel" | grep "^U	" || true)
+  # TOOL-aJoinedCanon-6: the two era flags, read BEFORE the label walk because arm B consults them
+  # inside it. A U row now carries `<seq> <uid> <labera> <tokera>`; an older stream carrying neither
+  # reads as 0 and both arms stay silent, which is what blank-means-off has to mean here too.
+  declare -A ALLABERA ALTOKERA
+  while IFS="	" read -r _et _eseq _euid _elab _etok; do
+    [ -n "$_euid" ] || continue
+    ALLABERA["$_euid"]="${_elab:-0}"; ALTOKERA["$_euid"]="${_etok:-0}"
+  done <<<"$alU"
   alpop=$(printf '%s\n' "$alU" | grep -c . || true)
   # Labels sorted per spec, deduplicated, in ONE sort rather than one per spec. `-k2,2n` is the
   # stream order the retired outer loop walked and `-k4,4` is the `sort -u` it applied inside it,
   # so the three failure strings below are built in exactly the order they were before. No LC_ALL,
   # matching the retired `sort -u`, which took the ambient collation.
-  declare -A ALHASLAB
-  while IFS="	" read -r _lt _lseq _luid _llab; do
+  declare -A ALHASLAB ALSPECLAB
+  altokbad=""
+  while IFS="	" read -r _lt _lseq _luid _llab _ltok; do
     [ -n "$_llab" ] || continue
     ALHASLAB["$_lseq"]=1
     _alk="$_luid $_llab"
+    ALSPECLAB["$_alk"]=1
     if [ -z "${ALFORM[$_alk]+x}" ]; then algap="$algap $_luid/$_llab"
     elif [ "${ALFORM[$_alk]}" = bad ]; then albad="$albad $_luid/$_llab"
     fi
+    # ---- TOOL-aJoinedCanon-6 ARM B: the ledger answer is joined to its own criterion by CONTENT,
+    # ---- not by label alone. Today a label match is the whole join, so an answer can name a
+    # ---- different file, command or arm from the criterion it claims to answer and nothing sees it
+    # ---- — provably wrong on a CLOSED, green unit. A pair passes when either token CONTAINS the
+    # ---- other after case folding, which is loose on purpose: a criterion naming a path and an
+    # ---- answer naming that path plus a flag must agree, and only a shared-nothing pair is a
+    # ---- finding. An EMPTY list on either side makes this silent for that criterion: an empty spec
+    # ---- side is check 12's acceptance-witness arm, and an empty ledger side is the `albad` branch
+    # ---- above. Neither is this arm's to re-report, and reporting them here would double-count.
+    if [ "${ALTOKERA[$_luid]:-0}" = 1 ] && [ -n "${ALFORM[$_alk]+x}" ] \
+       && [ -n "$_ltok" ] && [ -n "${ALTOK[$_alk]:-}" ]; then
+      _lhit=0; _lsave=$IFS; IFS='`'
+      for _lsa in $_ltok; do
+        [ -n "$_lsa" ] || continue
+        for _lla in ${ALTOK[$_alk]}; do
+          [ -n "$_lla" ] || continue
+          if [[ ${_lsa,,} == *"${_lla,,}"* || ${_lla,,} == *"${_lsa,,}"* ]]; then _lhit=1; break 2; fi
+        done
+      done
+      IFS=$_lsave
+      [ "$_lhit" = 1 ] || altokbad="$altokbad $_luid/$_llab"
+    fi
   done <<<"$(printf '%s\n' "$alsel" | grep "^L	" | sort -u -t"	" -k2,2n -k4,4)"
+  # ---- TOOL-aJoinedCanon-6 ARM A: a ledger answer whose label the spec does not number. The
+  # ---- existing arms walk the SPEC side and ask what the ledger is missing; nothing walked the
+  # ---- LEDGER side, so an answer labelled AC9 on a unit whose §6 stops at AC7 is invisible — it
+  # ---- satisfies nothing, blocks nothing, and reads as coverage. Bash associative-array key order
+  # ---- is unspecified, so the offenders are SORTED before the string is built; the sibling arms get
+  # ---- byte-stable output from a sorted input stream and this one has to earn it explicitly.
+  alorph=""
+  if [ "${#ALFORM[@]}" -gt 0 ]; then
+    alorph=$(for _ok in "${!ALFORM[@]}"; do
+        _ou="${_ok% *}"
+        [ "${ALLABERA[$_ou]:-0}" = 1 ] || continue
+        [ -n "${ALSPECLAB[$_ok]+x}" ] && continue
+        printf '%s/%s\n' "$_ou" "${_ok#* }"
+      done | sort | while IFS= read -r _or; do printf ' %s' "$_or"; done)
+  fi
   # A CLOSED Tier-2 spec with the heading and no labels cannot be evidenced, and "every criterion
   # is evidenced" is vacuously TRUE over none of them. That vacuity is the whole reason this arm
   # exists rather than being an oversight the check tolerates.
@@ -1377,7 +2214,20 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
   [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
   [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
+  [ -z "$alorph" ] || fail 23 "a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
+  [ -z "$altokbad" ] || fail 23 "a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things:$altokbad"
   [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
+  # TOOL-aJoinedCanon-6: each new arm announces its OWN empty population. Both cutoffs ship ahead of
+  # the fleet, so on the landing commit each grades nothing, and a skip that looks like a pass is
+  # indistinguishable from coverage. Counted over the same U rows the arms read, by era flag.
+  if [ -n "$LEDGER_LABEL_CUTOFF" ]; then
+    _lgn=0; for _lk in "${!ALLABERA[@]}"; do [ "${ALLABERA[$_lk]}" = 1 ] && _lgn=$((_lgn+1)); done
+    [ "$_lgn" -gt 0 ] || printf 'memory-hygiene: the ledger-LABEL arm graded NO unit — LEDGER_LABEL_CUTOFF is %s and every closed Tier-2 spec predates it. Its coverage is its self-test fixtures, not this corpus.\n' "$LEDGER_LABEL_CUTOFF"
+  fi
+  if [ -n "$LEDGER_TOKEN_CUTOFF" ]; then
+    _tgn=0; for _tk in "${!ALTOKERA[@]}"; do [ "${ALTOKERA[$_tk]}" = 1 ] && _tgn=$((_tgn+1)); done
+    [ "$_tgn" -gt 0 ] || printf 'memory-hygiene: the ledger-TOKEN arm graded NO unit — LEDGER_TOKEN_CUTOFF is %s and every closed Tier-2 spec predates it. Its coverage is its self-test fixtures, not this corpus.\n' "$LEDGER_TOKEN_CUTOFF"
+  fi
 fi
 
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the

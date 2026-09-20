@@ -1,112 +1,143 @@
-.githooks/pre-commit	1	memory-tree
-.githooks/pre-push	2	run-gates
-.githooks/pre-push.test.sh	2	run-gates
-WIRE-INTO-PROJECT.md	28	codebase-map,drift-audit,hooks,memory-recall,memory-tree,playbook,workflows
-coding-governance-agents.template.md	2	hooks,playbook
+# THE CARRIED-PREFIX BAN LIST. Not a ratchet any more: TOOL-dRetiredFork-17 made
+# --write-ratchet unable to ADD a row or RAISE a count, so a new literal cannot be absorbed
+# by running the remedy the gate prints. A row is <path> <count> <kits>, tab-separated.
+#
+# A FOURTH COLUMN IS A HUMAN'S REASON for a literal that is genuinely correct. Only a person
+# writes one, in the pass that needs it; the write path preserves it but never invents it.
+# predicate-epoch: 3
+.githooks/pre-commit	2	(loose),memory-tree
+.githooks/pre-push	2	(loose),run-gates
+.githooks/pre-push.test.sh	2	(loose)
+WIRE-INTO-PROJECT.md	53	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,workflows	the 29th is `contribute`, a GOV-SIDE verb an adopter never runs: it is invoked from a gov checkout against an adopter tree, so the path is gov's own and is correct at gov's prefix. DEPL-dRetiredFork-6. The other 28 predate this column and are recorded, not justified. RAISED 47 -> 53 by hand, 2026-09-08, for the process-monitor section 3e: this file is the RUNBOOK, so an install path an operator types is its content rather than a carried literal, and the six new hits are the adopter, the two scope probes, the two gate legs and the sweep. Deriving them would hand the operator a variable to expand. TOOL-aReapedSpinner-11.
+coding-governance-agents.template.md	3	(loose),hooks,playbook
 skills/session-kickoff/SKILL.md	2	codebase-map,playbook
-skills/session-kickoff/manifest-check.sh	2	lib,unattended
+skills/session-kickoff/manifest-check.sh	3	lib,unattended	the third is the `# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh` marker line of the resolver block this file now carries INLINE (the aReplayedCard closing review, F2: its card append spawned a python it never ran). The marker is part of the byte-compared block, so the literal cannot be derived away; the same marker is the `lib` literal every other inline copy carries. The comments beside it name no prefix.
 tools/agent-instructions/README.md	4	agent-instructions,playbook
-tools/agent-instructions/kit.toml	1	agent-instructions
-tools/check-agent-cap-restatement.sh	2	hooks,workflows
+tools/agent-instructions/kit.toml	2	agent-instructions,codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
+tools/check-agent-cap-restatement.sh	3	(loose),hooks,workflows
 tools/check-agent-cap-restatement.test.sh	1	hooks
-tools/check-install-prefix.sh	6	govkit,lib
-tools/check-install-prefix.test.sh	3	memory-tree
-tools/check-kit-versions.sh	30	codebase-map,drift-audit,govkit,hooks,lexicon,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
-tools/check-line-length.sh	1	lexicon
-tools/check-microformats.sh	1	playbook
-tools/check-wiring.sh	6	hooks,lib,memory-recall,memory-tree
-tools/check-wiring.test.sh	16	hooks,lib,memory-recall,memory-tree
+tools/check-install-prefix.sh	9	(loose),govkit,lib
+tools/check-install-prefix.test.sh	8	(loose),memory-tree	FIXTURE-INTERNAL PATHS. `mkfix_source` builds a scratch gov tree containing `tools/demo/` and `tools/govkit/`, and the arms then run the gate INSIDE it -- so `tools/` in this file is the fixture's own layout and is correct at every prefix. The row rose 18 -> 25 when TOOL-dRetiredFork-17's closing review forced the BAN arms to stop re-implementing the gate's awk and invoke the real gate instead, which needs real fixture trees. Same class as the check-pass-order row below: a sweep that rewrites a fixture value is not a repath.
+tools/check-kit-versions.sh	33	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows	RAISED 33 -> 34 BY HAND, TOOL-aHoistedPass-7: `tools/unattended/check-brief-recorded.sh` joins the three-name loop that pairs each unattended carrier's KIT_UNATTENDED_VERSION with its same-line marker. The loop is a DECLARED population and must stay one — deriving it by globbing the kit dir would make a carrier that FORGETS the constant silently absent from its own check, which is the green-by-absence class this file's siblings are full of gates against. This is gov's own version gate and every one of the other 33 literals is here for the same reason.
+tools/check-line-length.sh	6	(loose),lexicon
+tools/check-line-length.test.sh	27	(loose),lib	the suite PORTED onto the self-test harness: its fixture copies `tools/check-line-length.sh` into a scratch repo and every arm invokes it there, so the literal is fixture-internal and is the same justification `check-install-prefix.test.sh` and `check-pass-order.test.sh` already carry. Withheld from adopters by a `project-owned` rule in its own entry. TOOL-aQuenchedHarness-6.
+tools/check-microformats.sh	2	(loose),playbook
+tools/check-placeholders.sh	2	(loose)
+tools/check-placeholders.test.sh	1	(loose)
+tools/check-testsuite-counts.sh	5	(loose),lib	the counts gate names the harness a suite may source, `tools/lib/lib-selftest.sh`, because the second accepted spelling is defined by that path. TOOL-aQuenchedHarness-6.
+tools/check-testsuite-counts.test.sh	3	(loose),lib	its arms build fixtures that source the harness by path, which is what the new spelling requires them to grade. TOOL-aQuenchedHarness-6.
+tools/check-wiring.sh	3	(loose),lib
+tools/check-wiring.test.sh	11	(loose),lib,memory-tree
 tools/codebase-map/adopt-codebase-map.sh	3	lib
-tools/codebase-map/adopt-codebase-map.test.sh	5	codebase-map,lib
-tools/codebase-map/map_extractors.py	2	codebase-map,run-gates
+tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map,lib
+tools/codebase-map/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
+tools/codebase-map/map_extractors.py	3	(loose),codebase-map,run-gates
 tools/codebase-map/map_lib.py	1	hooks
+tools/codebase-map/scen-adversarial.json	201	(loose),codebase-map,drift-audit,gate-lint,govkit,lexicon,memory-recall,memory-tree,playbook,run-gates	a DATA fixture whose rows ARE repo paths: 28 scenarios naming the seam each behaviour phrase should reach, established by reading THIS tree. There is nothing to derive — the paths are the measurement's subject, not a reference to a file this code runs. It is withheld from both install paths (kit.toml `project-owned`, plus its own row in WIRE-INTO-PROJECT.md's removal step), so no adopter receives it at any prefix. TOOL-dTracedLattice-1 S8.
 tools/codebase-map/selftest.py	5	codebase-map
-tools/drift-audit/README.md	3	drift-audit
+tools/drift-audit/README.md	4	(loose),drift-audit
 tools/drift-audit/adopt-drift-audit.sh	5	drift-audit,lib
 tools/drift-audit/drift_report.py	3	drift-audit
-tools/drift-audit/drift_signals.py	3	drift-audit
-tools/drift-audit/drift_signals.template.py	2	drift-audit
+tools/drift-audit/drift_signals.py	3	(loose),drift-audit
+tools/drift-audit/drift_signals.template.py	4	(loose),drift-audit
+tools/drift-audit/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/gate-lint/README.md	3	gate-lint
 tools/gate-lint/kit.toml	1	gate-lint
 tools/gate-lint/ps-hygiene.py	1	gate-lint
-tools/govkit/registry.toml	15	agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows
-tools/hooks/README.md	1	workflows
-tools/hooks/agent-cap.js	5	hooks,workflows
+tools/govkit/registry.toml	70	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,lib,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows	the deployer registry: every `[[exempt_leg]]` reason NAMES the descriptor that withholds the file, which is the whole content of the exemption. TOOL-aQuenchedHarness-3 added twenty-three of them and TOOL-aQuenchedHarness-6 three more. A registry that could not name a path could not record an exemption. RAISED 58 -> 59, TOOL-aReapedSpinner-6: this file IS the declared deployable population, so every entry it gains is one more path literal by construction. There is nothing to derive — a registry that globbed its own entries would stop being a declaration, which is the whole reason it is not a directory listing.
+tools/hooks/README.md	4	(loose),workflows
+tools/hooks/agent-cap.js	7	(loose),hooks,workflows
 tools/hooks/agent-cap.test.sh	3	hooks,workflows
 tools/hooks/scratch-guard.js	1	run-gates
-tools/hooks/scratch-guard.test.sh	4	hooks,run-gates
-tools/install-prefix-carried.txt	92	agent-instructions,codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows
-tools/install-prefix-waivers.txt	6	codebase-map,memory-tree
-tools/lexicon/LEXICON.md	3	lexicon
+tools/hooks/scratch-guard.test.sh	2	hooks,run-gates
+tools/install-prefix-waivers.txt	10	(loose),codebase-map,memory-tree
+tools/lexicon/LEXICON.md	2	lexicon
 tools/lexicon/README.md	10	codebase-map,drift-audit,lexicon
 tools/lexicon/SKILL.template.md	1	lexicon
 tools/lexicon/adopt-lexicon.sh	4	lexicon,lib
-tools/lexicon/kit.toml	1	memory-recall
-tools/lexicon/lexicon.py	1	codebase-map
+tools/lexicon/kit.toml	2	codebase-map,memory-recall	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/lexicon/lexicon_conf.py	3	lexicon
 tools/lexicon/scaffold_lexicon.py	4	lexicon
-tools/lexicon/selftest.py	15	codebase-map,hooks,lexicon
+tools/lexicon/selftest.py	24	lexicon	FIXTURE-INTERNAL PATHS, same class as the `check-install-prefix.test.sh` row above and justified the same way. Every literal this row counts is an argv element in a `subprocess.run(..., cwd=<scratch tree>)`: the arms build a scratch repo, copy the kit into it at `tools/lexicon/`, and run the REAL engine inside it. So `tools/` here is the FIXTURE's own layout, not the host's, and it is correct at every prefix an adopter installs at. The row rose 15 -> 21 under TOOL-aSurfacedLexicon: a build that added the convention predicate, the cell refusals, a shell parser and the canon overlay, each of which needs its own end-to-end fixture rather than an in-process call, because a refusal that only ever fires in-process is not the refusal an operator meets. The six prose mentions of SIBLING kits that this build also added were NOT justified here -- they were rewritten to drop the prefix, because a path in a comment is documentation and derives nothing. The 22nd is TOOL-aSurfacedLexicon-10's `run_expand_wrapper`, the same shape again: it runs `adopt-lexicon.sh --expand` inside the fixture repo, because the once-refusal and the stamp live in the WRAPPER and an in-process call would exercise neither. The 23rd is TOOL-aGradedDialect-4's re-scaffold arm, the same shape a third time: it runs `scaffold_lexicon.py` inside the fixture repo with `cwd=` that scratch tree, because the seeded `SEED_CONVENTIONS` rows and the emitted `CELLS` comment are what an adopter actually meets and an in-process call emits neither. Verified against source 2026-09-10: the only literal this build added to this file is that argv element. RAISED 23 -> 24, TOOL-aGradedDialect-10: one more `subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ...], cwd=<scratch tree>)`, the arm that scaffolds a helpers-only `.tsx` tree and asserts the `+returns:jsx` row is ABSENT; same fixture-internal class, same justification.
 tools/memory-recall/README.md	8	memory-recall
-tools/memory-recall/adopt-memory-recall.sh	5	lib,memory-recall
+tools/memory-recall/adopt-memory-recall.sh	8	(loose),lib,memory-recall
+tools/memory-recall/extract.py	1	(loose)
+tools/memory-recall/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/memory-recall/recall-fixture.json	1	memory-recall
 tools/memory-recall/recall-opened.js	1	memory-recall
 tools/memory-recall/recall_conf.py	1	memory-tree
-tools/memory-tree/README.md	4	memory-tree
+tools/memory-tree/README.md	5	(loose),memory-tree
 tools/memory-tree/adopt-memory-tree.sh	5	lib,memory-tree
+tools/memory-tree/build-readme-slot-highwater.txt	1	(loose)
+tools/memory-tree/build-readme-slot-limits.txt	1	(loose)
 tools/memory-tree/check-arms.py	4	memory-tree
-tools/memory-tree/check-memory-hygiene.sh	6	codebase-map,lib,memory-tree
+tools/memory-tree/check-memory-hygiene.sh	8	(loose),codebase-map,lib,memory-tree
 tools/memory-tree/check-memory-hygiene.test.sh	4	lib,memory-tree
 tools/memory-tree/check-method-carriers.sh	1	memory-tree
-tools/memory-tree/check-method-carriers.test.sh	2	memory-tree
+tools/memory-tree/check-method-carriers.test.sh	1	memory-tree
 tools/memory-tree/check-verdict-epoch.sh	10	memory-recall,memory-tree
-tools/memory-tree/check-verdict-epoch.test.sh	3	memory-tree
-tools/memory-tree/corpus_ids.py	8	lib,memory-tree
+tools/memory-tree/corpus_ids.py	4	lib,memory-tree
 tools/memory-tree/gen_build_index.py	6	memory-tree,unattended
 tools/memory-tree/gotchas.py	11	memory-tree
-tools/memory-tree/hygiene-parity.test.sh	7	memory-tree
+tools/memory-tree/hygiene-parity.test.sh	2	memory-tree
 tools/memory-tree/kit-dogfood-parity.test.sh	5	lib,memory-tree
+tools/memory-tree/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/memory-tree/marker-contract.test.sh	1	memory-tree
-tools/memory-tree/merge-rows.py	3	lib,memory-recall,memory-tree
+tools/memory-tree/merge-rows.py	4	(loose),lib,memory-recall,memory-tree
 tools/memory-tree/merge-rows.sh	5	lib
-tools/memory-tree/merge-rows.test.sh	26	lib,memory-recall,memory-tree
+tools/memory-tree/merge-rows.test.sh	7	lib,memory-tree
 tools/playbook/README.md	3	govkit,playbook
 tools/playbook/adopt-playbook.sh	3	playbook
 tools/playbook/kit.toml	1	govkit
 tools/playbook/render_playbook.py	1	run-gates
+tools/process-monitor/README.md	3	process-monitor	the install commands a human copies. A derived spelling would print a token rather than a runnable line, which is the opposite of what a README is for.
+tools/process-monitor/adopt-process-monitor.sh	3	lib,process-monitor	an adopter's own USAGE lines. LOWERED 5 -> 3: the settings-merge invocation this file PRINTS as its wiring remedy used to be counted here as "one command a human types", and that justification was wrong — the string is emitted at runtime by the unwired arm, so at a `scripts/` prefix it named a file the operator does not have, measured at two adopters. It is derived through KIT_REL now, like every other runtime path here. What is left is prose a human reads. The `lib` hit is the inlined resolve_python's canonical-copy pointer, which the sibling adopters carry identically.
+tools/process-monitor/adopt-process-monitor.test.sh	1	process-monitor	a suite that must name the files it grades. It is `project-owned` in kit.toml and is withheld from `govkit apply`, so no adopter ever receives these bytes at any prefix. LOWERED 4 -> 1, 2026-09-08: the four adopter invocations now go through KIT_REL, derived from git rev-parse --show-prefix. What is left is one usage line a human reads.
+tools/push-main.test.sh	10	(loose)
+tools/pytest-parallel-guardrails/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3	lib
-tools/run-gates/README.md	1	lib
-tools/run-gates/kit.toml	2	govkit,memory-recall
+tools/run-gates/README.md	2	(loose),lib
+tools/run-gates/ceiling-evidence.txt	1	run-gates	gov's own recorded readings, withheld from adopters by a `project-owned` rule: the paths are gov leg names and travel nowhere. TOOL-aQuenchedHarness-2.
+tools/run-gates/derive-ceilings.py	2	(loose),run-gates	the ceiling deriver names `tools/gate-legs.json` and its evidence file, both of which sit at that path in an adopter too, because `run-gates` is installed at the tool root by construction. TOOL-aQuenchedHarness-2.
+tools/run-gates/gate-profiles.txt	1	(loose)
+tools/run-gates/kit.toml	3	codebase-map,govkit,memory-recall	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/run-gates/profile_bar.py	1	run-gates
-tools/run-gates/profile_bar.test.sh	9	run-gates
-tools/run-gates/run-gates.evidence.test.sh	5	run-gates
-tools/run-gates/run-gates.gov.test.sh	4	govkit,lib,memory-recall,run-gates
-tools/run-gates/run-gates.sh	3	lib
-tools/run-gates/run-gates.test.sh	33	lib,run-gates
-tools/run-gates/run-gates.turnstile.test.sh	21	run-gates
-tools/settings-merge.py	1	hooks
-tools/unattended/.unattended.conf.example	3	memory-tree,run-gates
-tools/unattended/SKILL.template.md	1	memory-tree
+tools/run-gates/profile_bar.test.sh	1	(loose)
+tools/run-gates/run-gates.evidence.test.sh	1	(loose)
+tools/run-gates/run-gates.gov.test.sh	9	(loose),govkit,lib,memory-recall,run-gates
+tools/run-gates/run-gates.sh	4	(loose),lib
+tools/run-gates/run-gates.test.sh	7	(loose),lib,run-gates	the run-gates canary, withheld from adopters by a `project-owned` rule; the two new literals are the wall fixture and the profile row it reads, both gov-side. TOOL-aQuenchedHarness-1.
+tools/run-gates/run-gates.turnstile.test.sh	1	(loose)
+tools/run-gates/run-selftests.sh	6	(loose),lib,run-gates,unattended	the on-demand self-test runner names gov paths in its own header and usage because it IS the gov-side invocation: `bash tools/run-gates/run-selftests.sh`. An adopter receives the script and its own declaration, never gov's population. TOOL-aQuenchedHarness-4. RAISED 5 -> 6 by hand, 2026-09-09: the sixth is the resolver's parity MARKER line, which the gate requires byte-identical to the canonical copy and which therefore cannot be derived. It arrived when this file stopped using the banned `command -v` idiom. The sibling runner carries the same literal for the same reason. TOOL-aReapedSpinner-11.
+tools/run-gates/run-selftests.test.sh	7	(loose),lib,run-gates	the arms for that runner, WITHHELD from every adopter by a `project-owned` rule in `tools/run-gates/kit.toml`, so the gov paths it spells never travel. TOOL-aQuenchedHarness-6.
+tools/run-gates/selftest-budgets.txt	15	(loose),run-gates,unattended	RAISED 14 -> 15 by hand, TOOL-aDeferredBar-3: the gate-guard suite's budget row, a gov suite path by construction like the fourteen before it. gov's declared self-test population: every row names a gov suite by path, which is what the file IS. Withheld from adopters by a `project-owned` rule for exactly that reason. TOOL-aQuenchedHarness-4. The fourteenth arrived at the landing merge: main added a seventh unattended suite while this branch delegated the six, so its row came with it.
+tools/settings-merge.py	4	(loose),hooks
+tools/unattended/.unattended.conf.example	6	(loose),memory-tree,run-gates
 tools/unattended/adopt-unattended.sh	2	unattended
 tools/unattended/adopt-unattended.test.sh	2	unattended
+tools/unattended/check-brief-recorded.sh	2	unattended	WRITTEN BY HAND, TOOL-aHoistedPass-7, and the same two shapes the sibling row below carries: the usage line in the file header, which names the leg the way an operator invokes it, and the `evil.sh` path inside the comment recording the incident where a tracked conf line redirected the sibling's DRIVER. Neither is a path this script resolves at runtime -- both are prose about paths -- and a derived spelling in either would make the header unreadable and the incident unciteable.
+tools/unattended/check-brief-recorded.test.sh	4	memory-tree,unattended	FIXTURE-INTERNAL PATHS, not gov's install prefix, exactly as the sibling suite's row below records at length. Every path here is inside the scratch tree the suite builds with `mkdir -p tools/unattended` and then runs the checker inside, so `tools/` is that fixture's own layout and is correct at every prefix. The sibling was swept to a derived prefix once and 14 of its 19 arms broke, because the `.unattended.conf` heredoc is QUOTED. This suite is on no bar, so nothing would report it here either.
 tools/unattended/check-pass-order.sh	2	unattended
-tools/unattended/check-pass-order.test.sh	14	memory-tree,unattended
+tools/unattended/check-pass-order.test.sh	5	memory-tree,unattended	FIXTURE-INTERNAL PATHS, not gov's install prefix. This suite builds its own tree with `mkdir -p tools/unattended` and runs the checker inside it, so `tools/` here is that fixture's own layout and is correct at every prefix. TOOL-dRetiredFork-17 swept them to a derived prefix and broke 14 of 19 arms -- the .unattended.conf heredoc is QUOTED, so the config received four literal bytes -- and reverting them is what raised this row 1 -> 14. The suite is on no bar, so nothing else would have reported it.
 tools/unattended/check-playbook.sh	1	run-gates
-tools/unattended/check-playbook.test.sh	37	unattended
+tools/unattended/check-playbook.test.sh	3	unattended
 tools/unattended/check-unattended.sh	3	memory-tree,unattended
 tools/unattended/check-unattended.test.sh	3	memory-tree,unattended
-tools/unattended/cross-component.test.sh	2	unattended
-tools/unattended/kit.toml	2	unattended
-tools/unattended/playbook.fixture.md	2	unattended
-tools/unattended/run-unattended-gates.sh	2	unattended
-tools/unattended/unattended.sh	7	memory-tree,workflows
-tools/unattended/unattended.test.sh	8	memory-recall,memory-tree,unattended
+tools/unattended/cross-component.test.sh	1	(loose)
+tools/unattended/gate-guard.test.sh	63	govkit,memory-tree,run-gates,unattended	WRITTEN BY HAND, TOOL-aDeferredBar-3. FIXTURE-INTERNAL PATHS of a different kind: every literal is the COMMAND STRING an arm feeds the hook — `bash tools/unattended/check-unattended.test.sh`, `GATE_FULL=1 bash tools/run-gates/run-gates.sh` — which are the deny SHAPES under test, not paths the suite runs. The predicate keys on a basename, so a repath would change nothing it grades; withheld from adopters by the kit's `project-owned` rule like its six siblings. RE-KEYED 37 -> 39 by hand at the closing review's F1: the rev-5 `bash -n` and `bash -x` payloads spell the suite's own path as a command string, two more of the same class, and the row was written before that fold in the same commit. RE-KEYED 39 -> 42 at the closing review's F2: the selftest.py deny payload, its check_names token and the --selftest flag control, the same command-string class. RE-KEYED 42 -> 48 at its F7 and F8: four run-shape payloads and their one token check, and the two PowerShell `$env:` payloads, every one a command string fed to the hook. RE-KEYED 48 -> 56 at closing round 2 (R3 R4 R5 R6 R12 R13 R14): the five PowerShell spellings, the seven substitution shapes with the bar or a suite inside them plus the heredoc-body control, the two `timeout` long forms and the `py`/`python3.12` launchers, command strings again; eight new literals for twenty-one arms because most payloads spell the bare fixture name `tools/x.test.sh`, which is one literal each and none for the arms that spell it only in prose. RE-KEYED 56 -> 62 at closing round 3 (T1 T2 T3 T4 T5 T6 T7 T8): twenty-four arms, six new literals, counted from the diff — the three PowerShell `NAME= value` payloads spell the plain bar, and the two `py -3`/`-X utf8` payloads with one token check spell the govkit suite; every other new arm spells the bare fixture name, which the existence filter does not count. RAISED 62 -> 63 BY HAND at the origin/main merge before landing aDeferredBar: cWidenedNet widened this gate's own predicate (7484d8d7) and one fixture-internal command string it had been blind to is now counted; the file did not change.
+tools/unattended/kit.toml	3	codebase-map,unattended	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
+tools/unattended/lib-unattended.sh	1	unattended	one literal, a pointer to `memory/gotchas/empty-field-collapses-unless-it-is-last.md` beside the `read` whose field order that class governs. Gov prose in a gov file. TOOL-aQuenchedHarness-7.
+tools/unattended/run-unattended-gates.sh	6	(loose),run-gates,unattended	the kit runner now delegates to `tools/run-gates/run-selftests.sh` and says so in the budget block that re-declares `BUDGET_kit_gate` against a gov-side reading. TOOL-aQuenchedHarness-4 and -7.
+tools/unattended/unattended.sh	8	lib,memory-tree,workflows	RAISED 7 -> 8 BY HAND at aDeferredBar's closing round 2 (R2, R8): the eighth literal is the `# >>> resolve_python` marker line naming its canonical copy, which every inline copy of that block carries verbatim because the resolver's parity gate compares the block INCLUDING its marker line. Same class as the `lib` literal check-memory-hygiene.sh, run-gates.sh and adopt-lexicon.sh carry for the same block. Not a path the driver reads: the block is inline precisely because `../lib/` does not exist where the driver ships.
+tools/unattended/unattended.test.sh	8	(loose),memory-recall,memory-tree,unattended	RAISED 3 -> 8 BY HAND at aDeferredBar's closing review F3: the SPEC_TOKENS_CLI dispatch arms copy the real checker INTO the scratch fixture at `tools/check-spec-tokens.py`, write the fixture's own `tools/gate-legs.json`, declare that path in the fixture's conf and name a missing `tools/gone.py`. FIXTURE-INTERNAL PATHS, the class the check-pass-order and check-brief-recorded rows record: the fixture tree is built by the suite and the driver under test reads the declaration from that tree, so `tools/` is the fixture's own layout and is correct at every prefix.
+tools/workflows/README.md	4	workflows
 tools/workflows/check-protocol-parity.test.sh	3	memory-tree,workflows
-tools/workflows/check-review-join.sh	3	hooks,workflows
-tools/workflows/check-review-join.test.sh	9	hooks,workflows
+tools/workflows/check-review-join.sh	4	(loose),hooks,workflows
+tools/workflows/check-review-join.test.sh	3	hooks,workflows
 tools/workflows/check-verifier-fanout.sh	3	hooks,workflows
 tools/workflows/check-verifier-fanout.test.sh	1	hooks
 tools/workflows/check-workflow-syntax.js	2	workflows
+tools/workflows/drift-audit-state.js	1	(loose)
+tools/workflows/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/workflows/tier2-review.js	3	hooks,memory-tree,workflows
-tools/workflows/tier2-review.test.sh	1	workflows
-tools/workflows/unattended-build.js	4	hooks,memory-tree,unattended,workflows
-tools/workflows/unattended-build.test.sh	2	hooks,workflows
+tools/workflows/unattended-build.test.sh	8	memory-tree,unattended,workflows	the suite ASSERTS on the sub-workflow's path — an arm greps the trace for `workflow:tools/workflows/tier2-review.js` to prove the spawn happened in the script rather than anywhere else. The literal IS the assertion; deriving it would make the arm agree with whatever the harness did. TOOL-aHoistedPass-6 raised this 2 -> 6, DERIVED at the landing with `bash tools/check-install-prefix.sh --list` rather than predicted in the spec. Four new literals, each of them the assertion itself and not prose about one: two arms name the child workflow the return hands out, and two read `dispatch.args` back for the driver command and the bug-class checklist the caller passes each child. Deriving any of them would make the arm agree with whatever the harness did, which is the reason this row already gives for the two it had. 6 -> 8 at TOOL-aProbedUnit's closing fold (round 2, cluster D): the withheld clean-round hand-out is asserted on the driver command of its resume route and on the child workflow `dispatch.args` still carries, both read back from the return — the literal is the assertion, exactly the class above.

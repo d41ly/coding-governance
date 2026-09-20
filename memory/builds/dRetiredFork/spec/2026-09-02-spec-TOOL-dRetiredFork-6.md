@@ -1,13 +1,16 @@
 # TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
+**Status:** CLOSED · rev-2 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-6-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-6-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-6-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-6-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -22,7 +25,11 @@ which is the argument for taking it rather than a preference about wording.
 ## 2. Scope (IN)
 
 - **S1** — Replace the hand-written ternary in `tools/workflows/drift-audit-code.js` with
-  `livenessOf` and `livenessNote` derived from the run's own counters.
+  `deriveLiveness` and `renderLivenessNote` derived from the run's own counters. NOT inCMS's
+  `livenessOf`/`livenessNote`: gov's lexicon declares no `liveness` verb and its offender pin is
+  shrink-only, so both spellings would red the naming gate. `derive` is declared as "compute a value
+  from a source so it never has to be authored", which is exactly what replacing a hand-written
+  ternary means, and `render` as "turn structure into text".
 - **S2** — The same replacement in `tools/workflows/drift-audit-state.js`.
 - **S3** — A DEAD PROBE assertion: a note derived from counters that cannot move prints DEAD PROBE
   rather than a reassuring zero, which is the property `AGENTS.md` §7 requires of every signal.
@@ -98,6 +105,11 @@ comment text.
 
 - rev-1 · 2026-09-02 · initial draft, from the inCMS `KIT_DRIFT_AUDIT_HARNESS_DELTA` rows on
   `drift-audit-code.js` and `drift-audit-state.js`.
+- rev-2 · 2026-09-03 · built. S1 names the helpers gov's way rather than inCMS's, for the reason
+  `TOOL-dRetiredFork-2` set one unit earlier; the mechanism is unchanged. AC3's RED was observed by
+  reinstating the ternary's fall-through, under which a dead probe renders PARTIAL rather than DEAD
+  PROBE. Recorded because the distinctness arm still PASSED under that break — the two states'
+  counters differ so their sentences differ — which makes the DEAD PROBE arm the load-bearing one.
 
 ## 10. Reuse audit
 

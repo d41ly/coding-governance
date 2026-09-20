@@ -3,5 +3,5 @@
   "event": "PreToolUse",
   "matcher": "Bash|PowerShell",
   "marker": "scratch-guard.js",
-  "hook_path": ".claude/hooks/scratch-guard.js"
+  "hook_path": "{kit}/hooks/scratch-guard.js"
 }

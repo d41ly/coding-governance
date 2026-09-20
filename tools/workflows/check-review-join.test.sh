@@ -11,11 +11,12 @@
 #    repo per assertion.
 #  * `PASS` prints after the LAST arm. Upstream printed it ~150 lines early and landed a red bar
 #    because the head of the output said success.
+KIT_REL="${KIT_REL:-tools/workflows}"
 set -u
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-GATE="tools/workflows/check-review-join.sh"
-SYNTAX="tools/workflows/check-workflow-syntax.js"
+GATE="$KIT_REL/check-review-join.sh"
+SYNTAX="$KIT_REL/check-workflow-syntax.js"
 fails=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -101,12 +102,17 @@ BS="$TMP/badstatus"; mkdir -p "$BS/tools/workflows" "$BS/tools/hooks"
 ( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }
 await log('hi')
-" > tools/workflows/w.js
+" > $KIT_REL/w.js
   printf 'process.exit(3)
 ' > tools/hooks/agent-cap.js
   git add -A && git commit -qm badstatus --no-verify )
-cp "$GATE" "$BS/gate.sh"
-arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./gate.sh' _ "$BS"
+# TOOL-dRetiredFork-10: the gate resolves its predicate RELATIVE TO ITSELF now, so these
+# fixtures place it where an install actually puts it. They previously dropped it at the
+# fixture ROOT and worked only because the gate hard-coded `$ROOT/tools/hooks/` -- the very
+# literal this unit removes. No kit installs a workflow gate at a repository root, so the old
+# shape described a layout that has never existed in any adopter.
+cp "$GATE" "$BS/tools/workflows/gate.sh"
+arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$BS"
 
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
 arm 'an empty scan is not a pass' 'nothing was scanned, which is not a pass' \
@@ -149,11 +155,11 @@ mkdir -p "$D/tools/workflows"
   # tools/, while the syntax gate scans only files carrying the `export const meta` marker. With one
   # plain seed the ignored-file arm below would empty the syntax gate's population and red for the
   # opposite reason to the one it is testing — measured, not guessed.
-  printf 'const x = 1\n' > tools/workflows/seed.js
+  printf 'const x = 1\n' > $KIT_REL/seed.js
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
-    > tools/workflows/seed-workflow.js
+    > $KIT_REL/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
-cp "$GATE" "$D/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+mkdir -p "$D/tools/workflows" && cp "$GATE" "$D/tools/workflows/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
 # TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
 # without one meets the missing-predicate refusal instead of the verdict this arm asserts.
 mkdir -p "$D/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$D/tools/hooks/agent-cap.js"
@@ -164,7 +170,7 @@ const verdicts = {}
 for (const v of all) verdicts[v.ref] = v
 EOF
 arm 'discovery: an UNTRACKED banned join is caught' 'scratch-join.js' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
 cat >"$D/tools/workflows/scratch-workflow.js" <<'EOF'
 export const meta = { name: 'x', description: 'y' }
 const a = (
@@ -176,7 +182,7 @@ arm 'discovery: an UNTRACKED workflow script is parsed' 'SyntaxError' \
 # .gitignore line: both gates must go quiet, or "untracked" would mean "unignorable".
 printf 'tools/workflows/scratch-*.js\n' > "$D/.gitignore"
 arm 'discovery: a git-ignored file is not judged (review-join)' 'clean — no ref-keyed verdict join' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
 arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
   bash -c 'cd "$1" && node ./syntax.js' _ "$D"
 
@@ -186,23 +192,83 @@ arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
 E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
-cp "$GATE" "$E/gate.sh"
+mkdir -p "$E/tools/workflows" && cp "$GATE" "$E/tools/workflows/gate.sh"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
 mkdir -p "$E/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$E/tools/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$E"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$E"
 
 # TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
 # predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
 # assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
 N="$TMP/nohook"; mkdir -p "$N/tools/workflows"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
-  printf "export const meta = { name: 'x' }\nawait log('hi')\n" > tools/workflows/w.js
+  printf "export const meta = { name: 'x' }\nawait log('hi')\n" > $KIT_REL/w.js
   git add -A && git commit -qm nohook --no-verify )
-cp "$GATE" "$N/gate.sh"
+cp "$GATE" "$N/tools/workflows/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$N"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$N"
+
+# ---- ARM 2: the agent wave that silently drops itself (TOOL-dRetiredFork-7) ----------------------
+# Absorbed from inCMS, REDUCED: its arms keyed on that repo's own record ids are left behind, because
+# an arm keyed on a foreign corpus reds on absence rather than on behaviour.
+#
+# Each fixture is a whole scratch TREE, not a lone file, because arm 2's population and its liveness
+# refusal are both properties of the scan, and an explicit file list bypasses the refusal by design.
+a2tree() {  # $1 = dir · $2 = harness body
+  mkdir -p "$1/tools/workflows" "$1/tools/hooks"
+  cp "$ROOT/tools/hooks/agent-cap.js" "$1/tools/hooks/agent-cap.js"
+  printf '%s\n' "$2" > "$1/tools/workflows/h.js"
+  ( cd "$1" && git init -q . && git config user.email t@t.test && git config user.name t \
+    && git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
+}
+
+A2=$(mktemp -d)
+a2tree "$A2/nocount" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter(Boolean)
+return { note: "clean: 0 findings", findings: live }'
+arm 'arm 2: a falsy-dropped wave with NO arity counter is caught' 'never counts them' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/nocount" "$ROOT/$GATE"
+
+# THE FALSY DROP IS A FAMILY, not a spelling. `.filter((r) => r)` walked past the first version of
+# this arm upstream, so it is fixtured here rather than trusted.
+a2tree "$A2/arrow" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter((r) => r)
+return { note: "clean", findings: live }'
+arm 'arm 2: the arrow spelling of the falsy drop is judged too' 'never counts them' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/arrow" "$ROOT/$GATE"
+
+# THE COUNTER NAME IS CAPTURED, NEVER MATCHED. A correct harness whose counter is spelled
+# `deadLenses` rather than `lensesDead` went RED upstream; that regression is fixtured.
+a2tree "$A2/named" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter(Boolean)
+const deadLenses = LENSES.length - live.length
+if (deadLenses) log("dead " + deadLenses)
+return { note: deadLenses ? "PARTIAL" : "clean", dead: deadLenses }'
+arm 'arm 2: an oddly-named counter that IS read passes' 'clean — no ref-keyed' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/named" "$ROOT/$GATE"
+
+# A COUNT COMPUTED AND NEVER CONSULTED is the same silent pass wearing a number.
+a2tree "$A2/unread" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter(Boolean)
+const lensesDead = LENSES.length - live.length
+return { note: "clean: 0 findings", findings: live }'
+arm 'arm 2: a counter computed and never read is caught' 'never reads the count' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/unread" "$ROOT/$GATE"
+
+# S3's LIVENESS REFUSAL: a scanned population that judges NOTHING is not a pass.
+a2tree "$A2/vacuous" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+log(raw.length)'
+arm 'arm 2: agents dispatched but nothing judged REFUSES' 'judged NONE of them' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/vacuous" "$ROOT/$GATE"
+
+rm -rf "$A2"
 
 # ---- verdict, LAST -------------------------------------------------------------------------------
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi

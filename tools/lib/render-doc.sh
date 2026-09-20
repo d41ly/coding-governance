@@ -33,6 +33,14 @@ render_doc() {
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
+  # sits INSIDE the marked block rather than in the callers, so the parity table already gating this
+  # block covers it too — a per-caller transform would be a second duplication nothing compares,
+  # because gov's live copy is written by the parity test and an adopter's by the adopter, so the
+  # two formatters never meet.
+  local rows=${READINESS_ROWS//|/$'
+'- }
+  out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
   printf '%s' "$out"
 }
 # <<< render_doc

@@ -26,13 +26,14 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-exempt-pin: 67
+exempt-pin: 68
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBoundedVerdict/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBranchedMandate/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aCandidStub/README.md - predates the contract; drains when its build's owner conforms it
+!memory/builds/cRefutedPremise/README.md - CLOSED at landing, so the header's terminal rule applies: its two judgement slots are forward-looking and cannot be honestly authored after the build closed
 memory/builds/aCollapsedScan/README.md
 !memory/builds/aDeclaredBound/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aDeclaredCeiling/README.md - predates the contract; drains when its build's owner conforms it
@@ -73,6 +74,7 @@ memory/builds/aThawedCorpus/README.md
 !memory/builds/aTimedTurnstile/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aUnmannedHelm/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aWalkedCorpus/README.md - predates the contract; drains when its build's owner conforms it
+memory/builds/aWeighedCompass/README.md
 !memory/builds/aWireWarden/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aWrittenMethod/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/bConvergentLodestar/README.md - predates the contract; drains when its build's owner conforms it
@@ -111,9 +113,37 @@ memory/builds/aGradedMandate/README.md
 memory/builds/aProvenReuse/README.md
 memory/builds/aClosedDocket/README.md
 memory/builds/dMispairedQuote/README.md
+memory/builds/aTunedCompass/README.md
 !memory/builds/aUnblockedFleet/README.md - registered BOUND by commit 655fffc5 without measuring the slots, so three of them (problem 1893/900, improvements 719/500, rules 3802/1800) have reddened the leg ever since. That run is PARKED at phase BUILDING, not closed, so this row is a temporary unblock and drains when that run resumes and trims the three slots.
 memory/builds/dBriefedPass/README.md
 memory/builds/dGaugedVintage/README.md
 memory/builds/dFoldedVerdict/README.md
 memory/builds/dRetiredFork/README.md
+memory/builds/dRatifiedSeam/README.md
+memory/builds/dSealedTally/README.md
+memory/builds/aSurfacedLexicon/README.md
+memory/builds/aStagedLane/README.md
+memory/builds/aHoistedPass/README.md
+memory/builds/aHonedRuleset/README.md
+memory/builds/aWeldedTribunal/README.md
+memory/builds/dTracedLattice/README.md
+memory/builds/aKeyedAnnotation/README.md
+memory/builds/aWeighedCanon/README.md
+memory/builds/aJoinedCanon/README.md
+memory/builds/aQuenchedHarness/README.md
+memory/builds/aPooledSweep/README.md
+memory/builds/aReapedSpinner/README.md
+memory/builds/aGradedDialect/README.md
+memory/builds/aLeakedHandle/README.md
+memory/builds/dMuffledSentinel/README.md
+memory/builds/dPolishedVitrine/README.md
+memory/builds/cGradedDebt/README.md
+memory/builds/cSpliceWarden/README.md
+memory/builds/aReplayedCard/README.md
+
+memory/builds/cWidenedNet/README.md
+memory/builds/aRatifiedRulings/README.md
+memory/builds/aProbedUnit/README.md
+memory/builds/aDeferredBar/README.md
+memory/builds/dMergedTally/README.md
 memory/builds/aProbedToolkit/README.md

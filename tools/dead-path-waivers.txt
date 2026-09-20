@@ -52,3 +52,7 @@ tools/memory-tree/check-memory-hygiene.test.sh	1	for p in MEMORY.md IN-FLIGHT.md
 tools/memory-tree/check-memory-hygiene.test.sh	1	{ printf '# ARCH status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/STATUS.md	fixture builds an over-long STATUS.md for the size arm
 tools/memory-tree/check-memory-hygiene.test.sh	1	chit 6 'memory/builds/tLong/STATUS.md'	positive arm: check 6 hits the banned STATUS.md
 tools/memory-tree/check-memory-hygiene.test.sh	1	cnot 6 'memory/builds/tLong/STATUS.md'	negative arm: check 6 does NOT hit it once retired
+tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"tools/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"scripts/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"path": "scripts/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"source": "tools/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification

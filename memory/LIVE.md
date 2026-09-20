@@ -16,10 +16,13 @@ terminal status. Nothing here is edited by hand.
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |
+| [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
+| [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 |
+| [dPolishedVitrine](builds/dPolishedVitrine/README.md) | INPROGRESS | d | 2026-09-12 | tooling+deployer | 19 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 |
-| [dRetiredFork](builds/dRetiredFork/README.md) | OPEN | d | 2026-09-02 | tooling+deployer | 30 |
+| [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |

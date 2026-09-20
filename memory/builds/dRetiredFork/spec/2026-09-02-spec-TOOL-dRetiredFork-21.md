@@ -1,12 +1,15 @@
 # TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4 · ratified 2026-09-02
+**Status:** CLOSED · rev-2 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 4 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-21-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-21-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-21-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-21-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 |
 
 <!-- /gen:spec-records -->
 
@@ -135,6 +138,28 @@ own descriptors in the first place.
 **RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
+
+- rev-2 . 2026-09-03 . BUILT, and TWO of six scope items were already delivered by
+  `TOOL-dRetiredFork-14` one unit earlier. S1 is DONE: both fragments carry a `{kit}` token expanded
+  against THE FRAGMENT'S OWN LOCATION, which is stronger than the `{prefix}` this spec asked for
+  because it is correct for a repo whose kits sit at more than one prefix.
+
+  **AC3's answer, recorded as the criterion requires: the repath DOES rewrite a fragment-supplied
+  path.** `merge()` takes the fragment, `resolve_hook_path()` expands its token, and a command whose
+  marker matches but whose path differs is rewritten in place. So S1's edits are sufficient for an
+  already-wired tree, and the permissive reading is the one that shipped.
+
+  S2 was the live find: `adopt-memory-recall.sh --with-hook` still did `mkdir -p .claude/hooks` and
+  copied into it, re-creating the exact duplicate the previous unit withdrew, with a closing line
+  naming it. It now copies NOTHING -- the hook already ships in the kit dir -- and names the path
+  that actually exists.
+
+  S4's gate quantifies over two populations because one is not enough: the fragments, and the
+  ADOPTER SCRIPTS. A gate over declarations alone would have passed the whole time that installer
+  was re-creating the withdrawn copy, since it reads no fragment. All five arms were observed RED
+  before wiring, including the empty-population refusal.
+
+
 
 - rev-1 · 2026-09-02 · initial draft. PROMOTED from spec-audit round 2 blocker 5 under BUILD-METHOD
   M4's disposition rule. Both fragment values, `tools/settings-merge.py:286` and the

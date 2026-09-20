@@ -56,10 +56,20 @@ when the primary tree is back on the default branch, or verify the boundary's ob
 run the full bar with every switch the boundary would have set, and say in the landing report which
 hook actually ran.
 
-**A gate on this is possible and is not written.** `check-wiring.sh` already resolves
-`core.hooksPath`; it could compare the resolved directory's blob against the tracked one at HEAD and
-report a mismatch. That is a check about the OPERATOR's environment rather than the tree, which is
-why it is worth stating as a documented check here first.
+**A check on this IS WRITTEN, as of `TOOL-aWeldedTribunal-7`, 2026-09-04.** `tools/check-wiring.sh`
+check H compares the resolved `pre-commit` and `pre-push` against this tree's tracked blobs and
+reports a divergence naming both hashes, the resolved path, and the branch the supplying checkout is
+on. A hook this tree does not TRACK prints a `skip` rather than a finding.
+
+**It reports at `note` severity and not as a wiring failure, and that is a decision.** The reasoning
+is at the call site in `tools/check-wiring.sh`, beside the list it acts on, and is deliberately not
+repeated here: this record owns the CLASS, the call site owns why this instance takes the severity
+it takes. The two used to carry the same paragraph word for word.
+
+The severity matters because `.unattended.conf` makes that check an unattended run's precondition,
+so redding here would refuse a run for a sibling checkout's branch. That path is named rather than
+paraphrased: trimming the duplicated paragraph took this record's only anchor to it, which silently
+stopped the class routing to diffs that touch it.
 
 ## Related
 
@@ -77,8 +87,11 @@ What replaces it is a **documented check**, run at the landing boundary and nowh
 `core.hooksPath`, resolve the branch of the checkout it points into, and say in the landing report
 which hook ran. A landing report that does not name it is a report that assumed it.
 
-The nearest thing to a gate is `tools/check-wiring.sh`, which already resolves `core.hooksPath` and
-already runs at SessionStart — it could compare the resolved directory's `pre-push` against the
-tracked blob at HEAD and report a mismatch. That is opened as a backlog item rather than written
-here, because a check whose subject is the operator's environment needs a decision about whether it
-reds or reports, and this record is not the place to take it.
+`tools/check-wiring.sh` now does exactly this, at SessionStart and on `--check`, over both tracked
+hooks. What it does NOT do is PREVENT the divergence: a push made after the report still runs the
+other checkout's hook, and closing that window needs a refusal inside the hook itself — which is a
+separate decision about what the push boundary REFUSES, and is a filed follow-up rather than
+something this record should imply is done.
+
+So the landing-boundary documented check below still stands. The report tells you which hook will
+run; it does not make the right one run.

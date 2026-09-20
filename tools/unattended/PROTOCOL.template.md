@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.15 -->
+<!-- gov:kit unattended@1.24 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -220,10 +220,16 @@ belonging here:
     before recording. A single `ABORTED` terminal says a run stopped and never why; the parked reason
     is prose for the owner, and this is the field the status line, the resume path and the gate leg
     join on. Present only on an aborted record, under facts 10 and 11's reading.
+13. **The run's local branch ref**, the value of `git symbolic-ref HEAD` at preflight, recorded by
+    `--preflight` on BOTH anchors and pinned once. Fact 10 is not this: it is the ref the REMOTE
+    advertised and is absent on a default-branch run, so a reader keying on it alone sees no branch
+    for the protocol's primary anchor. This is the fact the `gate-guard` hook keys a live run to the
+    branch a tool call is made on; a record written before it existed is keyed by fact 10 instead.
 
 Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
 default-branch run for the first two, a run that did not abort for the third. That is legal: the
-"nothing else" clause bounds what may appear, not what must. Fact 9 is always written.
+"nothing else" clause bounds what may appear, not what must. Fact 9 is always written, and fact 13
+whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there.
 
 **A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
 none could plus what independently verifies the value. A hand-reconstructed fact carrying no such
@@ -331,11 +337,11 @@ something no machine could have checked:
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED, and that is the whole predicate: the bypass-flag grep it carried duplicated leg check 11 and is gone. It runs inside `--close`, BEFORE the landing it names, so it cannot observe the push nor fail for anything the run did. The observation lives in `--landed`, the only verb after it |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. SIX terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all |
-| `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures TWO things and neither is a judgement about the review's content: that a review of what shipped exists and is bound to THIS run, and that the run's own `--review` loop for the build slug reached one of its three declared exits, with `CONVERGED` implying zero blockers. A review record is a document; a loop that never ended is a run that stopped reviewing, and only the second is readable |
+| `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures TWO things and neither is a judgement about the review's content: that a review of what shipped exists and is bound to THIS run, and that the run's own `--review` loop for the build slug reached a declared exit, with `CONVERGED` implying zero blockers. A review record is a document; a loop that never ended is a run that stopped reviewing, and only the second is readable |
 | `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
 | `set-checks-recorded` | machine | every set-scoped check the playbook declares recorded a PASS for THIS run's set. It reads the VERDICT and not merely its existence — a set check is a declared leg with a binary anchored verdict, unlike the prose review `closing-review-recorded` can only assert the existence of. Same mode scoping |
 | `specs-audited` | machine | every unit the generated region carries as CLOSED is named by a TRACKED record under this build whose first twelve unfenced lines carry a `**Serves:**` line of kind `spec-audit`. The id join is WHOLE-TOKEN and expands the `N..M` range the binding grammar admits: a substring join lets `TOOL-x-19` satisfy `TOOL-x-1`, and an unexpanded one blocks a unit that WAS audited. It measures that the pre-code pass left evidence; it does not read what the audit found, whether it ran at the unit's current rev, or whether a WONTDO unit was audited — a LOWER bound, safe as a refusal and useless as a certificate |
-| `reuse-probed` | machine | a recall probe actually RAN in this run's tree — the liveness half of `reuse-first`, whose tracked half is whatever the memory kit demands of a spec's reuse section. Five outcomes, three of them MET: the directive was WAIVED, and the item reports the waiver and its reason, which is what stops a waiver being silent; `RECALL_CLI` is blank or unreadable, an announced skip, because a core item no adopter without a recall kit could meet would block every close in their fleet; or queries are recorded, and the count rides the message. UNMET splits the two facts an operator must not confuse: the log is ABSENT, so the item cannot answer, versus the log exists and holds nothing for this tree, so the probe was not run. It is NOT a merge-bar leg and cannot be one — the query log lives in the git common dir, is neither tracked nor pushed, and a leg reading it in a fresh clone could only report DEAD PROBE. What it does not observe: that the probe was run FOR this build rather than earlier in the same worktree |
+| `reuse-probed` | machine | a reuse probe actually RAN in this run's tree — the liveness half of `reuse-first`, whose tracked half is whatever the memory kit demands of a spec's reuse section. It reads EVERY declared probe log: `RECALL_CLI`'s query log and `MAP_CLI`'s lookup log, which are the build method's M5 pair, and the count it reports names each half. Five outcomes, three of them MET: the directive was WAIVED, and the item reports the waiver and its reason, which is what stops a waiver being silent; NEITHER CLI is declared or readable, an announced skip, because a core item no adopter without those kits could meet would block every close in their fleet; or rows are recorded, and the per-log counts ride the message. A log counts only where its own CLI is declared, so an undeclared kit's stray log is never mistaken for evidence. UNMET splits the two facts an operator must not confuse: every declared log is ABSENT, so the item cannot answer, versus a log exists and holds nothing for this tree, so the probe was not run. It is NOT a merge-bar leg and cannot be one — these logs live in the git common dir, are neither tracked nor pushed, and a leg reading them in a fresh clone could only report DEAD PROBE. What it does not observe: that the probe was run FOR this build rather than earlier in the same worktree |
 | `keepalive-reaped` | agent-attested | the scheduled keepalive was deleted — written by `--attest <slug> --item keepalive-reaped` |
 | `parked-decisions-surfaced` | agent-attested | every parked entry reached the wrap-up — written by `--attest <slug> --item parked-decisions-surfaced`, which DERIVES the record key (`parked-surfaced:`) so no operator spells one. **The value MAY carry a count** via `--value`, and then `--close` refuses unless it equals the number of `surfaced`-class parked lines — "I surfaced them" becomes "I surfaced N, and the record holds N". Still agent-attested: no machine observes a wrap-up. Omitting the count keeps the old behaviour, so an older record is not retroactively red. The overrides this same `--close` is about to write are excluded, because the DoD is evaluated before they land |
 
@@ -450,6 +456,8 @@ where this document says it may:
 | `BYPASS_BAN` | the flag the close path must never emit |
 | `GATE_CMD` | the full merge bar, for `gates-green` |
 | `GATE_BOUND` | the wall-clock bound, in seconds, on `GATE_CMD` and `WIRING_CHECK`. OPTIONAL: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
+| `UNIT_STALL_BOUND` | the idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when both the newest write in the tree and the newest commit are older than it. OPTIONAL, on `GATE_BOUND`'s terms: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
+| `REVIEW_ROUNDS` | the round bound a spec-audit subject — any `--review` subject that is not the build slug — takes before it exits `BOUNDED`; the build slug is the closing diff review and keeps the runaway ceiling. OPTIONAL, on `GATE_BOUND`'s terms: absent takes the kit default of 1 and says so on stderr; non-numeric or zero is a refusal, and so is a value at or above the runaway ceiling, because the ceiling would fire first and the declared bound could never be reached |
 | `WIRING_CHECK` | the non-repairing wiring check `--preflight` delegates to |
 | `KEEPALIVE_CREATE` · `KEEPALIVE_DELETE` | the agent-facing scheduler tool calls, named for the agent to use |
 | `KEEPALIVE_INTERVAL` | the cadence the agent schedules the keepalive at, rendered into the Skill as prose |
@@ -461,15 +469,19 @@ where this document says it may:
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
-| `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `KICKOFF_EXITS` | a shrink-only floor on the interactive exits section 13 of THIS contract enumerates |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
+| `PASS_ORDER_WAIVER` | where that leg's waiver registry lives, repo-relative. BLANK keeps `<MEMORY_ROOT>/project/pass-order-waiver.txt`; a DECLARED path must be tracked at HEAD or the leg refuses |
+| `BRIEF_RECORDED_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT carries no usable `brief · item <id>` row reds the `brief-recorded` leg — usable meaning the LAST such row's twelve-hex hash still joins to a tracked file at that same commit. Graded on the README's `opened:` date. The anchor is the build commit and NOT its first parent, unlike the sibling above: `--brief` STAGES its row, so the row lands in the same commit as the pass, and a first-parent anchor would red the CONFORMING runs. The two terms are jointly satisfiable — a spec in an earlier commit, the brief row alongside the code. Only a unit built while its run was LIVE is graded: one whose build commit carries a run-state record already in a terminal phase was built outside any run, and is announced by id and not graded, provided HEAD still carries that record's base, phase and witness and no later commit naming the unit and touching a path outside the record surface was made while a run was live, where the unit is graded instead. BLANK turns the term OFF and the leg announces it |
 | `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. A DECLARATION rather than a path in the driver, because a kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the carried-prefix ratchet reds on exactly that |
+| `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. A DECLARATION rather than a path in the driver, for the same reason its sibling is one. Until it existed the map log was a write-only surface: the unit that specced this reader shipped the logger and not the reader, and its acceptance ledger recorded a gate accepting a declaration that was nowhere in the product |
+| `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. The checker gov declares is gov-internal, at its tool root, and no kit ships it; the key is filled only where a project carries its own. Declared because the checker's own bar leg grades LIVE specs and an unattended build closes every unit spec in its build commit, so the dispatch is the one point that sees a spec while it can still change (aDeferredBar closing review F3) |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
@@ -519,6 +531,13 @@ ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`
 an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
 run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
 And a run that gets one push past all of that, after which the remote's advertisement is genuine.
+And a run that rewrites the harness child's prompt between dispatches, which the fan-out guard's
+re-read does not reach: it feeds the burst rules and the join rule and nothing else, so a second
+`agent()` carrying any prompt admits. And a run that never calls `--dispatch` or `--brief` at all,
+since both are acts a run performs rather than gates a run meets, and the history legs that grade
+them afterwards grade only what a CLOSED unit's build commit carries. And a run that stops early
+with units unbuilt, since completeness rests on `build-complete` at `--close` alone and its escape
+is a recorded `--override`.
 
 **What actually binds.** None of those levers travels with a push. The same leg, re-run in a clone
 the run never touched by a party the run cannot execute code as — a required status check, or a
@@ -633,13 +652,20 @@ is a different reader. The failure is what you would predict: a unit built befor
 spec written afterwards, and no record of what the builder was handed.
 
 **The route is the kit's build harness**, taken in `prompt` and `slug` mode. It drives SPEC, AUDIT
-and BUILD as stages of ONE program, so BUILD is unreachable except through both and on a TERMINAL
-`--review` verdict. Recipe mode does not take it: its pieces are not specs.
+and DISPOSAL as stages of ONE program, and hands out the ordered roster only on a TERMINAL
+`--review` verdict. What the program holds is that the ROSTER IS NOT HANDED OUT EARLY — not that the
+build is unreachable early, which it never was: a run that ignores the roster can still build, and
+nothing inside a Workflow script can stop it. Recipe mode does not take it: its pieces are not specs.
 
 **TWO LIMITS, as rules rather than caveats, because a reader who assumes them away trusts the harness
 for what it cannot do.** It buys ORDER and never ENFORCEMENT — a Workflow script has no filesystem,
 so every observation it makes is a claim its own agent returned, and what refuses is `--dispatch` at
-the moment of the act and the pass-order leg over the commit graph. And it does not cover
+the moment of the act — on a MISSING or a THIN unit, and on no other state of a unit — and
+the pass-order leg over the commit graph afterwards, which refuses spec-after-code for CLOSED units.
+Enforced TWICE because the first half is bypassable by simply not calling the verb, and only the
+commit graph remembers the order. Those two states are the whole of what the verb inspects, and it
+accepts a second declaration for a unit it has already seen, so nothing there backstops the loop.
+And it does not cover
 orientation, preflight, the owner turn, closing, landing or the keepalive: those are main-loop acts,
 and the run-state file joins the two halves.
 
@@ -647,3 +673,20 @@ and the run-state file joins the two halves.
 answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusal reachable on a
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
+
+## 13. The kickoff engine's interactive exits
+
+Moved from the engine's Step 5b (`TOOL-aHonedRuleset-3`); the engine keeps a pointer.
+**A run that still stops at any of these is not unattended, it is stuck:**
+
+1. **Step 0 · ambiguous worktree parent** → the checkout holding the default branch; still
+   ambiguous → ABORT and record why.
+2. **Step 0 · no git anywhere** → ABORT: there is nothing to land into.
+3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
+   conventions) → ABORT and record the condition verbatim; continuing is how a run destroys work.
+4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold; proceed generically and park the
+   offer for the owner's wrap-up.
+5. **Step 3 · a field that cannot be derived** → park the question, options and reason; proceed on
+   the most conservative reading; ACCEPTANCE or GATES unfillable → ABORT: not Ready, and an unattended
+   run cannot split it.
+6. **Step 5 · the READY stop** → replaced by the hand-back, the ONLY replacement the mandate buys.
