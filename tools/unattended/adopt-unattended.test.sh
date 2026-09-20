@@ -75,6 +75,17 @@ KICKOFF_EXITS=""
 PHASES_EXTRA=""
 DOD_EXTRA=""
 EOF
+  # ONE COMMIT, SO HEAD IS BORN (TOOL-aWokenSentinel-14). Two later arms borrow this seed for a
+  # fixture the driver's `--liveness` reads, and its clock block marks `git log -1 --format=%ct`
+  # DEAD on the empty answer an unborn HEAD gives, so every borrowing arm was red for a reason it
+  # could not name. Null global and system config, the kit's own seed idiom in
+  # check-playbook.test.sh: a nested `git init` never reads the enclosing checkout's config, but it
+  # DOES read the machine's, and `commit.gpgsign=true` there fails the commit outright — this repo's
+  # `fixture-inherits-ambient-machine-state`. A failing commit is the seed's own loud refusal, never
+  # a quiet subshell exit that leaves HEAD unborn: `borrowed-seed-inherits-its-head-state`.
+  ( cd "$1" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
+      && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git commit -q -m seed ) \
+    || { echo "FAIL seed: the fixture commit did not land in $1"; exit 2; }
 }
 
 # The adopter's --check honours GOV_SETTINGS_JSON (aDeferredBar closing review F5), so every --check

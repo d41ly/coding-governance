@@ -67,7 +67,7 @@ research record under `build/`.
 | 11 | `TOOL-aWokenSentinel-11` | CLOSED | a kit-gate check that the driver holds ONE derivation of the sidecar root, `resolve_sidecar_dir`, so a second `rev-parse --git-dir` spelling reds the bar for every unit (audit H3) |
 | 12 | `TOOL-aWokenSentinel-12` | PLANNED | the tick consults login BEFORE it kills: a logged-out node kills nothing, observed by an arm whose live process survives, and the class left-shifted to `memory/gotchas/` (audit H4) |
 | 13 | `TOOL-aWokenSentinel-13` | PLANNED | the tick sources the root `.unattended.conf` into its own shell before its `read_bound_key` calls, so a declared bound is honoured and the NOTE names the file; arms under a declared key (audit H5) |
-| 14 | `TOOL-aWokenSentinel-14` | PLANNED | `seed()` in `adopt-unattended.test.sh` commits once, so every fixture that borrows it has a born HEAD and `--liveness`'s `git log` probe is live; the class left-shifted to `memory/gotchas/` (audit H6) |
+| 14 | `TOOL-aWokenSentinel-14` | CLOSED | `seed()` in `adopt-unattended.test.sh` commits once, so every fixture that borrows it has a born HEAD and `--liveness`'s `git log` probe is live; the class left-shifted to `memory/gotchas/` (audit H6) |
 | 15 | `TOOL-aWokenSentinel-15` | PLANNED | the spec-audit commission's blob-pin pre-flight: the harness's resolver returns each subject's committed blob and working-tree hash, and refuses to dispatch a lens while any differ (audit round 2 B1, B2) |
 | 16 | `TOOL-aWokenSentinel-16` | PLANNED | `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch, with the no-ff fixture arm that is RED today (audit round 2 H1; `TOOL-dUnstalledConvoy-38`) |
 | 17 | `TOOL-aWokenSentinel-17` | PLANNED | the driver suite reads `--status` by FIELD: `extract_next` armed on a suffixed line and `check_status_one_line` armed against a two-line driver copy (audit round 2 H2, H3) |
@@ -99,7 +99,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | CLOSED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-11 — a kit-gate check that the driver holds ONE derivation of the sidecar root](spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md) | 4 | 2 | CLOSED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-20 |
+| [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-20 |
 | [TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch](spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 8 | 2 | SPECCED | rev-3 | 2026-09-20 |
@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 39 bound to this build, across 4 record folder(s).
+Records: 40 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

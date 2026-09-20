@@ -25,6 +25,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [armed-but-unreachable-rule](armed-but-unreachable-rule.md) | class | 4 |  | a declaration can be non-empty, well-formed and still impossible to violate — testing that a rule EXISTS is not testing that it can FIRE |
 | [assertion-between-two-derived-values](assertion-between-two-derived-values.md) | class | 4 |  | a check comparing two values the same code derives from one source is a tautology, and it arms cleanly |
 | [bash-c-multiline-flattens-under-msys](bash-c-multiline-flattens-under-msys.md) | class | 4 |  | a multi-line script handed to `bash -c` from a Windows python re-parses as one line under the MSYS layer, and a backslashed `C:\` path handed to MSYS bash loses its separators, so a probe that works in a shell fails from a subprocess with an error naming neither cause |
+| [borrowed-seed-inherits-its-head-state](borrowed-seed-inherits-its-head-state.md) | class | 3 |  | a fixture built from another suite's seed inherits that seed's HEAD state, and a probe that reads HEAD is dead on an unborn one |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 7 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [check-format-grades-two-populations](check-format-grades-two-populations.md) | class | 3 |  | the build README slot gate binds every tracked README on one axis and only the declared ones on the other, so a new folder can red on a rule its author never opted into |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 6 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
@@ -85,6 +86,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [waiver-row-that-hides-nothing-reds](waiver-row-that-hides-nothing-reds.md) | class | 3 |  | a curation-debt row whose file would pass unwaived is itself a failure, and check 8's population is the backlog shards alone — so a row listed for a fault it does not earn reds instead of protecting |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-70 record(s): 70 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+71 record(s): 71 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

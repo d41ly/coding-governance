@@ -91,3 +91,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T18:09:27Z dispatch · item 85c7761f TOOL-aWokenSentinel-11 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-11-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-20T18:09:33Z brief · item TOOL-aWokenSentinel-11 · reason 1c07e4bd7420 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-11-1-build-brief.md
+
+2026-09-20T18:28:17Z dispatch · item 807a39b4 TOOL-aWokenSentinel-14 · reason tools/unattended/adopt-unattended.test.sh memory/gotchas/borrowed-seed-inherits-its-head-state.md memory/gotchas/INDEX.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-14-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-20T18:28:22Z brief · item TOOL-aWokenSentinel-14 · reason 9c8b61f42a08 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-14-1-build-brief.md
