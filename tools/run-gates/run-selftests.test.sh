@@ -140,6 +140,12 @@ build_repo() {
   # argv — so `--kit tools/attr/<file>.sh` selects exactly that suite and no arm pays for the rest.
   # A shared suite mutated per arm would make every arm's cost the population's cost.
   #
+  # THE NAMES BELOW MUST STAY MUTUALLY NON-PREFIXING, because a substring filter is exactly the
+  # id-matched-as-a-substring shape: `deadl.sh` must not select `deadl9.sh`, and `both.sh` must not
+  # select `deadboth.sh` — the `.sh` and the `/` in front are what keep each one alone today. A
+  # filter that matched two suites would move the counts, and one that matched none REFUSES, so
+  # either mistake is loud; a new suite named as another's prefix is the way to make it quiet.
+  #
   # THE ROWS ARE NOT IN L'S DECLARATION. They sit in `rows.txt` and each attribution arm appends
   # them, which leaves the declaration the arms above this line read BYTE-IDENTICAL: the derived
   # run-wall arm computes its number from the budgets present, so two extra rows would red an arm

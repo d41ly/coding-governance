@@ -884,6 +884,11 @@ if [ -n "$ATTRIBUTE" ]; then
   # ---- unit that caused it — the blocker this repo's own attribution critique ranked first. A
   # ---- varying value the normaliser does not know reads NEW, which is the direction that fails
   # ---- toward noise rather than toward a false pass.
+  # ----
+  # ---- ONE KNOWN SOURCE OF THAT NOISE, named so a reader does not re-diagnose it: the R worktree
+  # ---- is a FRESH checkout, so on this platform it lands CRLF on every path `.gitattributes` does
+  # ---- not pin. A suite that reads such a file can differ between R and L for the line endings
+  # ---- alone, and that difference reads NEW. It is the safe direction and it is still noise.
   attr_rx() { printf '%s' "$1" | sed 's,[][(){}.*+?^$\\|],\\&,g'; }
   attr_spellings() { # one absolute root -> forward-slash, backslash and MSYS /c/ spellings
     local r=$1 d rest
@@ -985,12 +990,25 @@ if [ -n "$ATTRIBUTE" ]; then
       fi
       ckey=$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_')
       cfile="$CACHE_ROOT/$ckey.$rblob.fails"
+      # AN UNREADABLE CACHE ENTRY IS A MISS, NOT A ZERO. Defaulting its status to 0 would fabricate
+      # a clean R run out of a file that says nothing, and a clean R is exactly what suppresses the
+      # DEAD PROBE at R that a corrupt entry cannot rule out — the fallback-fabricates-the-passing-
+      # value class. Re-measuring costs one run; believing it costs the verdict.
+      cachehit=0
       if [ -r "$cfile" ]; then
-        src=cached
         rrc=$(sed -n '1s/^rc //p' "$cfile")
-        case "${rrc:-}" in ''|*[!0-9]*) rrc=0 ;; esac
+        case "${rrc:-}" in
+          ''|*[!0-9]*)
+            echo "run-selftests: the cached baseline for '$name' carries no readable exit status, so it" >&2
+            echo "run-selftests: is re-measured rather than read as a clean run at $R8" >&2 ;;
+          *) cachehit=1 ;;
+        esac
+      fi
+      if [ "$cachehit" = 1 ]; then
+        src=cached
         sed -n '2,$p' "$cfile" > "$ATTR_TMP/r.set"
       else
+        rrc=0
         src=fresh
         attr_worktree || exit 2
         rs=$(date +%s)
