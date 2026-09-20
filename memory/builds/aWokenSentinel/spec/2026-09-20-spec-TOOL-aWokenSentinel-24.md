@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-prompt-TOOL-aWokenSentinel-24-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-24-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 |
 
 <!-- /gen:spec-records -->

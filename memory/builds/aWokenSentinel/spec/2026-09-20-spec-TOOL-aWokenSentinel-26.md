@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-prompt-TOOL-aWokenSentinel-26-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-26-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

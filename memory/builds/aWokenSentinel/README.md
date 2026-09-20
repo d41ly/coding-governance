@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aPrimedKeepalive aProbedUnit
 authorized-by: prompt
-ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28
+ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aWokenSentinel-29 TOOL-aWokenSentinel-30
 ---
 
 # aWokenSentinel — a keepalive that lives outside the failure domain of the run it keeps alive
@@ -37,14 +37,14 @@ research record under `build/`.
 
 ## Build-level rules
 
-- **Every unit ships to adopters through its kit.** A change to a rendered or copy-installed file lands in the template AND its render in one commit.
-- **Failure-domain rule.** A mechanism is only counted as covering a stall class when it does not share the stalled session's process, event loop or account for that class. This is the research record's ranking rule and the reason the cron job is demoted rather than fixed.
-- **No self-test suite runs inside a pass.** A pass observes the single arm or the staged break; `run-unattended-gates.sh` runs once, at the close, on a frozen clone, and from unit 21 on `run-selftests.sh --kit tools/workflows` runs beside it there for the harness suite's leg.
+- **Every unit ships to adopters through its kit.** A rendered or copy-installed file lands in the template AND its render in one commit.
+- **Failure-domain rule.** A mechanism covers a stall class only when it shares none of the stalled session's process, event loop or account for that class; the research record's ranking rule, and why the cron job is demoted rather than fixed.
+- **No self-test suite runs inside a pass.** A pass observes the single arm or the staged break; `run-unattended-gates.sh` runs once at the close on a frozen clone, with `run-selftests.sh --kit tools/workflows` beside it from unit 21 on.
 - **Vocabulary changes land in every carrier in one commit**: driver, leg, VERBS, SKILL, protocol, conf and its example.
-- **The CLI token is the owner's**, minted out of band; unit 5 ships inert until registered and reports an absent login as an announced skip, never a pass.
-- **Classification at open**: all MISSING; specced by the harness's SPEC stage from the briefs under `prompts/`. Unit 7 was ADDED after preflight by `--rescope`, on the measured `session_crons` field.
-- **Spec audits disposed by severity (M4), 2026-09-20, four rounds** over units 1-7, 8-14, 15-20, 21-24: every BLOCKER and HIGH PROMOTED by `--rescope --act add` into units 8-14, 15-20, 21-24, 25-28, one per defect (round 4's H3-H5 share one); every MEDIUM and LOW FOLDED as a rev-N bump. None parked, waived, retired or re-reviewed.
-- **The promotion cascade has no generation bound**: 7, 6, 4 and 4 units per round, and round 4 did not decay; recorded for the owner, the run invents no bound. Round 3 swapped orders 7 and 17.
+- **The CLI token is the owner's**, minted out of band; unit 5 ships inert until registered and reports an absent login as an announced skip.
+- **Classification at open**: all MISSING; specced from the briefs under `prompts/`. Unit 7 ADDED after preflight by `--rescope` on the measured `session_crons` field.
+- **Four spec-audit rounds disposed by severity (M4), 2026-09-20**: every BLOCKER and HIGH PROMOTED into units 8-14, 15-20, 21-24, 25-28, one per defect; every MEDIUM and LOW FOLDED. Round 3 swapped orders 7 and 17.
+- **The cascade stopped at generation four as M4's CEILING (TOOL-aWokenSentinel-29).** Generations promoted 7, 6, 4, 4; the fourth did not shrink. Units 25-28 build from their disposal-authored specs with no fifth audit; the method defect is TOOL-aWokenSentinel-30.
 
 ## Parked decisions
 
@@ -90,7 +90,7 @@ research record under `build/`.
 **Build status:** SPECCED · 28 unit(s) · node a · opened 2026-09-16 · streams tooling
 ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13
 ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25
-ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28
+ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aWokenSentinel-29 TOOL-aWokenSentinel-30
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -125,9 +125,9 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 4 record folder(s).
+Records: 35 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28.
 <!-- /gen:build-index -->
