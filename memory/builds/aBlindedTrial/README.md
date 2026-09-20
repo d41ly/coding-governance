@@ -64,7 +64,7 @@ ids TOOL-aBlindedTrial-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | INPROGRESS | rev-2 | 2026-09-20 |
+| [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | INPROGRESS | rev-3 | 2026-09-20 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

@@ -1,6 +1,6 @@
 # TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial
 
-**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-1 · base d46d3ccb · streams tooling+playbook · order 1 · ratified 2026-09-20
+**Status:** INPROGRESS · rev-3 · 2026-09-20 · node a · Tier-1 · base d46d3ccb · streams tooling+playbook · order 1 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
@@ -37,7 +37,11 @@ same briefs are built under three regimes and graded blind.
   by AC5, AC6.
 - S6 — Grading: hidden-suite pass rate split by certainty tag; blind find→refute review per script
   with confirmed defects by severity; adherence judges over the S specs and P plans; non-blank lines
-  of code; output tokens per arm attributed from the agent transcripts. Observed by AC7, AC8, AC9.
+  of code; output tokens per arm attributed from the agent transcripts; and an edge-probe
+  convergence measure — per task, one probe script written blind from the brief and the suite
+  author's open-point list fingerprints every implementation's behaviour on each open point, so the
+  record can say how many distinct behaviours the nine tools show and whether the arms differ in
+  within-arm agreement. Observed by AC7, AC8, AC9, AC11.
 - S7 — One build record carrying the tables, the derivation of every figure, and the verdict.
   Observed by AC10.
 
@@ -159,6 +163,11 @@ one-file tools and the record says exactly that.
 - **AC10** — When the build record is written, every figure in it names the `results/*.json` key or
   the command that derives it, and the verdict states the trial's own token cost beside the arms'.
   Red when: a number in the record has no derivation, or the trial's cost is omitted.
+- **AC11** — When `probe_<T>.py` runs over the nine implementations of a task, every probe records a
+  fingerprint per implementation (or `TIMEOUT`/`ERROR`, never a blank), and `probe-results.json`
+  carries the distinct-behaviour count per probe and the within-arm agreement per arm.
+  Red when: a probe that crashed on one tool is reported as agreement, or the probe author read any
+  implementation.
 
 ## 7. Gates
 
@@ -193,6 +202,10 @@ The scope menu, put to the owner 2026-09-20 and ratified at the recommended shap
 - rev-2 · 2026-09-20 · §8 · scope approved by the owner at the recommended shape on all four forks;
   status INPROGRESS. S2 and S4 completed before approval as preparation: twenty units graded, three
   suites frozen at 43/42/42 tests, each failing 100% against an exit-0 stub.
+- rev-3 · 2026-09-20 · S6 · AC11 · AMEND: the hidden suites cannot separate the arms — every finished
+  cell of tasks A and B passes 43/43 and 42/42 — so the edge-probe convergence measure is added
+  over the open points the suites left unpinned. The suites stay frozen; the probe is a second
+  instrument, not a rewrite of the first.
 
 ## 10. Reuse audit
 
