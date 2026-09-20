@@ -95,3 +95,11 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T18:28:17Z dispatch · item 807a39b4 TOOL-aWokenSentinel-14 · reason tools/unattended/adopt-unattended.test.sh memory/gotchas/borrowed-seed-inherits-its-head-state.md memory/gotchas/INDEX.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-14-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-20T18:28:22Z brief · item TOOL-aWokenSentinel-14 · reason 9c8b61f42a08 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-14-1-build-brief.md
+
+2026-09-20T18:35:33Z dispatch · item cc728357 TOOL-aWokenSentinel-3 · reason tools/unattended/stop-guard.js tools/unattended/run-lease.js tools/unattended/stop-guard.fragment.json tools/unattended/stop-guard.test.sh .claude/settings.json tools/unattended/adopt-unattended.sh tools/unattended/adopt-unattended.test.sh tools/unattended/kit.toml tools/run-gates/selftest-budgets.txt tools/install-prefix-carried.txt memory/map/generated/symbols.json memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-3-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-20T18:35:39Z brief · item TOOL-aWokenSentinel-3 · reason 05db5e225f7d memory/builds/aWokenSentinel/prompts/2026-09-16-prompt-TOOL-aWokenSentinel-3-1-build-brief.md
+
+2026-09-20T18:57:27Z dispatch · item cc728357 TOOL-aWokenSentinel-3 · reason memory/map/generated/inventories.json memory/map/generated/MAP.md
+
+2026-09-20T19:02:19Z dispatch · item cc728357 TOOL-aWokenSentinel-3 · reason memory/map/features/unattended.md

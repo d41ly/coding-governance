@@ -23,6 +23,12 @@ set -u
 # arriving in one kit pull. The default keeps gov identical; an adopter sets it once.
 KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$HERE/../lib/resolve-python.sh" ]; then
+  . "$HERE/../lib/resolve-python.sh"
+  TESTPY=$(resolve_python) || { echo "adopt-unattended.test: no usable python"; exit 2; }
+else
+  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+fi
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 st=0; n=0
@@ -54,12 +60,29 @@ seed() { # dir  -> a git repo carrying the kit, a conf, and a TRACKED memory-tre
   # arms until this was fixed.
   cp "$HERE/adopt-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" \
      "$HERE/check-unattended.sh" "$HERE"/*.template.md "$1/$KIT_REL/"
-  # TOOL-aDeferredBar-3: the adopter's --check reads the gate-guard hook's marker out of the
-  # settings file, so the seed carries a wired one; arm 1a moves it aside, misfiles it and reads the
-  # refusal. The marker is read from the fragment, never spelled, for the reason the adopter gives.
+  # EVERY FRAGMENT AND EVERY HOOK THE KIT SHIPS, BY GLOB (TOOL-aWokenSentinel-3). The adopter's
+  # --check now loops over `*.fragment.json` in the kit dir and joins each to the hook it names, so
+  # the seed carries both populations; this line used to read ONE fragment's marker out of `$HERE`
+  # and never copy the file, which left arm 1's --check red at `gate-guard.fragment.json is missing
+  # from the kit` on every run, in a suite no bar runs. The settings file gets one entry per
+  # fragment under its own event and matcher — read from the fragment, never spelled — because the
+  # adopter reads the marker out of the settings file; arm 1a moves it aside, misfiles it and reads
+  # the refusal.
+  cp "$HERE"/*.fragment.json "$HERE"/*.js "$1/$KIT_REL/"
   mkdir -p "$1/.claude"
-  printf '{"hooks":{"PreToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node \\"${CLAUDE_PROJECT_DIR}/%s/%s\\""}]}]}}\n' \
-    "$KIT_REL" "$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$HERE/gate-guard.fragment.json")" > "$1/.claude/settings.json"
+  # One event key per fragment: the kit's fragments declare distinct events, and a second under
+  # one event would need a group merge this seed does not do — the merger owns that.
+  printf '{"hooks":{' > "$1/.claude/settings.json"
+  _sep=""
+  for _fr in "$HERE"/*.fragment.json; do
+    _ev=$(sed -n 's/^[[:space:]]*"event":[[:space:]]*"\([^"]*\)".*/\1/p' "$_fr" | head -1)
+    _ma=$(sed -n 's/^[[:space:]]*"matcher":[[:space:]]*"\([^"]*\)".*/\1/p' "$_fr" | head -1)
+    _mk=$(sed -n 's/^[[:space:]]*"marker":[[:space:]]*"\([^"]*\)".*/\1/p' "$_fr" | head -1)
+    printf '%s"%s":[{"matcher":"%s","hooks":[{"type":"command","command":"node \\"${CLAUDE_PROJECT_DIR}/%s/%s\\""}]}]' \
+      "$_sep" "$_ev" "$_ma" "$KIT_REL" "$_mk" >> "$1/.claude/settings.json"
+    _sep=","
+  done
+  printf '}}\n' >> "$1/.claude/settings.json"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
 LANDER="bash tools/land.sh"
@@ -167,14 +190,49 @@ out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/no-such-settings.json" bash "$KIT_REL"
 same "arm 1a a declared GOV_SETTINGS_JSON that is not a file is REFUSED" "$rc" "1"
 hit "$out" "REFUSED — GOV_SETTINGS_JSON names $TMP/no-such-settings.json, which is not a file"
 mv "$TMP/settings.out-of-tree.json" "$A/.claude/settings.json"
-# The fragment is shipped surface: absent is a refusal naming the file, never a silent pass.
-mv "$A/$KIT_REL/gate-guard.fragment.json" "$TMP/fragment.aside"
+# The fragments are shipped surface: EVERY fragment gone is a refusal naming the kit dir, never a
+# loop over nothing that prints `in sync` (TOOL-aWokenSentinel-3, spec §8 F5: one fragment gone
+# from a copy that still holds another is NOT detected per file, and the arm says so rather than
+# pretending; the population floor is the zero guard, the fragment-to-hook join below is the
+# other half, and the printed count is what a reader compares).
+mkdir -p "$TMP/fragments.aside"; mv "$A/$KIT_REL"/*.fragment.json "$TMP/fragments.aside/"
 out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
-same "arm 1a --check refuses with the fragment gone" "$rc" "1"
-hit "$out" "gate-guard.fragment.json is missing from the kit"
-mv "$TMP/fragment.aside" "$A/$KIT_REL/gate-guard.fragment.json"
+same "arm 1a --check refuses with every fragment gone" "$rc" "1"
+hit "$out" "no *.fragment.json in $KIT_REL"
+mv "$TMP/fragments.aside"/*.fragment.json "$A/$KIT_REL/"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the restored tree is in sync again" "$rc" "0"
+# the count is DERIVED by the loop and equals the kit's own fragment population
+hit "$out" "hooks: $(ls "$HERE"/*.fragment.json | grep -c '') fragment(s) wired"
+# A FIXTURE FRAGMENT naming a fixture hook: UNWIRED by name, wired by the merger, then refused when
+# its hook is deleted — the fragment-to-hook join, observed on a fragment the kit does not ship.
+# one key per line, the shape every shipped fragment has and the only one the adopter's sed reads
+printf '{\n  "name": "fx",\n  "event": "PreToolUse",\n  "matcher": "Read",\n  "marker": "fx.js",\n  "hook_path": "{kit}/unattended/fx.js"\n}\n' > "$A/$KIT_REL/fx.fragment.json"
+printf 'process.exit(0)\n' > "$A/$KIT_REL/fx.js"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a fixture fragment is UNWIRED" "$rc" "1"
+hit "$out" "the fx hook is UNWIRED"
+hit "$out" "--fragment $KIT_REL/fx.fragment.json"
+# The merger is the kit's SIBLING in the gov tree, run with cwd at the fixture root, which its own
+# docstring fixes as the target: `{kit}` resolves against the fragment's location, not the cwd.
+( cd "$A" && "$TESTPY" "$HERE/../settings-merge.py" --fragment "$KIT_REL/fx.fragment.json" >/dev/null 2>&1 )
+same "arm 1a the merger accepted the fixture fragment" "$?" "0"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the merger wires the fixture fragment" "$rc" "0"
+hit "$out" "hooks: $(( $(ls "$HERE"/*.fragment.json | grep -c '') + 1 )) fragment(s) wired"
+rm "$A/$KIT_REL/fx.js"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a a fragment naming a hook the kit does not carry is refused" "$rc" "1"
+hit "$out" "names the hook fx.js, which is not a file in $KIT_REL"
+rm "$A/$KIT_REL/fx.fragment.json"
+"$TESTPY" -c 'import json,sys
+p=sys.argv[1]; d=json.load(open(p))
+for ev in list(d["hooks"]):
+    d["hooks"][ev]=[g for g in d["hooks"][ev] if not any("fx.js" in h.get("command","") for h in g.get("hooks",[]))]
+    if not d["hooks"][ev]: del d["hooks"][ev]
+json.dump(d,open(p,"w"),indent=2)' "$A/.claude/settings.json"
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
-same "arm 1a the restored tree is in sync again" "$?" "0"
+same "arm 1a the tree without the fixture fragment is in sync again" "$?" "0"
 
 # ---- ARM 1b: HOSTILE CONF VALUES, round-tripped.
 # ---- Conf values are free prose. The previous `sed` render interpolated them unescaped into

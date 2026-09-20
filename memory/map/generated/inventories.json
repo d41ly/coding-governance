@@ -165,6 +165,7 @@
       "armed-but-unreachable-rule.md",
       "assertion-between-two-derived-values.md",
       "bash-c-multiline-flattens-under-msys.md",
+      "borrowed-seed-inherits-its-head-state.md",
       "bounded-through-a-pipe-is-unbounded.md",
       "check-format-grades-two-populations.md",
       "concurrency-is-not-a-budget.md",

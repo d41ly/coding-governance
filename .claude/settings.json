@@ -76,6 +76,17 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/unattended/stop-guard.js\""
+          }
+        ]
+      }
     ]
   }
 }

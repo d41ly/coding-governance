@@ -1,12 +1,13 @@
 # TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 6
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
+| [2026-09-16-build-TOOL-aWokenSentinel-3-1-acceptance-ledger.md](../build/2026-09-16-build-TOOL-aWokenSentinel-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-3-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-3-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
@@ -327,8 +328,10 @@ Cell `js.function camel` from `.lexicon.conf`, verbs from its table. In `run-lea
 `readStdin`, `resolveRepo`, `readConfValue`, `readMemoryRoot`, `readBoundKey`, `scanLeases`,
 `resolveLease`, `deriveSidecarPath`, `writeSidecarLine`, `readSidecarLines`, `renderUtc`. In
 `stop-guard.js`: `runLiveness`, `parseLiveness`, `measureBlocks`, `checkStop`, `renderBlock`,
-`main`. Constants `KIT_STOP_GUARD_VERSION`, `BLOCKS_DEFAULT`, `HARNESS_CONSECUTIVE_CAP`,
-`LIVENESS_BOUND_MS`, `REASONS`. All
+`checkSession` (the whole decision for one payload, `gate-guard.js`'s `checkCommand` shape, so
+`main` is the stdin parse, the event gate and the fail-open wrap and nothing else), `main`.
+Constants `KIT_STOP_GUARD_VERSION`, `BLOCKS_DEFAULT`, `HARNESS_CONSECUTIVE_CAP`,
+`LIVENESS_BOUND_MS`, `REASONS`, `KNOB`. All
 exported, `main` guarded by `require.main === module`, so a `require` from the suite or from unit
 4 reads no stdin. Cell `sh.function snake`: none minted; the adopter's loop is inline in the
 `--check` branch, which deliberately defines no `fail()` (its line 14).
@@ -560,6 +563,10 @@ New arm: tools/unattended/adopt-unattended.test.sh · `seed()` copies every frag
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · §4 Inventory · build pass: `checkSession` joins the hook's inventory, the
+  `checkCommand` shape `gate-guard.js` already has — the decision over one payload is one function
+  the suite can `require`, and `main` stays the parse, the event gate and the fail-open wrap; the
+  constant `KNOB` names the conf key once. No criterion moves.
 - rev-3 · 2026-09-20 · AC2 · §7 · folded spec-audit round 2: L2 (raw 30) — AC2 still required
   `block 1/12` three lines above its `block 1/6`, a rev-1 residue the rev-2 fold appended to
   rather than replaced, so one literal remains and it is 6; sibling agreement for the promoted

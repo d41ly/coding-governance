@@ -17,6 +17,7 @@ rendered-skills = ["unattended"]
 gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mode-read-eats-a-bare-cr.md",
   "assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
+  "borrowed-seed-inherits-its-head-state.md",
   "bounded-through-a-pipe-is-unbounded.md",
   "status-set-in-a-subshell.md", "id-matched-as-a-substring.md", "containment-tested-one-way.md",
   "structured-record-split-on-whitespace.md", "staged-break-substitutes-a-synthetic-value.md",
