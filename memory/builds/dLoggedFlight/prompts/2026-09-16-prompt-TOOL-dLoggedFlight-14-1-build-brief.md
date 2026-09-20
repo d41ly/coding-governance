@@ -47,6 +47,13 @@ bump with its section 9 line.
 - **Codebase map.** A new file or identifier a dossier claims is claimed in
   `memory/map/features/runlog.md`; regenerate with `python tools/codebase-map/gen_map.py --write` in the
   same commit. A retired identifier leaves the dossier in the same commit.
+- **The dossier is AT its byte cap.** `memory/map/features/runlog.md` measured 20460 bytes of check 6's
+  20480 after `TOOL-dLoggedFlight-21`, and five units still owe prose there. Check 6 is HELD under the
+  pre-commit `--staged` run, so it will not catch a breach: measure with `wc -c` yourself before you
+  commit. Your dossier edit is byte-neutral or shorter — replace a sentence, never append one — and a
+  claim you must add is paid for by prose you cut. If your unit cannot fit even then, keep the claim,
+  say so in your return, and leave the split alone: splitting the dossier is what check 6 prescribes at
+  the cap, and it is a unit with its own spec, not an edit a build pass makes in passing.
 - **Kit versions do not move.** runlog is new in this build at 1.0. No unit here touches another kit;
   if yours finds it must, stop and say so in your return.
 - **Line endings.** Read data files with `newline=""`; a new script or data path is pinned LF in
