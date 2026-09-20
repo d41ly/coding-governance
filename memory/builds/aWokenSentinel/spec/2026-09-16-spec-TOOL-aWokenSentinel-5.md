@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 9 · ratified 2026-09-16
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 11 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-5-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-5-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
@@ -113,18 +114,26 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
   `resolve_sidecar_dir`, through which S8 finds the resume log in the driver. Unit 2's spec hands
   this unit "keying the tick on `verdict: STALE` and on `pid-alive`" and the resume log's
   derivation, and that is the whole of what this unit reads.
-- **consumes-from** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver holds one
-  `rev-parse --git-dir`; S8's read through the function is what keeps it green. The tick's own
-  derivation in its own file is outside that check by its design.
+- **consumes-from** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver, the lib and
+  the tick together hold one code-line `rev-parse --git-dir`, in the lib; S8's read through the
+  function is what keeps it green in the driver, and S4's read through the same function is what
+  keeps it green in the tick, which is inside that check's population at its rev-2.
+- **consumes-from** `TOOL-aWokenSentinel-20` — `resolve_sidecar_dir` in `lib-unattended.sh`,
+  which the tick sources; S4's resume-log root is that function's answer, never an inline
+  `rev-parse` of the tick's own. Without the move the tick would hold the second bash spelling of
+  the root the kit's own record (the lib header's pointer, dUnstalledConvoy seq 22) says must not exist.
 - **hands-off** `TOOL-aWokenSentinel-6` — the protocol's section 5 naming the tick as a keepalive
   actor, the Skill's short section naming the two hooks and the tick, the README's sidecar-layout
   paragraph beside this unit's registration lines, and the rationale prose for `RESUME_ATTEMPTS`
   and `RESUME_TURNS` where unit 6 finds this unit's one-liners wanting. This unit writes the
   registration lines and the section 8 rows; unit 6 does not rewrite them.
-- **hands-off** `TOOL-aWokenSentinel-7` — nothing this unit writes; unit 7 prints no `--status`
-  line at its rev-2. The stop-guard listing is `TOOL-aWokenSentinel-9`'s FIELD on the same line,
-  appended after this unit's, on this unit's omit-at-nothing rule — the shape F1 chose, and the
-  one-line promise unit 9 turns into an arm.
+- **hands-off** `TOOL-aWokenSentinel-9` — the field rule at `verb_status` (appended to
+  `parked`, omitted at nothing) and the `resume-tick` field that precedes unit 9's keepalive field
+  on the same line — the shape F1 chose, and the one-line promise unit 17 arms and unit 9 reads.
+  Unit 7 prints no `--status` line at its rev-2 and takes nothing from this unit.
+- **hands-off** `TOOL-aWokenSentinel-18` — the guard inside the hoisted `read_bound_key` that
+  refuses a caller with no `CONF` naming a file; this unit moves the function verbatim, unit 18
+  adds the guard one order after unit 13 sets `CONF` in the tick.
 - **hands-off** `TOOL-aWokenSentinel-12` — the arm that observes a live recorded pid surviving
   under a logged-out CLI, and the gotcha class for a destructive step ordered before its
   precondition; this unit builds the order, unit 12 proves it.
@@ -203,8 +212,10 @@ reader of it in the tick would be a second copy of its default.
 
 ### Attempts (S4)
 
-`<git-dir>/unattended/resume.<slug>.log`, where `<git-dir>` is `git rev-parse --git-dir` run with
-cwd in the worktree — the brief's one spelling, the same dir the `stop` and `stall` kinds use.
+`$(resolve_sidecar_dir)/resume.<slug>.log`, the function `TOOL-aWokenSentinel-20` puts in
+`lib-unattended.sh` and the tick sources, called with cwd in the worktree so it answers that
+tree's git dir — the kit's one spelling, the same dir the `stop` and `stall` kinds use, and the
+tick spells no `rev-parse` of its own, which is what unit 11's check reads.
 One space-separated line per launch, appended before the launch so a tick that dies mid-launch
 still counts:
 
@@ -542,6 +553,16 @@ arm's assertions, read off the floor-breach line with the floor over-pinned.
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §3 · §4 · folded spec-audit round 2: sibling agreement for the promoted
+  `TOOL-aWokenSentinel-20` (H6, raw 36) and the rev-2 of spec 11 (M9, raw 50) — S4's resume-log
+  root reads through the lib's `resolve_sidecar_dir` and the tick joins the one-derivation
+  check's population; M6 (raw 26) — spec 9's `consumes-from` on this unit had no reciprocal, so
+  the unit-9 `hands-off` is declared and the unit-7 absence bullet is dropped, the check-12 join
+  reading a declared absence as an edge; a `hands-off` on the promoted `TOOL-aWokenSentinel-18`
+  (H4, raw 4); and the two check-12 lines the round-2 record's M2 paragraph reports as seen on
+  this spec — the `consumes-from` on unit 1 gains its reciprocal in spec 1's rev-3, and spec 4's
+  `hands-off` on this unit is dropped there, because the tick acts on `--liveness`'s verdict alone
+  and never opens the stall sidecar. Order 9 → 11 for the insertions of units 20 and 16.
 - rev-2 · 2026-09-20 · S12 · S3 · S5 · S8 · §3 · §4 · §5 · AC2 · AC5 · AC9 · AC12 · §7 · folded
   spec-audit round 1: L1 (raw 10) — the walk's two announced skips had no criterion, so S12 and
   AC12 observe them. Sibling agreement for the promoted units: the `--status` hands-off names unit

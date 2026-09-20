@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-0-run-mandate.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-0-run-mandate.md) | journal | — |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-build-brief.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
@@ -97,6 +98,9 @@ the run-state file is the kit's contract and this changes what it carries.
   reporting a record whose session is `absent` as `UNBOUND`.
 - **hands-off** `TOOL-aWokenSentinel-3` — binding a hook's stdin `session_id` to the run whose
   `session:` fact equals it; an `absent` fact binds nothing.
+- **hands-off** `TOOL-aWokenSentinel-5` — the `session:` and `pid:` facts the tick's candidate
+  selection greps for (`^session: ` present and not `absent`), and `--resume <slug>
+  --keepalive-id <id>` as the first act the CONTINUE payload names.
 - **hands-off** `TOOL-aWokenSentinel-4` — the same binding from the stall-recorder, through the
   module unit 3 extracts.
 - **hands-off** `TOOL-aWokenSentinel-6` — the `## Resume` prose of the Skill, protocol section
@@ -379,6 +383,10 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: one check-12 line
+  the round-2 record's M2 paragraph reports as seen on the full hygiene run at 12513c25 — spec 5
+  declares `consumes-from` this unit and this unit declared no `hands-off` back, so the edge is
+  declared with what the tick takes. Order unchanged.
 - rev-2 · 2026-09-20 · S6 · AC2 · AC9 · folded spec-audit round 1: M4 (raw 7) — the prologue
   exports and the arm block are file carriers no criterion read, so S6 now joins them to a new AC9
   whose greps read the suite by path; L4 (raw 13) — the NOTE's three-way alternation had one arm

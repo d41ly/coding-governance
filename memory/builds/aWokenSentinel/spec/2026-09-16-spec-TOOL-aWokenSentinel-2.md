@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-2-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-2-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
@@ -111,9 +112,13 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
   which `--landed` reuses to find the stop log; this unit derives it once for the stall log.
 - **hands-off** `TOOL-aWokenSentinel-5` — reading `resume.<slug>.log` through the same
   `resolve_sidecar_dir`, never an inline `rev-parse`.
-- **hands-off** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver holds exactly one
-  `rev-parse --git-dir`, this function's, so the one-derivation rule AC7 states for this unit's
-  own pass binds every later unit on the bar.
+- **hands-off** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver, the lib and the
+  tick together hold exactly one code-line `rev-parse --git-dir`, this function's, so the
+  one-derivation rule AC7 states for this unit's own pass binds every later unit on the bar.
+- **hands-off** `TOOL-aWokenSentinel-20` — moving `resolve_sidecar_dir` verbatim from the driver
+  into `lib-unattended.sh` one order later, so the tick calls the same function through the lib it
+  sources; this unit defines it in the driver, where AC7 counts it, and unit 20 changes its home
+  and nothing it prints.
 - **hands-off** external — the kit version bump, the closing pass's, once.
 
 ## 4. Design
@@ -453,9 +458,14 @@ graded line removed.
   dir — `git rev-parse --git-dir` — holds one line written by `printf`, the verb prints
   `last-stall:` followed by that line verbatim; when the file is absent, `last-stall: none`; and
   `grep -c 'resolve_sidecar_dir' tools/unattended/unattended.sh` prints at least `2`, the
-  definition and this verb's call, and `0` at base.
+  definition and this verb's call, and `0` at base; and
+  `grep -cE '^[^#]*rev-parse --git-dir' tools/unattended/unattended.sh` prints exactly `1` at this
+  unit's tip and `0` at base — the literal on one CODE line, the function's, however many comment
+  lines name it.
   Red when: the line is parsed or truncated; an absent file is a refusal; or the root is spelled
-  inline, which leaves unit 7 a second spelling to drift from.
+  inline, which leaves unit 7 a second spelling to drift from; or the code-line count is not 1,
+  which is the premise unit 11's check reads after unit 20 moves the one line into the lib.
+  figure: every count is DERIVED by the greps at observation.
 - **AC8** — When `stat` is shadowed on `PATH` by a stub that exits 1 over a dirty fixture tree,
   the verb prints `UNATTENDED check 52 FAILED` and `the liveness cannot be measured on this node`,
   no `verdict:` line, and exits 1; and `grep -c 'read_tree_clocks' tools/unattended/unattended.sh`
@@ -507,6 +517,11 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §3 · AC7 · folded spec-audit round 2: sibling agreement for the promoted
+  `TOOL-aWokenSentinel-20` (H6, raw 36) — AC7 pins the code-line count of `rev-parse --git-dir`
+  at exactly 1 at this unit's tip, the premise spec 11 rested on and nothing asserted, and §3 hands
+  the function's move to the lib off; the unit-11 bullet names the widened population. Order
+  unchanged.
 - rev-2 · 2026-09-20 · S2 · S5 · §3 · §4 · AC2 · AC5 · AC6 · §10 · folded spec-audit round 1:
   M2 (raw 5, 23, 41) — the `read_bound_key` count was 5 at base, not 3, so AC6 now greps the call
   line's own spelling and S5 and §10 say fourth caller; M3 (raw 6) — S5's four carriers had no

@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aPrimedKeepalive aProbedUnit
 authorized-by: prompt
-ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14
+ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20
 ---
 
 # aWokenSentinel — a keepalive that lives outside the failure domain of the run it keeps alive
@@ -44,6 +44,7 @@ research record under `build/`.
 - **The CLI token is the owner's**, minted out of band; unit 5 ships inert until registered and reports an absent login as an announced skip, never a pass.
 - **Classification at open**: all MISSING; specced by the harness's SPEC stage from the briefs under `prompts/`. Unit 7 was ADDED after preflight by `--rescope`, on the measured `session_crons` field.
 - **Spec-audit round 1 disposed by severity (M4), 2026-09-20.** BOUNDED at `REVIEW_ROUNDS` 1, 43 confirmed: the 16 at BLOCKER and HIGH PROMOTED by `--rescope --act add` into units 8 to 14, one per defect, audited as specs before build; the 27 at MEDIUM and LOW FOLDED as rev-2 of units 1 to 7. Nothing parked, waived, retired or re-reviewed.
+- **Spec-audit round 2 disposed by severity (M4), 2026-09-20.** Units 8 to 14, BOUNDED, 31 raw ids in 22 defects: 2 BLOCKER and 6 HIGH PROMOTED into units 15 to 20, one per mechanism (B1+B2 share one, H2+H3 share one); 10 MEDIUM and 4 LOW FOLDED as rev-N bumps, siblings re-agreed, order re-derived. Nothing parked, waived, retired or re-reviewed.
 
 ## Parked decisions
 
@@ -67,38 +68,50 @@ research record under `build/`.
 | 12 | `TOOL-aWokenSentinel-12` | PLANNED | the tick consults login BEFORE it kills: a logged-out node kills nothing, observed by an arm whose live process survives, and the class left-shifted to `memory/gotchas/` (audit H4) |
 | 13 | `TOOL-aWokenSentinel-13` | PLANNED | the tick sources the root `.unattended.conf` into its own shell before its `read_bound_key` calls, so a declared bound is honoured and the NOTE names the file; arms under a declared key (audit H5) |
 | 14 | `TOOL-aWokenSentinel-14` | PLANNED | `seed()` in `adopt-unattended.test.sh` commits once, so every fixture that borrows it has a born HEAD and `--liveness`'s `git log` probe is live; the class left-shifted to `memory/gotchas/` (audit H6) |
+| 15 | `TOOL-aWokenSentinel-15` | PLANNED | the spec-audit commission's blob-pin pre-flight: the harness's resolver returns each subject's committed blob and working-tree hash, and refuses to dispatch a lens while any differ (audit round 2 B1, B2) |
+| 16 | `TOOL-aWokenSentinel-16` | PLANNED | `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch, with the no-ff fixture arm that is RED today (audit round 2 H1; `TOOL-dUnstalledConvoy-38`) |
+| 17 | `TOOL-aWokenSentinel-17` | PLANNED | the driver suite reads `--status` by FIELD: `extract_next` armed on a suffixed line and `check_status_one_line` armed against a two-line driver copy (audit round 2 H2, H3) |
+| 18 | `TOOL-aWokenSentinel-18` | PLANNED | `read_bound_key` refuses with exit 2 a caller that named no conf, so a bound read from a shell with `CONF` unset is a refusal rather than a default with an empty NOTE (audit round 2 H4) |
+| 19 | `TOOL-aWokenSentinel-19` | PLANNED | `adopt-unattended.test.sh` declares a shrink-only `FLOOR_ASSERTIONS`, and the close's `run-unattended-gates.sh` run is the named observer of every arm the committed `seed()` feeds (audit round 2 H5) |
+| 20 | `TOOL-aWokenSentinel-20` | PLANNED | `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, and unit 11's check counts code lines across the three files (audit round 2 H6) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 14 unit(s) · node a · opened 2026-09-16 · streams tooling
+**Build status:** SPECCED · 20 unit(s) · node a · opened 2026-09-16 · streams tooling
 ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13
-ids TOOL-aWokenSentinel-14
+ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it](spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-11 — a kit-gate check that the driver holds ONE derivation of the sidecar root](spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read](spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk](spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer](spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing](spec/2026-09-20-spec-TOOL-aWokenSentinel-12.md) | 10 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-13 — the resume tick sources the root conf before its bound reads, so a declared bound is honoured and the NOTE names the file](spec/2026-09-20-spec-TOOL-aWokenSentinel-13.md) | 11 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-6 — the contract: protocol section 5, the Skill, the README, the conf prose and the dossier, with the cron job demoted to the idle-wake](spec/2026-09-16-spec-TOOL-aWokenSentinel-6.md) | 12 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing](spec/2026-09-16-spec-TOOL-aWokenSentinel-7.md) | 13 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md) | 14 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it](spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-11 — a kit-gate check that the driver holds ONE derivation of the sidecar root](spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch](spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 8 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read](spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk](spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md) | 10 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer](spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md) | 11 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing](spec/2026-09-20-spec-TOOL-aWokenSentinel-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-13 — the resume tick sources the root conf before its bound reads, so a declared bound is honoured and the NOTE names the file](spec/2026-09-20-spec-TOOL-aWokenSentinel-13.md) | 13 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-18 — `read_bound_key` refuses a caller that named no conf: a bound read from a shell with `CONF` unset exits 2 instead of taking a default with an empty NOTE](spec/2026-09-20-spec-TOOL-aWokenSentinel-18.md) | 14 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-6 — the contract: protocol section 5, the Skill, the README, the conf prose and the dossier, with the cron job demoted to the idle-wake](spec/2026-09-16-spec-TOOL-aWokenSentinel-6.md) | 15 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing](spec/2026-09-16-spec-TOOL-aWokenSentinel-7.md) | 16 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-17 — the driver suite reads `--status` by FIELD: one extraction helper armed on a suffixed line, and a one-line assertion armed against a two-line driver](spec/2026-09-20-spec-TOOL-aWokenSentinel-17.md) | 17 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md) | 18 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-15 — the spec-audit commission pins each subject at its committed blob and refuses a dirty subject before a lens is dispatched](spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md) | 20 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9.
+Ids no record names: TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20.
 
-Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9.
+Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -107,18 +120,24 @@ Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-10 TOOL-aWokenSen
 |---|---|---|
 | 1 | `TOOL-aWokenSentinel-1` | no |
 | 2 | `TOOL-aWokenSentinel-2` | no |
-| 3 | `TOOL-aWokenSentinel-11` | no |
-| 4 | `TOOL-aWokenSentinel-14` | no |
-| 5 | `TOOL-aWokenSentinel-3` | no |
-| 6 | `TOOL-aWokenSentinel-8` | no |
-| 7 | `TOOL-aWokenSentinel-10` | no |
-| 8 | `TOOL-aWokenSentinel-4` | no |
-| 9 | `TOOL-aWokenSentinel-5` | no |
-| 10 | `TOOL-aWokenSentinel-12` | no |
-| 11 | `TOOL-aWokenSentinel-13` | no |
-| 12 | `TOOL-aWokenSentinel-6` | no |
-| 13 | `TOOL-aWokenSentinel-7` | no |
-| 14 | `TOOL-aWokenSentinel-9` | no |
+| 3 | `TOOL-aWokenSentinel-20` | no |
+| 4 | `TOOL-aWokenSentinel-11` | no |
+| 5 | `TOOL-aWokenSentinel-14` | no |
+| 6 | `TOOL-aWokenSentinel-3` | no |
+| 7 | `TOOL-aWokenSentinel-16` | no |
+| 8 | `TOOL-aWokenSentinel-8` | no |
+| 9 | `TOOL-aWokenSentinel-10` | no |
+| 10 | `TOOL-aWokenSentinel-4` | no |
+| 11 | `TOOL-aWokenSentinel-5` | no |
+| 12 | `TOOL-aWokenSentinel-12` | no |
+| 13 | `TOOL-aWokenSentinel-13` | no |
+| 14 | `TOOL-aWokenSentinel-18` | no |
+| 15 | `TOOL-aWokenSentinel-6` | no |
+| 16 | `TOOL-aWokenSentinel-7` | no |
+| 17 | `TOOL-aWokenSentinel-17` | no |
+| 18 | `TOOL-aWokenSentinel-9` | no |
+| 19 | `TOOL-aWokenSentinel-19` | no |
+| 20 | `TOOL-aWokenSentinel-15` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

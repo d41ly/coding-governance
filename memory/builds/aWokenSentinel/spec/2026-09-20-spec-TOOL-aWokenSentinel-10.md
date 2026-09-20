@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 |
 
 <!-- /gen:spec-records -->
 
@@ -160,6 +162,10 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · §1 · folded at the M4 disposal of spec-audit round 2: no finding of that
+  round names this unit; L2 (raw 30) was spec 3's residue and is folded there, so spec 3 AC2 now
+  carries the one literal `block 1/6` this unit's S1 declares. Order 7 → 9 for the insertions of
+  units 20 and 16.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 1 as the
   promotion of H2 (raw ids 19, 31); takes the example line and the `optional_keys` entry from spec
   3 S5 and the root-conf line from spec 6 S5, both folded at their rev-2 to point here.

@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-13 — the resume tick sources the root conf before its bound reads, so a declared bound is honoured and the NOTE names the file
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 11 · ratified 2026-09-20
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 13 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-14 |
 
 <!-- /gen:spec-records -->
 
@@ -27,27 +29,41 @@ arms under a declared key and a NOTE that names a non-empty path.
 - **S1** — In `tools/unattended/resume-tick.sh`, directly after the root is resolved and before
   any `read_bound_key` call: `CONF="$ROOT/.unattended.conf"`; an absent file is `resume-tick:
   REFUSED — <root> carries no .unattended.conf, so the tick has no bounds to read`, exit 2; then
-  `. "$CONF"` into the tick's own shell, so `RESUME_ATTEMPTS` and `RESUME_TURNS` resolve exactly
-  as `GATE_BOUND` does in the driver. The knobs are ROOT-scoped: one repo, one pair of bounds,
+  `RESUME_ATTEMPTS=""; RESUME_TURNS=""` — the driver's own clear-before-source at
+  `unattended.sh:339`, so an exported value never stands in for a declaration — then `. "$CONF"`
+  into the tick's own shell, so `RESUME_ATTEMPTS` and `RESUME_TURNS` resolve exactly as
+  `GATE_BOUND` does in the driver. The knobs are ROOT-scoped: one repo, one pair of bounds,
   whatever worktree a run lives in. Spec 5 §4 is folded at its rev-2 to this read and cites this
   unit; unit 5 builds it at its own pass, and this unit's diff is the proof. Observed by AC1, AC2
   and AC3.
 - **S2** — `MEMORY_ROOT` stays per-worktree and stays a subshell read, as spec 5 §4 has it: a
   worktree's memory root is that tree's fact, and sourcing a second conf into the tick's shell
   would let a worktree's declaration overwrite the root's bounds mid-walk. Observed by AC4.
-- **S3** — The arms: `RESUME_ATTEMPTS="2"` declared in the fixture's conf with two post-move
-  attempt lines seeded → `ATTEMPTS EXHAUSTED` and no NOTE; the conf declaring neither key → the
-  NOTE, once per key, whose interpolated path is the fixture's conf and is non-empty; `RESUME_TURNS="7"`
-  declared → the launcher carries `--max-turns 7`; each observed RED first against a tick copy
-  with the `. "$CONF"` line removed. Observed by AC1, AC2 and AC3.
+- **S3** — The arms, each named with the break it is observed RED against: `RESUME_ATTEMPTS="2"`
+  declared in the fixture's conf with two post-move attempt lines seeded → `ATTEMPTS EXHAUSTED`
+  and no NOTE, red against a tick copy with the `. "$CONF"` line removed; `RESUME_TURNS="7"`
+  declared → the launcher carries `--max-turns 7`, red against the same copy; the conf declaring
+  neither key → the NOTE, once per key, whose interpolated path is the fixture's conf and exists,
+  red against a tick copy with the WHOLE four-line block removed, where unit 18's guard refuses
+  and zero NOTEs print; and `RESUME_ATTEMPTS=abc` exported into the tick's environment with the
+  conf declaring `2` → the cap is 2 and no refusal, red against a tick copy with the two clearing
+  assignments removed, where the tick exits 2 blaming the conf for a value it never declared.
+  Observed by AC1, AC2, AC3 and AC5.
 - **S4** — A NOTE naming no file is the signature of this defect and is greppable: one arm
-  asserts every `Declare one in ` line on the tick's stderr is followed by a path that exists.
-  Observed by AC2.
+  asserts the two `Declare one in ` lines on the tick's stderr are present and each is followed
+  by a path that exists. The source-line-only copy cannot red it — `CONF` stays set there — so its
+  break is the whole-block copy, where `read_bound_key` refuses through unit 18's guard before a
+  NOTE can print and the count reads 0. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
-- **No change to `read_bound_key`.** Its calling-shell contract is the driver's and the hoist
-  keeps its bytes; this unit satisfies the contract from the tick as the driver does.
+- **No change to `read_bound_key`'s read.** Its calling-shell contract is the driver's and the
+  hoist keeps its bytes; this unit satisfies the contract from the tick as the driver does. The
+  guard that makes an unset `CONF` a refusal rather than an empty NOTE is unit 18's, one order
+  later, and it is what gives this unit's NOTE arm a break it reds against.
+- **No conf comment sentence.** The one sentence in the conf comments saying the two keys are read
+  from the ROOT conf by the tick is spec 5's, written in its §4 Data model; unit 6 finds it
+  present and adds nothing, and this unit declares no edge for a sentence it does not write.
 - **No per-worktree bounds.** A run in a worktree reads the root's `RESUME_ATTEMPTS`; a worktree
   conf that declares a different value is not read for these two keys, and the tick's header says
   so. The driver's own read is per-tree because the driver runs in one tree; the tick walks them
@@ -62,11 +78,12 @@ arms under a declared key and a NOTE that names a non-empty path.
 - **consumes-from** `TOOL-aWokenSentinel-5` — the tick, the hoisted `read_bound_key` in
   `lib-unattended.sh`, the fixture with its `mkconf`-shaped conf and the stub `claude`. Without the
   tick there is no read to fix.
-- **consumes-from** external — the driver's own idiom at `tools/unattended/unattended.sh:341`,
-  `. "$CONF"` before the bound reads, which this read copies.
-- **hands-off** `TOOL-aWokenSentinel-6` — the one sentence in the conf comments for the two keys
-  saying they are read from the ROOT conf by the tick, where unit 6 finds unit 5's one-liners
-  wanting.
+- **consumes-from** external — the driver's own idiom at `tools/unattended/unattended.sh:339`
+  to `:341`, the keys cleared and then `. "$CONF"` before the bound reads, which this read copies
+  whole.
+- **hands-off** `TOOL-aWokenSentinel-18` — the guard inside `read_bound_key` that refuses a
+  caller with no `CONF` naming a file, and the two arms that observe it: a bare-shell call and
+  this unit's conf block removed whole from a tick copy.
 
 ## 4. Design
 
@@ -77,6 +94,7 @@ After `ROOT` is resolved (spec 5 §4 'The walk') and before the walk begins:
 ```
 CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "resume-tick: REFUSED — $ROOT carries no .unattended.conf, so the tick has no bounds to read" >&2; exit 2; }
+RESUME_ATTEMPTS=""; RESUME_TURNS=""
 # shellcheck disable=SC1090
 . "$CONF"
 read_bound_key RESUME_ATTEMPTS "$RESUME_ATTEMPTS_DEFAULT" attempts "…"
@@ -86,6 +104,10 @@ read_bound_key RESUME_TURNS "$RESUME_TURNS_DEFAULT" turns "…"
 `read_bound_key` then reads `${!_bk_name:-}` from a shell that has sourced the file, prints its
 NOTE with `$CONF` interpolated to a path that exists, and refuses a malformed value with exit 2
 exactly as the driver does — the same function, the same contract, satisfied the same way. The
+clearing line is the driver's at `unattended.sh:339`: `${!name}` reads the calling shell INCLUDING
+its environment, so without it an exported `RESUME_ATTEMPTS` would stand in for a declaration the
+conf never made, silently when well-formed and as a refusal blaming the conf when junk. A
+scheduler's environment is exactly the one nobody audits. The
 per-worktree `MEMORY_ROOT` subshell read in the walk is untouched: it reads one key from one
 tree's conf and never sources into the tick's shell.
 
@@ -102,8 +124,11 @@ the tick edits.
 
 The signature of the specced defect was `Declare one in  to change it` — two spaces, no file. One
 arm greps the tick's stderr for `Declare one in ` and asserts what follows, up to ` to change it`,
-is a path that exists. It is the liveness assertion for the read: a NOTE that names a file proves
-`CONF` was set before the call.
+is a path that exists, and that exactly two such lines print. It is the liveness assertion for the
+read: a NOTE that names a file proves `CONF` was set before the call. Its break is the whole conf
+block removed, not the source line alone: with the block gone `CONF` is unset, unit 18's guard in
+`read_bound_key` refuses with exit 2 before any NOTE prints, and the arm reads zero lines — which
+is the signature made impossible rather than merely observed.
 
 ### Inventory
 
@@ -114,8 +139,8 @@ and set here for the same reason.
 
 | file | change |
 |---|---|
-| `tools/unattended/resume-tick.sh` | the four lines above, if unit 5's pass did not already build spec 5's rev-2 read; the header sentence on root scope |
-| `tools/unattended/resume-tick.test.sh` | three arms: the declared cap, the two NOTEs with a non-empty path, the declared turns |
+| `tools/unattended/resume-tick.sh` | the five lines above, if unit 5's pass did not already build spec 5's rev-2 read; the header sentence on root scope |
+| `tools/unattended/resume-tick.test.sh` | five arms: the declared cap, the two NOTEs with a non-empty path, the declared turns, the two-worktree walk with a differing declaration, the exported junk value |
 
 ### Alternatives rejected
 
@@ -141,30 +166,50 @@ and set here for the same reason.
 
 ## 6. Acceptance criteria
 
-The fixture is spec 5 §6's scratch repo under a short `%TEMP%` path with its stub `claude`; the
-staged break is a tick copy with the `. "$CONF"` line removed.
+The fixture is spec 5 §6's scratch repo under a short `%TEMP%` path with its stub `claude`. The
+staged breaks are named per criterion, because one copy cannot red them all: the SOURCE copy has
+the `. "$CONF"` line removed; the BLOCK copy has the whole conf block of §4 removed; the CLEAR copy
+has the two clearing assignments removed; the WORKTREE copy sources each worktree's conf into the
+tick's own shell during the walk.
 
 - **AC1** — When the fixture's conf declares `RESUME_ATTEMPTS="2"` and the sidecar is pre-seeded
   with two attempt lines dated after the fixture commit, `bash resume-tick.sh --repo <fixture>`
-  prints `ATTEMPTS EXHAUSTED` and no `declares no RESUME_ATTEMPTS` line; against the staged break
+  prints `ATTEMPTS EXHAUSTED` and no `declares no RESUME_ATTEMPTS` line; against the SOURCE copy
   it launches attempt 3 and prints the NOTE.
   Red when: a declared cap is ignored, which is every tick reading the kit default.
 - **AC2** — When the fixture's conf declares neither key, the tick's stderr carries `declares no
-  RESUME_ATTEMPTS` and `declares no RESUME_TURNS` once each, and every `Declare one in ` on
+  RESUME_ATTEMPTS` and `declares no RESUME_TURNS` exactly once each, and each `Declare one in ` on
   stderr is followed by a path that `test -f` accepts; with no `.unattended.conf` at the root the
-  tick prints `REFUSED` naming the root and exits 2.
-  Red when: the NOTE's path is empty, which is the specced defect's own signature; or a root with
-  no conf walks on defaults silently.
+  tick prints `REFUSED` naming the root and exits 2. Against the BLOCK copy the tick exits 2 with
+  `read_bound_key was called with CONF unset` on stderr, zero `declares no` lines, and no launcher
+  written — unit 18's guard, which is the one break this arm reds against; the SOURCE copy leaves
+  `CONF` set and cannot red it, and §7 says so.
+  Red when: the NOTE's path is empty, which is the specced defect's own signature and is what unit
+  18 makes a refusal; or the count of NOTEs is not two, which is a read that never happened; or a
+  root with no conf walks on defaults silently.
 - **AC3** — When the fixture's conf declares `RESUME_TURNS="7"`, the launcher file the tick writes
-  carries `--max-turns 7` and `stub.log` shows the stub invoked with it.
+  carries `--max-turns 7` and `stub.log` shows the stub invoked with it; against the SOURCE copy
+  it carries `40`.
   Red when: the launcher carries `40` under a declared `7`.
-- **AC4** — When one worktree of the fixture carries a conf declaring `MEMORY_ROOT=mem2` and a
-  bound record under `mem2/builds/`, and the root conf declares `RESUME_ATTEMPTS="2"`, the tick
-  walks that tree's record under `mem2` and still caps it at 2; `grep -c 'RESUME_ATTEMPTS'` over
-  that worktree's conf is 0, which is what makes the root's value the one observed.
-  Red when: a worktree conf's absence of the key resets the cap to the default mid-walk, which is
-  the second conf sourced into the tick's shell.
-  fixture: `git worktree add` inside the scratch repo; the second conf written by the arm.
+- **AC4** — When one worktree of the fixture carries a conf declaring `MEMORY_ROOT=mem2` AND
+  `RESUME_ATTEMPTS="6"`, a bound record under `mem2/builds/` with two post-move attempt lines
+  seeded in that worktree's sidecar, and the root conf declares `RESUME_ATTEMPTS="2"`, the tick
+  walks that tree's record under `mem2`, prints `ATTEMPTS EXHAUSTED` for it, and writes no
+  launcher; against the WORKTREE copy it launches attempt 3, which is the worktree's `6` read in
+  place of the root's `2`.
+  Red when: the worktree's declaration is read, which is the second conf sourced into the tick's
+  shell; or the two values are the same, which makes the observation unable to tell the scopes
+  apart.
+  fixture: `git worktree add` inside the scratch repo; the second conf and the two attempt lines
+  written by the arm.
+- **AC5** — When `RESUME_ATTEMPTS=abc` is exported into the tick's environment and the fixture's
+  conf declares `RESUME_ATTEMPTS="2"` with two post-move attempt lines seeded, the tick prints
+  `ATTEMPTS EXHAUSTED` and no `REFUSING`; with the conf declaring neither key the tick prints the
+  `declares no RESUME_ATTEMPTS` NOTE and caps at the kit default; against the CLEAR copy the first
+  case exits 2 with `REFUSING - RESUME_ATTEMPTS is declared as 'abc'`, blaming the conf for a
+  value it never declared.
+  Red when: an exported value overrides the conf or the default, which is a bound nobody declared
+  in the one file the owner edits.
 
 ## 7. Gates
 
@@ -173,7 +218,7 @@ staged break is a tick copy with the `. "$CONF"` line removed.
 These run once at `--close`. The pass runs none of them: it verifies with the tick over the
 fixtures of AC1 to AC4.
 
-New arm: `tools/unattended/resume-tick.test.sh` · the declared cap, the two NOTEs with a non-empty path, the declared turns and the two-worktree walk, each observed red against a tick copy with the source line removed · `FLOOR_ASSERTIONS` rises by the arms' executed assertions
+New arm: `tools/unattended/resume-tick.test.sh` · the declared cap and the declared turns, red against the SOURCE copy; the two NOTEs with a non-empty path, red against the BLOCK copy through unit 18's guard; the two-worktree walk with a differing declaration, red against the WORKTREE copy; the exported junk value, red against the CLEAR copy · `FLOOR_ASSERTIONS` rises by the arms' executed assertions
 
 ## 8. Open questions
 
@@ -187,6 +232,16 @@ New arm: `tools/unattended/resume-tick.test.sh` · the declared cap, the two NOT
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S1 · S3 · S4 · §3 · §4 · AC1 · AC2 · AC3 · AC4 · AC5 · §7 · folded
+  spec-audit round 2: sibling agreement for the promoted `TOOL-aWokenSentinel-18` (H4, raw 4) —
+  the NOTE-path arm's break is the whole conf block removed, where unit 18's guard refuses, and §7
+  names a break per arm because the source-line copy leaves `CONF` set; M2 (raw 22) — the
+  `hands-off` on unit 6 named a sentence spec 5's Data model writes, so the bullet is dropped and
+  a non-goal states the writer; M3 (raw 18, 23) — AC4's worktree conf declared no value and seeded
+  no attempts, so it now declares `6` against the root's `2` with two attempt lines and reads
+  `ATTEMPTS EXHAUSTED`; M7 (raw 39) — §4 dropped the driver's clear-before-source it cited, so the
+  two clearing assignments join the block and AC5 exports junk to observe them. Order 11 → 13 for
+  the insertions of units 20 and 16.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 1 as the
   promotion of H5 (raw ids 26, 33).
 

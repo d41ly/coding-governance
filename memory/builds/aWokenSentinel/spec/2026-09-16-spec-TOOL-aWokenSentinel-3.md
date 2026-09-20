@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-3-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-3-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
@@ -402,10 +403,10 @@ observation here: it runs at the close.
   Red when: a record at BUILDING with `session: absent` binds, or a sidecar file appears.
 - **AC2** — When `FIX`'s record carries `session:` equal to `P`'s and the stub's liveness file
   holds `phase: BUILDING` and `verdict: LIVE`, the same invocation prints `rc=0`, stdout is one
-  JSON object with `decision` equal to `block` and a `reason` naming the slug, `block 1/12` and
+  JSON object with `decision` equal to `block` and a `reason` naming the slug, `block 1/6` and
   `--plan`, and the sidecar holds one line whose `decision` is `block` and `blocks` is 1, parsed
-  with `python -c 'import json,sys;…'`, never by grep over the raw bytes; the reason reads
-  `block 1/6`.
+  with `python -c 'import json,sys;…'`, never by grep over the raw bytes; `1/6` because
+  `BLOCKS_DEFAULT` is 6 and every carrier unit 10 declares reads 6.
   Red when: the hook exits 0 with empty stdout on an open run, or the line is not written.
 - **AC3** — When the liveness file holds `verdict: TERMINAL`, the invocation prints `rc=0` with
   empty stdout and the sidecar's new line carries `decision` `allow` and `reason` `terminal`. The
@@ -513,7 +514,7 @@ one payload, the merger, the hook-destinations gate, the adopter's `--check`, th
 
 New arm: tools/unattended/stop-guard.test.sh · a fixture record bound to the payload's session against a stub driver, one arm per §6 payload, the unwritable-sidecar and sleeping-stub arms of AC19, the cap-under-harness arm of AC18, one arm against the real driver on a git fixture; the break is the hook absent, then each row of the §4 table negated · `FLOOR_ASSERTIONS` derived at the suite's first green, none moved
 
-New arm: tools/unattended/adopt-unattended.test.sh · `seed()` copies every fragment and hook; arm 1a's fragment-gone arm reads every fragment gone; the `fx` fixture-fragment arm for UNWIRED, wired, and hook-missing; the break is the adopter at base, whose seeded `--check` exits 1 · no floor exists in this suite
+New arm: tools/unattended/adopt-unattended.test.sh · `seed()` copies every fragment and hook; arm 1a's fragment-gone arm reads every fragment gone; the `fx` fixture-fragment arm for UNWIRED, wired, and hook-missing; the break is the adopter at base, whose seeded `--check` exits 1 · `FLOOR_ASSERTIONS` is `TOOL-aWokenSentinel-19`'s, pinned at that unit's order from a static count that includes these arms; none exists at this unit's order
 
 ## 8. Open questions
 
@@ -559,6 +560,12 @@ New arm: tools/unattended/adopt-unattended.test.sh · `seed()` copies every frag
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · AC2 · §7 · folded spec-audit round 2: L2 (raw 30) — AC2 still required
+  `block 1/12` three lines above its `block 1/6`, a rev-1 residue the rev-2 fold appended to
+  rather than replaced, so one literal remains and it is 6; sibling agreement for the promoted
+  `TOOL-aWokenSentinel-19` (H5, raw 5) — the adopter-suite arm line said no floor exists in that
+  suite, which is true at this order and false after unit 19 pins one. Order 5 → 6 for unit 20's
+  insertion.
 - rev-2 · 2026-09-20 · S2 · S5 · S6 · §3 · §4 · AC2 · AC3 · AC6 · AC11 · AC18 · AC19 · §7 · §8 ·
   folded spec-audit round 1: M5 (raw 8) — the suite's `project-owned` entry had no criterion, so
   AC18 greps it, and the key's declarations move to unit 10 where AC-read greps live; M7 (raw 24)

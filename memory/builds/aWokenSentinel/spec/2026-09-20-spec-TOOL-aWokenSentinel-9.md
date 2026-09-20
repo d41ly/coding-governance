@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 14
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 |
 
 <!-- /gen:spec-records -->
 
@@ -28,16 +30,19 @@ second line reds instead of drifting.
   `keepalive` fact is non-empty; nothing is appended otherwise. `present` and `absent` come from
   the same `grep -qF` unit 7's `--landed` uses. `--status` reads the newest line whatever its
   phase, because it reports and does not judge. Observed by AC1 and AC2.
-- **S2** — The one-line promise is an arm: `run --status tRun | wc -l` prints `1` on a fixture
-  whose sidecar, resume log and parked region are all populated, so every field that can print
-  prints on the same line. Observed by AC3.
+- **S2** — The one-line promise is an arm: `check_status_one_line tRun`, unit 17's helper,
+  asserts one stdout line on a fixture whose sidecar, resume log and parked region are all
+  populated, so every field that can print prints on the same line. Its staged break is unit
+  17's, a driver copy printing a second line, because a copy with this unit's field clause
+  removed prints one line too and cannot red it. Observed by AC3.
 - **S3** — The `--status` entry of `tools/unattended/VERBS.template.md` names the field, and its
   render `memory/guides/UNATTENDED-VERBS.md` is re-made in the same commit. Observed by AC4.
 - **S4** — The arms: the three fixtures of unit 7's AC1, AC3 and AC4 read through `--status` for
   `present`, `absent` and the omitted field, plus the fourth fixture — a stop line present and the
   record's `keepalive` line deleted — for the omitted field, which is the `none` arm the audit's
-  L6 (raw 15) asked for in field form; each observed RED first against a driver copy with the
-  field's line removed. Observed by AC1, AC2 and AC3.
+  L6 (raw 15) asked for in field form; each field arm observed RED first against a driver copy
+  with the field's line removed, and the one-line arm against unit 17's two-line copy. Observed
+  by AC1, AC2 and AC3.
 
 ## 3. Non-goals (OUT)
 
@@ -48,6 +53,9 @@ second line reds instead of drifting.
   the status-and-resume agreement arm at `unattended.test.sh:1028` keeps holding by construction.
 - **No second line, ever.** The arm of S2 is the rule; a future field joins the line or does not
   print.
+- **No reader change.** The suite's two whole-line readers of `--status` are unit 17's, read
+  through `extract_next`, which cuts the `next` value at the first separator after it; this
+  unit's field is a suffix after `next` and that cut is what keeps every reader untouched.
 
 ### Edges
 
@@ -55,9 +63,12 @@ second line reds instead of drifting.
   `grep -qF` id match. Without the helper this unit has nothing to print; unit 7 S4 is retired at
   its rev-2 and prints no line.
 - **consumes-from** `TOOL-aWokenSentinel-5` — the field rule at `verb_status`: appended to
-  `parked`, omitted at nothing, and the `resume-tick` field that precedes this one.
-- **consumes-from** `TOOL-aWokenSentinel-3` — the sidecar line whose `session_crons` value and
-  `utc` the field reports.
+  `parked`, omitted at nothing, and the `resume-tick` field that precedes this one. The sidecar
+  line whose `session_crons` value and `utc` the field reports is unit 3's, reached through unit
+  7's own edge on unit 3 rather than declared here.
+- **consumes-from** `TOOL-aWokenSentinel-17` — `extract_next` and `check_status_one_line`, the
+  suite's field-wise readers of the status line; without them the one-line arm has no break it can
+  red against and the `:1874` reader breaks on the first suffixed fixture.
 - **hands-off** external — nothing.
 
 ## 4. Design
@@ -80,16 +91,20 @@ what it printed before this unit, exactly as unit 5's field promises for the res
 
 The word order — id first, presence second, the utc last — reads as a sentence on the line
 (`keepalive k1 absent in the harness listing at 2026-09-16T12:00:00Z`) and keeps ` · ` as the only
-field separator, so the suite's `sed 's/.*· next //'` reader and the `grep -c 'next '` reader at
-`:1859` are untouched: the `next` field stays last and this field sits before it, on the same
-line, as `parked` and `noted` do.
+field separator. The `printf` at `unattended.sh:2975` prints `$parked` as its LAST operand, so
+every suffix — `parked`, `noted`, `STALE briefs`, `briefs gone`, unit 5's `resume-tick` field and
+this one — prints AFTER `next`, and only `halt-code` sits before it; this field is the last suffix.
+The suite's `grep -c 'next '` reader at `:1859` is indifferent to that, and its `:1874` reader
+goes through unit 17's `extract_next`, which cuts the value at the first separator after `next`,
+so neither moves.
 
 ### The one-line arm
 
 One arm in region two of the driver suite, on a fixture where every optional field is populated —
-a parked row, a resume log of one line, a stop line naming the id — asserts
-`$(run --status tRun | wc -l)` is `1`. It is the header's comment at `unattended.sh:8` turned into
-a check; a second stdout line from any future unit reds it by name.
+a parked row, a resume log of one line, a stop line naming the id — calls unit 17's
+`check_status_one_line tRun`, which asserts one stdout line with stderr dropped. It is the header's
+comment at `unattended.sh:8` turned into a check; a second stdout line from any future unit reds it
+by name, and the break that proves the arm can red is unit 17's two-line driver copy.
 
 ### The carriers
 
@@ -135,7 +150,9 @@ No function, key, verb or file is minted; the helper is unit 7's.
 - observability — the line names the id, the presence and the utc; the operator sees the reap's
   state without opening the sidecar.
 - risks — a status line that grows past a reader's expectation is the class this unit's arm now
-  guards; the `next` field stays last, which is the only position any reader keys on.
+  guards; a reader that takes everything after `next` as the unit id is the class unit 17's
+  `extract_next` closes, and this field is the first fixture to carry a suffix on that reader's
+  line.
 - testing — §6; four fixtures and the one-line arm, each against the driver over the suite's
   scratch fixture.
 - migration — none; a record with no stop line and an old record with no `keepalive` fact print
@@ -152,10 +169,11 @@ break is a driver copy with the field clause removed.
 - **AC1** — When the newest stop line reads phase `LANDING` and its `session_crons` contains `k1`,
   `bash tools/unattended/unattended.sh --status tRun` prints one line carrying ` · keepalive k1
   present in the harness listing at 2026-09-16T12:00:00Z`; when the listing is `[]`, the same
-  line carries ` · keepalive k1 absent in the harness listing at 2026-09-16T12:00:00Z`; and the
-  line still ends with the `next` field the `:1874` reader extracts.
-  Red when: `present` and `absent` swap, or the field prints after `next`, which moves the one
-  position every reader keys on.
+  line carries ` · keepalive k1 absent in the harness listing at 2026-09-16T12:00:00Z`; the
+  field is the LAST ` · `-separated field of the line, and `extract_next` over the same line still
+  prints the unit id.
+  Red when: `present` and `absent` swap, or the field prints before `next`, which breaks the
+  suffix convention every other field keeps; or the `next` value read by field changes.
 - **AC2** — When no stop log exists for the slug, the status line is byte-identical to what the
   driver at this unit's base prints, compared with `cmp` over the two outputs; when a stop line
   exists and the record's `keepalive` line is deleted with `sed -i '/^keepalive: /d'`, the line
@@ -163,9 +181,10 @@ break is a driver copy with the field clause removed.
   Red when: the field prints at nothing, which grows every existing status line; or a listing with
   no id to compare prints a presence.
 - **AC3** — When the fixture holds a parked row, a two-line `resume.tRun.log` and a stop line
-  naming `k1`, `bash tools/unattended/unattended.sh --status tRun | wc -l` prints `1`, and the same
-  count over `--resume tRun`'s output minus its resume lines is `1` for the status portion,
-  observed by the existing status-and-resume agreement arm still holding.
+  naming `k1`, `check_status_one_line tRun` passes with `1`, and the same count over
+  `--resume tRun`'s output minus its resume lines is `1` for the status portion, observed by the
+  existing status-and-resume agreement arm still holding. Observed RED first against unit 17's
+  two-line driver copy, never against the field-clause copy, which prints one line.
   Red when: any field arrives on a second line, which is the H1 defect re-introduced by any unit.
 - **AC4** — When `grep -c 'in the harness listing' tools/unattended/VERBS.template.md` and the
   same over `memory/guides/UNATTENDED-VERBS.md` run, both print 1 and 0 at this unit's base, and
@@ -173,7 +192,8 @@ break is a driver copy with the field clause removed.
   Red when: the template moved and the render did not, which check 10 reds at the close.
 - **AC5** — When `grep -c 'run --status' tools/unattended/unattended.test.sh` is compared between
   this unit's base and tip, the difference equals the arms this unit adds, and the arm at `:1874`
-  — `--status selects the same first row through the extracted helper` — is unchanged in bytes.
+  — `--status selects the same first row through the extracted helper` — is unchanged in bytes
+  from unit 17's tip, where it reads through `extract_next`.
   Red when: a control arm was edited to admit a second line, which is the resolution this unit
   rejects.
 
@@ -185,7 +205,7 @@ These are `--close`'s. The pass runs none of them: it verifies with the driver i
 AC3 over the fixture and the greps of AC4 and AC5. Under `unattended kit gate`, check 10's
 parity of the VERBS pair is the join this unit moves.
 
-New arm: `tools/unattended/unattended.test.sh` · the four field fixtures of AC1 and AC2 and the one-line arm of AC3, each observed red against a driver copy with the field clause removed · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the executed count; `FLOOR_SHARD_1` does not move
+New arm: `tools/unattended/unattended.test.sh` · the four field fixtures of AC1 and AC2, each observed red against a driver copy with the field clause removed; the one-line arm of AC3, observed red against unit 17's driver copy printing a second line · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the executed count; `FLOOR_SHARD_1` does not move
 
 ## 8. Open questions
 
@@ -193,6 +213,15 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S2 · S4 · §3 · §4 · §5 · AC1 · AC3 · AC5 · §7 · folded spec-audit round
+  2: sibling agreement for the promoted `TOOL-aWokenSentinel-17` (H2, raw 34, 49; H3, raw 3) — §4
+  states the field order as the `printf` at `unattended.sh:2975` has it, suffixes after `next`
+  and this field the last of them; AC1 asserts the last-field property instead of a line ending in
+  `next`; the one-line arm reads through `check_status_one_line` and names unit 17's two-line copy
+  as its break, since the field-clause copy prints one line too; the `:1874` reader is unit 17's
+  `extract_next`. M6 (raw 26) — the `consumes-from` on unit 3 had no reciprocal and is routed
+  through unit 7's edge; the one on unit 5 gains its reciprocal in spec 5's rev-3. Order 14 → 18
+  for the insertions of units 16, 18 and 17.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 1 as the
   promotion of H1 (raw ids 1, 21, 30, 44); carries the `none` arm of L6 (raw id 15) in field form,
   which unit 7's rev-2 routes here.

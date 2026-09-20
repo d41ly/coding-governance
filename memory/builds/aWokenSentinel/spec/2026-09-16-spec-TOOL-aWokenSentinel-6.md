@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-6 — the contract: protocol section 5, the Skill, the README, the conf prose and the dossier, with the cron job demoted to the idle-wake
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 12 · ratified 2026-09-16
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 15 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-7 |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-6-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-6-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
@@ -373,6 +374,11 @@ cap checks.
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: the `hands-off` on
+  unit 7 gains its reciprocal in spec 7's rev-3 (a check-12 line the round-2 record's M2 paragraph
+  reports as seen), and spec 13's rev-2 drops the `hands-off` it declared on this unit for the conf
+  comment sentence spec 5 writes (M2, raw 22), so this unit's edge set is unchanged in bytes.
+  Order 12 → 15 for the insertions of units 20, 16 and 18.
 - rev-2 · 2026-09-20 · S5 · S6 · §3 · §4 · AC1 · AC2 · AC6 · AC7 · folded spec-audit round 1: M1
   (raw 2, 25, 28, 37, 49) — units 6 and 7 both rewrote the dossier's closing bullet, so S6 and §4
   leave it to unit 7 and AC7 asserts it unchanged; M6 (raw 9) — the one-copy absent-owner rule had

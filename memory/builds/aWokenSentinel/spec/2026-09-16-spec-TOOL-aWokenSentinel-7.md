@@ -1,12 +1,13 @@
 # TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 13 · ratified 2026-09-16
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 16 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-7-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-7-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 
 <!-- /gen:spec-records -->
@@ -109,6 +110,9 @@ item nothing could contradict becomes a check against evidence the agent did not
   session at `FINISHED-UNSTAMPED` is BLOCKED, the listing is recorded in phase `LANDING`, and the
   session is told to re-run `--landed`. Without it every wired landing that follows the documented
   order ends its turn on the S2 remedy and is never continued — the six-records wedge B1 names.
+- **consumes-from** `TOOL-aWokenSentinel-6` — section 5's actor sentence, which names this
+  unit's check by the verb only and is left for this unit to make true, and the dossier's closing
+  bullet unit 6 leaves byte-identical for this unit to rewrite.
 - **consumes-from** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver holds one
   `rev-parse --git-dir`; S9's read through the function is what keeps it green.
 - **hands-off** `TOOL-aWokenSentinel-9` — the keepalive listing as a field on `--status`'s one
@@ -469,6 +473,13 @@ reverted as its break · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the exec
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: one check-12 line
+  the round-2 record's M2 paragraph reports as seen on the full hygiene run at 12513c25 — spec 6
+  declares `hands-off` this unit and this unit declared no `consumes-from` back, so the edge is
+  declared with what this unit takes. The `--landed` check-34 predicate this unit's verb sits
+  beside is `TOOL-aWokenSentinel-16`'s at order 7, sequenced before this unit; AC14's fixture is
+  the fast-forward shape and is unmoved by it. Order 13 → 16 for the insertions of units 20, 16
+  and 18.
 - rev-2 · 2026-09-20 · S2 · S4 · S6 · S8 · S9 · §3 · §4 · AC5 · AC8 · AC12 · AC14 · §7 · §8 · §10
   · folded spec-audit round 1: M1 (raw 2, 25, 28, 37, 49) — AC8 could not fail and two units
   wrote one dossier bullet, so unit 6 leaves the bullet to this unit, AC8 states the base value as

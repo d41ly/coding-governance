@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-16-prompt-TOOL-aWokenSentinel-4-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-4-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
@@ -69,8 +70,6 @@ refused. `--liveness` reads that file's last line as `last-stall`.
 - **consumes-from** `TOOL-aWokenSentinel-14` — `seed()` in `adopt-unattended.test.sh` committing
   once, so the real-driver fixture of AC10 has a born HEAD and `--liveness` reaches its
   `last-stall` step instead of refusing at check 52 on a dead `git log` probe.
-- **hands-off** `TOOL-aWokenSentinel-5` — acting on a stall: the tick reads `--liveness`, whose
-  `last-stall` is this line.
 - **hands-off** `TOOL-aWokenSentinel-6` — the README's sidecar layout paragraph, the Skill's
   hook section, the map dossier.
 - **hands-off** external — a measurement of the `StopFailure` stdin on this fleet, which turns
@@ -286,6 +285,11 @@ New arm: tools/unattended/adopt-unattended.test.sh · the seeded fixture with it
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: one check-12 line
+  the round-2 record's M2 paragraph reports as seen on the full hygiene run at 12513c25 — the
+  `hands-off` on unit 5 had no reciprocal, and rightly: the tick acts on `--liveness`'s `verdict`
+  alone and never reads `last-stall`, so the bullet claimed a consumer that does not exist and is
+  dropped. Order 8 → 10 for the insertions of units 20 and 16.
 - rev-2 · 2026-09-20 · S4 · §3 · §4 · AC10 · AC13 · folded spec-audit round 1: L7 (raw 16) — the
   descriptor's `project-owned` entry had no criterion, so S4 joins AC13, which greps it. Sibling
   agreement for the promoted unit 14 (H6, raw 32): the real-driver fixture paragraph and AC10's

@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 6 · ratified 2026-09-20
+**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 8 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 |
 
 <!-- /gen:spec-records -->
 
@@ -43,8 +45,9 @@ remedy promises is then a row the table performs.
   and the sidecar line; a second payload with the cap reached asserts `blocks-exhausted`; each is
   observed RED first against the hook with the row reverted to allow. Observed by AC1, AC2 and AC3.
 - **S6** — `verdict: FINISHED-UNSTAMPED` remains an ALLOW for an UNBOUND record by construction —
-  the hook never reaches its table for a session no record names — so the six pre-unit-1 records
-  at `LANDING` in this tree keep ending their turns silently. Observed by AC5.
+  the hook never reaches its table for a session no record names — so every pre-unit-1 record at
+  `LANDING` in this tree, none of which carries a `session:` fact, keeps ending its turns silently.
+  Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -66,16 +69,20 @@ remedy promises is then a row the table performs.
 ### Edges
 
 - **consumes-from** `TOOL-aWokenSentinel-3` — the hook, its decision table, `measureBlocks`, the
-  sidecar line grammar and the stub-driver fixture. Without the hook there is no row to change; the
-  row is provisional in unit 3's table at its order and replaced here one order later.
-- **consumes-from** `TOOL-aWokenSentinel-2` — `verdict: FINISHED-UNSTAMPED` and its offline
-  ancestry test against the local remote-tracking ref. Without it the row never selects.
+  sidecar line grammar and the stub-driver fixture, and through unit 3's own edge on unit 2 the
+  `verdict: FINISHED-UNSTAMPED` vocabulary with its offline ancestry test against the local
+  remote-tracking ref. Without the hook there is no row to change, and without the verdict the
+  row never selects; the row is provisional in unit 3's table at its order and replaced here one
+  order later.
+- **consumes-from** `TOOL-aWokenSentinel-16` — check 34 accepting the `--no-ff` landing the
+  charter mandates: the marker's commit contains the witness and sits on the remote default
+  branch, so step 3 of the loop below reaches `LANDED` from the run worktree. Without it every
+  re-run on that landing shape refuses (OPEN `TOOL-dUnstalledConvoy-38`), each refusal spends one
+  block of the shared budget, and the record wedges at `LANDING` by a longer route — audit H1.
 - **hands-off** `TOOL-aWokenSentinel-7` — the integration arm over the driver suite's `--landed`
   fixture: refusal, one Stop payload through the real hook and the real driver, the block with
   this reason, the sidecar line in `LANDING`, and `--landed` re-run to `LANDED` without a second
   turn. Unit 7 owns the refusal and therefore the arm.
-- **hands-off** `TOOL-aWokenSentinel-6` — nothing; the contract names the stop-guard by trigger
-  and this row changes no trigger.
 
 ## 4. Design
 
@@ -98,9 +105,10 @@ class. Nothing else in the hook moves.
 
 ### Why a BLOCK is the right answer for a bound session
 
-The `allow` row was written for the records in this tree at base: six non-terminal records with
-CLOSED READMEs whose runs finished without a stamp, none of which carries a `session:` fact. Those
-never reach the table, because `resolveLease` binds by session and an absent fact binds nothing. The
+The `allow` row was written for the records in this tree at base: the non-terminal records whose
+runs finished without a stamp, none of which carries a `session:` fact — the count is derived by
+AC5's grep at observation, never typed here. Those never reach the table, because `resolveLease`
+binds by session and an absent fact binds nothing. The
 only session that reaches this row is one that HOLDS a run whose work is already on the default
 branch and whose record still says `LANDING`, and the one thing such a session must do before it
 ends is `--landed`. Allowing its stop is allowing the wedge; blocking it, once per stop and bounded,
@@ -108,19 +116,27 @@ is the resume this build exists to provide, at zero API cost and inside the turn
 
 The loop this closes, traced against unit 7's refusals with the sidecar wired and the session bound:
 
-1. `--close`, commit, the lander pushes `main`, `--landed` runs. The newest stop line predates the
-   close, so unit 7's second refusal fires: END THE TURN once, re-run `--landed`.
+1. `--close`, commit, the lander pushes `main` — a `--no-ff` merge whose sha the marker records
+   while the run worktree's HEAD stays the merge's second parent — and `--landed` runs. Check 34
+   accepts that shape through unit 16 (before it, `TOOL-dUnstalledConvoy-38` refused every such
+   re-run and the recorded workaround was a fast-forward of the run branch onto the merge). The
+   newest stop line predates the close, so unit 7's second refusal fires: END THE TURN once, re-run
+   `--landed`.
 2. The session ends its turn. The hook binds, `--liveness` reads `FINISHED-UNSTAMPED`, this row
    BLOCKS, and the sidecar gains a line in phase `LANDING` carrying the harness's `session_crons`
    VERBATIM — written before the decision is printed, as unit 3's order of work has it.
-3. The session continues and re-runs `--landed`. The newest line is in `LANDING`; the id is absent
-   from the listing, so the verb prints `checked` and stamps `LANDED`; or the id is present, unit
-   7's first refusal names the reap, the session reaps, ends the turn, and step 2 repeats with a
-   listing that no longer names the id.
+3. The session continues and re-runs `--landed` in the SAME worktree. The newest line is in
+   `LANDING`; the id is absent from the listing, so the verb prints `checked` and stamps `LANDED`;
+   or the id is present, unit 7's first refusal names the reap, the session reaps, ends the turn,
+   and step 2 repeats with a listing that no longer names the id. The clone-shared marker's
+   overwrite by a concurrent landing (`TOOL-aUnblockedFleet-7`, OPEN) is tolerated by unit 16's
+   predicate when the later landing contains this one, and refuses otherwise, costing one block.
 4. After `LANDED` the next stop reads `TERMINAL` and allows silently.
 
-Every iteration costs one block and the count is bounded by `STOP_GUARD_BLOCKS`, so a reap the
-harness never reflects ends in `blocks-exhausted`, announced, rather than a loop.
+Every iteration costs one block and the count is bounded by `STOP_GUARD_BLOCKS`, which every
+block row shares, so a reap the harness never reflects — or a `--landed` refusal for any other
+reason, each of which costs one block per turn — ends in `blocks-exhausted`, announced, rather
+than a loop.
 
 ### The block reason
 
@@ -150,7 +166,7 @@ is unmoved.
 | file | change |
 |---|---|
 | `tools/unattended/stop-guard.js` | the row in `checkStop`, the literal in `renderBlock`, the class in `REASONS`, the header paragraph |
-| `tools/unattended/stop-guard.test.sh` | the `FINISHED-UNSTAMPED` arm rewritten from allow to block; the cap arm on this row; the unbound arm |
+| `tools/unattended/stop-guard.test.sh` | new arms: the `FINISHED-UNSTAMPED` block payload, the cap payload, the background-tasks payload and the unbound payload — spec 3 arms no allow row for this verdict at its order, so nothing is rewritten |
 
 ### Alternatives rejected
 
@@ -178,9 +194,13 @@ is unmoved.
   sidecar line names the class.
 - risks — the harness's own consecutive-block cap (see unit 3 §4 as folded at rev-2) ends a turn
   before `STOP_GUARD_BLOCKS` where the knob sits above it; the count persists in the sidecar so the
-  hook's cap still binds across turns. A landing whose `--landed` keeps refusing for a reason other
-  than the reap — a dirty tree, an anchor mismatch — is blocked up to the cap and then allowed, and
-  every block's reason text told the session which verb to run and what it printed.
+  hook's cap still binds across turns. The budget is SHARED with the `run-open` row, and a
+  `--landed` refusal of any kind costs one block per turn. A landing whose `--landed` keeps
+  refusing for a reason other than the reap — a dirty tree, an anchor mismatch — is blocked up to
+  the cap and then allowed, and every block's reason text told the session which verb to run and
+  what it printed. The check-34 refusal on the mandated `--no-ff` landing shape was that case for
+  EVERY wired landing until unit 16 (`TOOL-dUnstalledConvoy-38`), which is why that unit is
+  sequenced before this one.
 - testing — §6, each arm against the copied hook and the stub driver, in milliseconds; the arm
   against the real driver is unit 7's.
 - migration — additive; a reason class the pre-unit-8 hook never wrote.
@@ -211,17 +231,23 @@ observation is one payload fed to the hook.
   Red when: a pending task's completion is blocked, which spends a turn to arrive where the harness
   was going.
 - **AC4** — When `grep -c 'landing-unstamped' stop-guard.js` runs at the tip it
-  prints at least 3 — the `REASONS` entry, the `checkStop` branch and the header sentence — and
-  prints 0 at this unit's base; `grep -c 'finished-unstamped' stop-guard.js`
-  prints 0.
+  prints at least 4 — the `REASONS` entry, the `checkStop` branch, the `renderBlock` selector and
+  the header sentence — and prints 0 at this unit's base; the leading comment block alone, cut
+  with `awk` at the first line that is not a comment, carries `landing-unstamped` at least once
+  and 0 times at base; `grep -c 'finished-unstamped' stop-guard.js` prints 0.
   Red when: the old class survives, which is two rows for one verdict; or the header does not name
-  the row, which leaves the next reader to rediscover B1.
-  figure: 3 is DERIVED by the grep at observation; 0 at base is PINNED as read from unit 3's spec.
+  the row, which leaves the next reader to rediscover B1 — observable only over the comment block,
+  because the three code carriers satisfy the whole-file count on their own.
+  figure: 4 and the header count are DERIVED by the greps at observation; 0 at base is PINNED as
+  read from unit 3's spec.
 - **AC5** — When `FIX` holds a record at `LANDING` with `session: absent` and the liveness file
   holds `verdict: FINISHED-UNSTAMPED`, a payload with any `session_id` prints `rc=0`, empty stdout,
-  and writes no sidecar line.
+  and writes no sidecar line; and `grep -L '^session: '` over every `RUN.md` under the memory
+  tree's builds at the tip lists each record at a non-terminal phase, so the population this row
+  never reaches is derived at observation rather than typed.
   Red when: an unbound finished record is blocked, which traps every owner session on this node
-  while six such records exist in the tree.
+  for every such record the grep lists.
+  figure: the record count is DERIVED by the grep at observation; no integer is written here.
 
 ## 7. Gates
 
@@ -243,6 +269,23 @@ New arm: tools/unattended/stop-guard.test.sh · the `FINISHED-UNSTAMPED` payload
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · S6 · §3 · §4 · §5 · AC4 · AC5 · folded spec-audit round 2: sibling
+  agreement for the promoted `TOOL-aWokenSentinel-16` (H1, raw 48) — the loop trace names the
+  `--no-ff` landing shape, unit 16's check-34 predicate and the two OPEN rows
+  `TOOL-dUnstalledConvoy-38` and `TOOL-aUnblockedFleet-7`, §5 says the block budget is shared and
+  a refusal costs one block per turn, and §3 consumes unit 16; M1 (raw 6) — AC4's `grep -c`
+  threshold was met by the three code carriers alone, so the header is now observed over the
+  comment block cut with `awk` and the whole-file count names `renderBlock` as the fourth carrier;
+  L1 (raw 27) — Files touched named an allow arm spec 3 never builds and omitted the
+  background-tasks arm, so the row lists the four new payloads §7 names; L4 (raw 45) — "six
+  records" was a typed count of a derived population and wrong at base, so S6, §4 and AC5 state
+  the property and AC5 derives the count by grep. Order 6 → 8 for unit 16's insertion.
+- rev-2 · 2026-09-20 · §3 · two edge-join findings from check 12: the `hands-off` bullet on unit
+  6 declared an absence, which the join reads as an edge with no reciprocal, and is dropped
+  because the `No prose carrier` non-goal already holds the fact; the `consumes-from` bullet on
+  unit 2 had no `hands-off` back in spec 2, which this writer does not hold, so the verdict
+  dependency is folded into the unit-3 bullet, unit 3 declaring its own reciprocated edge on
+  unit 2. Observed by the full `check-memory-hygiene.sh` run over the tree at 12513c25.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 1 as the
   promotion of B1 (raw ids 18, 29, 43).
 
