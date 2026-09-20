@@ -1276,5 +1276,21 @@ else
   echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run"
 fi
 
+# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
+# static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
+# over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
+# pass that wrote this line may not run the suite; the first green under GATE_SELFTESTS=1 or
+# run-selftests.sh --kit tools/workflows confirms the executed count against it. The inline
+# `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
+# the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
+# diff or not at all.
+FLOOR_ASSERTIONS=293
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
+# NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
+# appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
+# range starts at the exit line itself, so a suite with nothing after it reads exactly 1; a comment
+# or a blank line after it is not counted.
+[ "$(sed -n '/^exit \$st$/,$p' "$0" | grep -cvE '^\s*(#|$)')" = 1 ] || { echo "FAIL a line follows the terminal exit and can never run"; st=1; }
+
 echo "--- $n arms, exit $st"
 exit $st

@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 21
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-21-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-21-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-21-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-21-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 |
 
@@ -161,11 +162,12 @@ later unit appends past it reds with its own sentence instead of hiding inside t
 `<n>` is the static count times 0.9 rounded down — 285 from the 317 sites at base, re-derived by
 the pass from the file it edits, because unit 15 adds arms before this unit's order and the count
 at the pass is what binds; AC4 bounds it from below as well as above, so a pin far under the
-count is red rather than merely slack. The static count is a lower bound on the executed count everywhere but
-one place: the `PV-AC12` branch near the suite's end skips its sites with an announced `SKIP` when
-no unattended adopter sits at `$UK`, and this repo carries one, so on this tree the sites execute
-and the ten percent is headroom rather than a mask. The inline `n=$((n+1))` sites the grep does
-not count only raise the executed figure above the static one.
+count is red rather than merely slack. The static count is a lower bound on the executed count on
+every tree: the one region that can skip, the `PV-AC12` branch near the suite's end, which prints an
+announced `SKIP` when no unattended adopter sits at `$UK`, counts only through inline `n=$((n+1))`
+sites the grep does not see (read at the pass: zero `same`/`has`/`hasnt_` sites inside it), so a
+skip there lowers nothing the pin measures, and the inline sites everywhere only raise the executed
+figure above the static one.
 
 ### Why a held leg and not a bar leg
 
@@ -278,8 +280,8 @@ No function, key, verb or file is minted.
   pin, which is an off-by-one that reds every honest run; or the self-read passes on the appended
   line, which is the stranded shape unseen; or it reds on the unmodified suite, which is an
   anchor that does not match this suite's `exit $st` spelling.
-  fixture: the suite copy with one appended line, made by `cp` and `printf` under a short
-  `%TEMP%` path.
+  fixture: the suite copy with one appended line, made by `cp` and `printf` under the session
+  scratchpad — a single file, so the short `%TEMP%` path a git clone needs on Windows is not owed.
 
 ## 7. Gates
 
@@ -306,6 +308,12 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-21 · §4 · AC5 · folded at the build pass, no report id: §4's lower-bound sentence had the
+  `PV-AC12` branch masking grep-counted sites on an adopter-less tree, and the branch holds none —
+  it counts through inline `n=$((n+1))` sites only, so the static count is a lower bound on every
+  tree; AC5's fixture copy goes under the session scratchpad, because the harness reserves the
+  short `%TEMP%` path for a clone and a one-file copy is not one. Derived at the pass: 326 sites,
+  pin 293; 103 `run_wf` sites at 186 ms each, budget 60 by the floor, ceiling 120.
 - rev-2 · 2026-09-20 · S4 · S5 · §3 · §4 · AC1 · AC4 · AC5 · §7 · folded spec-audit round 4:
   sibling agreement for the promoted `TOOL-aWokenSentinel-27` (H3 raw 18, 29; H4 raw 20, 30; H5
   raw 19) — the `PASS`-line non-goal withdrawn, the three meta-gate enrolments handed off by edge

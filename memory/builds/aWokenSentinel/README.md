@@ -115,7 +115,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md) | 18 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-aWokenSentinel-15 — the spec-audit commission pins each subject at its committed blob and refuses a dirty subject before a lens is dispatched](spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md) | 20 | 2 | CLOSED | rev-2 | 2026-09-21 |
-| [TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md) | 21 | 2 | CLOSED | rev-3 | 2026-09-21 |
 | [TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first](spec/2026-09-20-spec-TOOL-aWokenSentinel-22.md) | 22 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-23 — a kit-gate check banning the line count that reads an empty capture as one line: `printf '%s\n'`, `echo` or a here-string into `wc -l` over a captured variable, with the class in `memory/gotchas/`](spec/2026-09-20-spec-TOOL-aWokenSentinel-23.md) | 23 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-24 — the tick's conf-block staged break is ONE artifact: `build_tick_without_conf_block` in the tick's suite makes the copy from two anchor lines and asserts its shape, so both arms that stage it name a helper and no count](spec/2026-09-20-spec-TOOL-aWokenSentinel-24.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-20 |
@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 55 bound to this build, across 4 record folder(s).
+Records: 56 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -185,3 +185,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T23:03:06Z dispatch · item c5a31443 TOOL-aWokenSentinel-15 · reason tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-15-1-acceptance-ledger.md
 
 2026-09-20T23:03:06Z brief · item TOOL-aWokenSentinel-15 · reason a2ab80b96958 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-15-1-build-brief.md
+
+2026-09-20T23:14:51Z dispatch · item 1d8530e7 TOOL-aWokenSentinel-21 · reason tools/gate-legs.json tools/run-gates/selftest-budgets.txt tools/govkit/registry.toml tools/workflows/unattended-build.test.sh memory/guides/SESSION-KICKOFF.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-21-1-acceptance-ledger.md
+
+2026-09-20T23:14:52Z brief · item TOOL-aWokenSentinel-21 · reason 2b76fd627319 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-21-1-build-brief.md
