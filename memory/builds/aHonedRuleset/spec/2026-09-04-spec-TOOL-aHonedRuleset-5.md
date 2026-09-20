@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 3 · ratified 2026-09-04
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 3 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -8,7 +8,10 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
+| [2026-09-06-build-TOOL-aHonedRuleset-5-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aHonedRuleset-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
+| [2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md) | diff-review | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-8 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -28,6 +31,10 @@ A**, which changes where the rule is written and nothing about what it says. S10
 caught something: its failing case is observed in commit A over text commit A does not semantically
 touch, and observed AGAIN in commit B over the pattern that actually ships. §8 F3 records why a
 single commit was rejected and who overruled it.
+
+**S14 rides commit A despite sitting last.** It was added at rev-5 and appended rather than inserted,
+because every existing citation of an S-number is an address a renumber would silently break. Read
+the commit assignment from this paragraph and from §4's files-touched table, never from the number.
 
 - **S1** — `skills/session-kickoff/MANIFEST-TEMPLATE.md:29-31` becomes the single PROSE home. Its
   text is unchanged in commit A; S11 rewrites it. Every other prose carrier points at it or at the
@@ -53,9 +60,24 @@ single commit was rejected and who overruled it.
   playbook-only`, and the scope-limit line contains the literal `compare the stamp rule's sha
   expression`. Neither string occurs in that file today, measured at 0 apiece. Both anchors are
   worded to survive S11, so commit B does not have to rewrite them.
-- **S8** — `memory/guides/SESSION-KICKOFF.md` gets its `last-audit` re-stamp in commit A, because
+- **S8** — `memory/guides/SESSION-KICKOFF.md` gets its re-stamp in commit A, because
   `skills/session-kickoff/SKILL.md` and `skills/session-kickoff/manifest-check.sh` are both watched
-  pathspecs on line 6 of that file.
+  pathspecs on line 6 of that file. **BOTH stamp keys, not one.** This is the item units 2, 3, 4 and
+  6 copy, and the rule is written out here so those four can point at it rather than carry a fifth
+  copy of it. `last-audit` alone does not clear check 9 — the two keys measure different events.
+  Check 9 at `skills/session-kickoff/manifest-check.sh:398-403` counts `--no-merges` commits touching
+  any `watch:` pathspec since `last-body-change` and fails at 10, and it is EXCLUDED from the staged
+  pre-commit leg, so it reds only at the full bar, which is exactly where every unit's Definition of
+  Done runs. Before each commit the builder therefore re-derives
+  `git rev-list --count --no-merges <last-body-change>..HEAD -- "${WATCH[@]}"` against the manifest's
+  live `watch:` list, and advances `last-body-change` in that same commit whenever the §B re-verify
+  actually changed the body OR that count would otherwise reach 10. Measured 2026-09-06 the counter
+  stands at **3**; this build's watched commits take it to **9**, one short of the wall, while
+  `aHoistedPass` is in flight against the same ten pathspecs. The class was ruled a BLOCKER twice
+  before — `memory/builds/aThawedCorpus/reviews/2026-08-27-review-TOOL-aThawedCorpus-4-diff-round1.md`
+  F1 and
+  `memory/builds/aGroundedOrientation/reviews/2026-08-27-review-TOOL-aGroundedOrientation-1-diff-review-round1.md`
+  F1 — which is why it is scope here and not a note.
 - **S9** — the row's failing case is OBSERVED before commit A lands, per §7 of the charter: the
   `git merge-base <remote>/<default> HEAD` clause in `skills/session-kickoff/MANIFEST-TEMPLATE.md:29`
   is staged with one word changed, `bash tools/check-playbook-parity.sh` is run and must exit 1
@@ -69,11 +91,26 @@ single commit was rejected and who overruled it.
 - **S11** — the fix is applied at the two homes ONLY: the prose home at
   `skills/session-kickoff/MANIFEST-TEMPLATE.md:29-31` and the machine home `STAMP_SHA_RULE`. The four
   carriers S2, S3, S4 and S6 became pointers in commit A and inherit the new text with no edit, which
-  is the concrete payoff of doing the single-homing first.
+  is the concrete payoff of doing the single-homing first. **The rewrite keeps the anchor literal
+  `Stamp rule: sha = ` and the sha expression that follows it on ONE physical line, in both homes.**
+  That is a correctness constraint and not a wrapping preference: §4 shows the parity extraction is
+  per-line and `head -1` cannot rejoin a wrap, and S11 rewrites the exact line the new row extracts
+  from — today a three-line wrapped bullet whose continuation already carries a second backticked
+  `git merge-base` expression.
 - **S12** — this repo's own instantiated copy at `memory/guides/SESSION-KICKOFF.md:22` is
-  re-instantiated to the fixed rule, and that file takes its second `last-audit` re-stamp, because
-  commit B touches `skills/session-kickoff/manifest-check.sh` again. Commit B's stamp is written by
-  the NEW rule, which is this unit's own dogfood of the fix.
+  re-instantiated to the fixed rule, and that file takes its second re-stamp under S8's both-keys
+  rule, because commit B touches `skills/session-kickoff/manifest-check.sh` again. Commit B's stamp
+  is written by the NEW rule, which is this unit's own dogfood of the fix. **Commit B revises manifest
+  BODY prose**, not only the audit block, so `last-body-change` advances here on S8's first clause
+  and not merely on its counter clause.
+- **S14** — the `skills/session-kickoff/SKILL.md` row of `tools/template-size-highwater.txt` is
+  re-recorded to the post-S3 measurement with
+  `bash tools/check-template-size.sh --bump skills/session-kickoff/SKILL.md`, **in commit A**. This is
+  §8 F1's ruling — `bump the high-water down, in the same commit, to the post-S3 measurement` — which
+  rev-3 folded into AC2 and into no scope item and no files-touched row, so the two sections a builder
+  works from described a commit A that AC2 fails. F1 also forecloses the escape that `TOOL-aHonedRuleset-3`
+  does it: this unit is the LAST in the build to touch that file, and a `--bump` taken at `order 2`
+  records a figure `order 3` immediately supersedes.
 - **S13** — the parity row's extraction is re-anchored onto the fixed sha expression in the same
   commit, its failing case is observed a SECOND time against the shipped pattern, and
   `KICK-cSettledDocket-1` in `memory/backlog/KICK.md` flips to CLOSED naming this unit. Closing it IS
@@ -224,8 +261,15 @@ arm that reds when either extraction matches nothing. ONE row joins it:
 The compared value is `git merge-base <remote>/<default> HEAD` in commit A and `HEAD` in commit B —
 the same row, re-anchored, because the fix changes what the rule prescribes and not what the row is
 for. Each extraction captures the value out of its own delimiter, backticks on the template side and
-`$(…)` or bare on the constant side, and the loop already strips whitespace, so neither side's line
-wrapping matters and `head -1` is not a problem. Capturing from inside backticks inside `PAIRS` is
+`$(…)` or bare on the constant side. **Both sides must sit on ONE physical line, and the rev-4 text
+claiming otherwise was false about the mechanism.** Verified at `tools/check-playbook-parity.sh:135-136`:
+each extraction is a `sed` substitution applied per LINE, `head -1` then keeps one line, and `tr -d
+'[:space:]'` strips whitespace only INSIDE that line. A value split across a wrap resolves to nothing
+and cannot be rejoined, which is the rule sibling `TOOL-aHonedRuleset-4` S2 already states correctly.
+The row's stated side is anchored on the literal `Stamp rule: sha = `, which is unique in
+`skills/session-kickoff/MANIFEST-TEMPLATE.md` and survives S11 unchanged; anchoring on a bare
+backticked token would let `head -1` take the first backticked value on any earlier line of a file
+dense with them. Capturing from inside backticks inside `PAIRS` is
 precedented: the `agent-cap hook matcher` row already backslash-escapes each backtick, which is what
 keeps the double-quoted assignment from running a command substitution.
 
@@ -252,7 +296,8 @@ beside its existing "WHAT IT DOES NOT DO" paragraph.
 | A | `WIRE-INTO-PROJECT.md` | S4 — the step 2 pointer |
 | A | `skills/session-kickoff/manifest-check.sh` | S5, S6 — hoist the constant, interpolate it |
 | A | `tools/check-playbook-parity.sh` | S7 — one `PAIRS` row and two header lines |
-| A | `memory/guides/SESSION-KICKOFF.md` | S8 — re-verify §B, re-stamp `last-audit` |
+| A | `memory/guides/SESSION-KICKOFF.md` | S8 — re-verify §B, re-stamp BOTH keys per S8 |
+| A | `tools/template-size-highwater.txt` | S14 — `--bump` the engine row down, per §8 F1 |
 | B | `skills/session-kickoff/MANIFEST-TEMPLATE.md` | S10, S11 — the prose home's new rule text |
 | B | `skills/session-kickoff/manifest-check.sh` | S11 — `STAMP_SHA_RULE`'s new text |
 | B | `memory/guides/SESSION-KICKOFF.md` | S12 — re-instantiate line 22, second re-stamp |
@@ -362,10 +407,17 @@ No new file, no new gate leg, no inventory key. `tools/gate-legs.json` is not ed
   AC4, AC5 and AC6 do not reach, since those grade the `PAIRS` row only. Both counts hold at commit B
   as well, which is why the anchors are worded without `merge-base` in them.
 - **AC8** — After commit B, `grep -rn 'merge-base <remote>/<default> HEAD\|merge-base
-  <local-default> HEAD' skills/ WIRE-INTO-PROJECT.md memory/guides/SESSION-KICKOFF.md` returns
-  nothing, and `grep -c 'HEAD on any branch' skills/session-kickoff/MANIFEST-TEMPLATE.md
-  skills/session-kickoff/manifest-check.sh` returns `1` for each — the fixed rule at both homes and
-  the old spelling nowhere.
+  <local-default> HEAD\|merge-base origin/main HEAD' skills/ WIRE-INTO-PROJECT.md
+  memory/guides/SESSION-KICKOFF.md` returns nothing, and `grep -c 'on any branch'
+  skills/session-kickoff/MANIFEST-TEMPLATE.md skills/session-kickoff/manifest-check.sh
+  memory/guides/SESSION-KICKOFF.md` returns `1` for each — the fixed rule at both homes AND in this
+  repo's own instantiated copy, and the old spelling nowhere. **The THIRD alternative is what makes
+  this criterion reach the file it names.** `memory/guides/SESSION-KICKOFF.md:22` carries the
+  CONCRETISED spelling `git merge-base origin/main HEAD`, which neither abstract alternative can
+  match, so the rev-3 wording named that path in a pattern provably unable to fail on it and left S12
+  — this unit's only dogfood of its own fix — with no criterion. The positive half observes that S12
+  RAN, rather than only that a string is absent; `on any branch` is the pinned literal because it is
+  backtick-independent and returns 0 in all three files at base.
 - **AC9** — When `bash skills/session-kickoff/manifest-check.test.sh` runs it exits 0 after each
   commit, so the constant's hoist and then its rewrite broke no fixture and the shipped-seed arm
   still passes.
@@ -378,6 +430,15 @@ No new file, no new gate leg, no inventory key. `tools/gate-legs.json` is not ed
   `coding-governance-agents.template.md:68` as the carriers the fix leaves stale.
 - **AC12** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary it is green, with the
   `playbook parity`, `kickoff-manifest ratchet` and `kickoff engine size <=18KiB` legs all reported.
+  Additionally, `bash skills/session-kickoff/manifest-check.sh` exits 0 after commit B — the last of
+  this build's watched commits — with NO check-9 failure, which is the observation S8's both-keys rule
+  exists to earn.
+- **AC13** — The new row's STATED side resolves alone. After commit B, running that row's `sed`
+  extraction against `skills/session-kickoff/MANIFEST-TEMPLATE.md` on its own returns a NON-EMPTY
+  value equal to the sha expression `STAMP_SHA_RULE` owns. Run before `tools/check-playbook-parity.sh`
+  is invoked, because a row whose two sides are both empty AGREES, and the anti-vacuity arm is a
+  separate assertion from the equality one. This is the criterion S11's one-physical-line constraint
+  is graded by.
 
 ## 7. Gates
 
@@ -495,6 +556,42 @@ No new file, no new gate leg, no inventory key. `tools/gate-legs.json` is not ed
   supersedes" while its last bullet said those lines "were never carriers of this one". The last
   bullet is the correct one; the third now defers to it instead of contradicting it.
 
+- rev-5 · 2026-09-06 · **round-2 spec audit folded: H1, H2, H3, M3 and M6.** **H3, set-wide** — S8
+  said `last-audit` and nothing in this build ever named `last-body-change`; S8 now states both keys
+  in full as the single home units 2, 3, 4 and 6 point at, with check 9's mechanism, its exclusion
+  from the staged leg, the re-derivation command, and the measured counter (3 at 2026-09-06, 9 after
+  this build's watched commits, wall at 10). S12 gains the body-prose clause and AC12 gains the
+  check-9 observation. The class was a BLOCKER in `aThawedCorpus` and `aGroundedOrientation`; it is
+  cited rather than re-argued. **H1** — AC8 named `memory/guides/SESSION-KICKOFF.md` while carrying
+  only the two ABSTRACT merge-base spellings, and that file's line 22 holds the CONCRETISED one, so
+  the criterion could not fail on the file S12 exists to fix. Third alternative added, plus a POSITIVE
+  assertion on `on any branch` across all three carriers, so S12 is observed to have run. **H2** — §4
+  claimed the parity loop strips whitespace so wrapping does not matter; verified false at
+  `tools/check-playbook-parity.sh:135-136`, where the `sed` runs per line and `head -1` cannot rejoin
+  a wrap. The false sentence is replaced by the real mechanism, the anchor literal `Stamp rule: sha = `
+  is pinned, S11 gains the one-physical-line constraint the falsehood was standing in for, and AC13
+  grades the stated side's extraction alone — because a row whose two sides are both empty agrees.
+  **M3** — §8 F1's ratified high-water bump-down was in AC2 and in no scope item and no files-touched
+  row; it is now S14 with its own table row, appended rather than inserted so no existing S-number
+  citation moves, and §2's ordering preamble says S14 rides commit A. **M6** — §10 still said two
+  `PAIRS` rows; rev-3 cut it to one. Nothing else moved: no fork re-opened, no figure re-derived, and
+  L1 and L2 belong to `TOOL-aHonedRuleset-4`.
+
+- rev-6 · 2026-09-06 · **built as two commits and CLOSED.** Commit A single-homed the rule and armed
+  the parity row; commit B changed what the rule says and the four commit-A pointers inherited the new
+  text with no edit, which is the payoff the split was for. Every criterion was run. AC10 is the one
+  that matters: `manifest-check.sh` exits 0 after commit B ON THIS FEATURE BRANCH with a stamp written
+  by the new rule, which is the exact run `KICK-cSettledDocket-1` records failing three times. S9 and
+  S13 each observed the row RED — once over commit A's pattern, once over the shipped one — and the
+  intermediate state produced a third, unplanned observation: with both sources moved and the row not
+  yet re-anchored, the anti-vacuity arm fired with *an extraction matched NOTHING*.
+  **Two build-time facts worth the record.** AC2's floor of 90 bytes was missed at 84 by the first
+  pointer draft and the pointer was tightened rather than the criterion moved; the engine ends 143
+  bytes down and its high-water is bumped to match at 16991. And check 7's 300-char entry cap is
+  measured by an awk that counts BYTES here — the gate's own header says it does not pin which — so
+  both KICK rows had to be rewritten twice: a 300-CHARACTER row carrying `·`, `§` and `→` measures
+  305 and reds.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "one rule stated in several documents with the source that
@@ -502,8 +599,9 @@ owns it"` ranked `kit-dogfood-parity.PAIRS [build-method]` and `check-playbook-p
 among its affordance-seam hits. That is the seam this unit extends: `tools/check-playbook-parity.sh`
 S2 holds a declared `PAIRS` list of exactly this shape, with an anti-vacuity arm and a completion
 sentinel already built, and its in-script comment records that the list is in-script rather than a
-data file because it "reuses the seam kit-dogfood-parity.PAIRS already establishes". Two rows join it
-and no new mechanism is built. The probe also surfaced
+data file because it "reuses the seam kit-dogfood-parity.PAIRS already establishes". ONE row joins it
+and no new mechanism is built — the count moved from two to one at rev-3, for the reason §4's parity
+subsection gives, and this sentence was left stating the old figure until rev-5. The probe also surfaced
 `manifest-check.sh [session-kickoff]` as a seam, which is the second half of the answer: that script
 already owns `MANIFEST_LOCATIONS` and `TASK_SKELETON` as single homes for values that used to be
 spelled across several files, and `STAMP_SHA_RULE` is the third instance of the same pattern in the

@@ -469,7 +469,7 @@ where this document says it may:
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
-| `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `KICKOFF_EXITS` | a shrink-only floor on the interactive exits section 13 of THIS contract enumerates |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
@@ -673,3 +673,20 @@ and the run-state file joins the two halves.
 answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusal reachable on a
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
+
+## 13. The kickoff engine's interactive exits
+
+Moved from the engine's Step 5b (`TOOL-aHonedRuleset-3`); the engine keeps a pointer.
+**A run that still stops at any of these is not unattended, it is stuck:**
+
+1. **Step 0 · ambiguous worktree parent** → the checkout holding the default branch; still
+   ambiguous → ABORT and record why.
+2. **Step 0 · no git anywhere** → ABORT: there is nothing to land into.
+3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
+   conventions) → ABORT and record the condition verbatim; continuing is how a run destroys work.
+4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold; proceed generically and park the
+   offer for the owner's wrap-up.
+5. **Step 3 · a field that cannot be derived** → park the question, options and reason; proceed on
+   the most conservative reading; ACCEPTANCE or GATES unfillable → ABORT: not Ready, and an unattended
+   run cannot split it.
+6. **Step 5 · the READY stop** → replaced by the hand-back, the ONLY replacement the mandate buys.

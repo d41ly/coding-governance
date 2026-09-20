@@ -14,6 +14,7 @@ scope = "repo"
 kind = "flat"
 home = "tools"
 selectable = "conditional"
+why_conditional = "gov's tools/line-length-limits.txt names gov's own two subjects and neither path exists in an adopter tree, where a row naming an absent path is a stale red — so a default install would red on install day. The target authors its own declaration first."
 version_from = { none = "it grades whatever a target declares and carries no behaviour of its own to version" }
 
 [[files]]

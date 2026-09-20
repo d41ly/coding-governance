@@ -115,9 +115,7 @@ flagged §A task instead) and STAGE it; Step 5 commits it after the append: for 
 drift check lists, re-check the §B claim(s) derived from it (gate fence ← CI/scripts · pointer
 map ← moved dirs · traps/corrections ← toolchain files), fix or DELETE stale rows, and delete
 dated entries whose prune-when condition now holds.
-Re-stamp `last-audit` (ISO datetime with offset · sha = `HEAD` on the default branch, else
-`git merge-base <remote>/<default> HEAD`; no remote → `git merge-base <local-default> HEAD` —
-Step 0 already resolved the local default), and record
+Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
 repair commit message AND the READY card. The repair rides the session's unit branch/worktree — never a direct
@@ -225,22 +223,10 @@ Before the first pass, load the project's build method if it ships one —
 `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, rendered by the memory-tree kit: the spec set, the fork
 rule, the pass loop and the regrounding procedure, none of which this engine states.
 
-**The six interactive exits, and how each resolves with no owner turn** — a run that still stops
-at any of these is not unattended, it is stuck:
-
-1. **Step 0 · ambiguous worktree parent** ("Ask only if ambiguous") → resolve to the checkout holding
-   the default branch; if still ambiguous, ABORT and record why.
-2. **Step 0 · no git anywhere** ("scope-only kickoff, or stop") → ABORT: there is nothing to land into.
-3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
-   conventions) → ABORT and record the condition verbatim: continuing here is how a run destroys
-   work, and the mandate does not reach them.
-4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold. Proceed with the generic steps and
-   park the offer as a decision the owner gets at the wrap-up.
-5. **Step 3 · a field that cannot be derived** → park it with the question, the options seen, and the
-   reason, then proceed on the most conservative reading. If ACCEPTANCE or GATES is the unfillable
-   field, ABORT: a unit with no acceptance check is not Ready, and an unattended run cannot split it.
-6. **Step 5 · the READY stop** → replaced by this step's hand-back, the ONLY replacement the
-   mandate buys.
+**Six other interactive exits of this engine stop to ask, and a mandated run that stops at one is stuck, not
+unattended.** `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md` §13 enumerates them and how each resolves
+with no owner turn; this step's hand-back is the only one of the six the mandate buys. Not restated
+here — a paraphrase and its source are two answers to one question.
 
 An ABORT is a VERB: the unattended kit's `--abort <slug> --reason "<why>"` writes the reason into
 the run-state file's parked region, records a terminal phase with a witness, and stages it. A run

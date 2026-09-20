@@ -1446,6 +1446,32 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     for e in unreachable:
         r.fail(f"entry '{e}' is reached by no selection and is not marked conditional")
 
+    # ---- 7d (TOOL-aHonedRuleset-8 S4): a conditional mark must carry a REASON a machine can grade.
+    #      `why_conditional` was free text NOTHING read: three descriptors carried it, no code path
+    #      and no gate looked at it. The one entry whose stated reason failed measurement was the one
+    #      that omitted the field entirely. This copies registry.toml's `[[exempt]]` discipline --
+    #      an empty reason is "an omission wearing a label" -- to the other escape hatch.
+    for e in sorted(descs):
+        d0 = descs[e][0]
+        if d0.get("selectable") == "conditional" and not str(d0.get("why_conditional", "")).strip():
+            r.fail(f"entry '{e}' is marked conditional and carries no why_conditional — a conditional "
+                   f"mark without a stated reason is an omission wearing a label, and this is the one "
+                   f"field that would have caught a mark whose argument had stopped being true")
+
+    # ---- 7e (TOOL-aHonedRuleset-8 S5): an entry whose `requires` names a default-set member must be
+    #      reachable by SOME declared selection. The quantifier is deliberate and was measured: read
+    #      as "default-reachable" the arm demands drift-audit, playbook-render and unattended join the
+    #      default set, which is the wrong arm; read as "reachable by some selection" the violating
+    #      set is exactly the entry this unit fixes. It sits BESIDE 7b, never modifying it -- 7b's
+    #      conditional escape is correct for the four entries that earn it, and this asks a different
+    #      question: not "is it reachable" but "is a DEPENDENT of the default set reachable at all".
+    _reachable = set(default_kits(reg)) | set(all_kits(descs))
+    for e in sorted(descs):
+        needs = descs[e][0].get("requires") or []
+        if any(dep in default_kits(reg) for dep in needs) and e not in _reachable:
+            r.fail(f"entry '{e}' requires a default-set member but is reached by no declared "
+                   f"selection, so the dependency is documented and the entry ships to nobody")
+
     # ---- 7c: every guard pathspec in gov's OWN manifest falls into exactly ONE declared class.
     #          A class table that does not partition its input is how the emitter gets a rule for the
     #          majority and no rule for the rest — which is what happened when the hooks directory

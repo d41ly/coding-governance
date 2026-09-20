@@ -39,6 +39,21 @@ HARNESS = {"selftest.py", "refusal_join.py", "matrix.py"}
 # Shrink-only. Both are DERIVED on a first run and written here; a move in the weakening direction
 # must name both values beside it, which is the convention this repo already enforces on every pin.
 BRANCH_PIN = 217    # DERIVED on the first run over the real engine, not guessed. Shrink-only.
+# 244 -> 246, PIN UNMOVED, TOOL-aHonedRuleset-8. Two new `fail` branches in `selfcheck()`: the
+# why_conditional REASON gate (arm 7d) and the requires-edge REACHABILITY arm (arm 7e). Both are
+# ARMED -- selftest arms exercise each failing case, and each was observed RED by hand before
+# landing: 7d on `check-placeholders` with its reason removed, 7e on this unit's own base state.
+# THE RAISE IS DECLINED, and that is a departure from this file's convention worth naming. Every
+# prior row here is an `X -> Y` pin raise, and `141 -> 161` (TOOL-dUnstalledConvoy-26) states the
+# reason: a floor that trails the population stops catching the matcher going blind. The pin is
+# declined on a ruling recorded by the concurrent deployer unit that also adds branches to this
+# file: its non-goals make moving BRANCH_PIN out of scope, because a 217 -> 219 move would claim two
+# new branches took the pin to the population when the population is 246, and it files re-baselining
+# as its own backlog row. The id is deliberately NOT cited here: that spec is still SPECCED, and
+# drift-audit's `non_terminal_specs_cited_by_product_source` is a shrink-only list of exactly this
+# shape -- product source pointing at something that can still change under it. Find it through
+# memory/LIVE.md, which is generated and cannot go stale. So the trailing floor is a KNOWN DEFERRAL
+# with an owner, not an acceptable property.
 # 216 -> 217 at ROUND 4's fold. ONE new refusal, from the round's BLOCKER: the reserved-key guard in
 # `target_context`, which refuses a target `[answers]` or `[kit.<eid>]` key naming one of the three
 # tokens gov seeds for itself. Armed by SEVEN arms -- five doors, plus the liveness pair that proves

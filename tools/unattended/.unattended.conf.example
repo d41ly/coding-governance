@@ -107,8 +107,9 @@ SPEC_TOKENS_CLI=""
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
-# interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,
-# because the count is a property of that document and not of this kit.
+# of that skill's interactive exits the INSTALLED PROTOCOL enumerates a no-owner-turn resolution for
+# — it counts in <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md section 13, so MEASURE it against your
+# own installed protocol, because the count is a property of that document and not of this kit.
 KICKOFF_ENGINE=""
 KICKOFF_EXITS=""
 

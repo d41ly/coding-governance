@@ -73,11 +73,13 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
 
 ## Gaps
 
-- **Headroom is MEASURED, not recorded here.** The pair that used to sit in this bullet was wrong in
-  the measurement and in the caps it named, because both move and a number typed beside them does
-  not. The caps are declared on the method's own line 8; compare with
-  `awk 'END{print NR}' memory/guides/BUILD-METHOD.md` and `wc -c`. The line axis binds before the
-  byte axis, so M1's displacement rule stays load-bearing.
+- **There is no local cap to measure headroom against, since `TOOL-aHonedRuleset-6`.** The method
+  declared a byte and a line budget in its own opening prose, said in the same breath that no gate
+  enforced the pair, and the owner ruled the claim DELETED rather than made enforceable. What is
+  left is the hygiene class cap for `guides/`, a different constraint with a different owner. M1's
+  displacement discipline survives as a norm with no enforced figure. *(This bullet described the
+  pre-deletion state until `aHonedRuleset`'s closing review caught it, and it had also inverted the
+  axis: the deleted prose said the BYTE half bound first.)*
 - **The carrier check is STRUCTURAL, not semantic.** `check-method-carriers.sh` catches an
   undeclared carrier, a stale row and a copied `## M<n>` section. A fluent paraphrase that invents
   its own headings passes, and the leg says so rather than implying a comprehension it lacks.

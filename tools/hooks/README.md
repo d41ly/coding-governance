@@ -134,7 +134,10 @@ nothing. It exists so a file gate can share this predicate instead of re-impleme
 **A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
 rules off with no diff and a hook that still looks wired. `tools/check-wiring.sh` asserts its absence.
 
-An array LITERAL of ≤5 elements — the finder-lens fan — passes unmarked and needs no helper.
+An array LITERAL of ≤5 elements — the finder-lens fan — is a RECEIVER the hook can size, which is
+one of the three ways a receiver branch qualifies above; it needs no helper. It is not a blanket
+exemption for the shape: a raw `parallel([...])` over five literal elements is still denied,
+because the allowance is a property of what an `agent(` fan runs OVER and not of the literal.
 
 ## Direct spawns are COUNTED, not parsed
 
