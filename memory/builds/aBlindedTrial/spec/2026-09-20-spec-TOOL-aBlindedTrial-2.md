@@ -1,11 +1,12 @@
 # TOOL-aBlindedTrial-2 — the driver reads `spec-audit:` from the build README and owes the audit only when it is declared
 
-**Status:** INPROGRESS · rev-1 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 1 · ratified 2026-09-20
+**Status:** CLOSED · rev-2 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 1 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md](../build/2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md) | journal | TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 |
 | [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 |
 | [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round2.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 |
 
@@ -158,6 +159,9 @@ New arm: `tools/unattended/unattended.test.sh` · the `specs-audited` block, key
 ## 9. Revision log
 
 - rev-1 · 2026-09-20 · initial draft from the scout of `unattended.sh` at b7dee206.
+- rev-2 · 2026-09-21 · §6 · CLOSED. All eight criteria observed (ledger in the opt-in journal). The
+  closing review's F3 and F4 moved the term zero onto the BASE-derived value with `fail 53` for a
+  disagreeing fact, and a bare key onto `fail 52`; both are in the shipped driver.
 
 ## 10. Reuse audit
 

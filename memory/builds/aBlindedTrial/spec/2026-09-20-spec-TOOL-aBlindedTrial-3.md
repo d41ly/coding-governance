@@ -1,11 +1,12 @@
 # TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared
 
-**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md](../build/2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md) | journal | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 |
 | [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 |
 | [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round2.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 |
 
@@ -48,14 +49,13 @@ programmatic route, which no tool-call hook can see.
 - No driver verb records the OFF fact; the driver's own preflight line (`TOOL-aBlindedTrial-2`) is
   the record, and the harness's log line and return are the witnesses.
 - No project-wide default: `specAudit` is caller-supplied, read from the preflight line.
+- The DIRECT `Workflow` route is `TOOL-aBlindedTrial-4`'s: the hook denies it; the nested `workflow()`
+  here is a runtime call the hook cannot see, which is why this unit exists. A sibling, not an edge.
 
 ### Edges
 
 - **consumes-from** `TOOL-aBlindedTrial-2` — the value the caller passes is the driver's pinned
   `spec-audit` fact; without that unit the caller has nothing to read.
-- **hands-off** `TOOL-aBlindedTrial-4` — the hook denies a DIRECT `Workflow` call with kind
-  `spec-audit`; the nested `workflow()` here is a runtime call the hook cannot see, which is why
-  this unit exists.
 
 ## 4. Design
 
@@ -134,6 +134,10 @@ New arm: `tools/workflows/unattended-build.test.sh` · `UNITS` minus the key aga
 - rev-2 · 2026-09-20 · S6 · eleven fixture lines gained the key, not nine: the two fan fixtures also pin
   `subjects` and would have met the AC5 pairing refusal; the rule in S6 already covered them, the count
   was short. No criterion moved.
+- rev-3 · 2026-09-21 · §6 · CLOSED. All seven criteria observed; F6 added `round > 1` to the
+  audit-shaped refusal.
+- rev-4 · 2026-09-21 · §3 · the hands-off line to unit 4 becomes a non-goal sentence: the two units are
+  siblings guarding two routes, not a handoff, and check 12 wants an edge reciprocated.
 
 ## 10. Reuse audit
 

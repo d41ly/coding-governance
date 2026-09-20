@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-20
 streams: tooling+playbook
 roster: TOOL
-ids: TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6
+ids: TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
 authorized-by: prompt
 ---
 
@@ -58,6 +58,11 @@ and the method text.
   untested. Options: run the same three arms on one vague brief (≈60 agents), or accept the present
   verdict as bounded to explicit briefs. Not the run's to decide: it is the trial's scope, ratified
   at three tasks on 2026-09-20.
+- **A project-wide "audits owed by default" declaration.** The per-build `spec-audit:` key is the
+  owner's instrument; an adopter wanting today's rule on every build has no one-line way to say so.
+  Options: a conf key that pins the fact for every build, or nothing. Backlog `TOOL-aBlindedTrial-7`.
+- **A spec's §7 leg line versus the legs its files trip.** Round 1's F7: unit 4 omitted a leg whose
+  guard its own edit tripped. Both inputs are machine-readable. Backlog `TOOL-aBlindedTrial-8`.
 
 <!-- roster:units -->
 
@@ -72,20 +77,20 @@ and the method text.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 5 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
-ids TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6
+**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
+ids TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 TOOL-aBlindedTrial-6 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-20 |
-| [TOOL-aBlindedTrial-2 — the driver reads `spec-audit:` from the build README and owes the audit only when it is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-2.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-20 |
-| [TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-3.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-20 |
-| [TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare](spec/2026-09-20-spec-TOOL-aBlindedTrial-4.md) | 2 | 2 | INPROGRESS | rev-3 | 2026-09-20 |
-| [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-20 |
+| [TOOL-aBlindedTrial-2 — the driver reads `spec-audit:` from the build README and owes the audit only when it is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-20 |
+| [TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-3.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-20 |
+| [TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare](spec/2026-09-20-spec-TOOL-aBlindedTrial-4.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-20 |
+| [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

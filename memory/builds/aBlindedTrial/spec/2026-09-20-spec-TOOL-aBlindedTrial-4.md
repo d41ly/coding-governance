@@ -1,11 +1,12 @@
 # TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare
 
-**Status:** INPROGRESS · rev-3 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
+**Status:** CLOSED · rev-5 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md](../build/2026-09-21-build-TOOL-aBlindedTrial-2-opt-in-ledger.md) | journal | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-5 |
 | [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-5 |
 | [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round2.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-5 |
 
@@ -50,6 +51,8 @@ attended session rather than merely not required.
 
 - The hook does not read BASE and does not spawn git for this rule.
 - No `--only=` member is added; the closed set stays `join`.
+- The programmatic route — a harness's nested `workflow()` — is `TOOL-aBlindedTrial-3`'s; a sibling,
+  not an edge.
 - No change to `scratch-guard.js`'s behaviour; only the front-matter reader becomes shared, and its
   own arms keep passing.
 
@@ -57,7 +60,6 @@ attended session rather than merely not required.
 
 - **consumes-from** `TOOL-aBlindedTrial-2` — the key grammar `spec-audit: <date>`; a different
   spelling there makes this rule deny every declared build.
-- **hands-off** `TOOL-aBlindedTrial-3` — the programmatic route.
 
 ## 4. Design
 
@@ -149,6 +151,10 @@ New arm: `tools/hooks/agent-cap.test.sh` · README with and without the key, arg
   it owes. §7 gains `scratch-guard self-test`, the sibling leg the same `tools/hooks/` guard trips;
   the floor is re-pinned to 7 with a dated reason in the test, and the suite was re-run and
   observed at 165 passed, 0 failed, so the §3 claim is now observed rather than asserted. No AC moves.
+- rev-4 · 2026-09-21 · §6 · CLOSED. All seven criteria observed; rounds 1 and 2 folded `String(kind)`,
+  the subjects-to-build tie, the `..` and absolute-path denies, the win32-only MSYS fold.
+- rev-5 · 2026-09-21 · §3 · the hands-off line to unit 3 becomes a non-goal sentence, for the same
+  reason as unit 3's rev-4.
 
 ## 10. Reuse audit
 
