@@ -1,12 +1,13 @@
 # TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
+| [2026-09-16-build-TOOL-aWokenSentinel-1-1-acceptance-ledger.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-0-run-mandate.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-0-run-mandate.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-build-brief.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
@@ -206,7 +207,8 @@ The unit's own arms, in a new block beside the `--audit` arms in region two:
 2. `reset_tree`, then `env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID bash "$SCRIPT" --preflight tRun
    --keepalive-id k1 2>&1`.
 3. On the record arm 1 left: `run --resume tRun --keepalive-id zzz`.
-4. `mutate` the phase to `LANDED`, then the same invocation.
+4. `mutate` the phase to `LANDED`, then the same invocation with `yyy` — a value the record does
+   not already hold, because arm 3 has just written `zzz` to this same record.
 
 ### Inventory
 
@@ -314,9 +316,10 @@ the same invocation.
   Red when: the replacement line is absent or names the wrong old values, which is the read
   happening after the write; the file is not staged; or the plain form rewrites the lease.
 - **AC4** — When the fixture's phase is rewritten to `LANDED` by `mutate` and
-  `bash tools/unattended/unattended.sh --resume tRun --keepalive-id zzz` runs, the output carries
+  `bash tools/unattended/unattended.sh --resume tRun --keepalive-id yyy` runs, the output carries
   `UNATTENDED check 26 FAILED` and `LANDED via --resume`, no `lease replaced` line, the exit is 1,
-  and `grep -c '^keepalive: zzz$'` prints `0`; and when the same terminal record gets
+  `grep -c '^keepalive: yyy$'` prints `0` and `grep -c '^keepalive: zzz$'` still prints `1`, which
+  is AC3's value surviving; and when the same terminal record gets
   `bash tools/unattended/unattended.sh --resume tRun` without the option, the output carries
   `nothing to resume — phase LANDED is terminal` and exits 0, which is the arm at
   `tools/unattended/unattended.test.sh:4370` still holding.
@@ -383,6 +386,10 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · §4 arm 4 · AC4 · at the build pass: AC4 asked `--keepalive-id zzz` on the
+  terminal record and then `grep -c '^keepalive: zzz$'` to print `0`, but arm 3 has just written
+  `zzz` to that same record, so the literal could never be observed; the terminal arm now sends
+  `yyy`, greps `yyy` for `0` and `zzz` for `1`. Same mechanism, an observable value. Order unchanged.
 - rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: one check-12 line
   the round-2 record's M2 paragraph reports as seen on the full hygiene run at 12513c25 — spec 5
   declares `consumes-from` this unit and this unit declared no `hands-off` back, so the edge is

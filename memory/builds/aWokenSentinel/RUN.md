@@ -75,3 +75,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T16:43:31Z rescope · item add TOOL-aWokenSentinel-28 · reason spec-audit round 4 H6 HIGH (raw 2): spec 23 bans three spellings of the added-newline line count, printf, echo and the here-string, and its S3 and AC1 stage only the printf line, so the here-string branch of the regex, a separate alternation with the variable on the other side of wc -l, has no RED observation and the class gate lands with two of three cases never seen to fail; spec 23 keeps the printf staging and the echo and here-string arms are promoted to their own unit over the same suite copy, each observed RED and GREEN restored with the near-miss beside them
 
 2026-09-20T17:03:15Z review · item aWokenSentinel-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
+
+2026-09-20T17:09:24Z dispatch · item 90a83aba TOOL-aWokenSentinel-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-20T17:09:30Z brief · item TOOL-aWokenSentinel-1 · reason d290ac894ee8 memory/builds/aWokenSentinel/prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-build-brief.md

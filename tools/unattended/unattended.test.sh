@@ -350,6 +350,13 @@ git commit -q --allow-empty -m "unit work" --no-verify
 BASE=$(git rev-parse main)
 UNIT0=$(git rev-parse HEAD)
 export GOV_DEFAULT_BRANCH=main
+# THE LEASE FIXTURE (TOOL-aWokenSentinel-1). Every `--preflight` below records `session:` and `pid:`
+# from the environment, and the bar runs INSIDE a Claude session on every registered node — so
+# without these two lines each fixture record carries the real session's id and names a live
+# process, differently on every box (memory/gotchas/fixture-inherits-ambient-machine-state.md). The
+# pid is above anything a Linux box hands out and past any Windows box on this fleet.
+export CLAUDE_CODE_SESSION_ID=fixture-session
+export CLAUDE_PID=999999999
 
 # Back to the pristine unit-branch tree. A HARD reset, not a checkout: several arms COMMIT their
 # fixture (they have to — preflight refuses a dirty tree, so an uncommitted fixture would be
@@ -5206,6 +5213,67 @@ same "AC4 a zero UNIT_STALL_BOUND exits 2" "$rc" "2"
 hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
 reset_tree
 
+# ---- TOOL-aWokenSentinel-1: the LEASE. `--preflight` records `session:` and `pid:` beside the
+# ---- keepalive, `absent` with ONE NOTE where the harness exposes none, and `--resume --keepalive-id`
+# ---- replaces all three on a live record and is refused through check 26 on a terminal one. The
+# ---- environment is the subject, so these arms spell `bash "$SCRIPT"` rather than the `run` helper
+# ---- where the env differs from the prologue's fixture values.
+# AC1 — both exposed: three facts, no NOTE.
+reset_tree
+out=$(CLAUDE_CODE_SESSION_ID=abc CLAUDE_PID=4242 bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "AC1 preflight with the lease exposed exits 0" "$rc" "0"
+same "AC1 session recorded verbatim" "$(grep -c '^session: abc$' memory/builds/tRun/RUN.md)" "1"
+same "AC1 pid recorded verbatim" "$(grep -c '^pid: 4242$' memory/builds/tRun/RUN.md)" "1"
+same "AC1 the moved keepalive line still lands" "$(grep -c '^keepalive: k1$' memory/builds/tRun/RUN.md)" "1"
+miss "$out" "NOTE - this harness exposes no"
+# AC3 — on the record AC1 left, the resumed session replaces the lease: old values read BEFORE the
+# write, the file staged, exit 0. Then the plain form is byte-identical to before and rewrites nothing.
+out=$(CLAUDE_CODE_SESSION_ID=def CLAUDE_PID=9 bash "$SCRIPT" --resume tRun --keepalive-id zzz 2>&1); rc=$?
+same "AC3 a live-record replacement exits 0" "$rc" "0"
+hit "$out" "resume at phase RUNNING"
+hit "$out" "lease replaced · keepalive k1 -> zzz · session abc -> def · pid 4242 -> 9"
+same "AC3 keepalive replaced" "$(grep -c '^keepalive: zzz$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 session replaced" "$(grep -c '^session: def$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 pid replaced" "$(grep -c '^pid: 9$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 the replaced record is staged" "$(git diff --cached --name-only | grep -c '^memory/builds/tRun/RUN.md$')" "1"
+# ...and the INDEX carries the new value, which is what says --resume staged it rather than
+# --preflight having staged the old one: HEAD's fixture record has no keepalive line at all.
+same "AC3 the staged blob holds the replaced keepalive" "$(git diff --cached -- memory/builds/tRun/RUN.md | grep -c '^+keepalive: zzz$')" "1"
+out=$(run --resume tRun)
+miss "$out" "lease replaced"
+same "AC3 the plain form leaves the keepalive" "$(grep -c '^keepalive: zzz$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 the plain form leaves the session" "$(grep -c '^session: def$' memory/builds/tRun/RUN.md)" "1"
+same "AC3 the plain form leaves the pid" "$(grep -c '^pid: 9$' memory/builds/tRun/RUN.md)" "1"
+# AC4 — a terminal record is not re-leased: check 26 names the verb, nothing is written, exit 1; and
+# the plain form on the same record still prints the terminal line at exit 0.
+mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: LANDED/'
+out=$(run --resume tRun --keepalive-id yyy); rc=$?
+same "AC4 a terminal-record replacement exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 26 FAILED"
+hit "$out" "LANDED via --resume"
+miss "$out" "lease replaced"
+same "AC4 the terminal record's keepalive is untouched" "$(grep -c '^keepalive: yyy$' memory/builds/tRun/RUN.md)" "0"
+same "AC4 the terminal record's keepalive still reads the live value" "$(grep -c '^keepalive: zzz$' memory/builds/tRun/RUN.md)" "1"
+out=$(run --resume tRun); rc=$?
+same "AC4 the plain form on a terminal record exits 0" "$rc" "0"
+hit "$out" "nothing to resume — phase LANDED is terminal"
+# AC2 — neither exposed: both facts `absent`, ONE NOTE naming both.
+reset_tree
+out=$(env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "AC2 preflight under a harness exposing nothing still exits 0" "$rc" "0"
+same "AC2 session absent" "$(grep -c '^session: absent$' memory/builds/tRun/RUN.md)" "1"
+same "AC2 pid absent" "$(grep -c '^pid: absent$' memory/builds/tRun/RUN.md)" "1"
+same "AC2 one NOTE naming both" "$(grep -c 'NOTE - this harness exposes no session id or pid, so no out-of-session resumer can find this run' <<<"$out")" "1"
+# ...and only the pid withheld: the NOTE names the pid alone, and the session the harness exposed is
+# recorded rather than blanked with it.
+reset_tree
+out=$(CLAUDE_CODE_SESSION_ID=abc env -u CLAUDE_PID bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "AC2 preflight with only the pid withheld exits 0" "$rc" "0"
+same "AC2 the NOTE names the pid alone" "$(grep -c 'exposes no pid, so' <<<"$out")" "1"
+same "AC2 the exposed session survives the withheld pid" "$(grep -c '^session: abc$' memory/builds/tRun/RUN.md)" "1"
+same "AC2 the withheld pid is absent" "$(grep -c '^pid: absent$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
@@ -5718,7 +5786,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=790
+FLOOR_ASSERTIONS=824
+# RAISED 790 -> 824 by TOOL-aWokenSentinel-1: the lease block's 34 executed assertions, in region two
+# beside the `--audit` arms, measured by running that block alone over the sourced prologue.
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -5762,7 +5832,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=594
+FLOOR_SHARD_2=628
+# +34 for the TOOL-aWokenSentinel-1 lease arms, in region two beside the `--audit` arms.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
 # +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
 # +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.

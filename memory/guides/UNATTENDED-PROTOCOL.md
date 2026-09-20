@@ -225,11 +225,17 @@ belonging here:
     advertised and is absent on a default-branch run, so a reader keying on it alone sees no branch
     for the protocol's primary anchor. This is the fact the `gate-guard` hook keys a live run to the
     branch a tool call is made on; a record written before it existed is keyed by fact 10 instead.
+14. **The session id** holding the run, from `CLAUDE_CODE_SESSION_ID` at `--preflight`, re-recorded
+    by `--resume --keepalive-id`, the literal `absent` where the harness exposes none. With fact 2
+    and fact 15 it is the LEASE: what an out-of-session actor binds to.
+15. **The pid** of the process holding the run, from `CLAUDE_PID`, on the same terms as fact 14.
 
 Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
 default-branch run for the first two, a run that did not abort for the third. That is legal: the
 "nothing else" clause bounds what may appear, not what must. Fact 9 is always written, and fact 13
-whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there.
+whenever `HEAD` names a branch at preflight; a detached preflight writes nothing there. Facts 14
+and 15 are always WRITTEN, and the literal `absent` is a value, not a missing line: a record with no
+such line was never asked, one carrying `absent` was asked and answered no.
 
 **A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
 none could plus what independently verifies the value. A hand-reconstructed fact carrying no such

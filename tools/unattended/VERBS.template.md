@@ -74,7 +74,9 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
-- `--resume` — re-enters the run from the run-state file; must agree with `--status`.
+- `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
+  `--keepalive-id <id>` it REPLACES the lease — keepalive, session, pid — so a resumed session's
+  record names the session that now holds it; refused on a terminal record.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record

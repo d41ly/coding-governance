@@ -7,7 +7,7 @@
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
-#   unattended.sh --resume <slug>                          # the same line, plus the next action
+#   unattended.sh --resume <slug> [--keepalive-id <id>]    # the same line, plus the next action; with the id, the lease is replaced
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
@@ -1635,8 +1635,8 @@ scaffold_runmd() { # slug -> writes and stages <MEMORY_ROOT>/builds/<slug>/RUN.m
     printf '# %s - run state\n\n' "$slug"
     printf 'Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED\n'
     printf 'from the build README on every read, so it cannot go stale between them. This file holds\n'
-    printf 'only what nothing else does: the phase and its witness, the keepalive id, the pinned BASE\n'
-    printf 'with its anchor evidence, and the parked decisions.\n\n'
+    printf 'only what nothing else does: the phase and its witness, the keepalive id and the lease — the\n'
+    printf 'session and pid holding the run — the pinned BASE with its anchor evidence, and the parked decisions.\n\n'
     printf '%s\n%s\n\n' "$GEN_OPEN" "$GEN_CLOSE"
     printf '## Run facts\n\n'
     printf '## Parked\n'
@@ -2802,7 +2802,7 @@ verb_preflight() { # slug · keepalive-id
   [ -n "$(fact "$rel" anchor-ref)" ] || set_fact "$rel" anchor-ref "$AREF" || return 1
   [ -n "$(fact "$rel" anchor-sha)" ] || set_fact "$rel" anchor-sha "$ASHA" || return 1
   [ -n "$(fact "$rel" anchor-url)" ] || set_fact "$rel" anchor-url "$AURL" || return 1
-  set_fact "$rel" keepalive "$kid"  || return 1
+  write_lease "$rel" "$kid" || return 1
   # S4: which anchor authorized this run, and — when it was the second one — the observation it
   # rested on. EVIDENCE, exactly like anchor-ref/sha/url: written so a party off this machine can
   # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
@@ -2885,6 +2885,26 @@ set_fact() { # file · key · value
     return 1
   fi
   mv "$tmp" "$f"
+}
+
+# THE LEASE: the keepalive id and the session and pid holding the run, written by ONE function with
+# two callers — --preflight when a run starts and --resume --keepalive-id when a later session takes
+# it over (TOOL-aWokenSentinel-1). A record naming a cron job id and no session gave every
+# out-of-session actor — the stop-guard, the stall-recorder, the resume tick — nothing to bind to.
+# The values come from the harness's environment, never from argv. An unset one is recorded as the
+# LITERAL `absent`, not omitted: a missing line and a pre-lease record are the same bytes, and "never
+# asked" is a different fact from "asked and answered no". ONE stderr NOTE per call names which was
+# withheld; a harness that exposes no id is a fact about the harness and the run still starts.
+write_lease() { # run-state file · keepalive-id
+  local rel="$1" kid="$2" sid="${CLAUDE_CODE_SESSION_ID:-}" pid="${CLAUDE_PID:-}" gone=""
+  set_fact "$rel" keepalive "$kid" || return 1
+  if [ -z "$sid" ] && [ -z "$pid" ]; then gone="session id or pid"
+  elif [ -z "$sid" ]; then gone="session id"
+  elif [ -z "$pid" ]; then gone="pid"; fi
+  set_fact "$rel" session "${sid:-absent}" || return 1
+  set_fact "$rel" pid "${pid:-absent}" || return 1
+  [ -z "$gone" ] || printf 'unattended: NOTE - this harness exposes no %s, so no out-of-session resumer can find this run; the lease records absent and the hooks and the tick report it UNBOUND rather than guess.\n' "$gone" >&2
+  return 0
 }
 
 verb_status() { # slug
@@ -3076,9 +3096,15 @@ print_audit() { # slug
   return 0
 }
 
-verb_resume() { # slug
+verb_resume() { # slug · [keepalive-id]
   verb_status "$1" || return 1
-  local rel p; rel=$(runmd_of "$1"); p=$(fact "$rel" phase)
+  local rel p kid="${2:-}"; rel=$(runmd_of "$1"); p=$(fact "$rel" phase)
+  # THE LEASE IS REPLACED HERE AND NOT BY A RE-PREFLIGHT. `--preflight` on a live record overwrites it
+  # and re-pins the anchor (TOOL-aBranchedMandate-8), so the resumed session's only route to a record
+  # naming the session that now holds the run is this verb. Terminal first: a finished record is not
+  # re-leased, and the refusal is the whole output. Without the option the verb is byte-identical to
+  # what it always was; an empty value is the option's absence.
+  if [ -n "$kid" ]; then refuse_if_terminal "$rel" --resume || return 1; fi
   if is_terminal "$p"; then
     local rhc; rhc=$(fact "$rel" halt-code)
     if [ -n "$rhc" ]; then
@@ -3089,9 +3115,19 @@ verb_resume() { # slug
   else
     echo "unattended: resume at phase $p — read $rel, then continue the first non-terminal unit above"
     # The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the authored region
-    # carries twelve facts and never restates a derivable one (protocol section 2).
+    # carries the facts protocol section 2 enumerates and never restates a derivable one.
     [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
     echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
+    if [ -n "$kid" ]; then
+      # Old values READ BEFORE the write, so the line reports what the record said rather than what
+      # was just written twice. Staged through the one refusal --park uses, so the new lease is in
+      # the index the gate leg reads.
+      local ok os op
+      ok=$(fact "$rel" keepalive); os=$(fact "$rel" session); op=$(fact "$rel" pid)
+      write_lease "$rel" "$kid" || return 1
+      echo "unattended: lease replaced · keepalive $ok -> $(fact "$rel" keepalive) · session $os -> $(fact "$rel" session) · pid $op -> $(fact "$rel" pid)"
+      stage_or_fail "$rel" || return 1
+    fi
   fi
   return 0
 }
@@ -5322,7 +5358,7 @@ case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
-  --resume)    verb_resume "$SLUG" ;;
+  --resume)    verb_resume "$SLUG" "$KID" ;;
   --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
