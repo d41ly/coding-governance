@@ -3517,4 +3517,46 @@ else
   fi
 fi
 
+
+# ---- check 32 - the kit holds ONE derivation of the sidecar root. TOOL-aWokenSentinel-11, the
+# left-shift of a spec-audit finding: two specs in one build were about to spell
+# `<git-dir>/unattended` twice, once as `resolve_sidecar_dir` and once inline, and a per-unit
+# acceptance criterion pinning the count binds one pass of one unit and cannot say whose line made
+# it two. The count belongs here, where it binds every unit and every later edit.
+#
+# THE POPULATION IS THREE NAMED FILES beside this checker, never a glob: the driver, the library
+# and the resume tick where it exists (it contributes zero where it does not, so this is the same
+# check before and after that file lands). This checker's own source spells the literal inside its
+# grep and the suites spell it in their fixtures, which is why the population is named. The
+# derivation's ONE home is the library — the file the driver and the tick both source, ratified as
+# the home of any rule two scripts must answer identically — so the library is asserted to hold
+# exactly one and the driver is asserted to CALL it. Zero is a refusal too: a population that reads
+# sidecars with no derivation is spelling the root some other way, and `at most one` would pass it,
+# which is the vacuous-selector class.
+#
+# CODE LINES ONLY — `^[^#]*` — because the driver's idiom is a prose header beside every function,
+# and a header naming the rule beside the one function that holds it is right, not a second
+# spelling. `grep -c` counts LINES, never occurrences: a line carrying the literal twice counts once,
+# which is the intended unit for a check about spellings.
+#
+# What this check does NOT check, because a structural check reads as a semantic one to everybody
+# who did not write it: a second derivation spelled WITHOUT the literal — `rev-parse --git-common-dir`,
+# a `$GIT_DIR` read, a path composed from `.git` by hand — is invisible here; the check binds the one
+# literal this build's specs spelled. The two hooks, `stop-guard.js` and `stall-recorder.js`, are
+# outside the population by design: they derive the git dir in JavaScript through `deriveSidecarPath`,
+# and a shell function cannot be their spelling. A spelling on a COMMENT line is not counted, so a
+# commented-out second derivation passes until the edit that uncomments it, which is the edit this
+# check reds. And whether the one derivation is CORRECT — the worktree's git dir, never the common
+# dir — is the driver suite's fixture, not this count.
+_sd_lib="$_LIB_DIR/lib-unattended.sh"
+_sd_n=0
+for _sd_f in "$DRIVER" "$_sd_lib" "$HERE/resume-tick.sh"; do
+  [ -f "$_sd_f" ] || continue
+  _sd_n=$((_sd_n + $(grep -cE '^[^#]*rev-parse --git-dir' "$_sd_f" || true)))
+done
+_sd_in_lib=$(grep -cE '^[^#]*rev-parse --git-dir' "$_sd_lib" || true)
+_sd_calls=$(grep -cE '^[^#]*\$\(resolve_sidecar_dir\)' "$DRIVER" || true)
+[ "$_sd_n" -eq 1 ] && [ "$_sd_in_lib" -eq 1 ] && [ "$_sd_calls" -ge 1 ] \
+  || fail 32 "the kit must hold ONE derivation of the sidecar root — resolve_sidecar_dir, in lib-unattended.sh — and the driver must read every sidecar through it; a second 'rev-parse --git-dir' on a code line of the driver, the lib or the tick is a second spelling that drifts from the first, and zero is a reader with no derivation. code-line count: $_sd_n (lib: $_sd_in_lib), driver callers: $_sd_calls"
+
 exit "$status"

@@ -1899,6 +1899,32 @@ mkdir -p "$_c31_dir" && : > "$_c31_route"
 miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 31"
 reset_tree
 
+# ---- 32 (TOOL-aWokenSentinel-11): the kit holds ONE derivation of the sidecar root, on a CODE
+# ---- line of the library, and the driver reads every sidecar through it. The fixture's driver and
+# ---- library are copies of the shipped pair, so the pristine tree counts one spelling in the lib,
+# ---- none in the driver and one caller, and the arms below move exactly one of those three.
+# ---- The break is the shape the spec-audit finding named: a second `$(GIT rev-parse --git-dir)`
+# ---- spelled inline inside `verb_status`, which is where one spec of that build had put it.
+# ---- The arm carries the ENTIRE literal signature up to the first interpolation plus the count
+# ---- the refusal prints, so it reads the refusal's number and not only its sentence.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^verb_status() {/a\  _x=$(GIT rev-parse --git-dir)/unattended'
+hit "$(run)" "the kit must hold ONE derivation of the sidecar root — resolve_sidecar_dir, in lib-unattended.sh — and the driver must read every sidecar through it; a second 'rev-parse --git-dir' on a code line of the driver, the lib or the tick is a second spelling that drifts from the first, and zero is a reader with no derivation. code-line count: 2"
+# ...the NEAR-MISS, and it is a control on the predicate rather than a second break: the same line
+# as a COMMENT is not a spelling, because the driver's idiom is a prose header beside every function
+# and a header that names the rule is right. The check's own header says a commented-out second
+# derivation passes until the edit that uncomments it, and this arm is that sentence, observed.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^verb_status() {/a\  # _x=$(GIT rev-parse --git-dir)/unattended'
+miss "$(run)" "check 32"
+# ...and ZERO CALLERS is the other direction of the same refusal: a derivation nothing calls is a
+# function that exists for the grep. The one call site is deleted and the count the refusal prints
+# is read, so an `at most one` predicate — which would pass this copy — cannot pass this arm.
+reset_tree
+mutate $KIT_REL/unattended.sh '/sidecar=$(resolve_sidecar_dir)/d'
+hit "$(run)" "driver callers: 0"
+reset_tree
+
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be
 # ---- silent whether the predicate worked or not, which is the class this kit keeps meeting.
@@ -3249,7 +3275,10 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
 # ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
 # ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
-FLOOR_ASSERTIONS=410
+FLOOR_ASSERTIONS=416
+# ---- RAISED 410 -> 416 by TOOL-aWokenSentinel-11: the three check-32 arms execute six assertions
+# ---- (three `mutate`, two `hit`, one `miss`), all in region two beside the check-31 arms, so
+# ---- FLOOR_SHARD_2 carries the same +6 and FLOOR_SHARD_1 is untouched.
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -3275,7 +3304,7 @@ FLOOR_ASSERTIONS=410
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=319
+FLOOR_SHARD_2=325
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
