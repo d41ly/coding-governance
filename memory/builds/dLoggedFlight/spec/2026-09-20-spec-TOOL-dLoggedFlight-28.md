@@ -95,8 +95,11 @@ and a derived one follows the render.
 The liveness half is not decoration. A sweep whose removals never reach the render is the vacuous
 selector this repo reds gates for, and the corpus already carries the same lesson from a different
 angle: `DEPL-aTetheredConvoy-5` records that a guard deriving its population from a lossy source
-cannot tell zero-of-zero from clean. So the arm prints what it removed and asserts that each removal
-moved the rendered bytes.
+cannot tell zero-of-zero from clean. So the arm prints what it removed, asserts that the removals
+partition the timeline, and asserts that every kind the base render writes a row for moved the
+rendered bytes when it went. Not every kind: rev-2 measured that a kind the renderer neither rows
+nor counts leaves the bytes untouched by construction, which is a fact about the renderer and not a
+gap in the sweep.
 
 `TOOL-dLoggedFlight-22` AC5 already re-reads the same five expectations, but it reads the SOURCE and
 asks whether each one is written as a derivation. That is a shape check over text. This arm asks
@@ -133,8 +136,8 @@ whether the derivation actually tracks its input, which no reading of the source
 - security — N/A — test code only, over synthetic fixtures.
 - perf / scale — one render per swept kind on each of the two models; the arm prints the render count
   so the cost is visible rather than inferred.
-- error / empty / loading states — a model whose timeline holds one kind sweeps once; an empty swept
-  set reds rather than passing silently.
+- error / empty / loading states — a model whose timeline holds one kind, or none, reds rather than
+  passing silently: one mutation is not a sweep, and a copy of the whole model is not a mutation.
 - observability — each failure names the swept kind, the expectation and both values.
 - risks — a swept kind no expectation reads passes for that kind and says nothing; S2's
   render-differs assertion, over the kinds the base render shows a row for, is what keeps such a pass
@@ -150,9 +153,10 @@ whether the derivation actually tracks its input, which no reading of the source
 - **AC1** — When `test_record_kind_sweep` runs over `build_class_model`'s model, the swept set equals
   the distinct event kinds of that model's timeline, and every expectation `TOOL-dLoggedFlight-26` S3
   and S5 derive matches the render of each copy `build_kind_removed` returns.
-  Red when: an expectation fails on a copy, a kind on the timeline is not swept, or the swept set is
-  empty. Staged RED by an arm copy that types the `values withheld` count at the base render's value,
-  which must fail on the first swept kind carrying an intruder while the base render still passes.
+  Red when: an expectation fails on a copy, a kind on the timeline is not swept, or the swept set
+  holds fewer than two kinds. Staged RED by an arm copy that types the `values withheld` count at the
+  base render's value, which must fail on the first swept kind carrying an intruder while the base
+  render still passes.
   figure: DERIVED — the swept set and every expectation are read from the model at observation time.
 - **AC2** — When the arm sweeps, every kind the base render shows a Timeline row for renders a
   document differing from the base, each swept kind removed at least one event, the removal counts
@@ -201,7 +205,11 @@ New arm: `tools/runlog/selftest.py` · AC1's and AC3's arm copies that type an e
   `withheld rows` fact, so the sweep still subsumes the retirement case the audit asked for. The two
   readers the arm needs, `read_sweep_expectations` and `measure_killed`, join the inventory in the
   same bump; the second derives what the `values withheld` count must fall by from the builder's own
-  `read_placed` list rather than from a kind-to-placement map typed beside the sweep.
+  `read_placed` list rather than from a kind-to-placement map typed beside the sweep. Three clauses
+  that only made sense under the old wording moved with it, which is the
+  `amendment-leaves-its-other-half-standing` class the pass's own checklist named: §4's closing
+  sentence, §5's error-states row, and AC1's empty-swept-set red-when, now a set of fewer than two
+  kinds, since one mutation is not a sweep.
 
 ## 10. Reuse audit
 

@@ -90,10 +90,10 @@ Two substitutes were used instead, and the line between them matters:
   sides of `TOOL-dLoggedFlight-22` and is the whole reason the sweep is parameterized by the
   timeline's own kinds.
 - **Three helpers arrive**, `build_kind_removed`, `measure_killed` and `read_sweep_expectations`, and
-  the arm itself. `python tools/lexicon/lexicon.py --suggest <name> --as py.function` was asked for
-  both names in the spec's inventory before they were written and answered OK for each; the two
-  helpers rev-2 adds lead with `measure` and `read`, both declared verbs. `VERB_OFFENDER_PIN` does
-  not move. No module-body constant arrives.
+  the arm itself. `python tools/lexicon/lexicon.py --suggest <name> --as py.function` answered OK for
+  all four: the two in rev-1's inventory before they were written, the two rev-2 adds when it added
+  them. `VERB_OFFENDER_PIN` does not move. No module-body constant arrives, and the arm's only nested
+  callables are lambdas, which the naming leg has no name to grade.
 - **`read_sweep_expectations` reads both sides at observation time.** The rendered side comes off the
   markdown through `parse_record_markdown`, the derived side off the model that render was made from,
   so no figure is compared with itself. Its shown slice follows the renderer's edge rule, which is why
@@ -112,6 +112,15 @@ Two substitutes were used instead, and the line between them matters:
   seconds for `runlog selftest` against the leg's 180-second ceiling. This arm adds two fixture builds
   and about a dozen renders, which cannot be timed without running the suite, so the figure is left
   where it is deliberately and the post-build run is where a breach would show.
+- **The bug-class checklist named a live one.** `gotchas.py --for-diff` over the first commit
+  selected 18 classes, and `amendment-leaves-its-other-half-standing` was a hit rather than a
+  reading: rev-2 changed AC2 and left three clauses standing that only made sense under rev-1 —
+  section 4's closing sentence, section 5's error-states row, and AC1's empty-swept-set red-when.
+  All three moved in the follow-up commit, and the rev-2 entry records them.
+  `staged-break-substitutes-a-synthetic-value` describes this pass's probe exactly, which is why its
+  limits are written above rather than left for a reader to infer.
+  `ledger-token-wrapped-across-a-line-joins-nothing` was checked against this file: every criterion's
+  backticked token sits on its own `- ACn —` line, none wrapped.
 - **This pass's own prose is unreviewed surface.** No audit runs beside it, so the spec's rev-2 text,
   the README paragraph and this ledger are read for the first time at the closing diff review.
 
