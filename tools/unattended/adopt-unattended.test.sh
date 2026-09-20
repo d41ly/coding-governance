@@ -233,6 +233,20 @@ for ev in list(d["hooks"]):
 json.dump(d,open(p,"w"),indent=2)' "$A/.claude/settings.json"
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 1a the tree without the fixture fragment is in sync again" "$?" "0"
+# THE STALL-RECORDER'S GROUP (TOOL-aWokenSentinel-4): the seed wires every fragment the kit ships, so
+# the `StopFailure` group is in the fixture by glob; with THAT group deleted from a copy declared
+# through GOV_SETTINGS_JSON the loop names the hook by its fragment's name, and with the fixture's
+# own file back the count line reads the population again. Observed on a fragment the kit ships,
+# where the fixture-fragment arm above observes it on one it does not.
+"$TESTPY" -c 'import json,sys
+d=json.load(open(sys.argv[1])); del d["hooks"]["StopFailure"]; json.dump(d,open(sys.argv[2],"w"),indent=2)'   "$A/.claude/settings.json" "$TMP/settings.nostall.json"
+out=$( cd "$A" && GOV_SETTINGS_JSON="$TMP/settings.nostall.json" bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the StopFailure group removed is UNWIRED" "$rc" "1"
+hit "$out" "the stall-recorder hook is UNWIRED"
+hit "$out" "no StopFailure entry under matcher * naming stall-recorder.js"
+out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 1a the fixture's own settings file is wired again" "$rc" "0"
+hit "$out" "hooks: $(ls "$HERE"/*.fragment.json | grep -c '') fragment(s) wired"
 
 # ---- ARM 1b: HOSTILE CONF VALUES, round-tripped.
 # ---- Conf values are free prose. The previous `sed` render interpolated them unescaped into

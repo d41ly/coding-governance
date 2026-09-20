@@ -1678,6 +1678,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "extractErrorClass",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.js"
+    },
+    {
       "id": "extract_acceptance",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -2396,6 +2401,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/unattended/stall-recorder.js"
     },
     {
       "id": "main",
