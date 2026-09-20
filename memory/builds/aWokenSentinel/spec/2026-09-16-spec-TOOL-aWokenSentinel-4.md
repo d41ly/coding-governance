@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
 
@@ -33,7 +34,7 @@ refused. `--liveness` reads that file's last line as `last-stall`.
 - **S4** — the fragment `stall-recorder.fragment.json` on event `StopFailure` with matcher `*`,
   so every error class is recorded, wired into `.claude/settings.json` by the merger in the same
   commit, asserted wired by the adopter's generalised fragment loop, and the suite in the
-  descriptor's `project-owned` list. Observed by AC7, AC8, AC9.
+  descriptor's `project-owned` list. Observed by AC7, AC8, AC9 and AC13.
 - **S5** — the line is what `--liveness` prints as `last-stall:`, observed once against the real
   driver on a git fixture. Observed by AC10.
 - **S6** — the suite, its budget row, the carried-prefix registry raise, and the symbols
@@ -65,6 +66,9 @@ refused. `--liveness` reads that file's last line as `last-stall`.
 - **consumes-from** `TOOL-aWokenSentinel-1` — the `session:` fact; an unset one binds nothing.
 - **consumes-from** `TOOL-aWokenSentinel-2` — the `last-stall` reader in `--liveness`, which
   prints the last line of this sidecar or `none`.
+- **consumes-from** `TOOL-aWokenSentinel-14` — `seed()` in `adopt-unattended.test.sh` committing
+  once, so the real-driver fixture of AC10 has a born HEAD and `--liveness` reaches its
+  `last-stall` step instead of refusing at check 52 on a dead `git log` probe.
 - **hands-off** `TOOL-aWokenSentinel-5` — acting on a stall: the tick reads `--liveness`, whose
   `last-stall` is this line.
 - **hands-off** `TOOL-aWokenSentinel-6` — the README's sidecar layout paragraph, the Skill's
@@ -129,10 +133,13 @@ last write of the pass. The `**` engine rule ships hook and fragment; the suite 
 `KIT` is a scratch directory holding `stall-recorder.js` and `run-lease.js` — no driver stub,
 because this hook never spawns one; `FIX` and `P` are unit 3's shapes, `P` carrying
 `hook_event_name` `StopFailure` and the arm's `error` value or none. One integration arm builds a
-`git init` fixture seeded the way the adopter suite's `seed()` does, copies the real driver beside
-the hook, feeds one payload, then runs that driver's `--liveness fx` and asserts its `last-stall:`
-line equals the sidecar's last line, read from the file. The suite prints `PASS (<n> assertions)`
-against a derived `FLOOR_ASSERTIONS`.
+`git init` fixture seeded the way the adopter suite's `seed()` does — which, from
+`TOOL-aWokenSentinel-14` at order 4, commits once, so HEAD is born and the driver's
+`git log -1 --format=%ct` clock probe is live; on an unborn HEAD `--liveness` refuses at check 52
+before its `last-stall` step and neither line this arm asserts ever prints — copies the real
+driver beside the hook, feeds one payload, then runs that driver's `--liveness fx` and asserts its
+`last-stall:` line equals the sidecar's last line, read from the file. The suite prints
+`PASS (<n> assertions)` against a derived `FLOOR_ASSERTIONS`.
 
 ### Inventory
 
@@ -232,8 +239,9 @@ guarded by `require.main === module`.
   at BUILDING with `session:` equal to `P`'s, and one `rate_limit` payload has been fed, the
   copied driver's own `--liveness fx` prints a `last-stall:` line equal to the sidecar's last
   line, both read from the fixture; before the payload it prints `last-stall: none`.
-  fixture: a `git init` tree seeded like the adopter suite's, under a short `%TEMP%` path; the
-  driver needs unit 2's verb, landed by order.
+  fixture: a `git init` tree seeded by the adopter suite's `seed()`, which commits once from unit
+  14 so HEAD is born and the `git log` probe is live, under a short `%TEMP%` path; the driver
+  needs unit 2's verb, landed by order.
   cost: the driver's startup, seconds, twice.
   Red when: the reader prints the line with its payload trimmed, or `none` after a write.
 - **AC11** — When `python tools/codebase-map/gen_map.py --check` runs after the regen, `rc=0`;
@@ -244,6 +252,10 @@ guarded by `require.main === module`.
   its raised count and no unlisted literal in the kit dir.
   cost: 6 s and 83 s measured on node a 2026-09-15.
   Red when: a name leads with a verb outside the table, or the budget row lands without its raise.
+- **AC13** — When `grep -c 'stall-recorder.test.sh' tools/unattended/kit.toml` runs it prints 1
+  and 0 at base — the `project-owned` list.
+  Red when: the suite ships to every `govkit apply` adopter with every other criterion green,
+  because no gate asserts a kit's `*.test.sh` is withheld.
 
 ## 7. Gates
 
@@ -274,6 +286,11 @@ New arm: tools/unattended/adopt-unattended.test.sh · the seeded fixture with it
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S4 · §3 · §4 · AC10 · AC13 · folded spec-audit round 1: L7 (raw 16) — the
+  descriptor's `project-owned` entry had no criterion, so S4 joins AC13, which greps it. Sibling
+  agreement for the promoted unit 14 (H6, raw 32): the real-driver fixture paragraph and AC10's
+  `fixture:` line state the born HEAD the committed `seed()` gives them and the edge consumes it.
+  Order 4 → 8.
 - rev-1 · 2026-09-16 · initial draft, from the spec brief and the research record.
 
 ## 10. Reuse audit

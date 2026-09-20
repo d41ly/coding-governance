@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-6 — the contract: protocol section 5, the Skill, the README, the conf prose and the dossier, with the cron job demoted to the idle-wake
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 6 · ratified 2026-09-16
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 12 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-7 |
+| [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
 
@@ -43,12 +44,16 @@ words beside them.
 - **S5** — `.unattended.conf` and `tools/unattended/.unattended.conf.example`: the `KEEPALIVE_*`
   comments say the job they name is the idle-wake, and each of the four knobs `STOP_GUARD_BLOCKS`,
   `RESUME_STALE_BOUND`, `RESUME_ATTEMPTS` and `RESUME_TURNS` carries a one-line rationale in both
-  files — added here only where the unit that added the key left none. A touch of
-  `.unattended.conf` re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md` in the same
-  commit. Observed by AC6.
-- **S6** — `memory/map/features/unattended.md`: the scheduler paragraph and the closing
-  "unenforceable by construction" bullet rewritten for the hooks and the tick, within
-  `DOSSIER_CAP_BYTES`; no claim changes, so no generated map artifact moves. Observed by AC7.
+  files. The KEY lines are never this unit's: `RESUME_STALE_BOUND` is unit 2's, `RESUME_ATTEMPTS`
+  and `RESUME_TURNS` are unit 5's, `STOP_GUARD_BLOCKS` is `TOOL-aWokenSentinel-10`'s, each with
+  its rationale; this unit adds a rationale only where one of them left none, and expects to find
+  none absent. A touch of `.unattended.conf` re-stamps `last-audit` in
+  `memory/guides/SESSION-KICKOFF.md` in the same commit. Observed by AC6.
+- **S6** — `memory/map/features/unattended.md`: the scheduler paragraph rewritten for the hooks
+  and the tick, within `DOSSIER_CAP_BYTES`; no claim changes, so no generated map artifact moves.
+  The closing "unenforceable by construction" bullet is NOT this unit's: unit 7 rewrites it for the
+  `--landed` check it builds, one order later, so one paragraph has one writer and unit 7's
+  `prints 0` criterion is 1 at its own base. Observed by AC7.
 - **S7** — The sweep: every tracked non-record carrier is grepped for `keepalive` and for
   `cannot be corrected`, and each hit is either rewritten here, or listed in section 3 with the
   reason it stays true or stays out of reach. Observed by AC2 and AC8.
@@ -99,9 +104,13 @@ words beside them.
 - **consumes-from** `TOOL-aWokenSentinel-5` — `resume-tick.sh`, the README's registration
   section, the sidecar kind `resume` with its launcher and `.out` files, `RESUME_ATTEMPTS` and
   `RESUME_TURNS` with their section 8 rows.
+- **consumes-from** `TOOL-aWokenSentinel-10` — the `STOP_GUARD_BLOCKS` line with its rationale in
+  both conf files and its section 8 row; without it AC6 finds the key nowhere to locate.
 - **hands-off** `TOOL-aWokenSentinel-7` — the sentence in section 5 that `keepalive-reaped` is
   checked at `--landed` against the harness's own listing; this unit writes the actors, unit 7
-  writes the check, and section 5 names the check by the verb only.
+  writes the check, and section 5 names the check by the verb only. And the dossier's closing
+  bullet, "The keepalive half is unenforceable by construction", which unit 7 rewrites and this
+  unit leaves byte-identical.
 - **hands-off** external — the M10 noun in `tools/memory-tree/BUILD-METHOD.template.md`, a backlog
   row the close mints for the owner.
 
@@ -194,18 +203,20 @@ Skill and the fixture in one run.
 Conf: the `KEEPALIVE_CREATE`/`KEEPALIVE_DELETE` comment gains "the job is the idle-wake; the
 keepalive is the hooks and the tick, protocol section 5"; the `KEEPALIVE_INTERVAL` comment says
 idle-wake. For the four knobs the pass reads both files and adds a one-line rationale only above a
-key that carries none, so a knob unit 2, 3 or 5 documented is not touched twice. Whether
-`.unattended.conf` is touched at all is decided by that read; when it is, the manifest re-stamp
-rides in the same commit, and when it is not, the stamp is not touched.
+key that carries none, so a knob unit 2, 5 or 10 documented is not touched twice — and each of
+those units declares its key WITH a rationale, so the read is expected to add nothing. Whether
+`.unattended.conf` is touched at all is decided by that read and by the `KEEPALIVE_*` comment
+edit; when it is, the manifest re-stamp rides in the same commit, and when it is not, the stamp is
+not touched.
 
 Dossier: the paragraph beginning "Nothing in a script can reach the scheduler" is rewritten to
-name the idle-wake, the three keepalive actors and `--liveness` as the shared predicate, and the
-closing bullet "The keepalive half is unenforceable by construction" becomes "The idle-wake half
-is agent-attested and checked at `--landed` against the harness's own stop listing; the keepalive
-half is three mechanisms outside the session, none of which the driver can prove ran." Measured
-at base: 20387 of `DOSSIER_CAP_BYTES` 20480, ninety-three bytes of headroom, so each rewrite
-replaces its paragraph at no more than the original's byte length plus that headroom; the
-`[claims]` block does not change.
+name the idle-wake, the three keepalive actors and `--liveness` as the shared predicate. The
+closing bullet "The keepalive half is unenforceable by construction" is left byte-identical: unit
+7 rewrites it for the check it builds, and two ratified records prescribing two texts for one
+paragraph was audit finding M1. Measured at base: 20387 of `DOSSIER_CAP_BYTES` 20480,
+ninety-three bytes of headroom, so the rewrite replaces its paragraph at no more than the
+original's byte length plus that headroom, and leaves unit 7 headroom it states in its own §4;
+the `[claims]` block does not change.
 
 ### The sweep (S7)
 
@@ -269,18 +280,28 @@ The base for the "0 at base" figures is this unit's own pass base, read by `git 
   `tools/unattended/PROTOCOL.template.md` and over `memory/guides/UNATTENDED-PROTOCOL.md`, each
   prints 1 and prints 0 at base; `grep -c '^## 5[.] The idle-wake and the keepalive'` prints 1 in
   both; the section 5 region cut by `awk '/^## 5[.] /{f=1;next} f&&/^## /{f=0} f'` carries
-  `stop-guard`, `stall-recorder`, `resume-tick`, `--liveness` and `--resume` each at least once and
+  `stop-guard`, `stall-recorder`, `resume-tick`, `--liveness` and `--resume` each at least once,
+  `never ends its turn by asking` exactly once (item 5, the one-copy rule every pointer targets),
+  `AGENT` and `DRIVER` each at least once (item 4, the actors), each of those three 0 at base, and
   `for four kit versions` zero times.
   Red when: the opening sentence is absent, which means the rule was paraphrased instead of stated;
-  or a mechanism name is missing, which means an actor was left out; or the narration survived.
+  a mechanism name is missing, which means an actor was left out; the one-copy rule is absent,
+  which leaves the Skill, the stop-guard reason and the tick payload pointing at nothing; or the
+  narration survived.
 - **AC2** — When `grep -c 'cannot be corrected in place'` runs over `tools/unattended/SKILL.template.md`
   and `.claude/skills/unattended/SKILL.md`, each prints 0 and prints 1 at base; the `## Resume`
   region cut by `awk '/^## Resume/{f=1;next} f&&/^## /{f=0} f'` carries `--keepalive-id` at least
   once and prints 0 at base; `grep -c '^## What wakes a stalled run'` prints 1 in both files and
-  0 at base; `grep -c 'schedule the idle-wake NOW'` prints 1 in both; and the `## What wakes a
-  stalled run` region names neither `--preflight` nor `/session-kickoff`.
-  Red when: the sentence survives in either file, which is the two-answers class; or the new
-  section names `/session-kickoff`, which moves check 18's first-mention order.
+  0 at base; `grep -c 'schedule the idle-wake NOW'` prints 1 in both; the `## What wakes a
+  stalled run` region, cut by `awk '/^## What wakes a stalled run/{f=1;next} f&&/^## /{f=0} f'`,
+  carries `stop-guard`, `stall-recorder`, `resume-tick` and `--liveness` each at least once and
+  names neither `--preflight` nor `/session-kickoff`; the `## Reap` region cut the same way
+  carries `idle-wake` at least once and 0 at base; and the `## Before any path` region's last
+  paragraph carries `never end the turn by asking` once and 0 at base, the absent-owner sentence.
+  Red when: the sentence survives in either file, which is the two-answers class; the new section
+  names `/session-kickoff`, which moves check 18's first-mention order; the new section's content
+  names no mechanism, which is a heading over nothing; or the Reap prose still calls the job the
+  keepalive.
 - **AC3** — When `grep -c '^## The sidecar' tools/unattended/README.md` runs, it prints 1 and 0 at
   base, and the region below it carries `stop.<slug>.log`, `stall.<slug>.log` and
   `resume.<slug>.log`; `grep -c 'gov-resume-tick' tools/unattended/README.md` is unchanged from
@@ -299,16 +320,18 @@ The base for the "0 at base" figures is this unit's own pass base, read by `git 
 - **AC6** — When each of `STOP_GUARD_BLOCKS`, `RESUME_STALE_BOUND`, `RESUME_ATTEMPTS` and
   `RESUME_TURNS` is located in `.unattended.conf` and in `tools/unattended/.unattended.conf.example`,
   the line immediately above each key starts with `#`; `grep -c 'idle-wake'` over each file prints
-  at least 1 and 0 at base; and `git show --stat HEAD` lists `memory/guides/SESSION-KICKOFF.md`
-  whenever it lists `.unattended.conf`.
+  at least 1 and 0 at base; `grep -c '^STOP_GUARD_BLOCKS='` over each file is unchanged from this
+  unit's base, because that line is unit 10's and this unit adds no key; and `git show --stat HEAD`
+  lists `memory/guides/SESSION-KICKOFF.md` whenever it lists `.unattended.conf`.
   Red when: a knob carries no rationale line, which means a reader configuring from the file gets a
   bare number; or the conf moved without the stamp, which `kickoff-manifest ratchet` reds at the
   close.
 - **AC7** — When `wc -c memory/map/features/unattended.md` runs, it prints at most the
   `DOSSIER_CAP_BYTES` value in `.memory-tree.conf`; `wc -c memory/guides/UNATTENDED-PROTOCOL.md`
   prints at most 61440; `grep -c 'resume tick' memory/map/features/unattended.md` prints at least
-  1 and 0 at base; and `python tools/codebase-map/gen_map.py --check` exits 0, because no claim
-  moved.
+  1 and 0 at base; `grep -c 'unenforceable by construction' memory/map/features/unattended.md`
+  is unchanged from this unit's base, the closing bullet being unit 7's; and
+  `python tools/codebase-map/gen_map.py --check` exits 0, because no claim moved.
   Red when: either file grew past its cap, which `memory hygiene` reds at the close; or the dossier
   was left untouched; or the map check reds, which means a claim moved and a regen is owed.
   figure: both caps are DERIVED at observation, 20480 from `.memory-tree.conf` and 61440 from the
@@ -350,6 +373,13 @@ cap checks.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S5 · S6 · §3 · §4 · AC1 · AC2 · AC6 · AC7 · folded spec-audit round 1: M1
+  (raw 2, 25, 28, 37, 49) — units 6 and 7 both rewrote the dossier's closing bullet, so S6 and §4
+  leave it to unit 7 and AC7 asserts it unchanged; M6 (raw 9) — the one-copy absent-owner rule had
+  no needle, so AC1 greps item 5 and item 4; M7 (raw 24) — no unit wrote the root conf's
+  `STOP_GUARD_BLOCKS` line, so S5, §4 and AC6 name unit 10 as its writer and the edge consumes it;
+  L8 (raw 17) — three of S2's Skill edits had no criterion, so AC2 cuts the new section and the
+  Reap section and greps them. Order 6 → 12.
 - rev-1 · 2026-09-16 · initial draft.
 
 ## 10. Reuse audit

@@ -1,12 +1,13 @@
 # TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 7 · ratified 2026-09-16
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 13 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
+| [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 
 <!-- /gen:spec-records -->
 
@@ -27,30 +28,46 @@ item nothing could contradict becomes a check against evidence the agent did not
 - **S2** — When the sidecar exists but its newest line was recorded in any phase other than
   `LANDING`, `verb_landed` refuses through a second new `fail` branch: the stop-guard records this
   session and no stop after the close exists to check the reap against, so the check could run and
-  did not. The refusal names the remedy, which is to end the turn once and re-run the verb.
-  Observed by AC2.
+  did not. The refusal names the remedy, which is to end the turn once and re-run the verb — and
+  the continuation that remedy promises is `TOOL-aWokenSentinel-8`'s `landing-unstamped` row,
+  landed at order 6, which BLOCKS a bound session at `FINISHED-UNSTAMPED` and tells it to re-run
+  `--landed`; at base the stop-guard's table ALLOWED that stop and the remedy ended the run
+  (audit B1). Observed by AC2 and AC14.
 - **S3** — When the newest line was recorded in `LANDING` and does not name the id, `verb_landed`
   proceeds to the anchor observation and prints one `checked` line naming the id and the utc; when
   no sidecar exists, or the record names no `keepalive` id, it proceeds and prints one `unchecked`
   line saying why. A pass is never silent. Observed by AC3 and AC4.
-- **S4** — `verb_status` prints one more line after its status line: the recorded keepalive id and
-  what the newest stop-guard line says about it — `present`, `absent`, or `unrecorded` when no
-  line exists. Observed by AC5.
+- **S4** — RETIRED at rev-2. The recorded keepalive id and what the newest stop-guard line says
+  about it is `TOOL-aWokenSentinel-9`'s FIELD on `verb_status`'s existing line, omitted when
+  unrecorded; this unit prints no second line and edits `verb_status` not at all, because a second
+  stdout line reds the suite's whole-output reader at `unattended.test.sh:1874` and the driver
+  header's one-line promise (audit H1). NOT OBSERVED — moved; AC5 observes that this unit leaves
+  the line alone.
 - **S5** — `dod_met`'s `keepalive-reaped` arm sets `DOD_OUT` on the met path so `--close` announces
   that the attestation is checked at `--landed`, through the existing met-with-something-to-say
   print rather than a new one. Observed by AC6.
 - **S6** — Every carrier that calls the item unobservable by a script is corrected in the same
   commit: the protocol's DoD table row, the Skill's close paragraph and its landed section, the
-  VERBS entries for `--landed` and `--status`, and the map dossier's paragraph on the keepalive
-  half; each template edit re-renders its output in that commit. Observed by AC7 and AC8.
+  VERBS entry for `--landed` (the `--status` entry is unit 9's), and the map dossier's closing
+  bullet on the keepalive half, which unit 6 leaves byte-identical for this unit; each template
+  edit re-renders its output in that commit. The build README's roster row for this unit, written
+  at `--rescope` after base and so outside the git-grep-at-base sweep, said `--close` where the
+  check is at `--landed`; it was corrected at the audit's disposal on 2026-09-20 and is listed here
+  so the sweep's scope names it. Observed by AC7 and AC8.
 - **S7** — The backlog row `TOOL-aPromptedMandate-11` moves to `CLOSED` in this unit's commit,
   citing the mechanism. Observed by AC9.
 - **S8** — Both new `fail` branches and the two pass shapes get arms in the driver's suite, beside
   the existing `--landed` success arm, each observed red on a staged break before the branch is
-  wired, and the suite's floors move by the arms' executed assertions. Observed by AC10 and AC11.
-- **S9** — The driver holds ONE derivation of the sidecar root after this unit lands: this verb
-  calls the derivation unit 2 introduced, and where unit 2 left it inline this unit extracts it at
-  instance #2 rather than spelling a second `rev-parse --git-dir`. Observed by AC12.
+  wired, and the suite's floors move by the arms' executed assertions; plus ONE continuation arm
+  that drives the documented landing order end to end — the S2 refusal on the `--landed` fixture,
+  one `Stop` payload for the fixture's bound session through the real `stop-guard.js` beside the
+  real driver, the `landing-unstamped` block, the sidecar line in `LANDING`, and `--landed` re-run
+  to `LANDED` with no second turn — so the B1 wedge is a red arm rather than a paragraph. Observed
+  by AC10, AC11 and AC14.
+- **S9** — This verb reads the sidecar root through `resolve_sidecar_dir`, unit 2's one derivation,
+  and spells no `rev-parse --git-dir` of its own; the rule that the driver holds ONE derivation is
+  `TOOL-aWokenSentinel-11`'s kit-gate check, landed at order 3, which binds every unit and not
+  this pass alone. Observed by AC12.
 - **S10** — The match rule for the id inside `session_crons` is verified against a REAL stop-guard
   line where one exists at build time, because the listing's shape is unmeasured and a substring
   rule that never matches the real spelling is a check that cannot fail. Observed by AC13.
@@ -62,7 +79,10 @@ item nothing could contradict becomes a check against evidence the agent did not
   compare the listing on a terminal verdict; that is a change to unit 3's predicate and a follow-up
   under `### Edges`, not this unit.
 - No change to the stop-guard's predicate, its continuation reason, or the sidecar's grammar. This
-  unit is a READER of unit 3's line and writes nothing under the git dir.
+  unit is a READER of unit 3's line and writes nothing under the git dir. The one row that makes
+  this unit's remedy true — a bound session at `FINISHED-UNSTAMPED` is blocked and told to run
+  `--landed` — is unit 8's, already landed; this unit asserts it in AC14 and does not build it.
+- No `--status` edit. The listing field is unit 9's.
 - No gate leg reads the sidecar. It is untracked and per-worktree, so a leg in a fresh clone could
   only report DEAD PROBE — the same reason `reuse-probed` is not a leg, protocol section 6.
 - No parsing of the `session_crons` value beyond a substring test for the recorded id. Its shape
@@ -85,6 +105,14 @@ item nothing could contradict becomes a check against evidence the agent did not
   spellings the reader matches nothing and refuses every landing as pre-close.
 - **consumes-from** `TOOL-aWokenSentinel-2` — the driver's derivation of the sidecar root, which
   that unit introduces to read `stall.<slug>.log`. This verb calls it; S9 forbids a second one.
+- **consumes-from** `TOOL-aWokenSentinel-8` — the stop-guard's `landing-unstamped` row: a bound
+  session at `FINISHED-UNSTAMPED` is BLOCKED, the listing is recorded in phase `LANDING`, and the
+  session is told to re-run `--landed`. Without it every wired landing that follows the documented
+  order ends its turn on the S2 remedy and is never continued — the six-records wedge B1 names.
+- **consumes-from** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver holds one
+  `rev-parse --git-dir`; S9's read through the function is what keeps it green.
+- **hands-off** `TOOL-aWokenSentinel-9` — the keepalive listing as a field on `--status`'s one
+  line, its `none` arm in field form (audit L6), and the `--status` VERBS entry.
 - **consumes-from** `TOOL-aWokenSentinel-1` — the `session:` fact that binds a session to the run.
   The stop-guard writes a line only for a bound session, so a record preflighted before unit 1
   landed never gains a sidecar and every landing of it reads `unchecked`, announced.
@@ -126,8 +154,10 @@ The verb then decides, in this order, with `kid=$(fact "$rel" keepalive)`:
 Why the line's own `phase` field decides "after the close" and not a clock: the record carries no
 timestamp for a phase change, so a clock comparison would mean reading the LANDING commit's
 committer date and parsing the line's ISO utc with `date -d` — a second clock with its own failure
-mode. `--close` is the sole writer of `LANDING` (S9 of `TOOL-aBoundedVerdict-15`, armed in the
-suite), and `--landed` is the sole writer of `LANDED`, so a stop recorded in `LANDING` is by
+mode. `--close` is the sole writer of `LANDING` — S9 of `TOOL-cFinalBerth-1`
+(`memory/builds/cFinalBerth/spec/2026-08-13-spec-cFinalBerth-1.md`, the driver's branch comment
+at `unattended.sh:2312` is that S9), with the staging fix `TOOL-aBoundedVerdict-15` cites at
+`:2324` — and `--landed` is the sole writer of `LANDED`, so a stop recorded in `LANDING` is by
 construction a stop between the two, and the field is already on the line.
 
 The two refusal texts, literal head first so `check-arms.py` can arm them, `<…>` interpolated:
@@ -150,10 +180,16 @@ Why the second refusal exists rather than the brief's `unchecked` pass: the Skil
 turn boundary between `--close` and `--landed`, and the ordinary landing runs attest, close, commit,
 lander and `--landed` in ONE turn. Under a pass-on-older-line rule the check would fire only when a
 turn happened to end between the two, which is by accident, and `TOOL-aPromptedMandate-11` would
-not honestly close. Requiring the post-close line costs one stop-guard block per landing — the
-stop-guard refuses a `LANDING` record's stop, records the listing, continues the session — and
-only where the sidecar already exists, so an adopter without the hook, or a session never bound,
-is never wedged. The fork and its M3 derivation are §8.
+not honestly close. Requiring the post-close line costs one stop-guard block per landing — and
+that block is `TOOL-aWokenSentinel-8`'s `landing-unstamped` row, not an assumption about unit 3:
+after the lander the witness is on `origin/<default>`, `--liveness` reads `FINISHED-UNSTAMPED`
+(spec 2 S3), and at base spec 3's table ALLOWED that stop, so the turn ended and nothing continued
+the session (audit B1, raw 18, 29, 43). Unit 8 makes the row a bounded BLOCK whose reason names
+`--landed`; the stop-guard records the listing, continues the session, and the re-run reads the
+post-close line. The refusal fires only where the sidecar already exists, so an adopter without
+the hook, or a session never bound, is never wedged; a reap the harness never reflects ends in
+`blocks-exhausted`, announced, after `STOP_GUARD_BLOCKS` blocks. The fork and its M3 derivation
+are §8; AC14 is the arm.
 
 What it does NOT check, said in the verb's header comment: whether the job named by `keepalive`
 was ever the run's job, whether a job under another id is still firing, or anything about a stop
@@ -161,16 +197,11 @@ the hook did not record. It reads one line the harness populated and compares on
 
 ### `--status` and `--close`
 
-`verb_status` prints, immediately after its `unattended: <slug> · phase …` line and before the
-witness refusal, exactly one line:
-
-```
-keepalive: <kid|none> · last harness listing <utc|none>: present|absent|unrecorded
-```
-
-`present` and `absent` come from the same `read_stop_listing` call and the same `grep -qF`;
-`unrecorded` when the helper prints nothing. `--status` reads the newest line whatever its phase,
-because it reports, it does not judge.
+`verb_status` is not edited by this unit. The listing reaches the operator as
+`TOOL-aWokenSentinel-9`'s field on the existing status line — ` · keepalive <kid> <present|absent>
+in the harness listing at <utc>`, omitted when nothing is recorded — built from this unit's
+`read_stop_listing` and the same `grep -qF`, one order later. A second stdout line was this unit's
+rev-1 shape and reds the suite's `:1874` whole-output reader on every fixture (audit H1).
 
 `dod_met`'s `keepalive-reaped` arm (`tools/unattended/unattended.sh:3909` at base) keeps its
 predicate and gains one line on the met path: `DOD_OUT="keepalive-reaped: attested; checked at
@@ -187,8 +218,9 @@ found by `git grep -i 'unenforceable by construction'`:
 |---|---|---|
 | `tools/unattended/PROTOCOL.template.md` DoD table, the `keepalive-reaped` row | `agent-attested` stays; the description gains: checked at `--landed` against the stop-guard's newest listing, refused when the id is still listed, announced `unchecked` where no record exists | `memory/guides/UNATTENDED-PROTOCOL.md` |
 | `tools/unattended/SKILL.template.md`, the close paragraph "Two of them are yours to attest, because no script can observe them" | one of them is READ BACK: the stop-guard records the harness's listing at every stop and `--landed` refuses when your id is still in it; the landed section gains the end-the-turn remedy | `.claude/skills/unattended/SKILL.md` |
-| `tools/unattended/VERBS.template.md`, the `--landed` and `--status` entries | the listing check and its two refusals; the one-line addition to `--status` | `memory/guides/UNATTENDED-VERBS.md` |
-| `memory/map/features/unattended.md`, "The keepalive half is unenforceable by construction" | the reap is checked at `--landed` where the stop-guard is wired; the schedule half stays agent-only | none, the dossier is authored; `map_diff.py` reports it fresh |
+| `tools/unattended/VERBS.template.md`, the `--landed` entry | the listing check and its two refusals; the `--status` entry is unit 9's | `memory/guides/UNATTENDED-VERBS.md` |
+| `memory/map/features/unattended.md`, "The keepalive half is unenforceable by construction" | the reap is checked at `--landed` where the stop-guard is wired; the schedule half stays agent-only. Unit 6 leaves this bullet byte-identical (its S6 at rev-2), so this unit is its one writer and the sentence is present at this unit's own base | none, the dossier is authored; `python tools/codebase-map/gen_map.py --check` is the freshness observation — `map_diff.py` attributes a range and reports no freshness |
+| `memory/builds/aWokenSentinel/README.md`, roster row 7 | said CHECKED at `--close`; corrected to `--landed` at the audit's disposal, 2026-09-20, outside the pass | none |
 | `memory/backlog/TOOL.md`, `TOOL-aPromptedMandate-11` | `OPEN` → `CLOSED`, with the mechanism named | none |
 
 The render command is `bash tools/unattended/adopt-unattended.sh`; the parity legs byte-compare
@@ -206,13 +238,22 @@ object each, with `session_crons` last, for example
 `{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}` — the shape is
 this unit's fixture and not a claim about the harness, which S10 covers.
 
+The continuation arm (S8, AC14) writes no stop line by hand. On the `--landed` fixture with a
+pre-close line present it runs `--landed`, reads the S2 refusal, then feeds one `Stop` payload —
+`session_id` equal to the fixture record's `session:` fact, which is the prologue's
+`fixture-session` from unit 1, `cwd` the fixture root — to the REAL `stop-guard.js` under
+`tools/unattended/` with the real driver beside it, so the hook binds, spawns `--liveness tRun`,
+reads `FINISHED-UNSTAMPED` (the fixture's witness is on the fixture `origin/main`), takes unit 8's
+row, and writes the `LANDING` line itself with the payload's `session_crons`; the arm then re-runs
+`--landed` and reads `phase LANDED`. It is the one arm in the suite that runs the hook, and it
+needs `node`, which every registered node has for `gate-guard.js`.
+
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
 | `read_stop_listing` | shell function in the driver | `sh.function`, verb `read`, snake — `--suggest` says OK |
 | two `fail <n>` numbers | refusal branches | derived at build time, next free above the high-water |
-| `keepalive:` status line | printed line | no cell; grammar above |
 
 No conf key, no verb, no file under the kit dir.
 
@@ -220,11 +261,11 @@ No conf key, no verb, no file under the kit dir.
 
 | file | change |
 |---|---|
-| `tools/unattended/unattended.sh` | `read_stop_listing`; `verb_landed` check and two refusals; `verb_status` line; `dod_met` `DOD_OUT` |
-| `tools/unattended/unattended.test.sh` | the arms of AC1 to AC6, AC10; floors of AC11 |
+| `tools/unattended/unattended.sh` | `read_stop_listing`; `verb_landed` check and two refusals; `dod_met` `DOD_OUT` |
+| `tools/unattended/unattended.test.sh` | the arms of AC1 to AC4, AC6, AC10 and AC14; floors of AC11 |
 | `tools/unattended/PROTOCOL.template.md` · `memory/guides/UNATTENDED-PROTOCOL.md` | DoD row |
 | `tools/unattended/SKILL.template.md` · `.claude/skills/unattended/SKILL.md` | close paragraph, landed section |
-| `tools/unattended/VERBS.template.md` · `memory/guides/UNATTENDED-VERBS.md` | two entries |
+| `tools/unattended/VERBS.template.md` · `memory/guides/UNATTENDED-VERBS.md` | the `--landed` entry |
 | `memory/map/features/unattended.md` | one paragraph |
 | `memory/backlog/TOOL.md` | one row's status |
 
@@ -305,13 +346,11 @@ after.
   `keepalive-reaped: attested, unchecked — the record names no keepalive id` and lands.
   Red when: the verb refuses on a missing file, which would wedge every adopter without the hook;
   or lands with no `unchecked` line.
-- **AC5** — When `run --status tRun` runs on the three fixtures of AC1, AC3 and AC4, its second
-  line is respectively `keepalive: k1 · last harness listing 2026-09-16T12:00:00Z: present`,
-  `keepalive: k1 · last harness listing 2026-09-16T12:00:00Z: absent` and `keepalive: k1 · last
-  harness listing none: unrecorded`; the first line is byte-identical to what it printed before
-  this unit.
-  Red when: the line is missing on any of the three, or `present` and `absent` swap, or the first
-  line changed.
+- **AC5** — When `run --status tRun` runs on the three fixtures of AC1, AC3 and AC4, its output
+  is exactly ONE line by `wc -l` and that line is byte-identical to what the driver at this unit's
+  base prints on the same fixture, compared with `cmp` over the two outputs.
+  Red when: a second line prints, which reds the `:1874` whole-output reader on every fixture; or
+  the line changed, which is this unit editing a verb unit 9 owns.
 - **AC6** — When `run --close tRun` runs on the suite's close-success fixture with
   `keepalive-reaped: yes` attested, its output carries `unattended: keepalive-reaped: attested;
   checked at --landed against the stop-guard's last harness listing` and still ends `close OK`.
@@ -326,9 +365,17 @@ after.
   Red when: a template count and its render's count differ, which is the parity defect the same
   commit exists to prevent; or the refuted sentence survives in either Skill file.
 - **AC8** — When the pass finishes, `grep -c 'unenforceable by construction'
-  memory/map/features/unattended.md` prints 0 and `python tools/codebase-map/map_diff.py` reports
-  the `unattended` dossier fresh.
-  Red when: the sentence survives, or the dossier is reported stale.
+  memory/map/features/unattended.md` prints 0 and prints 1 at this unit's own base, because unit
+  6 leaves the bullet to this unit; `grep -c 'checked at' memory/map/features/unattended.md`
+  prints at least 1 and 0 at this unit's base; `wc -c memory/map/features/unattended.md` prints at
+  most the `DOSSIER_CAP_BYTES` value in `.memory-tree.conf`; and
+  `python tools/codebase-map/gen_map.py --check` exits 0.
+  Red when: the sentence survives; the positive needle is absent, which is the bullet deleted
+  rather than rewritten; the dossier grew past its cap; or the map check reds, which means a claim
+  moved. A `prints 0` that already held at this unit's base would be a criterion that cannot fail,
+  which is why the base value is stated as 1 and derived from unit 6's rev-2 S6.
+  figure: the cap is DERIVED at observation from `.memory-tree.conf`; 1 at base is DERIVED from
+  spec 6 S6 at rev-2 and checked by `git show <base>:memory/map/features/unattended.md`.
 - **AC9** — When the pass finishes, `grep -c 'TOOL-aPromptedMandate-11 · CLOSED' memory/backlog/TOOL.md`
   prints 1 and `grep -c 'TOOL-aPromptedMandate-11 · OPEN'` over the same file prints 0.
   Red when: the row is still `OPEN`, or a second row was added instead of the one being moved.
@@ -349,11 +396,13 @@ after.
   pass counts its `hit`, `miss` and `same` calls and the ledger row says `count confirmed at
   --close`.
 - **AC12** — When the pass finishes, `grep -c 'rev-parse --git-dir' tools/unattended/unattended.sh`
-  prints 1.
-  Red when: it prints 2 or more, which means this unit spelled a second sidecar-root derivation
-  beside unit 2's instead of calling it, or found unit 2's inline and copied it rather than
-  extracting it.
-  figure: DERIVED at observation; the count is 0 at base 5f9648d6 and unit 2 makes it non-zero.
+  is unchanged from this unit's own order base, and `grep -c 'resolve_sidecar_dir' tools/unattended/unattended.sh`
+  is one higher than at that base — this verb's call.
+  Red when: the first count moved, which means this unit spelled a second sidecar-root derivation
+  and unit 11's kit-gate check reds at the close; or the second did not, which means the verb reads
+  the sidecar some other way.
+  figure: DERIVED at observation against this unit's order base; the count-is-one rule itself is
+  unit 11's check and not pinned here.
 - **AC13** — When a stop-guard line exists for a BOUND run in any worktree of this repo at build
   time — this run's own `stop.aWokenSentinel.log` if the run re-bound its session after unit 1,
   else none — `grep -c` of that run's recorded `keepalive` id over the newest line prints 1 while
@@ -364,6 +413,22 @@ after.
   carries no `session:` fact. Where no bound run exists, the ledger row reads `deferred: no bound
   run at build time`, the assumption stays marked UNVERIFIED in §4, and the first bound landing
   observes it.
+- **AC14** — When, on the `--landed` fixture with a stop line in phase `BUILDING` present,
+  `run --landed tRun` prints the S2 refusal, then one `Stop` payload with `session_id`
+  `fixture-session` and `cwd` the fixture root is fed to `node stop-guard.js` from
+  `tools/unattended/` with the real driver beside it, the hook prints one JSON object with
+  `decision` `block` and a `reason` carrying `landing-unstamped`'s text — `finished and
+  unstamped` and `--landed` — the sidecar's newest line has `phase` `LANDING` and `session_crons`
+  deep-equal to the payload's, and a second `run --landed tRun` prints `keepalive-reaped: checked`
+  and `phase LANDED`. Observed RED first against a hook copy with unit 8's row reverted to allow,
+  where the record stays at `LANDING`.
+  Red when: the hook allows the stop, which is the wedge B1 names, manufactured by this unit's
+  remedy; the second `--landed` still refuses on a pre-close line, which means the hook wrote no
+  `LANDING` line or wrote it with another phase; or the hook does not bind, which means the
+  fixture's `session:` fact and the payload's `session_id` disagree.
+  fixture: the suite's `--landed` success fixture with the prologue's `fixture-session` lease from
+  unit 1 and the fixture `origin`; `node` on `PATH`, as `gate-guard.js` already requires.
+  cost: one driver spawn from inside the hook, seconds.
 
 ## 7. Gates
 
@@ -377,8 +442,9 @@ under `unattended skill wiring`, the Skill render.
 
 New arm: `tools/unattended/unattended.test.sh` · the two new refusals, each observed by the fixture
 of AC1 and AC2 with its `fail` line commented out before the arm is trusted, plus the `checked`,
-`unchecked` and no-id passes of AC3 and AC4, the three `--status` shapes of AC5 and the `--close`
-row of AC6 · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the executed count, AC11;
+`unchecked` and no-id passes of AC3 and AC4, the one-line `--status` assertion of AC5, the
+`--close` row of AC6, and the continuation arm of AC14 through the real hook with unit 8's row
+reverted as its break · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the executed count, AC11;
 `FLOOR_SHARD_1` does not move.
 
 ## 8. Open questions
@@ -396,9 +462,23 @@ row of AC6 · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the executed count,
   RESOLVED (agent, 2026-09-16, delegated): B2, as S2 and AC2 state; the run-state file names the
   mandate (`mode: prompt`, `authorized-by: prompt`) and M3 delegates the forks the build's specs
   state. The spec audit may refute the derivation; the record of it is here.
+  AMENDED at rev-2 (agent, 2026-09-20, delegated): the audit did not refute B2, it refuted B2's
+  PREMISE — that the stop-guard refuses a `LANDING` record's stop — which was asserted here and
+  contradicted by spec 3's `FINISHED-UNSTAMPED → allow` row (B1, raw 18, 29, 43). B2 stands;
+  the premise is now `TOOL-aWokenSentinel-8`'s row, consumed by this unit and asserted by AC14.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S2 · S4 · S6 · S8 · S9 · §3 · §4 · AC5 · AC8 · AC12 · AC14 · §7 · §8 · §10
+  · folded spec-audit round 1: M1 (raw 2, 25, 28, 37, 49) — AC8 could not fail and two units
+  wrote one dossier bullet, so unit 6 leaves the bullet to this unit, AC8 states the base value as
+  1 with a positive needle and `gen_map.py --check` as the freshness observation; L6 (raw 15) —
+  the `none` arm of the listing grammar is unit 9's in field form, routed by the S4 retirement;
+  L10 (raw 50) — the LANDING-is-close-only rule is cited to `TOOL-cFinalBerth-1` S9; L11 (raw 52)
+  — `RUN.md:30`; L12 (raw 53) — the roster row corrected to `--landed` and listed as an S6
+  carrier. Sibling agreement for the promoted units: the S2 remedy's continuation is unit 8's row,
+  consumed and asserted by the new AC14 (B1); S4 is retired to unit 9's field and AC5 asserts one
+  line (H1); S9 and AC12 defer the one-derivation rule to unit 11's check (H3). Order 7 → 13.
 - rev-1 · 2026-09-16 · initial draft, authored by the harness's SPEC stage from the unit-7 brief.
 
 ## 10. Reuse audit
@@ -412,9 +492,13 @@ refusal ladder (`tools/unattended/unattended.sh:2354` at base), `verb_status`'s 
 sidecar root is unit 2's derivation, cited rather than re-spelled (S9). The recall probe's top hit
 is the backlog row itself; its fourth hit is the `aPrimedKeepalive` round-2 spec audit whose
 remedy — record the delete's return beside the id — is rejected in §4 because it is still the
-agent's own report. The recall hit at `memory/builds/aPromptedMandate/RUN.md:24` is the
-measurement: two jobs attested dead, both listed firing. Nothing the probes returned disagreed with
-source; the driver line numbers above were re-found at base 5f9648d6 and the brief's `:3909` for
-the grep was exact.
+agent's own report. The recall hit at `memory/builds/aPromptedMandate/RUN.md:30` — the CORRECTION
+row, `:24` being the `## Parked` heading — is the measurement: two jobs attested dead, both listed
+firing. Where the probes and the sibling specs disagreed with this spec's rev-1: spec 2 S3 grades a
+`LANDING` record whose witness is on the local remote-tracking ref as `finished-unstamped`, and
+spec 3's ratified table allowed that stop, so the premise rev-1 §4 rested on was not in any
+sibling and is now unit 8's row. Otherwise nothing the probes returned disagreed with source; the
+driver line numbers above were re-found at base 5f9648d6 and the brief's `:3909` for the grep was
+exact.
 
 Recall terms used: `keepalive-reaped attestable not checkable CronList firing forever attestation read-back list verb landed status`

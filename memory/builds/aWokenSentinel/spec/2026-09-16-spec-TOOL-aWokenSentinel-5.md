@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 5 · ratified 2026-09-16
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 9 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
 
@@ -33,8 +34,11 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
   table is section 4. Observed by AC1, AC2, AC3 and AC4.
 - **S3** — `RESUME_ATTEMPTS` (kit default 6) and `RESUME_TURNS` (kit default 40) are read through
   `read_bound_key`, which this unit HOISTS verbatim from `tools/unattended/unattended.sh` into
-  `tools/unattended/lib-unattended.sh` so the tick and the driver read a bound the same way. The
-  driver's four calls stay where they are. Both keys are added to `.unattended.conf` and
+  `tools/unattended/lib-unattended.sh` so the tick and the driver read a bound the same way — and
+  satisfies the function's calling-shell contract the way the driver does: the tick sources
+  `$ROOT/.unattended.conf` into its own shell with `CONF` set before the two calls, which is
+  `TOOL-aWokenSentinel-13`'s design, root-scoped, and that unit's arms observe it under a declared
+  key. The driver's four calls stay where they are. Both keys are added to `.unattended.conf` and
   `tools/unattended/.unattended.conf.example` with a one-line rationale each, to
   `tools/unattended/kit.toml` `optional_keys`, and to the protocol's section 8 key table with its
   render, because check 22 of the kit gate joins the example to that table in both directions.
@@ -42,8 +46,10 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
 - **S4** — Attempts are counted from `<git-dir>/unattended/resume.<slug>.log`, one line per
   launch, and only the lines newer than the run's last move count against the cap. Observed by
   AC3.
-- **S5** — On `pid-alive: yes` the tick kills the recorded pid's TREE before launching:
-  `taskkill //PID <pid> //T //F` under MSYS, `kill -- -<pgid>` elsewhere. Observed by AC4.
+- **S5** — On `pid-alive: yes` the tick kills the recorded pid's TREE before launching — and
+  only AFTER the login row has answered logged-in, so a kill happens only where a launch will
+  follow, which is `TOOL-aWokenSentinel-12`'s order and that unit's arm observes it: `taskkill
+  //PID <pid> //T //F` under MSYS, `kill -- -<pgid>` elsewhere. Observed by AC4.
 - **S6** — `claude auth status` is consulted before every launch; a CLI that is not logged in is an
   ANNOUNCED skip line and exit 0, never a pass and never a launch. Observed by AC2.
 - **S7** — The launch is DETACHED through a launcher file the tick writes under the sidecar dir:
@@ -51,10 +57,15 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
   section 4. Observed by AC1 and AC7.
 - **S8** — `verb_status` gains one FIELD on its existing line, ` · resume-tick <n> attempt(s), last
   <utc>`, printed only when the sidecar holds at least one line, so no existing arm that reads the
-  status line whole sees a byte it did not see at base. Observed by AC9.
+  status line whole sees a byte it did not see at base; the sidecar is found through unit 2's
+  `resolve_sidecar_dir`, never an inline `rev-parse`, which `TOOL-aWokenSentinel-11`'s kit-gate
+  check binds. Observed by AC9.
 - **S9** — `adopt-unattended.sh --check` prints one INFO line saying whether a scheduled task named
   `gov-resume-tick` exists on this node, before its `in sync` line, and reds on neither answer.
   `tools/unattended/README.md` carries the registration line per OS. Observed by AC10.
+- **S12** — The walk's two announced skips — a non-zero `--liveness` exit prints
+  `liveness probe failed: <line>` and skips the run; a worktree without `.unattended.conf` prints
+  one line and is skipped while the other trees are still walked. Observed by AC12.
 - **S10** — The tick's own suite, one arm per decision, with a STUB `claude` first on `PATH`; a
   budget row for it in `tools/run-gates/selftest-budgets.txt`; the suite named in `kit.toml`'s
   `project-owned` list; every function in the tick and its suite leads with a verb `.lexicon.conf`
@@ -98,17 +109,28 @@ and on `STALE` kills the recorded pid's tree, appends an attempt line and launch
   first. Without unit 1 every record reads `session: absent` and the tick has nothing to resume.
 - **consumes-from** `TOOL-aWokenSentinel-2` — `--liveness <slug>` and its `verdict`, `pid`,
   `pid-alive` and `last-move` lines, `RESUME_STALE_BOUND` as the number behind `stale` (read
-  there, never here), and the `fail 52` refusal shape the tick treats as a dead probe. Unit 2's
-  spec hands this unit "keying the tick on `verdict: STALE` and on `pid-alive`", and that is the
-  whole of what this unit reads.
+  there, never here), the `fail 52` refusal shape the tick treats as a dead probe, and
+  `resolve_sidecar_dir`, through which S8 finds the resume log in the driver. Unit 2's spec hands
+  this unit "keying the tick on `verdict: STALE` and on `pid-alive`" and the resume log's
+  derivation, and that is the whole of what this unit reads.
+- **consumes-from** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver holds one
+  `rev-parse --git-dir`; S8's read through the function is what keeps it green. The tick's own
+  derivation in its own file is outside that check by its design.
 - **hands-off** `TOOL-aWokenSentinel-6` — the protocol's section 5 naming the tick as a keepalive
   actor, the Skill's short section naming the two hooks and the tick, the README's sidecar-layout
   paragraph beside this unit's registration lines, and the rationale prose for `RESUME_ATTEMPTS`
   and `RESUME_TURNS` where unit 6 finds this unit's one-liners wanting. This unit writes the
   registration lines and the section 8 rows; unit 6 does not rewrite them.
-- **hands-off** `TOOL-aWokenSentinel-7` — nothing this unit writes; unit 7 prints a second
-  `--status` line, and this unit's field sits on the first line, omitted at zero, so the two
-  cannot collide.
+- **hands-off** `TOOL-aWokenSentinel-7` — nothing this unit writes; unit 7 prints no `--status`
+  line at its rev-2. The stop-guard listing is `TOOL-aWokenSentinel-9`'s FIELD on the same line,
+  appended after this unit's, on this unit's omit-at-nothing rule — the shape F1 chose, and the
+  one-line promise unit 9 turns into an arm.
+- **hands-off** `TOOL-aWokenSentinel-12` — the arm that observes a live recorded pid surviving
+  under a logged-out CLI, and the gotcha class for a destructive step ordered before its
+  precondition; this unit builds the order, unit 12 proves it.
+- **hands-off** `TOOL-aWokenSentinel-13` — the arms that observe the root conf's declared
+  `RESUME_ATTEMPTS` and `RESUME_TURNS` honoured and the NOTE naming a non-empty path; this unit
+  builds the read, unit 13 proves it.
 - **hands-off** external — registering `gov-resume-tick` on each node, the owner's act; the
   owner-notification fallback, a backlog row the close mints.
 
@@ -128,6 +150,12 @@ repository is `resume-tick: REFUSED — <root> is not a git repository, so there
 to walk`, exit 2. The tick defines no `fail()` helper and has no numbered checks, so it joins no
 population `tools/memory-tree/check-arms.py` discovers; its refusal lines are its own suite's to
 assert.
+
+Before the walk, the tick's own conf read, as `TOOL-aWokenSentinel-13` §4 states it:
+`CONF="$ROOT/.unattended.conf"`, refused with exit 2 naming the root when absent, then `. "$CONF"`
+into the tick's shell, then the two `read_bound_key` calls — the driver's own idiom at
+`unattended.sh:341`, so `RESUME_ATTEMPTS` and `RESUME_TURNS` resolve from the ROOT's declaration
+and the NOTE names that file. The two knobs are root-scoped: one repo, one pair of bounds.
 
 `git -C "$ROOT" worktree list --porcelain` gives one `worktree <path>` line per tree. Per tree: skip
 with one line when `<path>/.unattended.conf` is absent (a checkout predating the kit); otherwise
@@ -150,9 +178,14 @@ siblings.
 |---|---|---|---|---|
 | not `STALE` | — | — | — | `skip · verdict <V>` |
 | `STALE` | `RESUME_ATTEMPTS` or more since the last move | — | — | `skip · ATTEMPTS EXHAUSTED · last <utc> · out <path>` |
-| `STALE` | under the cap | `yes` | — | kill the tree, then the two rows below |
-| `STALE` | under the cap | any | not logged in | `SKIP — the CLI is not logged in on this node; nothing can resume <slug>` |
+| `STALE` | under the cap | any | not logged in | `SKIP — the CLI is not logged in on this node; nothing can resume <slug>` — nothing killed, nothing written |
+| `STALE` | under the cap | `yes` | logged in | kill the tree, then the row below |
 | `STALE` | under the cap | any | logged in | append the attempt line, launch detached, `resumed · attempt <n> · out <path>` |
+
+The login row precedes the kill row, and the order is the point: a kill is useful only where a
+launch will follow, so the probe that decides whether one can happen runs first, and a logged-out
+node kills nothing. `TOOL-aWokenSentinel-12` owns that ordering's proof — the arm with a live
+recorded pid under a logged-out stub — and the gotcha class it left-shifts.
 
 Every act prints exactly one line, `resume-tick: <slug> · <worktree> · <act>`, and `--dry-run`
 prints the line it WOULD act on with ` (dry-run)` appended and does nothing else — no kill, no
@@ -201,7 +234,8 @@ resumed turn ever re-stalls on a survivor, at the cost of a Python launch in the
 
 ### Login (S6)
 
-`claude auth status` printed, on node `a` 2026-09-16 with the CLI logged in, a JSON object whose
+Consulted BEFORE any kill, per the table above. `claude auth status` printed, on node `a`
+2026-09-16 with the CLI logged in, a JSON object whose
 second line is `"loggedIn": true`, exit 0. The tick greps `"loggedIn":[[:space:]]*true` over the
 output and treats anything else — `false`, an error, an empty answer — as not logged in, because
 the exit code of the logged-out case was not measured and a grep over the measured shape is right
@@ -248,7 +282,8 @@ and never spelled:
 ### `--status` (S8)
 
 In `verb_status`, beside the `parked`, `noted` and `STALE briefs` fields and following their rule:
-when `$(GIT rev-parse --git-dir)/unattended/resume.<slug>.log` exists and has at least one line,
+when `$(resolve_sidecar_dir)/resume.<slug>.log` — unit 2's one derivation, never an inline
+`rev-parse`, which unit 11's check reds at the close — exists and has at least one line,
 `parked="$parked · resume-tick <n> attempt(s), last <utc>"` with `<n>` the line count and `<utc>`
 the last line's first token. Absent or empty, nothing is printed — the ordinary line does not grow.
 `--resume` inherits it through `verb_status`, so the status-and-resume agreement arm still holds.
@@ -278,8 +313,9 @@ this many times with no movement between them, then stops and says ATTEMPTS EXHA
 `RESUME_TURNS` — the `--max-turns` a resumed session gets, kit default 40 (`# one resumed turn
 budget; a run that needs more is resumed again by the next tick`). Both read by `read_bound_key`
 with `attempts` and `turns` as the unit word, defaults named `RESUME_ATTEMPTS_DEFAULT` and
-`RESUME_TURNS_DEFAULT` in the tick, never a literal digit in the call. Two rows in the protocol's
-section 8 table on `UNIT_STALL_BOUND`'s terms.
+`RESUME_TURNS_DEFAULT` in the tick, never a literal digit in the call, from the ROOT conf sourced
+into the tick's shell (unit 13); each comment line says the tick reads the root's copy. Two rows
+in the protocol's section 8 table on `UNIT_STALL_BOUND`'s terms.
 
 ### Inventory
 
@@ -333,8 +369,10 @@ section 8 table on `UNIT_STALL_BOUND`'s terms.
   resumes on a probe that answered nothing.
 - observability — every decision is one line on the tick's stdout, every launch leaves its
   launcher and its `.out` beside the attempt line, and `--status` shows the count.
-- risks — a false `STALE` from unit 2's clock kills a healthy session's tree and resumes into it;
-  the harm is duplicated work and a killed `Workflow`, bounded by `RESUME_STALE_BOUND`, and the
+- risks — a false `STALE` from unit 2's clock, on a LOGGED-IN node, kills a healthy session's
+  tree and resumes into it; the harm is duplicated work and a killed `Workflow`, bounded by
+  `RESUME_STALE_BOUND`. A logged-out node kills nothing: the login row precedes the kill row, so
+  the false-`STALE` harm there is one announced SKIP line. The
   parent transcript's movement during a long sidechain is UNVERIFIED. A hidden CLI flag can be
   withdrawn: a launch failing on `--max-turns` leaves `unknown option` in the `.out`, the attempt
   still counts, and `ATTEMPTS EXHAUSTED` names that file. `schtasks` runs the task only while the
@@ -374,7 +412,8 @@ and a stub `claude` first on `PATH` that writes its argv and its own pid to `stu
   `<git-dir>/gate-logs/` first, the tick prints `skip · verdict LIVE` and consults neither login
   nor the stub.
   Red when: the logged-out answer launches anyway, which means the grep read the exit code; or the
-  skip is silent; or a LIVE record probes login, which means the table's order is wrong.
+  skip is silent; or a LIVE record probes login, which means the table's order is wrong. The
+  logged-out arm with a LIVE recorded pid — the sleep survives — is unit 12's AC1.
 - **AC3** — When the sidecar is pre-seeded with six lines dated after the fixture commit and the
   record is `STALE`, the tick prints `ATTEMPTS EXHAUSTED · last <utc>` and invokes nothing; when
   the six lines predate the commit, attempt 7 launches, because a move resets the count; and with
@@ -396,8 +435,9 @@ and a stub `claude` first on `PATH` that writes its argv and its own pid to `stu
   `read_bound_key ` call count is unchanged from this unit's base; and with the fixture conf
   declaring `GATE_BOUND="abc"`, `bash tools/unattended/unattended.sh --status tRun` still prints
   `which is not a positive integer of seconds` and exits 2, while a conf declaring no
-  `RESUME_ATTEMPTS` makes the tick print `declares no RESUME_ATTEMPTS` on stderr once and act on
-  the default of 6.
+  `RESUME_ATTEMPTS` makes the tick print `declares no RESUME_ATTEMPTS` on stderr once, naming the
+  root conf's path after `Declare one in `, and act on the default of 6; the declared-key arms are
+  unit 13's.
   Red when: the driver keeps a definition, which means the function was copied and the tick has a
   second reader; or the driver's refusal sentence changed bytes, which reds the existing bound arms;
   or the NOTE is absent, which means the tick read the key with a bare default.
@@ -426,9 +466,11 @@ and a stub `claude` first on `PATH` that writes its argv and its own pid to `stu
   whose first tokens are UTC stamps, `bash tools/unattended/unattended.sh --status tRun` prints its
   one line carrying ` · resume-tick 2 attempt(s), last <the second stamp>`; with the sidecar
   removed the line is byte-identical to what it printed before this unit; `--resume tRun`'s first
-  line carries the same field.
-  Red when: the field prints at zero, which grows every existing status line; or it prints as a
-  second line, which reds the arms that `sed` the whole `--status` output.
+  line carries the same field; and `grep -c 'rev-parse --git-dir' tools/unattended/unattended.sh`
+  is unchanged from this unit's base, which is the read going through `resolve_sidecar_dir`.
+  Red when: the field prints at zero, which grows every existing status line; it prints as a
+  second line, which reds the arms that `sed` the whole `--status` output; or the count moved,
+  which is a second spelling of the sidecar root and reds unit 11's check at the close.
 - **AC10** — When `bash tools/unattended/adopt-unattended.sh --check` runs on node `a`, it prints
   one line beginning `unattended: INFO —` naming `gov-resume-tick` before its `in sync` line and
   exits 0 whether or not the task is registered; `schtasks //query //tn gov-resume-tick` on this
@@ -447,6 +489,13 @@ and a stub `claude` first on `PATH` that writes its argv and its own pid to `stu
   adopters because `project-owned` does not name it.
   figure: 983 and 6 are DERIVED from `.lexicon.conf` at observation and PINNED here as read on
   2026-09-16.
+- **AC12** — When the fixture's driver is shadowed by a stub that exits 1 on `--liveness`, the
+  tick prints `liveness probe failed:` with the stub's first line, launches nothing and writes no
+  attempt line; and when the fixture gains a second worktree by `git worktree add` with no
+  `.unattended.conf` in it, the tick prints one skip line naming that tree and still prints its
+  decision line for the first tree's run.
+  Red when: a dead probe is read as a verdict and launches, which is the alternative §4 refuses;
+  or a conf-less tree ends the walk early, which is a skip that skips everything after it.
 
 ## 7. Gates
 
@@ -458,7 +507,7 @@ invocations section 6 names over a scratch repo, `python tools/lexicon/lexicon.p
 the join this unit moves.
 
 New arm: `tools/unattended/resume-tick.test.sh` · every decision of section 4's table staged by
-fixture — AC1 to AC4, AC7 and AC8 — each observed red against the tick with the graded line
+fixture — AC1 to AC4, AC7, AC8 and the two announced skips of AC12 — each observed red against the tick with the graded line
 commented out before the arm is trusted · a `FLOOR_ASSERTIONS` pin authored from the executed
 count of the first green run, the shape `gate-guard.test.sh` carries.
 
@@ -493,6 +542,14 @@ arm's assertions, read off the floor-breach line with the floor over-pinned.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S12 · S3 · S5 · S8 · §3 · §4 · §5 · AC2 · AC5 · AC9 · AC12 · §7 · folded
+  spec-audit round 1: L1 (raw 10) — the walk's two announced skips had no criterion, so S12 and
+  AC12 observe them. Sibling agreement for the promoted units: the `--status` hands-off names unit
+  9's field, not a second line from unit 7 (H1); S8 and AC9 read the resume log through
+  `resolve_sidecar_dir` and consume unit 11's check (H3); the decision table's login row precedes
+  the kill row and §5's risk row says a logged-out node kills nothing, proof handed to unit 12
+  (H4); the walk sources the root conf into the tick's shell with `CONF` set before the bound
+  reads, root-scoped, proof handed to unit 13 (H5). Order 5 → 9.
 - rev-1 · 2026-09-16 · initial draft.
 
 ## 10. Reuse audit

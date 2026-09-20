@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
 
@@ -29,9 +30,10 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
   `tools/unattended/SKILL.template.md`, and both renders re-made in the same commit — the three
   carriers check 26 of the kit gate joins. Observed by AC1 and AC9.
 - **S2** — The verb prints, in this order and nothing else on stdout: `phase`, `state`,
-  `default-branch`, `session`, `pid`, `pid-alive`, `keepalive`, `last-move`, `last-move-source`,
-  `transcript`, `last-stall`, `stale`, `verdict`. Each value's vocabulary is section 4's. It exits
-  0 on any run-state file. Observed by AC2 to AC7.
+  `default-branch`, `session`, `pid`, `keepalive`, `pid-alive`, `last-move`, `last-move-source`,
+  `transcript`, `last-stall`, `stale`, `verdict` — section 4's step order, which AC2 cites. Each
+  value's vocabulary is section 4's. It exits 0 on any run-state file whose probes answer; a dead
+  probe is the check-52 refusal of S8, exit 1 with no verdict line. Observed by AC2 to AC7.
 - **S3** — `state` is one of `terminal`, `finished-unstamped` and `live`, where
   `finished-unstamped` is the OFFLINE half of `check_single_live`'s predicate: phase `LANDING` and
   a sha-shaped witness that is an ancestor of the local default branch's ref, no network.
@@ -41,11 +43,15 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
   session transcript when its path derives. The first two are `print_audit`'s clocks at
   `tools/unattended/unattended.sh:3013` to `:3025`, EXTRACTED into `read_tree_clocks`, which both
   verbs call; neither keeps a copy. Observed by AC5 and AC8.
-- **S5** — `RESUME_STALE_BOUND` is read through `read_bound_key` beside its two siblings, kit
-  default `GATE_BOUND_DEFAULT + 1800` seconds DERIVED in the driver, declared in `.unattended.conf`
-  and `tools/unattended/.unattended.conf.example` with its reason, listed in `optional_keys` of
+- **S5** — `RESUME_STALE_BOUND` is read through `read_bound_key` beside its three siblings
+  `GATE_BOUND`, `UNIT_STALL_BOUND` and `REVIEW_ROUNDS`, the fourth caller, with its default
+  DERIVED in the driver from the two DECLARED bounds already resolved — `GATE_BOUND +
+  UNIT_STALL_BOUND` — never from the kit defaults; declared in `.unattended.conf` and
+  `tools/unattended/.unattended.conf.example` with its reason, listed in `optional_keys` of
   `tools/unattended/kit.toml`, and rowed in section 8's key table of
-  `tools/unattended/PROTOCOL.template.md`. Observed by AC6.
+  `tools/unattended/PROTOCOL.template.md`; each of the four carriers read by a criterion. A
+  declared value below that sum is announced on stderr, because under it the driver's own bar
+  reads dead. Observed by AC6.
 - **S6** — `pid-alive` is `yes`, `no` or `unknown`, probed by `tasklist` under MSYS and `kill -0`
   elsewhere, `unknown` when the fact is `absent`, non-numeric, or the probe tool is missing.
   Observed by AC4.
@@ -103,6 +109,11 @@ themselves. Tier 2: a new verb is a change to the kit's contract.
   unit ships the one invocation line check 26 demands and nothing more.
 - **hands-off** `TOOL-aWokenSentinel-7` — the sidecar root's derivation, `<git-dir>/unattended/`,
   which `--landed` reuses to find the stop log; this unit derives it once for the stall log.
+- **hands-off** `TOOL-aWokenSentinel-5` — reading `resume.<slug>.log` through the same
+  `resolve_sidecar_dir`, never an inline `rev-parse`.
+- **hands-off** `TOOL-aWokenSentinel-11` — the kit-gate check that the driver holds exactly one
+  `rev-parse --git-dir`, this function's, so the one-derivation rule AC7 states for this unit's
+  own pass binds every later unit on the bar.
 - **hands-off** external — the kit version bump, the closing pass's, once.
 
 ## 4. Design
@@ -212,15 +223,24 @@ one `tasklist` knows.
 
 ### The bound (S5)
 
-After the `UNIT_STALL_BOUND` read at `:362`:
-`read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run reads STALE after the kit default of ${RESUME_STALE_BOUND_DEFAULT}s with no signal moved"`,
-with `RESUME_STALE_BOUND=""` added to the empty-initialisation line at `:339` and
-`RESUME_STALE_BOUND_DEFAULT=$((GATE_BOUND_DEFAULT + 1800))` beside `UNIT_STALL_BOUND_DEFAULT` at
-`:256`. 5400 at base, DERIVED: `GATE_BOUND` is the longest a bounded command may run and a
-healthy bar is silence on every signal but the gate logs, so the stale bound sits one
-`UNIT_STALL_BOUND` above it. The conf declaration carries this sentence as its reason, the
-example mirrors it, `optional_keys` gains the key, and the protocol's section 8 key table gains a
-row on `UNIT_STALL_BOUND`'s terms.
+After BOTH existing reads — `GATE_BOUND` at `:369` and `UNIT_STALL_BOUND` at `:370`, which
+resolve the declared or defaulted values into their variables — two lines:
+`RESUME_STALE_BOUND_DEFAULT=$((GATE_BOUND + UNIT_STALL_BOUND))` and
+`read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run reads STALE after the derived default of ${RESUME_STALE_BOUND_DEFAULT}s (GATE_BOUND + UNIT_STALL_BOUND) with no signal moved"`,
+with `RESUME_STALE_BOUND=""` added to the empty-initialisation line at `:339`. No literal at `:256`
+and no retyped `1800`: the default derives from the DECLARED bounds, so an adopter who raises
+`GATE_BOUND` for a longer bar — the conf's own documented remedy — raises this default with it,
+and the two-numbers class the driver's `REVIEW_ROUNDS_DEFAULT` comment records is not re-entered.
+5400 at base with the kit defaults, DERIVED: `GATE_BOUND` is the longest a bounded command may run
+and a healthy bar is silence on every signal but the gate logs, so the stale bound sits one
+`UNIT_STALL_BOUND` above it. After the read, one more line: when the resolved `RESUME_STALE_BOUND`
+is below `GATE_BOUND + UNIT_STALL_BOUND`, stderr carries
+`unattended: NOTE - RESUME_STALE_BOUND (<n>s) is below GATE_BOUND + UNIT_STALL_BOUND (<sum>s), so a
+full bar's silence reads STALE and an out-of-process resumer may kill a healthy bar` — a NOTE and
+not a refusal, because a declared bound is the adopter's to lower and the driver's job is to say
+what it costs. The conf declaration carries the derivation sentence as its reason, the example
+mirrors it, `optional_keys` gains the key, and the protocol's section 8 key table gains a row on
+`UNIT_STALL_BOUND`'s terms.
 
 ### The carriers (S1)
 
@@ -370,8 +390,9 @@ graded line removed.
   which `python3 tools/memory-tree/check-arms.py --report` shows as a `check 52` branch not `ARMED`.
 - **AC2** — When the fixture's phase is `LANDED`, `bash tools/unattended/unattended.sh --liveness tRun`
   prints `state: terminal` and `verdict: TERMINAL`, exits 0, and prints thirteen `key: value` lines
-  and nothing else on stdout, the thirteen keys in section 4's order; and every key prints again on
-  a `BUILDING` fixture, so `grep -c ':'` over stdout is `13` in both.
+  and nothing else on stdout, the thirteen keys in S2's order, which is section 4's step order
+  with `keepalive` before `pid-alive`; and every key prints again on a `BUILDING` fixture, so
+  `grep -c ':'` over stdout is `13` in both.
   Red when: a terminal record omits a key, so a reader must know which state prints what; a line
   prints that is not `key: value`; or the exit is non-zero.
   figure: thirteen is DERIVED from S2's list at observation time.
@@ -400,21 +421,34 @@ graded line removed.
   `touch` of one file under the fixture git dir's `gate-logs`, it prints
   `last-move-source: gate-log`, `stale: no` and `verdict: LIVE`; and after a file at the transcript
   path derived for `fixture-session` under a `CLAUDE_CONFIG_DIR` the arm builds is touched,
-  `transcript:` names that path and `last-move-source: transcript`.
+  `transcript:` names that path and `last-move-source: transcript`; and on the STALE fixture with
+  no gate log and no transcript, after `touch scratch.txt` writes one untracked file over the
+  hour-old commit, the verb prints `last-move-source: write` and `stale: no`.
   Red when: a clean, log-less, transcript-less tree reads `LIVE`, which is an empty signal read as
-  "now"; a touched gate log leaves `STALE`, which is the third signal not joined; or the transcript
-  path never resolves, which is the encoding wrong for `.` or for `:`.
+  "now"; a touched gate log leaves `STALE`, which is the third signal not joined; the transcript
+  path never resolves, which is the encoding wrong for `.` or for `:`; or the dirty-write signal
+  never wins, which is a maximum that dropped `TC_LASTW` and reads every run mid-edit as STALE.
   fixture: the arm sets `CLAUDE_CONFIG_DIR` itself for both halves, so the box's real transcripts
   are never read and git's global config under `HOME` is untouched.
 - **AC6** — When the fixture conf declares no `RESUME_STALE_BOUND` — the `NOCONF` heredoc — stderr
-  carries `declares no RESUME_STALE_BOUND, so a run reads STALE after the kit default of 5400s`
+  carries `declares no RESUME_STALE_BOUND, so a run reads STALE after the derived default of 5400s`
   once; when the eighth positional is `"abc"` the driver prints `REFUSING - RESUME_STALE_BOUND is
-  declared as` and exits 2 before any verb runs; and `grep -c 'read_bound_key' tools/unattended/unattended.sh`
-  prints at least `4` — the definition and three calls — and prints `3` at base.
-  Red when: a blank is silent; junk is coerced; or the count stays `3`, which is a key with its own
-  `case`.
-  figure: 5400 is DERIVED in the driver as `GATE_BOUND_DEFAULT + 1800`; the arm's needle carries
-  the literal and reds if the derivation or either addend moves.
+  declared as` and exits 2 before any verb runs; when the eighth positional is `"60"` under the
+  fixture's `GATE_BOUND="3600"` and `UNIT_STALL_BOUND="1800"`, stderr carries
+  `RESUME_STALE_BOUND (60s) is below GATE_BOUND + UNIT_STALL_BOUND (5400s)` once and the verb still
+  prints its verdict; `grep -c '^read_bound_key RESUME_STALE_BOUND ' tools/unattended/unattended.sh`
+  prints `1` and `0` at base, and `grep -cE '^read_bound_key [A-Z_]+ ' tools/unattended/unattended.sh`
+  prints `4` and `3` at base; and each of the four carriers reads the key once —
+  `grep -c '^RESUME_STALE_BOUND=' .unattended.conf` and the same over
+  `tools/unattended/.unattended.conf.example` print `1`, `grep -c 'RESUME_STALE_BOUND' tools/unattended/kit.toml`
+  prints `1`, and the section 8 region of `memory/guides/UNATTENDED-PROTOCOL.md` cut by
+  `awk '/^## 8[.] /{f=1;next} f&&/^## /{f=0} f'` carries the key once — every one `0` at base.
+  Red when: a blank is silent; junk is coerced; a bound below the sum is silent, which is the false
+  STALE unit 5 kills on; the call count stays `3`, which is a key with its own `case`; or a carrier
+  is missing, which check 22 reds at the close and this grep sees now.
+  figure: 5400 is DERIVED in the driver as `GATE_BOUND + UNIT_STALL_BOUND` from the fixture's
+  declared values; the arm's needle carries the literal and reds if the derivation or either
+  declared addend moves. The counts `1`, `4`, `3` and `0` are DERIVED by the greps at observation.
 - **AC7** — When the file `stall.tRun.log` under the `unattended` directory of the fixture's git
   dir — `git rev-parse --git-dir` — holds one line written by `printf`, the verb prints
   `last-stall:` followed by that line verbatim; when the file is absent, `last-stall: none`; and
@@ -473,6 +507,15 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S2 · S5 · §3 · §4 · AC2 · AC5 · AC6 · §10 · folded spec-audit round 1:
+  M2 (raw 5, 23, 41) — the `read_bound_key` count was 5 at base, not 3, so AC6 now greps the call
+  line's own spelling and S5 and §10 say fourth caller; M3 (raw 6) — S5's four carriers had no
+  criterion, so AC6 reads each by path; M8 (raw 35) — the default derived from kit defaults and
+  retyped 1800, so §4 derives it from the declared `GATE_BOUND + UNIT_STALL_BOUND` after both
+  reads and announces a declared value below the sum; L2 (raw 11) — S2's exit contract now names
+  the check-52 refusal; L3 (raw 12) — AC5 gains the dirty-write arm; L9 (raw 27) — S2's key order
+  is section 4's and AC2 cites S2. Edges gain hands-off rows to units 5 and 11 for the
+  one-derivation rule H3 (raw 4, 20, 34) promoted to `TOOL-aWokenSentinel-11`.
 - rev-1 · 2026-09-16 · initial draft, from the brief in
   `memory/builds/aWokenSentinel/prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md`
   and the research record under `build/`. Three corrections against the node: the transcript
@@ -489,8 +532,10 @@ skips | unscanned layers: .sh` and ranked `read_roots` in `tools/process-monitor
 `boundedParallel` in the workflow scripts — neither is a seam for a shell verb, and the driver is
 in the layer the map does not scan, so the seams are cited from source by grep. The seam this unit
 extends is `print_audit`'s clock block at `tools/unattended/unattended.sh:3013` to `:3025`, which
-becomes `read_tree_clocks` with two callers; `read_bound_key` at `:358`, whose third caller this is
-after `GATE_BOUND`, `UNIT_STALL_BOUND` and `REVIEW_ROUNDS` — a call, never a fourth `case`;
+becomes `read_tree_clocks` with two callers; `read_bound_key` at `:358`, whose FOURTH caller this
+is after `GATE_BOUND`, `UNIT_STALL_BOUND` and `REVIEW_ROUNDS` — a call, never a fourth `case`;
+the audit counted the grep at base as 5 (definition, three calls, one comment at `:525`), which is
+why AC6 anchors its count on the call line's own spelling;
 `is_terminal` at `:613`; and the offline half of `check_single_live`'s finished-unstamped test at
 `:1372` to `:1392`, whose sha-shape `case` and `merge-base --is-ancestor` are reused with a local
 ref in place of the observed anchor. The verb-carrier seam is check 26 of

@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-0-run-mandate.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-0-run-mandate.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
+| [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 
 <!-- /gen:spec-records -->
 
@@ -48,7 +49,9 @@ the run-state file is the kit's contract and this changes what it carries.
 - **S6** — Arms in `tools/unattended/unattended.test.sh`, one per criterion below, each observed
   red on a staged break of the one line it grades; the suite's prologue pins
   `CLAUDE_CODE_SESSION_ID` and `CLAUDE_PID` to fixture values so no fixture record inherits the
-  ids of whatever session runs the suite. Observed by AC1 to AC5.
+  ids of whatever session runs the suite. The arms' invocations are observed by AC1 to AC5; the
+  prologue exports and the arm block are FILE carriers and are observed by AC9, which reads the
+  suite by path.
 - **S7** — The record obligations of the pass: this spec's header goes to CLOSED in the pass
   commit; the acceptance ledger at
   `memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-1-1-acceptance-ledger.md`
@@ -290,9 +293,13 @@ the same invocation.
 - **AC2** — When `env -u CLAUDE_CODE_SESSION_ID -u CLAUDE_PID bash tools/unattended/unattended.sh --preflight tRun --keepalive-id k1`
   runs over a reset fixture, `grep -c '^session: absent$'` and `grep -c '^pid: absent$'` each print
   `1`, and the merged output carries `NOTE - this harness exposes no session id or pid, so no
-  out-of-session resumer can find this run` exactly once.
+  out-of-session resumer can find this run` exactly once; and when only `CLAUDE_PID` is unset —
+  `CLAUDE_CODE_SESSION_ID=abc env -u CLAUDE_PID bash tools/unattended/unattended.sh --preflight tRun --keepalive-id k1`
+  over a reset fixture — the output carries `exposes no pid, so` exactly once, `grep -c '^session: abc$'`
+  prints `1` and `grep -c '^pid: absent$'` prints `1`.
   Red when: a key is missing rather than `absent`; the NOTE is absent, or prints twice, which is
-  one NOTE per variable rather than one per call.
+  one NOTE per variable rather than one per call; or the single-absent arm names the wrong noun or
+  writes `session: absent` for a session the harness exposed.
 - **AC3** — When, on the record AC1 left, `bash tools/unattended/unattended.sh --resume tRun --keepalive-id zzz`
   runs with `CLAUDE_CODE_SESSION_ID=def CLAUDE_PID=9`, the output carries `resume at phase
   RUNNING` and the line `lease replaced · keepalive k1 -> zzz · session abc -> def · pid 4242 -> 9`,
@@ -340,6 +347,14 @@ the same invocation.
   declared set; or the header still reads `SPECCED`.
   figure: ten is what the `watch` line held on 2026-09-16; the observation reads the line, not
   this number.
+- **AC9** — When `grep -c '^export CLAUDE_CODE_SESSION_ID=fixture-session$' tools/unattended/unattended.test.sh`
+  and `grep -c '^export CLAUDE_PID=999999999$' tools/unattended/unattended.test.sh` run, each
+  prints `1` and `0` at base; and `grep -c -- '--keepalive-id zzz' tools/unattended/unattended.test.sh`
+  prints at least `1` and `0` at base, which is the arm block's own needle.
+  Red when: an export is absent, so every fixture record in the suite carries the real session's
+  id and unit 2's `fixture-session` transcript arm fails on a defect this unit never observed; or
+  the arm block was never written and the suite has no `fail` branch for the harness-arms leg to
+  count.
 
 ## 7. Gates
 
@@ -364,6 +379,10 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S6 · AC2 · AC9 · folded spec-audit round 1: M4 (raw 7) — the prologue
+  exports and the arm block are file carriers no criterion read, so S6 now joins them to a new AC9
+  whose greps read the suite by path; L4 (raw 13) — the NOTE's three-way alternation had one arm
+  observed, so AC2 gains the `CLAUDE_PID`-only arm with `session: abc` still recorded.
 - rev-1 · 2026-09-16 · initial draft, from the brief in
   `memory/builds/aWokenSentinel/prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md`
   and the research record under `build/`. Two corrections against source: the option parser is
