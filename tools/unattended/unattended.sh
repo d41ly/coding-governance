@@ -3122,16 +3122,10 @@ print_audit() { # slug
   return 0
 }
 
-# THE SIDECAR ROOT, derived ONCE: `<git-dir>/unattended`, the WORKTREE's git dir — where `gate-logs/`
-# already lives — never the common dir, because a run lives in one worktree. Every reader of a
-# sidecar file (the stall log here, the stop log at `--landed`, the resume log in the tick) calls
-# this rather than respelling it, and the kit gate counts the literal on exactly one code line. An
-# empty answer is a DEAD PROBE for the caller, never a path composed from an empty root.
-resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir cannot be derived
-  local g; g=$(GIT rev-parse --git-dir 2>/dev/null) || g=""
-  [ -n "$g" ] || return 1
-  printf '%s/unattended\n' "$g"
-}
+# THE SIDECAR ROOT is `resolve_sidecar_dir` in `lib-unattended.sh`, sourced above: the tick sources
+# the same lib, and a root two scripts must spell identically lives there (TOOL-aWokenSentinel-20).
+# This file holds NO derivation of it — the kit gate counts the literal on exactly one code line,
+# in the lib — and every sidecar reader here calls the function rather than respelling it.
 
 # THE SESSION TRANSCRIPT, when it derives. The CLI keeps one per session under
 # `<config>/projects/<encoded worktree root>/<session>.jsonl`, the root in its native spelling with

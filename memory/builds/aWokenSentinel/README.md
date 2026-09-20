@@ -73,7 +73,7 @@ research record under `build/`.
 | 17 | `TOOL-aWokenSentinel-17` | PLANNED | the driver suite reads `--status` by FIELD: `extract_next` armed on a suffixed line and `check_status_one_line` armed against a two-line driver copy (audit round 2 H2, H3) |
 | 18 | `TOOL-aWokenSentinel-18` | PLANNED | `read_bound_key` refuses with exit 2 a caller that named no conf, so a bound read from a shell with `CONF` unset is a refusal rather than a default with an empty NOTE (audit round 2 H4) |
 | 19 | `TOOL-aWokenSentinel-19` | PLANNED | `adopt-unattended.test.sh` declares a shrink-only `FLOOR_ASSERTIONS`, and the close's `run-unattended-gates.sh` run is the named observer of every arm the committed `seed()` feeds (audit round 2 H5) |
-| 20 | `TOOL-aWokenSentinel-20` | PLANNED | `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, and unit 11's check counts code lines across the three files (audit round 2 H6) |
+| 20 | `TOOL-aWokenSentinel-20` | CLOSED | `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, and unit 11's check counts code lines across the three files (audit round 2 H6) |
 | 21 | `TOOL-aWokenSentinel-21` | PLANNED | the build harness's suite `unattended-build.test.sh` joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm for unit 15's compare (audit round 3 H1) |
 | 22 | `TOOL-aWokenSentinel-22` | PLANNED | check 34's two refusal branches unit 16 leaves unarmed get their arms over the suite's marker fixture — the marker with no sha, the marker the remote default branch does not reach — each read RED first against the pre-predicate driver (audit round 3 H2) |
 | 23 | `TOOL-aWokenSentinel-23` | PLANNED | a kit-gate check that no shell file in the kit counts a captured variable's lines through `printf '%s
@@ -97,7 +97,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 |---|---|---|---|---|---|
 | [TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it](spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-20 |
-| [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | CLOSED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-11 — a kit-gate check that the driver holds ONE derivation of the sidecar root](spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-20 |
@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 37 bound to this build, across 4 record folder(s).
+Records: 38 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

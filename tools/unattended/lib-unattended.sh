@@ -17,6 +17,10 @@
 #
 # The lesson is not "be more careful". Two spellings of one rule is [[two-answers-to-one-question]],
 # and the fix for it is one spelling, which is this file.
+#
+# WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
+# root the driver and the resume tick both read; the anchored id tests; path containment; and
+# "has this pass committed yet". The same rule admits the resume tick as a third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -43,6 +47,21 @@ GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
 # loops, which is what `is_published` now does, rather than caching a wrapper that is mostly
 # called from subshells.
 GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
+
+# THE SIDECAR ROOT, derived ONCE, HERE and nowhere else: `<git-dir>/unattended`, the WORKTREE's git
+# dir — where `gate-logs/` already lives — never the common dir, because a run lives in one
+# worktree and one sidecar per worktree is the whole point. Every reader of a sidecar file (the
+# stall log at `--liveness`, the stop log at `--landed`, the resume log in the tick) calls this
+# rather than respelling it; the driver and the tick both source this file, so a second spelling in
+# either would be two answers to one question, and the kit gate counts the literal on exactly one
+# code line across the three. An empty answer is a DEAD PROBE for the caller, never a path composed
+# from an empty root — the caller refuses, it does not default. Moved from the driver, where unit 2
+# defined it, by TOOL-aWokenSentinel-20; the body is unit 2's, unchanged.
+resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir cannot be derived
+  local g; g=$(GIT rev-parse --git-dir 2>/dev/null) || g=""
+  [ -n "$g" ] || return 1
+  printf '%s/unattended\n' "$g"
+}
 
 # ------------------------------------------------------------------------------- ids, anchored
 # An id compared as a SUBSTRING joins `-1` to `-10`, and the joined pair is always the wrong one:

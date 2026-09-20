@@ -83,3 +83,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T17:28:15Z dispatch · item e1b1b51d TOOL-aWokenSentinel-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md .unattended.conf tools/unattended/.unattended.conf.example tools/unattended/kit.toml memory/guides/SESSION-KICKOFF.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-2-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-20T17:28:21Z brief · item TOOL-aWokenSentinel-2 · reason bcff21c34106 memory/builds/aWokenSentinel/prompts/2026-09-16-prompt-TOOL-aWokenSentinel-2-1-build-brief.md
+
+2026-09-20T18:02:02Z dispatch · item 0e3f3fe2 TOOL-aWokenSentinel-20 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-20-1-acceptance-ledger.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-20T18:02:07Z brief · item TOOL-aWokenSentinel-20 · reason ee92fce91cf2 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-20-1-build-brief.md
