@@ -44,7 +44,7 @@ driver said so rather than writing a second row.
   left, the check named `commitment` and nothing else. The schema tuple was restored and asserted
   restored. The arm itself is owed: `test_record_template_pairs`, staged RED by that same widening,
   which it applies to the schema's own tuple inside a `try`/`finally`.
-- AC4 — `grep -n "committed first" tools/runlog/README.md tools/runlog/record.py memory/map/features/runlog.md` — run directly, it exits 1 and finds nothing. The README's commitment paragraph now names the time-ordered prefix and the START of it, the module docstring says the count is the whole anchor, and the dossier's sentence says the commitment carries a digest and a count and no time at all.
+- AC4 — `grep -n "committed first" tools/runlog/README.md tools/runlog/record.py memory/map/features/runlog.md` — run directly, it exits 1 and finds nothing. The README's commitment paragraph now names the time-ordered prefix and the START of it, the module docstring says the count is the whole anchor, and the dossier's sentence says the commitment is a digest and a count with no time.
 
 ## What else the pass carried
 
@@ -61,6 +61,13 @@ driver said so rather than writing a second row.
   `VERB_OFFENDER_PIN` does not move. That query is not the leg.
 - The runlog dossier lists `TOOL-dLoggedFlight-21` among its decisions and `memory/map/generated` was
   regenerated in the code commit; the three new function names are in `symbols.json`.
+- **The dossier has almost no room left.** It sat 5 bytes under check 6's `DOSSIER_CAP_BYTES` before
+  this unit, so the first draft of its commitment sentence put the file 452 bytes over and the cap was
+  measured, not assumed. What landed is a one-sentence summary at 20 bytes of margin, and the full
+  statement of S3 and S4 lives in the kit README and the `record.py` docstring, which have no cap.
+  Units `-20`, `-22`, `-23`, `-24` and `-27` all still owe dossier prose and cannot each spend 20
+  bytes. Splitting the dossier is what check 6 prescribes at the cap and it is a unit, not an edit, so
+  it is named here rather than attempted.
 - No committed run record exists in this tree, so nothing needs to read a four-field commitment line.
   The rendered Skill names the commitment nowhere, so it was not re-rendered.
 - The sibling specs that consume this unit — `-20`, `-22`, `-23` and `-24` — already describe a
