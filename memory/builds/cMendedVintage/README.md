@@ -85,28 +85,28 @@ did not revert, and an outbox nothing drains.
 | 16 | `TOOL-cMendedVintage-5` | CLOSED | the carried predicate sees a `${VAR:-tools/…}` default-value literal |
 | 17 | `DEPL-cMendedVintage-10` | CLOSED | `update --write` writes the `.gitattributes` block and takes the renormalize with it |
 | 18 | `DEPL-cMendedVintage-15` | CLOSED | the synthesized `attributes` snapshot entry is restorable and leaves the orphan sweep |
-| 19 | `TOOL-cMendedVintage-10` | OPEN | a superseded dispatch declaration is not an open pass |
-| 20 | `DEPL-cMendedVintage-17` | OPEN | a withdrawn pin set takes its own verdict, never the empty-marker write |
-| 21 | `DEPL-cMendedVintage-11` | OPEN | `cmd_check` grades the attributes row's block |
-| 22 | `DEPL-cMendedVintage-12` | OPEN | `apply`'s CONFIGURE honours `deploy["inert"]` |
-| 23 | `DEPL-cMendedVintage-13` | OPEN | `update --write` emits gate legs, on unit 10's write stage |
-| 24 | `DEPL-cMendedVintage-21` | OPEN | one atomic-write helper, with an observer that fails when it is absent |
-| 25 | `DEPL-cMendedVintage-14` | OPEN | stale conflict orders are reaped; an order filename keys on the full path |
-| 26 | `TOOL-cMendedVintage-6` | OPEN | `check-receipt.sh`, the receipt-sync leg, and its row on gov's own bar |
-| 27 | `TOOL-cMendedVintage-7` | OPEN | that leg reports rows carrying `evidence: "unattributed"` |
-| 28 | `TOOL-cMendedVintage-8` | OPEN | process-monitor's empty-live-scope arm gets a code distinct from a conf refusal |
-| 29 | `DEPL-cMendedVintage-18` | OPEN | a withdrawn row whose path did not restore stays in the receipt |
-| 30 | `DEPL-cMendedVintage-19` | OPEN | a row's role is re-resolved at every schema, so a role move is reported |
-| 31 | `DEPL-cMendedVintage-20` | OPEN | a retired flag's absence is graded under every spelling it has |
-| 32 | `DEPL-cMendedVintage-22` | OPEN | the gate-leg drift guard compares the target, not gov against itself |
-| 33 | `DEPL-cMendedVintage-23` | OPEN | the lf-pin write is contained, and every receipt-path join is graded |
-| 34 | `DEPL-cMendedVintage-24` | OPEN | the dirty-path refusal reaches the row this build taught `update` to write |
-| 35 | `DEPL-cMendedVintage-25` | OPEN | the git plumbing readers stop word-splitting a path |
-| 36 | `TOOL-cMendedVintage-11` | OPEN | the census arm resolves its launcher instead of trusting the name |
-| 37 | `DEPL-cMendedVintage-26` | OPEN | the scoped-index and rename halves of the dirty-path guard |
-| 38 | `DEPL-cMendedVintage-27` | OPEN | the role re-resolution keeps the three-way merge a rendered row still needs |
-| 39 | `TOOL-cMendedVintage-12` | OPEN | the brief reader stops waiting on a grandchild's write end |
-| 40 | `DEPL-cMendedVintage-28` | OPEN | a receipt path that escapes is answered before an operator's untracked file |
+| 19 | `TOOL-cMendedVintage-10` | CLOSED | a superseded dispatch declaration is not an open pass |
+| 20 | `DEPL-cMendedVintage-17` | CLOSED | a withdrawn pin set takes its own verdict, never the empty-marker write |
+| 21 | `DEPL-cMendedVintage-11` | CLOSED | `cmd_check` grades the attributes row's block |
+| 22 | `DEPL-cMendedVintage-12` | CLOSED | `apply`'s CONFIGURE honours `deploy["inert"]` |
+| 23 | `DEPL-cMendedVintage-13` | CLOSED | `update --write` emits gate legs, on unit 10's write stage |
+| 24 | `DEPL-cMendedVintage-21` | CLOSED | one atomic-write helper, with an observer that fails when it is absent |
+| 25 | `DEPL-cMendedVintage-14` | CLOSED | stale conflict orders are reaped; an order filename keys on the full path |
+| 26 | `TOOL-cMendedVintage-6` | CLOSED | `check-receipt.sh`, the receipt-sync leg, and its row on gov's own bar |
+| 27 | `TOOL-cMendedVintage-7` | CLOSED | that leg reports rows carrying `evidence: "unattributed"` |
+| 28 | `TOOL-cMendedVintage-8` | CLOSED | process-monitor's empty-live-scope arm gets a code distinct from a conf refusal |
+| 29 | `DEPL-cMendedVintage-18` | CLOSED | a withdrawn row whose path did not restore stays in the receipt |
+| 30 | `DEPL-cMendedVintage-19` | CLOSED | a row's role is re-resolved at every schema, so a role move is reported |
+| 31 | `DEPL-cMendedVintage-20` | CLOSED | a retired flag's absence is graded under every spelling it has |
+| 32 | `DEPL-cMendedVintage-22` | CLOSED | the gate-leg drift guard compares the target, not gov against itself |
+| 33 | `DEPL-cMendedVintage-23` | CLOSED | the lf-pin write is contained, and every receipt-path join is graded |
+| 34 | `DEPL-cMendedVintage-24` | CLOSED | the dirty-path refusal reaches the row this build taught `update` to write |
+| 35 | `DEPL-cMendedVintage-25` | CLOSED | the git plumbing readers stop word-splitting a path |
+| 36 | `TOOL-cMendedVintage-11` | CLOSED | the census arm resolves its launcher instead of trusting the name |
+| 37 | `DEPL-cMendedVintage-26` | CLOSED | the scoped-index and rename halves of the dirty-path guard |
+| 38 | `DEPL-cMendedVintage-27` | CLOSED | the role re-resolution keeps the three-way merge a rendered row still needs |
+| 39 | `TOOL-cMendedVintage-12` | CLOSED | the brief reader stops waiting on a grandchild's write end |
+| 40 | `DEPL-cMendedVintage-28` | CLOSED | a receipt path that escapes is answered before an operator's untracked file |
 
 <!-- /roster:units -->
 
