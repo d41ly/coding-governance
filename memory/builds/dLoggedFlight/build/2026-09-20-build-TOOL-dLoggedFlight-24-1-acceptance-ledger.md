@@ -44,6 +44,13 @@ run, with the break that stages it RED named beside it.
   `(None, None)` for a missing, empty or non-numeric window, subtracts the half-open second only for a
   `last-activity` end, and passes a `terminal-end` through — a case `record_window` cannot produce,
   since the model derives it with no `term_end`, and which would be a journal time if it ever did.
+- **The arm's `last-activity` check edits a window rather than building one**, which is the
+  substituted-value class: it hands `derive_window_bounds` a copy of the fixture's own
+  `record_window` with `end_from` swapped, so it grades the function and not the path. The REAL path
+  was observed here on the second probe fixture — a non-terminal run whose later own commit pushed the
+  model's window past the leg's, rendering the last record commit's own committer time — and it is
+  `TOOL-dLoggedFlight-25`'s AC1 and AC3 that observe it durably, over models built at the Skill's
+  `landing` and `pending` placements. This unit does not claim that coverage.
 - The model's `window` is untouched and still bounds every timed set. The second `derive_window` call
   reads only `phases_at`, which the model had already built, so the unit adds no git call and no source
   read; `test_model_ac8_git_calls` should not move.
