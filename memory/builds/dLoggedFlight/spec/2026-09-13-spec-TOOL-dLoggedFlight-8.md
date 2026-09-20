@@ -96,7 +96,9 @@ sources actually support. Every later surface renders from this model rather tha
   tool calls are not the run's. That is a SECOND constant beside `TREE_BLIND_VERBS`, and a proper
   subset of it, because naming a session and claiming a tree are different questions: `--resume`
   continues the run and `--landed` lands it, so both are the run's own acts whatever session made
-  them, while neither makes the tree it ran in the run's. The same rule decides which calls move a
+  them, while neither makes the tree it ran in the run's. The two members named here and that
+  difference are the ONE copy of those sets in this spec, and AC24 pins both against the constants in
+  both directions, so this sentence cannot drift from them. The same rule decides which calls move a
   non-terminal end above and which ENDs are attribution points (S8). A read IS the run's own when its
   START named a session one of the run's acts named, or named no session at all: on the shipped
   default `RUNLOG_SESSION_VARS` is blank, so the keepalive tick's `--audit` records none, and a rule

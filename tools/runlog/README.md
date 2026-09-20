@@ -550,6 +550,12 @@ prefix and root, and hold the render to an independent one.
   shape, on every bar from then on; `verify` looks for the pre-move key, and `record --write` writes
   a second file. Nothing follows the path back past the move, and no waiver clears the refusal: the
   unit's acceptance ledger parks that question.
+- **A visit made from a session nobody recorded.** A read is the run's own when it names a session
+  one of the run's acts named, or names NONE — and on the shipped default no call records one, so
+  every session-less read of the run's own slug inside its own journal segment is admitted. That is
+  the narrowest shared location left in this key, and it is deliberate: the alternative drops the
+  keepalive tick's own `--audit` and a stalled run can never fire. Recording a session
+  (`RUNLOG_SESSION_VARS`) closes it.
 - **A writer broken for the whole of a run made here.** With none of the run's own driver lines on
   this node, the model cannot tell that from a run made on another node, and reads `not-local`.
   The reverse holds too: a `--status` made here inside another node's run is one of that run's
