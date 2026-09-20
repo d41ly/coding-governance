@@ -75,6 +75,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
+  `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued, and is the only
+  restart one may issue. It refuses, numbered and before any write, unless the record is HELD, its
+  `held-at` equals the value passed, and — under `ANCHOR_SCOPE=published` — the tip the remote
+  advertises for the run branch is HEAD or an ancestor of it; an unreachable remote refuses too.
+  On success the take-over runs unchanged and still requires the session's own `--keepalive-id`,
+  and its history row carries `scheduled` rather than `manual`. `UNATTENDED-STOPS.md` is the
+  contract; the rules are not restated here.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
@@ -142,8 +149,10 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   a code or condition outside its grammar, and a keepalive neither reaped nor recorded unreachable,
   because a job still firing into a held run re-dispatches its units at the next tick. One
   exception to the published-tip clause: under `--code platform-unavailable`, and only when the
-  remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. The
-  contract is `UNATTENDED-STOPS.md`.
+  remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. In the
+  SAME write it decides whether a DURABLE restart is owed and records `resume-owed` and
+  `hold-streak`, printing the schedule name, its fire instant and the prompt for the agent to file.
+  The contract is `UNATTENDED-STOPS.md`.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the keepalive is still

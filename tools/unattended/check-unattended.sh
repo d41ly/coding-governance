@@ -127,6 +127,8 @@ DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LEASE_STALE_AFTER=""
+RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
+RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
 # ---- and the second is why the guard is now structural rather than a probe.
 # ----
@@ -191,6 +193,7 @@ while IFS= read -r -d '' _ck; do
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
+    RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
     UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
@@ -1780,6 +1783,52 @@ else
       fail 35 "LANDER_MODE is declared outside the driver's closed set, so every run in this project refuses at conf load and no landing is reachable at all, declared $LANDER_MODE against the set $_c35_set" ;;
   esac
 fi
+# ---- 36: THE DURABLE RESTART CARRIER, GRADED AND ANNOUNCED. TOOL-dDerivedDocket-5 S1 and S2.
+# ---- Three questions, and the first is the one a project gets wrong silently: the switch's value.
+# ----
+# ---- THE CLOSED SET AND THE DEFAULT COME FROM THE DRIVER, off its two marked lines, never retyped
+# ---- here — check 35's own rule for LANDER_MODE, applied to the sibling switch beside it. A marker
+# ---- that stops resolving is a REFUSAL, because a set read as empty makes every value legal.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the declared tools EXIST, that the carrier is really durable,
+# ---- or that any restart was ever filed. No script reaches a harness scheduler store — that is the
+# ---- premise the whole feature rests on — so filing and reaping stay agent-attested, exactly as the
+# ---- keepalive's are. This grades the DECLARATION and nothing beyond it.
+_c36_line=$(grep -A1 -F 'gov:resume-schedule-set' "$DRIVER" 2>/dev/null | tail -1)
+_c36_set=$(printf '%s' "$_c36_line" | sed 's/[^a-z|]//g' | tr '|' ' ')
+_c36_def=$(grep -F 'gov:resume-schedule-default' "$DRIVER" 2>/dev/null | sed -n 's/.*RESUME_SCHEDULE=\([a-z]*\).*/\1/p' | head -1)
+if [ -z "${_c36_set// /}" ] || [ -z "$_c36_def" ]; then
+  fail 36 "this leg cannot read the closed RESUME_SCHEDULE set and its default off the driver's own marked lines, so the declared switch would be graded against an empty set and every value, a misspelling included, would read as legal: $DRIVER"
+else
+  _c36_eff="$RESUME_SCHEDULE"; _c36_src=declared
+  [ -n "$_c36_eff" ] || { _c36_eff="$_c36_def"; _c36_src=defaulted; }
+  case " $_c36_set " in
+    *" $_c36_eff "*)
+      echo "unattended: RESUME_SCHEDULE $_c36_eff ($_c36_src) — whether a hold that owes a restart prints one for the agent to file, graded against the driver's own set: $_c36_set" ;;
+    *)
+      fail 36 "RESUME_SCHEDULE is declared outside the driver's closed set, so every run in this project refuses at conf load and no verb is reachable at all, declared $RESUME_SCHEDULE against the set $_c36_set"
+      _c36_eff=refused ;;
+  esac
+  if [ "$_c36_eff" = on ]; then
+    # ---- THE PAIR IS REQUIRED WHILE THE SWITCH IS ON, and undeclared is not defaulted: a hold then
+    # ---- records `none · no carrier` and the run pauses with nothing filed to restart it. --hold
+    # ---- itself never refuses for this — the hold is the safe state — so the refusal lives here.
+    for _c36_k in RESUME_SCHEDULE_CREATE RESUME_SCHEDULE_DELETE; do
+      eval "_c36_v=\${$_c36_k}"
+      [ -n "$_c36_v" ] || fail 36 "RESUME_SCHEDULE is $_c36_eff ($_c36_src) and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair, or write RESUME_SCHEDULE=\"off\": $_c36_k"
+    done
+    # ---- THE CARRIER MAY NOT BE THE KEEPALIVE'S. Graded on the CREATE half, which is the one that
+    # ---- files the task: this project's own conf declares that store session-scoped, so a restart
+    # ---- filed there dies with the session it exists to outlive and every hold then reads as owing
+    # ---- a restart that can never fire.
+    if [ -n "$RESUME_SCHEDULE_CREATE" ] && [ "$RESUME_SCHEDULE_CREATE" = "$KEEPALIVE_CREATE" ]; then
+      fail 36 "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both $RESUME_SCHEDULE_CREATE"
+    fi
+  elif [ "$_c36_eff" = off ]; then
+    echo "unattended: RESUME_SCHEDULE is off — no hold in this project owes a durable restart, and every held run waits for a person to type --resume"
+  fi
+fi
+
 # ---- ...and the self-test surface the in-place close derives its announcement from. A DECLARED
 # ---- prefix matching no tracked path is a refusal: it reads as coverage of a surface that is not
 # ---- there, and the landing of kit work under it is then never told the flagged bar is owed. A

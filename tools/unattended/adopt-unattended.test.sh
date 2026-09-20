@@ -68,6 +68,9 @@ GATE_CMD="true"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="TheCreateCall"
 KEEPALIVE_DELETE="TheDeleteCall"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 KEEPALIVE_INTERVAL="every 10 minutes"
 CORE_FLOOR="6:6"
 KICKOFF_ENGINE=""
@@ -422,6 +425,40 @@ out=$( cd "$H9c" && MEMORY_TREE_DIR='vendor/m t' bash "$KIT_REL"/adopt-unattende
 same "arm 9 a tracked override holding a space refuses at exit 2" "$rc" "2"
 hit "$out" "holds a character outside"
 absent "$H9c/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an override holding a space"
+
+# ---- arm 10 (TOOL-dDerivedDocket-5): the DURABLE restart carrier, on with no carrier declared, and
+# ---- off. The on-with-no-carrier case is the whole rollout: an adopter upgrading with an existing
+# ---- conf takes the kit default `on`, declares nothing, and has to meet a RED here rather than
+# ---- learn at its first hold that nothing will restart it.
+H10="$TMP/resume-on-nocarrier"; seed "$H10"
+sed -i '/^RESUME_SCHEDULE_CREATE=/d; /^RESUME_SCHEDULE_DELETE=/d' "$H10/.unattended.conf"
+out=$( cd "$H10" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
+same "arm 10 an on conf with no carrier refuses to install a placeholder-carrying Skill" "$rc" "1"
+hit "$out" "{{RESUME_SCHEDULE_CREATE}}"
+absent "$H10/.claude/skills/unattended/SKILL.md" "arm 10 installed a Skill naming an unfilled carrier"
+# ...and the SAME conf under an already-installed Skill - the upgrade shape - reds under --check on
+# the render it just made, rather than on the absence of a file.
+mkdir -p "$H10/.claude/skills/unattended"
+sed -e 's/{{RESUME_SCHEDULE_CREATE}}/PreUpgradeCreate/g' -e 's/{{RESUME_SCHEDULE_DELETE}}/PreUpgradeDelete/g' \
+    "$H10/$KIT_REL/SKILL.template.md" > "$H10/.claude/skills/unattended/SKILL.md"
+out=$( cd "$H10" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 10 --check refuses on the placeholder in the render it just made" "$rc" "1"
+hit "$out" "the render this check just made carries an unfilled placeholder"
+hit "$out" "{{RESUME_SCHEDULE_CREATE}}"
+# ---- ...and OFF renders one FIXED literal in place of both tool names, so a project that opted out
+# ---- says so in the sentence where a tool name would stand rather than carrying a placeholder,
+# ---- which is the one outcome an opt-out must not produce.
+H10b="$TMP/resume-off"; seed "$H10b"
+sed -i '/^RESUME_SCHEDULE_CREATE=/d; /^RESUME_SCHEDULE_DELETE=/d; s/^RESUME_SCHEDULE=.*/RESUME_SCHEDULE="off"/' \
+    "$H10b/.unattended.conf"
+( cd "$H10b" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+present "$H10b/.claude/skills/unattended/SKILL.md" "arm 10 the off render was not installed"
+( cd "$H10b" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
+same "arm 10 --check agrees with the off render" "$?" "0"
+n=$((n+1)); grep -qF 'not scheduled: RESUME_SCHEDULE is off' "$H10b/.claude/skills/unattended/SKILL.md" \
+  || { echo "FAIL arm 10 the off render carries no not-scheduled literal"; st=1; }
+n=$((n+1)); grep -qF 'RESUME_SCHEDULE_CREATE' "$H10b/.claude/skills/unattended/SKILL.md" \
+  && { echo "FAIL arm 10 the off render still names the carrier key"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

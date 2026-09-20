@@ -3363,6 +3363,8 @@ SELFTESTS_OWED_PATHS="tools/"
 BYPASS_BAN="--no-verify"
 GATE_CMD="true"
 WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
 LMC
   git add -A >/dev/null && git commit -q -m seed --no-verify
 ) >/dev/null 2>&1
@@ -3442,6 +3444,53 @@ out=$(lmrun)
 hit "$out" "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal"
 lmrestore tools/unattended/unattended.sh
 
+
+# ---- 36: the DURABLE restart carrier, TOOL-dDerivedDocket-5. GREEN CONTROL first: this conf
+# ---- declares no switch at all, which is the population every upgrading adopter is in, and the
+# ---- effective value has to be ANNOUNCED rather than silently applied.
+out=$(lmrun)
+hit  "$out" "RESUME_SCHEDULE on (defaulted)"
+miss "$out" "check 36 FAILED"
+
+# ---- 36: an unrecognised spelling. The driver refuses it at conf load, so every verb in such a
+# ---- project is unreachable and a leg that resolved it silently to either value would be reporting
+# ---- about a project that cannot run at all.
+printf 'RESUME_SCHEDULE="maybe"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "RESUME_SCHEDULE is declared outside the driver's closed set, so every run in this project refuses at conf load and no verb is reachable at all, declared"
+lmrestore .unattended.conf
+
+# ---- 36: the switch on and no carrier declared. Undeclared is not defaulted: every hold such a
+# ---- project takes records `none · no carrier` and pauses with nothing filed to restart it.
+printf 'RESUME_SCHEDULE="on"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair, or write RESUME_SCHEDULE=\"off\": RESUME_SCHEDULE_CREATE"
+hit "$out" "RESUME_SCHEDULE_DELETE"
+lmrestore .unattended.conf
+
+# ---- 36: the carrier declared as the KEEPALIVE's own create tool. That store is session-scoped by
+# ---- this project's own conf, so every restart filed there dies with the session it exists to
+# ---- outlive — and the hold that filed it reads as owing a restart that can never fire.
+printf 'RESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="CronCreate"\nRESUME_SCHEDULE_DELETE="CronDelete"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both CronCreate"
+lmrestore .unattended.conf
+
+# ---- 36: OFF is a legal declaration and is announced, not a refusal. A project may decide that
+# ---- every held run waits for a person, and a leg that red on that would be policy, not a check.
+printf 'RESUME_SCHEDULE="off"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit  "$out" "RESUME_SCHEDULE is off — no hold in this project owes a durable restart, and every held run waits for a person to type --resume"
+miss "$out" "check 36 FAILED"
+lmrestore .unattended.conf
+
+# ---- 36: the DRIVER's marker removed, on check 35's own terms. A set read as empty would make
+# ---- every declared value, a misspelling included, read as legal.
+sed -i '/gov:resume-schedule-set/d' "$lm_dir/tools/unattended/unattended.sh"
+out=$(lmrun)
+hit "$out" "this leg cannot read the closed RESUME_SCHEDULE set and its default off the driver's own marked lines, so the declared switch would be graded against an empty set and every value, a misspelling included, would read as legal"
+lmrestore tools/unattended/unattended.sh
+
 rm -rf "$lm_dir"
 
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
@@ -3480,7 +3529,10 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- FLOOR_SHARD_1 is untouched. Both breach-line reads are in that unit's acceptance ledger.
 # ---- RAISED by exactly the arm, 2026-09-14, node a (closing diff review of aRatifiedRulings, finding
 # ---- 7): fixture F executes one assertion, in region two, so both floors below carry +1.
-FLOOR_ASSERTIONS=410
+# ---- RAISED 410 -> 419 by TOOL-dDerivedDocket-5: check 36's nine arms, all in the LANDER_MODE
+# ---- fixture block inside region two, so FLOOR_SHARD_2 carries the same +9 and FLOOR_SHARD_1
+# ---- is untouched.
+FLOOR_ASSERTIONS=419
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -3506,7 +3558,7 @@ FLOOR_ASSERTIONS=410
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=91
-FLOOR_SHARD_2=319
+FLOOR_SHARD_2=328
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;

@@ -736,11 +736,29 @@ keepalive the record's `keepalive` fact names — you HOLD the lease: resume wit
 `--resume <slug> --keepalive-id <that id>` and do not reap anything. Otherwise you are TAKING
 OVER: reap the recorded job and read the result back, schedule a new one, then run
 `--resume <slug> --keepalive-id <new id>`, which records the new id. If that resume REFUSES or
-prints `still held`, reap only the job you just scheduled, read the result back, and stop — remove
-nothing else, because a durable restart filed under this slug's name is deleted only after a
-take-over's `--resume` succeeds, and deleting it here would leave a held run with nothing to
-restart it. Replace your OWN job only through
+prints `still held`, reap only the job you just scheduled, read your scheduler's listing back to
+confirm it is gone, and stop — remove nothing else, because a durable restart filed under this
+slug's name is deleted only after a take-over's `--resume` succeeds, and deleting it here would
+leave a held run with nothing to restart it. Replace your OWN job only through
 `--resume <slug> --keepalive-id <new> --replaces <old>`.
+
+**If a durable scheduled task woke you, pass `--scheduled <held-at>`** — the value is in the prompt
+that task carries, and it is the only restart a schedule may issue. It refuses, before any write,
+unless the record is still HELD at that exact `held-at` and the remote advertises nothing this
+worktree lacks. A refusal is the answer, not an obstacle: reap the keepalive you scheduled, confirm
+it from the listing, leave the named task alone, and stop.
+
+**On the take-over branch, PUSH the record before any other work.** A schedule filed on another
+node compares the remote's advertised tip against its own HEAD, and a take-over that has not
+pushed yet is invisible to that comparison — which is the window in which two nodes can drive one
+slug. Pushing first shrinks it.
+
+**Delete the durable restart only AFTER a `--resume` that took the run over and whose record you
+have pushed.** Issue `delete_scheduled_task` against `unattended-resume-<slug in lower case>`,
+and go on when no task has it — an `owner` hold owes none, and a run held with the switch off owes
+none either. Never before that `--resume`, and never on its refusal or its `still held` branch: a
+manual resume before an `after` hold's instant would otherwise delete the one thing left to restart
+the run, while `--status` went on naming it.
 
 **On the take-over branch, REAP the recorded id before you schedule a replacement.** In that
 order, and the order is the whole point. The intuition is that a resumed session's keepalive died with its process because
@@ -943,6 +961,24 @@ keepalive and name it with `--reaped <id>`, because a job still firing into a he
 re-dispatches its units at the next tick; from another node, where you cannot reach that session's
 store, say `--keepalive-unreachable <node>` instead. The codes and the release-condition grammar
 are in `UNATTENDED-STOPS.md`, and the refusal names the legal set either way.
+
+**Then file the restart it printed, if it printed one.** `--hold` prints `resume-owed` with a
+schedule name and a fire instant, or `none` and the reason there is none. On `none`, file nothing
+and stop. Otherwise, in this order:
+
+1. `delete_scheduled_task` against the printed NAME. Go on when no task has it — that is the
+   normal case. Every hold of this slug files under that one name, a fired one-shot can stay listed
+   under its id, and a create meeting a taken id is not a replacement. The delete loses nothing a
+   hold owes: `--hold` refuses on a HELD record, so any task under that name belongs to a hold that
+   has already ended, and the scheduled restart refuses on `held-at` anyway.
+2. `create_scheduled_task` under that same name, at that exact instant, ONE-SHOT, with the
+   three prompt lines `--hold` printed, copied VERBATIM. Do not rewrite them and do not add the
+   hold reason: a durable prompt executes later in a session nobody watches, and every value in
+   those lines is one the driver validated.
+
+The carrier is the one your project declares, and it must be DURABLE: a filed task outlives the
+session that filed it. The keepalive's scheduler is not it — that store is session-scoped, and the
+kit gate reds a conf that names it here.
 
 ## If it cannot finish
 

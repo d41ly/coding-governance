@@ -84,3 +84,13 @@ tools/unattended/unattended.sh	49	18	--dispatch: the inline resolver found no us
 # message about the wrong thing. Pinned rather than armed with a synthetic break, which proves the
 # mechanism for the synthetic value and not the real one. TOOL-dDerivedDocket-4.
 tools/unattended/unattended.sh	56	4	HEAD does not resolve on this node, so the hold has no witness to record and a witnessless pause is the claim an oracle skips
+#
+# TOOL-dDerivedDocket-5 pins two CLOCK branches in `--hold`, and they are one hazard read twice.
+# Both fire only when `date -u` answers nothing on a host where the same binary answered a moment
+# earlier - `read_utc_now` for the first, and `date -u -d` over a `held-at` the driver itself just
+# wrote for the second. A fixture cannot stage that without hiding `date` from PATH, which would
+# take the rest of the suite down with it. They are branches rather than silent fallbacks for the
+# reason the sibling condition reader states: a hold recorded as owing a restart nobody can name
+# is worse than one that owes none, and a zero from a dead clock reads as an instant.
+tools/unattended/unattended.sh	56	5	the clock answered nothing, so this hold has no held-at to record and every later reader
+tools/unattended/unattended.sh	56	6	the fire instant of this hold's restart cannot be computed on this node, because a clock probe it needs answered nothing

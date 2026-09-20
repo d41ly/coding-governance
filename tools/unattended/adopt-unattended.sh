@@ -126,6 +126,13 @@ CONF="$ROOT/.unattended.conf"
 # not presence-of-value, and "" made every such key invisible to the only check looking for it.
 MEMORY_ROOT=memory; LANDER="{{LANDER}}"; KEEPALIVE_CREATE="{{KEEPALIVE_CREATE}}"
 KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVAL}}"
+# TOOL-dDerivedDocket-5 - the DURABLE restart carrier keeps its placeholders on exactly the
+# keepalive pair's terms, and that standing placeholder is the whole rollout: an adopter who
+# upgrades with an existing conf takes the kit default `on`, declares no carrier, and reds THIS
+# check rather than learning at its first hold that nothing will restart it. The switch itself
+# is pre-set EMPTY, for ANCHOR_SCOPE's reason - it is not interpolated, it SELECTS.
+RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE="{{RESUME_SCHEDULE_CREATE}}"
+RESUME_SCHEDULE_DELETE="{{RESUME_SCHEDULE_DELETE}}"
 # TOOL-aPromptedMandate-5 - ANCHOR_SCOPE is the ONE interpolated key that must NOT keep its
 # placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
 # means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
@@ -142,6 +149,16 @@ AUTH_PARAM=""
 _MTD_OVERRIDE=${MEMORY_TREE_DIR:-}
 # shellcheck disable=SC1090
 . "$CONF"
+# THE EFFECTIVE CARRIER PAIR. With the switch OFF the render writes one FIXED literal in place of
+# both tool names, so the Skill of a project that opted out says so in the sentence where a tool
+# name would otherwise stand - rather than carrying a placeholder that reds the arm below, which
+# is the one outcome an opt-out must not produce. Blank and absent both resolve to `on`, exactly
+# as the driver resolves them, because the two readings disagreeing is how an adopter gets a
+# green render for a switch the driver refuses.
+RS_OFF_LITERAL="not scheduled: RESUME_SCHEDULE is off"
+if [ "$RESUME_SCHEDULE" = off ]; then
+  RESUME_SCHEDULE_CREATE="$RS_OFF_LITERAL"; RESUME_SCHEDULE_DELETE="$RS_OFF_LITERAL"
+fi
 # The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
 # anchor - the driver's own value guard falls through exactly this way - and the Skill has to state
 # what the run will DO rather than what the file happens to say. Deriving it here also means the
@@ -300,6 +317,8 @@ render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gita
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
   out=${out//\{\{KEEPALIVE_DELETE\}\}/"$KEEPALIVE_DELETE"}
   out=${out//\{\{KEEPALIVE_INTERVAL\}\}/"$KEEPALIVE_INTERVAL"}
+  out=${out//\{\{RESUME_SCHEDULE_CREATE\}\}/"$RESUME_SCHEDULE_CREATE"}
+  out=${out//\{\{RESUME_SCHEDULE_DELETE\}\}/"$RESUME_SCHEDULE_DELETE"}
   out=${out//\{\{ANCHOR_SCOPE\}\}/"$ANCHOR_EFFECTIVE"}
   # LAST, deliberately. Substitutions run in sequence over one string, so a value carrying another
   # key's placeholder text would be re-substituted by any pass that followed it. Appended here, such
@@ -317,6 +336,17 @@ if [ "$MODE" = "--check" ]; then
   trap 'rm -f "$TMP"' EXIT
   render > "$TMP" || { echo "unattended: the render FAILED — the template could not be read; refusing to compare"; exit 1; }
   [ -s "$TMP" ] || { echo "unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses"; exit 1; }
+  # TOOL-dDerivedDocket-5 - THE PLACEHOLDER ARM RUNS OVER THE FRESH RENDER TOO, and before the diff.
+  # The arm further down grades the INSTALLED file, which the install path refuses to write with a
+  # placeholder in it - so for a tree whose TEMPLATE grew a key its conf does not declare, the only
+  # thing that fired was "out of sync", which sends the reader to re-render and says nothing about
+  # the key. That is the upgrade shape: an adopter taking a kit version with a new conf key meets
+  # this before it meets a hold that files nothing.
+  if grep -qE '\{\{[A-Z_]+\}\}' "$TMP"; then
+    echo "unattended: the render this check just made carries an unfilled placeholder — .unattended.conf declares no value for it, so re-rendering would refuse and the installed Skill cannot be brought into sync"
+    grep -nE '\{\{[A-Z_]+\}\}' "$TMP" | head -5 | sed 's/^/    /'
+    exit 1
+  fi
   if ! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1; then
     echo "unattended: $SKILL_OUT is out of sync with SKILL.template.md + .unattended.conf"
     echo "  re-render with: $0"

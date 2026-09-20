@@ -370,17 +370,16 @@ every other check decorative.
 
 ## 5. The keepalive — an AGENT obligation
 
-The scheduling store is in-memory and session-scoped, and deleting a job removes it from that same
-store. **No script can reach it.** So the obligation splits by actor, and the split is not a
-convenience:
+The scheduling store is in-memory and session-scoped, and deleting a job removes it from that same store.
+**No script can reach it.** So the obligation splits by actor, and the split is not a convenience:
 
-**What this section does NOT say, because it said it for four kit versions and it is measured
-false: that the job dies when the agent process exits.** It may not.
-`TOOL-aPromptedMandate-11` records a run asserting exactly that about two jobs, twice, while the
-scheduler's own listing showed both still firing. Treat a job you did not schedule as ALIVE until a
-delete says otherwise. The consequence is section 5's resume rule below, and the reason the reap is an
-obligation rather than a formality: the failure mode of assuming death is a keepalive firing forever
-under a green `keepalive-reaped` attestation.
+**What this section does NOT say, because it said it for four kit versions and it is measured false:
+that the job dies when the agent process exits.** It may not. `TOOL-aPromptedMandate-11` records a run
+asserting exactly that about two jobs, twice, while the scheduler's own listing showed both still
+firing. Treat a job you did not schedule as ALIVE until a delete says otherwise. The consequence is
+section 5's resume rule below, and the reason the reap is an obligation rather than a formality: the
+failure mode of assuming death is a keepalive firing forever under a green `keepalive-reaped`
+attestation. A hold may owe a DURABLE restart too; `UNATTENDED-STOPS.md` carries that contract.
 
 - The **agent** schedules the keepalive as the run's **FIRST act**, before any orientation and
   before `--preflight`, on **every** start path — and reaps it before the run reaches a terminal
@@ -477,9 +476,10 @@ where this document says it may:
 | `BRIEF_RECORDED_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT carries no usable `brief · item <id>` row reds the `brief-recorded` leg — usable meaning the LAST such row's twelve-hex hash still joins to a tracked file at that same commit. Graded on the README's `opened:` date. The anchor is the build commit and NOT its first parent, unlike the sibling above: `--brief` STAGES its row, so the row lands in the same commit as the pass, and a first-parent anchor would red the CONFORMING runs. The two terms are jointly satisfiable — a spec in an earlier commit, the brief row alongside the code. Only a unit built while its run was LIVE is graded: one whose build commit carries a run-state record already in a terminal phase was built outside any run, and is announced by id and not graded, provided HEAD still carries that record's base, phase and witness and no later commit naming the unit and touching a path outside the record surface was made while a run was live, where the unit is graded instead. BLANK turns the term OFF and the leg announces it |
 | `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
-| `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. A DECLARATION rather than a path in the driver, because a kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the carried-prefix ratchet reds on exactly that |
-| `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. A DECLARATION rather than a path in the driver, for the same reason its sibling is one. Until it existed the map log was a write-only surface: the unit that specced this reader shipped the logger and not the reader, and its acceptance ledger recorded a gate accepting a declaration that was nowhere in the product |
+| `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. |
+| `MAP_CLI` | the repo-relative path to the codebase-map probe whose lookup log `reuse-probed` also reads — the other half of the build method's M5 pair. OPTIONAL, on exactly `RECALL_CLI`'s terms: blank or absent means that kit is not adopted, and the item announces a skip only when NEITHER is declared. |
 | `SPEC_TOKENS_CLI` | the repo-relative path to the spec-token checker `--dispatch` runs over the live tree BEFORE it admits a build pass, refusing the dispatch on a non-zero exit. OPTIONAL, on `RECALL_CLI`'s terms: blank or absent means no spec-token checker is carried, and the verb announces the skip on stdout rather than passing over it. The checker gov declares is gov-internal, at its tool root, and no kit ships it; the key is filled only where a project carries its own. Declared because the checker's own bar leg grades LIVE specs and an unattended build closes every unit spec in its build commit, so the dispatch is the one point that sees a spec while it can still change (aDeferredBar closing review F3) |
+| `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |

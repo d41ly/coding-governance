@@ -90,6 +90,27 @@ KEEPALIVE_DELETE="<your-schedule-delete-tool>"
 # rendering "at the cadence this project declares — ." with every gate green.
 KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 
+# REPLACE with YOUR harness's DURABLE scheduler tool names, or write RESUME_SCHEDULE="off" below.
+# These file the restart a hold owes, and the carrier must be durable — a filed task outlives the
+# session that filed it — and must accept a caller-chosen name. It may NOT be the keepalive pair
+# above where that store is session-scoped: the kit gate reds a create tool equal to KEEPALIVE_CREATE,
+# because a restart filed there dies with the session it exists to outlive.
+#
+# The switch takes `on` or `off`; absent or blank is `on` and says so on stderr, and any other
+# spelling is a refusal. Leaving these two placeholders standing while the switch is on reds both the
+# adopter check and this kit's own discharge probe, which is what forces the choice at your upgrade
+# rather than at your first hold.
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="<your-durable-schedule-create-tool>"
+RESUME_SCHEDULE_DELETE="<your-durable-schedule-delete-tool>"
+
+# OPTIONAL, on GATE_BOUND's terms: absent takes the kit default and says so on stderr, and anything
+# that is not a positive integer is a refusal. The DELAY is how long after a `probe` hold its restart
+# fires, in seconds; the LIMIT is how many consecutive holds with no progress a run may take before
+# it stops owing restarts at all.
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.

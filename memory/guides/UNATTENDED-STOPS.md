@@ -108,9 +108,14 @@ take-over prints the push as its first act. Work that exists on one node only is
 | `hold-reason` | free text, stored and printed as a quotation only |
 | `held-at` | UTC, ISO-8601 with a trailing `Z` |
 | `hold-unpushed` | HEAD's sha, only where the exception above fired; absent otherwise |
+| `resume-owed` | `<name> · fire <UTC instant>`, or `none · off`, `none · owner`, `none · limit`, `none · no carrier` |
+| `hold-streak` | `<n> · at <sha8>` — consecutive holds between which nothing but this run's own records changed |
 
-and one history-class parked row, `hold · item <code> · reason until <cond> · reaped <id>`, or
-`· unreachable <node>`. `--status` counts it as noted rather than owed.
+and one history-class parked row, `hold · item <code> · reason until <cond> · reaped <id> · resume <name>`,
+or `· unreachable <node>` in place of the reaped field and `none(<why>)` in place of the name.
+`--status` counts it as noted rather than owed. A take-over writes its own history-class row,
+`resume · item <slug> · reason held|working · keepalive <id> · scheduled|manual`, so a restart a durable
+task issued can be told from one a person typed.
 
 ## 6. The checkpoint
 
@@ -121,6 +126,7 @@ empty, so it would block the close it exists to lead to.
 ```
 held · code <c> · until <cond> · since <iso> · from <phase>
 checkpoint · witness <sha8> · next <unit> · last bar <path> · parked <n>[ · unpushed <sha8>]
+resume · <resume-owed> · streak <n · at sha8>
 reason · "<hold-reason>"
 ```
 
@@ -256,3 +262,116 @@ declared bound firing, which is a cause outside the run in the way every other h
 an implementation that always takes the cheaper one, retiring the observation while satisfying every
 word of that section. The ordering is what preserves the strong claim wherever the strong claim is
 available.
+
+## 11. The durable restart a hold owes
+
+*A run that ends HELD used to resume only when somebody typed `--resume`, so a usage limit that
+resets at 03:00 cost the whole night. This section is the contract for the restart `--hold` files
+instead. The protocol's section 5 points here and states none of it.*
+
+### The five keys
+
+| Key | Meaning |
+|---|---|
+| `RESUME_SCHEDULE` | `on` or `off`. Absent or blank is `on`, announced as defaulted; any other value is a numbered refusal at conf load |
+| `RESUME_SCHEDULE_CREATE` | the DURABLE scheduler's create tool, named for the AGENT to call. REQUIRED while the switch is on |
+| `RESUME_SCHEDULE_DELETE` | its delete tool, on the same terms |
+| `RESUME_SCHEDULE_DELAY` | seconds, default 1800: how long after a `probe` hold its restart fires. OPTIONAL, announced when defaulted, refused when not a positive integer |
+| `RESUME_SCHEDULE_LIMIT` | holds, default 6: how many consecutive holds with no progress a run may take before it stops owing restarts. Same terms |
+
+**The carrier may not be the keepalive's.** A `RESUME_SCHEDULE_CREATE` equal to `KEEPALIVE_CREATE` is
+a numbered refusal in the kit gate: that store is session-scoped by its own contract, so a restart
+filed there dies with the session it exists to outlive. The carrier must be DURABLE — a filed task
+outlives the session that filed it — and must accept a caller-chosen name.
+
+### The fire rule
+
+| Condition | Owed | Fire instant |
+|---|---|---|
+| `after <instant>` | yes | the instant, or `held-at` plus 60 s when it has already passed |
+| `probe host`, `probe gate`, `probe api` | yes | `held-at` plus `RESUME_SCHEDULE_DELAY` |
+| `owner` | no | — |
+
+An `after` hold fires AT ITS INSTANT and never at `held-at` plus the delay: a usage limit that
+resets at a named time restarts into the same limit otherwise. Each schedule is ONE-SHOT. A `probe`
+resume whose probe fails holds again, and that hold owes a new one-shot; there is no recurring task
+to outlive the run, and the chain ends at the streak limit.
+
+### The name, and the no-progress bound
+
+The name is `unattended-resume-` followed by the slug in LOWER CASE. It is DERIVED and recorded
+nowhere, so any session holding only the slug can reap it and no write on a HELD record is needed to
+remember a carrier id. Lower case, because a carrier that sanitises names to kebab case would
+otherwise store a name a later delete does not match; two slugs differing only in case therefore map
+to one name, which is the stated cost of the choice.
+
+`hold-streak` counts consecutive holds between which no path changed other than the run's own
+records: the run-state file, and the build folder's `BACKLOG.md`, where the asks, SEV rows and KEEP
+rows filed ABOUT a stop are recorded and committed before `--hold`. A hold after any other path
+changed resets the count to 1. The hold and resume writes move HEAD, and the stop's own ask filing
+changes that `BACKLOG.md`, and neither is progress — a bare HEAD comparison would reset on the
+hold's own commit and the limit would never bind. It carries its OWN sha because `witness` is
+rewritten by every later phase write and so cannot say where the previous hold stood. At
+`RESUME_SCHEDULE_LIMIT` the hold still SUCCEEDS and `resume-owed` reads `none · limit`, so a run
+that cannot move stops spawning sessions.
+
+**`--hold` never refuses for a missing carrier.** The hold is the safe state, and refusing it would
+push the run back toward the ABORTED ending HELD exists to replace. It records `none · no carrier`
+and says so, and the kit gate and the adopter check red the missing declaration instead.
+
+### What `--hold` prints, and what the agent files
+
+`--hold` prints the schedule name, the fire instant in UTC, and a three-line prompt, and the agent
+files that prompt VERBATIM. Every interpolated value has a validated shape: the slug passed the
+driver's own slug check, the toplevel came from `git rev-parse --show-toplevel`, and `held-at`
+matched the hold's timestamp grammar. **The hold REASON never reaches the prompt** — it is free text,
+and a durable prompt executes later in a session nobody watches.
+
+The prompt's `--keepalive-id` is fixed prompt text, not an interpolated value: the scheduled session
+fills it with the keepalive its own scheduler created, because the take-over refuses a missing id.
+
+The prompt's last line reaps that keepalive whenever the resume refuses or prints `still held`,
+because nothing else would: a keepalive left firing ticks `--resume <slug> --keepalive-id <own id>`
+as its first act, and on a HELD record that call takes the take-over row with NO `--scheduled`, past
+the four refusals below. The same line LEAVES THE NAMED TASK IN PLACE. A session refused because a
+later hold began would otherwise delete, under the one name every hold of the slug shares, the
+restart that later hold filed.
+
+Every hold of a slug files under that one name, so the hold step DELETES the name before it files,
+going on when no task has it: a fired one-shot can stay listed, disabled, under its id. The delete
+loses nothing a hold owes, because `--hold` refuses on a HELD record, so a task under the name
+belongs to a hold that has already ended — and refusal 2 below catches it on `held-at`.
+
+### `--resume <slug> --scheduled <held-at>`
+
+The only restart a schedule issues. Four refusals, in order, before the take-over writes anything:
+
+| # | Refuses when | Why |
+|---|---|---|
+| 1 | the record is not HELD | a working phase belongs to the resume matrix, which refuses a session that cannot show the lease's keepalive, and a schedule is filed only for a hold |
+| 2 | `held-at` differs from `--scheduled` | the hold this task was filed for has ended and a later one began |
+| 3 | the remote-advertised run-branch tip is neither HEAD nor an ancestor of it, under `ANCHOR_SCOPE=published` | another session pushed work after the hold; a pushed hold commit of this worktree's own is an ancestor and passes |
+| 4 | the remote does not answer | freshness cannot be shown, and a restart that might double-drive is worse than one that waits for a human |
+
+Rule 3 reuses the bounded `ls-remote` the driver already runs at preflight. Under another anchor
+scope `--hold` does not require the push, so rule 3 is SKIPPED with an announcement rather than
+faked. On success the take-over runs unchanged, and it still requires the session's own
+`--keepalive-id`.
+
+**The cross-node window is open and is stated rather than closed.** A take-over on another node that
+has not pushed its record yet is invisible to rule 3, so for that window two nodes can drive one
+slug. The Skill's take-over step pushes the record FIRST to shrink it.
+
+### The Skill's half, and the close
+
+Filing and reaping are AGENT obligations, exactly as the keepalive's are: no script reaches a
+harness scheduler store. The hold step deletes the printed name and then files the printed schedule
+under it. The Resume section deletes that name only AFTER a take-over's `--resume` succeeds and its
+record is pushed — never before that `--resume`, and never when it refuses or prints `still held`,
+scheduled or manual, because a manual resume before an `after` hold's instant would otherwise leave
+the run HELD with the one thing that could restart it deleted.
+
+`--close` and `--abort` name every schedule the record's hold history owed, beside the keepalive id,
+so the `keepalive-reaped` attestation is made over a list the agent was SHOWN. There is no new
+Definition-of-Done item: a durable task outliving the run under a green attestation is the failure
+that item already exists to catch.

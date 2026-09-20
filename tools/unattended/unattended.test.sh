@@ -124,6 +124,15 @@ REVIEW_ROUNDS="${7-7}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
+# DECLARED for the reason the comment above it gives for LANDER_MODE: a blank switch and two
+# blank bounds announce their defaults on stderr, `run` merges stderr into what every arm reads,
+# and the arms that compare WHOLE --status output would be comparing against three extra lines.
+# The two bounds are positional so the streak arms can pin a limit they can actually reach.
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="${8-1800}"
+RESUME_SCHEDULE_LIMIT="${9-6}"
 PHASES_EXTRA=""
 DOD_EXTRA=""
 EOF
@@ -6152,6 +6161,11 @@ REVIEW_ROUNDS="7"
 WIRING_CHECK="true"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
 PHASES_EXTRA=""
 DOD_EXTRA=""
 IPC
@@ -6465,6 +6479,238 @@ ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit 
 cd "$TMP" || exit 2
 rm -rf "$ip_dir" "$ip_out" "$ip_oroot"
 
+
+# ============ TOOL-dDerivedDocket-5: the durable restart a hold owes ==============================
+# The schedule name is DERIVED from the slug in lower case, so the fixture's `tRun` files under
+# `unattended-resume-trun`. Spelled here rather than recomputed: an arm that derives its own
+# expectation the same way the subject does cannot catch the subject deriving it wrongly.
+RSNAME=unattended-resume-trun
+
+# ---- AC3: an `after` hold fires AT ITS INSTANT, records it, prints the three lines the agent files,
+# ---- and `--status` reports it. The fire instant is the RED that matters: computing `held-at` plus
+# ---- the delay here restarts a usage-limit hold straight back into the same limit.
+build_hold_fixture
+out=$(run --hold tRun --code platform-limit --until "after 2099-01-01T00:00:00Z" --reason "the api is rate limited" --reaped k1)
+same "AC3 resume-owed names the derived schedule and the condition's own instant" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" "$RSNAME · fire 2099-01-01T00:00:00Z"
+hit "$out" "unattended:   name  $RSNAME"
+hit "$out" "unattended:   fire  2099-01-01T00:00:00Z"
+hit "$out" "Resume the unattended run for build tRun. Work only in the git worktree at "
+hit "$out" "--keepalive-id <the id of the keepalive you schedule first>"
+hit "$out" "If the driver refuses or prints still held, delete the keepalive you scheduled for this resume, list your scheduler's jobs to confirm it is gone, leave the scheduled task named $RSNAME in place because a later hold may have filed it, and stop."
+n=$((n+1)); grep -q "^[0-9].*Z hold · item platform-limit · reason until after 2099-01-01T00:00:00Z · reaped k1 · resume $RSNAME\$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL AC3 the hold history row does not carry the schedule it owed"; st=1; }
+out=$(run --status tRun)
+hit "$out" "resume · $RSNAME · fire 2099-01-01T00:00:00Z · streak 1 · at "
+# ...and an `after` instant that has ALREADY passed fires a minute after the hold rather than in the
+# past, which is the one shape a carrier cannot file.
+build_hold_fixture
+run --hold tRun --code platform-limit --until "after 2000-01-01T00:00:00Z" --reason "x" --reaped k1 >/dev/null
+RSAT=$(sed -n 's/^held-at: //p' memory/builds/tRun/RUN.md)
+same "AC3 a past instant fires sixty seconds after the hold" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" \
+     "$RSNAME · fire $(date -u -d "$RSAT + 60 seconds" +%Y-%m-%dT%H:%M:%SZ)"
+
+# ---- AC4: a `probe` hold has no instant of its own and fires DELAY seconds after it was taken; an
+# ---- `owner` hold owes nothing and prints no prompt, because only a human act on the machine
+# ---- clears it and a session restarted into one finds the same stop.
+build_hold_fixture
+run --hold tRun --code host-degraded --until "probe host" --reason "x" --reaped k1 >/dev/null
+RSAT=$(sed -n 's/^held-at: //p' memory/builds/tRun/RUN.md)
+same "AC4 a probe hold fires held-at plus RESUME_SCHEDULE_DELAY" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" \
+     "$RSNAME · fire $(date -u -d "$RSAT + 1800 seconds" +%Y-%m-%dT%H:%M:%SZ)"
+build_hold_fixture
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
+same "AC4 an owner hold owes no restart" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" "none · owner"
+miss "$out" "Resume the unattended run for build tRun"
+miss "$out" "unattended:   name  "
+hit  "$out" "unattended: resume-owed none · owner"
+
+# ---- AC4b: the switch off, and a declared switch with no carrier. Neither refuses the hold - the
+# ---- hold is the safe state, and refusing it sends the run back toward the ABORTED ending HELD
+# ---- exists to replace - and each records WHICH of the two it was.
+build_hold_fixture
+mutate .unattended.conf 's/^RESUME_SCHEDULE="on"$/RESUME_SCHEDULE="off"/'
+git add -A >/dev/null && git commit -q -m offswitch --no-verify
+out=$(run --hold tRun --code platform-limit --until "after 2099-01-01T00:00:00Z" --reason "x" --reaped k1)
+hit "$out" "phase HELD · code platform-limit"
+same "AC4b the switch off records none · off" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" "none · off"
+build_hold_fixture
+mutate .unattended.conf 's/^RESUME_SCHEDULE_CREATE=.*$/RESUME_SCHEDULE_CREATE=""/'
+git add -A >/dev/null && git commit -q -m nocarrier --no-verify
+out=$(run --hold tRun --code platform-limit --until "after 2099-01-01T00:00:00Z" --reason "x" --reaped k1)
+hit "$out" "phase HELD · code platform-limit"
+same "AC4b an undeclared carrier records none · no carrier" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" "none · no carrier"
+
+# ---- AC5: the hold REASON is free text and never reaches the prompt. A durable prompt executes
+# ---- later in a session nobody watches, so anything interpolated into it has to have a shape the
+# ---- driver validated; the reason has none.
+build_hold_fixture
+out=$(run --hold tRun --code platform-limit --until "after 2099-01-01T00:00:00Z" --reason "EXMP-injected-text" --reaped k1)
+miss "$out" "EXMP-injected-text"
+out=$(run --status tRun)
+hit "$out" 'reason · "EXMP-injected-text"'
+same "AC5 --status shows the reason on exactly one line, its own" \
+     "$(printf '%s\n' "$out" | grep -c 'EXMP-injected-text')" "1"
+
+# ---- AC6: the no-progress streak, with the limit pinned at 2. The RED this stages is the bare HEAD
+# ---- comparison: the hold's own commit, and the ask the stop files in the build folder's
+# ---- BACKLOG.md, both move HEAD, so a run that cannot progress would reset to 1 on every hold and
+# ---- the limit would never bind.
+build_hold_fixture
+mkconf true true 2026-08-19 3600 "" 1800 7 1800 2
+git add -A >/dev/null && git commit -q -m limit2 --no-verify
+run --hold tRun --code host-degraded --until "probe host" --reason "x" --reaped k1 >/dev/null
+same "AC6 the first hold writes streak 1" \
+     "$(sed -n 's/^hold-streak: //p' memory/builds/tRun/RUN.md | cut -d' ' -f1)" "1"
+printf -- '- an ask filed about the stop\n' >> memory/builds/tRun/BACKLOG.md
+git add -A >/dev/null && git commit -q -m "held, with the stop's own ask filed" --no-verify
+run --resume tRun --keepalive-id k2 >/dev/null
+git add -A >/dev/null && git commit -q -m takeover --no-verify
+out=$(run --hold tRun --code host-degraded --until "probe host" --reason "x" --reaped k2)
+same "AC6 the second hold with no progress writes streak 2" \
+     "$(sed -n 's/^hold-streak: //p' memory/builds/tRun/RUN.md | cut -d' ' -f1)" "2"
+same "AC6 the limit stops the run owing restarts" \
+     "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" "none · limit"
+hit "$out" "phase HELD · code platform-limit"
+git add -A >/dev/null && git commit -q -m held2 --no-verify
+run --resume tRun --keepalive-id k3 >/dev/null
+printf 'real work\n' > progress.txt
+git add -A >/dev/null && git commit -q -m progress --no-verify
+run --hold tRun --code host-degraded --until "probe host" --reason "x" --reaped k3 >/dev/null
+same "AC6 a hold after a path outside the run's own records resets the streak" \
+     "$(sed -n 's/^hold-streak: //p' memory/builds/tRun/RUN.md | cut -d' ' -f1)" "1"
+n=$((n+1)); grep -q "^resume-owed: $RSNAME · fire " memory/builds/tRun/RUN.md \
+  || { echo "FAIL AC6 a reset streak does not owe a restart again"; st=1; }
+reset_tree
+
+# ---- AC7: the scheduled restart's four refusals, each before any write. Rule 1 is the RED that
+# ---- matters: without it a scheduled session falls through to the lease matrix on a working phase
+# ---- and is treated as the holder resuming.
+build_hold_fixture
+before=$(sum); lb=$(read_lease_hash)
+out=$(run --resume tRun --scheduled 2026-01-01T00:00:00Z --keepalive-id kS)
+hit "$out" "--scheduled names a restart filed for a hold and this record is not HELD, so the hold it was filed for is over; a working phase belongs to the lease matrix, which refuses a session that cannot show the lease's keepalive, and falling through to it would treat an unwatched scheduled session as the holder resuming. Nothing was written. Phase:"
+same "AC7 a scheduled resume on a working phase wrote nothing" "$(sum)" "$before"
+same "AC7 a scheduled resume on a working phase left the lease alone" "$(read_lease_hash)" "$lb"
+build_hold_fixture
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+before=$(sum); lb=$(read_lease_hash)
+out=$(run --resume tRun --scheduled 2026-01-01T00:00:00Z --keepalive-id kS)
+hit "$out" "--scheduled names a held-at this record does not carry, so the hold this task was filed for has ended and a later one began; nothing was written. The record's held-at is:"
+same "AC7 a scheduled resume naming another hold wrote nothing" "$(sum)" "$before"
+same "AC7 a scheduled resume naming another hold left the lease alone" "$(read_lease_hash)" "$lb"
+
+# ---- AC7 rules 3 and 4, which need `published` and a remote. A SECOND CLONE advances the bare
+# ---- origin, so the advertised tip is a commit this worktree does not carry and is therefore
+# ---- neither HEAD nor an ancestor of it: the double-drive this refusal exists to stop.
+build_hold_fixture; write_published_conf
+git push -q -f origin HEAD:main >/dev/null 2>&1
+git push -q -f origin HEAD:refs/heads/unit >/dev/null 2>&1
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+git push -q -f origin HEAD:refs/heads/unit >/dev/null 2>&1
+RSAT=$(sed -n 's/^held-at: //p' memory/builds/tRun/RUN.md)
+before=$(sum); lb=$(read_lease_hash)
+out=$(run --resume tRun --scheduled "$RSAT" --keepalive-id kS)
+hit "$out" "unattended: --scheduled — the remote advertises refs/heads/unit at "
+hit "$out" "which is HEAD or an ancestor of it, so no session has pushed work this worktree lacks"
+build_hold_fixture; write_published_conf
+git push -q -f origin HEAD:refs/heads/unit >/dev/null 2>&1
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+git push -q -f origin HEAD:refs/heads/unit >/dev/null 2>&1
+RSAT=$(sed -n 's/^held-at: //p' memory/builds/tRun/RUN.md)
+before=$(sum); lb=$(read_lease_hash)
+RS_CLONE="$ORIGIN_DIR/rsclone"
+git clone -q "$ORIGIN" "$RS_CLONE" >/dev/null 2>&1
+( cd "$RS_CLONE" && git config user.email t@t.test && git config user.name t \
+    && git checkout -q -B unit origin/unit && printf 'another node\n' > elsewhere.txt \
+    && git add -A && git commit -q -m elsewhere --no-verify && git push -q origin HEAD:refs/heads/unit ) >/dev/null 2>&1
+out=$(run --resume tRun --scheduled "$RSAT" --keepalive-id kS)
+hit "$out" "the remote advertises a tip for this run's branch that is neither HEAD nor an ancestor of it, so a session somewhere pushed work after this hold and a restart here would drive one slug from two places; nothing was written, and a human decides this one"
+same "AC7 a scheduled resume over a moved remote wrote nothing" "$(sum)" "$before"
+same "AC7 a scheduled resume over a moved remote left the lease alone" "$(read_lease_hash)" "$lb"
+git remote set-url origin "$ORIGIN_DIR/nope.git"
+out=$(run --resume tRun --scheduled "$RSAT" --keepalive-id kS)
+hit "$out" "the remote did not answer, so whether another session has pushed work this worktree lacks is UNKNOWN rather than no, and a restart that might double-drive the slug is worse than one that waits for a human; nothing was written"
+same "AC7 a scheduled resume over an unreachable remote wrote nothing" "$(sum)" "$before"
+git remote set-url origin "$ORIGIN"
+git checkout -q --detach
+out=$(run --resume tRun --scheduled "$RSAT" --keepalive-id kS)
+hit "$out" "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, the remote advertises no tip for it, or the advertised tip is one this clone does not have. Nothing was written"
+git checkout -q unit
+rm -rf "$RS_CLONE"
+
+# ---- AC8: the matching scheduled restart completes unit 4's take-over unchanged, records the new
+# ---- keepalive, and leaves a history row a manual restart's cannot be confused with. The same call
+# ---- with no --keepalive-id refuses at the take-over and writes nothing.
+build_hold_fixture
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+RSAT=$(sed -n 's/^held-at: //p' memory/builds/tRun/RUN.md)
+before=$(sum); lb=$(read_lease_hash)
+out=$(run --resume tRun --scheduled "$RSAT")
+hit "$out" "rather than 'published', so --hold never required the push and the remote-freshness refusal is SKIPPED"
+hit "$out" "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires"
+same "AC8 a scheduled resume with no keepalive id wrote nothing" "$(sum)" "$before"
+same "AC8 a scheduled resume with no keepalive id left the lease alone" "$(read_lease_hash)" "$lb"
+out=$(run --resume tRun --scheduled "$RSAT" --keepalive-id C)
+hit "$out" "taken over"
+same "AC8 the scheduled take-over records its own keepalive" \
+     "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "C"
+n=$((n+1)); grep -q "^[0-9].*Z resume · item tRun · reason held · keepalive C · scheduled\$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL AC8 the scheduled take-over's history row does not say it was scheduled"; st=1; }
+# ...and the manual restart of the same shape is TOLD APART from it by that row.
+build_hold_fixture
+run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+run --resume tRun --keepalive-id C >/dev/null
+n=$((n+1)); grep -q "^[0-9].*Z resume · item tRun · reason held · keepalive C · manual\$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL AC8 a manual take-over's history row does not say it was manual"; st=1; }
+
+# ---- AC11: the attestation is asked for over a list the agent was SHOWN. A durable one-shot
+# ---- outliving the run under a green `keepalive-reaped` is the failure that item exists to catch,
+# ---- and an ask naming only the keepalive cannot reach it.
+build_hold_fixture
+run --hold tRun --code host-degraded --until "probe host" --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+run --resume tRun --keepalive-id kC >/dev/null
+git add -A >/dev/null && git commit -q -m tk --no-verify
+out=$(run --close tRun)
+hit "$out" "the reap list this attestation is made over — keepalive kC · durable schedule $RSNAME"
+out=$(run --abort tRun --code external-prerequisite --reason "x")
+hit "$out" "the reap list this attestation is made over — keepalive kC · durable schedule $RSNAME"
+# ...and a run whose history holds no hold row that owed one says THAT, rather than naming a task
+# nobody filed.
+build_hold_fixture
+out=$(run --close tRun)
+hit "$out" "the reap list this attestation is made over — keepalive k1 · no durable schedule: no hold of this run owed one"
+reset_tree
+
+# ---- AC15: the kit.toml conf-placeholder probe, RESOLVED from the descriptor rather than retyped,
+# ---- so it stages RED against a kit.toml whose alternation still names the keepalive keys alone.
+RS_PROBE=$(read_hole_probe "$HERE/kit.toml" keepalive-tool-names)
+n=$((n+1)); [ -n "$RS_PROBE" ] || { echo "FAIL AC15 the conf-placeholder hole declares no discharge command"; st=1; }
+RS_FIX="$TMP/rs-probe"; rm -rf "$RS_FIX"; mkdir -p "$RS_FIX"
+sed -e 's|^KEEPALIVE_CREATE=.*|KEEPALIVE_CREATE="CronCreate"|' \
+    -e 's|^KEEPALIVE_DELETE=.*|KEEPALIVE_DELETE="CronDelete"|' \
+    -e 's|^KEEPALIVE_INTERVAL=.*|KEEPALIVE_INTERVAL="every 10 minutes"|' \
+    "$HERE/.unattended.conf.example" > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ); rc=$?
+same "AC15 the example's surviving resume placeholders fail the probe" "$rc" "1"
+sed -i -e 's|^RESUME_SCHEDULE_CREATE=.*|RESUME_SCHEDULE_CREATE="create_scheduled_task"|' \
+       -e 's|^RESUME_SCHEDULE_DELETE=.*|RESUME_SCHEDULE_DELETE="delete_scheduled_task"|' \
+       "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ); rc=$?
+same "AC15 the same conf with both carrier keys filled discharges the hole" "$rc" "0"
+rm -rf "$RS_FIX"
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
@@ -6502,7 +6748,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=790
+# RAISED 790 -> 845 by TOOL-dDerivedDocket-5: the durable-restart arms execute 55 assertions,
+# all of them in region two, so FLOOR_SHARD_2 carries the same +55 and FLOOR_SHARD_1 is
+# untouched.
+FLOOR_ASSERTIONS=845
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -6546,7 +6795,7 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=594
+FLOOR_SHARD_2=649
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
 # +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
 # +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.

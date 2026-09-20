@@ -114,6 +114,7 @@
 - TOOL-aProbedUnit-11 · a run watches its own units: `--audit <slug>` grades each open dispatched unit's tree idle time against `UNIT_STALL_BOUND` (1800 s) and prints the remedy; the keepalive runs it. A git clone under the scratchpad hits MAX_PATH on Windows, so a clone takes `%TEMP%/<short>`.
 - **TOOL-aReplayedCard-1** — **the commit deny binds sessions started under the wiring**: `git commit` alone; a NEW `authorized-by: prompt|recipe` README exempts; an absent or replay-written card allows. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md` §8.
 - **TOOL-aReplayedCard-2** — **fragments carry `interpreter`/`args`; `{here}` serves a flat kit**: the merger renders unquoted, re-matches by marker and event; three readers resolve `{here}` with a parity refusal. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-2.md` §4.
+- **TOOL-dDerivedDocket-5** — **auto-resume ships ON, in the kit and here**: the owner ruled it on everywhere, overriding charter §9's default-off gate for standing configuration for this feature alone; adopters opt out with `RESUME_SCHEDULE="off"`. Contract `guides/UNATTENDED-STOPS.md` §11.
 
 ## DEPL — deployer
 

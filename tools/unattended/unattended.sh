@@ -18,6 +18,7 @@
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node>
+#   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA>
@@ -270,6 +271,13 @@ REVIEW_ROUNDS_DEFAULT=1
 # to a second driver mid-gate. Two hours is generous on purpose: the cost of waiting is a delayed
 # take-over, and the cost of not waiting is two sessions driving one run.
 LEASE_STALE_AFTER_DEFAULT=7200
+# 1800s: a `probe` hold is a stop whose own release is a probe, and half an hour is the shortest
+# gap at which a restarted session is not simply re-asking the question the hold just answered.
+# 6 holds: the no-progress ceiling. A run that has held six times with nothing changed but its own
+# records is not waiting on anything a seventh session will find. Both are the owner's figures,
+# TOOL-dDerivedDocket-5.
+RESUME_SCHEDULE_DELAY_DEFAULT=1800
+RESUME_SCHEDULE_LIMIT_DEFAULT=6
 
 # LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
 # runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
@@ -352,6 +360,11 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 # never merged with them: a halt code ENDS a run and a hold code PAUSES one, and one list would let
 # a pause be recorded as an ending.
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""
+# TOOL-dDerivedDocket-5 - the DURABLE RESUME SCHEDULE. A switch, a declared carrier tool pair and
+# two numeric bounds. The pair is NAMED and never called: the driver records and prints what the
+# agent files, exactly as it does for the keepalive, because no script reaches a harness scheduler.
+RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
+RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; LEASE_STALE_AFTER=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -412,6 +425,24 @@ if [ "$LANDER_MODE" = in-place ] && [ -z "$LANDER" ]; then
   echo "unattended: REFUSING - LANDER_MODE is 'in-place' and this project declares no LANDER, but every step of that mode is a call into one: there is nothing to prepare the merge, nothing to ask about it and nothing to push it." >&2
   exit 2
 fi
+# TOOL-dDerivedDocket-5 - THE AUTO-RESUME SWITCH, written on the marked pattern above it so the kit
+# gate READS the closed set and the default off these two lines instead of retyping them. A value
+# outside the set is a REFUSAL and never a fallback, for LANDER_MODE's reason: a misspelling falling
+# through to `off` would silently un-owe every restart in a fleet that declared one.
+#
+# BLANK IS `on` AND SAYS SO. The owner ruled this feature on in the kit and in this repo, overriding
+# charter section 9's default-off gate for it alone, and a defaulted switch nobody announced would be
+# that override happening silently - which is the one shape the ruling refused.
+case "$RESUME_SCHEDULE" in
+  "") RESUME_SCHEDULE=on   # gov:resume-schedule-default
+      echo "unattended: NOTE - this project declares no RESUME_SCHEDULE, so it takes the kit default 'on': a hold that owes a restart prints one for the agent to file. Declare one in $CONF to change it." >&2 ;;
+  # gov:resume-schedule-set
+  on|off) ;;
+  *) echo "unattended: REFUSING - RESUME_SCHEDULE is declared as '$RESUME_SCHEDULE', which is outside the closed set 'on off'. A switch that cannot be resolved is a restart policy nobody declared." >&2
+     exit 2 ;;
+esac
+read_bound_key RESUME_SCHEDULE_DELAY "$RESUME_SCHEDULE_DELAY_DEFAULT" seconds "a probe hold fires its restart at the kit default of ${RESUME_SCHEDULE_DELAY_DEFAULT}s after it was taken"
+read_bound_key RESUME_SCHEDULE_LIMIT "$RESUME_SCHEDULE_LIMIT_DEFAULT" holds "a run that cannot move stops owing restarts after the kit default of $RESUME_SCHEDULE_LIMIT_DEFAULT consecutive holds"
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
 read_bound_key UNIT_STALL_BOUND "$UNIT_STALL_BOUND_DEFAULT" seconds "a dispatched unit reads STALLED after the kit default of ${UNIT_STALL_BOUND_DEFAULT}s with no write and no commit"
 read_bound_key LEASE_STALE_AFTER "$LEASE_STALE_AFTER_DEFAULT" seconds "a per-slug lease reads stale after the kit default of ${LEASE_STALE_AFTER_DEFAULT}s, or after GATE_BOUND, whichever is longer"
@@ -465,7 +496,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -753,6 +784,77 @@ check_hold_condition_met() { # <condition>
       return 1 ;;
   esac
   return 0
+}
+# ---------------------------------------------------------- TOOL-dDerivedDocket-5: the restart
+# THE SCHEDULE NAME, DERIVED FROM THE SLUG and recorded as a carrier id nowhere. Any session holding
+# only the slug can therefore reap it, so no write on a HELD record is needed to remember one. Lower
+# case, because a carrier that sanitises names to kebab case would otherwise store a name a later
+# delete does not match — and two slugs differing only in case then map to one name, which is the
+# stated cost of that choice rather than an oversight.
+resume_schedule_name() { # slug -> the one name every hold of that slug files under
+  printf 'unattended-resume-%s\n' "$(printf '%s' "$1" | tr 'A-Z' 'a-z')"
+}
+# THE FIRE RULE, and the one place it is computed. An `after` hold fires AT ITS INSTANT, because a
+# usage limit that resets at 03:00 restarts into the same limit if the delay is applied to it
+# instead; an instant already past fires a minute after the hold, so a condition met the moment it
+# was written still produces a task rather than one in the past. A `probe` hold has no instant of
+# its own and fires DELAY seconds after it was taken. An `owner` hold owes nothing: only a human act
+# on the machine clears it, and a session restarted into it would find the same stop.
+#
+# A CLOCK THAT ANSWERS NOTHING IS A DEAD PROBE, reported through RS_DEAD, never a fire instant
+# nobody computed — the sibling condition reader above takes the same care for the same reason.
+RS_FIRE=""; RS_WHY=""; RS_DEAD=""
+resolve_resume_fire() { # release condition · held-at
+  RS_FIRE=""; RS_WHY=""; RS_DEAD=""
+  local cond="$1" at="$2" want base
+  case "$cond" in owner) RS_WHY=owner; return 0 ;; esac
+  base=$(date -u -d "$at" +%s 2>/dev/null) || base=""
+  case "$base" in ""|*[!0-9]*) RS_DEAD="date -u -d over held-at"; return 1 ;; esac
+  case "$cond" in
+    "after "*)
+      want=$(date -u -d "${cond#after }" +%s 2>/dev/null) || want=""
+      case "$want" in ""|*[!0-9]*) RS_DEAD="date -u -d over the release condition"; return 1 ;; esac
+      [ "$want" -le "$base" ] && want=$(( base + 60 )) ;;
+    *) want=$(( base + RESUME_SCHEDULE_DELAY )) ;;
+  esac
+  RS_FIRE=$(date -u -d "@$want" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null) || RS_FIRE=""
+  [ -n "$RS_FIRE" ] || { RS_DEAD="date -u -d @<epoch>"; return 1; }
+  return 0
+}
+# THE NO-PROGRESS STREAK. `hold-streak` carries its OWN sha — `<n> · at <sha8>` — because `witness`
+# is rewritten by every later phase write and so cannot say where the previous hold stood. Nothing
+# but --hold writes this fact.
+#
+# PROGRESS IS ANY PATH CHANGED SINCE THAT SHA other than the run's own records: the run-state file,
+# and the build folder's BACKLOG.md where the asks, SEV rows and KEEP rows filed ABOUT a stop are
+# recorded and committed before --hold. The hold and resume writes move HEAD and the stop's own ask
+# filing changes that BACKLOG.md, and neither is progress on the build — a bare HEAD comparison
+# would therefore reset the streak on the hold's own commit and the limit would never bind.
+resolve_hold_streak() { # slug · run-state file · HEAD sha -> prints the streak
+  local slug="$1" rel="$2" head="$3" prev n at changed
+  prev=$(fact "$rel" hold-streak)
+  n=${prev%% *}; at=${prev##* }
+  case "$n" in ""|*[!0-9]*) printf '1\n'; return 0 ;; esac
+  case "$at" in ""|*[!0-9a-fA-F]*) printf '1\n'; return 0 ;; esac
+  GIT rev-parse --verify --quiet "$at^{commit}" >/dev/null 2>&1 || { printf '1\n'; return 0; }
+  changed=$(GIT diff --name-only "$at" "$head" 2>/dev/null \
+            | grep -v -x -F "$rel" \
+            | grep -v -x -F "$MEMORY_ROOT/builds/$slug/BACKLOG.md")
+  [ -n "$changed" ] && { printf '1\n'; return 0; }
+  printf '%s\n' "$(( n + 1 ))"
+}
+# THE REAP LIST the keepalive-reaped attestation is made over, DERIVED from the record's own hold
+# rows and never a second fact. An agent attests over a list it was SHOWN, because a durable task
+# outliving the run under a green attestation is the exact failure that item exists to catch.
+print_reap_targets() { # run-state file · slug
+  local rel="$1" slug="$2" ka owed
+  ka=$(fact "$rel" keepalive)
+  owed=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z hold · item .* · resume unattended-resume-' "$rel" 2>/dev/null || true)
+  if [ "${owed:-0}" -gt 0 ]; then
+    printf 'unattended: the reap list this attestation is made over — keepalive %s · durable schedule %s, owed by %s hold row(s) of this run\n' "${ka:-none}" "$(resume_schedule_name "$slug")" "$owed"
+  else
+    printf 'unattended: the reap list this attestation is made over — keepalive %s · no durable schedule: no hold of this run owed one\n' "${ka:-none}"
+  fi
 }
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
@@ -2975,6 +3077,10 @@ verb_abort() { # slug · reason · code
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
+  # TOOL-dDerivedDocket-5 - S9. The attestation is asked for over a list the agent was SHOWN, and
+  # the durable restart schedule is on it beside the keepalive: a one-shot filed by a hold outlives
+  # the run under a green `keepalive-reaped` unless the ask names it.
+  print_reap_targets "$rel" "$slug"
   for item in keepalive-reaped parked-decisions-surfaced; do
     ck=$(checker_of "$item")
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
@@ -3075,6 +3181,7 @@ print_interrupted_acts() {
 run_hold() { # slug · code · until · reason · reaped · unreachable
   local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6"
   local rel cur ka head legal bt rc adv unpushed=""
+  local rsname heldat streak owed owedwhy rsrow
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to hold: $rel"; return 1; }
@@ -3169,6 +3276,40 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
       return 1
     fi
   fi
+  # ---- TOOL-dDerivedDocket-5 - THE RESTART DECISION, computed here so it lands in the SAME write
+  # ---- as the hold facts. A hold that wrote the phase and then discovered it could not compute a
+  # ---- fire instant would leave a HELD record with no restart decision at all, which is the one
+  # ---- state --status could not report and --close could not attest over.
+  rsname=$(resume_schedule_name "$slug")
+  heldat=$(read_utc_now)
+  if [ -z "$heldat" ]; then
+    fail 56 "the clock answered nothing, so this hold has no held-at to record and every later reader — the release condition, the scheduled restart's own refusal and the fire instant — joins on exactly that field"
+    return 1
+  fi
+  streak=$(resolve_hold_streak "$slug" "$rel" "$head")
+  owed=""; owedwhy=""
+  if [ "$RESUME_SCHEDULE" != on ]; then
+    owedwhy=off
+  elif [ "$until" = owner ]; then
+    owedwhy=owner
+  elif [ -z "$RESUME_SCHEDULE_CREATE" ] || [ -z "$RESUME_SCHEDULE_DELETE" ]; then
+    # NOT A REFUSAL, and that is the whole of section 4's rollout argument: the hold is the safe
+    # state, and refusing it for a missing declaration would push the run back toward the ABORTED
+    # ending HELD exists to replace. The kit gate and the adopter check red the declaration instead.
+    owedwhy="no carrier"
+  elif [ "$streak" -ge "$RESUME_SCHEDULE_LIMIT" ]; then
+    owedwhy=limit
+  else
+    if ! resolve_resume_fire "$until" "$heldat"; then
+      fail 56 "the fire instant of this hold's restart cannot be computed on this node, because a clock probe it needs answered nothing, and a hold recorded as owing a schedule nobody can name is worse than one that owes none: $RS_DEAD"
+      return 1
+    fi
+    if [ -n "$RS_WHY" ]; then owedwhy="$RS_WHY"; else owed="$RS_FIRE"; fi
+  fi
+  # THE HISTORY ROW'S OWN FIELD, bound to a name rather than written as a `${owed:+…}${owed:-…}`
+  # pair: the second half of that pair expands to the VALUE when the variable is set, so the row
+  # would have carried the fire instant where the schedule name belongs.
+  if [ -n "$owed" ]; then rsrow="$rsname"; else rsrow="none($owedwhy)"; fi
   # ---- nothing above this line wrote anything ------------------------------------------------------
   set_fact "$rel" phase HELD || return 1
   set_fact "$rel" witness "$head" || return 1
@@ -3176,15 +3317,21 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
   set_fact "$rel" hold-code "$code" || return 1
   set_fact "$rel" hold-until "$until" || return 1
   set_fact "$rel" hold-reason "$reason" || return 1
-  set_fact "$rel" held-at "$(read_utc_now)" || return 1
+  set_fact "$rel" held-at "$heldat" || return 1
+  if [ -n "$owed" ]; then
+    set_fact "$rel" resume-owed "$rsname · fire $owed" || return 1
+  else
+    set_fact "$rel" resume-owed "none · $owedwhy" || return 1
+  fi
+  set_fact "$rel" hold-streak "$streak · at $(printf '%.8s' "$head")" || return 1
   if [ -n "$unpushed" ]; then set_fact "$rel" hold-unpushed "$unpushed" || return 1; fi
   # HISTORY-CLASS, in park()'s own row grammar so `--status` counts it as noted rather than owed and
   # check 27 can join the kind against the declared vocabulary. The free-text reason is NOT repeated
   # here: it has a fact of its own, which is the only place --status quotes it from.
   if [ -n "$reaped" ]; then
-    park "$rel" hold "$code" "until $until · reaped $reaped"
+    park "$rel" hold "$code" "until $until · reaped $reaped · resume $rsrow"
   else
-    park "$rel" hold "$code" "until $until · unreachable $unreach"
+    park "$rel" hold "$code" "until $until · unreachable $unreach · resume $rsrow"
   fi
   write_lease_released "$slug" held || true
   stage_or_fail "$rel" || return 1
@@ -3192,6 +3339,25 @@ run_hold() { # slug · code · until · reason · reaped · unreachable
   if [ -n "$unpushed" ]; then
     echo "unattended: the branch tip is UNPUBLISHED and recorded as hold-unpushed — it exists only on this node until a take-over pushes it: $unpushed"
   fi
+  # ---- THE OWED RESTART, printed for the agent to file VERBATIM. The driver records and prints; it
+  # ---- never calls the carrier, exactly as it never schedules the keepalive, because no script
+  # ---- reaches a harness scheduler store. Every interpolated value has a validated shape — the slug
+  # ---- passed check_slug, the toplevel came from git, held-at matched the hold's own grammar — and
+  # ---- the hold REASON is free text and never reaches this prompt, because a durable prompt executes
+  # ---- later in a session nobody watches.
+  echo "unattended: hold-streak $streak · at $(printf '%.8s' "$head") — consecutive holds between which nothing but this run's own records changed"
+  if [ -z "$owed" ]; then
+    echo "unattended: resume-owed none · $owedwhy — no durable restart is owed by this hold, so nothing is filed and a manual --resume is the way out"
+    return 0
+  fi
+  echo "unattended: resume-owed $rsname · fire $owed — file this ONE-SHOT with your DURABLE scheduler, under this exact name and instant:"
+  echo "unattended:   name  $rsname"
+  echo "unattended:   fire  $owed"
+  echo "unattended:   prompt, verbatim — three lines:"
+  printf 'Resume the unattended run for build %s. Work only in the git worktree at %s.\n' "$slug" "$ROOT"
+  printf 'Load the unattended skill and follow its Resume section with: --resume %s --scheduled %s --keepalive-id <the id of the keepalive you schedule first>.\n' "$slug" "$heldat"
+  printf 'If the driver refuses or prints still held, delete the keepalive you scheduled for this resume, list your scheduler'"'"'s jobs to confirm it is gone, leave the scheduled task named %s in place because a later hold may have filed it, and stop.\n' "$rsname"
+  echo "unattended: delete $rsname with the declared delete tool FIRST and go on when no task has it, then file it — a fired one-shot can still hold the name"
   return 0
 }
 
@@ -3613,6 +3779,7 @@ BRIEFROWS
     _hcode=$(fact "$rel" hold-code); _huntil=$(fact "$rel" hold-until)
     _hsince=$(fact "$rel" held-at);  _hfrom=$(fact "$rel" held-from)
     _hreason=$(fact "$rel" hold-reason); _hunp=$(fact "$rel" hold-unpushed)
+    _howed=$(fact "$rel" resume-owed); _hstreak=$(fact "$rel" hold-streak)
     _wit8=$(printf '%.8s' "${w:-NONE}"); _bar=$(resolve_newest_gate_log)
     printf 'held · code %s · until %s · since %s · from %s\n' "$_hcode" "$_huntil" "$_hsince" "$_hfrom"
     if [ -n "$_hunp" ]; then
@@ -3620,6 +3787,7 @@ BRIEFROWS
     else
       printf 'checkpoint · witness %s · next %s · last bar %s · parked %s\n' "$_wit8" "$unit" "$_bar" "${nparked:-0}"
     fi
+    printf 'resume · %s · streak %s\n' "${_howed:-none · unrecorded}" "${_hstreak:-unrecorded}"
     printf 'reason · "%s"\n' "$_hreason"
   fi
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
@@ -3738,7 +3906,7 @@ print_resume_orientation() { # run-state file · phase
 # is taken, so a refused take-over writes nothing at all — not the lease, not the phase, not the id.
 # A take-over that half-wrote would leave the slug holding a lease for a session that then stopped.
 run_takeover() { # slug · run-state file · keepalive id · held|working · phase
-  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head
+  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head how
   if [ -z "$kid" ]; then
     verb_status "$slug" || true
     fail 59 "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
@@ -3764,6 +3932,12 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   # THE SEAM the process-ledger unit fills: the run's own orphaned processes are reaped HERE, after
   # the lease is held and before the phase moves, and only on this row and the stale one.
   set_fact "$rel" keepalive "$kid" || return 1
+  # TOOL-dDerivedDocket-5 - THE HISTORY ROW, written after every refusal and after the lease, so a
+  # refused take-over leaves none. It says which of the two restarts this was: a session the driver
+  # admitted through --scheduled passed the four refusals above the matrix, and a manual one did
+  # not, so a reader who cannot tell them apart cannot tell whether the remote was ever consulted.
+  how=manual; [ -n "$RS_SCHEDULED" ] && how=scheduled
+  park "$rel" resume "$slug" "$mode · keepalive $kid · $how"
   head=$(GIT rev-parse HEAD 2>/dev/null)
   if [ "$mode" = held ]; then
     hf=$(fact "$rel" held-from); [ -n "$hf" ] || hf=RUNNING
@@ -3787,13 +3961,46 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
 # refuse for want of an id print the --status block first, so a session regrounding by the build
 # method's no-id spelling still reads its phase and witness before it is told what to pass.
 verb_resume() { # slug
-  local slug="$1" rel p cond hf age bound rhc rc ka
+  local slug="$1" rel p cond hf age bound rhc rc ka _rs_at _rs_bt _rs_rc
   local ls_state ls_id ls_ref ls_file ls_fresh
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
   read_derived_phase "$rel"; p="$DP_PHASE"
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dDerivedDocket-5 - THE SCHEDULED RESTART'S FOUR REFUSALS, evaluated in section 4's order
+  # and BEFORE every row of the matrix below, so a restart filed by a durable task writes nothing at
+  # all unless the exact hold it was filed for is still this record's state. A schedule outlives the
+  # session that filed it by design; these are what stop it outliving the hold.
+  if [ -n "$RS_SCHEDULED" ]; then
+    if [ "$p" != HELD ]; then
+      fail 60 "--scheduled names a restart filed for a hold and this record is not HELD, so the hold it was filed for is over; a working phase belongs to the lease matrix, which refuses a session that cannot show the lease's keepalive, and falling through to it would treat an unwatched scheduled session as the holder resuming. Nothing was written. Phase: $p"
+      return 1
+    fi
+    _rs_at=$(fact "$rel" held-at)
+    if [ "$_rs_at" != "$RS_SCHEDULED" ]; then
+      fail 60 "--scheduled names a held-at this record does not carry, so the hold this task was filed for has ended and a later one began; nothing was written. The record's held-at is: ${_rs_at:-none}"
+      return 1
+    fi
+    # RULE 3, AND IT IS SKIPPED RATHER THAN FAKED under another anchor scope: --hold requires the
+    # push only under `published`, so there is no published tip to compare against and an
+    # announcement is the honest report. Reuses the bounded ls-remote the driver already runs at
+    # preflight rather than a second observation of the same endpoint.
+    if [ "$ANCHOR_SCOPE" = published ]; then
+      _rs_bt=$(branch_tip_quiet); _rs_rc=$?
+      case "$_rs_rc" in
+        0) echo "unattended: --scheduled — the remote advertises ${_rs_bt%% *} at ${_rs_bt##* }, which is HEAD or an ancestor of it, so no session has pushed work this worktree lacks" ;;
+        4) fail 60 "the remote advertises a tip for this run's branch that is neither HEAD nor an ancestor of it, so a session somewhere pushed work after this hold and a restart here would drive one slug from two places; nothing was written, and a human decides this one"
+           return 1 ;;
+        5) fail 60 "the remote did not answer, so whether another session has pushed work this worktree lacks is UNKNOWN rather than no, and a restart that might double-drive the slug is worse than one that waits for a human; nothing was written"
+           return 1 ;;
+        *) fail 60 "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, the remote advertises no tip for it, or the advertised tip is one this clone does not have. Nothing was written"
+           return 1 ;;
+      esac
+    else
+      echo "unattended: --scheduled — ANCHOR_SCOPE is '$ANCHOR_SCOPE' rather than 'published', so --hold never required the push and the remote-freshness refusal is SKIPPED: this restart is not checked against work another session may have pushed"
+    fi
+  fi
   bound=$(resolve_lease_bound)
   # READ ONCE, INTO LOCALS. `verb_status` reads the lease too and overwrites the globals, so every
   # decision below is taken against the copy this function made before it printed anything.
@@ -4108,6 +4315,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     esac
     i=$((i + 1))
   done
+  # TOOL-dDerivedDocket-5 - S9, the sibling of --abort's line. Printed BEFORE the set is evaluated,
+  # because the agent-attested `keepalive-reaped` item is read back from the record and the list is
+  # what the attestation is made over.
+  print_reap_targets "$rel" "$slug"
   for item in $(dod); do
     item=${item%%:*}; ck=$(checker_of "$item")
     is_overridden "$item" && continue
@@ -6166,7 +6377,7 @@ VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
 # --hold's own three, and --resume's one. Initialised here rather than in the conf-default block,
 # for the reason PK_ITEM is: a tracked .unattended.conf could otherwise pre-set one and satisfy a
 # refusal nobody typed an argument for.
-HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; RS_REPLACES=""
+HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
@@ -6216,6 +6427,7 @@ while [ $# -gt 0 ]; do
     --reaped)       HOLD_REAPED="${2:-}"; shift 2 || shift ;;
     --keepalive-unreachable) HOLD_UNREACH="${2:-}"; shift 2 || shift ;;
     --replaces)     RS_REPLACES="${2:-}"; shift 2 || shift ;;
+    --scheduled)    RS_SCHEDULED="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
     # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
     # the close can verify, and the current predicate already tolerates trailing text after

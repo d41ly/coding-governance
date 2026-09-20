@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-5-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
@@ -651,6 +652,37 @@ pair, and recorded in the unit's journal. No gate can make it.
     `tools/unattended/check-unattended.sh:1689` citation as the provenance of the requirement, and
     says AC16 grades it. S10, AC16's substance and the funding arithmetic were re-read before this
     edit and none of them moved.
+- rev-7 · 2026-09-21 · the build pass. Seven divergences, each found on the tree and changed here
+  before the code was written.
+  - **The take-over's history row needs a KIND.** S6 and AC8 require a row carrying `scheduled`, and
+    unit 4's take-over writes none — `park` is the only row writer and its kind vocabulary is closed.
+    So `PARK_KINDS` gains `resume`, history-class by complement, written on BOTH take-over modes as
+    `resume · item <slug> · reason held|working · keepalive <id> · scheduled|manual`. A manual
+    restart is what the `manual` half is for: AC8's own `Red when:` is that the two cannot be told
+    apart.
+  - **AC9's red is the adopter's, and `--check` had to be taught it.** The install path already
+    refuses to write a Skill carrying a placeholder, so `--check` on a fresh adopter reported only
+    "not rendered", and on an UPGRADING one only "out of sync" — neither naming the key. `--check`
+    now greps the render it just made, before the diff, which is §4 Rollout's sentence made literal.
+  - **AC16's LINE half needed paying for.** The trim is 511 bytes out of two TABLE ROWS and frees no
+    line, while the owed key row costs one. Section 5's opening paragraph is rewrapped from three
+    lines to two — `convenience:` was a twelve-character widow — and the §5 pointer sentence joins
+    the paragraph below it inside its existing seven lines. Measured at the pass: the protocol and
+    its template go 60275 → 60036 bytes and 673 → 673 lines, with 272 bytes gross added.
+  - **The §8 citations moved.** `RECALL_CLI` and `MAP_CLI` are at `PROTOCOL.template.md:480` and
+    `:481`, not 482 and 483; S10 names the passages by their opening words, which is what carried.
+  - **S12's row cannot be DECLARED.** `--dispatch` refuses a write set overlapping `SHARED_RECORDS`,
+    which this project declares as `memory/DECISIONS.md` and the backlog. The row therefore lands in
+    its own commit whose subject names no unit, which is this repo's standing shape for the shared
+    records a build owes, and the unit's own commit declares what it declared.
+  - **Gov declares all five keys, not three.** S11 names the switch and the carrier pair; the two
+    bounds are declared beside them because `read_bound_key` announces a defaulted bound on stderr
+    on EVERY driver invocation, and three NOTE lines per verb is noise the other bounds already
+    avoid the same way.
+  - **AC8's take-over arms run under the DEFAULT anchor scope.** Rule 3 announces a skip there, which
+    the arm asserts; its PASSING branch is armed in the published fixture on its own announcement
+    rather than on a take-over, whose authorization re-verification is a different subject and would
+    have made the arm red for a reason AC8 is not about.
 
 ## 10. Reuse audit
 

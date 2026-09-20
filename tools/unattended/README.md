@@ -86,6 +86,16 @@ necessarily carries unresolved braces, so grading one reds on a target that is n
 until render time. That second exclusion was widened from the first the moment a second template
 existed.
 
+## Why `RECALL_CLI` and `MAP_CLI` are declarations
+
+Both name a repo-relative path in `.unattended.conf` rather than carrying one in the driver, and the
+argument for that form lives here rather than in the protocol's key table, which states what each key
+IS. A kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the
+carried-prefix ratchet reds on exactly that. `MAP_CLI` is a declaration for the same reason its sibling
+is one. Until it existed the map log was a write-only surface: the unit that specced this reader shipped
+the logger and not the reader, and its acceptance ledger recorded a gate accepting a declaration that was
+nowhere in the product.
+
 ## Running the kit's own checks
 
 ```
