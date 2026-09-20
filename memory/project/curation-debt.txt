@@ -52,13 +52,3 @@ memory/builds/aUnmannedHelm/README.md
 # reads as a delimiter. All six are fixed, so the row now earns checks 6 and 7 only. Drains when the
 # TOOL index is split or its rows are shortened.
 memory/backlog/TOOL.md
-
-# cMendedVintage/RUN.md — ADDED 2026-09-17, and the row is honest about being the wrong shape.
-# A run-state file is APPEND-ONLY BY DESIGN: the unattended kit writes a row per dispatch, brief,
-# park, rescope and phase, and nothing in the protocol ever removes one. So it is not "pending
-# slimming" and no future curation drains this row — it is here because a 36-unit run overflowed a
-# 61,440 B cap measured for authored indexes, and because the alternative was blocking a landing on
-# a conflict between two kits. The kits disagree about what this file IS: memory-tree grades it as
-# an index and caps it; unattended treats it as a ledger and appends to it. That disagreement is
-# PARKED for the owner as its own decision, and whoever resolves it should delete this row.
-memory/builds/cMendedVintage/RUN.md
