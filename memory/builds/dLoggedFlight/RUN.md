@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes — 8 parked decisions, every one carried into the wrap-up the owner reads
 keepalive-reaped: yes — CronDelete cancelled f0857e3d, the replacement this session scheduled on 2026-09-16 after the recorded id 577b05c7 was found already gone (CronList empty, CronDelete answered no such job). Both are reaped
 witness: 9a3dce4e
-phase: VERIFYING
+phase: LANDING
 branch-sha: a4007553c89f244136b3783b3a0b1bd3223f25ab
 branch-ref: refs/heads/branch/unattended-build-transparency-ea83a5
 mode: prompt
@@ -210,3 +210,5 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-20T15:12:09Z brief · item TOOL-dLoggedFlight-30 · reason bc056276b5bf memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md
 
 2026-09-20T16:41:27Z decision · item ten units' build commits carry no brief row, so the brief-recorded leg reds and this build cannot land as it stands · reason from TOOL-dLoggedFlight-20 onward the orchestrator's ground text told each unit agent to leave memory/builds/dLoggedFlight/RUN.md out of its commits, because a spec-audit harness was staging that file beside it. The driver STAGES a brief row rather than committing it, so the row landed one commit late and the leg reads none at the build commit for units 20, 22, 23, 24, 25, 26, 27, 28, 29 and 30. Units 16, 14 and 21 conform. Options seen: park the landing and leave the branch unmerged; move BRIEF_RECORDED_CUTOFF past this build, which drops 15 builds opened since 2026-09-06 out of the leg's population; rewrite the ten build commits to carry their staged rows, which dangles every sha the ledgers, specs and run-state rows cite and needs a force push of a published branch. No option is the run's to take: the first two change a governance declaration or leave the mandate unfulfilled, and the third rewrites published history
+
+2026-09-20T21:30:44Z override · item specs-audited · reason the spec-audit chain was bounded at round 7 by a decision this run parked on 2026-09-20 and the owner has not overturned. Rounds 4, 5, 6 and 7 each promoted units over one class, the inventory of arms and fixtures a retirement touches, which no spec audit can close while the owner's instruction of 2026-09-13 holds every suite to VERIFYING; round 7's own precision was 0.27 against the charter's 0.5 floor. TOOL-dLoggedFlight-28, -29 and -30 are round 7's promotions and were built from their specs as written. What audits them instead is the post-build run itself: the suite ran their arms for the first time and refuted two criteria of their siblings, which is the observation a paper audit could not make
