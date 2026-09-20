@@ -198,11 +198,25 @@ check_hit "$OUT" "resume-tick: tRun · $FX · SKIP — the CLI is not logged in 
 check_same "AC2 the stub saw auth status" "$(grep -c 'argv auth status' "$STUB_LOG")" "1"
 check_same "AC2 the stub saw no -p" "$(grep -c 'argv -p' "$STUB_LOG")" "0"
 check_same "AC2 no sidecar line" "$([ -s "$SIDECAR/resume.tRun.log" ] && echo written || echo none)" "none"
-mkdir -p "$FX_GITDIR/gate-logs" && touch "$FX_GITDIR/gate-logs/leg.log"; rm -f "$STUB_LOG"
+# The gate log is dated five minutes AHEAD: against the fixture's one-second bound a file touched
+# `now` is stale by the time the driver reads it two seconds later, and the arm was green or red on
+# the clock's mercy — measured both ways on node `a`.
+mkdir -p "$FX_GITDIR/gate-logs" && touch -d '+5 minutes' "$FX_GITDIR/gate-logs/leg.log"; rm -f "$STUB_LOG"
 run_tick_over "$TICK"
 check_same "AC2 a LIVE record exits 0" "$RC" "0"
 check_hit "$OUT" "resume-tick: tRun · $FX · skip · verdict LIVE" "AC2 a LIVE record is skipped by verdict"
 check_same "AC2 a LIVE record consults neither login nor the stub" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+# ...and the login probe's bound is a bound on the CLOCK, not on the verdict
+# (`memory/gotchas/bounded-through-a-pipe-is-unbounded`): a stub whose `auth status` leaves a
+# sleeper behind holding its stdout answers logged-out, and the tick is back within a few seconds
+# rather than when the sleeper ends. The arm MEASURES the wall, because the message half of this
+# class is always right. RED against a tick reading the answer through `$( )`.
+mkdir -p "$TMP/stub2"
+printf '#!/bin/sh\nsleep 20 &\nprintf "{\\n  \\"loggedIn\\": false\\n}\\n"\nexit 0\n' > "$TMP/stub2/claude"; chmod +x "$TMP/stub2/claude"
+build_fixture 999999999
+PATH="$TMP/stub2:$PATH" run_tick_over "$TICK"
+check_hit "$OUT" "SKIP — the CLI is not logged in on this node" "AC2 a sleeper behind the CLI still yields the logged-out skip"
+check_same "AC2 the tick did not wait for the CLI's orphan" "$([ "$SECS" -le 8 ] && echo yes || echo "no: ${SECS}s")" "yes"
 
 # ---- AC1: the STALE fixture with a dead recorded pid is RESUMED: one line ending in the .out path,
 # ---- the tick back within 5 s while the stub still sleeps (the launch is DETACHED), the argv
@@ -298,10 +312,10 @@ check_same "AC12 two lines, one per tree" "$(printf '%s\n' "$OUT" | grep -c '')"
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Derived from
 # the seven arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20 (the pass that
-# wrote this file may not run the suite): AC8 6, AC7 11, AC2 8, AC1 15, AC3 7, AC4 4, AC12 8 — 59
+# wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, AC12 8 — 61
 # executed, pinned at ~10% headroom. The main loop's first green at VERIFYING confirms the executed
 # count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=53
+FLOOR_ASSERTIONS=55
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

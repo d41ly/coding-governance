@@ -565,7 +565,11 @@ arm's assertions, read off the floor-breach line with the floor over-pinned.
   recorded in the ledger rather than folded: AC5's driver call count is compared against the
   pass's parent (4), not the pinned base (3), because unit 2 landed the fourth call after the
   base; and the suite's stub dir is POSIX-spelled because a `C:/` element in PATH splits at the
-  drive colon and lets the real CLI win — measured on node `a` the first time an arm ran.
+  drive colon and lets the real CLI win — measured on node `a` the first time an arm ran. The
+  pass's bug-class checklist named `bounded-through-a-pipe-is-unbounded` on the login probe, so
+  its answer goes to a file under the sidecar and never through `$( )`, its liveness probe is the
+  driver's measured `timeout -k 1s 10 true`, and the suite measures the tick's wall against a
+  stub that leaves a sleeper on stdout.
 - rev-3 · 2026-09-20 · §3 · §4 · folded spec-audit round 2: sibling agreement for the promoted
   `TOOL-aWokenSentinel-20` (H6, raw 36) and the rev-2 of spec 11 (M9, raw 50) — S4's resume-log
   root reads through the lib's `resolve_sidecar_dir` and the tick joins the one-derivation

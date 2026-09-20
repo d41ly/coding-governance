@@ -107,12 +107,17 @@ print_decision() { # slug · worktree · act
 # with the CLI logged in, a JSON object whose second line is `"loggedIn": true`, exit 0. The grep
 # is over the measured shape and anything else — `false`, an error, an empty answer, a timeout —
 # is not logged in, because the logged-out exit code was not measured and a grep is right in both.
-# Bounded by `timeout 60` where `timeout` works; a bound may never turn the check into a skip.
-check_login() { # -> 0 when the CLI answers logged in
-  local out
-  if timeout 1 true >/dev/null 2>&1; then out=$(timeout 60 claude auth status 2>/dev/null </dev/null)
-  else out=$(claude auth status 2>/dev/null </dev/null); fi
-  printf '%s\n' "$out" | grep -qE '"loggedIn":[[:space:]]*true'
+# Bounded by `timeout 60` where `timeout` works (the driver's measured liveness probe, which
+# `timeout 1 true` fails under load); a bound may never turn the check into a skip. THE ANSWER GOES
+# TO A FILE, never through `$( )`: a substitution reads until the LAST write end closes, so a
+# child the CLI leaves behind would hold the tick past the bound with the verdict already in —
+# `memory/gotchas/bounded-through-a-pipe-is-unbounded`, and the suite measures the wall.
+check_login() { # scratch-file -> 0 when the CLI answers logged in
+  if timeout -k 1s 10 true >/dev/null 2>&1; then timeout -k 5s 60 claude auth status </dev/null >"$1" 2>&1
+  else claude auth status </dev/null >"$1" 2>&1; fi
+  grep -qE '"loggedIn":[[:space:]]*true' "$1" 2>/dev/null; local rc=$?
+  rm -f -- "$1"
+  return "$rc"
 }
 
 # THE TREE KILL. Under MSYS the recorded pid is `claude.exe`'s Windows pid, a native parent, so
@@ -199,7 +204,10 @@ run_tick() { # worktree · slug · session
   utc=$(date -u +%Y-%m-%dT%H:%M:%SZ); stamp=$(date -u +%Y%m%dT%H%M%SZ)
   out="$sidecar/resume.$slug.$stamp.out"; launcher="$sidecar/resume.$slug.$stamp.sh"
   if [ "$DRY_RUN" = 1 ]; then print_decision "$slug" "$wt" "resumed · attempt $n · out $out"; return 0; fi
-  if ! check_login; then
+  # The sidecar dir first: the login answer lands in a file there (see check_login) and the attempt
+  # line follows it. A dir that cannot be made is announced like a dead probe, and nothing is killed.
+  mkdir -p "$sidecar" || { echo "resume-tick: $slug · $wt · liveness probe failed: the sidecar directory cannot be created: $sidecar"; return 0; }
+  if ! check_login "$sidecar/resume.$slug.$stamp.auth"; then
     echo "resume-tick: $slug · $wt · SKIP — the CLI is not logged in on this node; nothing can resume $slug"; return 0
   fi
   [ "$RL_ALIVE" = yes ] && run_kill_tree "$RL_PID"
@@ -207,7 +215,6 @@ run_tick() { # worktree · slug · session
   # outside the root keeps its absolute path, which still runs.
   kitrel=${KIT_DIR#"$ROOT"/}
   payload="You are the resumed session of unattended run \`$slug\`. First run \`bash $kitrel/unattended.sh --resume $slug --keepalive-id <the idle-wake id you schedule now, per the unattended Skill>\` so this session's lease replaces the dead one. Then continue from the phase the run-state file names. The owner is absent: never park a question the protocol lets you decide — take the option that makes no measured observable worse and record why. If the run is terminal, reap the idle-wake and stop."
-  mkdir -p "$sidecar" || { echo "resume-tick: $slug · $wt · liveness probe failed: the sidecar directory cannot be created: $sidecar"; return 0; }
   # THE ATTEMPT LINE, appended BEFORE the launch, so a tick that dies mid-launch still counts.
   printf '%s attempt %s session %s pid %s pid-alive %s out %s\n' "$utc" "$n" "$sid" "$RL_PID" "$RL_ALIVE" "$out" >> "$log"
   # THE LAUNCHER: three statements, and the record of what was launched, argv included. The PATH
