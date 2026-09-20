@@ -143,7 +143,8 @@ index.
 - **consumes-from** `TOOL-dDerivedDocket-17` — the contract text for T0 to T5, the override route and
   the KEEP rule, which the guide carries.
 - **consumes-from** `TOOL-dDerivedDocket-19` — the authority rule in protocol §1, which the Skill
-  points at. Added by this spec; that unit's spec owes the matching hands-off line.
+  points at. Added by this spec; that unit's spec already carries the matching hands-off line, at
+  `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-19.md:115`.
 - **consumes-from** `TOOL-dDerivedDocket-18` — the folder-wide anchor ban whose carrier sentence S3
   writes.
 - **consumes-from** `TOOL-dDerivedDocket-7` — the `--asks --build <slug> --all` form the M9 row

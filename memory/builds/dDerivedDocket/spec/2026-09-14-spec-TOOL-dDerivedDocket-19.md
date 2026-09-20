@@ -445,7 +445,9 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   Unit 16 is ordered before this unit, and the hygiene edge arm reds a consumes-from whose target is
   ordered after the consumer. The dependency runs the other way: this unit extends unit 16's scan
   and pinning. RESOLVED (agent, 2026-09-14, delegated): this unit declares consumes-from unit 16;
-  unit 16's spec owes the matching hands-off, and its consumes-from this unit is dropped.
+  unit 16's spec carries the matching hands-off at
+  `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md:159`, and its
+  consumes-from this unit is dropped.
 - **F4 — which commits does the cross-run arm walk?** Options: the plain `BASE..witness` and
   `BASE..HEAD`; the run's own commits, excluding the default branch's side of the landing. Under both
   lander modes the first holds every default-branch commit landed since BASE, so an owner's

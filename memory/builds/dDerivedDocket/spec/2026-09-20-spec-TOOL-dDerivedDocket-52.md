@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
 
@@ -69,11 +71,20 @@ clean.
 
 - Pinning or re-deriving any fact. This unit answers "which commit introduced this line"; unit 18's
   S2 and S8 decide what to do with the answer, and their text is unchanged by this unit.
-- Retrofitting the leg's two existing first-commit reads. `tools/unattended/check-unattended.sh:508`
-  answers a DATE for a cutoff comparison and already follows the rename; `:1497-1502` deliberately
-  does not follow, because the waiver arm selects its population at an exact path and a renamed
-  record is a different file to it. Neither is wrong for its own question, and changing either is a
-  separate unit with its own arms.
+- Retrofitting the leg's THREE existing first-commit reads. Measured at HEAD on 2026-09-20 by
+  grepping `--diff-filter=A` over the file: `tools/unattended/check-unattended.sh:508` answers a DATE
+  for a cutoff comparison and already follows the rename; `:1313` is check 15's
+  `LANDED_ANCHOR_CUTOFF` site and does not follow; `:1502` deliberately does not, because the waiver
+  arm selects its population at an exact path and a renamed record is a different file to it. None is
+  wrong for its own question, and changing any of them is a separate unit with its own arms. An
+  earlier draft of this bullet counted two and missed `:1313`, which is the site the sibling named
+  below converts.
+- Routing that sibling's first-commit DATING through this resolver. The build keeps BOTH, and the
+  reason is not tolerance: `TOOL-dDerivedDocket-22` answers WHEN a record was first committed, this
+  unit answers WHICH commit introduced a given LINE, and the signatures differ by that line while the
+  answers differ by type. F2 states why `--follow` is right for the first question and wrong for the
+  second. Merging them would be one function answering two questions, which is the shape §4's
+  verification step exists to refuse one level down.
 - Changing the rotation itself. `archive_name_of` and the staged `git mv` keep their behaviour; this
   unit reads the rename, it does not alter it.
 - Answering reachability. Whether a commit touching a path is reachable from a merge parent is a
@@ -97,7 +108,13 @@ clean.
   preflight when it re-derives `m-base:`, the same resolution its S8 uses to find the commit that
   introduced `asks-at-landing:`, and the named empty that makes the ancestry fallback its §4
   announces reachable at last. Without it S2 grades a rotated record against a base nobody recorded.
-- **hands-off** external — retrofitting `tools/unattended/check-unattended.sh:1497-1502` and the
+- **hands-off** `TOOL-dDerivedDocket-22` — the first-commit DATING that unit builds in this same
+  file, including the tenancy floor its §4 takes from this unit's close-out. This resolver does not
+  change it, is not called by it, and does not make its `--follow` reading wrong; F2 says why the two
+  rulings differ. Without this bullet two rotation-aware first-commit resolvers land in one file with
+  opposite tool rulings and a reader who meets one is routed to neither, which is what the G7 audit
+  found.
+- **hands-off** external — retrofitting `tools/unattended/check-unattended.sh:1502` and the
   disposition-date read beside it onto this resolver, deferred outside this build.
 
 ## 4. Design
@@ -266,9 +283,20 @@ tree: no tracked record carries an `asks:` fact until unit 35 arms gov.
 ### Inventory
 
 One shell function in `tools/unattended/check-unattended.sh`, its floor step, and one reason-line
-prefix carrying the four named empties of S4 apart. No new conf key, no new fact, no new verb, no new
-leg code. Any new shell function is named through
-`python tools/lexicon/lexicon.py --suggest <identifier> --as <cell>`.
+prefix carrying the named empties of S4 apart, whose count and wording stay in S4. No new conf key,
+no new fact, no new verb, no new leg code. The identifier is RECORDED here rather than left for the
+build pass to invent, so the naming leg and `spec tokens (a spec's own names resolve)` both have a
+name to grade before the function exists. On 2026-09-20,
+`python tools/lexicon/lexicon.py --suggest resolve_introducing_commit --as sh.function` answered OK.
+
+| Identifier | Cell | Verb, and why |
+|---|---|---|
+| `resolve_introducing_commit` | `sh.function` | `resolve`: it turns a record and a line into the commit they denote, and RUNS the candidate — S3's verification — rather than returning the first row a walk offered |
+
+`.lexicon.conf:23` declares `sh` a `parser` coverage mode rather than a dark one, and
+`.lexicon.conf:422` declares the `sh.function snake` cell, so `lexicon naming predicates`
+(`tools/gate-legs.json:1052`, guarded on `tools/`) grades this identifier at this unit's commit
+whether or not the spec claims the leg. §7 now claims it.
 
 ### Files touched (estimate)
 
@@ -301,8 +329,11 @@ leg code. Any new shell function is named through
   and the deepest floored window on this tree is 60. The cap bounds the traversal and reports
   truncation, per S5. The profile note at `tools/unattended/lib-unattended.sh:169-171` prices a
   `--follow` walk at 31 git spawns in a full leg run, so this is not the leg's cost centre.
-- error / empty / loading states — the three named empties of S4 are the whole of this row: an
-  unknown answer, an absent one and an unresolvable range each print their own reason.
+- error / empty / loading states — the named empties of S4 are the whole of this row, and their
+  COUNT and their wording stay in S4 rather than being restated here. Restating them is how this row
+  came to say three while S4 says four, having missed the tenancy floor the same day's close-out
+  added; a second copy of a list is the copy that rots, which is the charter rule this spec argues
+  from elsewhere. Each empty prints its own reason and none of them is silent.
 - observability — every empty prints one line naming the record and the reason, so a green row can
   never be read as a verified one.
 - risks — the stated residual in §4, two records sharing one line, and a cap set too low, which S4
@@ -346,9 +377,9 @@ leg code. Any new shell function is named through
   `tools/memory-tree/row_grammar.py:335-340` already records for a rotation baseline.
   permission: that the caller then takes unit 18's announced ancestry reading is observed at unit 18's
   commit, for the reason AC1 gives; this criterion asserts only what the resolver returns and prints.
-- **AC4** — When the fixture's rotation lands inside a MERGE commit, the resolver still answers the
-  preflight commit; the same fixture graded with the simplified spelling answers nothing, and that
-  contrast is asserted in the arm.
+- **AC4** — When the fixture's rotation lands inside a MERGE commit, the resolver in
+  `tools/unattended/check-unattended.sh` still answers the preflight commit; the same fixture graded
+  with the simplified spelling answers nothing, and that contrast is asserted in the arm.
   Red when: the enumeration drops `--full-history`, so a rotation TREESAME to one parent for the
   record's path is pruned, the resolver answers nothing for a record it could have resolved, and it
   does so with no reason line — an absent answer wearing the face of a clean one.
@@ -400,7 +431,7 @@ leg code. Any new shell function is named through
 
 ## 7. Gates
 
-`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/check-unattended.test.sh` · a rotated mandated record, a record whose
 rotation and preflight commits both carry the line, a rotation landing inside a merge, a shallow
@@ -424,6 +455,15 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-
   RESOLVED (agent, 2026-09-20, delegated): (b). Both answer correctly on this tree, measured in §4,
   and (a) is a heuristic that also inherits the simplification which hides a rotation inside a merge —
   the case `tools/memory-tree/row_grammar.py:335-340` measured on this repo's own archives.
+  This ruling is about a SHA and does not overturn `--follow` where the answer is a DATE, which is why
+  the build carries two resolvers and not one. A date is compared against a cutoff, so a heuristic
+  that picks a neighbouring commit still grades correctly as long as it errs in a known direction —
+  `TOOL-dDerivedDocket-22` states its own direction, that a reused path can date a later run's archive
+  to an earlier run's first commit and so errs toward grandfathering and never toward a frozen red. A
+  sha is not compared, it is RE-DERIVED FROM: unit 18's S2 takes a merge-base from it, so a
+  neighbouring commit is a different ancestry rather than a rounded one, and a heuristic whose answer
+  depends on what else moved in the rotation commit cannot be trusted with it. Neither ruling is a
+  defect in the other, and §3 declares that unit hands-off on this ground.
 - **F3** — Does the verification step belong here or in unit 18? Options: (a) here, so the resolver
   cannot return an unverified sha; (b) in the caller, so the resolver stays a thin git read.
   RESOLVED (agent, 2026-09-20, delegated): (a). A resolver that returns a candidate the caller must
@@ -452,19 +492,40 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-
   extracted resolver, and required the truncation verdict to precede grading (S5, §4 step 3, the §4
   residual, AC6, §7) after measuring a mid-walk sentinel answer the re-introduction on an
   eight-commit fixture at cap 4.
+  Extended on the same pass, same base and rev, by the G7 round-1 spec audit's fold · H5 (38) · §3's
+  non-goals and Edges, §8 F2 and §10 · this spec named `TOOL-dDerivedDocket-22` zero times while that
+  unit resolves a first commit with `--follow --diff-filter=A` in the same file, states this unit's
+  own tenancy floor in its §4, and records this unit's close-out in its §9 twice — a coupling recorded
+  on one side only. The routing DECISION is that the build keeps both resolvers, because one answers a
+  DATE and one a SHA; F2 now says why `--follow` is right for the first and wrong for the second, §3
+  declares the edge, and §10 stops quoting a `.sh`-blind probe as a negative result. The non-goal's
+  count of the leg's existing first-commit reads was also wrong at HEAD, not merely stale: there are
+  THREE, and `:1313` was the missing one.
+  L1 (11, 13) · §5's error row · it counted three named empties where S4 declares four, having missed
+  the tenancy floor the same day's close-out added. The row now points at S4 instead of restating it.
+  M4 (21) · §4's Inventory and §7 · filed against `TOOL-dDerivedDocket-53` and true here too, because
+  `.lexicon.conf:23` declares `sh` a `parser` mode and `.lexicon.conf:422` a live `sh.function` cell,
+  so this unit's new shell function is graded by `lexicon naming predicates` whatever §7 said. §7 now
+  lists that leg and §4 records the identifier with its `--suggest` answer.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "finding the commit that introduced a line in a run-state
-record across a rename"` returns no seam for this work and says why in its own header:
-`unscanned layers: .sh`. The ranked candidates are all python, and the highest-ranked, `run`, is a
-name-token collision rather than a seam. So no existing seam fits, and the evidence is that the
-corpus the probe reads does not contain the layer this unit writes. The in-tree prior art the probe
-cannot see was found by reading source: the two first-commit reads already in the leg at
-`tools/unattended/check-unattended.sh:508` and `:1497-1502`, which disagree about rename following on
-purpose, and the unsimplified-walk rationale at `tools/drift-audit/drift_report.py:806-818` and
-`tools/memory-tree/row_grammar.py:335-340`. This unit extends neither call site (§3) and reuses their
-lesson rather than their code.
+record across a rename"` prints `unscanned layers: .sh` and ranks only python candidates, the highest
+of which, `run`, is a name-token collision. **That is a LIMIT, not a result.** The probe cannot see
+the layer this unit writes, so a "no seam" conclusion drawn from it is a probe with no liveness
+assertion — the shape charter §7 bans in a gate, arriving in a reuse audit instead. An earlier draft
+of this section treated the blindness as a negative result and missed a sibling in this same build.
+
+Two searches the probe cannot make were therefore made by hand. Reading source found the in-tree
+prior art: the three first-commit reads already in the leg at
+`tools/unattended/check-unattended.sh:508`, `:1313` and `:1502`, which disagree about rename
+following on purpose, and the unsimplified-walk rationale at
+`tools/drift-audit/drift_report.py:806-818` and `tools/memory-tree/row_grammar.py:335-340`. Grepping
+this build's own spec folder for the mechanism's distinguishing command found the sibling §3 now
+declares hands-off, which resolves a first commit with `--follow --diff-filter=A` in this same file
+and states the same tenancy floor in its own §4. This unit extends none of the three call sites (§3)
+and reuses their lesson rather than their code.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the commit that introduced a pinned
 run-state line found across a rotation rename" --terms "rotation rename archive_name_of run-state

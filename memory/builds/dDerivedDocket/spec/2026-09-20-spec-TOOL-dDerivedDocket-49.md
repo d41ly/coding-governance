@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
 
@@ -13,9 +15,13 @@
 `verb_plan` picks its `next:` line by first-wins accumulation across two loops
 (`tools/unattended/unattended.sh:2253-2254` and `:2262`, read at `:2274-2280`), so the precedence
 between the shapes is an artefact of iteration order and exists only in prose. Unit 16 adds a third
-shape whose position that prose pins and whose own fixture contradicts it, which is the defect this
-unit is promoted from. Make the precedence a DECLARED ladder with one rung per shape, give every
-rung that exists today a failing case, and pin the position the new rung takes.
+shape whose position that prose pins and whose own fixture CONTRADICTED it, which is the defect
+this unit is promoted from. That fixture has since moved: unit 16's AC18 carries the two-arm
+replacement wording at HEAD
+(`memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md:480-502`, logged in
+that spec's §9 at `:640-644`). What remains is to make the precedence a DECLARED ladder with one
+rung per shape, give every rung that exists today a failing case, pin the position the new rung
+takes, and keep that landed criterion in step with it.
 
 ## 2. Scope (IN)
 
@@ -28,8 +34,9 @@ rung that exists today a failing case, and pin the position the new rung takes.
   an undecided ask, nothing graded, everything terminal. Observed by AC5.
 - **S3** The ask rung's POSITION is pinned here and its PREDICATE is not built here. It sits third,
   after both unit rungs and before both terminal rungs, which is the ordering unit 16's design
-  states and its own fixture contradicts. Its input is empty on every call until unit 16 fills it,
-  so the ladder prints exactly what the driver prints today. Observed by AC5 and AC6.
+  states and which that unit's own fixture contradicted until AC18's fold landed. Its input is
+  empty on every call until unit 16 fills it, so the ladder prints exactly what the driver prints
+  today. Observed by AC5 and AC6.
 - **S4** The three existing shape literals are byte-identical after this unit, so leg check 30's
   conjunction stays reachable and the driver suite's existing terminal-wording arm
   (`tools/unattended/unattended.test.sh:1802`) still hits. Observed by AC6.
@@ -37,12 +44,15 @@ rung that exists today a failing case, and pin the position the new rung takes.
   in which the rung above it takes the line instead. The MISSING-against-terminal pair is the same
   boundary the promoted finding names one rung lower, observed where it can be observed at this
   unit's order. Observed by AC2, AC3 and AC4.
-- **S6** The replacement text for unit 16's AC18 — assert the MISSING shape over the fixture that
-  holds two MISSING units, and add a second arm over the same fixture with both MISSING units
-  retired, asserting the shape flips to the undecided one. That criterion's text belongs to unit 16,
-  so it is handed over as a cross-edit rather than written here. NOT OBSERVED by a criterion of this
-  unit: the flip needs the ask rung's predicate, which unit 16 builds, so it is observed by that
-  unit's own second arm at its own pass.
+- **S6** Unit 16's AC18 is kept IN STEP with this ladder, and is no longer handed over as a
+  cross-edit: that text is already landed. At HEAD AC18 asserts the MISSING shape over the fixture
+  that holds two MISSING units, and a second arm over the same fixture with both MISSING units
+  retired asserts the flip to the undecided one
+  (`memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md:480-502`, logged in
+  that spec's §9 at `:640-644`). This unit asserts that text rather than writing it, so a later
+  re-fold of AC18 cannot silently re-open the rung order S3 pins. The runtime FLIP stays unit 16's:
+  it needs the ask rung's predicate, which that unit builds, and is observed by its own second arm
+  at its own pass. Observed by AC9.
 - **S7** Every new refusal or shape branch gets an arm in `tools/unattended/unattended.test.sh`,
   each observed RED with its fix unstaged, and the `tools/unattended/unattended.sh` pair of
   `ARMS_FLOORS` in `.memory-tree.conf` moves in the same commit. Observed by AC8.
@@ -62,11 +72,11 @@ rung that exists today a failing case, and pin the position the new rung takes.
   `nonterminal_units ... | head -1` over the RENDERED units region
   (`tools/unattended/unattended.sh:2910`), which `--resume` inherits by calling that verb (`:3080`).
   The second keeps its own shape, a bare id carrying none of the ladder's five shape strings, so
-  this unit changes neither verb's output. Unit 16 S8, AC17 and AC18 assert that those two verbs
-  print the same `next:` as `--plan`, and no unit of this build builds that join, so the parity
-  clause is handed back to unit 16 as a cross-edit that strikes it and routes it to the open backlog
-  row `TOOL-aBoundedVerdict-23`, which already carries the render-order half of the same question.
-  What stays open after this unit is one question with one home, rather than a claim with no
+  this unit changes neither verb's output. Unit 16 S8, AC17 and AC18 once asserted that those two
+  verbs print the same `next:` as `--plan`, and no unit of this build builds that join; that parity
+  clause is STRUCK at HEAD, logged in that spec's §9 at `:653-658`, and the question is routed to
+  the open backlog row `TOOL-aBoundedVerdict-23`, which already carries the render-order half of
+  it. What stays open after this unit is one question with one home, rather than a claim with no
   mechanism.
 - Reordering within a rung. The live-unit rung keeps region order and the MISSING rung keeps
   whatever order `missing_units` prints (`tools/unattended/unattended.sh:2007-2024`), which today
@@ -87,10 +97,15 @@ rung that exists today a failing case, and pin the position the new rung takes.
   exist at HEAD. This unit re-points them and builds neither.
 - **hands-off** `TOOL-dDerivedDocket-16` — the rung the undecided-ask shape occupies and the input
   that fills it, so that unit adds a predicate to a declared ladder rather than a branch to an
-  accumulation, and its `next:` contract for `--plan` has a rung position it can point at. It also
-  takes the replacement wording for the criterion whose fixture contradicts that contract, which
-  this unit hands over rather than editing in place, and the parity clause of S8, AC17 and AC18,
-  which §3 rules a non-goal and a second cross-edit strikes.
+  accumulation, and its `next:` contract for `--plan` has a rung position it can point at. Both
+  edits this unit once owed that spec are landed at HEAD and neither is re-made here. That spec's
+  AC18 now carries both arms in its own words: a first run over its fixture printing the MISSING
+  `next:` shape while a unit shape remains, and a second run over the same fixture with both MISSING
+  units retired, printing the UNDECIDED `next:` shape naming the earlier-listed mandated ask — the
+  ordering this unit's ladder declares, which had no failing case in the consuming spec before. And
+  the `--status` and `--resume` parity that §3 rules a non-goal is STRUCK from that spec's S8, AC17
+  and AC18, its own revision log routing the question to the backlog row `TOOL-aBoundedVerdict-23`.
+  AC9 asserts the first of the two at this unit's commit.
 
 ## 4. Design
 
@@ -134,11 +149,16 @@ stays reachable.
 ### Why the rung the promoted finding names is pinned and not built
 
 The finding is that one spec's design sentence puts the undecided shape after every unit shape while
-its own fixture — two MISSING units present — demands the undecided shape from the same run. Both
-halves cannot hold. This unit rules for the design sentence, because that sentence is the one the
+its own fixture — two MISSING units present — DEMANDED the undecided shape from the same run. Both
+halves could not hold. This unit rules for the design sentence, because that sentence is the one the
 other consumers of the plan output were written against and because the opposite rule makes a run
 report an ask as next while a planned unit has no spec at all, which is the wrong instruction for
-whoever reads the line. The fixture is the half that moves, and its replacement wording is S6.
+whoever reads the line. The fixture was the half that moved, and it has moved already: unit 16's
+AC18 carries the two-arm replacement wording at HEAD
+(`memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md:480-502`, logged at
+`:640-644`). So S6 is not an edit this unit makes but a property it keeps, and AC9 grades it: the
+obligation that outlives the fold is that a later re-fold of AC18 cannot silently re-open the rung
+order this unit exists to pin.
 
 Pinning the position here rather than in the consuming spec is the point of the unit: a position in
 a declared table is gradeable by a source-level arm, and a sentence in a design section is not.
@@ -160,8 +180,9 @@ performs no read of its own.
 ### Files touched (estimate)
 
 `tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh` · `.memory-tree.conf` for
-`ARMS_FLOORS`. No protocol copy, no guide, no Skill and no dossier (S8). The consuming spec's
-criterion text is a cross-edit and is not written from here.
+`ARMS_FLOORS`. No protocol copy, no guide, no Skill and no dossier (S8). This unit makes no
+cross-edit at all: the consuming spec's criterion text is already landed at HEAD, and AC9 asserts
+it rather than writing it.
 
 ### Rollout
 
@@ -214,7 +235,8 @@ and the only reader that can tell the difference is a source-level arm.
   literals and by AC1's end-to-end control, and rung 3 stays inert so this unit cannot change any
   verdict on any tree that exists today.
 - testing — one arm per rung, one arm per adjacent-rung boundary, a source-level arm on the declared
-  order, and the existing terminal-wording arm kept green.
+  order, a read of unit 16's AC18 at this unit's commit (AC9), and the existing terminal-wording arm
+  kept green.
 - migration — none. No file format, conf key or record field changes.
 - user docs — none owed. The output is byte-identical, so no guide or Skill sentence goes stale;
   the plan verb's prose carriers are unit 20's.
@@ -277,6 +299,16 @@ and the only reader that can tell the difference is a source-level arm.
   tree are runs this pass may not make, so both are deferred to the run the main loop makes at
   VERIFYING after the last unit. In the pass each new arm is observed RED by hand against a scratch
   fixture with its fix unstaged, which is this criterion's direct check.
+- **AC9** — When `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md` is
+  read at this unit's commit with `git show`, that spec's AC18 asserts `next:` reads the MISSING
+  shape on its first run, a second arm over the same fixture with both MISSING units retired
+  asserts the flip to the UNDECIDED shape, and that spec's §9 carries the revision entry naming
+  AC18 and this unit. The comparison is over tracked text at one commit, so this criterion owes no
+  suite run and no leg.
+  Red when: unit 16's AC18 names ONE shape only, so a later re-fold of the consuming spec silently
+  re-opens the rung order S3 pins and the ordering this unit declares has no failing case in the
+  spec that consumes it; or that spec's §9 carries no entry naming AC18, so the two halves can drift
+  with nothing recording that they were ever joined.
 
 ## 7. Gates
 
@@ -333,6 +365,28 @@ suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unatte
   `order` is not a parallel instruction. `--dispatch`'s own order gate reads it as exactly that: it
   blocks only on a STRICTLY earlier sibling (`tools/unattended/unattended.sh:5010`) under the rule
   stated at `:4983`, so the sequence is the harness's roster order and not a driver refusal.
+- rev-1 · 2026-09-20 · §1 · §2 · §3 · §4 · §5 · §6 · §10 · fold of the G7 round-1 spec audit
+  (`memory/builds/dDerivedDocket/reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md`),
+  findings H1 (1, 16) and L4 (47), both disposed FOLD by the orchestrator. H1: the cross-edit S6
+  handed unit 16 was already discharged, and no criterion of either spec graded it. At HEAD that
+  spec's AC18 carries the two-arm replacement wording
+  (`memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md:480-502`, logged at
+  `:640-644`) and the `--status` / `--resume` parity clause is struck (logged at `:653-658`), so
+  §1, S3, S6, the Edges bullet, §3's non-goal and §4 now describe HEAD rather than the moment the
+  draft was written, S6 asserts the landed text instead of handing it over, and a new AC9 grades it
+  at this unit's commit in the shape unit 51's AC5 uses. The obligation that survives the fold is
+  named in S6 and §4: a later re-fold of AC18 must not silently re-open the rung order S3 pins.
+  L4: §10's prior art is in that build's round-TWO record and is now cited by path and line. No
+  left-shift gate proposed by that report is wired or cited here, because only one of its eleven
+  candidates was ever run over the tree and this fold ran none.
+  Extended once more on the same pass, same base and rev · §3 Edges · the `hands-off` bullet to
+  `TOOL-dDerivedDocket-16` stopped citing that spec's own line numbers. A hand-off payload is read
+  against the TARGET's text, and a citation of the target's own lines can never occur there, so the
+  two landed edits are now named in that unit's own words: AC18's two runs over one fixture and the
+  shape each prints, and the struck `--status` and `--resume` parity with the backlog row its
+  revision log routes the question to. Every backticked token left in the bullet occurs in that
+  spec. §9's own citations above are untouched — they are a revision log's record of where the text
+  landed, not a payload anybody joins.
 
 ## 10. Reuse audit
 
@@ -349,9 +403,11 @@ Recall returned `TOOL-dHonouredPark-4`, which closed the earlier disagreement be
 `--status` about which unit is next by making `--plan` read the rendered region, and
 `TOOL-aBoundedVerdict-23`, still open on the same pair choosing by render order rather than
 dependency order. Both are named in section 3 as the boundary this unit does not cross. The
-`cBriefedPilot` round-1 review record supplied the third prior instance, a phantom MISSING row
-becoming the next line once every earlier spec is terminal, which is the exact rung boundary AC2
-grades.
+`cBriefedPilot` round-TWO review record,
+`memory/builds/cBriefedPilot/reviews/2026-08-16-review-TOOL-cBriefedPilot-1-2.md:309`, supplied the
+third prior instance: a phantom `MISSING` row becoming the next line once every earlier spec is
+terminal, which is the exact rung boundary AC2 grades. The round-1 record of that build names
+MISSING only as a stale master-overview count and carries no phantom at all.
 
 Recall terms used: `verb_plan next MISSING roster missing_units terminal precedence shape plan_row
 NOT A UNIT graded undecided`

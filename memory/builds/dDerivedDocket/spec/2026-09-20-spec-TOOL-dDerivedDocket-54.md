@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 |
 
 <!-- /gen:spec-records -->
 
@@ -22,7 +24,9 @@ from commits the probe can actually see.
 
 - **S1** One predicate in `tools/unattended/lib-unattended.sh`: given a commit, a BASE and a path, it
   answers whether a commit since BASE touching that path is reachable from that commit, walking
-  UNSIMPLIFIED so that no side of a merge is pruned for being TREESAME to it. Observed by AC1.
+  UNSIMPLIFIED so that no side of a merge is pruned for being TREESAME to it. The commit is whatever
+  the caller hands over, which is a merge PARENT and may itself be a merge — the subject §4 measures,
+  and the only one at which the two spellings disagree. Observed by AC1.
 - **S2** The probe answers EXISTENCE and nothing else. It returns yes or no, it names no commit to
   the caller, and it makes no claim about who authored either side. Its header says so, because a
   reachability answer reads as an attribution to everybody who did not write it. Observed by AC4.
@@ -40,8 +44,9 @@ from commits the probe can actually see.
   nothing, so both spellings walk the whole history and answer a confident YES for a commit the range
   never contained. BASE is caller-supplied and the caller reads it from the graded record, so neither
   half is hypothetical. Observed by AC3.
-- **S5** Arms in `tools/unattended/check-unattended.test.sh` staging the merge on both sides — the
-  side from which a touching commit is reachable and the side from which none is — plus THREE
+- **S5** Arms in `tools/unattended/check-unattended.test.sh` over a witness merge one of whose
+  parents is a NESTED merge, staging both sides at that subject — the nested-merge parent from which a
+  touching commit is reachable, and the witness's other parent from which none is — plus THREE
   cannot-answer arms: a BASE that is not an object, a BASE that is empty, and a BASE that is a legal
   object of another type. The suite's executed-assertion floor for
   `tools/unattended/check-unattended.sh` moves in the same commit. The three arms are separate
@@ -86,10 +91,21 @@ from commits the probe can actually see.
 
 ### The measurement
 
-Reproduced in a scratch repo at HEAD on 2026-09-20 (PINNED). BASE holds one file at its first
-content; a run-branch commit changes it; a default-branch commit touches only an unrelated file; a
-merge resolves the file back to the BASE content, so the merge is TREESAME to the default-branch
-parent for that path.
+**The subject is whatever commit the caller hands over, and that is a PARENT.** The predicate is
+asked once per parent of a merge on the witness's tail and never about the merge itself, so a table
+measured only at merges grades a subject the caller never passes. A PLAIN parent needs no flag: row 3
+below has the simplified spelling answering correctly for the run-branch parent. The case that hurts
+is a parent that is ITSELF a merge, TREESAME to one of its own parents for the record's path, because
+that is the shape simplification prunes — and a witness tail carrying one is the ordinary result of a
+run branch that merged the default branch in before landing. That parent is the subject AC1 grades.
+
+Reproduced in a scratch repo at HEAD on 2026-09-20 (PINNED), on git 2.54.0. BASE holds one file at
+its first content; a run-branch commit changes it; a default-branch commit touches only an unrelated
+file; a merge resolves the file back to the BASE content, so the merge is TREESAME to the
+default-branch parent for that path. A WITNESS merge then takes that merge as its first parent and an
+unrelated side branch off BASE as its second, so the parent the caller grades is itself a merge. The
+TREESAME relation was asserted directly rather than inferred: the merge's diff against the
+default-branch parent for that path is empty, and against the run-branch parent it is not.
 
 | Probe, for that path, since BASE | Answer |
 |---|---|
@@ -97,11 +113,24 @@ parent for that path.
 | unsimplified, from the merge | the merge |
 | simplified, from the run-branch parent | the run commit |
 | unsimplified, from the default-branch parent | nothing |
+| simplified, from the witness's NESTED-MERGE parent | nothing |
+| unsimplified, from the witness's NESTED-MERGE parent | the nested merge |
+| unsimplified, from the witness's other parent | nothing |
 
-Row 1 is the defect: a touching commit IS reachable from that merge and the probe prints nothing. Row
-4 is the near-miss that had to be measured too — the flag does not make the probe answer yes for
-every parent, so the walk does not start stopping at every merge once it is applied. Rows 2 and 4
-together are the pair the arm asserts.
+Rows 1 and 2 are the defect at the simpler subject: a touching commit IS reachable from that merge
+and the simplified probe prints nothing. Rows 3 and 4 are why the flag is not a blanket fix — the
+simplified spelling is already right for a plain parent, and the unsimplified one does not start
+answering yes for every parent once it is applied. **Rows 5 and 6 are the one pair AC1 asserts**,
+because they are that same contrast at the subject the caller actually passes, and row 7 is the
+near-miss AC2 asserts beside it: the witness's other parent reaches no touching commit and the
+unsimplified walk still answers nothing, so exactly one side is excluded. Rows 5 and 6 run rows 1 and
+2's two commands at the SAME commit and answer the same, because the subject is the same commit: what
+the fixture adds is the witness ABOVE it, which is the whole of the fix, since the predicate is
+handed a commit and the only thing that was wrong was that no fixture ever handed it this one. This
+spec names one row pair for that arm and no other. An earlier draft named two different pairs in two
+places and neither pair was a simplified-versus-unsimplified contrast measured AT a parent — row 4
+measures a parent and row 2 measures the merge, which is two subjects rather than one contrast —
+which is why the rows above were re-measured rather than re-cited.
 
 The same reading is already recorded twice in this tree for the same reason. The drift signal that
 walks product commits carries it as a comment with its own scratch-repo reproduction
@@ -192,8 +221,20 @@ Dark by construction. Nothing calls the predicate at this unit's commit, and no 
 ### Inventory
 
 One shell function in `tools/unattended/lib-unattended.sh` and one cannot-answer line prefix. No new
-conf key, no new fact, no new verb, no new leg code. Any new shell function is named through
-`python tools/lexicon/lexicon.py --suggest <identifier> --as <cell>`.
+conf key, no new fact, no new verb, no new leg code. The identifier is RECORDED here rather than left
+for the build pass to invent, so the naming leg and `spec tokens (a spec's own names resolve)` both
+have a name to grade before the function exists. On 2026-09-20,
+`python tools/lexicon/lexicon.py --suggest check_touching_commit_reachable --as sh.function` answered
+OK.
+
+| Identifier | Cell | Verb, and why |
+|---|---|---|
+| `check_touching_commit_reachable` | `sh.function` | `check`: it asserts a predicate and returns a verdict, which is the whole of S2 |
+
+`.lexicon.conf:23` declares `sh` a `parser` coverage mode rather than a dark one, and
+`.lexicon.conf:422` declares the `sh.function snake` cell, so `lexicon naming predicates`
+(`tools/gate-legs.json:1052`, guarded on `tools/`) grades this identifier at this unit's commit
+whether or not the spec claims the leg. §7 now claims it.
 
 ### Files touched (estimate)
 
@@ -246,21 +287,33 @@ conf key, no new fact, no new verb, no new leg code. Any new shell function is n
 ## 6. Acceptance criteria
 
 - **AC1** — When the predicate in `tools/unattended/lib-unattended.sh` is called over a fixture whose
-  witness is a merge that resolves the run-state path to the other side's content, it answers YES for
-  the parent from which the run's touching commit is reachable, and the arm asserts the simplified
-  spelling answers nothing for that same parent — rows 1 and 2 of §4's measurement table, reproduced
-  by the suite rather than quoted from this spec.
-  Red when: the walk is simplified, so the merge is pruned for that path, neither parent reads as the
-  run side, a caller's walk stops with no exclusion, and an owner's default-branch grant reds a record
-  that can then never be cleared.
+  witness merge takes as one parent a NESTED merge that resolves the run-state path to the other
+  side's content, it answers YES for that nested-merge PARENT, from which the run's touching commit is
+  reachable, and the arm asserts the simplified spelling answers nothing for that same parent — rows 5
+  and 6 of §4's measurement table, reproduced by the suite rather than quoted from this spec. The
+  subject is the parent the caller passes and never the witness itself, which is what makes the
+  contrast reachable at all: at a plain parent the simplified spelling is already right (row 3), so an
+  arm graded there certifies nothing. The library is SOURCED and never executed
+  (`tools/unattended/lib-unattended.sh:1-4`), so what this pass observes is the predicate sourced over
+  a scratch fixture repo and not a suite run; that is what keeps this criterion and the three below it
+  observable while the leg self-test suite named on §7's `New arm:` line is held.
+  Red when: the walk is simplified, so the nested merge is pruned for that path, the parent the run's
+  own commits sit behind reads as untouched, a caller's walk stops with no exclusion, and an owner's
+  default-branch grant reds a record that can then never be cleared; or the fixture grades the witness
+  merge itself, where rows 1 and 2 already differ, so the arm passes over the subject class the caller
+  actually hands it.
   new arm: staged RED first. The arm may not pass until it has been SEEN RED with the simplified
   spelling in place.
   permission: the criterion asserts the PREDICATE's answer, because check 19 grades no `may:` grant at
   HEAD — at `tools/unattended/check-unattended.sh:1432-1455` it grades the authorization mode, the
   playbook and the piece count — and unit 19's cross-run arm is the first caller, at a LATER order.
   The check-19 verdict half is therefore observed at unit 19's commit and not in this unit's pass.
+  The leg self-test suite that will carry these arms is not run here either: this pass sources the
+  predicate over its scratch fixture and observes each new arm RED by hand, and the suite's own run
+  is deferred to the VERIFYING run the main loop makes after the last unit.
 - **AC2** — When the same fixture's probe in `tools/unattended/lib-unattended.sh` is asked about the
-  parent from which NO touching commit is reachable, it answers no, so exactly one side is excluded and the walk descends rather than
+  witness's OTHER parent, from which NO touching commit is reachable, it answers no — row 7 of §4's
+  measurement table — so exactly one side is excluded and the walk descends rather than
   stopping.
   Red when: the unsimplified walk reports a hit for a parent reaching no touching commit, so every
   merge reads as both sides and the fail-closed stop fires on correct histories.
@@ -296,10 +349,11 @@ conf key, no new fact, no new verb, no new leg code. Any new shell function is n
 
 ## 7. Gates
 
-`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/check-unattended.test.sh` · a merge resolving the run-state path to the
-other side's content, graded from both parents, a BASE that is not an object, an empty BASE, and a
+New arm: `tools/unattended/check-unattended.test.sh` · a witness merge one of whose parents is a
+NESTED merge resolving the run-state path to the other side's content, graded from that parent and
+from the witness's other parent, a BASE that is not an object, an empty BASE, and a
 BASE that is a blob or a tree sha · the leg suite's
 executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
@@ -331,6 +385,29 @@ executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattend
   no `may:` grant until unit 19 lands · and the verifier pass that followed widened that refusal from
   non-empty to RESOLVES-TO-A-COMMIT (S4, S5, §4's table and prose, AC3, §5's security row, §7) after
   measuring a blob or tree sha exit 0 and answer a commit, with the exclusion silently dropped.
+  Extended on the same pass, same base and rev, by the G7 round-1 spec audit's fold · H4 (36) · §4's
+  measurement, S1, S5, AC1, AC2 and §7 · the table measured only merges while the caller passes a
+  PARENT, AC1 cited rows 1 and 2 while §4 named rows 2 and 4 for the same arm, and row 3 had the
+  simplified spelling answering correctly at a parent, so the arm's control was false by this spec's
+  own measurement. The fixture now carries a witness merge whose parent is itself a NESTED merge
+  TREESAME to one of its parents for the record's path, three rows were MEASURED at that subject in a
+  scratch repo on git 2.54.0 on 2026-09-20, and one row pair is named for AC1 in one place.
+  M4 (21) was filed against `TOOL-dDerivedDocket-53` and holds here too: `.lexicon.conf:23` declares
+  `sh` a `parser` mode and `.lexicon.conf:422` a live `sh.function` cell, so this unit's new shell
+  function is graded by `lexicon naming predicates` whatever §7 says. §7 now lists that leg and §4's
+  Inventory records the identifier and its `--suggest` answer.
+  The verifier pass that followed corrected §4's account of the earlier draft — row 4 DID measure a
+  parent, so what neither pair carried was a CONTRAST at one — and made explicit that rows 5 and 6
+  re-run rows 1 and 2's commands at the same commit, which the added witness puts in the caller's
+  position.
+  Extended again on the same pass, same base and rev · AC1 · the bar join of
+  `tools/check-spec-tokens.py` reds a spec dated at or after `SPEC_DIRECT_CUTOFF` that names a suite
+  as an acceptance observation, and AC1 spelled this kit's leg self-test suite as a bare path while
+  saying in the same sentence that the pass does NOT run it. The sentence now names the suite the
+  way §7 does, through its `New arm:` line, which the join does not grade, and the `permission:` line
+  says outright that the suite's own run is the VERIFYING run's and that this pass observes the
+  sourced predicate over a scratch fixture. The witness, the subject and every `Red when:` arm are
+  unchanged.
 
 ## 10. Reuse audit
 

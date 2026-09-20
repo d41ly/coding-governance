@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
 
@@ -31,11 +33,17 @@ next module reaching for a key the kit does not own.
   the walk pays no second conf resolve (§4). Observed by AC1 and AC2.
 - **S2** — the refusal, named, reachable, and TRUE for the caller that receives it. The
   installed-check hoists out of `grammar()` into `_check_grammar_installed(why, cure)`, one helper
-  holding the ONE raise site and taking the CAUSE and the REMEDY from its caller; both callers share the kit-absent sentence and neither
-  inherits the other's cure. `grammar()` passes the cause and cure it writes today, so its message
-  stays byte-identical (`tools/memory-tree/corpus_ids.py:272`); `resolve_anchor` passes its own —
-  an anchor route was requested, and the remedy is to install the memory-recall kit beside this one,
-  because no conf value of this kit turns the call off. A caller that wants a skip rather than a
+  holding the module's raise and taking the CAUSE and the REMEDY from its caller. `grammar()` has
+  TWO refusal points and both route through that helper: the absent-`extract.py` raise
+  (`tools/memory-tree/corpus_ids.py:271-276`) and the outdated-kit raise (`:281-283`), whose message
+  today tells every caller to blank the pins to turn checks 13-15 off. Both callers share the
+  kit-state sentence at each point and neither inherits the other's cure. `grammar()` passes the
+  cause and cure it writes today at both, so its two messages stay byte-identical
+  (`tools/memory-tree/corpus_ids.py:272` and `:282`); `resolve_anchor` passes its own at both —
+  an anchor route was requested, and the remedy is to install or update the memory-recall kit beside
+  this one, because no conf value of this kit turns the call off. Re-causing only the first point
+  would leave the pin cure alive on the second, which is the defect this item declares it closes,
+  surviving on the path a stale sibling kit takes. A caller that wants a skip rather than a
   refusal catches that one exception type and prints a skip naming the arm and the kit; nothing
   returns a silent `None` for an absent kit, because an absent kit and a line that anchors nothing
   are the same value otherwise. Observed by AC3.
@@ -73,6 +81,17 @@ next module reaching for a key the kit does not own.
   (`tools/memory-tree/check-memory-hygiene.test.sh:2460`) is raised to the count that suite's own
   PASS line prints at this unit's commit, re-read and never predicted, which is the rule that
   constant's own header states. Observed by AC5.
+- **S8** — the TARGET root's own declarations, mapped onto this kit's refusal. `grammar(root)`
+  reaches `extract.grammar_for(root)` (`tools/memory-tree/corpus_ids.py:284`), which resolves the
+  conf AT THAT ROOT (`tools/memory-recall/extract.py:492`), and that resolver raises the sibling
+  kit's `ConfError` — a `RuntimeError` subclass (`tools/memory-recall/recall_conf.py:46`) and not
+  this kit's `Problem` — when the root carries no `.memory-tree.conf`
+  (`tools/memory-recall/recall_conf.py:249`), declares no `MEMORY_ROOT` (`:253`), or declares no
+  usable `FAMILIES` (`:262`). `resolve_anchor` catches that ONE type and re-raises `Problem`, naming
+  the root it was given and which of the three declarations was missing, because the resolver
+  already distinguishes them. Measured at HEAD: `ConfError` occurs zero times in
+  `tools/memory-tree/corpus_ids.py`, so none of that module's three `except Problem` handlers
+  (`tools/memory-tree/corpus_ids.py:699`, `:835` and `:1253`) catches it. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -101,7 +120,9 @@ next module reaching for a key the kit does not own.
   `--measure` (`:708`), which call `walk()` whatever the pins say. S2 splits the cause where THIS
   unit's own caller makes it false and leaves that older one alone: `--print-defined-ids` degrades
   with its own line rather than showing it (`:856`), and re-causing two more verbs changes output no
-  caller of this unit is behind.
+  caller of this unit is behind. This bullet is about the CAUSE sentence those two verbs inherit and
+  never about the outdated-kit refusal's CURE, which S2 re-routes at both of `grammar()`'s refusal
+  points.
 - **The kit version.** This unit moves no version marker. `TOOL-dDerivedDocket-36` moves
   `KIT_MEMORY_TREE_VERSION` once for this build, and these bytes ride that move, the same way unit
   13's check-wiring bytes ride unit 9's.
@@ -133,7 +154,8 @@ that.
 
 ```
 resolve_anchor(root, E=None) -> callable(line) -> id | None
-    E = E if E is not None else grammar(root)   # corpus_ids.py:259, raises when the kit is absent
+    E = E if E is not None else grammar(root)   # corpus_ids.py:259; raises on an absent or old
+                                                #   sibling kit AND on an undeclared target root
     return lambda line: _anchor(E, line)
 ```
 
@@ -143,6 +165,25 @@ a conf file per line of a README. The root is explicit and has no default: the m
 in the sibling kit binds to the repo the KIT is installed in (`tools/memory-recall/extract.py:68`
 and `:106`), which is the measured wrong-root class both modules' docstrings already record, and a
 default here would put it back.
+
+`grammar(root)` has a SECOND failure mode, and it fires on this route's headline input. The first is
+the one the kit already names and S2 re-causes: the sibling kit is absent, or predates
+`grammar_for(root)`. The second is the TARGET root. `grammar_for` resolves the conf at that root
+(`tools/memory-recall/extract.py:492`) and refuses with the sibling kit's own `ConfError` when the
+root carries no `.memory-tree.conf`, declares no `MEMORY_ROOT` or declares no usable `FAMILIES`.
+That type is a `RuntimeError` (`tools/memory-recall/recall_conf.py:46`) and this module catches
+`Problem`, so at HEAD it escapes as a traceback: `ConfError` occurs zero times in
+`tools/memory-tree/corpus_ids.py` and the three `except Problem` handlers at
+`tools/memory-tree/corpus_ids.py:699`, `:835` and `:1253` never see it. An undeclared root is not
+an exotic input for a route whose whole point is an ARBITRARY one: every caller outside this kit
+hands over a tree this kit did not write, and the three declarations are exactly what such a tree may
+lack. This build's own fixture-root caller is NOT the instance — measured at HEAD, unit 51's
+`_fixture` writes `MEMORY_ROOT`, `DISCIPLINES` and `FAMILIES` into the scratch conf
+(`tools/memory-tree/gen_build_index.py:1915-1916`), so it resolves cleanly and the G7 record's claim
+that it is the first caller to trip this does not hold. The escape itself does: it needs only a root
+the caller did not build. So S8 maps the type at the route rather than letting the kit's ONE public
+entry point leak a foreign exception past the ban its own docstring writes
+(`tools/memory-tree/corpus_ids.py:24`).
 
 The OPTIONAL bundle is what lets `_anchor` keep exactly one call site, and without it AC2 asserts a
 call graph this unit does not reach. At HEAD `_anchor`'s only caller is `walk()`
@@ -269,12 +310,12 @@ and needs only to precede unit 15.
 | Identifier | Kind | Cell |
 |---|---|---|
 | `resolve_anchor` | module function in `corpus_ids.py` | `py.function`; leads with the declared verb `resolve`, checked with `lexicon.py --suggest` |
-| `_check_grammar_installed` | module function in `corpus_ids.py` | `py.function`; leads with the declared verb `check`, checked with `lexicon.py --suggest`. `require` is not a row of the table, which is why the helper is not called that |
+| `_check_grammar_installed` | module function in `corpus_ids.py` | `py.function`; leads with the declared verb `check`, checked with `lexicon.py --suggest`. `require` is not a row of the table, which is why the helper is not called that. It serves BOTH of `grammar()`'s refusal points, so `installed` reads as installed-and-usable rather than as the file-exists half alone |
 | the derived key list and the exemption list | shell locals in the self-test | `sh.function` grades function names; a local is graded by no cell |
 
 ### Files touched (estimate)
 
-`tools/memory-tree/corpus_ids.py` (S1, S2, and its selftest arms) ·
+`tools/memory-tree/corpus_ids.py` (S1, S2, S8, and its selftest arms) ·
 `tools/memory-tree/check-memory-hygiene.test.sh` (S3, S7) ·
 `tools/memory-tree/.memory-tree.conf.example` (S4) ·
 `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md` (S5) ·
@@ -303,9 +344,12 @@ marker moves here; see §3.
   closed over rather than resolved inside the returned callable. The one in-kit caller pays nothing
   at all: `walk()` hands the route the bundle it already resolved, so re-pointing it adds no second
   resolve per walk (§4).
-- error / empty / loading states — three states and each is named: the kit is absent, which raises
-  S2's refusal; the grammar resolves and the line anchors nothing, which returns `None`; the
-  derivation in S3 finds no key, which refuses rather than passing.
+- error / empty / loading states — four states and each is named: the sibling kit is absent or
+  predates `grammar_for(root)`, which raises S2's refusal at whichever of `grammar()`'s two points
+  applies; the TARGET root is not a declared memory tree, which raises S8's refusal naming the root
+  and the missing declaration rather than letting `ConfError` escape; the grammar resolves and the
+  line anchors nothing, which returns `None`; the derivation in S3 finds no key, which refuses
+  rather than passing.
 - observability — the skip a caller prints names the arm and the kit, so a green suite row can never
   be read as a verified one.
 - risks — the parity arm is the risk, in both directions. Under-reading passes by finding nothing,
@@ -313,8 +357,8 @@ marker moves here; see §3.
   real-tree run before writing it tested by finding a live miss. Over-reading is what the
   unconstrained receiver buys, and it is priced: the `os.environ` names it absorbs are on the
   declared list, and a fixture dict's invented key would red by name rather than pass in silence.
-- testing — arms in the corpus-ids selftest for S1 and S2, arms in the memory-hygiene self-test for
-  S3 and S4, each observed RED before it is allowed to pass. The suite stays inside its declared
+- testing — arms in the corpus-ids selftest for S1, S2 and S8, arms in the memory-hygiene self-test
+  for S3 and S4, each observed RED before it is allowed to pass. The suite stays inside its declared
   ceiling on the `memory-hygiene self-test` row of `tools/gate-legs.json`; the added arms are string
   work over files already read by that block.
 - migration — none. No conf value changes meaning, and a blank `ARMS_FLOORS` is the state every tree
@@ -330,6 +374,10 @@ marker moves here; see §3.
   Red when: the returned callable is bound to the repo the kit is installed in rather than to the
   root it was given, so every id in the scratch tree fails to match and the arm reads clean because
   a clean corpus and an unrecognising grammar are the same empty answer.
+  permission: the suite that carries these arms is the `corpus-ids selftest` leg, whose argv is
+  `python3 tools/memory-tree/corpus_ids.py --selftest` and which is held under `chunk = selftests`
+  in `tools/gate-legs.json`, so its run belongs to the orchestrator's VERIFYING bar and not to this
+  pass. Each new arm's RED is observed by hand before it is allowed to pass.
 - **AC2** — When the same selftest asserts this module's own call graph, derived from its own source
   in the idiom `_walk_continues` already uses (`tools/memory-tree/corpus_ids.py:797`),
   `corpus_ids.py` names `extract.anchor_at` exactly once, at `_anchor`; `_anchor`'s only caller is
@@ -339,18 +387,26 @@ marker moves here; see §3.
   route as `resolve_anchor(root)` with no bundle while keeping its own, so the conf at that root is
   resolved twice per walk (`tools/memory-recall/extract.py:478-505`) — the cost §4 gives as the
   reason the bundle is closed over, paid twice and invisible, because both resolves answer the same.
+  permission: as AC1 — the same held leg, run at VERIFYING.
 - **AC3** — When `GRAMMAR_DIR` is pointed at a directory that does not exist and `resolve_anchor` is
   called, in the same arm shape the module already uses for its exit-3 degradation
   (`tools/memory-tree/corpus_ids.py:856`), it raises the kit's `Problem`; the message names the
   memory-recall kit, gives the cause as the anchor route the caller asked for, and prescribes
   installing that kit beside this one; and it names neither `DEAD_PATH_PIN` nor `ORPHAN_ID_PIN`,
-  which this caller has not set and which turn nothing off for it. In the same fixture `grammar()`
-  raises too, and ITS message is byte-identical to the one at this unit's parent commit.
+  which this caller has not set and which turn nothing off for it. A SECOND fixture points
+  `GRAMMAR_DIR` at a directory whose `extract.py` carries no `grammar_for`, which is `grammar()`'s
+  other refusal point (`tools/memory-tree/corpus_ids.py:281-283`), and makes the same assertions
+  there: the message names the kit, gives the cause as the anchor route, prescribes UPDATING that
+  kit beside this one, and names neither pin. In each fixture `grammar()` raises too, and ITS
+  message is byte-identical to the one at this unit's parent commit.
   Red when: the new caller inherits `grammar()`'s message and is told to blank two pins that are not
   set and do not gate this call, so the refusal states a cause the caller does not have and
   prescribes a cure that is a no-op — which a criterion asking only that A remedy be named certifies
-  as correct; or the absent kit returns a callable answering `None` for every line, so an
-  uninstalled grammar is indistinguishable from a corpus with no records in it.
+  as correct; or only the first refusal point is re-caused, so the pin cure survives on the path a
+  stale sibling kit takes and no fixture in this unit ever reaches it; or the absent kit returns a
+  callable answering `None` for every line, so an uninstalled grammar is indistinguishable from a
+  corpus with no records in it.
+  permission: as AC1 — the same held leg, run at VERIFYING.
 - **AC4** — When the memory-hygiene self-test's new block derives the conf keys the kit's Python
   modules read, it names more than zero keys, and it names `MEMORY_ROOT` and `ROTATION_MODE` among
   them; with the block pointed at a fixture directory holding one module that reads one key absent
@@ -365,17 +421,27 @@ marker moves here; see §3.
   permission: the suite that carries this arm is the `memory-hygiene self-test` leg, held under
   `chunk = selftests`, so its run belongs to the orchestrator's VERIFYING bar and not to this pass.
   Each arm's RED is observed by hand against the staged break above before the pass ends.
-- **AC5** — When that block runs over the real kit directory at this unit's commit, every key it
-  derives is declared in `tools/memory-tree/.memory-tree.conf.example` or is on the exemption list,
-  every exemption names a key some module still reads — the `os.environ` names the unconstrained
-  receiver pulls in included, graded in that second direction like any other — and the suite's PASS
-  line prints an assertion count at or above `FLOOR_ASSERTIONS` as that constant reads in the same
-  commit.
+- **AC5** — When S3's derivation is run STANDALONE over the real kit directory at this unit's
+  commit — the arm's own `sed` and `grep` scan, executed by hand over `tools/memory-tree/*.py`
+  rather than through the suite that will carry it — every key it derives is declared in
+  `tools/memory-tree/.memory-tree.conf.example` or is on the exemption list, and every exemption
+  names a key some module still reads, the `os.environ` names the unconstrained receiver pulls in
+  included, graded in that second direction like any other. And when `FLOOR_ASSERTIONS`, declared at
+  `tools/memory-tree/check-memory-hygiene.test.sh:2460`, is read with `git show` at this unit's
+  commit and at its parent, the number at the commit is HIGHER.
   Red when: the exemption list carries a name no module reads any more, so a stale exemption widens
-  the surface the arm was written to narrow.
+  the surface the arm was written to narrow; or the arms land and the floor holds at its parent
+  value, so a later deletion of them is invisible — which a comparison of the printed count AGAINST
+  the floor as it reads in the SAME commit cannot see, because this unit only adds arms and that
+  comparison then holds whether the floor moved or not.
   figure: the assertion count is DERIVED by re-reading the suite's own PASS line at this unit's
-  commit; the floor is raised to that number rather than predicted.
-  permission: as AC4 — the same held suite, run at VERIFYING.
+  commit and the floor is raised to that number rather than predicted; both floor values are read
+  from the two commits at observation time and neither is written into this spec.
+  permission: the standalone derivation and the two `git show` reads are this pass's own direct
+  check, and neither runs a suite. The half that needs the suite itself — that the raised floor
+  EQUALS the count its PASS line prints — belongs to the `memory-hygiene self-test` leg, held under
+  `chunk = selftests`, so it is observed on the orchestrator's VERIFYING bar and not in this pass.
+  The suite is named on this spec's `New arm:` line and is run nowhere here.
 - **AC6** — When `ARMS_FLOORS` is read out of `tools/memory-tree/.memory-tree.conf.example` at this
   unit's commit, it is present and blank, and the leg that reads it exits 0 over a SCRATCH tree
   whose conf declares it blank — a fixture, because this repository's own conf declares it non-blank
@@ -398,12 +464,24 @@ marker moves here; see §3.
   Red when: the artifacts are regenerated in a later commit than the `.py`, which the pre-commit map
   leg refuses, or the dossier keeps prose that describes a population one arm smaller than the one
   that ships.
+- **AC9** — When `resolve_anchor` is called over a scratch root that carries no
+  `.memory-tree.conf`, again over one whose conf declares no `MEMORY_ROOT`, and again over one whose
+  conf declares no usable `FAMILIES`, each call raises this kit's own `Problem`, each message names
+  the root it was handed and which of the three declarations was missing, and no `ConfError` reaches
+  the caller.
+  Red when: the sibling kit's `ConfError` is left to escape, so an arbitrary target root — the one
+  input this route exists to accept — answers with a raw traceback out of a module whose own
+  docstring forbids one
+  (`tools/memory-tree/corpus_ids.py:24`), and a gate reading it learns neither which root nor which
+  declaration was missing; or the three cases collapse into one sentence, so a caller told only that
+  its root is not a memory tree cannot tell an absent file from a conf that declares no families.
+  permission: as AC1 — the same held leg, run at VERIFYING.
 
 ## 7. Gates
 
 `corpus-ids selftest` · `memory-hygiene self-test` · `memory hygiene` · `harness arms (fail branches armed or pinned)` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/memory-tree/corpus_ids.py --selftest` · a scratch tree whose conf declares one family, plus `GRAMMAR_DIR` pointed at a directory that does not exist · none
+New arm: `tools/memory-tree/corpus_ids.py --selftest` · a scratch tree whose conf declares one family, plus `GRAMMAR_DIR` pointed at a directory that does not exist, plus a second `GRAMMAR_DIR` whose `extract.py` carries no `grammar_for`, plus three scratch roots carrying respectively no `.memory-tree.conf`, no `MEMORY_ROOT` and no usable `FAMILIES` · none
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · the real kit directory with `ARMS_FLOORS` still absent from the shipped example, and a fixture directory holding two modules, one reading an undeclared key through a dict named `conf` and one reading another through a dict named anything else · `FLOOR_ASSERTIONS`, raised to the count the PASS line prints at this unit's commit
 
 ## 8. Open questions
@@ -451,6 +529,46 @@ New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · the real kit direct
   `merge-rows.py` reads none, S1 and §4 put `walk()`'s resolve three lines above the call site it is
   twenty-four above, and the empty-derivation refusal was cited as two bare line numbers that resolve
   against the previous paragraph's `extract.py` rather than the suite.
+- rev-1 · 2026-09-20 · S2 · S8 · §3 · §4 · §5 · §7 · AC1 · AC2 · AC3 · AC5 · AC9 · the G7 round-1
+  spec audit's fold, same rev. H3 (29): `grammar(root)` carries a second failure mode that fires on
+  this route's one public input — the sibling kit's `ConfError` is a `RuntimeError` and not this
+  kit's `Problem`, so an arbitrary target root with no `.memory-tree.conf` escaped as a traceback
+  past three `except Problem` handlers. S8 maps the type at the route, AC9 grades all three cases
+  the resolver distinguishes, the route paragraph re-prices `grammar(root)`, and the readiness row
+  goes from three named states to four. One half of that finding did NOT survive re-reading and is
+  recorded as corrected rather than folded: the report named unit 51's fixture root as the first
+  caller to trip the escape, and at HEAD that fixture writes `MEMORY_ROOT`, `DISCIPLINES` and
+  `FAMILIES` (`tools/memory-tree/gen_build_index.py:1915-1916`), so it resolves cleanly. The escape
+  needs only a root this kit did not write, which is what the route exists to accept. M5 (30):
+  `grammar()` holds TWO raise sites and not one, and the second still prescribes blanking two pins
+  that turn nothing off for this caller; S2 routes both through the hoisted helper, the
+  inherited-cause non-goal says so in as many words, and AC3 gains the fixture that reaches the
+  second. M2 (5): AC5 graded the printed assertion count at or above `FLOOR_ASSERTIONS` as that
+  constant reads in the SAME commit, which this unit's added arms make true whether the floor moved
+  or not, so it is restated in the shape units 52 and 54 already use — a higher floor at this commit
+  than at its parent, read with `git show` at both, equal to the printed count. AC1, AC2 and AC3
+  also gained the `permission:` line their held suite owes; no finding asked for that and it moves
+  no assertion. No gate from that report's left-shift list is wired, cited or promised here: only
+  one of its eleven candidates was ever run over the tree, and that one belongs to another spec.
+- rev-1 · 2026-09-20 · AC1 · AC2 · AC3 · AC9 · close-out of the same rev, against the G7 fold
+  verifier. The `permission:` line the fold added to those four criteria named the FLAG form
+  `python3 tools/memory-tree/corpus_ids.py --selftest` as a check the building pass may make. That
+  argv is the `corpus-ids selftest` leg's own, verbatim, in `tools/gate-legs.json`, so the line
+  granted in its first clause the held leg it withheld in its second, and contradicted AC4's
+  permission line in §6 over a leg carrying the same `chunk = selftests` and `subject = kit`.
+  Restated in AC4's shape: the leg's run is the orchestrator's at VERIFYING and each new arm's RED
+  is observed by hand. No assertion moved.
+  Extended once more on the same pass, same base and rev · AC5 · the bar join of
+  `tools/check-spec-tokens.py` reds a spec dated at or after `SPEC_DIRECT_CUTOFF` that names a
+  suite as an acceptance observation, and AC5 named this kit's self-test suite as the thing that
+  RUNS. The witness is restated as the direct one it was
+  always meant to be: S3's derivation executed standalone over the real kit directory, and
+  `FLOOR_ASSERTIONS` read with `git show` at the commit and its parent, cited by line rather than
+  spelled as an invocation. The equality against the suite's own PASS line is the one half a suite
+  run can answer, so it moves into the `permission:` line and defers to the VERIFYING bar, where the
+  `memory-hygiene self-test` leg already sits held. The suite stays named on §7's `New arm:` line,
+  which the join does not grade. Every assertion this criterion made is still made, by a reader that
+  does not need the suite to have run.
 
 ## 10. Reuse audit
 

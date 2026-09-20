@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md) | spec-audit | TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-54 |
 
 <!-- /gen:spec-records -->
 
@@ -19,11 +21,16 @@ notice stream reach the caller as two values.
 
 ## 2. Scope (IN)
 
-- **S1** `run_bounded` captures the two streams into two files rather than one, under the same
-  `timeout -k 5s` wrapper, the same `</dev/null` and the same file form in both branches, and
-  publishes three values beside `RB_TOOK`: `RB_STDOUT`, the command's stdout alone; `RB_ERR`, its
-  stderr alone; and `RB_OUT`, which keeps every byte both streams produced. The `mktemp` refusal
-  branch sets all three. Observed by AC1.
+- **S1** `run_bounded` captures the two streams into two files rather than one, both under a
+  single scratch directory from one `mktemp -d`, under the same `timeout -k 5s` wrapper, the same
+  `</dev/null` and the same file form in both branches, and publishes three values beside
+  `RB_TOOK`: `RB_STDOUT`, the command's stdout alone; `RB_ERR`, its stderr alone; and `RB_OUT`,
+  which keeps every byte both streams produced. The teardown moves with the capture: the `rm -f` of
+  the one file (`tools/unattended/unattended.sh:197`) becomes a recursive removal of that
+  directory. On the `mktemp -d` refusal branch `RB_STDOUT` and `RB_ERR` are set empty and `RB_TOOK`
+  is set to 0, while `RB_OUT` KEEPS that branch's existing sentence,
+  `run_bounded: cannot create a capture file`, byte-for-byte: it is the branch's only diagnostic
+  and three callers print it. Observed by AC1.
 - **S2** The one behaviour delta is declared: `RB_OUT` becomes stdout followed by stderr rather than
   the two interleaved in arrival order. No byte is lost, so the three callers that read it today —
   `$WIRING_CHECK` (`tools/unattended/unattended.sh:1206`), `$GATE_CMD` (`:3283`) and
@@ -37,11 +44,14 @@ notice stream reach the caller as two values.
   lines and 2000 bytes, with a line naming how many lines were dropped. Every refusal in the driver
   that quotes a bounded call's output quotes that tail too when `RB_ERR` is non-empty, so a checker
   whose whole diagnosis is on stderr is never reported with an empty reason. Observed by AC5 and AC6.
-- **S5** A stdout-empty call is no longer one undivided fact. A call whose `RB_STDOUT` holds no line
-  while `RB_ERR` holds text is reported as the producer having written only to stderr, quoting the
-  tail; both empty stays the DEAD PROBE it is today; and a bound breach keeps the never-answered
-  wording the `gates-green` item already draws (`tools/unattended/unattended.sh:3286-3291`). Observed
-  by AC5.
+- **S5** A stdout-empty call is no longer one undivided fact, and the discrimination has a subject
+  at THIS unit's order rather than only in consumers that do not exist yet. A second helper,
+  `derive_stream_verdict`, takes `RB_STDOUT`, `RB_ERR` and the bounded call's status and RETURNS
+  one of three distinct strings: the producer wrote only to stderr, carrying `read_stderr_tail`'s
+  output; both streams empty, which is the DEAD PROBE it is today; and a bound breach, which keeps
+  the never-answered wording the `gates-green` item already draws
+  (`tools/unattended/unattended.sh:3290`). It decides and prints nothing, and which callers adopt
+  it is unit 16's and unit 17's, per §3. Observed by AC5.
 - **S6** Every new refusal branch gets an arm in `tools/unattended/unattended.test.sh`, each observed
   RED with its fix unstaged, and the `tools/unattended/unattended.sh` pair of `ARMS_FLOORS` in
   `.memory-tree.conf` moves in the same commit. Observed by AC8.
@@ -82,8 +92,9 @@ notice stream reach the caller as two values.
 - **consumes-from** `TOOL-dDerivedDocket-15` — the rule that under `--tsv` stdout carries the `ask`
   lines and the `examined` line and nothing else, while the waiver line and every other notice go to
   stderr. Without it the split buys nothing, because the rows and the notices would still share one
-  stream and AC4 could not tell a clean row stream from a merged one. That unit's spec owes the
-  matching line.
+  stream and AC4 could not tell a clean row stream from a merged one. That unit's spec already
+  carries the reciprocal, at
+  `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md:106`.
 - **hands-off** `TOOL-dDerivedDocket-16` — which capture the `ASKS_CMD` witness is handed:
   `run_bounded` keeps the producer's stderr out of the row stream, so that unit's contract and S5
   stand as written and its parse refusal fires on a real column change rather than on a notice.
@@ -95,8 +106,11 @@ notice stream reach the caller as two values.
   driver does.
 - **hands-off** `TOOL-dDerivedDocket-28` — the capture that unit's S1 pins as unchanged. It is two
   files after this unit rather than one, under the same `timeout -k` wrapper, so that pin is
-  restated rather than dropped and the ledger still wraps exactly one `run_bounded`. That unit's
-  spec owes the matching line.
+  restated rather than dropped and the ledger still wraps exactly one `run_bounded`. That unit's own
+  Edges block already carries the reciprocal in its own words: the two-file capture inside
+  `run_bounded` is what its ledger WRAPS rather than rewrites, and without this unit landing first
+  its own pin would read as forbidding the split, leaving the two units contradicting each other on
+  one function.
 
 ## 4. Design
 
@@ -141,9 +155,16 @@ two blocks rather than one conversation. That is stated here because it is the o
 difference for a reader of a refusal, and because an arm that greps `RB_OUT` for a phrase is
 unaffected by it.
 
-The refusal branch is widened deliberately. Today a failed `mktemp` leaves the other values holding
-whatever the previous call left in them, which is the stale-value class; all three are cleared on
-that path.
+The refusal branch is widened deliberately, and NOT in the direction a first reading suggests. At
+HEAD that branch is one line, `tools/unattended/unattended.sh:185`: it SETS `RB_OUT` to the string
+`run_bounded: cannot create a capture file` and returns, before `RB_TOOK` is assigned at `:195`.
+`RB_OUT` is therefore not stale on that path. It is the freshest and only thing the caller gets,
+and three callers print it: `check_wiring` (`:1208`), `gates-green` through `DOD_OUT` (`:3285`),
+and `--dispatch` through `head -1` (`:4974`). Emptying it would make a failed capture refuse with
+no reason at all, which is this unit's own defect arriving on the one path it opens deliberately.
+The value that genuinely carries over from the previous call is `RB_TOOK`, which `:4975` prints in
+the `--dispatch` refusal. So the branch sets the two NEW values empty, sets `RB_TOOK` to 0, and
+leaves `RB_OUT`'s sentence untouched.
 
 ### Who reads which
 
@@ -175,12 +196,18 @@ The second row is the one this unit adds, and it is the liveness assertion the c
 rules ask of any probe: a producer that is talking and a producer that is dead stop reporting the
 same way.
 
+`derive_stream_verdict` (S5) is the one reader of that table. It takes the two captures and the
+call's status and returns the row's string, so the discrimination is written once and is gradeable
+at this unit's order rather than re-derived inside each of the four consumers that route this
+call.
+
 ### Inventory
 
 | Identifier | Kind | Cell |
 |---|---|---|
 | `RB_STDOUT`, `RB_ERR` | driver globals beside `RB_OUT` and `RB_TOOK` | screaming snake, as both siblings; `.lexicon.conf` declares no shell constant cell, so no naming arm grades them |
 | `read_stderr_tail` | shell function | `sh.function`; `python tools/lexicon/lexicon.py --suggest read_stderr_tail --as sh.function` answered OK on 2026-09-20 |
+| `derive_stream_verdict` | shell function | `sh.function`; `python tools/lexicon/lexicon.py --suggest derive_stream_verdict --as sh.function` answered OK on 2026-09-20 |
 
 ### Files touched (estimate)
 
@@ -209,7 +236,10 @@ against and unit 16's consumes-from edge reds.
 
 The change is dark for the witness, because no gov README carries an `asks:` key and `ASKS_CMD` is
 blank until unit 35 arms it. It is live for the three existing callers from this commit, which is
-why AC3 exists.
+why AC3 exists. `read_stderr_tail` and `derive_stream_verdict` are dark with the witness, which is
+why AC5 and AC6 grade them by DIRECT call over a stub rather than through a caller's output: a
+helper with no live caller at this order has no failing case otherwise, and a layer that stays
+inert while its suite reads green is the shape this build files elsewhere.
 
 ### Alternatives rejected
 
@@ -231,16 +261,23 @@ why AC3 exists.
 
 - security — no new input is trusted and no new path is written. `RB_ERR` is producer output quoted
   into a refusal, so the tail is bounded (S4) to keep a chatty command from flooding a park row.
-- perf / scale — one extra `mktemp -d` and one extra `cat` per bounded call, against calls that are
-  already a subprocess and a bound; the file form that makes the bound real is unchanged.
-- error / empty / loading states — the three stdout-empty states above are separated, the `mktemp`
-  refusal clears all three values, and a bound breach keeps its own wording.
+- perf / scale — the `mktemp` at `tools/unattended/unattended.sh:185` is SWAPPED for a `mktemp -d`
+  rather than added, so the directory costs nothing extra; the reads go from the one `cat` at
+  `:196` to three, because §4 forbids joining the two VALUES and `RB_OUT` takes its own
+  substitution over both files, which is two extra reads per bounded call against calls that are
+  already a subprocess and a bound. The teardown goes from `rm -f` to a recursive removal of one
+  directory (S1). The file form that makes the bound real is unchanged.
+- error / empty / loading states — the three stdout-empty states above are separated and
+  `derive_stream_verdict` returns one string per state; the `mktemp -d` refusal empties the two new
+  values and zeroes `RB_TOOK` while KEEPING `RB_OUT`'s existing sentence, which is that branch's
+  only diagnostic; and a bound breach keeps its own wording.
 - observability — a refusal now names which stream it read and quotes the other, so a run that
   refuses says whether the producer was silent or merely noisy.
 - risks — `RB_OUT` stops interleaving, which is the one observable delta and is pinned by AC3. A
   second risk is scope creep into the runner's bound, which §3 cuts explicitly.
 - testing — arms for the split, for both existing bound properties, for the three callers, for the
-  real producer's two streams, and for the tail bound. Each is observed RED with its fix unstaged.
+  real producer's two streams, for the three stdout-empty verdicts, and for the tail bound. Each is
+  observed RED with its fix unstaged.
 - migration — none. No file format, conf key or record field changes.
 - user docs — none owed. This unit writes no conf key, so leg check 22 asks for no protocol row, and
   the guide and Skill prose that describe refusal shapes are unit 20's.
@@ -250,13 +287,20 @@ why AC3 exists.
 - **AC1** — When a stub command writes one known line to stdout and a different known line to
   stderr and the driver's `run_bounded` runs it over a scratch fixture, `RB_STDOUT` holds the first
   and not the second, `RB_ERR` holds the second and not the first, and `RB_OUT` holds both. When
-  `mktemp` is made to fail on the same stub, all three values are cleared and the function returns
-  1. The arm extracts the function from the driver the way the kit's existing bound arms do
-  (`tools/unattended/unattended.test.sh:5348`).
+  `mktemp -d` is made to fail on the same stub, the function returns 1, `RB_STDOUT` and `RB_ERR`
+  are empty, `RB_OUT` still reads `run_bounded: cannot create a capture file` verbatim, and
+  `RB_TOOK` reads 0. The arm SEEDS `RB_TOOK` with a non-zero sentinel immediately before that
+  refusing call rather than leaning on a prior successful one: the stub returns inside a second and
+  `tools/unattended/unattended.sh:195` computes `RB_TOOK` in whole seconds from `date +%s`, so a
+  prior call leaves it at 0 already and the zeroing assertion would pass whether or not the branch
+  zeroes anything. The arm extracts the function from the driver the way the kit's existing bound
+  arms do (`tools/unattended/unattended.test.sh:5348`).
   Red when: either branch of `run_bounded` still merges the two streams into one capture file, so
   `RB_STDOUT` holds the stderr line and a healthy producer reads as a parse refusal; or the refusal
-  branch leaves the previous call's values in place, so a caller reads a stale stream as this call's
-  output.
+  branch empties `RB_OUT`, so a failed capture refuses with no reason at all through the three
+  callers that print it at `tools/unattended/unattended.sh:1208`, `:3285` and `:4974`; or it leaves
+  `RB_TOOK` holding the previous call's figure, so the `--dispatch` refusal at `:4975` reports an
+  elapsed time this call never measured.
 - **AC2** — When the extracted `run_bounded` runs against a 2s `GATE_BOUND` over a 30s sleeper it
   returns in under 20s with status 124 or 137, and when it runs against a command that backgrounds a
   30s grandchild and exits it does not block — the two properties
@@ -292,14 +336,20 @@ why AC3 exists.
   redirect in one branch before it is allowed to pass.
   fixture: the builds-mode fixture tree unit 15 AC7 builds, and unit 15's stderr routing, which the
   shared step's dispatch order lands before this unit runs.
-- **AC5** — When a stub writes nothing to stdout and one line to stderr, the caller reports that the
-  producer wrote only to stderr and quotes `read_stderr_tail`; when the same stub writes to neither,
-  the caller reports a DEAD PROBE; and when it outlives a live bound, the caller reports that the
-  command never answered. The three messages differ from each other.
-  Red when: a talking producer with an empty stdout is reported as a DEAD PROBE, so a broken
-  redirect and a dead command are one verdict and a green-looking zero means nothing.
-- **AC6** — When a stub writes 500 lines to stderr, the refusal quotes at most 20 of them and names
-  how many were dropped, and the quoted text is at most 2000 bytes.
+- **AC5** — When the arm extracts `derive_stream_verdict` from `tools/unattended/unattended.sh`
+  the way AC1 extracts `run_bounded` (`tools/unattended/unattended.test.sh:5348`) and calls it
+  directly after a stub that wrote nothing to stdout and one line to stderr, it returns the
+  wrote-only-to-stderr string, carrying `read_stderr_tail`'s output; after a stub that wrote to
+  neither it returns the DEAD PROBE string; and on a status of 124 or 137 it returns the
+  never-answered string, whose wording is the one the `gates-green` item already draws at
+  `tools/unattended/unattended.sh:3290`. The three returned strings differ from each other.
+  Red when: a talking producer with an empty stdout is given the DEAD PROBE string, so a broken
+  redirect and a dead command are one verdict and a green-looking zero means nothing; or two of the
+  three strings are equal, so a caller printing them cannot tell the states apart.
+- **AC6** — When a stub writes 500 lines to stderr and the arm extracts `read_stderr_tail` from
+  `tools/unattended/unattended.sh` the way AC1 extracts `run_bounded`
+  (`tools/unattended/unattended.test.sh:5348`), what it returns holds at most 20 of those lines,
+  names how many were dropped, and is at most 2000 bytes.
   Red when: the tail is unbounded, so one chatty producer fills a park row and a refusal nobody can
   read replaces the one that was readable.
   figure: 20 lines and 2000 bytes are PINNED literals declared in the driver beside
@@ -360,7 +410,7 @@ executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
   (raw id 21) at the review's bounded exit. The design takes option (a) of that record's fork and
   states why option (b) is refused; AC4 is the left-shift arm that record asks for, written against
   the real declared producer with a notice that is guaranteed present; the Edges block names the
-  four siblings that route the same call, of which units 15 and 28 owe a matching bullet.
+  four siblings that route the same call.
 - rev-1 · 2026-09-20 · §3 §4 · close-out of the same rev, folding the p1 verifier's three problems.
   The Rollout states why order 15 is shared rather than chosen: orders 1 to 38 are occupied, both new
   units land before unit 16, and check 12's edge arm grades an equal order as satisfied. §4's
@@ -372,6 +422,42 @@ executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
   the rule stated at `:4983`, so the sequence AC4 depends on rests on the harness's roster order
   alone, which the Rollout now says. §3 also drops an ordinal count of this pass's cross-edits,
   which no later reader can check.
+- rev-1 · 2026-09-20 · §2 · §3 · §4 · §5 · §6 · §9 · fold of the G7 round-1 spec audit
+  (`memory/builds/dDerivedDocket/reviews/2026-09-20-review-TOOL-dDerivedDocket-48-spec-audit-g7-round1.md`),
+  findings H2 (26), M1 (3), L2 (22) and L3 (23), all disposed FOLD by the orchestrator. H2: the
+  premise was false at HEAD. `tools/unattended/unattended.sh:185` SETS `RB_OUT` to the branch's
+  only diagnostic and returns before `RB_TOOK` is assigned at `:195`, so S1, §4 and AC1 now keep
+  that sentence byte-for-byte, empty the two NEW values and zero `RB_TOOK` instead; built as it
+  read before, a failed capture would have refused with an empty reason through `:1208`, `:3285`
+  and `:4974`. M1: AC5 named no subject and every caller this spec names reads `RB_OUT`, so S5 now
+  declares `derive_stream_verdict`, §4 names it as the verdict table's one reader, the Rollout says
+  why it is graded by direct call, and AC5 grades its three strings at this unit's commit; AC6 took
+  the same treatment for `read_stderr_tail`, which had the same unnamed subject. L2: §5's perf row
+  priced a SWAPPED `mktemp` as an extra one and one extra read where §4's design needs three, and
+  the spec never stated the teardown, which S1 now carries. L3: both siblings' reciprocals are live
+  at HEAD (`memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md:106` and
+  `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-28.md:97`), so the
+  owes-the-line clauses are struck from both Edges bullets and from the entry above. None of that
+  report's left-shift candidates is wired or cited here: only one of its eleven was ever run over
+  the tree, and none was run by this fold.
+  Extended by that fold's verifier, same base and rev · AC1 · one repair, which moves no
+  assertion. AC1's refusal arm was written to run after "a prior successful call has left `RB_TOOK`
+  non-zero", which the stub cannot deliver: `tools/unattended/unattended.sh:195` computes `RB_TOOK`
+  in whole seconds from `date +%s` and a one-line stub returns inside one, so the precondition was
+  met only when a call straddled a second boundary and the `RB_TOOK` reads 0 assertion otherwise
+  passed on a value the branch never touched. The arm now SEEDS a non-zero sentinel before the
+  refusing call, which is the same state deterministically. Two further items are reported to the
+  orchestrator rather than edited here, because both need a ruling: S4's driver-wide clause has no
+  observer left now that AC5 grades a helper instead of a caller, and AC5's never-answered string is
+  tied to a `gates-green` sentence that names the merge bar and `$GATE_CMD`. §10 gains the reuse
+  lookup the new helper owed, run for this repair on 2026-09-20; its result changes no decision.
+  Extended once more on the same pass, same base and rev · §3 Edges · the `hands-off` bullet to
+  `TOOL-dDerivedDocket-28` stopped citing that spec's own line number. A hand-off payload is read
+  against the TARGET's text, and a citation of the target's own lines can never occur there, so the
+  bullet now names what that unit carries in its words — the two-file capture its ledger WRAPS rather
+  than rewrites, and the pin that would otherwise read as forbidding the split. Every backticked
+  token left in the bullet occurs in that spec. The L3 reading the previous entry records is
+  unchanged: the reciprocal is live at HEAD, and only the way this bullet POINTS at it moved.
 
 ## 10. Reuse audit
 
@@ -385,6 +471,17 @@ the one `run_bounded` at `tools/unattended/unattended.sh:183`, its three callers
 and `:4968`, and the extraction idiom the kit's own bound arms already use at
 `tools/unattended/unattended.test.sh:5348`. No existing helper returns a bounded tail of a captured
 stream, so `read_stderr_tail` is new rather than an extension.
+
+`derive_stream_verdict` was looked up separately, after the G7 fold added it:
+`python tools/codebase-map/reuse_lookup.py "a helper maps an empty capture to one of three distinct
+verdict strings"` returned `derive_verdict` and `scan_verdicts` in
+`tools/process-monitor/classify.py:38` and `:52`, which classify a process row against a ceiling and
+a spin rate and share a name stem with this helper and nothing else, plus `derive_layer_verdict` in
+`tools/codebase-map/reuse_lookup.py`. It reports the same unscanned `.sh` layer, so it is blind to
+the driver here too. The discrimination this helper names exists today only inline, in the
+`gates-green` breach branch (`tools/unattended/unattended.sh:3289-3291`), so it is an extraction of
+one existing branch plus the row the verdict table adds, and not a second answer to a question some
+other helper already answers.
 
 Recall returned `TOOL-aReapedSpinner-17`, which measured a command substitution costing about 300s
 per capture against a file redirect and is the reason the file form is kept here, and

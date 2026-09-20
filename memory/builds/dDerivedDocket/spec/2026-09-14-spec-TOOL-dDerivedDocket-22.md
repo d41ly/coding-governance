@@ -209,6 +209,14 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   and the unattended-suite arms that unit added, which this unit's AC13 run executes first.
 - **consumes-from** `TOOL-dDerivedDocket-20` — the unattended-suite arms that unit added, which this
   unit's AC13 run executes first.
+- **consumes-from** `TOOL-dDerivedDocket-52` — the tenancy floor §4's first-commit dating applies to a
+  LIVE `RUN.md` in a folder that has already rotated, taken from that unit's close-out after it
+  measured three of this tree's live records dated to a previous run's preflight; and the boundary
+  that lets two rotation-aware first-commit readings share `tools/unattended/check-unattended.sh`.
+  That unit answers a SHA and refuses `--follow` for it, because a sha is re-derived from rather than
+  compared. This unit's dating at check 15's `LANDED_ANCHOR_CUTOFF` site answers a DATE, keeps
+  `--follow`, and states the direction of its own error, which is why the two rulings are not a
+  defect in each other. Without the split a reader who meets one of the two is routed to neither.
 - **hands-off** `TOOL-dDerivedDocket-28` — the in-place removal point, `--landed`'s successful
   observation, where that unit removes its ledger.
 
@@ -761,6 +769,13 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   `--follow --diff-filter=A` dating three of this tree's live records to a previous run's preflight.
   The rev is kept rather than bumped, because this spec already carries a 2026-09-20 entry and the
   pass extends it; the cross-edit's own wording is otherwise verbatim.
+  Extended once more on the same pass, same base and rev · §3 Edges · the reciprocal `consumes-from`
+  bullet for `TOOL-dDerivedDocket-52` is written. That unit has declared its `hands-off` since its own
+  close-out and this spec answered nothing, so check 12's edge arm graded a one-sided edge. The new
+  bullet states this unit's side in its own words: the tenancy floor §4 already took from that
+  close-out, and the DATE-versus-SHA boundary under which both first-commit readings live in
+  `tools/unattended/check-unattended.sh`. Its target sits at an EARLIER order, which is what a
+  consumes-from edge requires. No assertion moves and no criterion changes.
 
 ## 10. Reuse audit
 
