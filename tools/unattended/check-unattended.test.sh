@@ -3228,7 +3228,7 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)$|  p=$(fact "$rel" phase); w=$(fact "$rel" witness)|'
 out=$(run)
-hit "$out" "the phase fact is read outside the two readers"
+hit "$out" "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified"
 hit "$out" "reads the phase fact directly inside verb_status()"
 
 # ---- CHECK 32, arm two: the same read inside a function that also WRITES the phase. The exemption
@@ -3275,7 +3275,7 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate $KIT_REL/unattended.sh 's/ inherited-red"$/"/'
 out=$(run)
-hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor"
+hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it"
 
 # ---- ...and its two conf branches, which behave exactly as HALT_FLOOR's do: undeclared and
 # ---- malformed are both REFUSALS, because a pin that quietly defaults is a pin nobody set.
@@ -3283,13 +3283,13 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate .unattended.conf 's/^HOLD_FLOOR=.*/HOLD_FLOOR=""/'
 out=$(run)
-hit "$out" "HOLD_FLOOR is undeclared in .unattended.conf"
+hit "$out" "HOLD_FLOOR is undeclared in .unattended.conf, and with no floor a deleted hold code is indistinguishable from a vocabulary that never had one"
 
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate .unattended.conf 's/^HOLD_FLOOR=.*/HOLD_FLOOR="five"/'
 out=$(run)
-hit "$out" "HOLD_FLOOR is not a single integer"
+hit "$out" "HOLD_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
 
 # ---- The PHASE TAIL the gate-guard hook restates. HELD sits BEFORE VERIFYING, so the hook's own
 # ---- parity arm keeps reading the list it already spells and a run held from BUILDING is refused
@@ -3306,7 +3306,7 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 mutate $KIT_REL/unattended.sh 's|^  if \[ "$want" = HELD \]; then$|  if [ "$want" = NEVERAPHASE ]; then|'
 out=$(run)
-hit "$out" "a phase another verb PRODUCES is reachable through --phase"
+hit "$out" "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read"
 hit "$out" "HELD"
 
 # ---- ...and CHECK 33's CONTROL, for arm four's reason.
@@ -3314,6 +3314,24 @@ reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
 out=$(run)
 miss "$out" "a phase another verb PRODUCES is reachable through --phase"
+reset_tree
+
+
+# ---- the hold vocabulary's VACUITY arm: an empty core set makes the hold verb validate against
+# ---- nothing and record a pause under any word at all.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_CORE=.*/HOLD_CODES_CORE=""/'
+out=$(run)
+hit "$out" "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all"
+
+# ---- ...and check 32's own liveness refusal. A driver this leg cannot read is a population of no
+# ---- lines, and grading no lines is how a structural arm passes by finding nothing.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+rm -f $KIT_REL/unattended.sh
+out=$(run)
+hit "$out" "the driver is not where this leg reads it, so the phase-read routing below would be graded over no lines at all and would pass by finding nothing"
 reset_tree
 
 fi   # ---- end REGION TWO ----------------------------------------------------------------------

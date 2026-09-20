@@ -77,3 +77,10 @@ tools/unattended/unattended.sh	49	21	a sibling spec status header carries someth
 # `resolve_python` RUNS each candidate and cannot be made to fail from the suite's fixture
 # without hiding every python launcher from PATH, which the suite's own arms need on it.
 tools/unattended/unattended.sh	49	18	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
+# `--hold` reaches HEAD only after `check_clean` has passed, and `check_clean` counts UNTRACKED
+# paths - so a repository whose HEAD cannot resolve, which is one carrying no commit at all, has
+# already been refused for a dirty tree before this line runs. The guard stays because the
+# alternative is a HELD record carrying an empty witness, which `--status` then refuses with a
+# message about the wrong thing. Pinned rather than armed with a synthetic break, which proves the
+# mechanism for the synthetic value and not the real one. TOOL-dDerivedDocket-4.
+tools/unattended/unattended.sh	56	4	HEAD does not resolve on this node, so the hold has no witness to record and a witnessless pause is the claim an oracle skips

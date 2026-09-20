@@ -5739,20 +5739,20 @@ run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/d
 git add -A >/dev/null && git commit -q -m held --no-verify
 before=$(sum)
 out=$(run --hold tRun --code platform-limit --until owner --reason "y" --reaped k1)
-hit "$out" "the run is already HELD, and a second hold overwrites held-from with HELD"
+hit "$out" "the run is already HELD, and a second hold overwrites held-from with HELD — the one field --resume reads to find the way back, so the second hold destroys the first one's only exit; read --status, or --resume it"
 same "AC14 a second hold wrote nothing" "$(sum)" "$before"
 build_hold_fixture; before=$(sum)
 out=$(run --hold tRun --code platform-limit --until owner --reason "x")
-hit "$out" "--hold requires --reaped <id> or --keepalive-unreachable <node>"
+hit "$out" "--hold requires --reaped <id> or --keepalive-unreachable <node>, because a keepalive still firing into a HELD run re-dispatches its units at the next tick; the driver cannot reap a job in a session store it cannot see, and can only record that somebody did"
 same "AC14 a hold naming no keepalive disposition wrote nothing" "$(sum)" "$before"
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped kZ)
-hit "$out" "--reaped names an id that is not the keepalive this slug currently runs under"
+hit "$out" "--reaped names an id that is not the keepalive this slug currently runs under, so the job that keeps firing into this run is not the one that was stopped; the live id is"
 same "AC14 a hold naming the wrong reaped id wrote nothing" "$(sum)" "$before"
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 --keepalive-unreachable nodeX)
-hit "$out" "--hold takes --reaped or --keepalive-unreachable and never both"
+hit "$out" "--hold takes --reaped or --keepalive-unreachable and never both: one says the job was stopped and read back, the other says this node cannot reach the session holding it, and a record claiming both says neither"
 build_hold_fixture; write_published_conf; before=$(sum)
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
-hit "$out" "the remote ANSWERED and does not carry this branch tip"
+hit "$out" "the remote ANSWERED and does not carry this branch tip, so a hold here would park work that exists only on this node while the endpoint that could hold it is reachable; push the branch, then hold"
 same "AC14 a hold over an unpublished tip the remote could have received wrote nothing" "$(sum)" "$before"
 
 # ---- AC15: the ONE exception. `platform-unavailable` over a remote that does not ANSWER holds an
@@ -5761,7 +5761,7 @@ build_hold_fixture; write_published_conf
 git remote set-url origin "$ORIGIN_DIR/nope.git"
 before=$(sum)
 out=$(run --hold tRun --code host-degraded --until owner --reason "x" --reaped k1)
-hit "$out" "only a platform-unavailable hold may park an unpublished tip"
+hit "$out" "the remote did not answer, so whether this branch tip is published is UNKNOWN rather than yes, and only a platform-unavailable hold may park an unpublished tip — a sustained outage is the one stop whose own push fails too. This code is not that one"
 same "AC15 a non-excepted code over an unanswering remote wrote nothing" "$(sum)" "$before"
 UNPUB=$(git rev-parse HEAD)
 out=$(run --hold tRun --code platform-unavailable --until owner --reason "the endpoint is down" --reaped k1)
@@ -5781,10 +5781,10 @@ n=$((n+1)); printf '%s\n' "$out" | head -1 | grep -q "PUSH THIS FIRST" || { echo
 # ---- AC16: the code set and the condition grammar, both validated at --hold.
 build_hold_fixture; before=$(sum)
 out=$(run --hold tRun --code bogus --until owner --reason "x" --reaped k1)
-hit "$out" "--hold names a hold code that is not in the effective vocabulary"
+hit "$out" "--hold names a hold code that is not in the effective vocabulary, and the hold codes are a SECOND vocabulary beside the halt codes rather than an extension of them; declare it in HOLD_CODES_EXTRA or use one of these"
 same "AC16 a bogus code wrote nothing" "$(sum)" "$before"
 out=$(run --hold tRun --code platform-limit --until 'after tomorrow' --reason "x" --reaped k1)
-hit "$out" "--hold names a release condition outside the closed grammar"
+hit "$out" "--hold names a release condition outside the closed grammar, and an unvalidated condition reaches a resume scheduler's fire-instant computation as free prose; the grammar is after <YYYY-MM-DDTHH:MM:SSZ>, probe host|gate|api, or owner"
 same "AC16 an unvalidated condition wrote nothing" "$(sum)" "$before"
 printf 'HOLD_CODES_EXTRA="vendor-outage"\n' >> .unattended.conf
 git add -A >/dev/null && git commit -q -m extracode --no-verify
@@ -5810,7 +5810,7 @@ run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/d
 git add -A >/dev/null && git commit -q -m held --no-verify
 before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun)
-hit "$out" "a take-over is a change of driver and the new driver has to name itself"
+hit "$out" "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
 hit "$out" "unattended: tRun · phase HELD"
 same "AC21 a no-id take-over of a HELD record wrote nothing" "$(sum)" "$before"
 same "AC21 a no-id take-over of a HELD record left the lease alone" "$(read_lease_hash)" "$lb"
@@ -5819,7 +5819,7 @@ printf 'taken 2000-01-01T00:00:00Z keepalive kOld host h\nrefreshed 2000-01-01T0
 before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun)
 hit "$out" "presumed-stopped"
-hit "$out" "a take-over is a change of driver and the new driver has to name itself"
+hit "$out" "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
 same "AC21 a no-id resume over a stale lease wrote nothing" "$(sum)" "$before"
 same "AC21 a no-id resume over a stale lease left the lease alone" "$(read_lease_hash)" "$lb"
 
@@ -5830,15 +5830,15 @@ git add -A >/dev/null && git commit -q -m held --no-verify
 printf 'taken %s keepalive kOther host h\nrefreshed %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$LEASE"
 before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun --keepalive-id kC)
-hit "$out" "another session already resumed this held run and holds its lease"
+hit "$out" "another session already resumed this held run and holds its lease, so a second take-over would drive one slug from two sessions; the lease names its keepalive and when it was last refreshed"
 same "AC6 a take-over over a fresh lease wrote nothing" "$(sum)" "$before"
 same "AC6 a take-over over a fresh lease left the lease alone" "$(read_lease_hash)" "$lb"
 build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun --keepalive-id kB)
-hit "$out" "a live session drives this slug under a different keepalive"
+hit "$out" "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder; a holder replacing its own job says so with --replaces, and the lease's id is"
 same "AC6 a foreign-id resume over a fresh working lease wrote nothing" "$(sum)" "$before"
 out=$(run --resume tRun)
-hit "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop"
+hit "$out" "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write; a session whose own scheduler lists the keepalive the LEASE line names says so with --keepalive-id"
 hit "$out" "unattended: tRun · phase RUNNING"
 same "AC6 a no-id resume over a fresh working lease wrote nothing" "$(sum)" "$before"
 same "AC6 a no-id resume over a fresh working lease left the lease alone" "$(read_lease_hash)" "$lb"
@@ -5870,7 +5870,7 @@ out=$(run --resume tRun --keepalive-id kC)
 n=$((n+1)); grep -q '^keepalive: kC$' memory/builds/tRun/RUN.md || { echo "FAIL AC19 a leaseless take-over did not record the new keepalive"; st=1; }
 build_hold_fixture; rm -f "$LEASE"; before=$(sum)
 out=$(run --resume tRun --keepalive-id kC)
-hit "$out" "inside the staleness bound"
+hit "$out" "s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names and everyone else waits out the bound: pass --keepalive-id"
 same "AC19 a leaseless resume inside the bound wrote nothing" "$(sum)" "$before"
 
 # ---- AC22: the holder of a run that PREDATES the lease. Without this row every run in flight when
@@ -5883,7 +5883,7 @@ n=$((n+1)); grep -q '^taken .* keepalive k1 host ' "$LEASE" || { echo "FAIL AC22
 build_hold_fixture; rm -f "$LEASE"; before=$(sum)
 out=$(run --resume tRun --keepalive-id kB)
 hit "$out" "unattended: tRun · phase RUNNING"
-hit "$out" "inside the staleness bound"
+hit "$out" "s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names and everyone else waits out the bound: pass --keepalive-id"
 same "AC22 a second session's leaseless resume inside the bound wrote nothing" "$(sum)" "$before"
 n=$((n+1)); [ ! -f "$LEASE" ] || { echo "FAIL AC22 a refused leaseless resume created a lease"; st=1; }
 
@@ -5895,12 +5895,12 @@ n=$((n+1)); grep -q '^taken .* keepalive kB host ' "$LEASE" || { echo "FAIL AC20
 n=$((n+1)); grep -q '^keepalive: kB$' memory/builds/tRun/RUN.md || { echo "FAIL AC20 --replaces did not record the new id in the record"; st=1; }
 git add -A >/dev/null && git commit -q -m repl --no-verify
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
-hit "$out" "--reaped names an id that is not the keepalive this slug currently runs under"
+hit "$out" "--reaped names an id that is not the keepalive this slug currently runs under, so the job that keeps firing into this run is not the one that was stopped; the live id is"
 out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped kB)
 hit "$out" "phase HELD · code platform-limit"
 build_hold_fixture; before=$(sum); lb=$(read_lease_hash)
 out=$(run --resume tRun --keepalive-id kB --replaces kX)
-hit "$out" "--replaces names an id this slug's lease does not hold"
+hit "$out" "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is"
 same "AC20 a --replaces naming a foreign id wrote nothing" "$(sum)" "$before"
 same "AC20 a --replaces naming a foreign id left the lease alone" "$(read_lease_hash)" "$lb"
 
@@ -5911,20 +5911,20 @@ run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/d
 git add -A >/dev/null && git commit -q -m held --no-verify
 before=$(sum)
 out=$(run --landed tRun)
-hit "$out" "the run is HELD, and a paused run is left by --resume alone"
+hit "$out" "the run is HELD, and a paused run is left by --resume alone; a terminal written from here would end a run that stopped for a cause it did not choose and has not re-verified: --resume the slug first"
 same "AC5 --landed on a HELD record wrote nothing" "$(sum)" "$before"
 out=$(run --close tRun)
-hit "$out" "the run is HELD, so the Definition-of-Done set would be evaluated"
+hit "$out" "the run is HELD, so the Definition-of-Done set would be evaluated against a run that stopped part-way for a cause outside itself; --resume it first, and close it when the work it paused in the middle of is done"
 same "AC5 --close on a HELD record wrote nothing" "$(sum)" "$before"
 out=$(run --phase tRun BUILDING --witness deadbeef)
-hit "$out" "the run is HELD and a held run is left by --resume alone"
+hit "$out" "the run is HELD and a held run is left by --resume alone, which tests the release condition, re-verifies the authorization at the pinned BASE and takes the lease; a phase move out of HELD would skip all three: --resume the slug"
 same "AC5 --phase out of a HELD record wrote nothing" "$(sum)" "$before"
 
 # ---- AC13: HELD is PRODUCER-ONLY. One phase move into it would write the phase with none of the
 # ---- facts --hold writes beside it, and --resume would have nothing to read.
 build_hold_fixture; before=$(sum)
 out=$(run --phase tRun HELD --witness deadbeef)
-hit "$out" "HELD is written by --hold alone"
+hit "$out" "HELD is written by --hold alone, because the hold facts — the code, the release condition, the phase it was held from and the moment — are written with it, and a phase move into it would be that record with none of them"
 same "AC13 --phase into HELD wrote nothing" "$(sum)" "$before"
 
 # ---- AC3: the checkpoint composes NO gate verdict. The reason is quoted on its own line and the
@@ -5975,7 +5975,7 @@ same "AC10 a same-id re-preflight keeps the recorded keepalive" "$(sed -n 's/^ke
 git add -A >/dev/null && git commit -q -m rp --no-verify
 lb=$(read_lease_hash)
 out=$(run --preflight tRun --keepalive-id k2)
-hit "$out" "this run already records a keepalive and a re-preflight does not re-pin one"
+hit "$out" "this run already records a keepalive and a re-preflight does not re-pin one, because that id names the job whose reaping the close attests; a session taking this slug over says so through the verb whose matrix decides whether it holds it: --resume"
 hit "$out" "--resume"
 same "AC10 a different-id re-preflight keeps the recorded keepalive" "$(sed -n 's/^keepalive: //p' memory/builds/tRun/RUN.md)" "k1"
 same "AC10 a refused re-preflight left the lease byte-unchanged" "$(read_lease_hash)" "$lb"
@@ -5984,7 +5984,7 @@ run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1 >/d
 git add -A >/dev/null && git commit -q -m held --no-verify
 lb=$(read_lease_hash)
 out=$(run --preflight tRun --keepalive-id k1)
-hit "$out" "the run is HELD, and a re-preflight would re-pin a run that is paused"
+hit "$out" "the run is HELD, and a re-preflight would re-pin a run that is paused on a cause it has not re-verified; the verb that leaves HELD tests the release condition, re-checks the authorization at the pinned BASE and takes the lease: --resume"
 same "AC10 a preflight over a HELD record left the lease byte-unchanged" "$(read_lease_hash)" "$lb"
 
 # ---- AC24: the kit.toml `hold-floor` hole's own discharge command, RESOLVED from the descriptor
@@ -6015,6 +6015,79 @@ printf 'HOLD_FLOOR=5\n' >> "$HD/.unattended.conf"
 ( cd "$HD" && bash -c "${HP:-false}" ) >/dev/null 2>&1; rc=$?
 n=$((n+1)); [ "$rc" -eq 0 ] || { echo "FAIL AC24 the hold-floor probe refused a bare integer, which the directives-floor probe it copies admits"; st=1; }
 rm -rf "$HD"
+reset_tree
+
+
+# ---- --hold's ARGUMENT refusals, and the two record refusals below them. Each needle is the FULL
+# ---- literal run `check-arms.py` derives, not the clause a reader would stop at: an arm that stops
+# ---- at the last word of a sentence reads as unarmed and the meta-gate says so with no hint why.
+build_hold_fixture; before=$(sum)
+out=$(run --hold tNoSuchBuild --code platform-limit --until owner --reason "x" --reaped k1)
+hit "$out" "no run-state file, so there is no run to hold"
+out=$(run --hold tRun --until owner --reason "x" --reaped k1)
+hit "$out" "--hold requires --code, because a paused run that does not say why it paused is indistinguishable from one that stopped, and the code is the field the checkpoint and any resume scheduler both join on"
+out=$(run --hold tRun --code platform-limit --reason "x" --reaped k1)
+hit "$out" "--hold requires --until, because a pause with no release condition is a stop wearing a pause's name; the grammar is after <utc-instant>, probe host|gate|api, or owner"
+out=$(run --hold tRun --code platform-limit --until owner --reaped k1)
+hit "$out" "--hold requires --reason, because the code is what every machine reader joins on and the reason is the only sentence the owner gets in place of the turn nobody took"
+out=$(run --hold tRun --code platform-limit --until owner --reason "I would have reached for --no-verify" --reaped k1)
+hit "$out" "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar for as long as the hold lasts; say it without the literal flag"
+same "every --hold argument refusal wrote nothing" "$(sum)" "$before"
+
+build_hold_fixture
+sed -i '/^phase: /d' memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m nophase --no-verify
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
+hit "$out" "the run-state file declares no phase, so there is no phase to hold the run FROM, and --resume reads exactly that field to decide where the run goes back to"
+
+# ---- the published-tip clause's OTHER arm: a tip the remote cannot be asked about at all, which is
+# ---- a different refusal from one it answered about and must send the reader somewhere else.
+build_hold_fixture; write_published_conf
+git checkout -q --detach
+out=$(run --hold tRun --code platform-limit --until owner --reason "x" --reaped k1)
+hit "$out" "this run's branch tip cannot be confirmed on its remote, so a hold would record a witness nothing off this node can reach; the run is not on a named branch, or the advertised tip is one this clone does not have"
+git checkout -q unit
+
+# ---- a lease the node cannot WRITE. Staged by making the lease DIRECTORY a regular file, which is
+# ---- the one shape `mkdir -p` cannot repair, so the holder's own take-of-an-absent-lease refuses.
+build_hold_fixture; rm -f "$LEASE"
+rm -rf "$TMP/.git/unattended"; printf 'x' > "$TMP/.git/unattended"
+out=$(run --resume tRun --keepalive-id k1)
+hit "$out" "cannot write this slug's lease file, and an unwritten lease leaves the run readable as undriven by the next session that asks"
+rm -f "$TMP/.git/unattended"
+
+out=$(run --resume tNoSuchBuild --keepalive-id kC)
+hit "$out" "no run-state file, so there is no run to resume"
+
+# ---- a MALFORMED lease is its own state. Read as absent it would hand the slug to whoever asked
+# ---- next, which is the one outcome the file exists to prevent.
+build_hold_fixture
+printf 'this is not a lease at all\n' > "$LEASE"
+before=$(sum)
+out=$(run --resume tRun --keepalive-id kC)
+hit "$out" "this slug's lease file cannot be parsed, and a lease nothing can read must not be treated as an absent one, because absent is the state that ADMITS a take-over; repair or delete it by hand"
+same "a malformed lease wrote nothing" "$(sum)" "$before"
+
+# ---- THE TWO DEAD-CLOCK REFUSALS, staged with a `date` that answers nothing. A zero from a dead
+# ---- clock would read as released on one path and as written-just-now on the other, which is the
+# ---- reassuring-zero class this kit refuses by name; both say so instead.
+DSTUB=$(mktemp -d)
+printf '#!/bin/sh\nexit 1\n' > "$DSTUB/date"; chmod +x "$DSTUB/date"
+build_hold_fixture
+run --hold tRun --code platform-limit --until "after 2000-01-01T00:00:00Z" --reason "x" --reaped k1 >/dev/null
+git add -A >/dev/null && git commit -q -m held --no-verify
+out=$(PATH="$DSTUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id kC 2>&1)
+hit "$out" "the release condition cannot be evaluated on this node, because a clock probe it needs answered nothing, so whether the hold is over is unanswerable rather than no and a zero from a dead clock would read as released"
+build_hold_fixture; rm -f "$LEASE"
+out=$(PATH="$DSTUB:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id kC 2>&1)
+hit "$out" "this record has no lease and the age of the newest commit touching its build folder is unanswerable on this node, so whether its holder is gone cannot be decided and a take-over here would be a guess wearing a verdict's clothes"
+rm -rf "$DSTUB"
+
+# ---- --replaces names the job going OUT; --keepalive-id names the one coming IN. With only the
+# ---- first, the lease would be left naming a job that has been reaped.
+build_hold_fixture
+out=$(run --resume tRun --replaces k1)
+hit "$out" "--replaces says which job is being retired and --keepalive-id says which one takes it on, so a replacement with no new id would leave the lease naming a job that has been reaped: pass --keepalive-id"
 reset_tree
 
 fi   # ---- end REGION TWO ----------------------------------------------------------------------

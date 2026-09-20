@@ -108,3 +108,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-20T21:21:32Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-09-20T21:23:22Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason memory/builds/dDerivedDocket/README.md
+
+2026-09-20T21:37:36Z dispatch · item 315eb4bb TOOL-dDerivedDocket-4 · reason memory/project/unarmed-branches.txt
