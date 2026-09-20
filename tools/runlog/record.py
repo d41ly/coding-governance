@@ -18,6 +18,10 @@ code path. Its vocabularies are the model's own closed lists, held by reference,
 model cannot name two sets. Each section declares its fact lines as templates and its tables as column
 classes, with the timeline's columns classed per event kind. The `Data` block at the end is the
 markdown re-encoded as JSON: every fact and every shown row, so the two copies cannot disagree.
+Every slot that renders a TIME also declares which sources its value may be read from, and both of
+them are already public in git: NO COMMITTED TIME COMES FROM A JOURNAL OR A TRANSCRIPT (owner,
+2026-09-16). `check_time_sources` grades that declaration, and the leg refuses a rendered row whose
+own source is not one the slot declares.
 
 THE CAP IS REACHABLE FOR EVERY INPUT. Every section that grows is bounded: the timeline shows its first
 and last `TIMELINE_EDGE` rows, and every list aggregates by kind past `LIST_BOUND` rows. A record still
@@ -115,6 +119,18 @@ USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
 # two states for every source. `partial` is a lower bound and says so in Coverage; under any other
 # state the count is `-`.
 COUNTED_STATES = ("present", "partial")
+# THE ONLY SOURCES A COMMITTED TIME MAY BE READ FROM (spec S1 of TOOL-dLoggedFlight-20). Both are
+# already public in git — a commit's own committer time, and the time a row of the committed
+# run-state file carries — so a reader of the record learns no time `git log` on the public remote
+# does not already give them. No committed time comes from a journal or a transcript (owner,
+# 2026-09-16), and this constant is where that ruling is HELD instead of being restated per path:
+# `TOOL-dLoggedFlight-15` to `-19` each withheld the values of one path a review had found, and each
+# was followed by a round finding a path the rule had not enumerated. A SOURCE either is public or
+# is not, which is decidable per slot, so `RECORD_SCHEMA["sources"]` declares one non-empty set of
+# these per slot that renders a time, `check_time_sources` refuses a declaration naming anything
+# else, and the leg's `source` rule refuses a rendered row that names anything else.
+TIME_SOURCES = ("git", "run-state")
+_GIT, _RUN_STATE = frozenset(("git",)), frozenset(("run-state",))
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 RECORD_NAME_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-[A-Za-z0-9]+-[0-9]+)-"
                             + RECORD_TAG + r"-([0-9a-f]{8})\.md")
@@ -160,6 +176,11 @@ RECORD_SCHEMA = {
     "serves_kind": SERVES_KIND,
     "intro": INTRO,
     "none": NONE,
+    # THE CLASSES THAT CARRY A TIME (spec S1 of TOOL-dLoggedFlight-20). `sources` below declares
+    # where every slot of one of these may be filled from, and `scan_time_slots` reads those slots
+    # off this schema rather than from a list typed beside it, so a fact or column added here is
+    # declared or refused rather than quietly rendered.
+    "time_classes": ("utc", "duration"),
     "headings": ("Summary", "Timeline", "Units", "Decisions", "Conformance", "Anomalies", "Coverage",
                  "Data"),
     "shaped": {
@@ -333,6 +354,35 @@ RECORD_SCHEMA = {
         ("Coverage", "journal starts", 0): "driver",
         ("Coverage", "journal starts", 1): "driver",
         ("Coverage", "unjoined starts", 0): "driver",
+    },
+    # WHERE EACH RENDERED TIME MAY COME FROM (spec S1 of TOOL-dLoggedFlight-20), keyed exactly as
+    # `scan_time_slots` keys a slot: `(section, label, the nth time slot of the fact's template)`,
+    # `(section, table, row kind, column header)` where a layout classes its columns per kind, and
+    # `(section, table, column header)` for any other table. The value is a SET rather than one
+    # source because a slot can be filled from either: the Timeline's `elided` fact reads the UTC of
+    # the first and last row it omits, and that is a `commit` row or a `dispatch` row alike.
+    #
+    # Every entry here names a source `TIME_SOURCES` allows, and every slot the schema declares has
+    # an entry — there is no deliberately absent population, as there is for `count_sources`, since
+    # a time whose source nobody can name is the class this unit closes. `check_time_sources` grades
+    # both directions.
+    "sources": {
+        # The Summary window and its duration are `record_window`'s, every bound a commit's own
+        # committer time (TOOL-dLoggedFlight-24 S2), and the closing second a half-open end adds is
+        # taken back off before either is rendered.
+        ("Summary", "window", 0): _GIT,
+        ("Summary", "window", 1): _GIT,
+        ("Summary", "duration", 0): _GIT,
+        ("Timeline", "elided", 0): _GIT | _RUN_STATE,
+        ("Timeline", "elided", 1): _GIT | _RUN_STATE,
+        ("Timeline", "events", "phase", "UTC"): _RUN_STATE,
+        ("Timeline", "events", "commit", "UTC"): _GIT,
+        ("Timeline", "events", "merge", "UTC"): _GIT,
+        ("Timeline", "events", "dispatch", "UTC"): _RUN_STATE,
+        ("Timeline", "events", "brief", "UTC"): _RUN_STATE,
+        # A review round is a row of the committed run-state file, and that row's own time is what
+        # the record renders beside its verdict.
+        ("Decisions", "rounds", "UTC"): _RUN_STATE,
     },
     # SHAPES NO RECORD MAY CARRY ANYWHERE, whatever class a value passed (TOOL-dLoggedFlight-10 S5).
     # The renderer withholds a value one of these finds, and the schema leg refuses a record in whose
@@ -555,6 +605,76 @@ def check_count_sources(schema) -> list:
                         if (section, label) not in covered for nth in range(len(positions)))
     print("runlog: count_sources declares no source for %d {int} slot(s) outside its facts: %s"
           % (len(undeclared), ", ".join(undeclared) or "none"))
+    return out
+
+
+# --------------------------------------------------- no committed time comes from a journal
+
+def scan_time_slots(schema) -> dict:
+    """`{slot key: its class}` for every slot of `schema` that renders a value of a `time_classes`
+    class, read off the schema's own facts and tables.
+
+    Three key shapes, one per place a class is declared: `(section, label, nth)` for the nth time
+    placeholder of a fact's FIRST template, since a fact's alternative carries no value slot at all;
+    `(section, table, row kind, column header)` where a table classes its columns per row kind; and
+    `(section, table, column header)` for any other table. The three are distinguishable, and
+    `check_time_sources` prints one as its parts joined by `/`.
+
+    It holds no typed list of slots, which is the whole of this unit's change of shape (spec S1 of
+    TOOL-dLoggedFlight-20): the population IS the schema, so a time slot added to it cannot be
+    outside the population a withholding rule ran over, which is how each of five earlier rules
+    leaked through a path the next audit round found.
+    """
+    classes = frozenset(schema.get("time_classes") or ())
+    out = {}
+    for section, spec in schema["sections"].items():
+        for label, templates in spec["facts"]:
+            nth = 0
+            for cls in (PLACEHOLDER_RE.split(templates[0])[1::2] if templates else []):
+                if cls in classes:
+                    out[(section, label, nth)] = cls
+                    nth += 1
+        for table in spec["tables"]:
+            header = table["header"]
+            if "rows" in table:
+                for kind, cols in table["rows"].items():
+                    out.update({(section, table["name"], kind, head): cls
+                                for cls, head in zip(cols, header) if cls in classes})
+            else:
+                out.update({(section, table["name"], head): cls
+                            for cls, head in zip(table["cols"], header) if cls in classes})
+    return out
+
+
+def check_time_sources(schema) -> list:
+    """Every refusal `schema["sources"]` earns, one line each naming the slot, empty for a clean
+    declaration.
+
+    Refused: a slot `scan_time_slots` returns with no entry, so a fact or a column added to the
+    schema reds until somebody says where its value comes from; an entry naming a source outside
+    `TIME_SOURCES`, which is what a journal- or transcript-timed slot would have to be declared as;
+    and an entry keyed to no slot, which is a declaration the slot it described has left behind.
+
+    WHAT THIS DOES NOT CHECK: that a declared source is the one the value really comes from. Nothing
+    here reads the renderer or a model, so a slot declared `git` whose value the renderer takes off
+    the run-state file passes. The leg's `source` rule grades that where a rendered row states its
+    own source, and `TOOL-dLoggedFlight-23`'s population arm reads the rendered text.
+    """
+    slots = scan_time_slots(schema)
+    sources = schema.get("sources") or {}
+    out = []
+    for key in sorted(slots, key=str):
+        name = "/".join(str(part) for part in key)
+        declared = sources.get(key)
+        if not declared:
+            out.append(f"sources: {name} renders a {slots[key]} and declares no source")
+            continue
+        bad = sorted(s for s in declared if s not in TIME_SOURCES)
+        if bad:
+            out.append(f"sources: {name} names the source {', '.join(repr(s) for s in bad)}, which a "
+                       "committed time may not be read from")
+    out += [f"sources: {'/'.join(str(part) for part in key)} is no time slot the schema declares"
+            for key in sorted(sources, key=str) if key not in slots]
     return out
 
 
@@ -1161,8 +1281,12 @@ def check_commitment(root, record_path, journal_root, memory_root=None) -> tuple
 
 # THE LEG'S RULES (TOOL-dLoggedFlight-10 S2), a closed list: every refusal of a record names one. The
 # first eight are the spec's list; `line`, `name` and `unreadable` are what a closed grammar implies.
+# `source` is TOOL-dLoggedFlight-20 S7's: a row that renders a time beside a source `sources` does not
+# declare that time may come from. It is its OWN rule and not `cell` because the row's source passed
+# its class — `driver` is a source the model has — and a refusal naming `cell` would send a reader
+# looking for a value outside a vocabulary rather than for a time a journal produced.
 RECORD_RULES = ("headings", "first-cell", "cell", "absolute-path", "uuid", "data", "size", "serves", "line",
-                "name", "unreadable")
+                "name", "unreadable", "source")
 # A build's runs are refused under these, and the leg's own liveness assertions under the last two.
 RUN_RULES = ("run-start", "run-window")
 LIVENESS_RULES = ("root", "glob")
@@ -1245,9 +1369,21 @@ def check_fact_value(checks, templates, text) -> bool:
     return False
 
 
-def check_table_row(ln, cells, table, checks) -> list:
+def check_table_row(ln, section, cells, table, checks) -> list:
     """Every refusal ONE table row earns: its first cell's shape, then each cell against its column's
-    class, the timeline's columns classed by the event kind its key column names."""
+    class, the timeline's columns classed by the event kind its key column names, and the SOURCE RULE
+    over any column of a time class (spec S7 of TOOL-dLoggedFlight-20).
+
+    The source rule: a row that renders a time and states its own source states one
+    `RECORD_SCHEMA["sources"]` declares that slot may be filled from, so a row a journal or a
+    transcript timed is refused for its source rather than for a layout somebody could restore. A
+    `-` where a time is rendered fails it too: an unattributed time is the class itself, not an
+    absent value.
+
+    WHAT THE SOURCE RULE DOES NOT CHECK: a time in a table with no `source` column — the Decisions
+    rounds — and every fact's time, neither of which states a source in the record's bytes at all.
+    `check_time_sources` grades those on the declaration, and this rule cannot reach them.
+    """
     header = table["header"]
     if len(cells) != len(header):
         return [(ln, "cell", f"{len(cells)} cells under the {len(header)}-column `{table['name']}` header")]
@@ -1265,6 +1401,17 @@ def check_table_row(ln, cells, table, checks) -> list:
     for col, (cls, cell) in enumerate(zip(classes, cells)):
         if not check_cell(checks, cls, cell):
             out.append((ln, "cell", f"column `{header[col]}` holds a value outside the `{cls}` class"))
+    at = next((i for i, cls in enumerate(classes) if cls == "source"), None)
+    if at is None or at >= len(cells):
+        return out
+    key = (section, table["name"]) + ((cells[table["key"]],) if "rows" in table else ())
+    declared = RECORD_SCHEMA.get("sources") or {}
+    for col, (cls, cell) in enumerate(zip(classes, cells)):
+        if cls in RECORD_SCHEMA["time_classes"] and cell != NONE \
+                and cells[at] not in (declared.get(key + (header[col],)) or ()):
+            out.append((ln, "source", f"column `{header[col]}` renders a time beside the source "
+                                      f"`{cells[at]}`, which the schema does not declare that slot "
+                                      "may be filled from"))
     return out
 
 
@@ -1380,7 +1527,7 @@ def check_record_data(json_lines, fence_ln, checks) -> list:
                     out.append((at, "data", f"a row of table `{decl['name']}` is not a list of strings"))
                     continue
                 out += check_table_row(resolve_line(json.dumps(row, ensure_ascii=False, separators=(",", ":"))),
-                                       row, decl, checks)
+                                       name, row, decl, checks)
     return out
 
 
@@ -1446,7 +1593,7 @@ def check_record_lines(lines, checks, slug, own_ids) -> list:
             if not (line.startswith("| ") and line.endswith(" |")):
                 out.append((ln, "line", "a table row not framed `| … |`"))
                 continue
-            out += check_table_row(ln, line[2:-2].split(" | "), table["decl"], checks)
+            out += check_table_row(ln, sec, line[2:-2].split(" | "), table["decl"], checks)
             continue
         if line.startswith("- "):
             label, sep, value = line[2:].partition(": ")

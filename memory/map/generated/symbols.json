@@ -1393,6 +1393,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_time_sources",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "check_token_under",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -5518,6 +5523,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_skill_time_routing",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "scan_slot_budget",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -5536,6 +5546,11 @@
       "id": "scan_template_pairs",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_time_slots",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "scan_tracked_specs",
@@ -6863,6 +6878,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_record_ac1_time_sources",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_record_ac1_withheld_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -7139,6 +7159,11 @@
     },
     {
       "id": "test_skill_ac4_safety",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_skill_ac7_time_routing",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

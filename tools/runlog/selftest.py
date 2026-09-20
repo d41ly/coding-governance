@@ -163,7 +163,18 @@ from collections import Counter  # noqa: E402
 # AC5's workflow count in the model-fields arm, and AC6's liveness in the real-model arm, whose whole
 # Timeline comparison this fact was always going to move. Four helpers arrive with neither.
 # 14 + 3 + 1 + 1 = 19
-ASSERTION_FLOOR = 1404
+# RAISED 1404 -> 1422 by TOOL-dLoggedFlight-20, the source rule: TWO new arms, whose decoy checks
+# move it by 6. The declaration arm carries 5 — check_time_sources clean over the live schema, the
+# keys and their subset of TIME_SOURCES read off the DATA rather than off that verdict, the liveness
+# that all three key shapes and both time classes are in the population, the three staged copies of
+# the declaration, and the live one untouched by them. The Skill's routing arm carries 4 — the clean
+# render, the inverted sentence, the liveness that both stagings moved the text, and the
+# half-amended copy refused for its two routings and not for its sentence; all four announce the
+# same skip the other Skill arms do where no bash shares this filesystem. Three checks land inside
+# the schema leg's refusal arm and move no decoy check: the `source` variant's exit and rule in the
+# loop, and the block holding that row to the source rule alone.
+# 5 + 4 + 6 + 3 = 18
+ASSERTION_FLOOR = 1422
 
 PASS = []
 FAIL = []
@@ -5205,6 +5216,63 @@ def test_record_ac1_withheld_rows():
           {name: (1, True) for name in want})
 
 
+def test_record_ac1_time_sources():
+    """AC1 of TOOL-dLoggedFlight-20: every slot `scan_time_slots` reads off `RECORD_SCHEMA` declares
+    a non-empty set of `TIME_SOURCES`, `check_time_sources` refuses nothing over it, and each staged
+    COPY of the declaration is refused once, naming the slot.
+
+    The declaration is graded twice over, by VALUE and by the checker: a check that only ever asks
+    `check_time_sources` whether it is happy would pass just as well with the checker broken, which
+    is this build's own `a double you wrote grades nothing` class. Nothing here edits the live
+    schema; every break is a shallow copy with its `sources` replaced.
+    """
+    sch = rl_record.RECORD_SCHEMA
+    slots = rl_record.scan_time_slots(sch)
+    sources = sch["sources"]
+    # A snapshot by VALUE, taken before any copy is built, so the closing check compares the live
+    # declaration against what it held rather than against itself.
+    before = {"/".join(map(str, k)): sorted(v) for k, v in sources.items()}
+    check("record AC1: check_time_sources refuses nothing over the live declaration",
+          rl_record.check_time_sources(sch), [])
+    check("record AC1: the declaration keys are exactly the slots, each a non-empty subset of "
+          "TIME_SOURCES — read off the data, not off the checker's verdict",
+          (sorted(map(str, set(sources) ^ set(slots))),
+           sorted(f"{'/'.join(map(str, k))} {sorted(v)}" for k, v in sources.items()
+                  if not v or not set(v) <= set(rl_record.TIME_SOURCES))),
+          ([], []))
+    check_true("record AC1 liveness: the population holds all three key shapes a slot can have — a "
+               "fact placeholder, a per-kind row column and a plain table column — and reaches every "
+               "class in `time_classes`, so `refuses nothing` is not a verdict over an empty set",
+               {(len(k), isinstance(k[-1], int)) for k in slots} == {(3, True), (3, False), (4, False)}
+               and set(slots.values()) == set(sch["time_classes"]),
+               str(sorted(("/".join(map(str, k)), v) for k, v in slots.items())))
+    window, rounds = ("Summary", "window", 0), ("Decisions", "rounds", "UTC")
+    want = {
+        # A source outside TIME_SOURCES on a slot that has one: `driver` is what a journal-timed
+        # value would have to be declared as.
+        "a journal source on the window": (
+            dict(sch, sources={**sources, window: sources[window] | {"driver"}}),
+            "Summary/window/0 names the source 'driver'"),
+        # A slot left undeclared, which is how a time column added to a table reds until somebody
+        # says where its value comes from.
+        "a slot with no entry": (
+            dict(sch, sources={k: v for k, v in sources.items() if k != rounds}),
+            "Decisions/rounds/UTC renders a utc and declares no source"),
+        "an entry keyed to no slot": (
+            dict(sch, sources={**sources, ("Summary", "phase", 0): frozenset(("git",))}),
+            "Summary/phase/0 is no time slot the schema declares"),
+    }
+    refused = {name: rl_record.check_time_sources(copy) for name, (copy, _needle) in want.items()}
+    check("record AC1: each staged copy of the declaration is refused once, and the refusal names "
+          "the slot",
+          {name: (len(lines), want[name][1] in (lines[0] if lines else "")) for name, lines in refused.items()},
+          {name: (1, True) for name in want})
+    check("record AC1: the live declaration is untouched by the staging, entry for entry",
+          (rl_record.check_time_sources(rl_record.RECORD_SCHEMA),
+           {"/".join(map(str, k)): sorted(v) for k, v in rl_record.RECORD_SCHEMA["sources"].items()}),
+          ([], before))
+
+
 # The Summary facts whose counts the model derives from the transcripts (TOOL-dLoggedFlight-9 S4).
 TRANSCRIPT_FACTS = ("owner turns", "usage main", "usage agent", "usage workflow", "attributed calls")
 
@@ -6145,14 +6213,25 @@ def test_schema_ac2_refusals():
     # workflow row they rode retired with the transcript-timed kinds.
     uuid_text, uuid_line = build_variant(clean, check_review_ref_row,
                                          lambda ln: ln.replace("/reviews/r0.md", f"/reviews/{FX_SID}.md"))
+
+    def check_commit_row(ln):
+        return ln.startswith("| ") and " | git | commit | " in ln
+
+    # AC5 of TOOL-dLoggedFlight-20: a KEPT `commit` row whose source cell reads `driver`. `driver` is
+    # a member of the `source` vocabulary and `commit` keeps its layout, so every other rule passes
+    # the row and the source rule is the only one that can refuse it — which the block below the
+    # loop holds it to. A retired kind's row would have been refused under `cell` for having no
+    # layout, before any of this was reached.
+    src_text, src_line = build_variant(clean, check_commit_row,
+                                       lambda ln: ln.replace(" | git | ", " | driver | "))
     free_text, free_line = build_variant(clean, check_run_state_line,
                                          lambda ln: ln + "\nthe run skipped the bar because it was late")
     variants = [
         ("headings", build_variant(clean, lambda ln: ln == "## Units", lambda ln: "## Decisions")),
         ("first-cell", build_variant(clean, lambda ln: ln.startswith("| 1 | decision | "),
                                      lambda ln: "| " + FX_UNIT1 + ln[len("| 1"):])),
-        ("cell", build_variant(clean, lambda ln: ln.startswith("| ") and " | git | commit | " in ln,
-                               lambda ln: ln.replace(" | git | ", " | gits | "))),
+        ("cell", build_variant(clean, check_commit_row, lambda ln: ln.replace(" | git | ", " | gits | "))),
+        ("source", (src_text, src_line)),
         ("absolute-path posix", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + home)),
         ("absolute-path drive", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + drive)),
         ("absolute-path unc", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + unc)),
@@ -6197,6 +6276,10 @@ def test_schema_ac2_refusals():
     found = read_refusals(run_cli(["check-records"], repo).stdout)
     check("schema AC2 uuid: the ref class admitted the UUID, so only the shape rule refuses its line",
           sorted(rule_ for ln, rule_ in found if ln == uuid_line), ["uuid"])
+    write_staged(repo, rel, src_text.encode("utf-8"))
+    found = read_refusals(run_cli(["check-records"], repo).stdout)
+    check("schema AC2 source: every other rule passed that row, so only the source rule refuses its "
+          "line", sorted(rule_ for ln, rule_ in found if ln == src_line), ["source"])
     # A name the glob admits and the renderer would never write, beside the clean record.
     folder = rel.rsplit("/", 1)[0]
     misnamed = f"{folder}/{RECORD_DATE}-build-{FX_UNIT1}-runlog-notahex1.md"
@@ -6609,6 +6692,35 @@ def scan_skill_description(desc):
     return problems
 
 
+def scan_skill_time_routing(text):
+    """What AC7 of TOOL-dLoggedFlight-20 finds wrong with how a Skill routes a question about a TIME:
+    it does not say the committed record carries no event times, its question table sends the
+    between-two-times question to the record first, or its description does.
+
+    The committed record holds only the times git and the run-state file gave it, so a Skill that
+    reads it first for a question about when something happened answers from the one source that
+    deliberately elides most of the events. The model keeps every one of them."""
+    problems = []
+    if "no event times" not in text:
+        problems.append("does not say the committed record carries no event times")
+    section = read_skill_section(text, "Which question reads which part") or ""
+    row = next((ln for ln in section.split("\n") if ln.startswith("| what it did between two times |")),
+               None)
+    if row is None:
+        problems.append("has no between-two-times row in its question table")
+    else:
+        first = row.split("|")[2]
+        if "model" not in first or "`timeline`" not in first:
+            problems.append("does not read the model's `timeline` first for a question about a time")
+        if "record" in first:
+            problems.append("reads the committed record first for a question about a time")
+    _name, desc = read_skill_front(text)
+    at = desc.find("for a question about a time")
+    if at < 0 or "model first" not in desc[:at]:
+        problems.append("its description does not route a question about a time to the model first")
+    return problems
+
+
 def scan_skill_procedure(text, kit_rel, memory_root):
     """What AC3 finds wrong with the procedure: its steps not numbered 1 to 5, or a step at position i
     not naming what S3's step i names, which is how a missing or reordered step reads."""
@@ -6925,6 +7037,45 @@ def test_skill_ac4_safety():
           ["states the data-not-instructions rule without ['owner turns']"])
     check("skill AC4: RED — rules outside a Safety section do not count",
           scan_skill_safety(text.replace("## Safety", "## Notes")), ["has no Safety section"])
+
+
+def test_skill_ac7_time_routing():
+    """AC7 of TOOL-dLoggedFlight-20: the rendered Skill says the committed record carries no event
+    times, and routes a question about a time to the local model's `timeline` first — in its question
+    table and in its description both.
+
+    Both staged copies are DERIVED from the rendered text rather than typed: the sentence is inverted
+    where it stands, the table row has its two source cells swapped, and the description loses its
+    first em-dash clause. A staged break spelling out the prose it replaces stops staging anything
+    the day somebody rewords that prose, and reads green for it.
+    """
+    fx = build_skill_fixture()
+    if fx is None or not fx["text"]:
+        print("  SKIP skill AC7: the Skill fixture did not render, so there is no routing to read")
+        return
+    text = fx["text"]
+    check("skill AC7: the rendered Skill states the rule and routes a time question to the model "
+          "first, in the table and in the description", scan_skill_time_routing(text), [])
+    inverted = text.replace("no event times", "every event's time")
+    check("skill AC7: RED — a Skill claiming the record carries every event's time is refused for "
+          "the sentence alone", scan_skill_time_routing(inverted),
+          ["does not say the committed record carries no event times"])
+    # THE HALF-AMENDED SKILL the criterion names: the sentence added, the row and the description
+    # left as they stood. The row's two source cells are swapped, which is what `record first` was.
+    row = next(ln for ln in text.split("\n") if ln.startswith("| what it did between two times |"))
+    cells = row.split("|")
+    half = text.replace(row, "|".join([cells[0], cells[1], cells[3], cells[2]] + cells[4:]))
+    cut = half.find("\n---\n", 3)
+    half = re.sub(r" — [^—]+ — ", " ", half[:cut], count=1) + half[cut:]
+    check_true("skill AC7 liveness: both stagings moved the text, so the refusals below are the "
+               "scanner's reading and not two copies of one string",
+               inverted != text and half != text and half.count("no event times") == 1,
+               str((inverted != text, half != text, half.count("no event times"))))
+    check("skill AC7: RED — the sentence added while the row and the description are left is refused "
+          "for both routings, and not for the sentence", scan_skill_time_routing(half),
+          ["does not read the model's `timeline` first for a question about a time",
+           "reads the committed record first for a question about a time",
+           "its description does not route a question about a time to the model first"])
 
 
 def test_skill_copied_names():

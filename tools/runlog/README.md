@@ -336,6 +336,18 @@ rows. Both lists are the constants' own, in `record.py`, and not restated here.
 Anomalies carry no time and Coverage no `epoch` for the same reason. The local model keeps every one
 of them, which is what the Skill answers from. Owner turns stay counts per position, as always.
 
+**The rule is held per SOURCE, not per path.** `RECORD_SCHEMA["sources"]` declares, for every slot
+that renders a time — each placeholder of a `time_classes` class, each Timeline row layout's column
+and each column of any other table — the non-empty set of `TIME_SOURCES` its value may be read from,
+and `scan_time_slots` reads that population off the schema itself rather than off a list beside it.
+A slot's value is a SET because one slot can be filled from either source: the `elided` fact reads
+the UTC of the first and last row it omits, and that is a `commit` row or a `dispatch` row alike.
+`check_time_sources` refuses a slot with no entry, a source outside `TIME_SOURCES` and an entry keyed
+to no slot, so a fact or a column added to the schema reds until somebody says where its value comes
+from. The schema leg's `source` rule is the other half, over the rendered bytes. Five earlier rules
+withheld the values of one path each, and each was followed by an audit round finding a path it had
+not enumerated; a source either is already public in git or is not, which is decidable per slot.
+
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
 duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under
 the build's own folder. The vocabularies are closed lists, the model's own wherever it owns one. A
@@ -388,9 +400,13 @@ renderer that honours the schema proves nothing about a record edited afterwards
 tracked `<memory root>/builds/*/build/*-runlog-*.md` from the INDEX and grades its bytes against
 `RECORD_SCHEMA`, compiling the schema's data itself rather than calling the renderer. It checks the fixed
 head and its `**Serves:**` ids, the eight headings in order, each section's declared facts against
-their templates and its declared tables against their column classes, and the Data twin's keys and
-values. A forbidden shape refuses the record wherever it sits. Each refusal names the record, the line
-and one rule from `RECORD_RULES`.
+their templates, its declared tables against their column classes, and the Data twin's keys and
+values. A row that renders a time AND states its own source is held to `sources` under the `source`
+rule: a row a journal timed is refused for naming that journal, not for a layout somebody could
+restore. A time in a table with no source column, and every fact's time, state no source in the
+record's bytes at all — `check_time_sources` grades those on the declaration and the leg cannot
+reach them. A forbidden shape refuses the record wherever it sits. Each refusal names the record, the
+line and one rule from `RECORD_RULES`.
 
 It also derives every tracked run's start with `derive_run_starts`, and its window through the model's
 own `derive_record_commits` and `derive_window`, from git alone. It refuses a build whose runs share a

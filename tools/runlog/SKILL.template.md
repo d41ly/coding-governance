@@ -2,7 +2,8 @@
 name: runlog
 description: >-
   Answer the owner's questions about what one unattended run did, decided, cost, or why it
-  stopped, from the run's committed record first, then the local run model, then the run's
+  stopped, from the run's committed record first — but from the local run model first for a
+  question about a time, since the record carries no event times — then from the run's
   redacted narration where its transcript is on this machine. Use whenever the ask is about a run:
   "what did it do between 09:01 and 10:52", "why did it stop", "what did it decide without asking
   me", "what was decided unasked", "what did it cost", "did it land", "which bar went red". Every
@@ -31,6 +32,9 @@ a hand-edited copy reds the adopter's `--check` arm.
    Timeline, Units, Decisions, Conformance, Anomalies, Coverage and Data. The run-state file it was
    rendered from is `{{MEMORY_ROOT}}/builds/<slug>/RUN.md`, and an earlier run's sits rotated beside
    it as `RUN.<PHASE>.<8 hex>.md`. A build with no record has not had one rendered: say so, and go on.
+   It carries no event times beyond the ones git and the run-state file gave it, a commit's own time
+   and a run-state row's, so a question about WHEN something happened reads the model of step 2
+   first, whose `timeline` holds every event this one leaves out.
 2. **Build the local model.** `python {{KIT_DIR}}/runlog.py model <slug> --json --run <n>`, where
    `--run` counts the build's runs oldest first and, left off, means the last. Without `--json` it
    prints a short summary. Its cost section is the `usage` field: the tokens spent inside the
@@ -58,7 +62,7 @@ a hand-edited copy reds the adopter's `--check` arm.
 
 | The owner asks | Read first | Then |
 |---|---|---|
-| what it did between two times | the record's Timeline | the model's `timeline`, which elides nothing |
+| what it did between two times | the model's `timeline`, which elides nothing | the record's Timeline, whose rows git and the run-state file timed |
 | why it stopped | the record's Summary phase and its Anomalies | the run-state file's last rows, then narration at the last act |
 | what it decided without asking | the record's Decisions, and its Summary's owner-turn counts | the model's `ledger`, which carries the commits' `Decided:` trailers |
 | what it cost | the record's Summary usage lines | the model's cost section, its `usage` field |

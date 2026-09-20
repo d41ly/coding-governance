@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 27
+**Status:** CLOSED · rev-4 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -48,9 +48,14 @@ leg's source rule, the Skill's routing and the class record.
 - **S5** Moved to `TOOL-dLoggedFlight-22` S3. NOT OBSERVED here: that unit's AC3 observes it.
 - **S6** Moved to `TOOL-dLoggedFlight-23` S1 to S5. NOT OBSERVED here: that unit's AC1 to AC4 observe
   it.
-- **S7** The schema leg. `check-records` refuses a committed record whose Timeline row has a source
-  other than `git` or `run-state`, or whose layout carries a time column `TOOL-dLoggedFlight-22` S2
-  removed, naming the record, the line and the rule. Observed by AC5.
+- **S7** The schema leg. `check-records` refuses, under a rule of its own in `RECORD_RULES` named
+  `source`, a committed record whose Timeline row renders a time beside a source `sources` does not
+  declare that slot may be filled from, naming the record, the line and that rule. A row that renders
+  a time with its source cell `-` is refused too: an unattributed time is the class itself. The rule
+  reaches a row that STATES a source; a fact's time and the Decisions `rounds` column state none in
+  the record's bytes, and `check_time_sources` is what binds those. The clause about a layout
+  carrying a time column `TOOL-dLoggedFlight-22` S2 removed is DISCHARGED, not implemented — rev-4's
+  section 9 says by what. Observed by AC5.
 - **S8** The Skill. `tools/runlog/SKILL.template.md` says the committed record carries no event times.
   Its question table's row for what a run did between two times reads first from the local `model`
   timeline (`SKILL.template.md:61`). Its `description` (`SKILL.template.md:4-7`) no longer sends a
@@ -162,7 +167,8 @@ remote, and that is why they are the kept sources.
 
 `runlog selftest` · `runlog record schema` · `runlog skill wiring` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC1's two schema copies and AC7's half-amended Skill · floor raised by the arm count
+New arms: `tools/runlog/selftest.py` · AC1's three schema copies and AC7's half-amended Skill, plus
+AC5's `source` variant inside the schema leg's own refusal arm · floor raised to 1422 by 18
 
 ## 8. Open questions
 
@@ -191,6 +197,22 @@ none
   `TOOL-dLoggedFlight-25`, `-26` and `-27` are inserted before it. Because this rev moved by a review
   that did not audit this unit, the spec is unreviewed again under BUILD-METHOD M4. S3's pointer names
   where the provenance facts went once `TOOL-dLoggedFlight-25` took them from unit 24.
+
+- rev-4 · 2026-09-20 · S7 · §7 · the build pass, written before the code it changes. THE SECOND
+  CLAUSE OF S7 IS DISCHARGED BY WHAT UNITS 22 AND 20 ALREADY LAND, and writing a third rule for it
+  would be a second answer to one question. A record whose Anomalies or Coverage table carries a time
+  column `TOOL-dLoggedFlight-22` S2 removed does not match any header that section declares, so
+  `check_record_lines` refuses it at the header line under `cell` before a row is read
+  (`tools/runlog/record.py` at `6f481d31`, the `a table header section … declares no table for`
+  branch); and a time column RE-ADDED to the schema is a slot `scan_time_slots` returns with no
+  entry, which `check_time_sources` refuses by AC1. This is rev-3's own finding one step on: that rev
+  moved AC5's fixture off a `verb` row for the same reason, a retired layout being refused under
+  `cell` before any class check. So the source rule is written once, over the Timeline rows that
+  state a source, and S7 now says what it does not reach. §7's new-arm line: AC1 stages THREE copies
+  of the declaration rather than two, the third an entry keyed to no slot, since the checker refuses
+  three things; AC5's arm is a variant inside `test_schema_ac2_refusals`, because that arm holds
+  `RECORD_RULES` in both directions and a new rule nobody staged would red it; the floor moves by 18,
+  to 1422.
 
 ## 10. Reuse audit
 

@@ -47,27 +47,32 @@ is local.
 
 ## The fix
 
-Three parts, and the first is the one that holds.
+Three parts. The first keeps the derivation honest; the second is the one that closed the class.
 
 - **Keep the derivation away from the withheld value.** `tools/runlog/model.py` builds the gap
   sequence from no owner turn, and keeps out, and counts, any gap with an owner turn inside it or
   within one idle threshold of either end.
-- **Grade the rendered TEXT, not the inputs.** `tools/runlog/record.py` refuses the whole record
-  when any UTC it would write, or any idle row's start plus its duration, or the second after that
-  sum, falls in an owner turn's second. It reads the text the render produced, not the model's gaps,
-  so a model that regressed is still caught. The second-after comparison matters: a start and a
-  duration each truncated to the second can put their sum a second BEFORE the true end, which an
-  equality test misses.
+- **Withhold the SOURCE, not the value.** Grading the rendered values was the second part for five
+  revisions, and each one ran over a narrower population than the leak: an idle gap's end, a stale
+  extract, a killed verb's END, a compaction row, the commitment's last line. Each fix closed the
+  path it was shown and the next audit round found one it had not enumerated. The rule that holds
+  names the SOURCES a published value may be read from — for the runlog record, `git` and the
+  committed run-state file, both already public — and refuses every other, whatever the value. A
+  source either is public or is not, which is decidable per slot, so there is no population left to
+  enumerate. `tools/runlog/record.py` declares one set of sources per slot that renders a time and
+  `check_time_sources` grades that declaration; the schema leg holds a rendered row to it; and
+  `TOOL-dLoggedFlight-23`'s population arm reads every time-bearing token a render writes.
 - **Strike the residue.** A README line accepting half the leak is not a disclosure. It is an
   unratified amendment to the spec.
 
 Gated by the runlog kit's self-test, whose idle arms build their session from a transcript through
 the real extractor, so an owner turn is followed by its reply the way the harness writes one. Each
-part above was seen RED with its own break staged.
+part above was seen RED with its own break staged: the source rule over three staged copies of the
+declaration and over a rendered row whose source cell reads `driver`.
 
 ## What this does NOT say
 
 It does not say every derived value must be withheld. Commit times are public through git whatever
-the record says, and a coincidence between one and an owner turn's second is refused only because
-the text check cannot tell a coincidence from a derivation. The class is about values the withheld
-one FLOWS INTO. Enumerate those, not every number that happens to be close.
+the record says, which is why they are a KEPT source rather than a refused value. The class is about
+values the withheld one FLOWS INTO. Enumerate those, not every number that happens to be close —
+and where the enumeration keeps coming up one path short, stop enumerating and withhold the source.

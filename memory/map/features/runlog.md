@@ -119,29 +119,26 @@ claimed here as `join-key-widened-by-a-shared-location.md`.
 
 **The committed record admits a value only through a CLASS, because the repository is public.**
 `RECORD_SCHEMA` is data: shaped regexes and closed lists, the model's own lists by reference, with
-each section's fact templates and table columns declared, so the schema leg of `TOOL-dLoggedFlight-10`
-grades committed bytes against the same data rather than trusting the renderer. A value outside its
-class becomes `-` and is counted, so a model that grew a value the schema lacks says so.
-Owner turns stay counts, never clock times. The spec's first bounds measured over the cap once the
-JSON twin doubles every row, so `TIMELINE_EDGE` and `LIST_BOUND` fell, with a halving step for
-wide cells; the figures live in those constants. The commitment is a digest and a count of
-the MODEL's attributed lines, no time (owner, 2026-09-16); only an append leaves verify's prefix
-intact.
+each section's fact templates and table columns declared, which the leg below grades committed bytes
+against. A value outside its class becomes `-` and is counted, so a model that grew a value the
+schema lacks says so. Owner turns stay counts, never clock times. The twin doubles every row, so the
+first bounds measured over the cap and fell; `TIMELINE_EDGE` and `LIST_BOUND` hold them, halved
+again for wide cells. The commitment is a digest and a count of the MODEL's attributed lines, no
+time (owner, 2026-09-16); only an append leaves verify's prefix intact.
 
 **The schema leg reads the INDEX and the schema's DATA, never the renderer.** A record edited by hand,
 by a merge or by a later renderer is exactly what a renderer's own discipline cannot vouch for, so
 `check_records` compiles `RECORD_SCHEMA` itself and grades staged bytes, in a number of git calls the
 self-test holds constant over the population. Its clean fixture is rendered, never typed. Which unit a
 spec defines is read through the model's `derive_spec_unit`, so neither can disagree. That arm found
-a real one: the `label` class admits a lowercase UUID, so the absolute-path and UUID shapes
-became schema data the renderer withholds by and the leg refuses on. The leg re-derives every run's
+a real one: a path class's file segment admits a lowercase UUID, so the absolute-path and UUID
+shapes became schema data the renderer withholds by and the leg refuses on. The leg re-derives every run's
 start and window from git alone through the model's `derive_record_commits` and `derive_window`; the
 model keeps that result as `record_window`, which the committed record RENDERS, bounds and provenance
 both, reachable from a fresh clone. `derive_window_closer` names the write still to land: a render
 rides the commit carrying its verb's write, so a terminal placement reads `terminal-pending`, not a
 `last-activity` reading as a run gone quiet. Staged against this
-tree, the naive key and the unbounded era each red every rotated build it tracks, the two defects the
-round-2 and round-3 audits named.
+tree, the naive key and the unbounded era each red every rotated build it tracks.
 
 **The Skill is rendered, and its CLI stays offline.** The owner asks questions and reads no timeline,
 so `TOOL-dLoggedFlight-12` ships instructions to the agent that holds them rather than a model call:
@@ -218,10 +215,11 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   lines here, its empty journals read `not-local`.
 - **A moved memory root reds the schema leg.** The move adds every record, so a rotated build's runs
   share its start; the leg names that shape, and nothing clears it.
-- **No journal or transcript time is committed** (owner, 2026-09-16), so the record's Timeline holds
-  the git- and run-state-timed kinds alone, its Anomalies carry no time and its Coverage no `epoch`.
-  `TOOL-dLoggedFlight-22` retired the rest with the owner-time refusal that used to guard them; the
-  local model keeps every one, and the Skill answers from it.
+- **No journal or transcript time is committed** (owner, 2026-09-16). Withholding a VALUE per path
+  leaked five times over, so each slot rendering a time declares its SOURCES instead — `git` and the
+  run-state file, public already — graded by `check_time_sources` and, on a rendered row, the leg's
+  `source` rule. `TOOL-dLoggedFlight-22` retired the journal-timed rows and time columns with the
+  owner-time refusal; the local model keeps every one, and the Skill answers from it.
 - **The record proves shapes, not truth.** A count can be wrong and still an integer. The lists it
   copies from the spec template and hygiene doc are held only by the withheld self-test, and its
   commitment only on the node holding the journal. An unknown count is `-` by the renderer, off a
