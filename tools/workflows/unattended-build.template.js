@@ -268,9 +268,12 @@ const auditIds = a.auditIds === undefined ? [] : a.auditIds
 // argument beside no declaration is an IMPOSSIBLE PAIRING, refused by name like the others below: a
 // caller-pinned subject set, a post-disposal scope and a fold re-invoke each presuppose a round that,
 // with the audit off, never ran — so the shape is a re-invoke of an audit that did not happen, and a
-// runtime that cannot read the README cannot tell which half the caller meant.
+// runtime that cannot read the README cannot tell which half the caller meant. `round > 1` is the
+// fourth such argument (closing review of units 2–5, F6): the only paths that tell a caller to pass
+// it are audit re-invokes, so beside no declaration it names a round that never happened.
 const specAudit = a.specAudit !== undefined
 const auditShaped = ['subjects', 'auditIds', 'subjectRound'].filter(function (k) { return a[k] !== undefined })
+if (a.round !== undefined && a.round > 1) auditShaped.push('round')
 if (!specAudit && auditShaped.length) {
   throw new Error(
     'unattended-build: `' + auditShaped.join('` and `') + '` is present beside no `specAudit`. Those ' +

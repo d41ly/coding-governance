@@ -749,6 +749,50 @@ check_spec_audit "rule0: README path is a DIRECTORY → deny (exit 2, not a cras
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tDir/reviews\"}"
 check_spec_audit "rule0: README absent → deny naming the path tried" 2 "builds/tNone/README.md;;could not be read" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tNone/reviews\"}"
+# F1 (closing review of units 2–5, round 1) — the guard and its callee must agree on WHAT a spec-audit
+# call IS. `tier2-review.js` derives `kind` as `String(a.kind)`, so `["spec-audit"]` runs a full audit
+# there; the hook's strict equality ADMITTED it. Both delivery forms, on the undeclared README.
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+check_spec_audit "rule0: kind [\"spec-audit\"] (an array) on the undeclared README → deny" 2 "TOOL-aBlindedTrial-6;;spec-audit:" \
+  "{\"kind\":[\"spec-audit\"],\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# ...and the CLASS: one payload set fed to the hook AND to the callee's own `kind` line — the one line
+# of tier2-review.js that decides `isSpec` — asserting the two agree. An edit to either side reds
+# here until the other follows. The harness sits beside this kit in this repo; an adopter layout
+# without it gets an ANNOUNCED skip, never a silent green.
+T2R="$HERE/../workflows/tier2-review.js"
+if [ -f "$T2R" ]; then
+  kind_line=$(grep -m1 '^const kind = ' "$T2R")
+  for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
+    callee=$(node -e "const a={kind:$k}; $kind_line; console.log(kind==='spec-audit'?2:0)" 2>/dev/null)
+    printf '%s' "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$GOOD\",\"args\":{\"kind\":$k,\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}" \
+      | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+    if [ -n "$callee" ] && [ "$got" = "$callee" ]; then echo "ok   rule0: pair — hook and tier2-review agree on kind $k (exit $got)"; pass=$((pass+1))
+    else echo "FAIL rule0: pair — hook exit $got, tier2-review isSpec says exit-equivalent '$callee' for kind $k"; fail=$((fail+1)); fi
+  done
+else
+  echo "skip rule0: pair arm — tier2-review.js is not beside this kit (adopter layout); the class arm did NOT run"
+fi
+# F2 — the declaration is read from where the RECORD lands (`reviewDir`), so the SUBJECTS must sit
+# under that same `builds/<slug>/`, else naming a declared build's reviews folder audits an
+# undeclared build's specs. And a `reviewDir` that climbs through `..` is not placed by its own text.
+printf -- '---\nslug: tSA\nspec-audit: 2026-09-20\n---\n' > "$SAREADME"
+mkdir -p "$SAREPO/memory/builds/tOther/reviews"; printf -- '---\nslug: tOther\n---\n' > "$SAREPO/memory/builds/tOther/README.md"
+check_spec_audit "rule0: declared reviewDir, one subject under ANOTHER build → deny naming subjects + the path" 2 '`subjects`;;builds/tOther/spec/s.md' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"},{\"path\":\"memory/builds/tOther/spec/s.md\",\"blob\":\"abc1234\"}]}"
+check_spec_audit "rule0: declared reviewDir, every subject under the SAME build → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"},{\"path\":\"memory/builds/tSA/spec/t.md\",\"blob\":\"abc1235\"}]}"
+check_spec_audit "rule0: declared reviewDir, a subject with NO builds/<slug> segment → deny naming subjects" 2 '`subjects`' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"docs/s.md\",\"blob\":\"abc1234\"}]}"
+check_spec_audit "rule0: declared reviewDir, a subject re-routed through .. → deny naming subjects" 2 '`subjects`' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"memory/builds/tSA/../tOther/spec/s.md\",\"blob\":\"abc1234\"}]}"
+check_spec_audit "rule0: reviewDir climbing through .. into a declared build → deny naming reviewDir" 2 '`reviewDir`;;..' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ/memory/builds/tOther\",\"reviewDir\":\"../../builds/tSA/reviews\"}"
+# F5 — an MSYS-form `repo` (`/c/...`) is a spelling this node's corpus carries and the harness's own
+# `git -C` accepts; `path.resolve` on win32 made it `C:\c\...` and denied a DECLARED build with ENOENT.
+# Derived from $SAJ, so on a host where `pwd -W` is not a thing the arm feeds the unchanged POSIX path.
+SAM=$(printf '%s' "$SAJ" | sed 's|^\([A-Za-z]\):/|/\L\1/|')
+check_spec_audit "rule0: declared build, repo in MSYS /<drive>/ form → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAM\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
 
 # ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
 # EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm

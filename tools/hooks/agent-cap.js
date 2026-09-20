@@ -1721,6 +1721,27 @@ function scanJoinFindings(script) {
 // front-matter slice is the sibling hook's `readFrontMatterKey`, the same read scratch-guard.js makes
 // for `authorized-by:` — one reader, so a body-only key (a fenced example) is not front matter for
 // either. Required lazily and inside the try: a withdrawn sibling is a deny, not a crash.
+//
+// THREE MORE, from the closing review of units 2–5 (round 1). F1: `kind` is compared as
+// `String(a.kind)`, because that is how the callee (tier2-review.js) derives it — under strict
+// equality `["spec-audit"]` passed this guard and ran a full audit there; one predicate, two
+// spellings, and the guard's was the narrower. F2: the declaration is read from where the RECORD
+// lands, so every `subjects[].path` must sit under the same `builds/<slug>/` as `reviewDir`'s parent,
+// else naming a declared build's reviews folder audits an undeclared build's specs; and a `..`
+// segment anywhere in `reviewDir` or a subject is a deny, since the path's text no longer says where
+// it lands. F5: `repo` is folded from MSYS spelling before `path.resolve` — on win32 a leading `/` is
+// root-relative to the cwd's DRIVE, so `/c/projects/x` became `C:\c\projects\x` and a DECLARED build
+// was denied with ENOENT. No lowercasing: an fs read must not.
+
+// The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, or any `..`
+// segment. One walk for every subject so containment cannot be tested one way (closing review F2).
+function extractBuildSlug(p) {
+  const parts = String(p).replace(/\\/g, '/').split('/')
+  if (parts.indexOf('..') !== -1) return null
+  const i = parts.indexOf('builds')
+  return i === -1 || !parts[i + 1] ? null : parts[i + 1]
+}
+
 function checkSpecAuditDeclared(data) {
   const ID = 'TOOL-aBlindedTrial-6'
   const renderDeny = (why) =>
@@ -1734,18 +1755,25 @@ function checkSpecAuditDeclared(data) {
     if (typeof a === 'string') {
       try { a = JSON.parse(a) } catch { return null }
     }
-    if (!a || typeof a !== 'object' || Array.isArray(a) || a.kind !== 'spec-audit') return null
+    if (!a || typeof a !== 'object' || Array.isArray(a) || String(a.kind) !== 'spec-audit') return null
     if (typeof a.repo !== 'string' || a.repo === '') {
       return renderDeny(`a spec-audit Workflow call whose \`repo\` is not a non-empty string cannot be placed, so it cannot be admitted.`)
     }
     const parts = String(a.reviewDir === undefined || a.reviewDir === null ? '' : a.reviewDir)
       .replace(/\\/g, '/').replace(/\/+$/, '').split('/')
     const dir = parts.slice(0, -1) // reviewDir's parent: the build folder
-    if (dir.length < 2 || dir[dir.length - 2] !== 'builds' || dir[dir.length - 1] === '') {
-      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(a.reviewDir)}) is not directly under a \`builds/<slug>/\` folder cannot be placed, so it cannot be admitted.`)
+    if (dir.length < 2 || dir[dir.length - 2] !== 'builds' || dir[dir.length - 1] === '' || parts.indexOf('..') !== -1) {
+      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(a.reviewDir)}) is not directly under a \`builds/<slug>/\` folder, or climbs through \`..\`, cannot be placed, so it cannot be admitted.`)
+    }
+    if (Array.isArray(a.subjects)) {
+      const stray = a.subjects.find((s) => extractBuildSlug(s && s.path) !== dir[dir.length - 1])
+      if (stray !== undefined) {
+        return renderDeny(`a spec-audit Workflow call whose \`subjects\` name a path (${JSON.stringify(stray && stray.path)}) outside \`builds/${dir[dir.length - 1]}/\`, the build its \`reviewDir\` places it in, would audit a build whose README this rule never read, so it cannot be admitted.`)
+      }
     }
     const path = require('path')
-    const root = path.resolve(data.cwd || process.cwd(), a.repo)
+    const repo = a.repo.replace(/\\/g, '/').replace(/^\/([A-Za-z])\//, '$1:/')
+    const root = path.resolve(data.cwd || process.cwd(), repo)
     readme = path.join(root, ...dir, 'README.md').split(path.sep).join('/')
     const bytes = require('fs').readFileSync(readme, 'utf8')
     const { readFrontMatterKey } = require(path.join(__dirname, 'scratch-guard.js'))

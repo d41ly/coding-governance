@@ -5633,6 +5633,19 @@ out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
 rm -f memory/builds/tRun/reviews/a4.md
 
+# ---- F3 (closing review of units 2–5, round 1): the term zero keys on the BASE DERIVATION and the
+# ---- pinned fact is EVIDENCE. Key at BASE, the `spec-audit:` line deleted from RUN.md: the first cut
+# ---- read the fact, said the README at BASE declares no key — false — and MET the item, so a unit
+# ---- landed with no audit evidence and no recorded override. The tracked audit record is left in
+# ---- place so the ONLY reason --close blocks on this item is the disagreement.
+bcopen; crfix
+mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-20; recorded: (none)"
+hit "$out" "so --close blocks: specs-audited"
+miss "$out" "declares no spec-audit: key"
+miss "$out" "close OK"
+
 # ---- AC3 (aBlindedTrial-2): the epoch closes — main back to where tRun declares NO key — and a CLOSED
 # ---- unit with NO record closes with the item MET and ANNOUNCED, never blocked on it.
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
@@ -5680,6 +5693,20 @@ git add -A >/dev/null && git commit -q -m sa-malformed --no-verify && git push -
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: later"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- F4 (closing review of units 2–5, round 1): a BARE `spec-audit:` line is present-and-empty, not
+# ---- absent. The `""` arm read it as undeclared and preflight said not owed — the silent opt-out the
+# ---- refusal's own comment forbids, one value narrower. The same refusal, shown as (empty).
+bcreset; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit:'
+git add -A >/dev/null && git commit -q -m sa-empty --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: (empty)"
+miss "$out" "not owed (opt-in)"
 miss "$out" "preflight OK"
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
 git checkout -qf unit; bcreset

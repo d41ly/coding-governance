@@ -135,8 +135,12 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   `tool_input.args` ONLY — an object, or the JSON string the Workflow tool often delivers — and
   never the script text, which both shipped harnesses fill with the word. It fails CLOSED for this
   kind alone: a `repo` that is not a string, a `reviewDir` not directly under a `builds/<slug>/`
-  folder, and a README it cannot read are each a deny naming the field or the path, and every throw
-  inside it is returned as a deny because a hook that crashes at exit 1 admits. TWO LIMITS, stated
+  folder or climbing through `..`, a `subjects[].path` under any OTHER build than the one `reviewDir`
+  places (the declaration is read from where the record lands, so the subjects must sit under that
+  same build), and a README it cannot read are each a deny naming the field or the path, and every
+  throw inside it is returned as a deny because a hook that crashes at exit 1 admits. `kind` is
+  compared as `String(kind)`, the callee's own derivation, so `["spec-audit"]` is a spec audit to
+  both; `repo` is folded from MSYS spelling (`/c/…`) before it is resolved. TWO LIMITS, stated
   rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
   call and not a tool call, so the programmatic route is the unattended driver's to refuse
   (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README while that driver reads BASE, so

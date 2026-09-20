@@ -1445,7 +1445,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -1484,10 +1484,17 @@ check_authorization() { # slug · base
   # a REFUSAL rather than a default in either direction: read as absent it would silently opt a
   # build out that the owner meant to opt in, and pinned as-is it would carry a fact no reader can
   # date. The shape is the front matter's own `opened:` shape and nothing looser.
+  #
+  # PRESENCE IS TESTED SEPARATELY FROM VALUE (closing review of units 2-5, F4). A bare `spec-audit:`
+  # line emits `spec-audit=` and an empty value, which the `""` arm below read as ABSENT - the exact
+  # silent opt-out the sentence above forbids, one value narrower. Present-and-empty is shown as
+  # `(empty)` so it takes the refusal; a README with no such line still falls through as not owed.
   AUTH_SPEC_AUDIT=$(printf '%s\n' "$_fm" | sed -n 's/^spec-audit=//p' | head -1)
-  case "$AUTH_SPEC_AUDIT" in
+  _sa_shown="$AUTH_SPEC_AUDIT"
+  if [ -z "$AUTH_SPEC_AUDIT" ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then _sa_shown="(empty)"; fi
+  case "$_sa_shown" in
     ""|[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
-    *) fail 52 "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: $AUTH_SPEC_AUDIT"
+    *) fail 52 "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: $_sa_shown"
        return 1 ;;
   esac
   # out of the SAME scan. The `No second GIT show` rule above bounds THAT
@@ -3820,10 +3827,22 @@ $_bcnon"
       # OVERRIDABLE, deliberately, unlike `authorization-reachable`: a genuinely thin Tier-1 unit
       # becomes a recorded decision rather than an invisible skip.
       DOD_OUT=""
-      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_miss=""
+      local _sa_rows _sa_ids _sa_id _sa_f _sa_named _sa_fact _sa_miss=""
       # TERM ZERO, the `pieces-complete` shape: MET, and it ANNOUNCES the skip, because a silent pass
-      # is indistinguishable from coverage. Keyed on the pinned fact, never on the worktree README.
-      if [ -z "$(fact "$rel" spec-audit)" ]; then
+      # is indistinguishable from coverage. Keyed on the BASE-DERIVED value (closing review of units
+      # 2-5, F3): `authorization-reachable` is graded earlier in this same shell, is not overridable,
+      # and leaves `AUTH_SPEC_AUDIT` populated from the README blob at BASE. The first cut keyed on the
+      # pinned fact instead - the run-state file, which the run WRITES - so deleting one `spec-audit:`
+      # line from RUN.md turned an owed audit into "not owed" with a sentence about BASE that was
+      # false. That is the deleted-`base:`-line shape `trusted_base`'s header names, one key over, and
+      # it takes the same cure: the recorded fact is EVIDENCE compared against the derivation, never
+      # the input, and a disagreement on PRESENCE is a refusal. Never the worktree README either.
+      _sa_fact=$(fact "$rel" spec-audit)
+      if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
+        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
+        return 1
+      fi
+      if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
         DOD_OUT="specs-audited — not owed: the spec audit is opt-in and the build README at BASE declares no spec-audit: key, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
         return 0
       fi

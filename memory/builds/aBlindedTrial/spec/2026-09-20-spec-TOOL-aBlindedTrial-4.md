@@ -1,10 +1,12 @@
 # TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare
 
-**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
+**Status:** INPROGRESS · rev-3 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-20-review-TOOL-aBlindedTrial-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-5 |
 
 <!-- /gen:spec-records -->
 
@@ -121,7 +123,7 @@ attended session rather than merely not required.
 
 ## 7. Gates
 
-`agent-cap self-test` · `verifier fan-out` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `agent-cap restatement`
+`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `agent-cap restatement`
 
 New arm: `tools/hooks/agent-cap.test.sh` · README with and without the key, args as object and as string · none
 
@@ -139,6 +141,13 @@ New arm: `tools/hooks/agent-cap.test.sh` · README with and without the key, arg
   caller reads a STAGED BLOB through `git show`, which has no file on disk to name, so a path-taking
   reader could not make it a caller; the rule in `agent-cap.js` reads its file and hands the bytes
   over. No AC moves.
+- rev-3 · 2026-09-20 · §3 / §7 · AMEND (closing review of units 2–5, F7): §3 claimed scratch-guard's
+  "own arms keep passing" while `bash tools/hooks/scratch-guard.test.sh` was red at HEAD and at base
+  b7dee206 alike — AC9 read 7 engine spans against a floor of 8, a pre-existing red from
+  `KICK-aReplayedCard-3` that this unit's `tools/hooks/` edit brings onto the `GATE_SELFTESTS=1` run
+  it owes. §7 gains `scratch-guard self-test`, the sibling leg the same `tools/hooks/` guard trips;
+  the floor is re-pinned to 7 with a dated reason in the test, and the suite was re-run and
+  observed at 165 passed, 0 failed, so the §3 claim is now observed rather than asserted. No AC moves.
 
 ## 10. Reuse audit
 

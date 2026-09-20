@@ -1128,9 +1128,18 @@ has    "BT3-AC5 subjects beside no specAudit: THROWS" "$o" "THROW"
 has    "BT3-AC5 ...naming the pairing" "$o" '`subjects` is present beside no `specAudit`'
 hasnt_ "BT3-AC5 ...before any agent is spawned" "$o" "agent:"
 o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"auditIds":["A-tB-3"],#')" "$(returns CONVERGED 0)")
-has    "BT3-AC5 auditIds beside no specAudit: THROWS by the same guard" "$o" '`auditIds` is present beside no `specAudit`'
+has    "BT3-AC5 auditIds beside no specAudit: THROWS by the same guard" "$o" '`auditIds` and `round` is present beside no `specAudit`'
 o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,"subjectRound":2,#')" "$(returns CONVERGED 0)")
-has    "BT3-AC5 subjectRound beside no specAudit: THROWS by the same guard" "$o" '`subjectRound` is present beside no `specAudit`'
+has    "BT3-AC5 subjectRound beside no specAudit: THROWS by the same guard" "$o" '`subjectRound` and `round` is present beside no `specAudit`'
+# ---- ...and `round > 1` ALONE (closing review of units 2–5, F6): the fourth audit-shaped argument.
+# ---- Only an audit re-invoke is ever told to pass it, so beside no declaration it names a round that
+# ---- never ran; before this arm the OFF path handed the roster out under `"round":2` without a word.
+o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":2,#')" "$(returns CONVERGED 0)")
+has    "BT3-AC5 round 2 beside no specAudit: THROWS by the same guard" "$o" "THROW"
+has    "BT3-AC5 ...naming round" "$o" '`round` is present beside no `specAudit`'
+hasnt_ "BT3-AC5 ...before any agent is spawned" "$o" "agent:"
+o=$(run_wf "$(printf '%s' "$OFF_UNITS" | sed 's#"slug":"tB",#"slug":"tB","round":1,#')" "$(returns CONVERGED 0)")
+hasnt_ "BT3-AC5 round 1 beside no specAudit is the first round and is NOT refused" "$o" "THROW"
 # ---- AC6: the DECLARED build keeps its audit exactly as before — the control for every arm above.
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has    "BT3-AC6 declared: the sub-workflow is awaited" "$o" "workflow:"
