@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.2 -->
+<!-- gov:kit lexicon@1.5 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -43,16 +43,18 @@ outside its closed set names the file and the line. `dot` is deliberately NOT a 
 convention: it is a classifier form the report uses so a dotted name is reported as satisfying
 something, and no language convention is "identifiers contain dots".
 
-Three refusals are CROSS-BLOCK and run after the whole file is parsed, because `LANGS` may be
+Four refusals are CROSS-BLOCK and run after the whole file is parsed, because `LANGS` may be
 declared below `CELLS` and a reader that refuses on line order refuses a legal file. A `CELLS` row
 naming an extension `LANGS` does not declare reds; a `PINS` row naming a cell with no `CELLS` row
-reds; and a `decorator` selector on a language `LANGS` declares `probe` or `dark` reds, naming both,
-because decorators come from a real parse and that subset could only ever be empty.
+reds; a `decorator` selector on a language `LANGS` declares `probe` or `dark` reds, naming both,
+because decorators come from a real parse and that subset could only ever be empty; and a
+`returns` selector on an extension `LANGS` reads with anything but `tsx-tokens` reds the same way,
+because only that reader emits the element mark and the subset would be empty for the same reason.
 
 ### The selector — routing a SUBSET of a cell to a second convention
 
 A `CELLS` row key may carry ONE selector clause, `+<kind>:<literal>`, with `kind` in `prefix`
-`decorator`. It splits the cell's population in two: the names the selector matches are graded ONCE,
+`decorator` `returns`. It splits the cell's population in two: the names the selector matches are graded ONCE,
 against the selector's own convention and its own pin, and they LEAVE the parent cell's population.
 The parent keeps its own row and grades the complement.
 
@@ -61,6 +63,10 @@ CELLS:
   py.function                     snake
 
   py.function+prefix:Test         pascal
+
+  tsx.function                    camel
+
+  tsx.function+returns:jsx        pascal
 
 PINS:
   py.function.conv                0
@@ -72,6 +78,31 @@ It exists for the languages whose case is a function of ROLE rather than of surf
 rule, React's PascalCase components — where one `(language, surface)` cell would red half a correct
 codebase, and the only honest alternative is declaring the language `dark`.
 
+**`returns:jsx` is the role-derived kind**, and it reads the role from the BODY rather than from the
+name, which is the only reading that does not grade a name against itself. It routes every DECLARED
+function — `function name`, whether a statement or a named expression, and a `const`/`let`/`var`
+bound to an arrow or function expression — whose VALUE is a JSX element: a brace-less arrow body,
+or the expression after a `return`, with the element at call depth zero. `=> <A />`,
+`return x ? (<A />) : null` and `return open && (<Modal />)` are returned; `=> mount(<A />)`,
+`return renderToStaticMarkup(<A />)` and `return [{ el: <A /> }]` are not — a component RETURNS an
+element, a test helper hands one to something. A member — an object property, a class property, a
+method — is never routed, because its name is its container's KEY, spelled by the API that reads
+it: `render: (r) => <td />` is Puck's to name, not yours. An anonymous callback absorbs what it
+renders, so a higher-order function returning `(props) => <C />` is not a component and stays in
+the parent. The whole rule, with the measurement each clause cost, is `parse_ts_source`'s header
+in `lexicon.py`; the only literal is `jsx`, the reader is `tsx-tokens` alone, and the surface is
+`function` alone — each a named refusal at the row.
+
+What it cannot see stays in the parent and is PINNED there: a component that returns `null`, a
+portal, or a callback's result, and a `vi.mock` module shape whose keys mirror another file's
+exports. What it sees and you may not want routed is pinned in the selector's row: a render helper
+that returns an element under a camel name. On the adopter tree this was built for, the pair pins
+an order of magnitude fewer names than arming the cell blind did; the figures are dated and live
+in ONE place, `parse_ts_source`'s header, because a number typed beside the thing it measures is
+the copy that rots. A `render*` prefix cannot take the routed render helpers back, because a
+name matching two selectors is refused rather than resolved (below). That composition is the
+grammar's open edge, stated rather than papered.
+
 - **A routed name is graded once**, never against both conventions. Grading it twice would make
   every routed name a guaranteed violation of one of the two cells.
 - **A name matching TWO selectors is REFUSED**, naming both literals, and is graded by neither. A
@@ -79,14 +110,17 @@ codebase, and the only honest alternative is declaring the language `dark`.
   `DEAD CELL` covers an overlapping pair completely: two selectors that CAN both match either do
   both match some name, or one of them selected nothing and reds as a dead cell.
 - **A selector matching NOTHING reds** as a `DEAD CELL`, like any other cell grading an empty
-  population.
+  population. **A parent whose selectors routed EVERY name does not**: its population is empty
+  because the partition is complete, and a `.tsx` tree of components with no helper yet is a legal
+  state the camel parent waits through, not a dead declaration.
 - **A selector'd cell with no `PINS` row of its own reads as a pin of `0`.** It never inherits the
   parent's count, and its offenders are never folded back into the parent's row — the two ratchet
   separately, in both directions.
 - **The literal carries no dot**, because a `PINS` row key is `<cell>.<predicate>` split on the dot.
   A dotted decorator (`@app.route`) is matched on its LAST segment, so it is selectable as `route`.
 - There is no regex kind, and no suffix or infix kind. A predicate language over names is a second
-  grading language inside a naming gate; the two motivating populations use a prefix.
+  grading language inside a naming gate; the two name-based populations use a prefix, and the one
+  role-based population reads the body rather than widening the name grammar.
 
 The selector row prints directly beneath its parent, with its own count, denominator and rule, so a
 routed subset is visible rather than a silent subtraction from the row above it.
@@ -172,10 +206,12 @@ is this declaration's first armed cell, over the 607 definitions the shell token
 **`DEAD CELL`** — a declared, armed cell whose population rule selected NOTHING. It replaces a
 report: the engine printed `armed but grading nothing` for the whole life of the declaration and
 nothing ever acted on it, which is the green-by-absence class wearing a different label. Two
-exemptions, both the same argument — an empty population is evidence only where a non-empty one was
+exemptions, all the same argument — an empty population is evidence only where a non-empty one was
 possible. A `dark` row is a declared refusal to grade, so its zero is the declaration working. An
 extension the corpus carries no file of is an `INERT DECLARATION`, which this engine already
-reports one arm over; redding a cell for it would make two refusals disagree about one tree.
+reports one arm over; redding a cell for it would make two refusals disagree about one tree. And a
+PARENT whose selector rows sum to its whole denominator is empty because the partition is complete,
+which is the selector working; a selector row has no rows beneath it and is never exempt this way.
 **It does not check** an armed EXTENSION with no cell row at all — that is `DEAD PROBE`, which is
 still shipped and is not subsumed.
 
@@ -231,11 +267,22 @@ undeclared one is a named refusal.
 | Mode | Extractor | Standing |
 |---|---|---|
 | `parser` | a real parse | complete over its extension |
-| `probe` | a regex pattern set | incomplete BY CONSTRUCTION, reported as such every run |
+| `probe` | whatever the pattern-set id names | incomplete BY CONSTRUCTION, reported as such every run |
 | `dark` | none, declared explicitly | named every run, never silently absent |
 
-TWO PARSERS SHIP and the `LANGS` row's pattern-set id says which runs: `python-ast` is `ast`,
-`shell-tokens` is the tokenizer below. A `parser` row naming neither is a refusal, not a
+**The mode token carries the STANDING and the pattern-set id selects the READER.** That middle row
+used to read "a regex pattern set", and it stopped being true when `TOOL-aGradedDialect-3` §8 F1
+widened the dispatch: a tokenizer-shaped reader that honestly MISSED its conformance floor now has
+somewhere to run, under the mode that promises incompleteness rather than under the one that
+promises a complete parse. `resolve_extractor` in `lexicon.py` is the one place that question is
+answered, for all four sites that ask it. So a `probe` guarantees you the incompleteness and the
+per-run report, never a particular implementation.
+
+Which reader runs is the `LANGS` row's pattern-set id and never a second mode token: `python-ast` is
+`ast`, `shell-tokens` is the tokenizer below, and `PARSERS` in `lexicon.py` is the whole list. **No
+count of them is written here** — this paragraph opened with one for two releases and the dict grew
+underneath it, which is a figure typed beside the population that owns it. A `parser` row naming an
+id that is in neither catalog is a refusal, not a
 fallthrough to Python. A new mode TOKEN was the other shape available and it is refused:
 `drift-audit` ranks `parser` above `probe` above `dark` and reads an unknown mode as ABSENT, so
 a language moving from `dark` to a freshly named mode would score as a weakening and fire a
@@ -281,20 +328,23 @@ meaningful rather than noisy.
 
 ### Arming a language this kit does not ship
 
-`probe` needs a pattern set, and the kit ships exactly one — `js-regex`. Before this, a TypeScript,
-Go, Rust or C# adopter could only declare their language `dark`, so the whole vocabulary-and-
-convention apparatus graded nothing; the alternative was editing `PATTERN_SETS` inside
-`lexicon.py`, which is an `engine`-role file the next `apply` overwrites.
+`PATTERN_SETS` holds the shipped regex sets and `js-regex` is the only one in it. **TypeScript is no
+longer on the list of languages this reaches for**: `.ts` and `.tsx` ship as declared extensions with
+their own readers, and what they read and refuse is `parse_ts_defs`'s header and `LEXICON.md`'s
+`.ts`/`.tsx` section. A Go, Rust or C# adopter is still where a TypeScript one used to be — the whole
+vocabulary-and-convention apparatus grades nothing for them until something is declared, and the
+alternative is editing `PATTERN_SETS` inside `lexicon.py`, which is an `engine`-role file the next
+`apply` overwrites.
 
 Declare the extractor instead. A `PATTERNS:` block holds one row per
 `<pattern-set-id>.<functions|types|imports>`, and the rest of the row is one Python regex, taken
 verbatim to end of line and compiled with `re.M` exactly as the shipped sets are:
 
-    LANGS="... ts:ts-regex:probe"
+    LANGS="... go:go-regex:probe"
 
     PATTERNS:
-      ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)
-      ts-regex.types      ^\s*(?:export\s+)?(?:interface|class)\s+([A-Za-z_$][\w$]*)
+      go-regex.functions  ^\s*func\s+(?:\([^)]*\)\s*)?([A-Za-z_]\w*)
+      go-regex.types      ^\s*type\s+([A-Za-z_]\w*)
 
 EXACTLY ONE CAPTURING GROUP per row, and it captures the NAME. Zero groups, two groups, a regex that
 does not compile, or a repeated row key is a refusal naming the file and the line — never a dropped
@@ -307,7 +357,11 @@ disarming the rest of the set; a row naming an unshipped id builds a new set who
 empty. Nothing mutates the shipped constant, and every run prints which shipped keys a declaration
 replaced, so a set weakened rather than emptied is read rather than inferred.
 
-THE BOUNDARY. This buys grading, never a lexer. A declared set is a `probe` on exactly the terms the
+THE BOUNDARY. This buys grading, never a lexer. **The kit does not decline to run an adopter's own
+extractor** — a declared set is compiled and walked exactly as a shipped one is, by the same corpus
+walk, the same coverage fraction and the same measured pins. What a declaration cannot hand itself is
+the `parser` standing: that is EARNED by a reader scored against a conformance corpus, never granted
+by writing the token. A declared set is a `probe` on exactly the terms the
 table above states — incomplete by construction, reported as such every run — and the law at the top
 of this section still binds: if a regex over a language would look like coverage while silently
 skipping what it forgot, `dark` is the honest declaration. Two vacuity arms watch a declared set: an
@@ -411,9 +465,9 @@ DEBT/UNRULED ratchet. `notail` had no reader but that defect and is gone from th
 Four refusals are distinct and separately worded, because a caller who typed a cell that does not
 exist, a `dark` cell, a key that is not a cell, and a BARE SURFACE have four different problems. The
 bare-surface refusal is a MENU: it lists the declared cells carrying that surface. A cell whose row
-carries a `prefix` selector is routed FROM THE NAME, the way the grader routes it; a `decorator`
-selector cannot be resolved from an identifier at all, so such a cell answers in the parent's
-convention and SAYS SO rather than answering confidently.
+carries a `prefix` selector is routed FROM THE NAME, the way the grader routes it; a `decorator` or
+`returns` selector cannot be resolved from an identifier at all, so such a cell answers in the
+parent's convention and SAYS SO rather than answering confidently.
 
 The re-caser is SPAN-ANCHORED and it REFUSES rather than inventing. It builds from
 `_SUBTOKEN_RE.finditer` spans and regenerates exactly two things — the separator the convention

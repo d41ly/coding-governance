@@ -1,146 +1,151 @@
 #!/usr/bin/env bash
 # check-line-length.test.sh — the failing case for every branch the gate carries.
 #
-# ONE scratch repo, reused. `git init` measured ~7s on this fleet and the gate roots itself with
-# `git rev-parse`, so a repo per arm puts the suite past its own timeout while proving nothing.
+# PORTED ONTO `tools/lib/lib-selftest.sh` by TOOL-aQuenchedHarness-6, with the arm inventory
+# unchanged — same labels, same staged breaks, same expected verdicts, diffed before and after by
+# `bash tools/lib/extract-arms.sh`. Read that harness's header for why the shape is
+# declare-then-run rather than run-as-you-go; what is worth knowing HERE is what the port removed.
 #
-# THE HARNESS RUNS SETUP AND THE GATE SEPARATELY, and that is not a style choice. An earlier draft
+# THE COST WAS NEVER THE GATE, IT WAS THE FIXTURE. Traced at 36 s / 432 lines
+# (`memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md`),
+# the outer script spawned 31 `python3` — every one of them building a line of repeated characters,
+# 18 of those inside a `reset` that ran before every arm. At 773 ms a python spawn on this fleet that
+# is ~24 s of the 36 s, spent on strings the shell can build with no process at all. `build_line`
+# below is that, in builtins; the line files are built ONCE into the fixture; and each arm now
+# copies a snapshot instead of mutating one shared directory.
+#
+# THE PROPERTY THAT MADE THE OLD SHAPE UNPARALLELISABLE, kept as a warning against restoring it: the
+# suite reused ONE scratch repo and `reset` mutated it between arms, so two arms running at once
+# landed the second's setup inside the first's subject invocation. Per-arm isolation is what buys the
+# pool; the pool is not an optimisation on top of it.
+#
+# THE HARNESS RUNS SETUP AND THE SUBJECT SEPARATELY, and that is not a style choice. An earlier draft
 # ran `sh -c 'setup; gate; cleanup'` and read the rc of the CLEANUP — so every red arm reported 0 and
-# the suite would have certified a gate that never fired. Setup happens first, the gate runs alone,
-# and its rc is the one compared.
+# the suite would have certified a gate that never fired. Setup happens first, the subject runs
+# alone, and its rc is the one compared.
 set -u
-HERE=$(cd "$(dirname "$0")" && pwd)
-ROOT=$(cd "$HERE/.." && pwd)
+HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
+  echo "check-line-length.test: not a git work tree"; exit 2; }
+cd "$ROOT" || exit 2
+. "$HERE/lib/lib-selftest.sh"
+
 GATE="$ROOT/tools/check-line-length.sh"
-TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+[ -f "$GATE" ] || { echo "check-line-length.test: no gate at $GATE"; exit 2; }
 
-ASSERTIONS=0; FAILED=0
-say_ok()   { ASSERTIONS=$((ASSERTIONS+1)); printf 'arm ok    %s\n' "$1"; }
-say_fail() { ASSERTIONS=$((ASSERTIONS+1)); FAILED=$((FAILED+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
+# THE SUITE STILL DECLARES ITS OWN ARM COUNT. The floor moved into the harness so eighteen ported
+# suites do not carry eighteen copies of the guard, but the NUMBER is this suite's and stays here.
+SELFTEST_FLOOR=18
 
-W="$TMP/repo"; mkdir -p "$W/tools"
-git -C "$W" init -q 2>/dev/null
-git -C "$W" config user.email t@t; git -C "$W" config user.name t
-cp "$GATE" "$W/tools/check-line-length.sh"
+# build_line <char> <n> — <n> copies of <char>, in builtins. `printf -v` and parameter expansion
+# cost no process; this one function is where the 31 python spawns went. It is UTF-8 safe by construction:
+# the replacement is the argument, so an em dash lands as one character per space.
+build_line() { local pad; printf -v pad "%${2}s" ""; printf '%s\n' "${pad// /$1}"; }
 
-# RESOLVED, never named. The repo-wide ban exists because the MS-Store `python3` stub answers
-# `command -v` and exits 9009 without executing anything — being on PATH is not evidence, running is.
-PY=""
-for _c in "${GOV_PYTHON:-}" python3 python py; do
-  [ -n "$_c" ] || continue
-  if "$_c" -c "import sys" >/dev/null 2>&1; then PY=$_c; break; fi
-done
-[ -n "$PY" ] || { echo "check-line-length.test: no usable python launcher; each candidate was RUN"; exit 2; }
-line() { "$PY" -c "import sys;sys.stdout.write(sys.argv[1]*int(sys.argv[2])+chr(10))" "$1" "$2"; }
-
-reset() {                      # a subject the gate passes on, and a declaration naming it
-  line x 100 > "$W/subject.md"
-  printf 'subject.md\t450\n' > "$W/tools/line-length-limits.txt"
-  rm -f "$W/other.md"
+# The fixture is the state the old suite's `reset` produced — a subject the gate passes on and a
+# declaration naming it — plus every line file the arms need, built once instead of per arm.
+build_repo() {
+  mkdir -p tools L || return 2
+  git init -q . >/dev/null 2>&1 || return 2
+  git config user.email t@t && git config user.name t || return 2
+  cp "$GATE" tools/check-line-length.sh || return 2
+  build_line x 100 > subject.md
+  printf 'subject.md\t450\n' > tools/line-length-limits.txt
+  build_line y 451 > L/y451
+  build_line y 450 > L/y450
+  build_line y 300 > L/y300
+  build_line y 600 > L/y600
+  build_line y 10  > L/y10
+  build_line — 400 > L/em400
+  printf '%s\n' '```' > L/fence
+  # The interpreter dies AFTER the resolver's probe accepted it — the shape a resolver cannot catch.
+  printf '#!/usr/bin/env bash\n[ "$1" = "-c" ] && exit 0\nexit 4\n' > deadpy
+  chmod +x deadpy
 }
+build_fixture build_repo || exit 2
 
-# arm <label> <want-rc> <want-substring> [env] [gate-args...]
-arm() {
-  local label=$1 wrc=$2 want=$3 envv=$4; shift 4
-  local out rc
-  if [ -n "$envv" ]; then
-    out=$(cd "$W" && env "$envv" bash tools/check-line-length.sh "$@" 2>&1); rc=$?
-  else
-    out=$(cd "$W" && bash tools/check-line-length.sh "$@" 2>&1); rc=$?
-  fi
-  if [ "$rc" -eq "$wrc" ] && printf '%s' "$out" | grep -qF "$want"; then say_ok "$label"
-  else say_fail "$label" "expected rc $wrc naming '$want', got $rc: $(printf '%s' "$out" | head -2 | tr '\n' ' ')"; fi
-}
-
-reset
-arm "control · a short subject passes" 0 "0 over 450" ""
+arm "control · a short subject passes" 0 "0 over 450" \
+    'true' 'bash tools/check-line-length.sh'
 
 # The `want` strings for red arms are each the branch's ENTIRE literal signature up to its first
 # interpolation, which the harness meta-gate requires. An arm asserting a readable prefix keeps
 # passing after the sentence it was written for is rewritten around it, and the branch quietly loses
 # its only proof.
-reset; line y 451 >> "$W/subject.md"
-arm "an over-length line reds naming the line and its length" 1 "a subject carries line(s) over its limit of" ""
+arm "an over-length line reds naming the line and its length" 1 "a subject carries line(s) over its limit of" \
+    'cat L/y451 >> subject.md' 'bash tools/check-line-length.sh'
 
-reset; line y 450 >> "$W/subject.md"
-arm "exactly at the limit passes" 0 "0 over 450" ""
+arm "exactly at the limit passes" 0 "0 over 450" \
+    'cat L/y450 >> subject.md' 'bash tools/check-line-length.sh'
 
 # ---------------------------------------------------------------- resolution order
-reset; printf 'subject.md\t200\n' > "$W/tools/line-length-limits.txt"; line y 300 >> "$W/subject.md"
-arm "the DECLARATION beats the environment" 1 "limit of 200" "LINE_MAX=9999"
+arm "the DECLARATION beats the environment" 1 "limit of 200" \
+    'printf "subject.md\t200\n" > tools/line-length-limits.txt; cat L/y300 >> subject.md' \
+    'LINE_MAX=9999 bash tools/check-line-length.sh'
 
-reset; line y 300 > "$W/other.md"
-arm "an UNDECLARED subject honours the environment" 1 "resolved from the environment" "LINE_MAX=200" other.md
+arm "an UNDECLARED subject honours the environment" 1 "resolved from the environment" \
+    'cat L/y300 > other.md' 'LINE_MAX=200 bash tools/check-line-length.sh other.md'
 
-reset; line y 300 > "$W/other.md"
-arm "an undeclared subject with no environment falls through to 450" 0 "limit from the default" "" other.md
+arm "an undeclared subject with no environment falls through to 450" 0 "limit from the default" \
+    'cat L/y300 > other.md' 'bash tools/check-line-length.sh other.md'
 
-reset; line y 300 >> "$W/subject.md"
-arm "a POSITIONAL beats the declaration" 1 "resolved from a positional" "" subject.md 200
+arm "a POSITIONAL beats the declaration" 1 "resolved from a positional" \
+    'cat L/y300 >> subject.md' 'bash tools/check-line-length.sh subject.md 200'
 
 # ---------------------------------------------------------------- the exemption, and its boundary
-reset; { printf '```\n'; line y 600; printf '```\n'; } >> "$W/subject.md"
-arm "a long line INSIDE a fence does not red" 0 "0 over 450" ""
+arm "a long line INSIDE a fence does not red" 0 "0 over 450" \
+    '{ cat L/fence; cat L/y600; cat L/fence; } >> subject.md' 'bash tools/check-line-length.sh'
 
-reset; { printf '| '; line y 600; } >> "$W/subject.md"
-arm "a long line inside a TABLE does red" 1 "characters" ""
+arm "a long line inside a TABLE does red" 1 "characters" \
+    '{ printf "| "; cat L/y600; } >> subject.md' 'bash tools/check-line-length.sh'
 
 # ---------------------------------------------------------------- measurement and declaration hygiene
-reset; line — 400 >> "$W/subject.md"
-arm "a non-ASCII line is measured in CHARACTERS, not bytes" 0 "0 over 450" ""
+arm "a non-ASCII line is measured in CHARACTERS, not bytes" 0 "0 over 450" \
+    'cat L/em400 >> subject.md' 'bash tools/check-line-length.sh'
 
-reset; printf 'subject.md\t450\ngone.md\t450\n' > "$W/tools/line-length-limits.txt"
 arm "a row naming an ABSENT path reds as stale" 1 \
-  "the declaration names a subject that does not exist, so its row excuses nothing and is stale" ""
+    "the declaration names a subject that does not exist, so its row excuses nothing and is stale" \
+    'printf "subject.md\t450\ngone.md\t450\n" > tools/line-length-limits.txt' \
+    'bash tools/check-line-length.sh'
 
-reset; printf 'subject.md\tlots\n' > "$W/tools/line-length-limits.txt"
 arm "a NON-NUMERIC limit is a named failure, not a shell error" 1 \
-  "the declared line limit for this subject is not a number, so the comparison below would be against text: '" ""
+    "the declared line limit for this subject is not a number, so the comparison below would be against text: '" \
+    'printf "subject.md\tlots\n" > tools/line-length-limits.txt' \
+    'bash tools/check-line-length.sh'
 
-reset; printf '# only a comment\n' > "$W/tools/line-length-limits.txt"
-arm "a declaration selecting NO subject is cannot-run" 2 "would grade nothing" ""
+arm "a declaration selecting NO subject is cannot-run" 2 "would grade nothing" \
+    'printf "# only a comment\n" > tools/line-length-limits.txt' \
+    'bash tools/check-line-length.sh'
 
 # ---------------------------------------------------------------- certify-without-measuring
 # THE FOUR ARMS BELOW ARE ONE CLASS: the gate printed `line-length OK … 0 over 0 characters` and
 # exited 0 in every one of them. `over` is empty on a clean subject and empty on a crashed scanner,
 # and the shell discarded the status that told them apart. Each arm asserts a NON-ZERO verdict, so a
 # regression cannot pass by printing the right words.
-reset; line y 300 >> "$W/subject.md"
 arm "a non-numeric POSITIONAL limit is a named failure, not a certified zero" 1 \
-  "the line limit is not a number, so nothing could be compared against it: '" "" subject.md abc
+    "the line limit is not a number, so nothing could be compared against it: '" \
+    'cat L/y300 >> subject.md' 'bash tools/check-line-length.sh subject.md abc'
 
-reset; line y 10 > "$W/other.md"
 arm "a non-numeric LINE_MAX is a named failure, not a certified zero" 1 \
-  "the line limit is not a number, so nothing could be compared against it: '" "LINE_MAX=abc" other.md
+    "the line limit is not a number, so nothing could be compared against it: '" \
+    'cat L/y10 > other.md' 'LINE_MAX=abc bash tools/check-line-length.sh other.md'
 
 # A subject whose every line sits inside a fence measures ZERO lines. Empty-population is the
 # vacuity this tree bans by name: the old gate printed OK over a file it graded nothing in.
-reset; { printf '```\n'; line y 600; printf '```\n'; } > "$W/subject.md"
 arm "a subject with NO gradeable line is a dead probe, not a clean verdict" 1 \
-  "the scanner reached no gradeable line in this subject, so a clean verdict would certify a measurement that never happened" ""
+    "the scanner reached no gradeable line in this subject, so a clean verdict would certify a measurement that never happened" \
+    '{ cat L/fence; cat L/y600; cat L/fence; } > subject.md' 'bash tools/check-line-length.sh'
 
-# The interpreter dies AFTER the resolver's probe accepted it — the shape a resolver cannot catch.
-reset
-printf '#!/usr/bin/env bash\n[ "$1" = "-c" ] && exit 0\nexit 4\n' > "$W/deadpy"; chmod +x "$W/deadpy"
 arm "a scanner that dies mid-run is a named failure, not a certified zero" 1 \
-  "the offender scan did not run for this subject, so no line was measured and OK would be a lie" "LINELEN_PY=$W/deadpy"
+    "the offender scan did not run for this subject, so no line was measured and OK would be a lie" \
+    'true' 'LINELEN_PY=$PWD/deadpy bash tools/check-line-length.sh'
 
 # THE INSTALL-DAY PAIR, and the two must land on DIFFERENT verdicts. The kit withholds the
 # declaration on purpose — gov's rows name gov's paths, and a row naming an absent path is a stale
 # red — so ABSENT is the shape every adopter starts in, and the exit 2 it used to get there was the
 # very failure the withholding was made to prevent. Measured in a scratch install before this arm
 # existed. Its neighbour above is what stops this one being read as "an empty population is fine".
-reset; rm -f "$W/tools/line-length-limits.txt"
 arm "an ABSENT declaration is NOT ADOPTED at exit 0, not a red install day" 0 \
-  "NOT ADOPTED — no declaration at" ""
+    "NOT ADOPTED — no declaration at" \
+    'rm -f tools/line-length-limits.txt' 'bash tools/check-line-length.sh'
 
-printf '\n'
-if [ "$FAILED" -ne 0 ]; then
-  printf 'check-line-length.test.sh FAILED — %d arm(s)\n' "$FAILED"; exit 1
-fi
-FLOOR_ASSERTIONS=18
-if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
-  printf 'check-line-length.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
-    "$ASSERTIONS" "$FLOOR_ASSERTIONS"; exit 1
-fi
-echo "PASS ($ASSERTIONS assertions)"
+run_arms check-line-length.test.sh

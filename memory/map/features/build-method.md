@@ -15,7 +15,9 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-other-half-standing.md",
-  "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md"]
+  "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md",
+  "observation-before-the-last-fold-of-the-same-commit.md",
+  "hand-named-gate-list-green-while-the-bar-reds.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -96,6 +98,10 @@ stale; the spec's §10 records the discrepancy, because the same probe will misl
   in a deletion no record explains. The replacement is falsifiable: it names the missing input, so a
   reader can check whether the call carries it. The obligation is still the method's least
   instrumented step, because nothing yet asserts that a spec audit HAPPENED.
+- **A spec's gate list is authored. The bar's list is derived.** No check compares the two. Five builds
+  closed a unit green on the legs their specs named while the unguarded codebase-map leg was red.
+  The pre-commit hook now catches that one leg for staged `.py` and `.js` paths. For every other leg
+  the defence is still a documented check: `hand-named-gate-list-green-while-the-bar-reds`.
 
 ## Reuse affordance
 

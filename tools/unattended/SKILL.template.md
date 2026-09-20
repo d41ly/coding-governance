@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.18 -->
+<!-- gov:kit unattended@1.24 -->
 
 # Unattended runs
 
@@ -25,6 +25,16 @@ before ORIENTING. Use `{{KEEPALIVE_CREATE}}`, at the cadence this project declar
 ```
 {{KEEPALIVE_CREATE}}  ->  keep the id
 ```
+
+**What the tick runs.** The prompt it schedules is the stall probe — once the run has a slug, run
+`bash {{KIT_DIR}}/unattended.sh --audit <slug>`; before `--preflight` no slug exists and the tick
+does nothing. The verb prints one line per dispatched-and-open unit with how long the TREE has
+been idle and a verdict against `UNIT_STALL_BOUND`. On `PROGRESSING` do nothing. On `STALLED`,
+act: stop the unit's task, record why with `--park` or a brief note, then re-dispatch that unit
+with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
+is doing or whether a process is stuck — its figures are the tree's, and the process side is the
+process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
+while a `Workflow` ran in the background and did nothing with the turn.
 
 **Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
 three of the four paths below never reached it: the two that start from prose or a playbook orient,
@@ -464,6 +474,16 @@ definition, so the absence is a decision and not an oversight.
 
 ## While it runs
 
+- **No merge bar and no self-test suite inside a pass — yours or any agent you dispatch.** A pass
+  verifies with the direct check its spec names; a unit that needs a suite verdict returns the
+  need in its `summary` and does not run one. The bar runs ONCE, at `VERIFYING`, after the last
+  unit is terminal: `--close` runs the plain bar for `gates-green`, and kit work owes the
+  `GATE_SELFTESTS=1` form too, run by you at `VERIFYING` and nowhere earlier. Where a pass touched
+  files a leg guards and you judge a bar necessary, the plain bar with no flag is the scoped form,
+  at the main loop and never in a child. The rule is the build method's M6; this bullet points at
+  it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
+  self-test runner or any `*.test.sh` is denied on this branch until the record reaches
+  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal.
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
   no witness is skipped by the oracle that would have judged it, so an unwitnessed phase is the
   cheapest possible lie and you are the only author of that field.
@@ -562,6 +582,14 @@ definition, so the absence is a decision and not an oversight.
   read-window narrowing is conditional on `scriptPath`, and a `name:` call exits it at zero.
   **Read the build method WHOLE before the first call**, because the child is handed one unit and the
   method is what tells it what a pass is.
+  **The child is ordered to run no gate, suite or bar inside its pass** — the bar is `--close`'s,
+  once, after every finding is fixed — and to verify with the one check that exercises its change,
+  and to bound every command it runs: a non-code command that does not return within its bound is
+  skipped and named in its return.
+  **The harness call carries `scratch: <your session scratchpad, absolute>`** — the path your own
+  system prompt names, never `$TMPDIR` — and refuses without it; every agent it spawns is told that
+  is where temporary files go, and the child receives it in `dispatch.args` and refuses too, both
+  without the key and with a `ground` that does not name it.
 
   Between dispatches, re-read `bash {{KIT_DIR}}/unattended.sh --plan <slug> --paths` rather than
   trusting a list you are holding, and branch on all four shapes it prints:
@@ -580,7 +608,7 @@ definition, so the absence is a decision and not an oversight.
   whole range on every closing round, and until now no carrier this kit ships even named it:
 
   ```bash
-  python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD
+  python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
   ```
 
   It takes a COMMITTED range, so it runs AFTER the commit and never before it — the pre-commit
@@ -589,7 +617,8 @@ definition, so the absence is a decision and not an oversight.
   than reading its status. A class it names that is already violated is the next pass. (Adopters
   whose memory tree ships without that kit have no such command; the obligation is then whatever
   their own build method names.)
-- Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`.
+- Check yourself with `bash {{KIT_DIR}}/unattended.sh --status <slug>`, and the units with
+  `bash {{KIT_DIR}}/unattended.sh --audit <slug>`.
 
 ## While the work runs
 
@@ -617,7 +646,10 @@ a named refusal rather than a complete-looking list.
 
 A review that keeps coming back BLOCKED is the fault this kit was built to remove, and the remedy is
 not a round cap — over the tracked corpus the clean exit the method names occurs ZERO times, so a cap
-would only move the stall earlier. Record every round and the verb tells you what the loop is doing:
+would only move the stall earlier. A SPEC subject's declared bound, `REVIEW_ROUNDS`, is not that cap:
+it ends in a DISPOSITION rather than a stall, because every finding standing at the bound is
+disposed exactly as at `NON-CONVERGENT`. Record every round and the verb tells you what the loop
+is doing:
 
 ```bash
 bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict <verdict> --blockers <N>
@@ -627,21 +659,42 @@ bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <id-or-slug> --verdict 
 `--verdict` is one of exactly three: `CLEAN`, `CLEAN WITH FIXES`, `BLOCKED`. `--blockers` is the
 confirmed-blocker count for THIS round, as a plain integer.
 
-It answers with one of four states, and the state is what you act on:
+It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
-- **CONVERGED** — zero blockers. The loop is done for that subject.
-- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every blocker still standing
-  is DISPOSED. FOLD one that is a defect in a document the review was already reading, as a `rev-N`
-  bump with its §9 line. PROMOTE one whose closing needs a MECHANISM this build does not have: it
-  becomes a UNIT, specced at its tier, built, closed. Never parked, never waived, never RETIRED, and
-  never re-reviewed. Both terminate — a fold ends the defect, and a promoted unit is audited as a SPEC.
+- **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
+  mediums and lows are still disposed, by the severity rule the next bullet states. Where a HIGH
+  stood, record `--disposition promote` on that round — ACCEPTED there, never required — so the
+  merge bar demands the unit the high became instead of reading the promotion as nothing; with
+  nothing above MEDIUM the row needs no field.
+- **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every CONFIRMED finding is
+  DISPOSED BY SEVERITY — and that holds at `CONVERGED` too. A BLOCKER or HIGH is PROMOTED: it
+  becomes a UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built,
+  closed. A MEDIUM or LOW is FOLDED into the spec it belongs to, as a `rev-N` bump with its §9 line.
+  Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
   reads new ids, and `build-complete`, which reads only that no row is non-terminal.
-  **Record which you took**, with `--disposition fold|promote` on the round that exits; the merge
-  bar reads that field, and a fold with nothing recorded is indistinguishable from a promotion that
-  never happened.
+  **Record it**, with `--disposition promote` on the round that exits: `promote` is the ONLY value a
+  terminal exit can record, because every exit that is not `CONVERGED` carries at least one BLOCKER
+  and the rule promotes every one of them, so `fold` at an exit with blockers is REFUSED rather than
+  written. The merge bar reads that field and demands the new unit ids it implies; a promotion with
+  nothing recorded is indistinguishable from one that never happened.
+- **BOUNDED** — the declared round bound, `REVIEW_ROUNDS` (kit default 1), is reached on a subject
+  that is not the build slug. **The loop STOPS**, and every CONFIRMED finding is DISPOSED BY
+  SEVERITY, exactly as at `NON-CONVERGENT`; the round records `--disposition promote`, the only
+  value a terminal exit can carry. The owner ruled on 2026-09-14 that a SPEC subject takes one round
+  by default; the closing diff review keeps its convergence loop, because its subject is the build
+  slug, whose bound is the runaway ceiling. **A promotion at this exit is NOT audited by the round
+  that produced it**: after `--rescope --act add` and the new spec, re-invoke the harness at round
+  N+1. It keys the `--review` subject per spec-set generation: a post-disposal re-invoke passes
+  `auditIds` and no `subjectRound` and takes a fresh subject; a fold re-invoke copies the
+  `subjectRound` the CONVERGING return handed back. So the subject that just ended is never
+  re-rounded, and the re-invoke audits ONLY the promoted specs — the ones no tracked `spec-audit`
+  record names yet — under their own one-round bound. `auditIds` and `subjects` are never passed
+  together: the harness refuses the pair by name, because a supplied subject set cannot be scoped to
+  the promoted units. Skip that re-invocation and the promoted unit closes un-audited, which
+  `specs-audited` refuses at `--close`.
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
@@ -676,7 +729,7 @@ back, and say what it returned. Assume a surviving job, not a dead one; the fail
 dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
 
 Then schedule the new one. This is the only exception to "read the record first": read it, reap,
-schedule, and then do the work.
+schedule, kick off, and then do the work.
 
 **The record cannot be corrected in place, and you must know that rather than discover it.**
 `--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
@@ -684,6 +737,16 @@ new id. The `keepalive` fact keeps naming the old job, so your `keepalive-reaped
 covers BOTH — the one you deleted here and the one you scheduled — and the wrap-up says so, with what
 the delete returned. Re-preflighting to record the new id is NOT the remedy: it refuses on a dirty
 tree and re-pins the anchor, which costs more than the stale field does.
+
+**Then, if this project ships `/session-kickoff`, invoke it — after the reap and the re-schedule,
+before the first pass.** Its unattended hand-back fires because the run-state file exists in a
+non-terminal phase: it emits the READY card, appends it to this session's orientation card, and
+continues at the phase the record names, halting nowhere. It is owed because a resumed session
+starts with no card, or a replay-written one — two states the card-reading commit deny does NOT
+reach (both allow, with a witness line: a session the writer never ran for cannot run the remedy)
+— so nothing else will orient it, and its first commit would otherwise be the first durable act
+nobody oriented. A backstop that refuses it would be a predicate change in the hook, not a
+sentence here. Skip it silently if the project has no such skill, as the start path does.
 
 ## Close
 

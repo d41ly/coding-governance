@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runnable check for the recall-opened PostToolUse hook.
-# Run: bash memory-recall/recall-opened.test.sh   (exit 0 = all pass · 1 = a failure · 3 = skipped)
+# Run from the kit directory: bash ./recall-opened.test.sh   (exit 0 = all pass · 1 = a failure · 3 = skipped)
 #
 # Every case drives the hook the way the harness does — a JSON payload on stdin — against a
 # THROWAWAY repo carrying a fabricated query log. Nothing here touches the live log; a gate that

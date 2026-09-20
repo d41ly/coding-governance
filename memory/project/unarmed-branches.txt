@@ -65,8 +65,15 @@ tools/unattended/unattended.sh	49	8	cannot hash the brief, so the row would carr
 # fixture's units region emits one row. A second rostered unit changes a fixture shared by this
 # whole suite, which the standing instruction on this node forbids running. TOOL-dBriefedPass-6
 # carries the separate fixture; TOOL-dBriefedPass-3 rev-5 DECLARES the branch unexercised.
-tools/unattended/unattended.sh	49	19	and an earlier step still holds a unit that is neither terminal nor dispatched
+tools/unattended/unattended.sh	49	22	and an earlier step still holds a unit that is neither terminal nor dispatched
 # The SIBLING malformed-order refusal sits inside the same sibling loop, so it needs the same two
 # rostered units the blocker message does and is unarmable from the shared fixture for the same
 # reason. TOOL-dBriefedPass-6 arms both together.
-tools/unattended/unattended.sh	49	18	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
+tools/unattended/unattended.sh	49	21	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it
+# THE ORDINALS ABOVE MOVED 19 -> 22 and 18 -> 21 at aDeferredBar's closing round 2 (R1): three
+# `fail 49` refusals landed ABOVE the order gate inside verb_dispatch, the same insertion-point
+# class the 27 row records, and both rows read as reworded until re-keyed. Two of the three are
+# armed; the third is the resolver refusal below, pinned rather than armed because
+# `resolve_python` RUNS each candidate and cannot be made to fail from the suite's fixture
+# without hiding every python launcher from PATH, which the suite's own arms need on it.
+tools/unattended/unattended.sh	49	18	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run

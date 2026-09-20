@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.68 -->
+<!-- gov:kit memory-tree@2.79 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -113,7 +113,7 @@ item present ONLY a conforming mark resolves it, the first line does not vote, a
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 
-**Which**, and this is what `specs-reviewed` measures. Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
+**Which**, and this is what `specs-reviewed` measures. Every spec with no review record naming it. A spec whose rev moved since its last review — by anything but that review's own fold — or that you
 authored this run, is unreviewed.
 
 **The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call
@@ -137,7 +137,11 @@ verdict line; write it anyway, because M9 derives from these records. **Carry th
 answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
 
-**A BLOCKED verdict has a disposition, and until now it had none.** The loop is bounded by CONVERGENCE, not a round count: a round re-arms only if its confirmed-blocker count is STRICTLY SMALLER than the one before — not merely "changed", which a 2, 1, 2 oscillation satisfies forever. **At the exit every blocker still standing is DISPOSED**: FOLD a defect in a document the review read, PROMOTE one needing a mechanism this build lacks and audit it as a SPEC; never parked, waived or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
+**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed", which 2, 1, 2 satisfies forever. **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
+
+**CONVERGED is terminal for its subject, rev bumps included**: a blocker confirmed on it afterwards — in the
+fold text, say — takes the severity rule's disposition and never another round; `--review`
+refuses the round and names this route.
 
 ## M5 — Recall and reuse
 
@@ -177,9 +181,16 @@ python {{KIT_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 **It takes a COMMITTED range, so it runs after the commit, not before it.** Staged-but-uncommitted work is not in
 `HEAD`, so the pre-commit spelling `<pass-base>..HEAD` resolves to an empty range and prints "touches no file" —
 which reads as a clean checklist and is not one. Its stdout IS the checklist and it always exits 0 — finish it, do
-not read its status. If a class it names is already violated, that is the next pass. Then the diff-scoped
-gates for what the pass touched; the full bar runs ONCE, at the push boundary. A pass whose gate is red is not
-followed by another: fix it, or park it with the reason. A pass that produced no change commits nothing and says so.
+not read its status. If a class it names is already violated, that is the next pass.
+
+**A pass runs no merge bar and no self-test suite.** Its verification is the direct check its
+spec's acceptance names — a checker run on a staged break, a `--selftest` flag, a fixture — and a
+pass that needs a suite verdict returns that need to the main loop rather than running one. The
+bar runs ONCE, after the last unit is terminal: at the close under a mandate, at the push boundary
+otherwise. Where a pass touched files a leg guards and the MAIN LOOP judges a bar necessary, the
+plain bar with no flag is the scoped form — at the main loop, never in a child. A pass whose check
+is red is not followed by another: fix it, or park it with the reason. A pass that produced no
+change commits nothing and says so.
 
 **Parking, at any point.** Write the *question*, the *options you saw*, and the *reason you refused* into the
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the

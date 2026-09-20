@@ -1,5 +1,11 @@
 # curation-debt.txt - index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
 #
+# A ROW THAT HIDES NOTHING NOW REDS (TOOL-cGradedDebt-1). The gate keeps each listed file IN checks
+# 6, 7 and 8 and partitions the findings, so a row whose fault was fixed - or whose cap was RAISED
+# past it, which is how the TOOL.md row outlived its own by three weeks - is named as stale. The
+# same run PRINTS which of the three each row actually earns, so the blast-radius paragraphs below
+# are now DERIVED beside the hand-written ones: where the two disagree, the run is right.
+#
 # FIVE ROWS DRAINED AT TOOL-dFramedEntrypoint-5, which removed the document-inventory region and the
 # records table from every build README. Every one of the five was RENDERER-SHAPED - a generated row
 # or a generated region blowing a cap on an authored-prose class - and each said so in its own text.
@@ -40,7 +46,9 @@ memory/builds/aUnmannedHelm/README.md
 # and 11, and are measured-at values that drift as rows land - re-measure there rather than trusting
 # this line. The owner call on which remedy to take is carried at TOOL-aWeighedCompass-3.
 # BLAST RADIUS, stated because a debt row is wider than the failure that earned it: this silences
-# checks 6, 7 AND 8 on TOOL.md, not just the byte cap. Check 8 is NOT idle here - with the registry
-# emptied it reds on line 34 - so this row is currently hiding one real status-token fault as well as
-# the width. Drains when the TOOL index is split or its rows are shortened.
+# checks 6, 7 AND 8 on TOOL.md, not just the byte cap. Check 8 was NOT idle here: measured unwaived
+# at TOOL-cGradedDebt-2 it red on SIX rows and not the one this note used to name - four leading
+# with an off-vocabulary WITHDRAWN token, two quoting a markdown table cell whose pipe the matcher
+# reads as a delimiter. All six are fixed, so the row now earns checks 6 and 7 only. Drains when the
+# TOOL index is split or its rows are shortened.
 memory/backlog/TOOL.md

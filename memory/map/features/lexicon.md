@@ -167,7 +167,9 @@ a line-based conf and `map_lib.load_conf()` has no multi-line support.
 
 That reader now also decides WHICH LANGUAGES ARE ARMED, which moved a seam. `PATTERN_SETS` in
 `lexicon.py` used to be the whole answer, and it sits in an `engine`-role file an upgrade
-overwrites — so an adopter with TypeScript, Go or C# could only declare their language `dark`.
+overwrites — so an adopter with Go or C# has no shipped extractor to reach for, and TypeScript was
+in that list until `TOOL-aGradedDialect-3` shipped `ts-tokens` and `tsx-tokens` as declared
+extensions of their own.
 A `PATTERNS:` block in the declaration now carries `<pattern-set-id>.<part>` rows, and
 `resolve_pattern_sets` merges them over the shipped constant PER KEY into a new mapping that every
 reader takes: the engine's one corpus walk, the coverage fraction, the scaffold's measured pins, and
@@ -192,6 +194,16 @@ disagree about what "no word characters" MEANS — `leading_verb` strips leading
 ASCII subtoken classes, `read_core` strips underscores at both ends and nothing else — so the same
 name is UNGRADEABLE for vocabulary and AMBIGUOUS for convention. One rule across both was never
 available: they agree only on pure-underscore names and the empty string.
+
+A per-definition FACT reaches the grader beside the population and never inside it. `extract`
+returns `(name, line)` pairs that another kit unpacks positionally, so the shape is frozen; the
+`decorator` selector answered that with an additive accessor keyed on the definition site, and the
+`returns:jsx` selector (`TOOL-aGradedDialect-10`) rides the same seam — `extract_jsx_defs` marks
+every declared `.tsx` function whose VALUE is an element, `scan_routes` reads both accessors
+through one `marks` dict, and the lexer's one new token kind is walked past by every definition
+arm — measured on the conformance corpus and the adopter tree, not argued from the token's
+text. The rule for which definitions carry the mark, and what each clause of it
+cost on the adopter corpus, is `parse_ts_source`'s header; a third accessor takes the same shape.
 
 ## Gaps
 

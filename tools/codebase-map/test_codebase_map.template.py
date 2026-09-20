@@ -153,7 +153,13 @@ def test_dossier_decisions_are_declining() -> None:
     check the very thing it exists to close. So it announces.
     """
     tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
-    assert tree.dossiers, "no dossiers under the map root: this check cannot judge an empty population"
+    if not tree.dossiers:
+        # UNGRADED, not failed. A freshly seeded tree has no dossiers yet, and asserting over
+        # an empty population is how this check reds an adopter on their first run. It binds
+        # the day the first dossier lands -- the same shape the unset-pin branch below uses.
+        print("     UNGRADED: no dossiers under the map root yet; this check grades a "
+              "population that does not exist, and binds when the first dossier lands")
+        return
     empty = sorted(d.feature for d in tree.dossiers if not d.decisions)
     raw = (m.load_conf().get("DOSSIER_DECISIONS_EMPTY_PIN", "") or "").strip()
     if not raw:

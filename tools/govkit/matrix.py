@@ -61,7 +61,13 @@ SCRATCH_EXPECT = {
     "micro-format definitions": "microformats OK —",
     "micro-format gate selftest": "PASS (",
     "line length": "NOT ADOPTED — no declaration at",
-    "line-length gate selftest": "PASS (",
+    # `line-length gate selftest` USED to be here and its removal is the point. The suite it runs is
+    # withheld from every target now: TOOL-aQuenchedHarness-6 ported it onto `tools/lib/lib-selftest.sh`,
+    # which is gov-internal and travels to nobody, so a shipped copy would red on arrival with
+    # `build_fixture: command not found`. It is a leg on GOV's bar with an [[exempt_leg]] row, and
+    # this table states what a SCRATCH INSTALL prints — a leg no install receives has no verdict to
+    # state. The both-directions assertion below is what caught the mismatch rather than letting the
+    # table quietly describe a leg that had stopped being emitted.
 }
 
 

@@ -6,10 +6,11 @@
  * (min(16, cores-2) ≈ 14). Large concurrent agent bursts saturate server
  * throughput and trip the SERVER rate limiter — killing whole review phases
  * and burning millions of subagent tokens for zero output. That cap is NOT
- * lowerable from userland, and workflow sidechains don't run hooks — so the
- * only preventive lever is to scan the Workflow *tool call* (a main-loop call
- * that DOES fire PreToolUse) and reject scripts that use the raw fan-out
- * primitives instead of the capped helpers.
+ * lowerable from userland, and a script's own `agent()` is a runtime call and
+ * not a TOOL call, so no matcher ever sees it — so the only preventive lever
+ * is to scan the Workflow *tool call* (a main-loop call that DOES fire
+ * PreToolUse) and reject scripts that use the raw fan-out primitives instead
+ * of the capped helpers.
  *
  * CONTRACT: route ALL fan-out through boundedParallel(thunks, CAP) /
  * boundedPipeline(items, CAP, ...stages). The sanctioned helper bodies are the
@@ -21,7 +22,9 @@
  * spawn claims a numbered slot with O_EXCL under a session+prompt-keyed dir in
  * the git common dir, and the spawn that finds every slot taken is denied. The
  * budget resets on the next user prompt. Agents spawned INSIDE a workflow
- * sidechain remain uncounted and always will be — no hook runs there.
+ * sidechain remain uncounted and always will be — the script's `agent()` is
+ * not a tool call, so no matcher covers it. NOT because a sidechain runs no
+ * hooks: it does, and RULE 4 carries the measurement.
  *
  * CAP: 5, a FILE CONSTANT and not overridable. This guard RESOLVES the number
  * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
@@ -60,7 +63,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.13' // gov:kit agent-cap@1.13 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.15' // gov:kit agent-cap@1.15 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1415,9 +1418,20 @@ function capFindings(script) {
 // session that fans out with direct `Agent` tool calls met no rule at all — the charter calls the
 // number BINDING and the commonest modality was unguarded.
 //
-// THE CASE THIS FILE'S OWN REJECTED ALTERNATIVE WAS ABOUT IS STILL REJECTED. Counting agents spawned
-// INSIDE a workflow script is impossible: that script runs in a sidechain with no hooks, so nothing
-// observes those spawns. A main-loop `Agent` call differs in kind — a hook DOES fire. MEASURED on
+// THE CASE THIS FILE'S OWN REJECTED ALTERNATIVE WAS ABOUT IS STILL REJECTED — but NOT for the reason
+// this comment gave for two releases. Counting agents spawned INSIDE a workflow script is impossible
+// because the script's `agent()` is a runtime call and not a TOOL call: the matcher covers
+// `Workflow|Agent` and there is no tool call to match. A sidechain agent could not re-fan-out either,
+// holding neither of those tools — MEASURED 2026-08-15, `ToolSearch` for them returns nothing.
+//
+// IT IS NOT BECAUSE A SIDECHAIN RUNS NO HOOKS. It runs them. MEASURED 2026-09-12 on node d: the
+// project-level `PreToolUse` guard on matcher `Bash|PowerShell` — `scratch-guard`, the sibling hook
+// beside this one, wired the same way — DENIED a Bash command issued by an agent inside a `Workflow`
+// sidechain. That is exactly the matcher-on-a-tool-the-sidechain-does-hold experiment the 2026-08-15
+// record asked for, and it settles the reach question against the old claim. The conclusion survives
+// its refuted premise, which is why the static scan stays; the premise does not.
+//
+// A main-loop `Agent` call differs in kind — it IS a tool call, so this hook receives it. MEASURED on
 // node a before any of this was written: `tool_name` arrives as exactly `Agent`, and the payload
 // carries `session_id`, `prompt_id` and `tool_use_id`.
 //
@@ -1483,9 +1497,14 @@ const AGENT_TTL_MS = 12 * 60 * 60 * 1000
 // PreToolUse DOES fire for Agent — re-confirmed here by watching a real spawn claim a slot. Both
 // cannot be right, and wiring a release for an event that never arrives would ship exactly the
 // mechanism-that-cannot-fire this repo gates against. Settle it with a PostToolUse[Agent] probe plus
-// a PostToolUse[Bash] CONTROL, in a FRESH session: settings are not hot-reloaded, which is why it
-// could not be settled where it was found. Then the TTL demotes to the crash/interrupt backstop the
-// hooks reference recommends and stops being the primary mechanism.
+// a PostToolUse[Bash] CONTROL, wired IN PLACE. This comment used to send that probe to a FRESH
+// session because settings are not hot-reloaded; that reason is wrong. The public hooks reference
+// says direct edits to hooks in settings files are normally picked up by the file watcher, and
+// OBSERVED on node d in session a6d954d0 the wired agent-cap command CHANGED mid-session after
+// commit 206af3de retargeted `.claude/settings.json` — two denials in one transcript naming two
+// different commands. A fresh session is still the tidier control, because it removes the question of
+// WHEN the watcher caught the edit; it is no longer a precondition. Then the TTL demotes to the
+// crash/interrupt backstop the hooks reference recommends and stops being the primary mechanism.
 const SLOT_TTL_MS = 45 * 60 * 1000
 const slug = (s) => String(s).replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 120)
 

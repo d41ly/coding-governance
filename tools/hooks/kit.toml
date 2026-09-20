@@ -21,10 +21,14 @@ include = ["agent-cap.js"]
 role = "engine"
 to = "{prefix}/hooks/agent-cap.js"
 
+# WITHHELD, TOOL-aQuenchedHarness-3: this suite stages a break into a copy of the hook
+# beside it, so its subject is the hook and it has a job only when that source changes.
+# `project-owned` rather than a second carve-out rule, because this home enumerates its
+# files one rule per file and a source claimed twice is the conflict selfcheck reports.
+# `silenced_legs` drops the leg that names it, so both halves close here.
 [[files]]
 include = ["agent-cap.test.sh"]
-role = "engine"
-to = "{prefix}/hooks/agent-cap.test.sh"
+role = "project-owned"
 
 # The descriptor travels with the kit, as it does for every entry whose include is `**`. Without
 # this rule it was the ONE file under a non-flat home that no rule claimed — invisible to the
@@ -53,37 +57,39 @@ include = ["scratch-guard.js"]
 role = "engine"
 to = "{prefix}/hooks/scratch-guard.js"
 
+# WITHHELD, TOOL-aQuenchedHarness-3: this suite stages a break into a copy of the hook
+# beside it, so its subject is the hook and it has a job only when that source changes.
+# `project-owned` rather than a second carve-out rule, because this home enumerates its
+# files one rule per file and a source claimed twice is the conflict selfcheck reports.
+# `silenced_legs` drops the leg that names it, so both halves close here.
 [[files]]
 include = ["scratch-guard.test.sh"]
-role = "engine"
-to = "{prefix}/hooks/scratch-guard.test.sh"
+role = "project-owned"
 
 [[files]]
 include = ["scratch-guard.fragment.json"]
 role = "engine"
 to = "{prefix}/hooks/scratch-guard.fragment.json"
 
-[[gate_leg]]
-name = "scratch-guard self-test"
-subject = "kit"
-argv = ["bash", "{prefix}/hooks/scratch-guard.test.sh"]
-guard = ["{prefix}/hooks/"]
-
 [adopt]
+# RESTORED. TOOL-aQuenchedHarness-3 removed two `[[gate_leg]]` rows from this file and took
+# the `[adopt]` table and the whole `[check]` block out with them -- the hunk boundaries ran
+# past the rows it meant to delete. `agent-cap` was then the only descriptor of thirteen
+# carrying neither, and `govkit check <target>` reds on exactly that for every adopter that
+# selected it. Found by the closing review of the build that deleted them.
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
-
-[[gate_leg]]
-name = "agent-cap self-test"
-subject = "kit"
-argv = ["bash", "{prefix}/hooks/agent-cap.test.sh"]
-guard = ["{prefix}/hooks/"]
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+#
+# The reason is UNCHANGED except for its first clause, which said the kit "ships a self-test
+# that rides the bar as its own leg". It no longer ships one: TOOL-aQuenchedHarness-3
+# withheld both suites, and they are legs on GOV's bar alone. The rest of the argument --
+# no adopter verb, no rendered artifact, wiring is check-wiring's question -- holds as it did.
 none = """
-the kit ships a self-test that rides the bar as its own leg, and no adopter and no rendered artifact — so there is nothing here for `check` to run that is not already a gate. Whether the hook is WIRED is check-wiring's question, not this kit's
+this kit ships a hook and a settings fragment and nothing that runs: its two self-tests are withheld from every adopter and are legs on gov's bar alone, and there is no rendered artifact. Whether the hook is WIRED is check-wiring's question, not this kit's
 """
 
 [[lf_pin]]

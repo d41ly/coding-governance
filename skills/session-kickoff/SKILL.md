@@ -46,22 +46,21 @@ not a meeting.
 
 ## Step 1 — Orient (ONE batched command; report ≤5 lines)
 
-In a single shell call, in `<repo>`: current branch · `status --short` · fetch +
-`merge --ff-only <remote>/<default>` (only when on the default branch with a clean tree;
-report if it moved) · `rev-parse HEAD` → report as **BASE** (pin the immutable SHA for later
-diff-scoping, never a moving ref) · `git worktree list` when the layout is multi-tree AND no
-hook already reported it.
+One shell call in `<repo>`: `git branch --show-current` · `status --short` · fetch +
+`merge --ff-only <remote>/<default>` (only on the default branch with a clean tree; report if
+it moved) · `rev-parse HEAD` → report as **BASE** (the immutable SHA for diff-scoping, never a
+moving ref). A card opening `orientation —` in context already carries the node tag, tree
+kind, worktree count and recent subjects: consume those, never its branch or BASE (HEAD may
+have moved since). No card → add `git worktree list` when multi-tree.
 
-If the ff moved the default branch AND the project has a codebase map (the manifest declares
-one, or `.codebase-map.conf` exists at the repo root): render the feature-level digest of what
-came in — the manifest's map-diff command over `<old-sha>..<new-sha>` (default:
-`python tools/codebase-map/map_diff.py <old>..<new>`) — and report it (rollup + coverage line;
-`--verbose` only if asked).
+If the ff moved the default branch AND the project has a codebase map (manifest-declared, or
+`.codebase-map.conf` at the repo root): run the manifest's map-diff command over
+`<old-sha>..<new-sha>` (default `python tools/codebase-map/map_diff.py <old>..<new>`) and report
+the rollup + coverage line, `--verbose` only if asked.
 
-**STOP and tell the user first** (before any further step) when: a foreign `MERGE_HEAD` or
-`UU` conflict entries exist; the ff-merge fails (local diverged from remote); or the
-checked-out branch violates the project's stated conventions. A clean tree is NOT proof
-you're on the right branch.
+**STOP and tell the user first** when: a foreign `MERGE_HEAD` or `UU` conflict entries exist;
+the ff-merge fails (local diverged); or the branch violates the project's stated conventions.
+A clean tree is NOT proof you're on the right branch.
 
 ## Step 2 — Load the project layer (the manifest)
 
@@ -112,9 +111,10 @@ value falls through to the next candidate and gets one flag line in the READY ca
 proceed unaudited and say so in one clause. Relay a version WARN without blocking on it.
 
 On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restructure becomes a
-flagged §A task instead): for each file the drift check lists, re-check the §B claim(s) derived
-from it (gate fence ← CI/scripts · pointer map ← moved dirs · traps/corrections ← toolchain
-files), fix or DELETE stale rows, and delete dated entries whose prune-when condition now holds.
+flagged §A task instead) and STAGE it; Step 5 commits it after the append: for each file the
+drift check lists, re-check the §B claim(s) derived from it (gate fence ← CI/scripts · pointer
+map ← moved dirs · traps/corrections ← toolchain files), fix or DELETE stale rows, and delete
+dated entries whose prune-when condition now holds.
 Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
@@ -190,46 +190,49 @@ No kit → skip (one clause).
 **Only if the manifest defines an id/ledger protocol:** mint + collision-check the session
 slug per its rules and draft the ledger row for the user. No id scheme → skip (one clause).
 
-## Step 5 — READY card, then stop
+## Step 5 — READY card, append it, then stop
 
-Echo a compact **READY card**: repo · branch + BASE sha · remote/default branch · scope
-in/out · acceptance · gates · governing docs + prior records · slug (or "none") · the
-manifest-audit delta line (when Step 2b ran a repair). Then hand
-control back: *"Ready — say go and I'll start, or adjust any field."* Do not start building
-until the user confirms.
+Echo a compact **READY card** — repo · remote/default branch · `## task` (the sealed fields:
+scope in/out · acceptance · gates · slug or "none") · `## manifest` (the audit delta line, when
+Step 2b ran a repair) · `## read` (governing docs + entrypoints) · `## records` (prior records +
+the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items) —
+closed by the READY micro-format at branch + `base` = BASE. Pipe the six sections and that line
+into `bash <check-script> --card --append --session <sid>`, `<sid>` from the `orientation —`
+header in context; report a refusal on the card and still stop. Commit Step 2b's staged repair
+AFTER that append, THEN hand control back:
+*"Ready — say go and I'll start, or adjust any field."* Do not start building until the user
+confirms.
 
-## Step 5b — the unattended hand-back (only inside a run that was actually started as one)
+## Step 5b — the unattended hand-back (only inside a run actually started as one)
 
-**Default is the stop above.** This step is the narrow exception, and it fires only when the project
-adopts an unattended-run kit AND **this session is already inside a started unattended run** — its
-run-state file exists for this build, in a non-terminal phase, written by that kit's own preflight.
-Never on the strength of a chat instruction.
+**Default is the stop above.** This step fires only when the project adopts an unattended-run kit
+AND **this session is already inside a started unattended run** — its run-state file exists for
+this build, non-terminal, written by that kit's own preflight. Never on a chat instruction.
 
-**The authorization is a precondition, not the trigger.** A committed build folder is what lets a run
-START; it is true of every build in the tree, so treating it as the signal that a run IS happening
-hands the exception to every attended session. Anything short of a live run-state file → Step 5 halts
-exactly as written, prompt string and all.
+**The authorization is a precondition, not the trigger.** A committed build folder lets a run START
+and exists for every build in the tree, so reading it as proof a run IS happening hands the
+exception to every attended session. Anything short of a live run-state file → Step 5 halts exactly
+as written, prompt string and all.
 
-Inside one: echo the READY card, add one line naming the build and its run-state file, and
-**continue without halting**. The card is still emitted — an unattended run needs its scope on the
-record more than an attended one does, because nobody is going to ask.
+Inside one: echo the READY card, append it as Step 5 does plus one line naming the build and its
+run-state file, commit the staged repair after that append, and **continue without halting**. The
+card is still emitted — an unattended run needs its scope on the record MORE, because nobody is
+going to ask.
 
-Before the first pass, load the project's build method if it ships one — `<MEMORY_ROOT>/guides/BUILD-METHOD.md`,
-rendered by the memory-tree kit. It carries the spec set, the fork rule, the pass loop and the
-regrounding procedure, none of which this engine states.
+Before the first pass, load the project's build method if it ships one —
+`<MEMORY_ROOT>/guides/BUILD-METHOD.md`, rendered by the memory-tree kit: the spec set, the fork
+rule, the pass loop and the regrounding procedure, none of which this engine states.
 
 **Six other interactive exits of this engine stop to ask, and a mandated run that stops at one is stuck, not
 unattended.** `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md` §13 enumerates them and how each resolves
 with no owner turn; this step's hand-back is the only one of the six the mandate buys. Not restated
 here — a paraphrase and its source are two answers to one question.
 
-An ABORT is a VERB, not a decision to stop typing: the unattended kit's `--abort <slug> --reason
-"<why>"` writes the reason into the run-state file's parked region, records a terminal phase with a
-witness, and stages it. Use it rather than simply halting — a run that stops without it stays
-non-terminal forever, and every later run is measured against a counter that still includes yours.
-It requires both agent-attested items first (reap the keepalive, surface the parked decisions),
-because an abort orphans the same job and leaves the same decisions unseen. It does not merge and it
-does not push.
+An ABORT is a VERB: the unattended kit's `--abort <slug> --reason "<why>"` writes the reason into
+the run-state file's parked region, records a terminal phase with a witness, and stages it. A run
+that halts without it stays non-terminal forever, and every later run is measured against a counter
+that still includes yours. It requires both agent-attested items first (reap the keepalive, surface
+the parked decisions). It does not merge and it does not push.
 
 ## Scaffolding a manifest (only on user yes)
 

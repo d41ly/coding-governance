@@ -129,6 +129,16 @@ BASE_RESOLVE_CUTOFF=""
 # repo's conf leaves an adopter a dead arm reading as armed.
 SPEC_LEGLINE_CUTOFF=""
 
+# Bar-invocation ratchet, read by the spec-tokens checker rather than by the hygiene engine: from
+# this date a LIVE spec whose acceptance bullet or §7 leg line backticks a merge-bar or self-test
+# suite invocation is red — a bar or a suite is not an acceptance observation; observe the checker
+# on a staged break, a --selftest flag or a fixture, and name the suite under `New arm:`. Set it to
+# the day AFTER the later of your newest spec filename date on any ref and the setting commit's own
+# date; the checker refuses a value not strictly past the day it was committed. Blank = never
+# required, and the report line then counts the live specs carrying such a token. Declared here by
+# hand for the same reason as the row above: the example-parity arm cannot see this key.
+SPEC_DIRECT_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
@@ -146,7 +156,7 @@ CHARTER="AGENTS.md"
 
 # --- corpus_ids.py (checks 13-15; check 16 is STRUCTURAL and behind no pin). Every number below
 # --- is MEASURED against YOUR corpus by
-# --- `python memory-tree/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
+# --- `python <kit>/corpus_ids.py --measure`, and NEVER inherited from another repo: a pin
 # --- copied from a larger tree is either vacuous or permanently red. Blank turns its check off.
 # --- Ship them blank, run --measure once the tree has content, and paste what it prints.
 # Orphan ids: cited but never defined. Shrink-only once set.
@@ -182,6 +192,30 @@ DOSSIER_CAP_LINES="0"
 # because it reds every line rather than expressing an intent.
 ENTRY_CAP_CHARS="300"           # a row document
 BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were measured wider
+
+# ROTATION_MODE — what a ROTATION MEANS for a status-bearing shard. TWO values and no third:
+#   cut       the archive holds TERMINAL rows only (CLOSED/WONTDO); every non-terminal row stays in
+#             the live shard. Live and archive PARTITION the family, so an id sits in exactly ONE
+#             file and its status has exactly one owner.
+#   snapshot  `git mv` the whole index to the archive, then open a fresh one carrying the
+#             non-terminal rows forward. A live id then sits in TWO files, the archived copy being a
+#             dated photograph of the index rather than a second answer about that id's status.
+# BOTH ARE COHERENT. They are different DISCIPLINES, not different strictnesses, which is why there
+# is no default and no forward resolution: neither is the safe fallback, and a tree graded under the
+# other project's discipline reports green over rows nobody reconciled.
+# THIS REPO DECLARES cut. The shipped example declares snapshot — the deliberate example/gov
+# divergence READINESS_ROWS above already records — because snapshot is what this kit's prose has
+# always described and what inCMS practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
+# MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
+# — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
+# into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising
+# terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7 of those
+# disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12.
+# BLANK IS UNDECLARED, and nothing refuses it today. That is the honest cost of not breaking every
+# adopter tree on a kit upgrade, and it is weaker than this comment's "no default" reads: an adopter
+# can run forever undeclared. An UNRECOGNISED value is a different answer from a blank one and does
+# NOT collapse into it — it aborts the engine at exit 2, beside ENTRY_CAP_UNIT.
+ROTATION_MODE="snapshot"
 # Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
 # membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
 # identically on every node — which is why the answer is declared here rather than probed.

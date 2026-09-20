@@ -38,8 +38,11 @@ src_of() { for c in "$REPO/tools/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; 
 install_driver() {
   local p="$1" rel src
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
-  for rel in memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh \
-             memory-recall/extract.py memory-recall/recall_conf.py; do
+  # A CONTINUED LINE CANNOT CARRY A COMMENT — the backslash would escape the space before it,
+  # not the newline — so the list is two assignments, each of which can be marked.
+  _rels="memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  _rels="$_rels memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  for rel in $_rels; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
     # of the driver — the shim's resolver, the memory-recall kit the anchor grammar is imported
@@ -236,7 +239,9 @@ JSON
   # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
   # denies every matcher there is.
   rm -f .claude/settings.json
-  "${PYBIN:-python}" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
+  "$py" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
@@ -267,7 +272,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
     && ck "AC8 recall kit absent -> skip, exit 0" 1 || ck "AC8 recall kit absent -> skip, exit 0" 0
 
   # state 2 — kit adopted, hook opt-in NOT taken -> skip, exit 0 (never UNWIRED)
-  cp "$FRAG" memory-recall/recall-opened.fragment.json
+  cp "$FRAG" memory-recall/recall-opened.fragment.json  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'opt-in not taken'; } \
     && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
@@ -277,7 +282,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
   # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
   # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
-  printf '// stub\n' > memory-recall/recall-opened.js
+  printf '// stub\n' > memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
@@ -293,7 +298,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   cp "$SMERGE" tools/settings-merge.py
 
   # state 4 — merged into settings.json -> ok, exit 0
-  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1
+  "$py" tools/settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
@@ -301,13 +306,118 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from
   # WIRE §3c step 4 (two separate commands) in reverse order, and from any later loss of the
   # untracked hook file; Claude Code then runs `node` against nothing on every Read.
-  rm -f memory-recall/recall-opened.js
+  rm -f memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
     && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
   cleanup
 else
   echo "skip recall cases — settings-merge.py or recall-opened.fragment.json not found"
+fi
+
+# AC14 — the orientation-card arm (TOOL-aReplayedCard-2), SIX states in one repo, plus the
+# `--resolve-fragment` print verb. The two fragments are `{here}`-shaped: they sit beside the
+# kickoff engine, which is `kind = "flat"` and ships to `{prefix}/`, so the fixture installs them
+# at `$KIT_REL/` next to a stub engine — the adopter layout — and reads the matchers back from the
+# fragments themselves, never from a second spelling here.
+CARDFRAG=""; REPLAYFRAG=""
+for c in "$HERE/orientation-card.fragment.json" "$REPO/skills/session-kickoff/orientation-card.fragment.json"; do
+  [ -f "$c" ] && { CARDFRAG="$c"; REPLAYFRAG="$(dirname "$c")/orientation-replay.fragment.json"; break; }
+done
+if [ -f "$SMERGE" ] && [ -n "$CARDFRAG" ] && [ -f "$REPLAYFRAG" ]; then
+  . "$REPO/tools/lib/resolve-python.sh"
+  py=$(resolve_python) || { echo "check-wiring.test: no usable python"; exit 2; }
+  newrepo
+  git config core.hooksPath .githooks        # isolate: hooks wired, so only the card arm can move the exit
+  mkdir -p $KIT_REL .claude; cp "$SMERGE" $KIT_REL/settings-merge.py
+
+  # state 1 — no fragment anywhere -> skip, exit 0
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     card' && printf '%s' "$out" | grep -q 'does not ship'; } \
+    && ck "AC14 card fragments absent -> skip, exit 0" 1 || ck "AC14 card fragments absent -> skip, exit 0" 0
+
+  # state 2 — fragments shipped, engine absent -> skip (not adopted), exit 0
+  cp "$CARDFRAG" $KIT_REL/orientation-card.fragment.json
+  cp "$REPLAYFRAG" $KIT_REL/orientation-replay.fragment.json
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     card' && printf '%s' "$out" | grep -q 'not adopted'; } \
+    && ck "AC14 fragments present, engine absent -> skip, exit 0" 1 || ck "AC14 fragments present, engine absent -> skip, exit 0" 0
+
+  # the print verb: `{here}` is the fragment's OWN directory, `{kit}` two up, and a fragment with
+  # no hook_path is a non-zero answer rather than an empty line that reads as a root path.
+  got=$(bash "$SCRIPT" --resolve-fragment $KIT_REL/orientation-card.fragment.json 2>/dev/null)
+  ck "AC14 --resolve-fragment expands {here} to the fragment's directory" "$([ "$got" = "$KIT_REL/manifest-check.sh" ] && echo 1 || echo 0)"
+  mkdir -p $KIT_REL/hooks; printf '{"hook_path": "{kit}/hooks/x.js", "marker": "x.js", "matcher": "M", "event": "E", "name": "x"}\n' > $KIT_REL/hooks/x.fragment.json
+  got=$(bash "$SCRIPT" --resolve-fragment $KIT_REL/hooks/x.fragment.json 2>/dev/null)
+  ck "AC14 --resolve-fragment expands {kit} two directories up" "$([ "$got" = "$KIT_REL/hooks/x.js" ] && echo 1 || echo 0)"
+  printf '{"marker": "x.js"}\n' > $KIT_REL/hooks/nohook.fragment.json
+  got=$(bash "$SCRIPT" --resolve-fragment $KIT_REL/hooks/nohook.fragment.json 2>/dev/null); rc=$?
+  ck "AC14 --resolve-fragment refuses a fragment with no hook_path" "$([ "$rc" != 0 ] && [ -z "$got" ] && echo 1 || echo 0)"
+  rm -rf $KIT_REL/hooks
+
+  # state 3 — engine present, nothing in settings.json -> UNWIRED, exit 1; --session still exits 0
+  printf '#!/usr/bin/env bash\nexit 0\n' > $KIT_REL/manifest-check.sh
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  card' && printf '%s' "$out" | grep -q 'orientation-card entry (--write)'; } \
+    && ck "AC14 engine present, unmerged -> UNWIRED naming the entry, exit 1" 1 || ck "AC14 engine present, unmerged -> UNWIRED naming the entry, exit 1" 0
+  chk --session >/dev/null; [ "$?" = 0 ] && ck "AC6 --session exit 0 despite card unwired" 1 || ck "AC6 --session exit 0 despite card unwired" 0
+
+  # state 4 — THE NARROWED MATCHER (AC7). The writer is right; the replay sits under `resume`
+  # alone, so the card is gone after the first compaction while the file reads as wired to a
+  # marker grep. Written by hand, because the merger would re-match it.
+  cat > .claude/settings.json <<JSON
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \\"\${CLAUDE_PROJECT_DIR}/$KIT_REL/manifest-check.sh\\" --card --write"
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \\"\${CLAUDE_PROJECT_DIR}/$KIT_REL/manifest-check.sh\\" --card --replay"
+          }
+        ]
+      }
+    ]
+  }
+}
+JSON
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  card' \
+      && printf '%s' "$out" | grep -q "wired under matcher 'resume', not 'resume|compact'"; } \
+    && ck "AC14 a replay matcher lacking compact -> UNWIRED naming compact" 1 \
+    || ck "AC14 a replay matcher lacking compact -> UNWIRED naming compact" 0
+  ck "AC14 ...and the correctly wired writer does not print ok on its own" \
+    "$(printf '%s' "$out" | grep -q 'ok       card' && echo 0 || echo 1)"
+
+  # state 5 — both merged by the merger itself -> ok, exit 0. This is the arm that reds when
+  # `matchers_of` greps a dash-leading marker without `-e`: grep exits 2 on `--write` as an option.
+  rm -f .claude/settings.json
+  "$py" $KIT_REL/settings-merge.py --fragment $KIT_REL/orientation-card.fragment.json >/dev/null 2>&1
+  "$py" $KIT_REL/settings-merge.py --fragment $KIT_REL/orientation-replay.fragment.json >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       card' \
+      && printf '%s' "$out" | grep -q -- "--write at 'startup|clear', --replay at 'resume|compact'"; } \
+    && ck "AC14 both merged -> ok naming both matchers, exit 0" 1 || ck "AC14 both merged -> ok naming both matchers, exit 0" 0
+
+  # state 6 — the writer alone merged: half a wiring is UNWIRED naming the half that is missing.
+  rm -f .claude/settings.json
+  "$py" $KIT_REL/settings-merge.py --fragment $KIT_REL/orientation-card.fragment.json >/dev/null 2>&1
+  out=$(chk --check); rc=$?
+  { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'orientation-replay entry (--replay) is not in settings.json'; } \
+    && ck "AC14 writer merged, replay not -> UNWIRED naming the replay" 1 || ck "AC14 writer merged, replay not -> UNWIRED naming the replay" 0
+  cleanup
+else
+  echo "skip card cases — settings-merge.py or the orientation fragments not found"
 fi
 
 # AC9 — the eol arm: detect in --check, repair in --fix, and never reach past its bound.
@@ -437,7 +547,7 @@ out=$(chk --check); rc=$?
 # a merge driver that cannot start exits non-zero without writing %A: git then reports CONFLICT and
 # leaves the path holding OURS-only content with no markers. The remedy has to name the launcher that
 # TRAVELS WITH THE KIT, because `tools/lib/pyrun.sh` is gov-internal and an adopter never receives it.
-cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py
+cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'merge-rows.sh beside it'; } \
   && ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 1 \
@@ -467,7 +577,10 @@ chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); r
 # ...and it is the KIT-INTERNAL launcher that won, not the gov-internal shim. `install_driver` lays
 # both, so without this the fallback could silently win everywhere and every arm here would still
 # pass — while an adopter, who receives only the kit, got a command naming a file they do not have.
-{ printf '%s' "$got" | grep -q 'memory-tree/merge-rows.sh' \
+# The pattern sits in a variable so the marked line carries no line continuation — a trailing
+# backslash escapes the space before a comment, not the newline, and the break is valid shell.
+_want_launcher='memory-tree/merge-rows.sh'   # gov:root-fixture — the kit launcher's own spelling
+{ printf '%s' "$got" | grep -q "$_want_launcher" \
   && ! printf '%s' "$got" | grep -q 'pyrun'; } \
   && ck "AC10 the kit launcher wins over the gov-internal shim" 1 \
   || ck "AC10 the kit launcher wins over the gov-internal shim" 0
@@ -568,7 +681,7 @@ qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && 
 rm -rf "$Q"
 git checkout -q -- $KIT_REL/memory-recall/extract.py 2>/dev/null || true
 if grep -q 'def anchor_at(line, g=None):' $KIT_REL/memory-recall/extract.py; then
-  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py
+  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
 fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \

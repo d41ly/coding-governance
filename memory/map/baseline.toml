@@ -36,7 +36,6 @@ gate-legs = [
 kits = [
   "agent-instructions",
   "drift-audit",
-  "gate-lint",
   "lib",
   "pytest-parallel-guardrails",
   "workflows",

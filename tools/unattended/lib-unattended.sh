@@ -28,6 +28,20 @@
 # pin the other does not have.
 GIT_PIN_REPLACE=core.useReplaceRefs=false
 GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
+# NO MEMO LIVES HERE, and the attempt is recorded because it looked obviously right.
+# TOOL-aQuenchedHarness-10 cached this wrapper on argv, having measured that 436 of the leg's
+# 1008 git calls are byte-identical repeats. It bought almost nothing: about twenty call sites
+# invoke `GIT` inside `$( )`, and whole functions — `pass_commit`, `next_anchor`,
+# `baseline_units`, `pinned_units` — are themselves called through command substitution, so
+# every cache entry they filled died with the subshell that filled it. `rev-parse HEAD` still
+# cost 39 spawns with the cache active.
+#
+# It also RED-ED check 28, which is the better reason it is gone: that check reads this
+# definition LINE and requires the replace-ref pin on it, so a wrapper whose body carries the
+# pin while its signature does not is exactly the unpinned-wrapper shape it exists to catch.
+# The lesson the measurement actually supports: fill tables ONCE in the main shell before the
+# loops, which is what `is_published` now does, rather than caching a wrapper that is mostly
+# called from subshells.
 GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
 
 # ------------------------------------------------------------------------------- ids, anchored
@@ -38,8 +52,24 @@ GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
 id_rows() {  # haystack-text · id  -> the lines carrying that id as a whole token
   printf '%s\n' "$1" | grep -E "(^|[^A-Za-z0-9-])$2([^A-Za-z0-9-]|\$)" || true
 }
+# PURE BASH, AND THIS ONE IS THE HOT PATH. `id_rows` forks a subshell and spawns a `grep` per
+# call, and `pass_commit` calls this once per commit in its window -- 1528 calls in one run of
+# `check-unattended.sh`, measured on node `a` 2026-09-07, which was the largest single spawn
+# population left in the leg after the `git log -1` removal above it.
+#
+# THE PATTERN IS `id_rows`'S, and the two are EQUIVALENT on a multi-line haystack even though
+# grep anchors per LINE and bash anchors per STRING: a newline is itself a member of the
+# negated class each anchor alternates with, so every position where grep's `^` or `$` would
+# match is a position where the character-class branch matches instead. That is the kind of
+# claim that is obviously true and occasionally false, so it was checked differentially over
+# seventeen cases -- both anchors, both multi-line edges, the `-1`/`-10` trap and the
+# hyphenated suffix -- before this landed, and the leg's whole stdout is byte-identical
+# across the change. TOOL-aQuenchedHarness-7.
+#
+# `id_rows` KEEPS its grep: it returns the matching LINES, which is a different job, and it is
+# not called per commit.
 id_in() {    # haystack-text · id  -> 0 when the id appears as a whole token
-  [ -n "$(id_rows "$1" "$2")" ]
+  [[ $1 =~ (^|[^A-Za-z0-9-])"$2"([^A-Za-z0-9-]|$) ]]
 }
 
 # --------------------------------------------------------------------------- paths, normalised
@@ -81,6 +111,35 @@ is_repo_root() {
   return 1
 }
 
+# --------------------------------------------------- the paths a unit's brief rows name, once
+# Prints, one per line and normalised, every path a ` brief · item <unit> · reason ` row names in
+# the run-state file AS IT STANDS AT <commit>. Two consumers, one parser: `pass_commit` subtracts
+# this set before it calls a commit a pass commit, and check 23 subtracts the same set before it
+# grades what that commit carried. When the exclusion lived in check 23 alone, a `{run-state,
+# brief}` bookkeeping commit naming the unit — the ordinary shape, since `--brief` requires the
+# brief TRACKED and stages the run-state file beside it — was SELECTED as the pass commit, graded
+# clean once the brief was forgiven, and the pass's real commit was never read. The closing diff
+# review of aRatifiedRulings, finding 7. Only the leg was fooled: the driver's condition 1 also
+# requires an `overlaps` hit against the declared set before it closes a pass, and a brief overlaps
+# nothing an ordinary pass declares.
+#
+# THE TREE AT THE COMMIT, never the working copy: a row appended after the commit is outside it by
+# construction, which is what keeps a post-hoc `--brief` from excusing a stray write. Selected on
+# the whole field with both separators, so `-1` is not a prefix of `-10`; parsed with
+# `check-brief-recorded.sh`'s own expansions, so a grammar change breaks every reader the same way.
+# The blob lands in a VARIABLE and the loop reads the variable through a heredoc: a substitution in
+# the heredoc body is the class `pass_commit` deadlocked on.
+read_brief_paths() {  # commit · unit · run-state-path
+  _rb_run=$(GIT show "$1:$3" 2>/dev/null || true)
+  while IFS= read -r _rb_r; do
+    case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
+    _rb_r=${_rb_r#* · reason }; _rb_r=${_rb_r#* }
+    normpath "$_rb_r"; printf '\n'
+  done <<RBP
+$_rb_run
+RBP
+}
+
 # ------------------------------------------------------------- has this pass committed yet, once
 # Prints the FIRST pass commit after <anchor> and returns 0; prints nothing and returns 1 while the
 # pass is still open. Three callers need this and each spelled it separately before: the driver's
@@ -90,6 +149,9 @@ is_repo_root() {
 # `--dispatch` STAGES the run-state file, so the run commits that declaration itself — and that
 # commit's subject names the unit, because it is about that unit. Counting it closes a pass before
 # the pass has written a byte, and the whole disjointness proof then runs over an empty sibling set.
+# THE BRIEF `--brief` STAGED IS THE SAME KIND OF BOOKKEEPING: a commit whose touch set minus the
+# run-state file minus the paths its brief rows name is EMPTY moved nothing the pass wrote, and the
+# walk continues to the commit that did (`read_brief_paths` above).
 #
 # The window is `<anchor>..HEAD` and the answer is the FIRST qualifying commit, never a later one: a
 # pass's own review fold or spec bump lands after its group has ended and is not the commit that
@@ -102,13 +164,57 @@ is_repo_root() {
 pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEAD]
   _pa=$1; _pu=$2; _prel=$3; _pto=${4:-HEAD}
   GIT rev-parse --verify --quiet "$_pa^{commit}" >/dev/null 2>&1 || return 1
-  for _pc in $(GIT log --reverse --format=%H "$_pa..$_pto" 2>/dev/null); do
-    id_in "$(GIT log -1 --format=%s "$_pc" 2>/dev/null)" "$_pu" || continue
+  # THE SUBJECT COMES OUT OF THE SAME WALK AS THE SHA. It used to cost a `git log -1` per
+  # commit in the window, on every call, and this function is called once per (anchor, unit)
+  # pair -- so the same commits were re-read once per pair. Profiled on node `a` 2026-09-07
+  # over a full run of `bash tools/unattended/check-unattended.sh`: 1528 of that run's 2513
+  # git spawns were this one line, against 31 for the `--follow` walk everyone assumes is the
+  # expensive one. `%H%x09%s` gets both out of one walk. TOOL-aQuenchedHarness-7.
+  #
+  # A FILE, NEVER A PIPE AND NO LONGER A HEREDOC. The heredoc was here for a real reason and the
+  # reason still stands: a piped `while` runs in a subshell and this loop RETURNS from the function,
+  # so the `return 0` below would exit the subshell and the function would fall through. What the
+  # heredoc solved in one direction it broke in the other, because its body was a COMMAND
+  # SUBSTITUTION: `$( )` reads until EOF, EOF arrives when the LAST inherited write end closes, and
+  # `GIT` is a shell FUNCTION — so the substitution forks a subshell which forks `git`, and the
+  # reader waits on a grandchild's write end. On 2026-09-10 that never closed: the `unattended kit
+  # gate` leg sat at zero CPU for 63 minutes, with the forked subshell holding both ends of its own
+  # pipe on fd 3 and fd 4 and no descendant alive, until an operator killed it.
+  #
+  # The walk therefore runs in the CURRENT shell with its stdout redirected to a scratch file, and
+  # the loop reads that file by redirect. No pipe exists, so no EOF has to arrive; a redirect from a
+  # file creates no subshell, so `return 0` still returns from `pass_commit`. Both properties at
+  # once, which is what the heredoc could not do.
+  # `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` is the class; the `shell hygiene (a loop
+  # fed by a command substitution)` merge-bar leg now refuses it repo-wide. TOOL-aLeakedHandle-1.
+  #
+  # A SCRATCH FILE THAT CANNOT BE CREATED IS A NAMED REFUSAL, not a fall-through to `return 1`.
+  # `return 1` already MEANS "this pass has not committed yet", so answering a broken TMPDIR with it
+  # would report every open pass as open forever and read as a correct answer. Both callers spell
+  # `$(pass_commit … || true)`, so rc 2 reaches them as the same empty answer rc 1 does — the
+  # difference is the stderr line, which is the only thing that makes a broken TMPDIR visible.
+  _pf=$(mktemp) || { printf 'lib-unattended: pass_commit cannot create a scratch file, so it cannot say whether this pass committed\n' >&2; return 2; }
+  GIT log --reverse --format="%H%x09%s" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
+  # It reads LINES rather than word-splitting because a subject holds spaces, and the possibly-empty
+  # field is LAST for the reason memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
+  while IFS=$'\t' read -r _pc _psub; do
+    [ -n "$_pc" ] || continue
+    id_in "$_psub" "$_pu" || continue
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
+    # EXACT membership against the newline-wrapped set, deliberately not `covers`: a row naming a
+    # directory must forgive nothing under it. Same test check 23 makes, on the same set.
+    _pnl=$'\n'; _pbrief="$_pnl$(read_brief_paths "$_pc" "$_pu" "$_prel")$_pnl"
+    _pleft=""
+    for _pp in $_ptouch; do
+      case "$_pbrief" in *"$_pnl$_pp$_pnl"*) ;; *) _pleft=1; break ;; esac
+    done
+    [ -n "$_pleft" ] || continue
     printf '%s\n' "$_pc"
+    rm -f "$_pf"
     return 0
-  done
+  done <"$_pf"
+  rm -f "$_pf"
   return 1
 }
 

@@ -11,16 +11,81 @@ why_two_ids = "this directory versions its files under TWO kit ids — the revie
 include = "**"
 role = "engine"
 
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+[[files]]
+include = ["check-review-join.test.sh", "check-verifier-fanout.test.sh", "tier2-review.test.sh", "unattended-build.test.sh"]
+role = "project-owned"
+
 [[files]]
 include = ["REVIEW-PROTOCOL.template.md"]
 role = "rendered"
 to = "{memory_root}/guides/REVIEW-PROTOCOL.md"
 placeholders = ["TOOL_ROOT"]
 
+# THE BUILD HARNESS IS RENDERED, not shipped. It went out as an engine file under the `**` rule
+# above, and apply writes those verbatim, so the four install paths it spells reached every adopter
+# at another prefix naming files that adopter does not have: the driver, the bug-class checklist, the
+# review sub-workflow it awaits and the child it hands the caller. A workflow script has no filesystem
+# at run time, so it cannot find its siblings itself; the render is the one derivation it can have.
+# The owner chose it on 2026-09-12 over having each caller pass the paths in.
+#
+# CLAIMING THE DESTINATION is what takes the old file out of the engine pool — `scan_claimed_paths`
+# drops from `**` every path another rule owns — while the TEMPLATE still ships under `**`, because
+# the adopter's render reads it. The playbook fixture made the same engine-to-rendered move one kit
+# over, for the same class, and its rule in the unattended descriptor says so.
+#
+# THREE TOKENS. `KIT_DIR` and `TOOL_ROOT` come from the kit's own location. `MEMORY_TREE_DIR` does
+# NOT come from `TOOL_ROOT`: an adopter may install the memory-tree kit flat in its tool root, and
+# both measured adopters do, so `TOOL_ROOT` plus `memory-tree/` names a file neither has. The renderer
+# PROBES the tracked tree for `gotchas.py`, and when it finds none it SKIPS this pair out loud and
+# still renders the protocol, because this kit requires agent-cap and nothing else.
+[[files]]
+include = ["unattended-build.template.js"]
+role = "rendered"
+to = "{kit}/unattended-build.js"
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR"]
+
 [adopt]
 argv = []
 mutates_index = false
-why_no_adopter = "the harness is copied and its protocol rendered; the render is performed by the parity gate's own --render mode rather than by a separate adopter"
+why_no_adopter = "both rendered artifacts, the review protocol and the build harness, are written by the parity gate's own --render mode rather than by a separate adopter; the [[regenerate]] block below runs that mode, so an update run with GOVKIT_RERENDER=1 re-renders them"
+
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. With GOVKIT_RERENDER unset `update` lands a
+# new template, declines this block without printing anything, and so leaves both renders one
+# vintage stale, while its verdict loop still prints each moved render's row as `re-rendered`
+# although no render ran; where a bar wires the parity leg, it reds them there. The argv is this
+# kit's own gate in its render mode, so the renderer and the leg that grades its output are one file
+# and cannot disagree about a token.
+#
+# `--tracked-only` BECAUSE A REGENERATE REFRESHES, IT DOES NOT INSTALL (round 2, R2-3). govkit
+# captures the argv's output and rows nothing it writes, so a plain `--render` put a second review
+# protocol into a consumer that keeps its own extract on purpose, with no line naming the file. The
+# flag skips, by name, a pair whose live copy is absent and untracked; creating one stays with the
+# hand `--render` the runbook's copy-install step runs.
+#
+# THE INTRODUCING UPDATE, run with GOVKIT_RERENDER=1, needs a govkit that lands an unclaimed source
+# BEFORE it re-renders, because the template reaches an existing install only through that landing.
+# govkit 1.11 moved the landing; against an older govkit the render refuses with
+# `missing shipped copy`.
+[[regenerate]]
+argv = ["bash", "{kit}/check-protocol-parity.test.sh", "--render", "--tracked-only"]
 
 [[gate_leg]]
 name = "verifier fan-out"
@@ -32,7 +97,11 @@ guard = ["{kit}/"]
 name = "review-protocol parity (kit vs dogfood)"
 subject = "repo"
 argv = ["bash", "{kit}/check-protocol-parity.test.sh"]
-guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]
+# UNGUARDED, like the unattended wiring leg that grades the other carrier of the same checklist
+# command. The verdict reads the memory-tree kit's `gotchas.py` through `git ls-files`, and no
+# sibling-kit guard token exists to name it (TOOL-aCollapsedScan-11), so a guard scoped to this kit
+# let a memory-tree move skip this leg inside the pre-push window. It costs about a second.
+guard = []
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
@@ -40,12 +109,6 @@ guard = ["{kit}/", "{memory_root}/guides/REVIEW-PROTOCOL.md"]
 none = """
 the parity gate is this entry's leg and it performs its own render comparison; there is no adopter to ask
 """
-
-[[gate_leg]]
-name = "verifier fan-out self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-verifier-fanout.test.sh"]
-guard = ["{kit}/", "{prefix}/hooks/"]
 
 [[gate_leg]]
 name = "review-join ban (no ref-keyed join)"
@@ -59,21 +122,6 @@ subject = "repo"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
 
-[[gate_leg]]
-name = "tier2-review self-test"
-subject = "kit"
-argv = ["bash", "{kit}/tier2-review.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "review-join self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-review-join.test.sh"]
-guard = ["{kit}/", "{prefix}/hooks/"]
-
-# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
-# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
-# answer about which paths they govern, never these pattern strings.
 [[lf_pin]]
 pattern = "{kit}/*.js"
 why = "measured: 350 CR bytes made the shipped harness unlaunchable while its own syntax leg stayed green"

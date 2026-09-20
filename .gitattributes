@@ -174,6 +174,13 @@ tools/*/kit.toml text eol=lf
 # must fire. Not harmless, and MEASURED — this comment previously said "harmless today", which the
 # same kit's own selftest then disproved. The reader also strips CR; both halves are armed.
 .lexicon.conf text eol=lf
+# The frozen TypeScript conformance corpus. Its records are the compiler's reading of the COMMITTED
+# bytes, and a `src` value is TypeScript source carried as a JSON string — so the file's own line
+# endings are not the load-bearing half here, the excerpts are, and they are LF inside the strings
+# whatever the checkout does. The pin is for the review: this file is read one record per line so a
+# diff says which record moved, and an unpinned path smudges to CRLF on this fleet and re-writes
+# every one of them on the next re-extraction. TOOL-aGradedDialect-2.
+tools/lexicon/ts-conformance-fixtures.json text eol=lf
 memory/guides/PLAYBOOK-TEMPLATE.md eol=lf
 tools/unattended/PLAYBOOK-TEMPLATE.template.md eol=lf
 tools/unattended/check-playbook.sh eol=lf
@@ -191,3 +198,12 @@ tools/govkit/subject-pins.tsv text eol=lf
 # line, so a CR would land inside the value field and a ceiling would parse as UNARMED.
 tools/memory-tree/build-readme-slot-limits.txt eol=lf
 tools/memory-tree/build-readme-slot-highwater.txt eol=lf
+
+# The run-gates declared-value tables are READ WITH A TAB SPLIT — `gate-profiles.txt` by
+# `awk -F'	'`, the ceiling pair by python — so a stray CR lands in the LAST field of every
+# row and corrupts the value nobody thought to strip. TOOL-aQuenchedHarness-2.
+tools/run-gates/*.txt text eol=lf
+
+# process-monitor kit (TOOL-aReapedSpinner-6): the shell and the conf are execution-sensitive.
+tools/process-monitor/*.sh text eol=lf
+.process-monitor.conf text eol=lf

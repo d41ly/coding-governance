@@ -70,12 +70,31 @@ BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor",
 #:
 #: A pair with no row is seeded `dark`, which is a declaration and not a gap: the row is written, it
 #: is named on every run, and arming it is one word.
+#:
+#: `("tsx", "function")` WAS `dark` from TOOL-aGradedDialect-4 §8 F1 until TOOL-aGradedDialect-10:
+#: a `.tsx` function's case follows its ROLE, a React component being PascalCase and a helper
+#: camelCase, and no `(extension, surface)` cell can see a role. The `returns:jsx` selector can,
+#: so the pair below is what the scaffolder now proposes — the parent at the helper's case, and
+#: `SEED_SELECTORS` routing every definition whose value is an element to the component's. The
+#: REASON is emitted beside the rows in the `CELLS` block below, where the adopter meets it.
 SEED_CONVENTIONS = {
     ("py", "function"): "snake",
     ("py", "type"): "pascal",
     ("js", "function"): "camel",
     ("js", "type"): "pascal",
     ("sh", "function"): "snake",
+    ("ts", "function"): "camel",
+    ("ts", "type"): "pascal",
+    ("tsx", "function"): "camel",
+    ("tsx", "type"): "pascal",
+}
+
+#: `(ext, surface) -> (selector, convention)`: the selector'd row proposed BENEATH that parent, only
+#: when its subset is non-empty on the corpus — a selector matching nothing is a `DEAD CELL` on
+#: the adopter's first run. The convention is prescriptive like every row above: React's own
+#: rule that a component is PascalCase.
+SEED_SELECTORS = {
+    ("tsx", "function"): ("returns:jsx", "pascal"),
 }
 
 
@@ -267,6 +286,24 @@ def main(argv: list[str]) -> int:
     body.append("# The pin is a TWO-SIDED equality thereafter: a count that RISES reds, and a count")
     body.append("# that FALLS reds too, printing the row to paste. A drain lands in the declaration")
     body.append("# or it is not landed -- an unrecorded drain leaves a pin nothing can ever meet.")
+    # S3 — WHAT A LARGE PIN MEANS, and the door that answers it, stated from the two figures this
+    # walk has just measured. Both are computed rather than written: a percentage typed here would
+    # be one repo's measurement pinned into every other repo's declaration, and the share is the
+    # number an adopter actually reacts to. The door is named because the obvious reaction to a big
+    # pin is to widen the `VERBS` table until the tree passes, which is the mirror this kit refuses.
+    if total_defs:
+        body.append(f"# MEASURED ON THIS CORPUS: {verb_offenders} of {total_defs} definition(s), "
+                    f"{100.0 * verb_offenders / total_defs:.1f}%, lead with a token")
+        body.append("# the VERBS proposal below does not hold.")
+    else:
+        body.append("# MEASURED ON THIS CORPUS: no definitions were extracted at all, so the offender")
+        body.append("# share is undefined rather than zero.")
+    body.append("# A LARGE share is not a tree full of bad names -- it is usually a canon that does not")
+    body.append("# carry this domain's concepts. Widening the VERBS table to legalise what is already")
+    body.append("# here is the mirror shape this seed exists to avoid, so that is not the door. The")
+    body.append("# door is the CANON: overlay: an owner ADDS a cluster there, with a dated reason in")
+    body.append("# `canon_unfrozen`, and the gate reads it beside the frozen table. Everything else is")
+    body.append("# a rename, which is what the RENAMES work list below is for.")
     body.append(f'VERB_OFFENDER_PIN="{verb_offenders}"')
     body.append(f'SUFFIX_OFFENDER_PIN="{suffix_offenders}"')
     body.append("")
@@ -330,8 +367,15 @@ def main(argv: list[str]) -> int:
     for (_e, _kind), _n in sorted(cell_pops.items()):
         if not _n:
             continue
-        seeded_cells[f"{_e}.{lex.PREDICATE_SURFACES[_kind]}"] = SEED_CONVENTIONS.get(
-            (_e, lex.PREDICATE_SURFACES[_kind]), "dark")
+        _surface = lex.PREDICATE_SURFACES[_kind]
+        seeded_cells[f"{_e}.{_surface}"] = SEED_CONVENTIONS.get((_e, _surface), "dark")
+        # THE SELECTOR'D ROW, beneath its parent and only over a NON-EMPTY subset. The subset is
+        # read by the engine's own accessor over the same walk, so the row the seed proposes is
+        # the row the first `--check` routes, and a corpus with no component in it gets no row.
+        _sel = SEED_SELECTORS.get((_e, _surface))
+        if _sel and _sel[0].startswith("returns:") \
+                and lex.extract_jsx_defs(scanned, root, declared, _e):
+            seeded_cells[f"{_e}.{_surface}+{_sel[0]}"] = _sel[1]
     if seeded_cells:
         _rows = {k: (v, frozenset()) for k, v in seeded_cells.items()}
         _measured, _ = lex.measure_conventions(scanned, {"CELLS": _rows, "PINS": {}}, root, declared)
@@ -346,7 +390,33 @@ def main(argv: list[str]) -> int:
         body.append("# change here moves the matching `.conv` pin below; `--measure` reprints them.")
         body.append("CELLS:")
         for _k, _v in seeded_cells.items():
-            body.append(f"  {_k:<14} {_v}")
+            # S5 — THE ONE ROW THAT OWES A REASON, carried beside the row rather than in the block
+            # preamble, because a reader meets the decision at the row. It is a RULE and not a
+            # figure: a share measured on some other repo's components, pinned into this
+            # declaration, is the same defect as a hardcoded pin one section up.
+            if _k == "tsx.function":
+                body.append("  # A React component is a function that RETURNS JSX, so the case of a")
+                body.append("  # name in this cell follows the definition's ROLE and not its surface")
+                body.append("  # -- which is the one distinction an (extension, surface) cell cannot")
+                if "tsx.function+returns:jsx" in seeded_cells:
+                    body.append("  # make and the `+returns:jsx` row beneath it can: a declared function")
+                    body.append("  # whose VALUE is an element is graded there, at the component's case,")
+                    body.append("  # and leaves this row, which grades the helpers. What the reader")
+                    body.append("  # cannot see stays here and is pinned: a component returning null, a")
+                    body.append("  # portal, or a callback's result. A render helper that returns an")
+                    body.append("  # element is routed and pinned there. A member -- an object property,")
+                    body.append("  # a class property or a method -- is never routed, because its name")
+                    body.append("  # is its container's key.")
+                else:
+                    # THE OTHER HALF, stated: a comment promising a row beneath it that is not
+                    # there reads as a scaffolder that forgot. Closing review round 1.
+                    _row = SEED_SELECTORS[("tsx", "function")]
+                    body.append("  # make. No declared function in this corpus RETURNS an element yet,")
+                    body.append(f"  # so no `{_k}+{_row[0]}  {_row[1]}` row is proposed beneath")
+                    body.append("  # this one -- a selector matching nothing is a DEAD CELL refusal.")
+                    body.append("  # Add that row when the first component lands; `--measure` prints")
+                    body.append("  # its pin.")
+            body.append(f"  {_k:<{max(14, len(_k))}} {_v}")
         body.append("")
         _pins = [(k, len(r["verdicts"])) for k, r in _measured.items()
                  if r["graded"] and r["convention"] != "dark"]

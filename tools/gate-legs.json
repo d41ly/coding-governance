@@ -136,6 +136,31 @@
     "ceiling": 300
   },
   {
+    "name": "shell hygiene (a loop fed by a command substitution)",
+    "argv": [
+      "python3",
+      "tools/gate-lint/sh_hygiene.py",
+      "memory/project/substitution-fed-loops.txt"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "shell-hygiene selftest",
+    "argv": [
+      "python3",
+      "tools/gate-lint/sh_hygiene.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/gate-lint/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "kit version markers",
     "argv": [
       "bash",
@@ -232,7 +257,8 @@
     ],
     "guard": [
       "tools/hooks/",
-      "tools/lib/"
+      "tools/lib/",
+      "skills/session-kickoff/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -495,11 +521,6 @@
       "bash",
       "tools/workflows/check-protocol-parity.test.sh"
     ],
-    "guard": [
-      "memory/guides/REVIEW-PROTOCOL.md",
-      "tools/lib/",
-      "tools/workflows/"
-    ],
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 300
@@ -713,6 +734,45 @@
     "ceiling": 300
   },
   {
+    "name": "process-monitor wiring",
+    "argv": [
+      "bash",
+      "tools/process-monitor/adopt-process-monitor.sh",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 60
+  },
+  {
+    "name": "process-monitor census selftest",
+    "argv": [
+      "python",
+      "tools/process-monitor/selftest.py"
+    ],
+    "guard": [
+      "tools/process-monitor/census.py",
+      "tools/process-monitor/selftest.py"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 180
+  },
+  {
+    "name": "process-monitor adopter selftest",
+    "argv": [
+      "bash",
+      "tools/process-monitor/adopt-process-monitor.test.sh"
+    ],
+    "guard": [
+      "tools/process-monitor/adopt-process-monitor.sh",
+      "tools/process-monitor/adopt-process-monitor.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 360
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",
@@ -729,7 +789,7 @@
       "bash",
       "tools/unattended/check-unattended.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
+    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 16040
@@ -1180,6 +1240,28 @@
     "ceiling": 60
   },
   {
+    "name": "leg ceilings clear their evidenced maximum",
+    "argv": [
+      "python",
+      "tools/run-gates/derive-ceilings.py",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "every held leg is budgeted, every budget row resolves",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-selftests.sh",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "spec-tokens self-test",
     "argv": [
       "bash",
@@ -1190,7 +1272,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 120
+    "ceiling": 300
   },
   {
     "name": "kit-placeholders self-test",
@@ -1204,5 +1286,48 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 120
+  },
+  {
+    "name": "selftest harness self-test",
+    "argv": [
+      "bash",
+      "tools/lib/lib-selftest.test.sh"
+    ],
+    "guard": [
+      "tools/lib/lib-selftest.sh",
+      "tools/lib/lib-selftest.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 370
+  },
+  {
+    "name": "extract-arms self-test",
+    "argv": [
+      "bash",
+      "tools/lib/extract-arms.test.sh"
+    ],
+    "guard": [
+      "tools/lib/extract-arms.sh",
+      "tools/lib/extract-arms.test.sh",
+      "tools/lib/lib-selftest.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "run-selftests self-test",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-selftests.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/run-selftests.sh",
+      "tools/run-gates/run-selftests.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
   }
 ]

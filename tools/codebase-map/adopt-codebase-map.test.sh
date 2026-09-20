@@ -131,7 +131,7 @@ fi
 # could not stamp" is not enough on its own — a mangled write plus an honest note would still leave
 # a broken conf on disk. The last two prefixes are ordinary ones the conf grammar accepts, so the
 # stamping's HAPPY path is armed too and this loop cannot pass by only ever declining.
-DEFAULT_MDC='python codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run
+DEFAULT_MDC='python codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run; gov:root-fixture — the example default, pre-stamp
 i=0
 for prefix in 'R&D' 'a b' "x'y" 'ok-dir' 'ok.dir'; do
   i=$((i+1))
@@ -161,7 +161,7 @@ done
 # ---------------------------------------------------------------------------------------------
 # arm 4 (review H2) — the DOCUMENTED path: the operator copies the example conf FIRST, so the
 # adopter's create-branch stamp never fires. The digest command must still resolve, because the
-# scaffolded map README ships it. Before the fix that README named codebase-map/map_diff.py at a
+# scaffolded map README ships it. Before the fix that README named codebase-map/map_diff.py at a  # gov:root-fixture — quoting the defect that was fixed, not naming a live path
 # tools/-prefixed install, and `ls` on it said No such file.
 # ---------------------------------------------------------------------------------------------
 KD=$(mkrepo "$TMP/a4" "tools")

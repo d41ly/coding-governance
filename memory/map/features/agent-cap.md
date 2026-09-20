@@ -24,11 +24,13 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = [
+gotcha-classes = ["bash-c-multiline-flattens-under-msys.md", "git-rm-cached-refuses-a-diverged-index-blob.md",
   "trailing-comma-counted-as-an-element.md",
   "allowlist-narrower-than-the-root-it-guards.md",
   "a-pair-exists-and-it-is-the-wrong-one.md",
   "a-view-fix-trades-one-blindness-for-another.md",
+  "settings-edit-takes-effect-mid-session.md",
+  "conf-value-interpolated-into-a-regex.md",
 ]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []
@@ -110,6 +112,21 @@ learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entr
 `agent-cap` and versions the whole home: `version_from` is entry-level and single-valued, so a
 second constant would be invisible to govkit rather than gated by it.
 
+**`scratch-guard.js` carries a SECOND check, and it rides the process that already spawns.**
+`TOOL-aReplayedCard-1`: after the scratch verdict, `checkOriented` refuses a main-loop `git commit`
+while the session's orientation card under `<git-common-dir>/orientation/` still holds the kickoff
+writer's sentinel `READY — none yet`, or names another tree than the commit targets. It is inside
+this file and not a third hook because a node spawn was measured at 0.8–1.1 s on node `a`, so a
+second file on the `Bash|PowerShell` matcher doubles every shell call. The predicate has ONE
+evaluation order, written above the function: shape, `agent_id`, missing fields, an unwalkable
+target, an absent or replay-written card, then the sentinel-or-mismatch test, and only then the
+exemption — the commit that CREATES a build README carrying `authorized-by:` with a value in the
+unattended driver's `SECOND_ANCHOR_MODES`, pinned by a parity arm. An ABSENT card and a
+replay-written one ALLOW, with a witness line that reaches the debug log and the self-test only:
+a deny on either refused this build's own landing run, with a remedy it could not run. The drive
+fold is `buildComparablePath`'s own step, applied to the `-C` target and `cwd` BEFORE the walk and
+to both toplevels before the compare; there is no second normaliser.
+
 ## Shared seams
 
 **Every declared hook path is asserted to SHIP, in both directions.** A fragment names a
@@ -137,9 +154,12 @@ builds a payload and feeds each committed harness through `tools/hooks/agent-cap
 two entry points. A bash re-implementation of a node predicate would not disagree loudly — it would
 drift the day either side is tightened.
 
-`tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path) and
+`tools/settings-merge.py` owns the wiring fragment (event, matcher, marker, hook path, plus the
+optional interpreter and args `TOOL-aReplayedCard-2` added for the bash-scripted card verb) and
 `tools/check-wiring.sh` joins on it, asserting the matcher VALUE rather than merely that the file
-mentions `agent-cap.js`.
+mentions `agent-cap.js`. The merger re-matches an entry it finds under the wrong matcher, and both
+readers expand a fragment's `{kit}` or `{here}` token identically — `check-hook-destinations.sh`
+asks each through `--resolve-fragment` and refuses when they disagree.
 
 `tools/workflows/check-protocol-parity.test.sh` keeps the shipped
 `tools/workflows/REVIEW-PROTOCOL.template.md` equal to the live `memory/guides/REVIEW-PROTOCOL.md`
@@ -157,13 +177,24 @@ turns the cap rules off with no diff.
 
 ## Gaps
 
+- **The orientation deny stops forgetting, not evasion.** A commit made by a script, a heredoc or a
+  non-git tool, a deleted or hand-written card, a `cd`/`-C` target that is not a literal path or
+  does not exist (the last `cd <dir>` before the git token is read; an absent or shell-expanded
+  target is a witness, never a walk into an ancestor's `.git`), and a session that started before
+  the wiring and never restarted all escape; a READY line's presence is asserted,
+  never its correctness. The drive fold lowercases, so on a case-sensitive filesystem the walk
+  finds no `.git` and allows with the witness line — every registered node is Windows. Stated in
+  the hook's header and in `tools/hooks/README.md`, with no waiver clause by owner decision.
 - **The join rule reads a blanked view, and a regex literal survives it.** So a file holding the ban
   table matches its own rule, and `check-review-join.sh` carries a self-exclusion row for the hook.
   The exclusion is measured rather than defensive, and it is the kind of row that silently widens if
   the table ever moves.
-- **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** That script runs
-  with no hooks, so no process observes those spawns. Declared here and in the protocol rather than
-  implied away; it is the reason the `Workflow` half is static.
+- **Agents spawned INSIDE a workflow sidechain are uncounted, and always will be.** The script's
+  `agent()` is a runtime call and not a TOOL call, so the `Workflow|Agent` matcher has nothing to
+  match, and a sidechain agent holds neither tool to re-fan-out with. NOT because a sidechain runs no
+  hooks — it does, MEASURED 2026-09-12: a project `PreToolUse` guard on `Bash|PowerShell` denied a
+  Bash command issued from inside one. Declared here and in the protocol rather than implied away; it
+  is the reason the `Workflow` half is static.
 - **A `Workflow({name:'…'})` run supplies no source to the hook.** Covered second-hand by the
   merge-bar leg over `tools/workflows/`, which is why that leg exists at all.
 - **The runtime count does not distinguish a verifier from any other agent.** Keying on "is this a

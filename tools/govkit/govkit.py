@@ -39,9 +39,10 @@ import posixpath
 import re
 import subprocess
 import sys
+import tempfile
 import time
 
-KIT_GOVKIT_VERSION = "1.10"  # gov:kit govkit@1.10 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.11"  # gov:kit govkit@1.11 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
@@ -548,6 +549,34 @@ def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dic
     )
 
 
+def derive_marker_coupling(root: pathlib.Path,
+                           descs: dict[str, tuple[dict, str]]) -> dict[str, set[str]]:
+    """Which kits must move TOGETHER, because one ships a file carrying the other's version marker.
+
+    A descriptor's `marker_carriers` names files OUTSIDE its own claim that carry its `gov:kit`
+    marker, and selfcheck holds that list complete. The entry that owns such a file is the one that
+    ships it, so a pull moving the owner and not the declarer lands the declarer's new marker over
+    its old constant, and a pull moving the declarer and not the owner does the reverse. Either way
+    the tree's cross-kit version parity reds. Measured at NicoCares on 2026-09-13: review-harness 1.8
+    pulled alone wrote `drift-audit-code.js` at drift-audit 1.10 beside `drift_report.py` at 1.9,
+    and its parity leg's arm 9 redded.
+
+    SYMMETRIC, because both directions split the marker. The owner is found the way selfcheck finds
+    a claim, through `entry_members` and the same `{prefix}` spelling, never from a path's segments.
+    """
+    members = {eid: entry_members(root, eid, d, dp) for eid, (d, dp) in descs.items()}
+    edges: dict[str, set[str]] = {}
+    for eid, (d, _dp) in descs.items():
+        for carrier in d.get("marker_carriers") or []:
+            path = carrier.replace("{prefix}", "tools")
+            for owner, pref in members.items():
+                if owner != eid and any(path == m or path.startswith(m.rstrip("/") + "/")
+                                        for m in pref):
+                    edges.setdefault(eid, set()).add(owner)
+                    edges.setdefault(owner, set()).add(eid)
+    return edges
+
+
 def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
                       kits: list[str], deploy: dict | None = None) -> list[str]:
     """Which entries this run installs.
@@ -1045,6 +1074,32 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 r.fail(f"entry '{eid}' declares role '{role}', which is not in ROLE_KINDS "
                        f"({', '.join(sorted(ROLE_KINDS))}) — `plan` and `apply` both read that "
                        f"table, so an unlisted role has no defined outcome in either verb")
+
+    # ---- 3b-ii: A KIT SHIPPING A `rendered`/`generated` ROW DECLARES A `[[regenerate]]` ARGV.
+    #          `update` already REPORTS the gap, per kit, per run — and reporting it at the adopter
+    #          is reporting it to the one person who cannot fix it. TOOL-dRetiredFork-29 sat open
+    #          while six kits and twelve rows carried it, and what the adopters actually saw was
+    #          their own parity legs going red on artifacts a vintage stale, twice rolling the kit
+    #          back mid-update. Gated HERE because gov is where a descriptor is authored and a
+    #          missing declaration is a one-line fix; the class recurs the moment kit seven ships a
+    #          rendered row, which is precisely what an instance-level fix would not catch.
+    for eid, (d, _dpath) in sorted(descs.items()):
+        # `rendered` ONLY, and `generated` deliberately NOT: the same predicate `update`'s own
+        # decline uses. A `generated` row is a target-owned MEASUREMENT seeded empty — the two
+        # waiver registries and the carried-prefix ratchet say so in their own notes — and gov
+        # regenerating one would overwrite the adopter's rows with gov's. A first cut of this rule
+        # read both kinds and reported exactly those three as defects; they are the counter-example
+        # the predicate is narrowed against.
+        _rendered = [rule for rule in d.get("files", [])
+                     if rule.get("role") == "rendered"]
+        if _rendered and not (d.get("regenerate") or []):
+            r.fail(f"entry '{eid}' ships {len(_rendered)} `rendered` row(s) and "
+                   f"declares no `[[regenerate]]` argv, so `update` has nothing to run with "
+                   f"GOVKIT_RERENDER=1 and every one of them goes a vintage stale in every adopter "
+                   f"tree on every update — the "
+                   f"kit's own drift check then reds on a file the adopter never edited. Declare a "
+                   f"narrow re-render entrypoint; the adopter's `[adopt]` argv is NOT one, it "
+                   f"no-ops or refuses on an already-adopted tree")
 
     # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
     #          closed enum. DEPL-dCarriedReceipt-10 S5.
@@ -1840,38 +1895,70 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # ---- gated: `apply`'s bar catches the leg at ONE adopter's install, after the descriptor has
     # ---- already shipped; this catches it here, before any adopter can receive it.
     #
-    # THE POPULATION IS `shipped_owner`, the map arm 7h3 already builds — derived from the file
-    # rules the way `apply` resolves them, not from `claims`, which covers a fraction of the rules
-    # in this tree and would have quantified over a third of the payload while reporting a confident
-    # zero over the rest.
+    # IT IS `silenced_legs` ITSELF NOW, pointed at a bare target — one predicate, not a second
+    # spelling of its question. TOOL-aLeakedHandle-1's closing review, F1. The first cut compared
+    # each argv element against `shipped_owner`, the gov-SOURCE map arm 7h3 builds, and SKIPPED any
+    # element carrying a token other than `{prefix}` because the map could not resolve one. Measured
+    # on this tree at the moment it failed: 20 argv elements graded, 113 skipped — every `{kit}` and
+    # every `{memory_root}` path, which is nearly all of them — while its note printed a confident
+    # `0 unshippable`. A leg naming `{memory_root}/project/…` sailed through it, shipped, and
+    # withheld itself at every adopter with `apply` exiting 1. That is the could-not-fail shape
+    # arriving as an under-derived population rather than as a wrong predicate.
     #
-    # `{prefix}/x` IS A TARGET-SIDE DESTINATION and the map is keyed by GOV SOURCE, so the two are
-    # compared by TAIL rather than by substitution. Substituting `tools` for the token was tried
-    # first and run over the real tree before being wired — the standing rule here — and it redded
-    # an innocent leg: the kickoff kit's own ratchet argv spells `{prefix}/manifest-check.sh` while
-    # gov's copy lives under `skills/session-kickoff/`, so the substituted form named a file that
-    # was never gov's spelling of it. A tail match asks the question the spec actually poses: does
-    # SOME kit ship this file. An element carrying no `{prefix}` is a gov-relative path already and
-    # is compared whole.
-    _shipped = set(shipped_owner)
-    _leg_hits = 0
-    for eid, (d, _dpath) in sorted(descs.items()):
-        for leg in d.get("gate_leg", []):
-            for a in leg.get("argv", []):
-                if "/" not in a or "{" in a.replace("{prefix}", ""):
-                    continue          # not a path, or carries a token this arm cannot resolve
-                if a.startswith("{prefix}/"):
-                    _tail = a[len("{prefix}/"):]
-                    if any(s == _tail or s.endswith("/" + _tail) for s in _shipped):
-                        continue
-                elif a in _shipped:
-                    continue
-                _leg_hits += 1
-                r.fail(f"entry '{eid}' declares gate leg '{leg.get('name')}' whose argv names "
-                       f"'{a}', which no kit ships — so no adopter can ever receive the engine this "
-                       f"leg runs. `apply` would emit the row and the receipt would record it as "
-                       f"coverage for a leg that cannot run. Withdraw the leg, or ship the file")
-    r.note(f"gate legs: every argv path checked against the shipped map · {_leg_hits} unshippable")
+    # THE FIXTURE IS A BARE TARGET: a scratch directory holding nothing. A target that holds nothing
+    # cannot supply a path by accident, so every argv element the predicate resolves must be
+    # accounted for by some rule in some descriptor or it names nothing anywhere. Nothing is written
+    # to it and nothing is read from it — `planned_writes` walks GOV's tree, and the directory is
+    # only ever a resolution root. This resolves `{prefix}` by substitution rather than by the tail
+    # match the source-keyed map needed: the question is now "does a rule PUT a file there", which
+    # is the question `apply` asks, so the kickoff ratchet's `{prefix}/manifest-check.sh` — gov's
+    # copy of which lives under `skills/session-kickoff/` — passes on its DESTINATION and needs no
+    # special case.
+    #
+    # `have` IS EVERY RESOLVED PLAN DESTINATION AT EVERY KIND, and NOT the `write` set `cmd_plan`
+    # passes. The difference is what makes this gateable: a leg naming a `project-owned` path is a
+    # DELIBERATE withhold — `process-monitor` documents that mechanism in its own descriptor and
+    # `drift-audit` copies it, both relying on `silenced_legs` to drop the leg with the file — and
+    # failing on those would red a design. A leg naming a path NO rule resolves to at ANY role is
+    # the defect. Measured before wiring: 3 hits, of which 2 were those withholds and 1 was F1.
+    #
+    # WHAT THIS DOES NOT CHECK. Whether the file gov ships to that path is the RIGHT one, whether
+    # the leg passes, or an argv element carrying an UNANSWERED intake token — this fixture answers
+    # nothing on purpose, and `silenced_legs` leaves an unresolved element to the sibling refusal at
+    # `apply`. It answers one question: does some rule put a file where this leg's argv looks.
+    #
+    # THE POPULATION IS EVERY REGISTRY ENTRY, and the first cut of THIS arm got that wrong in F1's
+    # own direction — round 2, D2. It selected `all_kits(descs)`, which drops every entry marked
+    # `selectable = "conditional"`: 21 of 26 graded while the note beside it counted argv over all
+    # 26, so one output disagreed with itself. A conditional entry is excluded from `--all`, not
+    # from installation — `resolve_selection`'s `kits` mode validates against `descs` — so
+    # `apply --kits check-microformats` installs one and emits its legs, and the five dropped here
+    # carried 9 legs and 20 argv elements ungraded. The count below is therefore summed over the
+    # SELECTION the predicate visits and states that selection against the registry, so a narrower
+    # population can never again be reported as the whole one.
+    with tempfile.TemporaryDirectory() as _bare:
+        _bare_t = pathlib.Path(_bare)
+        _bare_deploy = {"gov_source": "local", "prefix": "tools"}
+        _bare_sel = derive_install_order(sorted(descs), descs)
+        # ITS OWN REPORT, discarded. A bare target answers no intake token, so `planned_writes`
+        # legitimately refuses a destination for every kit that takes one; those are findings about
+        # the FIXTURE and not about gov, and the rows carrying them are excluded from `have` below
+        # by the same `missing` key.
+        _bare_rows = planned_writes(root, _bare_t, _bare_deploy, descs, _bare_sel, Report())
+        _bare_have = {x["dest"] for x in _bare_rows if not x["missing"]}
+        _leg_argv = sum(len(leg.get("argv", []))
+                        for _e in _bare_sel for leg in descs[_e][0].get("gate_leg", []))
+        _silent = silenced_legs(descs, _bare_sel, _bare_t, _bare_deploy, _bare_have)
+        for _eid, _nm, _bad in sorted(_silent):
+            r.fail(f"entry '{_eid}' declares gate leg '{_nm}' whose argv names "
+                   f"{', '.join(_bad)}, which NO rule in any descriptor writes, seeds, orders or "
+                   f"produces — so `apply` withholds the leg and exits 1 at every target selecting "
+                   f"this kit, and the receipt records no coverage for it. Ship the file (a `seed` "
+                   f"rule is how a leg's data file travels), or take the path from an intake answer "
+                   f"the operator supplies")
+        r.note(f"gate legs: {len(_bare_sel)} of {len(descs)} registry entries graded · "
+               f"{_leg_argv} argv element(s) offered against a bare target · "
+               f"{len(_silent)} naming a path no rule produces")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over
@@ -1956,6 +2043,83 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             r.fail(f"entry '{eid}' declares scope '{d['scope']}' and its rules derive '{derived}' — "
                    f"an entry is machine-scoped only when every one of its rules is")
     r.note(f"entry scope: {n_scope} declaration(s) checked against their derived value")
+
+    # ---- 7l: A KIT THAT DECLARES `[[regenerate]]` MAY NOT CLAIM THAT `update` RE-RENDERS WITHOUT
+    #          NAMING THE FLAG THAT GATES IT, in the same sentence. Build dPolishedVitrine's round-1
+    #          review, F5: five carriers said an update re-renders the kit's artifacts, or names it one
+    #          vintage stale, and with GOVKIT_RERENDER unset it does neither -- the regenerate is
+    #          declined in silence, by DEPL-dRetiredFork-3's byte-identical-output criterion. Every
+    #          kit that adds a block will want to write that sentence, so the CLASS is gated here,
+    #          over each such kit's own tracked files and its descriptor, rather than one kit's copy.
+    #
+    #          WHAT THIS DOES NOT CHECK. A sentence is a claim when it names `update` and one of the
+    #          re-render words; its truth is not graded, only that it names the flag. The sentence
+    #          split is a heuristic over prose with comment leaders stripped, so a claim broken
+    #          across a paragraph boundary, or one that never says `update`, is not seen. Probed over
+    #          the real tree before it was wired: four hits in the review-harness kit, the four the
+    #          review named, one in the unattended descriptor it did not, and no near-miss that was a
+    #          claim.
+    #
+    #          THE NEGATIVE HALF, from round 2's R2-7. Naming the flag is not enough when the sentence
+    #          then says the flag-off run is SILENT. It is not: the verdict loop relabels a moved
+    #          template's `rendered` row `re-rendered` and prints it before the flag is read, so a
+    #          flag-off update prints `re-rendered` over a render nothing ran. Three carriers said
+    #          "prints nothing" beside that line, and a reader takes the line as proof. So a sentence
+    #          naming `update`, the flag, and a silence word has to name the `re-rendered` line it
+    #          still prints. Probed over the real tree first: three hits, all in the review-harness
+    #          kit, the three the review named plus the descriptor sentence it offered as the model,
+    #          and no near-miss.
+    _rr_lead = re.compile(r"^\s*(#+|//+|\*+|>+|-\s)?\s?")
+    _rr_split = re.compile(r"(?<=[.!?])\s+(?=[A-Z`(\"'*_])")
+    _rr_update = re.compile(r"\bupdate\b", re.I)
+    _rr_claim = re.compile(r"re-?render|regenerat|re-runs? the render|vintage stale", re.I)
+    _rr_flag = re.compile(r"GOVKIT_RERENDER|\bflag\b")
+    _rr_silent = re.compile(r"\b(?:prints?|says?|outputs?|reports?)\s+nothing\b|without\s+printing"
+                            r"|\bin\s+silence\b|\bsilent(?:ly)?\b|\bno\s+output\b", re.I)
+    n_rr_kits = n_rr_claims = n_rr_silent = 0
+    for eid, (d, dpath) in descs.items():
+        if not d.get("regenerate"):
+            continue
+        n_rr_kits += 1
+        _home = (d.get("home") or "").rstrip("/")
+        _ls = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", f"{_home}/"],
+                             capture_output=True, text=True, check=False).stdout.split("\0")
+        _rel_d = pathlib.Path(dpath).resolve().relative_to(pathlib.Path(root).resolve()).as_posix()
+        for _f in sorted({x for x in _ls if x} | {_rel_d}):
+            try:
+                _text = (root / _f).read_text(encoding="utf-8")
+            except (OSError, UnicodeDecodeError):
+                continue
+            _para: list[str] = []
+            _sents: list[str] = []
+            for _ln in _text.splitlines() + [""]:
+                _s = _rr_lead.sub("", _ln).strip()
+                if _s:
+                    _para.append(_s)
+                elif _para:
+                    _sents += _rr_split.split(" ".join(_para))
+                    _para = []
+            for _s in _sents:
+                if not _rr_update.search(_s):
+                    continue
+                if _rr_flag.search(_s) and _rr_silent.search(_s):
+                    n_rr_silent += 1
+                    if "re-rendered" not in _s:
+                        r.fail(f"'{_f}' (kit '{eid}', which declares [[regenerate]]) says a "
+                               f"flag-off `update` is silent, and it is not: it still prints the "
+                               f"row as `re-rendered` while no render ran. Say so in the same "
+                               f"sentence: {_s[:200]}")
+                if not _rr_claim.search(_s):
+                    continue
+                n_rr_claims += 1
+                if "GOVKIT_RERENDER" not in _s:
+                    r.fail(f"'{_f}' (kit '{eid}', which declares [[regenerate]]) says `update` "
+                           f"re-renders without naming GOVKIT_RERENDER in the same sentence, and "
+                           f"with that flag unset `update` declines the regenerate in silence: "
+                           f"{_s[:200]}")
+    r.note(f"re-render claims: {n_rr_claims} sentence(s) naming `update` and a re-render, and "
+           f"{n_rr_silent} calling a flag-off run silent, across {n_rr_kits} kit(s) declaring "
+           f"[[regenerate]]")
 
     # ---- 8: the SURFACE predicate, both directions (spec S12). This is the arm that stops a
     #         population claim going stale, and the one place a count is derived rather than spelled.
@@ -5931,6 +6095,26 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 "`update` moves an INSTALLED set forward; widening it is `--add-kits` and an owner "
                 "decision. Refusing rather than silently classifying an entry the target never took")
         _want = set(kits)
+        # ---- THE SCOPE CARRIES A SHARED VERSION MARKER, which NicoCares' scoped pull split on
+        # ---- 2026-09-13. A kit the receipt claims that shares a marker with a kit in scope moves
+        # ---- WITH it, closed transitively, and each one is named. It only ever adds a kit this
+        # ---- receipt already claims, so it widens nothing the refusal above guards: splitting the
+        # ---- pair is not a narrower pull, it is a tree whose parity leg reds on the first bar.
+        _coupled = derive_marker_coupling(root, descs)
+        _added: dict[str, str] = {}
+        _todo = sorted(_want)
+        while _todo:
+            _via = _todo.pop()
+            for _other in sorted(_coupled.get(_via, set())):
+                if _other in _claimed and _other not in _want:
+                    _want.add(_other)
+                    _added[_other] = _via
+                    _todo.append(_other)
+        for _other in sorted(_added):
+            print(f"govkit update — scope: {_other} moves with {_added[_other]}, because one ships a "
+                  f"file carrying the other's version marker (`marker_carriers`); a pull moving only "
+                  f"one lands a marker its own constant does not match")
+        kits = list(kits) + sorted(_added)
         rows_all = [w for w in rows_all if str(w.get("kit") or "") in _want]
         print(f"govkit update — scope: --kits {', '.join(sorted(_want))} -> "
               f"{len(rows_all)} of {len(receipt.get('files') or [])} receipt row(s)")
@@ -6944,130 +7128,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     if deleted:
         git_pathspec(target, ["rm", "-q", "--ignore-unmatch"], deleted)
 
-    # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
-    # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
-    # disposition CAPS at report, and no `[adopt].argv` is spawned anywhere in this verb — the only
-    # subprocess it runs per kit is `[check].argv`, a verifier. So every rendered destination goes
-    # ONE VINTAGE STALE on every update. Measured at one adopter: NINE rendered rows, including three
-    # SKILL.md files and both binding protocols, plus the two CI jobs that byte-compare them.
-    #
-    # GATED OFF BY DEFAULT, and that is this spec's own section 4 rather than caution added here:
-    # this is the first time `update` executes target-side code, so it ships dark and is flipped on
-    # after in-place verification against a fixture and then one adopter. The charter's dark-landing
-    # rule, applied to the deployer itself. With the flag off the output is byte-identical to before,
-    # which is what makes the first release safe to land.
-    #
-    # THE ARGV IS ALWAYS GOV'S. It comes from a gov-authored descriptor and NEVER from the target's
-    # `deploy.toml`. That is the trust boundary section 5 names: the code runs in the target's tree
-    # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
-    # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
-    # trusted.
-    _rerender_on = os.environ.get("GOVKIT_RERENDER") == "1"
-    _rr_ran: list[str] = []
-    _rr_declined: list[tuple[str, str]] = []
-    if write:
-        for _eid in touched_kits:
-            _d, _ = descs[_eid]
-            # S3 non-goal — A KIT THE TARGET HOLDS DELIBERATELY INERT IS NOT RUN, and the run says
-            # so. Running its adopter is a POSTURE FLIP, which is exactly why "just run apply" was
-            # never the workaround for any of this.
-            if _eid in {str(x) for x in (deploy.get("inert") or [])}:
-                _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
-                                           "would flip a posture the target chose"))
-                continue
-            # S1 IS NOT BUILT, AND THE REASON IS A MEASUREMENT RATHER THAN A PREFERENCE. The
-            # spec asks `update` to run the kit's `[adopt].argv`. Run against an adopted tree,
-            # `memory-tree`'s adopter takes one of exactly two branches, and NEITHER re-renders:
-            # with its marker present it prints "already scaffolded — nothing to do" and exits
-            # 0, and with the marker absent it REFUSES the tree as foreign and exits 1, which
-            # that kit declares as the outcome `refused-foreign-tree`. Both were reproduced on a
-            # fixture. So the adopter cannot refresh a stale rendered row: it is a no-op on the
-            # happy path and a refusal off it, which is correct behaviour for an ADOPTER and is
-            # why re-adoption was never the missing piece.
-            #
-            # A DECLARED `[[regenerate]]` BLOCK IS THEREFORE THE WHOLE MECHANISM: a narrow argv
-            # whose one job is to re-render, with no adoption guard to trip over.
-            _regen = _d.get("regenerate") or []
-            if not _regen:
-                # NOT `continue`. A kit that ships rendered rows and declares no regeneration is
-                # the actual live defect -- its artifacts go one vintage stale on every update --
-                # and a silent skip here would report that state as a clean run. TOOL-dRetiredFork-29.
-                if any(str((_row or {}).get("role")) == "rendered"
-                       for _row in (_d.get("files") or [])):
-                    _rr_declined.append((_eid, "this kit ships `rendered` rows and declares no "
-                                               "[[regenerate]] argv, so they stay one vintage "
-                                               "stale; its adopter cannot do this job"))
-                continue
-            if not _rerender_on:
-                _rr_declined.append((_eid, "the re-render step is OFF (set GOVKIT_RERENDER=1); "
-                                           "its artifacts are one vintage stale until it is run"))
-                continue
-            _ctx_rr = target_context(target, deploy, _eid, _d)
-            for _blk in list(_regen):
-                _argv = _blk.get("argv") or []
-                if not _argv:
-                    continue
-                _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
-                _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
-                                      capture_output=True, text=True)
-                # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
-                # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
-                # would have failed every update that touched `memory-tree`, whose adopter
-                # SEEDS ITS CONF AND STOPS BY DESIGN -- a declared, accepted, non-zero outcome.
-                # DEPL-dRetiredFork-5 taught `check` this same lesson one unit ago; the third
-                # caller learning it independently is the argument for the helper existing.
-                # THE SAME INVERSION WAS WRITTEN HERE TOO, and was latent only because no
-                # descriptor declares a `[[regenerate]]` block yet — it would have armed itself on
-                # the first one. Same rule as `run_kit_check`: a satisfied probe on a zero exit is
-                # good, and `ok` decides a non-zero one.
-                _oc_rr = classify_outcome(target, _d, _ctx_rr, _out.returncode)
-                _bad = not outcome_accepted(_out.returncode, _oc_rr,
-                                            declares_outcome_for(_d, _out.returncode))
-                _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
-                               + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
-                               + ("  REFUSED" if _bad else ""))
-                if _bad:
-                    r.fail(f"kit '{_eid}': the declared re-render/regenerate argv exited "
-                           f"{_out.returncode} and no declared outcome accepts that. The "
-                           f"post-write verification below rolls this run back rather than "
-                           f"committing a bad render")
-    # AC6 — SILENT WHEN THE FLAG IS OFF. The criterion asks for output byte-identical to the
-    # pre-change run, and a step that announces its own absence is not dark. Once the flag is
-    # ON every decline is named, which is section 5s observability item and the class this
-    # build keeps closing: a skip that looks like a pass.
-    if _rerender_on:
-        print(f"govkit update — re-render: {len(_rr_ran)} argv run, "
-              f"{len(_rr_declined)} declined")
-        for _line in _rr_ran:
-            print(f"govkit update —   ran {_line}")
-    for _eid, _why in (_rr_declined if _rerender_on else []):
-        # A SKIP THAT LOOKS LIKE A PASS IS THE CLASS THIS BUILD KEEPS CLOSING. Every declined kit is
-        # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
-        print(f"govkit update —   DECLINED {_eid}: {_why}")
-
-    # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
-    # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
-    # already knows how to answer about itself — its own `[check].argv`, the same declaration
-    # `cmd_check` runs — and compare that answer against the BASELINE taken before the write.
-    #
-    # THE ROLLBACK KEYS ON THE TRANSITION, never on the after-state alone, and that is the whole
-    # difference between a verifier and a wedge. On the after-state alone, an adopter carrying ONE
-    # unrelated local red in a touched kit reverts every correct write on EVERY run, forever: the
-    # `r.fail` below reaches the `if r.problems` arm, `gov_commit` never advances, and §3 refuses
-    # the `--force` that would otherwise be the way out. Red-before-and-red-after is reported as
-    # pre-existing and left alone. What that trade costs is narrower and is stated rather than
-    # implied: a kit already red keeps its writes, so a genuinely broken merge inside THAT kit lands
-    # unobserved, because a binary check cannot tell "still broken" from "newly broken".
-    #
-    # IT RUNS UNCONDITIONALLY UNDER `--write`. There is no flag, in any spelling, because an opt-in
-    # verifier verifies the runs that were already careful.
-
-    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
-    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
-    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
-    # first and not the second, and rolling one of those back is not merely wasted: the occupied
-    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
-    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
     # ---- DEPL-dSealedTally-1 S2. MOVED HERE, AND THE BLOCK IS SPLIT ------------------------
     # This half decides and WRITES. It used to sit ~400 lines below, after the whole
     # verify-and-rollback pass, which meant its `snap_rows` entries were appended to a
@@ -7077,6 +7137,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     #
     # IT MOVES NO EARLIER THAN THIS. It needs `withdrawn_rows`, which the write loop above
     # builds, so the end of that loop is the earliest position available.
+    #
+    # AND IT RUNS BEFORE THE RE-RENDER BELOW, which is build dPolishedVitrine's round-1 F2 and a
+    # measured defect rather than tidiness. A kit whose `[[regenerate]]` reads a template the
+    # receipt has never named gets that template ONLY through this landing. With the re-render
+    # first, the introducing update ran the render against a tree that did not hold its input:
+    # `missing shipped copy`, exit 1, an `r.fail`, and on the next run no row touched the kit, so
+    # the regenerate never fired again and no sequence of updates produced the render. Reproduced
+    # on a `review-harness` install at prefix `scripts` taken from 24f8c712 to that unit's tip.
+    # Nothing here reads anything the re-render writes, so the two blocks swap without a cost.
     #
     # THE TALLY DID NOT COME WITH IT. Its `unclaimed sources:` summary stays below the pass,
     # because a rolled-back landing is removed from `_landed_new` DURING the pass -- printing
@@ -7342,6 +7411,143 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                               "origin": "landed", "fields": {},
                               "index": {_dest: _idx_pre.get(_dest)}})
 
+    # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
+    # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
+    # disposition CAPS at report, and no `[adopt].argv` is spawned anywhere in this verb — the only
+    # subprocess it runs per kit is `[check].argv`, a verifier. So every rendered destination goes
+    # ONE VINTAGE STALE on every update. Measured at one adopter: NINE rendered rows, including three
+    # SKILL.md files and both binding protocols, plus the two CI jobs that byte-compare them.
+    #
+    # GATED OFF BY DEFAULT, and that is this spec's own section 4 rather than caution added here:
+    # this is the first time `update` executes target-side code, so it ships dark and is flipped on
+    # after in-place verification against a fixture and then one adopter. The charter's dark-landing
+    # rule, applied to the deployer itself. With the flag off the output is byte-identical to before,
+    # which is what makes the first release safe to land.
+    #
+    # THE ARGV IS ALWAYS GOV'S. It comes from a gov-authored descriptor and NEVER from the target's
+    # `deploy.toml`. That is the trust boundary section 5 names: the code runs in the target's tree
+    # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
+    # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
+    # trusted.
+    _rerender_on = os.environ.get("GOVKIT_RERENDER") == "1"
+    _rr_ran: list[str] = []
+    _rr_declined: list[tuple[str, str]] = []
+    if write:
+        for _eid in touched_kits:
+            _d, _ = descs[_eid]
+            # S3 non-goal — A KIT THE TARGET HOLDS DELIBERATELY INERT IS NOT RUN, and the run says
+            # so. Running its adopter is a POSTURE FLIP, which is exactly why "just run apply" was
+            # never the workaround for any of this.
+            if _eid in {str(x) for x in (deploy.get("inert") or [])}:
+                _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
+                                           "would flip a posture the target chose"))
+                continue
+            # S1 IS NOT BUILT, AND THE REASON IS A MEASUREMENT RATHER THAN A PREFERENCE. The
+            # spec asks `update` to run the kit's `[adopt].argv`. Run against an adopted tree,
+            # `memory-tree`'s adopter takes one of exactly two branches, and NEITHER re-renders:
+            # with its marker present it prints "already scaffolded — nothing to do" and exits
+            # 0, and with the marker absent it REFUSES the tree as foreign and exits 1, which
+            # that kit declares as the outcome `refused-foreign-tree`. Both were reproduced on a
+            # fixture. So the adopter cannot refresh a stale rendered row: it is a no-op on the
+            # happy path and a refusal off it, which is correct behaviour for an ADOPTER and is
+            # why re-adoption was never the missing piece.
+            #
+            # A DECLARED `[[regenerate]]` BLOCK IS THEREFORE THE WHOLE MECHANISM: a narrow argv
+            # whose one job is to re-render, with no adoption guard to trip over.
+            _regen = _d.get("regenerate") or []
+            if not _regen:
+                # NOT `continue`. A kit that ships rendered rows and declares no regeneration is
+                # the actual live defect -- its artifacts go one vintage stale on every update --
+                # and a silent skip here would report that state as a clean run. TOOL-dRetiredFork-29.
+                if any(str((_row or {}).get("role")) == "rendered"
+                       for _row in (_d.get("files") or [])):
+                    _rr_declined.append((_eid, "this kit ships `rendered` rows and declares no "
+                                               "[[regenerate]] argv, so they stay one vintage "
+                                               "stale; its adopter cannot do this job"))
+                continue
+            if not _rerender_on:
+                _rr_declined.append((_eid, "the re-render step is OFF (set GOVKIT_RERENDER=1); "
+                                           "its artifacts are one vintage stale until it is run"))
+                continue
+            _ctx_rr = target_context(target, deploy, _eid, _d)
+            for _blk in list(_regen):
+                _argv = _blk.get("argv") or []
+                if not _argv:
+                    continue
+                _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
+                _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
+                                      capture_output=True, text=True)
+                # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
+                # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
+                # would have failed every update that touched `memory-tree`, whose adopter
+                # SEEDS ITS CONF AND STOPS BY DESIGN -- a declared, accepted, non-zero outcome.
+                # DEPL-dRetiredFork-5 taught `check` this same lesson one unit ago; the third
+                # caller learning it independently is the argument for the helper existing.
+                # THE SAME INVERSION WAS WRITTEN HERE TOO, and was latent only because no
+                # descriptor declares a `[[regenerate]]` block yet — it would have armed itself on
+                # the first one. Same rule as `run_kit_check`: a satisfied probe on a zero exit is
+                # good, and `ok` decides a non-zero one.
+                _oc_rr = classify_outcome(target, _d, _ctx_rr, _out.returncode)
+                _bad = not outcome_accepted(_out.returncode, _oc_rr,
+                                            declares_outcome_for(_d, _out.returncode))
+                _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
+                               + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
+                               + ("  REFUSED" if _bad else ""))
+                if _bad:
+                    # WHAT HAPPENS NEXT IS SAID, NOT PROMISED. This sentence used to promise that
+                    # the verification below "rolls this run back", and for a kit declaring
+                    # `[check] none` nothing can: its verify is `landed-unmeasured` and restores
+                    # nothing, so the promise sat above `rolled back 0` with every write still
+                    # staged (build dPolishedVitrine, round-1 F2). Even a kit WITH a check is
+                    # rolled back only on a green-to-red transition, so neither branch promises.
+                    _has_check = bool((_d.get("check") or {}).get("argv"))
+                    r.fail(f"kit '{_eid}': the declared re-render/regenerate argv exited "
+                           f"{_out.returncode} and no declared outcome accepts that, so the "
+                           f"receipt is not re-stamped. "
+                           + ("This kit's own [check] runs next and rolls its writes back only "
+                              "if it passed before this run and fails after; a check already red, "
+                              "or one blind to the render, leaves them standing"
+                              if _has_check else
+                              "This kit declares no [check] argv, so nothing below can roll its "
+                              "writes back: they stay staged, and the render has to be repaired "
+                              "by hand before the next update"))
+    # AC6 — SILENT WHEN THE FLAG IS OFF. The criterion asks for output byte-identical to the
+    # pre-change run, and a step that announces its own absence is not dark. Once the flag is
+    # ON every decline is named, which is section 5s observability item and the class this
+    # build keeps closing: a skip that looks like a pass.
+    if _rerender_on:
+        print(f"govkit update — re-render: {len(_rr_ran)} argv run, "
+              f"{len(_rr_declined)} declined")
+        for _line in _rr_ran:
+            print(f"govkit update —   ran {_line}")
+    for _eid, _why in (_rr_declined if _rerender_on else []):
+        # A SKIP THAT LOOKS LIKE A PASS IS THE CLASS THIS BUILD KEEPS CLOSING. Every declined kit is
+        # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
+        print(f"govkit update —   DECLINED {_eid}: {_why}")
+
+    # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
+    # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
+    # already knows how to answer about itself — its own `[check].argv`, the same declaration
+    # `cmd_check` runs — and compare that answer against the BASELINE taken before the write.
+    #
+    # THE ROLLBACK KEYS ON THE TRANSITION, never on the after-state alone, and that is the whole
+    # difference between a verifier and a wedge. On the after-state alone, an adopter carrying ONE
+    # unrelated local red in a touched kit reverts every correct write on EVERY run, forever: the
+    # `r.fail` below reaches the `if r.problems` arm, `gov_commit` never advances, and §3 refuses
+    # the `--force` that would otherwise be the way out. Red-before-and-red-after is reported as
+    # pre-existing and left alone. What that trade costs is narrower and is stated rather than
+    # implied: a kit already red keeps its writes, so a genuinely broken merge inside THAT kit lands
+    # unobserved, because a binary check cannot tell "still broken" from "newly broken".
+    #
+    # IT RUNS UNCONDITIONALLY UNDER `--write`. There is no flag, in any spelling, because an opt-in
+    # verifier verifies the runs that were already careful.
+
+    # WHAT THE WRITE LOOP ACTUALLY DID, frozen before any rollback edits these lists. The snapshot's
+    # population is what the loop was GOING to act on; this is what it reached. A row refused at its
+    # own arm — a conflicting three-way, a rename destination the target already holds — is in the
+    # first and not the second, and rolling one of those back is not merely wasted: the occupied
+    # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
+    # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
     # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
     # path is classified untouched by the closing tally, which reports it as a file this run
     # never wrote -- while it sits staged in the adopter's index.
@@ -7950,6 +8156,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # The same flag already refuses loudly on its other two error classes, and the parser refuses a
     # missing `=` with the words "accepting it would silently pin nothing".
     pins_used: set[str] = set()
+    versions_at: dict[tuple[str, str], str] = {}
     for p in plan:
         dest = p["dest"]
         if dest not in idx:
@@ -8037,6 +8244,23 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
                 row["commit"], row["gov_oid"], rung = hit
                 row["carry"] = rung
                 row["evidence"] = "vintage-match"
+
+        # THE VERSION FOLLOWS THE BYTES, NOT THE VINTAGE THIS RUN MEASURES AT. A row attributed to an
+        # older commit whose gov blob this vintage no longer holds carries that kit's version AT that
+        # commit. Stamping every row with the measuring vintage's constant made a re-adopt that
+        # pinned a kit the migration never pulled report the new version over old bytes: NicoCares'
+        # `check-memory-hygiene.sh` row read 2.69 over commit 013b1af9 while the file declared 2.68,
+        # and `update`'s per-kit delta read `level` for a kit whose bytes were a version behind. A
+        # row whose blob is unchanged since its commit keeps the measuring vintage's, because its
+        # bytes are that vintage's too.
+        if row.get("commit") and row.get("gov_oid") and p["src"]:
+            _now = blob_at(root, commit, p["src"])
+            if _now is None or blob_oid(_now) != row["gov_oid"]:
+                _vk = (p["kit"], row["commit"])
+                if _vk not in versions_at:
+                    versions_at[_vk] = resolve_entry_version_at(root, descs[p["kit"]][0],
+                                                                row["commit"])
+                row["version"] = versions_at[_vk]
 
         ev = row["evidence"]
         key = "forked" if p["role"] == "forked" else (rung or ev)
