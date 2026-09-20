@@ -128,6 +128,17 @@ reach. Every arm below is therefore owed to the post-build run with the break th
 - `tools/runlog/SKILL.template.md` and the rendered Skill were not touched: the Skill names the
   record's sections but not the Timeline's facts, so `scan_skill_copies` has nothing new to hold. No
   kit version moves and no other kit was reached.
+- **The new counts give no withheld time back, and that was checked rather than assumed.** The
+  bug-class checklist selects `withheld-value-recovered-from-a-derived-one` over this diff, and its
+  question is which rendered values took a withheld one as an input. A kind's count reads `kind`
+  alone and never `t`: it is the length of a filter over the timeline, so no arithmetic over it, over
+  `duration`, over the `events` count or over the window bounds places any one retired event. The
+  values the retirement withheld are times; what this unit publishes is cardinality, which is why
+  `TOOL-dLoggedFlight-22` section 5 could keep it at all.
+- **The two staged breaks edit no file, so the stale-bytecode class cannot reach them.** Both wrap a
+  shipped function in memory and restore it in a `finally`; nothing is written to `record.py` and
+  re-imported, which is the shape that lets a second edit inside one second run the first edit's
+  cached bytecode.
 - **This pass's own prose is unreviewed surface.** No audit runs beside it, so spec rev-3's S8, AC6
   and section 9, the dossier edit, the README paragraph and this ledger are read for the first time at
   the closing diff review.
