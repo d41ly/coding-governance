@@ -3583,8 +3583,8 @@ _sd_calls=$(grep -cE '^[^#]*\$\(resolve_sidecar_dir\)' "$DRIVER" || true)
 #
 # What this check does NOT check, because a structural check reads as a semantic one to everybody
 # who did not write it: `printf '%s' "$x" | wc -l` with NO newline is correct — it counts embedded
-# newlines and reads an empty capture as 0 — and is the driver's own idiom at eight lines, so it is
-# not a hit. A count through an intermediate command (`printf '%s\n' "$x" | grep -o … | wc -l`, the
+# newlines and reads an empty capture as 0 — and is the driver's own idiom (count them with the
+# near-miss grep, never here), so it is not a hit. A count through an intermediate command (`printf '%s\n' "$x" | grep -o … | wc -l`, the
 # driver suite's dir-count) is not read: the newline reaches grep, not wc. A `wc -l` over a file or
 # a `$(…)` is outside the predicate. A fourth spelling of the same defect — `"${x}"` with braces, or
 # a variable not immediately quoted — passes; the class is recorded under memory/gotchas/ by NAME

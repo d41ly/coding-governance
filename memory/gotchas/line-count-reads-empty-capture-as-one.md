@@ -27,8 +27,8 @@ _o=""; printf '%s'   "$_o" | grep -c ''  # 0  — nothing in, nothing counted
 `grep -c ''` counts lines the way `wc -l` does on non-empty input, counts a final line with no
 trailing newline (which `wc -l` misses), and reads `0` on empty input — the one property the helper
 needs. `printf '%s' "$x" | wc -l` with no added newline reads empty as `0` too, but misses the
-unterminated final line; it counts embedded newlines correctly and is the driver's own idiom at eight
-lines, which is why the gate below does not red it.
+unterminated final line; it counts embedded newlines correctly and is the driver's own idiom, which
+is why the gate below does not red it.
 
 ## The instance
 

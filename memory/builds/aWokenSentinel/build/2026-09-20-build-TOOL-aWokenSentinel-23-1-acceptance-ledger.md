@@ -46,4 +46,9 @@ commit; the Gaps bullet that still said `CORE_FLOOR` is `10:8` and two DoD items
 section asks for on touch and leaves the file 12 B under the cap. The NEXT claim on this dossier
 cannot fit: the gate's remedy is a split into two dossiers, which no unit of this build is scoped
 to do, and the curation-debt row was not taken because a row silences checks 6, 7 and 8 on the
-whole file to buy 43 bytes.
+whole file to buy 43 bytes. The bug-class checklist over the pass commit (`gotchas.py --for-diff
+HEAD~1..HEAD`, 30 classes) selected `two-answers-to-one-question` against the one count the diff
+typed in prose: the checker header, the arm comment and the gotcha record each said the driver's
+correct idiom sits "at eight lines", a figure the near-miss grep owns; the count is removed from
+all three in the follow-up commit, and the eight line numbers stay only in AC5's row above as the
+measurement taken at the pass.

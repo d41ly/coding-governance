@@ -1946,8 +1946,8 @@ out=$(run)
 hit "$out" "a shell file in this kit counts a captured variable's lines by adding a newline first — printf '%s\n', echo or a here-string into wc -l — which reads an EMPTY capture as one line, so an assertion on the count passes on a command that wrote nothing; count with printf '%s' \"\$x\" | grep -c '' instead, which reads empty as 0. hits: unattended.test.sh:"
 hit "$out" "UNATTENDED check 33 FAILED"
 # ...the NEAR-MISS, a control on the predicate rather than a second break: the same count WITHOUT the
-# added newline is the driver's own idiom at eight lines — it counts embedded newlines and reads an
-# empty capture as 0 — and the check's header says it is not a hit. This arm is that sentence,
+# added newline is the driver's own idiom — it counts embedded newlines and reads an empty capture
+# as 0 — and the check's header says it is not a hit. This arm is that sentence,
 # observed; without it the arm above is equally consistent with a ban on every `| wc -l`.
 reset_tree
 cp "$HERE/unattended.test.sh" $KIT_REL/
