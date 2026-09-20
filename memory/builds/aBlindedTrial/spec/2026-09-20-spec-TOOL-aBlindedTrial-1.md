@@ -1,6 +1,6 @@
 # TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-1 · base d46d3ccb · streams tooling+playbook · order 1
+**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-1 · base d46d3ccb · streams tooling+playbook · order 1 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
@@ -169,27 +169,30 @@ read from `tools/gate-legs.json` at emission time. The leg line:
 
 ## 8. Open questions
 
-The scope menu. Each item carries a recommendation and a price; the trial runs at the recommended
-shape unless the owner picks otherwise.
+The scope menu, put to the owner 2026-09-20 and ratified at the recommended shape on every item.
 
 - **F1 — replicates per cell.** Three (recommended; 27 builds, 9 audits) or five (45 builds, 15
   audits, roughly 1.7× the cost). Three cannot detect a small effect; it can detect a large one and
   it measures the cost ratio precisely either way. Recommendation: three, and re-run the surviving
-  contrast at five only if the result is close.
+  contrast at five only if the result is close. RESOLVED (owner, 2026-09-20): three.
 - **F2 — a fourth arm, spec WITHOUT audit.** Isolates the audit's contribution from the spec's.
   Adds 9 builds and 9 spec authors. Recommendation: no — arm P already separates "thinking first"
   from "the ceremony", and if S beats P the follow-up trial is exactly this arm.
+  RESOLVED (owner, 2026-09-20): no fourth arm.
 - **F3 — task set.** The three briefs in `XP/briefs/` (recommended) or swap one for an in-repo task
   built inside a scratch clone of this tree with its gates. In-repo tasks measure a different thing
   — reuse of existing seams — and contaminate the arms with prior art. Recommendation: the three
-  standalone briefs.
+  standalone briefs. RESOLVED (owner, 2026-09-20): the three standalone briefs.
 - **F4 — grading weights.** Report the four measures separately (recommended) rather than a composite
-  score; a composite hides which measure moved.
+  score; a composite hides which measure moved. RESOLVED (owner, 2026-09-20): separate measures.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-20 · initial draft; retrospective S1 already run while drafting (figures in
   `retro.json`), the rest awaits scope approval.
+- rev-2 · 2026-09-20 · §8 · scope approved by the owner at the recommended shape on all four forks;
+  status INPROGRESS. S2 and S4 completed before approval as preparation: twenty units graded, three
+  suites frozen at 43/42/42 tests, each failing 100% against an exit-0 stub.
 
 ## 10. Reuse audit
 

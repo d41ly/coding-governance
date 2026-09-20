@@ -58,13 +58,13 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-09-20 · streams tooling+playbook
 ids TOOL-aBlindedTrial-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | INPROGRESS | rev-2 | 2026-09-20 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).
