@@ -5390,6 +5390,10 @@ rm -rf "$GATE_LOGS"
 # override's `projects/`, named by the session the prologue pinned.
 ENC=$(git rev-parse --show-toplevel | tr ':\\/.' '----')
 n=$((n+1)); case "$ENC" in *[:/.]*|"") echo "FAIL fixture: the encoded root still carries a separator or is empty: $ENC"; st=1 ;; esac
+# ...pinned to a LITERAL of the rule the CLI was measured to apply on node `a`, 2026-09-16 — a
+# drive colon, every slash and the leading dot of `.claude` each become one `-` — so the arm is an
+# oracle the driver's spelling must match rather than a re-derivation that would agree with it.
+same "AC5 the encoding pins the measured rule" "$(printf '%s' 'D:/some.repo/.claude/wt' | tr ':\\/.' '----')" "D--some-repo--claude-wt"
 mkdir -p "$ORIGIN_DIR/cfg/projects/$ENC" && touch "$ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
 out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
 hit "$out" "transcript: $ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
@@ -5956,11 +5960,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=897
-# RAISED 824 -> 897 by TOOL-aWokenSentinel-2: the `--liveness` block plus one NOCONF assertion, in
+FLOOR_ASSERTIONS=898
+# RAISED 824 -> 898 by TOOL-aWokenSentinel-2: the `--liveness` block plus one NOCONF assertion, in
 # region two beside the lease arms, measured by running that block alone over the sourced prologue:
-# n 26 -> 100 on node `a` (MSYS), of which 2 are the MSYS-only `tasklist`-stub arm, so the raise is
-# the 72 every platform executes plus the NOCONF line — a floor is the minimum a green run reaches.
+# n 26 -> 101 on node `a` (MSYS), of which 2 are the MSYS-only `tasklist`-stub arm, so the raise is
+# the 73 every platform executes plus the NOCONF line — a floor is the minimum a green run reaches.
 # RAISED 790 -> 824 by TOOL-aWokenSentinel-1: the lease block's 34 executed assertions, in region two
 # beside the `--audit` arms, measured by running that block alone over the sourced prologue.
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
@@ -6006,8 +6010,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=701
-# +73 for the TOOL-aWokenSentinel-2 `--liveness` arms and the NOCONF line, in region two — see
+FLOOR_SHARD_2=702
+# +74 for the TOOL-aWokenSentinel-2 `--liveness` arms and the NOCONF line, in region two — see
 # FLOOR_ASSERTIONS above for the platform split.
 # +34 for the TOOL-aWokenSentinel-1 lease arms, in region two beside the `--audit` arms.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).

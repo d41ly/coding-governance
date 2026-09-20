@@ -5,8 +5,8 @@
 Every leg-shaped half below reads `observed at --close`: this pass ran no gate, no leg and no
 suite, per the build README's rule three. The one check the pass verified with is the unit's own
 arm block, sourced beside the suite's prologue (plus `build_audit_fixture`, the `--audit` STALLED
-arm and the NOCONF arm) into a scratch runner and run ALONE — 74 executed assertions in the block
-on node `a` under MSYS (n 26 → 100, two of them the MSYS-only `tasklist`-stub arm) plus one on the
+arm and the NOCONF arm) into a scratch runner and run ALONE — 75 executed assertions in the block
+on node `a` under MSYS (n 26 → 101, two of them the MSYS-only `tasklist`-stub arm) plus one on the
 NOCONF fixture, green against the built driver, and RED against eight frozen kit copies each
 missing one graded line: the no-record `fail 52`, the dead-probe `fail 52` (replaced by `:`, since
 deleting it leaves an empty `then`), the gate-log join, the below-sum NOTE, the
@@ -34,7 +34,7 @@ No kit gate, harness-arms leg (beyond the `--report` read above), hygiene leg, s
 lexicon leg, install-prefix leg or codebase-map leg ran inside this pass; every one is `--close`'s
 and each row above says so. The five function names were asked of `python tools/lexicon/lexicon.py
 --suggest <name> --as sh.function`, which answered OK for each — a query, not the leg. The suite's
-`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rose by 73, the count every platform executes (72 in the
+`FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rose by 74, the count every platform executes (73 in the
 block plus the NOCONF line; MSYS executes two more); the suite whole was not run, so the sharded
 totals are the prior measurement plus that count and not a fresh one. Whether `_` is replaced in
 the transcript directory encoding stays UNVERIFIED, as the spec records. The build README's
