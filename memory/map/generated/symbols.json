@@ -863,6 +863,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "build_sentinel_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_session_events",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -1333,6 +1338,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "check_record_times",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "check_records",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1373,6 +1383,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_slots_rendered",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "check_substitution",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
@@ -1391,6 +1406,11 @@
       "id": "check_target_reads_subject",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_time_classes",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "check_time_sources",
@@ -4083,7 +4103,17 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_public_times",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_record_cells",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_record_copies",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -4696,6 +4726,11 @@
       "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_staged",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "render_swapped_name",
@@ -5391,6 +5426,11 @@
       "id": "scan_claimed_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_class_tokens",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "scan_corpus",
@@ -6944,6 +6984,11 @@
     },
     {
       "id": "test_record_template_pairs",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_time_population",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

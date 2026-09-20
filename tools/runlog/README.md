@@ -348,6 +348,24 @@ from. The schema leg's `source` rule is the other half, over the rendered bytes.
 withheld the values of one path each, and each was followed by an audit round finding a path it had
 not enumerated; a source either is already public in git or is not, which is decidable per slot.
 
+**One self-test arm reads the whole population back.** It renders a fixture whose every journal-
+and transcript-timed value carries a second no public source shows, and grades every token of a
+`time_classes` class against the commit and run-state times read off that fixture, every sum of a
+rendered time and a rendered duration against those seconds, and each of the three encodings one
+of them can take — its ISO form, its epoch second and its clock time — whatever class carries it.
+It asserts that every slot `scan_time_slots` returns rendered a token, so a slot the fixture never
+reached reds by name instead of passing with nothing to grade, and that no other shaped class
+matches a public time's rendered form or a difference of two.
+
+**One self-test arm reads the whole population back.** It renders a fixture whose every journal-
+and transcript-timed value carries a second no public source shows, and grades every token of a
+`time_classes` class against the commit and run-state times read off that fixture, every sum of a
+rendered time and a rendered duration against those seconds, and each of the three encodings one
+of them can take — its ISO form, its epoch second and its clock time — whatever class carries it.
+It asserts that every slot `scan_time_slots` returns rendered a token, so a slot the fixture never
+reached reds by name instead of passing with nothing to grade, and that no other shaped class
+matches a public time's rendered form or a difference of two.
+
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
 duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under
 the build's own folder. The vocabularies are closed lists, the model's own wherever it owns one. A

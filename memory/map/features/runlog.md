@@ -217,9 +217,9 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   share its start; the leg names that shape, and nothing clears it.
 - **No journal or transcript time is committed** (owner, 2026-09-16). Withholding a VALUE per path
   leaked five times over, so each slot rendering a time declares its SOURCES instead — `git` and the
-  run-state file, public already — graded by `check_time_sources` and, on a rendered row, the leg's
-  `source` rule. `TOOL-dLoggedFlight-22` retired the journal-timed rows and time columns with the
-  owner-time refusal; the local model keeps every one, and the Skill answers from it.
+  run-state file, public already — graded by `check_time_sources`, the leg's `source` rule on a
+  rendered row, and one arm over every token of a declared class and each encoding of a withheld
+  second. The journal-timed rows and columns retired; the model keeps every one of them.
 - **The record proves shapes, not truth.** A count can be wrong and still an integer. The lists it
   copies from the spec template and hygiene doc are held only by the withheld self-test, and its
   commitment only on the node holding the journal. An unknown count is `-` by the renderer, off a

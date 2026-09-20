@@ -1,11 +1,12 @@
 # TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 28
+**Status:** CLOSED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-dLoggedFlight-23-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-dLoggedFlight-23-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
 | [2026-09-16-review-TOOL-dLoggedFlight-21-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-21-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-24 |
 
@@ -109,6 +110,13 @@ enumerate which sums are legitimate.
 |---|---|---|
 | `build_sentinel_model` | function | `py.function`, led by `build` |
 | `test_record_time_population` | function | `py.function`, led by `test` |
+| `read_public_times` | function | `py.function`, led by `read` |
+| `read_record_copies` | function | `py.function`, led by `read` |
+| `scan_class_tokens` | function | `py.function`, led by `scan` |
+| `render_staged` | function | `py.function`, led by `render` |
+| `check_record_times` | function | `py.function`, led by `check` |
+| `check_slots_rendered` | function | `py.function`, led by `check` |
+| `check_time_classes` | function | `py.function`, led by `check` |
 
 ### Files touched (estimate)
 
@@ -138,16 +146,19 @@ enumerate which sums are legitimate.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `test_record_time_population` renders S2's fixture through `render_record`, every token
-  obeys S3's rule in both copies.
-  Red when: any token breaks it. Staged RED five ways, each on a copy: a renderer whose Summary
-  `duration` reads the model's journal-bounded `window`, a model whose one kept `commit` row carries a
-  journal event's time, a model whose `run` count is a sentinel epoch second, and two copies each
-  carrying one sentinel encoding no `utc` token covers, its `HH:MM:SS` and its ISO form. No kept class
-  but `utc` admits a colon (`record.py:117-152`), so those two ride a ledger entry `ref` on a schema copy
-  whose `ref` class is widened to admit that encoding. Before its verdict, every staged RED asserts that
-  its broken token reached the text and lies outside the set S3 accepts, and it reds as a dead probe
-  otherwise.
+- **AC1** — When `test_record_time_population` renders S2's fixture through `render_staged`, which
+  drives `build_record_parts`, `build_record_doc` and `render_markdown` at the nominal bounds, every
+  token obeys S3's rule in both copies.
+  Red when: any token breaks it. Staged RED five ways: a renderer whose Summary `duration` reads the
+  model's journal-bounded `window` — its END less the rendered start, which is the sum B1 recovers —
+  a model whose one kept `commit` row carries a journal event's time, a model whose `run` count is a
+  sentinel epoch second, and two renders each carrying one sentinel encoding no `utc` token covers,
+  its `HH:MM:SS` and its ISO form. No kept class but `utc` admits a colon (`record.py:117-152`), so
+  those two ride a ledger entry `ref` with the `ref` class widened to admit that encoding — the LIVE
+  constant, restored in a `finally` and asserted back afterwards, since `build_matchers` reads the
+  schema off its own module rather than taking one, so a copy reaches no render. Before its verdict,
+  every staged RED asserts that its broken token reached the text and lies outside the set S3
+  accepts, and it reds as a dead probe otherwise.
 - **AC2** — When the fixture's kept rows pass twice `TIMELINE_EDGE`, the `elided` fact renders, and its
   two times equal the first and last omitted kept rows' times, neither a sentinel.
   Red when: the fact does not render, or either time differs; staged RED by a renderer copy whose elided
@@ -166,7 +177,7 @@ enumerate which sums are legitimate.
 
 `runlog selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC1's five copies, AC2's renderer copy, AC3's two cut fixtures and extra-slot schema copy, and AC4's schema copy · floor raised by the arm count
+New arm: `tools/runlog/selftest.py` · AC1's five staged renders, AC2's range read from the unfiltered timeline, AC3's two cut fixtures and its extra-slot schema copy, and AC4's schema copy · floor 1422 to 1451
 
 ## 8. Open questions
 
@@ -184,6 +195,17 @@ none
   equals a public difference, and every staged RED asserts its break lies outside the accepted set
   before its verdict. §3 gains the edge to `TOOL-dLoggedFlight-25`, promoted by the same audit. The
   order moves from 25 to 28.
+- rev-3 · 2026-09-20 · §4 · AC1 · §7 · written as built. §4's inventory names the seven helpers the
+  arm arrives with. AC1 records three divergences the code forced. The render is driven through
+  `build_record_parts`, `build_record_doc` and `render_markdown` at the nominal bounds, because a
+  staged Summary fact has to reach the twin as well as the markdown and because AC2 and AC3 grade
+  the doc rather than the bytes. The `ref` class is widened on the LIVE schema and restored in a
+  `finally`, because `build_matchers` reads the schema off its own module rather than taking one,
+  so a copy would reach no render; the suite's own class arm stages a vocabulary the same way. And
+  the staged duration is the journal window's END less the rendered start, which is the sum a
+  reader adds to recover a withheld bound — B1's own shape — rather than that window's own span,
+  which no rendered start joins. §7 records the floor the arm's 26 checks and their 3 decoy checks
+  move: 1422 to 1451.
 
 ## 10. Reuse audit
 

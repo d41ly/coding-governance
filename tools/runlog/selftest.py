@@ -174,7 +174,17 @@ from collections import Counter  # noqa: E402
 # the schema leg's refusal arm and move no decoy check: the `source` variant's exit and rule in the
 # loop, and the block holding that row to the source rule alone.
 # 5 + 4 + 6 + 3 = 18
-ASSERTION_FLOOR = 1422
+# RAISED 1422 -> 1451 by TOOL-dLoggedFlight-23, the time population: ONE new arm with 26
+# checks — the sentinel pre-check and the liveness that the model carries every one of them;
+# the clean render over both copies and the liveness that both carry tokens of both time
+# classes; two checks for each of AC1's five staged REDs, the first asserting that the break
+# reached the text and lies outside what the rule accepts and the second reading the verdict;
+# AC2's fact, its liveness and its unfiltered-range break; AC3's clean enumeration, its
+# key-shape liveness and its three staged REDs; AC4's clean verdict, its dropped class and its
+# liveness; and the closing check that the staging left the live schema as it was. Its decoy
+# checks move it by 3, and the seven helpers it arrives with carry none.
+# 26 + 3 = 29
+ASSERTION_FLOOR = 1451
 
 PASS = []
 FAIL = []
@@ -5271,6 +5281,403 @@ def test_record_ac1_time_sources():
           (rl_record.check_time_sources(rl_record.RECORD_SCHEMA),
            {"/".join(map(str, k)): sorted(v) for k, v in rl_record.RECORD_SCHEMA["sources"].items()}),
           ([], before))
+
+
+# ==================================================== the time population (TOOL-dLoggedFlight-23)
+#
+# ONE ARM OVER EVERY TIME-BEARING TOKEN A RENDER WRITES. The owner-time class was closed four times
+# at a population narrower than the leak — the row kinds, then the `utc` slots, then `utc` tokens
+# over whatever a fixture happened to render — so BOTH of this arm's populations are read off the
+# schema the renderer also reads: `time_classes` for the classes and `scan_time_slots` for the
+# slots. It holds no typed list of either, which is the left-shift of the first closing review's B1
+# and of `memory/gotchas/withheld-value-recovered-from-a-derived-one.md`. Its fixture gives every
+# value a journal or a transcript timed a SENTINEL second, chosen so that no public time, and no sum
+# or difference of two of them, can equal one; the arm ASSERTS that choice before it grades, so a
+# coincidence in the fixture can neither hide a staged break nor red a clean render.
+
+
+def read_public_times(repo, record):
+    """Every time a reader of the PUBLIC repository already has: each commit's own committer time,
+    read from git, and the time each row of the committed run-state file carries.
+
+    Read off the FIXTURE and never off the model. `every utc token equals a public time` compared
+    with the times the renderer has just written would be a comparison with itself, which is the
+    `a double you wrote grades nothing` class this build has paid for once already.
+    """
+    out = {float(s) for s in run_git(["log", "--all", "--format=%ct"], repo).stdout.split()}
+    text = run_git(["show", f"main:{record}"], repo).stdout
+    for mo in re.finditer(r"(?m)^([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z) ", text):
+        t = rl_model.parse_iso(mo.group(1))
+        if t is not None:
+            out.add(t)
+    return frozenset(out)
+
+
+def build_sentinel_model():
+    """The landed fixture's REAL model, extended until every slot the schema declares is filled and
+    every value a journal or a transcript timed carries a sentinel (spec S2 of
+    TOOL-dLoggedFlight-23). Returns it beside the public times, their non-negative differences and
+    the sentinels, so the arm grades against sets it did not take from the render.
+
+    THE SENTINELS ARE SEARCHED, never merely spaced: a candidate is skipped unless it lies outside
+    every public sum and every public difference AND its clock time differs from every public time's.
+    A candidate past the whole public span satisfies the arithmetic by construction; the CLOCK is
+    what the search is for, since a sentinel sharing `HH:MM:SS` with a rendered time would red a
+    clean render, and one that the spacing happened to place there would do so only sometimes.
+
+    THE TIMELINE IS ORDERED BY LIST POSITION, not by time, and the renderer walks it in that order.
+    A sentinel lies beyond every public time by that same construction, so a time-sorted timeline
+    would gather every one of them at one end and the range AC2 stages — read from the unfiltered
+    timeline — would differ from the kept one by its length alone, which is the weaker half of what
+    that break has to show.
+    """
+    fx = build_landed_fixture()
+    j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    m = dataclasses.asdict(build_model(fx["repo"], journals=j))
+    public = read_public_times(fx["repo"], fx["record"])
+    pub = sorted(public)
+    diffs = frozenset(b - a for a in pub for b in pub if b >= a)
+    sums = frozenset(p + d + plus for p in pub for d in diffs for plus in (0.0, 1.0))
+    clocks = {time.strftime("%H:%M:%S", time.gmtime(t)) for t in pub}
+    sent, cand = [], float(max(pub)) + 86400.0
+
+    def next_sentinel():
+        nonlocal cand
+        while True:
+            cand += 7919.0
+            if (cand not in sums and time.strftime("%H:%M:%S", time.gmtime(cand)) not in clocks
+                    and all(abs(cand - s) not in diffs for s in sent)
+                    and all(abs(cand - p) not in diffs for p in pub)):
+                sent.append(cand)
+                return cand
+
+    # EVERY JOURNAL- AND TRANSCRIPT-TIMED VALUE THE MODEL ALREADY HOLDS. The retired kinds and the
+    # owner turns are the model's own; an anomaly's `t` is the time of the journal or transcript
+    # event that triggered it, which `build_anomaly_rows` says the record does not carry.
+    for e in m["timeline"]:
+        if e.get("kind") in rl_record.RETIRED_EVENTS or e.get("kind") == "owner":
+            e["t"] = next_sentinel()
+    journal = [dict(RETIRED_FIELDS[k], kind=k, t=next_sentinel()) for k in rl_record.RETIRED_EVENTS]
+    journal.append({"t": next_sentinel(), "source": "transcripts", "kind": "owner", "via": "typed"})
+    m["window"] = dict(m["window"], start=next_sentinel(), end=next_sentinel())
+    m["anomalies"] = [{"kind": k, "subclass": "other" if k == "nonterminal-merged" else None,
+                       "t": next_sentinel(), "evidence": "e"} for k in rl_model.ANOMALY_KINDS]
+    # THE KEPT ROWS, one of every kind the schema declares a layout for, cycled so each reaches both
+    # the head and the tail table, and each at a time read back off the fixture rather than invented.
+    declared = rl_record.derive_table("Timeline", "events")["rows"]
+    first = next(e for e in m["timeline"] if e.get("kind") == "commit")
+    shapes = {"phase": {"source": "run-state", "witness": first["sha"], "phase": "BUILDING",
+                        "sha": first["sha"]},
+              "commit": {"source": "git", "sha": first["sha"], "units": [FX_UNIT1], "own": True},
+              "merge": {"source": "git", "sha": fx["merge"], "units": [FX_UNIT1], "own": False},
+              "dispatch": {"source": "run-state", "unit": FX_UNIT1, "line": 30},
+              "brief": {"source": "run-state", "unit": FX_UNIT1, "line": 31}}
+    kinds = [k for k in rl_record.TIMELINE_EVENTS if k in declared]
+    kept = [dict(shapes[kinds[i % len(kinds)]], kind=kinds[i % len(kinds)], t=pub[i % len(pub)])
+            for i in range(2 * rl_record.TIMELINE_EDGE + 10)]
+    stride = max(1, len(kept) // (len(journal) + 1))
+    for i, e in enumerate(journal):
+        kept.insert(min(len(kept), (i + 1) * stride + i), e)
+    m["timeline"] = list(m["timeline"]) + kept
+    m["record_rows"] = list(m["record_rows"]) + [
+        {"t": pub[len(pub) // 2], "kind": "review", "item": "a-subject", "step": None,
+         "reason": "verdict CLEAN · blockers 0 · CONVERGED", "line": 90}]
+    return {"m": m, "journals": j, "public": public, "diffs": diffs, "sentinels": tuple(sent)}
+
+
+def read_record_copies(text):
+    """A record's TWO copies as bytes: the markdown above the `Data` fence, and the twin inside it.
+    The token rule is graded over each, so a break folded into one copy alone still reds."""
+    head, _, rest = text.partition(rl_record.DATA_OPEN)
+    return {"markdown": head, "twin": rest.partition(rl_record.DATA_CLOSE)[0]}
+
+
+def scan_class_tokens(text, cls):
+    """Every token of one shaped class in `text`, wherever it sits.
+
+    A class-BLIND scan of the bytes and not a walk of the slots that declare the class: a time in a
+    slot nobody declared, or in a class nobody declared a time, is what this arm exists to find, and
+    a walk of the declaration cannot see either.
+    """
+    return re.findall(r"(?<![0-9A-Za-z])(" + rl_record.RECORD_SCHEMA["shaped"][cls] + r")(?![0-9A-Za-z])",
+                      text)
+
+
+def check_record_times(text, fx):
+    """Every way a rendered record breaks the token rule (spec S3), one line each naming the copy and
+    the token; empty for a record that obeys it.
+
+    The four clauses: a `utc` token that is no public time; a `duration` token that is no
+    non-negative difference of two; a rendered time plus a rendered duration, or that sum plus the
+    second a half-open end adds, landing on a sentinel — the recovery B1 found; and, whatever class
+    carries it, a sentinel's ISO form, its epoch second as a whole token, or its clock time.
+    """
+    public, diffs, sent = fx["public"], fx["diffs"], fx["sentinels"]
+    iso = {rl_model.derive_iso(t) for t in public}
+    spans = {"%ds" % int(d) for d in diffs}
+    out = []
+    for copy, body in read_record_copies(text).items():
+        times = sorted(set(scan_class_tokens(body, "utc")))
+        durations = sorted(set(scan_class_tokens(body, "duration")))
+        out += [f"{copy}: the utc token {t} is no public time" for t in times if t not in iso]
+        out += [f"{copy}: the duration token {d} is no difference of two public times"
+                for d in durations if d not in spans]
+        for t in times:
+            at = rl_model.parse_iso(t)
+            for d in durations:
+                for plus in (0.0, 1.0):
+                    if at is not None and at + float(d[:-1]) + plus in sent:
+                        out.append(f"{copy}: {t} plus {d} recovers the withheld time "
+                                   f"{rl_model.derive_iso(at + float(d[:-1]) + plus)}")
+        for s in sent:
+            for name, enc in (("ISO form", rl_model.derive_iso(s)),
+                              ("clock time", time.strftime("%H:%M:%S", time.gmtime(s)))):
+                if enc in body:
+                    out.append(f"{copy}: the {name} {enc} of a withheld time is in the bytes")
+            if re.search(r"(?<![0-9A-Za-z])%d(?![0-9A-Za-z])" % int(s), body):
+                out.append(f"{copy}: the epoch second {int(s)} of a withheld time is in the bytes")
+    return out
+
+
+def render_staged(m, commitment, duration=None):
+    """ONE render at the nominal bounds, through the renderer's own seams, with the Summary
+    `duration` replaced where one is given.
+
+    A renderer copy and not a model copy, because `build_summary_facts` takes the window's two bounds
+    AND the duration from one `derive_window_bounds` call: patching that seam would move the `window`
+    fact too, and AC1's break names the duration alone. Replacing it in `parts` reaches BOTH copies,
+    since `build_record_doc` carries the summary into the doc and `render_twin` re-encodes that doc.
+    """
+    parts = rl_record.build_record_parts(m, "memory", commitment)
+    if duration is not None:
+        parts["summary"] = [(label, duration if label == "duration" else text)
+                            for label, text in parts["summary"]]
+    doc = rl_record.build_record_doc(parts, rl_record.TIMELINE_EDGE, rl_record.LIST_BOUND)
+    return parts, doc, rl_record.render_markdown(doc, parts["serves"])
+
+
+def check_slots_rendered(schema, doc):
+    """Every slot `scan_time_slots(schema)` returns that rendered no token in `doc`, by its own key.
+
+    The liveness half (spec S5): a slot the fixture never reached passes the token rule by having
+    nothing to grade, which is the green-by-absence class one level up from the tokens.
+    """
+    classes = frozenset(schema.get("time_classes") or ())
+    seen = set()
+    for section, sec in doc.items():
+        facts = dict(sec["facts"])
+        for label, templates in schema["sections"][section]["facts"]:
+            if label not in facts:
+                continue
+            nth = 0
+            for cls in (rl_record.PLACEHOLDER_RE.split(templates[0])[1::2] if templates else []):
+                if cls in classes:
+                    if scan_class_tokens(facts[label], cls):
+                        seen.add((section, label, nth))
+                    nth += 1
+        for tb in sec["tables"]:
+            table = rl_record.derive_table(section, tb["name"])
+            for row in tb["rows"]:
+                if "rows" in table:
+                    kind = row[table["key"]] if len(row) > table["key"] else None
+                    for cls, head, cell in zip(table["rows"].get(kind, ()), tb["header"], row):
+                        if cls in classes and cell != rl_record.NONE:
+                            seen.add((section, tb["name"], kind, head))
+                else:
+                    for cls, head, cell in zip(table["cols"], tb["header"], row):
+                        if cls in classes and cell != rl_record.NONE:
+                            seen.add((section, tb["name"], head))
+    return sorted("/".join(map(str, k)) for k in rl_record.scan_time_slots(schema) if k not in seen)
+
+
+def check_time_classes(schema, fx):
+    """Every `shaped` class of `schema` that fullmatches the rendered form of a public time, or of a
+    difference of two, and is NOT one of its `time_classes` (spec S5).
+
+    The other liveness half. `time_classes` is where every population above is read from, so a class
+    dropped out of it narrows all of them at once and silently.
+    """
+    forms = {rl_model.derive_iso(t) for t in fx["public"]} | {"%ds" % int(d) for d in fx["diffs"]}
+    classes = frozenset(schema.get("time_classes") or ())
+    out = []
+    for name, pat in sorted(schema["shaped"].items()):
+        if name in classes:
+            continue
+        pattern = re.compile(pat.replace("<root>", re.escape("memory")).replace("<slug>",
+                                                                                re.escape(FX_SLUG)))
+        hit = sorted((f for f in forms if pattern.fullmatch(f)), key=lambda f: (-len(f), f))
+        if hit:
+            out.append(f"time_classes: the class {name} matches the rendered time {hit[0]} and is no "
+                       "declared time class")
+    return out
+
+
+def test_record_time_population():
+    """AC1 to AC4 of TOOL-dLoggedFlight-23: one arm over every time-bearing token a render writes.
+
+    AC1 grades both copies of a clean render against the token rule and then stages it RED five ways
+    — the duration read from the model's journal-bounded window, a journal time on a kept `commit`
+    row, a sentinel's epoch second in a count slot, and its clock time and its ISO form on a ledger
+    `ref`. AC2 holds the `elided` fact to the first and last kept rows the shown tables omit. AC3
+    asserts that every slot `scan_time_slots` returns rendered a token, staged RED by two cut
+    fixtures and by a schema declaring one slot the record never fills. AC4 asserts that no other
+    shaped class can carry a rendered time.
+
+    Every break asserts that its token reached the text and lies outside the set the rule accepts
+    BEFORE the rule's verdict is read, so a break that never rendered reds as a dead probe rather
+    than passing as a refusal.
+    """
+    fx = build_sentinel_model()
+    m, sent, pub = fx["m"], fx["sentinels"], sorted(fx["public"])
+    sch = rl_record.RECORD_SCHEMA
+    keep = sch["shaped"]["ref"]
+    labels = [label for label, _ in sch["sections"]["Summary"]["facts"]]
+    commitment = rl_record.measure_commitment(m, fx["journals"])
+    # S2's pre-check, by VALUE and before anything is graded.
+    sums = {p + d + plus for p in pub for d in fx["diffs"] for plus in (0.0, 1.0)}
+    clocks = {time.strftime("%H:%M:%S", time.gmtime(t)) for t in pub}
+    bad = sorted(int(s) for s in sent
+                 if s in sums or time.strftime("%H:%M:%S", time.gmtime(s)) in clocks
+                 or any(abs(s - other) in fx["diffs"] for other in sent if other != s)
+                 or any(abs(s - p) in fx["diffs"] for p in pub))
+    check("record AC1: every sentinel lies outside every public time, every public time plus a "
+          "public difference, every difference of two sentinels and every public clock time",
+          (bad, len(sent) > 0, len(pub) > 1), ([], True, True))
+    check_true("record AC1 liveness: the model the arm renders carries every one of them, so the "
+               "scans below run over a population and not an empty set",
+               set(sent) <= ({e["t"] for e in m["timeline"]} | {a["t"] for a in m["anomalies"]}
+                             | {m["window"]["start"], m["window"]["end"]}), str(len(sent)))
+    parts, doc, text = render_staged(m, commitment)
+    check("record AC1: every time-bearing token of the clean render obeys the source rule, in both "
+          "copies", check_record_times(text, fx), [])
+    copies = read_record_copies(text)
+    check_true("record AC1 liveness: both copies carry utc tokens AND duration tokens, so `obeys` is "
+               "no verdict over an empty scan",
+               all(scan_class_tokens(body, cls) for body in copies.values()
+                   for cls in sch["time_classes"]),
+               str({name: len(scan_class_tokens(body, "utc")) for name, body in copies.items()}))
+    # RED 1. B1's own recovery shape: the duration read from the model's journal-bounded window
+    # against the rendered start, so a reader adds the two and recovers a bound no public source
+    # shows. `render_staged` says why the copy is of the renderer and not of the model.
+    # `or pub[0]` keeps a window that failed to render from crashing the arm before AC3 names
+    # the slot it left empty; the break below is then meaningless and AC3 is what reports it.
+    start = rl_model.parse_iso(dict(doc["Summary"]["facts"])["window"].split(" to ")[0]) or pub[0]
+    token = "%ds" % int(m["window"]["end"] - start)
+    _, _, red = render_staged(m, commitment, duration=token)
+    check("record AC1 RED: the staged duration reached the text and is no difference of two public "
+          "times", (token in red, float(token[:-1]) in fx["diffs"]), (True, False))
+    lines = check_record_times(red, fx)
+    check("record AC1 RED: ...and the arm reds on it, naming the token and the bound it recovers",
+          (any(token in ln and "no difference" in ln for ln in lines),
+           any("recovers the withheld time" in ln for ln in lines)), (True, True))
+    # RED 2. A journal event's time on one kept `commit` row: the leak the row kinds' retirement was
+    # meant to make impossible, staged on a model copy.
+    rows, at = [dict(e) for e in m["timeline"]], None
+    for i in range(len(rows) - 1, -1, -1):
+        if rows[i].get("kind") == "commit":
+            rows[i]["t"], at = sent[0], i
+            break
+    _, _, red = render_staged(dict(m, timeline=rows), commitment)
+    iso = rl_model.derive_iso(sent[0])
+    check("record AC1 RED: the staged row's time reached the text and is no public time",
+          (at is not None, iso in red, iso in {rl_model.derive_iso(t) for t in pub}),
+          (True, True, False))
+    check("record AC1 RED: ...and the arm reds on it, naming the token",
+          any(iso in ln for ln in check_record_times(red, fx)), True)
+    # RED 3. A sentinel's EPOCH second in a count slot: the `int` class admits it, no `utc` token
+    # carries it, and only the class-blind scan can see it.
+    _, _, red = render_staged(dict(m, run=int(sent[1])), commitment)
+    epoch = "%d" % int(sent[1])
+    lines = check_record_times(red, fx)
+    check("record AC1 RED: the staged epoch second reached the text as a whole token",
+          bool(re.search(r"(?<![0-9A-Za-z])" + epoch + r"(?![0-9A-Za-z])", red)), True)
+    check("record AC1 RED: ...and the arm reds on it with no utc token having carried it",
+          (any(epoch in ln for ln in lines), [ln for ln in lines if "utc token" in ln]), (True, []))
+    # REDs 4 and 5. The two encodings a `utc` token cannot carry, on a ledger entry's `ref`. No kept
+    # class but `utc` admits a colon, so the `ref` class is widened for the render and restored in a
+    # `finally` — the LIVE constant and not a copy, because `build_matchers` reads the schema off
+    # this module rather than taking one (spec rev-3).
+    for name, enc in (("clock time", time.strftime("%H:%M:%S", time.gmtime(sent[2]))),
+                      ("ISO form", rl_model.derive_iso(sent[2]))):
+        led = dict(m["ledger"])
+        led["entries"] = list(led["entries"]) + [{"source": "decision", "ref": enc}]
+        led["counts"] = {**(led.get("counts") or {}),
+                         "decision": (led.get("counts") or {}).get("decision", 0) + 1}
+        sch["shaped"]["ref"] = keep + r"|[0-9:TZ-]{8,20}"
+        try:
+            _, _, red = render_staged(dict(m, ledger=led), commitment)
+        finally:
+            sch["shaped"]["ref"] = keep
+        check(f"record AC1 RED: a withheld time's {name} reached the text on a ref, outside every "
+              "form a public time takes",
+              (enc in red, enc in {rl_model.derive_iso(t) for t in pub}), (True, False))
+        check(f"record AC1 RED: ...and the class-blind scan reds on it, naming the {name}",
+              any(enc in ln and "of a withheld time" in ln for ln in check_record_times(red, fx)),
+              True)
+    # AC2. The `elided` fact's two times are the first and last KEPT rows the shown tables omit,
+    # never the model's own timeline, which still holds every journal event the rows dropped.
+    tl, tlf = parts["rows"]["timeline"], dict(doc["Timeline"]["facts"])
+    edge = int(tlf["events"].split(" · shown ")[1].split(" · ")[0]) // 2
+    gap, raw = tl[edge:len(tl) - edge], m["timeline"]
+    ends = (gap[0][0], gap[-1][0]) if gap else (rl_record.NONE, rl_record.NONE)
+    check("record AC2: the elided fact names the first and last kept rows the shown tables omit",
+          tlf.get("elided"), "%d events from %s to %s" % (len(gap), ends[0], ends[1]))
+    check("record AC2 liveness: the render stayed at the nominal edge, the gap is not empty, and "
+          "neither of its two times is a withheld one",
+          (edge, len(gap) > 0, [t for t in ends
+                                if t in {rl_model.derive_iso(s) for s in sent}]),
+          (rl_record.TIMELINE_EDGE, True, []))
+    wide = raw[edge:len(raw) - edge]
+    check("record AC2 RED: read from the model's unfiltered timeline the range differs, and names a "
+          "time no record carries",
+          ("%d events from %s to %s" % (len(wide), rl_model.derive_iso(wide[0]["t"]),
+                                        rl_model.derive_iso(wide[-1]["t"])) != tlf.get("elided"),
+           any(rl_model.derive_iso(s) in (rl_model.derive_iso(wide[0]["t"]),
+                                          rl_model.derive_iso(wide[-1]["t"])) for s in sent)),
+          (True, True))
+    # AC3. Every slot the schema declares rendered a token, staged RED three ways.
+    check("record AC3: every slot scan_time_slots returns rendered at least one token",
+          check_slots_rendered(sch, doc), [])
+    slots = rl_record.scan_time_slots(sch)
+    check_true("record AC3 liveness: that population holds all three key shapes a slot can have and "
+               "both time classes, so it is no claim over one kind of slot",
+               {(len(k), isinstance(k[-1], int)) for k in slots} == {(3, True), (3, False), (4, False)}
+               and set(slots.values()) == set(sch["time_classes"]), str(len(slots)))
+    cut = dict(m, record_rows=[r for r in m["record_rows"] if r.get("kind") != "review"])
+    check("record AC3 RED: with the fixture's review round removed it reds naming the rounds table's "
+          "UTC column", check_slots_rendered(sch, render_staged(cut, commitment)[1]),
+          ["Decisions/rounds/UTC"])
+    declared, shown, short = rl_record.derive_table("Timeline", "events")["rows"], 0, []
+    for e in raw:
+        if e.get("kind") in declared:
+            shown += 1
+            if shown > rl_record.TIMELINE_EDGE:
+                continue
+        short.append(e)
+    check("record AC3 RED: with the kept rows cut to TIMELINE_EDGE nothing is elided and it reds "
+          "naming the elided fact's two slots",
+          check_slots_rendered(sch, render_staged(dict(m, timeline=short), commitment)[1]),
+          ["Timeline/elided/0", "Timeline/elided/1"])
+    sections = sch["sections"]
+    summary = dict(sections["Summary"], facts=sections["Summary"]["facts"] + (("landed", ("{utc}",)),))
+    check("record AC3 RED: a schema copy declaring one utc slot the record never fills reds naming "
+          "that slot, so the arm's slot list cannot be a typed one",
+          check_slots_rendered(dict(sch, sections={**sections, "Summary": summary}), doc),
+          ["Summary/landed/0"])
+    # AC4. No class outside `time_classes` can carry a time the record renders.
+    check("record AC4: every shaped class matching a public time's rendered form, or a difference of "
+          "two, is a declared time class", check_time_classes(sch, fx), [])
+    check("record AC4 RED: a copy whose time_classes omits duration reds naming duration",
+          [ln.split(" ")[3] for ln in check_time_classes(dict(sch, time_classes=("utc",)), fx)],
+          ["duration"])
+    check_true("record AC4 liveness: the forms those classes are measured against hold a rendered "
+               "public time AND a rendered difference of two, so neither half is an empty set",
+               len(fx["public"]) > 1 and len(fx["diffs"]) > 1,
+               str((len(fx["public"]), len(fx["diffs"]))))
+    check("record AC1 and AC3: the live schema is what it was before the staging, its ref class and "
+          "its Summary fact labels both",
+          (sch["shaped"]["ref"], [label for label, _ in sch["sections"]["Summary"]["facts"]]),
+          (keep, labels))
 
 
 # The Summary facts whose counts the model derives from the transcripts (TOOL-dLoggedFlight-9 S4).
