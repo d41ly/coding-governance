@@ -268,6 +268,6 @@ silently; re-derive this section whenever the feature is touched.*
 - **Nothing binds the executing kit to kit code an owner approved.** A run may edit these scripts and
   commit them; the parity legs compare two files the same run can change together. This bounds every
   property above and is the reason the protocol names an off-machine verifier as the real control.
-- **The keepalive half is unenforceable by construction.** Two DoD items are agent-attested because
-  no script can reach the scheduling store. They are labelled everywhere they appear, and they are
-  still the softest part of the contract.
+- **The reap is checked at `--landed`; the schedule is not.** With the stop-guard wired, it refuses
+  while the newest harness listing names the recorded id. No script can schedule or reap for the
+  agent, so that half stays attested and softest.

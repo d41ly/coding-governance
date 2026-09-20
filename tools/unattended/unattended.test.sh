@@ -2638,6 +2638,95 @@ n=$((n+1)); git diff --cached --name-only | grep -qF 'memory/builds/tRun/RUN.md'
   || { echo "FAIL --landed left the terminal record unstaged, so the leg's index-read population cannot see it"; st=1; }
 git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main
 
+# ==================================================================================================
+# TOOL-aWokenSentinel-7 — `keepalive-reaped` is READ BACK at --landed against the stop-guard's newest
+# sidecar line. The fixture is the success arm above, rebuilt per arm; the hand-written stop lines
+# are one compact JSON object each with `session_crons` LAST, which is this unit's fixture and not a
+# claim about the harness (spec 7 S10). `reset_tree` runs `git clean`, which never reaches the git
+# dir, so every arm starts with `rm -f` of the sidecar and the last one removes it — or the --landed
+# arms downstream would read a line this block left behind.
+# ==================================================================================================
+build_landed_fixture() { # [extra-sed] -> the success fixture: a LANDING record whose HEAD is on origin/main, checked out as main
+  reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+  sed -i "s/^phase: .*/phase: LANDING/${1:+; $1}" memory/builds/tRun/RUN.md
+  fixture; git push -q -f origin HEAD:main; git checkout -q -B main HEAD
+}
+remove_landed_fixture() { git checkout -q unit; git branch -f main "$BASE"; git push -q -f origin "$BASE":main; }
+STOP7="$(git rev-parse --git-dir)/unattended/stop.tRun.log"; mkdir -p "${STOP7%/*}"
+# ---- AC1: the NEWEST line is post-close and still names the id — refused, naming id and utc, and the
+# ---- record untouched. The older line would pass, so this also proves the reader takes the last one.
+build_landed_fixture; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T11:00:00Z","phase":"LANDING","session_crons":[]}' \
+  '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s7.line"   # AC5 — --status is untouched by this unit: one line
+before=$(sum)
+out=$(run --landed tRun)
+hit "$out" "the keepalive attestation is contradicted by the harness's own listing: the stop-guard recorded the cron store after the close and it still names the recorded keepalive id, so the job was not reaped — reap it, END THE TURN so the stop-guard records the listing again, then re-run --landed"
+hit "$out" "k1 listed at 2026-09-16T12:00:00Z"
+miss "$out" "phase LANDED"
+same "AC1 the contradicted --landed wrote nothing" "$(sum)" "$before"
+# ---- AC2: the newest line is PRE-CLOSE — refused as a check that could run and did not, naming utc
+# ---- and phase; a line with no `phase` key reads `(unreadable)` and refuses the same way. Same
+# ---- fixture: AC1 landed nothing.
+rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "the stop-guard records this session and no stop after the close exists to check the reap against, so the attestation could be checked and was not — END THE TURN once (the stop-guard records the listing and continues you), then re-run --landed; if no record appears afterwards the hook is unwired and adopt-unattended.sh --check says so: newest stop-guard record"
+hit "$out" "2026-09-16T12:00:00Z in phase BUILDING"
+same "AC2 the pre-close --landed wrote nothing" "$(sum)" "$before"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "in phase (unreadable)"
+same "AC2 the unreadable --landed wrote nothing" "$(sum)" "$before"
+# ---- AC3: post-close and the id is ABSENT — one `checked` line naming id and utc, then LANDED on
+# ---- the remote arm. A silent pass is what this unit forbids.
+rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[]}' > "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s7.line"
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at 2026-09-16T12:00:00Z"
+hit "$out" "phase LANDED"
+same "AC3 the checked landing records the remote anchor" "$(sed -n 's/^landed-anchor: //p' memory/builds/tRun/RUN.md)" "remote"
+remove_landed_fixture
+# ---- AC4: NO sidecar lands with an ANNOUNCED `unchecked`, and no `keepalive` fact with the other
+# ---- one. A refusal on a missing file would wedge every adopter without the hook.
+build_landed_fixture; rm -f "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s7.line"
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: attested, unchecked — no stop-guard record for this run"
+hit "$out" "phase LANDED"
+remove_landed_fixture
+build_landed_fixture '/^keepalive: /d'; rm -f "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: attested, unchecked — the record names no keepalive id"
+hit "$out" "phase LANDED"
+remove_landed_fixture
+# ---- AC14 — THE CONTINUATION, end to end through the REAL hook: the pre-close refusal, one Stop
+# ---- payload for the fixture's bound session fed to stop-guard.js with the real driver beside it,
+# ---- the `landing-unstamped` BLOCK (unit 8's row), the LANDING line the hook itself writes with the
+# ---- payload's listing verbatim, and --landed re-run to LANDED with no second turn. RED against a
+# ---- hook copy with that row reverted to allow: nothing prints and the block assertions fail, which
+# ---- is the B1 wedge as an arm. The listing names ANOTHER job, so the pass is the id's absence and
+# ---- not the listing's emptiness. `node` is on PATH wherever gate-guard.js runs.
+build_landed_fixture; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
+out=$(run --landed tRun)
+hit "$out" "no stop after the close exists to check the reap against"
+n=$((n+1)); command -v node >/dev/null 2>&1 || { echo "FAIL AC14 needs node on PATH, as gate-guard.js already does"; st=1; }
+_root7=$(cygpath -m "$PWD" 2>/dev/null || printf '%s' "$PWD")
+_hook7=$(printf '{"hook_event_name":"Stop","session_id":"fixture-session","cwd":"%s","stop_hook_active":false,"session_crons":[{"id":"other-job"}]}' "$_root7" \
+  | node "$HERE/stop-guard.js" 2>"$ORIGIN_DIR/s7.hook.err")
+hit "$_hook7" '"decision":"block"'
+hit "$_hook7" "finished and unstamped"
+hit "$_hook7" "--landed"
+_last7=$(tail -n 1 "$STOP7")
+hit "$_last7" '"phase":"LANDING"'
+hit "$_last7" '"session_crons":[{"id":"other-job"}]'
+out=$(run --landed tRun)
+hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at"
+hit "$out" "phase LANDED"
+remove_landed_fixture; rm -f "$STOP7"
+
 # ---- THE LOCAL ARM (TOOL-dUnstalledConvoy-1). A build merged into local main that could not push had
 # ---- no terminal to reach and aborted with the work complete; three of the five aborted runs in this
 # ---- tree died at or near that wall. The fixtures below are that shape exactly.
@@ -4376,6 +4465,10 @@ fixture
 out=$(run --close tRun --override closing-review-recorded --reason "fixture records no review" --override build-complete --reason "fixture ships one unit")
 miss "$out" "the attested count of surfaced parked decisions does not match the record"
 hit  "$out" "close OK"
+# ---- TOOL-aWokenSentinel-7 AC6, on the same close-OK output: the MET `keepalive-reaped` item says
+# ---- where it is read back, through the announcing branch a met item with something to say already
+# ---- has — so a green close never reads as the reap having been observed here.
+hit  "$out" "unattended: keepalive-reaped: attested; checked at --landed against the stop-guard's last harness listing"
 
 # ---- THE OVERRIDE EXCLUSION, and it needs a fixture CARRYING an override or it passes either way.
 # ---- The close evaluates the Definition of Done and only THEN appends its override lines, so a close
@@ -6074,7 +6167,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=917
+FLOOR_ASSERTIONS=946
+# RAISED 917 -> 946 by TOOL-aWokenSentinel-7: the `keepalive-reaped` read-back arms (28) beside the
+# --landed success arm and one hit on the close-OK output (1), all region two, measured by running
+# the two blocks alone over the sourced prologue: n 20 -> 48 and 48 -> 51 (two of those three are
+# the fixture's own) on node `a`.
 # RAISED 910 -> 917 by TOOL-aWokenSentinel-17: the field-wise `--status` reader arms (7) in region
 # two beside the extraction arms, measured by running that block alone over the sourced prologue:
 # n 23 -> 30 on node `a`.
@@ -6133,7 +6230,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=721
+FLOOR_SHARD_2=750
+# +29 for the TOOL-aWokenSentinel-7 `keepalive-reaped` read-back arms, in region two beside the
+# --landed success arm, plus one hit on the park-taxonomy close-OK output.
 # +7 for the TOOL-aWokenSentinel-17 field-wise `--status` reader arms, in region two beside the
 # extraction arms.
 # +6 for the TOOL-aWokenSentinel-5 `--status` resume-tick field arm, in region two beside the

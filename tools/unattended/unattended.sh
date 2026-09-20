@@ -2319,6 +2319,25 @@ verb_phase() { # slug · phase · witness
   return 0
 }
 
+# TOOL-aWokenSentinel-7 — THE STOP-GUARD'S NEWEST LINE, read by KEY and never by position. The hook
+# appends one compact JSON object per stop of a bound session to `<git-dir>/unattended/stop.<slug>.log`
+# with `session_crons` as its LAST key (spec 3's grammar), so the listing is everything after that key
+# and needs no JSON parser; `utc` and `phase` are cut from their quoted keys. Prints three lines — utc,
+# phase, listing — or nothing with status 1 when the file is absent or empty. A line whose phase or
+# utc cannot be read prints `(unreadable)` in its place, so the caller grades it pre-close and the
+# refusal shows what it saw rather than passing a line it could not parse. The sidecar root is the
+# library's one derivation, which the kit gate counts.
+read_stop_listing() { # slug -> utc \n phase \n session_crons, or nothing (status 1)
+  local _d _f _l _u _p _c
+  _d=$(resolve_sidecar_dir) || return 1
+  _f="$_d/stop.$1.log"
+  [ -s "$_f" ] || return 1
+  _l=$(tail -n 1 -- "$_f"); _l=${_l%$'\r'}
+  _u=$(printf '%s\n' "$_l" | grep -oE '"utc":"[^"]*"' | head -1 | sed 's/^"utc":"//; s/"$//')
+  _p=$(printf '%s\n' "$_l" | grep -oE '"phase":"[^"]*"' | head -1 | sed 's/^"phase":"//; s/"$//')
+  case "$_l" in *'"session_crons":'*) _c=${_l#*\"session_crons\":} ;; *) _c="" ;; esac
+  printf '%s\n%s\n%s\n' "${_u:-(unreadable)}" "${_p:-(unreadable)}" "$_c"
+}
 
 # S1 - THE SOLE PRODUCER OF `LANDED`, and it is an OBSERVATION rather than a claim.
 #
@@ -2341,6 +2360,11 @@ verb_phase() { # slug · phase · witness
 # The anchor observation is FATAL and its message is NOT suppressed. --close suppresses it and
 # reports only the downstream unmet item, which is the message-channel scar this kit already carries;
 # this verb does not repeat it.
+#
+# THE REAP IS READ BACK HERE (TOOL-aWokenSentinel-7), against the stop-guard's newest sidecar line,
+# because this is the only verb that runs after a stop the close's turn could have ended on. What it
+# does NOT check: that the id named by `keepalive` was ever the run's job, that no job under another
+# id still fires, or anything about a stop the hook did not record. One line, one id, one substring.
 verb_landed() { # slug
   local slug="$1" rel cur head lbranch unp oldest akind rbref rbtip
   check_slug "$slug" || return 1
@@ -2373,6 +2397,40 @@ WTS
     return 1
   fi
   check_clean || return 1
+  # TOOL-aWokenSentinel-7 — THE REAP, READ BACK. `keepalive-reaped` is attested at --close; here the
+  # attestation meets the one piece of evidence the agent did not write: the harness's own cron
+  # listing, which the stop-guard copies into the sidecar at every stop of a bound session. A local
+  # file read, so it sits before the remote round-trip as the marker does, and a refusal here leaves
+  # the record at LANDING, repairable by the remedy it names, because the terminal writes sit last.
+  # The line's own `phase` decides "after the close": --close is the sole writer of LANDING
+  # (TOOL-cFinalBerth-1 S9) and this verb the sole writer of LANDED, so a stop recorded in LANDING is
+  # by construction a stop between the two, and no clock is needed. A PRE-CLOSE newest line REFUSES
+  # rather than passing unchecked: the ordinary landing runs close, lander and this verb in one turn,
+  # so a pass there would check only the landings where a turn happened to end in between (spec 7
+  # §8, B2); the stop-guard's landing-unstamped row (TOOL-aWokenSentinel-8) continues the session
+  # after the turn the remedy asks for. The refusal fires only where the sidecar already exists, so
+  # an adopter without the hook, or a session never bound, reads `unchecked` and is never wedged.
+  # NOT CHECKED: whether the id named by `keepalive` was ever the run's job, whether a job under
+  # another id still fires, or anything about a stop the hook did not record — one line the harness
+  # populated, one id, one substring test.
+  local _kid _sl _su _sp _sc
+  _kid=$(fact "$rel" keepalive)
+  if [ -z "$_kid" ]; then
+    echo "unattended: keepalive-reaped: attested, unchecked — the record names no keepalive id"
+  elif ! _sl=$(read_stop_listing "$slug"); then
+    echo "unattended: keepalive-reaped: attested, unchecked — no stop-guard record for this run (the hook is not wired, or the session was never bound)"
+  else
+    _su=$(printf '%s\n' "$_sl" | sed -n 1p); _sp=$(printf '%s\n' "$_sl" | sed -n 2p); _sc=$(printf '%s\n' "$_sl" | sed -n '3,$p')
+    if [ "$_sp" != LANDING ]; then
+      fail 54 "the stop-guard records this session and no stop after the close exists to check the reap against, so the attestation could be checked and was not — END THE TURN once (the stop-guard records the listing and continues you), then re-run --landed; if no record appears afterwards the hook is unwired and adopt-unattended.sh --check says so: newest stop-guard record $_su in phase $_sp"
+      return 1
+    fi
+    if printf '%s\n' "$_sc" | grep -qF -- "$_kid"; then
+      fail 53 "the keepalive attestation is contradicted by the harness's own listing: the stop-guard recorded the cron store after the close and it still names the recorded keepalive id, so the job was not reaped — reap it, END THE TURN so the stop-guard records the listing again, then re-run --landed: $_kid listed at $_su"
+      return 1
+    fi
+    echo "unattended: keepalive-reaped: checked — $_kid absent from the harness listing at $_su"
+  fi
   # THE LANDER MARKER, read BEFORE the remote observation. It is the only verb that runs after the
   # push, so this is where the evidence can exist — and it goes first because it is a local file read
   # against a remote round-trip, and because an operator who has not run the lander should be told
@@ -4135,7 +4193,14 @@ $_bcnon"
       DOD_OUT="$_tn probe row(s) recorded for this tree: ${_rn:-0} recall, ${_mn:-0} map"
       return 0 ;;
     keepalive-reaped)
-      grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;
+      # STILL AGENT-ATTESTED HERE, and READ BACK at --landed (TOOL-aWokenSentinel-7): the stop-guard
+      # copies the harness's cron listing into the sidecar at every stop of a bound session, and the
+      # only verb after the lander compares the recorded id with the newest post-close line. The
+      # predicate is unchanged; the met path says where the check is, through the announcing print
+      # verb_close already has, so a green close never reads as the reap having been observed here.
+      grep -qE '^keepalive-reaped: (yes|true)' "$rel" || return 1
+      DOD_OUT="keepalive-reaped: attested; checked at --landed against the stop-guard's last harness listing"
+      return 0 ;;
     parked-decisions-surfaced)
       # STILL AGENT-ATTESTED — no machine can observe a wrap-up — but "I surfaced them" becomes "I
       # surfaced N, and the record holds N". The value is read off the SAME key rather than from a new

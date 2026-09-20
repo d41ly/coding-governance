@@ -778,10 +778,12 @@ be invisible. A bar that does not answer within it is KILLED, and
 FAILED. Those are different facts, and an operator who confuses them spends an hour hunting a
 failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
 
-It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest, because no script
-can observe them: that you reaped the idle-wake (`{{KEEPALIVE_DELETE}}`), and that every parked
-decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
-gate says so wherever it reports them.
+It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest: that you reaped
+the idle-wake (`{{KEEPALIVE_DELETE}}`), and that every parked decision reached the wrap-up. **One of
+them is READ BACK.** The stop-guard records the harness's own cron listing at every stop of a bound
+session, and `--landed` refuses while your recorded id is still in it — so attest the reap honestly,
+because the next verb checks it against evidence you did not write. The other has no observer;
+attestation is not a machine verdict, and the gate says so wherever it reports them.
 
 **TWO items have NO override, and this is where you will meet them: `authorization-reachable` and
 `pieces-complete`.** Neither can be overridden, waived or attested around. An override on the
@@ -868,6 +870,16 @@ put your unfinished run in every later run's concurrency report.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
+
+**It reads the reap back, and it may tell you to END THE TURN.** Where the stop-guard is wired, the
+newest stop it recorded for this run carries the harness's cron listing. `--landed` reads that line:
+recorded in `LANDING` and free of your keepalive id, it prints `keepalive-reaped: checked` and
+stamps; still naming the id, it refuses — reap the job, end the turn so the stop-guard records the
+listing again, then re-run. A newest line from BEFORE the close is also a refusal, because the check
+could run and has not: end the turn ONCE, the stop-guard blocks that stop as `finished and unstamped`
+and continues you, and the re-run reads the post-close line. If no record ever appears the hook is
+unwired and `adopt-unattended.sh --check` says so. With no sidecar at all — no hook, or a session
+never bound — the verb lands and prints `unchecked` with the reason, never silently.
 
 ## If it cannot finish
 

@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 17 · ratified 2026-09-16
+**Status:** CLOSED · rev-5 · 2026-09-21 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 17 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-16-build-TOOL-aWokenSentinel-7-1-acceptance-ledger.md](../build/2026-09-16-build-TOOL-aWokenSentinel-7-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-7-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-7-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
@@ -88,7 +89,9 @@ item nothing could contradict becomes a check against evidence the agent did not
   only report DEAD PROBE — the same reason `reuse-probed` is not a leg, protocol section 6.
 - No parsing of the `session_crons` value beyond a substring test for the recorded id. Its shape
   is unmeasured (research §6 records presence, not form); the id match is the whole question this
-  unit asks, and S10 verifies the rule against a real line before the unit closes.
+  unit asks, and S10 verifies the rule against a real line before the unit closes. **UNVERIFIED at
+  the build** (AC13 deferred: no worktree of this repo held a stop sidecar and this run carries no
+  `session:` fact); the first bound landing observes it, and a `0` there amends the rule.
 - No new conf knob, no kit version bump (the closing pass's, once), no kickoff-manifest stamp (the
   driver is not a watched path; `.unattended.conf` is not touched).
 - No change to `--liveness` (unit 2) or to the CONTINUE payload (unit 5).
@@ -182,6 +185,7 @@ The two refusal texts, literal head first so `check-arms.py` can arm them, `<…
 The `fail` numbers are the next two free in the driver at build time, read with
 `grep -oE 'fail [0-9]+' tools/unattended/unattended.sh | sort -k2 -n | tail -1`; the high-water is 51
 at base 5f9648d6 and units 1 to 5 take numbers before this one runs, so no number is pinned here.
+Taken at the build, high-water 52: **53** for the listed id and **54** for the pre-close line.
 
 Why the second refusal exists rather than the brief's `unchecked` pass: the Skill never mandates a
 turn boundary between `--close` and `--landed`, and the ordinary landing runs attest, close, commit,
@@ -481,6 +485,15 @@ reverted as its break · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the exec
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-21 · §4 · §3 · status · the build pass: the two `fail` numbers taken (53, 54); the
+  `session_crons` match rule marked UNVERIFIED with AC13's deferral, since no bound run existed at
+  build time. Two carrier edits diverged from §4's table for BYTE CAPS the table did not price: the
+  protocol render sat at 61436 B against `GUIDE_CAP_BYTES` 61440, so the DoD row's +150 B is paid
+  for by dropping the attestation-verb paragraph's history sentence ("Before it existed the keys
+  had no writer …", −184 B; git holds it), 61402 B after; the dossier sat at 20473 B against
+  `DOSSIER_CAP_BYTES` 20480, so the bullet is 247 B for 241, 20479 after. The dispatch was
+  declared without `memory/LIVE.md` and `memory/ledger`, which check 49 reserves to unit 16's never-
+  written rows, as every sibling since unit 16 did. CLOSED.
 - rev-4 · 2026-09-20 · §3 · AC5 · §7 · folded spec-audit round 3 M6 (raw 23, 41): AC5 counted
   `run --status` output with `wc -l` over merged stderr, a third whole-line reader one order before
   the unit that retires that shape, so it now asserts through `check_status_one_line` with a

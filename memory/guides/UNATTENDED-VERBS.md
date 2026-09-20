@@ -89,7 +89,15 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
   exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
   not refuse the default branch: the mandated lander refuses every other one, so landing happens
-  exactly where that guard would otherwise fire.
+  exactly where that guard would otherwise fire. It READS THE REAP BACK: the newest line of the
+  stop-guard's sidecar carries the harness listing of the cron store, and the verb compares the
+  recorded keepalive id with it before the anchor round-trip. Two refusals — the line is post-close
+  and still names the id (reap it, end the turn so the listing is recorded again, re-run), or the
+  newest line predates the close, so the check could run and has not (end the turn once; the
+  stop-guard blocks a finished-and-unstamped stop and continues you). A post-close line without the
+  id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
+  reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
+  the id was ever this run's job.
 - `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
   as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
   acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
