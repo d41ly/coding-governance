@@ -117,7 +117,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dDerivedDocket-1 — held-suite failure baseline](spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-20 |
-| [TOOL-dDerivedDocket-2 — in-place landing merge](spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md) | 2 | 2 | SPECCED | rev-5 | 2026-09-20 |
+| [TOOL-dDerivedDocket-2 — in-place landing merge](spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase](spec/2026-09-14-spec-TOOL-dDerivedDocket-4.md) | 3 | 2 | SPECCED | rev-6 | 2026-09-20 |
 | [TOOL-dDerivedDocket-3 — the run's landing path](spec/2026-09-14-spec-TOOL-dDerivedDocket-3.md) | 4 | 2 | SPECCED | rev-5 | 2026-09-20 |
 | [TOOL-dDerivedDocket-5 — auto-resume from HELD](spec/2026-09-14-spec-TOOL-dDerivedDocket-5.md) | 5 | 2 | SPECCED | rev-6 | 2026-09-20 |
@@ -164,7 +164,7 @@ ids TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-50 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 38 | 1 | SPECCED | rev-5 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 21 bound to this build, across 4 record folder(s).
+Records: 22 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
