@@ -249,6 +249,14 @@ PBT_OUT="$ROOT/$PBT_REL"
 VERBS_SHIP="$KIT_DIR/VERBS.template.md"
 VERBS_REL="$MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
 VERBS_OUT="$ROOT/$VERBS_REL"
+# the SIXTH artifact, and the verb carrier's twin. The protocol stood 1,116 bytes under its cap
+# with the stop contract still to write, so the codes, the release conditions, the lease and the
+# resume matrix go here and the protocol keeps two pointers. Copied rather than rendered, for the
+# reason the three above it are: it carries no placeholder, so a render step would be a second
+# spelling of `cat`.
+STOPS_SHIP="$KIT_DIR/STOPS.template.md"
+STOPS_REL="$MEMORY_ROOT/guides/UNATTENDED-STOPS.md"
+STOPS_OUT="$ROOT/$STOPS_REL"
 # the FIFTH artifact (TOOL-dRetiredFork-12), and the only one besides the Skill that is RENDERED
 # rather than copied: it carries `{{KIT_DIR}}` five times. It also lands inside the kit directory
 # rather than under the memory root, because it is a fixture the kit's own validity gate reads.
@@ -349,6 +357,14 @@ if [ "$MODE" = "--check" ]; then
   fi
   if ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
     echo "unattended: $VERBS_REL has drifted from the shipped verb carrier; re-run $0"; exit 1
+  fi
+  # the SIXTH artifact, with the same two refusals and for the same reason: a reader sent to run
+  # the adopter and a reader sent to read a diff need different sentences.
+  if [ ! -f "$STOPS_OUT" ]; then
+    echo "unattended: $STOPS_REL is missing — run $0 to install the stop contract"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $STOPS_REL has drifted from the shipped stop contract; re-run $0"; exit 1
   fi
   # the FIFTH artifact. RENDERED, so it is compared the way the Skill is and not the way the three
   # copied ones are: re-render from the template and diff. This is the parity assertion that makes
@@ -453,6 +469,12 @@ fi
 if [ ! -f "$VERBS_OUT" ] || ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$VERBS_SHIP" > "$VERBS_OUT"
   echo "unattended: installed $VERBS_REL"
+fi
+# the stop contract, the same shape again. Without this the kit would ship a gate its own adopter
+# could not satisfy, which is the defect the protocol block above records having had.
+if [ ! -f "$STOPS_OUT" ] || ! diff -q <(tr -d '' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$STOPS_SHIP" > "$STOPS_OUT"
+  echo "unattended: installed $STOPS_REL"
 fi
 # the fifth artifact, RENDERED rather than copied. It is written into the kit directory itself, so
 # an adopter installed at any prefix gets a fixture whose paths name THEIR prefix -- which is the

@@ -270,7 +270,7 @@ happens.
 Kit-owned core, in run order:
 
 `PREFLIGHT` · `RESEARCHING` · `TESTING` · `SPECCING` · `REVIEWING` · `FOLDING` · `BUILDING` ·
-`RUNNING` · `VERIFYING` · `LANDING` · `LANDED` · `ABORTED`
+`RUNNING` · `HELD` · `VERIFYING` · `LANDING` · `LANDED` · `ABORTED`
 
 Named for the build method's PASS kinds:
 
@@ -285,6 +285,7 @@ and neither is a member, so a prompt-started run OCCUPIES them while performing 
 does name — the commit boundary and the regrounding points stay exactly where the method puts them. `RUNNING` survives with a stated meaning — a run
 between named passes — because the core set is shrink-only and deleting a member lowers the floor.
 
+`HELD` is the non-terminal stop; `UNATTENDED-STOPS.md` is its contract.
 `LANDED` and `ABORTED` are terminal. `LANDING` is the state a slot-status vocabulary cannot express
 — built and reviewed, not yet merged — and it is why the run-state file is deliberately outside the
 status-vocabulary check.
@@ -403,13 +404,8 @@ under a green `keepalive-reaped` attestation.
 
 A driver verb that claimed to schedule or reap would be claiming an effect it cannot produce.
 
-**RESUME is the third case, and it is the one the actor split does not cover.** A resumed session did
-not schedule the job the run-state file names and cannot assume it died with the process that did.
-So it REAPS that recorded id first, reads the result back and reports it, and only then schedules a
-replacement. `--keepalive-id` is accepted by `--preflight` alone, so the new id cannot be recorded:
-the `keepalive` fact keeps naming the old job, the close attestation covers both, and the wrap-up says
-which. Ordering matters — reap, then schedule — because the reverse leaves the run holding two jobs
-and a record naming neither correctly.
+A take-over records the new id, and a holder replacing its own job records it with
+`--replaces`, so `keepalive` names the live job the close attests.
 
 ## 6. Landing
 
@@ -436,9 +432,9 @@ what preserves the strong claim wherever the strong claim is available.
 
 ## 7. The verbs
 
-The eighteen verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
+The nineteen verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
 `VERBS.template.md` and byte-compared against it by the same leg that compares this pair. Read them
-there. Nothing about any verb changed in the move.
+there. Nothing about any verb changed in the move. The stop contract is `UNATTENDED-STOPS.md`, installed and compared the same way.
 
 The move was a BYTE decision and is recorded as one. This document had reached its cap EXACTLY, and
 a contract with no room left to state its next rule has stopped being amendable — which is a
@@ -472,6 +468,9 @@ where this document says it may:
 | `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
+| `HOLD_CODES_EXTRA` | project hold codes, appended to the core set |
+| `HOLD_FLOOR` | the shrink-only SIZE of the kit's core hold-code set. MANDATORY, for the reason `CORE_FLOOR` is |
+| `LEASE_STALE_AFTER` | seconds a lease may go unrefreshed before a take-over; the bound is the larger of it and `GATE_BOUND`. OPTIONAL |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |

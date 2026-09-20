@@ -100,3 +100,11 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-20T20:03:06Z dispatch · item 94c12e2f TOOL-dDerivedDocket-2 · reason tools/push-main.sh tools/push-main.test.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated
 
 2026-09-20T20:03:10Z brief · item TOOL-dDerivedDocket-2 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T20:38:35Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/kit.toml tools/unattended/adopt-unattended.sh tools/unattended/.unattended.conf.example .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/map/features/unattended.md memory/map/generated memory/map/baseline.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-4.md memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger
+
+2026-09-20T20:38:40Z brief · item TOOL-dDerivedDocket-4 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T21:21:32Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-20T21:23:22Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason memory/builds/dDerivedDocket/README.md

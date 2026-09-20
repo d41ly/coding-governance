@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
+**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-4-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
@@ -22,7 +23,7 @@ host, an inherited red it may not absorb — has two endings today, ABORTED or a
 both end the run. Add a non-terminal HELD phase that a run enters by a verb, with a code, a release
 condition and a generated checkpoint, and that it leaves by `--resume` with no owner answer. Add a
 per-slug lease so two sessions cannot drive one slug, and route every phase read through
-`derived_phase()`, or `recorded_phase()` where a call site's table row says so, so they cannot
+`read_derived_phase()`, or `read_recorded_phase()` where a call site's table row says so, so they cannot
 disagree. Built in the first group by owner ruling D12-i11. The same derivation surfaces the
 non-terminal records that dead sessions abandoned, which TOOL-aReapedTicket-5 records and the design
 lists among this unit's closes.
@@ -85,7 +86,7 @@ lists among this unit's closes.
   its build folder is older than the bound. `--resume` then takes the run over. It is announced,
   never a refusal. A leaseless record resumed with the id its `keepalive` fact records is its
   holder's, and takes the lease instead. Observed by AC7, AC19 and AC22.
-- **S8** Two phase readers, `derived_phase` and `recorded_phase`. Every read of the `phase` fact
+- **S8** Two phase readers, `read_derived_phase` and `read_recorded_phase`. Every read of the `phase` fact
   outside the phase writers goes through one of them, as the call-site table in §4 classifies it.
   `refuse_if_terminal` takes a `--recorded` mode, and only `--landed` passes it, because that verb's
   own postcondition is a terminal. The arm's exemption is the `set_fact <file> phase` line, never the
@@ -114,7 +115,7 @@ lists among this unit's closes.
 - The auto-resume scheduler. The auto-resume unit schedules `/unattended --resume <slug>`; this unit
   only makes that resume correct and refusable.
 - Deriving LANDED from the advertised tip and rotating a derived-LANDED record at preflight. The
-  derived-terminal unit adds that derivation inside `derived_phase()`.
+  derived-terminal unit adds that derivation inside `read_derived_phase()`.
 - The bound stack that turns a kill before `acquired` into `host-degraded`, and the HOST exit.
   Those are the declared-wall and honest-verdicts units; this unit only accepts the codes.
 - A pending review runId in the checkpoint. The review-durability unit records it and adds the line.
@@ -126,12 +127,12 @@ lists among this unit's closes.
 
 - **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion for the unattended suites
   this unit's verification reads: `verdict clean`, with every inherited suite filed.
-- **hands-off** `TOOL-dDerivedDocket-3` — `derived_phase()` and the HELD refusals, which the landing
+- **hands-off** `TOOL-dDerivedDocket-3` — `read_derived_phase()` and the HELD refusals, which the landing
   path's `--close` and Land steps rely on, plus the companion guide the landing text may overflow
   into, including `--hold`'s unpublished-tip exception for `platform-unavailable`.
 - **hands-off** `TOOL-dDerivedDocket-5` — the lease, the hold facts and the resume contract that a
   scheduled resume invokes.
-- **hands-off** `TOOL-dDerivedDocket-22` — `derived_phase()`, inside which the LANDED derivation from
+- **hands-off** `TOOL-dDerivedDocket-22` — `read_derived_phase()`, inside which the LANDED derivation from
   the advertised tip goes; the call-site table that derivation must respect; and the lease matrix,
   to which that unit adds the `released <iso> landed` row.
 - **hands-off** `TOOL-dDerivedDocket-27` — the `host-degraded` code and the `probe gate` condition
@@ -141,7 +142,7 @@ lists among this unit's closes.
   run-owned process reap goes, and the `--status` line the orphan count joins, and the reap step
   inside `--resume`, placed after the lease is held on the take-over and matching-id rows only.
 - **hands-off** `TOOL-dDerivedDocket-29` — the checkpoint, which gains the pending review runId.
-- **hands-off** `TOOL-dDerivedDocket-16` — `derived_phase()`, through which that unit's preflight
+- **hands-off** `TOOL-dDerivedDocket-16` — `read_derived_phase()`, through which that unit's preflight
   labels a claiming build terminal or not, report-only.
 - **hands-off** `TOOL-dDerivedDocket-24` — the `inherited-red` hold code and the resumable HELD
   stop the park policy ends in.
@@ -163,8 +164,11 @@ lists among this unit's closes.
 | `held-at` | UTC, ISO-8601 with a trailing `Z` |
 | `hold-unpushed` | HEAD's sha; written only when `platform-unavailable` was held while the remote did not answer, absent otherwise |
 
-The history row is `<UTC> hold · code <c> · until <cond> · reaped <id>|unreachable <node>`. It is
-history-class, so `--status` counts it as noted rather than owed.
+The history row is `<UTC> hold · item <c> · reason until <cond> · reaped <id>|unreachable <node>`,
+in `park()`'s own grammar and with `hold` joining `PARK_KINDS`. It is history-class and outside
+`PARK_KINDS_OWED`, so `--status` counts it as noted rather than owed, and check 27's join reaches
+the kind. The free-text reason is NOT repeated in the row: `hold-reason` is the only place
+`--status` quotes it from (rev-7).
 
 ### Codes and conditions
 
@@ -325,12 +329,12 @@ The bar is a PATH and never a verdict word. The reason sits on its own line, quo
 parsed. That is the dCarriedReceipt class: a prose reason there stated a gate verdict, and a reader
 took it for one.
 
-### `derived_phase()`
+### `read_derived_phase()`
 
-Two readers: `derived_phase`, the effective phase, and `recorded_phase`, the fact as written. At
+Two readers: `read_derived_phase`, the effective phase, and `read_recorded_phase`, the fact as written. At
 BASE the `phase` fact is read at the sites below, and this unit routes each one as its row says. The
 structural arm in `tools/unattended/check-unattended.sh` takes the `recorded` rows as its
-allow-list. `derived_phase` is where later derivations go, starting with the derived-terminal unit's
+allow-list. `read_derived_phase` is where later derivations go, starting with the derived-terminal unit's
 LANDED.
 
 | Function | Site at BASE | Reads | Why |
@@ -348,19 +352,19 @@ LANDED.
 
 The exemption is a LINE, never a function. The arm scans for `set_fact <file> phase` sites, and a
 read that shares a line with one is a writer's own guard and is exempt. Everything else is graded:
-- Outside `derived_phase` and `recorded_phase`, every other direct read of the `phase` fact reds,
+- Outside `read_derived_phase` and `read_recorded_phase`, every other direct read of the `phase` fact reds,
   whatever function contains it. At BASE, `verb_preflight`'s rotation test at `:2658` is such a
   read, inside a function that also writes the phase.
-- A call to `recorded_phase` reds unless its function's row names recorded.
+- A call to `read_recorded_phase` reds unless its function's row names recorded.
 - A table row naming a function that no longer reads the phase reds.
 
 Before the arm is wired, its predicate runs over BASE's driver and prints hits and near-misses
 (charter §7). `:2658` must appear as a hit.
 
-`derived_phase <file>` is called as a plain command and never inside `$(...)`, which would lose what
+`read_derived_phase <file>` is called as a plain command and never inside `$(...)`, which would lose what
 it sets (the `status-set-in-a-subshell` class). It sets two globals, the effective phase and a
 reason that is empty unless the phase stays LANDING for a stated cause. It returns 0, prints
-nothing, never calls `fail`, and never touches the global `status`. `recorded_phase <file>` returns
+nothing, never calls `fail`, and never touches the global `status`. `read_recorded_phase <file>` returns
 the fact as written. Both names pass `python tools/lexicon/lexicon.py --suggest` at build time.
 
 ### Preflight on a live record
@@ -496,7 +500,7 @@ is raised here: raising one is an owner turn, and the other units of this build 
 - **AC8** — When `bash tools/unattended/check-unattended.sh` grades a copy of the driver in which
   `--status` reads the `phase` fact directly, it reds naming that call site. It also reds naming the
   site for a copy whose `verb_preflight` rotation test reads the fact directly although that
-  function writes the phase. A copy in which `verb_resume` calls `recorded_phase` reds naming the
+  function writes the phase. A copy in which `verb_resume` calls `read_recorded_phase` reds naming the
   function, and so does a copy whose allow-list names a function that no longer reads the phase.
   Red when: the structural arm greps a population that excludes the verbs, so it passes on nothing;
   or the allow-list has no staleness test, so a stale row silently widens it; or the exemption
@@ -706,7 +710,7 @@ is raised here: raising one is an owner turn, and the other units of this build 
 `unattended kit gate` · `unattended skill wiring` · `playbook validity gate` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `line length` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a HELD fixture record with an unmet `after`, a dirty tree, and a fresh foreign lease · the driver suite's executed-assertion floor
-New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading the phase fact outside `derived_phase()`, one whose writer function `verb_preflight` reads it directly at its rotation test, one with HELD deleted from the core set, and a driver copy whose `verb_phase` accepts HELD; the predicate first run over BASE's driver with hits and near-misses printed, `unattended.sh:2658` a live hit · the core phase floor and the leg suite's executed-assertion floor
+New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading the phase fact outside `read_derived_phase()`, one whose writer function `verb_preflight` reads it directly at its rotation test, one with HELD deleted from the core set, and a driver copy whose `verb_phase` accepts HELD; the predicate first run over BASE's driver with hits and near-misses printed, `unattended.sh:2658` a live hit · the core phase floor and the leg suite's executed-assertion floor
 
 ## 8. Open questions
 
@@ -818,7 +822,7 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   order. Own-slug re-preflight stays idempotent and keeps the keepalive (F5, AC10). A leaseless
   working record reads `presumed-stopped` by build-folder commit age (F8, AC19), citing
   TOOL-aReapedTicket-5. `--replaces` records a holder's replacement keepalive (F9, AC20). Every
-  phase read is classified as `derived_phase` or `recorded_phase` per call site (AC8), and §1 says
+  phase read is classified as `read_derived_phase` or `read_recorded_phase` per call site (AC8), and §1 says
   so. `HOLD_FLOOR` is added (F10). AC14 and AC16 to AC18 cover `--hold`'s preconditions, the code
   set, the lease lifecycle, and re-authorization at a take-over. G3 H4: hands-off 16's reason is now
   that unit's report-only claim label.
@@ -906,6 +910,42 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
     `tools/unattended/unattended.test.sh` or `tools/unattended/check-unattended.test.sh` at any
     flag setting, so "the build's one post-build bar" alone would have read as a bar that covers
     them.
+- rev-7 · 2026-09-21 · BUILT. Seven divergences, each changed here before the code was written.
+  - §4 Data model: the history row's shape was incompatible with `park()`'s grammar, which
+    `--status`'s noted counter and check 27 both parse. A row spelled `· code <c> · until` carries
+    no ` · item `, so the counter would have reached it in NEITHER half of its partition and the
+    row would have been written and counted by nothing. It is now `· item <c> · reason until …`,
+    `hold` joins `PARK_KINDS` and stays out of `PARK_KINDS_OWED`, and §4 says so.
+  - §4 Take-over, authorization: `trusted_base` is called WITH `allow-degenerate`. A run taken
+    over before it built anything has a merge-base equal to HEAD, which is `--preflight`'s normal
+    state and not `--close`'s; without the flag every early take-over would refuse. It is still
+    the pair §4 names, and `check_authorization` is unchanged.
+  - §4 Where the text goes: the companion template is `tools/unattended/STOPS.template.md`,
+    rendered to `{memory_root}/guides/UNATTENDED-STOPS.md` and COPIED rather than rendered, as the
+    verb carrier is, because it carries no placeholder. The protocol's §7 sentence counting the
+    verb entries moves from `eighteen` to `nineteen`, which is byte-neutral.
+  - §6 AC15: the take-over's push line is the first line of STDOUT. `read_bound_key` writes its
+    defaulted-bound NOTEs to stderr before any verb runs, so a merged capture makes "first line"
+    a claim about the fixture's conf rather than about the verb. Observed on the fixture.
+  - §7: the new leg arms are checks 32 (the phase-read routing) and 33 (a produced phase reachable
+    through `--phase`), and check 2 gains the `HOLD_FLOOR` arm beside `HALT_FLOOR`'s.
+  - §7, the two executed-assertion floors: NOT MOVED. This pass runs no suite, so neither new
+    count was measured, and a floor raised above what a suite executes reds the bar on the run
+    that raised it. Both pins are shrink-only, so arms added under them stay covered; moving them
+    is owed to the first run that measures the suites.
+  - NAMES: every function this unit defines leads with a verb `.lexicon.conf`'s table declares,
+    because the naming leg's offender pin is an equality in both directions and a new definition
+    leading with anything else reds it. The two readers are `read_derived_phase` and
+    `read_recorded_phase`, which keep the spec's own tokens as substrings, so every `grep -qF` in
+    §4, AC8 and §7 still resolves. `--hold`'s handler is `run_hold` rather than `verb_hold`, which
+    departs from the driver's `verb_*` family for the same reason and for no other; the lease
+    helpers are `read_lease`, `write_lease_taken`, `write_lease_refreshed`, `write_lease_released`,
+    `remove_lease`, `resolve_lease_path`, `resolve_lease_bound` and `check_lease_fresh`.
+    `--suggest --as sh.function` was asked for each before it was written.
+  - §5 migration: `check-unattended.test.sh`'s own `mkconf` gains `HOLD_FLOOR`, DERIVED from the
+    driver exactly as its three siblings are. Without it every fixture in that suite declares no
+    floor and the new check-2 arm reds on all of them, which is a fixture answering a question
+    nobody asked.
 - rev-6 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H2 id 24, M2 id 4, H1 id 13).
   - H2: S2's third conf key stops being unpriced and unwitnessed. S2 now says where
     `HOLD_CODES_EXTRA` is declared, §4 prices its §8 key-table row at the shape of its sibling

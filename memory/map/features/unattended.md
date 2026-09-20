@@ -24,7 +24,7 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
 ]
-guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
+guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
@@ -92,7 +92,14 @@ run never touched.
 so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
 splits by actor — the agent schedules and reaps, the driver records an id and asserts a recorded
 reap — and the reaped item is labelled agent-attested wherever it is reported, so it never spends
-the `--close` override budget. The tick runs `--audit`, the unit stall probe.
+the `--close` override budget. The tick runs `--resume --keepalive-id`, which refreshes the
+lease, then `--audit`, the unit stall probe.
+
+**A stop the run cannot fix is a PAUSE, not an ending.** `HELD` is non-terminal: entered by
+`--hold` with a code, a condition and a witness, left by `--resume` alone. A per-slug LEASE
+under the git common dir keys on the session-scoped keepalive id, so a resume tells orientation
+from take-over. Every `phase` read routes through `read_derived_phase` or `read_recorded_phase`.
+See `UNATTENDED-STOPS.md`.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
@@ -105,20 +112,15 @@ and the fleet has a recorded case of a pin RAISE indistinguishable from a drain.
 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
-every read, so "current" is the absence of a second answer rather than a comparison between two. It
-was once byte-compared against a fresh render, and that equality was unmaintainable in the ordinary
-case. The authored region holds only the facts nothing in the tree derives, enumerated in the
+every read, so "current" is the absence of a second answer rather than a comparison between two. The authored region holds only the facts nothing in the tree derives, enumerated in the
 protocol's own section 2 and deliberately not counted here — three carriers once held three different
-counts of them at the same time. The precedent is in this repo: one build's hand-kept status file still reads
-IN-PROGRESS while the generated region of the same build's README correctly reads CLOSED. The
-authored half rotted and the derived half did not.
+counts of them at the same time.
 
 **The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
 in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
 the charter, so they now live in the charter's `kit:unattended` conditional block in §1 — dropped by
 the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
-body, both written to stay true for a non-adopting re-puller. A new universal-core section for an
-opt-in kit was rejected on both counts. The Skill's `## Resume` section invokes `/session-kickoff`
+body, both written to stay true for a non-adopting re-puller. The Skill's `## Resume` section invokes `/session-kickoff`
 after the reap and the re-schedule (`TOOL-aReplayedCard-3`), so a session resumed after process
 death re-orients and its first commit is not denied on an un-oriented card; `check-unattended.sh`
 check 18 keeps the template's FIRST kickoff mention below its first `--preflight`, and the resume

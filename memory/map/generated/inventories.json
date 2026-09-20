@@ -233,6 +233,7 @@
       "REVIEW-PROTOCOL.md",
       "SESSION-KICKOFF.md",
       "UNATTENDED-PROTOCOL.md",
+      "UNATTENDED-STOPS.md",
       "UNATTENDED-VERBS.md"
     ],
     "backlog-shards": [

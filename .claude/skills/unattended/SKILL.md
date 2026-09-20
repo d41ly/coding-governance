@@ -26,9 +26,15 @@ every 10 minutes (cron 3-59/10 * * * *) — and keep the id it returns, because 
 CronCreate  ->  keep the id
 ```
 
-**What the tick runs.** The prompt it schedules is the stall probe — once the run has a slug, run
-`bash tools/unattended/unattended.sh --audit <slug>`; before `--preflight` no slug exists and the tick
-does nothing. The verb prints one line per dispatched-and-open unit with how long the TREE has
+**What the tick runs.** TWO acts, in order, and only once the run has a run-state file; before
+`--preflight` no slug exists and the tick does nothing. FIRST,
+`bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <your own id>`. That is how this
+session's lease is refreshed: the driver cannot observe a harness tick, so the refresh has to
+arrive through a verb, and the matching-id row of the resume matrix is the one that does it
+without writing anything else. SECOND, and ONLY when that first act neither refuses nor prints
+`still held`, `bash tools/unattended/unattended.sh --audit <slug>`. After either of those two outcomes
+this session does not drive the slug, and acting on a `STALLED` verdict would re-dispatch units a
+live holder is driving, or a held run's units — the double drive the lease exists to stop. The verb prints one line per dispatched-and-open unit with how long the TREE has
 been idle and a verdict against `UNIT_STALL_BOUND`. On `PROGRESSING` do nothing. On `STALLED`,
 act: stop the unit's task, record why with `--park` or a brief note, then re-dispatch that unit
 with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
@@ -714,14 +720,27 @@ like any other, and a verb no surface names is a verb the documentation join tre
 ## Resume
 
 ```bash
-bash tools/unattended/unattended.sh --resume <slug>
+bash tools/unattended/unattended.sh --status <slug>
+bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <id>
 ```
 
 Read the run-state file before doing anything else. It survived compaction and process death; your
 context did not.
 
-**Then REAP the recorded id, and only then schedule a replacement.** In that order, and the order is
-the whole point. The intuition is that a resumed session's keepalive died with its process because
+**Run `--status <slug>` first, because who you are decides everything below.** If your own
+scheduler lists the keepalive its `LEASE` line names — or, when no `LEASE` line prints, the
+keepalive the record's `keepalive` fact names — you HOLD the lease: resume with
+`--resume <slug> --keepalive-id <that id>` and do not reap anything. Otherwise you are TAKING
+OVER: reap the recorded job and read the result back, schedule a new one, then run
+`--resume <slug> --keepalive-id <new id>`, which records the new id. If that resume REFUSES or
+prints `still held`, reap only the job you just scheduled, read the result back, and stop — remove
+nothing else, because a durable restart filed under this slug's name is deleted only after a
+take-over's `--resume` succeeds, and deleting it here would leave a held run with nothing to
+restart it. Replace your OWN job only through
+`--resume <slug> --keepalive-id <new> --replaces <old>`.
+
+**On the take-over branch, REAP the recorded id before you schedule a replacement.** In that
+order, and the order is the whole point. The intuition is that a resumed session's keepalive died with its process because
 the store is session-scoped — and that intuition is MEASURED FALSE: a run asserted it twice about two
 jobs and `CronCreate`'s own listing showed both still firing. So issue
 `CronDelete` against the `keepalive` id the run-state file already names, read the result
@@ -729,17 +748,10 @@ back, and say what it returned. Assume a surviving job, not a dead one; the fail
 dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
 
 Then schedule the new one. This is the only exception to "read the record first": read it, reap,
-schedule, kick off, and then do the work.
+schedule, resume, kick off, and then do the work.
 
-**The record cannot be corrected in place, and you must know that rather than discover it.**
-`--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
-new id. The `keepalive` fact keeps naming the old job, so your `keepalive-reaped` attestation at close
-covers BOTH — the one you deleted here and the one you scheduled — and the wrap-up says so, with what
-the delete returned. Re-preflighting to record the new id is NOT the remedy: it refuses on a dirty
-tree and re-pins the anchor, which costs more than the stale field does.
-
-**Then, if this project ships `/session-kickoff`, invoke it — after the reap and the re-schedule,
-before the first pass.** Its unattended hand-back fires because the run-state file exists in a
+**Then, if this project ships `/session-kickoff`, invoke it — after the `--resume` that neither
+refused nor printed `still held`, before the first pass.** Its unattended hand-back fires because the run-state file exists in a
 non-terminal phase: it emits the READY card, appends it to this session's orientation card, and
 continues at the phase the record names, halting nowhere. It is owed because a resumed session
 starts with no card, or a replay-written one — two states the card-reading commit deny does NOT
@@ -851,6 +863,26 @@ put your unfinished run in every later run's concurrency report.
 
 `--close` moves you to `LANDING`, and nothing else may: a phase move into it would claim the
 Definition of Done was evaluated without evaluating it.
+
+## If it cannot continue YET — hold it
+
+```bash
+bash tools/unattended/unattended.sh --hold <slug> --code <hold-code> --until <condition> \
+  --reason "<what stopped it>" --reaped <the keepalive id you just deleted>
+```
+
+**Use this, not `--abort`, when the thing that stopped the run is not the run's to fix and is not
+permanent** — a usage limit, an overloaded API, a degraded host, an owner action on the machine, a
+red you inherited and may not absorb. `ABORTED` is a terminal and says the run FINISHED; `HELD`
+says it PAUSED, and `--resume` is the way out with no owner turn.
+
+Commit everything and push the branch first: `--hold` refuses a dirty tree, and under
+`ANCHOR_SCOPE=published` it refuses an unpublished tip — except under `--code platform-unavailable`
+while the remote does not answer, which is the one stop whose own push fails too. Reap your
+keepalive and name it with `--reaped <id>`, because a job still firing into a held run
+re-dispatches its units at the next tick; from another node, where you cannot reach that session's
+store, say `--keepalive-unreachable <node>` instead. The codes and the release-condition grammar
+are in `UNATTENDED-STOPS.md`, and the refusal names the legal set either way.
 
 ## If it cannot finish
 

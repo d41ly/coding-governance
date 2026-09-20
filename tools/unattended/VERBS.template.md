@@ -132,6 +132,18 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it
   is the one verb safe to call before a run exists.
 
+- `--hold` — the non-terminal stop. `--hold <slug> --code <c> --until <cond> --reason <text>`
+  plus exactly one of `--reaped <id>` and `--keepalive-unreachable <node>`. It writes `HELD`, the
+  code, the release condition, the phase it was held from and the moment, and RELEASES the slug's
+  lease; `--resume` is the only way out. The code comes from a SECOND closed vocabulary beside the
+  halt codes, never an extension of them — a halt code ends a run and a hold code pauses one, and
+  one list would let a pause be recorded as an ending. Every refusal is numbered and comes before
+  any write: an already-HELD record, a dirty tree, an unpublished tip under `ANCHOR_SCOPE=published`,
+  a code or condition outside its grammar, and a keepalive neither reaped nor recorded unreachable,
+  because a job still firing into a held run re-dispatches its units at the next tick. One
+  exception to the published-tip clause: under `--code platform-unavailable`, and only when the
+  remote does not ANSWER, it accepts the unpublished tip and records it as `hold-unpushed`. The
+  contract is `UNATTENDED-STOPS.md`.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the keepalive is still

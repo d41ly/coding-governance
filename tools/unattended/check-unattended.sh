@@ -119,6 +119,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FL
 DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
+HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LEASE_STALE_AFTER=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
 # ---- and the second is why the guard is now structural rather than a probe.
 # ----
@@ -182,7 +183,8 @@ while IFS= read -r -d '' _ck; do
     MEMORY_ROOT|LANDER|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
-    HALT_FLOOR|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
+    UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
@@ -386,6 +388,9 @@ FOLD_CUTOFF=$(core_of FOLD_CUTOFF)
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
 HALT_CODES_CORE=$(core_of HALT_CODES_CORE)
+# The HOLD vocabulary, read for the reason the halt one is: a set the driver validates against and
+# nothing grades is a vocabulary with a floor nobody enforces.
+HOLD_CODES_CORE=$(core_of HOLD_CODES_CORE)
 HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
 if [ -z "$PHASES_CORE" ] || [ -z "$DOD_CORE" ]; then
   fail 1 "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set: $DRIVER"
@@ -613,6 +618,23 @@ else
 fi
 if [ -z "$HALT_CODES_CORE" ]; then
   fail 2 "the driver declares no HALT_CODES_CORE vocabulary, so the abort verb would validate against an empty set and accept anything: $DRIVER"
+fi
+
+# ---- THE HOLD VOCABULARY, graded exactly as the halt one above it and never merged with it: a
+# ---- halt code ENDS a run and a hold code PAUSES one, and one list would let a pause be recorded
+# ---- as an ending. Its floor behaves the same way — undeclared or malformed is a REFUSAL, never a
+# ---- defaulted value, because a pin that quietly defaults is a pin nobody set.
+if [ -z "$HOLD_FLOOR" ]; then
+  fail 2 "HOLD_FLOOR is undeclared in .unattended.conf, and with no floor a deleted hold code is indistinguishable from a vocabulary that never had one"
+elif ! printf '%s' "$HOLD_FLOOR" | grep -qE '^[0-9]+$'; then
+  fail 2 "HOLD_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name: $HOLD_FLOOR"
+else
+  nhold=$(printf '%s' "$HOLD_CODES_CORE" | wc -w)
+  [ "$nhold" -ge "$HOLD_FLOOR" ] \
+    || fail 2 "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it: $nhold against $HOLD_FLOOR"
+fi
+if [ -z "$HOLD_CODES_CORE" ]; then
+  fail 2 "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all: $DRIVER"
 fi
 
 # ---- EVERY ABORTED RECORD CARRIES A LEGAL CODE. The population is every tracked run-state file,
@@ -3516,5 +3538,68 @@ else
     _c31_hit "$_c31_bm" $_c31_paths
   fi
 fi
+
+# ---- 32: EVERY READ OF THE `phase` FACT GOES THROUGH ONE OF THE TWO READERS (S8). Two readers, a
+# ---- call-site classification, and a structural arm that grades it — because a classification
+# ---- nothing enforces is a comment. The rules, stated once here and nowhere else:
+# ----
+# ----   * outside `read_derived_phase` and `read_recorded_phase`, a direct read of the fact REDS, whatever
+# ----     function contains it — including a function that also WRITES the phase, which is where the
+# ----     one live instance at BASE sat;
+# ----   * the exemption is a LINE, never a function: a read that shares its line with the
+# ----     `set_fact <file> phase` it guards is that writer's own guard;
+# ----   * a `read_recorded_phase` call REDS unless the allow-list below names its function;
+# ----   * an allow-list entry naming a function that no longer calls `read_recorded_phase` REDS too,
+# ----     because a stale row silently widens the very set it was written to narrow.
+# ----
+# ---- DECLARED, so a fixture can move it. A list typed inside the awk program could not be broken by
+# ---- a staged edit, and an arm whose failing case cannot be staged is an assertion about nothing.
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed"
+if [ ! -f "$DRIVER" ]; then
+  fail 32 "the driver is not where this leg reads it, so the phase-read routing below would be graded over no lines at all and would pass by finding nothing: $DRIVER"
+else
+  _c32=$(PRF="$PHASE_RECORDED_FNS" awk '
+    BEGIN { n = split(ENVIRON["PRF"], a, /[ \t]+/); for (i = 1; i <= n; i++) if (a[i] != "") allow[a[i]] = 1 }
+    /^[a-z_][A-Za-z0-9_]*\(\)/ { fn = $0; sub(/\(\).*/, "", fn) }
+    /^[ \t]*#/ { next }
+    {
+      ln = $0; sub(/\r$/, "", ln)
+      isread = (ln ~ /(^|[^A-Za-z0-9_])fact[ \t]+[^ \t]+[ \t]+phase([^A-Za-z0-9_-]|$)/) \
+            || (ln ~ /s\/\^phase: \/\/p/)
+      iswrite = (ln ~ /set_fact[ \t]+[^ \t]+[ \t]+phase([^A-Za-z0-9_-]|$)/)
+      if (isread && !iswrite && fn != "read_derived_phase" && fn != "read_recorded_phase")
+        printf "\n  %s:%d reads the phase fact directly inside %s(), which is neither reader", FILENAME, NR, fn
+      if (ln ~ /(^|[^A-Za-z0-9_])read_recorded_phase[ \t]+"/) {
+        seen[fn] = 1
+        if (!(fn in allow))
+          printf "\n  %s:%d calls read_recorded_phase() inside %s(), which the allow-list does not name", FILENAME, NR, fn
+      }
+    }
+    END { for (k in allow) if (!(k in seen)) printf "\n  the allow-list names %s(), which no longer calls read_recorded_phase()", k }
+  ' "$DRIVER")
+  [ -z "${_c32//[[:space:]]/}" ] \
+    || fail 32 "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified:$_c32"
+fi
+
+# ---- 33: A PHASE ANOTHER VERB PRODUCES IS NOT REACHABLE THROUGH `--phase`. Vocabulary membership is
+# ---- not permission: every literal phase a `set_fact … phase` site writes is a PRODUCER's, written
+# ---- with the facts that make it mean something, and a phase move into it would be that record with
+# ---- none of them. The terminals are covered by `verb_phase`'s own `is_terminal` branch, and
+# ---- `--preflight`'s initial RUNNING is the one literal that is a starting position rather than a
+# ---- produced claim, so both are excluded.
+if [ -f "$DRIVER" ]; then
+  _c33_body=$(awk '/^verb_phase\(\)/ { inb = 1 } inb { print } inb && /^}/ { exit }' "$DRIVER")
+  _c33_lits=$(grep -oE 'set_fact[ \t]+[^ \t]+[ \t]+phase[ \t]+[A-Z]+' "$DRIVER" | awk '{ print $NF }' | sort -u)
+  _c33=""
+  for _c33_p in $_c33_lits; do
+    [ "$_c33_p" = RUNNING ] && continue
+    case " $PHASES_TERMINAL " in *" $_c33_p "*) continue ;; esac
+    printf '%s\n' "$_c33_body" | grep -qF "\"\$want\" = $_c33_p" \
+      || _c33="$_c33 $_c33_p"
+  done
+  [ -z "${_c33//[[:space:]]/}" ] \
+    || fail 33 "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read:$_c33"
+fi
+
 
 exit "$status"

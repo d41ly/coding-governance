@@ -59,6 +59,15 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-VERBS.md"
 placeholders = []
 
+# the stop contract, the verb carrier's twin. HELD, the hold codes, the release conditions, the
+# per-slug lease and the resume matrix live here so the protocol — which stood 1,116 bytes under
+# its cap — keeps two pointers instead of a contract. Placeholder-free like the three above it.
+[[files]]
+include = ["STOPS.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-STOPS.md"
+placeholders = []
+
 # the playbook template. Placeholder-free like the protocol, so the
 # adopter copies it rather than rendering it.
 [[files]]
@@ -89,7 +98,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "LEASE_STALE_AFTER"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -224,6 +233,21 @@ blocks_gate = true
 why = "undeclared or malformed reds the kit gate at check 16 arm C. The correct value for a faithful copy install is the driver's own DIRECTIVES_CORE member count, so this is a transcription hole rather than a corpus measurement — the same shape as core-floor, and declared in the SAME commit as the branch that refuses it. Without the declaration an adopter deploys green through govkit and reds their own unattended kit gate with no key and no hole to tell them why."
 discharge = { command = ["bash", "-c", "grep -qE '^DIRECTIVES_FLOOR=\"?[0-9]+' .unattended.conf"] }
 
+# The HOLD vocabulary's floor, the same shape as `directives-floor` above and for the same reason:
+# undeclared or malformed reds this kit's own gate leg, the correct value for a faithful copy
+# install is the driver's own HOLD_CODES_CORE member count, and without a hole an adopter deploys
+# green through govkit and then reds their unattended kit gate with no key and nothing to tell them
+# why. The probe admits the QUOTED form both shipped confs use for its sibling HALT_FLOOR and the
+# bare integer, because a probe matching only one of the two passes a fixture written that way and
+# reds every conf written the other.
+[[hole]]
+id = "hold-floor"
+kind = "measured-pin"
+blocks_adopt = false
+blocks_gate = true
+why = "undeclared or malformed reds the kit gate at check 2's hold arm. The correct value for a faithful copy install is the driver's own HOLD_CODES_CORE member count, so this is a transcription hole rather than a corpus measurement, declared in the SAME commit as the branch that refuses it. Without the declaration an adopter deploys green through govkit and reds their own unattended kit gate with no key and no hole to tell them why."
+discharge = { command = ["bash", "-c", "grep -qE '^HOLD_FLOOR=\"?[0-9]+' .unattended.conf"] }
+
 [[hole]]
 id = "core-floor"
 kind = "measured-pin"
@@ -247,6 +271,9 @@ why = "an installed artifact its own adopter byte-compares"
 [[lf_pin]]
 pattern = "{memory_root}/guides/UNATTENDED-VERBS.md"
 why = "an installed artifact both its adopter and check 10 byte-compare"
+[[lf_pin]]
+pattern = "{memory_root}/guides/UNATTENDED-STOPS.md"
+why = "an installed artifact its own adopter byte-compares"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

@@ -72,7 +72,10 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # `reuse-probed`, and the floor is shrink-only, so leaving it at 10 makes `check-unattended.sh`
 # check 3 red with "the declared floor sits below the kit's own core count". Bump it when you take
 # the version.
-CORE_FLOOR="12:12"
+#
+# UPDATING TO THE KIT THAT ADDS `HELD`: the PHASE half moves 12 -> 13. `HELD` is the non-terminal
+# stop a run enters by `--hold` and leaves by `--resume`, and the floor is shrink-only.
+CORE_FLOOR="13:12"
 
 # The recall CLI whose query log the `reuse-probed` Definition-of-Done item reads. REPO-RELATIVE
 # path, and BLANK is the default and means "not adopted": the item then reports an announced SKIP
@@ -209,6 +212,21 @@ DOD_EXTRA=""
 # because a pin that quietly defaults is a pin nobody set.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="7"
+
+# The HOLD VOCABULARY, a SECOND set beside the halt codes and never an extension of them: a halt
+# code ENDS a run and a hold code PAUSES one, and one list would let a pause be recorded as an
+# ending. A run enters HELD with one of these, a release condition and a witness, and leaves it by
+# `--resume` with no owner turn. The floor is shrink-only and REQUIRED, exactly as HALT_FLOOR is:
+# undeclared or malformed is a refusal, not a defaulted value, because a pin that quietly defaults
+# is a pin nobody set.
+HOLD_CODES_EXTRA=""
+HOLD_FLOOR="5"
+
+# How long a per-slug lease may go unrefreshed before a second session may take the run over. The
+# EFFECTIVE bound is max(GATE_BOUND, LEASE_STALE_AFTER): a live bar holds a session silent for the
+# whole bar, so a bound under GATE_BOUND would hand the slug away mid-gate. Optional — leave it out
+# and the kit default is announced on every run rather than applied silently.
+LEASE_STALE_AFTER="7200"
 
 # The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
 # `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in

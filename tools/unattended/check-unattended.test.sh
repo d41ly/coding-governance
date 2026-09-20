@@ -103,6 +103,8 @@ DIRECTIVES_EXTRA_TABLE=""
 # 50-minute suite run to find, which is the only reason it is this loud.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
+HOLD_CODES_EXTRA=""
+HOLD_FLOOR="${HDFLOOR_OVERRIDE:-$HOLD_FLOOR_DERIVED}"
 EOF
 }
 
@@ -146,6 +148,7 @@ EOF
 
 DIRECTIVES_FLOOR_DERIVED="$(grep '^DIRECTIVES_CORE=' "$HERE/unattended.sh" | sed 's/^DIRECTIVES_CORE="//; s/"$//' | wc -w)"
 HALT_FLOOR_DERIVED="$(grep '^HALT_CODES_CORE=' "$HERE/unattended.sh" | sed 's/^HALT_CODES_CORE="//; s/"$//' | wc -w)"
+HOLD_FLOOR_DERIVED="$(grep '^HOLD_CODES_CORE=' "$HERE/unattended.sh" | sed 's/^HOLD_CODES_CORE="//; s/"$//' | wc -w)"
 CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
@@ -3213,6 +3216,106 @@ reset_tree
 # ---- Main sharded this suite while this branch added arms to it. The SHARDING is kept — it is
 # ---- the structure — and the floors below are RE-MEASURED against the merged suite rather than
 # ---- carried over, because a floor inherited across a merge is a number, not a floor.
+
+# ============== TOOL-dDerivedDocket-4: the phase-read routing, the core floor, --phase ============
+# Every arm below grades a DRIVER COPY in the fixture, which is the only place the sets and the call
+# sites live. The re-stage before each edit is load-bearing for the reason the parked-kind arms
+# above already record: `reset_tree`'s `git clean -qfd` removes the copied kit, and without it the
+# sed edits nothing, the grep finds nothing, and the arm passes by finding nothing.
+
+# ---- CHECK 32, arm one: a direct read of the phase fact in a function that is neither reader.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)$|  p=$(fact "$rel" phase); w=$(fact "$rel" witness)|'
+out=$(run)
+hit "$out" "the phase fact is read outside the two readers"
+hit "$out" "reads the phase fact directly inside verb_status()"
+
+# ---- CHECK 32, arm two: the same read inside a function that also WRITES the phase. The exemption
+# ---- is a LINE and never a function, so `verb_preflight`'s rotation test is graded although the
+# ---- same function carries the `set_fact … phase RUNNING` guard the exemption covers. This is the
+# ---- one live instance at BASE, and a function-wide exemption would cover five of the ten rows.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  if \[ -f "$rel" \] \&\& is_terminal "$DP_PHASE"; then$|  if [ -f "$rel" ] \&\& is_terminal "$(fact "$rel" phase)"; then|'
+out=$(run)
+hit "$out" "reads the phase fact directly inside verb_preflight()"
+
+# ---- CHECK 32, arm three: a `read_recorded_phase` call in a function the allow-list does not name.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"$|  p=$(read_recorded_phase "$rel")|'
+out=$(run)
+hit "$out" "calls read_recorded_phase() inside verb_resume(), which the allow-list does not name"
+
+# ---- CHECK 32, arm four: a STALE allow-list row. A row naming a function that no longer reads the
+# ---- phase silently widens the very set it was written to narrow, so the join runs both ways.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed ghostfn"|'
+out=$(run)
+hit "$out" "the allow-list names ghostfn(), which no longer calls read_recorded_phase()"
+
+# ---- CHECK 32, the CONTROL: the shipped driver and the shipped allow-list are silent. Without it
+# ---- every arm above could be passing because the check reds on anything at all.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+out=$(run)
+miss "$out" "the phase fact is read outside the two readers"
+
+# ---- CHECK 1's CORE_FLOOR, over the PHASE half: deleting HELD reds against a floor of 13:12.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/ HELD VERIFYING / VERIFYING /'
+out=$(run)
+hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
+
+# ---- CHECK 2's HOLD_FLOOR: deleting a hold code a sibling unit routes to reds the shrink-only pin.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/ inherited-red"$/"/'
+out=$(run)
+hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor"
+
+# ---- ...and its two conf branches, which behave exactly as HALT_FLOOR's do: undeclared and
+# ---- malformed are both REFUSALS, because a pin that quietly defaults is a pin nobody set.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate .unattended.conf 's/^HOLD_FLOOR=.*/HOLD_FLOOR=""/'
+out=$(run)
+hit "$out" "HOLD_FLOOR is undeclared in .unattended.conf"
+
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate .unattended.conf 's/^HOLD_FLOOR=.*/HOLD_FLOOR="five"/'
+out=$(run)
+hit "$out" "HOLD_FLOOR is not a single integer"
+
+# ---- The PHASE TAIL the gate-guard hook restates. HELD sits BEFORE VERIFYING, so the hook's own
+# ---- parity arm keeps reading the list it already spells and a run held from BUILDING is refused
+# ---- the flagged bar and the suites. Read off the shipped driver, never off a copy of the list.
+n=$((n+1))
+c32_tail=$(sed -n 's/^PHASES_CORE="\(.*\)"/\1/p' "$HERE/unattended.sh" | grep -o 'VERIFYING.*')
+[ "$c32_tail" = "VERIFYING LANDING LANDED ABORTED" ] \
+  || { echo "FAIL the driver's phase tail from VERIFYING is [$c32_tail], which is not the list gate-guard.js spells in PHASES_ALLOW"; st=1; }
+
+# ---- CHECK 33: a phase another verb PRODUCES is not reachable through --phase. Dropping HELD's
+# ---- guard makes one phase move write a HELD record with no held-at, hold-until, hold-code or
+# ---- held-from — a pause nothing can evaluate and --resume cannot release.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  if \[ "$want" = HELD \]; then$|  if [ "$want" = NEVERAPHASE ]; then|'
+out=$(run)
+hit "$out" "a phase another verb PRODUCES is reachable through --phase"
+hit "$out" "HELD"
+
+# ---- ...and CHECK 33's CONTROL, for arm four's reason.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+out=$(run)
+miss "$out" "a phase another verb PRODUCES is reachable through --phase"
+reset_tree
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
