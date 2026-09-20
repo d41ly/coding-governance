@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 9
+**Status:** CLOSED · rev-3 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-10-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-10-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-10-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-10-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 |
 
@@ -72,7 +73,7 @@ line with its rationale and the kickoff-manifest re-stamp that edit owes.
 | `tools/unattended/.unattended.conf.example` | `# the stop-guard blocks a bound session's turn end at most this many times per run and session, then allows and says so; the harness itself ends a turn after 8 consecutive blocks, so a value above 8 is unreachable inside one turn` then `STOP_GUARD_BLOCKS="6"` | check 22's `undocumented`/`phantom` directions; adopters |
 | `tools/unattended/kit.toml` `optional_keys` | the key appended to the list | `govkit` `requires_if` reads |
 | `tools/unattended/PROTOCOL.template.md` section 8 | `\| \`STOP_GUARD_BLOCKS\` \| the cap on stop-guard blocks per run and session, kit default 6. OPTIONAL, on \`GATE_BOUND\`'s terms for absence: the hook says so on stderr; a malformed value ALLOWS the stop with \`knob-malformed\` on the sidecar line, because for a Stop hook a refusal is a block \|` | check 22's key column; readers |
-| `.unattended.conf` | the same comment line and `STOP_GUARD_BLOCKS="6"` after `UNIT_STALL_BOUND` | check 22's `proj_extra` direction; the hook on this repo |
+| `.unattended.conf` | the same comment line, closed with this unit's id as every sibling knob's rationale line cites its own, and `STOP_GUARD_BLOCKS="6"` after `UNIT_STALL_BOUND` | check 22's `proj_extra` direction; the hook on this repo |
 
 The render is `bash tools/unattended/adopt-unattended.sh`; check 10 byte-compares the pair at the
 close and `--check` compares it now.
@@ -80,8 +81,23 @@ close and `--check` compares it now.
 ### The manifest re-stamp
 
 `.unattended.conf` is on the `watch:` line of `memory/guides/SESSION-KICKOFF.md`. The commit
-re-stamps `last-audit` with a delta line in its subject, the shape units 2 and 5 already use for
-their own conf keys; the stamp names this commit's parent or a later sha.
+re-stamps `last-audit` with a delta line in its message, the shape units 2 and 5 already use for
+their own conf keys. The stamp's sha is the ratchet's own rule, `HEAD` on the default branch and
+`git merge-base origin/main HEAD` on a run branch — so on this branch it names the merge-base, not
+this commit's parent, which is unreachable from `origin/main` — and it is the DATETIME that moves:
+the ratchet's C5 reads a re-stamp as any commit whose block-scoped `last-audit` VALUE differs from
+its parent's, at or after the newest watch-touching commit.
+
+### The guide cap
+
+The render sat at 61345 B against `GUIDE_CAP_BYTES=61440` at the pass's parent, so the one row this
+unit owes lands it over hygiene check 6 and the pre-commit refused the commit. The pass lands the
+row and a `memory/project/curation-debt.txt` entry for the render, the escape check 6 declares
+(`memory/HYGIENE.md` check 6, "grandfather"): check-6-only on a guide, measured in the row, and
+reported stale by the registry's own guard the run the cap moves past the render or the protocol is
+split. The cap itself is a watched governance carrier and the template is the kit's binding
+contract, so the owner call between raising the cap and splitting the protocol is PARKED on the
+run-state record as `guide-cap TOOL-aWokenSentinel-10`, not taken.
 
 ### Inventory
 
@@ -96,6 +112,7 @@ No identifier is minted. `STOP_GUARD_BLOCKS` is unit 3's key; this unit declares
 | `tools/unattended/PROTOCOL.template.md`, `memory/guides/UNATTENDED-PROTOCOL.md` | one section 8 row, re-rendered |
 | `.unattended.conf` | one comment line, one key line |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
+| `memory/project/curation-debt.txt` | one row for the render, added at the build pass (rev-3) |
 
 ### Alternatives rejected
 
@@ -140,7 +157,8 @@ Each criterion is a grep or `--check` over a tracked file, seconds. Figures at b
 - **AC3** — When `grep -c '^STOP_GUARD_BLOCKS="6"$' .unattended.conf` runs it prints 1 and 0 at
   base, the line above it starts with `#`, and `git show --name-only --format= HEAD` on the pass
   commit lists `.unattended.conf` together with `memory/guides/SESSION-KICKOFF.md`, whose
-  `last-audit` line names the commit's parent or a later sha and whose subject carries a delta line.
+  `last-audit` value differs from its parent's and names the sha of `git merge-base origin/main
+  HEAD` at the commit, and whose message carries the `manifest-audit:` delta line.
   Red when: the conf moved without the stamp, which `kickoff-manifest ratchet` reds at the close;
   or the rationale line is absent, which reds spec 6 AC6 at its order.
 - **AC4** — When `bash tools/unattended/adopt-unattended.sh --check` runs after the render, it
@@ -163,6 +181,15 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-20 · §4, AC3 · at the build pass: the stamp rule read "this commit's parent or a
+  later sha", which the ratchet's own rule (`HEAD` on the default branch, else the merge-base) and
+  the charter's §1 both contradict on a run branch — the merge-base is an ANCESTOR of the parent,
+  and the parent can never be the stamp because the ratchet's `STAMP_SHA_RULE` names the
+  merge-base; AC3 now reads the moved VALUE at the merge-base, which is what C5 grades. §4's root
+  conf row gains the unit-id suffix every sibling rationale line in `.unattended.conf` carries.
+  AMEND (add): the render crossed `GUIDE_CAP_BYTES` by 193 B on this row alone, which speccing did
+  not measure; §4 "The guide cap" and the files-touched table take the `curation-debt.txt` row and
+  the parked owner call. Status CLOSED.
 - rev-2 · 2026-09-20 · §1 · folded at the M4 disposal of spec-audit round 2: no finding of that
   round names this unit; L2 (raw 30) was spec 3's residue and is folded there, so spec 3 AC2 now
   carries the one literal `block 1/6` this unit's S1 declares. Order 7 → 9 for the insertions of

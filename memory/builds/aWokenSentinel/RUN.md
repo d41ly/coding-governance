@@ -131,3 +131,11 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T19:24:50Z dispatch · item 6bb7ac75 TOOL-aWokenSentinel-8 · reason memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-8-1-acceptance-ledger.md
 
 2026-09-20T19:26:17Z brief · item TOOL-aWokenSentinel-8 · reason 7d6fed11a91f memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-8-1-build-brief.md
+
+2026-09-20T19:34:47Z dispatch · item 3853a7da TOOL-aWokenSentinel-10 · reason .unattended.conf memory/guides/SESSION-KICKOFF.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/kit.toml memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-10-1-acceptance-ledger.md
+
+2026-09-20T19:34:52Z brief · item TOOL-aWokenSentinel-10 · reason fa954b0c3447 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-10-1-build-brief.md
+
+2026-09-20T19:42:15Z dispatch · item 3853a7da TOOL-aWokenSentinel-10 · reason memory/project/curation-debt.txt
+
+2026-09-20T19:42:59Z decision · item guide-cap TOOL-aWokenSentinel-10 · reason QUESTION: memory/guides/UNATTENDED-PROTOCOL.md sat at 61345 B against GUIDE_CAP_BYTES=61440 at 3853a7da, and the one section 8 row unit 10 owes (STOP_GUARD_BLOCKS, which check 22 reds undocumented without it) lands it at 61633 B, so hygiene check 6 refused the pass commit; unit 6's section 5 prose lands on the same file next. OPTIONS SEEN: (a) raise GUIDE_CAP_BYTES in .memory-tree.conf for this corpus, a watched governance carrier; (b) split the section 8 key table out of the protocol into its own guide, or slim the protocol, which no unit of this build is scoped to touch and which is the kit's BINDING contract; (c) drop the row and leave check 22 red to the close; (d) a curation-debt.txt row on the render, the gate's own declared escape with a stale-row guard. REFUSED: (a) is veto 2 and (b) is out of every spec's scope, so neither is the run's to take; (c) trades a byte cap for a red kit gate. TAKEN: (d), the narrowest escape the gate declares (check 6 only, a guide is check 7's ex7 exemption), measured and self-draining, with the owner call between (a) and (b) recorded here and on the registry row.
