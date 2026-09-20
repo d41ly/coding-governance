@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: yes — every parked row is carried into the wrap-up the owner reads, the two this session added among them: the audit chain bounded at round 7, and the brief-recorded refusal the owner ruled on by ordering the commit replay
+parked-surfaced: yes — 8 parked decisions, every one carried into the wrap-up the owner reads
 keepalive-reaped: yes — CronDelete cancelled f0857e3d, the replacement this session scheduled on 2026-09-16 after the recorded id 577b05c7 was found already gone (CronList empty, CronDelete answered no such job). Both are reaped
 witness: 9a3dce4e
 phase: VERIFYING
