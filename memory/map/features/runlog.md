@@ -85,37 +85,37 @@ owner's split puts extracts under the user profile, where on node `d` a sandbox 
 So a command is classified in memory and dropped, labels survive only token-shaped, and the store
 lives outside every repository, keyed by the git common dir so all worktrees of a clone share one.
 The reader holds one parsed record per open file, which the self-test counts through the one parse
-seam over a generated tree, with a hold-everything reader through the same counter as its liveness. A keepalive is JOINED to its `CronCreate` rather than matched by wording, because the
-wording drifted and a prefix missed fires the join found. The self-test's own `main` aims every
-ambient root at a decoy before any arm runs, since an arm that forgot one redirection would otherwise
-read or write the owner's real store.
+seam over a generated tree, with a hold-everything reader through the same counter as its liveness.
+A keepalive is JOINED to its `CronCreate` rather than matched by wording, which drifted. The
+self-test's `main` aims every ambient root at a decoy before any arm runs, so an arm that forgot one
+cannot reach the owner's real store.
 
 **The run model keys a run on the commit that STARTED it, and bounds every read to that run's era.**
-The driver rotates a finished record in its successor's preflight commit, so a path's own creation
-commit gives an archive its successor's start; with renames off, the commits that ADDED a run-state
-path are the starts, one per run. A window ends at the END that moved the phase INTO a terminal one,
+The driver rotates a finished record in its successor's preflight commit, so a path's creation commit
+gives an archive its successor's start; with renames off, the commits that ADDED a run-state path are
+the starts, one per run. A window ends at the END that moved the phase INTO a terminal one,
 never at a mention of the slug, which later commits keep making. Its first cut took any END reading a
-terminal phase, and the arm modeling a real landed record against a journal dated after it saw that
-window end three days late, on a `--status` that read LANDED on both lines. A non-terminal window
-ends one second past the run's last event over every source it owns, its own commits and the bars
-of the trees it holds included. The closing review's round 1 found it read only the driver and the
-record commits, which left this build's own later commits and both of its bars outside its window.
-Its git cost is constant and counted, because a model per run over a corpus of runs must not grow
-with a run's commits.
+terminal phase, and a real landed record's window then ended three days late on a post-run
+`--status`. A non-terminal window ends one second past the run's last event over every
+source it owns, its own commits and the bars of the trees it holds included; round 1 found it read
+the driver and the record commits alone, which left this build's own later commits and both of its
+bars outside its window.
+Its git PROCESS cost is constant and counted, since a model per run over a corpus must not grow with
+a run's commits; BLOB volume does, and S12 says how.
 
 **ONE predicate bounds every timed set the model derives**: `check_in_window`, and spec 8's S2
-names the sets.
-The closing review's round 1 found them bounded three ways: attribution counted every call of every
+names the sets. Round 1 found them bounded three ways: attribution counted every call of every
 session; own commits were bounded by the era, so a later commit naming a unit id became the last own
-commit and made `verify` report an unchanged journal; and the timeline listed commits past its end.
+commit and made `verify` report an unchanged journal; and the timeline listed commits past the end.
 
 **A tree joins a line to a run only while the run HOLDS it.** The first key was every tree any of
 the run's calls ran in. The run's `--landed` runs in the primary tree, and an owner's `--status` can
-too, so every run's bar and push there became this run's for its whole window. The closing review's
-round 1 confirmed it as a HIGH. A tree is now held from the run's first call there that claims it,
-which no verb in `TREE_BLIND_VERBS` does and no call after the close does. The hold ends at
-another run's first claim there, because a worktree outlives its run and gets reused. The class is
-claimed here as `join-key-widened-by-a-shared-location.md`.
+too, so every run's bar and push there became this run's for its whole window, a round-1 HIGH. A tree
+is now held from the run's first call there that claims it, which no verb in `TREE_BLIND_VERBS` does
+and no call after the close does, until another run's first claim there, since a worktree outlives
+its run and gets reused. Round 2 found the class in two more keys, the SESSIONS a visit names and the
+lines that place a run here, which `READ_ONLY_VERBS` — the verbs that only READ the record —
+answers. The class is claimed here as `join-key-widened-by-a-shared-location.md`.
 
 **The committed record admits a value only through a CLASS, because the repository is public.**
 `RECORD_SCHEMA` is data: shaped regexes and closed lists, the model's own lists by reference, with
@@ -174,13 +174,14 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
 - `RECORD_SCHEMA` is shared as data with the record schema leg, `TOOL-dLoggedFlight-10`, which shipped
   after the record and holds its glob to the renderer's `derive_record_relpath` at run time. The
   unattended Skill's render step, `TOOL-dLoggedFlight-11`, runs `record --write` and the index
-  re-render it prints, and grades the run's own record under the leg before it lands. The record's first six ledger sources are held to the driver's owed sets by the
-  same withheld arm that holds the model's copies.
+  re-render it prints, and grades the run's own record under the leg before it lands. The record's
+  first six ledger sources are held to the driver's owed sets by the same withheld arm that holds the
+  model's copies.
 - The unattended driver's parked-kind, owed and terminal-phase sets are COPIED into the model, and
   the withheld self-test holds each copy to the driver's source, with the fixture scaffold and the
   driver's writer key sets beside them. The record's copies of the spec template's status tokens and
-  check 22's verdicts are held the same way. Its staging harness met
-  a stale-bytecode trap, claimed here as `staged-break-runs-stale-bytecode.md`.
+  check 22's verdicts are held the same way. Its staging harness met a stale-bytecode trap, claimed
+  here as `staged-break-runs-stale-bytecode.md`.
 - The gate runner's own `redact()` stays separate: it masks leg output on write, and this table does
   not replace it.
 - `.memory-tree.conf` — read, never written. The reader copies the memory-tree engine's line reader
@@ -210,9 +211,9 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   named in its `method` field. It reads only history reachable from HEAD. It judges idle gaps only
   where every session's transcript is local, and keeps out any gap beside an owner turn. A store
   extract made before the window's end reads `stale`. Two runs claiming one tree in the same stretch
-  both hold it, so a bar there joins both. The spec-mark
-  split still reads each spec at the era's end, not the window's. With none of a run's own driver
-  lines here, its empty journals read `not-local`.
+  both hold it, so a bar there joins both. The spec-mark split is taken at the last record commit in
+  the window; its grain is a commit. With none of a run's own ACT lines here, a visit being none, its
+  empty journals read `not-local`.
 - **A moved memory root reds the schema leg.** The move adds every record, so a rotated build's runs
   share its start; the leg names that shape, and nothing clears it.
 - **No journal or transcript time is committed** (owner, 2026-09-16). Withholding a VALUE per path

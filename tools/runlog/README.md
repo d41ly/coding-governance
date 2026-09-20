@@ -257,8 +257,15 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   The key is the run's own lines, never any line naming its build, which an earlier run driven here
   holds — and never a read-only visit, which places nothing whoever made it.
 - **Every inferred answer is named** in the model's `method` field.
-- **Git cost is constant** whatever the run's size: the self-test counts the processes for a run of
-  10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
+- **Git PROCESS cost is constant** whatever the run's size: the self-test counts the processes for a
+  run of 10 commits and one of 100 and requires the two counts to be equal. The spec's S12 lists them.
+  The blob VOLUME of the one `cat-file --batch` is not constant: the spec-mark split asks for each
+  unit's spec at every record commit, because the window that chooses between them is derived from
+  blobs in that same batch. S12 carries the measured figures.
+- **The spec-mark split is taken at the window, not the era.** Each spec's section 8 marks at the
+  run's `start^` baseline are subtracted from its marks at the last record commit at or before the
+  window's end. For a build's last run the era runs to HEAD, so reading there made every later edit
+  of one of its specs a decision the run took.
 - **The model names what the record reads.** `journal_lines` lists, per producer, the line numbers
   of every journal line it attributed to the run; the extractor's workflow runs inside the window sit
   on the timeline with their labels; and every anomaly carries `t`, the time of the event behind it.
@@ -575,10 +582,11 @@ prefix and root, and hold the render to an independent one.
   changes the digest, and `verify` reports the digest, never the line: it holds the committed hash and
   a count, so it can say the prefix is not the one committed and nothing about where it parted. The
   case itself is no longer invisible, which is the one thing the retired time floor bought.
-- **A spec mark made after the run, in the run's era.** The ledger still splits each spec's section 8
-  marks at the era's end, where the spec's S4 says the window's: the window's end needs the one blob
-  read that also carries the specs. For a build's last run the era is open, so a mark added to one of
-  its specs later counts as the run's. The gap is recorded in the spec's revision log, not accepted.
+- **Which SECOND a spec mark was made in.** The ledger splits each spec's section 8 marks between the
+  run's `start^` baseline and the last RECORD commit at or before its window's end, so the
+  granularity is a commit: a mark committed inside the window but after the run's last record commit
+  reads as neither before the run nor inside it. Reading a rev per mark would cost a second
+  `cat-file`, which the model's six-call bound does not have.
 - **A record verified on another node.** The commitment is checkable only where the journal is, and
   `verify` elsewhere refuses rather than guessing.
 - **The lists the record copies, in a tree without their owners.** The spec template's status tokens

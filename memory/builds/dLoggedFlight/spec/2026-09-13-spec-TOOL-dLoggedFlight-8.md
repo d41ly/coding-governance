@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-18 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-19 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -157,7 +157,15 @@ sources actually support. Every later surface renders from this model rather tha
   - `Decided:` trailers from the run's commits (`TOOL-dLoggedFlight-7`), plus a near-miss count of body
     lines beginning `Decided:` that git did not parse as trailers;
   - spec section 8 marks split by resolver, owner or agent, and by whether the commit that introduced
-    them falls inside the window;
+    them falls inside the window. The split is the difference between each spec's marks at the run's
+    `start^` baseline and its marks at the last RECORD commit at or before the window's end, or at
+    that same baseline where no record commit is. Rev-8 read the second at the ERA's end, which for a
+    build's last run is HEAD, so a mark added to one of its specs after the run counted as decided
+    inside it. Every candidate rev is requested in the one `cat-file --batch` of S12, because the
+    window is derived from the phases those blobs carry and so is not known when they are asked for;
+    the choice is made afterwards. The granularity is therefore a record commit and not a second: a
+    mark committed inside the window but after the run's last record commit reads as neither before
+    the run nor inside it. Observed by AC26;
   - `memory/DECISIONS.md` rows the run's commits added, classified as the owner's when they carry
     `(owner` followed by `)`, `,` or `:`, or the phrase "owner ruling" or "owner call" in any case. The
     classification is named `heuristic` in the model's `method` field. A report-only arm prints its
@@ -288,6 +296,13 @@ sources actually support. Every later surface renders from this model rather tha
   parents. The push join's second key and the merged flag walk that one listing, so a push is tested
   against the own commit it followed (S3) at no extra call. One `cat-file --batch` carries blobs. A
   detached HEAD costs one more. The wall time is printed report-only. Observed by AC8.
+
+  This is a bound on PROCESSES, and S4's split makes that explicit rather than implied: the blob
+  VOLUME of that one batch grows with the units times the record commits, because every candidate rev
+  of the split is requested before the window that chooses between them is known. Measured on this
+  repository's own `dLoggedFlight` at 30 units and 50 record commits, the batch went from 110 requests
+  and 1.36 MB to 1580 requests and 18.16 MB, and the whole model from 0.247 s to 0.392 s, at six git
+  calls throughout. A cheaper derivation would have to split the batch and cost a seventh.
 
 ## 3. Non-goals (OUT)
 
@@ -628,6 +643,13 @@ command.
   `READ_ONLY_VERBS` emptied the read reads `dead` again, which is L2's own symptom. Both staged
   pairs hold the same number of lines and lie outside the window.
   Red when: a read-only visit places a run on this node, or an act stops placing one.
+- **AC26** — When `build_run_model` reads a landed fixture whose unit's spec gains one section 8
+  `RESOLVED` mark at a commit inside its window, the ledger holds one `inside` spec mark. With the
+  same mark committed after the window's end it holds none, and with the mark carried from before
+  the run it holds one `before`. All three cost six git calls, and all three carry the mark at HEAD
+  with windows closing at the same end.
+  Red when: a mark committed after the run counts as decided inside it, a mark the run inherited
+  counts as its own, an in-window mark stops counting, or the split costs a git call.
 
 ## 7. Gates
 
@@ -795,6 +817,17 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   resumed or landed it. The unit 8 acceptance ledger's residue on this is closed there, and the kit
   README's sentence saying a `--status` made here places another node's run is REPLACED rather than
   answered beside.
+- rev-19 · 2026-09-20 · S4 S12 · AC26 · folded R2-L2 of the closing diff review, round 2: the
+  spec-mark split read the era, not the window. Rev-8 left it there and gave a reason — that bounding
+  it would change S12's calls — which round 2 refuted and this fold confirms: S12 counts PROCESSES,
+  and every candidate rev rides the one `cat-file --batch`. The split is now taken at the last record
+  commit at or before the window's end, so a `RESOLVED` mark added to a spec after the run is counted
+  neither before it nor inside it; for a build's last run the era is open to HEAD, so every later
+  edit of one of its specs had counted as the run's own decision, in a committed fact. What the fold
+  does buy is BLOB VOLUME, units times record commits, and S12 now states that bound and the figures
+  measured for it rather than leaving "constant git cost" to be read as constant cost. The split's
+  granularity is a record commit, so a mark made inside the window but after the run's last record
+  commit reads as neither; S4 says so.
 
 ## 10. Reuse audit
 

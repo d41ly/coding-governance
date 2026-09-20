@@ -239,7 +239,13 @@ from collections import Counter  # noqa: E402
 # and the liveness that both staged pairs hold the same line count, lie outside the window, and carry
 # only their own verb. Its decoy checks move it by 3.
 # 4 + 3 = 7
-ASSERTION_FLOOR = 1526
+# RAISED 1526 -> 1533 by TOOL-dLoggedFlight-8, folding R2-L2's spec-mark split: ONE new arm with 4
+# checks — the same mark on the same spec, committed inside the window, after it, and carried from
+# before the run, each with its ledger entries and the six git calls beside them; and the liveness
+# that all three specs carry the mark at HEAD, all three windows close at one end, and the late
+# commit lies past it. Its decoy checks move it by 3, and the two helpers it arrives with carry none.
+# 4 + 3 = 7
+ASSERTION_FLOOR = 1533
 
 PASS = []
 FAIL = []
@@ -4136,6 +4142,74 @@ def test_model_ac25_visit_places_nothing():
                and {ln["verb"] for ln in made["visit"][0]} == {"--status"}
                and {ln["verb"] for ln in made["act"][0]} == {"--park"},
                str((visited.window["end"], made["visit"][0][0]["t"])))
+
+
+# The section 8 mark the spec-mark split counts, in the grammar `MARK_RE` reads.
+SPEC_MARK = "- F1 Which way? RESOLVED (agent, 2026-09-13)"
+
+
+def build_spec_mark_fixture(mark_minute, baseline=False):
+    """`(model, the spec's text at HEAD)`: the landed run with ONE section 8 mark on its unit's spec,
+    added at `mark_minute`, or carried from before the run when `baseline`. Its window closes at the
+    `--landed` END at minute 27, and its record commits are at minutes 2, 7, 22 and 28, so the split
+    is taken at minute 22 and a mark committed at minute 40 lies outside it."""
+    rm = f"memory/builds/{FX_SLUG}/RUN.md"
+    spec = f"memory/builds/{FX_SLUG}/spec/2026-09-13-spec-{FX_UNIT1}.md"
+    files = build_base_files()
+    if baseline:
+        files[spec] = build_spec_text(FX_UNIT1, "a unit", marks=SPEC_MARK)
+    first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files}])
+    base = s0[1]
+    st = build_preflight_state(FX_SLUG, base, base)
+    s3 = set_runstate_fact(set_runstate_fact(st, "phase", "BUILDING"), "witness", base)
+    s4 = set_runstate_fact(set_runstate_fact(s3, "phase", "LANDING"), "keepalive-reaped", "yes")
+    s5 = set_runstate_fact(s4, "phase", "LANDED")
+    commits = [
+        {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
+        {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
+         "files": {rm: s3, "tools/a.txt": "b\n"}},
+        {"t": derive_minute(22), "subject": f"records({FX_SLUG}): close OK, phase LANDING",
+         "files": {rm: s4}},
+        {"t": derive_minute(28), "subject": f"records({FX_SLUG}): --landed", "files": {rm: s5}},
+    ]
+    if mark_minute is not None:
+        commits.append({"t": derive_minute(mark_minute),
+                        "subject": f"spec({FX_SLUG}): the fork resolved",
+                        "files": {spec: build_spec_text(FX_UNIT1, "a unit", marks=SPEC_MARK)}})
+    repo, _shas = build_history(sorted(commits, key=lambda c: c["t"]), repo=first)
+    driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
+              + render_driver_lines(6, "--phase", phase_from="RUNNING", phase_to="BUILDING")
+              + render_driver_lines(21, "--close", phase_from="BUILDING", phase_to="LANDING")
+              + render_driver_lines(27, "--landed", phase_from="LANDING", phase_to="LANDED",
+                                    wt=FX_WT_PRIMARY))
+    j = write_journals(repo.parent, driver=driver)
+    return build_model(repo, journals=j), (repo / spec).read_bytes().decode("utf-8")
+
+
+def read_spec_marks(model):
+    return [(e["resolver"], e["when"]) for e in model.ledger["entries"] if e["source"] == "spec-mark"]
+
+
+def test_model_ac26_mark_split_at_the_window():
+    """AC26 (R2-L2 of the closing review, round 2): the spec-mark split is taken at the last record
+    commit at or before the WINDOW's end, never at the era's, which for a build's last run is HEAD. The
+    same mark on the same spec counts `inside` when its commit falls in the window and not at all when
+    it falls after, and counts `before` when the run inherited it. The git call count does not move,
+    because the extra spec blobs ride the one `cat-file --batch`."""
+    cases = {name: build_spec_mark_fixture(minute, baseline=base)
+             for name, minute, base in (("inside", 20, False), ("after", 40, False),
+                                        ("before", None, True))}
+    for name, want in (("inside", [("agent", "inside")]), ("after", []),
+                       ("before", [("agent", "before")])):
+        model, _text = cases[name]
+        check(f"model AC26: a mark committed {name} the run's window counts {want or 'not at all'}, "
+              "at six git calls", (read_spec_marks(model), model.cost["git_calls"]), (want, 6))
+    check_true("model AC26 liveness: all three specs carry the mark at HEAD and all three windows "
+               "close at the same end, so the placement is the only difference",
+               all(SPEC_MARK in text for _m, text in cases.values())
+               and len({m.window["end"] for m, _t in cases.values()}) == 1
+               and cases["after"][0].window["end"] < float(derive_minute(40)),
+               str({n: (m.window["end"], SPEC_MARK in t) for n, (m, t) in cases.items()}))
 
 
 def test_zz_model_idle_invariant():

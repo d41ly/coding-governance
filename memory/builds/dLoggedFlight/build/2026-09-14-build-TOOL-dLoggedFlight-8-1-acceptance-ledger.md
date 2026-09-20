@@ -349,6 +349,15 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   terminal write, and that same read carries the specs, so bounding the split changes S12's calls.
   Spec 8's rev-8 line names the gap and routes it to round 2. The kit README lists it among what
   the model does not do.
+  **CLOSED by the fold of R2-L2 of the closing diff review, round 2**, which refuted the reason:
+  S12 bounds PROCESSES, and every candidate rev rides the one `cat-file --batch`, so the split now
+  reads the last record commit at or before the window's end. What it does cost is blob VOLUME,
+  units times record commits — measured on this repository's own build at 110 requests and 1.36 MB
+  before, 1580 and 18.16 MB after, with the whole model moving from 0.247 s to 0.392 s at six git
+  calls throughout. A NARROWER residue takes its place, and the kit README now names that instead:
+  the split's grain is a record commit, so a mark committed inside the window but after the run's
+  last record commit reads as neither before the run nor inside it. Closing that would need a rev
+  per mark and a second `cat-file`, which S12 does not have.
 - **Parked by the H2 and M5 fold: the session key has H2's shape.** The bug-class checklist over the
   fold's code commit named `join-key-widened-by-a-shared-location`. The class has a second instance
   in the same function: a run's sessions are every session any of its calls names, `--status` and

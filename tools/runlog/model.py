@@ -1506,11 +1506,16 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
 
     # Every blob, through ONE cat-file. The decision log is read for every era candidate, since the
     # window that bounds them needs this read first; the rows are taken from the bounded ones.
-    era_end_rev = (refs["head"] or "HEAD") if era["next"] is None else f"{era['next']}^"
     units = read_units(root, build, id_re)
     requests = [f"{c['sha']}:{live_path}" for c in record_commits]
+    # THE SPEC-MARK SPLIT'S CANDIDATE REVS (R2-L2 of the closing review, round 2): each unit's spec at
+    # the run's `start^` baseline and at EVERY record commit of the era, so the split can be taken at
+    # the last one inside the window. The window is not known here — it is derived from the phases
+    # these very blobs carry — and S12 allows ONE `cat-file --batch`, so the candidates are REQUESTED
+    # and the choice made below. This buys blobs, never a git process; §4 carries the measurement.
     for u in units:
-        requests += [f"{pick['start']}^:{u['spec']}", f"{era_end_rev}:{u['spec']}"]
+        requests.append(f"{pick['start']}^:{u['spec']}")
+        requests += [f"{c['sha']}:{u['spec']}" for c in record_commits]
     log_path = f"{mr}/{DECISION_LOG}"
     for c in own_era:
         if len(c["parents"]) == 1 and any(p == log_path for _, p in c["files"]):
@@ -1772,10 +1777,18 @@ def build_run_model(root, slug, run=None, journal_root=None, store=None, project
         u["build_t"] = float(bc["t"]) if bc else None
 
     # ---- ledger inputs
+    # THE SPEC-MARK SPLIT'S REV (spec S4, R2-L2): the last record commit at or before the window's
+    # end, else the `start^` baseline, which then makes the two reads equal and the inside count nil.
+    # Rev-8 read each spec at the ERA's end — HEAD for a build's last run — so a RESOLVED mark added
+    # to one of its specs after the run counted as decided inside it, in a committed fact. Its reason
+    # for leaving it, that bounding the split would change S12's calls, does not hold: a spec blob
+    # requested at each record commit rides the one `cat-file --batch` like every other request.
+    split_rev = next((c["sha"] for c in reversed(record_commits) if float(c["t"]) <= window["end"]),
+                     f"{pick['start']}^")
     marks = []
     for u in units:
         before = Counter(scan_spec_marks(extract_open_questions(blobs.get(f"{pick['start']}^:{u['spec']}"))))
-        at_end = Counter(scan_spec_marks(extract_open_questions(blobs.get(f"{era_end_rev}:{u['spec']}"))))
+        at_end = Counter(scan_spec_marks(extract_open_questions(blobs.get(f"{split_rev}:{u['spec']}"))))
         for mark, n in sorted(at_end.items()):
             kept = min(n, before.get(mark, 0))
             for when, count in (("before", kept), ("inside", n - kept)):
