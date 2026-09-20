@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 19
+**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 12513c25 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-19-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-19-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-19-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-19-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-20 |
 

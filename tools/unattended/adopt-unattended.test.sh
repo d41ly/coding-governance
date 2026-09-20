@@ -506,5 +506,20 @@ same "arm 9 a tracked override holding a space refuses at exit 2" "$rc" "2"
 hit "$out" "holds a character outside"
 absent "$H9c/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an override holding a space"
 
+# FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
+# static count of the assertion sites in this file — `grep -cE '^\s*(same|hit|miss|absent|present) '`
+# over it, 87 at 4255e292 (TOOL-aWokenSentinel-19) — at ~10 % headroom, rounded down, because the
+# pass that wrote this line may not run the suite; the close's first green under
+# run-unattended-gates.sh is what confirms it held — that runner surfaces no count, only the
+# `unattended adopter e2e` row. The inline `n=$((n+1))` sites are not in the static count, so it is a
+# LOWER bound on what a green run executes. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=78
+[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
+# NOTHING EXECUTABLE MAY FOLLOW THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): an arm appended after it
+# is dead while every static signal says it is fine, and a numeric floor with headroom hides exactly
+# that many. One grep, and it cannot go slack. The range starts at the exit line itself, so a suite
+# with nothing after it reads exactly 1; a comment or a blank line after it is not counted.
+[ "$(sed -n '/^exit "\$st"$/,$p' "$0" | grep -cvE '^\s*(#|$)')" = 1 ] || { echo "FAIL a line follows the terminal exit and can never run"; st=1; }
+
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

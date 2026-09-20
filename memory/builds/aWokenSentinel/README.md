@@ -113,7 +113,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-17 — the driver suite reads `--status` by FIELD: one extraction helper armed on a suffixed line, and a one-line assertion armed against a two-line driver](spec/2026-09-20-spec-TOOL-aWokenSentinel-17.md) | 16 | 2 | CLOSED | rev-3 | 2026-09-21 |
 | [TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing](spec/2026-09-16-spec-TOOL-aWokenSentinel-7.md) | 17 | 2 | CLOSED | rev-5 | 2026-09-21 |
 | [TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md) | 18 | 2 | CLOSED | rev-2 | 2026-09-21 |
-| [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-aWokenSentinel-15 — the spec-audit commission pins each subject at its committed blob and refuses a dirty subject before a lens is dispatched](spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md) | 20 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first](spec/2026-09-20-spec-TOOL-aWokenSentinel-22.md) | 22 | 2 | SPECCED | rev-2 | 2026-09-20 |
@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 53 bound to this build, across 4 record folder(s).
+Records: 54 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

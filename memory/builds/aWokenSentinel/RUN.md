@@ -177,3 +177,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T22:38:55Z dispatch · item d24fd7c0 TOOL-aWokenSentinel-9 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-9-1-acceptance-ledger.md
 
 2026-09-20T22:39:00Z brief · item TOOL-aWokenSentinel-9 · reason 52e9759d7baf memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-9-1-build-brief.md
+
+2026-09-20T22:55:33Z dispatch · item 4255e292 TOOL-aWokenSentinel-19 · reason tools/unattended/adopt-unattended.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-19-1-acceptance-ledger.md
+
+2026-09-20T22:55:38Z brief · item TOOL-aWokenSentinel-19 · reason 19c39d0bc391 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-19-1-build-brief.md
