@@ -4514,13 +4514,15 @@ def test_record_ac4_classes():
     # time and twelve `a`s: two literals standing for what a builder placed on rows that retire.
     first_commit = next((e for e in m["timeline"] if e.get("kind") == "commit"), None)
     first_phase = next((e for e in m["timeline"] if e.get("kind") == "phase"), None)
-    check_true("record AC4 liveness: the model's timeline holds a commit event and a phase event for "
-               "the utc, sha and phase values to be derived from",
-               first_commit is not None and first_phase is not None)
     start, close = rl_record.derive_window_bounds(m.get("record_window"))
+    check_true("record AC4 liveness: the model holds a commit event, a phase event and a record "
+               "window for the utc, sha, phase and duration values to be derived from",
+               first_commit is not None and first_phase is not None
+               and start is not None and close is not None,
+               str((first_commit is not None, first_phase is not None, start, close)))
     shaped = {"utc": rl_model.derive_iso(first_commit["t"]),
               "int": rl_record.derive_count(len(m["ledger"]["entries"])),
-              "duration": f"{int(close - start)}s",
+              "duration": f"{int(close - start)}s" if start is not None and close is not None else None,
               "sha": rl_record.derive_short_sha(first_commit["sha"]),
               "digest": rl_record.measure_commitment(m, j)["sha256"],
               "phase": first_phase["phase"], "unit": FX_UNIT1, "units": FX_UNIT1,

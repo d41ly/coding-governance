@@ -327,13 +327,13 @@ stopped by going quiet. A re-render once that commit has landed reads `terminal-
 commit's own time. The lag is declared rather than hidden, and `window`, `duration` and `window closed
 by` are the only three facts it moves.
 
-**No journal or transcript time is committed** (owner, 2026-09-16). Every time the record carries
-is a commit's committer time or a run-state write's, so the Timeline holds `phase`, `commit`,
-`merge`, `dispatch` and `brief` rows alone. `RETIRED_EVENTS` names the kinds dropped before a row is
-built — the verbs, pushes, gate runs, compactions, limits, idle gaps and workflow runs — and they are
-not counted in `values withheld`, since a retired kind is not a value outside its class. Anomalies
-carry no time and Coverage no `epoch` for the same reason. The local model keeps every one of them,
-which is what the Skill answers from. Owner turns stay counts per position, as they always were.
+**No journal or transcript time is committed** (owner, 2026-09-16). Every time the record carries is
+a commit's committer time or a run-state write's, so the Timeline holds the kinds `TIMELINE_EVENTS`
+names and no others. `RETIRED_EVENTS` beside it names the kinds a journal or a transcript timed,
+dropped before a row is built and NOT counted in `values withheld`, since a retired kind is not a
+value outside its class. Both lists are the constants' own, in `record.py`, and not restated here.
+Anomalies carry no time and Coverage no `epoch` for the same reason. The local model keeps every one
+of them, which is what the Skill answers from. Owner turns stay counts per position, as always.
 
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
 duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under
