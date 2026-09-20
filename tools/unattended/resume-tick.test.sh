@@ -213,8 +213,7 @@ check_same "AC7 an empty walk is announced" "$OUT" "resume-tick: no bound run in
 # ...AC5's pass half: the two NOTEs name the root conf's path, a file that exists, once each.
 check_same "AC5 the NOTE for RESUME_ATTEMPTS prints once" "$(printf '%s\n' "$ERR" | grep -c 'declares no RESUME_ATTEMPTS')" "1"
 check_same "AC5 the NOTE for RESUME_TURNS prints once" "$(printf '%s\n' "$ERR" | grep -c 'declares no RESUME_TURNS')" "1"
-NOTE_PATH=$(printf '%s\n' "$ERR" | sed -n 's/.*Declare one in \(.*\) to change it.*/\1/p' | head -n 1)
-check_same "AC5 the NOTE names a file that exists" "$([ -n "$NOTE_PATH" ] && [ -f "$NOTE_PATH" ] && echo yes || echo no)" "yes"
+check_same "AC5 both NOTEs name a file that exists" "$(measure_note_files "$ERR")" "2"
 
 # ---- AC2: a logged-out CLI is an ANNOUNCED skip at exit 0 — the stub saw `auth status` and no
 # ---- `-p`, and no sidecar line was written; a LIVE record probes neither login nor the stub.
