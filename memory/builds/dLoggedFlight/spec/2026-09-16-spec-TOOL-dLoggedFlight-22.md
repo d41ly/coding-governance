@@ -1,11 +1,12 @@
 # TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 25
+**Status:** CLOSED · rev-4 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-dLoggedFlight-22-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-dLoggedFlight-22-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
 | [2026-09-16-review-TOOL-dLoggedFlight-21-spec-audit-round1.md](../reviews/2026-09-16-review-TOOL-dLoggedFlight-21-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 |
 
@@ -86,13 +87,18 @@ exist there yet.
   | `build_big_model` for `test_record_ac6_cap` (`:4335`, `:4375`) | 500 rows seeded from every non-owner event, journal kinds included, widened through `verb` names and `workflow` labels | seeds kept kinds only; widens the `commit` rows' units cell until the widest record's overflow at the nominal bounds (`:4404-4411`) is still observed. Its `events` expectations, `500 · shown 60 · elided 440` and the widest `505`, are `TOOL-dLoggedFlight-26` S6's derived counts, no edit here |
   | `test_record_model_fields` (`:4491`) | the rendered workflow row and the anomaly's rendered time (`:4526-4532`) | the model-side assertions (`:4515-4525`) stand; the render assertion reads an `out-of-band-edit` anomaly row with no time, and its workflow-row half retires. `TOOL-dLoggedFlight-27` S6 reads the workflow count in `withheld rows` |
   | `test_record_copied_sets` (`:4534`) | `PUSH_DECISIONS` against the pre-push hook (`:4544-4551`) | that half retires with the constant; the status-token and verdict halves stand |
-  | `test_record_ac9_owner_times` (`:4601`) | `scan_owner_times` and the refusal | retires whole; the model keeping idle gaps away from owner turns stays observed by `test_model_ac19_idle` |
+  | `test_record_ac9_owner_times` (`:4601`) | `scan_owner_times` and the refusal | retires whole; the model keeping idle gaps away from owner turns stays observed by `test_model_ac19_idle`. `test_record_ac1_real_model` takes the record half it leaves, AC1 over the idle fixture's REAL model, which also keeps that model in the population `test_zz_model_idle_invariant` counts — this arm was one of the TWO that fed it, so retiring it alone would leave that liveness grading a population of one (rev-4) |
+  | `test_fresh_ac4_three_shapes` (`:5048`) | the Coverage `sources` row, read by a cell count of six | reads five, the `epoch` column gone. A reader by VALUE, named by no probe over the retired names, and the fourth audit's class found a fourth time (rev-4) |
+  | `parse_floor_raise` (`:5450`) and `test_record_placement_windows` (`:5537`) | a floor comment whose newest move is a RAISE, and a typed `TOOL-dLoggedFlight-25` in the arm that grades it | the reader takes `RAISED` or `LOWERED`, since S6 moves the floor DOWN, and the arm reads the unit id out of the comment rather than typing it; `TOOL-dLoggedFlight-26` moved the floor and left that literal behind, which is this build's own class one level up. Its arithmetic grader takes a negative total (rev-4) |
   | `test_record_ac10_unknown_counts` (`:4689`) | its `--close` verb row's `rc` cell (`:4732-4739`) | that loop retires with the verb rows; every count assertion above it stands unedited |
   | `test_record_ac3_shape` (`:4189`) | table rows led by a timestamp | kept `commit` and `phase` rows still lead with one, so it stands unedited; UNVERIFIED until the build runs it |
 
 - **S6** The floor. `ASSERTION_FLOOR` (`selftest.py:114`) is re-declared to the assertion count the suite
   prints once S5 is built. Its comment names this unit and each retired arm or half, in the shape of the
-  floor's existing RAISED comments. Observed by AC5.
+  floor's existing RAISED comments — with the word `LOWERED`, since this is the first unit whose floor
+  moves DOWN, and with the arithmetic those comments carry reaching a negative figure. The count is
+  DERIVED by hand here rather than read off a run, because no pass runs the suite; the ledger records it
+  as owed to the post-build run, and a floor under the true total still passes. Observed by AC5.
 - **S7** The closed specs. `TOOL-dLoggedFlight-9` gains a rev line recording that S4's journal-sourced
   row layouts and time columns, S4's owner-time refusal with AC9, the `rc` half of AC10, and the members
   of AC4 no render reaches are superseded here. `TOOL-dLoggedFlight-10` gains one recording that its S5
@@ -170,7 +176,10 @@ ones are reached across the renders that can carry each member.
 
 | identifier | kind | cell |
 |---|---|---|
-| `RETIRED_EVENTS` | constant | none |
+| `RETIRED_EVENTS` | constant | `py.constant` |
+| `RETIRED_FIELDS` | constant | `py.constant` |
+| `read_class_values` | function | `py.function`, led by `read` |
+| `test_record_ac1_real_model` | function | `py.function`, led by `test` |
 
 `scan_owner_times`, `derive_clean_rc`, `UTC_TOKEN_RE`, `TWIN_ROW_RE`, `GATE_VERDICTS` and
 `PUSH_DECISIONS` are removed.
@@ -209,7 +218,9 @@ ones are reached across the renders that can carry each member.
 
 - **AC1** — When `render_record` renders `build_class_model`'s model, the Timeline holds only `phase`,
   `commit`, `merge`, `dispatch` and `brief` rows, and `values withheld` reads the count of the builder's
-  `read_placed`, so no dropped event is counted as withheld.
+  `read_placed`, so no dropped event is counted as withheld. And when it renders the idle fixture's REAL
+  model, `test_record_ac1_real_model` reads the same Timeline and the same withheld count off that model
+  with every retired kind and every owner row taken OUT of it (rev-4), so the baseline is a measurement.
   Red when: a row of a retired kind renders, or `values withheld` counts a dropped event.
   figure: DERIVED — the expected count is `TOOL-dLoggedFlight-26`'s placements, read at observation time.
 - **AC2** — When `render_record` renders the same model, the Anomalies `anomalies` table's header is
@@ -234,7 +245,9 @@ ones are reached across the renders that can carry each member.
   name probe cannot find: the `values withheld` expectations of `test_record_ac4_classes` and
   `test_schema_ac1_render_then_grade`, the vocabulary-short liveness block, the shaped map's `utc` and
   `sha`, and `test_record_ac6_cap`'s `events` expectations. Red too when any of them is typed rather than
-  derived as `TOOL-dLoggedFlight-26` leaves it.
+  derived as `TOOL-dLoggedFlight-26` leaves it. Red too (rev-4) when `test_fresh_ac4_three_shapes`
+  still reads a six-cell Coverage row, when `parse_floor_raise` reads only `RAISED`, or when
+  `test_record_placement_windows` still types a unit id in place of reading the one its comment names.
 - **AC6** — When `git grep -n -e "verb token" -e "check numbers" -e "THREE LISTS" -e "pre-push hook's decisions" -e "Timeline .rc." -e "rc of an END" -- tools/runlog/README.md tools/runlog/record.py memory/map/features/runlog.md`
   runs, it finds nothing.
   Red when: any hit remains. Each phrase sits on one line at `f7bf9d2f`, and a phrase that wraps is not
@@ -277,6 +290,17 @@ New arm: `tools/runlog/selftest.py` · AC1's retired-kind rows and AC4's schema 
   describing the retired classes, the `rc` rule and the copied push decisions; M6, §3's gate decision is
   parked in the run-state file; L1, AC4 stages a `shaped` copy keeping `verb`, and S5 says how a shaped
   class counts as reached. The order moves from 23 to 25.
+
+- rev-4 · 2026-09-20 · S5 · S6 · §4 · AC1 · AC5 · the build pass. Three readers the rev-3 inventory
+  still missed, each found by reading the code rather than a name: `test_fresh_ac4_three_shapes` reads
+  the Coverage row by a cell COUNT of six, which S2 makes five; `parse_floor_raise` knows only the word
+  `RAISED`, and S6's floor is the first to move DOWN; and `test_record_placement_windows` types
+  `TOOL-dLoggedFlight-25` while grading whichever unit moved the floor last, which
+  `TOOL-dLoggedFlight-26` had already broken. S5's `test_record_ac9_owner_times` row gains the arm that
+  takes its record half, `test_record_ac1_real_model`: retiring it outright would have left
+  `test_zz_model_idle_invariant`'s `both >= 2` liveness over a population of one, since that arm and
+  `test_model_ac19_idle` were its only two feeders. §4 lists the three suite identifiers this adds and
+  gives `RETIRED_EVENTS` its cell.
 
 ## 10. Reuse audit
 

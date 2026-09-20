@@ -181,8 +181,8 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   same withheld arm that holds the model's copies.
 - The unattended driver's parked-kind, owed and terminal-phase sets are COPIED into the model, and
   the withheld self-test holds each copy to the driver's source, with the fixture scaffold and the
-  driver's writer key sets beside them. The record's copies of the pre-push hook's decisions, the
-  spec template's status tokens and check 22's verdicts are held the same way. Its staging harness met
+  driver's writer key sets beside them. The record's copies of the spec template's status tokens and
+  check 22's verdicts are held the same way. Its staging harness met
   a stale-bytecode trap, claimed here as `staged-break-runs-stale-bytecode.md`.
 - The gate runner's own `redact()` stays separate: it masks leg output on write, and this table does
   not replace it.
@@ -218,14 +218,14 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   lines here, its empty journals read `not-local`.
 - **A moved memory root reds the schema leg.** The move adds every record, so a rotated build's runs
   share its start; the leg names that shape, and nothing clears it.
-- **No rendered time falls in an owner turn's second.** Owner turns are counts, and a gap endpoint
-  derived from one is the same datum, so the renderer refuses a record whose text carries a time in
-  an owner turn's second, an idle row's start plus its duration included. A public commit time that
-  shares such a second by coincidence is refused too, since text cannot tell the two apart.
+- **No journal or transcript time is committed** (owner, 2026-09-16), so the record's Timeline holds
+  the git- and run-state-timed kinds alone, its Anomalies carry no time and its Coverage no `epoch`.
+  `TOOL-dLoggedFlight-22` retired the rest with the owner-time refusal that used to guard them; the
+  local model keeps every one, and the Skill answers from it.
 - **The record proves shapes, not truth.** A count can be wrong and still be an integer. The lists it
-  copies from the pre-push hook, the spec template and the hygiene doc are held to them only by the
-  withheld self-test, and its commitment is checkable only on the node that holds the journal. An
-  unknown count is `-` by the renderer alone; the leg grades none against its Coverage row.
+  copies from the spec template and the hygiene doc are held to them only by the withheld self-test,
+  and its commitment is checkable only on the node that holds the journal. An unknown count is `-` by
+  the renderer alone; the leg grades none against its Coverage row.
 - **The schema leg compares windows in commit time.** A clock skew between two nodes that puts a
   predecessor's terminal write after its successor's start moves a window without redding it, and the
   leg never compares a record's two copies with each other.

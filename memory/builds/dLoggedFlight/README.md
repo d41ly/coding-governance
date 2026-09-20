@@ -97,7 +97,7 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 19 | `TOOL-dLoggedFlight-19` | WONTDO | every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes |
 | 20 | `TOOL-dLoggedFlight-20` | MISSING | the committed record carries no time a journal or transcript produced |
 | 21 | `TOOL-dLoggedFlight-21` | CLOSED | the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines |
-| 22 | `TOOL-dLoggedFlight-22` | MISSING | the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name |
+| 22 | `TOOL-dLoggedFlight-22` | CLOSED | the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name |
 | 23 | `TOOL-dLoggedFlight-23` | MISSING | one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot |
 | 24 | `TOOL-dLoggedFlight-24` | CLOSED | the Summary window and its duration render the git-only window the schema leg derives |
 | 25 | `TOOL-dLoggedFlight-25` | CLOSED | the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements |
@@ -141,7 +141,7 @@ ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLogg
 | [TOOL-dLoggedFlight-24 — the Summary window and its duration render the git-only window the schema leg derives](spec/2026-09-16-spec-TOOL-dLoggedFlight-24.md) | 22 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements](spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md) | 23 | 2 | CLOSED | rev-3 | 2026-09-20 |
 | [TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps](spec/2026-09-16-spec-TOOL-dLoggedFlight-26.md) | 24 | 2 | CLOSED | rev-2 | 2026-09-20 |
-| [TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name](spec/2026-09-16-spec-TOOL-dLoggedFlight-22.md) | 25 | 2 | SPECCED | rev-3 | 2026-09-16 |
+| [TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name](spec/2026-09-16-spec-TOOL-dLoggedFlight-22.md) | 25 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-dLoggedFlight-27 — the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read](spec/2026-09-16-spec-TOOL-dLoggedFlight-27.md) | 26 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced](spec/2026-09-16-spec-TOOL-dLoggedFlight-20.md) | 27 | 2 | SPECCED | rev-3 | 2026-09-16 |
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 28 | 2 | SPECCED | rev-2 | 2026-09-16 |
@@ -150,7 +150,7 @@ ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLogg
 | [TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value](spec/2026-09-20-spec-TOOL-dLoggedFlight-30.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 32 bound to this build, across 4 record folder(s).
+Records: 33 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 

@@ -4,13 +4,13 @@
 A run's model is machine-local, and most runs are made on some other node. This renders the model into
 ONE tracked record in the build folder, under the declared memory root, that every node can read. The
 repository is public, so the record is STRUCTURAL ONLY: every value in it is drawn from `RECORD_SCHEMA`,
-a closed set of value classes. Some are shaped, such as a UTC timestamp, a verb token or a sha. The rest
+a closed set of value classes. Some are shaped, such as a UTC timestamp, a duration or a sha. The rest
 are closed vocabularies, such as the coverage states. No free text, absolute path, session id, host id
 or command can reach the file, because nothing reaches it except through a class. A model value outside
 its field's class is written `-`, which also stands for an absent value, and the summary's `values
 withheld` line counts every one, so a model that grew a value the schema does not admit says so. An
-UNKNOWN value is absent too: a count from a source the model never read, and the rc of an END that did
-not exit clean, are `-` rather than the zero that reads clean.
+UNKNOWN value is absent too: a count from a source the model never read is `-` rather than the zero
+that reads clean.
 
 THE SCHEMA IS DATA, SHARED. The renderer builds the record from `RECORD_SCHEMA`, and the schema leg
 (TOOL-dLoggedFlight-10) re-validates the committed bytes against the same data rather than trusting this
@@ -24,12 +24,6 @@ and last `TIMELINE_EDGE` rows, and every list aggregates by kind past `LIST_BOUN
 over `RECORD_CAP_BYTES`, which cells of unusual width can cause, halves what it shows until it fits: the
 timeline's rows first, then the lists' bound, in turn. Every elision and aggregation is stated in the
 record itself.
-
-NO TIME IN AN OWNER TURN'S SECOND. Owner turns are counts per position, and a value derived from one
-is the same datum: an idle row that starts or ends on a turn places it. `scan_owner_times` reads the
-text a render would write and `render_record` refuses the whole record when any UTC in it, or any idle
-row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap beside an
-owner turn out already; this is the renderer's own check, so a model that regressed cannot publish one.
 
 THE COMMITMENT makes a later edit to the journal detectable on the node that holds it: the sha256 and
 the line count of the journal lines the MODEL attributed to the run, read from its `journal_lines` and
@@ -45,8 +39,8 @@ also derives every tracked run's start and window from git alone and refuses two
 share a start or whose windows overlap. What it does not check is stated at `check_records`.
 
 WHAT THIS DOES NOT DO. Rendering makes no git call: the model's calls are the whole cost, and rendering
-is a pure function of the model. It does not judge whether a value is TRUE, only that it is in its
-class and, for a time, outside every owner turn's second. It does not choose when a record is rendered; the unattended Skill's step does. And it names
+is a pure function of the model. It does not judge whether a value is TRUE, only that it is in
+its class. It does not choose when a record is rendered; the unattended Skill's step does. And it names
 nothing outside this kit by literal: the memory root is resolved, and the build-index generator is found
 beside this kit by its file name.
 """
@@ -87,22 +81,23 @@ INTRO = ("Rendered from the run model by the runlog kit's `record` command. Ever
 DATA_OPEN = "```json"
 DATA_CLOSE = "```"
 
-# THREE LISTS ANOTHER FILE OWNS, COPIED, because a kit reads no sibling at run time. The withheld
+# TWO LISTS ANOTHER FILE OWNS, COPIED, because a kit reads no sibling at run time. The withheld
 # self-test holds each to its owner in both directions where the owner is present: the spec status
-# tokens to the spec template, the push decisions to the pre-push hook, whose three pre-loop refusals
-# and seven END decisions they are, and the review verdicts to the hygiene doc's check 22. A value
-# outside a copy is withheld like any other, never guessed at.
+# tokens to the spec template, and the review verdicts to the hygiene doc's check 22. A value outside
+# a copy is withheld like any other, never guessed at. The pre-push hook's own decision list was a
+# third until TOOL-dLoggedFlight-22 retired the `push` rows that carried it.
 UNIT_STATUSES = ("OPEN", "SPECCED", "INPROGRESS", "BLOCKED", "DEFERRED", "CLOSED", "WONTDO")
-PUSH_DECISIONS = ("refuse-default-branch", "skip-nondefault", "skip-delete", "refuse-manifest",
-                  "refuse-raw", "refuse-head", "full", "scoped")
 REVIEW_VERDICTS = ("CLEAN", "CLEAN WITH FIXES", "BLOCKED")
-# The gate verdicts are the spec's own list (S4): the runner writes GREEN, RED and NONE, and REFUSED is
-# declared for a refusal line; a verdict outside it is withheld and counted.
-GATE_VERDICTS = ("GREEN", "RED", "REFUSED", "NONE")
-# The timeline's event kinds. `owner` is deliberately absent: owner turns are counts per position and
-# never clock times, so the renderer drops them from the timeline before a row is built.
-TIMELINE_EVENTS = ("phase", "verb", "commit", "merge", "push", "push-refused", "gate", "dispatch",
-                   "brief", "compact", "limit", "idle", "workflow")
+# The timeline's event kinds, every one of which is timed by git or by the run-state file. `owner` is
+# deliberately absent: owner turns are counts per position and never clock times, so the renderer drops
+# them from the timeline before a row is built.
+TIMELINE_EVENTS = ("phase", "commit", "merge", "dispatch", "brief")
+# THE KINDS NO COMMITTED RECORD CARRIES (TOOL-dLoggedFlight-22 S1). Each is timed by the journal or by
+# a transcript, and no journal or transcript time is committed (owner, 2026-09-16), so the renderer
+# drops it before a row is built. It is NOT a value outside its class, so it is not counted in `values
+# withheld`; `TOOL-dLoggedFlight-27`'s `withheld rows` fact counts these per kind from a declared
+# source. The local model keeps every one of them.
+RETIRED_EVENTS = ("verb", "push", "push-refused", "gate", "compact", "limit", "idle", "workflow")
 EXCLUDED_KINDS = tuple(k for k in mdl.PARK_KINDS if k not in mdl.PARK_KINDS_OWED)
 USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
 # The transcripts' coverage states under which a count the model derives from them is KNOWN (spec S4).
@@ -150,10 +145,7 @@ RECORD_SCHEMA = {
         "duration": r"[0-9]{1,12}s",
         "sha": r"[0-9a-f]{7,40}",
         "digest": r"[0-9a-f]{64}",
-        "verb": r"--[a-z-]{2,20}",
         "phase": r"[A-Z]{3,12}",
-        "checks": r"[0-9]{1,3}(?:,[0-9]{1,3})*",
-        "label": r"[a-z0-9-]{1,40}",
         "unit": _UNIT,
         "units": _UNIT + r"(?: " + _UNIT + r")*",
         "path": _PATH,
@@ -168,8 +160,6 @@ RECORD_SCHEMA = {
         "coverage-state": mdl.COVERAGE_STATES,
         "ledger-source": mdl.LEDGER_SOURCES,
         "owner-position": mdl.OWNER_POSITIONS,
-        "gate-verdict": GATE_VERDICTS,
-        "push-decision": PUSH_DECISIONS,
         "conformance-item": mdl.CONFORMANCE_ITEMS,
         "conformance-state": mdl.CONFORMANCE_STATES,
         "anomaly-kind": mdl.ANOMALY_KINDS,
@@ -215,18 +205,10 @@ RECORD_SCHEMA = {
                  "key": 2,
                  "rows": {
                      "phase": ("utc", "source", "event", "sha", "phase", "none", "none"),
-                     "verb": ("utc", "source", "event", "verb", "phase", "int", "checks"),
                      "commit": ("utc", "source", "event", "sha", "none", "none", "units"),
                      "merge": ("utc", "source", "event", "sha", "none", "none", "units"),
-                     "push": ("utc", "source", "event", "push-decision", "none", "int", "yes-no"),
-                     "push-refused": ("utc", "source", "event", "push-decision", "none", "none", "yes-no"),
-                     "gate": ("utc", "source", "event", "gate-verdict", "none", "int", "sha"),
                      "dispatch": ("utc", "source", "event", "unit", "none", "none", "none"),
                      "brief": ("utc", "source", "event", "unit", "none", "none", "none"),
-                     "compact": ("utc", "source", "event", "none", "none", "none", "none"),
-                     "limit": ("utc", "source", "event", "none", "none", "none", "none"),
-                     "idle": ("utc", "none", "event", "duration", "none", "none", "none"),
-                     "workflow": ("utc", "source", "event", "label", "none", "none", "none"),
                  }},
             ),
         },
@@ -273,8 +255,8 @@ RECORD_SCHEMA = {
         "Anomalies": {
             "facts": (("anomalies", ("{int} · shown {int} · aggregated {yes-no}",)),),
             "tables": (
-                {"name": "anomalies", "header": ("#", "UTC", "kind", "subclass"),
-                 "cols": ("int", "utc", "anomaly-kind", "merged-subclass")},
+                {"name": "anomalies", "header": ("#", "kind", "subclass"),
+                 "cols": ("int", "anomaly-kind", "merged-subclass")},
                 {"name": "by-kind", "header": ("#", "kind", "subclass", "count"),
                  "cols": ("int", "anomaly-kind", "merged-subclass", "int")},
             ),
@@ -290,18 +272,19 @@ RECORD_SCHEMA = {
                 ("idle gaps", ("judged {yes-no} · near an owner turn {int}",)),
             ),
             "tables": (
-                {"name": "sources", "header": ("#", "source", "state", "lines", "bad", "epoch"),
-                 "cols": ("int", "source", "coverage-state", "int", "int", "utc")},
+                {"name": "sources", "header": ("#", "source", "state", "lines", "bad"),
+                 "cols": ("int", "source", "coverage-state", "int", "int")},
             ),
         },
         "Data": {"facts": (), "tables": ()},
     },
     # SHAPES NO RECORD MAY CARRY ANYWHERE, whatever class a value passed (TOOL-dLoggedFlight-10 S5).
     # The renderer withholds a value one of these finds, and the schema leg refuses a record in whose
-    # bytes one is found. They are data here because the `label` class admits a lowercase UUID, so a
-    # rule only the leg knew would let the renderer write a record the leg refuses. An absolute path
-    # is a drive letter, a `/Users/`, `/home/` or MSYS drive root at a token start, or a UNC prefix in
-    # either slash.
+    # bytes one is found. They are data here because a path class's file segment admits a lowercase
+    # UUID — `_PATH_SEG` opens on `[A-Za-z0-9]` and continues over `[A-Za-z0-9._-]` — so a rule only
+    # the leg knew would let the renderer write a record the leg refuses. An absolute path is a drive
+    # letter, a `/Users/`, `/home/` or MSYS drive root at a token start, or a UNC prefix in either
+    # slash.
     "forbidden": {
         "absolute-path": (r"(?<![A-Za-z0-9])[A-Za-z]:[\\/]"
                           + r"|" + _TOKEN_START + r"(?:/(?:[A-Za-z]|Users|home)/|//[A-Za-z0-9])"
@@ -309,13 +292,6 @@ RECORD_SCHEMA = {
         "uuid": r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}",
     },
 }
-# THE OWNER-TIME REFUSAL reads the RENDERED text, never the model's own gaps, so what it grades is what
-# would be written (spec S4, rev-6): a UTC token anywhere, and an idle row in either copy, the markdown
-# table row and the Data twin's JSON row. Both shapes are the schema's own, read from it rather than
-# spelled here, so a timeline whose columns move cannot leave the idle half of the check reading none.
-UTC_TOKEN_RE = re.compile(RECORD_SCHEMA["shaped"]["utc"])
-TWIN_ROW_RE = re.compile(r'\["[^\]]*\]')
-
 
 # ---------------------------------------------------------------------------------- small helpers
 
@@ -529,39 +505,16 @@ def resolve_record_path(root, model, serves, date=None, memory_root=None) -> tup
 
 # ---------------------------------------------------------------------------------- the rows
 
-def derive_clean_rc(e) -> str | None:
-    """An END's `rc` where that END reads `exit=clean`, else None, which renders `-` (spec S4). An
-    unclean END's `rc` is whatever `$?` its EXIT trap saw, often 0, so a killed verb or push shown with
-    it would read as one that succeeded. M3 of the closing review, round 1."""
-    return e.get("rc") if e.get("exit") == "clean" else None
-
-
 def derive_timeline_values(e) -> tuple:
     """One timeline event as the seven raw column values its kind declares; `render_cell` classes them."""
     kind = e.get("kind")
     head = (mdl.derive_iso(e.get("t")), e.get("source"), kind)
     if kind == "phase":
         return head + (derive_short_sha(e.get("witness")), e.get("phase"), None, None)
-    if kind == "verb":
-        # The phase the verb left, or, for a verb with no END, the phase it found.
-        return head + (e.get("verb"), e.get("phase_to") or e.get("phase_from"), derive_clean_rc(e),
-                       ",".join(e.get("checks") or []))
     if kind in ("commit", "merge"):
         return head + (derive_short_sha(e.get("sha")), None, None, " ".join(e.get("units") or []))
-    if kind == "push":
-        return head + (e.get("decision"), None, derive_clean_rc(e), derive_yes_no(e.get("lander")))
-    if kind == "push-refused":
-        return head + (e.get("decision"), None, None, derive_yes_no(e.get("lander")))
-    if kind == "gate":
-        return head + (e.get("verdict"), None, e.get("rc"), derive_short_sha(e.get("head")))
     if kind in ("dispatch", "brief"):
         return head + (e.get("unit"), None, None, None)
-    if kind == "idle":
-        dur = e.get("dur")
-        return head + (f"{int(dur)}s" if isinstance(dur, (int, float)) and dur >= 0 else dur, None, None,
-                       None)
-    if kind == "workflow":
-        return head + (e.get("label"), None, None, None)
     return head + (None, None, None, None)
 
 
@@ -570,8 +523,11 @@ def build_timeline_rows(m, ctx) -> list:
     rows = []
     for e in m.get("timeline") or []:
         kind = e.get("kind")
-        if kind == "owner":
-            continue      # owner turns are counts per position, never clock times (spec S4)
+        # Owner turns are counts per position, never clock times (spec S4), and a RETIRED kind is
+        # timed by a journal or a transcript, which no record commits (TOOL-dLoggedFlight-22 S1).
+        # NEITHER is a value outside its class, so neither is counted in `values withheld`.
+        if kind == "owner" or kind in RETIRED_EVENTS:
+            continue
         classes = spec.get(kind)
         if classes is None:
             ctx["withheld"] += 1      # an event kind the schema does not declare is never rendered
@@ -629,20 +585,22 @@ def build_conformance_rows(m, ctx) -> list:
 
 
 def build_anomaly_rows(m, ctx) -> list:
+    """The anomalies, each led by its ordinal. An anomaly's time is NOT read: it is the time of the
+    journal or transcript event that triggered it (TOOL-dLoggedFlight-22 S2). The model keeps it."""
     cols = derive_table("Anomalies", "anomalies")["cols"]
-    return [[render_cell(ctx, c, v) for c, v in zip(cols, (str(i), mdl.derive_iso(a.get("t")), a.get("kind"),
-                                                           a.get("subclass")))]
+    return [[render_cell(ctx, c, v) for c, v in zip(cols, (str(i), a.get("kind"), a.get("subclass")))]
             for i, a in enumerate(m.get("anomalies") or [], 1)]
 
 
 def build_coverage_rows(m, ctx) -> list:
+    """One row per source, each led by its ordinal. A source's `epoch` is NOT read: it is the time of
+    its journal's first line (TOOL-dLoggedFlight-22 S2). The model keeps it."""
     cols = derive_table("Coverage", "sources")["cols"]
     cov = m.get("coverage") or {}
     rows = []
     for i, name in enumerate(mdl.SOURCE_NAMES, 1):
         row = cov.get(name) or {}
-        raw = (str(i), name, row.get("state"), derive_count(row.get("lines")), derive_count(row.get("bad")),
-               mdl.derive_iso(row.get("epoch")))
+        raw = (str(i), name, row.get("state"), derive_count(row.get("lines")), derive_count(row.get("bad")))
         rows.append([render_cell(ctx, c, v) for c, v in zip(cols, raw)])
     return rows
 
@@ -804,7 +762,7 @@ def build_record_doc(parts, edge, bound) -> dict:
     for section, key, name, agg_name, keys, order in (
             ("Conformance", "conformance", "items", "by-state", (1, 3),
              (mdl.CONFORMANCE_ITEMS, mdl.CONFORMANCE_STATES)),
-            ("Anomalies", "anomalies", "anomalies", "by-kind", (2, 3),
+            ("Anomalies", "anomalies", "anomalies", "by-kind", (1, 2),
              (mdl.ANOMALY_KINDS, mdl.MERGED_SUBCLASSES))):
         body = rows[key]
         agg = len(body) > bound
@@ -874,60 +832,11 @@ def render_markdown(doc, serves) -> str:
     return "\n".join(out) + "\n"
 
 
-def scan_owner_times(model, text) -> list:
-    """Every place the rendered `text` carries a time in the second of an owner turn the model holds
-    (spec S4, rev-6), as `(line, what)`, naming the place and NEVER the time. Empty when none does.
-
-    Every UTC token is compared with each turn's second. So is each idle row's END, its UTC plus its
-    duration: the start and the duration are each truncated to the second, so the true end lies in
-    that second or the next, and a turn in either is recovered by the sum. The turns are read from the
-    model's owner positions and from any owner row its timeline still holds, so a model that dropped
-    one list is still graded by the other. This is the renderer's OWN check, over the text it would
-    write, and it does not trust the model to have kept its idle gaps away from an owner turn.
-    """
-    m = derive_view(model)
-    owners = set()
-    for t in [p.get("t") for p in ((m.get("owner_positions") or {}).get("turns") or []) if isinstance(p, dict)] \
-            + [e.get("t") for e in (m.get("timeline") or []) if isinstance(e, dict) and e.get("kind") == "owner"]:
-        if isinstance(t, (int, float)) and not isinstance(t, bool) and t >= 0:
-            owners.add(int(t))
-    hits = []
-    if not owners:
-        return hits
-    table = derive_table("Timeline", "events")
-    cols = table["rows"]["idle"]
-    at_utc, at_dur = cols.index("utc"), cols.index("duration")
-    dur_rx = re.compile(RECORD_SCHEMA["shaped"]["duration"])
-    for ln, line in enumerate(text.split("\n"), 1):
-        for tok in UTC_TOKEN_RE.findall(line):
-            sec = mdl.parse_iso(tok)
-            if sec is not None and int(sec) in owners:
-                hits.append((ln, "a time"))
-        row = None
-        if line.startswith("| ") and line.endswith(" |"):
-            row = line[2:-2].split(" | ")
-        elif TWIN_ROW_RE.match(line):
-            try:
-                row = json.loads(TWIN_ROW_RE.match(line).group(0))
-            except ValueError:
-                row = None
-        if not (isinstance(row, list) and len(row) == len(cols) and row[table["key"]] == "idle"):
-            continue
-        start = mdl.parse_iso(row[at_utc])
-        if start is None or not dur_rx.fullmatch(str(row[at_dur])):
-            continue
-        end = int(start) + int(row[at_dur][:-1])
-        if {end, end + 1} & owners:
-            hits.append((ln, "an idle row's end, its time plus its duration"))
-    return hits
-
-
 def render_record(model, memory_root=None, commitment=None, bounds=None) -> str:
     """The record's bytes, as text. A pure function of the model: no git call and no file read.
 
-    Raises ValueError when the run served no spec-defined unit, when even every section aggregated
-    and no timeline row shown cannot fit the cap, or when the text would carry a time in the second of
-    an owner turn (`scan_owner_times`), which nothing downstream could withdraw once published.
+    Raises ValueError when the run served no spec-defined unit, or when even every section
+    aggregated and no timeline row shown cannot fit the cap.
     """
     parts = build_record_parts(model, memory_root, commitment)
     edge, bound = bounds or (TIMELINE_EDGE, LIST_BOUND)
@@ -935,13 +844,6 @@ def render_record(model, memory_root=None, commitment=None, bounds=None) -> str:
     while True:
         text = render_markdown(build_record_doc(parts, edge, bound), parts["serves"])
         if len(text.encode("utf-8")) <= RECORD_CAP_BYTES:
-            hits = scan_owner_times(parts["m"], text)
-            if hits:
-                raise ValueError(f"runlog: the record would carry {len(hits)} time(s) in the second of an "
-                                 f"owner turn, the first being {hits[0][1]} on line {hits[0][0]}. A record "
-                                 "keeps owner turns to counts per position with no clock time, so it is "
-                                 "refused and nothing is written; an idle gap beside an owner turn, which "
-                                 "the model should have kept out, is the likely cause")
             return text
         if edge == 0 and bound == 0:
             raise ValueError(f"runlog: the record is {len(text.encode('utf-8'))} bytes with every section "

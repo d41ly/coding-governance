@@ -327,29 +327,27 @@ stopped by going quiet. A re-render once that commit has landed reads `terminal-
 commit's own time. The lag is declared rather than hidden, and `window`, `duration` and `window closed
 by` are the only three facts it moves.
 
-**No time in an owner turn's second.** A value derived from an owner turn is the same datum, so the
-render refuses the whole record, naming where and never what, when any UTC it would write, or any
-idle row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap
-beside an owner turn out already, and Coverage says whether idle gaps were judged and how many were
-kept out. `scan_owner_times` is the renderer's own check, so a model that regressed cannot publish
-one. A public commit time that happens to share an owner turn's second is refused too, since the
-check cannot tell a coincidence from a derivation. A refused render blocks nothing.
+**No journal or transcript time is committed** (owner, 2026-09-16). Every time the record carries
+is a commit's committer time or a run-state write's, so the Timeline holds `phase`, `commit`,
+`merge`, `dispatch` and `brief` rows alone. `RETIRED_EVENTS` names the kinds dropped before a row is
+built — the verbs, pushes, gate runs, compactions, limits, idle gaps and workflow runs — and they are
+not counted in `values withheld`, since a retired kind is not a value outside its class. Anomalies
+carry no time and Coverage no `epoch` for the same reason. The local model keeps every one of them,
+which is what the Skill answers from. Owner turns stay counts per position, as they always were.
 
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
-duration, a sha, a sha256 digest, a verb token, a phase token, a list of check numbers, a workflow
-label, one of the build's own unit ids, and a path under the build's own folder. The vocabularies are
-closed lists, the model's own wherever it owns one. A value outside its class is written `-`, the
-same as an absent one, and the summary's `values withheld` line counts them. So is a value carrying a
-shape `RECORD_SCHEMA["forbidden"]` lists, an absolute path or a UUID, whatever class it passed: the
-`label` class admits a lowercase UUID. The schema leg below validates committed bytes against the same
-data.
+duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under
+the build's own folder. The vocabularies are closed lists, the model's own wherever it owns one. A
+value outside its class is written `-`, the same as an absent one, and the summary's `values
+withheld` line counts them. So is a value carrying a shape `RECORD_SCHEMA["forbidden"]` lists, an
+absolute path or a UUID, whatever class it passed: a path class's file segment admits a lowercase
+UUID. The schema leg below validates committed bytes against the same data.
 
 **An unknown value is `-`, never the zero that reads clean.** The owner turns, the usage lines and
 the attributed calls come from the transcripts, so each is `-` unless those read `present` or
 `partial`. The model counts zero of what it never read, and an `in-window 0` would say the run never
 asked. A `stale` extract is not one of those states: its counts can be short by exactly the owner
-turns the run's last stretch held, and nothing in them says so. A Timeline `rc` is written only beside an END that reads `exit=clean`, since a killed verb's
-`rc` is its EXIT trap's `$?`.
+turns the run's last stretch held, and nothing in them says so.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
 `TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision
@@ -498,9 +496,9 @@ prefix and root, and hold the render to an independent one.
   its specs later counts as the run's. The gap is recorded in the spec's revision log, not accepted.
 - **A record verified on another node.** The commitment is checkable only where the journal is, and
   `verify` elsewhere refuses rather than guessing.
-- **The lists the record copies, in a tree without their owners.** The pre-push hook's decisions, the
-  spec template's status tokens and check 22's review verdicts are held to those files by the
-  withheld self-test, where the files are present. A value outside a copy is withheld, never rendered.
+- **The lists the record copies, in a tree without their owners.** The spec template's status tokens
+  and check 22's review verdicts are held to those files by the withheld self-test, where the files
+  are present. A value outside a copy is withheld, never rendered.
 - **Whether a path the record names is tracked.** The renderer checks each path's shape and makes no
   git call; the model reads its paths from git.
 - **Whether a record's two copies agree.** The schema leg grades the markdown and the Data twin each on

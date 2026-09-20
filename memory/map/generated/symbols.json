@@ -1933,11 +1933,6 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
-      "id": "derive_clean_rc",
-      "kind": "function",
-      "file": "tools/runlog/record.py"
-    },
-    {
       "id": "derive_count",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -3828,6 +3823,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_class_values",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_cli_help",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -5408,11 +5408,6 @@
       "file": "tools/runlog/model.py"
     },
     {
-      "id": "scan_owner_times",
-      "kind": "function",
-      "file": "tools/runlog/record.py"
-    },
-    {
       "id": "scan_owner_turns",
       "kind": "function",
       "file": "tools/runlog/extract.py"
@@ -6818,6 +6813,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_record_ac1_real_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_record_ac2_serves",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -6849,11 +6849,6 @@
     },
     {
       "id": "test_record_ac8_cost",
-      "kind": "function",
-      "file": "tools/runlog/selftest.py"
-    },
-    {
-      "id": "test_record_ac9_owner_times",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

@@ -138,7 +138,21 @@ from collections import Counter  # noqa: E402
 # the liveness that the unmodified render carried the vocabulary member the block drops, without which
 # the count that block expects would be the placements alone. Every other change here replaces a typed
 # literal with a derivation and moves no count. Two helpers arrive with neither.
-ASSERTION_FLOOR = 1392
+# LOWERED 1392 -> 1385 by TOOL-dLoggedFlight-22, the retirements: this is the first move DOWN, and the
+# reader above learned the word for it here. OFF: `test_record_ac9_owner_times` retires whole with the
+# owner-time refusal, 21 assertions and its 3 decoy checks; the `--close` rc loop of record AC10 goes
+# with `derive_clean_rc`, 2; and the copied-sets arm loses its pre-push half with the `push` rows, 1.
+# ON: one new arm, AC1 over the idle fixture's REAL model — the retired kinds absent from its rows, the
+# same render from a model without them, no owner time, and the liveness that the model held all three
+# — 4 assertions and its 3 decoy checks, which also keeps that fixture's model in the population the
+# `test_zz_model_*` invariants grade. Record AC4 gains 11: AC1's rendered kinds, the builder's event
+# shapes and the model's liveness; AC2's two headers and its liveness; the union's liveness over the
+# placement renders; and the two staged schema copies with a liveness each. The schema leg's arm gains
+# the liveness that its vocabulary list is a proper subset, 1, and the model-fields arm the liveness
+# that the anomaly it renders timeless carries a time in the model, 1. Its vocabulary loop is 15 names
+# either way, the schema having lost two and gained the two window vocabularies.
+# 4 + 3 + 1 + 11 + 1 - 21 - 3 - 2 - 1 = -7
+ASSERTION_FLOOR = 1385
 
 PASS = []
 FAIL = []
@@ -4302,6 +4316,70 @@ def test_record_ac3_shape():
           (text.split("\n")[0], read_serves_ids(text)[0]), (rl_record.TITLE, "journal"))
 
 
+# ONE EVENT SHAPE PER RETIRED KIND, so the class model can carry a real instance of each and AC1 can
+# watch it dropped. Held beside the builder rather than inside it, so the arm can pin the two lists to
+# each other in both directions ONCE instead of on every call (TOOL-dLoggedFlight-22 S5).
+RETIRED_FIELDS = {
+    "verb": {"source": "driver", "verb": "--landed", "state": "ended", "rc": "0", "exit": "clean",
+             "checks": ["34", "7"], "phase_from": "LANDING", "phase_to": "LANDING"},
+    "push": {"source": "pushes", "decision": "scoped", "rc": "0", "exit": "clean", "lander": "1"},
+    "push-refused": {"source": "pushes", "decision": "refuse-default-branch", "lander": "0"},
+    "gate": {"source": "gates", "verdict": "GREEN", "head": "a" * 40, "rc": "1"},
+    "compact": {"source": "transcripts"},
+    "limit": {"source": "transcripts"},
+    "idle": {"source": "model", "dur": 960.0},
+    "workflow": {"source": "transcripts", "label": "tier2-review"},
+}
+
+
+def read_class_values(text, slug=FX_SLUG, memory_root="memory", own_ids=()):
+    """`{class: {value}}` over a rendered record, each value read at a SLOT the schema declares that
+    class for — a table column, a Timeline row layout, or a fact template's placeholder — and never by
+    matching a class regex against a cell some other class owns (TOOL-dLoggedFlight-22 S5).
+
+    A class whose only slots retired is therefore reachable by nothing, however many cells its regex
+    would still fullmatch, which is the whole reason this reads slots instead of cells. `-` is an
+    absent or withheld value and reaches no class. The class regexes are the LEG's own compilation of
+    the schema, so the slot map and the grader cannot be two copies.
+    """
+    sch = rl_record.RECORD_SCHEMA
+    checks = rl_record.build_record_checks(slug, memory_root, own_ids)
+    out = {}
+
+    def add(cls, value):
+        if isinstance(value, str) and value != rl_record.NONE:
+            out.setdefault(cls, set()).add(value)
+
+    for name, sec in parse_record_markdown(text).items():
+        spec = sch["sections"].get(name)
+        if spec is None:
+            continue
+        declared = dict(spec["facts"])
+        for label, value in sec["facts"].items():
+            for template in declared.get(label, ()):
+                parts = rl_record.PLACEHOLDER_RE.split(template)
+                rx = "".join(re.escape(p) if i % 2 == 0 else f"({re.escape(rl_record.NONE)}|{checks[p][0]})"
+                             for i, p in enumerate(parts))
+                hit = re.fullmatch(rx, value)
+                if hit:
+                    for cls, got in zip(parts[1::2], hit.groups()):
+                        add(cls, got)
+                    break
+        by_header = {tuple(tb["header"]): tb for tb in spec["tables"]}
+        for tb in sec["tables"]:
+            decl = by_header.get(tuple(tb["header"]))
+            if decl is None:
+                continue
+            for row in tb["rows"]:
+                if "rows" in decl:
+                    classes = decl["rows"].get(row[decl["key"]]) if len(row) > decl["key"] else None
+                else:
+                    classes = decl["cols"]
+                for cls, cell in zip(classes or (), row):
+                    add(cls, cell)
+    return out
+
+
 def build_class_model():
     """A REAL model, from the landed fixture, given one value of every class the schema declares and
     every member of every closed vocabulary a table carries, plus four intruders in fields the renderer
@@ -4310,8 +4388,8 @@ def build_class_model():
     Returns the PLACEMENTS as a fifth value (TOOL-dLoggedFlight-26 S2): one `(carrier, field)` entry
     per intruder put on a field the renderer reads, appended at the line that places it. Every count an
     arm asserts over this model is derived from that list instead of typed beside the builder, so a
-    retirement that moves a carrier moves the expectation with it. Each carrier is also a row kind or a
-    table TOOL-dLoggedFlight-22 keeps, so that retirement moves none of them.
+    retirement that moves a carrier moves the expectation with it. Each carrier is a row kind or a
+    table TOOL-dLoggedFlight-22 kept, so that retirement moved none of them.
     """
     fx = build_landed_fixture()
     j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
@@ -4319,22 +4397,14 @@ def build_class_model():
     m = dataclasses.asdict(real)
     t = float(derive_minute(12))
     tl = m["timeline"]
-    # Every END-bearing event carries the `exit` the model copies from its END, since a Timeline `rc` is
-    # written only beside `exit=clean` (TOOL-dLoggedFlight-9 S4).
-    for i, d in enumerate(rl_record.PUSH_DECISIONS):
-        tl.append({"t": t + i, "source": "pushes", "kind": "push", "decision": d, "rc": "0", "exit": "clean",
-                   "lander": "1" if i % 2 else "0"})
-    tl.append({"t": t + 10, "source": "pushes", "kind": "push-refused", "decision": "refuse-default-branch",
-               "lander": "0"})
-    for i, v in enumerate(rl_record.GATE_VERDICTS):
-        tl.append({"t": t + 20 + i, "source": "gates", "kind": "gate", "verdict": v, "head": "a" * 40, "rc": "1"})
-    tl += [{"t": t + 30, "source": "model", "kind": "idle", "dur": 960.0},
-           {"t": t + 31, "source": "transcripts", "kind": "workflow", "label": "tier2-review"},
-           {"t": t + 32, "source": "transcripts", "kind": "compact"},
-           {"t": t + 33, "source": "transcripts", "kind": "limit"},
-           {"t": t + 34, "source": "driver", "kind": "verb", "verb": "--landed", "state": "ended", "rc": "1",
-            "exit": "clean", "checks": ["34", "7"], "phase_from": "LANDING", "phase_to": "LANDING"},
-           {"t": float(MODEL_T0 + 11 * 60 + 30), "source": "transcripts", "kind": "owner", "via": "typed"}]
+    # ONE EVENT OF EVERY RETIRED KIND, its fields the shape the model really holds for that kind, and
+    # the kind list read from `RETIRED_EVENTS` rather than typed (TOOL-dLoggedFlight-22 S5). Each is
+    # dropped before a row is built, which is what AC1 observes, and none is counted as withheld. The
+    # loops over `PUSH_DECISIONS` and `GATE_VERDICTS` that stood here retired with those vocabularies,
+    # whose only slots were the rows this unit removed.
+    for i, kind in enumerate(rl_record.RETIRED_EVENTS):
+        tl.append(dict(RETIRED_FIELDS[kind], t=t + i, kind=kind))
+    tl.append({"t": float(MODEL_T0 + 11 * 60 + 30), "source": "transcripts", "kind": "owner", "via": "typed"})
     # The absolute path is ASSEMBLED here, as the redaction arms expand their positives, so no tracked
     # line of this repository carries the shape this intruder exists to prove the record refuses.
     intruders = {"command": "git push --force origin main", "session": FX_SID,
@@ -4386,34 +4456,79 @@ def build_class_model():
 
 
 def test_record_ac4_classes():
-    """AC4: one value of every class reaches the file and every member of every closed vocabulary a
-    table carries does; the intruders in fields the renderer reads are withheld and counted, and none of
-    them, nor anything from a field it never reads, reaches the file. Every count and every shaped value
-    this arm expects is DERIVED from what the builder placed (TOOL-dLoggedFlight-26 S3 and S5), so a
-    retirement that moves a carrier cannot leave a stale literal behind."""
+    """AC1, AC2 and AC4: the Timeline holds the kept kinds alone and neither table carries a time; one
+    value of every class reaches the file at a slot that declares it, and every member of every closed
+    vocabulary is reached across the class model's render and the three placement renders; the intruders
+    in fields the renderer reads are withheld and counted, and none of them, nor anything from a field it
+    never reads, reaches the file. Every count and every shaped value this arm expects is DERIVED from
+    what the builder placed (TOOL-dLoggedFlight-26 S3 and S5) or from the schema itself
+    (TOOL-dLoggedFlight-22 S5), so a retirement that moves a carrier cannot leave a stale literal."""
     m, intruders, j, _fx, placed = build_class_model()
     text = rl_record.render_record(m, "memory", rl_record.measure_commitment(m, j))
+    doc = parse_record_markdown(text)
     cells = read_record_cells(text)
     sch = rl_record.RECORD_SCHEMA
-    for name in ("event", "source", "coverage-state", "ledger-source", "gate-verdict", "push-decision",
-                 "conformance-item", "conformance-state", "anomaly-kind", "merged-subclass", "review-verdict",
-                 "review-exit", "unit-status", "yes-no", "owner-position"):
-        missing = [v for v in sch["vocab"][name] if v not in cells]
+    own_ids = [u["id"] for u in m["units"] if u.get("id")]
+    # AC1. The rendered kinds, the schema's declared layouts and `TIMELINE_EVENTS` are pinned to one
+    # another, so a kind that reached two of the three still reds. A kind named by both constants would
+    # be dropped before its layout was read, and the rendered set would then fall short here.
+    shown_kinds = sorted({row[2] for tb in (doc.get("Timeline") or {}).get("tables") or []
+                          for row in tb["rows"] if len(row) > 2})
+    kept = sorted(rl_record.TIMELINE_EVENTS)
+    check("record AC1: the Timeline holds only the kinds the schema declares a row layout for, the "
+          "journal- and transcript-timed ones dropped before a row is built",
+          (shown_kinds, sorted(rl_record.derive_table("Timeline", "events")["rows"])), (kept, kept))
+    check("record AC1: the builder holds one event shape per kind RETIRED_EVENTS names, both directions",
+          sorted(RETIRED_FIELDS), sorted(rl_record.RETIRED_EVENTS))
+    check_true("record AC1 liveness: the model the renderer was handed holds an event of every retired "
+               "kind, so the row set above is a drop and not an empty population",
+               set(rl_record.RETIRED_EVENTS) <= {e.get("kind") for e in m["timeline"]},
+               str(sorted({str(e.get("kind")) for e in m["timeline"]})))
+    # AC2. Both tables still lead each row with its ordinal; neither carries a time any more.
+    check("record AC2: the Anomalies table carries no time column and the Coverage table no epoch",
+          {name: [tb["header"] for tb in (doc.get(name) or {}).get("tables") or []]
+           for name in ("Anomalies", "Coverage")},
+          {"Anomalies": [["#", "kind", "subclass"]],
+           "Coverage": [["#", "source", "state", "lines", "bad"]]})
+    check_true("record AC2 liveness: the model behind that render holds an anomaly time and a source "
+               "epoch, so those two headers drop a value there was something to render for",
+               any(a.get("t") for a in m["anomalies"])
+               and any((m["coverage"].get(name) or {}).get("epoch") for name in rl_model.SOURCE_NAMES),
+               str([a.get("t") for a in m["anomalies"]][:2]))
+    # AC4's vocabulary list is the SCHEMA's own, and it is reached over the union of this render and the
+    # three `build_placement_models` makes, since one record carries one `window closed by` (F2).
+    union = set(cells)
+    for st in build_placement_models().values():
+        union |= read_record_cells(rl_record.render_record(
+            st["model"], "memory", rl_record.measure_commitment(st["model"], st["journals"])))
+    check_true("record AC4 liveness: a closed-by member this render does not carry is reached by the "
+               "placement renders, so the union is wider than one record",
+               bool(set(sch["vocab"]["closed-by"]) - cells)
+               and set(sch["vocab"]["closed-by"]) <= union,
+               str(sorted(set(sch["vocab"]["closed-by"]) & cells)))
+    for name in sorted(sch["vocab"]):
+        missing = [v for v in sch["vocab"][name] if v not in union]
         check(f"record AC4: every member of the {name} vocabulary reaches the file", missing, [])
     # The `utc` and the `sha` come from the model's first commit event, whose row the renderer writes
     # (S5). They used to be the appended `push` rows' minute and the `gate` rows' head, typed here as a
     # time and twelve `a`s: two literals standing for what a builder placed on rows that retire.
     first_commit = next((e for e in m["timeline"] if e.get("kind") == "commit"), None)
-    check_true("record AC4 liveness: the model's timeline holds a commit event for the utc and sha "
-               "values to be derived from", first_commit is not None)
-    shaped = {"utc": rl_model.derive_iso(first_commit["t"]), "int": "15", "duration": "960s",
+    first_phase = next((e for e in m["timeline"] if e.get("kind") == "phase"), None)
+    check_true("record AC4 liveness: the model's timeline holds a commit event and a phase event for "
+               "the utc, sha and phase values to be derived from",
+               first_commit is not None and first_phase is not None)
+    start, close = rl_record.derive_window_bounds(m.get("record_window"))
+    shaped = {"utc": rl_model.derive_iso(first_commit["t"]),
+              "int": rl_record.derive_count(len(m["ledger"]["entries"])),
+              "duration": f"{int(close - start)}s",
               "sha": rl_record.derive_short_sha(first_commit["sha"]),
-              "digest": rl_record.measure_commitment(m, j)["sha256"], "verb": "--landed",
-              "phase": "LANDING", "checks": "34,7", "label": "tier2-review", "unit": FX_UNIT1, "units": FX_UNIT1,
+              "digest": rl_record.measure_commitment(m, j)["sha256"],
+              "phase": first_phase["phase"], "unit": FX_UNIT1, "units": FX_UNIT1,
               "path": m["record"], "ref": f"{m['record']}:13"}
     check("record AC4: the fixture names one value of every shaped class", sorted(shaped), sorted(sch["shaped"]))
-    check("record AC4: one value of every shaped class reaches the file",
-          [c for c, v in shaped.items() if v not in cells], [])
+    reached = read_class_values(text, own_ids=own_ids)
+    check("record AC4: one value of every shaped class reaches the file, at a slot that declares it",
+          sorted(c for c, v in shaped.items() if v not in reached.get(c, ())), [])
     leaked = [k for k, v in intruders.items() if v in text or json.dumps(v)[1:-1] in text]
     check("record AC4: none of the four intruders reaches the file", leaked, [])
     check_true("record AC4 liveness: each intruder IS in the model the renderer was handed",
@@ -4444,6 +4559,30 @@ def test_record_ac4_classes():
     check("record AC4 liveness: a vocabulary short one member withholds that value",
           (keep[-1] in read_record_cells(dropped),
            f"- values withheld: {len(placed) + owed}\n" in dropped), (False, True))
+    # THE TWO STAGED BREAKS AC4 NAMES, each on a COPY of the schema and neither touching the render: a
+    # vocabulary and a shaped class no slot declares change what the arm's DERIVED lists must find,
+    # which is the whole point of deriving them. The retired `push-decision` members are written here,
+    # in the arm that proves they are unreachable, and nowhere the renderer reads.
+    sch["vocab"]["push-decision"] = ("full", "scoped")
+    try:
+        unreached = [v for v in sch["vocab"]["push-decision"] if v not in union]
+    finally:
+        del sch["vocab"]["push-decision"]
+    check("record AC4 RED: a schema copy keeping push-decision reds naming every member no render "
+          "reaches", unreached, ["full", "scoped"])
+    for label, pattern, live in (("its own", r"--[a-z-]{2,20}", False),
+                                 ("one a rendered cell matches", r"[a-z]{3,12}", True)):
+        sch["shaped"]["verb"] = pattern
+        try:
+            missing = [c for c in sch["shaped"] if c not in reached]
+            matched = sorted(c for c in cells if re.fullmatch(pattern, c))
+        finally:
+            del sch["shaped"]["verb"]
+        check(f"record AC4 RED: a schema copy keeping verb with {label} regex reds naming verb",
+              "verb" in missing, True)
+        check_true(f"record AC4 RED liveness: {'a' if live else 'no'} rendered cell fullmatches that "
+                   "regex, so what the arm grades is the slot and never the shape",
+                   bool(matched) is live, str(matched[:3]))
 
 
 def build_big_model(n_timeline=500, n_units=60, n_anomalies=200, n_entries=300, wide=False):
@@ -4452,22 +4591,25 @@ def build_big_model(n_timeline=500, n_units=60, n_anomalies=200, n_entries=300, 
     fx = build_landed_fixture()
     j = write_journals(fx["repo"].parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
     m = dataclasses.asdict(build_model(fx["repo"], journals=j))
-    seed = [e for e in m["timeline"] if e["kind"] != "owner"]
+    # THE KEPT KINDS ALONE (TOOL-dLoggedFlight-22 S5): a retired kind is dropped before a row is
+    # built, so seeding one would shrink the rendered population under the count this arm reads back.
+    declared = rl_record.derive_table("Timeline", "events")["rows"]
+    seed = [e for e in m["timeline"] if e["kind"] in declared]
     t0 = float(derive_minute(0))
-    tl = []
-    for i in range(n_timeline):
-        e = dict(seed[i % len(seed)], t=t0 + i * 7)
-        if wide and e["kind"] == "verb":
-            e["verb"] = "--" + "x" * 20
-        tl.append(e)
-    if wide:
-        tl += [{"t": t0 + n_timeline * 7 + i, "source": "transcripts", "kind": "workflow", "label": "w" * 40}
-               for i in range(5)]
-    m["timeline"] = tl
     unit0 = m["units"][0]
     m["units"] = [dict(unit0, id=f"X-{FX_SLUG}-{i}", order=i,
                        status=rl_record.UNIT_STATUSES[i % len(rl_record.UNIT_STATUSES)])
                   for i in range(1, n_units + 1)]
+    tl = []
+    for i in range(n_timeline):
+        e = dict(seed[i % len(seed)], t=t0 + i * 7)
+        # THE WIDEST CELL A KEPT ROW CAN CARRY is a commit's `units`: every unit id the model owns, all
+        # of which the `units` class admits. It replaces the 20-character verb names and the 40-
+        # character workflow labels that widened this model until those rows retired.
+        if wide and e["kind"] in ("commit", "merge"):
+            e["units"] = [u["id"] for u in m["units"]]
+        tl.append(e)
+    m["timeline"] = tl
     m["anomalies"] = [{"kind": rl_model.ANOMALY_KINDS[i % len(rl_model.ANOMALY_KINDS)], "t": t0 + i,
                        "subclass": (rl_model.MERGED_SUBCLASSES[i % len(rl_model.MERGED_SUBCLASSES)]
                                     if rl_model.ANOMALY_KINDS[i % len(rl_model.ANOMALY_KINDS)] == "nonterminal-merged"
@@ -4705,31 +4847,27 @@ def test_record_model_fields():
     check("record fields: an anomaly carries the time of the event that triggered it",
           [(a["kind"], a.get("t")) for a in model.anomalies], [("out-of-band-edit", oob_t)])
     text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, j))
-    rows = scan_record_rows(text)
-    check("record fields: the record shows the workflow row and the anomaly's time",
-          ([r[3] for r in rows if len(r) == 7 and r[2] == "workflow"],
-           [r[1] for r in rows if len(r) == 4 and r[2] == "out-of-band-edit"]),
-          (["tier2-review"], [rl_model.derive_iso(oob_t)]))
+    # The workflow row retired with the transcript-timed kinds (TOOL-dLoggedFlight-22 S1), and the
+    # anomaly renders as a kind and a subclass with no time beside it (S2). `TOOL-dLoggedFlight-27`
+    # reads the workflow count back out of the `withheld rows` fact.
+    check("record fields: the record shows the anomaly as a kind alone, with no time in its row",
+          [row for tb in parse_record_markdown(text)["Anomalies"]["tables"] for row in tb["rows"]],
+          [["1", "out-of-band-edit", "-"]])
+    check_true("record fields liveness: the model behind that row carries the anomaly's time, so the "
+               "row above drops a value there was something to render for",
+               [a.get("t") for a in model.anomalies] == [oob_t])
 
 
 def test_record_copied_sets():
-    """The record's copies of three lists another file owns, each held to its owner in both directions
-    where the owner is present: the pre-push hook's decisions, the spec status tokens of the spec
-    template, and the review verdicts of the hygiene doc's check 22. Each announces its skip."""
+    """The record's copies of two lists another file owns, each held to its owner in both directions
+    where the owner is present: the spec status tokens of the spec template, and the review verdicts of
+    the hygiene doc's check 22. Each announces its skip. The pre-push hook's decisions were a third
+    until TOOL-dLoggedFlight-22 retired the `push` rows that were their only slot."""
     top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
     try:
         mr = rl.resolve_memory_root(top)
     except ValueError:
         mr = None
-    hook = top / ".githooks" / "pre-push"
-    if hook.is_file():
-        text = hook.read_bytes().decode("utf-8", "replace")
-        found = set(re.findall(r"\bRUNLOG_DECISION=([a-z][a-z-]*)", text)) | set(
-            re.findall(r"^\s*write_push_once ([a-z][a-z-]*)", text, re.M))
-        check("record sets: the hook's decisions are the record's push decisions, both directions",
-              sorted(found), sorted(rl_record.PUSH_DECISIONS))
-    else:
-        print("  SKIP record sets: no pre-push hook beside this kit, so its decisions cannot be compared")
     spec_template = top / mr / "TEMPLATE-SPEC.md" if mr else None
     if spec_template is not None and spec_template.is_file():
         lines = spec_template.read_bytes().decode("utf-8", "replace").split("\n")
@@ -4779,81 +4917,42 @@ def test_record_ac8_cost():
     print(f"  report (grades nothing): record render over 500 timeline rows {wall:.3f}s")
 
 
-def test_record_ac9_owner_times():
-    """AC9 (B1 of the closing review): no rendered time falls in an owner turn's second. A real model
-    with owner turns beside three silences renders with none. A model given an idle row that starts in
-    one, ends in one, or ends the second before one under truncation refuses, naming no time, and
-    writes nothing; each near miss three seconds further away renders."""
+def test_record_ac1_real_model():
+    """AC1 over a REAL model rather than the class model's: the run whose transcripts gave it an idle
+    gap beside four owner turns renders no idle row, no row of any retired kind and no owner turn's
+    time, and drops every one of them without counting one as withheld. The baseline is the same model
+    with those events taken out, so what the count is graded against is a measurement and not a literal.
+
+    This is the half of the retired `test_record_ac9_owner_times` that survives on the record's side
+    (TOOL-dLoggedFlight-22 S5): the model keeping idle gaps away from an owner turn stays
+    `test_model_ac19_idle`'s, and the renderer's own refusal retired with the rows it guarded. It also
+    keeps the idle fixture's model in the population the `test_zz_model_*` invariants grade, which that
+    arm was one of two to feed.
+    """
     fx = build_idle_fixture()
     model = build_model(fx["repo"], journals=fx["journals"], store=fx["store"])
-    text = rl_record.render_record(model, "memory", rl_record.measure_commitment(model, fx["journals"]))
-    owners = {int(o) for o in fx["owners"]}
-    check_true("record AC9 liveness: the model holds the fixture's four owner turns",
-               sorted(int(t["t"]) for t in model.owner_positions["turns"]) == sorted(owners),
-               str(model.owner_positions["counts"]))
-    utcs = [int(rl_model.parse_iso(tok)) for tok in re.findall(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]{8}Z", text)]
-    check_true("record AC9 liveness: the record carries times to compare", len(utcs) > 10, str(len(utcs)))
-    check("record AC9: no UTC the real record carries falls in an owner turn's second",
-          sorted(u for u in utcs if u in owners), [])
-    idle = [(int(rl_model.parse_iso(r[0])), int(r[3][:-1])) for r in scan_record_rows(text)
-            if len(r) == 7 and r[2] == "idle"]
-    check("record AC9: the record shows the one idle row the model kept", len(idle), 1)
-    check("record AC9: ...and no idle row's UTC plus its duration, nor the second after, is an owner turn's",
-          [s for s, d in idle if {s + d, s + d + 1} & owners], [])
-    check("record AC9: the Coverage section says idle gaps were judged, and counts the three kept out",
-          "- idle gaps: judged yes · near an owner turn 3" in text, True)
+    commitment = rl_record.measure_commitment(model, fx["journals"])
+    doc = parse_record_markdown(rl_record.render_record(model, "memory", commitment))
+    text = rl_record.render_record(model, "memory", commitment)
+    kinds = sorted({row[2] for tb in (doc.get("Timeline") or {}).get("tables") or []
+                    for row in tb["rows"] if len(row) > 2})
+    check("record AC1: a real run's record carries no row of a retired kind and no owner row",
+          [k for k in kinds if k in rl_record.RETIRED_EVENTS or k == "owner"], [])
     m = dataclasses.asdict(model)
-    o = fx["owners"][1]
-
-    def build_variant(t, dur, drop=None):
-        v = json.loads(json.dumps(m))
-        v["timeline"] = sorted(v["timeline"] + [{"t": t, "source": "model", "kind": "idle", "dur": dur}],
-                               key=lambda e: e["t"])
-        if drop == "timeline":
-            v["timeline"] = [e for e in v["timeline"] if e["kind"] != "owner"]
-        elif drop == "positions":
-            v["owner_positions"]["turns"] = []
-        return v
-
-    def read_refusal(v):
-        try:
-            rl_record.render_record(v, "memory")
-        except ValueError as exc:
-            return str(exc)
-        return None
-
-    for name, t, dur in (("starts in", o + 0.4, 1200.0), ("ends in", o - 1200.0, 1200.0),
-                         ("ends, under truncation, the second before", o - 1200.3, 1200.3)):
-        msg = read_refusal(build_variant(t, dur))
-        check(f"record AC9: an idle row that {name} an owner turn's second refuses", bool(msg and "owner turn" in msg),
-              True)
-        check(f"record AC9: ...and the refusal of the row that {name} it names no time", bool(msg) and re.search(
-            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T", msg) is None and str(int(o)) not in msg, True)
-        check(f"record AC9 near miss: the row that {name} it, moved three seconds further away, renders",
-              read_refusal(build_variant(t - 3, dur)), None)
-    check("record AC9: the truncated case's rendered end is the second BEFORE the turn, so only the "
-          "second-after comparison catches it", int(o - 1200.3) + int(1200.3), int(o) - 1)
-    # EACH COPY ON ITS OWN: one idle row ending on the turn, as the markdown table writes it and as the
-    # Data twin writes it, with no UTC of its own in an owner turn's second, so only the end can match.
-    cells = [rl_model.derive_iso(o - 1200), "-", "idle", "1200s", "-", "-", "-"]
-    for copy_name, line in (("markdown", "| " + " | ".join(cells) + " |"),
-                            ("Data twin", json.dumps(cells, separators=(",", ":")) + ",")):
-        check(f"record AC9: an idle row ending on an owner turn is found in the {copy_name} copy alone",
-              [what for _ln, what in rl_record.scan_owner_times(m, line)],
-              ["an idle row's end, its time plus its duration"])
-    check("record AC9: with the timeline's owner rows gone, the owner positions still refuse",
-          bool(read_refusal(build_variant(o + 0.4, 1200.0, drop="timeline"))), True)
-    check("record AC9: with the owner positions gone, the timeline's owner rows still refuse",
-          bool(read_refusal(build_variant(o + 0.4, 1200.0, drop="positions"))), True)
-    folder = fx["repo"] / "memory" / "builds" / FX_SLUG / "build"
-    try:
-        rl_record.write_record(fx["repo"], build_variant(o + 0.4, 1200.0), journal_root=fx["journals"],
-                               date=RECORD_DATE)
-        wrote = "returned"
-    except ValueError:
-        wrote = "refused"
-    check("record AC9: write_record refuses the regressed model and writes nothing",
-          (wrote, sorted(p.name for p in folder.glob("*-runlog-*.md")) if folder.is_dir() else []), ("refused", []))
+    dropped = rl_record.RETIRED_EVENTS + ("owner",)
+    bare = parse_record_markdown(rl_record.render_record(
+        dict(m, timeline=[e for e in m["timeline"] if e.get("kind") not in dropped]), "memory", commitment))
+    check("record AC1: taking those events out of the model moves neither the Timeline nor the withheld "
+          "count, so not one of them was counted as a value outside its class",
+          (bare["Timeline"], bare["Summary"]["facts"]["values withheld"]),
+          (doc["Timeline"], doc["Summary"]["facts"]["values withheld"]))
+    check("record AC1: no owner turn's clock time is anywhere in the record",
+          [i for i, o in enumerate(fx["owners"]) if rl_model.derive_iso(o) in text], [])
+    check_true("record AC1 liveness: the model rendered held an idle gap, every owner turn of the "
+               "fixture and tool calls, so the two records above are a drop and not an empty population",
+               any(e["kind"] == "idle" for e in m["timeline"])
+               and len(model.owner_positions["turns"]) == len(fx["owners"]) and bool(model.tools),
+               str(sorted({str(e["kind"]) for e in m["timeline"]})))
 
 
 # The Summary facts whose counts the model derives from the transcripts (TOOL-dLoggedFlight-9 S4).
@@ -4871,8 +4970,11 @@ def test_record_ac10_unknown_counts():
     """AC10 (M6, and the render half of M3, of the closing review, round 1). With no transcript on the
     machine the landed run's owner-turn, usage and attributed-calls counts render `-`, never the zero
     the model holds for what it never read; with its session's extract, made by the real extractor,
-    they render as integers, and so they do with a second session named and not local, `partial`. A
-    `--close` END reading `exit=unclean` renders `-` in its Timeline row's `rc`, and `exit=clean` its 0."""
+    they render as integers, and so they do with a second session named and not local, `partial`.
+
+    Its `--close` verb row half retired with the journal-timed rows (TOOL-dLoggedFlight-22 S5): a
+    killed END's `rc` had nowhere left to render, and `derive_clean_rc` went with it. Every count
+    assertion here stands unedited, which is what TOOL-dLoggedFlight-16 AC4 pins."""
     fx = build_landed_fixture()
     repo = fx["repo"]
     # An owner's heartbeat from a second session, in the primary tree, names a session with no extract.
@@ -4910,13 +5012,6 @@ def test_record_ac10_unknown_counts():
     check_true("record AC10 liveness: the known render holds a non-zero owner turn and non-zero calls, so a "
                "- in their place would differ", model.owner_positions["counts"]["in-window"] == 1
                and model.attribution["calls"] > 0, str((model.owner_positions["counts"], model.attribution["calls"])))
-    for exit_, want in (("unclean", "-"), ("clean", "0")):
-        krepo, kj, kstore = build_killed_close_fixture(exit_)
-        rows = [r for r in scan_record_rows(rl_record.render_record(build_model(krepo, journals=kj, store=kstore),
-                                                                    "memory"))
-                if len(r) == 7 and r[2] == "verb" and r[3] == "--close"]
-        check(f"record AC10: a --close END reading rc=0 and exit={exit_} renders rc {want} on the Timeline",
-              [r[5] for r in rows], [want])
 
 
 # ================================================================ extract freshness (TOOL-dLoggedFlight-16)
@@ -5045,7 +5140,7 @@ def test_fresh_ac4_three_shapes():
         counts[name] = sorted({c for label in TRANSCRIPT_FACTS for c in read_fact_counts(text, label)})
         facts = parse_record_markdown(text).get("Coverage", {}).get("facts", {})
         idle[name] = facts.get("idle gaps", "").split(" · ")[0]
-        rows[name] = [r[2] for r in scan_record_rows(text) if len(r) == 6 and r[1] == "transcripts"]
+        rows[name] = [r[2] for r in scan_record_rows(text) if len(r) == 5 and r[1] == "transcripts"]
     states = {name: m.coverage["transcripts"]["state"] for name, m in models.items()}
     check("fresh AC4: the short, field-less and mixed models read stale, the one with a session missing "
           "partial, and the fresh one present",
@@ -5451,11 +5546,15 @@ def build_placement_models():
 
 
 def parse_floor_raise(text):
-    """`(from, to, block)` of the NEWEST `ASSERTION_FLOOR` raise in this suite's own source: the two
-    figures its line names and the comment block it opens, or None where no raise is written."""
+    """`(from, to, block)` of the NEWEST `ASSERTION_FLOOR` move in this suite's own source: the two
+    figures its line names and the comment block it opens, or None where no move is written.
+
+    A move is RAISED or LOWERED (TOOL-dLoggedFlight-22 S6): a unit that retires an arm moves the floor
+    DOWN, and a reader that knew only one direction would read the last raise before it as the newest
+    and grade a figure nothing declares."""
     lines = text.split("\n")
     hits = [(i, m) for i, ln in enumerate(lines)
-            for m in [re.fullmatch(r"# RAISED ([0-9]+) -> ([0-9]+) by (.*)", ln)] if m]
+            for m in [re.fullmatch(r"# (?:RAISED|LOWERED) ([0-9]+) -> ([0-9]+) by (.*)", ln)] if m]
     if not hits:
         return None
     i, m = hits[-1]
@@ -5537,15 +5636,18 @@ def test_record_placement_windows():
     check("record AC2: no arm re-renders a model with an edited window any more",
           "window=" + "dict(m[" + '"window"' + "]" in src, False)
     raised = parse_floor_raise(src)
-    check("record AC2: the newest floor raise names this unit and reaches the declared floor",
+    # The unit id is READ, never typed (TOOL-dLoggedFlight-22 S5): this arm pinned its own id, and the
+    # next unit to move the floor left the pin behind — the reader-by-value class one level up.
+    check("record AC2: the newest floor raise reaches the declared floor and names the unit that made it",
           (raised is not None and raised[1] == ASSERTION_FLOOR,
-           raised is not None and "TOOL-dLoggedFlight-25" in raised[2]), (True, True))
-    sums = re.findall(r"((?:[0-9]+ [+-] )+[0-9]+) = ([0-9]+)", raised[2] if raised else "")
+           raised is not None and re.search(r"by [A-Z]+-[A-Za-z]+-[0-9]+[,:]", raised[2]) is not None),
+          (True, True))
+    sums = re.findall(r"((?:[0-9]+ [+-] )+[0-9]+) = (-?[0-9]+)", raised[2] if raised else "")
     got = None
     if sums:
         expr, total = sums[-1]
         got = (sum(int(p) for p in expr.replace(" - ", " + -").split(" + ")), int(total))
-    check("record AC2: and the newest raise's own arithmetic reaches the figure it moves the floor by",
+    check("record AC2: and the newest move's own arithmetic reaches the figure it moves the floor by",
           got, (raised[1] - raised[0],) * 2 if raised else None)
     bare = {k: v for k, v in dataclasses.asdict(models["landed"]["model"]).items()
             if k != "record_window"}
@@ -5722,21 +5824,35 @@ def test_schema_ac1_render_then_grade():
     check_true("schema AC1: ...with nothing refused", " · 0 refused · " in r.stdout, r.stdout[-400:])
     cells = read_record_cells(fx["clean"].decode("utf-8"))
     sch = rl_record.RECORD_SCHEMA
-    missing = [f"{name} {v}" for name in ("event", "source", "coverage-state", "ledger-source", "gate-verdict",
-                                          "push-decision", "conformance-item", "conformance-state", "anomaly-kind",
-                                          "merged-subclass", "review-verdict", "review-exit", "unit-status",
-                                          "yes-no", "owner-position")
-               for v in sch["vocab"][name] if v not in cells]
-    check("schema AC1 liveness: the graded record carries every member of every closed vocabulary", missing, [])
+    # THE VOCABULARIES A TABLE COLUMN OR A ROW LAYOUT DECLARES, read from the schema and never typed
+    # (TOOL-dLoggedFlight-22 S5). ONE record carries one `window closed by`, so a vocabulary only a
+    # Summary fact carries cannot be reached here at all; `test_record_ac4_classes` reaches those
+    # across three renders.
+    named = sorted({cls for sec in sch["sections"].values() for tb in sec["tables"]
+                    for cls in (tuple(tb.get("cols") or ())
+                                + tuple(c for row in (tb.get("rows") or {}).values() for c in row))
+                    if cls in sch["vocab"]})
+    missing = [f"{name} {v}" for name in named for v in sch["vocab"][name] if v not in cells]
+    check("schema AC1 liveness: the graded record carries every member of every closed vocabulary a "
+          "table column or a row layout declares", missing, [])
+    check_true("schema AC1 liveness: that list is derived and is a PROPER subset of the schema's "
+               "vocabularies, so a fact-only one is not silently counted as reached here",
+               set(named) < set(sch["vocab"]) and len(named) > 5, str(named))
+    # THE UUID CARRIER is a ledger entry whose `ref` names a file segment that is a lowercase UUID,
+    # which the `ref` class admits (TOOL-dLoggedFlight-22 S5). It rode a workflow row's `label` until
+    # that row and that class retired.
     m = dict(fx["m"])
-    m["timeline"] = sorted(fx["m"]["timeline"] + [{"t": float(derive_minute(12)) + 35, "source": "transcripts",
-                                                   "kind": "workflow", "label": FX_SID_B}], key=lambda e: e["t"])
+    ref = f"memory/builds/{FX_SLUG}/build/{FX_SID_B}.md"
+    led = fx["m"]["ledger"]
+    m["ledger"] = dict(led, entries=list(led["entries"]) + [{"source": "decision", "ref": ref}])
     held = rl_record.render_record(m, "memory")
-    check_true("schema S5 liveness: the label class alone admits a lowercase UUID",
-               re.fullmatch(sch["shaped"]["label"], FX_SID_B) is not None)
+    graders = rl_record.build_record_checks(FX_SLUG, "memory", [u["id"] for u in m["units"] if u.get("id")])
+    check("schema S5 liveness: the ref class admits that path and refuses a free name, so the UUID "
+          "reaches the renderer through a class rather than past one",
+          (bool(graders["ref"][1](ref)), bool(graders["ref"][1]("not a ref"))), (True, False))
     # The builder's placements plus the one carrier this arm adds above (TOOL-dLoggedFlight-26 S3): the
-    # count follows a placement the builder moves or drops, and the `+ 1` is the UUID label alone.
-    check("schema S5: the renderer withholds a UUID-shaped label and counts it",
+    # count follows a placement the builder moves or drops, and the `+ 1` is the UUID ref alone.
+    check("schema S5: the renderer withholds a UUID-shaped ref and counts it",
           (FX_SID_B in held, f"- values withheld: {len(fx['placed']) + 1}\n" in held), (False, True))
     real = rl_record.build_forbidden
     rl_record.build_forbidden = lambda: ()
@@ -5770,18 +5886,23 @@ def test_schema_ac2_refusals():
     def check_run_state_line(ln):
         return ln.startswith("- run-state: ")
 
-    def check_workflow_row(ln):
-        return ln.startswith("| ") and " | transcripts | workflow | tier2-review |" in ln
+    review_ref = f"memory/builds/{FX_SLUG}/reviews/r0.md:3"
 
-    uuid_text, uuid_line = build_variant(clean, check_workflow_row, lambda ln: ln.replace("tier2-review", FX_SID))
+    def check_review_ref_row(ln):
+        return ln.startswith("| ") and f"| {review_ref} |" in ln
+
+    # THE UUID AND THE ESCAPE BOTH RIDE THAT LEDGER ENTRY'S `ref` (TOOL-dLoggedFlight-22 S5): the
+    # workflow row they rode retired with the transcript-timed kinds.
+    uuid_text, uuid_line = build_variant(clean, check_review_ref_row,
+                                         lambda ln: ln.replace("/reviews/r0.md", f"/reviews/{FX_SID}.md"))
     free_text, free_line = build_variant(clean, check_run_state_line,
                                          lambda ln: ln + "\nthe run skipped the bar because it was late")
     variants = [
         ("headings", build_variant(clean, lambda ln: ln == "## Units", lambda ln: "## Decisions")),
         ("first-cell", build_variant(clean, lambda ln: ln.startswith("| 1 | decision | "),
                                      lambda ln: "| " + FX_UNIT1 + ln[len("| 1"):])),
-        ("cell", build_variant(clean, lambda ln: " | driver | verb | --preflight |" in ln,
-                               lambda ln: ln.replace(" | driver | ", " | drivers | "))),
+        ("cell", build_variant(clean, lambda ln: ln.startswith("| ") and " | git | commit | " in ln,
+                               lambda ln: ln.replace(" | git | ", " | gits | "))),
         ("absolute-path posix", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + home)),
         ("absolute-path drive", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + drive)),
         ("absolute-path unc", build_variant(clean, check_run_state_line, lambda ln: "- run-state: " + unc)),
@@ -5789,8 +5910,8 @@ def test_schema_ac2_refusals():
         ("data not-json", build_variant(clean, lambda ln: ln == '{"schema":1,"sections":{', lambda ln: ln + "{")),
         ("data extra-key", build_variant(clean, lambda ln: ln.startswith('"Units":{"facts":'),
                                          lambda ln: ln.replace('"Units":{', '"Units":{"note":"x",', 1))),
-        ("data escape", build_variant(clean, lambda ln: ln.startswith("[") and '"workflow","tier2-review"' in ln,
-                                      lambda ln: ln.replace("tier2-review", "tier2\\u002dreview"))),
+        ("data escape", build_variant(clean, lambda ln: ln.startswith("[") and f'"{review_ref}"' in ln,
+                                      lambda ln: ln.replace("/reviews/", "/review\\u0073/"))),
         ("serves other-build", build_variant(clean, lambda ln: ln.startswith("**Serves:** "),
                                              lambda ln: "**Serves:** journal " + other)),
         ("serves undefined-id", build_variant(clean, lambda ln: ln.startswith("**Serves:** "),
@@ -5824,7 +5945,7 @@ def test_schema_ac2_refusals():
                    f"{found[:8]} {r.stdout[-300:]}")
     write_staged(repo, rel, uuid_text.encode("utf-8"))
     found = read_refusals(run_cli(["check-records"], repo).stdout)
-    check("schema AC2 uuid: the label class admitted the UUID, so only the shape rule refuses its line",
+    check("schema AC2 uuid: the ref class admitted the UUID, so only the shape rule refuses its line",
           sorted(rule_ for ln, rule_ in found if ln == uuid_line), ["uuid"])
     # A name the glob admits and the renderer would never write, beside the clean record.
     folder = rel.rsplit("/", 1)[0]
