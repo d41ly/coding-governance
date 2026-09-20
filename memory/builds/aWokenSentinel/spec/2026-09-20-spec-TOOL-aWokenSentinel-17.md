@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-17 — the driver suite reads `--status` by FIELD: one extraction helper armed on a suffixed line, and a one-line assertion armed against a two-line driver
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 16
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 12513c25 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-17-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-17-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-17-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-17-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 |
 
@@ -103,10 +104,12 @@ which is the other half of why the count is this and not that.
 
 `sed -n 's/.*· next //p'` prints only the line carrying the field, so a NOTE line that reached the
 input through `run`'s `2>&1` is dropped rather than mangled; the second `sed` cuts at the first
-` · ` after the value, which is the separator every suffix uses and the value never contains — a
-unit id is `[A-Za-z0-9-]` by the driver's own spelling. On a line with no suffix the cut matches
-nothing and the output is what the raw reader printed, which is why the `:1874` arm's expected value
-does not move.
+` · ` after the value, which is the separator every suffix uses and the value never contains. The
+value is the roster row's LABEL as the README's units pair spells it, `<id> — <title>` (measured at
+the pass: `ARCH-tRun-1 — the unit`), whose joiner is an em dash and not the middle dot, so the cut
+leaves the title in place — and the `want_unit` control derives the same label. On a line with no
+suffix the cut matches nothing and the output is what the raw reader printed, which is why the
+`:1874` arm's expected value does not move.
 
 ### Why the one-line assertion drops stderr
 
@@ -165,7 +168,9 @@ reaching its status `printf`, writes nothing to stdout, and reads `0` here for t
   `printf '%s'`, which reds as loudly as `2` and is AC2's third reading.
 - observability — each helper's `same` names the slug and the count.
 - risks — a future suffix whose VALUE contains ` · ` would be cut early; no field prints one, and
-  the field grammar unit 9 states forbids it.
+  the field grammar unit 9 states forbids it. A roster TITLE carrying ` · ` would be cut early
+  too; none in this tree does, and the awk control shares the exposure, so the arm would red
+  rather than pass wrong.
 - testing — §6; two arms and one edited reader, seconds each.
 - migration — N/A.
 - user docs — none; the helpers' comments.
@@ -216,6 +221,12 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-21 · §4 · §5 · folded at the pass: §4 said the `next` value is a bare unit id in
+  `[A-Za-z0-9-]`; the driver prints the roster row's label, `<id> — <title>`, and the pass measured
+  `ARCH-tRun-1 — the unit`. The cut holds because the label's joiner is an em dash, and §5 names
+  the title as the other place ` · ` could appear. No design change; the helpers are §4's bodies
+  verbatim, the AC4 reading is a permanent arm beside the two S4 names, and the executed count is
+  seven.
 - rev-2 · 2026-09-20 · S2 · §3 · §4 · §5 · AC2 · §7 · folded spec-audit round 3: sibling agreement
   for the promoted `TOOL-aWokenSentinel-23` (H3, raw 28) — `check_status_one_line` counts with
   `printf '%s' "$_o" | grep -c ''`, so an empty capture reads `0`, §5's empty-state sentence is

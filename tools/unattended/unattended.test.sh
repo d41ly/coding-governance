@@ -69,6 +69,26 @@ n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; echo "     GOT: $(printf '%s' "$1" | head -c 400)"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
+# TOOL-aWokenSentinel-17 — the `--status` line is read by FIELD, never as "everything after
+# `next `". The driver's printf takes `$parked` LAST, so every suffix — parked, noted, STALE briefs,
+# briefs gone, resume-tick — prints AFTER `next`, and a whole-line reader survives only on a fixture
+# that accumulates none (round-2 audit H2). `sed -n … p` prints only the line carrying the field, so a
+# NOTE that reached the input through `run`'s 2>&1 is dropped rather than mangled; the second cut
+# stops at the first ` · ` after the value, the separator every suffix uses and no unit id contains.
+extract_next() { # status-line -> the `next` field's value, cut at the next separator
+  printf '%s\n' "$1" | sed -n 's/.*· next //p' | sed 's/ · .*//'
+}
+# The header's `# one line` promise is about STDOUT: the driver legitimately NOTEs to stderr when
+# the conf declares no bound, so counting `run`'s merged output would grade the fixture's conf.
+# `grep -c ''` over `printf '%s'` reads an EMPTY capture as 0, where `printf '%s\n' … | wc -l` reads
+# it as 1 — which is how a verb that wrote NOTHING passed as one line (round-3 audit H3). Call it in
+# the MAIN shell with stdout sent to a file: a `$( )` capture runs the `same` in a subshell and
+# loses its verdict, and the line it prints is for the caller to read back from that file.
+check_status_one_line() { # slug -> asserts --status wrote exactly one stdout line; prints it
+  local _o; _o=$(bash "$SCRIPT" --status "$1" 2>/dev/null)
+  same "--status $1 is one stdout line" "$(printf '%s' "$_o" | grep -c '')" "1"
+  printf '%s\n' "$_o"
+}
 
 # ---- TOOL-dRetiredFork-9 S3: a `_`-prefixed subfolder under spec/ is NOT a spec -------------------
 # Absorbed from NicoCares `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
@@ -1879,7 +1899,35 @@ same "--status names a non-terminal unit through the extracted helper" "$(run --
 # proof of the defect.
 want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->/{f=0} f' memory/builds/tRun/README.md | grep -E '^\| \[.*\]\(spec/' | grep -vE '\| (CLOSED|WONTDO) \|' | head -1 | sed -e 's/^| \[//' -e 's/\](spec\/.*//')
 same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
-same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
+same "--status selects the same first row through the extracted helper" "$(extract_next "$(run --status tRun)")" "$want_unit"
+
+# ---- TOOL-aWokenSentinel-17 S4 / AC1: the reader above yields the id only because ITS fixture
+# ---- carries no suffix. One parked row makes the line end `· next <unit> · parked 1`, and the raw
+# ---- `sed 's/.*· next //'` it used to read through yields `<unit> · parked 1`; `extract_next` cuts
+# ---- at the separator. The control is `want_unit`, the same awk derivation the reader above
+# ---- compares against. RED against the helper reduced to the raw sed: the id, then ` · parked 1`.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+run --park tRun --item x --reason y >/dev/null
+s17=$(run --status tRun)
+hit "$s17" "· parked 1"
+same "AC1 extract_next cuts the next field under a parked suffix" "$(extract_next "$s17")" "$want_unit"
+# ---- AC2: exactly ONE stdout line, through `check_status_one_line`. RED against a driver copy
+# ---- with `printf 'x\n'` after the status printf (reads 2) and against one with the status printf
+# ---- deleted (reads 0), each copied WITH lib-unattended.sh beside it — the `stripped.sh` idiom
+# ---- below, not the lib-less L2 one — so the count is the verb's stdout and not the
+# ---- missing-library refusal's. The line it printed is read back from the file and cut the same
+# ---- way, so the helper is shown to hand its caller the line it counted.
+check_status_one_line tRun > "$TMP/s17.line"
+grep '^FAIL' "$TMP/s17.line" || true
+same "AC2 the helper prints the line it counted" "$(extract_next "$(cat "$TMP/s17.line")")" "$want_unit"
+# ---- AC4: with GATE_BOUND deleted from the conf the driver NOTEs to stderr. That is not the
+# ---- promise the header makes about stdout, and the count still reads 1 — a count over `run`'s
+# ---- merged output would red here and pass on a conf that declares everything.
+mutate .unattended.conf '/^GATE_BOUND=/d'
+hit "$(run --status tRun)" "declares no GATE_BOUND"
+check_status_one_line tRun > "$TMP/s17.line"
+grep '^FAIL' "$TMP/s17.line" || true
 
 # ---- TOOL-aWokenSentinel-5 S8 / AC9: the resume tick's attempts are a FIELD on the one status
 # ---- line, printed only when the sidecar holds a line. Absent, the line is byte-identical to what
@@ -6026,7 +6074,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=910
+FLOOR_ASSERTIONS=917
+# RAISED 910 -> 917 by TOOL-aWokenSentinel-17: the field-wise `--status` reader arms (7) in region
+# two beside the extraction arms, measured by running that block alone over the sourced prologue:
+# n 23 -> 30 on node `a`.
 # RAISED 904 -> 910 by TOOL-aWokenSentinel-5: the `--status` resume-tick field arm (6), in region
 # two beside the extraction arms, measured by running that block alone over the sourced prologue:
 # n 20 -> 26 on node `a`.
@@ -6082,7 +6133,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=714
+FLOOR_SHARD_2=721
+# +7 for the TOOL-aWokenSentinel-17 field-wise `--status` reader arms, in region two beside the
+# extraction arms.
 # +6 for the TOOL-aWokenSentinel-5 `--status` resume-tick field arm, in region two beside the
 # extraction arms.
 # +6 for the TOOL-aWokenSentinel-16 marker arms, in region two's lander-marker block.
