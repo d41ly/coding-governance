@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-8
+unpushed-at-landing: 0
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
-witness: 84383ffd78a1e8fee9207b15d1f050b68a0e339e
-phase: LANDING
+witness: bb7c9403dbd2918dd086325d0a60d628fcb1ef34
+phase: LANDED
 mode: slug
 anchor-kind: default-branch
 keepalive: 62177af0
