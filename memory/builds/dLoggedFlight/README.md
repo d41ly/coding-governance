@@ -87,7 +87,7 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 18 | `TOOL-dLoggedFlight-18` | WONTDO | an owner-causable journal line sets neither the window's rendered end nor the commitment's times |
 | 19 | `TOOL-dLoggedFlight-19` | WONTDO | every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes |
 | 20 | `TOOL-dLoggedFlight-20` | MISSING | the committed record carries no time a journal or transcript produced |
-| 21 | `TOOL-dLoggedFlight-21` | MISSING | the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines |
+| 21 | `TOOL-dLoggedFlight-21` | CLOSED | the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines |
 | 22 | `TOOL-dLoggedFlight-22` | MISSING | the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name |
 | 23 | `TOOL-dLoggedFlight-23` | MISSING | one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot |
 | 24 | `TOOL-dLoggedFlight-24` | MISSING | the Summary window and its duration render the git-only window the schema leg derives |
@@ -125,7 +125,7 @@ ids TOOL-dLoggedFlight-27
 | [TOOL-dLoggedFlight-15 — a row an owner act can cause carries no time that places the act](spec/2026-09-16-spec-TOOL-dLoggedFlight-15.md) | 17 | 2 | WONTDO | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-18 — an owner-causable journal line sets neither the window's rendered end nor the commitment's times](spec/2026-09-16-spec-TOOL-dLoggedFlight-18.md) | 18 | 2 | WONTDO | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-19 — every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes](spec/2026-09-16-spec-TOOL-dLoggedFlight-19.md) | 19 | 2 | WONTDO | rev-1 | 2026-09-16 |
-| [TOOL-dLoggedFlight-21 — the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines](spec/2026-09-16-spec-TOOL-dLoggedFlight-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-dLoggedFlight-21 — the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines](spec/2026-09-16-spec-TOOL-dLoggedFlight-21.md) | 21 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-24 — the Summary window and its duration render the git-only window the schema leg derives](spec/2026-09-16-spec-TOOL-dLoggedFlight-24.md) | 22 | 2 | SPECCED | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements](spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps](spec/2026-09-16-spec-TOOL-dLoggedFlight-26.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-16 |
@@ -135,7 +135,7 @@ ids TOOL-dLoggedFlight-27
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 28 | 2 | SPECCED | rev-2 | 2026-09-16 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 
