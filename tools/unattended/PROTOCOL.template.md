@@ -472,6 +472,7 @@ where this document says it may:
 | `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
+| `UNDECLARED_WRITE_CEILING` | the shrink-only CEILING on dispatched passes that committed outside the set they declared before dispatch. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. The count may FALL and never RISE, and a fall is ANNOUNCED rather than red — this population is derived from history reachability, not from a file listing, so a clone that cannot reach a group anchor legitimately grades fewer rows. Lowering the pin is a hand edit; an adopter's value is 0 |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
