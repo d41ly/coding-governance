@@ -82,7 +82,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 
 ### Edges
 
-- **consumes-from** `TOOL-dLoggedFlight-9` — `render_record`, `RECORD_SCHEMA` and `TIMELINE_EDGE`.
+- **consumes-from** `TOOL-dLoggedFlight-9` — `RECORD_SCHEMA`, `TIMELINE_EDGE`, and the render's
+  own three seams, `build_record_parts`, `build_record_doc` and `render_markdown`, which AC1
+  drives in place of `render_record` so that a staged fact reaches the twin too.
 - **consumes-from** `TOOL-dLoggedFlight-20` — `time_classes`, `TIME_SOURCES` and `scan_time_slots`.
 - **consumes-from** `TOOL-dLoggedFlight-21` — the commitment line, which carries no time token.
 - **consumes-from** `TOOL-dLoggedFlight-22` — the kept Timeline rows and the tables with no time
@@ -135,12 +137,14 @@ enumerate which sums are legitimate.
 ## 5. Production-readiness checklist
 
 - security — every time-bearing token of a render is held to a public source by one arm.
-- perf / scale — one render of one fixture; no git call beyond the fixture's model build.
+- perf / scale — one fixture, rendered once clean and once per staged break, and two git calls of
+  the arm's own to read the public times back off that fixture.
 - error / empty / loading states — a slot that rendered nothing reds by name rather than passing empty.
 - observability — each failure names the slot, the class or the token's line.
 - risks — a sentinel chosen near a public sum or difference would make a staged break invisible or fail
   the arm, which S2's pre-check refuses first.
-- testing — each AC staged RED on a copy of the fixture model or of the schema.
+- testing — each AC staged RED on a copy of the fixture model, of the rendered summary, or of the
+  schema, the last of these in place and restored, per AC1.
 - migration — N/A — test code only.
 - user docs — the kit README's record section names the arm.
 
@@ -205,7 +209,10 @@ none
   the staged duration is the journal window's END less the rendered start, which is the sum a
   reader adds to recover a withheld bound — B1's own shape — rather than that window's own span,
   which no rendered start joins. §7 records the floor the arm's 26 checks and their 3 decoy checks
-  move: 1422 to 1451.
+  move: 1422 to 1451. The bug-class checklist over the build commit then named two more halves
+  the amendment had left standing — §3's edge to `TOOL-dLoggedFlight-9` and §5's perf and
+  testing lines — and `naming-leg-grades-what-python-named`, which grades nested helpers, so
+  the sentinel minter is `add_sentinel` rather than leading with a verb the table lacks.
 
 ## 10. Reuse audit
 

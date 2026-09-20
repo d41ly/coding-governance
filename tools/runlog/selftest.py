@@ -5341,7 +5341,7 @@ def build_sentinel_model():
     clocks = {time.strftime("%H:%M:%S", time.gmtime(t)) for t in pub}
     sent, cand = [], float(max(pub)) + 86400.0
 
-    def next_sentinel():
+    def add_sentinel():
         nonlocal cand
         while True:
             cand += 7919.0
@@ -5356,12 +5356,12 @@ def build_sentinel_model():
     # event that triggered it, which `build_anomaly_rows` says the record does not carry.
     for e in m["timeline"]:
         if e.get("kind") in rl_record.RETIRED_EVENTS or e.get("kind") == "owner":
-            e["t"] = next_sentinel()
-    journal = [dict(RETIRED_FIELDS[k], kind=k, t=next_sentinel()) for k in rl_record.RETIRED_EVENTS]
-    journal.append({"t": next_sentinel(), "source": "transcripts", "kind": "owner", "via": "typed"})
-    m["window"] = dict(m["window"], start=next_sentinel(), end=next_sentinel())
+            e["t"] = add_sentinel()
+    journal = [dict(RETIRED_FIELDS[k], kind=k, t=add_sentinel()) for k in rl_record.RETIRED_EVENTS]
+    journal.append({"t": add_sentinel(), "source": "transcripts", "kind": "owner", "via": "typed"})
+    m["window"] = dict(m["window"], start=add_sentinel(), end=add_sentinel())
     m["anomalies"] = [{"kind": k, "subclass": "other" if k == "nonterminal-merged" else None,
-                       "t": next_sentinel(), "evidence": "e"} for k in rl_model.ANOMALY_KINDS]
+                       "t": add_sentinel(), "evidence": "e"} for k in rl_model.ANOMALY_KINDS]
     # THE KEPT ROWS, one of every kind the schema declares a layout for, cycled so each reaches both
     # the head and the tail table, and each at a time read back off the fixture rather than invented.
     declared = rl_record.derive_table("Timeline", "events")["rows"]
