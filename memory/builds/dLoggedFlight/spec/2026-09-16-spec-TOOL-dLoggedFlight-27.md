@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-27 — the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 26
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
@@ -92,6 +92,13 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   already covers `tools/runlog/**`. NOT OBSERVED: prose. What the `codebase-map coverage + freshness`
   leg grades at the close is that the regenerated map artifacts are committed in the same commit,
   which is a different assertion and is worth stating as itself.
+- **S8** The real-model arm. `test_record_ac1_real_model` renders the idle fixture's model twice —
+  once whole, once with every retired kind taken off its timeline — and asserts that the two
+  Timelines are EQUAL. This unit's fact is the one Timeline value those two renders must DIFFER on,
+  so that comparison narrows to the Timeline's tables and its `events` count, which still may not
+  move, and gains the assertion that `withheld rows` does. That is the fact's liveness over a REAL
+  model, and the arm was found by VALUE rather than by name: nothing in it spells the fact's label.
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -139,7 +146,12 @@ nobody made, so the population is now spelled in §3 by name.
 | identifier | kind | cell |
 |---|---|---|
 | `count_sources` | schema key | `RECORD_SCHEMA` |
+| `RETIRED_SOURCES` | module constant | `record.py`, beside `RETIRED_EVENTS` |
 | `check_count_sources` | function | `py.function`, led by `check` |
+| `derive_int_slots` | function | `py.function`, led by `derive` |
+| `derive_counted_sources` | function | `py.function`, led by `derive` |
+| `build_counted_values` | function | `py.function`, led by `build` |
+| `build_withheld_template` | function | `py.function`, led by `build` |
 | `withheld rows` | Timeline fact label | `RECORD_SCHEMA` fact template |
 
 ### Files touched (estimate)
@@ -203,6 +215,11 @@ regenerated map.
 - **AC5** — When `test_record_model_fields` renders its model, `withheld rows` reads that model's
   `workflow` event count where its transcripts read a state in `COUNTED_STATES`, and `-` otherwise.
   Red when: the value differs from the one read from the model, or the arm types it.
+- **AC6** — When `test_record_ac1_real_model` renders the idle fixture's model and the same model
+  with every retired kind taken off its timeline, the Timeline's tables and its `events` count are
+  equal across the two renders and their `withheld rows` facts differ.
+  Red when: a table or the event count moves, or the two `withheld rows` facts are equal.
+  figure: DERIVED — both values are read off the two renders at observation time.
 
 ## 7. Gates
 
@@ -231,6 +248,11 @@ New arm: `tools/runlog/selftest.py` · AC2's renderer copy ignoring `gate`'s ent
   driver journal join S2's declaration, S5 derives them, §3 names the excluded population by fact
   instead of misdescribing it, and S4 prints every undeclared `{int}` slot as an inventory; M4, S7
   stops saying a dossier CLAIMS a Python symbol and states what the map leg actually grades.
+- rev-3 · 2026-09-20 · S8 · AC6 · §2 Inventory · the build pass. Inventorying the readers of the
+  counts this unit adds, as rev-2's own §9 asks, turned up one more found by VALUE:
+  `test_record_ac1_real_model` compares two whole rendered Timelines, so the fact makes an arm that
+  spells neither `withheld rows` nor `count_sources` red. S8 narrows that comparison and turns the
+  difference into the fact's liveness over a real model; AC6 observes it.
 
 ## 10. Reuse audit
 

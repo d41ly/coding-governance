@@ -98,6 +98,16 @@ TIMELINE_EVENTS = ("phase", "commit", "merge", "dispatch", "brief")
 # withheld`; `TOOL-dLoggedFlight-27`'s `withheld rows` fact counts these per kind from a declared
 # source. The local model keeps every one of them.
 RETIRED_EVENTS = ("verb", "push", "push-refused", "gate", "compact", "limit", "idle", "workflow")
+# WHERE EACH RETIRED KIND'S COUNT COMES FROM (spec S2 of TOOL-dLoggedFlight-27). A retired kind is
+# still on the model's timeline, and the `withheld rows` fact counts it in place of the rows; a count
+# from a source the model never read is UNKNOWN and renders `-`, so the source is declared here and
+# `count_sources` below reads this table by position. `idle` names the model's idle JUDGEMENT rather
+# than a coverage state: its events exist only where the gaps were judged at all. A kind added to
+# `RETIRED_EVENTS` with no entry here leaves its slot undeclared, which `check_count_sources` refuses
+# rather than crashing on, so the declaration is what reds and not the import.
+RETIRED_SOURCES = {"verb": "driver", "push": "pushes", "push-refused": "pushes", "gate": "gates",
+                   "compact": "transcripts", "limit": "transcripts", "idle": "idle",
+                   "workflow": "transcripts"}
 EXCLUDED_KINDS = tuple(k for k in mdl.PARK_KINDS if k not in mdl.PARK_KINDS_OWED)
 USAGE_FIELDS = ("requests", "in", "out", "cache_read", "cache_write")
 # The transcripts' coverage states under which a count the model derives from them is KNOWN (spec S4).
@@ -116,6 +126,17 @@ COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+)")
 # mapped fact and re-parses it with its own parser, so the disagreement reds in code rather than
 # waiting for a reader to cross-read two documents.
 TEMPLATE_PARSERS = {"commitment": COMMITMENT_RE}
+
+
+def build_withheld_template(kinds) -> str:
+    """The `withheld rows` fact's template: each kind of row no record carries, followed by its count.
+
+    Defined here rather than inline because the schema and a staged copy of it must be able to build
+    the template from two different kind lists — a copy whose list gained a member is how AC4 proves
+    that a new retired kind reds until its source is declared.
+    """
+    return " · ".join(f"{k} {{int}}" for k in kinds)
+
 
 _PATH_SEG = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 _PATH = r"<root>/builds/<slug>/(?:" + _PATH_SEG + r"/)*" + _PATH_SEG + r"\.md"
@@ -199,6 +220,10 @@ RECORD_SCHEMA = {
             "facts": (
                 ("events", ("{int} · shown {int} · elided {int}",)),
                 ("elided", ("{int} events from {utc} to {utc}",)),
+                # WHAT THE RETIRED KINDS DID, in place of the rows no record carries (spec S1 of
+                # TOOL-dLoggedFlight-27). One count per member of `RETIRED_EVENTS`, in that
+                # constant's order, each from the source `count_sources` declares for it.
+                ("withheld rows", (build_withheld_template(RETIRED_EVENTS),)),
             ),
             "tables": (
                 {"name": "events", "header": ("UTC", "source", "event", "value", "phase", "rc", "more"),
@@ -277,6 +302,35 @@ RECORD_SCHEMA = {
             ),
         },
         "Data": {"facts": (), "tables": ()},
+    },
+    # WHICH SOURCE EACH `{int}` SLOT IS COUNTED FROM (spec S2 of TOOL-dLoggedFlight-27), keyed
+    # `(section, label, the nth {int} slot of the fact's template)`. A slot whose source the model
+    # did not read renders `-`: a count from a source nobody read is UNKNOWN, never the zero that
+    # reads clean, and that rule is now DECLARED once instead of hand-written per fact — two
+    # hand-written tests of one rule is how the rule drifts between them. A source is one of the
+    # model's own `SOURCE_NAMES`, or `idle`, which names the model's idle judgement.
+    #
+    # WHAT IS DELIBERATELY ABSENT: every `{int}` slot whose source cannot read unknown — the counts
+    # off git, the run-state file and the build folder. That population is not described in prose
+    # here, because a description of a derived set rots; `check_count_sources` PRINTS it on every
+    # run, so a newly undeclared count shows up in a diff instead.
+    "count_sources": {
+        **{("Timeline", "withheld rows", i): RETIRED_SOURCES[k]
+           for i, k in enumerate(RETIRED_EVENTS) if k in RETIRED_SOURCES},
+        **{("Summary", label, i): "transcripts"
+           for label, slots in (("owner turns", len(mdl.OWNER_POSITIONS)),
+                                ("usage main", len(USAGE_FIELDS)),
+                                ("usage agent", len(USAGE_FIELDS)),
+                                ("usage workflow", len(USAGE_FIELDS)),
+                                ("attributed calls", 2))
+           for i in range(slots)},
+        ("Coverage", "sessions", 0): "transcripts",
+        ("Coverage", "sessions", 1): "transcripts",
+        # The join these two count is `derive_journal_join` over the driver journal's own
+        # invocations, so the driver's coverage state is what says whether anybody counted them.
+        ("Coverage", "journal starts", 0): "driver",
+        ("Coverage", "journal starts", 1): "driver",
+        ("Coverage", "unjoined starts", 0): "driver",
     },
     # SHAPES NO RECORD MAY CARRY ANYWHERE, whatever class a value passed (TOOL-dLoggedFlight-10 S5).
     # The renderer withholds a value one of these finds, and the schema leg refuses a record in whose
@@ -410,6 +464,96 @@ def derive_table(section, name) -> dict:
         if table["name"] == name:
             return table
     raise KeyError(f"runlog: {section} declares no table {name!r}")
+
+
+# ------------------------------------------------------------------- an unknown count is `-`
+
+def derive_int_slots(schema) -> dict:
+    """`{(section, label): (placeholder positions of its `{int}` slots)}` over every fact `schema`
+    declares — the population `count_sources` keys into, derived from the templates themselves so a
+    fact that gains or loses a count slot moves this map rather than stranding a figure beside it.
+
+    The FIRST template alone: a fact's alternative carries no value slot at all (the commitment's
+    `none`), so a count can only ever be filled from the first.
+    """
+    out = {}
+    for section, spec in schema["sections"].items():
+        for label, templates in spec["facts"]:
+            classes = PLACEHOLDER_RE.split(templates[0])[1::2] if templates else []
+            out[(section, label)] = tuple(i for i, cls in enumerate(classes) if cls == "int")
+    return out
+
+
+def derive_counted_sources(m) -> frozenset:
+    """The declared count sources this model READ, so a count from one of them is a measurement.
+
+    A source is read when its coverage state is in `COUNTED_STATES`. `idle` is the one member that is
+    not a source at all but a JUDGEMENT, and it is NARROWER than `COUNTED_STATES` by exactly one
+    state: it needs the transcripts `present`, while a counted slot admits `partial` too. That
+    asymmetry is deliberate (spec S2 of TOOL-dLoggedFlight-27). A `partial` extract is a lower bound
+    and says so in Coverage, so a count from it is still a count; a run whose gaps were never judged
+    carries no idle event at all, so its idle count would be a zero nobody measured.
+    """
+    cov = m.get("coverage") or {}
+    read = {name for name in mdl.SOURCE_NAMES if (cov.get(name) or {}).get("state") in COUNTED_STATES}
+    if (cov.get("idle") or {}).get("judged"):
+        read.add("idle")
+    return frozenset(read)
+
+
+def build_counted_values(section, label, values, read) -> tuple:
+    """`values` with every DECLARED slot whose source the model did not read replaced by None, which
+    `render_cell` writes `-`. A slot `count_sources` does not declare is passed through untouched."""
+    slots = derive_int_slots(RECORD_SCHEMA).get((section, label), ())
+    sources = RECORD_SCHEMA.get("count_sources") or {}
+    out = list(values)
+    for nth, at in enumerate(slots):
+        src = sources.get((section, label, nth))
+        if src is not None and src not in read and at < len(out):
+            out[at] = None
+    return tuple(out)
+
+
+def check_count_sources(schema) -> list:
+    """Every refusal `schema["count_sources"]` earns, one line each, empty for a clean declaration —
+    and, PRINTED rather than refused, the `{int}` slots it covers no fact of.
+
+    Refused: an `{int}` slot of a covered fact with no entry, so a kind added to `RETIRED_EVENTS`
+    adds a slot that reds until its source is declared; an entry keyed to no `{int}` slot of any
+    declared fact; and a source that is neither one of the model's own nor `idle`.
+
+    The inventory is not a refusal because declaring a source for every count the record renders is
+    out of this unit's scope: the counts off git, the run-state file and the build folder have
+    sources that cannot read unknown. It is PRINTED so that population is ENUMERATED on every run
+    and a newly undeclared count shows up in the diff, rather than being described by a sentence
+    beside a set nobody recounts.
+
+    WHAT THIS DOES NOT CHECK: that a declared source is the one the value is really counted from.
+    Nothing here reads the renderer or a model, so a slot declared `driver` whose value the model
+    takes off the transcripts passes this and is caught, if at all, by the self-test that renders a
+    model with one source read and the rest not.
+    """
+    slots = derive_int_slots(schema)
+    sources = schema.get("count_sources") or {}
+    covered = {key[:2] for key in sources}
+    legal = frozenset(mdl.SOURCE_NAMES) | {"idle"}
+    out = []
+    for (section, label, nth), src in sorted(sources.items()):
+        if nth >= len(slots.get((section, label), ())):
+            out.append(f"count_sources: {section}/{label} slot {nth} is no {{int}} slot of a fact the "
+                       "schema declares")
+        elif src not in legal:
+            out.append(f"count_sources: {section}/{label} slot {nth} names the source {src!r}, which is "
+                       "neither one of the model's sources nor `idle`")
+    for (section, label), positions in sorted(slots.items()):
+        if (section, label) in covered:
+            out += [f"count_sources: {section}/{label} slot {nth} declares no source"
+                    for nth in range(len(positions)) if (section, label, nth) not in sources]
+    undeclared = sorted(f"{section}/{label}[{nth}]" for (section, label), positions in slots.items()
+                        if (section, label) not in covered for nth in range(len(positions)))
+    print("runlog: count_sources declares no source for %d {int} slot(s) outside its facts: %s"
+          % (len(undeclared), ", ".join(undeclared) or "none"))
+    return out
 
 
 # ---------------------------------------------------------------------------------- serves and names
@@ -634,12 +778,12 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
     # lines and the attributed calls come from the transcripts, and the model counts zero of what it
     # never read. M6 of the closing review, round 1: with the transcripts `not-local` the record said
     # `in-window 0`, a run that never asked, which is what the runlog Skill reads to answer "what did
-    # it decide without asking".
-    known = (cov.get("transcripts") or {}).get("state") in COUNTED_STATES
-
-    def derive_known(value):
-        return derive_count(value) if known else None
-
+    # it decide without asking". WHICH source each slot is counted from is now DECLARED, in
+    # `count_sources`, and `build_counted_values` applies the rule below to every fact that declares
+    # one (spec S3 of TOOL-dLoggedFlight-27) — the hand-written test that stood here covered these
+    # five facts and nothing else, and a second hand-written test for a sixth is how one rule becomes
+    # two that disagree.
+    read = derive_counted_sources(m)
     values = {
         "run-state": (m.get("record"),),
         "run": (derive_count(m.get("run")), derive_count(m.get("runs"))),
@@ -655,11 +799,11 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
         "merged": (derive_yes_no(m.get("merged")),),
         "units served": (str(len(serves)),),
         "sources present": (str(present), str(len(mdl.SOURCE_NAMES))),
-        "owner turns": tuple(derive_known(pos.get(p, 0)) for p in mdl.OWNER_POSITIONS),
-        "attributed calls": (derive_known(att.get("attributed", 0)), derive_known(att.get("calls", 0))),
+        "owner turns": tuple(derive_count(pos.get(p, 0)) for p in mdl.OWNER_POSITIONS),
+        "attributed calls": (derive_count(att.get("attributed", 0)), derive_count(att.get("calls", 0))),
     }
     for split in ex.SOURCES:
-        values[f"usage {split}"] = tuple(derive_known((usage.get(split) or {}).get(f, 0)) for f in USAGE_FIELDS)
+        values[f"usage {split}"] = tuple(derive_count((usage.get(split) or {}).get(f, 0)) for f in USAGE_FIELDS)
     facts = []
     for label, templates in RECORD_SCHEMA["sections"]["Summary"]["facts"]:
         if label == "values withheld":
@@ -671,7 +815,8 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
             else:
                 facts.append((label, templates[0]))
             continue
-        facts.append((label, render_fact(ctx, templates[0], values[label])))
+        facts.append((label, render_fact(ctx, templates[0],
+                                         build_counted_values("Summary", label, values[label], read))))
     return facts
 
 
@@ -700,6 +845,7 @@ def build_record_parts(model, memory_root=None, commitment=None) -> dict:
 def build_record_doc(parts, edge, bound) -> dict:
     """The record as `{section: {"facts": [(label, text)], "tables": [table]}}` at ONE pair of bounds."""
     m, ctx, rows = parts["m"], parts["ctx"], parts["rows"]
+    read = derive_counted_sources(m)
     doc = {"Summary": {"facts": list(parts["summary"]), "tables": []}}
 
     tl = rows["timeline"]
@@ -716,6 +862,15 @@ def build_record_doc(parts, edge, bound) -> dict:
         if edge:
             tables += [{"name": "events", "header": header, "rows": tl[:edge]},
                        {"name": "events", "header": header, "rows": tl[-edge:]}]
+    # WHAT THE RETIRED KINDS DID, counted off the model's own timeline, which the model already
+    # bounded to the run's window. This is not an elision and the counts do not move with `edge`:
+    # every event of a retired kind was dropped before a row was built, so the fact is what a reader
+    # keeps of them. A kind whose declared source the model never read reads `-`, never `0`.
+    kinds = Counter(e.get("kind") for e in m.get("timeline") or [])
+    facts.append(("withheld rows", render_fact(
+        ctx, derive_fact_templates("Timeline", "withheld rows")[0],
+        build_counted_values("Timeline", "withheld rows",
+                             tuple(derive_count(kinds.get(k, 0)) for k in RETIRED_EVENTS), read))))
     doc["Timeline"] = {"facts": facts, "tables": tables}
 
     units = rows["units"]
@@ -779,13 +934,25 @@ def build_record_doc(parts, edge, bound) -> dict:
     tr = cov.get("transcripts") or {}
     idle = cov.get("idle") or {}
     doc["Coverage"] = {
-        "facts": [("journal starts", render_fact(ctx, derive_fact_templates("Coverage", "journal starts")[0],
-                                                 (derive_count(starts.get("joined", 0)),
-                                                  derive_count(starts.get("record-creating", 0))))),
-                  ("unjoined starts", str(len(cov.get("unjoined_starts") or []))),
-                  ("sessions", render_fact(ctx, derive_fact_templates("Coverage", "sessions")[0],
+        # THREE COUNTS THAT USED TO COMMIT A CLEAN ZERO WITH THEIR SOURCE UNREAD (spec S2 of
+        # TOOL-dLoggedFlight-27): the sessions from the transcripts, and both journal-start counts
+        # from the driver journal, whose join `derive_journal_join` makes over its own invocations.
+        # `idle gaps` is NOT one of them: the model leaves `near_owner` None when the gaps went
+        # unjudged, so that fact already renders `-` by a mechanism of its own.
+        "facts": [("journal starts", render_fact(
+                      ctx, derive_fact_templates("Coverage", "journal starts")[0],
+                      build_counted_values("Coverage", "journal starts",
+                                           (derive_count(starts.get("joined", 0)),
+                                            derive_count(starts.get("record-creating", 0))), read))),
+                  ("unjoined starts", render_fact(
+                      ctx, derive_fact_templates("Coverage", "unjoined starts")[0],
+                      build_counted_values("Coverage", "unjoined starts",
+                                           (derive_count(len(cov.get("unjoined_starts") or [])),), read))),
+                  ("sessions", render_fact(
+                      ctx, derive_fact_templates("Coverage", "sessions")[0],
+                      build_counted_values("Coverage", "sessions",
                                            (derive_count(tr.get("sessions", 0)),
-                                            derive_count(tr.get("extracts", 0))))),
+                                            derive_count(tr.get("extracts", 0))), read))),
                   ("idle gaps", render_fact(ctx, derive_fact_templates("Coverage", "idle gaps")[0],
                                             (derive_yes_no(idle.get("judged")),
                                              derive_count(idle.get("near_owner")))))],

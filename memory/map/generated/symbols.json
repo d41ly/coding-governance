@@ -518,6 +518,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_counted_values",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "build_coverage_rows",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -833,6 +838,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_schema_copy",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_schema_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -961,6 +971,11 @@
       "id": "build_windows_rows",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
+    },
+    {
+      "id": "build_withheld_template",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "cache_dir",
@@ -1156,6 +1171,11 @@
       "id": "check_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "check_count_sources",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "check_declaration",
@@ -1938,6 +1958,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_counted_sources",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_default_branch",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1981,6 +2006,11 @@
       "id": "derive_install_order",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_int_slots",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
     },
     {
       "id": "derive_invocation",
@@ -3908,6 +3938,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_fact_slots",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_fixture",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -4283,6 +4318,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_withheld_rows",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "reconcile",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -4501,6 +4541,11 @@
       "id": "render_fact",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "render_fact_expectation",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "render_gate_line",
@@ -6814,6 +6859,11 @@
     },
     {
       "id": "test_record_ac1_real_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_ac1_withheld_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

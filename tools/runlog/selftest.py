@@ -152,7 +152,18 @@ from collections import Counter  # noqa: E402
 # that the anomaly it renders timeless carries a time in the model, 1. Its vocabulary loop is 15 names
 # either way, the schema having lost two and gained the two window vocabularies.
 # 4 + 3 + 1 + 11 + 1 - 21 - 3 - 2 - 1 = -7
-ASSERTION_FLOOR = 1385
+# RAISED 1385 -> 1404 by TOOL-dLoggedFlight-27, the withheld-rows fact: ONE new arm holding AC1, AC2
+# and AC4, with 14 checks — the fact's kinds and counts against the model, the liveness that the
+# model holds more retired events than the one per kind its builder appends, the three Coverage
+# counts that now declare a source, the unread copy's rows and its Coverage, the driver-absent copy,
+# the transcripts-partial copy where the idle judgement and COUNTED_STATES disagree with its
+# liveness, the two staged renderer breaks, and AC4's clean declaration, its covered facts, the
+# liveness that an undeclared population exists and the four staged schema copies — whose decoy
+# checks move it by 3. Two checks land inside arms that already existed and move no decoy check:
+# AC5's workflow count in the model-fields arm, and AC6's liveness in the real-model arm, whose whole
+# Timeline comparison this fact was always going to move. Four helpers arrive with neither.
+# 14 + 3 + 1 + 1 = 19
+ASSERTION_FLOOR = 1404
 
 PASS = []
 FAIL = []
@@ -4858,6 +4869,13 @@ def test_record_model_fields():
     check_true("record fields liveness: the model behind that row carries the anomaly's time, so the "
                "row above drops a value there was something to render for",
                [a.get("t") for a in model.anomalies] == [oob_t])
+    # AC5 of TOOL-dLoggedFlight-27: what the retired workflow row leaves behind is its COUNT, read
+    # off the model rather than typed, and `-` where the transcripts are not in `COUNTED_STATES`.
+    check("record fields: the retired workflow run is counted in `withheld rows`, from the model, and "
+          "reads `-` where its declared source was not read",
+          dict(read_withheld_rows(text))["workflow"],
+          str(sum(1 for e in model.timeline if e["kind"] == "workflow"))
+          if model.coverage["transcripts"]["state"] in rl_record.COUNTED_STATES else rl_record.NONE)
 
 
 def test_record_copied_sets():
@@ -4944,10 +4962,23 @@ def test_record_ac1_real_model():
     dropped = rl_record.RETIRED_EVENTS + ("owner",)
     bare = parse_record_markdown(rl_record.render_record(
         dict(m, timeline=[e for e in m["timeline"] if e.get("kind") not in dropped]), "memory", commitment))
-    check("record AC1: taking those events out of the model moves neither the Timeline nor the withheld "
-          "count, so not one of them was counted as a value outside its class",
-          (bare["Timeline"], bare["Summary"]["facts"]["values withheld"]),
-          (doc["Timeline"], doc["Summary"]["facts"]["values withheld"]))
+    # The Timeline's ROWS and its event count, not the whole section: `withheld rows` is the one
+    # Timeline value these two renders MUST differ on (S8 of TOOL-dLoggedFlight-27), and the check
+    # under this one is that fact's liveness over a real model. This arm was found by VALUE — it
+    # spells neither the fact's label nor `count_sources` — which is the class the retirement
+    # inventory keeps missing.
+    check("record AC1: taking those events out of the model moves neither the Timeline's rows and "
+          "event count nor the withheld count, so not one of them was counted as a value outside "
+          "its class",
+          (bare["Timeline"]["tables"], bare["Timeline"]["facts"]["events"],
+           bare["Summary"]["facts"]["values withheld"]),
+          (doc["Timeline"]["tables"], doc["Timeline"]["facts"]["events"],
+           doc["Summary"]["facts"]["values withheld"]))
+    check_true("record AC6: ...and `withheld rows` DOES move, since counting them is what that fact "
+               "is for", bare["Timeline"]["facts"]["withheld rows"]
+               != doc["Timeline"]["facts"]["withheld rows"],
+               str((doc["Timeline"]["facts"]["withheld rows"],
+                    bare["Timeline"]["facts"]["withheld rows"])))
     check("record AC1: no owner turn's clock time is anywhere in the record",
           [i for i, o in enumerate(fx["owners"]) if rl_model.derive_iso(o) in text], [])
     check_true("record AC1 liveness: the model rendered held an idle gap, every owner turn of the "
@@ -4955,6 +4986,223 @@ def test_record_ac1_real_model():
                any(e["kind"] == "idle" for e in m["timeline"])
                and len(model.owner_positions["turns"]) == len(fx["owners"]) and bool(model.tools),
                str(sorted({str(e["kind"]) for e in m["timeline"]})))
+
+
+def read_withheld_rows(text):
+    """The `withheld rows` fact as `[(kind, cell)]` in the order it renders, read off the markdown by
+    the shape S1 of TOOL-dLoggedFlight-27 gives it: pieces joined by ` · `, each a kind and its count.
+
+    The kinds come from the RENDERED text, never from `RETIRED_EVENTS`, so a member that went missing,
+    moved or was renamed shows up as a difference here instead of being read past — which is what AC1
+    compares against the constant."""
+    value = parse_record_markdown(text).get("Timeline", {}).get("facts", {}).get("withheld rows", "")
+    return [tuple(piece.rsplit(" ", 1)) for piece in value.split(" · ")] if value else []
+
+
+def read_fact_slots(text, section, label):
+    """The `{int}` cells of one fact, read at the positions the SCHEMA declares them: the rendered
+    value split back over its own template. The punctuation comes from that template rather than from
+    a second copy typed into an arm, so a fact that gains a field moves this reader with it."""
+    value = parse_record_markdown(text).get(section, {}).get("facts", {}).get(label, "")
+    parts = rl_record.PLACEHOLDER_RE.split(rl_record.derive_fact_templates(section, label)[0])
+    hit = re.fullmatch("".join(re.escape(p) if i % 2 == 0 else "(.+?)" for i, p in enumerate(parts)), value)
+    return [cell for cls, cell in zip(parts[1::2], hit.groups()) if cls == "int"] if hit else []
+
+
+def render_fact_expectation(section, label, values):
+    """A fact's expected text: the SCHEMA's own template with each placeholder filled by a value the
+    arm derived. The arm therefore grades the VALUES and carries no second copy of the template."""
+    parts = rl_record.PLACEHOLDER_RE.split(rl_record.derive_fact_templates(section, label)[0])
+    vals = iter(values)
+    return "".join(p if i % 2 == 0 else str(next(vals, "")) for i, p in enumerate(parts))
+
+
+def build_schema_copy(sources=None, kinds=None):
+    """A COPY of `RECORD_SCHEMA` for a staged break: its `count_sources` replaced, or its `withheld
+    rows` template re-derived from another kind list — which is how a kind added to `RETIRED_EVENTS`
+    is staged without editing the constant every other arm reads. The live schema is never touched,
+    so a copy that reds cannot leak into the next arm's render."""
+    sch = rl_record.RECORD_SCHEMA
+    out = dict(sch)
+    if sources is not None:
+        out["count_sources"] = sources
+    if kinds is not None:
+        facts = tuple((label, (rl_record.build_withheld_template(kinds),) if label == "withheld rows"
+                       else templates)
+                      for label, templates in sch["sections"]["Timeline"]["facts"])
+        out["sections"] = dict(sch["sections"], Timeline=dict(sch["sections"]["Timeline"], facts=facts))
+    return out
+
+
+def test_record_ac1_withheld_rows():
+    """AC1, AC2 and AC4 of TOOL-dLoggedFlight-27: `withheld rows` lists every retired kind in
+    `RETIRED_EVENTS`' order, each with the count of that kind's events on the model rendered; a slot
+    whose DECLARED source the model did not read renders `-` and never the zero that reads clean, with
+    the `idle` judgement narrower than `COUNTED_STATES` by exactly one state; and
+    `check_count_sources` refuses nothing over the live declaration and refuses each staged copy,
+    naming the slot.
+
+    Every expected count is DERIVED from the model at observation time (S5). That is the promoted
+    defect: the class model starts from the landed fixture's REAL model, which already holds the
+    fixture's driver verbs, gate lines and landing push before one event of each retired kind is
+    appended, so unit 22's typed count of 1 per kind could never have passed.
+    """
+    m, _intruders, j, _fx, _placed = build_class_model()
+    # S5's copy: every source the declaration names READ, so AC1 grades the counting and not the
+    # unknown rule. The class model deliberately leaves gates dead, pushes absent, the driver partial
+    # and the transcripts unread, which is the population AC2 below grades instead.
+    cov = dict(m["coverage"])
+    for name in rl_model.SOURCE_NAMES:
+        cov[name] = dict(cov[name], state="present")
+    cov["idle"] = dict(cov.get("idle") or {}, judged=True)
+    known = dict(m, coverage=cov)
+    text = rl_record.render_record(known, "memory", rl_record.measure_commitment(known, j))
+    kinds = Counter(e.get("kind") for e in known["timeline"])
+    check("record AC1: `withheld rows` lists every retired kind in RETIRED_EVENTS' order, each with "
+          "that kind's event count on the model rendered",
+          read_withheld_rows(text), [(k, str(kinds.get(k, 0))) for k in rl_record.RETIRED_EVENTS])
+    check_true("record AC1 liveness: the model rendered holds MORE retired events than the one per "
+               "kind its builder appends, so these counts are read off it and a typed 1 per kind "
+               "could never pass", sum(kinds.get(k, 0) for k in rl_record.RETIRED_EVENTS)
+               > len(rl_record.RETIRED_EVENTS), str({k: kinds.get(k, 0) for k in rl_record.RETIRED_EVENTS}))
+    facts = parse_record_markdown(text)["Coverage"]["facts"]
+    starts, tr = cov["journal_starts"], cov["transcripts"]
+    check("record AC1: the three Coverage counts that now declare a source are the model's own join "
+          "and session counts",
+          [facts[label] for label in ("journal starts", "unjoined starts", "sessions")],
+          [render_fact_expectation("Coverage", "journal starts",
+                                   (starts.get("joined", 0), starts.get("record-creating", 0))),
+           render_fact_expectation("Coverage", "unjoined starts",
+                                   (len(cov.get("unjoined_starts") or []),)),
+           render_fact_expectation("Coverage", "sessions",
+                                   (tr.get("sessions", 0), tr.get("extracts", 0)))])
+
+    def build_state_copy(judged, **states):
+        """A copy of that model with the named coverage states set and the idle gaps judged or not."""
+        row = dict(known["coverage"])
+        for name, state in states.items():
+            row[name] = dict(row[name], state=state)
+        row["idle"] = dict(row.get("idle") or {}, judged=judged)
+        return dict(known, coverage=row)
+
+    def read_shape(cell):
+        return cell if cell == rl_record.NONE else ("int" if cell.isdigit() else cell)
+
+    # AC2, copy one: nothing read but the driver, which is `partial` — a lower bound that says so in
+    # Coverage, and so still a count.
+    unread = build_state_copy(False, transcripts="not-local", gates="dead", pushes="absent",
+                              driver="partial")
+    t_unread = rl_record.render_record(unread, "memory")
+    check("record AC2: a retired kind whose declared source the model did not read renders `-`, while "
+          "`verb` renders a count off a driver that reads partial",
+          {k: read_shape(v) for k, v in read_withheld_rows(t_unread)},
+          {k: ("int" if k == "verb" else rl_record.NONE) for k in rl_record.RETIRED_EVENTS})
+    check("record AC2: on that copy the Coverage sessions slots read `-` and both journal-start "
+          "counts read integers, from the same single reading of the same two sources",
+          ([read_shape(c) for c in read_fact_slots(t_unread, "Coverage", "sessions")],
+           [read_shape(c) for c in read_fact_slots(t_unread, "Coverage", "journal starts")
+            + read_fact_slots(t_unread, "Coverage", "unjoined starts")]),
+          ([rl_record.NONE] * 2, ["int"] * 3))
+    # Copy two: the driver gone as well, which takes `verb`, both journal-start counts and every slot
+    # of the five Summary facts with it.
+    gone = build_state_copy(False, transcripts="not-local", gates="dead", pushes="absent",
+                            driver="absent")
+    t_gone = rl_record.render_record(gone, "memory")
+    check("record AC2: with the driver absent too, `verb`, the journal starts and the unjoined starts "
+          "read `-`, and so does every slot of the five Summary facts",
+          (dict(read_withheld_rows(t_gone))["verb"],
+           read_fact_slots(t_gone, "Coverage", "journal starts")
+           + read_fact_slots(t_gone, "Coverage", "unjoined starts"),
+           sorted({c for label in TRANSCRIPT_FACTS for c in read_fact_slots(t_gone, "Summary", label)})),
+          (rl_record.NONE, [rl_record.NONE] * 3, [rl_record.NONE]))
+    # Copy three: THE ONE CELL where the idle judgement and `COUNTED_STATES` disagree.
+    partial = build_state_copy(False, transcripts="partial")
+    t_partial = rl_record.render_record(partial, "memory")
+    got = dict(read_withheld_rows(t_partial))
+    check("record AC2: with the transcripts partial and the idle gaps unjudged, the three transcript "
+          "kinds read counts while `idle` reads `-`",
+          ([read_shape(got[k]) for k in ("compact", "limit", "workflow")], got["idle"]),
+          (["int"] * 3, rl_record.NONE))
+    check_true("record AC2 liveness: `partial` IS in COUNTED_STATES and that model holds idle events, "
+               "so the `-` above is the judgement's decision and not an empty population",
+               "partial" in rl_record.COUNTED_STATES
+               and any(e.get("kind") == "idle" for e in partial["timeline"]),
+               str(rl_record.COUNTED_STATES))
+    # THE TWO STAGED BREAKS AC2 NAMES, each a wrapper around the renderer's own lookup, restored in a
+    # `finally`, and neither of them editing the schema. The first ignores the declaration for `gate`;
+    # the second maps `idle` onto the transcripts coverage state like every other kind, which is right
+    # on the first two copies and wrong on the third — a break that reds on one cell alone.
+    real_values = rl_record.build_counted_values
+
+    def build_ignoring_gate(section, label, values, read):
+        out = list(real_values(section, label, values, read))
+        if (section, label) == ("Timeline", "withheld rows"):
+            at = rl_record.RETIRED_EVENTS.index("gate")
+            out[at] = values[at]
+        return tuple(out)
+
+    rl_record.build_counted_values = build_ignoring_gate
+    try:
+        broken = dict(read_withheld_rows(rl_record.render_record(unread, "memory")))
+    finally:
+        rl_record.build_counted_values = real_values
+    check("record AC2 RED: a renderer that ignores the declaration for `gate` writes a digit for a "
+          "kind whose journal read dead", read_shape(broken["gate"]), "int")
+    real_sources = rl_record.derive_counted_sources
+
+    def derive_idle_by_coverage(m_):
+        out = set(real_sources(m_)) - {"idle"}
+        if ((m_.get("coverage") or {}).get("transcripts") or {}).get("state") in rl_record.COUNTED_STATES:
+            out.add("idle")
+        return frozenset(out)
+
+    rl_record.derive_counted_sources = derive_idle_by_coverage
+    try:
+        staged = {name: dict(read_withheld_rows(rl_record.render_record(copy, "memory")))["idle"]
+                  for name, copy in (("unread", unread), ("driver absent", gone), ("partial", partial))}
+    finally:
+        rl_record.derive_counted_sources = real_sources
+    check("record AC2 RED: a renderer mapping `idle` onto the transcripts coverage state reds on the "
+          "partial copy alone, the one cell where that state and the judgement disagree",
+          {name: read_shape(cell) for name, cell in staged.items()},
+          {"unread": rl_record.NONE, "driver absent": rl_record.NONE, "partial": "int"})
+    # AC4. The declaration, and four copies of it, each refused by the slot it broke.
+    check("record AC4: check_count_sources refuses nothing over the live schema",
+          rl_record.check_count_sources(rl_record.RECORD_SCHEMA), [])
+    sources = rl_record.RECORD_SCHEMA["count_sources"]
+    covered = {key[:2] for key in sources}
+    check("record AC4: the declaration covers exactly the facts S2 names, and no others",
+          sorted(covered),
+          sorted([("Coverage", "journal starts"), ("Coverage", "sessions"),
+                  ("Coverage", "unjoined starts"), ("Timeline", "withheld rows")]
+                 + [("Summary", label) for label in TRANSCRIPT_FACTS]))
+    slots = rl_record.derive_int_slots(rl_record.RECORD_SCHEMA)
+    check_true("record AC4 liveness: the schema declares `{int}` slots OUTSIDE those facts, so the "
+               "inventory check_count_sources prints is a population and not an empty set",
+               any(fact not in covered and positions for fact, positions in slots.items()),
+               str(sorted(f"{s}/{lab}" for (s, lab), p in slots.items() if (s, lab) not in covered and p)[:4]))
+    gate_at, added = rl_record.RETIRED_EVENTS.index("gate"), len(rl_record.RETIRED_EVENTS)
+    want = {
+        "a slot with no entry": (
+            build_schema_copy(sources={k: v for k, v in sources.items()
+                                       if k != ("Timeline", "withheld rows", gate_at)}),
+            f"Timeline/withheld rows slot {gate_at} declares no source"),
+        # `{**sources, key: value}`, never `dict(sources, **{key: value})`: the keys are TUPLES and
+        # the second form raises `keywords must be strings` before a single arm can run.
+        "a source the model does not have": (
+            build_schema_copy(sources={**sources, ("Timeline", "withheld rows", gate_at): "ledger"}),
+            f"Timeline/withheld rows slot {gate_at} names the source 'ledger'"),
+        "an entry keyed to no slot": (
+            build_schema_copy(sources={**sources, ("Summary", "phase", 0): "transcripts"}),
+            "Summary/phase slot 0 is no {int} slot"),
+        "a retired kind with no source": (
+            build_schema_copy(kinds=rl_record.RETIRED_EVENTS + ("staged-kind",)),
+            f"Timeline/withheld rows slot {added} declares no source"),
+    }
+    refused = {name: rl_record.check_count_sources(copy) for name, (copy, _needle) in want.items()}
+    check("record AC4: each staged schema copy is refused once, and the refusal names the slot",
+          {name: (len(lines), want[name][1] in (lines[0] if lines else "")) for name, lines in refused.items()},
+          {name: (1, True) for name in want})
 
 
 # The Summary facts whose counts the model derives from the transcripts (TOOL-dLoggedFlight-9 S4).

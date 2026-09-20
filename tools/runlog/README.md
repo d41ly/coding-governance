@@ -331,7 +331,8 @@ by` are the only three facts it moves.
 a commit's committer time or a run-state write's, so the Timeline holds the kinds `TIMELINE_EVENTS`
 names and no others. `RETIRED_EVENTS` beside it names the kinds a journal or a transcript timed,
 dropped before a row is built and NOT counted in `values withheld`, since a retired kind is not a
-value outside its class. Both lists are the constants' own, in `record.py`, and not restated here.
+value outside its class. The Timeline's `withheld rows` fact counts each of them in place of the
+rows. Both lists are the constants' own, in `record.py`, and not restated here.
 Anomalies carry no time and Coverage no `epoch` for the same reason. The local model keeps every one
 of them, which is what the Skill answers from. Owner turns stay counts per position, as always.
 
@@ -343,11 +344,20 @@ withheld` line counts them. So is a value carrying a shape `RECORD_SCHEMA["forbi
 absolute path or a UUID, whatever class it passed: a path class's file segment admits a lowercase
 UUID. The schema leg below validates committed bytes against the same data.
 
-**An unknown value is `-`, never the zero that reads clean.** The owner turns, the usage lines and
-the attributed calls come from the transcripts, so each is `-` unless those read `present` or
-`partial`. The model counts zero of what it never read, and an `in-window 0` would say the run never
-asked. A `stale` extract is not one of those states: its counts can be short by exactly the owner
-turns the run's last stretch held, and nothing in them says so.
+**An unknown value is `-`, never the zero that reads clean.** WHICH source each count comes from is
+declared, in `RECORD_SCHEMA["count_sources"]`, one entry per `{int}` slot of the facts whose source
+can read unknown: the owner turns, the usage lines, the attributed calls and the Coverage sessions
+from the transcripts, both journal-start counts from the driver journal, and every kind of the
+Timeline's `withheld rows` from the journal or the extract that timed it. A declared slot renders
+`-` unless its source's coverage state is `present` or `partial`. The model counts zero of what it
+never read, and an `in-window 0` would say the run never asked. A `stale` extract is not one of
+those states: its counts can be short by exactly the owner turns the run's last stretch held, and
+nothing in them says so. `idle` is the one entry naming a JUDGEMENT rather than a coverage state,
+and it is narrower by exactly that one: gaps are judged only where the transcripts read `present`,
+so an unjudged run's idle count would be a zero nobody measured. `check_count_sources` grades the
+declaration — a slot with no source, a source the model does not have, an entry keyed to no slot —
+and PRINTS every `{int}` slot outside it, so the counts that deliberately declare none are
+enumerated on every run rather than described by a sentence beside them.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
 `TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision

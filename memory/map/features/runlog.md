@@ -222,10 +222,10 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
   the git- and run-state-timed kinds alone, its Anomalies carry no time and its Coverage no `epoch`.
   `TOOL-dLoggedFlight-22` retired the rest with the owner-time refusal that used to guard them; the
   local model keeps every one, and the Skill answers from it.
-- **The record proves shapes, not truth.** A count can be wrong and still be an integer. The lists it
-  copies from the spec template and the hygiene doc are held to them only by the withheld self-test,
-  and its commitment is checkable only on the node that holds the journal. An unknown count is `-` by
-  the renderer alone; the leg grades none against its Coverage row.
+- **The record proves shapes, not truth.** A count can be wrong and still an integer. The lists it
+  copies from the spec template and hygiene doc are held only by the withheld self-test, and its
+  commitment only on the node holding the journal. An unknown count is `-` by the renderer, off a
+  source `check_count_sources` grades the DECLARATION of; the leg grades none.
 - **The schema leg compares windows in commit time.** A clock skew between two nodes that puts a
   predecessor's terminal write after its successor's start moves a window without redding it, and the
   leg never compares a record's two copies with each other.
