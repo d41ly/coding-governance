@@ -255,6 +255,60 @@ check_hit "$(extract_reason "$OUT")" "block 1/6" "AC10 the worktree fixture bind
 [ -f "$F/wt-git/unattended/stop.fx.log" ] && print_ok "AC10 the line landed under the named git dir" || print_bad "AC10 no line under $F/wt-git"
 check_same "AC10 exactly one stop.fx.log under the fixture" "$(find "$F" -name 'stop.fx.log' | grep -c '')" "1"
 
+# ---- THE `landing-unstamped` ROW (TOOL-aWokenSentinel-8). `--landed` runs after the lander, so its
+# ---- refusals fire when the witness is already on the default branch and `--liveness` reads
+# ---- FINISHED-UNSTAMPED; each ends the turn on the promise that this hook continues the session.
+# ---- Spec 3's table ALLOWED that verdict, which wedged every wired landing at LANDING (audit B1).
+# ---- A bound session at that verdict BLOCKS, bounded by the same knob as `run-open`, and is told
+# ---- `--landed` is the one act left — never `--plan`, which sends a finished run to build nothing.
+# ---- Observed RED first against the hook at this unit's base, where the stop is allowed.
+# ---- U8-AC1: the block, its reason text, and the sidecar line carrying the listing verbatim.
+F=$(build_fixture LANDING "$SID"); set_liveness LANDING FINISHED-UNSTAMPED
+CRONS='[{"id":"f1209d79","schedule":"*/10 * * * *","prompt":"tick"}]'
+run_hook "$(build_payload "$F" "{\"session_crons\":$CRONS}")"
+check_same "U8-AC1 finished-unstamped rc" "$RC" "0"
+check_same "U8-AC1 the stop is blocked" "$(printf '%s' "$OUT" | "$TESTPY" -c 'import json,sys;print(json.loads(sys.stdin.read() or "{}").get("decision",""))')" "block"
+R=$(extract_reason "$OUT")
+check_hit "$R" "finished and unstamped" "U8-AC1 reason says finished and unstamped"
+check_hit "$R" "unattended.sh --landed fx" "U8-AC1 reason names --landed"
+check_hit "$R" "block 1/6" "U8-AC1 reason counts 1 of the default 6"
+check_hit "$R" "phase LANDING" "U8-AC1 reason names the phase"
+check_miss "$R" "--plan" "U8-AC1 reason never names --plan"
+check_miss "$R" "--abort" "U8-AC1 reason never names --abort"
+check_same "U8-AC1 line decision" "$(read_field "$(derive_sidecar "$F")" decision)" "block"
+check_same "U8-AC1 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "landing-unstamped"
+check_same "U8-AC1 line phase" "$(read_field "$(derive_sidecar "$F")" phase)" "LANDING"
+check_same "U8-AC1 line verdict" "$(read_field "$(derive_sidecar "$F")" verdict)" "FINISHED-UNSTAMPED"
+check_same "U8-AC1 line crons deep-equal" "$("$TESTPY" -c 'import json,sys
+line=json.loads(open(sys.argv[1]).read().splitlines()[-1])
+print("same" if line["session_crons"]==json.loads(sys.argv[2]) else "differs")' "$(derive_sidecar "$F")" "$CRONS")" "same"
+# ---- U8-AC2: the cap is the shared knob — two seeded landing-unstamped lines against 2 exhaust it,
+# ---- one seeded line blocks 2/2; the seed is asserted before the feed.
+render_landingline() { printf '{"utc":"2026-09-20T00:00:00Z","session":"%s","decision":"block","reason":"landing-unstamped","phase":"LANDING","verdict":"FINISHED-UNSTAMPED","blocks":%s,"background_tasks":0,"stop_hook_active":false,"session_crons":[]}\n' "$1" "$2"; }
+F=$(build_fixture LANDING "$SID" 'STOP_GUARD_BLOCKS="2"'); set_liveness LANDING FINISHED-UNSTAMPED
+mkdir -p "$F/.git/unattended"; { render_landingline "$SID" 1; render_landingline "$SID" 2; } > "$(derive_sidecar "$F")"
+check_same "U8-AC2 two lines seeded" "$(measure_lines "$(derive_sidecar "$F")")" "2"
+run_hook "$(build_payload "$F")"
+check_same "U8-AC2 exhausted rc" "$RC" "0"
+check_same "U8-AC2 exhausted stdout empty" "$OUT" ""
+check_same "U8-AC2 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "blocks-exhausted"
+render_landingline "$SID" 1 > "$(derive_sidecar "$F")"
+run_hook "$(build_payload "$F")"
+check_hit "$(extract_reason "$OUT")" "block 2/2" "U8-AC2 one seeded line blocks 2/2"
+# ---- U8-AC3: a pending background task still allows at this verdict — the harness re-invokes.
+F=$(build_fixture LANDING "$SID"); set_liveness LANDING FINISHED-UNSTAMPED
+run_hook "$(build_payload "$F" '{"background_tasks":[{"id":"t1"}]}')"
+check_same "U8-AC3 background rc" "$RC" "0"
+check_same "U8-AC3 background stdout empty" "$OUT" ""
+check_same "U8-AC3 line reason" "$(read_field "$(derive_sidecar "$F")" reason)" "background-tasks"
+# ---- U8-AC5: an UNBOUND record at LANDING never reaches the row — every pre-unit-1 record in the
+# ---- tree keeps ending its turns silently.
+F=$(build_fixture LANDING absent); set_liveness LANDING FINISHED-UNSTAMPED
+run_hook "$(build_payload "$F")"
+check_same "U8-AC5 unbound rc" "$RC" "0"
+check_same "U8-AC5 unbound stdout empty" "$OUT" ""
+[ ! -e "$(derive_sidecar "$F")" ] && print_ok "U8-AC5 unbound writes no sidecar" || print_bad "U8-AC5 unbound wrote $(derive_sidecar "$F")"
+
 # ---- AC18: the two bounds side by side — the default under the harness cap, the cap pinned at 8.
 check_same "AC18 BLOCKS_DEFAULT <= HARNESS_CONSECUTIVE_CAP" \
   "$(node -e 'const m=require(process.argv[1]);console.log(m.BLOCKS_DEFAULT<=m.HARNESS_CONSECUTIVE_CAP?"under":"over")' "$(resolve_native "$HOOK")")" "under"
@@ -311,7 +365,10 @@ n=$((pass+fail))
 # that wrote this file may not run the suite): 5 14 5 5 9 7 10 6 9 3 3 8 5 plus the run_hook
 # guard's one, 90 executed, pinned at ~10% headroom. The main loop's first green at VERIFYING confirms the
 # executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=80
+# RAISED 80 -> 104 by TOOL-aWokenSentinel-8: the `landing-unstamped` block run ALONE from the sourced
+# prologue on node a, 2026-09-20, executed 24 (13 5 3 3), green against the tip and 10 RED against
+# the hook at its base 6bb7ac75, where the stop was allowed with `finished-unstamped`.
+FLOOR_ASSERTIONS=104
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

@@ -119,3 +119,15 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T19:12:04Z dispatch · item 654322ff TOOL-aWokenSentinel-16 · reason memory/ledger/2026-09.md
 
 2026-09-20T19:12:08Z brief · item TOOL-aWokenSentinel-16 · reason 7e2ccfcec72e memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-16-1-build-brief.md
+
+2026-09-20T19:23:36Z dispatch · item 6bb7ac75 TOOL-aWokenSentinel-8 · reason tools/unattended/stop-guard.js
+
+2026-09-20T19:23:54Z dispatch · item 6bb7ac75 TOOL-aWokenSentinel-8 · reason tools/unattended/stop-guard.test.sh
+
+2026-09-20T19:24:12Z dispatch · item 6bb7ac75 TOOL-aWokenSentinel-8 · reason memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md
+
+2026-09-20T19:24:30Z dispatch · item 6bb7ac75 TOOL-aWokenSentinel-8 · reason memory/builds/aWokenSentinel/README.md
+
+2026-09-20T19:24:50Z dispatch · item 6bb7ac75 TOOL-aWokenSentinel-8 · reason memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-8-1-acceptance-ledger.md
+
+2026-09-20T19:26:17Z brief · item TOOL-aWokenSentinel-8 · reason 7d6fed11a91f memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-8-1-build-brief.md

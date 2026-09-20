@@ -22,20 +22,29 @@
  * preflighted before TOOL-aWokenSentinel-1 landed is invisible until `--resume --keepalive-id`
  * re-records its lease: the hook lands DARK for the run that builds it.
  *
- * THE DECISION on a bound session, in this order (spec §4 table):
+ * THE DECISION on a bound session, in this order (spec §4 table, amended by TOOL-aWokenSentinel-8):
  *   verdict TERMINAL              allow   `terminal`
- *   verdict FINISHED-UNSTAMPED    allow   `finished-unstamped` — PROVISIONAL at this order;
- *                                         TOOL-aWokenSentinel-8 replaces it with a bounded BLOCK
  *   no verdict, non-zero exit,
  *     or the liveness bound       allow   `liveness-unreadable`
  *   background_tasks non-empty    allow   `background-tasks` — the harness re-invokes the session
  *                                         when a task completes; a block there is a wasted turn
  *   STOP_GUARD_BLOCKS malformed   allow   `knob-malformed`
  *   blocks so far >= the knob     allow   `blocks-exhausted`
+ *   verdict FINISHED-UNSTAMPED    BLOCK   `landing-unstamped` — the one act left is `--landed`
  *   otherwise                     BLOCK   `run-open`
  * The verdict comes from `bash <this dir>/unattended.sh --liveness <slug>`, run with cwd at the
  * repo root and bounded at LIVENESS_BOUND_MS; this hook reads no mtime, transcript or git of its
  * own. `stop_hook_active` changes nothing but the reason text, which says so.
+ *
+ * WHY `landing-unstamped` BLOCKS. `--landed` runs after the lander, so its refusals fire when the
+ * witness is already on `origin/<default>` and `--liveness` reads FINISHED-UNSTAMPED; each refusal
+ * ends the turn on the promise that this hook records the harness's cron listing and continues
+ * the session. An allow here is the wedge the aWokenSentinel spec-audit's B1 names: the turn ends,
+ * nothing resumes the session, and the record sits at LANDING with its work on `main`. A bound
+ * session at that verdict is therefore blocked, under the same cap as `run-open`, and told that
+ * `--landed` is the one act left — never `--plan` or `--abort`, because a finished run has no unit
+ * to build and nothing to abort. An UNBOUND record at LANDING never reaches this table: every
+ * pre-unit-1 record in the tree keeps ending its turns silently, by construction of the key.
  *
  * TWO BOUNDS, SIDE BY SIDE. The HARNESS ends a turn after 8 consecutive stop-hook blocks
  * (HARNESS_CONSECUTIVE_CAP, measured in the aReplayedCard orientation record cited beside it), so
@@ -82,9 +91,8 @@ const BLOCKS_DEFAULT = 6
 // The driver's startup is seconds; sixty is the ceiling past which a hung liveness reads as
 // unreadable and allows. STOP_GUARD_LIVENESS_BOUND_MS overrides it — the fixture's seam.
 const LIVENESS_BOUND_MS = 60000
-const REASONS = ['terminal', 'finished-unstamped', 'liveness-unreadable', 'background-tasks',
-                 'knob-malformed', 'blocks-exhausted', 'run-open']
-const VERDICTS_ALLOW = { TERMINAL: 'terminal', 'FINISHED-UNSTAMPED': 'finished-unstamped' }
+const REASONS = ['terminal', 'liveness-unreadable', 'background-tasks', 'knob-malformed',
+                 'blocks-exhausted', 'landing-unstamped', 'run-open']
 
 /**
  * `bash <kitDir>/unattended.sh --liveness <slug>` with cwd at the root, because the driver sources
@@ -126,21 +134,27 @@ function measureBlocks(sidecar, sessionId) {
  */
 function checkStop(liveness, backgroundTasks, knob, blocks) {
   if (!liveness) return { decision: 'allow', reason: 'liveness-unreadable' }
-  if (VERDICTS_ALLOW[liveness.verdict]) return { decision: 'allow', reason: VERDICTS_ALLOW[liveness.verdict] }
+  if (liveness.verdict === 'TERMINAL') return { decision: 'allow', reason: 'terminal' }
   if (backgroundTasks > 0) return { decision: 'allow', reason: 'background-tasks' }
   if (knob.source === 'malformed') return { decision: 'allow', reason: 'knob-malformed' }
   if (blocks >= knob.value) return { decision: 'allow', reason: 'blocks-exhausted' }
+  if (liveness.verdict === 'FINISHED-UNSTAMPED') return { decision: 'block', reason: 'landing-unstamped' }
   return { decision: 'block', reason: 'run-open' }
 }
 
-/** The reason text the model reads under `Stop hook feedback:`. */
-function renderBlock(slug, phase, verdict, n, total, kitRel, stopHookActive) {
-  let text =
-    `stop-guard: this session holds unattended run ${slug}, phase ${phase}, liveness ${verdict}; ` +
-    `block ${n}/${total}. The owner is absent. Run \`bash ${kitRel}/unattended.sh --plan ${slug}\` ` +
-    'and build the next READY unit, or ' +
-    `\`bash ${kitRel}/unattended.sh --abort ${slug} --reason <text> --code <halt-code>\` if the run ` +
-    'cannot proceed. Never end the turn by asking: there is nobody to answer, and a question is a stall.'
+/** The reason text the model reads under `Stop hook feedback:`, selected by the block's reason class. */
+function renderBlock(reason, slug, phase, verdict, n, total, kitRel, stopHookActive) {
+  let text = reason === 'landing-unstamped'
+    ? `stop-guard: this session holds unattended run ${slug}, phase ${phase}, and its witness is already ` +
+      'on the default branch, so the run is finished and unstamped; ' +
+      `block ${n}/${total}. The stop-guard has just recorded the harness's cron listing. ` +
+      `Run \`bash ${kitRel}/unattended.sh --landed ${slug}\` now: it reads that listing against the ` +
+      'recorded keepalive id and stamps LANDED, or names the reap still owed. Never end the turn by asking.'
+    : `stop-guard: this session holds unattended run ${slug}, phase ${phase}, liveness ${verdict}; ` +
+      `block ${n}/${total}. The owner is absent. Run \`bash ${kitRel}/unattended.sh --plan ${slug}\` ` +
+      'and build the next READY unit, or ' +
+      `\`bash ${kitRel}/unattended.sh --abort ${slug} --reason <text> --code <halt-code>\` if the run ` +
+      'cannot proceed. Never end the turn by asking: there is nobody to answer, and a question is a stall.'
   if (stopHookActive) text += ' This is a continuation the hook already blocked once.'
   return text
 }
@@ -212,7 +226,7 @@ function checkSession(data, sessionId) {
       continue
     }
     if (verdict.decision === 'block' && first === null) {
-      first = renderBlock(l.slug, line.phase, line.verdict, blocks, knob.value, kitRel, active)
+      first = renderBlock(verdict.reason, l.slug, line.phase, line.verdict, blocks, knob.value, kitRel, active)
     }
   }
   return first

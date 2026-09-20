@@ -61,7 +61,7 @@ research record under `build/`.
 | 5 | `TOOL-aWokenSentinel-5` | PLANNED | `resume-tick.sh`: the OS-scheduled out-of-process resumer, acting on a stale lease only |
 | 6 | `TOOL-aWokenSentinel-6` | PLANNED | the contract: protocol §5, the Skill, the conf knobs and the kit version, with the cron job demoted to the idle-wake |
 | 7 | `TOOL-aWokenSentinel-7` | PLANNED | `keepalive-reaped` becomes CHECKED at `--landed` against the cron listing the stop-guard recorded, no longer attested |
-| 8 | `TOOL-aWokenSentinel-8` | PLANNED | the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is BLOCKED and told to run `--landed`, so the `--landed` refusal's end-the-turn remedy is continued rather than allowed (audit B1) |
+| 8 | `TOOL-aWokenSentinel-8` | CLOSED | the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is BLOCKED and told to run `--landed`, so the `--landed` refusal's end-the-turn remedy is continued rather than allowed (audit B1) |
 | 9 | `TOOL-aWokenSentinel-9` | PLANNED | the stop-guard listing as a FIELD on `--status`'s one line, omitted when unrecorded, and the header's one-line promise made an arm (audit H1) |
 | 10 | `TOOL-aWokenSentinel-10` | PLANNED | `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read: the example, `optional_keys`, the protocol's section 8 row with its render, the root conf with its rationale and the manifest re-stamp (audit H2) |
 | 11 | `TOOL-aWokenSentinel-11` | CLOSED | a kit-gate check that the driver holds ONE derivation of the sidecar root, `resolve_sidecar_dir`, so a second `rev-parse --git-dir` spelling reds the bar for every unit (audit H3) |
@@ -102,7 +102,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch](spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md) | 7 | 2 | CLOSED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 8 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-20 |
 | [TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read](spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk](spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md) | 10 | 2 | SPECCED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer](spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md) | 11 | 2 | SPECCED | rev-3 | 2026-09-20 |
@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 42 bound to this build, across 4 record folder(s).
+Records: 43 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
