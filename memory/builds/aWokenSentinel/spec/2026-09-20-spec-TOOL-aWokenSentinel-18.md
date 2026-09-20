@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-18 — `read_bound_key` refuses a caller that named no conf: a bound read from a shell with `CONF` unset exits 2 instead of taking a default with an empty NOTE
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 14
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 12513c25 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-18-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-18-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-18-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-18-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 |
 
@@ -24,9 +25,10 @@ with exit 2 when the calling shell has no `CONF` naming an existing file. A boun
 that sourced no conf is then a refusal that names the contract, never a kit default announced with
 nowhere to change it; the driver, which sets `CONF` at `tools/unattended/unattended.sh:323` before
 every call, is untouched in behaviour. Spec 13's NOTE arm already reds against the BLOCK copy at
-its own order — with the block gone the NOTE names no file and `test -f` refuses — so what this
-unit adds is not a break but a stronger reading of the same copy: exit 2 and zero NOTEs, the
-signature made impossible rather than merely observed. The BLOCK copy is one thing, spelled the
+its own order — with the block gone the tick dies under its `set -u` at the NOTE's `$CONF`, exit
+1 and zero NOTEs — so what this unit adds is not a break but a stronger reading of the same copy:
+exit 2 with a sentence naming the contract where a shell error was, and zero NOTEs, the signature
+made impossible rather than merely observed. The BLOCK copy is one thing, spelled the
 same way here and in spec 13 rev-3: the four lines `CONF=`, the `[ -f "$CONF" ]` refusal, the two
 clearing assignments and `. "$CONF"`, removed by `sed '/^CONF=/,/^\. "\$CONF"$/d'`, the
 `shellcheck` comment going with them uncounted and the two `read_bound_key` calls KEPT;
@@ -54,13 +56,17 @@ clearing assignments and `. "$CONF"`, removed by `sed '/^CONF=/,/^\. "\$CONF"$/d
   of order 13, which already holds `read_bound_key` hoisted by unit 5 and no guard — not the lib at
   `12513c25`, which holds no `read_bound_key` at all and would answer `command not found`. Against
   that break the bare-shell call prints a NOTE with an empty path and exits 0, the nonexistent
-  path prints a NOTE naming it, and the copy walks on defaults with two empty-path NOTEs. Observed
-  by AC1 and AC2.
+  path prints a NOTE naming it, and the copy dies under the tick's `set -u` at the library's NOTE
+  line — `CONF: unbound variable`, exit 1, zero NOTEs, no launcher — a shell error where a refusal
+  naming the contract belongs. U13's two rows that read that copy's exit 1 and its unbound-variable
+  line at unit 13's order are re-read here to exit 2 and the sentence, because a suite holds one
+  reading and it is the tip's; spec 13 S4 says this unit re-reads them. Observed by AC1 and AC2.
 - **S4** — Spec 13 rev-3 names, per arm, the break it is observed red against, and states the
-  BLOCK copy's reading AT ITS OWN ORDER, one before this unit: two `Declare one in ` lines with an
-  empty path, exit 0, attempt 1 launched — red because `test -f` refuses the empty path — and
-  that this unit re-reads the same copy as exit 2 with zero NOTEs and no launcher. Spec 13 and
-  this spec spell the copy with the same `sed` range and the same kept calls. Observed by AC4.
+  BLOCK copy's reading AT ITS OWN ORDER, one before this unit: `CONF: unbound variable` from the
+  library's NOTE line under the tick's `set -u`, exit 1, zero NOTEs, no launcher — red because the
+  two-existing-paths count is zero — and that this unit re-reads the same copy as exit 2 with the
+  guard's sentence, zero NOTEs and no launcher. Spec 13 and this spec spell the copy with the same
+  `sed` range and the same kept calls. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -111,7 +117,9 @@ taking `6` and `40` silently.
 A NOTE says "declared nothing, took the default, declare one here"; from a shell with no conf named
 the third clause is false and the second is the defect. The driver's malformed-value branch already
 treats a value nobody could have set as a refusal, and an unset `CONF` is the same fact one level
-up.
+up. Under a caller's `set -u` the NOTE line is a shell error before it is a NOTE — `CONF: unbound
+variable`, exit 1 — and a shell error names neither the contract nor the remedy; the guard reads
+`${CONF:-}` and refuses the same way with or without `set -u` in the caller.
 
 ### Inventory
 
@@ -122,7 +130,7 @@ No identifier is minted; the guard is two lines inside a function unit 5 moves.
 | file | change |
 |---|---|
 | `tools/unattended/lib-unattended.sh` | the guard and the header sentence on `read_bound_key` |
-| `tools/unattended/resume-tick.test.sh` | two arms: the bare-shell call with `CONF` unset and with `CONF=/nonexistent/path`, and the tick copy made by the `sed` range of S3 with both calls kept |
+| `tools/unattended/resume-tick.test.sh` | two arms: the bare-shell call with `CONF` unset and with `CONF=/nonexistent/path`, and the tick copy made by the `sed` range of S3 with both calls kept; U13's two BLOCK-copy rows re-read from exit 1 and the unbound-variable line to exit 2 and the sentence; `FLOOR_ASSERTIONS` re-derived |
 
 ### Alternatives rejected
 
@@ -168,9 +176,11 @@ the lib, so no reading below is taken there.
   block gone, both `read_bound_key` calls kept, `grep -c '^read_bound_key '` over the copy printing
   2 — runs as `bash resume-tick.sh --repo <fixture>`, it exits 2, stderr carries the same sentence,
   no `declares no` line prints, and no launcher file is written under the sidecar; against the
-  staged break the copy walks, prints two NOTEs with an empty path, and launches attempt 1 — which
-  is the reading spec 13's NOTE arm records at its own order.
+  staged break the copy exits 1 with `CONF: unbound variable` from the library's NOTE line under
+  the tick's `set -u`, zero NOTEs and no launcher — which is the reading spec 13 rev-4's NOTE arm
+  records at its own order.
   Red when: a tick that named no conf walks on defaults, which is the H4 arm's own green-by-absence;
+  or dies as a shell error instead of refusing with the sentence, which is the break's own reading;
   or the copy holds fewer than two calls, which is the block removed with the calls and a copy that
   never enters the function.
   fixture: the tick copy is made by the arm with the `sed` range above, in the scratch kit dir,
@@ -214,6 +224,17 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-21 · §1 · S3 · S4 · §4 · AC2 · inherited at this pass the FACT-QUESTION spec 13
+  rev-4 resolved (M3) and said this spec would inherit: the BLOCK copy's reading at unit 13's order
+  was carried here as two empty-path NOTEs and a launched attempt 1, which needs `CONF` set and
+  empty and nothing does that; the tick runs under `set -u`, so the copy dies at the library's NOTE
+  line — `CONF: unbound variable`, exit 1, zero NOTEs, no launcher — observed by this pass's own
+  RED run of the U18 arm block against the lib at the tip of order 13, where the copy's exit read 1
+  and the sentence was absent, eight rows red of ten. The break, the mechanism and the guard's
+  reading are unchanged; every carrier of the old reading in this spec is corrected, and S3 and the
+  Files-touched row now say U13's two exit-1 rows are re-read to the tip's reading, which spec 13
+  S4 already states. AC1's bare-shell readings stand as written: a bare `bash` runs no `set -u`, and
+  the empty-path NOTE printed there at exit 0 against the same break.
 - rev-2 · 2026-09-20 · §1 · S1 · S3 · S4 · §3 · §5 · AC1 · AC2 · AC3 · AC4 · §7 · folded
   spec-audit round 3: sibling agreement for the promoted `TOOL-aWokenSentinel-24` (H4, raw 18) —
   the BLOCK copy is spelled once, in §1, S3, the Edges and AC2, as the `sed` range from `CONF=`

@@ -357,8 +357,10 @@ check_same "AC12 two lines, one per tree" "$(printf '%s\n' "$OUT" | grep -c '')"
 # ---- named with the tick copy it is RED against; a pass observes those from a sourced copy of
 # ---- this prologue, and only the BLOCK copy is staged here, because unit 18 re-reads it:
 # ----   SOURCE   — `. "$CONF"` removed: a declared 2 reads as 6, a declared 7 as 40, the NOTE prints
-# ----   BLOCK    — `CONF=` through `. "$CONF"` removed, both read_bound_key calls kept: at this
-# ----              order the copy dies under set -u at the NOTE's $CONF — exit 1, zero NOTEs
+# ----   BLOCK    — `CONF=` through `. "$CONF"` removed, both read_bound_key calls kept: at unit
+# ----              13's order the copy died under set -u at the NOTE's $CONF — exit 1, zero NOTEs;
+# ----              from unit 18 on it is the library's own refusal, exit 2, and the rows below
+# ----              read that, because a suite holds one reading and it is the tip's
 # ----   WORKTREE — each worktree's conf sourced into the tick's shell mid-walk: the tree's 6 wins
 # ----   CLEAR    — the two clearing assignments removed: an exported `abc` is blamed on the conf
 # AC1 — a declared RESUME_ATTEMPTS="2" with two post-move lines is EXHAUSTED, and no NOTE prints.
@@ -391,8 +393,8 @@ check_same "U13 the BLOCK copy keeps both read_bound_key calls" "$(grep -c '^rea
 build_fixture 999999999
 run_tick_over "$BLOCK/resume-tick.sh"
 check_same "U13 the BLOCK copy names a file in no NOTE" "$(measure_note_files "$ERR")" "0"
-check_same "U13 the BLOCK copy exits 1 at this order" "$RC" "1"
-check_hit "$ERR" "CONF: unbound variable" "U13 the BLOCK copy dies under set -u at the NOTE's \$CONF"
+check_same "U13 the BLOCK copy exits 2 from unit 18 on" "$RC" "2"
+check_hit "$ERR" "read_bound_key was called with CONF unset" "U13 the BLOCK copy is refused by the library, not by set -u"
 check_same "U13 the BLOCK copy prints no NOTE and no launcher" "$(printf '%s\n' "$ERR" | grep -c 'declares no') · $(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "0 · 0"
 # AC4 — the bounds are ROOT-scoped. A second worktree whose conf declares MEMORY_ROOT=mem2 and
 # RESUME_ATTEMPTS="6" is walked under mem2 (MEMORY_ROOT stays that tree's, a subshell read) and
@@ -429,13 +431,40 @@ RESUME_ATTEMPTS=abc run_tick_over "$TICK"
 check_hit "$ERR" "declares no RESUME_ATTEMPTS" "U13 exported junk with no declaration still announces the default"
 check_hit "$OUT" "· resumed · attempt 3 · out " "U13 the kit default caps, not the environment"
 
+# ---- U18 (TOOL-aWokenSentinel-18): `read_bound_key` refuses a caller that named no conf, exit 2.
+# ---- Both arms are RED against the lib at the tip of order 13, which holds the hoisted function and
+# ---- no guard: there the bare-shell call exits 0 with `Declare one in  to change it`, the empty
+# ---- path, and the BLOCK copy dies under set -u at the NOTE's $CONF, exit 1 — a shell error, not
+# ---- a refusal that names the contract.
+# AC1 — a bare bash that sourced the library and named no CONF exits 2 with the guard's sentence, and
+# so does one whose CONF names no file: two conjuncts of one guard, one failing observation each.
+LIB_ERR=$(env -u CONF bash -c ". \"$KIT/lib-unattended.sh\"; read_bound_key RESUME_ATTEMPTS 6 attempts n" 2>&1 >/dev/null); LIB_RC=$?
+check_same "U18 a bound read with CONF unset exits 2" "$LIB_RC" "2"
+check_hit "$LIB_ERR" "read_bound_key was called with CONF unset" "U18 the unset refusal names the contract"
+check_miss "$LIB_ERR" "Declare one in  to change it" "U18 the empty-path NOTE is not producible"
+LIB_ERR=$(CONF=/nonexistent/path bash -c ". \"$KIT/lib-unattended.sh\"; read_bound_key RESUME_ATTEMPTS 6 attempts n" 2>&1 >/dev/null); LIB_RC=$?
+check_same "U18 a bound read with CONF naming no file exits 2" "$LIB_RC" "2"
+check_hit "$LIB_ERR" "read_bound_key was called with CONF unset or naming no file" "U18 the missing-file refusal is the same sentence"
+check_miss "$LIB_ERR" "Declare one in /nonexistent/path" "U18 no NOTE names a file that does not exist"
+# AC2 — the BLOCK copy (the conf block gone, both calls kept) over a fresh fixture: exit 2, the
+# sentence, no NOTE, no launcher. Staged inline here as U13 stages its own, until unit 24's helper
+# makes the two one artifact.
+BLOCK18="$TMP/kit-block18"; mkdir -p "$BLOCK18"; cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$BLOCK18/"
+sed '/^CONF=/,/^\. "\$CONF"$/d' "$TICK" > "$BLOCK18/resume-tick.sh"
+check_same "U18 the BLOCK copy keeps both read_bound_key calls" "$(grep -c '^read_bound_key ' "$BLOCK18/resume-tick.sh")" "2"
+build_fixture 999999999
+run_tick_over "$BLOCK18/resume-tick.sh"
+check_same "U18 a tick that named no conf exits 2" "$RC" "2"
+check_hit "$ERR" "read_bound_key was called with CONF unset" "U18 the tick's refusal is the guard's sentence"
+check_same "U18 the refused tick prints no NOTE and no launcher" "$(printf '%s\n' "$ERR" | grep -c 'declares no') · $(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "0 · 0"
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Derived from
-# the nine arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20/21 (the pass
+# the ten arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20/21 (the pass
 # that wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, U12 6,
-# AC12 8, U13 27 — 94 executed, pinned at ~10% headroom. The main loop's first green at VERIFYING
-# confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=84
+# AC12 8, U13 27, U18 10 — 104 executed, pinned at ~10% headroom. The main loop's first green at
+# VERIFYING confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=94
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

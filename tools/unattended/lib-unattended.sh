@@ -67,8 +67,12 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
 # ------------------------------------------------------------------------------ bounds, once
 # MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its two
 # knobs through this function, and the driver its four, so it lives where both source it. THE
-# CALLING-SHELL CONTRACT: the caller has sourced its conf into the shell that calls this and has
-# named that file in `CONF` — `${!name}` reads the calling shell, and the NOTE interpolates `$CONF`.
+# CALLING-SHELL CONTRACT, on the function line and ASSERTED by its first line (TOOL-aWokenSentinel-18):
+# `${!name}` reads the calling shell, and the NOTE interpolates `$CONF`, so a caller that named no
+# conf would be handed a default announced with nowhere to change it — `Declare one in  to change
+# it`, the empty path — or, under `set -u`, a shell error naming neither contract nor remedy. That
+# is a refusal here, in the one function every caller shares, so the next script that sources this
+# library from an unsourced shell refuses on its first run instead of taking the defaults silently.
 # A BOUND KEY: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6, hoisted at its second
 # instance by TOOL-aProbedUnit-3 — the charter's section 12 extracts the shared contract when the
 # second caller arrives, and the third (`REVIEW_ROUNDS`) is a call, never a third `case`.
@@ -84,7 +88,10 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
 # <UNIT> is an argument because a caller may count rounds rather than seconds, and a refusal that
 # says `seconds` about a round count is a false sentence. No `fail` branch here: this runs before
 # `fail()` exists and refuses with exit 2, the misconfiguration code, exactly as the block it replaces.
-read_bound_key() { # NAME · DEFAULT · UNIT · NOTE
+read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the conf into THIS shell and named it in CONF
+  [ -n "${CONF:-}" ] && [ -f "$CONF" ] || {
+    echo "unattended: REFUSING - read_bound_key was called with CONF unset or naming no file, so its NOTE could name nowhere to declare the key and a default would be taken from nowhere; set CONF to the sourced conf before the call" >&2
+    exit 2; }
   local _bk_name="$1" _bk_default="$2" _bk_unit="$3" _bk_note="$4" _bk_val
   _bk_val="${!_bk_name:-}"
   case "$_bk_val" in
