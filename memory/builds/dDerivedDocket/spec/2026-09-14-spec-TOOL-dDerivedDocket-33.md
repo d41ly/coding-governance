@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 33
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -191,10 +191,10 @@ What each rule refuses on purpose:
 
 ### Severity
 
-Measured 2026-09-14 at BASE over the four legacy shards: 0 of 521 rows carry an upper-case level word
-(`BLOCKER`, `HIGH`, `MED`, `LOW`), and the 18 case-insensitive hits in the TOOL shard are prose about
-review findings, not a label on the ask. PINNED as that measurement; the script re-derives the count
-at signing time and prints it. A mechanical severity rule would therefore either label nothing or
+Measured 2026-09-14 at `abac6d59` over the four legacy shards: 0 of 521 rows carry an upper-case
+level word (`BLOCKER`, `HIGH`, `MED`, `LOW`), and the 18 case-insensitive hits in the TOOL shard are
+prose about review findings, not a label on the ask. Re-measured 2026-09-16 at `fb07ca25`: 0 of 580
+rows. PINNED as those measurements; the script re-derives the count at signing time and prints it. A mechanical severity rule would therefore either label nothing or
 invent a level, and D7 is forward-only, so no legacy ask is required to carry one (§8 F2).
 
 ### Where the triage dispositions land
@@ -209,14 +209,14 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
 
 | Identifier | Kind | Where | Cell |
 |---|---|---|---|
-| the signing script | build-folder python artifact, unit tail `signer` | `memory/builds/dDerivedDocket/build/` | not graded: the naming leg's population is `tools/`, `skills/`, `.githooks/` and `.claude/`; its functions still lead with a verb `.lexicon.conf` declares |
+| the signing script | build-folder python artifact, unit tail `signer` | `memory/builds/dDerivedDocket/build/` | graded: `tools/lexicon/lexicon.py` walks every tracked file, build folders included, so its functions lead with a verb `.lexicon.conf` declares and add nothing to `VERB_OFFENDER_PIN` |
 | the signed same-id record | build record, unit tail `signed-same-id` | same folder | recording-file grammar, check 5 |
 | the signed triage record | build record, unit tail `signed-triage` | same folder | recording-file grammar, check 5 |
 | the landing same-id record | build record, unit tail `signed-same-id-landing` | same folder | recording-file grammar, check 5 |
 | the landing triage record | build record, unit tail `signed-triage-landing` | same folder | recording-file grammar, check 5 |
 | the switch-over same-id record | build record, unit tail `signed-same-id-switch` | same folder | recording-file grammar, check 5 |
 | the switch-over triage record | build record, unit tail `signed-triage-switch` | same folder | recording-file grammar, check 5 |
-| `--worksheets`, `--tail` | options of the signing script | the script | not graded: a build-folder script |
+| `--worksheets`, `--tail` | options of the signing script | the script | not graded: flags, not definitions |
 | rule ids U1-U4, T1-T6 | labels inside the records | the two records | none |
 | the decision row | one `memory/DECISIONS.md` row, keyed by this unit's id | TOOL heading | entry budget, check 7 |
 
@@ -231,7 +231,7 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
 
 - **A `--sign` mode in the migrator.** Rejected by M3 veto 2 (§8 F1).
 - **Signing by hand from the worksheets.** Not re-derivable: a reader re-applying the rules by eye
-  across roughly 150 pairs and roughly 275 asks cannot tell a rule error from a transcription error.
+  across roughly 150 pairs and roughly 325 asks cannot tell a rule error from a transcription error.
 - **Re-deriving the planner's history evidence in the script.** Two implementations of one walk, and
   the one that disagrees is unfindable. The cheap facts, a spec's token and a sha's existence, are
   re-read because a wrong one signs a closure; the expensive one is consumed and cited.
@@ -288,8 +288,8 @@ disposition is this run's judgment under delegation, so it does not (§8 F4).
 - **AC7** — When the signed triage record is read, no row's severity cell is anything but
   `unlabelled`, and the header states the level-word census and the count the script derived.
   Red when: a default level is written for a row whose text records none.
-  figure: the census is PINNED at 0 of 521 legacy rows, measured 2026-09-14 at BASE, and the script
-  re-derives it on every run.
+  figure: the census is PINNED at 0 of 521 legacy rows, measured 2026-09-14 at `abac6d59`, and 0 of
+  580 re-measured 2026-09-16 at `fb07ca25`; the script re-derives it on every run.
 - **AC8** — When `anchor_at` from `tools/memory-recall/extract.py` runs over every line of both
   signed records it returns no id, and `python tools/memory-tree/corpus_ids.py --check` reports no id
   defined twice.
@@ -377,7 +377,7 @@ this unit's pass and again by the flip before it applies the records.
   (b). The one-writer rule puts a judgment in its author's file, and design §17.2 already moved the
   closeout's satisfying record to any file for exactly this case.
 - **F5** — In which order do U1 to U4 run? (a) U1 first, as rev-1 lists them. (b) U2 first.
-  Measured for the G5 audit at BASE: all four design-named rows carry evidence `none`, so under (a)
+  Measured for the G5 audit at `abac6d59`: all four design-named rows carry evidence `none`, so under (a)
   U1 decides each and AC3's "under rule U2" is never observed. RESOLVED (agent, 2026-09-14,
   delegated): (b); the design's denial dominates evidence, which is also the conservative order.
 - **F6** — What leads a signed row, and in what order are the rows? (a) A row number, unordered, as
@@ -425,6 +425,60 @@ this unit's pass and again by the flip before it applies the records.
   `--tail landing`, compares both with this unit's default records, and reads each tail's records
   unchanged by the other run. S8 names the switch-over's re-sign beside the landing's, as unit 34
   Rollout step 5 cites it.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No path this unit cites moved in a way
+  that changes it: `anchor_at` in `tools/memory-recall/extract.py`, `corpus_ids.py --check`, the
+  hygiene check numbers 5, 7, 13 and 14, `reuse_lookup.py` and the curation-debt row at line 54 all
+  read as `abac6d59` had them. §4 Severity and AC7's figure line name `abac6d59` for the pinned
+  0-of-521 census and add the re-measurement at `fb07ca25`, 0 of 580, since "BASE" now names the new
+  base. §4 Inventory's signing-script cell said the naming leg's population was four directories;
+  `tools/lexicon/lexicon.py` walks every tracked file at both bases and lists build-folder scripts
+  among its offenders, so the cell now reads graded, with the same verb requirement. No landed build
+  does what an S-item plans. aProbedUnit's no-gate rule leaves every criterion as it stands: each
+  runs the signer, its `--check`, `corpus_ids.py --check` or the planner, none of which is a gate leg
+  or a suite. §10 records the base. Extended 2026-09-20, finishing the pass the first regrounder
+  left open: every count this spec can measure is re-measured at `fb07ca25`. The legacy row census,
+  0 of 521 at `abac6d59` and 0 of 580 here, REPRODUCES over the four shards. §10's anchor-hazard
+  figure was the design's 27 alone and now carries the re-measurement, 28 of 658 distinct legacy ids
+  over the four shards and the three TOOL backlog archives, with the added id and its anchor named;
+  the 14 from the three hand-typed resolution tables is unmoved, because the addition is a spec's
+  dash bullet. §4 Alternatives said roughly 275 asks and the triage population is roughly 325 at
+  this base, 326 on 59 terminal builds where `abac6d59` had 288 on 56 — more signing work, no rule
+  change. The four U2 ids, the curation-debt row at line 54 and all three §7 legs still resolve at
+  HEAD. This unit moves no kit version: its script is a build record. Extended 2026-09-20 by the
+  regrounding consolidation: the anchor-hazard sentence in §10 now says in terms that the ratified
+  design record stays as it is and that 27 is its `abac6d59` measurement. The four build-wide rules
+  leave the rest of this spec alone, and each was checked rather than assumed — no criterion here
+  observes a `.test.sh` or `selftest.py` FILE, a merge bar or a gate-leg command (the signer, its
+  `--check`, `corpus_ids.py --check` and the planner are none of those, re-verified against
+  `tools/gate-legs.json` at HEAD, where `corpus_ids.py` is declared only with `--selftest`); §7 adds
+  no arm, so no `New arm:` third field exists to price; no criterion asserts that a phrase counts
+  zero against HEAD, because every absence this spec reads is read over records the unit itself
+  writes; and this unit touches no capped carrier, its writes being its build folder and one
+  `memory/DECISIONS.md` row.
+  Extended again 2026-09-20 by the closing consolidation, which moved nothing here and says why.
+  The capped-carrier rule tightened from a ceiling to NET ZERO build-wide; this unit writes no row
+  of `tools/template-size-limits.txt` and `memory/DECISIONS.md` is an index under its own cap with
+  room, so no trim and no size criterion is owed. The orchestrator ratified the deferral reading
+  this spec already applies, a gate-leg command or a suite FILE invocation deferring to the run at
+  VERIFYING while a `--selftest` flag or a read-only verb stays in the pass, and no criterion here
+  is of the deferring kind. §10's anchor-hazard pair was re-read and stands: the design record keeps
+  its `abac6d59` count and this spec carries the `fb07ca25` re-measurement beside it, naming the one
+  added id and its anchor. The header date moves to the last-change date, 2026-09-20, with the rev
+  kept.
+  Extended again 2026-09-20 by the close-out pass, which moved one word. §8 F5 said its evidence
+  reading was "measured for the G5 audit at BASE" while §10 of this spec declares BASE to BE
+  `fb07ca25`; that audit ran at `abac6d59`, so the fork now names that commit and the spec stops
+  using one word for two of them. Nothing else moved, and the four closing rulings were each
+  checked against this spec rather than assumed away: it writes no row of
+  `tools/template-size-limits.txt` and claims no passage of any capped carrier, so neither net
+  zero nor its 2048-byte scoping nor the trim-collision ruling reaches it; it writes neither
+  `.unattended.conf` nor `tools/unattended/.unattended.conf.example`, so it owes no section 8
+  key-table row; every criterion runs the signer, its `--check`, `corpus_ids.py --check` or unit
+  11's planner, none of which is a gate-leg command over the real tree or a suite FILE, so the
+  narrow reading leaves all fifteen in the pass and no `permission:` line is owed; and
+  `tools/gate-legs.json` at HEAD gives none of §7's three legs `subject = kit` or
+  `chunk = selftests`, so no HELD leg is named here and no deferral needs the verifying run's
+  flags. The header date already reads 2026-09-20 and the rev is kept.
 
 ## 10. Reuse audit
 
@@ -435,12 +489,29 @@ proposal, and its scan-coverage line reports the shell layer unscanned. The reca
 design record, the brief's own delegation section, and the curation-debt note for
 `TOOL-aWeighedCompass-3`, and no record of any earlier delegated signing. The nearest prior art is
 the three hand-typed resolution tables unattended runs wrote for foreign ids, which design §19.1 K9
-measured as the source of 14 of the 27 anchor-hazard ids; §4's rule-id-first record shape exists
+measured as the source of 14 of the 27 anchor-hazard ids it counted at `abac6d59`, 27 of 599
+distinct legacy ids; re-measured at `fb07ca25` the hazard set is 28 of 658, its one addition the ask
+id `TOOL-aKeyedAnnotation-9`, which gained a dash-bullet anchor at
+`memory/builds/aDeferredBar/spec/2026-09-13-spec-TOOL-aDeferredBar-2.md:124` — an unattended run's
+own record, like the rest. The design record is RATIFIED and stays at its own measurement: its 27 is
+the count at `abac6d59`, correct for that tree, and this spec carries the re-measurement beside it
+rather than re-stamping a ratified record. §4's rule-id-first record shape exists
 to avoid exactly that. The recorded precedent for a closeout rule is nicocares' closed-build rows
 gate, which is external and is upstreamed by this build's closeout verdict, not by this unit.
 
 Where the design and the source disagree at BASE: design §11 cites the curation-debt row for the TOOL
 shard at line 46, and it is at `memory/project/curation-debt.txt:54`. Nothing in this unit depends on
 it.
+
+BASE is `fb07ca25`. Against `abac6d59` it leaves `tools/memory-recall/extract.py`,
+`tools/codebase-map/reuse_lookup.py` and `memory/project/curation-debt.txt` byte-identical.
+`tools/memory-tree/corpus_ids.py` and `tools/memory-tree/check-memory-hygiene.sh` moved without
+changing the `--check` mode or the check numbers this spec cites. `tools/lexicon/lexicon.py` moved
+and still grades every tracked file, which §4 Inventory now states. The legacy shards grew from 521
+rows to 580, still with no upper-case level word. No
+landed build (aProbedUnit, aDeferredBar, aReplayedCard, dMergedTally, dPolishedVitrine,
+dUnstagedSymbol, aRatifiedRulings) signs a table, triages an ask or writes a backlog disposition.
+aProbedUnit's child prompt in `tools/workflows/unattended-unit.js` runs no gate, suite or bar in a
+pass, and nothing this unit observes is one.
 
 Recall terms used: `same-id pair unit marker adjudication triage closeout KEEP WONTDO delegated signing owner curation-debt backlog shard`

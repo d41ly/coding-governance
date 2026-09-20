@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-26 — honest verdicts under contention
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 26
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
@@ -31,10 +31,12 @@ that row stays OPEN.
 ## 2. Scope (IN)
 
 - **S1** — the serial retry. A leg whose ceiling FIRED is deferred rather than failed: rc 124 with a
-  positive bound in its `.bound` file, or rc 137 whose `.sec` is at or above that bound, which is
-  `timeout -k`'s kill after an ignored TERM. Every other rc 137 — a self-kill, an OOM kill, an
-  operator's or a CI cancel — stays a FAIL with today's `killed after <s>s, ceiling <n>s` tail. The
-  red attribution unit reads CONTENDED by this same predicate. The reader prints
+  positive bound in its `.bound` file, or rc 137 under a positive bound whose `.sec` is at or above
+  it, which is `timeout -k`'s kill after an ignored TERM. Every other rc 137 — a self-kill, an OOM
+  kill, an operator's or a CI cancel, under a bound or with none — stays a FAIL with today's tail:
+  `(killed after <s>s, ceiling <n>s)` under a positive bound, and `(killed after <s>s)` with a bound
+  of 0 (`tools/run-gates/run-gates.sh:1494` and `:1499`). The red attribution unit reads CONTENDED
+  by this same predicate. The reader prints
   `GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; one serial retry after the pool
   drains)` in its manifest position. After the pool drains, and while the run's wall is still armed,
   each deferred leg runs once more alone under its own ceiling. A pass prints
@@ -62,7 +64,7 @@ that row stays OPEN.
   spawn-cost measurement, the runner reaps the timed-out attempt's process tree with `run_leg_reap`
   (`tools/run-gates/run-gates.sh:1001`): `runleg` writes `.rc` after a timeout without reaping, and
   both the outstanding-leg reaper and the wall watcher skip a leg that has an `.rc` (`:1033`,
-  `:1615`). When a deferred leg times out again on its retry, the runner measures once more, and the
+  `:1621`). When a deferred leg times out again on its retry, the runner measures once more, and the
   leg is HOST when that figure exceeds `GATE_HOST_RATIO` times the floor. The ratio is a source
   constant of 4 (§8 F1). The bar exits 4, printing `gates HOST — <n> leg(s) timed out twice while a
   spawn cost <x>x this clone's floor; the verdict is about the host, not the subject`, only when
@@ -90,11 +92,16 @@ that row stays OPEN.
   `TOOL-dDerivedDocket-13` and run-gates in `TOOL-dDerivedDocket-1`, and this unit's bytes ride those
   moves — `kit version markers` grades only the final tree's agreement.
 - **S9** — the kickoff manifest. `memory/guides/SESSION-KICKOFF.md`'s command-block line that a leg
-  outliving its `ceiling` is killed 'RED naming the leg and the number' (`:127` at BASE) is
+  outliving its `ceiling` is killed 'RED naming the leg and the number' (`:134` at BASE) is
   rewritten: a leg whose ceiling fired gets one serial retry, a pass on it counts green and is
   counted in `retried`, and a bar whose only failures are HOST exits 4. `last-audit` is re-stamped in
   the same commit with a delta line, because `tools/run-gates/run-gates.sh` is in the manifest's
-  `watch:` list. Observed by AC13.
+  `watch:` list. The rewrite LANDS NET ZERO on that carrier. The passage is the single command-block
+  ceiling line at `memory/guides/SESSION-KICKOFF.md:134`, and its replacement is written no longer
+  than the line it replaces. What will not fit in one line — the retry's own tail, the `pending`
+  chunk verdict and where exit 4 sits in the precedence — goes to `tools/run-gates/README.md`,
+  which S8 already has this unit writing and which owns the runner's exit codes. Observed by AC13
+  and AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -132,12 +139,14 @@ stdout      GATE retry  <leg>  (timed out after <n>s beside <k> neighbours; ...)
 
 Every new tail keeps the two-space tail contract (`tools/run-gates/run-gates.sh:1439-1445`), so
 `read_gate_verdicts` in `tools/govkit/govkit.py` still splits the bare leg name. It ignores the
-unknown `GATE retry` prefix and takes the leg's final `ok` or `FAIL` line.
+unknown `GATE retry` prefix and keeps the FIRST line per leg under each declared prefix
+(`tools/govkit/govkit.py:3578`); a deferred leg prints exactly one `ok` or `FAIL` line, after its
+retry, so that first line is the retry's verdict.
 
 ### The retry pass
 
 The reader's walk is unchanged except for the deferral. After the terminal `wait`
-(`tools/run-gates/run-gates.sh:1671`) and before `remove_wall_watcher`, a loop runs each deferred
+(`tools/run-gates/run-gates.sh:1677`) and before `remove_wall_watcher`, a loop runs each deferred
 leg through the existing `runleg` into fresh `.retry` files, one at a time. Keeping the wall armed
 is the bound on the retry: a retry cannot extend the run past its declared wall. Each deferred leg's
 first attempt is reaped before its retry starts.
@@ -170,7 +179,10 @@ exactly as `GATE_SPAWN_CMD` is.
 
 `tools/run-gates/run-gates.sh`, `tools/run-gates/run-gates.test.sh`, `tools/run-gates/README.md`,
 `.githooks/pre-push`, `.githooks/pre-push.test.sh`, `tools/drift-audit/drift_report.py`,
-`tools/drift-audit/selftest.py`, `memory/guides/SESSION-KICKOFF.md`.
+`tools/drift-audit/selftest.py`, `memory/guides/SESSION-KICKOFF.md`, and
+`memory/map/generated/symbols.json`, regenerated and staged in the commit that adds
+`measure_legs_retried_after_timeout`, because the pre-commit codebase-map leg refuses a staged
+`.py` whose map is stale or whose regenerated artifacts are unstaged.
 
 ### Alternatives rejected
 
@@ -214,73 +226,107 @@ exactly as `GATE_SPAWN_CMD` is.
   `beside 0 neighbours` for the lone hang. The arms live in `tools/run-gates/run-gates.test.sh`.
   Red when: the retry is removed, and the contended leg reads FAIL on its first timeout; or
   `measure_neighbours` prints a constant, which both fixtures accept unless the two counts are pinned.
-  permission: the canary is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC2** — When a chunk holds a deferred leg, its chunk line reads `pending` and the `---- retry:`
   line carries the final verdict. Red when: the chunk closes `green` before its retry has run.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC3** — When a fixture bar queues behind a planted live holder and then acquires, stdout carries
   `gate queue: acquired ` after `gate queue: waited ` and the run record header carries the same
   timestamp. Red when: the line is printed before the wait ends, or not at all.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC4** — With a planted floor of 1 ms and `GATE_SPAWN_CMD` seamed to cost 50 ms, a leg that times
   out twice ends HOST and `bash tools/run-gates/run-gates.sh` exits 4; with no floor file the same leg
   ends `GATE FAIL  ` naming the missing calibration. Red when: HOST is granted without a recorded
   floor — this bar's own start measurement taken as its calibration, which ends the arm FAIL with a
   ratio and no missing-calibration note, or an absent floor read as zero, which ends it HOST — the
   break DR 21.4 U24 names.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC5** — When a planted beacon names a dead pid, the bar still prints a verdict line and writes a
   verdict file; and in `.githooks/pre-push.test.sh` a fake runner that exits 0 writing no record gets
   its push blocked. Red when: the hook trusts the exit status alone, the TOOL-aSurfacedLexicon-25
   path.
+  permission: the canary and the hook suite are held, so they run at the build's one post-build
+  bar, spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC6** — When a scoped run with `GATE_REUSE=1` meets a leg whose ledger row reads `retried`, it
   runs the leg. Red when: `retried` is accepted as `ok` by the reuse predicate.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC7** — When `python tools/drift-audit/drift_report.py` runs over a fixture git dir holding two
   verdict files with `retried 1`, it reports 2 for `legs_retried_after_timeout`, and it prints DEAD
   PROBE over a git dir holding none. Red when: an unreadable population reports 0.
+  permission: the arm lives in `tools/drift-audit/selftest.py`, a held kit leg, so it runs at
+  the build's one post-build bar, spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
+  never a plain bar.
 - **AC8** — When `tools/run-gates/README.md` is read after this unit, its exit-code section lists
   exit 4 and the precedence of exits 1, 3 and 4, and it names the `GATE retry` tail and the `pending`
   chunk verdict.
   Red when: the README's exit codes stop at 3, so a caller reading them treats HOST as a red leg.
 - **AC9** — When a fixture leg SIGKILLs itself about 2 s into a 600 s ceiling, the bar prints no
   `GATE retry` line for it and ends it `GATE FAIL` with its `killed after` tail and no `timed out`
-  text; and the `4h` and `stubborn` arms pass pinning the new retry tails.
+  text; the `4h` and `stubborn` arms pass pinning the new retry tails; and the `4h-nobound` arm, the
+  same self-kill with no ceiling declared, passes unedited.
   Red when: every rc 137 with a positive bound is deferred, so a self-killed or OOM-killed leg is
-  retried, printed as timed out, and counted green when its retry passes.
-  permission: the canary is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`.
+  retried, printed as timed out, and counted green when its retry passes; or an rc 137 with a bound
+  of 0 is deferred because its `.sec` is at or above that zero, so the `4h-nobound` arm reads a
+  `GATE retry` line where it pins `(killed after <s>s)`.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC10** — With a planted floor of 1 ms and `GATE_SPAWN_CMD` seamed to 50 ms, when a fixture
   bar's only failed leg times out twice while another leg edits a tracked file mid-bar,
   `bash tools/run-gates/run-gates.sh` exits 4 and its `gates HOST` line names the moved tree; with a
   third leg failing an assertion too, it exits 1 and its RED line names the move and the HOST leg.
   Red when: the exits are ranked by whichever check runs last, so one bar exits 1 under one unit's
   rule and 4 under the other's, and the driver blames the subject or holds by accident.
-  permission: the canary is held; it runs at the build's one post-build bar.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC11** — When a fixture leg's timed-out attempt leaves a grandchild that keeps spawning and has
   written its pid to a file, that pid is dead when the leg's serial retry starts, as
   `tools/run-gates/run-gates.test.sh` observes.
   Red when: the reap is removed, so the attempt's own descendants run through the retry and the
   spawn measurement, and a bar exits 4 as HOST over its own leftovers — which the gate-wall unit holds
   as host-degraded and auto-resume re-enters.
-  permission: the canary is held; it runs at the build's one post-build bar.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC12** — When `bash tools/run-gates/run-gates.sh` runs over an empty fixture manifest, it exits 2
   printing `REFUSED` and naming the missing leg lines; when the verdict-file write is forced to fail
   through the unit's arm seam, it exits 2 naming the verdict file. Each is staged RED by removing its
   guard.
   Red when: the runner reaches its green branch with no leg line or no verdict file and exits 0,
   the zero-verdict pass §9 names, which AC5's dead-pid beacon arm never reaches.
-  permission: the canary is held; it runs at the build's one post-build bar.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC13** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
   passes with the re-stamped `last-audit`, and the §B ceiling line names the serial retry and exit 4.
   Red when: the stamp moves and the line still says a leg that outlives its ceiling is killed RED,
   so the front-loaded trap describes the BASE runner under a fresh stamp.
+  permission: the command is the `kickoff-manifest ratchet` leg; it runs at the build's one
+  post-build bar.
+- **AC14** — When `wc -c < memory/guides/SESSION-KICKOFF.md` is read at this unit's commit and at
+  its parent, the reading at this unit's commit is NO LARGER than the reading at the parent.
+  Red when: S9's replacement runs to a second line, so a carrier other units of this build write too
+  grows on a unit that priced itself at nothing. The detail that does not fit that one line has
+  AC8 for its landing in `tools/run-gates/README.md`, so the two criteria together are the whole
+  route and neither alone is. The cap half is red by the `memory hygiene` leg's index-cap check;
+  the NET delta against the parent is the half no leg reads, which is why this criterion reads
+  it.
+  permission: the reading is `wc -c` over a tracked file in the pass. NO CAP IS RAISED by this
+  unit: moving the 61440 is an owner turn.
 
 ## 7. Gates
 
-`run-gates canary` · `pre-push self-test` · `drift-audit selftest` · `drift-audit records` · `kit version markers` · `kickoff-manifest ratchet` · `memory hygiene`
+`run-gates canary` · `pre-push self-test` · `drift-audit selftest` · `drift-audit records` · `kit version markers` · `kickoff-manifest ratchet` · `codebase-map coverage + freshness` · `memory hygiene`
 
-Existing arms whose pinned tails S1 changes: `4h` (`tools/run-gates/run-gates.test.sh:1144`, pinning
-`(timed out after 3s)$`) and `stubborn` (`:1162-1172`) gain the serial-retry tail; `4h-kill`
-(`:1175-1206`) stays unedited and is the staged-RED arm for the fired-ceiling predicate.
+Existing arms whose pinned tails S1 changes: `4h` (`tools/run-gates/run-gates.test.sh:1149`, pinning
+`(timed out after 3s)$`) and `stubborn` (`:1166-1176`) gain the serial-retry tail; `4h-kill`
+(`:1179-1210`) stays unedited and is the staged-RED arm for the fired-ceiling predicate, and
+`4h-nobound` (`:1216-1244`), which pins the bound-0 kill tail, stays unedited beside it.
 
-New arm: tools/run-gates/run-gates.test.sh · a leg that times out only beside a spinner · none
-New arm: tools/run-gates/run-gates.test.sh · a seamed spawn cost against a planted floor · none
+New arm: tools/run-gates/run-gates.test.sh · a leg that times out only beside a spinner · the canary's executed-assertion floor
+New arm: tools/run-gates/run-gates.test.sh · a seamed spawn cost against a planted floor · the canary's executed-assertion floor
 New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record · none
 
 ## 8. Open questions
@@ -328,6 +374,56 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record ·
   kit's shipped bytes owning that kit's one version move: S8's version pointer names unit 13, whose
   S11 makes the drift-audit move, in place of unit 21; run-gates stays unit 1's, and S8's version
   clause stays NOT OBSERVED here.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). TOOL-aRatifiedRulings-4 gave
+  `report_one` a `(killed after <s>s)` tail for an rc 137 with no bound in play and the canary a
+  `4h-nobound` arm pinning it. §2 S1 therefore reads the rc-137 half of the fired-ceiling predicate
+  as "under a positive bound", as unit 23 §4 rule 2 now does, and names both of today's kill tails;
+  §6 AC9 adds that arm passing unedited and a `Red when:` for a deferred bound-0 kill; §7 names it.
+  Line citations re-read at fb07ca25: S5's wall-watcher skip is `:1621`, §4's terminal `wait` is
+  `run-gates.sh:1677`, §7's `4h` pinned line moved five lines down while the `stubborn` and
+  `4h-kill` arms moved four, and S9's kickoff ceiling line is `:134`. §4 no longer says `read_gate_verdicts` takes a leg's final line:
+  it keeps the first per prefix, which is the retry's because a deferred leg prints one. Files
+  touched gains `memory/map/generated/symbols.json`, which dUnstagedSymbol's pre-commit leg refuses
+  stale or unstaged when a `.py` is staged; §7 gains that pre-commit leg's own name,
+  `codebase-map coverage + freshness`, for the same reason. §7's two canary `New arm:` lines
+  name the executed-assertion floor they raise instead of `none`, a floor
+  TOOL-aRatifiedRulings-4 moved in the window.
+  §10's BASE paragraph describes fb07ca25. No S-item landed on main.
+  Extended 2026-09-20, same base, by the build-wide consolidation pass. AC2 to AC7 and AC13 gain
+  the `permission:` line AC1 and AC9 to AC12 already carried, so every criterion whose
+  observation is a held suite or a merge-bar leg command places that run at the build's one
+  post-build bar; AC8 reads a README and AC13's command is the `kickoff-manifest ratchet` leg's
+  own argv. That folds the CONSERVATIVE reading of BUILD-METHOD M6 and
+  `tools/unattended/gate-guard.js`; the ruling conflict behind it is parked for the owner in
+  this build's `RUN.md` and is not decided here. §7's three `New arm:` third fields were re-read
+  against each named suite and stand: neither the canary nor `.githooks/pre-push.test.sh` is one
+  of the two suites that pin an executed-assertion floor under the build-wide arm-line rule. The
+  one capped carrier this unit writes is `memory/guides/SESSION-KICKOFF.md`, 20057 bytes against
+  the 61440 its class declares.
+  Extended again 2026-09-20, same base, by the closing consolidation pass, which applied the
+  build's NET-ZERO rule to every capped carrier rather than only to the contested ones. §2 S9 now
+  NAMES the passage it rewrites, the command-block ceiling line at
+  `memory/guides/SESSION-KICKOFF.md:134`, and the document the detail that will not fit moves to,
+  `tools/run-gates/README.md`; new §6 AC14 reads the carrier at this unit's commit against its
+  PARENT and reds any growth. Naming the line is what lets the orchestrator see that no sibling
+  unit rewrites the same one: inside this closing set the passages taken are the §B `TMPDIR`
+  trap, this ceiling line, the §B M6 claim and the `last-audit:` stamp, and specs outside the set
+  write the same file, so the join across the whole build is the orchestrator's and no count of it
+  is typed here. The header date moves to the
+  last-change date; the rev does not, because the unit's scope did not move.
+  Closed 2026-09-20, same base, by the last consolidation pass before the spec audits re-run.
+  Every `permission:` line naming a HELD leg now spells the VERIFYING run
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, so the canary, the hook suite and
+  `tools/drift-audit/selftest.py` cannot be read as covered by a plain bar. Two rulings reached
+  this spec and changed nothing in it. §2 S9 REWRITES a real §B passage, the command-block ceiling
+  line, rather than merely re-stamping `last-audit:`, so it is a genuine replacement and not the
+  bookkeeping stamp the orchestrator ruled is neither a trim nor a collision. And the scoped
+  net-zero rule binds a carrier with less than 2048 bytes free, while
+  `memory/guides/SESSION-KICKOFF.md` has 41383 of its 61440 free, so AC14's no-larger reading is
+  stricter than the rule requires and is kept because it grades what §2 S9 promises. Rule 1's
+  narrow reading moved nothing: AC13 runs `manifest-check.sh` over the real tree and keeps
+  deferring, and every other observation is a suite file invocation. The header date stays at the
+  last-change date; the rev does not move.
 
 ## 10. Reuse audit
 
@@ -338,9 +434,15 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record ·
   extends: `runleg` and `report_one` for the retry, `input_key` and the `.leg` rows for the records,
   `GATE_RUN_ID` (`tools/run-gates/run-gates.sh:1084`) for the hook's pinned id, and `drift_report.py`'s
   `SIGNALS` list for S7.
-- **DR against BASE.** DR places the acquire line as the queue-status replacement for the refuted
-  TOOL-aUnblockedFleet-6; BASE agrees that `gate-queue-status` is deleted before a bar can be killed
-  (`tools/run-gates/run-gates.sh:925`), which is why the line is on stdout and in the run record.
+- **DR against BASE fb07ca25.** DR places the acquire line as the queue-status replacement for the
+  refuted TOOL-aUnblockedFleet-6; BASE agrees that `gate-queue-status` is deleted before a bar can be
+  killed (`tools/run-gates/run-gates.sh:925`), which is why the line is on stdout and in the run
+  record. Between `abac6d59` and fb07ca25 the runner moved only in its version pair and in
+  `report_one`, which gained the bound-0 kill tail and pushed the lines below it down by up to six; the queue,
+  `runleg`, `run_leg_reap`, the reuse predicate, `GATE_RUN_ID` and the main-shell `exit 0` sites
+  §3 reads did not move. `.githooks/pre-push`, `drift_report.py` and `read_gate_verdicts` did not
+  change, and the canary's timeout arms moved down four lines, its `4h` pinned assertion five, and
+  the suite gained `4h-nobound`.
 - **Rejected candidates** are in §4.
 - Recall terms used: `python tools/memory-recall/query.py "how should a leg killed by its ceiling
   under load be retried and distinguished from a real failure" --terms "ceiling timeout retry serial

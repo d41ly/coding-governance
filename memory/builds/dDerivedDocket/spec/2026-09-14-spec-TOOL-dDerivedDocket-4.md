@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 3
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -28,7 +28,9 @@ lists among this unit's closes.
 
 ## 2. Scope (IN)
 
-- **S1** HELD joins `PHASES_CORE` as a non-terminal phase, placed after LANDING. `CORE_FLOOR` in
+- **S1** HELD joins `PHASES_CORE` as a non-terminal phase, placed after RUNNING and before
+  VERIFYING, so the tail from VERIFYING that `tools/unattended/gate-guard.js` restates as its allow
+  set stays byte-equal and a HELD run is refused the flagged bar and the suites (F14). `CORE_FLOOR` in
   gov's `.unattended.conf` and in the kit's conf example moves from `12:12` to `13:12`; the DoD
   half moves later with the asks-disposed unit. Observed by AC9.
 - **S2** A verb
@@ -93,7 +95,8 @@ lists among this unit's closes.
   kit like the verb carrier; the protocol gains two rows, one in §3 and one in §7. The `unattended`
   dossier claims the new guide key. The Skill's Resume section carries §4's take-over rule, under
   which a take-over whose `--resume` refuses or prints `still held` reaps only the job it scheduled
-  and reads the result back. Observed by AC11.
+  and reads the result back, and its `/session-kickoff` step follows that `--resume`.
+  Observed by AC11 and AC23.
 - **S11** A DECISIONS row supersedes `TOOL-aBoundedVerdict-2`'s "never a new phase" for a
   non-terminal, resumable phase, minted by the orchestrator under this build's slug at build time.
   NOT OBSERVED by a criterion: it is a record, and check 13 and the recall floor grade its shape.
@@ -116,7 +119,7 @@ lists among this unit's closes.
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion for the unattended suites
-  this unit is allowed to run once at its end: `verdict clean`, with every inherited suite filed.
+  this unit's verification reads: `verdict clean`, with every inherited suite filed.
 - **hands-off** `TOOL-dDerivedDocket-3` — `derived_phase()` and the HELD refusals, which the landing
   path's `--close` and Land steps rely on, plus the companion guide the landing text may overflow
   into, including `--hold`'s unpublished-tip exception for `platform-unavailable`.
@@ -161,8 +164,11 @@ history-class, so `--status` counts it as noted rather than owed.
 
 ```
 HOLD_CODES_CORE = host-degraded platform-limit platform-unavailable host-owner-action inherited-red
-condition       = "after " <YYYY-MM-DDTHH:MM:SSZ> | "probe " ("host" | "gate" | "api") | "owner"
+condition       = "after " <utc-instant> | "probe " ("host" | "gate" | "api") | "owner"
 ```
+
+`<utc-instant>` is an ISO-8601 instant in UTC to the second with a trailing `Z`, the shape `held-at`
+records.
 
 The hold codes are a SECOND vocabulary beside the halt codes, not an extension of them: a halt code
 ends a run and a hold code pauses one, and one list would let a pause be recorded as an ending.
@@ -275,9 +281,19 @@ succeeds, never before it and never on this branch. Here the reap of the recorde
 
 The "reap before schedule" measurement paragraph stays, scoped to the take-over case. The Skill's
 keepalive section names the tick's first act, once a run-state file exists, as
-`--resume <slug> --keepalive-id <own id>`.
+`--resume <slug> --keepalive-id <own id>`. The stall probe `--audit <slug>`, which that section
+made the tick's prompt at BASE, stays as the tick's second act, and runs only after a first act
+that neither refuses nor prints `still held`. After either, this session may not drive the slug,
+and `--audit`'s `STALLED` instruction would have it re-dispatch units a live holder drives, or a
+held run's units, which is the double drive the lease exists to stop.
 
-Protocol §5's paragraph saying the new id cannot be recorded (`PROTOCOL.template.md:400-406`)
+The `/session-kickoff` step that follows, at BASE, the paragraph the take-over rule replaces is
+kept, and it runs after the `--resume` that neither refuses nor prints `still held`. Its hand-back
+continues at the phase the record names, and a HELD record names its held-from phase only once that
+resume has run. So the section's order sentence reads: read it, reap, schedule, resume, kick off,
+then do the work.
+
+Protocol §5's paragraph saying the new id cannot be recorded (`PROTOCOL.template.md:406-412`)
 becomes: "A take-over records the new id. A holder that replaces its own job records the replacement
 with `--replaces`. The `keepalive` fact therefore names the live job, and the close attestation
 covers that job." Its "reap before schedule" measurement is kept.
@@ -309,26 +325,27 @@ LANDED.
 
 | Function | Site at BASE | Reads | Why |
 |---|---|---|---|
-| `refuse_if_terminal` | `unattended.sh:1613` | derived; recorded under `--recorded` | KF15; only `--landed` passes `--recorded` |
-| `verb_preflight`, rotation test | `:2568` | derived | KF15 |
-| `verb_preflight`, phase-absent guard | `:2749` | direct, exempt | the read shares the line of the `set_fact … phase RUNNING` it guards |
-| `verb_resume` | `:2883` | derived | KF15 |
-| `verb_status` | `:2795` | derived | KF15, and the derived-terminal unit's S3 |
-| `check_single_live` | `:1283`, `:1324` | derived | the driver's twin of leg check 7's exclusion |
-| `archive_name_of` | `:1604` | recorded | names the archive by what the bytes it is handed say; the derived-terminal unit's rotation hands it a copy already carrying the terminal, before the write gate |
-| `verb_landed` | `:2270`, `:2282` | recorded | its own postcondition is a terminal; `:2282` reads another worktree's uncommitted copy |
+| `refuse_if_terminal` | `unattended.sh:1703` | derived; recorded under `--recorded` | KF15; only `--landed` passes `--recorded` |
+| `verb_preflight`, rotation test | `:2658` | derived | KF15 |
+| `verb_preflight`, phase-absent guard | `:2849` | direct, exempt | the read shares the line of the `set_fact … phase RUNNING` it guards |
+| `verb_resume` | `:3081` | derived | KF15 |
+| `verb_status` | `:2895` | derived | KF15, and the derived-terminal unit's S3 |
+| `print_audit` | `:3008` | derived | the `--audit` stall probe's finished-run refusal is the effective phase's, as `--status`'s is |
+| `check_single_live` | `:1373`, `:1414` | derived | the driver's twin of leg check 7's exclusion |
+| `archive_name_of` | `:1694` | recorded | names the archive by what the bytes it is handed say; the derived-terminal unit's rotation hands it a copy already carrying the terminal, before the write gate |
+| `verb_landed` | `:2360`, `:2372` | recorded | its own postcondition is a terminal; `:2372` reads another worktree's uncommitted copy |
 | `verb_phase` | new in this unit | derived | HELD's exit refusal (S9) |
 
 The exemption is a LINE, never a function. The arm scans for `set_fact <file> phase` sites, and a
 read that shares a line with one is a writer's own guard and is exempt. Everything else is graded:
 - Outside `derived_phase` and `recorded_phase`, every other direct read of the `phase` fact reds,
-  whatever function contains it. At BASE, `verb_preflight`'s rotation test at `:2568` is such a
+  whatever function contains it. At BASE, `verb_preflight`'s rotation test at `:2658` is such a
   read, inside a function that also writes the phase.
 - A call to `recorded_phase` reds unless its function's row names recorded.
 - A table row naming a function that no longer reads the phase reds.
 
 Before the arm is wired, its predicate runs over BASE's driver and prints hits and near-misses
-(charter §7). `:2568` must appear as a hit.
+(charter §7). `:2658` must appear as a hit.
 
 `derived_phase <file>` is called as a plain command and never inside `$(...)`, which would lose what
 it sets (the `status-set-in-a-subshell` class). It sets two globals, the effective phase and a
@@ -339,9 +356,9 @@ the fact as written. Both names pass `python tools/lexicon/lexicon.py --suggest`
 ### Preflight on a live record
 
 `--preflight` rotates a terminal record. At BASE, on a live non-terminal record, it is a
-re-preflight the kit sanctions after a compaction (`PROTOCOL.template.md:572`,
-`SKILL.template.md:169`). The anchor triple is pinned once (owner fork 2026-08-16), so only the
-`keepalive` and `witness` facts are rewritten, and the keepalive rewrite is
+re-preflight the kit sanctions after a compaction (`PROTOCOL.template.md:581`,
+`tools/unattended/SKILL.template.md:179`). The anchor triple is pinned once (owner fork
+2026-08-16), so only the `keepalive` and `witness` facts are rewritten, and the keepalive rewrite is
 TOOL-aBranchedMandate-8's defect. It now keeps the recorded keepalive. A re-preflight passing the
 same id is idempotent and refreshes the lease. One passing a different id refuses, numbered, naming
 `--resume`, whose matrix decides whether that session holds the slug. Any preflight over HELD
@@ -350,10 +367,34 @@ non-terminal phase wedges the next preflight.
 
 ### Where the text goes
 
-The protocol stands at 57,815 of its 61,440-byte guide cap, measured at BASE. The contract — codes,
-conditions, lease, checkpoint, resume matrix — goes to `UNATTENDED-STOPS.md`, rendered from a new
-kit template beside the verb carrier, and joined by the same wiring check. The protocol gains one
-§3 row for HELD and one §7 row pointing at the companion.
+The protocol stands at 60,324 of its 61,440-byte guide cap, measured at BASE: 1,116 bytes of
+headroom, and the build's declared additions do not sum under it. So this unit lands NET ZERO OR
+NEGATIVE on that carrier and spends none of the shared headroom. The contract —
+codes, conditions, lease, checkpoint, resume matrix — goes to `UNATTENDED-STOPS.md`, rendered from a
+new kit template beside the verb carrier, and joined by the same wiring check. The protocol gains
+one §3 row for HELD and one §7 row pointing at the companion, each a pointer that carries no
+contract text, at most 180 bytes together. §8's key table also gains one row each for `HOLD_FLOOR`
+and `LEASE_STALE_AFTER`, at most 239 bytes together: check 22 of
+`tools/unattended/check-unattended.sh` joins that table against
+`tools/unattended/.unattended.conf.example` and reds on a key declared in one and missing from the
+other, so those rows are OWED rather than optional. They are also the FIXED half of this unit's
+growth, because a key-table row cannot move to the companion the way contract prose can.
+
+The passage this unit trims, named precisely so that no sibling unit trims the same text:
+
+- §5's RESUME paragraph, `tools/unattended/PROTOCOL.template.md:406-412`, opening "RESUME is the
+  third case", 646 bytes. This unit already REPLACES it: the take-over rule makes its central claim
+  false, because a take-over does record the new id. The replacement stated above is roughly 205
+  bytes and stays in §5; the reap-before-schedule ordering and the `--keepalive-id` history the
+  paragraph carries move to `UNATTENDED-STOPS.md`, the companion this unit creates, which draws on
+  its own cap. The moved text carries no kit-path literal, so the shipped-surface ban does not move.
+
+That is 646 bytes trimmed against at most 624 added — 180 for the two pointer rows, about 205 for
+§5's replacement paragraph, and 239 for the two §8 key-table rows — so
+the protocol and its template each end this unit's pass no larger than they began it. AC23 reads
+both files' sizes at the pass rather than trusting this arithmetic, and reds if either GREW. No cap
+is raised here: raising one is an owner turn, and the other units of this build draw on the same
+1,116 bytes, which this unit leaves intact.
 
 ### Files touched (estimate)
 
@@ -392,7 +433,8 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   first push; the checkpoint names it. `--replaces` trusts the caller to name its own job, as the id
   itself does. The lease prevents an accidental second driver, not a malicious one.
 - testing — `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`
-  arms, each staged RED; run once at the unit's end under `--attribute` against BASE.
+  arms, each staged RED in the pass; run under `--attribute` against BASE at the build's one
+  post-build bar.
 - migration — `CORE_FLOOR` moves in gov's conf in the same commit as the phase; adopters move it in
   their own deployer builds. An existing record carries no hold facts. A working record in flight
   when this unit lands has no lease, and its holder's first `--resume` passing the recorded
@@ -436,13 +478,18 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   function, and so does a copy whose allow-list names a function that no longer reads the phase.
   Red when: the structural arm greps a population that excludes the verbs, so it passes on nothing;
   or the allow-list has no staleness test, so a stale row silently widens it; or the exemption
-  covers a whole writer function, so five of the table's nine rows can read the fact directly and
+  covers a whole writer function, so five of the table's ten rows can read the fact directly and
   never red.
 - **AC9** — When `HELD` is deleted from `PHASES_CORE` in a fixture copy of the driver,
   `bash tools/unattended/check-unattended.sh` reds on the `CORE_FLOOR` of `13:12`; and when
   `inherited-red` is deleted from `HOLD_CODES_CORE` in a fixture copy, the leg reds on `HOLD_FLOOR`.
+  On the built driver, `sed -n 's/^PHASES_CORE="\(.*\)"/\1/p' tools/unattended/unattended.sh | grep -o 'VERIFYING.*'`
+  prints `VERIFYING LANDING LANDED ABORTED`, the list `PHASES_ALLOW` spells in
+  `tools/unattended/gate-guard.js`.
   Red when: the floor stays at 12, so the deletion passes; or the hold vocabulary has no floor, so
-  dropping a code a sibling routes to passes.
+  dropping a code a sibling routes to passes; or HELD sits at or after VERIFYING, so the hook's
+  parity arm reds on a restatement that drifted, or the hook admits the flagged bar and the suites
+  on a run held from BUILDING.
 - **AC10** — When `--preflight` runs twice with the same `--keepalive-id` over a working-phase
   fixture record, with the record committed between the two runs, the second run exits 0 and the
   `keepalive` and anchor facts are unchanged. With a different `--keepalive-id` it refuses with a
@@ -459,9 +506,10 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   Skill, and the companion guide renders byte-identical to its template; the Skill's Resume section
   passes `--keepalive-id` on every `--resume` it spells, its take-over branch removes nothing before
   that resume but the recorded job and, when that resume refuses or prints `still held`, reaps only
-  the job it scheduled and reads the result back, and its keepalive section names
-  `--resume <slug> --keepalive-id` as the tick's first act. The verb guide's `--hold` entry lists
-  `--reaped` and `--keepalive-unreachable`.
+  the job it scheduled and reads the result back, and its `/session-kickoff` step comes after that
+  resume; its keepalive section names `--resume <slug> --keepalive-id` as the tick's first act and
+  `--audit <slug>` after it, run only when that first act neither refuses nor prints `still held`.
+  The verb guide's `--hold` entry lists `--reaped` and `--keepalive-unreachable`.
   Red when: the Skill never invokes `--hold`, so no agent following it would ever pause a run; or
   the Skill's Resume step still spells `--resume <slug>` with no id, so every holder is refused and
   every follower of the Skill takes the refusal for a stop; or the synopsis omits the keepalive
@@ -471,9 +519,15 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   refusals in front of it; or the take-over branch removes anything besides the recorded job before
   its `--resume`, or besides the job it scheduled once that resume refuses or prints `still held`,
   so once the auto-resume unit files a restart under the slug's name, a manual resume before an
-  `after` hold's instant deletes that restart and leaves the run HELD with nothing to restart it.
-- **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  `after` hold's instant deletes that restart and leaves the run HELD with nothing to restart it;
+  or the kickoff step precedes the take-over's `--resume`, so its hand-back continues a HELD record
+  at HELD; or the rewritten keepalive section drops `--audit`, so the stall probe stops firing; or
+  it runs `--audit` after a refused or `still held` first act, so a session that does not hold the
+  slug acts on a `STALLED` verdict and re-dispatches units it does not drive.
+  permission: both run over the rendered tree rather than a fixture, so they are gate legs and are
+  observed at the build's one post-build bar.
+- **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
   its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
@@ -482,7 +536,12 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
   filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
-  permission: D12-i8 lifts the do-not-run instruction for this unit.
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the
+  last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
+  made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
+  carries no leg for these suites at any flag setting. This folds the conservative reading of
+  the parked ruling conflict and decides nothing.
 - **AC13** — When `--phase <slug> HELD --witness <sha>` runs on a working-phase fixture, it refuses
   with a numbered message and the run-state file is byte-unchanged. When
   `bash tools/unattended/check-unattended.sh` grades a driver copy in which `verb_phase` accepts a
@@ -523,6 +582,12 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   released or `presumed-stopped` to a second session; or the holder's own orientation does not
   refresh, so an idle holder's lease goes stale and a second session takes the slug over while its
   holder is alive.
+  permission: the arm is written and staged RED in the pass; the suite that executes it,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes the
+  sequence is the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
 - **AC18** — When `--resume` runs on a HELD fixture whose mandate no longer verifies at the pinned
   BASE, it refuses with a numbered message, and the run-state file and the lease file are
   byte-unchanged.
@@ -557,13 +622,35 @@ kit template beside the verb carrier, and joined by the same wiring check. The p
   Red when: the absent row cannot tell the holder from a second session, so every run in flight when
   this unit lands stalls for the whole bound and the Resume rule sends its holder down the take-over
   path to reap its own keepalive.
+- **AC23** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
+  build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
+  parent's and is below the 61440-byte guide cap declared in
+  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  `tools/unattended/PROTOCOL.template.md`. The trim is taken and landed:
+  `grep -c 'RESUME is the third case' tools/unattended/PROTOCOL.template.md` counts 1 at the parent
+  and 0 at the build commit, and the reap-before-schedule ordering the paragraph carried is present
+  in `UNATTENDED-STOPS.md`. Both owed key-table rows arrived:
+  `grep -c 'HOLD_FLOOR' tools/unattended/PROTOCOL.template.md` and
+  `grep -c 'LEASE_STALE_AFTER' tools/unattended/PROTOCOL.template.md` each count 0 at the parent and
+  1 or more at the build commit. The companion guide `UNATTENDED-STOPS.md` this unit CREATES is read
+  the same way at the build commit and is below the same 61440-byte guide cap.
+  Red when: a pointer row carries contract text, so the companion and the protocol answer one
+  question twice and the 1,116 bytes the build's units share are spent here; or the size is read
+  against the figure written in this spec rather than against the parent commit, so a sibling's
+  landing hides this unit's overspend; or the paragraph is trimmed and its ordering rule lands in no
+  destination, which DELETES a rule rather than moving it; or the cap is raised to make the rows
+  fit, which is an owner turn; or a conf key this unit declares in
+  `tools/unattended/.unattended.conf.example` reaches §8's key table in no row, which reds check 22
+  of `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
+  protocol lands in a carrier nobody reads the size of.
+  permission: a read, a byte count and three greps, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `playbook validity gate` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `line length` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a HELD fixture record with an unmet `after`, a dirty tree, and a fresh foreign lease · none
-New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading the phase fact outside `derived_phase()`, one whose writer function `verb_preflight` reads it directly at its rotation test, one with HELD deleted from the core set, and a driver copy whose `verb_phase` accepts HELD; the predicate first run over BASE's driver with hits and near-misses printed, `unattended.sh:2568` a live hit · the core phase floor, 12 to 13
+New arm: `tools/unattended/unattended.test.sh` · a HELD fixture record with an unmet `after`, a dirty tree, and a fresh foreign lease · the driver suite's executed-assertion floor
+New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading the phase fact outside `derived_phase()`, one whose writer function `verb_preflight` reads it directly at its rotation test, one with HELD deleted from the core set, and a driver copy whose `verb_phase` accepts HELD; the predicate first run over BASE's driver with hits and near-misses printed, `unattended.sh:2658` a live hit · the core phase floor and the leg suite's executed-assertion floor
 
 ## 8. Open questions
 
@@ -647,6 +734,17 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   (a) lets a refused verb's bounded probes renew a dead session's lease. (b) never refreshes during
   the bar `--close` runs while evaluating its DoD, before its write gate, and that bar is the long
   silence the refresh source exists for. RESOLVED (agent, 2026-09-16, delegated): (c).
+- **F14 — where does HELD sit in `PHASES_CORE`?** `tools/unattended/gate-guard.js`, landed on main
+  after this spec was written, restates the driver's tail from VERIFYING as the phases it admits the
+  flagged bar and the suites in, and its suite pins that list to the driver. Options:
+  - (a) after LANDING, as rev-4 placed it, with HELD added to the hook's list and its parity arm;
+  - (b) after RUNNING and before VERIFYING, with the hook untouched.
+
+  (a) edits a second kit file and admits the flagged bar and every suite on a run held from
+  BUILDING, which the hook exists to refuse, and a held run has no work to verify. Under (b) a run
+  held from VERIFYING or LANDING regains the bar at the resume that returns it there, and the hook's
+  parity read is the only reader of the list that depends on its order, measured over `tools/` at
+  BASE. RESOLVED (agent, 2026-09-16, delegated): (b), observed by AC9.
 
 ## 9. Revision log
 
@@ -700,6 +798,58 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   and a new paragraph after it says the restart a hold owes is deleted only after a take-over's
   `--resume` succeeds; S10 says `only`; AC11 and its `Red when:` read that the branch removes
   nothing else; §8 F6's mark sentence cites unit 5 §8 F9.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main).
+  - aDeferredBar's `gate-guard.js` restates the driver's phase tail from VERIFYING, pinned by a
+    parity arm, so S1 places HELD after RUNNING and before VERIFYING (new §8 F14), and AC9 reads
+    the tail against the hook's list.
+  - aProbedUnit's `--audit` adds a phase read at `unattended.sh:3008`, so the §4 call-site table
+    gains a derived `print_audit` row and AC8 counts ten rows; every other row and §7's live hit
+    move with the grown driver, `:2568` to `:2658` among them.
+  - The Skill gained aProbedUnit's `--audit` keepalive tick and aReplayedCard's `/session-kickoff`
+    resume step, so §4's Skill paragraphs, S10 and AC11 keep the probe as the tick's second act,
+    run only after a first act that neither refuses nor prints `still held`, and the kickoff after
+    the take-over's `--resume`.
+  - The protocol render measures 60,324 bytes, and the template citations moved to `:406-412` and
+    `:581`, the Skill's to `:179`; §4 Where the text goes states the headroom.
+  - §4's condition grammar names `<utc-instant>` in place of a literal date placeholder.
+  - AC12's unit-end suite run meets aDeferredBar's M6 rule and the hook's refusal before
+    VERIFYING, which contradicts owner ruling D12-i8; that is reported to the orchestrator, and AC12
+    is unchanged. §10 describes the new base.
+  - Extended 2026-09-20, regrounding consolidation, folding the conservative reading of that parked
+    conflict and not deciding it. AC12 now reads the attributed run at the build's one post-build
+    bar, the run the main loop makes at VERIFYING after the last unit, and §5 testing and the §3
+    consumes-from edge to the baseline unit follow it;
+    AC11 and AC17 gain `permission:` lines, the first because both checks run over the rendered
+    tree and the second because its arm lives in a held suite. AC8, AC9 and AC13 keep their in-pass
+    observation: each grades a FIXTURE copy of the driver, which M6 names as a pass's own direct
+    check. §4 states the 250-byte MAXIMUM this unit adds to the protocol and new AC23 reads the
+    file's size at the pass against the 61440-byte guide cap; no cap is raised. Re-priced to NET
+    ZERO on 2026-09-20, on the orchestrator's ruling that a unit adding bytes to a capped carrier
+    funds them itself: §4 now names the passage this unit trims — §5's RESUME paragraph, 646 bytes,
+    whose contract detail moves to `UNATTENDED-STOPS.md` — and AC23 reds if either carrier grew
+    against this unit's parent commit rather than allowing 250 bytes of growth. §7's
+    `tools/unattended/unattended.test.sh` arm names the driver suite's executed-assertion floor
+    instead of `none`; the `check-unattended.test.sh` arm's third field dropped the floor NUMBER it
+    wrote and now names the core phase floor AND the leg suite's executed-assertion floor, because
+    its arms add executed assertions to `FLOOR_ASSERTIONS` and that floor moves with them.
+    No criterion of this unit asserts a phrase counts zero, so the could-not-fail sweep
+    found nothing here.
+  - Extended again on 2026-09-20, closing pass. The orchestrator ruled that a unit declaring a conf
+    key owes that key a §8 key-table row, because check 22 reds without one, so §4 prices the
+    `HOLD_FLOOR` and `LEASE_STALE_AFTER` rows at 239 bytes inside the same 646-byte trim and drops
+    the two pointer rows' ceiling from 250 to 180 to pay for them; AC23 witnesses both rows arriving
+    and reds on a declared key that reaches no row; it also reads the size of the companion guide
+    this unit creates, which is what a carrier with more than 2048 bytes free owes under the same
+    ruling. AC17's `permission:` line now names WHICH run
+    covers it: the suite holding its arm is on no bar leg, so the attributed
+    `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` run covers it and
+    `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` does not. Rule 1's narrow
+    reading is ratified, so AC8, AC9 and AC13 keep the in-pass observation already written.
+    Closing verifier, same pass and rev: AC12's `permission:` line now names the attributed run in
+    the orchestrator's own terms, because `tools/gate-legs.json` carries no leg for
+    `tools/unattended/unattended.test.sh` or `tools/unattended/check-unattended.test.sh` at any
+    flag setting, so "the build's one post-build bar" alone would have read as a bar that covers
+    them.
 
 ## 10. Reuse audit
 
@@ -716,6 +866,21 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   TOOL-aReapedTicket-5 among U26's closes. At BASE its population is two BUILDING records with no
   lease, `memory/builds/aClosedDocket/RUN.md` and `memory/builds/aUnblockedFleet/RUN.md`, which the
   absent-lease row surfaces.
+- BASE is `fb07ca25`, the origin/main tip this branch merged; the spec was written at `abac6d59`.
+  Nothing on main adds a HELD phase, a hold code, a lease or either of the two phase readers, and
+  TOOL-aBranchedMandate-8, TOOL-aReapedTicket-5 and TOOL-aBoundedVerdict-23 are still OPEN, with the
+  same two BUILDING records. What moved, and what this spec now meets:
+  - The driver grew by 280 lines, so every call-site line moved; `print_audit`, the `--audit` stall
+    probe, is a new phase reader. That probe's `UNIT_STALL_BOUND` measures a dispatched unit's idle
+    tree, not a session's liveness, and is a different bound from `LEASE_STALE_AFTER`.
+  - `tools/unattended/gate-guard.js` keys a run by its `run-branch` fact, else `branch-ref`, and
+    refuses the flagged bar and the suites in any phase outside the driver's tail from VERIFYING,
+    which F14 answers.
+  - The Skill's keepalive tick runs `--audit`, and its Resume section kicks off after `--resume`.
+  - The protocol render is 60,324 of 61,440 bytes.
+  - `memory/guides/BUILD-METHOD.md` M6 and the hook keep suites out of a pass before VERIFYING,
+    which reached AC12's run at the unit's end before the 2026-09-20 consolidation moved it to the
+    build's one post-build bar.
 - M12 was not reached: the owner ratified the mechanism.
 - Recall terms used: `HELD phase halt-code abort host-degraded platform-limit keepalive resume
   presumed-stopped lease checkpoint CORE_FLOOR phases`

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 20
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
@@ -28,13 +28,13 @@ index.
   that overlaps the index half of a `GENERATED_INDEXES` pair, through the library's `overlaps`. The
   driver refuses at conf load on a non-empty answer, as its `GATE_BOUND` refusal does, and the leg
   reports it under a new check code. It reads no memory-tree state. The leg's conf initialiser and
-  import allow-list (`tools/unattended/check-unattended.sh:116-120`, `:181-186`) gain
+  import allow-list (`tools/unattended/check-unattended.sh:116-121`, `:181-186`) gain
   `SHARED_RECORDS` and `GENERATED_INDEXES`, and the `__kit-default__` resolution of an undeclared
   `SHARED_RECORDS` to `$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog`
-  (`tools/unattended/unattended.sh:290`, `:328`) moves into `tools/unattended/lib-unattended.sh`
+  (`tools/unattended/unattended.sh:337`, `:387`) moves into `tools/unattended/lib-unattended.sh`
   beside the predicate, so the driver and the leg resolve the default once
   (`memory/gotchas/two-readers-of-one-config-one-re-derived.md`). Observed by AC1.
-- **S2** The comment at `tools/unattended/lib-unattended.sh:202-205` stops claiming that template
+- **S2** The comment at `tools/unattended/lib-unattended.sh:242-245` stops claiming that template
   section 1 mandates a backlog row. It says instead that a row is owed only by a unit planned before
   its spec (design §2.3), and that `build_commit` excludes whatever `SHARED_RECORDS` and the index
   halves of `GENERATED_INDEXES` declare, in either backlog mode. Observed by AC2.
@@ -46,9 +46,17 @@ index.
   build's `BACKLOG.md`; one pointer names the companion guide; and §2's anchor-ban paragraph covers
   every tracked file under the run's build folder, not only the run-state file (design §19.7 layer
   1, enforced by unit 18 S3), and names the link-wrapped `--asks --ready` paste as the sanctioned
-  way to cite a foreign ask. Net growth at most 300 B; if the anchor-ban sentence cannot fit, the
-  paragraph keeps one sentence stating the folder-wide scope and points at the companion guide for
-  the paste rule. Observed by AC3.
+  way to cite a foreign ask. That text adds at most 250 B per copy AND IS PAID FOR IN THE SAME
+  EDIT, because no cap is raised in this build and the free space does not cover every unit that
+  wants it. The passage that leaves is §11's paragraph beginning `Decide AT ONCE`, down to the
+  sentence ending `because the reader it defers to is the one who left`; it MOVES into the
+  DISCOVERY FILING section of the companion guide S4 creates, which §4 already lists and AC4
+  already asserts by heading, so no section is added — `tools/unattended/ASKS.template.md` and
+  its installed copy `memory/guides/UNATTENDED-ASKS.md`, which carry the ask contract and the
+  dispositions and draw on their own 61440 B cap rather than this one. §11 keeps one sentence
+  pointing there. The paragraph is larger than what this unit adds, so each protocol copy is
+  SMALLER at this unit's commit than at its parent. No other unit of this build trims that
+  paragraph. Observed by AC3.
 - **S4** A companion guide: `tools/unattended/ASKS.template.md`, installed as
   `memory/guides/UNATTENDED-ASKS.md` by `tools/unattended/adopt-unattended.sh`, declared in the kit
   descriptor with an LF pin, and byte-compared as a pair in leg check 10 beside the protocol, verbs
@@ -69,19 +77,42 @@ index.
   M2 sentence making a unit's `closes` list the only carrier of grouping; M6 clause 3 naming "an
   authored backlog shard" where it names `memory/backlog/*.md`; one M9 table row, asks filed and
   disposed, derived from `gen_build_index.py --asks --build <slug> --all`, because the table form
-  without `--all` lists live asks only (unit 7 S12). Net growth at most 250 B and 3 lines. Observed by
-  AC7.
-- **S8** `tools/workflows/unattended-build.js` accepts an optional `closes` list per unit and writes
-  "this unit closes <ids>; run no gate" into that unit's SPEC prompt (fix F7), with an arm in
-  `tools/workflows/unattended-build.test.sh`. Observed by AC8.
-- **S9** A sweep of every protocol and Skill sentence that describes ids, slugs, the prompt path or
-  backlog rows, read against the driver as unit 16 leaves it; each sentence changed or kept is listed
+  without `--all` lists live asks only (unit 7 S12). That text adds at most 160 B and 2 lines AND
+  IS PAID FOR IN THE SAME EDIT, on the same rule: the passage that leaves is M6's paragraph
+  beginning `It takes a COMMITTED range`, down to the sentence ending `that is the next pass`,
+  which is CLI prose about a memory-tree kit tool rather than a rule of the method. It MOVES
+  beside that tool's own row in `tools/memory-tree/README.md`, the kit README M6 already routes
+  prose to for exactly this reason, and M6 keeps one line carrying the trap and the pointer. The
+  paragraph is larger in both bytes and lines than what this unit adds, so the rendered copy is
+  SMALLER and SHORTER at this unit's commit than at its parent. No other unit of this build
+  trims that paragraph. Observed by AC7.
+- **S8** Fix F7's "run no gate" half LANDED on main and is not rebuilt here. `GROUND` tells every
+  stage and every SPEC writer that no gate, suite or bar runs inside a unit pass and that the bar
+  runs once at the close (`tools/workflows/unattended-build.template.js:461-463`,
+  TOOL-aProbedUnit-1), and the child prompt repeats it mode-independently, overriding any section 7
+  (`tools/workflows/unattended-unit.js:168-175`). The remainder is the attribution: the harness
+  accepts an optional `closes` list per unit and writes "this unit closes <ids>" into that unit's
+  SPEC prompt, with an arm in `tools/workflows/unattended-build.test.sh`. Since
+  TOOL-dPolishedVitrine-1 that harness is RENDERED, so the edit lands in
+  `tools/workflows/unattended-build.template.js` and `tools/workflows/unattended-build.js` is
+  re-rendered by `bash tools/workflows/check-protocol-parity.test.sh --render` in the same commit.
+  Observed by AC8.
+- **S9** A sweep of every sentence in the protocol and in `tools/unattended/SKILL.template.md`
+  that describes ids, slugs, the prompt path or backlog rows, read against the driver as unit 16 leaves it; each sentence changed or kept is listed
   with its verdict in this unit's build record. The sweep record also pairs every leg rule units 16
   to 19 add with the carrier sentence that states it (G3 class item 7). Observed by AC9.
 - **S10** Declarations in the same commit: the guide's row in `memory/project/method-carriers.txt`
   if it names the build method; its `guides` inventory key claimed in
   `memory/map/features/unattended.md` with the map regenerated; `ARMS_FLOORS` moved for each new
   `fail` branch. Observed by AC10.
+- **S11** — the version. NOT OBSERVED by a criterion here: the `unattended-build` engine's
+  `meta.version`, and the `gov:kit unattended-build@` marker beside it, do not move, though S8 is
+  the first edit of that kit's bytes in build order. `tools/check-kit-versions.sh` names no carrier
+  for that kit, so the build-wide criterion — a value strictly greater than both BASE's and the
+  `origin/main` tip's, across every carrier that script names — has an empty carrier set and nothing
+  to read, and the kit reaches adopters through the `tools/workflows/` descriptor rather than
+  through a version gate. Decided by the orchestrator in the regrounding consolidation pass, and
+  stated rather than left silent.
 
 ## 3. Non-goals (OUT)
 
@@ -124,9 +155,9 @@ index.
 
 A path in `SHARED_RECORDS` may never be declared by a pass. An index in `GENERATED_INDEXES` may be,
 alone. One path in both makes `--dispatch` answer by whichever rule it reaches first
-(`tools/unattended/unattended.sh:4773-4855`), and makes the declaration of the other meaningless.
+(`tools/unattended/unattended.sh:5051-5131`), and makes the declaration of the other meaningless.
 The predicate compares the kit's own two keys and nothing else, so it lands in any adopter
-unchanged. Gov declares no overlap at BASE (`.unattended.conf:206-207`), so it lands green; the
+unchanged. Gov declares no overlap at BASE (`.unattended.conf:236-237`), so it lands green; the
 switch-over edits both keys in one commit and this is what catches a half edit.
 
 ### Wording that is true in both modes
@@ -137,9 +168,9 @@ because the flip is one later commit. The table is the rule for each edit.
 | Carrier sentence at BASE | Rewritten as | Phrase the criterion greps |
 |---|---|---|
 | M6 clause 3, "`memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file" | "`memory/DECISIONS.md`, an authored backlog shard, the run-state file": a generated view is already the clause's last case | none; AC7 counts `memory/backlog` to 0 |
-| protocol §2, "a planned unit is minted as a backlog row" | a planned unit is minted as an ask in the run's own build before the run-state file names it | `minted as an ask in the run's own build` |
+| protocol §2, "A planned unit is minted as a backlog row" | a planned unit is minted as an ask in the run's own build before the run-state file names it | `minted as an ask in the run's own build` |
 | protocol §11, fails 1 or 2, "a BACKLOG row naming what was seen" | an ask filed in the run's own build, carrying what was seen and why it was declined | `an ask filed in the run's own build` |
-| `tools/unattended/lib-unattended.sh:202-205`, "template section 1 MANDATES a backlog row" | S2's sentence | none; AC2 counts the retired phrase to 0 |
+| `tools/unattended/lib-unattended.sh:242-245`, "template section 1 MANDATES a backlog row" | S2's sentence | none; AC2 counts `section 1 MANDATES` to 0 |
 | protocol §2 anchor ban, scoped to the run-state file's authored rows | every tracked file under the run's build folder; cite a foreign ask by the link-wrapped `--asks --ready` paste | `every tracked file under the run's build folder` |
 | none at BASE: protocol, the own-folder paragraph of S3 | every ask, disposition and header verb a run writes sits in its own folder under the folder slug | `sits in its own folder under the folder slug` |
 | none at BASE: protocol, the pointer of S3 | one sentence naming the companion guide | `UNATTENDED-ASKS.md` |
@@ -156,16 +187,26 @@ unit 16 §4, which the protocol's §8 row points at rather than listing. The gra
 the grades are stated once, in unit 15's module, and the guide points there rather than copying
 them, because a paraphrase and its source are two answers to one question.
 
-The guide exists because the protocol cannot hold this text: it is at 57815 B against the guide cap
-of 61440 B (`tools/memory-tree/check-memory-hygiene.sh:84`) and at least five units of this build
-add to it. Moving section 7 into `UNATTENDED-VERBS.md` is the precedent (the pair comment at
-`tools/unattended/check-unattended.sh:1586-1592`).
+The guide exists because the protocol cannot hold this text: it is at 60324 B at BASE `fb07ca25`
+against the guide cap of 61440 B (`tools/memory-tree/check-memory-hygiene.sh:84`), which leaves
+1116 B where `abac6d59` left 3625 B, and at least five units of this build add to it. This unit's S3
+spends at most 250 B of that and unit 19's at most 350 B, both cut in the regrounding consolidation
+pass so each share fits; whether all of this build's protocol shares sum under 1116 B is the
+orchestrator's to settle, and no cap is raised here. The companion guide S4 adds is a NEW file
+carrying its own 61440 B cap, so it draws nothing from this headroom. Moving section 7 into
+`UNATTENDED-VERBS.md` is the precedent (the pair comment at
+`tools/unattended/check-unattended.sh:1624-1630`).
 
 ### The build method's budget
 
-The rendered copy is 26439 B and 337 lines against its 27648 B and 350-line budget at BASE: 1209 B
-and 13 lines of headroom, both PINNED as measured at `abac6d59`. Unit 19 takes at most 300 B, this
-unit at most 250 B and 3 lines, and unit 31 replaces text rather than adding a paragraph. M1 forbids
+The rendered copy is 27264 B and 347 lines against its 27648 B and 350-line budget at BASE
+`fb07ca25`: 384 B and 3 lines of headroom, both PINNED as measured there, where `abac6d59` left
+1209 B and 14 lines. aRatifiedRulings, aDeferredBar and aProbedUnit spent the difference. NO CAP IS
+RAISED in this build — moving M1's budget is an owner turn under veto 2 — so the three shares are
+trimmed to fit instead: unit 19 takes at most 120 B and one line, this unit at most 160 B and two
+lines, and unit 31 replaces text rather than adding a paragraph, which leaves 104 B of the 384 B
+unspent. Only the byte half binds, because no checker reads the line half of that budget row
+(`tools/template-size-limits.txt:84-85`). M1 forbids
 stating any rule twice, so the M2 sentence is the only place the grouping rule is written; the guide
 points at M2.
 
@@ -195,7 +236,9 @@ AC13); no bar leg runs those suites (§8 F4).
 `memory/guides/UNATTENDED-ASKS.md` (new) · `tools/unattended/adopt-unattended.sh` ·
 `tools/unattended/kit.toml` · `tools/unattended/SKILL.template.md` ·
 `.claude/skills/unattended/SKILL.md` · `tools/memory-tree/BUILD-METHOD.template.md` ·
-`memory/guides/BUILD-METHOD.md` · `tools/workflows/unattended-build.js` ·
+`memory/guides/BUILD-METHOD.md` · `tools/memory-tree/README.md`, where S7's moved paragraph
+lands · `tools/workflows/unattended-build.template.js` ·
+`tools/workflows/unattended-build.js` ·
 `tools/workflows/unattended-build.test.sh` · `memory/project/method-carriers.txt` ·
 `memory/map/features/unattended.md` · `memory/map/generated/` · `.memory-tree.conf` for
 `ARMS_FLOORS`.
@@ -237,30 +280,59 @@ AC13); no bar leg runs those suites (§8 F4).
   are silent.
   Red when: the predicate compares strings for equality, so both nested pairs pass, or the leg reads
   the undeclared key as empty, so the driver refuses a conf the bar passes.
-  permission: this unit may not run the unattended suites; each refusal is observed by hand in the
-  fixture, and the leg itself runs at the one post-build bar.
-- **AC2** — When `git grep -n "MANDATES a backlog row" -- tools/unattended` runs, it returns nothing,
-  and the comment above `build_commit` names the planned-before-spec rule.
-  Red when: the false sentence survives beside the function whose exclusion it misstates.
+  permission: the three fixture cases are the pass's OWN direct check — the driver's and the leg's
+  own commands over a scratch fixture conf, which `memory/guides/BUILD-METHOD.md` M6 sanctions and
+  `tools/unattended/gate-guard.js` admits, because neither is a suite FILE invocation. What defers
+  is the gov-conf half, which is the leg over the REAL tree: it is read at the bar the main loop
+  makes at VERIFYING, after the last unit, where `unattended kit gate` runs unheld. This unit runs
+  no unattended suite in the pass.
+- **AC2** — When `git grep -n "section 1 MANDATES" -- tools/unattended` runs, it returns nothing, and
+  the comment above `build_commit` names the planned-before-spec rule. That phrase, not rev-2's
+  `MANDATES a backlog row`: the sentence wraps between `MANDATES a` and `backlog row` at
+  `tools/unattended/lib-unattended.sh:242-243`, so the longer grep already matched nothing at BASE
+  and was a criterion that could not fail.
+  Red when: the false sentence survives beside the function whose exclusion it misstates, or the grep
+  phrase spans a line break again, so the arm passes over unchanged prose.
 - **AC3** — When both copies of the protocol are compared, `bash tools/unattended/check-unattended.sh`
-  check 10 finds them byte-identical and `memory/guides/UNATTENDED-PROTOCOL.md` has grown by at most
-  300 B; `git grep -c "a planned unit is minted as a backlog row"` prints 0 for each copy, and
+  check 10 finds them byte-identical, and `git cat-file -s` run at this unit's parent and at its
+  commit reports a SMALLER size at the commit for `memory/guides/UNATTENDED-PROTOCOL.md` and for
+  `tools/unattended/PROTOCOL.template.md`, each also under the 61440 B guide cap;
+  `git grep -c "deferred costs the whole finding"` prints 1 for the installed
+  `UNATTENDED-ASKS.md` and 0 for each protocol copy, so §11's paragraph moved rather than
+  being deleted; `git grep -c "minted as a backlog row"` prints 0 for each copy, and
   `git grep -c` for each phrase in §4's table prints 1 per copy, except `UNATTENDED-ASKS.md`, which
   the `ASKS_CMD` row unit 16 writes also names, and which prints at least 1.
   Red when: an edit lands in one copy only, the copy breaches the guide cap other units share, the
   retired sentence survives, or a new sentence is absent, which an empty edit under the budget would
-  pass.
-  permission: the leg run is observed at the one post-build bar.
+  pass; or the retired-sentence grep is re-tightened to a phrase that leads with the lower-case `a`
+  of `a planned unit`, which the protocol spells `A` at the head of its sentence
+  (`memory/guides/UNATTENDED-PROTOCOL.md:256`), so the count is 0 before the unit does anything; or
+  a copy is the same size or LARGER at this unit's commit than at its parent, so this unit spent
+  headroom unit 19 and this build's other protocol writers are priced against instead of funding
+  its own text, which is why the comparison is against the parent commit rather than against a
+  declared share; or §11's paragraph was DELETED rather than moved, so the contract lost a rule
+  and the carrier shrank for the wrong reason.
+  permission: the leg run is observed at the one post-build bar the main loop runs at VERIFYING,
+  after the last unit; the byte count and both greps are read in the pass.
 - **AC4** — When `bash tools/unattended/adopt-unattended.sh --check` runs, it reports
   `UNATTENDED-ASKS.md` installed and equal to `ASKS.template.md`, and check 10 reports the
   `UNATTENDED-ASKS.md` pair among its pairs, with a pair count equal to the length of check 10's own
-  pair list; the level-2 headings of the installed `UNATTENDED-ASKS.md` are, in order, the sections
+  pair list; `wc -c` on the installed guide reads under the 61440 B guide cap
+  (`tools/memory-tree/check-memory-hygiene.sh:84`), which it carries as a new file of its own; the
+  level-2 headings of the installed `UNATTENDED-ASKS.md` are, in order, the sections
   §4 lists: routes; the mandate's six properties; orientation per ask; owner-call parking; discovery
   filing; the `asks-disposed` terms with the F3 hardening, the override route and the KEEP rule; the
   repoint rule; and the `ASKS_CMD` call shapes.
   Red when: the guide is installed with no byte-compare pair, so the adopter's copy drifts unseen, or
-  the guide is empty or lacks a listed section, so unit 17's hand-off lands nowhere.
-  permission: observed at the one post-build bar.
+  the guide is empty or lacks a listed section, so unit 17's hand-off lands nowhere, or it lands over
+  the guide cap this build may not raise.
+  permission: `bash tools/unattended/adopt-unattended.sh --check` is the `unattended skill wiring`
+  leg's own argv and check 10's pair count is the `unattended kit gate` leg over the real tree, and a
+  pass runs no gate leg, so both runs are observed at the one post-build bar the main loop runs at
+  VERIFYING, after the last unit. The hook admits the verb, but the child prompt of
+  `tools/workflows/unattended-unit.js` bans a GATE inside a pass whether or not the hook sees it. In
+  the pass the installed guide's headings and the `wc -c` byte count are read straight off the tree,
+  and the install is observed by comparing the installed file with `ASKS.template.md` by hand.
 - **AC5** — When the rendered Skill is read, its routing table carries a row sending ids, a prompt
   naming ids, and a filing-home slug to the recipe `--preflight` prints, and its opening fence
   refuses a value mixing a slug and ids.
@@ -272,15 +344,36 @@ AC13); no bar leg runs those suites (§8 F4).
   Red when: a step restates a rule the guide or the protocol holds, so two carriers answer one
   question.
 - **AC7** — When `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` runs it passes,
-  the rendered copy has grown by at most 250 B and 3 lines, and
-  `grep -c "memory/backlog" memory/guides/BUILD-METHOD.md` prints 0.
-  Red when: M6 still names the shard directory, which reads false for a builds-mode tree, or the
-  growth takes line headroom unit 19 and unit 31 were priced against.
-  permission: the size leg runs at the one post-build bar.
+  `git cat-file -s` run at this unit's parent and at its commit reports a SMALLER size at the
+  commit for `memory/guides/BUILD-METHOD.md` and for `tools/memory-tree/BUILD-METHOD.template.md`,
+  the rendered copy also under the 27648 B declared at `tools/template-size-limits.txt:86`;
+  `wc -l` over the rendered copy at those same two commits reports FEWER lines at the commit and
+  under the line budget its own `**Budget:` line declares;
+  `grep -c "memory/backlog" memory/guides/BUILD-METHOD.md` prints 0; and
+  `grep -c "resolves to an empty range" tools/memory-tree/README.md` prints 1, so M6's paragraph
+  moved rather than being deleted.
+  Red when: M6 still names the shard directory, which reads false for a builds-mode tree; or the
+  rendered copy is the same size or LARGER at this unit's commit than at its parent, so this unit
+  spent byte headroom unit 19 and unit 31 are priced against; or its line count holds or grows,
+  which NO checker would catch (`tools/template-size-limits.txt:84-85`) and which is how that
+  document reaches a budget no unit of this build may raise; or M6's paragraph was DELETED rather
+  than moved, so the trap it states reaches nobody.
+  permission: the size leg runs at the one post-build bar the main loop runs at VERIFYING, after the
+  last unit; the byte counts, the line counts and both greps are read in the pass.
 - **AC8** — When `bash tools/workflows/unattended-build.test.sh` evaluates the harness with a unit
-  carrying `closes`, the SPEC prompt for that unit contains the ids and "run no gate", and a unit
-  without `closes` gets the prompt unchanged.
-  Red when: the ids reach the prompt for every unit, so one unit's asks are attributed to another.
+  carrying `closes`, the SPEC prompt for that unit contains the ids, and a unit without `closes` gets
+  the prompt unchanged; `bash tools/workflows/check-protocol-parity.test.sh --check` reports the
+  template and its rendered copy identical.
+  Red when: the ids reach the prompt for every unit, so one unit's asks are attributed to another; or
+  the edit lands in the rendered `tools/workflows/unattended-build.js` alone, which the
+  `review-protocol parity (kit vs dogfood)` leg reds and the next `--render` silently reverts.
+  permission: `bash tools/workflows/check-protocol-parity.test.sh --check` carries a read-only verb,
+  which `tools/unattended/gate-guard.js` admits, so it is the pass's own direct check, and the same
+  file runs as the `review-protocol parity (kit vs dogfood)` leg at the one post-build bar.
+  `tools/workflows/unattended-build.test.sh` is run by NO bar leg: no row of `tools/gate-legs.json`
+  names it at BASE, which the open ask `TOOL-dBriefedPass-7` records and unit 29 §3 states, and a
+  bare suite run is denied before VERIFYING, so its `closes` arm is observed by hand at VERIFYING,
+  after the last unit, in the same run that makes the post-build bar.
 - **AC9** — When this unit's sweep record under `memory/builds/dDerivedDocket/build/` is read, it
   lists every protocol and Skill sentence naming ids, slugs, the prompt path or backlog rows, each
   with kept or changed and the driver behaviour it was read against, and a second list pairing each
@@ -294,10 +387,10 @@ AC13); no bar leg runs those suites (§8 F4).
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `harness arms (fail branches armed or pinned)` · `codebase-map coverage + freshness` · `workflow script syntax` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `unattended skill wiring` · `kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `harness arms (fail branches armed or pinned)` · `codebase-map coverage + freshness` · `workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/check-unattended.test.sh` · confs nesting a path in each direction, and one relying on the `SHARED_RECORDS` default · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
-New arm: `tools/unattended/unattended.test.sh` · the same conf read at driver start · none, the conf-load refusal is not a `fail` branch
+New arm: `tools/unattended/check-unattended.test.sh` · confs nesting a path in each direction, and one relying on the `SHARED_RECORDS` default · the leg suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/unattended.test.sh` · the same conf read at driver start · the driver suite's executed-assertion floor; `ARMS_FLOORS` does not move, because the conf-load refusal is not a `fail` branch
 New arm: `tools/workflows/unattended-build.test.sh` · a unit carrying `closes` and one without · none
 
 ## 8. Open questions
@@ -335,6 +428,83 @@ New arm: `tools/workflows/unattended-build.test.sh` · a unit carrying `closes` 
   unit 16 §4 also names unit 24's read-back (G4 L2); AC3's pointer phrase counts at least 1, because
   unit 16's protocol row names the guide too; AC1 and AC4 cite the installed guide and the index
   half without an untracked path, so the spec-token join stays clean.
+- rev-3 · 2026-09-20 · regrounded on fb07ca25 (origin/main). §2 §4 §7 §10 · S1 S2 S8 · AC2 AC8.
+  Citations that moved under the aRatifiedRulings,
+  dPolishedVitrine, aDeferredBar, aReplayedCard and aProbedUnit merges, each block byte-identical at
+  its new line: S1's `__kit-default__` init and resolution to `tools/unattended/unattended.sh:337`
+  and `:387`; S2's and §4's false `build_commit` comment to
+  `tools/unattended/lib-unattended.sh:242-245`, with `build_commit` itself now at `:247`; §4's
+  condition-3 block to `tools/unattended/unattended.sh:5051-5131`; the verbs-pair comment to
+  `tools/unattended/check-unattended.sh:1624-1630`; and gov's two keys to `.unattended.conf:236-237`.
+  S1's leg-initialiser range is corrected to `tools/unattended/check-unattended.sh:116-121`, which
+  did not move and was one line short at rev-2. `overlaps` is still at
+  `tools/unattended/lib-unattended.sh:105` and the allow-list still at `:181-186`.
+  S8 becomes a pointer plus its remainder: TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 landed fix F7's
+  "run no gate" half in `GROUND` at `tools/workflows/unattended-build.template.js:461-463` and in the
+  child prompt at `tools/workflows/unattended-unit.js:168-175`, so this unit builds only the `closes`
+  attribution. TOOL-dPolishedVitrine-1 made that harness RENDERED from
+  `tools/workflows/unattended-build.template.js`, declared at `tools/workflows/kit.toml:60-62`, so the
+  edit lands in the template and is re-rendered in the same commit; §4 Files touched names the
+  template, §7 gains `review-protocol parity (kit vs dogfood)`, the leg that grades the pair, and AC8
+  reads the pair rather than the landed "run no gate" text.
+  AC2's grep is corrected from `MANDATES a backlog row` to `section 1 MANDATES`: the sentence wraps
+  between the two words, so rev-2's phrase matched nothing at either base and the criterion could not
+  fail. §4's table row follows.
+  Both shared budgets are re-measured at BASE. BUILD-METHOD is 27264 B and 347 lines of 27648 B and
+  350, leaving 384 B and 3 lines where `abac6d59` left 1209 B and 14; the protocol is 60324 B of
+  61440 B, leaving 1116 B where it left 3625 B. This unit's 250 B and unit 19's 300 B no longer both
+  fit under BUILD-METHOD, which §4 states and which the orchestrator settles.
+  Verification pass, same regrounding: AC3 carried the SAME could-not-fail shape AC2 did, by case
+  rather than by a wrap. The protocol spells the sentence `A planned unit is minted as a backlog row`
+  at `memory/guides/UNATTENDED-PROTOCOL.md:256`, so rev-2's lower-case `a planned unit is minted as a
+  backlog row` counted 0 at both bases; AC3 now greps `minted as a backlog row`, which counts 1 per
+  copy at BASE, its Red-when names the case class, and §4's table quotes the sentence as spelled. The
+  verbs-pair comment is at `tools/unattended/check-unattended.sh:1624-1630`, not `:1623-1629`
+  (`:1623` is the `PREFIX=` assignment); the same off-by-one rode in from rev-2's `:1586-1592`, whose
+  comment began at `:1587`.
+  Extended 2026-09-20, same base, by the regrounding consolidation pass · §2 S3 S7 S11 · §4 · AC3
+  AC4 AC7 AC8 · §7. The two capped carriers are TRIMMED to fit rather than left oversubscribed,
+  because no cap is raised in this build: S7 falls from 250 B and 3 lines to 160 B and 2 lines
+  against BUILD-METHOD's 384 B, beside unit 19's cut to 120 B, which leaves 104 B for unit 31; S3
+  falls from 300 B to 250 B against the protocol's 1116 B, beside unit 19's cut to 350 B. AC7, AC3
+  and AC4 now read each file's SIZE against its cap at the pass, the new companion guide included,
+  as well as its growth. §4's two budget paragraphs state both splits.
+  S11 says what the silence used to: this unit is the first in build order to change
+  `unattended-build` bytes and moves no version, because `tools/check-kit-versions.sh` names no
+  carrier for that kit, so the build-wide version criterion has nothing to read. That is the
+  orchestrator's decision, recorded here in unit 37 S9's shape.
+  AC8's `permission:` line stops calling both of its commands suites that a bar runs: the
+  `--check` form is a read-only verb `tools/unattended/gate-guard.js` admits and is the pass's own
+  check, while `tools/workflows/unattended-build.test.sh` is named by no row of
+  `tools/gate-legs.json` and is observed by hand at VERIFYING. AC4's line went the other way on the
+  verifier's read: `adopt-unattended.sh --check` is the `unattended skill wiring` leg's own argv, so
+  the no-gate rule the child prompt states reaches it whatever the hook sees, and its run stays at
+  the post-build bar beside check 10's; only the headings and the byte count are read in the pass. §7's two unattended `New arm:` lines name the suites'
+  executed-assertion floors, which both suites pin, in place of a bare `ARMS_FLOORS` note and a bare
+  `none`; the `unattended-build.test.sh` line keeps `none`, because that suite pins no such floor.
+  AC2's, AC3's and AC7's zero-count phrases were re-run at HEAD in this pass: `section 1 MANDATES`
+  hits once, `minted as a backlog row` once per protocol copy and `memory/backlog` once in the
+  rendered build method, so each criterion can now fail and none is green before the unit acts.
+  Extended again on the closing consolidation pass · S3 S7 · §4 · AC3 AC7. Trimming the two
+  shares to fit was not enough, because a share is a claim about a build-wide sum and neither
+  sum closed. Both carriers are now NET ZERO OR NEGATIVE at this unit's own pass, funded inside
+  the same edit: S3 names §11's `Decide AT ONCE` paragraph, which MOVES into the companion guide
+  S4 creates and which draws on its own cap, and S7 names M6's `It takes a COMMITTED range`
+  paragraph, CLI prose about a memory-tree tool, which MOVES beside that tool's row in
+  `tools/memory-tree/README.md`. Each keeps a pointer line where it stood, and each is larger
+  than what this unit adds, so both spenders it used to compete with get headroom back instead.
+  AC3 and AC7 compare every carrier copy against this unit's PARENT commit rather than against a
+  budget, AC7 counts the build method's LINES itself because no checker reads that half, and
+  each names the destination phrase so a DELETION cannot pass as a move. Both destination
+  phrases were counted at HEAD and return 0 there, so neither criterion is green before the unit
+  acts. §4 Files touched gains the memory-tree README.
+  Extended again on the close-out pass, same base and rev · AC1. Rule 1 reads narrowly here, which
+  is how the criterion was always meant: the driver and leg commands run over AC1's scratch fixture
+  conf ARE the pass's direct check under `memory/guides/BUILD-METHOD.md` M6, and what defers is the
+  gov-conf half, the same leg over the real tree, which the bar the main loop makes at VERIFYING
+  covers unheld. Nothing else moved. No `permission:` line in this spec names a held leg: every leg
+  §7 lists resolves in `tools/gate-legs.json` with a subject of `repo` and a chunk outside
+  `selftests`, so a plain bar reaches each of them and no flag clause is owed.
 
 ## 10. Reuse audit
 
@@ -348,9 +518,27 @@ file a backlog row because `memory/backlog` is a shared record, which is the blo
 paragraph removes, and `TOOL-dBriefedPass-3`, which is why the build commit's exclusion set matters.
 
 Where the design and BASE disagree: design §8 cites `tools/unattended/lib-unattended.sh:197-220` for
-`build_commit`, which at BASE starts at line 207 with the false comment at 202-205; design §8 puts a
-closeout step on `--close` here, which unit 17 absorbed; design §19.8 U12 puts the guide in the DoD
-unit, which unit 17's own §8 moved here.
+`build_commit`, which at BASE `fb07ca25` starts at line 247 with the false comment at 242-245, having
+started at 207 with the comment at 202-205 when the design was written; design §8 puts a closeout
+step on `--close` here, which unit 17 absorbed; design §19.8 U12 puts the guide in the DoD unit,
+which unit 17's own §8 moved here.
+
+BASE is `fb07ca25`, origin/main, which HEAD `94fd2f54` merges without changing code. From `abac6d59`
+to it, the seams this unit extends kept their shapes and moved lines only: `overlaps`, the two-key
+init and resolution, condition 3's flat and nested halves, check 10's pair loop and the leg's
+allow-list. Nothing landed that refuses a path declared under both keys, and gov's own conf still
+declares no overlap, so S1 lands green as it did. Two landings reach this unit's carriers.
+TOOL-dPolishedVitrine-1 made `tools/workflows/unattended-build.js` a RENDERED copy of
+`tools/workflows/unattended-build.template.js`, and its round-1 F4 (`2814aaa5`) left the
+`review-protocol parity (kit vs dogfood)` leg unguarded in both carriers so it runs on every bar;
+S8, §4 Files touched and §7 follow. TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1 landed fix F7's
+"run no gate" sentence in `GROUND` and in the child prompt, which S8 now points at instead of
+rebuilding. The same landings put a rule this unit must not contradict in front of its own
+criteria: BUILD-METHOD M6 and `tools/unattended/gate-guard.js` deny a self-test suite or the bar
+inside a pass before VERIFYING, while owner rulings D12-h and D12-i8 let a unit run the unattended
+suites at its end. §4's fail-codes paragraph, §5 testing and §8 F4 are left exactly as the fork
+resolved them; the conflict is build-wide, reported rather than decided here, and the run defers
+every such observation to the VERIFYING run.
 
 Recall terms used: `SHARED_RECORDS GENERATED_INDEXES build_commit dispatch condition-3 records commit
 planned unit backlog row`

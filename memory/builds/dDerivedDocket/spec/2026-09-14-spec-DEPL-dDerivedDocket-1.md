@@ -1,6 +1,6 @@
 # DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-1 · base abac6d59 · streams deployer+tooling · order 38
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 38
 
 <!-- gen:spec-records -->
 
@@ -106,7 +106,7 @@ status token" wording is where one adopter's status-first rows came from.
 
 ### The edits, by location
 
-| Where, at BASE | Now | After |
+| Where, at `fb07ca25`, every citation unmoved from `abac6d59` | Now | After |
 |---|---|---|
 | `WIRE-INTO-PROJECT.md:123`, after the lexicon bullet | no kickoff-manifest bullet in §2's kit list | the S6 bullet |
 | `WIRE-INTO-PROJECT.md:124`-`:126` | "keeps the `kit:unattended` block in `§1`, which is the ONE substitute…" | names the substitute, the landing pointer and the contract |
@@ -243,7 +243,7 @@ The scaffold header, inside the existing `printf` format string:
 - risks — the section names commands other units built, so a renamed flag would strand an adopter;
   AC3 grades every name at this unit's pass. The concurrent adopter-wiring session may edit §3 step 4
   too, and the landing reconciles with whichever lands first. The attribute block now exists in both
-  the runbook and the kit README, as it did at BASE.
+  the runbook and the kit README, as it did at `abac6d59`.
 - testing — a scratch `git check-attr` over the attribute lines, a scratch scaffold with the hygiene
   gate run over it, a flag and path resolution pass, and a positional read of the new section.
 - migration — this unit documents the switch and performs none.
@@ -310,7 +310,7 @@ The scaffold header, inside the existing `printf` format string:
   row driver would read as a row in every fresh shard.
   fixture: a scratch git repository holding a copy of the kit directory and a `.memory-tree.conf`
   copied from `tools/memory-tree/.memory-tree.conf.example`, committed before the scaffold runs.
-  Measured at BASE on 2026-09-14: the scaffold wrote three shards and the hygiene gate exited 0 with
+  Measured at `abac6d59` on 2026-09-14: the scaffold wrote three shards and the hygiene gate exited 0 with
   0 graded rows.
   cost: under a minute.
 - **AC7** — When `bash tools/check-install-prefix.sh` runs at this unit's commit, it prints no `ROSE`,
@@ -329,9 +329,13 @@ The scaffold header, inside the existing `printf` format string:
 
 `memory hygiene` · `playbook parity` · `install-prefix (shipped surface)` · `dead-path carriers (deleted files still named)` · `kit/dogfood doc parity` · `memory-hygiene self-test` · `spec tokens (a spec's own names resolve)`
 
-No new gate arm. The runbook's entry-anchor checker is on no bar at BASE, so AC2 reads the position
-directly. `memory-hygiene self-test` is held and runs on the landing bar, which owes the self-tests
-because this build is kit work.
+No new gate arm. The runbook's entry-anchor checker is on no bar at `abac6d59` or at `fb07ca25`, so
+AC2 reads the position directly. `memory-hygiene self-test` is the one HELD leg in the list above:
+it reads `subject = kit` in `tools/gate-legs.json` at HEAD, so a plain bar PRINTS it held and runs
+it not at all. The run that covers it is the one after the last unit,
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which this build owes because it
+is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the list is
+`subject = repo` and runs on any bar, so nothing else here waits on the self-test flag.
 
 ## 8. Open questions
 
@@ -358,8 +362,8 @@ because this build is kit work.
   copy of the kit README. RESOLVED (agent, 2026-09-14, delegated): (b).
 - **F6** — Does this unit bump the memory-tree kit version for the header edit? (a) Yes. (b) No: the
   adopter script is outside the verdict-epoch gate's scan set, and the build lands in one landing, so
-  the version its earlier units set is the one that dates this edit on the default branch. RESOLVED
-  (agent, 2026-09-14, delegated): (b).
+  the version its earlier units set is the one that dates this edit on the default branch.
+  RESOLVED (agent, 2026-09-14, delegated): (b).
 - **F7** — How do the switch's commands meet the carried-prefix pin on this runbook? (a) Raise the
   row by hand in this pass with a dated reason. (b) Spell the commands relative to the kit directory,
   without the `tools/` prefix. (c) Leave the pin. (b) hands an operator a variable to expand, the
@@ -400,6 +404,51 @@ because this build is kit work.
   memory-recall prerequisite in step 4, which no criterion observed; AC7 and S7 name `SLACK` and
   `SWAPPED` beside `ROSE`, the leg's other two verdicts on a raised row; §5 security names step 6's
   landing merge as the writer's second commit; §4 edits table gains the carried-prefix row.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No scope, design or criterion moved.
+  `WIRE-INTO-PROJECT.md` changed only past line 535 (dPolishedVitrine's migration blocks and
+  aReplayedCard's card wiring), so every runbook line §2 S2, S4 and §4 cite sits where `abac6d59` had
+  it; the carried-prefix row S7 raises still reads 53; the scaffold header at
+  `tools/memory-tree/adopt-memory-tree.sh:281` and the usage lines AC3 cites are unchanged; the
+  three fixture replicas §3 keeps are still three; the shipped example conf AC6 copies gained only
+  a blank `SPEC_DIRECT_CUTOFF` row the hygiene engine does not read. The three reference hooks
+  step 5 names are still absent, as units 9 and 13 create them. §7's prose names the one
+  post-build bar, under owner ruling TOOL-aProbedUnit-8. §10.
+  Extended 2026-09-20 by the regrounding consolidation, which changed no scope, design or criterion
+  here and checked each of its four build-wide rules rather than assuming it. Suite permissions: no
+  criterion observes a `.test.sh` or `selftest.py` FILE invocation, a merge bar or a
+  `GATE_FULL=`/`GATE_SELFTESTS=` prefix; AC7 already defers its leg; and AC3's and AC6's runs of
+  `gen_build_index.py --check`, `merge-rows.py --check`, the scaffolder and the hygiene engine all
+  happen inside AC6's scratch fixture, which the child prompt in
+  `tools/workflows/unattended-unit.js` names among the direct checks a pass may use, so none is
+  deferred. §7 adds no arm, so no `New arm:` third field exists to price. AC6's `grep -c '^- '` zero
+  is read over a tree the scaffolder writes in the fixture rather than over HEAD, so it is not the
+  already-green class, and no other criterion asserts a phrase counts zero. And this unit touches
+  no capped carrier: `WIRE-INTO-PROJECT.md`, `tools/memory-tree/adopt-memory-tree.sh` and
+  `tools/install-prefix-carried.txt` each carry no row in `tools/template-size-limits.txt`.
+  Extended again 2026-09-20 by the closing consolidation, which moved nothing in this spec and
+  states why. The build-wide capped-carrier rule tightened from a ceiling to NET ZERO, and this unit
+  writes no capped carrier, so it owes no trim and no size criterion — the three files above were
+  re-checked against `tools/template-size-limits.txt` rather than carried over. The orchestrator
+  ratified the deferral reading this spec already applies: a gate-leg command or a suite FILE
+  invocation defers to the run at VERIFYING, while a checker run inside a fixture, a `--selftest`
+  flag and a read-only verb stay in the pass, which is what keeps AC3's and AC6's fixture runs where
+  they are and AC7's leg deferred. The header date moves to the last-change date, 2026-09-20, with
+  the rev kept.
+  Extended again 2026-09-20 by the close-out pass, which moved two words and no figure. This spec
+  wrote BASE for `abac6d59` in six places while its header declares `fb07ca25`, the same
+  contradiction of one word for two commits that the orchestrator ruled on for the charter unit of
+  this build; every use now
+  names a commit, §10 states that, and nothing measured changed. §7's prose now names the HELD leg
+  it lists and the run that covers it in the orchestrator's own terms: `memory-hygiene self-test`
+  reads `subject = kit` in `tools/gate-legs.json` at HEAD, so the bar after the last unit is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and a plain bar leaves that leg
+  held. The full command is spelled in §7 prose rather than in an acceptance bullet or the leg-list
+  line, the two places `tools/check-spec-tokens.py`'s bar join reads, so it adds no graded token.
+  The other three closing rulings reach nothing here: this unit writes no capped carrier, so the
+  net-zero rule and its 2048-byte scoping are both inapplicable; it adds no key to
+  `tools/unattended/.unattended.conf.example` and sets none in `.unattended.conf`, so it owes no
+  section 8 key-table row; and AC3's and AC6's fixture runs already read the narrow rule the
+  orchestrator ratified. The header date already reads 2026-09-20 and the rev is kept.
 
 ## 10. Reuse audit
 
@@ -416,7 +465,12 @@ replicate the scaffold's output rather than invoking it, which is why §3 leaves
 a runbook naming a section that does not exist, the class AC3 guards; and TOOL-aHonedRuleset-9,
 the runbook's anchor checker sitting on no bar, which is why AC2 reads the position directly.
 
-Where the design and the source disagree at BASE, re-verified here:
+EVERY MEASUREMENT IN THIS SPEC NAMES ITS SHA. This spec wrote BASE for `abac6d59`, the commit it was
+drafted and audited at, while its header declares `fb07ca25` and four sibling specs of this build
+declare BASE to BE `fb07ca25`; one word for two commits is a contradiction a reader cannot resolve,
+so every use now names a commit and the word is gone. No figure moved with the spelling.
+
+Where the design and the source disagree at `abac6d59`, re-verified here:
 
 - Design §11 and §15's U6 say the attribute is retargeted; §18 rev-3 A2 and the switch-over's spec
   keep it and add one (§8 F3).
@@ -424,5 +478,11 @@ Where the design and the source disagree at BASE, re-verified here:
   points at them rather than copying a measurement that will move.
 - The scaffold header text also appears in gov's four live shard headers and in three test
   fixtures. The shard headers are the switch-over's; the fixtures are inert (§3).
+- At `fb07ca25`, the base this spec is regrounded on, the runbook changed only past line 535, so §2
+  and §4's line citations hold; the `WIRE-INTO-PROJECT.md` row of
+  `tools/install-prefix-carried.txt` still reads 53; `tools/memory-tree/adopt-memory-tree.sh:281`,
+  `tools/memory-tree/merge-rows.py:1098-1104` and the replica count are unchanged. No landed build
+  adds a backlog mode, a `BACKLOG_MODE` key or a runbook switch section, and `.githooks/` holds no
+  `straggler-guard.sh`, `pre-rebase` or `commit-msg` yet.
 
 Recall terms used: `WIRE-INTO-PROJECT runbook migrate adopter shards scaffold header merge=rows attribute ledger retired status-first`

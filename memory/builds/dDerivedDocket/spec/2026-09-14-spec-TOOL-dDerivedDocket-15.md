@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 15
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -221,7 +221,7 @@ derived from the asks' families through `FAMILIES`, `ids:` (written empty and fi
 `--write` render the scaffold runs), `status: OPEN`, `authorized-by: slug` and `asks:`.
 `status: OPEN` is required because `derive_status` has no spec to derive from
 (`tools/memory-tree/gen_build_index.py:635-641`). The run's first spec commit deletes it, because an
-authored status beside a parseable spec header is the generator's two-answers refusal (`:643-648`);
+authored status beside a parseable spec header is the generator's two-answers refusal (`:644-649`);
 this build's own README did exactly that at `c6cb6951`. The five canon slots of `SLOT_CANON`
 (`tools/memory-tree/gen_build_index.py:107-113`) get generated bodies naming the asks and the tree
 they were read at, so the file carries no authored prose; the units roster pair is empty. Every
@@ -246,7 +246,9 @@ there, which is design §19.2's disqualifier stop.
 
 `tools/memory-tree/backlog.py` · `tools/memory-tree/gen_build_index.py` and its selftest ·
 `tools/memory-tree/.memory-tree.conf.example` · `.memory-tree.conf` (the blank key) ·
-`memory/map/generated/` regenerated for the new symbols.
+`memory/map/generated/` regenerated for the new symbols and staged in the same commit as the `.py`
+it describes, because the pre-commit fast leg runs the codebase-map gate whenever a `.py` is staged
+and refuses a stale or unstaged artifact (dUnstagedSymbol, `1a774fcd`).
 
 ### Alternatives rejected
 
@@ -354,9 +356,16 @@ there, which is design §19.2's disqualifier stop.
 - **AC12** — When `python3 tools/memory-tree/gen_build_index.py --selftest` runs, every arm this unit
   adds passes, and each was observed RED with its fix unstaged.
   Red when: an arm is wired without its failing case ever being seen.
-  cost: one kit selftest run; held, so it runs at the landing bar under `GATE_SELFTESTS=1`.
-  permission: unit passes run no gate legs (fix F7), so each arm's RED is observed by hand against a
-  scratch fixture in the pass, and the selftest itself runs at the one post-build bar.
+  cost: one kit selftest run, whose declared ceiling `tools/gate-legs.json` carries on the
+  `build-index selftest` row is inside what a pass can hold, so no cost deferral applies.
+  permission: the `--selftest` FLAG clause decides this criterion, not the gate-leg one: a flag on
+  another file is what `memory/guides/BUILD-METHOD.md` M6 and the header of
+  `tools/unattended/gate-guard.js` both name as a pass's direct check, and the hook denies a
+  `.test.sh` or `selftest.py` FILE invocation rather than this form. The pass runs it. That
+  `tools/gate-legs.json` also carries the same argv as a leg defers the BAR's run, never this one;
+  and that leg is HELD, `chunk = selftests`, so the run covering it is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at VERIFYING and never a plain
+  bar. Each arm's RED is still observed by hand against a scratch fixture with its fix unstaged.
 - **AC13** — When the memory-recall kit's `anchor_at` runs over every line the scaffold writes for
   AC10's fixture, it returns no anchor.
   Red when: a generated bullet reads `- EXMP-aFoo-3 — …`, which anchors a foreign id under the new
@@ -416,22 +425,61 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   passes no live-build set (unit 16 §8 F2 at rev-2); M8 §3 lists which mode-scoped directives bind
   the scaffold's README. AC9's two-token fixture names `p.py` and `q.py` at the fixture root, so no
   untracked path reaches the spec-token join.
+- rev-3 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No S-item, criterion or fork moves:
+  `gen_build_index.py` and `extract.py` are unchanged since `abac6d59`, so every §4 citation holds
+  but the two-answers refusal's, one line early at `abac6d59` too and now `:644-649`, and nothing
+  landed that grades an ask or scaffolds a README. §4 Files touched names the staged
+  map regeneration the dUnstagedSymbol pre-commit leg (`1a774fcd`) now refuses without. §10 records
+  the re-run reuse lookups with each neighbour's own file, the new BASE, and that TOOL-aProbedUnit-1
+  (`5493495a`) and TOOL-aDeferredBar-2 (`1afd26c9`) leave AC12 as written.
+  Extended 2026-09-20, same base, by the regrounding consolidation pass, which changed nothing here
+  and records why. AC12's observation is a `--selftest` FLAG on another file, which the header of
+  `tools/unattended/gate-guard.js` and the unit child prompt both name as a pass's direct check, so
+  it is not deferred. §7's `New arm:` third field stays
+  `none`, because `gen_build_index.py` pins no executed-assertion floor. No criterion here asserts
+  that a phrase counts zero, and this unit writes to no byte-capped carrier.
+  Extended again on the closing consolidation pass · AC12, the one item left open here. The two
+  clauses pointed opposite ways because the same argv is a `--selftest` flag AND the
+  `build-index selftest` leg's own row in `tools/gate-legs.json`. RESOLVED (agent, 2026-09-20,
+  delegated), decided by the orchestrator: the FLAG clause wins, so the pass runs it and nothing
+  about it defers. AC12's `cost:` and `permission:` lines are rewritten to say which clause
+  applies and why, in place of the earlier text that kept the arms in the pass and sent the run
+  itself to the post-build bar — one criterion cannot sit on both sides of the rule. The
+  deferral that does survive is the BAR's: that leg carries `chunk = selftests`, so a bar only
+  reaches it under `GATE_SELFTESTS=1`, which is a property of the bar and not of this criterion.
+  Extended again on the close-out pass, same base and rev · AC12, the only line owed anything here.
+  Its `permission:` line names the run that covers the held leg in the terms the build now uses,
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at VERIFYING, so the deferral it
+  describes cannot later be read as satisfied by a plain bar. The criterion itself does not move:
+  Rule 1's narrow reading leaves a `--selftest` FLAG on another file in the pass, and this spec
+  writes to no byte-capped carrier, so the net-zero rule reaches nothing here.
 
 ## 10. Reuse audit
 
 The seams are the generator's own: `_expand_ids` for ranges, the `--write` render for the scaffold's
 regions, the `SLOT_CANON` and readme-contract registry for its shape, and unit 7's `--asks` for the
 print path. `python tools/codebase-map/reuse_lookup.py "parse clause tail of a row and grade
-readiness"` returned name-stem neighbours (`parse_args`, `parse_conf` in
+readiness"`, re-run at `fb07ca25`, returns name-stem neighbours (`parse` in
+`tools/memory-recall/query.py`, `parse_args` in `tools/govkit/govkit.py`, `parse_conf` in
 `tools/memory-tree/corpus_ids.py`) and no readiness grader; `reuse_lookup.py "scaffold a new build
-readme with front matter"` returned `build_*` helpers and no scaffold. No existing seam fits the
-predicate or the scaffold: nothing in the tree grades an ask or writes a build README. The recall
-probe returned design §19 and `TOOL-aUnmannedHelm-4`, and no prior record of an ask envelope.
+readme with front matter"` returns `build_*` helpers and no scaffold. No existing seam fits the
+predicate or the scaffold: nothing in the tree grades an ask or writes a build README, and no build
+landed between `abac6d59` and `fb07ca25` adds one (no tracked file outside this build spells
+`--new-build`, `PROBE_ALLOW` or `ASKS_CMD`). The recall probe returned design §19 and
+`TOOL-aUnmannedHelm-4`, and no prior record of an ask envelope.
 
 Where the design and BASE disagree: design §19.3's example locator `` `tools/push-main.sh`:212 `` is
 illegal under fix F6; design §19.8 U10 places the check-13 scoping here and the brief places it in
-unit 8; `gen_build_index.py` did not change between `09a22d2b` and `abac6d59`, so the design's line
-citations hold.
+unit 8. BASE is `fb07ca25`, origin/main after 210 commits past `abac6d59`. `gen_build_index.py` and
+`tools/memory-recall/extract.py` did not change between `09a22d2b` and `fb07ca25`, so every line
+citation above holds, the two-answers refusal's corrected to `:644-649` because it was one line early
+before, and `SLOT_CANON`, `derive_status`, `_expand_ids` and the readme-contract registry's bound and
+exempt rows keep their meaning. Two landed builds bind this unit's pass without
+changing its design: TOOL-aProbedUnit-1 puts "no gate, suite or bar inside a pass" in the child
+prompt, which AC12's `permission:` line already follows; and the pre-commit codebase-map leg of
+dUnstagedSymbol, which Files touched now names. AC12's `--selftest` flag form is not a match for the
+spec-token `bar` join or for `tools/unattended/gate-guard.js`, both of which read a flag on another
+file as the direct check.
 
 Recall terms used: `acceptance-underivable orientation ask row pointer observable cut-line resolution
 table ids-driven run`

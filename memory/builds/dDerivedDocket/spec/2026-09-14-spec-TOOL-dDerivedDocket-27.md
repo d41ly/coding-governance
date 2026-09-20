@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 27
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -29,7 +29,9 @@ fits, instead of reporting all three like a red leg.
 ## 2. Scope (IN)
 
 - **S1** `GATE_WALL`, a positive integer of seconds in `.unattended.conf`, validated at conf load the
-  way `GATE_BOUND` is. The driver exports it to `$GATE_CMD`, whose runner already reads it
+  way `GATE_BOUND` is: by a call to the driver's `read_bound_key`, never a new `case`, with an empty
+  default, so a malformed value refuses with exit 2 and a blank one stays blank with the helper's
+  note. The driver exports a non-blank value to `$GATE_CMD`, whose runner already reads it
   (`tools/run-gates/run-gates.sh:422`). Blank leaves the runner's profile wall in force, announced.
   Observed by AC1, AC5 and AC12.
 - **S2** `GATE_PROFILE_CMD`, a declared command that prints the runner's resolved profile; gov sets
@@ -70,11 +72,16 @@ fits, instead of reporting all three like a red leg.
 - **S9** No unattended or run-gates version constant moves here: this unit's bytes ride the move
   `TOOL-dDerivedDocket-1` S9 makes once for the build. NOT OBSERVED by a criterion here:
   `kit version markers` grades the final tree's constant-marker agreement.
-- **S10** The unattended suites run once at the unit's end under attribution. Observed by AC10.
+- **S10** The unattended suites run under attribution at the build's one post-build bar, the run
+  the main loop makes at VERIFYING after the last unit; this unit's pass writes the arms and
+  stages each RED. Observed by AC10.
 - **S11** The lease's stale bound (`TOOL-dDerivedDocket-4` §4 'The lease') takes the pinned
   `gate-backstop` fact as its first term, `max(gate-backstop, LEASE_STALE_AFTER)`. `GATE_BOUND` is
   the announced fallback when the record carries no fact. KF7 specified
   `max(backstop, declared bound)`, and this is where the build delivers it. Observed by AC9.
+- **S12** This unit's delta on every capped carrier is ZERO OR NEGATIVE. Leg check 22 owes the two
+  conf keys ONE joined protocol key-table row, and §4 names the two §8 restatements that fund it.
+  Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -87,9 +94,9 @@ fits, instead of reporting all three like a red leg.
   runner's queue bound is already declared as a multiple of its TTL; S3 reports it, nothing sets it.
 - **The attended bar and the push boundary.** The pre-push hook and a person's run keep the profile
   row's wall. `GATE_WALL` here governs the unattended bar only.
-- **`GATE_BOUND`'s default and its other consumers**: the wiring check, the lander probes and the
-  asks witness keep the declared bound. The lease's stale bound is not one of them: S11 moves its
-  first term to the backstop.
+- **`GATE_BOUND`'s default and its other consumers**: the wiring check, the lander probes, the
+  asks witness and `--dispatch`'s declared spec-token checker keep the declared bound. The lease's
+  stale bound is not one of them: S11 moves its first term to the backstop.
 
 ### Edges
 
@@ -131,7 +138,7 @@ stdout               gates-green: ask <id> already OPEN for leg <leg> at <R8> ·
 
 ### Why the three terms
 
-The runner arms its wall at the first dispatch, after the queue (`tools/run-gates/run-gates.sh:1580`),
+The runner arms its wall at the first dispatch, after the queue (`tools/run-gates/run-gates.sh:1586`),
 and the queue fails open at `TS_MAXWAIT` (`tools/run-gates/run-gates.sh:601`), so the longest a
 healthy bar can take is queue plus wall. The margin covers what happens after the wall fires: the
 watcher's poll, at most 30 s, the kill of each leg's tree and the verdict render. 600 s is twenty
@@ -166,8 +173,31 @@ the failure strictly worse than a loose bound (`tools/run-gates/gate-profiles.tx
 `tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/SKILL.template.md` · `tools/unattended/.unattended.conf.example` · `.unattended.conf`
-· `tools/run-gates/run-gates.sh` · `tools/run-gates/run-gates.test.sh` · `tools/run-gates/README.md` ·
+· `tools/unattended/PROTOCOL.template.md`, which gains the joined key-table row ·
+`tools/unattended/README.md`, which receives the two trimmed §8 restatements ·
+`tools/run-gates/run-gates.sh` · `tools/run-gates/run-gates.test.sh` · `tools/run-gates/README.md` ·
 the rendered Skill.
+
+`memory/guides/BUILD-METHOD.md` is absent from that list, so this unit's delta on it is 0 bytes and
+it spends none of BUILD-METHOD's 384, and it spends none of the 1,116 bytes the protocol has left at
+BASE either. The protocol IS touched, for one key-table row, and it ends this unit's pass no larger
+than it began it. AC14 reads both carriers at the pass and reds if either GREW, so the claim is
+checked rather than asserted.
+
+Leg check 22 of `tools/unattended/check-unattended.sh` joins §8's key table against
+`tools/unattended/.unattended.conf.example` and reds on a key declared in one and missing from the
+other, so `GATE_WALL` and `GATE_PROFILE_CMD` are OWED a row rather than pending a ruling. ONE
+joined first cell carries both keys for about 150 bytes, and the protocol and
+`tools/unattended/README.md` are in Files touched for it. The row is paid for by trimming §8's own
+restated boilerplate, named precisely so that no sibling unit trims the same text — the
+`UNIT_STALL_BOUND` cell's restatement of `GATE_BOUND`'s terms at
+`tools/unattended/PROTOCOL.template.md:459`, opening "OPTIONAL, on", 119 bytes, which the cell has
+just pointed at and which the sibling row already states in full; and the `REVIEW_ROUNDS` cell's
+closing clause at `tools/unattended/PROTOCOL.template.md:460`, opening ", and so is a value at or
+above the runaway ceiling", 135 bytes. Both move to `tools/unattended/README.md`, the kit README,
+which carries no size row in `tools/template-size-limits.txt` and owns kit prose; neither carries a
+kit-path literal, so the shipped-surface ban does not move. That is 254 bytes against about 150, so
+the delta stays zero or negative. No cap is raised: raising one is an owner turn.
 
 ### Alternatives rejected
 
@@ -204,6 +234,12 @@ the rendered Skill.
   profile with `wall 5` and `queue 20`, waits 12 s, prints `gate queue: acquired`, and exits 0, under
   a conf declaring `GATE_BOUND="10"`, the item is MET and the printed bound names all three terms.
   Red when: the bar is bounded by `GATE_BOUND`, which charges the queue to the bar and kills it.
+  permission: the arm is written and staged RED in the pass; the suite that executes it,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes it is
+  the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
 - **AC2** — When the stub hangs without printing `gate queue: acquired` and the margin seam makes the
   backstop 3 s, the item is UNMET as never started, with a `hold` line naming `host-degraded` and
   `probe gate`.
@@ -212,20 +248,30 @@ the rendered Skill.
   is MET and the output names one re-run; when it exits 3 twice, the item is UNMET naming the moved
   tree.
   Red when: exit 3 reads as a failed leg, or the re-run repeats without bound.
-- **AC4** — When a conf declares `GATE_WALL` below the profile's `ceiling_max`,
-  `bash tools/unattended/check-unattended.sh` reds naming both numbers and `--preflight` refuses
-  before any write.
+  permission: the arm is written and staged RED in the pass; the suite that executes it,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes it is
+  the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
+- **AC4** — When `bash tools/unattended/check-unattended.sh` grades a FIXTURE conf declaring
+  `GATE_WALL` below the profile's `ceiling_max`, it reds naming both numbers, and `--preflight` over
+  that same fixture refuses before any write.
   Red when: the check compares the wall with the profile's own `wall`, which passes any wall.
 - **AC5** — When the leg runs over the real tree, gov's declared wall clears the largest declared leg
   ceiling; with `GATE_WALL` staged at 10800 it reds naming the largest ceiling.
   Red when: gov's conf leaves the wall undeclared, so the unattended bar runs under a number nobody
   chose.
   figure: the largest ceiling is DERIVED at observation from `tools/gate-legs.json`; it is 16040 at
-  BASE, PINNED 2026-09-14 for the staged break only.
+  fb07ca25, as at `abac6d59`, PINNED 2026-09-16 for the staged break only.
+  permission: the leg runs over the real tree rather than a fixture, so it is observed at the
+  build's one post-build bar.
 - **AC6** — When `bash tools/run-gates/run-gates.sh --print-profile` runs, it prints `queue` equal to
   four times the resolved turnstile TTL and `ceiling_max` equal to the manifest's largest ceiling.
   Red when: `queue` is printed before the TTL is resolved and reads 0.
-  permission: the runner arm lives in the held canary; it runs at the build's one post-build bar.
+  permission: the runner arm lives in `tools/run-gates/run-gates.test.sh`, the `run-gates canary`
+  leg, which a plain bar HOLDS, so the run that executes it is the VERIFYING run's
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
 - **AC7** — When the stub exits 4, the item is UNMET with a `hold` line naming `host-degraded` and
   `probe host`.
   Red when: HOST reads as a red leg, so the run fixes a subject that is not at fault.
@@ -238,6 +284,8 @@ the rendered Skill.
   before the commit, which the HELD unit's clean-tree precondition refuses; or the Close section
   gives a branch push the remote does not answer no hold, so the run's only documented ending is
   refused under `ANCHOR_SCOPE=published`.
+  permission: both run over the rendered tree rather than a fixture, so they are gate legs and are
+  observed at the build's one post-build bar.
 - **AC9** — When `tools/unattended/unattended.test.sh` runs `gates-green` with a stub bar that sleeps
   past `GATE_BOUND` and past `LEASE_STALE_AFTER`, both set low in the fixture conf, but stays inside
   the pinned `gate-backstop`, then `--status` from a second worktree of the fixture repository prints
@@ -246,8 +294,14 @@ the rendered Skill.
   `presumed-stopped` and a second session takes the slug over.
   fixture: a second WORKTREE, not a second clone, because the lease lives under the git common dir,
   which a clone does not share.
-- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+  permission: the arm is written and staged RED in the pass; the suite that executes it,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes it is
+  the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
+- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
   its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
@@ -256,7 +310,12 @@ the rendered Skill.
   pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
   filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
-  permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the
+  last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
+  made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
+  carries no leg for these suites at any flag setting. This folds the conservative reading of
+  the parked ruling conflict and decides nothing.
 - **AC11** — When the stub prints `gate queue: acquired` and then hangs past the backstop, the item
   is UNMET with the never-returned text and no `hold` line.
   Red when: every backstop kill maps to `host-degraded` and `probe gate`, so a wedged leg gets up to
@@ -278,14 +337,43 @@ the rendered Skill.
   inherited-only red under `land` reads UNMET, reversing D12-i4 for unattended runs; or the arm's
   quantifier is existential, so a record holding a MIXED red beside an INHERITED one commits LANDING
   over a new red that only the push boundary then stops.
-  permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
+  permission: the arm is written and staged RED in the pass; the suite that executes it,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes it is
+  the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
+- **AC14** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
+  build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
+  parent's and both trims are taken and landed:
+  `grep -c 'terms: absent takes the kit default and says so'` and
+  `grep -c 'and so is a value at or above the runaway ceiling'`, each over
+  `tools/unattended/PROTOCOL.template.md`, count 1 at the parent and 0 at the build commit,
+  with both trimmed passages present in `tools/unattended/README.md`. The owed joined row arrived:
+  `grep -c 'GATE_PROFILE_CMD' tools/unattended/PROTOCOL.template.md` counts 0 at the parent and 1 or
+  more at the build commit. The same
+  two readings hold for `tools/unattended/PROTOCOL.template.md` and for
+  `memory/guides/BUILD-METHOD.md`, and each size is below its declared ceiling — 61440 bytes in
+  `tools/memory-tree/check-memory-hygiene.sh` for the guide, and the `memory/guides/BUILD-METHOD.md`
+  row of `tools/template-size-limits.txt` for the method.
+  Red when: the key-table row is added and nothing is trimmed, so a unit whose design says it spends
+  nothing quietly spends the headroom the build's units share; or the size is read against the
+  figure written in this spec rather than against the parent commit, so a sibling's landing hides
+  this unit's overspend; or the trim is witnessed by a phrase the new row can itself carry, such
+  as a bare `OPTIONAL, on`, so a row written in the table's own house style masks the trim and the
+  count never moves; or only the larger of the two trims is taken, so the row is half funded; or
+  the trim is taken and the text lands in no destination, which DELETES a
+  refusal's reason rather than moving it; or the cap is raised to make the row fit, which is an
+  owner turn; or the two keys reach §8's key table in no row, which reds check 22 of
+  `tools/unattended/check-unattended.sh` on the next bar.
+  permission: a read, a byte count and three greps, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `run-gates canary` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · a stub gate that queues, hangs before acquiring, exits 3 twice, or exits 4 · none
-New arm: tools/unattended/check-unattended.test.sh · a conf whose wall is below the profile's largest ceiling · none
+New arm: tools/unattended/unattended.test.sh · a stub gate that queues, hangs before acquiring, exits 3 twice, or exits 4 · the driver suite's executed-assertion floor
+New arm: tools/unattended/check-unattended.test.sh · a conf whose wall is below the profile's largest ceiling · the leg suite's executed-assertion floor
 New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest with known ceilings · the canary's executed-assertion floor
 
 ## 8. Open questions
@@ -333,19 +421,76 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
   ADD 4 fold extended with an OPEN-ask reuse: §2 S5's exit-1 attribution arm keeps the auto-file and
   its reuse, observed through AC10's attributed run of the policy unit's arms; the §3 consumes-from
   edge to unit 24 names both and the reuse line; §4 Data model adds the reuse line to stdout.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §2 S1 validates `GATE_WALL` through
+  `read_bound_key`, the helper TOOL-aProbedUnit-3 hoisted `GATE_BOUND`'s `case` into, whose header
+  makes a later bound key a call; an empty default keeps a blank wall blank and announced. §3's
+  `GATE_BOUND` consumers gain `--dispatch`'s spec-token checker, which aDeferredBar runs through
+  `run_bounded`. §4 "Why the three terms" cites `arm_wall` at `run-gates.sh:1586`, six lines lower
+  after TOOL-aRatifiedRulings-4's `report_one` change. AC5's figure is re-read at fb07ca25, still
+  16040. §10's BASE paragraph describes fb07ca25: `run_bounded` at line 183, the bound read at
+  lines 358 and 369, and K15's numbers unchanged. No S-item landed on main. AC10's attributed run,
+  and every criterion observed inside an unattended suite, meet the gate-guard hook
+  TOOL-aDeferredBar-3 landed, which is reported to the orchestrator and not decided here.
+  Extended 2026-09-20, regrounding consolidation, folding the conservative reading of that parked
+  conflict and not deciding it. AC10 now reads the attributed run at the build's one post-build
+  bar, the run the main loop makes at VERIFYING after the last unit, and S10 follows it. AC1, AC3,
+  AC9 and AC13 gain `permission:` lines because each names `tools/unattended/unattended.test.sh`
+  as the file that executes it; AC5 and AC8 gain one because each runs a leg over the real or
+  rendered tree. AC4 keeps its in-pass observation: it grades a FIXTURE conf, which M6 names as a
+  pass's own direct check. AC6's existing post-build-bar line is unchanged. §4 states that this
+  unit's delta on every capped carrier is 0 bytes as specced, and what a check 22 key-table row
+  would cost if the build rules one owed; no cap is raised. On 2026-09-20 the orchestrator ruled
+  that a unit adding bytes to a capped carrier funds them itself, so §4 also names the passages
+  that would fund that row — §8's `UNIT_STALL_BOUND` restatement, 119 bytes, and the `REVIEW_ROUNDS`
+  closing clause, 135 bytes, both to `tools/unattended/README.md` — and new AC14 reads both capped
+  carriers at the pass and reds if either grew, which checks the 0-byte claim instead of asserting
+  it. The closing verifier replaced AC14's first witness, a bare `OPTIONAL, on` count that the
+  table's own house style lets the new row re-introduce, with one phrase unique to each trimmed
+  passage, and added the second trim's own witness so both named trims are graded rather than one.
+  Both §7 `New arm:` lines name their
+  suite's executed-assertion floor instead of `none`; the `run-gates.test.sh` arm already named
+  the canary's floor. No criterion of this unit asserts a phrase counts zero, so the
+  could-not-fail sweep found nothing here.
+  Extended again on 2026-09-20, closing pass. The orchestrator ruled the check 22 key-table row
+  OWED rather than pending, so S12, §4 and AC14 drop every conditional arm: the joined
+  `GATE_WALL`/`GATE_PROFILE_CMD` row is a cost this unit carries, the two named §8 trims fund it at
+  254 bytes against about 150, `tools/unattended/PROTOCOL.template.md` and
+  `tools/unattended/README.md` join Files touched, and AC14 now reads one unconditional arm plus a
+  witness that the row arrived. Rule 1's narrow reading is ratified: AC4 says in its first clause
+  that the checker grades a FIXTURE conf, which it always meant. AC1, AC3, AC9 and AC13's
+  `permission:` lines name WHICH run covers them — `tools/unattended/unattended.test.sh` is on no
+  bar leg, so the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` run
+  covers them and `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` does not — and
+  AC6's names the `run-gates canary` leg, which that flagged bar DOES carry and a plain bar holds.
+  Closing verifier, same pass and rev: the `permission:` line of the criterion that reads the
+  attributed run now names that run in the orchestrator's own terms, because
+  `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
+  `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
+  post-build bar" alone would have read as a bar that covers them.
 
 ## 10. Reuse audit
 
 - **Probe result.** `reuse_lookup.py` over "bound the merge bar by the runner wall plus the queue wait"
   returned `run_bounded` in `tools/process-monitor/census.py` — a different kit's bounded runner, not
   this driver's — and the run-gates `LEGS_FILE` affordance seam; `.sh` is unscanned. Reading source
-  found the seams this unit extends: the driver's `run_bounded` (`tools/unattended/unattended.sh:182`)
-  and its `GATE_BOUND` validation (`tools/unattended/unattended.sh:305`), the `gates-green` arm and its
-  never-returned text, and the runner's `--print-profile` verb (`tools/run-gates/run-gates.sh:511`),
-  whose header already names a second reader as its purpose.
-- **DR against BASE.** K15's numbers hold at BASE: `GATE_BOUND="3600"` in `.unattended.conf`, every
-  profile row at `wall=21600`, and `TS_MAXWAIT` derived as four TTLs, 7200 s at the 1800 s fallback.
-  DR's "read from `--print-profile`" would find no queue key there at BASE; S3 adds it.
+  found the seams this unit extends: the driver's `run_bounded` (`tools/unattended/unattended.sh:183`)
+  and its bound reader `read_bound_key` (`tools/unattended/unattended.sh:358`, called for
+  `GATE_BOUND` at `tools/unattended/unattended.sh:369`), the `gates-green` arm and its never-returned
+  text, and the runner's `--print-profile` verb (`tools/run-gates/run-gates.sh:511`), whose header
+  already names a second reader as its purpose.
+- **DR against BASE fb07ca25.** K15's numbers hold at fb07ca25 as at `abac6d59`: `GATE_BOUND="3600"`
+  in `.unattended.conf`, every profile row at `wall=21600`, and `TS_MAXWAIT` derived as four TTLs,
+  7200 s at the 1800 s fallback. DR's "read from `--print-profile`" would still find no queue key;
+  S3 adds it. Between the two bases `tools/run-gates/gate-profiles.txt` did not move, and
+  `tools/run-gates/run-gates.sh` moved only in its version pair (run-gates 1.7) and in `report_one`'s
+  kill tail. The driver gained `read_bound_key`, reading `GATE_BOUND`, `UNIT_STALL_BOUND` and
+  `REVIEW_ROUNDS`, a third `run_bounded` caller in `--dispatch`, and the unattended kit is 1.24; no
+  `GATE_WALL`, `GATE_PROFILE_CMD`, `gate-backstop` or `acquired` reader exists on main. At fb07ca25
+  the wired gate-guard hook (`tools/unattended/gate-guard.js`) denies a `*.test.sh` suite and
+  `run-unattended-gates.sh` while this branch's record is before `VERIFYING`, so AC10's run, and
+  every criterion observed inside an unattended suite, could not have executed inside a pass as
+  rev-5 first wrote them. The 2026-09-20 consolidation moved them to the build's one post-build
+  bar; the ruling conflict with D12-i8 behind that move is the orchestrator's.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: GATE_BOUND GATE_WALL wall TS_MAXWAIT turnstile queue acquired backstop
   print-profile ceiling host-degraded run_bounded — passed as `--terms` with the question "why does

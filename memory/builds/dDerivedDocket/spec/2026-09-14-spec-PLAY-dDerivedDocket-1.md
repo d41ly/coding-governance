@@ -1,6 +1,6 @@
 # PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams playbook · order 37
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams playbook · order 37
 
 <!-- gen:spec-records -->
 
@@ -54,8 +54,11 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   refuses a watched change without one. The §B claims the template feeds are re-read; none is
   expected to change, since the switch-over unit already rewrote the backlog claims. Observed by
   AC8.
-- **S7** The net byte budget: the template's CR-stripped size falls at this unit's commit, and
-  `AGENTS.md` stays within its declared ceiling. Observed by AC1 and AC4.
+- **S7** The net byte budget, on BOTH capped carriers and read against this unit's PARENT rather
+  than against a ceiling: the CR-stripped size of `coding-governance-agents.template.md` falls at
+  this unit's commit, and so does `AGENTS.md`'s. This unit adds bytes to neither and raises no cap,
+  which is what lets a unit at order 37 land on a parent whose free space earlier units have already
+  spent down. Observed by AC1 and AC4.
 - **S8** §1 Landing's explicit-ask substitute bullet, inside the first `kit:unattended` fence, says
   the build folder the run did not create is the DEFAULT-BRANCH anchor's property and that the
   protocol names what its second anchor weakens. It stays one line of at most 450 characters, names
@@ -93,7 +96,7 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
   kit keeps in §1, which after this unit is two fenced blocks carrying the landing pointer and the
   protocol contract as well as the ask substitute; and the new `kit:kickoff-manifest` fence around
   §1's kickoff-manifest merge exception, which a target that deselects that kit now loses, and which
-  the runbook's §2 kit list does not name at BASE. Added by this spec, not in the brief's table.
+  the runbook's §2 kit list does not name at `fb07ca25`. Added by this spec, not in the brief's table.
 - **hands-off** external — offering the in-place landing merge's carry-set check to attended
   landings as an opt-in, which D12-i3's consequences name as possible and nothing in this build owes.
 
@@ -101,7 +104,7 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 
 ### The edits, by location
 
-| Where, at BASE | Now | After |
+| Where, at `fb07ca25`, every citation unmoved from `abac6d59` | Now | After |
 |---|---|---|
 | `coding-governance-agents.template.md:55`-`:57`, the `kit:unattended` fence | one bullet: the explicit-ask substitute | that bullet, then the S1 landing bullet |
 | `coding-governance-agents.template.md:56`, the substitute bullet | "a committed build folder the run did not create", unqualified | qualified to the default-branch anchor (S8) |
@@ -109,7 +112,7 @@ and gov's own `AGENTS.md` is re-rendered and its authored lines describe the swi
 | `coding-governance-agents.template.md:66`-`:68`, the kickoff-manifest exception | its heading and bullet, unfenced | the same heading and bullet inside a `kit:kickoff-manifest` fence (S2) |
 | `coding-governance-agents.template.md:70`-`:77` | "**Unattended runs** *(kit-conditional — drop this block…)*" and its bullet, unfenced | "**Unattended runs.**" and the same bullet, inside a `kit:unattended` fence |
 | `coding-governance-agents.template.md:148` | "the backlog is mutable (stable ids, status updated in place; gaps fine)" | the S3 wording |
-| `AGENTS.md:78`-`:472`, the `gov:playbook` region | the BASE render | a fresh render |
+| `AGENTS.md:78`-`:472`, the `gov:playbook` region | the `fb07ca25` render | a fresh render |
 | `AGENTS.md:52`-`:53`, the layout line | `backlog/<FAMILY>.md` listed after the GENERATED pair | listed as the third GENERATED member |
 | `AGENTS.md:70`-`:71`, the node-registry paragraph | "backlogs shard per family at `memory/backlog/<FAMILY>.md`" | asks filed per build, and the family file their generated view |
 | `AGENTS.md:36`-`:38`, the `unattended/` entry under What ships here | "a committed standing mandate it ASSERTS and cannot have written" | "a committed standing mandate, §1 Landing's one substitute" (S8) |
@@ -167,10 +170,10 @@ The decision row, one line of at most 300 characters:
 
 ### Byte accounting
 
-PINNED: measured 2026-09-14 by applying the proposed text to BASE's template in a scratch copy and
+PINNED: measured 2026-09-14 by applying the proposed text to `abac6d59`'s template in a scratch copy and
 rendering it with `render_playbook.py` for a target that selects the unattended kit. The S8 and
 kickoff-manifest fence rows were measured at rev-2 the same day by applying their text to a scratch
-copy of BASE's template; their region column follows the renderer's rule that a selected kit's
+copy of `abac6d59`'s template; their region column follows the renderer's rule that a selected kit's
 markers are stripped, and was not rendered.
 
 | Edit | Template bytes | Rendered region bytes |
@@ -182,20 +185,24 @@ markers are stripped, and was not rendered.
 | S2 unattended fence markers | +49 | 0, because a surviving block loses its markers |
 | S2 kickoff-manifest fence markers | +61 | 0 for a target selecting the kit, as gov does |
 | S3 §6 bullet | +34 | +34 |
-| total | −45, so 48,840 of 49,152 | −155 |
+| total | −45, so 48,822 of 49,152 from `fb07ca25`'s 48,867 | −155 |
 
-The authored `AGENTS.md` passages in S4 add about 63 bytes, S8's Conventions clause saves 21 and its
-two mandate clauses about 10 more, so the charter moves from 64,347 to about 64,224 of its 64,512
-ceiling. The switch-over and the
-remote-CI unit may change `AGENTS.md` before this unit runs; AC1 and AC4 grade the commit rather
-than trusting this sum.
+Re-read at `fb07ca25`: the lexicon bullet in §12 lost 18 bytes in both the template and the region,
+on no line this table measures, so every delta above stands and only the starting sizes moved, from
+`abac6d59`'s 48,885 and 64,347. The authored `AGENTS.md` passages in S4 add about 63 bytes, S8's
+Conventions clause saves 21 and its two mandate clauses about 10 more, so the charter moves from
+64,329 to about 64,206 of its 64,512 ceiling. The switch-over and the
+remote-CI unit may change `AGENTS.md` before this unit runs, but neither may grow it — every unit of
+this build that writes a capped carrier lands net zero or negative on it — so the parent this unit
+subtracts from is at or below the figure above. AC1 and AC4 grade the commit against that parent
+rather than trusting this sum.
 
 ### Why the fence is safe to add
 
 The renderer's `remove_fenced` drops a fenced block's body and markers for a target that did not
 select the kit, and strips only the markers for one that did. `unattended` is already a registry
 entry, because the explicit-ask bullet is fenced with it, so no new refusal can fire. Measured at
-BASE: a scratch target whose `kits` omit `unattended` receives the unfenced block and its pointer
+`abac6d59`: a scratch target whose `kits` omit `unattended` receives the unfenced block and its pointer
 to `UNATTENDED-PROTOCOL.md`, a protocol that target does not have. With the proposed text it
 receives neither. `kickoff-manifest` is a registry entry too (`tools/govkit/registry.toml`), and gov
 selects it, so gov's region keeps the exception.
@@ -232,13 +239,20 @@ selects it, so gov's region keeps the exception.
   neither unattended block. The renderer refuses an unknown fence name, and `unattended` is known.
 - observability — the size gate's `template-size OK` line for both subjects, the render check's
   `region matches a fresh render` line, and the manifest check's check 5.
-- risks — the template's high-water record reads 48,378 at BASE against 48,885, so the size gate
-  already prints an advisory WARN; this unit shrinks the file by less than that gap and leaves the
-  WARN standing. `AGENTS.md` had 165 bytes free at BASE and another unit may spend some first; AC4
-  reads the commit. An adopter re-rendering gets the fence and the new §6 wording with no answer
-  change in its `deploy.toml`.
-- testing — the scratch render with and without the unattended kit, red at BASE and green after;
-  the size, render, line-length and manifest observations. No gate arm is added.
+- risks — the template's high-water record reads 48,378 at `fb07ca25` against 48,867, so the size
+  gate already prints an advisory WARN; this unit shrinks the file by less than that gap and leaves
+  the WARN standing. `AGENTS.md` carries a standing WARN of its own, 60,930 against 64,329, which
+  this unit also leaves standing: it shrinks that file too, §8 F6 records no high-water bump, and
+  the advisory never moves an exit code. `AGENTS.md` has 183 bytes free at `fb07ca25`, and no unit of this build
+  may spend them: the remote-CI unit at order 32 lands NET ZERO OR NEGATIVE on the charter, funding
+  its new sentence by trimming a passage the unattended kit README already owns, which its S7 states
+  and its AC8 reads. So this unit's parent is at or below `fb07ca25`'s count rather than at the
+  ceiling, and this unit shrinks it further. AC4 reads both counts at the commit rather than
+  trusting any sum written here. An adopter re-rendering gets the fence and the
+  new §6 wording with no answer change in its `deploy.toml`.
+- testing — the scratch render with and without the unattended kit, red at `fb07ca25` and green after;
+  the size, render, line-length and manifest observations, their legs at the one post-build bar. No
+  gate arm is added.
 - migration — N/A for data. Adopters receive the change when they next re-render their region.
 - user docs — the runbook sentence is handed off; the charter is itself the user-facing document.
 
@@ -249,8 +263,11 @@ selects it, so gov's region keeps the exception.
   `template-size OK`.
   Red when: the landing bullet lands without the §1 deletions, which grows the file while it stays
   under its ceiling, so the size gate stays green and only the parent comparison catches it.
-  figure: DERIVED at the commit. BASE's 48,885 and the −45 projection are PINNED, measured
-  2026-09-14; design §11's 49,032 was measured at `09a22d2b`.
+  figure: DERIVED at the commit. `abac6d59`'s 48,885 and the −45 projection are PINNED, measured
+  2026-09-14, and `fb07ca25`'s 48,867 is PINNED, measured 2026-09-16; design §11's 49,032 was
+  measured at `09a22d2b`.
+  permission: the two counts are the pass's observation; `check-template-size.sh` is the
+  `template size <=48KiB` leg, which no pass runs, and it runs at the one post-build bar.
 - **AC2** — When `python tools/playbook/render_playbook.py --target <scratch>` renders the template
   for scratch targets whose `kits` omit `unattended`, omit `kickoff-manifest`, omit both, and omit
   neither, `grep -c 'UNATTENDED-PROTOCOL'` over the rendered `AGENTS.md` prints 0 exactly where
@@ -258,8 +275,8 @@ selects it, so gov's region keeps the exception.
   `kickoff-manifest` is omitted, the landing bullet follows `unattended`, and no render carries two
   consecutive blank lines before §2; and
   `grep -c 'kit-conditional — drop this block' coding-governance-agents.template.md` prints 0.
-  Red when: the "Unattended runs" block stays unfenced, which is BASE's state and printed 1 in this
-  fixture on 2026-09-14, or the landing bullet sits on the unconditional local-first bullet; or the
+  Red when: the "Unattended runs" block stays unfenced, which is the state at `abac6d59` and at
+  `fb07ca25`, and printed 1 in this fixture on 2026-09-14, or the landing bullet sits on the unconditional local-first bullet; or the
   exception stays unfenced, so an adopter without the kickoff-manifest kit receives it with its only
   qualifier deleted; or the heading note survives inside the new fence, which the parent byte
   comparison and every render miss.
@@ -272,11 +289,18 @@ selects it, so gov's region keeps the exception.
   commit, it prints `render-playbook OK — region matches a fresh render`.
   Red when: the template is committed without re-rendering `AGENTS.md`, so the region still carries
   the deleted drop instructions.
-- **AC4** — When `bash tools/check-template-size.sh AGENTS.md` runs at this unit's commit, it prints
-  `template-size OK` against the declared 64512-byte ceiling.
-  Red when: the authored passages grow and the region is not re-rendered, so their bytes are spent
-  against BASE's 165 free bytes with no saving from the region to offset them.
-  figure: 64,347 at BASE is PINNED, measured 2026-09-14; the verdict is DERIVED.
+  permission: the command is the `playbook render wiring` leg and runs at the one post-build bar; in
+  the pass the region is re-rendered by S4's write-mode command and committed with the template.
+- **AC4** — When `tr -d '\r' < AGENTS.md | wc -c` runs at this unit's commit and at its parent, the
+  first count is LOWER, and `bash tools/check-template-size.sh AGENTS.md` prints `template-size OK`
+  against the declared 64512-byte ceiling.
+  Red when: the authored passages grow and the region is not re-rendered, so bytes are spent out of
+  free space this unit's parent no longer has — a ceiling read passes on a file that grew, and only
+  the parent comparison catches it, which is the whole reason this unit reads both.
+  figure: 64,347 at `abac6d59` and 64,329 at `fb07ca25` are PINNED, measured 2026-09-14 and 2026-09-16;
+  the parent's count and the verdict are DERIVED at the commit.
+  permission: the two counts are the pass's observation; `check-template-size.sh` is the
+  `charter size` leg, which no pass runs, and it runs at the one post-build bar.
 - **AC5** — When `grep -n 'status updated in place' coding-governance-agents.template.md AGENTS.md`
   runs it prints nothing, and §6's record-types bullet names stable ids and points at `§5` for where
   an ask's status lives.
@@ -288,7 +312,7 @@ selects it, so gov's region keeps the exception.
   node-registry paragraph names `memory/builds/*/BACKLOG.md` as where asks are filed and
   `memory/backlog/*.md` as their generated view; and the layout line lists the family views,
   `backlog/<FAMILY>`, among the GENERATED members.
-  Red when: only the region is re-rendered and the authored paragraph keeps its BASE wording, which
+  Red when: only the region is re-rendered and the authored paragraph keeps its `fb07ca25` wording, which
   contradicts the switched tree the same file's layout line describes; or the layout line keeps
   listing the views after the GENERATED pair as authored files.
 - **AC7** — When `grep -c '^- \*\*PLAY-dDerivedDocket-1\*\*' memory/DECISIONS.md` runs it prints 1,
@@ -301,10 +325,16 @@ selects it, so gov's region keeps the exception.
   passes and the `last-audit` line in `memory/guides/SESSION-KICKOFF.md` differs from its parent's.
   Red when: the template is committed without the re-stamp, which the staged leg's check 5 refuses
   at pre-commit because the template is in `watch:`.
+  permission: the `last-audit` comparison is a `git` read in the pass, and the pre-commit hook runs
+  the staged leg at commit; `manifest-check.sh` over the tree is the `kickoff-manifest ratchet` leg
+  and runs at the one post-build bar.
 - **AC9** — When `bash tools/check-line-length.sh` runs, both declared subjects pass at 450
   characters.
   Red when: the landing sentence is appended to the explicit-ask bullet, a 391-character line at
-  `coding-governance-agents.template.md:56` at BASE and 392 after S8, which makes it about 480.
+  `coding-governance-agents.template.md:56` at `abac6d59` and at `fb07ca25`, and 392 after S8, which makes
+  it about 480.
+  permission: the command is the `line length` leg and runs at the one post-build bar; in the pass
+  the character count of each line this unit writes is read directly against 450.
 - **AC10** — When the lines of the first `kit:unattended` fence in
   `coding-governance-agents.template.md` are searched with `grep -cE 'in-place|--prepare|--land|LANDER_MODE'`,
   the count is 0, and the landing bullet names the protocol's landing rule.
@@ -316,16 +346,16 @@ selects it, so gov's region keeps the exception.
   prints 0.
   Red when: the bullet keeps "a committed build folder the run did not create" unqualified, which is
   false for every run the second anchor authorizes, this build's own prompt-mode run among them; or
-  the Conventions bullet keeps restating it, which the grep finds at BASE's `AGENTS.md:582`; or the
+  the Conventions bullet keeps restating it, which the grep finds at `fb07ca25`'s `AGENTS.md:582`; or the
   `unattended/` entry or the protocol bullet keeps "a committed standing mandate it ASSERTS and
-  cannot have written", which the last grep finds at BASE's `AGENTS.md:38` and `:559`.
+  cannot have written", which the last grep finds at `fb07ca25`'s `AGENTS.md:38` and `:559`.
 
 ## 7. Gates
 
 `template size <=48KiB` · `charter size` · `playbook render wiring` · `playbook parity` · `playbook placeholder catalogue` · `line length` · `micro-format definitions` · `kickoff-manifest ratchet` · `memory hygiene` · `govkit acceptance matrix`
 
 No new gate arm. The fence is graded by the render and size legs above, and AC2's scratch render is
-an observation made once in the unit pass. The bar runs once, on the landing merge.
+an observation made once in the unit pass. The bar runs once, after every unit is built.
 
 ## 8. Open questions
 
@@ -344,13 +374,13 @@ an observation made once in the unit pass. The bar runs once, on the landing mer
   in-place landing". (b) A pointer to the protocol's landing rule that names no mode. The
   run's-landing-path unit makes the lander mode a declaration whose blank reads `primary`, so (a) is
   false for an adopter on the kit default. RESOLVED (agent, 2026-09-14, delegated): (b). The ruling
-  itself, attended local-first kept with a written unattended exception, is RESOLVED (owner,
-  2026-09-13) as D12-i3 and is carried out unchanged.
+  itself, attended local-first kept with a written unattended exception, is
+  RESOLVED (owner, 2026-09-13) as D12-i3 and is carried out unchanged.
 - **F4** — Which bytes pay for the clause? (a) The reader-facing drop instructions around the
   "Unattended runs" block, with the block fenced. (b) Rule prose elsewhere in §1. (c) Prose outside
   §1. (b) rewrites rules no ruling touched, and (c) departs from D12-i3's consequence that bytes in
-  §1 pay. RESOLVED (agent, 2026-09-14, delegated): (a). It also removes a measured BASE defect: a
-  target without the kit receives the unfenced block.
+  §1 pay. RESOLVED (agent, 2026-09-14, delegated): (a). It also removes a defect measured at
+  `abac6d59` and still live at `fb07ca25`: a target without the kit receives the unfenced block.
 - **F5** — Does §1's "Reconcile shared mutable files (backlogs, indexes) additively" change, as
   design §11 names it? (a) Change it. (b) Keep it. It is true in both modes: a build's `BACKLOG.md`
   is merged by the row driver, and the family view is the GENERATED index the same bullet already
@@ -375,7 +405,7 @@ an observation made once in the unit pass. The bar runs once, on the landing mer
 - rev-1 · 2026-09-14 · initial draft. Adds one edge the brief's table does not list, the hands-off
   to the runbook unit, `DEPL-dDerivedDocket-1`, for its sentence on the unattended blocks. Departs
   from design §11's wording on two lines (§8 F1, F5) and from D12-i3's consequence text on the
-  clause's words (§8 F3), each for a source fact at BASE the design did not have.
+  clause's words (§8 F3), each for a source fact at `abac6d59` the design did not have.
 - rev-2 · 2026-09-14 · spec-audit G5 round 1 fold. M13 (42): new S8 qualifies §1 Landing's
   explicit-ask substitute to the default-branch anchor, as design §19.8 assigns U6, and repoints gov's
   authored Conventions bullet; S4, §4 edits table, proposed text and byte accounting, AC11, §10. M14
@@ -385,12 +415,76 @@ an observation made once in the unit pass. The bar runs once, on the landing mer
   re-measured: the template's net is −45, not −107, and the region's −155; AC9 names the 392-character
   bullet.
 - rev-3 · 2026-09-16 · spec-audit round 2 fold. G5 M15 (17, 33): S8 reaches the two further authored
-  `AGENTS.md` lines stating the unqualified property, `:38` and `:559` at BASE; §4 edits table and
+  `AGENTS.md` lines stating the unqualified property, `:38` and `:559` at `abac6d59`; §4 edits table and
   byte accounting; AC11 greps `cannot have written` to 0; §10 records the root `README.md:56` line
   left to the owner; §8 F7. G5 L6 (34), PLAY end: hands-off DEPL names the `kit:kickoff-manifest`
   fence; §3 Non-goals. Fold verification: §4 Rollout step 3 edits every authored line S4 and S8
   name, not two passages; §5 perf restates the saving as about 120 bytes, the byte accounting's
   64,347 to 64,224.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). The one landed edit to either file is
+  the lexicon selector wording in §12 (`3281fcea`, the returns:jsx selector build), −18 bytes in the
+  template and in the region, on no line §4 cites: the template reads 48,867 and `AGENTS.md` 64,329,
+  so §4 byte accounting's total and charter sum, §5 risks, AC1's and AC4's figures and AC4's free
+  bytes move, and AC9 re-reads the 391-character line. Every template, `AGENTS.md`, runbook,
+  renderer and registry citation sits where `abac6d59` had it. AC1, AC3, AC4, AC8 and AC9 gain
+  `permission:` lines, because owner ruling TOOL-aProbedUnit-8 (landed with aProbedUnit) runs no
+  gate leg inside a unit pass; §5 testing and §7's prose say the bar runs once after every unit is
+  built, as M6 now states. No landed build touches D12-i3, §1 Landing or §6's backlog bullet. §10.
+  Second pass, 2026-09-20: every byte figure, ceiling, high-water and line citation above was
+  re-measured at HEAD and holds; §5 risks gains `AGENTS.md`'s own standing high-water WARN,
+  60,930 against 64,329, which AC1's and AC4's runs print beside `template-size OK`.
+  Extended 2026-09-20 by the regrounding consolidation, which moved one line and verified the rest.
+  §5 risks now names the remote-CI unit's declared 183-byte charter budget rather than "another unit
+  may spend some", so the two capped-carrier budgets in this build read against each other. The
+  other three build-wide rules changed nothing here, each checked rather than assumed: no criterion
+  observes a `.test.sh` or `selftest.py` FILE, a merge bar or an undeferred gate-leg command, AC1,
+  AC3, AC4, AC8 and AC9 having carried `permission:` lines since rev-4 and AC2's render running in a
+  scratch fixture; §7 adds no arm, so no `New arm:` third field exists to price; and every phrase
+  this unit asserts to zero was RUN against HEAD and counts non-zero there — `kit-conditional — drop
+  this block` in the template, `status updated in place` in both files, `backlogs shard per family`
+  in `AGENTS.md`, `folder the run did not create` outside the rendered region at `AGENTS.md:582` and
+  `cannot have written` twice — so none is the already-green class. AC10's zero is a forward ban on
+  words this unit must not write, not a retired phrase, and is left as it stands.
+  Extended again 2026-09-20 by the closing consolidation. The capped-carrier rule tightened from a
+  ceiling to NET ZERO build-wide, so S7 now states the budget over BOTH carriers and against this
+  unit's PARENT, AC4 gains the parent comparison AC1 already had and stops resting on a ceiling read
+  alone, and §4's accounting and §5's risks record that the remote-CI unit no longer spends the 183
+  free bytes but funds its own sentence by trimming — this unit's parent is therefore at or below
+  `fb07ca25`'s count. Nothing else moved: the orchestrator ratified the deferral reading this spec
+  already applied, a gate-leg command deferring to the run at VERIFYING while a fixture render stays
+  in the pass, which is AC2's case. The header date moves to the last-change date, 2026-09-20, with
+  the rev kept.
+  Extended a third time 2026-09-20 by the close-out pass, which moved one word and no figure. This
+  spec wrote BASE for `abac6d59` in 24 places while its header declares `fb07ca25` and four sibling
+  specs of this build declare BASE to BE `fb07ca25`; the orchestrator ruled that every use must say
+  which sha it means, so each one now names a commit. A figure measured on 2026-09-14 reads
+  `abac6d59` (§4's byte accounting, AC1's and AC4's `figure:` lines, §10's disagreement list), a
+  state at the regrounded base reads `fb07ca25` (§4's edits table, the hands-off to the runbook
+  unit, AC6's and AC11's Red-whens), and a fact true at both names both (AC2's Red-when, AC9's
+  391-character line, §10's unfenced block). §10 states the convention and the one place the word
+  survives, §4's proposed template text, where it is the charter's own generic word for a merge base
+  and names no commit. No byte figure, ceiling, citation or criterion changed, and all four were
+  re-read at HEAD: the template is 48,867 and `AGENTS.md` 64,329 at `fb07ca25`, 48,885 and 64,347 at
+  `abac6d59`, and `AGENTS.md:38`, `:129`, `:559` and `:582` and the template's `:56` all exist at
+  HEAD. The three other closing rulings reach nothing here, each checked rather than assumed:
+  net zero still binds both of this unit's carriers, which sit at 183 and 285 free, far under the
+  2048 the scoping rule sets, and this unit is negative on both; no criterion of this spec adds a
+  key to `tools/unattended/.unattended.conf.example` or sets one in `.unattended.conf`, so no
+  section 8 key-table row is owed; and §7 names ten legs, none of which is `subject = kit` or
+  `chunk = selftests` in `tools/gate-legs.json` at HEAD, so no permission line here defers a HELD
+  leg and none needs to name the `GATE_FULL=1 GATE_SELFTESTS=1` run. The header date already reads
+  2026-09-20 and the rev is kept.
+  Extended a fourth time 2026-09-20 by the close-out VERIFIER, which moved no word of the spec and
+  closes the one carrier the scoping rule reaches that the paragraph above does not name. §4's
+  Files touched carries `memory/guides/SESSION-KICKOFF.md` beside the two rows of
+  `tools/template-size-limits.txt`, and that file is capped by its CLASS in
+  `tools/memory-tree/check-memory-hygiene.sh` — 61440 bytes and 750 lines for a guide — where it
+  measures 20057 and 248 at `fb07ca25`. Tens of thousands of bytes free puts it outside net zero,
+  and this unit's only write to it is S6's in-place rewrite of one `last-audit` line, which the
+  orchestrator's first closing ruling classes as the re-stamp a watched-file change owes rather
+  than a byte claim, so no stated delta is owed and AC8 already reads that line against its
+  parent's. `memory/DECISIONS.md` is the other class-capped write and AC7 already holds its one row
+  to the 300-character entry budget. Nothing moved.
 
 ## 10. Reuse audit
 
@@ -406,19 +500,33 @@ the precedent that made the unattended rules kit-conditional so the byte-gated t
 section, and PLAY-dUnstalledConvoy-1, the precedent for editing the template and re-rendering the
 region rather than hand-editing the charter. No new seam is built.
 
-Where the design and the source disagree at BASE, re-verified here:
+EVERY MEASUREMENT IN THIS SPEC NAMES ITS SHA. This spec once wrote BASE for `abac6d59`, the commit
+it was first drafted and audited at, while its header declares `fb07ca25` and sibling specs of this
+build — units 32, 33, 34 and 35 — declare BASE to BE `fb07ca25`. One word for two commits is a
+contradiction a reader cannot resolve, so the word is gone from this spec's own prose: a figure
+measured on 2026-09-14 reads `abac6d59`, a state this spec is regrounded on reads `fb07ca25`, and a
+fact true at both names both. The one surviving "BASE" is inside §4's proposed template text, where
+it is the charter's own generic word for a merge base observed on the remote and names no commit.
 
-- Design §11 measured the template at 49,032 of 49,152 bytes. At BASE it is 48,885, and its
+Where the design and the source disagree at `abac6d59`, re-verified here:
+
+- Design §11 measured the template at 49,032 of 49,152 bytes. At `abac6d59` it is 48,885, and its
   high-water record reads 48,378.
-- Design §11's replacement sentence for §6 is true only in builds mode. At BASE check 4 admits only
+- At `fb07ca25`, the base this spec is regrounded on, the template is 48,867 and `AGENTS.md` 64,329,
+  both −18 from `abac6d59` by the §12 lexicon selector wording; the high-water still reads 48,378. The
+  renderer, `tools/govkit/registry.toml`, `.governance/deploy.toml`, the size and line-length gates,
+  the runbook lines and `README.md:56` are unchanged, `memory/DECISIONS.md`'s PLAY group still holds
+  one row, and the unattended protocol still weakens the did-not-create property on its second
+  anchor, which S8 cites.
+- Design §11's replacement sentence for §6 is true only in builds mode. At `abac6d59` check 4 admits only
   `README.md`, `RUN.md` and four subdirectories at a build root, and design §6 keeps `BACKLOG.md`
   refused in shards mode (§8 F1).
 - Design §11 names the reconcile bullet's "(backlogs, indexes)" for change; it reads true in both
   modes (§8 F5).
 - D12-i3's consequence quotes "in-place landing", while the run's-landing-path unit's spec, on disk
   at this writing, makes the lander mode a declaration whose blank reads `primary` (§8 F3).
-- The "Unattended runs" block is unfenced at BASE though it tells a reader to drop it. It arrived in
-  that shape at the charter's convergence into one file.
+- The "Unattended runs" block is unfenced at `abac6d59`, and still at `fb07ca25`, though it tells a
+  reader to drop it. It arrived in that shape at the charter's convergence into one file.
 - Design §19.8 assigns U6 the stale authorization sentence at `AGENTS.md:129`; D12-a dropped E2 but
   not prompt mode, so the sentence is still false on the second anchor (S8).
 - The same unqualified property sits in two more authored `AGENTS.md` lines outside the region,

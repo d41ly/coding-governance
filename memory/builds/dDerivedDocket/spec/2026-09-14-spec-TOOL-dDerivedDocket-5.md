@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 5
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -30,7 +30,9 @@ default-off gate for this one feature, and this unit records that ruling as a de
   value is a numbered refusal. `RESUME_SCHEDULE_CREATE` and `RESUME_SCHEDULE_DELETE` name the durable
   carrier's tool pair and are required while the effective value is `on`. `RESUME_SCHEDULE_DELAY`
   (seconds, default 1800) and `RESUME_SCHEDULE_LIMIT` (count, default 6) are optional, announced
-  when defaulted, and refused when not a positive integer. Observed by AC1, AC2 and AC13.
+  when defaulted, and refused when not a positive integer: the driver reads each through
+  `read_bound_key`, as it reads `GATE_BOUND`, so each is a call and neither is a new `case`.
+  Observed by AC1, AC2 and AC13.
 - **S2** The carrier may not be the keepalive's. A declared `RESUME_SCHEDULE_CREATE` equal to
   `KEEPALIVE_CREATE` is a numbered refusal in the kit gate, because this repo's conf declares that
   store session-scoped and a restart filed there dies with the session it exists to outlive.
@@ -76,7 +78,27 @@ default-off gate for this one feature, and this unit records that ruling as a de
   Observed by AC11.
 - **S10** The contract text — keys, fire rule, streak, refusals, carrier requirements — goes to
   unit 4's companion guide `UNATTENDED-STOPS.md`. The protocol gains one sentence in §5 pointing at
-  it, and the verb carrier documents `--scheduled`. Observed by AC10.
+  it, and the verb carrier documents `--scheduled`. The GROSS growth on
+  `memory/guides/UNATTENDED-PROTOCOL.md` and on its template is at most 300 bytes, which covers that
+  sentence and ONE key-table row carrying this unit's five conf keys joined in a single first cell.
+  That row is OWED and not optional: check 22 of `tools/unattended/check-unattended.sh` joins §8's
+  table against `tools/unattended/.unattended.conf.example` and reds on a key declared in one and
+  missing from the other. This unit lands NET ZERO OR NEGATIVE on that carrier and spends
+  none of the shared headroom: it FUNDS those bytes by trimming §8's own table, which is the region
+  it grows. The passage it trims, named precisely so that no sibling unit trims the same text: the
+  declaration rationale in the `RECALL_CLI` cell at
+  `tools/unattended/PROTOCOL.template.md:482`, opening "A DECLARATION rather than a path in the
+  driver, because a kit literal", 196 bytes, together with its back-reference and the write-only-log
+  provenance in the `MAP_CLI` cell at `tools/unattended/PROTOCOL.template.md:483`, 313 bytes. The
+  two move TOGETHER, because the second sentence reads "for the same reason its sibling is one" and
+  is unreadable apart from the first, and they go to `tools/unattended/README.md`, the kit README,
+  which carries no size row in `tools/template-size-limits.txt` and owns kit prose. Each cell keeps
+  its MEANING and its OPTIONAL terms; only the argument for the declaration form leaves. Neither
+  moved sentence carries a kit-path literal, so the shipped-surface ban does not move. That is 509
+  bytes trimmed against at most 300 added. No cap is raised: raising one is an owner turn, and the
+  other units of this build draw on the same 1,116 bytes, which this unit leaves intact. Anything
+  past the 300 stays in the companion guide, which draws on its own cap.
+  Observed by AC10 and AC16.
 - **S11** Gov's `.unattended.conf` declares `RESUME_SCHEDULE="on"` and the desktop app's
   scheduled-task tool pair; the kit's conf example declares `on` with placeholder tool names.
   `tools/unattended/kit.toml`'s conf-placeholder hole extends its discharge probe to
@@ -110,7 +132,7 @@ default-off gate for this one feature, and this unit records that ruling as a de
   runs, and the `UNATTENDED-STOPS.md` companion this unit's contract text joins. Without them there
   is no hold to schedule against and no take-over to schedule.
 - **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion over the unattended suites
-  this unit runs once at its end: `verdict clean`, with every inherited suite filed.
+  this unit's verification reads: `verdict clean`, with every inherited suite filed.
 
 ## 4. Design
 
@@ -230,7 +252,8 @@ caught only by the extended probe.
 `tools/unattended/adopt-unattended.sh` · `tools/unattended/SKILL.template.md` ·
 `tools/unattended/VERBS.template.md` · `tools/unattended/PROTOCOL.template.md` · unit 4's companion
 template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
-`tools/unattended/kit.toml` · the three test files named in §7 · the rendered guides and Skill ·
+`tools/unattended/kit.toml` · the three test files named in §7 · `tools/unattended/README.md`,
+which receives the trimmed §8 rationale · the rendered guides and Skill ·
 `memory/DECISIONS.md`.
 
 ### Alternatives rejected
@@ -264,8 +287,9 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   scheduled session that stops on a permission prompt is a stalled restart, visible in the app. Two
   slugs differing only in case map to one name.
 - testing — `tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.test.sh` and
-  `tools/unattended/adopt-unattended.test.sh` arms, each staged RED, plus one hand observation with a
-  real carrier; the suites run once at the unit's end under unit 1's attribution.
+  `tools/unattended/adopt-unattended.test.sh` arms, each staged RED in the pass, plus one hand
+  observation with a real carrier; the suites run under unit 1's attribution at the build's one
+  post-build bar.
 - migration — additive facts, read as absent on every existing record. Adopters decide at their
   own upgrade (§4 Rollout).
 - user docs — the companion guide section, the protocol §5 pointer, the verb carrier row and the
@@ -277,8 +301,8 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   `RESUME_SCHEDULE="maybe"`, it reds naming the key and the legal set; with the key absent it reports
   the effective value `on` as defaulted and does not red on that account.
   Red when: an unrecognised spelling resolves silently to either value.
-- **AC2** — When the fixture conf declares `RESUME_SCHEDULE_CREATE` equal to `KEEPALIVE_CREATE`,
-  `bash tools/unattended/check-unattended.sh` reds naming both keys.
+- **AC2** — When `bash tools/unattended/check-unattended.sh` grades a fixture conf declaring
+  `RESUME_SCHEDULE_CREATE` equal to `KEEPALIVE_CREATE`, it reds naming both keys.
   Red when: the session-scoped keepalive tool is accepted as the durable carrier, so every restart
   dies with the session it was filed to outlive.
 - **AC3** — When `--hold` runs on a HELD-capable fixture with `--until "after <future instant>"` and
@@ -314,6 +338,12 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   unreachable it refuses naming the remote.
   Red when: the scheduled path falls through to the lease matrix on a working phase instead of
   refusing before it, so a scheduled session is treated as a resuming holder.
+  permission: the arms are written and staged RED in the pass; the suite that executes them,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes them is
+  the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
 - **AC8** — When `--resume <slug> --scheduled <held-at> --keepalive-id C` runs against the matching
   HELD record, once with the remote at the pre-hold `witness` and once with the hold commit pushed,
   unit 4's take-over completes, records C, and the new history row carries `scheduled`. The same
@@ -343,6 +373,8 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   stops with its new keepalive still scheduled, so that job's first tick takes the HELD record over
   with no `--scheduled`, past the remote-freshness refusal a schedule filed on another node relies
   on.
+  permission: both run over the rendered tree rather than a fixture, so they are gate legs and are
+  observed at the build's one post-build bar.
 - **AC11** — When `--close` and `--abort` run on a fixture record whose history holds a hold row,
   each names that schedule beside the keepalive id in the attestation it asks for.
   Red when: the attestation names only the keepalive, so a durable task outlives the run under a
@@ -354,8 +386,10 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
 - **AC13** — When `bash tools/unattended/check-unattended.sh` runs on the real tree after this unit,
   it reports the switch `on` with the declared carrier and no refusal from S1 or S2.
   Red when: gov declares the keepalive's tool as the carrier, or leaves the carrier undeclared.
-- **AC14** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at
-  the unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L`
+  permission: the leg runs over the real tree rather than a fixture, so it is observed at the
+  build's one post-build bar.
+- **AC14** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L`
   and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is
   named by its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
@@ -364,7 +398,12 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
   filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
-  permission: the owner's self-test lift for this build's unattended units covers this unit.
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the
+  last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
+  made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
+  carries no leg for these suites at any flag setting. This folds the conservative reading of
+  the parked ruling conflict and decides nothing.
 - **AC15** — The discharge command of `tools/unattended/kit.toml`'s conf-placeholder hole runs in a
   fixture whose `.unattended.conf` is the shipped example with its three `KEEPALIVE_` lines filled
   and its `RESUME_SCHEDULE_CREATE` and `RESUME_SCHEDULE_DELETE` lines left verbatim. It exits
@@ -375,13 +414,37 @@ template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
   literal prose and the Skill tells an agent to file restarts with a tool named `<...>`; or the
   fixture is the verbatim example, whose keepalive placeholders red the probe with or without the
   extension.
+- **AC16** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
+  build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
+  parent's and is below the 61440-byte guide cap declared in
+  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  `tools/unattended/PROTOCOL.template.md`. The trim is taken and landed:
+  `grep -c 'A DECLARATION rather than a path in the driver' tools/unattended/PROTOCOL.template.md`
+  counts 2 at the parent and 0 at the build commit, and both sentences are present in
+  `tools/unattended/README.md`; the `RECALL_CLI` and `MAP_CLI` cells still state their meaning and
+  their OPTIONAL terms. The owed key-table row arrived:
+  `grep -c 'RESUME_SCHEDULE' tools/unattended/PROTOCOL.template.md` counts 0 at the parent and 1 at
+  the build commit, the one joined cell. The companion guide `UNATTENDED-STOPS.md`, which receives
+  this unit's contract text, is read the same way at the build commit and is below the same
+  61440-byte guide cap.
+  Red when: the §5 pointer restates the contract, so the companion and the protocol answer one
+  question twice and the 1,116 bytes the build's units share are spent here; or five separate
+  key-table rows are written where one joined first cell carries all five keys; or the size is read
+  against the figure written in this spec rather than against the parent commit, so a sibling's
+  landing hides this unit's overspend; or the `MAP_CLI` sentence is moved without its sibling, which
+  leaves a back-reference pointing at nothing; or the trim is taken and the text lands in no
+  destination, which DELETES the argument rather than moving it; or the cap is raised to make the
+  text fit, which is an owner turn; or the five keys reach §8's key table in no row at all, which
+  reds check 22 of `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
+  protocol lands in a carrier nobody reads the size of.
+  permission: a read, a byte count and two greps, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `playbook validity gate` · `memory hygiene` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `line length` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · HELD fixtures for each fire rule, the streak limit, and a scheduled resume against a moved and an unreachable local bare remote · none
-New arm: `tools/unattended/check-unattended.test.sh` · fixture confs with an unrecognised switch value and a carrier equal to the keepalive tool · the check-unattended.sh arms floor, by the branches added
+New arm: `tools/unattended/unattended.test.sh` · HELD fixtures for each fire rule, the streak limit, and a scheduled resume against a moved and an unreachable local bare remote · the driver suite's executed-assertion floor
+New arm: `tools/unattended/check-unattended.test.sh` · fixture confs with an unrecognised switch value and a carrier equal to the keepalive tool · the leg suite's executed-assertion floor, by the branches added
 New arm: `tools/unattended/adopt-unattended.test.sh` · an on conf with no carrier declared · none
 
 The observation that a real carrier accepts the printed name and instant, and accepts that name
@@ -517,6 +580,53 @@ pair, and recorded in the unit's journal. No gate can make it.
   OPEN-ask reuse F7 rejected as (c) here, and F7 keeps (b). Fold verification: S8's Resume delete
   goes on when no task has the name, as after an `owner` hold, and F9 says a task that fires into
   a take-over's live run before that take-over's delete is removed by that delete.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §2 S1's two numeric keys are read
+  through `read_bound_key`, the helper TOOL-aProbedUnit-3 hoisted `GATE_BOUND`'s `case` into, whose
+  header makes a later bound key a call. §10 gains a paragraph describing fb07ca25: the Skill's
+  keepalive tick now runs `--audit`, where §4 and §8 F8 read the HELD unit's F6 tick, which the
+  HELD unit keeps as the tick's first act with `--audit` second; the Resume section gained a
+  `/session-kickoff` step (TOOL-aReplayedCard-3); AC15's probe still reads the keepalive-only
+  alternation; and the protocol render's guide-cap headroom shrank to 1116 bytes, which S10's
+  sentence and the leg check 22 key-table rows for S1's keys both spend. No S-item landed on main.
+  AC14's unit-end run, which meets the gate-guard hook TOOL-aDeferredBar-3 landed, and the check 22
+  rows S10 does not name, are reported to the orchestrator and not decided here.
+  Extended 2026-09-20, regrounding consolidation, folding the conservative reading of that parked
+  conflict and not deciding it. AC14 now reads the attributed run at the build's one post-build
+  bar, the run the main loop makes at VERIFYING after the last unit, and §5 testing and the §3
+  consumes-from edge to the baseline unit follow it;
+  AC7, AC10 and AC13 gain `permission:` lines, AC7 because its arm lives in a held suite and the
+  other two because they run a leg over the real or rendered tree. AC1, AC2, AC9 and AC15 keep
+  their in-pass observation: each grades a FIXTURE, which M6 names as a pass's own direct check,
+  and AC9's `--check` is on the hook's read-only list. S10 now states the 300-byte MAXIMUM this
+  unit adds to the protocol, including the one joined key-table row check 22 may owe, and new AC16
+  reads the file's size at the pass against the 61440-byte guide cap; no cap is raised. Re-priced
+  to NET ZERO on 2026-09-20, on the orchestrator's ruling that a unit adding bytes to a capped
+  carrier funds them itself: S10 now names the passage this unit trims — the declaration rationale
+  in §8's `RECALL_CLI` and `MAP_CLI` cells, 509 bytes together, to `tools/unattended/README.md` —
+  and AC16 reds if either carrier grew against this unit's parent commit rather than allowing 300
+  bytes of growth. §7's
+  `tools/unattended/unattended.test.sh` arm names the driver suite's executed-assertion floor
+  instead of `none`; the `check-unattended.test.sh` arm's third field stopped naming the
+  `check-unattended.sh` arms and now names the leg suite's executed-assertion floor, which is the
+  `FLOOR_ASSERTIONS` its added branches move, and
+  `tools/unattended/adopt-unattended.test.sh` pins none, so its `none` is correct. No criterion of
+  this unit asserts a phrase counts zero, so the could-not-fail sweep found nothing here.
+  Extended again on 2026-09-20, closing pass. The orchestrator ruled the check 22 key-table row
+  OWED rather than pending, so S10 drops the conditional and states the joined row as a cost this
+  unit carries inside its own 300-byte ceiling, which its 509-byte trim over-covers; AC16 now
+  witnesses the row arriving, reds if the five keys reach no row, and reads the size of the
+  companion guide this unit's contract text lands in, which is what a carrier with more than 2048
+  bytes free owes under the same ruling. AC7's `permission:` line names
+  WHICH run covers it: the suite holding its arms is on no bar leg, so the attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` run covers it and
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` does not. Rule 1's narrow
+  reading is ratified; AC2 now says in its first clause that the checker grades a FIXTURE conf,
+  which it always meant, so no reader takes it for a real-tree run, and AC1, AC9 and AC15 stand.
+  Closing verifier, same pass and rev: the `permission:` line of the criterion that reads the
+  attributed run now names that run in the orchestrator's own terms, because
+  `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
+  `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
+  post-build bar" alone would have read as a bar that covers them.
 
 ## 10. Reuse audit
 
@@ -531,6 +641,26 @@ returned `TOOL-aPromptedMandate-11`, which is why every reap here is by name and
 presumed, and the aWrittenMethod enforcement pass's note that the harness scheduler fires only while
 the session is idle. Where the design and the source disagree: design §22.1 says the kit default is
 OFF; the later single owner turn ruled it on everywhere, and this spec follows the ruling.
+
+At fb07ca25, the base since rev-5, none of `--hold`, HELD, the lease, the `RESUME_SCHEDULE` keys or
+`--scheduled` exists on main, and what did land bears on the seams above. The driver reads
+bound keys through `read_bound_key` (`tools/unattended/unattended.sh:358`), which S1's two numeric
+keys call. The Skill's keepalive section makes the tick's prompt `--audit <slug>`
+(TOOL-aProbedUnit-3), while §4 and §8 F8 read the HELD unit's F6, a tick whose first act is
+`--resume <slug> --keepalive-id <own id>`. The HELD unit composes the two: its rewritten keepalive
+section keeps that `--resume` as the tick's first act and `--audit <slug>` as its second, so F8's
+premise stands, and a change there to the tick's first act reopens F8 here. The
+Resume section gained a `/session-kickoff` step after the reap and the re-schedule
+(TOOL-aReplayedCard-3), which a scheduled session follows like any resume. `tools/unattended/kit.toml`
+still probes the `KEEPALIVE_(CREATE|DELETE|INTERVAL)` alternation AC15 stages RED against, and
+`memory/guides/UNATTENDED-PROTOCOL.md` sits 1116 bytes under its 61440-byte guide cap, where it sat
+3625 under at `abac6d59` (PINNED 2026-09-16, `wc -c`). S10's one sentence spends from it, and so
+does the §8 key-table row that leg check 22 joins against the example conf for each of S1's five
+keys (`tools/unattended/check-unattended.sh:1689`), a row S10 does not yet name. The
+wired gate-guard hook (`tools/unattended/gate-guard.js`) denies `run-unattended-gates.sh` and any
+`*.test.sh` suite while this branch's record is before `VERIFYING`, so AC14's run could not have
+executed inside a pass as rev-5 first wrote it. The 2026-09-20 consolidation moved it to the
+build's one post-build bar; the ruling conflict with D12-i8 behind that move is the orchestrator's.
 
 M12 losses, each tested by reading the candidate's own contract: the keepalive's session-scoped
 scheduler states jobs die with the session; a per-node operating-system task is a new install

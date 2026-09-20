@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names
 
-**Status:** SPECCED · rev-2 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -26,9 +26,11 @@ rev-2 selection at `282e0a6b`, after the fixes, the build's live specs carry 107
 and 128 payload tokens, and no token misses.
 
 Each of those is a join over two tracked files, the shape `tools/check-spec-tokens.py` already
-exists to run. This unit adds it there as a fourth population. A later spec set then gets the answer
-from the bar rather than from a review round, and so does every later pass of this build, through
-the run of the checker the orchestrator makes after each unit commit (§4 Rollout). It was adopted
+exists to run. This unit adds it there as a fifth join over a fourth population, since the `bar`
+join TOOL-aDeferredBar-2 added reads two existing populations rather than minting one. A later spec
+set then gets the answer from the bar rather than from a review round, and so does every later pass
+of this build, through the run of the checker the orchestrator makes after each unit commit and the
+run `--dispatch` makes before each pass (§4 Rollout). It was adopted
 under the unattended protocol's section 11. It makes a leg
 this repo already runs red where it should, measured by the three hits above. Nothing measured gets
 worse, which holds only while its function names lead with a declared verb (§4 Inventory) and its
@@ -56,13 +58,18 @@ and its conf key stays out of the shipped example (§8 F5).
 - **S3** — the dated demand. `SPEC_HANDOFF_CUTOFF="2026-09-14"` is appended at the end of
   `.memory-tree.conf`, with a header comment in the idiom of `SPEC_LEGLINE_CUTOFF`: what the arm
   grades, why it exists as measured here, why this date, and that blank means off. Blank or absent
-  turns the arm off, and the report says `SPEC_HANDOFF_CUTOFF blank (arm off)`. The key goes in
+  turns the arm off, and the report says `SPEC_HANDOFF_CUTOFF blank (arm off)`. The key is read
+  through `read_cutoff_key`, so a set value that is not an ISO date refuses before grading, the rule
+  the checker's header states for every cutoff key it reads. The key goes in
   gov's conf only, never in `tools/memory-tree/.memory-tree.conf.example`, per §8 F5. It is appended
   rather than placed beside its sibling, so this unit moves no conf line a sibling spec cites, such
-  as `.memory-tree.conf:387`. Observed by AC4 and AC6.
+  as `ROTATION_MODE` at `.memory-tree.conf:429`, which unit 12 cites three times. Observed by AC4
+  and AC6.
 - **S4** — the report line. Every run prints
-  `spec-tokens: <b> hands-off bullet(s) graded · <t> payload token(s) · <s> silent (no live target in the build, or no source uid) · SPEC_HANDOFF_CUTOFF <date>`,
-  so a green run over zero bullets cannot pass for a graded one. Observed by AC1, AC3 and AC6.
+  `spec-tokens: hands-off join · <b> bullet(s) graded in live spec(s) · <t> payload token(s) · <s> silent (no live target in the build, or no source uid) · SPEC_HANDOFF_CUTOFF <date>`,
+  so a green run over zero bullets cannot pass for a graded one. Its `live spec(s) ·` is the text
+  by which `--dispatch`'s refusal drops a report line from its diagnosis (§8 F9). Observed by AC1,
+  AC3 and AC6.
 - **S5** — the waiver key. A `handoff` hit's key is `<source uid>><target uid>:<token>`, where each
   uid is the one its spec's H1 carries, never one read from a filename. A hit is waived only by a row
   whose token cell is that key. The existing stale-waiver and missing-reason refusals apply
@@ -78,7 +85,8 @@ and its conf key stays out of the shipped example (§8 F5).
   by its own header, and `TOOL-aKeyedAnnotation-9` records that absorbing a class there is not
   available. A foreign hit with no row to retire is parked, naming the hit, and this unit parks with
   it, because AC6 cannot pass over a live hit. Observed by AC6.
-- **S7** — the carriers. The checker's header docstring gains the fourth population and its limits.
+- **S7** — the carriers. The checker's header docstring gains the fifth join, its population and
+  its limits.
   The join proves a sibling names a token, never that it does the work. Consumes-from bullets are not
   graded, so a consumes-from payload is graded only through a hands-off check 12 forces at the
   producer and this join reads. Neither check grades a Tier-1 consumer's edges, an edge from a
@@ -86,13 +94,20 @@ and its conf key stays out of the shipped example (§8 F5).
   `SPEC_HANDOFF_CUTOFF`. An `external` bullet has no sibling to join. The
   `memory/map/features/spec-tokens.md` dossier refreshes its title and prose on touch. The kickoff
   manifest's `last-audit` is re-stamped in this unit's commit with a delta line in the commit
-  message, because `.memory-tree.conf` is in its `watch:` list. Observed by AC8.
-- **S8** — the self-test arms and their floor. `tools/check-spec-tokens.test.sh` gains the twelve
-  `arm` calls §7's `New arm:` rows sum to, and `FLOOR_ASSERTIONS` moves from 20 to 32. Observed by
-  AC7 and AC10.
+  message, because `.memory-tree.conf` is in its `watch:` list. That re-stamp is NOT a trim and
+  claims nothing from the manifest's headroom: rewriting the `last-audit:` line at
+  `memory/guides/SESSION-KICKOFF.md:5` is the bookkeeping every unit touching a watched file
+  owes, a timestamp and a sha replaced in place by a timestamp and a sha. Another unit of this
+  build rewrites the same line for the same reason, and that is NOT a collision. This unit
+  writes no other byte of that file, so it displaces nothing and funds nothing, and AC11 reads
+  the carrier only to catch a stamp written as an added line. Observed by AC8 and AC11.
+- **S8** — the self-test arms and their floor. `tools/check-spec-tokens.test.sh` gains thirteen
+  `arm` calls spread over §7's six `New arm:` rows in the distribution AC7 states, and
+  `FLOOR_ASSERTIONS` moves from 42 to 55. Observed by AC7 and AC10.
 - **S9** — the version. NOT OBSERVED by a criterion here: `KIT_SPEC_TOKENS_VERSION` does not move.
-  The file ships to no adopter, and the leg-line arm TOOL-aJoinedCanon-7 added was added at the same
-  version, so no reader of the constant sees a change.
+  The file ships to no adopter, `tools/check-kit-versions.sh` names no carrier for it, and the
+  leg-line arm TOOL-aJoinedCanon-7 added and the `bar` join TOOL-aDeferredBar-2 added were each
+  added at the same version, so no reader of the constant sees a change.
 
 ## 3. Non-goals (OUT)
 
@@ -134,7 +149,8 @@ and its conf key stays out of the shipped example (§8 F5).
 uids: for each tracked memory/builds/<b>/spec/.../*.md that is LIVE, at any depth:
     (b, the uid of its first "# <UID> " line) -> that file; one uid may map to several files
 for each tracked memory/builds/<b>/spec/.../<date>-spec-*.md that is LIVE:
-    skip unless <date> >= SPEC_HANDOFF_CUTOFF (blank: arm off, nothing graded)
+    skip unless <date> >= SPEC_HANDOFF_CUTOFF (blank: arm off, nothing graded;
+                                               not an ISO date: refused before grading)
     edges = the text under "### Edges" inside the "## <n>. Non-goals" section, found by heading
             text, up to the next "### " or "## "
     for each line matching ^(-|\*)[ \t]+\*\*hands-off\*\*[ \t], with its "  " continuation lines:
@@ -156,19 +172,20 @@ at `tools/memory-tree/check-memory-hygiene.sh:1533-1534`. Non-goals and Edges ar
 text at `:1547` and `:1549`. The marker is `:1553`, the verb `:1557`, and the backticked-or-bare
 target `:1564-1565`. Check 12 selects specs at any depth (`:1153`) and registers each one it grades
 (`:1588`). This map reads any depth too, through the checker's own population regex at
-`tools/check-spec-tokens.py:168`.
+`tools/check-spec-tokens.py:258`.
 
 One rule is wider than check 12's. Check 12 reads a bullet's first line only, and this join reads
-its two-space continuation lines too, the rule this file already uses for section 6 bullets
-(`tools/check-spec-tokens.py:237`). The target is read whole, because a sibling may name the token
-in its scope, its design or its edges, and any of those counts as naming it. Measured 2026-09-16 at
-`7804eb7f`, 624 tracked specs carry an H1 uid each and no two files in a build share one, so the
-several-files rule has no instance today.
+its two-space continuation lines too, the rule this file already uses for acceptance-criteria
+bullets (`tools/check-spec-tokens.py:370`). The target is read whole, because a sibling may name the
+token in its scope, its design or its edges, and any of those counts as naming it. Measured
+2026-09-16 at `7804eb7f`, 624 tracked specs carry an H1 uid each and no two files in a build share
+one, and again at `94fd2f54`, 649 of 649 with no shared uid, so the several-files rule has no
+instance today.
 
 ### The hit and its waiver
 
 A `handoff` hit's key is `<source uid>><target uid>:<token>`, both uids read from H1 lines, and
-that is the string a waiver row matches (`tools/check-spec-tokens.py:254` keys on the hit's third
+that is the string a waiver row matches (`tools/check-spec-tokens.py:405` keys on the hit's third
 field). A token waived for one edge is therefore not waived for another. A bare token key would
 waive the token in every bullet of every build, which is the stale-exception problem the registry
 refuses elsewhere. The registry is shrink-only by its header, so S6's offset rule governs when a row
@@ -176,8 +193,10 @@ may be added at all.
 
 ### The report
 
-The existing two report lines (`tools/check-spec-tokens.py:270` and `:279`) are unchanged. S4's line
-is printed third, whether or not the arm is on.
+The existing three report lines (`tools/check-spec-tokens.py:423`, the `bar` join's at `:430` or
+`:434`, and `:442`) are unchanged. S4's line is printed fourth, whether or not the arm is on. The
+hands-off tokens join neither population the `bar` join reads (`pop_toks`, `:329`), so its examined
+count and its `NEAR` lines do not move.
 
 ### Inventory
 
@@ -205,8 +224,9 @@ passes only where disjointness is proven. It is not proven for this pair, on two
 - Unit 6's pass closes its own spec, which this unit's S6 reads as an acceptance input (clause 2).
 - Both passes run `python tools/memory-tree/gen_build_index.py --write` (clause 3).
 
-So the pair runs in sequence. `tools/workflows/unattended-build.js` dispatches strictly sequentially
-and orders a shared step by id, which puts this unit first. Measured 2026-09-16 on the spec text at
+So the pair runs in sequence. `tools/workflows/unattended-build.js` hands the caller a roster ordered
+by step and then by id (`tools/workflows/unattended-build.js:314`), dispatched strictly sequentially
+(`:70`), which puts this unit first. Measured 2026-09-16 on the spec text at
 `7804eb7f`, S6 then grades 81 bullets, or 72 if unit 6 runs first. This unit declares no sibling
 edge, so check 12's order arm has nothing to compare.
 
@@ -214,7 +234,11 @@ edge, so check 12's order arm has nothing to compare.
 owner rule the build brief states, so the brief cannot make a later pass run this join. The
 orchestrator does: from this unit's step onward, it runs `python tools/check-spec-tokens.py` over the
 tree after each unit commit, and a hit it reports is fixed in the live spec carrying it before the
-next unit's pass, as S6 states for this unit's own commit. The post-build bar runs the checker once
+next unit's pass, as S6 states for this unit's own commit. The harness backs that run
+mechanically: since TOOL-aDeferredBar-2, `--dispatch` runs the checker `.unattended.conf` declares
+as `SPEC_TOKENS_CLI` over the live tree before admitting a pass, and refuses the dispatch while it
+reds (`tools/unattended/unattended.sh:4964-4979`), so from this unit's commit a hit left in a live
+spec stops the next pass rather than reaching it. The post-build bar runs the checker once
 more, and grades none of this build's bullets there, because every spec is CLOSED by then. From this
 unit's commit on, that run replaces the join the orchestrator has made by hand after each fold. A
 later build is graded at every bar while its specs are live (§8 F4).
@@ -246,15 +270,19 @@ retires another row. The shipped example conf is not touched (§8 F5).
 
 ## 5. Production-readiness checklist
 
-- **security** — read-only over tracked files. No write, no subprocess beyond the `git ls-files`
-  call the checker already makes.
+- **security** — read-only over tracked files. No write, and no subprocess beyond the git calls the
+  checker already makes (`git rev-parse` at `tools/check-spec-tokens.py:251`, `git ls-files` at
+  `:140`, and the `bar` join's history query at `:305`).
 - **perf / scale** — one uid map over the live specs, and one read per graded target. The spec tokens
   leg's declared ceiling is 60 s, and the whole checker runs in seconds at this corpus size.
 - **error / empty / loading states** — an Edges block with no hands-off bullet grades nothing and
-  counts nothing. A blank key prints the arm-off line. A spec whose H1 carries no uid makes no map
+  counts nothing. A blank key prints the arm-off line, and a set key that is not an ISO date refuses
+  through `read_cutoff_key`. A spec whose H1 carries no uid makes no map
   entry, and its own bullets count silent. A target file that fails to decode is read with
   replacement, as every spec read in this file already is.
-- **observability** — S4's line on every run, and `--list` printing each hit with its key.
+- **observability** — S4's line on every run, and `--list` printing each hit with its key. A
+  dispatch the checker refuses names up to three non-report `spec-tokens:` lines, and S4's wording
+  keeps its line out of those three (§8 F9).
 - **risks** — a straggler branch from another node could merge a spec dated on or after the cutoff
   whose hands-off disagrees with its sibling. That reds the bar at the merge, which is the join
   working. The merging session fixes the source bullet or names the token in the target spec. It
@@ -263,18 +291,24 @@ retires another row. The shipped example conf is not touched (§8 F5).
   records that absorbing a class there is not available.
 - **testing** — the arms §7 lists, in `tools/check-spec-tokens.test.sh`, each break staged and
   observed red at the build's post-build bar. The new arms must fit the self-test leg's declared
-  figures, and neither figure is re-declared (§8 F7). At BASE the suite's row in
-  `tools/run-gates/selftest-budgets.txt` is 130 s, from a worst reading of 80 s over 20 arms, and its
-  leg ceiling in `tools/gate-legs.json` is 120 s. Twelve more arms at that per-arm cost land near
-  128 s, past the ceiling, so the twelve share the 40 s the ceiling leaves over that reading, about
-  3.3 s each against BASE's 4 s. BASE builds a fresh scratch repo for each of its 20 arm calls. The
-  new arms build one per criterion, six for twelve calls, and a criterion's later state edits that
+  figures, and neither figure is re-declared (§8 F7). At `fb07ca25` the leg's ceiling in
+  `tools/gate-legs.json` is 300 s, re-declared from 120 s at `577cffbb` over two kills at 120 s and
+  quiet readings of 43 s and 76 s, and the suite's row in `tools/run-gates/selftest-budgets.txt` is
+  still 130 s, from a worst reading of 80 s taken when the suite held 20 arms. It now executes 42
+  assertions: 38 `arm` calls over 22 scratch repos, two of them shared and reset in place by the bar
+  arms TOOL-aDeferredBar-2 added, plus four direct assertions. No reading at 42 is tracked; that
+  build projected 103 s idle for its first 32 assertions
+  (`memory/builds/aDeferredBar/spec/2026-09-13-spec-TOOL-aDeferredBar-2.md:509`). The new arms build
+  one scratch repo per criterion, six for thirteen calls, and a criterion's later state edits that
   repo's files in place: the checker takes the tracked list from `git ls-files`
-  (`tools/check-spec-tokens.py:87`) and reads each tracked file's working-tree bytes (`:203`), so
-  only a file the state creates needs `git add`. A breach of either figure at the post-build bar is
-  PARKED, naming the reading, and is never re-declared: re-declaring makes a declared budget worse,
-  which fails condition 2 of the unattended protocol's section 11, the condition this unit was
-  adopted under.
+  (`tools/check-spec-tokens.py:140`) and reads each tracked file's working-tree bytes (`:326`), so
+  only a file the state creates needs `git add`. At that build's measured split, 2.4 s per scratch
+  repo, 0.8 to 1.2 s per checker run and 0.4 s per in-place edit, the thirteen calls add about 30 to
+  35 s. That sits inside the 300 s ceiling AC10 grades. Added to the 103 s projection it is 133 to
+  138 s, past the 130 s budget row, which `tools/run-gates/run-selftests.sh` reads on demand and the
+  post-build bar does not. A breach of either figure is PARKED, naming the reading, and is never
+  re-declared: re-declaring makes a declared budget worse, which fails condition 2 of the unattended
+  protocol's section 11, the condition this unit was adopted under.
 - **migration** — none. A spec dated before the cutoff is never graded.
 - **user docs** — the checker's docstring and the dossier; the key's own header comment.
 
@@ -284,12 +318,14 @@ retires another row. The shipped example conf is not touched (§8 F5).
   `EXMP-tOne-1` and `EXMP-tOne-2`, and the first's hands-off bullet to the second names `` `--frob` ``
   which the second never names, `python tools/check-spec-tokens.py` exits 1 and prints `[handoff]`
   with the source file and the key `EXMP-tOne-1>EXMP-tOne-2:--frob`. With `--frob` added to the
-  second spec, it exits 0 and S4's line counts one bullet and one token. The arms are in
+  second spec, it exits 0 and S4's line carries
+  `1 bullet(s) graded in live spec(s) · 1 payload token(s)`. The arms are in
   `tools/check-spec-tokens.test.sh`.
   Red when: the join grades the target id itself, or searches the source instead of the target, and
   the missing token passes.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC2** — When the missing token sits on the bullet's two-space continuation line,
   `python tools/check-spec-tokens.py` exits 1 with the same `[handoff]` key. When the bullet instead
   opens with a `*` marker and a tab and names its target uid unbackticked, it exits 1 with that key
@@ -298,8 +334,9 @@ retires another row. The shipped example conf is not touched (§8 F5).
   graded; or the bullet shape is narrower than the one check 12 accepts at
   `tools/memory-tree/check-memory-hygiene.sh:1557`, so a bullet check 12 registers is neither graded
   nor counted.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC3** — When the hands-off target is a CLOSED sibling, the checker exits 0 over a token that
   sibling does not name, and S4's line reports `1 silent`. When the target is instead a uid no spec in
   the build carries in its H1, and the same scratch repo also holds a live source spec whose H1
@@ -308,24 +345,30 @@ retires another row. The shipped example conf is not touched (§8 F5).
   Red when: absence reds as disagreement, so a hand-off to a finished unit fails a spec nobody may
   edit; the skip is uncounted, so a silent run reads as a graded one; or a source whose H1 carries no
   uid is graded, or skipped without being counted, so the second state exits 1 or reports `1 silent`.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC4** — When `SPEC_HANDOFF_CUTOFF` is blank in the scratch repo's `.memory-tree.conf`, a missing
   token exits 0 and the report prints `SPEC_HANDOFF_CUTOFF blank (arm off)`. When the source spec's
-  date is before a set cutoff, the same bullet is not graded and the bullet count is 0.
-  Red when: the key is ignored, so every dated spec in the corpus is graded on landing day; or a
-  blank key grades anyway, so the arm cannot be turned off.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  date is before a set cutoff, the same bullet is not graded and the bullet count is 0. When the key
+  reads `2026-9-14`, the checker exits 1 printing `is not an ISO date` before grading.
+  Red when: the key is ignored, so every dated spec in the corpus is graded on landing day; a
+  blank key grades anyway, so the arm cannot be turned off; or a malformed key is read through
+  `read_conf_key` rather than `read_cutoff_key`, so a string comparison arms a join that grades
+  nothing, the class the checker's header refuses for every other cutoff key.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC5** — When `memory/project/spec-token-waivers.txt` in the scratch repo holds
   `EXMP-tOne-1>EXMP-tOne-2:--frob` with a reason, the AC1 fixture exits 0. When the second spec then
   names `--frob`, the checker exits 1 printing `STALE WAIVER`. A third spec's bullet to the second,
   naming `--frob` unnamed, still exits 1.
   Red when: the waiver matches on the token alone, so one row silences the token in every edge.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC6** — When the orchestrator's run of `python tools/check-spec-tokens.py` over the tree follows
-  this unit's commit and any fix S6 makes, it exits 0, and its third report line names
+  this unit's commit and any fix S6 makes, it exits 0, and S4's report line names
   `SPEC_HANDOFF_CUTOFF 2026-09-14` with a graded bullet count above zero. The ledger records the
   `--list` output S6 took, with its bullet, token and silent counts.
   Red when: the key is misspelled or blank, so the arm is off over the corpus that motivated it; the
@@ -337,17 +380,21 @@ retires another row. The shipped example conf is not touched (§8 F5).
   figure: DERIVED at observation from the specs still live at this unit's step, since every earlier
   pass closes its own spec. §4 Rollout gives the count measured on the text at `7804eb7f`.
 - **AC7** — When `grep -c '^arm "' tools/check-spec-tokens.test.sh` runs on this unit's commit, it
-  prints 32, and the `FLOOR_ASSERTIONS=` pin in `tools/check-spec-tokens.test.sh` reads 32: the 20
-  `arm` calls at BASE plus the 12 §7's `New arm:` rows add.
+  prints 51, and the `FLOOR_ASSERTIONS=` pin in `tools/check-spec-tokens.test.sh` reads 55: the 38
+  `arm` calls at `fb07ca25` plus the 13 this unit adds across §7's six `New arm:` rows, two for
+  each of the first three rows, three for each of the next two and one for the last, and on top of
+  them the four direct assertions the suite already makes outside `arm`
+  (`tools/check-spec-tokens.test.sh:265`, `:443`, `:445` and `:447`).
   Red when: arms land without raising the pin, so a later deletion of this unit's arms passes; or the
-  pin and the `arm` call count disagree in either direction, which
+  pin and the `arm` call count plus those four disagree in either direction, which
   `bash tools/check-testsuite-counts.sh` cannot see, because it runs nothing and reads only the
   suite's shape.
-  figure: PINNED. The 20 was counted at BASE `abac6d59` on 2026-09-16, and the 12 is the sum of §7's
-  rows.
+  figure: PINNED. The 38 calls and the 42 pin were counted at `fb07ca25` on 2026-09-16, and the 13
+  is the per-row distribution this criterion states, since §7's third fields name the floor in
+  words and carry no count.
 - **AC8** — When `bash skills/session-kickoff/manifest-check.sh` runs on this unit's commit, check 5
-  passes with the re-stamped `last-audit`, and `memory/map/features/spec-tokens.md` names four joins.
-  Red when: `.memory-tree.conf` moves with no re-stamp, or the dossier still describes three joins,
+  passes with the re-stamped `last-audit`, and `memory/map/features/spec-tokens.md` names five joins.
+  Red when: `.memory-tree.conf` moves with no re-stamp, or the dossier still describes four joins,
   which the map's freshness leg would not catch because it grades claims rather than prose.
   permission: this unit's pass runs no hand-run checker, by the build brief's owner rule. The
   pre-commit hook runs the checker's staged leg, check 5's staged form included, on this unit's
@@ -361,16 +408,30 @@ retires another row. The shipped example conf is not touched (§8 F5).
   Red when: the target is found by filename or one directory deep, so a legal family-less, tailed or
   sub-folder spec is counted silent and never graded; or the key's source half is read from the
   filename rather than the H1.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC10** — When the post-build bar runs `tools/check-spec-tokens.test.sh` with `GATE_SELFTESTS=1`,
-  the suite prints `PASS (32 assertions)` inside the self-test leg's declared ceiling in
+  the suite prints `PASS (55 assertions)` inside the self-test leg's declared ceiling in
   `tools/gate-legs.json`.
-  Red when: an arm is stranded past an exit or never reaches the checker, so fewer than 32 execute
-  while AC7's static count still reads 32; or the new arms run the suite past that ceiling, which
+  Red when: an arm is stranded past an exit or never reaches the checker, so fewer than 55 execute
+  while AC7's static count still reads 51; or the new arms run the suite past that ceiling, which
   reds the leg however many assertions pass.
-  permission: the suite is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`,
-  never in this unit's pass.
+  permission: the suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
+- **AC11** — When `wc -c < memory/guides/SESSION-KICKOFF.md` is read at this unit's commit and at
+  its parent, the reading at this unit's commit is NO LARGER than the reading at the parent, and
+  `git diff --numstat` over `memory/guides/SESSION-KICKOFF.md` between those same two commits,
+  resolved by sha rather than by `HEAD^ HEAD`, reports one line added and one removed; where a
+  pass lands more than one commit the pair is the stamp commit and its parent, so a fix-up
+  landing after the stamp does not red a stamp that landed correctly.
+  Red when: the re-stamp is written as an extra line rather than in place, or a §B claim is edited
+  here as well, so a carrier other units of this build write too grows on a unit whose whole edit
+  to it is a stamp. The cap half is red by the `memory hygiene` leg's index-cap check; the NET delta
+  against the parent is the half no leg reads, which is why this criterion reads it.
+  permission: both readings are `wc -c` and `git diff` over tracked files in the pass. NO CAP IS
+  RAISED by this unit: moving the 61440 is an owner turn.
 
 ## 7. Gates
 
@@ -379,12 +440,12 @@ retires another row. The shipped example conf is not touched (§8 F5).
 The testsuite-counts leg witnesses the suite's shape only: it runs nothing and compares no count, so
 AC7 and AC10 observe the floor. The lexicon leg grades the two function names §4 Inventory mints.
 
-New arm: tools/check-spec-tokens.test.sh · a hands-off token its target never names, then named · FLOOR_ASSERTIONS in tools/check-spec-tokens.test.sh, 2 arm calls
-New arm: tools/check-spec-tokens.test.sh · the token on a continuation line, and a star marker with a tab before an unbackticked target uid · FLOOR_ASSERTIONS in tools/check-spec-tokens.test.sh, 2 arm calls
-New arm: tools/check-spec-tokens.test.sh · a hands-off to a CLOSED sibling, then to an unspecced uid beside a source whose H1 carries no uid · FLOOR_ASSERTIONS in tools/check-spec-tokens.test.sh, 2 arm calls
-New arm: tools/check-spec-tokens.test.sh · a blank key, and a source dated before the cutoff · FLOOR_ASSERTIONS in tools/check-spec-tokens.test.sh, 2 arm calls
-New arm: tools/check-spec-tokens.test.sh · a waiver keyed on one edge, then stale, then not reaching another edge · FLOOR_ASSERTIONS in tools/check-spec-tokens.test.sh, 3 arm calls
-New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filename in a units sub-folder · FLOOR_ASSERTIONS in tools/check-spec-tokens.test.sh, 1 arm call
+New arm: tools/check-spec-tokens.test.sh · a hands-off token its target never names, then named · the suite's executed-assertion floor, raised by the arms this row adds
+New arm: tools/check-spec-tokens.test.sh · the token on a continuation line, and a star marker with a tab before an unbackticked target uid · the suite's executed-assertion floor, raised by the arms this row adds
+New arm: tools/check-spec-tokens.test.sh · a hands-off to a CLOSED sibling, then to an unspecced uid beside a source whose H1 carries no uid · the suite's executed-assertion floor, raised by the arms this row adds
+New arm: tools/check-spec-tokens.test.sh · a blank key, a source dated before the cutoff, and a key that is not an ISO date · the suite's executed-assertion floor, raised by the arms this row adds
+New arm: tools/check-spec-tokens.test.sh · a waiver keyed on one edge, then stale, then not reaching another edge · the suite's executed-assertion floor, raised by the arms this row adds
+New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filename in a units sub-folder · the suite's executed-assertion floor, raised by the arms this row adds
 
 ## 8. Open questions
 
@@ -438,8 +499,9 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   counting on S4's line the bullets check 12 accepts and this shape skips; (b) check 12's accepted
   shape, cited line for line in §4. RESOLVED (agent, 2026-09-16, delegated): (b). It grades every
   hands-off edge check 12 registers, so no skipped bullet is left to count.
-- **F7** — Do the twelve new arms fit the self-test leg's declared figures, or do the figures move?
-  Options: (a) keep the 120 s ceiling in `tools/gate-legs.json` and the 130 s budget in
+- **F7** — Do the new arms fit the self-test leg's declared figures, or do the figures move?
+  Options: (a) keep the leg's ceiling in `tools/gate-legs.json`, 120 s when this fork was resolved
+  and 300 s at `fb07ca25`, and the 130 s budget in
   `tools/run-gates/selftest-budgets.txt`, require the arms to fit, and park a breach; (b) stage fewer
   cases per arm call, lowering the arm count and the coverage S8, AC7 and AC10 pin; (c) re-declare
   either figure from the post-build reading. (c) makes a declared budget worse, which fails condition
@@ -453,6 +515,16 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   silent count it adds, with no arm call added. (b) leaves a reachable branch ungraded.
   RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (c). The arm count, the floor
   pin and §5's cost figures do not move, and S2 stays observed by AC3.
+- **F9** — How does S4's line sit beside the refusal `--dispatch` prints? That verb runs the checker
+  before every pass and, on a red run, names the first three `spec-tokens:` lines that are not
+  report lines, dropping the three existing report lines by their text
+  (`tools/unattended/unattended.sh:4973`).
+  Options: (a) word S4's line so that filter drops it too, through the `live spec(s) ·` it already
+  matches; (b) keep rev-2's wording, so a refused dispatch spends one of its three diagnosis lines on
+  the count and can crowd out a hit; (c) widen the filter, which changes the unattended kit's shipped
+  bytes and version, a surface this unit never priced. (b) degrades a landed diagnosis, and (c)
+  reaches a second kit for a wording choice this unit owns.
+  RESOLVED (agent, 2026-09-16, delegated): (a). AC1's graded state observes the wording.
 
 ## 9. Revision log
 
@@ -487,6 +559,76 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   checker after each unit commit, because the build brief's owner rule lets a unit pass run no gate
   and no hand-run checker. S6, AC6, §1 and §4 Files touched move this unit's own real-tree pass and
   its fixes to that run, and AC6 and AC8 gain `permission:` lines.
+- rev-3 · 2026-09-16 · regrounded on fb07ca25 (origin/main). TOOL-aDeferredBar-2 (`d7caa426`,
+  `50c4418a`, `15148b2a`) gave `tools/check-spec-tokens.py` a fourth join, `bar`, a third report
+  line, `AC_HEAD` and `read_cutoff_key`, and grew its suite to 38 `arm` calls and a 42 pin: §1 and S7
+  make this unit's join the fifth; S3, §4 The selection, §5 and new AC4 state three read the key
+  through `read_cutoff_key` and observe its ISO refusal, so S8, AC7, AC10 and §7's AC4 row move to 13
+  new calls, 51 `arm` calls and a 55 pin; §4 The report prints S4's line fourth and keeps it out of
+  the `bar` join's populations; AC6 names S4's line rather than an ordinal; AC8 counts five joins,
+  because the dossier already names four; §4 The selection, The hit, §5 and §10 re-cite the moved
+  lines. `577cffbb` re-declared the self-test leg's ceiling 120 s to 300 s: §5 testing and §8 F7's
+  option (a) carry it, and §5 prices the new arms against the 130 s budget row. `--dispatch` now runs
+  the declared checker before every pass (`tools/unattended/unattended.sh:4964-4979`): §1 and §4
+  Rollout name it, and new §8 F9 words S4's line so its refusal filter drops it, observed by AC1. S3
+  re-cites the conf line a sibling spec cites, S9 names the `bar` join's precedent, §4 Rollout cites
+  the roster order, and §10 re-cites the recall hit at `.memory-tree.conf:278`. Extended 2026-09-20,
+  same base, on a second regrounding pass. Every citation above was re-read at HEAD and holds:
+  `tools/check-spec-tokens.py` at `:140`, `:251`, `:258`, `:305`, `:326`, `:329`, `:370`, `:405`,
+  `:423`, `:430`, `:434` and `:442`; check 12's grammar at
+  `tools/memory-tree/check-memory-hygiene.sh:1153`, `:1517`, `:1533-1534`, `:1547`, `:1549`, `:1553`,
+  `:1557`, `:1564-1565`, `:1588` and `:1790`; `--dispatch` at `tools/unattended/unattended.sh`
+  `:4964-4979` and `:4973`; the roster at `tools/workflows/unattended-build.js:70` and `:314`; and
+  `tools/memory-tree/.memory-tree.conf.example:140`. Re-measured: the suite makes 38 `arm` calls with
+  `FLOOR_ASSERTIONS=42`, its four direct assertions sit at `tools/check-spec-tokens.test.sh:265`,
+  `:443`, `:445` and `:447`, the `spec-tokens self-test` ceiling is 300 s and its
+  `tools/run-gates/selftest-budgets.txt` row is 130 s, so S8, AC7, AC10 and §5 testing are unchanged.
+  S3's example conf line is corrected from `:422`, which no sibling cites, to `:429`, which unit 12
+  does. §4 Rollout's roster citation now reads a file main renders from
+  `tools/workflows/unattended-build.template.js`, which changes neither line.
+  Extended again 2026-09-20, same base, by the build-wide consolidation pass, which changed no
+  rule of this spec and is recorded so the check is on the record. The `permission:` lines on AC1
+  to AC5, AC9 and AC10 were re-read against the gate-guard hook's measured denied population and
+  KEPT: each observation is a `tools/check-spec-tokens.test.sh` file invocation carrying no
+  read-only verb, which is exactly what that hook denies before VERIFYING, and each already places
+  its run at the build's one post-build bar. AC6 and AC8 keep the no-hand-run-checker line the
+  build brief's owner rule gives them, and AC7's `grep -c` reads a tracked file in the pass and is
+  neither a suite nor a leg. §7's six `New arm:` third fields name `FLOOR_ASSERTIONS` and an arm
+  count rather than `none`, and `tools/check-spec-tokens.test.sh` is not one of the two suites the
+  build-wide arm-line rule names, so none of them moves. No criterion of this spec asserts that a
+  phrase counts zero, so the phrase sweep found nothing to repair. The capped carriers this unit
+  writes are `.memory-tree.conf`, which carries no byte cap, and
+  `memory/guides/SESSION-KICKOFF.md`, 20057 bytes against the 61440 its class declares.
+  Extended once more 2026-09-20, same base, by the closing consolidation pass, which applied the
+  build's NET-ZERO rule to every capped carrier rather than only to the contested ones, so the
+  forty-kilobytes-free argument is no longer load-bearing. §2 S7 now NAMES its passage, the
+  `last-audit:` line at `memory/guides/SESSION-KICKOFF.md:5`, records that a stamp displaces no
+  text, and new §6 AC11 reads the carrier at this unit's commit against its PARENT with a
+  `git diff --numstat` half that reds a stamp written as an added line. Inside this closing set the passages taken
+  are the §B `TMPDIR` trap, the ceiling line, the §B M6 claim and this stamp, so no two of them
+  collide; a stamp is not a contested passage at all, because every unit touching a watched path
+  rewrites it, the passes are ordered, and each leaves the file the same size. §8 F4's second resolution is RE-RATIFIED unchanged: the orchestrator's run
+  of the checker BETWEEN passes is the orchestrator's and not a pass's, so the build-wide rule
+  sending a gate-leg observation to the run at VERIFYING does not reach AC6 or AC8, and §4
+  Rollout keeps its wording. The header date moves to the last-change date; the rev does not,
+  because no criterion changed its subject.
+  Closed 2026-09-20, same base, by the last consolidation pass before the spec audits re-run.
+  §2 S7 STOPS CALLING THE MANIFEST RE-STAMP A TRIM, on the orchestrator's ruling: rewriting the
+  `last-audit:` line at `memory/guides/SESSION-KICKOFF.md:5` is the bookkeeping every unit
+  touching a watched file owes, it claims nothing from that carrier's headroom, and the sibling
+  unit that rewrites the same line is NOT a collision with this one. §7's six `New arm:` third
+  fields are rewritten in WORDS: each now reads the suite's executed-assertion floor, raised by
+  the arms its row adds, and none carries an identifier or a count, which is what the build's
+  field rule asks for. The arithmetic those counts carried is not stranded, it is MOVED to where
+  a criterion can own it: §6 AC7 now states the per-row distribution that sums to thirteen, its
+  `figure:` line says the thirteen is that distribution rather than a sum read out of §7, and
+  §2 S8 points at AC7 instead of at the rows. One verifier finding is repaired rather than
+  carried: AC11's second half read `git diff --numstat HEAD^ HEAD`, which reds a correctly landed
+  stamp whenever a pass lands more than one commit; it now resolves the stamp commit and its
+  parent by sha and says so. Every `permission:` line naming the HELD `spec-tokens self-test` leg
+  spells the VERIFYING run `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` rather than
+  "with `GATE_SELFTESTS=1`", so a held leg is not read as covered by a plain bar. The header date
+  stays at the last-change date; the rev does not move.
 
 ## 10. Reuse audit
 
@@ -494,20 +636,31 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   tokens against the sibling spec that receives them"` returned symbol-name neighbours only
   (`build_edges` in `tools/process-monitor/scope.py`, `join_aliases`, `parse_tokens`) and no seam in
   the spec-tokens feature. The seam was found by reading source instead: this unit extends
-  `tools/check-spec-tokens.py`, reusing its LIVE selection, `TICK`, `NOT_A_TOKEN`, the section-6
-  bullet shape, the conf-key reader `read_conf_key` and the waiver registry.
-- **Against BASE.** `tools/check-spec-tokens.py` and its test are unchanged from BASE to `7804eb7f`.
-  The cited lines hold at BASE: `:168` is the any-depth spec population, `:237` is the section-6
-  bullet regex, `:254` keys a waiver on the hit's third field, and `:270` and `:279` are the two
-  report lines.
+  `tools/check-spec-tokens.py`, reusing its LIVE selection, `TICK`, `NOT_A_TOKEN`, the
+  acceptance-criteria bullet shape, the cutoff reader `read_cutoff_key` and the waiver registry.
+- **Against BASE.** BASE is `fb07ca25`, origin/main, which HEAD `94fd2f54` merges without changing
+  code. From `abac6d59` to `fb07ca25`, TOOL-aDeferredBar-2 changed `tools/check-spec-tokens.py` and its
+  test: the `bar` join over the legs and paths populations, armed by `SPEC_DIRECT_CUTOFF`; the
+  acceptance section found by heading text; `read_cutoff_key`, one ISO-date refusal for every cutoff
+  key; a third report line; and 18 more `arm` calls with four direct assertions, the pin 20 to 42.
+  The cited lines hold at `fb07ca25`: `:258` is the any-depth spec population, `:370` is the
+  acceptance bullet regex, `:405` keys a waiver on the hit's third field, and `:423`, `:430` or
+  `:434`, and `:442` are the three report lines. `577cffbb` moved the self-test leg's ceiling to
+  300 s. The unattended kit's `--dispatch` gained its run of the declared checker, whose report-line
+  filter §8 F9 answers. The shipped example conf now declares `SPEC_DIRECT_CUTOFF` blank by hand
+  (`tools/memory-tree/.memory-tree.conf.example:140`); §8 F5 stays as resolved, so this unit's key
+  stays out of it. Probed read-only at `94fd2f54`, S1's join grades 109 bullets and 160 tokens with
+  no miss, every one in this build, and no other build's live spec dated on or after the cutoff
+  carries a hands-off bullet.
 - **Against check 12.** The grammar S1 takes is check 12's edge arm in
-  `tools/memory-tree/check-memory-hygiene.sh`, unchanged from BASE to `7804eb7f`; §4 The selection
-  cites each line. It is reused by copying its regexes into the checker, not by calling the engine,
+  `tools/memory-tree/check-memory-hygiene.sh`, unchanged from `abac6d59` to `fb07ca25` but for its
+  version line, memory-tree 2.74 to 2.78; §4 The selection cites each line, and each holds at
+  `fb07ca25`. It is reused by copying its regexes into the checker, not by calling the engine,
   for the reason §4 Alternatives rejected gives.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: `python tools/memory-recall/query.py "how are spec edges between sibling units
   checked for agreement" --terms "hands-off consumes-from Edges reciprocity sibling spec join payload
-  token check-spec-tokens SPEC_EDGES_CUTOFF edge"`. Top hits: `.memory-tree.conf:268`
-  (`SPEC_EDGES_CUTOFF`'s header, whose payload arm is check 12's `external` test and not this join),
+  token check-spec-tokens SPEC_EDGES_CUTOFF edge"`. Top hits: `.memory-tree.conf:278`, at `:268` when
+  queried (`SPEC_EDGES_CUTOFF`'s header, whose payload arm is check 12's `external` test and not this join),
   TOOL-aKeyedAnnotation-9 (the paths arm's open defect, untouched here), `memory/HYGIENE.md:135`,
   the aLeakedHandle round-2 review's edge-bullet checklist item, and this build's G4 round-1 record.

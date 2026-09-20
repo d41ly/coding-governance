@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 35
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 35
 
 <!-- gen:spec-records -->
 
@@ -38,8 +38,15 @@ against the fixture.
   topology is built by `straggler-guard.test.sh --topology <clone> <branch>`, the helper unit 13's
   suite builds its linked-worktree case through (its S8), so the two cannot drift; that mode sets no
   hooks path, so the clone's own `tools/check-wiring.sh --fix` still writes the value S6 measures.
+  That command's head word ends `.test.sh` and `--topology` is none of the five read-only verbs
+  `tools/unattended/gate-guard.js` exempts, so it is DENIED inside a unit pass: the linked-worktree
+  topology and the two breaks that need it, S6 and S7, are built and staged at the one post-build
+  run the orchestrator makes at VERIFYING, after the last unit, and the ledger records that timing.
+  The clone, the two scratch READMEs and the three breaks that need no linked worktree stay in the
+  pass.
   Every staged break below runs there, so the corpus a break is graded against is this repo's real
-  post-switch content, and nothing a break writes can reach the repository or its remote. The clone's `.memory-tree.conf` declares one extra family, `EXMP`, used by the scratch
+  post-switch content, and nothing a break writes can reach the repository or its remote. The
+  clone's `.memory-tree.conf` declares one extra family, `EXMP`, used by the scratch
   fixtures alone, so every id a RED prints is either a real id the corpus defines or an `EXMP` id.
   The two scratch READMEs of S3 and S4 are committed and pushed to the scratch remote's default
   branch BEFORE the hooks path is set, so neither landing meets the pre-push boundary and no bypass
@@ -57,8 +64,8 @@ against the fixture.
   anchors an ask id filed in another folder; `bash tools/unattended/check-unattended.sh` fails
   naming the folder-wide anchor ban and the id. Observed by AC4.
 - **S6** The straggler hook's RED: a LINKED worktree of the scratch clone, created with
-  `git worktree add <dir> -b <branch> abac6d59` on this build's pre-switch BASE, stages an edit to a
-  backlog shard; `git commit` there is refused by the post-switch `.githooks/pre-commit` the hooks
+  `git worktree add <dir> -b <branch> abac6d59`, a commit from before this build's switch-over,
+  stages an edit to a backlog shard; `git commit` there is refused by the post-switch `.githooks/pre-commit` the hooks
   path resolves to, which prints the relocation recipe. If unit 13's rev-2 records G2 H2's route (b)
   — the layer is inert in a worktree resolving a relative hooks path — S6 records that inertness in
   this same topology (the commit lands and no recipe prints), and S7's audit is the RED that binds;
@@ -77,7 +84,9 @@ against the fixture.
   `bash tools/memory-tree/check-memory-hygiene.sh` fail check 25 naming the merge, the id and the
   change commit. Observed by AC6.
 - **S8** Every RED is copied verbatim into this unit's acceptance ledger, and the scratch clone is
-  removed afterwards with its read-only git objects cleared first. The real tree carries only this
+  removed afterwards with its read-only git objects cleared first — afterwards meaning after the
+  deferred staging of S6 and S7 at the VERIFYING run (S2), because the linked worktree those two
+  need lives inside that clone, so the pass leaves it in place. The real tree carries only this
   unit's declared writes. Observed by AC7.
 - **S9** This build's own asks after arming. Its close is the first one graded with `ASKS_CMD` set,
   so every ask homed in `memory/builds/dDerivedDocket/BACKLOG.md` must be terminal or carry a
@@ -89,9 +98,15 @@ against the fixture.
   in that file, the record design §19.6 gives a declined discovery. It writes no other row: a live
   ask with neither a disposition nor a recorded decline is left for AC8 to red by name. The list the
   unit records names `<triage-id>`, which unit 34 S17 files with a KEEP and which stays live by
-  design, and the two asks this build's round-1 spec-audit fold filed as declined discoveries, the
-  ids TOOL-dDerivedDocket-38 and TOOL-dDerivedDocket-39, the whole population
-  `grep -n 'dDerivedDocket-[0-9]* · OPEN' memory/backlog/*.md` measured at spec time (§8 F6).
+  design, and every ask this build's spec-audit folds filed as a declined discovery. That set is
+  RE-MEASURED at this unit's commit and never read from this list or from any count in it: it is
+  whatever the `--asks --all --json` read above returns live and undisposed in this folder with a
+  section 11 decline in its own text, which is the population §8 F6 resolved and the only home those
+  asks have after the switch-over. Read at spec time over the shards this unit's base still carries,
+  `grep -n 'dDerivedDocket-[0-9]* · OPEN' memory/backlog/*.md` returns nine rows,
+  TOOL-dDerivedDocket-38 through TOOL-dDerivedDocket-46 — the round-1 fold's two and the seven the
+  round-2 fold filed at `f3ab70ca` — each recording its decline under the protocol's section 11, and
+  that reading is a size, not the list the unit writes from (§8 F6).
   Observed by AC7 and AC8.
 - **S10** The kickoff manifest's `last-audit` is re-stamped in the same commit, with a delta line in
   the commit message, because `.unattended.conf` is in its `watch:` list and the staged leg refuses a
@@ -169,6 +184,15 @@ P5 is the refusal reached; the resolution table's first cell must be backticked 
 link-wrapped, because a link-wrapped cell does not anchor (DR §5.3); and the merge must be a real
 merge, because a squash leaves no transition for the audit to see (design §18r.6, hole 1).
 
+**The scratch commits and `tools/hooks/scratch-guard.js`.** Since `TOOL-aReplayedCard-1` that hook
+refuses a `git commit` issued by the main loop while this session's orientation card carries no READY
+line or names a tree other than the one the commit resolves to, and every commit S6 and S7 make
+resolves to the scratch clone rather than to this worktree. Its own header names a subagent and an
+absent card among what it never gates: the subagent path returns before the orientation read and
+prints nothing, the absent-card path allows with a witness line, and a build pass is a subagent. A
+denial seen instead is a failure of the staging and not the RED under test, which §5's error states
+already class that way.
+
 ### What S1 arms beyond the three items
 
 `ASKS_CMD` is the single switch every ask-aware path keys on. Setting it arms the driver's preflight
@@ -216,11 +240,14 @@ under `memory/builds/dDerivedDocket/build/`.
 2. Set `ASKS_CMD`, write S9's KEEP rows in this build's `BACKLOG.md`, re-read the manifest's
    claims, re-stamp, and commit.
 3. Clone that commit into the scratch directory with a bare remote; land the two scratch READMEs
-   (S2); run the clone's `bash tools/check-wiring.sh --fix` to set the hooks path; create the linked worktree
-   for S6 and S7.
-4. Stage each break in the order of the table, confirm its RED, and copy it into the ledger.
-5. Read this build's own asks at that commit, record each with its status and deciding row, and
-   remove the scratch clone.
+   (S2); run the clone's `bash tools/check-wiring.sh --fix` to set the hooks path.
+4. Stage the first three breaks of the table in order, confirm each RED, and copy it into the
+   ledger. Build the linked worktree and stage S6's and S7's breaks at the VERIFYING run instead,
+   because the topology helper is a denied invocation inside a pass (S2), and copy those two REDs
+   into the same ledger there.
+5. Read this build's own asks at that commit and record each with its status and deciding row.
+   Remove the scratch clone only once step 4's deferred staging has run at VERIFYING, since the
+   linked worktree that staging needs lives inside it (S8).
 
 ### Alternatives rejected
 
@@ -255,6 +282,8 @@ under `memory/builds/dDerivedDocket/build/`.
   exits 0 with gov's `ASKS_CMD` non-blank and its protocol row present.
   Red when: the value is set in the kit's example and not in gov's `.unattended.conf`, so every run
   here still takes the not-adopted path.
+  permission: the command is the `unattended kit gate` leg over the real tree and runs at the one
+  post-build bar; in the pass the conf value and the protocol row are read directly.
 - **AC2** — When `unattended.sh --preflight` runs in the scratch clone on a landed README whose
   `asks:` names an unfiled id, it refuses naming P5 and that id, and the refusal names its term by
   label, P5, never a DEAD PROBE; where the READY witness ran, it returned one row per scoped id.
@@ -281,10 +310,15 @@ under `memory/builds/dDerivedDocket/build/`.
   carries the binding RED.
   Red when: the clone's `core.hooksPath` is unset, so no hook runs and the commit lands silently,
   which is what the bare `tools/check-wiring.sh`, the `--check` mode that writes nothing, leaves; or
-  the straggler is checked out in the primary scratch tree, so the branch guard or BASE's own hooks
-  answer first and no recipe prints; or the absolute arm is skipped, so the one configuration under
+  the straggler is checked out in the primary scratch tree, so the branch guard or the straggler
+  commit's own hooks answer first and no recipe prints; or the absolute arm is skipped, so the one configuration under
   which the layer reaches a straggler is never observed; or the relative arm records no
   `--session` note, so its landing commit cannot be told from an unset path.
+  permission: the linked worktree this arm needs is built by the straggler-guard suite's
+  `--topology` mode, a suite-FILE invocation carrying none of the five read-only verbs, which
+  `tools/unattended/gate-guard.js` row D4 denies before VERIFYING, so both arms are staged at the one
+  post-build run after the last unit (S2); nothing here is a gate leg, and the pass stages the three
+  breaks that need no linked worktree.
 - **AC6** — When the scratch straggler is merged with `git merge --no-ff` and the conflict is
   resolved to the default branch's view, `git commit` is refused by `.githooks/commit-msg`;
   concluded with `--no-verify`, `bash tools/memory-tree/check-memory-hygiene.sh` exits 1 naming the
@@ -292,16 +326,25 @@ under `memory/builds/dDerivedDocket/build/`.
   Red when: the merge is a squash, which leaves no transition, so the audit is silent and the RED is
   never observed.
   cost: one hygiene run in the scratch clone, minutes.
+  permission: this break lives in the linked worktree AC5's deferral builds, so it is staged at the
+  same post-build run (S2); the hygiene run itself is a checker on a fixture inside the scratch
+  clone, which the child prompt sanctions, and is not the `memory hygiene` leg's verdict.
 - **AC7** — When `git status --porcelain` runs in the worktree after the scratch clone is removed, it
   lists nothing beyond this unit's declared writes, the scratch directory no longer exists, and
   `bash tools/memory-tree/check-memory-hygiene.sh` names no orphan id in the ledger that copied the
   REDs.
   Red when: a fixture carried a real-family id, which the copied RED then cites and check 14 reds as
   defined nowhere.
+  permission: the `git status --porcelain` read is the pass's own, and the scratch directory's
+  absence is read at the deferred staging run that removes the clone (S2, S8), not in the pass,
+  which leaves the clone in place; `check-memory-hygiene.sh` over the real tree is the
+  `memory hygiene` leg and its verdict binds at the one post-build bar.
 - **AC8** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs at this unit's
   commit, every ask homed in this build's `BACKLOG.md` is terminal or carries a disposition row
-  there: `<triage-id>` its KEEP from unit 34, and
-  the asks TOOL-dDerivedDocket-38 and TOOL-dDerivedDocket-39 the KEEP S9 wrote citing section 11;
+  there: `<triage-id>` its KEEP from unit 34, and, for every ask that read returns live with a
+  section 11 decline in its text, the KEEP S9 wrote citing section 11 — nine such asks when this
+  spec was written, TOOL-dDerivedDocket-38 through TOOL-dDerivedDocket-46, and whatever the read
+  returns at the commit;
   `git diff HEAD^ HEAD` over this build's `BACKLOG.md` adds only KEEP rows, each naming an ask whose
   text records that decline; and the journal lists each ask with its status and
   deciding row.
@@ -311,6 +354,9 @@ under `memory/builds/dDerivedDocket/build/`.
 - **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
   passes with the re-stamped `last-audit`.
   Red when: the conf moves with no re-stamp, which the staged leg refuses at the commit.
+  permission: the pre-commit hook runs the staged leg at commit and the `last-audit` line is read
+  with `git` in the pass; `manifest-check.sh` over the tree is the `kickoff-manifest ratchet` leg and
+  runs at the one post-build bar.
 - **AC10** — When the acceptance ledger is read, it records that both scratch READMEs reached the
   scratch remote's default branch before `core.hooksPath` was set in the clone, and the procedure it
   records carries no `--no-verify` and no `GOV_GATE_CMD` other than S7's two documented uses.
@@ -363,6 +409,15 @@ observes them on real content.
   build that is not finished when it signs. RESOLVED (agent, 2026-09-16, delegated): (b), design
   §19.6's KEEP for a declined discovery, written by a pass of the build in its own file before the
   last closing commit. D12-c does not reach it: this build names no mandated ask.
+- **F7 — where does S2's topology run, now that the hook denies it inside a pass?** Options: (a) run
+  it at the one post-build run at `VERIFYING`, keeping in the pass the clone, the two scratch READMEs
+  and the three breaks that need no linked worktree; (b) give the topology helper an entry point
+  whose head word does not end `.test.sh`, which reopens unit 13 §8 F8 as resolved and costs a new
+  tracked `.githooks/` path with its own `[[exempt]]` row. RESOLVED (agent, 2026-09-20, delegated),
+  decided by the orchestrator: (a), under the build-wide reading that a suite FILE invocation
+  defers to the run at VERIFYING while a checker on a fixture or a staged break stays in the pass.
+  S2, Rollout steps 3 and 4 and AC5's and AC6's `permission:` lines already carry it; unit 13 §8 F8,
+  its AC14 and its hands-off bullet do not move.
 
 ## 9. Revision log
 
@@ -385,6 +440,86 @@ observes them on real content.
   a KEEP for each live ask homed here whose text records its section 11 decline, and names
   the asks TOOL-dDerivedDocket-38 and TOOL-dDerivedDocket-39 beside `<triage-id>`; §4 "This build's
   own close", Files touched, Rollout steps 2 and 5, §5 security, AC8, consumes-from 34; §8 F6.
+- rev-4 · 2026-09-20 · regrounded on fb07ca25 (origin/main). S9 and AC8: the declined-discovery
+  population this unit disposes is nine rows, TOOL-dDerivedDocket-38 through TOOL-dDerivedDocket-46,
+  not the two rev-3 named — the round-2 fold filed seven more at `f3ab70ca` — and both items now
+  RE-MEASURE that population at the unit's commit instead of reading a list, so the next fold cannot
+  rot them. §4 gains the `tools/hooks/scratch-guard.js` paragraph: `TOOL-aReplayedCard-1` landed an
+  orientation check that refuses a main-loop `git commit` whose tree is not the card's, which every
+  S6 and S7 commit in the scratch clone is, and whose subagent exemption is why a pass still lands
+  them. Re-verified unchanged at fb07ca25: `tools/check-wiring.sh`'s `--check`/`--fix`/`--session`
+  modes and the unset-only hooks write S2 and AC5 read, `.githooks/pre-push`'s `push-main-active`
+  marker AC10 reads, `memory/guides/SESSION-KICKOFF.md`'s `watch:` list carrying `.unattended.conf`
+  (S10), `manifest-check.sh` check 5 and its staged C5s (AC9), the memory-tree gate's check
+  numbering, whose highest is 24 at BOTH bases and whose README still says 23, so unit 9's check 25
+  is free and check 14 numbers as S7 and §4 cite them, §11 of
+  `memory/guides/UNATTENDED-PROTOCOL.md` as the decline trail S9 cites, and all four §7 legs in
+  `tools/gate-legs.json`. This unit moves no kit version: `.unattended.conf` is no carrier
+  `tools/check-kit-versions.sh` names. No landed build does what an S-item plans. §10 records the
+  base and the one landed rule this unit's S2 now contradicts. Checked a second time and corrected,
+  same date: S9's re-measure named `memory/backlog/*.md` as the population to read AT THIS UNIT'S
+  COMMIT, which is after unit 34's switch-over, where those four paths are the GENERATED family
+  views and every ask of this run is homed in this build's folder — the read unit 17 §4 rejects by
+  name — so S9 and AC8 now re-measure through the `--asks --all --json` read S9 already performs and
+  keep the nine as the spec-time size; §10 claimed the gate-guard rule also reaches AC1, AC4, AC6
+  and AC9, whose three leg commands no D row matches and which the child prompt permits; and this
+  line said the memory-tree gate has 23 checks, which is the README's stale count beside a shell
+  carrying 24 at both bases. Extended 2026-09-20 by the regrounding consolidation, which FOLDS the
+  build's conservative reading of the parked suite-permission conflict instead of deciding it. S2's
+  `straggler-guard.test.sh --topology` run is a denied `.test.sh` FILE invocation, so S2, Rollout
+  steps 3 and 4 and AC5's and AC6's new `permission:` lines move the linked-worktree topology and
+  the two breaks riding it, S6 and S7, to the one post-build run at VERIFYING; the clone, the two
+  scratch READMEs and the three breaks needing no linked worktree stay in the pass. AC1, AC7 and
+  AC9 gain a `permission:` line for the three leg verdicts whose subject is the real tree, and
+  §10's landed-rule paragraph is rewritten from REPORTED to FOLDED. Nothing else moved: §7 adds no
+  arm, so no `New arm:` third field exists to price; every absence this spec asserts is read over
+  the scratch clone or over records the unit itself writes, so no phrase of its own counts zero at
+  HEAD; and this unit touches no capped carrier, `.unattended.conf`,
+  `memory/guides/SESSION-KICKOFF.md`, this build's `BACKLOG.md` and its journal carrying no row in
+  `tools/template-size-limits.txt`, which the closing pass re-checked rather than carried over when
+  the capped-carrier rule tightened from a ceiling to NET ZERO. Verified the same day: the
+  deferral left S8 and Rollout step 5
+  removing the scratch clone inside the pass, which would destroy the linked worktree the deferred
+  staging needs, so both now remove it at the VERIFYING run and AC7's `permission:` line reads the
+  directory's absence there rather than in the pass.
+  Extended again 2026-09-20 by the closing consolidation. The orchestrator RATIFIED the deferral
+  reading and with it option (a) of the verifier's fork, now recorded as §8 F7 and named in §10, so
+  the split between the in-pass observations and the ones staged at VERIFYING is decided rather than
+  folded; the ruling conflict behind the reading stays parked. No criterion, scope item or rollout
+  step moved, and this unit owes no trim, writing no capped carrier. The header date already reads
+  the last-change date.
+  Extended again 2026-09-20 by the close-out pass, which moved nothing and closes the one ruling
+  a reader could mistake for a gap here. THE KEY-TABLE ROW: the closing rule makes a section 8
+  row unconditional for a unit that adds a key to `tools/unattended/.unattended.conf.example`
+  or sets one in `.unattended.conf`, and S1 does set `ASKS_CMD` in gov's `.unattended.conf`.
+  This unit still writes no row, and that is not an exemption: check 22 joins KEY NAMES, the
+  name is the ask-driver unit's at an earlier order together with its conf-example entry and
+  its protocol row, §4's edits table already says so in the `none; its key is the ask-driver
+  unit's` cell, and AC1 OBSERVES the row's presence rather than assuming it — so a missing row
+  reds this unit's own criterion instead of passing silently. A second row here would put one key
+  in the table twice, which check 22 cannot see at all — it reads the key column through
+  `sort -u`, so a duplicate joins to the same set — and would leave two rows to keep in step
+  where the ruling asks for one. The remaining
+  rulings reach nothing: no passage of any capped carrier is claimed, so the trim-collision and
+  net-zero rules are both inapplicable and the 2048-byte scoping has nothing to scope; and
+  `tools/gate-legs.json` at HEAD gives none of §7's four legs `subject = kit` or
+  `chunk = selftests`, so AC1's, AC7's and AC9's deferrals name no HELD leg and none needs to
+  say which form of the bar covers it. §8 F7's staging at VERIFYING is a different deferral
+  and is unaffected: it waits on the run itself, not on that run's flags. The header date
+  already reads 2026-09-20 and the rev is kept.
+  Extended again 2026-09-20 by the close-out VERIFIER, which moved two words and no figure. This
+  spec used BASE for `abac6d59` in S6 and in AC5's Red when while §10 declares BASE to BE
+  `fb07ca25`, the same one-word-for-two-commits contradiction the orchestrator ruled on for the
+  charter unit of this build; S6 now calls `abac6d59` a commit from before this build's
+  switch-over and AC5 names the straggler commit's own hooks, so every remaining use of the word
+  in this spec means `fb07ca25`. The closing scoping rule was then re-checked against this unit's
+  one CLASS-capped write, which the `tools/template-size-limits.txt` test above cannot see:
+  `memory/guides/SESSION-KICKOFF.md` is a guide capped at 61440 bytes and 750 lines and measures
+  20057 and 248 at `fb07ca25`, and this unit's only write to it is S10's in-place rewrite of one
+  `last-audit` line, which the orchestrator's first ruling classes as the re-stamp a watched-file
+  change owes rather than a byte claim — so no stated delta is owed here, and AC9 already reads
+  that line against its parent's. Nothing else moved, and the header date already reads
+  2026-09-20.
 
 ## 10. Reuse audit
 
@@ -401,6 +536,39 @@ repositories leaking on Windows, which S8 answers.
 
 Where DR and this build's specs disagree: DR §19.8 lists three breaks and gives U15 a pilot; the
 brief adds two breaks and D12-a moves the pilot to the owner (§8 F2, F3).
+
+BASE is `fb07ca25`. Against `abac6d59` the paths this unit reads moved as follows.
+`tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`, `tools/check-wiring.sh`,
+`skills/session-kickoff/manifest-check.sh`, `.githooks/pre-commit`, `.memory-tree.conf`,
+`.unattended.conf`, `memory/guides/SESSION-KICKOFF.md` and `memory/guides/UNATTENDED-PROTOCOL.md`
+all changed, and no claim this spec makes about any of them moved: the modes, markers, watch list,
+check numbers and section this unit reads are the ones rev-3 read. `ASKS_CMD`, `PROBE_ALLOW`,
+`--asks` and the `hooks own-tree` note are still absent at BASE, as they were, because the units
+that ship them have not run.
+
+ONE LANDED RULE CONTRADICTS S2, and it is NOW FOLDED under the build's conservative reading; the
+ruling conflict behind it stays parked for the owner in `memory/builds/dDerivedDocket/RUN.md`, and
+the resolved fork it collides with is unit 13's §8 F8. The hook is
+`tools/unattended/gate-guard.js`, built as `TOOL-aDeferredBar-3` and wired in
+`.claude/settings.json`; it denies at the tool call any command whose head word ends `.test.sh`
+while this branch's run is in a phase before VERIFYING, exempting only
+`--list`, `--check`, `--rank`, `--help` and `--render`. S2 builds its topology with
+`straggler-guard.test.sh --topology <clone> <branch>`, which carries none of the five and is
+therefore denied inside a pass, so S2, Rollout steps 3 and 4 and AC5's and AC6's `permission:` lines move
+that topology and the two breaks riding it to the one post-build run at VERIFYING. That is the
+first of the two options the regrounding verifier put to the orchestrator, and the orchestrator has
+since DECIDED it (§8 F7); the second, giving the topology helper an entry point that does not end
+`.test.sh`, would reopen unit 13 §8 F8 and cost a new tracked `.githooks/` path with its own
+`[[exempt]]` row, so it is closed rather than merely untaken.
+
+The hook does NOT reach AC1, AC4, AC6's hygiene run or AC9: those run `check-unattended.sh`,
+`check-memory-hygiene.sh` and `manifest-check.sh`, which no D row matches and which
+`tools/workflows/unattended-unit.js` permits by name as a checker run on a staged break or a
+fixture. The OWNER rule that a unit pass runs no gate leg does reach the two of those whose
+subject is the REAL TREE rather than the scratch clone, AC1 and AC9, and AC7 with them, so each
+gains a `permission:` line deferring its leg verdict to the one post-build bar while keeping its
+direct reads in the pass. AC4's and AC6's runs are inside the scratch clone and keep their in-pass
+observation.
 
 Recall terms used: `staged RED real tree arm dark default-OFF flag flip scratch clone bare remote
 unstage checkout`

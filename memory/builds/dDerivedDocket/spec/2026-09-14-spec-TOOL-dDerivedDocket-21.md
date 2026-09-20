@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 21
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
@@ -38,7 +38,7 @@ does not name.
 - **S3** The sweep of `tools/` and `.githooks/` for bare default-branch comparison bases, recorded
   as §4's inventory with a disposition per site: converted, already remote-relative, a NAME rather
   than a base, or waived with the reason. Observed by AC3.
-- **S4** govkit selfcheck's guard partition (`tools/govkit/govkit.py:1395`, check 7c) gains a
+- **S4** govkit selfcheck's guard partition (`tools/govkit/govkit.py:1423`, check 7c) gains a
   sixth class, `root-conf`: a pathspec with no `/` that equals some registry descriptor's
   `[config] file` value. The set is DERIVED from the descriptors already loaded, never listed.
   Observed by AC4.
@@ -50,25 +50,29 @@ does not name.
   leg whose tracked argv file imports a module beside it by name, or sources a file by a literal
   path, whose bytes name a declared root conf the guard lacks — the residual §3 leaves ungraded.
   Observed by AC5, AC6 and AC9.
-- **S6** The four bar legs S5 names at BASE gain their conf, in `tools/gate-legs.json` and in the
+- **S6** The three bar legs S5 names at BASE gain their conf, in `tools/gate-legs.json` and in the
   descriptor `[[gate_leg]]` row that declares each: `lexicon naming predicates` gains
   `.lexicon.conf`, `codebase-map gate coverage` gains `.codebase-map.conf`, and
-  `kit/dogfood doc parity` and `review-protocol parity (kit vs dogfood)` gain `.memory-tree.conf`;
-  and `recall floor`, a gov-only row no descriptor declares, gains `.memory-tree.conf` by hand: its
-  argv file reads `RECALL_FLOOR` through `recall_conf.CONF_NAME`
-  (`tools/memory-recall/recall_conf.py:41`), a transitive read S5 does not grade, and it is the leg
-  TOOL-aWalkedCorpus-5 was filed on. Observed by AC6 and AC9.
+  `kit/dogfood doc parity` gains `.memory-tree.conf`; and `recall floor`, a gov-only row no
+  descriptor declares, gains `.memory-tree.conf` by hand: its argv file reads `RECALL_FLOOR` through
+  `recall_conf.CONF_NAME` (`tools/memory-recall/recall_conf.py:41`), a transitive read S5 does not
+  grade, and it is the leg TOOL-aWalkedCorpus-5 was filed on. The fourth leg rev-3 named,
+  `review-protocol parity (kit vs dogfood)`, is DONE on main by a different remedy and is dropped
+  here: TOOL-dPolishedVitrine-1's round-1 F4 (`2814aaa5`) left it unguarded in both carriers, so it
+  runs on every bar and has no guard left to complete. Observed by AC6 and AC9.
 - **S7** The two comments that record the guard as impossible — `tools/lexicon/kit.toml:97` and
   the B1 block at `tools/lexicon/adopt-lexicon.sh:459` — are rewritten to name the new class. The
   `lexicon wiring` grade stays: it is unguarded, so it still grades the declaration if a guard is
   ever narrowed again. Observed by AC7.
 - **S8** Under the build's one-owner rule, the unit that first changes a kit's shipped bytes in build
   order moves that kit's version once, and every later unit's bytes in that kit ride the move (§8
-  F3). This unit moves govkit, lexicon, codebase-map and the review harness, once each. The review
-  harness's move is `meta.version` and both the `gov:kit tier2-review@` and `gov:kit review-harness@`
-  markers in `tools/workflows/tier2-review.js`: S6 changes that kit's descriptor,
-  `tools/workflows/kit.toml`, at order 21, before the review-durability unit first touches
-  `tier2-review.js`, and that unit's review-harness bytes ride this move. It does NOT move
+  F3). This unit moves govkit, lexicon and codebase-map, once each. It does NOT move the review
+  harness: rev-3 gave it that move because S6 edited `tools/workflows/kit.toml` at order 21, and at
+  BASE that edit does not exist — the parity leg is unguarded in both carriers, so S6 touches no
+  `tools/workflows/` descriptor and this unit changes no review-harness byte at all. Under rule (a)
+  the move passes to the review-durability unit, the first unit in build order still to change
+  `tools/workflows/tier2-review.js`, which is where the orchestrator placed it in the regrounding
+  consolidation pass (§8 F3, §10). It does NOT move
   drift-audit: unit 13, ordered earlier, changes `tools/drift-audit/` first and owns that move, and
   the drift-audit bytes S1 and S2 change ride it. Memory-tree's move is the memory-tree docs unit's,
   an exception to that rule, because `check-verdict-epoch.sh`'s topological rule requires the one
@@ -89,8 +93,8 @@ does not name.
   runtime is not seen by S5. Its header says so. S5 prints such legs as near-misses so the residual
   is visible; it never reds on one.
 - **Comparing a kit descriptor's guard with gov's manifest row.** TOOL-aPacedTurnstile-12 records
-  that nothing compares the two. S6 edits both by hand for its four legs; the parity gate is that
-  row's work.
+  that nothing compares the two. S6 edits both by hand for the three legs a descriptor declares,
+  `recall floor` having none; the parity gate is that row's work.
 - **The pre-push hook, the lander and `run-gates.sh`.** None needs a change: the runner and the
   lander already compare against `origin/<name>`, and the hook uses the name only to classify the
   pushed ref (§4). The hook also ships verbatim to adopters.
@@ -153,10 +157,12 @@ raises the count.
 | `tools/push-main.sh` | 4 (`:20`, `:23`, `:24`, `:63`) | the pushed branch and `$remote/$def`, two refusal messages, the current branch's name | already remote-relative; the local push is the in-place landing unit's |
 | `.githooks/pre-push` | 7 (`:91`–`:107`) | which pushed ref is the default branch, and a tracking-ref existence check | a NAME, not a base |
 | `.githooks/pre-commit` | 3 (`:25`–`:27`) | the primary-tree branch guard | a NAME, not a base |
-| `tools/unattended/unattended.sh` | 5 (`:777`, `:779`, `:795`, `:796`, `:1088`) | `check_branch` and `default_branch`, validated against the remote's advertisement | a NAME, not a base |
+| `tools/unattended/unattended.sh` | 6 (`:860`, `:862`, `:878`, `:879`, `:1178`, `:2821`) | `check_branch` and `default_branch`, validated against the remote's advertisement, and the `run-branch` fact | a NAME, not a base |
 | `tools/playbook/render_playbook.py` | 1 (`:111`) | a value rendered into the charter | a NAME, not a base |
 
-Total at BASE: 30 hits in 8 files, PINNED as that measurement.
+Total at BASE `fb07ca25`: 31 hits in 8 files, PINNED as that measurement. At `abac6d59` it was 30
+in the same 8 files; only `tools/unattended/unattended.sh` moved, gaining the `run-branch` fact
+TOOL-aDeferredBar-3 added, which is a NAME like its five siblings.
 
 ### The `root-conf` class
 
@@ -168,7 +174,7 @@ into exactly one class. A root file that no descriptor declares, such as `.nosuc
 into none and still reds 7c.
 
 The emitter needs no change. It already renders a guard through `resolve_tokens` and keeps it only
-when it matches a tracked path in the target (`tools/govkit/govkit.py:5042-5051`), so an adopter
+when it matches a tracked path in the target (`tools/govkit/govkit.py:5147-5156`), so an adopter
 that has adopted the kit receives the conf in the guard and one that has not drops it.
 
 ### The completeness check
@@ -177,8 +183,10 @@ For each manifest row with a non-empty `guard`, `subject` other than `kit` and `
 `selftests`: read every argv element that `git ls-files` tracks, and for each declared root conf
 whose file name occurs in those bytes, require it in the guard. A mention in a comment counts;
 that direction costs one re-run on a conf-only diff and never hides a red. Measured at BASE with a
-read-only probe over the real manifest: seven guarded bar legs, four of which name a root conf, and
-all four lack it — the four S6 lists.
+read-only probe over the real manifest at BASE `fb07ca25`: six guarded bar legs, three of which name
+a root conf, and all three lack it — the three S6 lists. At `abac6d59` it was seven and four; the
+seventh, `review-protocol parity (kit vs dogfood)`, left the guarded population when
+TOOL-dPolishedVitrine-1 dropped its guard, which is why S6 drops it too.
 
 LIVENESS: zero guarded bar legs graded is a refusal naming the manifest, because it reads exactly
 like a corpus with nothing to fix.
@@ -188,13 +196,16 @@ like a corpus with nothing to fix.
 `tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · `tools/drift-audit/README.md`
 · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` · `tools/gate-legs.json` ·
 `tools/lexicon/kit.toml` · `tools/lexicon/adopt-lexicon.sh` · `tools/codebase-map/kit.toml` ·
-`tools/memory-tree/kit.toml` · `tools/workflows/kit.toml` · the drift-audit and govkit dossiers. The
+`tools/memory-tree/kit.toml` · the drift-audit and govkit dossiers. `tools/workflows/kit.toml` is
+no longer among them: the parity leg it declares is unguarded at BASE, so S6 has nothing to add to
+that row. The
 S8 version moves add `tools/lexicon/lexicon.py` and the lexicon markers in `canon.py`, `README.md`
 and `LEXICON.md`, with the rendered lexicon Skill re-rendered; `tools/codebase-map/map_lib.py`, with
 the generated map that mirrors its version regenerated; govkit's constant and marker in
-`tools/govkit/govkit.py`; and the review harness's `meta.version` and its two `gov:kit` markers, all
-on one line of `tools/workflows/tier2-review.js`. No drift-audit version carrier is touched: the
-drift-audit bytes ride unit 13's move (S8).
+`tools/govkit/govkit.py`. No `tools/workflows/` file is among them: the review harness's
+`meta.version` and its two `gov:kit` markers in `tools/workflows/tier2-review.js` move in the
+review-durability unit, which is the first unit still to change that file (S8, §8 F3). No
+drift-audit version carrier is touched either: the drift-audit bytes ride unit 13's move (S8).
 
 ### Alternatives rejected
 
@@ -202,12 +213,14 @@ drift-audit bytes ride unit 13's move (S8).
   shape, generalised). Rejected by running its predicate over the real manifest: it leaves
   `review-protocol parity (kit vs dogfood)` with no same-kit reader of `.memory-tree.conf`, because
   that conf belongs to another kit, so it reds on landing for a leg it cannot fix without changing
-  the rule.
+  the rule. That leg has since left the guarded population entirely, so the probe would need
+  re-running against BASE; the rejection stands as recorded at `abac6d59` and is not re-litigated.
 - **The same arm with ANY unguarded reader.** Rejected by the same probe: `drift-audit records`
   names `.lexicon.conf`, so giving `lexicon wiring` a guard — the break the arm exists for — still
   passes. An arm that cannot fail on its own staged break is not an arm.
 - **Retiring the guards half as already done by the lexicon B1 fix.** B1 closes one instance for
-  one kit; the probe found three more guarded bar legs with the same gap.
+  one kit; the probe found two more guarded bar legs with the same gap at BASE `fb07ca25`, and
+  three at `abac6d59` before the parity leg left the guarded population.
 - **Drift keeping a bare name and fetching first.** A report that fetches is a network call on a
   leg that must run offline, and it still grades a ref the run could move.
 
@@ -216,7 +229,7 @@ drift-audit bytes ride unit 13's move (S8).
 - security — no new input surface. The base ladder reads refs and a remote URL that git already
   resolves; the completeness check reads tracked files govkit selfcheck already reads.
 - perf / scale — one `git remote get-url` and one `rev-parse` per drift run; the completeness check
-  reads each guarded bar leg's argv files once, seven of them at BASE.
+  reads each guarded bar leg's argv files once, six of them at BASE.
 - error / empty / loading states — an unfetched tracking ref refuses with exit 2 and names the
   fetch; a remote-less clone proceeds and announces; zero guarded bar legs refuses as a dead probe.
 - observability — the header's base ref and sha on every drift run; the graded and reader counts on
@@ -239,8 +252,11 @@ drift-audit bytes ride unit 13's move (S8).
   local commit.
   Red when: the base is the bare name, so the behind case reports the raised pin as a weakened
   ratchet the other two do not.
-  permission: the drift-audit selftest is a held kit leg; it runs at the build's one post-build bar
-  with `GATE_SELFTESTS=1`.
+  permission: the arm is a `selftest.py` FILE invocation and `drift-audit selftest` is a HELD kit
+  leg, so it defers wherever it would run. The run that covers it is the one the main loop makes at
+  VERIFYING, after the last unit,
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`; a plain bar holds that leg and
+  reaches this arm not at all.
 - **AC2** — When the same arm runs with `origin` configured and no tracking ref, the report exits 2
   naming `git fetch origin`; with no `origin` remote it names the local base on stderr and exits as
   the signals decide; and every header it prints carries the base ref, `@` and an eight-hex sha, the
@@ -254,6 +270,12 @@ drift-audit bytes ride unit 13's move (S8).
 - **AC4** — When `tools/govkit/selftest.py` feeds 7c a manifest whose guard names `.lexicon.conf`,
   the pathspec falls into exactly one class; a guard naming `.nosuch.conf` still reds.
   Red when: `root-conf` admits any file without a `/`, so an undeclared root file passes.
+  permission: that file is a whole-suite `selftest.py`, which `tools/unattended/gate-guard.js`
+  denies before VERIFYING and which is the HELD `govkit selftest` leg, so it runs at the one
+  post-build bar the main loop runs at VERIFYING, after the last unit — and that bar is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, because a plain bar holds every
+  leg of that chunk and would reach this one never. In the pass the arm's RED is observed by hand by
+  feeding 7c the same fixture manifest through a scratch copy.
 - **AC5** — When the completeness check grades a fixture manifest whose guarded, repo-subject leg's
   argv file names `.lexicon.conf` and whose guard lacks it, the fixture's
   `python tools/govkit/govkit.py selfcheck` reds naming the leg and the conf; with the conf added it
@@ -265,26 +287,35 @@ drift-audit bytes ride unit 13's move (S8).
   those legs' guards reverted it reds naming that leg.
   Red when: the population is empty and the check reports a green zero.
   figure: both counts are DERIVED at observation time from `tools/gate-legs.json`.
+  permission: `python tools/govkit/govkit.py selfcheck` over the REAL tree is the `govkit selfcheck`
+  leg, and a pass runs no gate leg, so that run is observed at the one post-build bar the main loop
+  runs at VERIFYING, after the last unit; in the pass the same check and the reverted-guard break are
+  observed over a scratch copy of the tree.
 - **AC7** — When `tools/lexicon/kit.toml` and `tools/lexicon/adopt-lexicon.sh` are read after S7,
   neither states that a root conf falls into no guard class, and `lexicon wiring` still grades the
   declaration.
   Red when: the stale sentence survives beside a guard that now names the conf.
 - **AC8** — When `KIT_GOVKIT_VERSION` in `tools/govkit/govkit.py`, `KIT_LEXICON_VERSION` in
-  `tools/lexicon/lexicon.py`, `KIT_CODEBASE_MAP_VERSION` in `tools/codebase-map/map_lib.py` and the
-  `meta.version` of `tools/workflows/tier2-review.js` are read at the unit's build commit and, with
-  `git show`, at `abac6d59`, each build-commit value is greater, compared as a dotted version
-  component by component, the review harness reading 1.8 over BASE's 1.7; every `gov:kit` marker for
-  that kit in the same file carries the same value, which in `tier2-review.js` is both the
-  `gov:kit tier2-review@` and the `gov:kit review-harness@` marker; when
+  `tools/lexicon/lexicon.py` and `KIT_CODEBASE_MAP_VERSION` in `tools/codebase-map/map_lib.py` are
+  read at the unit's build commit and, with
+  `git show`, both at BASE `fb07ca25` and at `origin/main` after a fetch in this pass, each
+  build-commit value is strictly greater than BOTH, compared as a dotted version component by
+  component, across every carrier `tools/check-kit-versions.sh` names for that kit; at `fb07ca25`
+  they read govkit 1.11, lexicon 1.4 and codebase-map 1.7. Every `gov:kit` marker for a kit in the
+  same file carries that kit's new value. When
   `git diff HEAD^ HEAD -- tools/drift-audit/drift_report.py` runs on the unit's build commit, it
-  shows no change to the `KIT_DRIFT_AUDIT_VERSION` line; and `bash tools/check-kit-versions.sh`
-  exits 0.
-  Red when: one of the four moves is skipped, which `tools/check-kit-versions.sh` cannot see,
+  shows no change to the `KIT_DRIFT_AUDIT_VERSION` line; when
+  `git diff HEAD^ HEAD -- tools/workflows/` runs there, it is empty, because the review harness's
+  move belongs to the review-durability unit; and `bash tools/check-kit-versions.sh` exits 0.
+  Red when: one of the three moves is skipped, which `tools/check-kit-versions.sh` cannot see,
   because it grades presence and constant-marker agreement and BASE's values already satisfy both;
-  or a constant moves and its marker does not; or the review harness moves to any value but 1.8,
-  which the review-durability unit's check of both kit ids then contradicts; or this unit moves
-  `KIT_DRIFT_AUDIT_VERSION` as well, a second move of that kit in one landing range beside the move
-  unit 13 owns.
+  or a constant moves and its marker does not; or a move is compared only against `abac6d59` or only
+  against `fb07ca25`, so a kit another node moved on main between them lands at a value the
+  advertised tip already holds; or this unit moves
+  `KIT_DRIFT_AUDIT_VERSION`, or the review harness's `meta.version`, as well — either would be a
+  second move of that kit in one landing range beside the move its owner makes.
+  figure: the three BASE values are PINNED as read at `fb07ca25`; the `origin/main` half is DERIVED
+  at the pass.
   permission: the reads are `git show` and `git diff` observations in the pass;
   `check-kit-versions.sh` is the `kit version markers` leg and runs at the build's one post-build
   bar.
@@ -294,13 +325,16 @@ drift-audit bytes ride unit 13's move (S8).
   `.memory-tree.conf` and `tools/memory-recall/recall_conf.py`.
   Red when: the recall floor stays unguarded on its conf, so a `RECALL_FLOOR`-only commit still
   guard-skips the leg TOOL-aWalkedCorpus-5 was filed on while this unit claims to answer it.
+  permission: as AC6 — the real-tree `selfcheck` run is the `govkit selfcheck` leg and is observed at
+  the one post-build bar the main loop runs at VERIFYING; the scratch-copy half is the pass's own
+  direct check.
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `govkit selftest` · `lexicon naming predicates` · `lexicon wiring` · `kit version markers` · `codebase-map coverage + freshness` · `workflow script syntax` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `govkit selftest` · `lexicon naming predicates` · `lexicon wiring` · `kit version markers` · `codebase-map coverage + freshness` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/drift-audit/selftest.py · a bare-remote fixture with local main behind, at and ahead of a raised pin, plus an unfetched tracking ref · none
-New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file, a conf-reading guarded leg without the conf, and a guarded leg reading a root conf through a same-directory module · none
+New arm: `tools/drift-audit/selftest.py` · a bare-remote fixture with local main behind, at and ahead of a raised pin, plus an unfetched tracking ref · none
+New arm: `tools/govkit/selftest.py` · a root-conf guard, an undeclared root file, a conf-reading guarded leg without the conf, and a guarded leg reading a root conf through a same-directory module · none
 
 ## 8. Open questions
 
@@ -333,8 +367,16 @@ New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file,
   `gov:kit drift-audit@` marker those scripts carry, and unit 20's `unattended-build.js` carries its
   own `gov:kit unattended-build@` identity and no review-harness marker.
   RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a), observed by AC8, which
-  also reads that this unit leaves `KIT_DRIFT_AUDIT_VERSION` unmoved and moves the review harness's
-  `meta.version` with both of its markers.
+  also reads that this unit leaves `KIT_DRIFT_AUDIT_VERSION` unmoved.
+
+  The review-harness half of that decision rested on S6 editing `tools/workflows/kit.toml` at
+  order 21, and that premise is dead at BASE: TOOL-dPolishedVitrine-1's round-1 F4 left the parity
+  leg unguarded in both carriers, so S6 edits no `tools/workflows/` descriptor and this unit changes
+  no byte of the review-harness kit. RESOLVED (agent, 2026-09-20, delegated), decided by the
+  orchestrator: rule (a) applies unchanged, so the review harness's one move passes to the
+  review-durability unit, the first unit in build order still to change
+  `tools/workflows/tier2-review.js`. S8, AC8 and §4 Files touched drop it here, and §7 drops
+  `workflow script syntax` with it, this unit having nothing left under that tree.
 
 ## 9. Revision log
 
@@ -372,6 +414,68 @@ New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file,
   are not counted. Third-pass fold verification: §2 S8's clause naming whose bytes ride the review
   harness's move is reworded to name the review-durability unit, not `tier2-review.js`; the owners
   S8 names are unchanged.
+- rev-4 · 2026-09-20 · regrounded on fb07ca25 (origin/main). §2 §4 §5 §8 F3 §10 · S4 S6 S8 · AC8.
+  Two citations moved and the rest did not. S4 and §10 re-cite check 7c at
+  `tools/govkit/govkit.py:1423` and §4 the guard emitter at `:5147-5156`, both blocks byte-identical
+  at their new lines under the dPolishedVitrine and aProbedUnit govkit commits. `tools/drift-audit/`
+  is byte-identical between the two bases, so S1, S2 and the ladder's
+  `tools/drift-audit/drift_report.py:1869` stand; so do `tools/run-gates/run-gates.sh:1228`,
+  `tools/memory-recall/recall_conf.py:41`, `tools/lexicon/kit.toml:97` and
+  `tools/lexicon/adopt-lexicon.sh:459`.
+  S6 drops `review-protocol parity (kit vs dogfood)`: TOOL-dPolishedVitrine-1's round-1 F4
+  (`2814aaa5`) left that leg unguarded in both carriers, which closes its half of the class by
+  another remedy. §4's completeness measurement is re-probed read-only at BASE and falls from seven
+  guarded bar legs and four conf readers to six and three, §5's perf line follows, §4's first
+  rejected alternative records that its probe subject left the population, and §4 Files touched drops
+  `tools/workflows/kit.toml`. §8 F3's review-harness premise goes with it, recorded there and in
+  §10 and left for the orchestrator rather than reopened.
+  §4's sweep is re-run at BASE with the same command and comment filter: the same 8 files, 31 hits
+  where `abac6d59` had 30. Only `tools/unattended/unattended.sh` moved, from 5 hits to 6 at `:860`,
+  `:862`, `:878`, `:879`, `:1178` and `:2821`, the sixth being the `run-branch` fact
+  TOOL-aDeferredBar-3 added, a NAME like its siblings, so its disposition does not change.
+  AC8 reads each of the four moves against BOTH `fb07ca25` and the `origin/main` tip observed in the
+  pass, per the build-wide kit-version decision, and re-pins the BASE values: govkit 1.11 from 1.10,
+  lexicon 1.4 from 1.3, codebase-map 1.7 unmoved, and the review harness 1.8 from 1.7, so rev-3's
+  "1.8 over BASE's 1.7" becomes at least 1.9.
+  Verification pass, same regrounding: two counts that fell with the parity leg are corrected. §3's
+  descriptor non-goal read "its four legs" and reads three, `recall floor` being the gov-only row no
+  descriptor declares; §4's third rejected alternative read "three more guarded bar legs" and reads
+  two at BASE `fb07ca25`, three at `abac6d59`. §4's sweep was re-run at HEAD with the spec's own
+  command and filter and reproduces 31 hits over the same 8 files at the same lines, and the
+  completeness probe reproduces six guarded bar legs and the same three conf readers.
+  Extended 2026-09-20, same base, by the regrounding consolidation pass · S8 · §4 Files touched ·
+  AC4 AC6 AC8 AC9 · §7 · §8 F3. The review harness's version move LEAVES this unit, decided by the
+  orchestrator on §8 F3's own rule (a): with the parity leg unguarded in both carriers, S6 edits no
+  `tools/workflows/` descriptor, so the first unit still to change `tools/workflows/tier2-review.js`
+  owns it, the review-durability unit. S8 keeps govkit, lexicon and codebase-map; AC8 reads three
+  moves rather than four, and its new clause reads `tools/workflows/` unchanged at this unit's build
+  commit; §4 Files touched names no file under that tree; §7 drops `workflow script syntax`, which
+  graded only the file this unit no longer touches; §8 F3 carries the decision in the resolved-fork
+  shape. That unit's own spec owes the matching version criterion, which another consolidation set
+  applies.
+  AC4, AC6 and AC9 gain `permission:` lines: `tools/govkit/selftest.py` is a whole-suite
+  `selftest.py` that `tools/unattended/gate-guard.js` denies before VERIFYING, and a real-tree
+  `govkit selfcheck` run is a gate leg, so both are observed at the one post-build bar the main loop
+  runs at VERIFYING, with the scratch-copy and fixture halves staying the pass's own direct checks.
+  AC1's existing line already read that way and is untouched. No criterion here asserts that a
+  phrase counts zero, this unit writes to no byte-capped carrier, and both `New arm:` third fields
+  stay `none`, because neither `tools/drift-audit/selftest.py` nor `tools/govkit/selftest.py` pins
+  an executed-assertion floor.
+  Extended again on the closing consolidation pass · §7 only. Both `New arm:` lines now backtick
+  the suite path, as every other spec of this build spells it and as the token checker reads a
+  path; neither file moved and both third fields still read `none`. Nothing else was owed here:
+  the review-harness decision above is applied on both sides, this unit writes to no byte-capped
+  carrier so the net-zero rule reaches nothing, and every `permission:` line already matches the
+  ratified reading — a suite FILE and a real-tree gate leg defer to VERIFYING, while the scratch
+  fixtures and `git show` reads stay the pass's own direct checks.
+  Extended again on the close-out pass, same base and rev · AC1 AC4. Both lines defer a HELD leg
+  and now NAME the run that covers it,
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at VERIFYING, so neither
+  `drift-audit selftest` nor `govkit selftest` can later be read as covered by a plain bar; both
+  carry `chunk = selftests` in `tools/gate-legs.json`, which a bar holds unless the flag sets them
+  loose. AC6, AC8 and AC9 are untouched: `govkit selfcheck` and `kit version markers` are unheld,
+  so the bar reaches them either way. Rule 1 reads narrowly here and already did — the fixture and
+  scratch-copy runs are the pass's own direct checks, the real-tree and suite-FILE runs defer.
 
 ## 10. Reuse audit
 
@@ -380,8 +484,19 @@ New arm: tools/govkit/selftest.py · a root-conf guard, an undeclared root file,
   `tracked` in `tools/govkit/govkit.py`, `branches` in `tools/memory-tree/check-arms.py` — and no
   seam for a base resolver; its coverage line reports `.sh` unscanned. Reading source found the two
   seams this unit extends: the `Git` class and base ladder in `tools/drift-audit/drift_report.py`,
-  and govkit selfcheck's 7c partition at `tools/govkit/govkit.py:1395`. No shared default-branch
+  and govkit selfcheck's 7c partition at `tools/govkit/govkit.py:1423`. No shared default-branch
   resolver exists to reuse; TOOL-aCollapsedScan-8 records why.
+- **Against BASE `fb07ca25`.** origin/main, which HEAD `94fd2f54` merges without changing code. From
+  `abac6d59` to it, `tools/drift-audit/` is byte-identical, so nothing landed that resolves a base
+  remote-first and S1 to S3 are owed exactly as written. `tools/govkit/govkit.py` moved 1.10 to 1.11
+  under TOOL-dPolishedVitrine-1 without touching 7c's partition or the guard emitter, which moved
+  lines only. One S-item is partly DONE: TOOL-dPolishedVitrine-1's round-1 F4 (`2814aaa5`) dropped
+  the `review-protocol parity (kit vs dogfood)` leg's guard in both carriers, so S6 drops that leg
+  and the guarded-bar-leg population falls to six with three conf readers. That removal also takes
+  `tools/workflows/kit.toml` out of S6's reach, which is the premise §8 F3's review-harness half
+  rested on; on that changed premise the orchestrator moved the review harness's one version move to
+  the review-durability unit, and §8 F3, S8, AC8 and §4 Files touched now read that way. No landed build widens govkit's guard partition, adds a completeness check, or gives
+  any of the three remaining legs its conf, so the rest of S4 to S7 is owed in full.
 - **DR against BASE.** DR says the lexicon leg's guard simply gains `.lexicon.conf`; BASE refuses
   it in govkit 7c, the lexicon kit's own descriptor says so, and TOOL-aSurfacedLexicon-4 struck that
   edit after measuring it. DR's i120 is already answered at BASE by `lexicon wiring` grading the

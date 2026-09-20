@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-2 — in-place landing merge
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 2
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -247,7 +247,9 @@ quotes the usage line.
   shows a filed record naming it that is not CLOSED.
   Red when: an arm was wired without its failing case having been observed; or the attributed run is
   read by its NEW count alone, so a suite that aborted before its first FAIL line reads as clean.
-  permission: the suite is a gate leg, so only the one post-build bar runs it.
+  permission: the suite is the `push-main self-test` leg, which a plain bar HOLDS, so the run that
+  executes it is the VERIFYING run's
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and nothing earlier.
 - **AC10** — When a single-parent records commit sits on top of T, `--land` accepts it and pushes
   HEAD; when a second merge sits there, `--land` refuses; and `--carry --slug tFix` over AC2's
   fixture exits 1 naming the same sha that `--land` names, while writing nothing.
@@ -331,6 +333,22 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   the fold verifier's terminal-row exclusion problems (unit 19 §8 F8): unit 19 reads a merge's run
   side by content and no longer by the prepared merge's subject, so the hands-off edge to unit 19
   names T's second parent, the run branch, in place of the subject.
+- rev-5 · 2026-09-20 · regrounded on fb07ca25 (origin/main) on the closing pass, this being the
+  one spec the 2026-09-16 regrounding consolidation left at `abac6d59`. No section's substance
+  moved.
+  `tools/push-main.sh`, `tools/push-main.test.sh` and `.githooks/pre-push` are byte-identical to
+  `abac6d59`, so §1's and AC13's line citations hold, and no landed build adds a lander flag
+  or a carry set. `build_commit`'s whole-token subject join is unchanged; `pass_commit` beside it
+  gained a brief-row exclusion at the aRatifiedRulings merge, which §4 does not rely on. The rule
+  aDeferredBar landed in the build method's M6, no suite inside a pass, agrees with S8 and AC9, and
+  its `gate-guard.js` admits AC9's post-build run at `VERIFYING`. §10 describes the new base.
+  Extended 2026-09-20, closing pass. AC9's `permission:` line now names the run that covers it in
+  the orchestrator's own terms, `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
+  because `push-main self-test` is a HELD leg and "the one post-build bar" read as a plain bar,
+  which never runs it. Those two changes — the regrounding and that line — are the whole of this
+  edit, and the header date follows them; no other section of this spec moved. Closing verifier,
+  same pass and rev: this entry was dated 2026-09-16 when it was written on 2026-09-20, which
+  claimed a regrounding on a day this spec was untouched, and the date is corrected above.
 
 ## 10. Reuse audit
 
@@ -344,6 +362,16 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   aHoistedPass landing record where local main had diverged by another build's thirteen commits.
   Where the design record and the source disagree: the hook's marker and head checks sit a line or
   two from the record's citations at BASE; the behaviour is as described.
+- BASE is `fb07ca25`, the origin/main tip this branch merged; the spec was written at `abac6d59`.
+  The lander, its suite and the pre-push hook did not change between the two, so every
+  `tools/push-main.sh` line this spec cites reads the same at BASE.
+  `tools/unattended/lib-unattended.sh` gained `read_brief_paths` and a brief-row exclusion inside
+  `pass_commit`; `build_commit`, which AC5 asks, is unchanged. Landed rules this unit meets: the
+  build method's M6 and `tools/unattended/gate-guard.js` keep every suite out of a pass until the
+  run reaches `VERIFYING`, which is where S8 and AC9 already put `tools/push-main.test.sh`; the
+  pre-commit fast leg now also runs the codebase-map gate when a `.py` or `.js` path is staged,
+  which no lander flag reaches: `--prepare`'s `git merge` runs no pre-commit hook, and `.githooks/`
+  ships no `pre-merge-commit`.
 - M12 was not reached: the design record tested this shape in a lab (arms P, Q, R, S and F) and the
   owner ratified it.
 - Recall terms used: `push-main lander in-place landing merge remote-tip carry-set foreign-commit

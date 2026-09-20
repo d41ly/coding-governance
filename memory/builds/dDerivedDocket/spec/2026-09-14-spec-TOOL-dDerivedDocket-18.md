@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 18
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -20,7 +20,7 @@ answers are written into a run-state file by the run being graded. Give the unat
 reading of each mandate fact, re-derived from inputs the run cannot move, so that a forged,
 mistaken or stale fact reds the bar instead of certifying itself. This is the pattern check 19
 already applies to `authorized-by:`, `playbook:` and `pieces:`
-(`tools/unattended/check-unattended.sh:1387-1418`), extended to the four facts the ask path adds.
+(`tools/unattended/check-unattended.sh:1424-1455`), extended to the four facts the ask path adds.
 `asks-ready:` and the freeze's content are re-derived by re-running the declared producer on frozen
 inputs before the record is published, and announced as not re-derived after (S8).
 
@@ -30,8 +30,8 @@ inputs before the record is published, and announced as not re-derived after (S8
   from the README blob at the recorded BASE, the blob check 19 already reads, and requires it
   byte-equal to the recorded fact. For a record in a working phase or HELD, it also requires the
   README at HEAD to carry the same bytes, which is property P6 seen from the leg. A record at LANDING
-  or at a terminal phase is past its close, and nothing re-reads its README's `asks:` line. Observed
-  by AC1 and AC2.
+  or at a terminal phase is past its close, and nothing re-reads its README's `asks:` line.
+  Observed by AC1 and AC2.
 - **S2** P5 re-derived. For every mandated id the leg requires the ask row `- <id> · filed ` in the
   home build's `BACKLOG.md` at the recorded `m-base:`, and it checks `m-base:` itself against the
   pinned `anchor-sha:`, never against `base:` (fix F4). Observed by AC3 and AC4.
@@ -70,7 +70,10 @@ inputs before the record is published, and announced as not re-derived after (S8
   no second implementation.
 - Check 13's claimant rule across the whole corpus is the memory-tree engine's, refined by D12-g in
   unit 8 (`TOOL-dDerivedDocket-8` S6). S3 is narrower: it covers the run's own folder for every foreign id, legacy ones included,
-  which is where the 27 hazard ids came from (DR §19.1 K9).
+  which is where the 27 hazard ids came from (DR §19.1 K9, measured at `abac6d59`; re-measured at
+  `fb07ca25` the set is 28 of 658 distinct legacy ids, its one addition TOOL-aKeyedAnnotation-9,
+  anchored at `memory/builds/aDeferredBar/spec/2026-09-13-spec-TOOL-aDeferredBar-2.md:124` — the
+  ratified design record stays at its own figure).
 - Moving the freeze to `--close` under in-place (unit 22) changes which records S4 grades. Unit 22
   extends S4's population to a committed LANDING record under `LANDER_MODE=in-place` in the same
   commit that moves the freeze. This unit grades recorded LANDED, which includes a record unit 22's
@@ -111,7 +114,7 @@ inputs before the record is published, and announced as not re-derived after (S8
 
 `m-base:` is merge-base(`anchor-sha:`, HEAD at preflight), both frozen commits, so equality is safe
 here in a way it is not for check 9. Check 9 had to move to ancestry because a merge-base computed
-NOW moves after landing (`tools/unattended/check-unattended.sh:1202-1208`); a merge-base of two
+NOW moves after landing (`tools/unattended/check-unattended.sh:1239-1245`); a merge-base of two
 frozen commits never moves. HEAD at preflight is the first parent of the earliest commit whose copy
 of the record carries the `m-base:` line, because preflight refuses a dirty tree and stages the
 record, so the next commit carries it.
@@ -129,7 +132,12 @@ The extractor is reached through the declared `RECALL_CLI`, whose directory hold
 extractor. That keeps the kit file from naming a sibling kit by literal, which the install-prefix
 gate bans. A blank `RECALL_CLI`, or an extractor that does not import, SKIPS S3 with a line saying
 which, never a pass. The arm runs one interpreter per folder, feeding every line of every tracked
-file under it, and collects `(file, line, id)` for each anchor whose slug is not the folder's.
+file under it, and collects `(file, line, id)` for each anchor whose slug is not the folder's. The
+interpreter is resolved by an inline `resolve_python` block, byte-identical to
+`tools/lib/resolve-python.sh`, which the driver has carried since aDeferredBar
+(`tools/unattended/unattended.sh:209`). The leg can source no shared library in an adopter, and the
+python resolver leg's invocation-shape ban reds a bare launcher in any tracked `*.sh`. A resolver
+that finds no usable launcher SKIPS S3 by name, as a blank `RECALL_CLI` does.
 
 Why a foreign slug and not "an id whose ask row is filed elsewhere": both a foreign ask id and a
 foreign unit id anchored in this folder make this build a second claimant under check 13, and the
@@ -156,7 +164,10 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
 
 ### Files touched (estimate)
 
-`tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
+`tools/unattended/check-unattended.sh`, whose conf import assigns only a key initialised above it
+and listed between `gov:conf-allow-begin` and `gov:conf-allow-end`, so `RECALL_CLI` and `ASKS_CMD`
+join both or the leg reads them blank whatever the conf declares ·
+`tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/lib-unattended.sh`, only if unit 16's matcher is not already there ·
 `.memory-tree.conf` for `ARMS_FLOORS` · `memory/map/features/unattended.md`.
 
@@ -187,7 +198,7 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
   A run whose own unit changes READY reds S8 on its own record, because the leg re-runs today's
   producer at `m-base:`; that difference is real, and the run parks it.
 - testing — one fixture per arm in `tools/unattended/check-unattended.test.sh`, each observed RED;
-  the unattended suites run once at the unit's end (D12-h), read through unit 1's
+  the unattended suites run at the build's one post-build bar, read through unit 1's
   `--attribute <BASE>`.
 - migration — none; every existing record is vacuous.
 - user docs — none beyond the leg's own header comments, which state what each arm does NOT check;
@@ -229,8 +240,14 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
 - **AC9** — When the leg runs over today's tree, it prints one line stating that no record pins an
   `asks:` fact, with the count 0.
   Red when: the leg prints nothing, so vacuity reads as a pass.
-- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  end of the unit, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
+  permission: unit passes run no gate legs (fix F7, and the unit child prompt since
+  TOOL-aProbedUnit-1), so this run of the leg over the real tree is observed at the one post-build
+  bar the main loop runs at VERIFYING, after the last unit. The pass's direct check is the leg run
+  over a scratch fixture repository holding no record with an `asks:` fact, never a run of §7's arm
+  file: that file is a self-test suite, which `tools/unattended/gate-guard.js` denies before
+  VERIFYING, and the arm itself executes with the suite at that same post-build bar.
+- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
   `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or
   `DEAD PROBE at R` is named by its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. Every arm this
@@ -240,6 +257,16 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
   past its budget, reads as clean; or an inherited failure is attributed away with no record filing
   it.
   cost: one run of the unattended suites, the unit's single sanctioned suite run (D12-h).
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the last
+  unit. `tools/unattended/gate-guard.js` denies the same runner before VERIFYING, so the hook and
+  the method agree. Which run covers it: `tools/gate-legs.json` carries NO leg for the unattended
+  suites, so this is one of the attributed suite runs the main loop makes beside its bar, and no
+  bar reaches it — not a plain one and not
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. In the pass each arm's RED is
+  observed by hand against a scratch fixture. That folds the conservative reading of the D12-h
+  conflict and does not decide it: S7, §5 and §10 keep the ruling's wording, and the run record
+  parks it for the owner.
 - **AC11** — When a fixture record's `asks-ready:` reads `EXMP-aFoo-3=yes` while the stub producer
   at the recorded `m-base:` grades that id `no`, and the record's preflight commit is not on the
   fixture remote's advertised tip, `bash tools/unattended/check-unattended.sh` reds check 19 naming
@@ -259,9 +286,9 @@ function is named through `python tools/lexicon/lexicon.py --suggest <identifier
 
 ## 7. Gates
 
-`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `install-prefix (shipped surface)` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per arm S1 to S5 carrying the break, plus a vacuous fixture, a forged `asks-ready:` pair and a forged freeze, each unpublished, and one published record · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per arm S1 to S5 carrying the break, plus a vacuous fixture, a forged `asks-ready:` pair and a forged freeze, each unpublished, and one published record · the leg suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
 ## 8. Open questions
 
@@ -309,6 +336,45 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
   verification then gave AC10's `Red when:` the rest of plan c1 §12's standard consumer text, the
   over-budget reading and the unfiled inherited failure, so it goes red on every half of unit 1
   S10's criterion, as the other consumers' criteria do.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No S-item, criterion or fork moves.
+  The check 19 and check 9 citations in §1, §4 and §10 are re-pointed, because `check-unattended.sh`
+  grew through aDeferredBar (`1afd26c9`), aProbedUnit (`5493495a`) and aRatifiedRulings
+  (`b6bbfa7b`); each cited block is byte-identical at its new line. §4's S3 paragraph resolves its
+  interpreter through the inline `resolve_python` block the driver has carried since aDeferredBar's
+  closing round 2, and §7 names the python resolver leg that grades that copy. AC9 gains a
+  `permission:` line, because TOOL-aProbedUnit-1's child prompt now binds F7's no-gate rule in every
+  pass. §10 records the suite-run conflict with ruling D12-h in AC10, reported and not decided.
+  Verification added to §4 Files touched the leg's conf import allow-list, which predates `abac6d59`
+  and assigns neither `RECALL_CLI` nor `ASKS_CMD` today, so S3, S5 and S8 would read both blank.
+  Extended 2026-09-20, same base, by the regrounding consolidation pass · AC9 AC10 · §7. AC10 gains
+  a `permission:` line deferring the `--attribute <BASE>` suite run to the one post-build bar the
+  main loop runs at VERIFYING, which folds the conservative reading of the D12-h conflict without
+  deciding it; S7, §5 and §10 keep the ruling's wording and the run record parks it. AC9's
+  `permission:` line no longer calls a run of §7's arm FILE the pass's direct check, because
+  `tools/unattended/gate-guard.js` denies a `*.test.sh` run before VERIFYING; the pass's check is
+  the leg itself over a vacuous scratch fixture. §7's `New arm:` third field names the leg suite's
+  executed-assertion floor, which that suite pins, beside the `ARMS_FLOORS` pin. No criterion here
+  asserts that a phrase counts zero, and this unit writes to no byte-capped carrier.
+  Extended again on the closing consolidation pass · §3 · §5 · §10 · AC10, with the header date
+  moved to the last-change date and the rev kept. Two owed cross-edits land. The first: the
+  D12-h conflict is FOLDED rather than decided, so AC10's own sentence, §5's testing line and §10
+  place the attributed run at the one the main loop makes at VERIFYING instead of at this unit's
+  end, while the ruling itself stays parked for the owner and stays reported. The second: §3's hazard-id bullet no longer gives a bare 27. It
+  keeps the design record's own figure, says it was measured at `abac6d59`, and adds the
+  re-measurement at BASE with its one addition and that addition's anchor, so this spec and unit
+  33's §10 stop answering one question two ways. This unit still writes to no byte-capped
+  carrier, so Decision 1's net-zero rule reaches nothing here.
+  Extended again on the close-out pass, same base and rev · §10 · AC10. AC10's `permission:` line
+  takes the owed cross-edit's wording verbatim, keeps the hook clause beside it, and now says which
+  run covers the suite run: `tools/gate-legs.json` carries no leg for the unattended suites, so it
+  is an attributed suite run beside the bar the main loop makes at VERIFYING and no bar reaches it,
+  held flags or not. §10 stops calling the D12-h mechanics decided — the question is parked for the
+  owner and the run folds the conservative reading meanwhile. Rule 1 reads narrowly here and
+  already did: AC9's leg run over a vacuous scratch fixture is the pass's own direct check, and what
+  defers is the same leg over the real tree and any run of §7's arm FILE. The close-out verifier
+  restored ruling D12-h's OWN words in that §10 sentence: the ruling says the suites run once at
+  the unit's end, and stating it in the folded terms left the paragraph parking a conflict it had
+  just defined away. AC10 and the `cost:` line are untouched.
 
 ## 10. Reuse audit
 
@@ -319,8 +385,22 @@ are two more keys through that same blob and `awk`. The anchor judgement reuses
 leg re-derives a run fact against the build README at BASE"` returns only generic python helpers,
 because the lookup reports `.sh` as an unscanned layer and so cannot see the leg; the `unattended`
 dossier's shared seams name no second re-derivation mechanism, and none is built. Where DR and the
-source disagree: DR places check 19 at `:1395-1418`, and at BASE the membership and agreement arms
-start at `tools/unattended/check-unattended.sh:1387`; nothing else moved.
+source disagree: DR places check 19 at `:1395-1418`, and at BASE `fb07ca25` the membership and
+agreement arms start at `tools/unattended/check-unattended.sh:1424`. The leg grew between
+`abac6d59` and `fb07ca25`, and no landed build adds a second opinion over a mandate fact, a folder
+anchor ban or a freeze: check 19 still second-opinions `authorized-by:`, `playbook:` and `pieces:`
+only, `anchor_at` is unchanged, and `RECALL_CLI` keeps its blank-means-not-adopted contract in both
+confs. The leg itself spawns no interpreter today, so S3's is its first, and the driver's inline
+resolver is the precedent it copies.
+
+Ruling D12-h, in its own words, would let this unit read the unattended suites once at its end
+(AC10). Since `5493495a` the unit child prompt of `tools/workflows/unattended-unit.js` and M6 of
+`memory/guides/BUILD-METHOD.md` forbid any self-test suite inside a pass, and
+`tools/unattended/gate-guard.js` denies `run-unattended-gates.sh` before VERIFYING. That question
+is PARKED for the owner — no child prompt and no hook amends a ratified ruling — and until an owner
+turn takes it the run folds the CONSERVATIVE reading, which is the one both machines already
+enforce: the attributed run is the one the main loop makes at VERIFYING, after the last unit, which
+is what AC10 and §5 are written to.
 
 Recall terms used: `second-opinion check-19 recorded-BASE authorization-mode playbook anchor-ban
 resolution-table foreign-id landed-anchor units-at-landing leg-arm skip-announce`

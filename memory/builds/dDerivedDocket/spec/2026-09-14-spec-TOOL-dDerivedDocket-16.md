@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 16
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
@@ -16,7 +16,7 @@
 ## 1. Goal
 
 Every unattended verb is addressed by slug, and an id passed where a slug belongs fails with a
-message about a missing README (`tools/unattended/unattended.sh:1358`). Teach the driver to take an
+message about a missing README (`tools/unattended/unattended.sh:1448`). Teach the driver to take an
 ask mandate from the one place the owner controls, a build README's `asks:` line, pin it with the
 properties that stop a run from choosing its own asks, plan units against it, and send every
 ids-shaped invocation to the owner's one-command scaffold instead of guessing (owner ruling D12-a).
@@ -26,12 +26,32 @@ ids-shaped invocation to the owner's one-command scaffold instead of guessing (o
 - **S1** `ASKS_CMD` in the conf: the kit default is blank, meaning not adopted and announced as a
   skip; the key joins `tools/unattended/.unattended.conf.example`, protocol §8's table in both
   copies, and leg check 22's join. Its contract is the three call shapes of §4, each appended to the
-  declared value. Observed by AC13 and AC15.
-- **S2** The authorization scan (`tools/unattended/unattended.sh:1375-1381`) also reads `asks:` from
+  declared value. Its §8 row adds at most 200 B to each protocol copy AND PAYS FOR ITSELF IN THE
+  SAME EDIT, because no cap is raised in this build and the free space does not cover every unit
+  that wants it. What leaves is the `SPEC_TOKENS_CLI` row's closing clause, from
+  `The checker gov declares is gov-internal` to the end of that table cell. It needs no new home:
+  `tools/unattended/.unattended.conf.example:102-105` already carries the same two sentences,
+  nearly word for word, beside the key they describe — which is the file this unit is already
+  opening for `ASKS_CMD`, and the one that owns what a project fills a key with. The protocol
+  cell is the SECOND copy and is the copy that goes; the row keeps the key's meaning and loses
+  only the duplicate. That clause is larger than what this unit adds, so each protocol copy is
+  SMALLER at this unit's commit than at its parent and the row spends none of the guide-cap
+  headroom this build's protocol edits share. No other unit of this build trims the same text, and
+  one overlap is named rather than left for a collision: the later unit that adds a `PROCMON_CMD`
+  key row pinned a 237-byte SUBSET of this clause, its tail from
+  `Declared because the checker's own bar leg`, as that row's funding. That row is owed
+  unconditionally, because check 22 of `tools/unattended/check-unattended.sh` reds on a key the §8
+  table does not carry, so it is no longer a conditional claim on this text. The orchestrator ruled
+  on 2026-09-20 that this unit, the earlier order, KEEPS this passage: it lands first and takes the
+  whole tail, so the funding is spent before that unit runs, and that unit names a different passage
+  or adds nothing to this carrier. Narrowing this trim to leave the tail is not an option: the head is 137 B,
+  which would no longer cover the 200 B this row adds.
+  Observed by AC13 and AC15.
+- **S2** The authorization scan (`tools/unattended/unattended.sh:1465-1471`) also reads `asks:` from
   the same blob. An `asks:` key while `ASKS_CMD` is blank refuses `--preflight`, which is term T1 of
   unit 17 enforced where it belongs. A README carrying `asks:` whose resolved mode is not `slug`
   refuses `--preflight` under a new driver code and writes nothing: `prompt` and `recipe` resolve at
-  the second anchor (`SECOND_ANCHOR_MODES`, `tools/unattended/unattended.sh:497`), which the run can
+  the second anchor (`SECOND_ANCHOR_MODES`, `tools/unattended/unattended.sh:580`), which the run can
   write, and choosing WHICH filed asks is what ruling D12-a took from the run. This is the driver twin
   of unit 18 S5 and mirrors unit 19 S2. Observed by AC5 and AC16.
 - **S3** Preflight pins three facts for a record whose README carries `asks:`: `m-base:`, the
@@ -73,7 +93,7 @@ ids-shaped invocation to the owner's one-command scaffold instead of guessing (o
 - **S11** Preflight prints one notice when `BACKLOG_MODE` differs between the anchor's tree and
   `HEAD`'s. Observed by AC12.
 - **S12** Every new `fail` branch gets an arm in `tools/unattended/unattended.test.sh`,
-  `ARMS_FLOORS` moves in the same commit, and the unattended suites run once at the unit's end under
+  `ARMS_FLOORS` moves in the same commit, and the unattended suites run under
   `--attribute <BASE>` (owner ruling D12-h). Observed by AC13.
 
 ## 3. Non-goals (OUT)
@@ -90,7 +110,7 @@ ids-shaped invocation to the owner's one-command scaffold instead of guessing (o
 - Gov's `ASKS_CMD` stays blank until unit 35 arms it, so every existing run takes the not-adopted
   path unchanged.
 - Widening `researched:M12:prompt` and `solution-tested:M12:prompt` (`DIRECTIVES_CORE`,
-  `tools/unattended/unattended.sh:473`) to a record that pins `asks:`. An ask-driven run resolves to
+  `tools/unattended/unattended.sh:556`) to a record that pins `asks:`. An ask-driven run resolves to
   `slug` mode by ruling D12-a, and owner ruling TOOL-aPromptedMandate-4 scopes both directives to
   prompt-authorized runs, so neither binds it. Whether they should is parked for the owner, because
   either answer changes or restates the reach of an owner ruling. Until then the run's per-ask
@@ -156,7 +176,7 @@ Shapes 1 and 2 are parsed as unit 15's projection; shape 3 is printed and never 
 place of the listing one line saying `ASKS_CMD` is not adopted, naming the key and the generator's
 `--asks --build <home>` form to run by hand. It never lists asks from a local parse, because only the
 fold knows which are live. Naming the generator in a refusal's hint has precedent in the driver's own
-repair hints (`tools/unattended/unattended.sh:1525`, `:2011`, `:2042`).
+repair hints (`tools/unattended/unattended.sh:1615`, `:2101`, `:2132`).
 
 A later caller adds one more shape: the inherited-red auto-file of unit 24 runs
 `<ASKS_CMD> --tsv --ready <ids> --target <slug>` over the WORKING TREE, for two reads. It reads its
@@ -197,12 +217,12 @@ F2), so there is one parser. For a filing home, the recipe lists that folder's l
 
 Order. The id-shape test — a value matching the `FAMILIES` id shape, carrying whitespace, or mixing
 a slug and ids — runs FIRST in `--preflight`, before `check_slug`
-(`tools/unattended/unattended.sh:1060-1070`) and before any anchor work, because it needs no tree;
+(`tools/unattended/unattended.sh:1143-1153`) and before any anchor work, because it needs no tree;
 `check_slug`'s fail 1 therefore never answers an ids value. The filing-home test runs next, once the
 anchor is observed, against the first anchor's merge-base `merge-base(ASHA, HEAD)` and before
 `trusted_base`: under `ANCHOR_SCOPE=published` a README absent at that merge-base widens to the
-second anchor (`:903-915`), and an unpushed branch is then refused with fail 32's push instruction
-(`:863`), which carries no recipe and, once followed, writes to the remote.
+second anchor (`:986-998`), and an unpushed branch is then refused with fail 32's push instruction
+(`:946`), which carries no recipe and, once followed, writes to the remote.
 
 ### Plan, next and rank
 
@@ -212,7 +232,7 @@ while a mandated ask, or a live ask filed in this folder, has no covering unit a
 Rank follows design §19.4: hold edges between mandated asks lifted to the units that close them,
 then severity, then the `asks:` listing order, then numeric sequence. MISSING units sort by numeric
 sequence, never the string order that puts `-10` before `-2` (`missing_units`,
-`tools/unattended/unattended.sh:1917-1934`).
+`tools/unattended/unattended.sh:2007-2024`).
 
 Under `--paths` an ASK row is exactly `ASK<TAB><id><TAB><summary>`, the summary
 `status=<S>;ready=<G>;cover=<unit id | disposition verb | ->;rank=<n>` in that key order (design
@@ -224,17 +244,20 @@ Under `--paths` an ASK row is exactly `ASK<TAB><id><TAB><summary>`, the summary
 
 Code 6 keeps the ids and filing-home refusals. The refusals of S2, S4 and S5 and the rescope refusal
 take new driver codes, S2 now making two refusals, each its own new code; and the dispatch hold
-refusal takes code 49 beside the order gate it joins (`tools/unattended/unattended.sh:4699-4720`).
-New numbers are allocated at build time as the next free integer, because other units of this build
-allocate codes concurrently.
+refusal takes code 49 beside the order gate it joins (`tools/unattended/unattended.sh:4988-5009`).
+Since TOOL-aDeferredBar-2, `--dispatch` also runs the declared `SPEC_TOKENS_CLI` under code 49
+before that gate (`tools/unattended/unattended.sh:4964-4968`), so S9's fixtures leave that key blank
+and take its announced skip. New numbers are allocated at build time as the next free integer,
+because other units of this build allocate codes concurrently.
 
 ### Rollout
 
 Dark. Every new branch sits behind a non-blank `ASKS_CMD` or an `asks:` key, and no gov README
 carries one. The protocol §8 row (S1) names the key, its blank default and "called in the shapes
 listed in `UNATTENDED-ASKS.md`", so the argument lists live in one carrier; the row is about 250
-bytes against a guide cap of 61440 B at 57815 B, which is shared with at least five units of this
-build.
+bytes against a guide cap of 61440 B and 750 lines. At `fb07ca25` the protocol is 60324 B and 675
+lines, so 1116 B of headroom remains where `abac6d59` left 3625 B, and it is shared with at least
+five units of this build.
 
 ### Inventory
 
@@ -280,9 +303,10 @@ build.
   carries no mechanical acceptance, so orientation alone stands between such an ask and a unit
   (parked, §3).
 - testing — one arm per branch in `tools/unattended/unattended.test.sh`, each observed RED; the
-  unattended suites run once at the unit's end and are read through unit 1's `--attribute <BASE>`.
+  unattended suites run at the build's one post-build bar and are read through unit 1's `--attribute <BASE>`.
 - migration — additive; every existing record takes the no-mandate path.
-- user docs — the protocol §8 row here; the Skill and the companion guide are unit 20's.
+- user docs — the protocol §8 row here, less the duplicated `SPEC_TOKENS_CLI` clause S1 drops
+  from that table; the Skill and the companion guide are unit 20's.
 
 ## 6. Acceptance criteria
 
@@ -341,19 +365,36 @@ build.
   Red when: the mode change passes silently, so a run plans against asks its BASE never filed.
 - **AC13** — When `bash tools/unattended/check-unattended.sh` runs, check 22's join is green with
   `ASKS_CMD` in the example conf and in both protocol copies; when
-  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the unit's end, its
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the build's one post-build bar, its
   attribution summary reads `verdict clean`, meaning no NEW FAIL, no `DEAD PROBE at L` and no
   `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by its
   file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. Every arm this
-  unit added passes, each observed RED with its fix unstaged.
+  unit added passes, each observed RED with its fix unstaged. And when `wc -c` runs at this unit's
+  build commit over `memory/guides/UNATTENDED-PROTOCOL.md` and over
+  `tools/unattended/PROTOCOL.template.md`, each reads STRICTLY BELOW what `git cat-file -s`
+  reports for the same path at this unit's parent commit, and below the 61440 B guide cap, with
+  check 10 finding the pair byte-identical so the trim and the addition both landed in both.
   Red when: the key is set by a project and documented nowhere, or an arm lands unobserved; or the
   attributed run is read by its NEW count alone, so a suite this unit's change aborted before its
   first FAIL line, or pushed past its budget, reads as clean; or an inherited failure is attributed
-  away with no record filing it.
+  away with no record filing it; or the §8 row lands without the `SPEC_TOKENS_CLI` trim beside it,
+  so a copy is LARGER at this unit's commit than at its parent and this unit spends headroom the
+  rest of this build's protocol edits are priced against.
   cost: one run of the unattended suites, the unit's single sanctioned run (D12-h).
-  permission: the leg runs named here and in AC9 are observed at the one post-build bar, because
-  unit passes run no gate legs (fix F7); ruling D12-h lifts the suites only.
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the last
+  unit. The same deferral carries the leg run named here, because a pass runs no gate leg either
+  (fix F7) and `tools/unattended/gate-guard.js` denies both before VERIFYING. Which run covers
+  which: the check-22 half is the `unattended kit gate` leg, which is not held, so it rides the bar
+  the main loop makes at VERIFYING,
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`; `tools/gate-legs.json` carries
+  no leg for the unattended suites at all, so the `--attribute <BASE>` half is one of the attributed
+  suite runs made beside that bar and no bar reaches it. In the pass each arm's RED is observed by
+  hand against a scratch fixture, the leg's own command over that fixture is the pass's direct check
+  under M6, and the byte read above is a `wc -c`. Deferring the real-tree and suite runs folds the
+  conservative reading of the D12-h conflict; it does not decide it. S12 and §5 keep the ruling's own
+  wording, and the run record parks the conflict for the owner.
 - **AC14** — When a foreign live spec closes a mandated fixture ask, the pinned `asks-ready:` grade
   is `no` in four fixtures: the foreign build's run-state file absent; tracked and reading a terminal
   phase through `derived_phase()`; tracked and reading HELD; and present only on an unmerged fixture
@@ -370,6 +411,9 @@ build.
   repository's conf the arm prints a named skip.
   Red when: the arm stubs the producer, so a notice on stdout or an empty field is green in the suite
   and a parse refusal on the real call.
+  permission: the suite run is observed at the one post-build bar the main loop runs at VERIFYING,
+  after the last unit; in the pass the two call shapes are observed by running the declared producer
+  directly over the same fixture tree.
   fixture: in gov the arm skips until unit 35 arms the key; unit 35's REDs are this build's first
   real-seam observation, and every later suite run exercises it.
 - **AC16** — When `--preflight` runs over a `prompt`-mode fixture README carrying `asks:`, and over a
@@ -396,7 +440,7 @@ build.
 
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `kit/dogfood doc parity` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · one fixture per refusal and output shape in §6, with a local bare remote for the anchor · `ARMS_FLOORS` for `tools/unattended/unattended.sh`
+New arm: `tools/unattended/unattended.test.sh` · one fixture per refusal and output shape in §6, with a local bare remote for the anchor · the driver suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
 
 ## 8. Open questions
 
@@ -449,23 +493,88 @@ New arm: `tools/unattended/unattended.test.sh` · one fixture per refusal and ou
   OPEN auto-filed ask, reading its earlier, possibly committed id back with the same call, so §4's
   paragraph on that later caller's shape and the §3 hands-off edge to unit 24 name both reads. The
   call's arguments are unchanged, and no criterion moves.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No S-item, criterion or fork moves.
+  Every driver citation in §1, §2 S2, §3, §4 and §10 is re-pointed, because `unattended.sh` grew by
+  280 lines through aDeferredBar (`1afd26c9`), aProbedUnit (`5493495a`) and aRatifiedRulings
+  (`b6bbfa7b`); each cited block is byte-identical at its new line. §4 Fail codes names the
+  spec-token run `--dispatch` gained under code 49 (TOOL-aDeferredBar-2), and §4 Rollout the
+  protocol's remaining 1116 B of guide-cap headroom. §10 records that TOOL-aProbedUnit-1's child
+  prompt and `tools/unattended/gate-guard.js` now refuse the suite run S12 and AC13 keep under
+  ruling D12-h; that conflict is reported to the orchestrator, not decided here.
+  Extended 2026-09-20, same base, by the regrounding consolidation pass · S1 · AC13 AC15 · §7.
+  AC13's `permission:` line now defers the `--attribute <BASE>` suite run to the one post-build bar
+  the main loop runs at VERIFYING, beside the leg runs it already deferred, and AC15 gains a
+  `permission:` line for its suite run. That folds the conservative reading of the D12-h conflict
+  and does not decide it: S12, §5 and §10 keep the ruling's wording, and the run record parks it.
+  S1 prices the §8 row at 200 B of the protocol's 1116 B of headroom and AC13 reads the file's size
+  against the 61440 B cap at the pass, because no cap is raised in this build. §7's `New arm:` third
+  field names the driver suite's executed-assertion floor, which that suite pins, beside the
+  `ARMS_FLOORS` pin it already named. No criterion here asserts that a phrase counts zero.
+  Extended again on the closing consolidation pass · S1 · §4 · §5 · §10 · AC13, and the header
+  date moves to the last-change date with the rev kept. The D12-h conflict is FOLDED rather than
+  decided: every attributed run in this build is read as the one the main loop makes at VERIFYING,
+  so S12, §5 and §10 stop saying the suites run at this unit's end and AC13's own sentence follows
+  them. The ruling itself, and whether its text yields, stay parked for the owner and reported. The §8 row is now NET ZERO OR NEGATIVE
+  on its carrier instead of priced against shared headroom: S1 names the one passage this unit
+  trims, the `SPEC_TOKENS_CLI` row's closing clause, and the file that already carries it, and
+  AC13 reads
+  both copies at the pass against the PARENT commit's size rather than against a share. The
+  clause is larger than the row, so the trim frees headroom for the other protocol spenders of
+  this build rather than competing with them.
+  Verification pass, same consolidation: S1's closing claim that no other unit trims that cell was
+  FALSE, and the overlap is now named. Unit 28's §4 pins the same cell's 237-byte provenance tail as
+  the conditional funding for a `PROCMON_CMD` row; this unit is ordered first and removes it, so that
+  funding does not survive to unit 28's pass. Nothing else moved: the trim, its destination and AC13
+  are unchanged, and which side yields is reported to the orchestrator rather than decided here.
+  Extended again on the close-out pass, same base and rev · S1 · §10 · AC13. The overlap is
+  SETTLED in this unit's favour: as the earlier order it KEEPS the `SPEC_TOKENS_CLI` passage, and
+  S1 says so instead of handing the question on. S1 also stops calling the later unit's
+  `PROCMON_CMD` row conditional, because a key set in a conf owes a §8 table row unconditionally or
+  check 22 reds. AC13's `permission:` line takes the owed cross-edit's wording verbatim, keeps the
+  leg-run clause beside it, and now names which run covers which half: the check-22 leg is unheld
+  and rides the bar the main loop makes at VERIFYING,
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, while `tools/gate-legs.json`
+  carries no leg for the unattended suites, so the `--attribute <BASE>` half is an attributed suite
+  run beside that bar and no bar reaches it. Rule 1 reads narrowly here and always did: a checker
+  run over a scratch fixture or a staged break is the pass's own direct check, and only a run over
+  the real or rendered tree defers. §10 and the entry above stop calling the D12-h mechanics
+  decided: the question is parked for the owner and the run folds the conservative reading
+  meanwhile. The close-out verifier corrected one measured figure in S1: leaving the 237 B
+  provenance tail behind would trim 137 B, not 138: the whole clause measures 374 B in
+  `tools/unattended/PROTOCOL.template.md` and the tail 237 B. The conclusion is unchanged, because neither figure covers 200 B.
 
 ## 10. Reuse audit
 
 The seams are the driver's own: the one-scan `awk` in `check_authorization`
-(`tools/unattended/unattended.sh:1375-1381`), the `set_fact` pinning beside `playbook:` and
-`pieces:` (`:2728-2741`), `roster_ids` and `missing_units` (`:1762-1777`, `:1917-1934`), `plan_row`'s
-two shapes (`:2020-2023`), the order gate at `--dispatch` (`:4699-4720`), and `run_bounded` for the
+(`tools/unattended/unattended.sh:1465-1471`), the `set_fact` pinning beside `playbook:` and
+`pieces:` (`:2828-2841`), `roster_ids` and `missing_units` (`:1852-1867`, `:2007-2024`), `plan_row`'s
+two shapes (`:2110-2113`), the order gate at `--dispatch` (`:4988-5009`), and `run_bounded` for the
 witness call. `python tools/codebase-map/reuse_lookup.py "driver pins a fact at preflight and plans a
 roster"` returned `plan` in `tools/memory-tree/gen_build_index.py`, the `.unattended.conf` affordance
 seam and `cmd_plan` in govkit, and states `.sh` is unscanned, so it is blind to the driver; the
 `unattended` dossier names no second planner. Recall returned `TOOL-dHonouredPark-4` (why `--plan`
 reads the rendered region in build order) and `TOOL-cBriefedPilot-6` (the roster join this extends).
 
-Where the design and BASE disagree: design §19.1 cites fail 6 at `:1357-1360`, which at BASE is
-`tools/unattended/unattended.sh:1358`; the driver's other citations hold, because `unattended.sh` did
-not change between `09a22d2b` and `abac6d59`. Design §19.2's E2 and the prompt-record subset check
-are superseded by ruling D12-a.
+Where the design and BASE disagree: design §19.1 cites fail 6 at `:1357-1360`, which at BASE
+`fb07ca25` is `tools/unattended/unattended.sh:1448`. The design's other driver citations are
+`abac6d59` lines, 83 to 289 lines early at `fb07ca25`; this spec cites the moved lines, and no seam it
+extends changed behaviour: `check_slug` still answers first in `--preflight`, the one-scan parse
+still reads four keys, the `next:` literals and `missing_units`' string order are unchanged, and
+nothing on main reads an `asks:` key. Design §19.2's E2 and the prompt-record subset check are
+superseded by ruling D12-a.
+
+One landed rule contradicts an owner ruling this spec keeps. Ruling D12-h lets this unit run the
+unattended suites once at its end (S12, AC13). Since `5493495a` the unit child prompt of
+`tools/workflows/unattended-unit.js` (TOOL-aProbedUnit-1 and TOOL-aDeferredBar-1) and M6 of
+`memory/guides/BUILD-METHOD.md` forbid any self-test suite inside a pass and override a spec that
+says otherwise. `tools/unattended/gate-guard.js`, wired in `.claude/settings.json`, denies a
+`run-unattended-gates.sh` call while the run's phase is before VERIFYING. Either the suite runs at
+the main loop after every unit is terminal, or D12-h's exception reaches the child prompt and the
+hook. That question is PARKED for the owner: neither the child prompt nor the hook can amend a
+ratified ruling, and only an owner turn can decide whether D12-h's exception reaches them. Until
+that turn the run folds the CONSERVATIVE reading, which is the one both machines already enforce:
+every attributed run here is the one the main loop makes at VERIFYING, after the last unit, and
+S12, §5 and AC13 are written to it. AC13's leg runs already sit at the post-build bar under fix F7.
 
 Recall terms used: `roster_ids preflight authorized-by second anchor fail 6 plan next MISSING
 rescope dispatch order`

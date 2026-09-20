@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-3 — the run's landing path
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -43,7 +43,7 @@ landing that cannot complete ending HELD instead of on local main.
   `in-place`, `gates-green` also refuses, numbered and before
   running, when `git status --porcelain` is non-empty, untracked files included, naming the
   full-green stamp's clean-tree precondition (`tools/run-gates/run-gates.sh:1114-1119` and
-  `:1855-1857`). Observed by AC1, AC2, AC10 and AC12.
+  `:1861-1863`). Observed by AC1, AC2, AC10 and AC12.
 - **S4** Under `in-place`, `--close` asks `$LANDER --carry --slug <slug>` after the Definition of
   Done evaluates and before any write, and refuses on exit 1 quoting the lander's list. Observed by
   AC6.
@@ -52,8 +52,8 @@ landing that cannot complete ending HELD instead of on local main.
   TOOL-dUnstalledConvoy-24 for this mode. The push boundary's scoped bar then covers that
   records-only delta, because the full-green stamp at the prepared merge sits in the same git dir.
   Protocol §2's rotation paragraph, the driver comment above `archive_name_of`
-  (`tools/unattended/unattended.sh:1590-1591`), and the test comment at
-  `tools/unattended/unattended.test.sh:2477` stop giving 'no verb commits' as the reason the archive
+  (`tools/unattended/unattended.sh:1680-1681`), and the test comment at
+  `tools/unattended/unattended.test.sh:2484` stop giving 'no verb commits' as the reason the archive
   name derives from the bytes. The reason that still holds is that two runs can honestly share a
   witness. A re-close whose write changes no byte commits nothing and says so. Observed by AC3, AC7,
   AC14 and AC15.
@@ -64,10 +64,13 @@ landing that cannot complete ending HELD instead of on local main.
   branch and holds with `--reaped` naming the keepalive the close's attestation reaped, and never
   merges into local main. When the remote answers nothing at all, it holds over the unpublished tip
   under `platform-unavailable`. A `--close` refused on the lander's observation failure takes the
-  same hold. Observed by AC4 and AC8.
+  same hold. The Skill's `While it runs` bullet, which at BASE has the main loop run kit work's
+  `GATE_SELFTESTS=1` bar by hand at `VERIFYING`, names `--close` as where that bar runs under
+  `in-place`, because `gates-green` runs it there. Observed by AC4, AC8 and AC16.
 - **S7** Under `primary`, every verb behaves as at BASE. Observed by AC9.
 - **S8** Arms in `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`,
-  run once at the unit's end under attribution. Observed by AC11.
+  written in this unit's pass and run under attribution at the build's one post-build bar, the run
+  the main loop makes at VERIFYING after the last unit. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -86,7 +89,7 @@ landing that cannot complete ending HELD instead of on local main.
 ### Edges
 
 - **consumes-from** `TOOL-dDerivedDocket-1` — the attributed criterion for the unattended suites this
-  unit runs once at its end: `verdict clean`, with every inherited suite filed.
+  unit's verification reads: `verdict clean`, with every inherited suite filed.
 - **consumes-from** `TOOL-dDerivedDocket-2` — `--prepare`, `--land`, `--carry` and `--prepared`,
   their refusal texts and exit codes, and the definition of a prepared merge, which `gates-green`
   asks `--prepared` about.
@@ -113,7 +116,7 @@ bash {{KIT_DIR}}/unattended.sh --landed <slug>
 ```
 
 The order is forced by one fact: the full-green stamp is written only by a clean, unmoved run
-(`tools/run-gates/run-gates.sh:1855`), so the bar must run on the prepared merge before the close
+(`tools/run-gates/run-gates.sh:1861`), so the bar must run on the prepared merge before the close
 writes a byte, and the push must reuse that stamp rather than pay a second full bar. The lab showed
 the graded merge, its stamp and the push resolving one git dir from the run's own worktree.
 
@@ -129,6 +132,11 @@ touches starts with an entry of `SELFTESTS_OWED_PATHS`, the bar gets `GATE_SELFT
 never, announced, which is the charter's "owed by a DoD only for KIT work" with the kit surface
 declared rather than guessed. Gov declares its kit roots. Nothing here runs the unattended kit's
 own suites, which live in no manifest; `GATE_SELFTESTS=1` runs only held manifest legs.
+
+At BASE the Skill's `While it runs` bullet, the build method's M6 carrier, tells the main loop to run
+the `GATE_SELFTESTS=1` form by hand at `VERIFYING` for kit work, beside the plain bar `--close` runs.
+Under `in-place` that form is this derived term inside `gates-green`, so the bullet names `--close`
+for it and a landing does not pay the self-test bar twice. Under `primary` the bullet is unchanged.
 
 A refusal of the precondition is a numbered failure, never an unmet item. An unmet `gates-green`
 invites an override, and an override here would land an ungraded merge. The refusal is keyed on
@@ -178,10 +186,39 @@ committed and the close wrote nothing, so the branch push and the hold are all t
 
 ### Where the text goes
 
-The protocol stands at 57,815 of its 61,440-byte cap at BASE, and HELD's two rows land first. §6 is
+The protocol stands at 60,324 of its 61,440-byte cap at BASE, 1,116 bytes of headroom, and the
+build's declared additions do not sum under that figure. So this unit lands NET ZERO OR NEGATIVE on
+that carrier and spends none of the shared headroom: it FUNDS its own growth by trimming. §6 is
 rewritten in place, not appended to: the two-anchor paragraph stays for the derived-terminal unit,
-the lander paragraph becomes the four-step sequence, and anything past a net growth of 400 bytes
-moves to the companion guide. The Skill's Close section gains the prepare step above its command,
+and the lander paragraph becomes the four-step sequence. That rewrite's GROSS growth is at most 280
+bytes, and anything past that moves to the companion guide.
+
+§8's key table gains one row each for `LANDER_MODE` and `SELFTESTS_OWED_PATHS`, at most 239 bytes
+together. The rows are OWED and not optional: check 22 of `tools/unattended/check-unattended.sh`
+joins that table against `tools/unattended/.unattended.conf.example` and reds on a key declared in
+one and missing from the other, so a unit that ships a key without its row reds the bar. A key-table
+row cannot overflow into a companion the way §6's prose can, so the rows are the FIXED half of this
+unit's growth and the §6 ceiling is the half that gives way — it is 120 bytes lower here than this
+spec carried before the rows were priced.
+
+The passages this unit trims, named precisely so that no sibling unit trims the same text:
+
+- §6's closing rationale paragraph, `tools/unattended/PROTOCOL.template.md:433-435`, opening
+  "Listing two anchors without ordering them", 265 bytes. The ordering RULE above it stays where it
+  is; the paragraph arguing WHY the order is a rule moves to `UNATTENDED-STOPS.md`, the companion
+  this unit's landing text already overflows into, which draws on its own cap.
+- §7's second paragraph, `tools/unattended/PROTOCOL.template.md:443-445`, opening "The move was a
+  BYTE decision and is recorded as one", 274 bytes. It is the kit's own history of an earlier
+  externalisation rather than a rule any run follows, so it moves to `tools/unattended/README.md`,
+  the kit README, which carries no size row in `tools/template-size-limits.txt` and owns kit prose.
+  Neither moved passage carries a kit-path literal, so the shipped-surface ban does not move either.
+
+That is 539 bytes trimmed against at most 519 added — 280 for §6's rewrite and 239 for the two §8
+key-table rows — so the protocol and its template each end this unit's pass no larger than they
+began it. AC16 reads both files' sizes at the pass rather than
+trusting this arithmetic, and reds if either GREW. No cap is raised here: raising one is an owner
+turn, and the other units of this build draw on the same 1,116 bytes, which this unit leaves intact.
+The Skill's Close section gains the prepare step above its command,
 and its Land section carries both modes, because the Skill is one render shared by every adopter
 and the mode is a conf value.
 
@@ -190,7 +227,8 @@ and the mode is a conf value.
 `tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/SKILL.template.md` · `tools/unattended/PROTOCOL.template.md` · the companion guide
-template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` · the rendered guides
+template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
+`tools/unattended/README.md`, which receives §7's trimmed paragraph · the rendered guides
 and Skill.
 
 ### Alternatives rejected
@@ -219,10 +257,11 @@ and Skill.
   leg. The derived term `SELFTESTS_OWED_PATHS` can under-declare a kit root; the kit gate reds a
   declared path that resolves to nothing, not one that is missing; AC13 compares gov's own list
   against the kit roots the tree declares.
-- testing — driver and kit-gate arms over a scratch repository with a bare remote, each staged RED,
-  run once at the unit's end under attribution.
+- testing — driver and kit-gate arms over a scratch repository with a bare remote, each staged RED
+  in the pass, and run under attribution at the build's one post-build bar.
 - migration — adopters stay `primary` until their own deployer builds adopt the in-place lander.
-- user docs — the Skill's Close and Land sections, protocol §6 and the conf example's two keys.
+- user docs — the Skill's Close and Land sections and its `While it runs` bullet, protocol §6 and
+  the conf example's two keys.
 
 ## 6. Acceptance criteria
 
@@ -246,6 +285,8 @@ and Skill.
   section lacks `--prepare` or `--land`, or names local main as a merge target, it reds; the shipped
   render passes, and the skill-wiring check reds a render that drifted from its template.
   Red when: the arm reads a section the render never emits, so it passes over nothing.
+  permission: the staged-break render is the pass's own direct check; the shipped render and the
+  skill-wiring check are gate legs, so both are observed at the build's one post-build bar.
 - **AC5** — When `--preflight` runs under `in-place` with a lander stub that exits 2 on `--carry`, it
   refuses naming `LANDER_MODE`, and so does a stub that exits 2 on `--prepared`. With a stub exiting
   1 on both, it proceeds. With a stub exiting 3 on either, it refuses naming the observation and not
@@ -263,11 +304,14 @@ and Skill.
   push and a `--hold` under `platform-unavailable` that passes `--reaped`. That includes the case
   where the branch push fails. The rendered Skill documents the same next act for a `--close`
   refused because `--prepared` exited 3. No rendered sentence in the Land section directs a merge
-  into local main.
+  into local main. The rendered `While it runs` bullet names `--close` as where an `in-place` run's
+  `GATE_SELFTESTS=1` bar runs.
   Red when: the fallback text survives from the primary path, which lands through local main; or
   the Land section gives a failed branch push no next act; or the Land section's `--hold` omits
   `--reaped`, so the HELD unit refuses the run at its only ending; or a close refused on the
-  lander's observation failure has no documented next act, so S6's route exists only in this spec.
+  lander's observation failure has no documented next act, so S6's route exists only in this spec;
+  or that bullet still sends an `in-place` run's main loop to run the `GATE_SELFTESTS=1` bar by hand
+  at `VERIFYING`, so kit work pays the self-test bar twice.
 - **AC9** — When `LANDER_MODE` is blank, `--close` and `gates-green` over the fixture produce the
   BASE driver's output and exit, including no commit and no carry probe.
   Red when: an in-place branch runs in primary mode.
@@ -276,8 +320,8 @@ and Skill.
   does not; and in both cases it shows `GATE_FULL=1`.
   Red when: the term is exported unconditionally or never; or `GATE_FULL=1` is not exported, so
   gov's guarded manifest grades the landing merge by guard, which is the i28 and i29 shape.
-- **AC11** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+- **AC11** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
   its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
@@ -286,7 +330,12 @@ and Skill.
   pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
   filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
-  permission: the brief lists this unit among those allowed to run the unattended suites.
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the
+  last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
+  made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
+  carries no leg for these suites at any flag setting. This folds the conservative reading of
+  the parked ruling conflict and decides nothing.
 - **AC12** — When `--close` runs under `in-place` over a prepared merge with one untracked file in
   the tree, `gates-green` refuses with a numbered message naming the stamp precondition, and no bar
   runs.
@@ -304,6 +353,8 @@ and Skill.
   repository that dogfoods it while every fixture criterion stays green; or the key is blank or
   misses a kit root, so an in-place landing of kit work runs without `GATE_SELFTESTS=1`, the kit DoD
   `AGENTS.md` states.
+  permission: the leg runs over the real tree rather than a fixture, so it is observed at the
+  build's one post-build bar.
 - **AC14** — When `grep -c 'verb here commits' tools/unattended/PROTOCOL.template.md` runs, it
   prints 0 (1 at BASE, where the premise wraps after `because no`), and so does
   `grep -c 'NO driver verb commits' tools/unattended/unattended.sh`; the rotation paragraph still
@@ -315,13 +366,37 @@ and Skill.
   re-prepared merge, and `git status --porcelain` is empty.
   Red when: step 4 commits unconditionally, so the re-close refuses on an empty commit after
   `gates-green` has already paid a full bar, and both documented re-prepare paths wedge.
+- **AC16** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
+  build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
+  parent's and is below the 61440-byte guide cap declared in
+  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  `tools/unattended/PROTOCOL.template.md`. Both trims are taken and both landed:
+  `grep -c 'Listing two anchors' tools/unattended/PROTOCOL.template.md` and
+  `grep -c 'The move was a BYTE decision' tools/unattended/PROTOCOL.template.md` each count 1 at the
+  parent and 0 at the build commit, the first paragraph's text is present in `UNATTENDED-STOPS.md`
+  and the second's in `tools/unattended/README.md`. Both owed key-table rows arrived:
+  `grep -c 'LANDER_MODE' tools/unattended/PROTOCOL.template.md` and
+  `grep -c 'SELFTESTS_OWED_PATHS' tools/unattended/PROTOCOL.template.md` each count 0 at the parent
+  and 1 or more at the build commit. The companion guide `UNATTENDED-STOPS.md`, which receives the
+  first trimmed paragraph and this unit's landing overflow, is read the same way at the build commit
+  and is below the same 61440-byte guide cap.
+  Red when: §6 is appended to rather than rewritten in place, so the paragraph this unit replaces
+  survives beside its successor and one unit spends the 1,116 bytes the build's units share; or the
+  size is read against the figure written in this spec rather than against the parent commit, so a
+  sibling's landing hides this unit's overspend; or the trim is taken and the text lands in no
+  destination, which DELETES a rule's reasoning rather than moving it; or the cap is raised to make
+  the edit fit, which is an owner turn and not this unit's; or a conf key this unit declares in
+  `tools/unattended/.unattended.conf.example` reaches §8's key table in no row, which reds check 22
+  of `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
+  protocol lands in a carrier nobody reads the size of.
+  permission: a read, a byte count and four greps, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `pass-order history` · `memory hygiene` · `kit version markers` · `line length` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a fixture branch green alone and red once merged onto a moved tip, and a lander stub whose carry probe exits 1 · none
-New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `--prepare`, and an invalid `LANDER_MODE` · none
+New arm: `tools/unattended/unattended.test.sh` · a fixture branch green alone and red once merged onto a moved tip, and a lander stub whose carry probe exits 1 · the driver suite's executed-assertion floor
+New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `--prepare`, and an invalid `LANDER_MODE` · the leg suite's executed-assertion floor
 
 ## 8. Open questions
 
@@ -380,6 +455,47 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
     consumes-from edge to unit 1 is updated.
   - G5 round-2 H1 (21, 36, 52), unit-3 end: §3 hands-off 34 names the in-place sequence the
     switch-over's landing reconcile runs before `--prepare`.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). Line citations moved with the landed
+  code: S3's stamp condition to `run-gates.sh:1861-1863`, and §4's to `:1861`, after
+  aRatifiedRulings added the no-ceiling kill branch; S5's driver comment to `unattended.sh:1680-1681`
+  and its test comment to `unattended.test.sh:2484`. §4 Where the text goes reads the protocol at
+  60,324 bytes, after fact 13, three conf rows and a longer cutoff row landed, and bounds this
+  unit's growth by what HELD's rows leave. aDeferredBar's Skill bullet has the main loop run the
+  `GATE_SELFTESTS=1` bar by hand at `VERIFYING` for kit work, so S6, §4 `gates-green`, §5 user docs
+  and AC8 name `--close` for that bar under `in-place`. AC11's unit-end suite run meets
+  aDeferredBar's M6 rule and `gate-guard.js` refusal before `VERIFYING`, which contradicts owner
+  rulings D12-h and D12-i8; that is reported to the orchestrator, and AC11 is unchanged. §10
+  describes the new base.
+  Extended 2026-09-20, regrounding consolidation, folding the conservative reading of that parked
+  conflict and not deciding it. AC11 now reads the attributed run at the build's one post-build
+  bar, the run the main loop makes at VERIFYING after the last unit, and S8, the §3 consumes-from
+  edge and §5 testing follow it; AC4 and AC13 gain `permission:` lines separating the pass's
+  staged-break checks from the leg runs over the real tree. §4 states the 400-byte MAXIMUM this
+  unit adds to the protocol and new AC16 reads the file's size at the pass against the 61440-byte
+  guide cap; no cap is raised. Re-priced to NET ZERO on the same date, on the orchestrator's
+  ruling that a unit adding bytes to a capped carrier funds them itself: §4 now names the two
+  passages this unit trims — §6's closing rationale paragraph, 265 bytes, to `UNATTENDED-STOPS.md`,
+  and §7's second paragraph, 274 bytes, to `tools/unattended/README.md` — and AC16 reds if either
+  carrier grew against this unit's parent commit rather than allowing 400 bytes of growth.
+  Both §7 `New arm:` lines name their suite's executed-assertion
+  floor instead of `none`, because `tools/unattended/unattended.test.sh` and
+  `tools/unattended/check-unattended.test.sh` each pin one. AC14's two greps were re-run at
+  fb07ca25 and count 1 each, so neither is a could-not-fail phrase.
+  Extended again on 2026-09-20, closing pass. The orchestrator ruled that a unit declaring a conf
+  key owes that key a §8 key-table row, because check 22 reds without one, so §4 now prices the
+  `LANDER_MODE` and `SELFTESTS_OWED_PATHS` rows at 239 bytes inside the same 539-byte trim and drops
+  §6's rewrite ceiling from 400 to 280 to pay for them — a key-table row cannot overflow into the
+  companion guide and §6's prose can. AC16 witnesses both rows arriving and reds on a declared key
+  that reaches no row, and reads the companion guide's own size at the pass, which is what a
+  carrier with more than 2048 bytes free owes under the same ruling. The orchestrator also ratified
+  Rule 1's narrow reading, under which a gate
+  leg's command over a FIXTURE or a staged break stays in the unit pass and the same command over
+  the real or rendered tree defers, so AC3's and AC4's lines stand as written and nothing moved.
+  Closing verifier, same pass and rev: the `permission:` line of the criterion that reads the
+  attributed run now names that run in the orchestrator's own terms, because
+  `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
+  `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
+  post-build bar" alone would have read as a bar that covers them.
 
 ## 10. Reuse audit
 
@@ -395,6 +511,19 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
   within a few lines of BASE's, and its check-26 criterion names a check that grades verbs (F2).
   The DECISIONS clause of TOOL-dClosedLexicon-11, 'no verb here commits', is superseded for
   `in-place`. The archive name's derivation is unchanged.
+- BASE is `fb07ca25`, the origin/main tip this branch merged; the spec was written at `abac6d59`.
+  The lander and the pre-push hook are byte-identical between the two, `gates-green` still runs
+  `$GATE_CMD` through `run_bounded` inside `--close`, TOOL-dUnstalledConvoy-24 is still OPEN, and
+  AC14's two greps still print 1 each. Nothing on main adds `LANDER_MODE`, `SELFTESTS_OWED_PATHS` or
+  a committing close. What moved: the driver grew by 280 lines (aDeferredBar's `run-branch` fact,
+  aProbedUnit's `--audit` and bound keys), so the cited driver and test lines moved; the
+  protocol render is 60,324 bytes; the Skill gained the `While it runs` bullet this unit qualifies,
+  the `--audit` keepalive tick and the resume kickoff step, none of which touches the Close or Land
+  sections. `tools/unattended/gate-guard.js` denies `run-unattended-gates.sh` at command position
+  while the branch's run record is before `VERIFYING`, which reached AC11's run at the unit's end
+  before the 2026-09-20 consolidation moved it to the build's one post-build bar;
+  the driver's own `GATE_FULL=1` export inside `--close` is not a tool-call command and is not
+  seen by the hook.
 - M12 was not reached: the owner ratified the mechanism and the lab measured it.
 - Recall terms used: `push-main lander in-place landing merge remote-tip carry-set foreign-commit
   pre-push marker full-green-stamp reconcile local-main`

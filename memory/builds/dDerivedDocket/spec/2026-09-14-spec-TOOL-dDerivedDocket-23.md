@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-23 — red attribution, report-only
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 23
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -17,7 +17,8 @@
 
 A red bar names which legs failed and never whose failure each one is. Five recorded stops were a
 run deciding, with no owner to ask, that a red "was not mine" (i12, i69, i93, i100 and i152), and at
-least two such claims were wrong: the reds at `aStagedLane/RUN.md:51` and `dCarriedReceipt/RUN.md:89`
+least two such claims were wrong: the reds at `memory/builds/aStagedLane/RUN.md:51` and
+`memory/builds/dCarriedReceipt/RUN.md:89`
 were the run's own. Give the runner an attribution mode that re-runs each red leg at a base R the run
 cannot rewrite, classifies it OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE by the rules the design
 critique hardened (KF14, KF3), and REPORTS. No exit code changes; the policy that acts on a verdict is
@@ -127,10 +128,10 @@ For a red leg with output O_L at L, run at R to O_R and exit rc_R:
 1. **OWN, forced** — the diff between R and the working tree touches a KF3 path. Every red, a
    timed-out one included, because a run that edited the grader cannot vouch for any of its verdicts.
 2. **CONTENDED** — the leg's recorded attempt ended with its ceiling FIRED: rc 124 with a positive
-   bound in its `.bound` file, or rc 137 whose `.sec` is at or above that bound, which is
-   `timeout -k`'s kill after an ignored TERM. Read from the attempt record, so a later retry pass that keeps the
-   first attempt's row keeps this reading. Not re-run. Any other rc 137 is a failure like any other and
-   goes on to rule 3.
+   bound in its `.bound` file, or rc 137 under a positive bound whose `.sec` is at or above it, which
+   is `timeout -k`'s kill after an ignored TERM. Read from the attempt record, so a later retry pass that keeps the
+   first attempt's row keeps this reading. Not re-run. Any other rc 137, a bound of 0 included, is a
+   failure like any other and goes on to rule 3.
 3. **OWN** — the leg has no row in R's manifest; or its `argv` at L differs from R's, the line naming
    `argv`; or the diff between R and the working tree touches its COMPARATOR: every tracked file under
    the directory that holds a tracked file of the leg's argv or of R's `signature` argv, plus every
@@ -179,11 +180,11 @@ check lists, the key being the offender key the check names — a path, an id, o
 locator or a count, and exits as the default mode does. No mode changes the default output of its
 checker.
 
-**Why not the existing `--list` modes** (measured at BASE `abac6d59`).
+**Why not the existing `--list` modes** (measured at `abac6d59`, re-run at BASE fb07ca25).
 `python tools/lexicon/lexicon.py --list` prints every offender keyed `path:line:`, per-cell `.conv`
 summary rows with population and teeth counts, the totals `graded=… offenders=…`, `armed … of …`
 and `… tracked file(s)`, and cuts `.conv` violations and the over-pin re-list at 40
-(`tools/lexicon/lexicon.py:2745-2802`). `bash tools/check-install-prefix.sh --list` opens with a
+(`tools/lexicon/lexicon.py:3267-3324`). `bash tools/check-install-prefix.sh --list` opens with a
 `hit(s) over … shipped files` header and keys hits by `path:line`. One added function or line
 anywhere shifts a key, so both legs would read MIXED on almost every branch, and the 40-row cut can
 hide a new offender behind a fixed one: the unsound direction F2 names.
@@ -204,7 +205,10 @@ the drift report's offender emitter. The manifest key `signature`; the run-recor
 `tools/drift-audit/selftest.py` · `tools/memory-tree/check-memory-hygiene.sh` ·
 `tools/memory-tree/check-memory-hygiene.test.sh` · `tools/lexicon/lexicon.py` ·
 `tools/lexicon/selftest.py` · `tools/lexicon/README.md` · `tools/check-install-prefix.sh` ·
-`tools/check-install-prefix.test.sh` · `tools/run-gates/README.md` · the run-gates dossier.
+`tools/check-install-prefix.test.sh` · `tools/run-gates/README.md` · the run-gates dossier ·
+`memory/map/generated/symbols.json`, regenerated and staged in the commit that adds the offender
+emitters, because the pre-commit codebase-map leg refuses a staged `.py` whose map is stale or
+whose regenerated artifacts are unstaged.
 
 ### Alternatives rejected
 
@@ -245,10 +249,13 @@ the drift report's offender emitter. The manifest key `signature`; the run-recor
   offender at R and at L that one plus one more, the leg reads `MIXED · inherited 1 · own 1`; when L
   fixed R's offender and added two others, it reads `MIXED · inherited 0 · own 2`.
   Red when: offenders are compared as counts, so the second fixture reads one inherited and one own.
-  permission: the canary is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC2** — When the fixture branch edits the red leg's checker file, the leg reads `OWN` naming its
   comparator, even though it is red at R too.
   Red when: the comparator clause is dropped, so a checker the branch rewrote reads INHERITED.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC3** — When the fixture leg's argv file does not exist at R, its line reads `DEAD PROBE` and the
   summary reads `attributed 0 of 1 red legs`; when its L output normalises to nothing with a non-zero
   exit, it reads `DEAD PROBE` as well; and `<git-dir>/gate-run/<id>/attribution` holds one
@@ -257,30 +264,46 @@ the drift report's offender emitter. The manifest key `signature`; the run-recor
   Red when: a leg that cannot run at R is read as an empty set, so it reads INHERITED; or the runner
   prints its `GATE attr` lines and writes no record, or writes the columns in another order, so every
   reader finds no attribution and `land` never engages.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC4** — When a fixture leg without a signature fails with byte-identical normalised output at L and
   R it reads `INHERITED`; when L's output gains one line and its FAIL line is unchanged, it reads
   `MIXED`.
   Red when: the no-signature rule compares FAIL lines only, so the new line passes unseen.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC5** — When the fixture diff between R and L touches `tools/run-gates/run-gates.sh`, a red that
   is identical at both ends reads `OWN` with the KF3 reason.
   Red when: the forced reading is dropped, so an edited classifier can grade its own red INHERITED.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC6** — When the shipped canary runs over a manifest row carrying `signature`, it passes; over one
   carrying a near-miss spelling of it, it reds; `tools/gate-legs.json` declares the key on exactly the
   four S3 legs.
   Red when: the pinned key set is not widened, so every real manifest reds the canary.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC7** — When `.githooks/pre-push.test.sh` drives the hook with a fake runner that prints its
   environment, `GATE_ATTRIBUTE` equals the remote sha fed on the hook's stdin, and the hook's exit
   equals the runner's.
   Red when: the hook exports its own local sha, which attributes a red against the tree that has it.
+  permission: the hook suite is the held `pre-push self-test` leg, so it runs at the build's
+  one post-build bar, spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
+  never a plain bar.
 - **AC8** — When the baseline unit's `--attribute` arms in `tools/run-gates/run-selftests.test.sh` run
   after S7, every one of them passes unedited, and `run-selftests.sh` holds no second copy of the
   normaliser.
   Red when: the lift changes the normaliser those arms were written against, or leaves a copy behind.
-  permission: the suite is a held kit leg; it runs at the build's one post-build bar.
-- **AC9** — Replays of the reds recorded at `aStagedLane/RUN.md:51` and `dCarriedReceipt/RUN.md:89`,
+  permission: the suite is the held `run-selftests self-test` leg, so it runs at the build's
+  one post-build bar, spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
+  never a plain bar.
+- **AC9** — Replays of the reds recorded at `memory/builds/aStagedLane/RUN.md:51` and
+  `memory/builds/dCarriedReceipt/RUN.md:89`,
   rebuilt as two-commit fixtures from the records' own descriptions, both read `OWN`.
   Red when: either replay reads INHERITED, which is the claim those runs made and got wrong.
   fixture: the replays are reconstructions from prose records; the tree holds neither original state.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC10** — When the fixture branch rewrites its red signature leg's `signature` in its own
   manifest, once to print one constant line and once to a wrapper that drops the branch's new
   offender from the real list, while that offender stands, the leg reads `MIXED` both times; a leg
@@ -288,19 +311,22 @@ the drift report's offender emitter. The manifest key `signature`; the run-recor
   whose `argv` differs between R and L reads `OWN` naming `argv`.
   Red when: S(L) is computed from L's row, so the constant-line signature equals S(R), reads
   INHERITED, and lands the run's own red under the policy unit's `land`.
-  permission: the canary is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC11** — When the fixture branch edits a helper module beside its red leg's checker so the
   checker hides the branch's new offender, and separately edits a root conf whose name the checker's
   bytes carry, the leg reads `OWN` naming the comparator both times.
   Red when: the comparator is the argv file alone, so a helper edit that hides the run's own
   offender reads INHERITED.
-  permission: the canary is held; it runs at the build's one post-build bar.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC12** — When each of the four declared `signature` argvs runs on the real tree, every stdout
   line is TAB-separated, carries no `:<digits>:` locator, and no line has a summary shape — a bare
   count, a colon-terminated header, a line beginning `… and`.
   Red when: a declared signature prints a count or a locator, so one unrelated insertion puts a
   line in S(L) that S(R) lacks and the leg reads MIXED on every branch.
-  permission: the arm lives in the held canary and runs at the build's one post-build bar; its
+  permission: the arm lives in the held canary, so it runs at the build's one post-build bar,
+  spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar; its
   staged break declares `python tools/lexicon/lexicon.py --list` as the lexicon row's signature in a
   scratch copy.
 - **AC13** — When `lexicon.py --offenders` and `check-install-prefix.sh --offenders` run over a
@@ -311,7 +337,8 @@ the drift report's offender emitter. The manifest key `signature`; the run-recor
   Red when: a key carries a line number or the mode truncates, so the unrelated insertion reads
   MIXED or a new offender past the cut reads INHERITED.
   permission: `lexicon selftest`, `install-prefix self-test`, `drift-audit selftest` and
-  `memory-hygiene self-test` are held kit legs; they run at the build's one post-build bar.
+  `memory-hygiene self-test` are held kit legs, so they run at the build's one post-build bar,
+  spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC14** — When the fixture bar's red legs are one that timed out at 124 under a positive bound,
   one whose argv changed between R and L, one absent from R's manifest, one green at R, one whose R
   copy runs past its ceiling, and one signature leg with a non-empty S(L) ⊆ S(R), their lines read
@@ -320,17 +347,19 @@ the drift report's offender emitter. The manifest key `signature`; the run-recor
   resolve, every red reads `DEAD PROBE` and the summary names the unresolvable R.
   Red when: any one rule is deleted and its leg falls through to a later one — a CONTENDED leg
   re-run at R, or a changed argv compared as though unchanged and read INHERITED.
-  permission: the canary is held; it runs at the build's one post-build bar.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC15** — When a fixture bar's wall fires while its attribution pass is re-running a red leg at
   R, that leg's `GATE attr` line reads `DEAD PROBE` with the reason `cut by the wall`, the summary
   counts it, and the runner exits within the wall plus its watcher's kill window.
   Red when: the pass runs after `remove_wall_watcher`, so the runner outlives its own wall and the
   driver's backstop kills it as never-returned.
-  permission: the canary is held; it runs at the build's one post-build bar.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates evidence` · `pre-push self-test` · `run-selftests self-test` · `drift-audit selftest` · `memory-hygiene self-test` · `lexicon selftest` · `install-prefix self-test` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates evidence` · `pre-push self-test` · `run-selftests self-test` · `drift-audit selftest` · `memory-hygiene self-test` · `lexicon selftest` · `install-prefix self-test` · `govkit selfcheck` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `kit version markers` · `memory hygiene` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/run-gates.test.sh · a two-commit fixture with a signature leg, a comparator edit, a leg absent at R, a KF3 touch and an L-only signature rewrite · the canary's executed-assertion floor, raised by the arms added
 New arm: .githooks/pre-push.test.sh · a fake runner printing its environment · none
@@ -393,6 +422,54 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   kit's shipped bytes owning that kit's one version move: S9 names unit 13, whose S11 makes the
   drift-audit move, in place of unit 21, which keeps lexicon; run-gates and memory-tree keep their
   owners, and S9 stays NOT OBSERVED here.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §4 rule 2 now reads the rc-137 half
+  of the fired-ceiling predicate as "under a positive bound", and sends a bound-0 rc 137 on to rule
+  3, because TOOL-aRatifiedRulings-4 gave `report_one` a `(killed after <s>s)` tail for a kill with
+  no bound in play, where a `.sec` at or above a zero bound would otherwise read CONTENDED; unit 26
+  S1 spells the predicate identically. §4's reason against the `--list` modes was re-run at
+  fb07ca25 and still holds, its lexicon citation moving to lines 3267 to 3324. §4 Files touched
+  gains the regenerated `memory/map/generated/symbols.json`, which dUnstagedSymbol's pre-commit leg
+  now refuses stale or unstaged when a `.py` is staged. §10's BASE paragraph describes fb07ca25. No
+  S-item landed on main. S9's owners are unchanged under the orchestrator's version decision: units
+  1, 13 and 21 change those kits before this unit, and unit 36 keeps memory-tree. §7 gains
+  `codebase-map coverage + freshness`, which dUnstagedSymbol's pre-commit leg now runs on any
+  commit staging a `.py`, so the offender emitters' commit is graded on it before the bar is.
+  Extended 2026-09-20, same base, by the build-wide consolidation pass. Every criterion whose
+  observation is a held `.test.sh` suite or a merge-bar leg command now carries a `permission:`
+  line placing that run at the build's one post-build bar, so AC2 to AC7 and AC9 read as AC1,
+  AC8 and AC10 to AC15 already did; the asymmetry was uneven annotation, not a different
+  permission. That folds the CONSERVATIVE reading of BUILD-METHOD M6 and
+  `tools/unattended/gate-guard.js`, which deny a suite before VERIFYING; the ruling conflict
+  behind it is parked for the owner in this build's `RUN.md` and is not decided here. §7's four
+  `New arm:` third fields were re-read against each named suite: only
+  `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh` pin an
+  executed-assertion floor and this unit names neither, so the three `none` fields are right and
+  the canary row is unchanged. This unit writes to no byte-capped carrier. §7 also gains `govkit selfcheck`, the leg that
+  grades the declared tooling population in both directions: §4 Files touched has named
+  `tools/run-gates/kit.toml` and the new `lib-attribute.sh` since rev-1, and units 13 and 21 both
+  name that leg for the same reason, so its absence here was an omission and not a scope line.
+  Extended again 2026-09-20, same base, by the closing consolidation pass. The two sibling run
+  records this spec cites are respelled from the build root, `memory/builds/aStagedLane/RUN.md:51`
+  and `memory/builds/dCarriedReceipt/RUN.md:89`, in §1 and in AC9: a build-folder-relative
+  shorthand is not a tracked path, so `tools/check-spec-tokens.py` skipped those two citations
+  rather than grading them, and unit 31 respelled its own equivalents at rev-3 for that reason.
+  Both lines were re-read at HEAD and carry what they are cited for. The unit's carrier finding is
+  unchanged: it writes no byte-capped carrier, so the build's net-zero rule reaches nothing here.
+  The header date moves to the last-change date under the build-wide date convention; the rev
+  does not move, because this pass changed no rule, criterion or scope item.
+  Closed 2026-09-20, same base, by the last consolidation pass before the spec audits re-run.
+  The orchestrator's ruling that a HELD leg is not covered by a plain bar is applied to every
+  `permission:` line of §6: each one deferring to the build's one post-build bar now spells that
+  run `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, so no later reader takes a held
+  leg for a leg a plain bar runs. Two lines that said only "a held kit leg" now NAME the leg,
+  `pre-push self-test` on AC7 and `run-selftests self-test` on AC8, because a reader cannot check
+  a held claim against `tools/gate-legs.json` without the name. The narrow reading of rule 1 was
+  applied and moved nothing here: every criterion of this unit observes through a suite FILE
+  invocation carrying no read-only verb, which defers wherever it runs, and none runs a leg's own
+  command over a fixture or over the real tree. The carrier finding is unchanged: this unit writes
+  no byte-capped carrier, so the net-zero rule and its 2048-byte scope reach nothing here. The
+  header date stays at the last-change date and the rev does not move, because this pass changed
+  no rule, criterion or scope item.
 
 ## 10. Reuse audit
 
@@ -404,10 +481,15 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   `.bound` files in the run record, the shipped canary's pinned key set (`KNOWN` in
   `tools/run-gates/run-gates.test.sh:99`), the eighth wire field after `ceiling`, and the baseline
   unit's normaliser and worktree runner, which S7 lifts rather than re-spells.
-- **DR against BASE.** DR places the attribution at `GATE_LEGS` (`tools/run-gates/run-gates.sh:91`);
-  BASE agrees that the runner reads one manifest path, so R's row is read by `git show` rather than
-  by re-pointing that variable. DR's KF3 list names "the attribution module", which does not exist at
-  BASE; S7 creates it, so the list has a file to name.
+- **DR against BASE fb07ca25.** DR places the attribution at `GATE_LEGS`
+  (`tools/run-gates/run-gates.sh:91`); BASE agrees that the runner reads one manifest path, so R's
+  row is read by `git show` rather than by re-pointing that variable. DR's KF3 list names "the
+  attribution module", which does not exist at BASE; S7 creates it, so the list has a file to name.
+  Between `abac6d59` and fb07ca25 the runner moved only in its version pair and in `report_one`'s
+  rc-137 tail, below every line this spec cites, and the canary's `KNOWN` set, `.githooks/pre-push`,
+  `run-selftests.sh`, `gate-fingerprint.sh`, the drift report and `check-install-prefix.sh` did not
+  move. The lexicon grew above its list-mode block, whose output shape is unchanged, and
+  `read_gate_verdicts` still matches only the runner descriptor's declared prefixes.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: inherited-red attribution OWN INHERITED MIXED signature normaliser re-run base
   scratch-worktree dead-probe comparator pre-push — passed as `--terms` with the question "how should

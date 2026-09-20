@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-6 — ask parser and status fold
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -242,7 +242,10 @@ past them rather than taking a separate namespace unit 36's README drift arm wou
 
 `backlog.py` (new) · `tools/memory-tree/gen_build_index.py` (`parse_spec` gains the two keys, and
 its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.example` ·
-`tools/memory-tree/kit.toml` (two optional keys) · `memory/HYGIENE.md` is NOT touched here.
+`tools/memory-tree/kit.toml` (two optional keys) · `memory/map/generated/` (re-rendered by
+`python tools/codebase-map/gen_map.py --write` and staged in the pass commit, because the pre-commit
+fast leg runs the codebase-map gate on a staged `.py` and refuses a stale or unstaged artifact) ·
+`memory/HYGIENE.md` is NOT touched here.
 
 ### Alternatives rejected
 
@@ -291,6 +294,9 @@ its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.e
   lists; `closes 2x`, a second `closes`, and one id under both verbs each refuse naming the file.
   Red when: a malformed value is dropped silently, so the spec renders with no link and its ask
   never closes.
+  cost: the `build-index selftest` leg's declared `ceiling` sits above the direct-check bound the
+  unattended kit's gate-guard suite grades, so this flag run is the pass's most expensive direct
+  check; each refusal can also be observed by calling `parse_spec` on a scratch fixture spec.
 - **AC4** — When `backlog.py --selftest` folds one fixture per rule R1 to R7, each ask derives that
   rule's token and its Decided-by names the evidence; an ask with a CLOSED row and a live closing spec
   derives CLOSED; one with CLOSED and WONTDO evidence derives CLOSED; an ask whose only hold is a
@@ -338,7 +344,7 @@ its selftest calls this module's arms) · `tools/memory-tree/.memory-tree.conf.e
 
 ## 7. Gates
 
-`build-index selftest` · `memory hygiene` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `memory hygiene` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness`
 
 New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rule and verdict staged into in-memory fixtures by this module's arms · none; the leg's ceiling moves only if its evidenced maximum does
 
@@ -385,6 +391,36 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · every shape, rul
   entry.
 - rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L8 (17): AC4 stages a DEFERRED hold whose `until`
   target folds CLOSED and names R6 in its Red-when; S6 says both rules are staged.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §4 Files touched names the codebase-map
+  artifacts and §7 gains `codebase-map coverage + freshness`, because dUnstagedSymbol's pre-commit
+  leg (1a774fcd) refuses a pass commit staging `backlog.py` over a stale map. AC3 gains a permission
+  line, because aDeferredBar (1afd26c9) declares `gen_build_index.py --selftest` a flag-form suite
+  above the direct-check bound and build method M6 keeps suites out of a pass. §10 describes the new
+  base. Nothing else moved: the generator, the merge driver and the memory-recall kit are
+  byte-identical to `abac6d59`, so every S-item, seam citation and AC stands. Regrounding
+  consolidation, 2026-09-20: AC3's permission line becomes a cost line. The build-wide rule folded
+  here defers only what the gate-guard hook DENIES — a `.test.sh` or `selftest.py` FILE invocation
+  carrying none of its read-only verbs — plus a gate-leg command, which the owner rule forbids a
+  pass to run by hand; a `--selftest` FLAG on another file stays the direct check build method M6
+  and the unit child prompt name, so deferring it would contradict unit 11 §8 F9. The ruling
+  conflict behind that scope is parked for the owner in the build's `RUN.md`; this pass folds the
+  conservative reading and decides nothing. Also checked and unchanged: no criterion of this unit
+  asserts a phrase counts zero, no `New arm:` line names a suite that pins an executed-assertion
+  floor, and this unit adds text to no capped carrier.
+  Closing consolidation, 2026-09-20: the orchestrator RATIFIED the NARROW reading for the build — a
+  gate leg's own command run over a FIXTURE or a staged break STAYS in the unit pass, that being the
+  direct check `memory/guides/BUILD-METHOD.md` M6 requires; the same command run over the real or
+  rendered tree defers to the one run the main loop makes at `VERIFYING`; and a `.test.sh` or
+  `selftest.py` FILE invocation carrying no read-only verb defers wherever it runs, because the
+  gate-guard hook denies it, while a `--selftest` FLAG on another file is not that shape and stays in
+  the pass — and added a single COST exception, which lands in unit 8 alone, where that leg's declared
+  `ceiling` sits above the per-command bound a pass holds. This leg's does not, so AC3's cost line stands
+  as written and no criterion of this unit moves. The orchestrator also SET the `VERIFYING` run:
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, plus the suite runs it attributes
+  beside the bar. That owes this spec nothing, because no line here defers an observation to a HELD
+  leg — the `build-index selftest` leg is held, but this unit's flag run of it stays in the pass and
+  is observed there. The header date is the last-change date; the rev
+  is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -404,6 +440,17 @@ at BASE there are none — `TOOL-cGradedDebt-2` rewrote them — so S9's fold ma
 straggler branches forked before that commit, which is exactly the population the permanent reader
 exists for. Design §5.2's `CYCLE` placeholder is dropped (§8 F2). No spec header at BASE carries
 `closes` or `advances`, measured by `git grep` over every spec.
+
+BASE is `fb07ca25`, origin/main 210 commits past `abac6d59`, where this spec was written and
+audited. `tools/memory-tree/gen_build_index.py`, `tools/memory-tree/merge-rows.py` and the
+memory-recall kit are byte-identical across the two, so the seams above hold at their cited lines;
+the TOOL shard's one `WITHDRAWN` is still prose inside a CLOSED row and no spec header carries either
+verb, both re-measured at `fb07ca25`. No landed build does any part of this unit. Two landed
+mechanisms bind its pass: the pre-commit codebase-map leg (dUnstagedSymbol), whose class the gotcha
+`memory/gotchas/hand-named-gate-list-green-while-the-bar-reds.md` records, and aDeferredBar's
+declaration of the generator's selftest as a suite by cost, which AC3's cost line records while
+keeping the flag run in the pass, that declaration being about cost and not about what the hook
+denies.
 
 M12 losses are the design's own tested rejections, carried in §4 Alternatives rejected with the
 measurement that rejected each.

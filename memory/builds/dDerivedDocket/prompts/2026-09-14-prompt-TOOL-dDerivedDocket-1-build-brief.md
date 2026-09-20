@@ -10,7 +10,7 @@ is the design. This brief carries the rules every pass shares, so no spec restat
 Build ONE unit, the one named in your prompt. Read this brief and the unit's spec whole before you
 touch code, then read `memory/guides/BUILD-METHOD.md` M6 and M7. Re-verify on the tree every claim the
 spec makes about current code: other units of this build have landed on the branch since the spec's
-BASE `abac6d59`, and a line citation may have moved. Where the spec is wrong, change the spec first,
+`base` (`fb07ca25` for every spec after the regrounding), and a line citation may have moved. Where the spec is wrong, change the spec first,
 as a rev bump with its section 9 line, then write the code.
 
 ## Hard rules
@@ -28,6 +28,9 @@ as a rev bump with its section 9 line, then write the code.
   Every gate runs once, after all units are built. A criterion whose observation IS a gate leg is owed
   to that post-build run, and the orchestrator writes its ledger line then. The pre-commit hook still
   fires on your commit; that is the hook, not a gate you ran.
+- **A fixture run needs the call's own working directory inside the fixture.** `tools/unattended/gate-guard.js`
+  resolves the repository from the tool call's payload working directory, not from a `cd` inside the
+  command, so a fixture suite run made from this tree is judged against this run's phase and denied.
 - **The test file you are writing is the exception**: run it directly, because that is how its refusals
   are staged RED. Two limits apply. Only units 1, 3, 4, 5, 16, 17, 18, 22, 24, 27, 28 and 30 run
   unattended-kit suites, each once at the unit's end: the owner's scoped lift of a standing instruction

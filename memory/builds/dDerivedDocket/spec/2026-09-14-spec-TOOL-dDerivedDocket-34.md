@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling+kickoff · order 34
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 34
 
 <!-- gen:spec-records -->
 
@@ -59,8 +59,9 @@ necessary, so no gate reads a half-switched tree.
   `GENERATED_INDEXES` pairs, one per renderer file. Observed by AC8.
 - **S9** Recall's durable-home pattern admits `builds/<slug>/BACKLOG.md`, the recall cache version
   bumps because extraction changed, and the recall floor is measured before and after the switch.
-  The memory-recall kit version and its README marker move once here. Observed by AC9, AC23 and
-  AC27.
+  The memory-recall kit version and its README marker move once here, as the first unit in build
+  order to change that kit's bytes, to a value above both the one at this spec's base and the one
+  the remote's default branch advertises at this pass. Observed by AC9, AC23 and AC27.
 - **S10** Drift-audit: `backlog_rows_outliving_closed_specs` and its pin retire; the live-rows signal
   is re-pointed at `gen_build_index.py --asks --json` with its watermark re-measured through
   `RATCHETS`; three report-only signals are added, each with a liveness assertion. Under `shards`
@@ -74,7 +75,15 @@ necessary, so no gate reads a half-switched tree.
   `BACKLOG.md` (design §14). Observed by AC11.
 - **S12** The kickoff manifest's claims this commit makes stale are updated in the same commit, and
   its `last-audit` is re-stamped, because the manifest's staged leg refuses a watched-file change
-  without one. Observed by AC12.
+  without one. Two of the four stale claims this spec named at `abac6d59` no longer sit in the
+  manifest: TOOL-aReplayedCard-4 moved those two traps into `memory/gotchas/` records. The same
+  commit qualifies each of those records as holding under shards mode only, because a claim this
+  commit makes stale stays stale in its new home. `memory/guides/SESSION-KICKOFF.md` is capped by
+  its CLASS in `tools/memory-tree/check-memory-hygiene.sh` rather than by a
+  `tools/template-size-limits.txt` row — 61440 bytes and 750 lines for a guide, against 20057 and
+  248 at `fb07ca25`, unmoved at HEAD — so net zero does not bind it and this unit does not claim
+  it: these edits and the re-stamp are DECLARED at no more than 600 bytes together, which AC12
+  reads at this unit's commit rather than trusting. Observed by AC12.
 - **S13** Four breaks are staged on the real tree after the switch-over commit, each confirmed RED and
   then removed: V1, the view's data-loss guard, V10 and V13. Observed by AC13.
 - **S14** The straggler inventory is taken over every local and remote-tracking ref before the write,
@@ -84,7 +93,14 @@ necessary, so no gate reads a half-switched tree.
   repository shaped as the landing and against the current remote tip. The landing merge is a
   transition whenever the tip's lineage carries a shards-mode backlog commit since the fork (unit 9
   S3's predicate), and the rows main gains during the build, with the triage its finished builds now
-  owe, must be carried across it. Observed by AC15, AC20, AC24, AC25 and AC28.
+  owe, must be carried across it. The reconcile also re-checks every kit version this build moved
+  against the tip and moves any the tip has reached above it (§8 F17). THE POPULATION IS EVERY KIT
+  THIS BUILD MOVED, not the one this unit moved: memory-recall and the rest at this unit's own
+  order, the review harness at order 29, whose `meta.version` and both `gov:kit` markers on
+  `tools/workflows/tier2-review.js` that unit moves once, and memory-tree at order 36. The reconcile
+  iterates the carriers `tools/check-kit-versions.sh` names, so a kit added to the build after this
+  spec was written is carried without editing this bullet. Observed by AC15, AC20, AC24,
+  AC25, AC28 and AC29.
 - **S16** The per-id status report: after the switch, each id's derived status equals the status the
   planner's per-id report predicts under the signed tables. The two writes outside the
   prediction, S11's disposal and S17's triage ask, are named exceptions. Observed by AC3.
@@ -104,8 +120,18 @@ necessary, so no gate reads a half-switched tree.
 - No relocation of any straggler branch. A run never performs one (design §18 rev-3 A10); the landing
   reconcile in §4 carries only entries the delta engine classifies mechanically, confirms only ids
   the receiving branch never acted on since the fork, and parks the rest with the recipe.
-- No gate run in the unit pass beyond the observations §6 names. The bar runs once, on the landing
-  merge, and that bar owes `GATE_FULL=1 GATE_SELFTESTS=1` because this build is kit work.
+- No merge bar and no self-test suite in the unit pass, and no gate leg's verdict claimed from it,
+  beyond the direct checks §6's observations name (design F7; aProbedUnit's child prompt in
+  `tools/workflows/unattended-unit.js`, which permits a checker on a staged break, a `--selftest`
+  flag or a fixture, with `tools/unattended/gate-guard.js` denying a suite FILE before VERIFYING).
+  AC6, AC7, AC8, AC9, AC10, AC12, AC21, AC27 and AC29 carry a `permission:` line naming what the pass
+  reads directly instead. AC21's is a deferral: `python tools/drift-audit/selftest.py` is a
+  `selftest.py` FILE and the hook denies it. AC17's is not, and must not become one: a `--selftest`
+  FLAG on another file is the direct check the same hook header and the same child prompt name by
+  example, so AC17 runs its fixtures in the pass and only the `backlog migration selftest` leg's
+  verdict waits for the bar. §7's two arm lines route both suites, and the bar runs once, at
+  VERIFYING after the last unit and before the landing, owing `GATE_FULL=1 GATE_SELFTESTS=1`
+  because this build is kit work.
 - No kit or HYGIENE prose beyond the carriers S6 and S12 require. The memory-tree kit README's
   backlog sections, the agent carriers and the backlog dossier are `TOOL-dDerivedDocket-36`'s; the
   charter is `PLAY-dDerivedDocket-1`'s; the runbook is `DEPL-dDerivedDocket-1`'s.
@@ -133,15 +159,17 @@ necessary, so no gate reads a half-switched tree.
   S17's id is substituted in AC3; and `--plan` at the switch-over's parent, which rollout step 5
   re-runs, and over a worktree of the remote tip, which reconcile step 2 runs (its S1), with its S6
   refusal naming each `--design-named` id outside the triage population, by which both steps drop a
-  recorded id (§8 F16). Added by this spec, not in the brief's edge table.
+  recorded id (§8 F16); and the `backlog migration selftest` leg AC17's `--write` fixtures extend,
+  whose ceiling stays at or under the direct-check bound unit 11 §8 F9 sets. Added by this spec, not
+  in the brief's edge table.
 - **consumes-from** `TOOL-dDerivedDocket-12` — the delta engine in its migration set (the owner's
   folder for transferred tokens, the `--as` folder for signed triage verdicts, a hold on the
   `--triage-ask` id for a hold naming no id), the provenance row shape, the landing form of
   `--ingest` the reconcile runs, and `--stragglers`.
 - **consumes-from** `TOOL-dDerivedDocket-2` — `push-main.sh --prepare --slug <slug>`, whose conflict
   refusal names `git merge <remote>/<def>` on the run branch as the reconcile to do first; the
-  landing reconcile's step 1 is that merge, and its step 8 runs `--prepare` over a branch that
-  already contains the tip. Added by this spec, not in the brief's edge table.
+  landing reconcile's step 1 is that merge, and its step 8 runs `--prepare --slug <slug>` over a
+  branch that already contains the tip. Added by this spec, not in the brief's edge table.
 - **consumes-from** `TOOL-dDerivedDocket-3` — the in-place landing sequence of its S6, a reconcile
   onto the run branch and then `--prepare`, `--close`, `--land` and `--landed`, into which the
   landing reconcile's steps fit before `--prepare`. Added by this spec, not in the brief's edge
@@ -177,12 +205,12 @@ necessary, so no gate reads a half-switched tree.
 |---|---|---|
 | records | every `builds/<slug>/BACKLOG.md`, the rendered views, the regenerated README regions; the authored shard bodies removed by the writer before the views are rendered at their paths; rollout step 5's re-planned census and worksheets and its two `-switch` signed records | the views are check 9's byte-compare subject from this commit |
 | deletions | `memory/archive/TOOL.2026-08-14.md`, `TOOL.2026-08-17.md`, `TOOL.2026-08-17b.md`; the curation-debt row at `memory/project/curation-debt.txt:54` | the archives are second definitions of migrated ids; the debt row would red its stale guard |
-| carriers of the deletion | the archive basenames at `.memory-tree.conf:387`, `tools/memory-tree/.memory-tree.conf.example:201`, `tools/memory-tree/check-memory-hygiene.sh:1057`, `tools/memory-tree/README.md:133`, `tools/memory-tree/row_grammar.py:167` and `:630`, reworded to describe the same-day suffix without naming a deleted file | `tools/check-dead-paths.sh` derives its needles from git and reds any carrier outside `memory/` naming them |
-| conf | `BACKLOG_MODE`, `ASK_CUTOFF`; the two `.unattended.conf` lines at `.unattended.conf:206` and `:207`; the added attribute line beside `.gitattributes:65` | the mode is what every builds-mode verdict keys on |
+| carriers of the deletion | the archive basenames at `.memory-tree.conf:422`, `tools/memory-tree/.memory-tree.conf.example:211`, `tools/memory-tree/check-memory-hygiene.sh:1057`, `tools/memory-tree/README.md:133`, `tools/memory-tree/row_grammar.py:167` and `:630`, reworded to describe the same-day suffix without naming a deleted file | `tools/check-dead-paths.sh` derives its needles from git and reds any carrier outside `memory/` naming them |
+| conf | `BACKLOG_MODE`, `ASK_CUTOFF`; the two `.unattended.conf` lines at `.unattended.conf:236` and `:237`; the added attribute line beside `.gitattributes:65` | the mode is what every builds-mode verdict keys on |
 | recall | the durable-home alternative beside `tools/memory-recall/extract.py:144`; `CACHE_VERSION` at `tools/memory-recall/query.py:134`; `KIT_MEMORY_RECALL_VERSION` and its `gov:kit memory-recall@` README marker, moved once here as the earliest unit to change that kit's shipped bytes | an old cache would serve anchors from files this commit deletes |
 | drift | the pin at `tools/drift-audit/drift_signals.py:260` and its signal retire; the live-rows watermark at `:288` re-measured; `_TERMINAL_STATUSES` at `tools/drift-audit/drift_report.py:1324` stays the shards-mode filter only; three new signals, whose drift-audit bytes ride unit 13 S11's one move of that kit's version; the DECISIONS row recording the supersession | a retired signal left one commit reports a reassuring zero |
 | disposal | WONTDO for `TOOL-aWeighedCompass-3`, superseded by this unit | its split-or-shorten call dissolves with the shard |
-| manifest | the rotation-union trap at `memory/guides/SESSION-KICKOFF.md:200`, the check-8 trap at `:251`, the pointer-map rows at `:114`-`:117` and the governing-docs line at `:67`, then the re-stamp | the manifest's staged leg refuses a watched-file change without a re-stamp, and the re-stamp asserts the claims were re-verified |
+| manifest | the pointer-map rows at `memory/guides/SESSION-KICKOFF.md:121`-`:124` and the governing-docs line at `:74`, then the re-stamp; and, in their new homes, `memory/gotchas/row-driver-emits-a-plausible-file-with-rows-missing.md` and `memory/gotchas/waiver-row-that-hides-nothing-reds.md`, each qualified as holding under shards mode only | the manifest's staged leg refuses a watched-file change without a re-stamp, and the re-stamp asserts the claims were re-verified; a claim this commit makes stale stays stale after `TOOL-aReplayedCard-4` moved it out of the manifest |
 
 ### Conservation — the declared normalizations
 
@@ -309,6 +337,15 @@ P3), which is also what unit 11's plan over the tip predicts. The reconcile is t
    a watched change without it. The read covers the working tree as well as the index: step 5 writes
    `.memory-tree.conf` unstaged, so an index-only read misses the routine landing, where main filed
    asks and touched no watched file. With no watched path changed, the manifest is not touched.
+   In the same step, re-read every kit version this build moved against `<tip>`, across the carriers
+   `tools/check-kit-versions.sh` names for that kit, comparing component by component rather than as
+   a decimal. For each kit whose value at `<tip>` is at or above the value the branch wrote, raise
+   every one of that kit's carriers to a value strictly above both, inside this merge commit. A kit
+   the tip left below the branch's value is not touched. The kits in scope are every kit this build
+   moved, the review harness at order 29 and memory-tree at order 36 included, and the step walks
+   `tools/check-kit-versions.sh`'s carrier list rather than a list written here. This is the
+   build-wide first-in-order rule's last application: the pass that moved a version read the tip at its own moment, and the tip keeps
+   moving until the landing (§8 F17).
 7. Run `gen_build_index.py --write`, then `--check`, which exits 0 with no V4, V6, V9, V10, V12 or
    V14. Stage every path steps 1 to 6 wrote and conclude the merge with `git commit`, whose
    pre-commit hook runs the manifest's staged leg. Check 25 reads the merge accounted when it is a
@@ -437,7 +474,7 @@ confirms an id the receiving side acted on (§8 F7).
 - security — the writer is the one sanctioned cross-folder writer, and only at this commit and its
   landing reconcile. It transfers text owners already wrote and the signed records' rows; it
   executes nothing from any row.
-- perf / scale — roughly 600 ids across roughly 90 folders, written once. The pre-commit hygiene run
+- perf / scale — roughly 660 ids across roughly 96 folders, written once. The pre-commit hygiene run
   over that many new files needs the raised hook timeout.
 - error / empty / loading states — the writer refuses when a signed record's header does not name
   the tracked worksheet's current blob sha; when that worksheet's data rows differ from what
@@ -503,22 +540,29 @@ confirms an id the receiving side acted on (§8 F7).
   `bash tools/check-dead-paths.sh` exits 0.
   Red when: a carrier outside `memory/` still names a deleted archive's basename, which the dead-path
   gate derives from git history and reds.
+  permission: the `git ls-files` read is the pass's own; `tools/check-dead-paths.sh` is the
+  `dead-path carriers (deleted files still named)` leg and runs at the one post-build bar.
 - **AC7** — When `memory/project/curation-debt.txt` is read it carries no row for the TOOL view, and
   `bash tools/memory-tree/check-memory-hygiene.sh` names no stale debt row.
   Red when: the row survives, and the stale-entry guard reds a row that no longer hides a finding.
   cost: minutes, since the hygiene leg is minutes.
+  permission: the debt file is read in the pass; `check-memory-hygiene.sh` is the `memory hygiene`
+  leg and runs at the one post-build bar.
 - **AC8** — When `.unattended.conf` is read, `SHARED_RECORDS` no longer names `memory/backlog`,
   `GENERATED_INDEXES` pairs it with both renderer files, and `bash tools/unattended/check-unattended.sh`
   reports no path declared under both keys.
   Red when: only the generator is paired, so a pass editing the backlog module never trips the
   generated-index refusal.
   permission: the kit's checks only, which the standing instruction permits; its self-tests are not
-  run here.
+  run here, and the `unattended kit gate` leg's own verdict binds at the one post-build bar.
 - **AC9** — When `python3 tools/memory-recall/check-recall.py` runs before and after the switch, the
   `records` floor after is equal or better.
   Red when: the switch loses a backlog-row fixture id's record, which drops the floor.
   cost: minutes, for the throwaway extraction `check-recall.py` builds on every run; it never reads
   the query cache, so AC27 observes the cache bump.
+  permission: the BEFORE reading can only be taken in this pass, since the switch happens in it, and
+  is the pass's own measurement of the floor; `check-recall.py` is the `recall floor` leg and its
+  verdict binds at the one post-build bar.
 - **AC10** — When `python tools/drift-audit/drift_report.py --check` runs after the switch, it exits 0,
   prints no `backlog_rows_outliving_closed_specs` line, and prints an examined count above zero for
   each of `backlog_asks_contested`, `backlog_evidence_sha` and `backlog_asks_unlabelled`; the
@@ -526,16 +570,30 @@ confirms an id the receiving side acted on (§8 F7).
   read from the projection with no status filter of drift's own.
   Red when: a new signal reads a field the JSON projection does not emit and reports zero examined;
   AC21 stages that zero and observes the DEAD PROBE.
+  permission: the command is the `drift-audit records` leg and runs at the one post-build bar; in the
+  pass the projection is read directly and each new signal's examined count read from it.
 - **AC11** — When `python tools/memory-tree/gen_build_index.py --asks TOOL-aWeighedCompass-3` runs, it
   prints WONTDO decided by the superseding disposition in this build's own file.
   Red when: the disposal is written in the ask owner's folder, which is a foreign write outside the
   migration's transferred text.
 - **AC12** — When `bash skills/session-kickoff/manifest-check.sh` runs on the switch-over commit, check
-  5 passes, and `memory/guides/SESSION-KICKOFF.md` carries none of the four BASE strings §4's
-  manifest row names: the rotation-union trap at `:200`, the check-8 trap at `:251`, the pointer-map
-  rows at `:114`-`:117` and the governing-docs line at `:67`, each grepped by its BASE text.
-  Red when: the audit block is re-stamped and the stale trap is left, which passes the gate and makes
-  the stamp assert a re-verification that did not happen.
+  5 passes; `memory/guides/SESSION-KICKOFF.md` carries neither of the two BASE strings §4's manifest
+  row names, the pointer-map rows at `:121`-`:124` and the governing-docs line at `:74`, each grepped
+  by its BASE text; and each of `memory/gotchas/row-driver-emits-a-plausible-file-with-rows-missing.md`
+  and `memory/gotchas/waiver-row-that-hides-nothing-reds.md` carries a sentence qualifying its claim
+  as holding under shards mode only; and, at this unit's commit,
+  `tr -d '\r' < memory/guides/SESSION-KICKOFF.md | wc -c` reads at most 600 bytes above what the
+  same command reads at this unit's PARENT and below 61440, and
+  `wc -l < memory/guides/SESSION-KICKOFF.md` reads below 750.
+  Red when: the audit block is re-stamped and a stale claim is left, which passes the gate and makes
+  the stamp assert a re-verification that did not happen; or only the manifest is grepped, so the two
+  claims `TOOL-aReplayedCard-4` moved into `memory/gotchas/` are read as fixed because they are no
+  longer where this spec first found them; or the four rewritten claims are written long enough to
+  carry a class-capped guide past its cap, which this size read catches in the pass and which check
+  6 of `tools/memory-tree/check-memory-hygiene.sh` would otherwise red at the post-build bar, where
+  no pass of this unit is left to trim it.
+  permission: the manifest ratchet is read directly in the pass by grepping the named strings; the
+  `kickoff-manifest ratchet` leg binds at the one post-build bar.
 - **AC13** — When each break in §4's table is staged over the committed switch-over and the named
   command runs, each exits non-zero with its expected verdict, and after each removal
   `gen_build_index.py --check` exits 0 again.
@@ -592,8 +650,10 @@ confirms an id the receiving side acted on (§8 F7).
   a writer that writes an empty `on ` target, files the triage ask in a foreign folder or holds on a
   spec H1 passes AC16 on gov's corpus, which has holds, and first meets an adopter at its own
   switch-over commit.
-  cost: one kit selftest run; it is held, so it binds at the landing bar under `GATE_SELFTESTS=1`,
-  and each arm's RED is observed by hand in the pass.
+  cost: one kit selftest run; the `backlog migration selftest` leg `TOOL-dDerivedDocket-11` adds
+  resolves in no manifest at HEAD, so whichever subject that unit declares for it, its verdict is
+  covered by the run after the last unit, made with `GATE_FULL` and `GATE_SELFTESTS` both set, and
+  each arm's RED is observed by hand in the pass.
 - **AC18** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs on the
   switch-over commit, every row of the signed triage record outside its exclusions list is decided by
   a disposition in this build's `BACKLOG.md`, and no other `BACKLOG.md` under `memory/builds/`
@@ -604,8 +664,9 @@ confirms an id the receiving side acted on (§8 F7).
 - **AC19** — When `git ls-files memory/backlog` runs between the `--write` step and the render step,
   it lists nothing, and the render step's `gen_build_index.py --write` exits 0 with all four views
   written.
-  Red when: the writer leaves a shard in place, so the guard reads its 460 id-leading lines and the
-  flip's render exits 1 with every view unwritten.
+  Red when: the writer leaves a shard in place, so the guard reads its id-leading lines — 515 in the
+  TOOL shard, measured at this spec's base, where `abac6d59` had 460 — and the flip's render exits 1
+  with every view unwritten.
 - **AC20** — When the reconcile's steps 2 to 4 are rehearsed against the current remote tip inside a
   scratch worktree of the run branch, `git worktree add --detach <scratch> HEAD`, so that step 2's
   census summary and worksheets and step 3's `-landing` records land there, step 4 with `--dry-run`
@@ -629,6 +690,13 @@ confirms an id the receiving side acted on (§8 F7).
   live-rows count and prints four DEAD PROBE lines while `--check` stays green; or a builds-mode tree
   with no `BACKLOG.md` yet, the state right after an adopter sets the mode, prints three DEAD PROBE
   lines nobody staged.
+  permission: this is a whole-suite selftest FILE invocation carrying none of the five read-only
+  verbs, the shape `tools/unattended/gate-guard.js` row D4 denies before VERIFYING, so the three
+  fixtures are run at the one post-build bar. `drift-audit selftest` is HELD there — `subject = kit`
+  in `tools/gate-legs.json` — so the run that covers it is the one after the last unit, made with
+  `GATE_FULL` and `GATE_SELFTESTS` both set, and a plain bar prints this leg held and runs it not at
+  all; §3's no-gate bullet spells that command. In the pass
+  each fixture's tree and the three signals' source are written and read directly.
 - **AC22** — When `memory/DECISIONS.md` is read on the switch-over commit, its TOOL heading carries
   one row keyed `TOOL-dDerivedDocket-34` that names DEPL-dGaugedVintage-13 as superseded, cites
   design §4.4, and fits the entry budget.
@@ -641,7 +709,7 @@ confirms an id the receiving side acted on (§8 F7).
   Red when: the durable pattern still admits only one directory level, so the migrated ids lose
   their durable home, which the `records` floor cannot see because `DURABLE` selects only the spine
   (`tools/memory-recall/extract.py:674`).
-  figure: "ten of twelve" is PINNED as measured 2026-09-14 at BASE against
+  figure: "ten of twelve" is PINNED as measured 2026-09-14 at `abac6d59` against
   `tools/memory-recall/recall-fixture.json`.
 - **AC24** — When AC15's completing fixture is extended so that the branch, after its switch-over,
   commits an acceptance ledger copying a staged RED verbatim that names the untouched flip's id,
@@ -688,12 +756,18 @@ confirms an id the receiving side acted on (§8 F7).
   `git diff HEAD^ HEAD -- tools/memory-recall/query.py tools/memory-recall/recall_conf.py tools/memory-recall/README.md tools/drift-audit/drift_report.py`
   runs on the switch-over commit, it shows `CACHE_VERSION` moved, `KIT_MEMORY_RECALL_VERSION` moved
   together with its `gov:kit memory-recall@` README marker, and `KIT_DRIFT_AUDIT_VERSION` unmoved,
-  because unit 13 S11 moves that constant once for the landing range; and
+  because unit 13 S11 moves that constant once for the landing range; the moved memory-recall value,
+  read as an X.Y pair and compared component by component, is strictly above both the value
+  `git show fb07ca25:<carrier>` prints and the value `git show origin/main:<carrier>` prints after a
+  `git fetch` in this pass, for each carrier `tools/check-kit-versions.sh` names; and
   `bash tools/check-kit-versions.sh` exits 0.
   Red when: extraction changes with no `CACHE_VERSION` bump, which neither `check-recall.py`, whose
   extraction never reads the query cache, nor `extract.py` can see, so a warm cache serves anchors
   from files this commit deletes; or the drift-audit constant moves a second time in one landing
-  range, against the build's one-owner rule.
+  range, against the build's one-owner rule; or the move clears the base alone, which
+  `tools/check-kit-versions.sh` cannot see because it compares the constant with its README marker
+  and never with another commit, so this kit ships at a number the advertised tip already spent on
+  other bytes and an adopter cannot tell the two vintages apart.
   permission: the diff is read in the pass; `bash tools/check-kit-versions.sh` is the
   `kit version markers` leg and binds at the one post-build bar.
 - **AC28** — A scratch repository holds three `EXMP` asks OPEN on finished builds that no rule
@@ -713,16 +787,46 @@ confirms an id the receiving side acted on (§8 F7).
   with no journal line, so its header's shrunken id set reads as unexplained beside unit 11's; or
   an id still in the triage population is dropped, so a closure the design named is never signed.
   cost: seconds. fixture: a scratch repository built in the pass; it writes nothing outside it.
+- **AC29** — When AC15's completing fixture's bare remote is given a tip that declares
+  `KIT_MEMORY_RECALL_VERSION` at the value the branch's switch-over wrote, step 6 raises that
+  constant AND its `gov:kit memory-recall@` marker in `tools/memory-recall/README.md` to a value
+  strictly above both, inside the merge commit, and `bash tools/check-kit-versions.sh` over the
+  merged tree exits 0; when the same fixture's tip declares a value the branch already passed, step
+  6 leaves both bytes as the branch wrote them and that check still exits 0; and when the branch
+  holds `1.9` while the tip holds `1.10`, the raise goes above `1.10`, not above `1.9`; and when the
+  fixture's tip declares a value at or above the branch's for a carrier OTHER than memory-recall —
+  the `KIT_MEMORY_TREE_VERSION` constant and its `tools/memory-tree/*.template.md` markers — step 6
+  raises that carrier's constant and every marker `tools/check-kit-versions.sh` pairs with it, so the
+  arm iterates the carriers that gate names rather than the one this unit moved.
+  Red when: the two values are compared as decimals, so a tip at `1.10` reads as below a branch at
+  `1.9` and the landing ships a version the tip already spent on other bytes; or the constant is
+  raised and its README marker is not, which `tools/check-kit-versions.sh` reds at the landing bar as
+  an unpaired carrier; or only the value read at the switch-over's pass is compared, which is the
+  reading the tip's own movement makes stale; or the re-check reads only
+  `KIT_MEMORY_RECALL_VERSION`, so a kit another unit moved — the review harness at order 29, whose
+  `meta.version` and both markers sit on one line of `tools/workflows/tier2-review.js`, or
+  memory-tree at order 36 — crosses the
+  landing unchecked while `tools/check-kit-versions.sh` still exits 0.
+  cost: seconds. fixture: AC15's.
+  permission: the comparison and the two edits are read directly in the rehearsal; the check is the
+  `kit version markers` leg and binds at the one post-build bar.
 
 ## 7. Gates
 
 `memory hygiene` · `recall floor` · `drift-audit records` · `dead-path carriers (deleted files still named)` · `kickoff-manifest ratchet` · `unattended kit gate` · `codebase-map coverage + freshness` · `drift-audit selftest` · `kit version markers`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the `backlog migration selftest` leg `TOOL-dDerivedDocket-11` adds · `--write` fixtures for each of §5's eight refusals, the triage ask's filing, its zero-holds arm, and the shard removal · the selftest's floor moves in the same commit
-New arm: `python tools/drift-audit/selftest.py` on the `drift-audit selftest` leg · the shards-mode fixture, the builds-mode fixture with no `BACKLOG.md`, and one builds-mode fixture per new signal with its field removed (AC21) · none; it is a held kit leg, so it runs at the landing bar under `GATE_SELFTESTS=1`
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the `backlog migration selftest` leg `TOOL-dDerivedDocket-11` adds · `--write` fixtures for each of §5's eight refusals, the triage ask's filing, its zero-holds arm, and the shard removal · the selftest's floor moves in the same commit, and the leg's ceiling stays at or under the direct-check bound unit 11 §8 F9 sets
+New arm: `python tools/drift-audit/selftest.py` on the `drift-audit selftest` leg · the shards-mode fixture, the builds-mode fixture with no `BACKLOG.md`, and one builds-mode fixture per new signal with its field removed (AC21) · none; it is a held kit leg
 
 The verdicts this unit stages are armed by the units that built them; this unit observes them live on
-the real tree for the first time.
+the real tree for the first time. `drift-audit selftest` is the one HELD leg in the list above —
+`subject = kit` in `tools/gate-legs.json` at HEAD — so a plain bar PRINTS it held and runs it
+not at all, and the arm on its line is covered only by the run after the last unit,
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which this build owes because
+it is kit work. `backlog migration selftest` does not resolve in that manifest at HEAD because
+`TOOL-dDerivedDocket-11` adds it; whichever subject that unit declares for it, this unit's
+AC17 runs its fixtures in the pass and only the leg's verdict waits, so the same run covers it.
+Every other leg listed is `subject = repo` and runs on any bar.
 
 ## 8. Open questions
 
@@ -764,8 +868,8 @@ the real tree for the first time.
   written? (a) The planner at the tip in a scratch worktree, the signer's landing re-run, and
   `--ingest --signed` writing each verdict not already disposed. (b) The signer over the merged
   tree's JSON projection. (c) Park when non-empty. Measured for the G5 audit: 61 of 64 asks main
-  filed in seven days sit on finished builds, so (c) parks the routine landing. RESOLVED (agent,
-  2026-09-14, delegated): (a).
+  filed in seven days sit on finished builds, so (c) parks the routine landing.
+  RESOLVED (agent, 2026-09-14, delegated): (a).
 - **F9** — How does the first builds-mode render meet a guard that reads every file at a view path?
   (a) The writer removes the authored shards after its conservation proof. (b) A one-time flag the
   guard honours. (c) A hand `git rm` in the rollout. (b) is a new generator surface and a standing
@@ -819,6 +923,14 @@ the real tree for the first time.
   are. Reconcile step 2 filters the same way at the tip, which the orchestrator's step-2 decision
   did not anticipate, and writes no journal line, since it runs outside any unit pass and the
   `<switch>` header less its own names the dropped set. Observed by AC28.
+- **F17** — What does the landing reconcile owe the kit versions this build moved? (a) Nothing; the
+  values the switch-over wrote stand to the landing. (b) Step 6 re-reads every carrier
+  `tools/check-kit-versions.sh` names for each kit this build moved against `<tip>`, and raises any
+  kit the tip has reached or passed to a value strictly above both. (a) leaves the build's
+  first-in-order kit-version rule resting on a tip reading that has since moved, which is measurable
+  rather than hypothetical: on 2026-09-20 the remote's default branch at `3bc78ff6` declared
+  `KIT_MEMORY_RECALL_VERSION` 1.9 where this spec's base declares 1.8, and four other kits moved the
+  same way inside the same window. RESOLVED (agent, 2026-09-20, delegated): (b). Observed by AC29.
 - The rulings this unit executes and does not revisit: D1 adopt, D3 no hard view cap, D6 closeout
   gated from this commit, D8 delete the archives, D9 check 15 keeps grading asks, D11-c direct-push
   landing — all RESOLVED (owner, 2026-09-13). The delegated signatures, and the replacement of the
@@ -897,6 +1009,114 @@ the real tree for the first time.
   the §4 drift row and AC27 name unit 13 S11, and the Files touched row for
   `tools/drift-audit/drift_report.py` names unit 13, in place of unit 21 S8 as the drift-audit
   version owner; the rev-3 line's "ride unit 21 S8" is history and stays.
+- rev-5 · 2026-09-20 · regrounded on fb07ca25 (origin/main), in two hands: the header, S9, S12,
+  S15, §3's no-gate bullet and the consumes-from 11 edge were regrounded first and are unchanged
+  here; this line closes what that pass left dangling and finishes the citation and count sweep.
+  S15's `§8 F17` and `AC29` now exist: new §8 F17 resolves that the landing reconcile re-checks
+  every kit version this build moved against the tip, §4 reconcile step 6 carries the re-check, and
+  new AC29 observes it. The rule is not hypothetical — `origin/main` at `3bc78ff6` already declares
+  `KIT_MEMORY_RECALL_VERSION` 1.9 where the base declares 1.8, so S9's move must clear 1.9 and the
+  reconcile must re-clear whatever the tip holds at the landing. §7's `--write` arm line now carries
+  the ceiling clause unit 11 §8 F9 sets, the pending cross-edit from the first half. Citations that
+  moved between the two bases, corrected in §4's table: `.unattended.conf:206`/`:207` to `:236`/
+  `:237`, `.memory-tree.conf:387` to `:422`,
+  `tools/memory-tree/.memory-tree.conf.example:201` to `:211`, the manifest's governing-docs line
+  `:67` to `:74` and its pointer-map rows `:114`-`:117` to `:121`-`:124`. The manifest row and AC12
+  also drop the two traps `TOOL-aReplayedCard-4` moved into `memory/gotchas/` and grade them in
+  their new homes, which S12 named and AC12 did not. Counts: AC19's 460 id-leading lines are 515 at
+  this base and are named as measured; §5 perf reads roughly 660 ids across roughly 96 folders,
+  where it read 600 across 90. Re-verified unmoved: `tools/memory-recall/extract.py:144` and `:674`,
+  `tools/memory-recall/query.py:134`, `tools/drift-audit/drift_signals.py:260` and `:288`,
+  `tools/drift-audit/drift_report.py:1324`, `.gitattributes:65`, `memory/project/curation-debt.txt`
+  line 54, the three archive-basename carriers, hygiene check 24 and all nine §7 legs, and the whole
+  `tools/memory-recall/` kit is byte-identical between the two bases, so AC23's ten-of-twelve pin
+  holds. No landed build does what an S-item plans. §10 records the base. Checked a third time and
+  corrected, same date: §3's bullet claimed every suite-or-leg criterion carries a `permission:`
+  line, which AC17 and AC21 do not and which no edit here gives them — it now states which criteria
+  carry one and routes those two through §7; §10 read `migrate_backlog.py --selftest` as denied by
+  `tools/unattended/gate-guard.js`, and that hook matches the suite FILE `selftest.py`, never a
+  `--selftest` flag on another file, which `tools/workflows/unattended-unit.js` names among the
+  direct checks a pass may run; and §10's remote reading is dated rather than stated as a position,
+  the tip having moved from `3bc78ff6` to `d46d3ccb` inside the same day with all five kit values
+  unchanged. AC27 stated the move only as MOVED and now grades it the way units 1 and 13 grade
+  theirs, strictly above both the base value and the one `origin/main` advertises at this pass, on
+  every carrier `tools/check-kit-versions.sh` names — the build-wide first-in-order rule, which S9
+  carried in prose and no criterion read. Every corrected citation and count above was reproduced
+  independently at HEAD. Extended 2026-09-20 by the regrounding consolidation, which FOLDS the
+  build's conservative reading of the parked suite-permission conflict instead of deciding it — the
+  ruling conflict is parked for the owner in `memory/builds/dDerivedDocket/RUN.md`. AC21 gains the
+  deferral its `selftest.py` FILE invocation owes, the shape `tools/unattended/gate-guard.js` row D4
+  denies; AC6, AC7, AC9 and AC10 gain one for their gate-leg verdicts and AC8's is extended to name
+  its leg, each keeping in the pass the reading only the pass can take; AC17 is deliberately NOT
+  deferred, because a `--selftest` FLAG on another file is the sanctioned direct check and deferring
+  it would contradict unit 11 §8 F9 as resolved. §3's no-gate bullet and §10's landed-rule paragraph
+  now name that split. AC29 is widened from one carrier pair to the carrier SET: it observed only
+  `KIT_MEMORY_RECALL_VERSION`, which is this unit's own kit, so the class-versus-instance hole left
+  memory-tree — moved at order 36, after this pass — crossing the landing unchecked while
+  `tools/check-kit-versions.sh` still exited 0, and its new arm iterates the carriers that gate
+  names. This unit touches no capped carrier: `memory/guides/SESSION-KICKOFF.md` carries no row in
+  `tools/template-size-limits.txt`, and neither `memory/guides/UNATTENDED-PROTOCOL.md` nor
+  `memory/guides/BUILD-METHOD.md` is in its Files touched. Verified the same day: the fold left a
+  duplicate of the bar sentence at the end of §3's no-gate bullet, which is removed.
+  Extended again 2026-09-20 by the closing consolidation, which moved no criterion here. The
+  orchestrator RATIFIED the deferral reading this spec folded, so AC21's deferral and AC17's
+  deliberate non-deferral both stand as decided rather than as a fold, and §10's landed-rule
+  paragraph now says so; the conflict behind the reading stays parked. The capped-carrier rule
+  tightened from a ceiling to NET ZERO build-wide and reaches nothing here: the Files-touched
+  re-check against `tools/template-size-limits.txt` still finds no row of that file among this
+  unit's writes, and `memory/guides/SESSION-KICKOFF.md` sits far inside the index cap its class
+  carries.
+  Extended a third time 2026-09-20 by the close-out pass, which widened no criterion and named two
+  things the spec left to inference. THE KIT-VERSION RE-CHECK: S15, §4's reconcile step 6 and
+  AC29's Red when read as memory-recall plus memory-tree, because those were the two kits in flight
+  when F17 was resolved. The review harness moved into the build's range at order 29, where
+  `TOOL-dDerivedDocket-29` S9 moves `meta.version` and BOTH `gov:kit` markers on one line of
+  `tools/workflows/tier2-review.js`, and `tools/check-kit-versions.sh` names that file as a carrier
+  at HEAD. The mechanism already covered it — the reconcile walks the gate's carrier list, not a
+  list written here — so nothing was broken, but a reader could not see it: all three places now
+  name the population as every kit this build moved and name the order-29 case beside the order-36
+  one. AC29's positive arm still exercises memory-tree as its second carrier; the review harness's
+  three-tokens-on-one-line shape is graded by the same arm's unpaired-carrier Red when.
+  THE HELD LEG: AC21's `permission:` line deferred to "the one post-build bar" while naming
+  `drift-audit selftest`, which is `subject = kit` in `tools/gate-legs.json` and runs on no plain
+  bar; it now says the covering run sets both `GATE_FULL` and `GATE_SELFTESTS`, and §7's prose
+  spells the command, which §3's no-gate bullet already did. That prose also answers the second
+  arm line: `backlog migration selftest` resolves in no manifest at HEAD because unit 11 adds
+  it, and the same run covers it whatever subject that unit declares. Its third field is back
+  to a floor and a clause — `none; it is a held kit leg` — with the command out of it, because
+  a `New arm:` third field names a floor in words and a full invocation there reads as one.
+  AC17's cost line carried the only backticked `GATE_SELFTESTS=1` in an acceptance bullet of
+  this spec and now names the two variables instead, so the bar join's graded population here
+  is back to AC21's witness alone. The flags are written unbackticked in
+  the acceptance bullet on purpose: `tools/check-spec-tokens.py`'s bar join reads backticked tokens
+  in acceptance bullets and in the leg-list line, so the command is spelled only where that join
+  does not look. One figure gained a sha: AC23's "ten of twelve" was measured 2026-09-14, at
+  `abac6d59`, and said "at BASE" while §10 declares BASE to be `fb07ca25`. The remaining closing
+  rulings reach nothing here: this unit writes no capped carrier, and its conf writes add no KEY
+  NAME anywhere. `BACKLOG_MODE` and `ASK_CUTOFF` are `.memory-tree.conf` keys, which check 22
+  does not read, and S8 changes the VALUES of `SHARED_RECORDS` and `GENERATED_INDEXES` in
+  `.unattended.conf` without introducing a name — both already carry rows in the protocol's
+  section 8 table, and check 22 joins on `^[A-Z_]+=` names rather than on values, so the
+  unconditional-row ruling owes this unit nothing and AC8 stays as written.
+  Extended a fourth time 2026-09-20 by the close-out VERIFIER, which repaired two readings and
+  widened no scope. AC17's cost line said the `backlog migration selftest` leg IS held, while §7
+  says that leg resolves in no manifest at HEAD and that the covering run is the same whichever
+  subject `TOOL-dDerivedDocket-11` declares for it; the cost line now says what §7 says, so one
+  spec no longer gives two answers to a question neither place can settle from here. And the
+  closing scoping rule reached one carrier this spec had tested only against
+  `tools/template-size-limits.txt`: S12 rewrites four claims in `memory/guides/SESSION-KICKOFF.md`,
+  a guide capped by its CLASS at 61440 bytes and 750 lines rather than by a row of that file, which
+  is why the paragraph above reads "no capped carrier" — a test that sees only one of the two cap
+  registries. The file has tens of thousands of bytes free, so the rule asks it for a STATED DELTA
+  and a size read rather than net zero: S12 declares at most 600 bytes for the four claims and the
+  re-stamp together, AC12 reads the byte count against this unit's PARENT and both counts against
+  the class caps, and its Red when names check 6 as the leg that would otherwise catch a breach at
+  the post-build bar. The earlier line's "index cap" wording for that file named the wrong class
+  and is superseded here; a file under `memory/guides/` is a guide. One more wording moved: §3's
+  no-gate bullet said the bar runs once "on the landing merge", a third spelling of the run §7 and
+  AC17 both call the run after the last unit, and it now names VERIFYING in the orchestrator's own
+  terms. Nothing else moved.
+  The header date already reads 2026-09-20 and the rev is kept.
 
 ## 10. Reuse audit
 
@@ -923,5 +1143,38 @@ Where the design and the source disagree at BASE, re-verified here:
   rather than going vacuous.
 - The recall cache carries a version constant that must bump when extraction changes; the design did
   not mention it.
+
+BASE is `fb07ca25`. Against `abac6d59` the corpus this unit migrates grew from 521 live shard rows
+to 580, and from 599 distinct legacy ids to 658 over the four shards and the three TOOL backlog
+archives, which is the conservation proof's population and the reason §5's estimate moved. The
+carriers this commit rewords, the recall kit, the drift pin and watermark and the row grammar are
+otherwise unchanged; the kickoff manifest is the one file whose content moved enough to change what
+this spec grades, and S12, §4's manifest row and AC12 now read it as it is.
+
+THE REMOTE IS AHEAD OF BASE, and that is a landing fact rather than a spec defect: read twice on
+2026-09-20, the remote's default branch was at `3bc78ff6` and then at `d46d3ccb`, both past
+`fb07ca25` and both declaring `KIT_MEMORY_RECALL_VERSION` 1.9 against the base's 1.8, with
+memory-tree, settings-merge, drift-audit and check-wiring moved the same way. That the tip moved
+twice inside one day, without moving those five values, is the reading §8 F17 rests on: S9's move is
+read against the tip at this unit's pass, and F17's re-check against the tip at the landing.
+
+ONE LANDED RULE REACHES THIS SPEC AND IS NOW FOLDED under the reading the orchestrator has since
+RATIFIED for this build — a gate-leg command or a suite FILE invocation defers to the run at
+VERIFYING, a `--selftest` flag or a read-only verb stays in the pass — while the ruling conflict
+BEHIND it stays parked for the owner in `memory/builds/dDerivedDocket/RUN.md`. The
+hook is `tools/unattended/gate-guard.js`, built as `TOOL-aDeferredBar-3`; it denies at the tool call
+and before VERIFYING any command whose head word ends `.test.sh` or `selftest.py`, exempting only
+`--list`, `--check`, `--rank`, `--help` and
+`--render`. AC21's `python tools/drift-audit/selftest.py` is such a command, so it now carries a
+`permission:` line deferring its three fixtures to the one post-build bar, beside §3's bullet and
+§7's arm line. AC17's
+`migrate_backlog.py --selftest` is NOT, and is deliberately left alone: the hook matches the suite
+FILE and not a `--selftest` FLAG on another file, its own header says so, and the child prompt names
+that flag among the direct checks a pass may run — so AC17's cost line stands as written, what binds
+at the bar is the leg rather than the flag, and deferring it would contradict unit 11 §8 F9 as
+resolved. The owner rule that a pass runs no gate leg reaches five more: AC6, AC7, AC9 and AC10 gain
+a `permission:` line deferring the leg's verdict while keeping whatever reading only the pass can
+take, and AC8's existing line is extended to name its leg. AC12, AC27 and AC29 already carried one
+and are unchanged apart from AC29's widened subject.
 
 Recall terms used: `flip BACKLOG_MODE generated view curation-debt rotation archive drift pin recall DURABLE SHARED_RECORDS GENERATED_INDEXES merge=rows`

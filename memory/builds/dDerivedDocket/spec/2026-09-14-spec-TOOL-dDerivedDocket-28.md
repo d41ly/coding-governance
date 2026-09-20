@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 28
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -26,7 +26,7 @@ rule: nothing kills a process this run did not start.
 
 ## 2. Scope (IN)
 
-- **S1** `run_bounded` (`tools/unattended/unattended.sh:182`) starts its command in the background,
+- **S1** `run_bounded` (`tools/unattended/unattended.sh:183`) starts its command in the background,
   records it, and waits for it; the file capture and the `timeout -k` wrapper are unchanged. The
   record is one line in a per-slug ledger beside the lease under the git common dir. Observed by AC1.
 - **S2** A record is an IDENTITY, not a name: the MSYS pid, its start token read from procfs, the
@@ -55,16 +55,23 @@ rule: nothing kills a process this run did not start.
 - **S9** No unattended version constant moves here: this unit's bytes ride the move
   `TOOL-dDerivedDocket-1` S9 makes once for the build. NOT OBSERVED by a criterion here:
   `kit version markers` grades the final tree's constant-marker agreement.
-- **S10** The unattended suites run once at the unit's end under attribution. Observed by AC10.
+- **S10** The unattended suites run under attribution at the build's one post-build bar, the run
+  the main loop makes at VERIFYING after the last unit; this unit's pass writes the arms and
+  stages each RED. Observed by AC10.
 - **S11** The ledger's removal. At a terminal write and at an in-place `--landed`'s successful
   observation, `<slug>.procs` is removed when no recorded process is alive. It is kept, with a line
   naming each live pid, when one is. Observed by AC12.
+- **S12** This unit's delta on every capped carrier is ZERO OR NEGATIVE. Leg check 22 owes
+  `PROCMON_CMD` a protocol key-table row, and §4 names the §8 rationale tail that funds it.
+  Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
 - **Processes the agent starts in its own shell** — a suite run at a unit's end, an ad-hoc bar. The
-  driver cannot observe a process it did not start (F1). Under this build's method the one bar a run
-  owes is `gates-green`'s, which S1 records.
+  driver cannot observe a process it did not start (F1). Under the build method at fb07ca25 (M6) a
+  run owes the bar once, at `VERIFYING`: `gates-green`'s plain bar, which S1 records, and, for kit
+  work, the `GATE_SELFTESTS=1` form the Skill's "While it runs" bullet has the agent run in its own
+  shell, which S1 cannot record and which stays outside the ledger like every agent-started suite.
 - **Killing by command line, age or spin rate.** Those are process-monitor's sweep modes, which the
   explicit `--kill-msys` path bypasses by design while keeping the fence.
 - **The fence, the census and the kill itself.** They are process-monitor's and are called, not
@@ -142,7 +149,38 @@ through `python tools/lexicon/lexicon.py --suggest <identifier> --as sh.function
 `tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` · the stops
 companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/.unattended.conf.example`
-· `.unattended.conf` · the rendered guides and Skill · `memory/map/features/unattended.md`.
+· `.unattended.conf` · `tools/unattended/PROTOCOL.template.md`, which gains the `PROCMON_CMD`
+key-table row · `tools/unattended/README.md`, which receives the trimmed §8 rationale · the rendered
+guides and Skill · `memory/map/features/unattended.md`.
+
+`memory/guides/BUILD-METHOD.md` is absent from that list, so this unit's delta on it is 0 bytes and
+it spends none of BUILD-METHOD's 384. The stops companion guide this unit's S8 rule lands in is a
+NEW file under `memory/guides/`, which draws on its own 61440-byte cap and not on the protocol's.
+The protocol IS touched, for one key-table row, and it ends this unit's pass no larger than it began
+it, so it spends none of the 1,116 bytes the protocol has left at BASE. AC13 reads both capped
+carriers at the pass and reds if either GREW, so the claim is checked rather than asserted.
+
+Leg check 22 of `tools/unattended/check-unattended.sh` joins §8's key table against
+`tools/unattended/.unattended.conf.example` and reds on a key declared in one and missing from the
+other, so `PROCMON_CMD` is OWED a row rather than pending a ruling. One row costs about 120 bytes.
+The row is paid for by trimming the rationale tail of §8's `BRIEF_RECORDED_CUTOFF` cell at
+`tools/unattended/PROTOCOL.template.md:479`, from ", unlike the sibling above:" to the end of the
+sentence closing "the brief row alongside the code.", 264 bytes — named precisely so that no sibling
+unit trims the same text. The cell keeps its RULE, that the anchor is the build commit and not its
+first parent, and keeps its "Graded on the README's `opened:` date" sentence; what leaves is the
+ARGUMENT for that anchor and the jointly-satisfiable note, to `tools/unattended/README.md`, the kit
+README, which carries no size row in `tools/template-size-limits.txt` and owns kit prose. The moved
+text carries no kit-path literal, so the shipped-surface ban does not move. That is 264 bytes
+against about 120, so the delta stays zero or negative. No cap is raised: raising one is an owner
+turn.
+
+This unit funded the row from §8's `SPEC_TOKENS_CLI` provenance tail until 2026-09-20. That passage
+is claimed by an earlier unit of this build, `TOOL-dDerivedDocket-16`, which lands twelve orders
+ahead of this one and removes the whole closing clause of that cell, so the witness grep would have
+counted 0 at this unit's parent and its arm could never have gone green. The orchestrator moved
+this unit rather than that one, because this unit's claim was the conditional one. This is NOT an
+edge and §3 declares none: after the move the two units touch disjoint text, and neither reads
+anything the other writes.
 
 ### Alternatives rejected
 
@@ -178,6 +216,12 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   process is gone and the output names it as a reaped orphan; a sleeper started outside the driver
   with the same argv is still alive.
   Red when: orphans are matched by command line, so the foreign sleeper dies too.
+  permission: the arm is written and staged RED in the pass; the suite that executes it,
+  `tools/unattended/unattended.test.sh`, sits on no bar leg at all, so the run that executes it is
+  the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
+  suite.
 - **AC2** — When the fixture holds an unrecorded process whose parent is gone, no reaping verb kills
   it, and `--status` does not count it.
   Red when: the reap walks the process table instead of the ledger.
@@ -197,6 +241,8 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   rendered tree, the stops companion and the Skill state that a process not in the ledger is never
   killed.
   Red when: the Skill leaves the kill of a stray process undirected, which is how i1 had to be parked.
+  permission: both run over the rendered tree rather than a fixture, so they are gate legs and are
+  observed at the build's one post-build bar.
 - **AC8** — When the fixture points the procfs seam at a directory that does not exist, new records
   carry `-`, `--resume` counts them and reaps none, and says why.
   Red when: a record without a token is reaped on the pid alone.
@@ -205,8 +251,8 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   orphan is still alive, and the ledger and the lease files are byte-unchanged.
   Red when: `--resume` reaps or prunes on a row that does not hold the lease, which races the
   holder's appends and writes a lease it does not hold.
-- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+- **AC10** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
   its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows.
@@ -215,7 +261,12 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
   filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
-  permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the
+  last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
+  made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
+  carries no leg for these suites at any flag setting. This folds the conservative reading of
+  the parked ruling conflict and decides nothing.
 - **AC11** — A fixture driver is killed while its stub bar sleeps. When the same slug's `gates-green`
   then runs, the orphan is reaped before the new stub bar starts. The same holds for `--preflight`.
   When `--hold` then runs over a fresh orphan left the same way, it reaps that orphan and proceeds.
@@ -231,12 +282,35 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   the verb runs, so an absent ledger cannot pass for a removed one.
   Red when: no verb removes the ledger, so every finished slug leaves one behind; or removal ignores
   live records, so a running process loses the only record that lets a later reap find it.
+- **AC13** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
+  build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
+  parent's, `grep -c 'unlike the sibling above' tools/unattended/PROTOCOL.template.md` counts 1 at
+  the parent and 0 at the build commit with the trimmed text present in
+  `tools/unattended/README.md`, and `grep -c 'PROCMON_CMD' tools/unattended/PROTOCOL.template.md`
+  counts 0 at the parent and 1 or more at the build commit. The companion guide
+  `UNATTENDED-STOPS.md`, where S8's rule lands, is read the same way at the build commit and is
+  below the same 61440-byte guide cap.
+  The same two size readings hold for `tools/unattended/PROTOCOL.template.md` and for
+  `memory/guides/BUILD-METHOD.md`, and each size is below its declared ceiling — 61440 bytes in
+  `tools/memory-tree/check-memory-hygiene.sh` for the guide, and the `memory/guides/BUILD-METHOD.md`
+  row of `tools/template-size-limits.txt` for the method.
+  Red when: the key-table row is added and nothing is trimmed, so a unit whose design says it spends
+  nothing quietly spends the headroom the build's units share; or the size is read against the
+  figure written in this spec rather than against the parent commit, so a sibling's landing hides
+  this unit's overspend; or the trim is taken and the text lands in no destination, which DELETES
+  the reason a key exists rather than moving it; or the cap is raised to make the row fit, which is
+  an owner turn; or `PROCMON_CMD` reaches §8's key table in no row, which reds check 22 of
+  `tools/unattended/check-unattended.sh` on the next bar; or the trim is witnessed by a phrase an
+  EARLIER unit of this build removes first, so the count reads 0 at this unit's parent and the arm
+  can never go green; or the companion is measured only in prose, so text pushed out of the
+  protocol lands in a carrier nobody reads the size of.
+  permission: a read, a byte count and two greps, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `process-monitor wiring` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-argv foreign sleeper, a reused-pid record and a missing procfs · none
+New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-argv foreign sleeper, a reused-pid record and a missing procfs · the driver suite's executed-assertion floor
 
 ## 8. Open questions
 
@@ -270,6 +344,50 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
     ledger exists before the verb, so a ledger never created cannot pass as removed.
   - G1 H1 (2, 24): AC10 reads `verdict clean` and the inherited-suite filing, and the consumes-from
     edge to unit 1 is updated.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §2 S1's `run_bounded` citation moves
+  from line 182 to 183 (aDeferredBar's inline `resolve_python` and aProbedUnit's `read_bound_key`
+  landed above it). §3's first non-goal no longer says the one bar a run owes is `gates-green`'s:
+  aDeferredBar's M6 rule and the Skill bullet TOOL-aDeferredBar-1 added make kit work also owe the
+  agent-run `GATE_SELFTESTS=1` form at `VERIFYING`, which the ledger cannot record. §10's BASE
+  paragraph describes fb07ca25: `run_bounded` gained a third caller, `--dispatch`'s spec-token
+  checker, and the reaper, the census and the runner's delegation site did not move. No S-item
+  landed on main; AC10's unit-end suite run meets the gate-guard hook TOOL-aDeferredBar-3 landed,
+  which is reported to the orchestrator and not decided here.
+  Extended 2026-09-20, regrounding consolidation, folding the conservative reading of that parked
+  conflict and not deciding it. AC10 now reads the attributed run at the build's one post-build
+  bar, the run the main loop makes at VERIFYING after the last unit, and S10 follows it. AC1 gains
+  a `permission:` line because it names `tools/unattended/unattended.test.sh` as the file that
+  executes it, and AC7 gains one because both of its checks run over the rendered tree. AC2 to
+  AC6, AC8, AC9, AC11 and AC12 keep their in-pass observation: each describes a FIXTURE, which M6
+  names as a pass's own direct check. §4 states that this unit's delta on every capped carrier is
+  0 bytes as specced, that the stops companion is a new guide under its own cap, and what a check
+  22 key-table row for `PROCMON_CMD` would cost if the build rules one owed; no cap is raised. On
+  2026-09-20 the orchestrator ruled that a unit adding bytes to a capped carrier funds them itself,
+  so §4 also names the passage that would fund that row — §8's `SPEC_TOKENS_CLI` provenance tail,
+  237 bytes, to `tools/unattended/README.md` — and new AC13 reads both capped carriers at the pass
+  and reds if either grew, which checks the 0-byte claim instead of asserting it.
+  §7's one `New arm:` line names the driver suite's executed-assertion floor instead of `none`.
+  No criterion of this unit asserts a phrase counts zero, so the could-not-fail sweep found
+  nothing here.
+  Extended again on 2026-09-20, closing pass. The orchestrator ruled the check 22 key-table row
+  OWED rather than pending, so S12, §4 and AC13 drop every conditional arm and
+  `tools/unattended/PROTOCOL.template.md` and `tools/unattended/README.md` join Files touched. It
+  also ruled the collision the closing verifier found: this unit's old funding passage, §8's
+  `SPEC_TOKENS_CLI` provenance tail, is an earlier unit's claim, and this unit is the one that
+  moves, so the row is now funded by the `BRIEF_RECORDED_CUTOFF` cell's rationale tail at 264 bytes
+  and AC13 is re-witnessed by a phrase unique to it. AC13 also reds on a witness an earlier unit
+  removes first, which is the class of defect that collision was, and it reads the size of the
+  companion guide S8's rule lands in, which is what a carrier with more than 2048 bytes free owes
+  under the same ruling. Rule 1's narrow reading is
+  ratified, so AC2 to AC6, AC8, AC9, AC11 and AC12 keep the in-pass observation already written,
+  and AC1's `permission:` line now names WHICH run covers it: the suite holding its arm is on no
+  bar leg, so the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` run
+  covers it and `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` does not.
+  Closing verifier, same pass and rev: the `permission:` line of the criterion that reads the
+  attributed run now names that run in the orchestrator's own terms, because
+  `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
+  `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
+  post-build bar" alone would have read as a bar that covers them.
 
 ## 10. Reuse audit
 
@@ -279,10 +397,20 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   reading source. The seams this unit extends: the driver's `run_bounded`, the reaper's `--kill-msys`
   path with its fence, and the runner's own delegation to that path, whose calling shape
   (`PROCMON_ROOT` set, a bounded `timeout`) is the precedent at `tools/run-gates/run-gates.sh:1004`.
-- **DR against BASE.** DR's `--kill` is the Windows-pid flag; BASE's MSYS translation lives in
+- **DR against BASE fb07ca25.** DR's `--kill` is the Windows-pid flag; the MSYS translation lives in
   `--kill-msys`. TOOL-aReapedSpinner-12 records that the delegated kill was never proven end to end
   because every runner in that environment was unattributable; S4 and the scratch-hygiene unit's
-  re-exec are what make the join reachable, and AC1 is its first end-to-end observation.
+  re-exec are what make the join reachable, and AC1 is its first end-to-end observation. Between
+  `abac6d59` and fb07ca25 `tools/process-monitor/reap.py` and `tools/process-monitor/census.py` did
+  not move, the runner's delegation site at `tools/run-gates/run-gates.sh:1004` sits where it did,
+  and `run_bounded` moved one line and gained a third caller, `--dispatch`'s declared spec-token
+  checker (TOOL-aDeferredBar-2), whose record joins the ledger as the gate's and the wiring check's
+  do; `--dispatch` reaps nothing. None of the ledger, `PROCMON_CMD` or the orphan reap exists on
+  main. At fb07ca25 the wired gate-guard hook (`tools/unattended/gate-guard.js`) denies
+  `run-unattended-gates.sh` while this branch's record is before `VERIFYING`, so AC10's unit-end
+  run could not have executed inside a pass as rev-4 first wrote it. The 2026-09-20 consolidation
+  moved it to the build's one post-build bar; the ruling conflict with D12-i8 behind that move is
+  the orchestrator's.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: orphan reap process-monitor fence reap.py kill-msys ledger pid session keepalive
   preflight resume foreign — passed as `--terms` with the question "which orphaned processes may an

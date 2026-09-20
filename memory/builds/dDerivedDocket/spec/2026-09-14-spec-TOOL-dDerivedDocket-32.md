@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-32 — remote CI on every push
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 32
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
@@ -88,7 +88,23 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   `tools/unattended/run-unattended-gates.sh` stop saying nothing runs the held suites automatically,
   the unattended runner's line 2 stops saying they run 'on demand and nowhere else', and each header
   names the daily schedule in `remote-ci.yml`, beside the compensating-check wording unit 1 S8 leaves
-  there. The run-gates and unattended version moves these edits ride are the landing range's single
+  there. `AGENTS.md` is a CAPPED carrier, 64512 bytes in `tools/template-size-limits.txt`, and it
+  measures 64329 CR-stripped at BASE, 183 below that ceiling. This unit spends NONE of those 183 and
+  RAISES NO CAP: it lands NET ZERO OR NEGATIVE on `AGENTS.md`, and AC8 reads the file's size at this
+  unit's commit against its BASE size AND against its parent's, rather than against the ceiling.
+  Three movements fund the new sentence, and the same 443 bytes fund the pointer that replaces the
+  trimmed passage: the replacement sentence and that pointer may not exceed 443 between them, every
+  figure re-measured in the tree at this pass rather than carried. The render saves 56: `CI_FILE`
+  stops carrying the 87-byte `ci_file` answer and starts carrying the 31-byte derived path. The
+  follow-up sentence it replaces is 80 bytes, re-measured at BASE. And this unit TRIMS from the same
+  merge-bar section the two sentences that begin `a suite that stages breaks into a copy of a
+  checker` and end `so adopters stop receiving them too.` — 307 bytes whose text
+  `tools/unattended/README.md` already owns, in its own words, beside that kit's runner catalog. The
+  one fact the kit README does not carry, that those legs left the kit's own descriptor so adopters
+  stop receiving them, MOVES into that README in the same commit, and `AGENTS.md` keeps a clause
+  pointing at it, which AC8 reads and which those 443 bytes must cover. The owner ruling and its
+  date, what stayed on the bar, and the on-demand runner line all stay in `AGENTS.md`; no other unit
+  trims this passage. The run-gates and unattended version moves these edits ride are the landing range's single
   ones, NOT OBSERVED by a criterion here: `kit version markers` grades them. Observed by AC8.
 - **S8** Every upload names its files and runs after a failure. The `bar` job's step that copies
   `<git-dir>/gate-logs/` and, when present, `<git-dir>/gate-last-failure.txt` from the clone into the
@@ -180,13 +196,16 @@ nothing wrong in the tree. It keeps the sweep's hang bound, the budget times the
 calling it: the sweep writes each suite's output under a `mktemp -d` root its EXIT trap deletes and
 prints only verdict lines, at most four for a FAIL (`tools/run-gates/run-selftests.sh:492-493` and
 `:681`), so a `tee` of the sweep captures a header and not what ran (§8 F7). One suite's bound exceeds
-the hosted job's 21600 s: `unattended gate selftest`, 13600 s times 2 is 27200 s (PINNED, measured
-2026-09-14). Such a suite runs under the cap S9 states, so its kill is named and its partial output
-is published.
+the hosted job's 21600 s: `unattended gate selftest`, 13600 s times 2 is 27200 s (PINNED,
+re-measured at BASE 2026-09-20, and still the only one). Such a suite runs under the cap S9 states,
+so its kill is named and its partial output is published.
 
 The held population is split by suite because it does not fit one job. `run-selftests.sh --list`
-at BASE declares 62 rows and 55710 leg-seconds, with one suite budgeted at 13600 s, against a hosted
-job's 360-minute limit. PINNED as measured on 2026-09-14. Deriving one entry per suite from `--list`,
+at BASE declares 63 rows and 55930 leg-seconds, with one suite budgeted at 13600 s, against a hosted
+job's 360-minute limit. PINNED as measured on 2026-09-20. At `abac6d59` the same command read 62 rows
+and 55710 s; the one arrival is `unattended gate-guard selftest` at 220 s, declared alongside the
+hook `TOOL-aDeferredBar-3` landed, and its derived bound of 440 s crosses no threshold this unit
+states. Deriving one entry per suite from `--list`,
 the runner's own resolved output — the budget file's argv column is blank on most rows, which read
 their argv from `tools/gate-legs.json`, and `--kit` is a substring filter, so directories do not
 partition the population (G5 H4, measured 2026-09-14) — at run time means a new suite joins the
@@ -234,7 +253,8 @@ holds A9 until unit 34 lands.
 ### Files touched (estimate)
 
 `.github/workflows/remote-ci.yml` (new) · `.gitattributes` · `.lexicon.conf` ·
-`.governance/deploy.toml` · `AGENTS.md` · `tools/run-gates/run-selftests.sh` (header) ·
+`.governance/deploy.toml` · `AGENTS.md` · `tools/unattended/README.md` (the trim's destination,
+S7) · `tools/run-gates/run-selftests.sh` (header) ·
 `tools/unattended/run-unattended-gates.sh` (header) · this unit's journal under
 `memory/builds/dDerivedDocket/build/`.
 
@@ -340,6 +360,10 @@ holds A9 until unit 34 lands.
   on every push, or at or above the timeout, so the platform kills the job before the runner can
   name a leg; or the grant read has never been seen to fail, so a job-level write grant, which
   overrides the workflow level, passes the unit's one security bound.
+  permission: reading `ceiling_max` runs the merge bar under a `GATE_FULL=` prefix, which
+  `tools/unattended/gate-guard.js` row D1 denies inside a pass, so that reading is taken at the one
+  post-build bar; in the pass the four scratch-copy breaks and the workflow file's own two numbers
+  are read directly.
 - **AC5** — When the `held-plan` derivation runs by hand, the union of its entries by row name
   equals the population `bash tools/run-gates/run-selftests.sh --list` prints, with no name twice,
   and each entry's `--kit "<argv>" --list` selects exactly its own row; on a scratch copy of the
@@ -350,6 +374,9 @@ holds A9 until unit 34 lands.
 - **AC6** — When `python tools/lexicon/lexicon.py` and `python tools/govkit/govkit.py selfcheck` run
   with the workflow file tracked, both pass.
   Red when: `yml` stays undeclared in `LANGS`, and the lexicon leg refuses the new extension.
+  permission: both commands are the `lexicon naming predicates` and `govkit selfcheck` legs and run
+  at the one post-build bar; in the pass the `LANGS` row and the registry's declared surface are
+  read directly.
 - **AC7** — When `git check-attr eol` runs over the workflow file `remote-ci.yml`, it reads `lf`,
   and `git ls-files --eol` shows the index blob as LF.
   Red when: the pin is missing and a Windows checkout commits CRLF bytes.
@@ -360,17 +387,31 @@ holds A9 until unit 34 lands.
   `grep -ci 'nothing runs the self-tests automatically\|nothing runs these automatically\|nowhere else'`
   over both runner headers prints 0; and `grep -c 'remote-ci.yml'` prints at least 1 over each runner
   header and over `AGENTS.md`'s merge-bar section, and `grep -c 'no NEW FAIL'` at least 1 over each
-  runner header.
+  runner header; `grep -c 'stop receiving them too' AGENTS.md` prints 0 while
+  `grep -c 'adopters stop receiving' tools/unattended/README.md` prints at least 1 and `AGENTS.md`
+  still names that README, the trim and its destination S7 pins; and `tr -d '\r' < AGENTS.md | wc -c`
+  at this unit's commit reads at most what the same command reads at this unit's PARENT, and at most
+  64329, the BASE count S7 holds this unit to, 183 below the ceiling
+  `tools/template-size-limits.txt` declares for that file.
   Red when: the `ci_file` answer is left in place, so deleting the workflow later revives "none
   yet" silently instead of refusing the render; or one runner header still says nothing runs its
   suites automatically after the schedule does; or a header's whole 'WHAT IS THEREFORE NOT COVERED'
   paragraph, or the `AGENTS.md` sentence, is deleted rather than rewritten, which passes every
-  absence grep and removes the compensating-check sentence unit 1 S8 rewrote.
+  absence grep and removes the compensating-check sentence unit 1 S8 rewrote; or the trimmed
+  sentences are deleted without the fact they carry reaching the kit README, so the build loses it;
+  or `AGENTS.md` GROWS at this unit's commit, which passes a ceiling read while spending headroom the
+  units after this one need, and leaves the `charter size` leg to red at the post-build bar where no
+  pass of this unit is left to trim it.
+  permission: the render check and the size check are the `playbook render wiring` and `charter size`
+  legs and run at the one post-build bar; in the pass the region is re-rendered by S7's write-mode
+  command, the greps are run directly, and the byte count is read with `wc -c`.
 - **AC9** — When `python tools/drift-audit/drift_report.py --check` runs after the `LANGS` edit, it
   exits 0 with `signal_lexicon_ratified_stale` at its pin; on a scratch copy with the `ratified=`
   line reverted, the same command reds naming that signal, and the journal records both.
   Red when: `yml::dark` lands without the re-stamp, which the unguarded `drift-audit records` leg
   reds on the landing bar and on the CI bar job while every unit-pass observation stays green.
+  permission: the command is the `drift-audit records` leg and runs at the one post-build bar; in the
+  pass the scratch-copy arm and the `ratified=` line are read directly.
 - **AC10** — When `grep -c 'uses: actions/upload-artifact@'` runs over the workflow file, it equals
   the count of `if: always()` lines on those steps and the count of `if-no-files-found: error`; the
   `bar` job's copy step names `gate-logs` and carries `if: always()`; and each `held` job's run step
@@ -454,17 +495,17 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   instruction stays, because the merge bar still does not run them. The population is
   `run-selftests.sh --list`'s, one matrix entry per suite (F6).
 - **F4** — May this unit edit `AGENTS.md`'s authored merge-bar sentence? The unit makes it false,
-  and the ratified design lists `AGENTS.md` among the documents this build updates. RESOLVED (agent,
-  2026-09-14, delegated): yes, that one sentence; the render and the rest of the charter's backlog
-  wording stay with the charter unit.
+  and the ratified design lists `AGENTS.md` among the documents this build updates.
+  RESOLVED (agent, 2026-09-14, delegated): yes, that one sentence; the render and the rest of the
+  charter's backlog wording stay with the charter unit.
 - **F5 — where the bar runs on the runner.** Options: (a) a clone at the primary-tree path; (b)
   answer-overridable path probes in the renderer. (b) is the playbook kit's surface and changes
   `derived` for every adopter. RESOLVED (agent, 2026-09-14, delegated): (a).
 - **F6 — how the held population is partitioned.** Options: (a) an exact selector added to
   `run-selftests.sh`; (b) one matrix entry per suite, keyed by its full resolved argv through the
   existing substring filter, the plan job refusing a key that selects other than one row. (a) is a
-  new run-gates surface and a second version move in this landing range. RESOLVED (agent,
-  2026-09-14, delegated): (b); (a) is recorded as an ADD candidate.
+  new run-gates surface and a second version move in this landing range.
+  RESOLVED (agent, 2026-09-14, delegated): (b); (a) is recorded as an ADD candidate.
 - **F7 — how the held job runs a suite and captures what ran.** Options: (a) `tee` the output of
   `run-selftests.sh --kit "<argv>" --sweep`, as rev-2; (b) run the row's argv as the sweep does,
   under `timeout -k 5 <bound>` with its output piped through `tee`, resolving the launcher and
@@ -474,6 +515,16 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   (c) is a new public run-gates surface and a second version move in this landing range, which veto
   2 reserves. RESOLVED (agent, 2026-09-16, delegated): (b), with a `platform-bounded` suite capped at
   `timeout-minutes` times 60 less 600 seconds, so its kill is named and its upload runs.
+- **F8 — which of this unit's criteria may be observed inside its own pass?** Options: (a) the
+  narrow reading, where a gate-leg command run over the REAL tree for that leg's verdict, and any
+  suite FILE invocation, defer to the run at VERIFYING, while the same checker run inside a scratch
+  clone, a `--selftest` flag and a read-only verb keep their in-pass observation; (b) the wider
+  reading, which defers AC3 and AC12 as well because the commands they run are gate-leg commands
+  wherever they run. RESOLVED (agent, 2026-09-20, delegated), decided by the orchestrator: (a). AC4,
+  AC6, AC8 and AC9 carry the deferral, AC3 and AC12 keep their scratch-clone runs, AC5 is exempt on
+  `--list` and AC14 runs synthetic argv. The hook-versus-owner conflict BEHIND the reading stays
+  parked for the owner in `memory/builds/dDerivedDocket/RUN.md`; what this fork decides is only how
+  this build's specs apply it.
 - The adoption of remote CI, its detection-after-landing timing and its held-suite schedule are
   RESOLVED (owner, 2026-09-13) as D11-b, D11-c and D12-i12, and the push of the workflow file as the
   owner's 2026-09-14 answer that the credential has scope.
@@ -507,13 +558,75 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   verification: S9 and AC11 mark `platform-bounded` every suite over the 21000 s cap rather than the
   21600 s limit, so none runs uncapped between them; §10 describes the held run as F7 decides it,
   not as `--sweep`.
+- rev-4 · 2026-09-20 · regrounded on fb07ca25 (origin/main). One figure moved:
+  `TOOL-aDeferredBar-3` (7e9bbeff) declared `unattended gate-guard selftest` at 220 s in
+  `tools/run-gates/selftest-budgets.txt`, so §4's held-population reading is re-measured at 63 rows
+  and 55930 leg-seconds and its single over-cap suite re-confirmed; S4, S9, AC5 and AC11 derive the
+  population from `--list` at run time and needed no edit. Everything else this unit names is
+  byte-identical at BASE: `derive_ci_file` and the answer-overrides-probe block
+  (`tools/playbook/render_playbook.py:405-419`), `.governance/deploy.toml`'s `ci_file` answer,
+  `.gitattributes` with no `yml` pin, `.lexicon.conf`'s `LANGS` still without `yml` and its
+  `ratified=` stamp, `signal_lexicon_ratified_stale`, the sweep's scratch root and verdict-line tail
+  (`tools/run-gates/run-selftests.sh:492-493`, `:571`, `:681`), the `modest` row of
+  `tools/run-gates/gate-profiles.txt`, and both runner headers, which still say the suites run on
+  demand and nowhere else. `AGENTS.md`'s merge-bar sentence calling remote CI a follow-up is
+  untouched; the single line main moved in that file is §12's lexicon-selector bullet.
+  `tools/run-gates/run-gates.sh` moved only its version line and its killed-leg tail, so
+  `GATE_WALL` at `:422` and the launcher rewrite at `:1369` read as cited, and §10 now spells the
+  first with its full path. This repo still carries no `.github/` directory. §10's BASE paragraph
+  re-measured. Extended 2026-09-20 by the regrounding consolidation, which folds the build-wide
+  conservative reading of the parked suite-permission conflict rather than deciding it (the fork is
+  parked for the owner in `memory/builds/dDerivedDocket/RUN.md`): AC4, AC6, AC8 and AC9 gain
+  `permission:` lines deferring their leg and merge-bar readings to the one post-build bar, while
+  AC3 and AC12 keep their in-pass runs because each runs a checker inside a scratch clone. S7 states
+  the byte budget this unit's `AGENTS.md` change is held to, 183 bytes against the 64512-byte ceiling
+  `tools/template-size-limits.txt` declares, and AC8 reads that count at the commit; no cap is
+  raised. §10 gains the paragraph naming both landed rules, the hook at the act and
+  `tools/check-spec-tokens.py`'s `bar` join at the spelling, and records that this spec's filename
+  date keeps it one day clear of `SPEC_DIRECT_CUTOFF`. Extended again 2026-09-20 by the closing
+  consolidation: the `AGENTS.md` budget is NET ZERO rather than the 183 bytes free, because the free
+  space does not cover this build's units and no cap is raised for one — S7 names the 307-byte
+  passage this unit trims and `tools/unattended/README.md` as the document that already owns it, S7
+  re-measures the replaced sentence at 80 bytes, AC8 reads the BASE count 64329 instead of the
+  ceiling and greps both ends of the move, and §4's Files touched gains the README. The closing
+  verifier re-measured all three movements in the tree: the trim is 307 bytes and the render saves
+  56, not 308 and 57, and the 443 they total with the replaced sentence must also cover the clause
+  pointing at the kit README that AC8 requires — so S7 now states the 443 and names the pointer
+  inside it, and AC8 reads the PARENT count beside the BASE one, which is what its own Red when
+  already asserted. New §8 F8
+  records the orchestrator's ruling on which criteria a pass may observe, which ratifies the split
+  this spec already carried, and §10's parked paragraph now points at it for the act half. The
+  build-wide question the regrounding verifier left open is closed by reading the whole spec set at
+  this pass: no unit at order 33 through 36 writes `AGENTS.md` at all, and the only other writer is
+  the charter unit at order 37, whose own criteria hold it below its parent.
+  Extended a third time 2026-09-20 by the close-out pass, which moved no scope, design or
+  criterion here and records what it checked rather than leaving four rulings unanswered in a
+  spec they could have reached. NET ZERO STILL BINDS, and the closing scoping rule is the reason
+  rather than an exception to it: that rule frees a carrier with at least 2048 bytes spare from
+  net zero and asks it only for a stated delta, and `AGENTS.md` has 183 free at `fb07ca25`
+  against the 64512 `tools/template-size-limits.txt` declares — an eleventh of the threshold —
+  so S7's trim-funded budget and AC8's parent-and-base read both stand as written. The trim
+  collision ruling reaches nothing here: this unit's 307 bytes come out of `AGENTS.md`'s own
+  merge-bar section and its destination is `tools/unattended/README.md`, so it claims no
+  passage of `memory/guides/UNATTENDED-PROTOCOL.md` and no cell of that protocol's section 8,
+  which is where the two claims that did collide sat. The unconditional key-table row is owed
+  by a unit that names a key in `tools/unattended/.unattended.conf.example` or sets one in
+  `.unattended.conf`; this unit writes neither file, its conf write being the `ci_file` answer
+  it REMOVES from `.governance/deploy.toml`, so check 22 grades nothing of its doing. And the
+  verifying run's flags change no permission line above: §7 lists eight legs and
+  `tools/gate-legs.json` at HEAD gives none of them `subject = kit` or `chunk = selftests`, so
+  no leg this spec names is HELD and none of AC4's, AC6's, AC8's or AC9's deferrals needs to
+  say which form of the bar covers it — every one of them runs on a plain bar. AC4 is the one
+  worth stating twice: its reading is deferred because the `GATE_FULL=` PREFIX is what the
+  hook denies, not because `ceiling_max` needs a full bar, and that value is the manifest's
+  largest declared ceiling either way. The header date already reads 2026-09-20, rev kept.
 
 ## 10. Reuse audit
 
 Nothing here builds a gate engine: every job runs a command the bar already owns. The history audit is
 `tools/memory-tree/check-memory-hygiene.sh` as the `memory hygiene` leg runs it; the per-sha verdict is
 `tools/run-gates/run-gates.sh` with `GATE_FULL=1` and its existing `GATE_WALL` override at
-`run-gates.sh:422`; the held run is each suite's own argv, run the way
+`tools/run-gates/run-gates.sh:422`; the held run is each suite's own argv, run the way
 `tools/run-gates/run-selftests.sh --sweep` runs one suite and with the launcher rewrite
 `tools/run-gates/run-gates.sh` applies to a leg, without calling the sweep, whose scratch root
 deletes the output the held job exists to publish (§8 F7). The charter line is derived by
@@ -528,6 +641,41 @@ Where DR and the source disagree at BASE: DR's L7 speaks of REQUIRED checks, and
 required is a repository setting this build may not change, so the unit ships the checks and leaves
 the setting to the owner. DR does not name a runner, a trigger set or an artifact shape; §4 decides
 them. M12's candidates and the observation that rejected each are in §4, Alternatives rejected.
+
+BASE is `fb07ca25`, origin/main 210 commits past the `abac6d59` this spec was first audited at. In
+this unit's territory exactly one thing moved, the budget row §4 now reads. No landed build ships a
+CI workflow: `git log --oneline abac6d59..fb07ca25` over the window finds no remote-CI commit, `git
+grep` over the landed kits and every build's specs for `remote-ci`, `.github/workflows` and
+`workflow_dispatch` returns only this spec, its two audit records and two terminal builds' prose,
+and `derive_ci_file` still falls back to the `ci_file` answer S7 removes. No codebase-map inventory
+in `tools/codebase-map/map_extractors.py` enumerates a `.yml`, and `tools/govkit/registry.toml` is
+unchanged, so S6's "owes neither a registry row nor a claim" holds. The two kit versions this unit's
+header edits ride both moved on main, run-gates 1.6 to 1.7 and unattended 1.19 to 1.24; S7 pins
+neither, and `TOOL-dDerivedDocket-1` S9 still owns the build's one move for each, read against BASE
+and the advertised tip rather than a number written here.
+
+TWO LANDED RULES REACH THIS SPEC, one at the ACT and one at the SPELLING. How the act applies to
+this spec is decided in §8 F8; the spelling is folded rather than decided, and the ruling conflict
+behind both is parked for the owner in `memory/builds/dDerivedDocket/RUN.md`.
+
+The act is `tools/unattended/gate-guard.js` (`TOOL-aDeferredBar-3`), wired in `.claude/settings.json`,
+which denies at the tool call, in any phase before VERIFYING, a command carrying a non-empty
+`GATE_FULL=` or `GATE_SELFTESTS=` prefix whatever verb follows it. AC4's `ceiling_max` reading is
+exactly that shape, so it is deferred to the one post-build bar, and the owner rule that a unit pass
+runs no gate leg defers AC6, AC8 and AC9 the same way. AC3 and AC12 keep their in-pass runs: each
+runs a checker inside a scratch clone, which the child prompt in
+`tools/workflows/unattended-unit.js` names among the direct checks a pass may use. AC5 is exempt at
+the hook by `--list`, one of its five read-only verbs, and AC14 runs synthetic argv and no suite.
+
+The spelling is the `bar` join `TOOL-aDeferredBar-2` added to `tools/check-spec-tokens.py`, keyed on
+`SPEC_DIRECT_CUTOFF` in `.memory-tree.conf`. It reds a merge-bar or suite INVOCATION backticked in an
+acceptance bullet or a §7 leg-list line of a LIVE spec whose FILENAME date is at or after that key.
+The key reads 2026-09-15 at HEAD and every spec of this build is dated 2026-09-14, so this spec's
+three carriers — AC4's prefixed runner, AC5's read-only run of the self-test runner and AC14's
+Red-when mention of the sweep — are COUNTED as pre-cutoff NEAR rows and graded by nothing. That
+escape is one day wide and is a property of the filename rather than of the deferral above: the join
+reads the SPELLING, so moving the runs to VERIFYING leaves all three tokens in place. Re-dating any
+spec of this build to 2026-09-15 or later, or a later corpus moving the cutoff forward, reds them.
 
 Recall terms used: `remote CI GitHub workflow scoped push required checks history audit check 9
 held suites schedule fetch-depth shallow direct push`

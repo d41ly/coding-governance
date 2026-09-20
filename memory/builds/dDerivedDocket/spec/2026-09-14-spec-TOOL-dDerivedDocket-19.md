@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-19 — authority only from an owner-committed README
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 19
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,7 @@ add to it, and the leg says so when something tries.
 
 ## 2. Scope (IN)
 
-- **S1** The authorization scan (`tools/unattended/unattended.sh:1375-1381`) reads a `may:`
+- **S1** The authorization scan (`tools/unattended/unattended.sh:1465-1471`) reads a `may:`
   front-matter line from the same blob it already parses. Preflight pins it as the run fact `may:`
   ONLY when the resolved mode is `slug`, and pins `may: none` when the key is absent. Observed by
   AC1.
@@ -51,7 +51,32 @@ add to it, and the leg says so when something tries.
   where a grant is honoured, what it lifts, what it does not, and that ask-row and `SCOPE`-row
   clauses honour nothing. BUILD-METHOD M3, in its template and rendered copy, gains ONE sentence
   pointing at it. The protocol §1 rule sentence opens with the fixed phrase
-  `A may: grant is honoured only from`, so a criterion can find it. Observed by AC9 and AC11.
+  `A may: grant is honoured only from`, so a criterion can find it. The §1 paragraph adds at most
+  350 B to each protocol copy and the M3 sentence at most 120 B and one line to each build-method
+  copy, AND EACH IS PAID FOR IN THE SAME EDIT, because no cap is raised in this build. Two
+  passages leave, both MOVED rather than deleted, and each is larger than what this unit puts in
+  its place:
+  - out of protocol §1, the paragraph beginning `A fork with no delegated resolver is parked`,
+    down to the sentence ending `spends an owner turn that was not needed`. It moves into the
+    `--park` entry of `tools/unattended/VERBS.template.md` and its installed copy
+    `memory/guides/UNATTENDED-VERBS.md`, which is where the verb entries live and which §7 of the
+    protocol already records as a byte decision of exactly this shape.
+  - out of BUILD-METHOD M3, the paragraph beginning `Mark it in place` and ending
+    `§8 says what that cannot see`. It moves into §8 of `tools/memory-tree/SPEC-TEMPLATE.template.md`
+    and its rendered copy `memory/TEMPLATE-SPEC.md`, which the memory-tree README's method pointer
+    table already names as the owner of the §8 mark grammar — and whose own rule is that a rule
+    appearing in both the method and a carrier it points at is a defect in the method. M3 keeps
+    ONE line pointing there, and the moved text drops its own pointer back to that file, which
+    becomes a self-reference once it lands inside it.
+  No other unit of this build trims either passage, and neither DESTINATION is this unit's alone.
+  One unit rewrites text INSIDE the BUILD-METHOD passage this unit moves: the fork-item unit
+  ordered later replaces the sentence saying both readers grade the SECTION and not each item, and
+  its own section 2 now follows that sentence into section 8 of `memory/TEMPLATE-SPEC.md` and its
+  kit template rather than into M3, because this unit lands first. The move is this unit's; the
+  rewrite lands where this unit put the text. The verbs pair is written by an earlier unit of this
+  build too, which lands its own moved paragraph in the `--attest` entry while this unit lands in
+  `--park`: two disjoint entries in one file, so the sharing is an ordering fact and not a contested
+  passage. Observed by AC9 and AC11.
 - **S8** A `memory/DECISIONS.md` row under this unit's own id records the M3 boundary change, as fix
   F1 requires. Observed by AC10.
 
@@ -101,7 +126,7 @@ add to it, and the leg says so when something tries.
 | the scaffold's output | never emitted | a generated README carries no authored authority |
 
 `slug` mode implies the default-branch anchor because the second anchor admits only
-`SECOND_ANCHOR_MODES="prompt recipe"` (`tools/unattended/unattended.sh:497`), and leg check 29
+`SECOND_ANCHOR_MODES="prompt recipe"` (`tools/unattended/unattended.sh:580`), and leg check 29
 already reds a `slug` record whose BASE came from the second anchor.
 
 ### What a grant lifts
@@ -216,15 +241,38 @@ Any new shell function is named through `python tools/lexicon/lexicon.py --sugge
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/PROTOCOL.template.md` · `memory/guides/UNATTENDED-PROTOCOL.md` ·
 `tools/memory-tree/BUILD-METHOD.template.md` · `memory/guides/BUILD-METHOD.md` ·
+`tools/unattended/VERBS.template.md` and `memory/guides/UNATTENDED-VERBS.md`, and
+`tools/memory-tree/SPEC-TEMPLATE.template.md` and `memory/TEMPLATE-SPEC.md`, the two pairs S7's
+moved passages land in ·
 `tools/memory-tree/backlog.py` and its selftest · `tools/memory-tree/gen_build_index.py`'s selftest ·
 `memory/DECISIONS.md` · `.memory-tree.conf` for `ARMS_FLOORS`.
 
 ### Budgets
 
-BUILD-METHOD's ≤27648 B is shared with units 20 and 31 and stood at 26439 B at BASE. This unit's
-net growth there is at most 300 B; raising M1's budget is an owner turn under veto 2 and is not
-this unit's to take. The protocol's guide cap is 61440 B against 57815 B at BASE, shared with at
-least five units of this build; this unit's net growth there is at most 600 B.
+NO CAP IS RAISED IN THIS BUILD, and no SHARE of one is claimed either. Raising M1's budget or the
+guide cap is an owner turn under veto 2, the free space does not cover every unit that wants it, and
+a share is only a promise about a sum nobody can check at a single pass. So this unit lands NET ZERO
+OR NEGATIVE on both capped carriers it writes to, paying for each addition inside the same edit
+(S7), and AC11 reads each file at this unit's own pass against its PARENT commit rather than against
+a budget.
+
+`memory/guides/BUILD-METHOD.md` stood at 26439 B and 336 lines at `abac6d59` and at 27264 B and
+347 lines at BASE `fb07ca25`, after aRatifiedRulings, aDeferredBar and aProbedUnit grew it, against
+the 27648 B declared at `tools/template-size-limits.txt:86` and the 350 lines its own budget line
+declares. This unit adds the M3 pointer sentence, at most 120 B and one line, and removes M3's
+`Mark it in place` paragraph, which is larger in both bytes and lines. Only the byte half is gated —
+no checker reads the line half of that budget row (`tools/template-size-limits.txt:84-85`) — which
+is why AC11 counts the lines itself rather than trusting the leg to.
+
+`memory/guides/UNATTENDED-PROTOCOL.md` stood at 57815 B at `abac6d59` and 60324 B at BASE against
+its 61440 B guide cap. This unit adds the §1 rule paragraph, at most 350 B, and removes §1's
+`--park` paragraph, which is larger.
+
+Both removals are MOVES with a named destination, so nothing is lost from the contract, and each
+frees more than this unit spends. That hands headroom BACK to the other carriers' spenders — units
+20 and 31 on the build method, units 3, 4, 5, 16, 17, 20, 22, 27 and 28 on the protocol — instead of
+competing with them. Whether their own sum then closes is still the orchestrator's to settle and is
+not a thing this unit's pass can observe.
 
 ### Alternatives rejected
 
@@ -254,7 +302,8 @@ least five units of this build; this unit's net growth there is at most 600 B.
   `tools/gate-legs.json` carries no leg for those suites; the backlog and build-index selftest arms
   run at the post-build bar under `GATE_SELFTESTS=1`.
 - migration — none; no README carries the key.
-- user docs — protocol §1 and one M3 sentence; the Skill's own text is unit 20's.
+- user docs — protocol §1 and one M3 sentence, plus the two passages S7 moves out of those same
+  two documents into the verbs guide and the spec template; the Skill's own text is unit 20's.
 
 ## 6. Acceptance criteria
 
@@ -264,12 +313,12 @@ least five units of this build; this unit's net growth there is at most 600 B.
   Red when: the fact is pinned in `prompt` mode as well, so a run-written README grants.
   permission: this unit may not run the unattended suites; the observation is made by hand in a
   scratch fixture repo with a local bare remote, and the suite runs in unit 22's attributed run (its
-  AC13).
+  AC13), which the main loop makes at the one post-build bar at VERIFYING, after the last unit.
 - **AC2** — When `--preflight` runs over a `prompt`-mode fixture README carrying `may:`, and over a
   `recipe`-mode one, it refuses under its new code and writes nothing.
   Red when: preflight pins `may: none` and continues, which hides the attempt, or the refusal keys on
   `prompt` alone, so a `recipe` README grants.
-- **AC3** — When the `may:` value carries `TOOL-aFoo3`, an id prefix failing the id grammar,
+- **AC3** — When the `may:` value carries `EXMP-aFoo3`, an id prefix failing the id grammar,
   preflight refuses naming the token; when it carries `` `tools/push-main.sh` `` and, in a second
   fixture, `tools/push-main.sh`, both pin the fact `may: tools/push-main.sh`, and check 19's S4 arm
   is green on both.
@@ -335,19 +384,35 @@ least five units of this build; this unit's net growth there is at most 600 B.
   and that sentence names the owner-committed `slug` README, veto 2 only, and that ask-row and
   `SCOPE`-row clauses honour nothing; `git grep -c "protocol §1"` over
   `tools/memory-tree/BUILD-METHOD.template.md` and `memory/guides/BUILD-METHOD.md` finds exactly one
-  more M3 sentence than at this unit's parent; and `git cat-file -s` at this unit's parent and at its
-  commit shows at most 300 B of net growth on `memory/guides/BUILD-METHOD.md` and at most 600 B on
-  `memory/guides/UNATTENDED-PROTOCOL.md`.
-  Red when: the edit is empty, or it passes the shared caps while spending more than its budget,
-  which is the headroom units 20 and 31 were priced against.
-  permission: a read and a byte count, no gate leg.
+  more M3 sentence than at this unit's parent; and `git cat-file -s` run at this unit's parent and at
+  its commit reports a SMALLER size at the commit for all four of
+  `memory/guides/BUILD-METHOD.md`, `tools/memory-tree/BUILD-METHOD.template.md`,
+  `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md`, each of the
+  first pair also under the 27648 B declared at `tools/template-size-limits.txt:86` and each of the
+  second under the 61440 B guide cap. `wc -l` over `memory/guides/BUILD-METHOD.md` at the same two
+  commits reports FEWER lines at the commit, and under the line budget its own `**Budget:` line
+  declares. The two destinations carry what left: `git grep -c "fork-unresolvable"` over
+  `memory/guides/UNATTENDED-VERBS.md` returns at least 1, `git grep -c "and it may WRAP"` over
+  `memory/TEMPLATE-SPEC.md` returns 1; `memory/guides/UNATTENDED-VERBS.md` reads under the 61440 B
+  cap its guide class carries (`tools/memory-tree/check-memory-hygiene.sh:84`), and no cap clause is
+  asserted for `memory/TEMPLATE-SPEC.md`, which sits outside that class and which no row of
+  `tools/template-size-limits.txt` names, so it carries no declared ceiling to read.
+  Red when: the edit is empty; or either carrier is the same size or LARGER at this unit's commit
+  than at its parent, so this unit spent headroom it was told to fund from its own edit instead —
+  which is why the comparison is against the parent commit and never against a declared share,
+  a share being a claim about a build-wide sum that no single pass can observe; or the line
+  count on the build method holds or grows, which no checker would
+  catch (`tools/template-size-limits.txt:84-85`) and which is how that document reaches a budget no
+  unit of this build may raise; or a passage was DELETED rather than moved, so the carrier shrank
+  and the contract lost a rule.
+  permission: a read, a byte count and a line count, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `kit/dogfood doc parity` · `build-method size` · `build-index selftest` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a `slug` README with `may:`, a `prompt` and a `recipe` README with `may:`, a malformed grant, a grant in both spellings · `ARMS_FLOORS` for `tools/unattended/unattended.sh`
-New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, an owner commit reaching the run through a prepared merge, a terminal primary-mode record whose witness is the landing merge, pushed and unpushed, a primary record whose witness is a fix commit on that pushed landing merge, a primary record whose witness is push-main's reconcile over another node's owner `may:` commit, a terminal in-place record whose witness is the close commit on that prepared merge, and a run aborted before `--prepare` after a plain reconcile brought an owner `may:` commit in, graded live and with its witness once the reconcile and once a commit after it · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/unattended.test.sh` · a `slug` README with `may:`, a `prompt` and a `recipe` README with `may:`, a malformed grant, a grant in both spellings · the driver suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
+New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, an owner commit reaching the run through a prepared merge, a terminal primary-mode record whose witness is the landing merge, pushed and unpushed, a primary record whose witness is a fix commit on that pushed landing merge, a primary record whose witness is push-main's reconcile over another node's owner `may:` commit, a terminal in-place record whose witness is the close commit on that prepared merge, and a run aborted before `--prepare` after a plain reconcile brought an owner `may:` commit in, graded live and with its witness once the reconcile and once a commit after it · the leg suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
 ## 8. Open questions
 
@@ -474,17 +539,85 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   it. F7 is kept. AC6 gains the fix-commit and push-main-reconcile records and grades the aborted
   run live as well; its `Red when:` replaces the tip-test clause, and §7's arm line follows. S4's
   text is unchanged; AC6 still observes it.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main). S1 and §10 re-cite the authorization
+  scan at `tools/unattended/unattended.sh:1465-1471` and §4 `SECOND_ANCHOR_MODES` at `:580`, both
+  moved by the aProbedUnit, aDeferredBar and aRatifiedRulings driver commits with their shapes
+  unchanged. §4 Budgets re-measures both carriers at BASE: BUILD-METHOD at 27264 B and 347 lines
+  after aRatifiedRulings, aDeferredBar and aProbedUnit grew it, 384 B and 3 lines under its caps, and
+  the protocol at 60324 B, 1116 B under its cap; this unit's own budgets and AC11 are unchanged. §10
+  states what the landed builds moved at the seams. No landed build adds a `may:` grant, and no S-item
+  is done on main. Extended 2026-09-20, same base, on a second regrounding pass: every citation above
+  re-read at HEAD and confirmed, `tools/unattended/unattended.sh:1465-1471` the one front-matter `awk` and `:580`
+  `SECOND_ANCHOR_MODES`; check 29's refusal at `tools/unattended/check-unattended.sh:1420` and
+  `ADV_HEAD` at `:294` still carry the shapes S4 and §4 read; `tools/gate-legs.json` still runs neither
+  unattended suite, so §8 F6's premise holds; and both carriers re-measured unchanged at 27264 B and
+  60324 B. §4 Budgets now states that this unit's 300 B and unit 20's 250 B together exceed
+  BUILD-METHOD's 384 B of headroom, which is the orchestrator's to settle and not this unit's.
+  Verification pass, same regrounding: that extension cited the authorization scan by bare basename,
+  and now spells it `tools/unattended/unattended.sh:1465-1471`, so the citation resolves against a
+  tracked path instead of being skipped as an untracked one.
+  Extended again 2026-09-20, same base, by the regrounding consolidation pass · §4 Budgets · S7 ·
+  AC1 AC11 · §7. The two capped carriers are TRIMMED to fit rather than re-argued, because no cap is
+  raised in this build: BUILD-METHOD falls from 300 B to 120 B and one line, of the 384 B free, and
+  the protocol from 600 B to 350 B of the 1116 B free. S7 prices both, §4 Budgets records the
+  trimmed split against unit 20's own cut to 160 B and what it leaves unit 31, and AC11 now reads
+  each file's SIZE against its cap at the pass as well as its net growth. AC1's `permission:` line
+  says where unit 22's attributed run happens under the conservative reading of the D12-h conflict,
+  which this pass folds and does not decide; §8 F6 stands as resolved. §7's two `New arm:` lines
+  name the suites' executed-assertion floors beside their `ARMS_FLOORS` pins. Every criterion here
+  asserting a count was re-run at HEAD: none asserts that a phrase counts zero, so none could be
+  green before the unit acts.
+  Extended again on the closing consolidation pass · S7 · §4 Budgets · §5 · AC11, with the header
+  date moved to the last-change date and the rev kept. The two capped carriers stop being priced
+  as SHARES of free space and become NET ZERO OR NEGATIVE at this unit's own pass, which is the
+  only thing a pass can observe: a share is a claim about a build-wide sum, and the sum did not
+  close on either carrier. S7 names the two passages that leave — protocol §1's `--park`
+  paragraph, to the `--park` entry of the verbs pair, and M3's `Mark it in place` paragraph, to
+  §8 of the spec-template pair, whose own pointer table already owns that grammar — and both are
+  moves rather than deletions. §4 Budgets is rewritten around that, §4 Files touched gains the
+  two destination pairs, and §5's user-docs line follows. AC11 now compares all four carrier
+  files against this unit's PARENT commit, counts BUILD-METHOD's lines itself because no checker
+  reads that half, and reds a carrier that held or grew, a line count that did not fall, and a
+  passage deleted instead of moved. Each destination witness was counted at HEAD and returns 0
+  today, so AC11 cannot be green before the unit acts. Both passages are this unit's alone to
+  TRIM, though neither destination is its alone to write.
+  Verification pass, same consolidation: AC11's closing clause read `each destination is under its
+  own cap`, which could not fail for `memory/TEMPLATE-SPEC.md` — that file sits outside the guide
+  class and no row of `tools/template-size-limits.txt` names it, so it has no ceiling to be under.
+  The clause now names the verbs guide's real cap and says plainly that the spec template has none.
+  No trim, destination or byte figure moved.
+  Extended again on the close-out pass, same base and rev · S7. The closing claim is weakened to
+  what is true. The TRIMS are still uncontested, and no byte figure moves; what is shared is the
+  two destinations. An earlier unit of this build lands its own moved paragraph in the `--attest`
+  entry of the verbs pair this unit writes through `--park`, and the fork-item unit ordered later
+  rewrites one sentence INSIDE the BUILD-METHOD passage this unit moves, following it into section
+  8 of `memory/TEMPLATE-SPEC.md` rather than back into M3. Neither is a second trim of either
+  passage, so AC9 and AC11 are unchanged; the record exists so a reader does not take
+  "no other unit" as a claim about the destinations. The close-out verifier re-spelled AC3's
+  malformed example token in the build's `EXMP` example family; it stays malformed, because the id
+  grammar the arm exercises reads `[A-Z]+-[A-Za-z0-9]+-[0-9]+` and is blind to the family.
 
 ## 10. Reuse audit
 
 The seam is the authorization scan's single `awk` over the README blob at BASE
-(`tools/unattended/unattended.sh:1375-1381`), which unit 16 extends with `asks:` and this unit with
+(`tools/unattended/unattended.sh:1465-1471`), which unit 16 extends with `asks:` and this unit with
 `may:`, plus leg check 19's re-parse of the same blob. `reuse_lookup.py "authority grant honoured
 only from an owner committed record"` returns the `unattended` dossier's `.unattended.conf` seam and
 generic record helpers; no seam in the lookup grades authority, and its scan reports `.sh` unscanned.
 The recall probe surfaced `TOOL-aStandingWrit-1`, which names the property S4's third arm closes: a
 run that lands a new build README authorizes the next run. Where DR and the source disagree: DR
 §19.2's "union of `may` clauses" is superseded by F1 and D12-j, and no code implements either yet.
+
+BASE is `fb07ca25`, origin/main, which HEAD `94fd2f54` merges without changing code. From
+`abac6d59` to it, `tools/unattended/unattended.sh`, `tools/unattended/check-unattended.sh`,
+`tools/unattended/lib-unattended.sh`, the protocol and BUILD-METHOD moved under aRatifiedRulings,
+dPolishedVitrine, aDeferredBar, aReplayedCard and aProbedUnit: the stall probe and `--audit`, a
+spec-token run at `--dispatch`, a brief-row path reader in the library, protocol fact 13 (the run's
+local branch ref), and M6's rule that a pass runs no bar and no suite. None adds a `may:` key, a
+grant token, or a walk of a run's own commits; the scan, check 19's re-parse, check 29 and
+`ADV_HEAD` keep their shapes at new lines, `tools/push-main.sh`'s `--no-ff` reconcile is unchanged,
+and no build README on `fb07ca25` carries `may:`. `tools/gate-legs.json` still carries no leg for
+either unattended suite.
 
 Recall terms used: `veto-2 governance-carrier authority grant owner-committed default-branch anchor
 prompt-mode run-authored mandate scaffold delegated resolver`

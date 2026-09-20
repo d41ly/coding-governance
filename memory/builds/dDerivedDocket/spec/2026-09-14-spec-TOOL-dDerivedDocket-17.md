@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 17
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
@@ -17,7 +17,7 @@
 
 A run pointed at a set of asks can reach `--close` today with a mandated ask still undecided, and
 no Definition-of-Done item notices, because none of the twelve concerns asks
-(`tools/unattended/unattended.sh:348`). Add a thirteenth core item, `asks-disposed`, that reads the
+(`tools/unattended/unattended.sh:407`). Add a thirteenth core item, `asks-disposed`, that reads the
 same fold the family view renders and decides whether every mandated ask, and every ask this build
 filed itself, ended in a state the owner can accept. Freeze what it read at landing, because REOPEN
 (owner ruling D4) makes CLOSED non-absorbing and a landed record's answer would otherwise change
@@ -44,7 +44,18 @@ under it.
   `memory/guides/UNATTENDED-PROTOCOL.md`, byte-identical: the count sentence reads "Thirteen", and a
   row for `asks-disposed` joins the table. Leg check 16's count-word table in
   `tools/unattended/check-unattended.sh` is extended past `twelve`, because today it maps
-  `thirteen` to -1 and would red the leg on the correct sentence. Observed by AC1 and AC10.
+  `thirteen` to -1 and would red the leg on the correct sentence. The row and the count word add at
+  most 200 B to each protocol copy AND ARE PAID FOR IN THE SAME EDIT, because no cap is raised in
+  this build and the free space does not cover every unit that wants it. The passage that leaves
+  §4 is the paragraph beginning `The two attested items have a VERB, the only way to write one`,
+  down to the sentence ending `not the trust assumption §9 states`; it moves into the `--attest`
+  entry of `tools/unattended/VERBS.template.md` and its installed copy
+  `memory/guides/UNATTENDED-VERBS.md`, the verbs half of the contract, which already carries that
+  verb and states most of this paragraph in shorter form — one fact in one place, and §7 of the
+  protocol records the same move as a byte decision. §4 keeps one sentence pointing at the verb
+  entry. The paragraph is larger than the row, so each protocol copy is SMALLER at this unit's
+  commit than at its parent. No other unit of this build trims that paragraph. Observed by AC1
+  and AC10.
 - **S6** A report-only drift-audit signal, `asks_disposed_overrides`, counting `override` park rows
   that name `asks-disposed` across every tracked run-state file. Owner ruling D12-b makes the item
   overridable on the condition that overrides are counted; without the count the override is
@@ -146,7 +157,7 @@ unit 22 supplies the endpoint for a derived-LANDED record
 (§8 F5).
 
 A bound breach in T2 reads "never answered", the same distinction `gates-green` draws
-(`tools/unattended/unattended.sh:3088-3093`), because a breach and a red are different faults.
+(`tools/unattended/unattended.sh:3286-3291`), because a breach and a red are different faults.
 
 **T3's admitted end states for an ask in M:**
 
@@ -169,12 +180,12 @@ A bound breach in T2 reads "never answered", the same distinction `gates-green` 
 
 **T5's owed classes** are a `decision` park row naming the ask, or a `rescope` park row whose act is
 in `PARK_ACTS_OWED`. The argument is that constant's own: M3 delegates scope resolution and never
-scope abandonment (`tools/unattended/unattended.sh:377-382`).
+scope abandonment (`tools/unattended/unattended.sh:436-441`).
 
 ### The override
 
 `--close --override asks-disposed --reason <text>` goes through the loop at
-`tools/unattended/unattended.sh:2946-2974` unchanged. That loop refuses a missing reason with check
+`tools/unattended/unattended.sh:3144-3172` unchanged. That loop refuses a missing reason with check
 12, refuses a reason spelling the bypass flag, and writes the `override` park row after the DoD
 loop. F3 governs every close that carries no override.
 
@@ -183,9 +194,9 @@ loop. F3 governs every close that carries no override.
 `asks-at-landing: <id>=<STATUS> <id>=<STATUS> …` is one line, sorted by slug and then numeric
 sequence, never by string. It is computed by the witness over M ∪ F at the tree the verb examines.
 It is written by the code path that writes `units-at-landing`
-(`tools/unattended/unattended.sh:2435-2437`), after it and before any terminal write, through
+(`tools/unattended/unattended.sh:2525-2527`), after it and before any terminal write, through
 `set_fact`, which inserts each new key directly under the `## Run facts` heading
-(`tools/unattended/unattended.sh:2776-2787`); the record reads newest-first, so the freeze sits on
+(`tools/unattended/unattended.sh:2876-2887`); the record reads newest-first, so the freeze sits on
 the line BEFORE `units-at-landing`. That preserves the `TOOL-dSealedTally-1` ordering: a refusal
 there leaves a non-terminal, repairable record. A record with no mandate and an empty F gets no
 line, so every existing record is unchanged.
@@ -217,10 +228,15 @@ Minted identifiers, each named at build time through
 `tools/unattended/unattended.test.sh` ·
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/PROTOCOL.template.md` · `memory/guides/UNATTENDED-PROTOCOL.md` ·
+`tools/unattended/VERBS.template.md` · `memory/guides/UNATTENDED-VERBS.md`, the pair S5's paragraph
+moves into ·
 `.unattended.conf` · `tools/unattended/.unattended.conf.example` · `.memory-tree.conf` ·
 `tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` ·
-`memory/map/features/unattended.md`. This unit moves no kit version constant, under the build's
-one-owner rule that the unit first to change a kit's bytes in build order owns that kit's one move.
+`memory/map/features/unattended.md` · `memory/map/generated/`, regenerated and staged in the commit
+that stages `tools/drift-audit/drift_report.py`, because the pre-commit fast leg runs the
+codebase-map gate whenever a `.py` is staged (dUnstagedSymbol, `1a774fcd`). This unit moves no kit
+version constant, under the build's one-owner rule that the unit first to change a kit's bytes in
+build order owns that kit's one move.
 Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, because unit 13 changes
 `tools/drift-audit/` bytes first, and its unattended bytes ride unit 1's move (unit 1 S9).
 
@@ -247,17 +263,33 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
 - risks — a change to unit 15's TSV shape breaks the parse, and the parse is written to refuse
   rather than misread. The item reads a run-writable record for its park rows, which the protocol's
   §9 uid limit already states.
-- testing — one arm per term and per new `fail` branch; the unattended suites run once, at the
-  unit's end (D12-h), and are read through unit 1's `--attribute <BASE>`.
+- testing — one arm per term and per new `fail` branch; the unattended suites run at the build's
+  one post-build bar and are read through unit 1's `--attribute <BASE>`.
 - migration — additive. Every existing record takes T0. `CORE_FLOOR` moves with the item.
-- user docs — the protocol §4 row here; the companion contract text is unit 20's.
+- user docs — the protocol §4 row here, and the attested-verb paragraph S5 moves into the
+  `--attest` entry of the verbs pair; the companion contract text is unit 20's.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash tools/unattended/check-unattended.sh` runs after S1, S4 and S5, check 16's
-  DoD join and its count-sentence join are both green over thirteen items.
+  DoD join and its count-sentence join are both green over thirteen items; and when `wc -c` runs at
+  this unit's build commit over `memory/guides/UNATTENDED-PROTOCOL.md` and over
+  `tools/unattended/PROTOCOL.template.md`, each reads STRICTLY BELOW what `git cat-file -s`
+  reports for the same path at this unit's parent commit, and below the 61440 B guide cap, while
+  `memory/guides/UNATTENDED-VERBS.md` reads under that same cap with the moved paragraph in it.
   Red when: the protocol still states "Twelve", or the table lacks the `asks-disposed` row, so the
-  join reports an item enforced by `--close` that the contract never names.
+  join reports an item enforced by `--close` that the contract never names; or the row lands
+  without S5's trim beside it, so a copy is LARGER at this unit's commit than at its parent and
+  this unit spends headroom the rest of this build's protocol edits are priced against; or the
+  paragraph is deleted rather than moved, so the verbs half never gains what §4 gave up.
+  permission: unit passes run no gate legs (fix F7, and the unit child prompt since
+  TOOL-aProbedUnit-1), so this green run of the leg over the real tree is observed at the one
+  post-build bar the main loop runs at VERIFYING, after the last unit, where `unattended kit gate`
+  is unheld and any bar reaches it. AC9's staged break is the pass's OWN direct
+  check and runs the leg's own command over a scratch copy carrying the break, which
+  `memory/guides/BUILD-METHOD.md` M6 sanctions and `tools/unattended/gate-guard.js` admits, because
+  it is neither a suite FILE invocation nor a run over the real tree; that real-tree run is the one
+  the build brief's owner rule forbids in a pass. The byte read above is a `wc -c` in the pass.
 - **AC2** — When `--close` runs in `tools/unattended/unattended.test.sh` on a fixture run with no
   `asks:` fact and a blank `ASKS_CMD`, the item is MET and prints a `skipped — asks-disposed` line.
   Red when: the item is MET with no announcement, which is a skip that reads as coverage.
@@ -294,17 +326,20 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
   `TOOL-dSealedTally-1` removed; or the freeze is written onto every record, or sorted as strings.
 - **AC9** — When `asks-disposed` is deleted from `DOD_CORE` while `.unattended.conf` declares a DoD
   floor of 13, `bash tools/unattended/check-unattended.sh` reds check 3, 'CORE Definition-of-Done set
-  has shrunk below its floor' (`tools/unattended/check-unattended.sh:692-694`).
+  has shrunk below its floor' (`tools/unattended/check-unattended.sh:729-731`).
   Red when: the floor stays at 12, so deleting the new item passes the shrink-only pin.
 - **AC10** — When `tools/unattended/check-unattended.test.sh` feeds check 16 a protocol stating
   "Thirteen kit-owned core items", the sentence parses to 13.
   Red when: the word table still stops at twelve and maps the correct sentence to -1.
+  permission: that file is a self-test suite, which `tools/unattended/gate-guard.js` denies before
+  VERIFYING, so the arm runs at the one post-build bar the main loop runs at VERIFYING, after the
+  last unit; in the pass the same protocol text is fed to the word table by hand in a scratch copy.
 - **AC11** — When `python tools/drift-audit/drift_report.py` runs over a fixture holding two
   `override` rows for `asks-disposed` and one for `gates-green`, `asks_disposed_overrides` reads 2
   and is not gateable; over a fixture with no run-state file it reads DEAD PROBE.
   Red when: the signal counts overrides of every item, or reports 0 over no records.
-- **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  end of the unit, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
+- **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`, meaning no NEW FAIL, no
   `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or
   `DEAD PROBE at R` is named by its file path in a filed backlog row or ask that is not CLOSED, as
   `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'` shows. Every arm this
@@ -314,6 +349,16 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
   past its budget, reads as clean; or an inherited failure is attributed away with no record filing
   it.
   cost: one run of the unattended suites, which is the unit's single sanctioned suite run (D12-h).
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the last
+  unit. `tools/unattended/gate-guard.js` denies the same runner before VERIFYING, so the hook and
+  the method agree. Which run covers it: `tools/gate-legs.json` carries NO leg for the unattended
+  suites, so this is one of the attributed suite runs the main loop makes beside its bar, and no
+  bar reaches it — not a plain one and not
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. In the pass each arm's RED is
+  observed by hand against a scratch fixture. That folds the conservative reading of the D12-h
+  conflict and does not decide it: S7, §5 and §10 keep the ruling's wording, and the run record
+  parks it for the owner.
 - **AC13** — When `--close` runs in `tools/unattended/unattended.test.sh` on a no-mandate fixture
   whose own `BACKLOG.md` files an ask that has no disposition row and is not terminal, with
   `ASKS_CMD` set, the item is UNMET naming that ask under T3.
@@ -356,8 +401,8 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
 
 `unattended kit gate` · `memory hygiene` · `harness arms (fail branches armed or pinned)` · `drift-audit records` · `kit/dogfood doc parity` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a fixture run per term T0 to T5, the override, and the freeze refusal · `ARMS_FLOORS` for `tools/unattended/unattended.sh`
-New arm: `tools/unattended/check-unattended.test.sh` · a protocol copy stating "Thirteen" and one with the row removed · `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
+New arm: `tools/unattended/unattended.test.sh` · a fixture run per term T0 to T5, the override, and the freeze refusal · the driver suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
+New arm: `tools/unattended/check-unattended.test.sh` · a protocol copy stating "Thirteen" and one with the row removed · the leg suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two items, and one with no run-state file · none
 
 ## 8. Open questions
@@ -425,19 +470,78 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two
     problems (unit 19 §8 F8, a content-based run side): §4's run's-own-commits function takes one or
     more exclusion tips, because unit 19's terminal walk excludes one parent at each merge it reads.
     T4's call, with the advertised tip alone, is unchanged.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No S-item, term or fork moves. Every
+  driver and leg citation in §1, §4, §6 AC9 and §10 is re-pointed, because `unattended.sh` and
+  `check-unattended.sh` grew through aDeferredBar (`1afd26c9`), aProbedUnit (`5493495a`) and
+  aRatifiedRulings (`b6bbfa7b`); each cited block is byte-identical at its new line, `DOD_CORE`
+  still holds twelve items, `CORE_FLOOR` still reads `12:12` and check 16's word table still stops
+  at twelve. §4 Files touched names the staged map regeneration dUnstagedSymbol's pre-commit leg
+  (`1a774fcd`) requires for S6's `.py`. AC1 gains a `permission:` line, because TOOL-aProbedUnit-1's
+  child prompt now binds F7's no-gate rule in every pass; it places AC9's staged break in a scratch
+  copy, because the build brief forbids a hand-run checker over the real tree. §10 records the
+  suite-run conflict with ruling D12-h in AC12, reported and not decided, and the protocol's 1116 B
+  of remaining headroom that S5's row spends.
+  Extended 2026-09-20, same base, by the regrounding consolidation pass · S5 · AC1 AC10 AC12 · §7.
+  AC12 gains a `permission:` line deferring the `--attribute <BASE>` suite run, and AC10 one for its
+  `check-unattended.test.sh` arm, both to the one post-build bar the main loop runs at VERIFYING.
+  That folds the conservative reading of the D12-h conflict and does not decide it: S7, §5 and §10
+  keep the ruling's wording, and the run record parks it. S5 prices its protocol row at 200 B of the
+  1116 B of headroom and AC1 reads the file's size against the 61440 B cap at the pass, because no
+  cap is raised in this build. §7's two unattended `New arm:` lines name the suites' executed-
+  assertion floors beside the `ARMS_FLOORS` pins; the `tools/drift-audit/selftest.py` line keeps
+  `none`, because that suite pins no such floor. No criterion here asserts that a phrase counts
+  zero.
+  Extended again on the closing consolidation pass · S5 · §4 · §5 · §10 · AC1 AC12, with the
+  header date moved to the last-change date and the rev kept. The D12-h conflict is FOLDED rather
+  than decided: every attributed run in this build is read as the one the main loop makes at
+  VERIFYING, so AC12's own sentence, §5's testing line and §10 stop placing it at this unit's end,
+  while the ruling itself stays parked for the owner. S5's protocol row is now NET ZERO OR NEGATIVE on its carrier rather than
+  priced against shared headroom. S5 names the one passage this unit trims, §4's attested-verb
+  paragraph, and the verbs pair it moves into; AC1 reads both protocol copies at the pass against
+  the PARENT commit's size and reds a copy that grew, a trim that deleted rather than moved, and
+  a verbs copy over its own cap. The paragraph is larger than the row, so this unit FREES
+  headroom for the other protocol spenders of this build instead of competing with them.
+  Extended again on the close-out pass, same base and rev · §10 · AC1 AC12. AC12's `permission:`
+  line takes the owed cross-edit's wording verbatim and keeps the hook clause beside it, and it now
+  says which run covers the suite run: `tools/gate-legs.json` carries no leg for the unattended
+  suites, so it is an attributed suite run beside the bar the main loop makes at VERIFYING and no
+  bar reaches it, held flags or not. AC1 reads Rule 1 narrowly, which is how it was already meant:
+  the leg's own command over a scratch copy carrying the staged break IS the pass's direct check
+  under `memory/guides/BUILD-METHOD.md` M6, and only the run over the real tree defers. §10 stops
+  calling the D12-h mechanics decided — the question is parked for the owner and the run folds the
+  conservative reading meanwhile — and its headroom sentence follows S5's net-negative pricing
+  instead of describing a share this unit no longer takes. The close-out verifier restored ruling
+  D12-h's OWN words in that §10 sentence: the ruling says the suites run once at the unit's end,
+  and stating it in the folded terms left the paragraph parking a conflict it had just defined
+  away. AC12 and the `cost:` line are untouched.
 
 ## 10. Reuse audit
 
 The seams are the driver's own. `dod_met` in `tools/unattended/unattended.sh` is extended with one
 arm, and its `pieces-complete` arm is the precedent for a term zero that is MET and announced
-(`:3117-3120`). The override path is reused unchanged, and `set_fact` beside `units-at-landing` is
+(`:3315-3318`). The override path is reused unchanged, and `set_fact` beside `units-at-landing` is
 the freeze's write site. `reuse_lookup.py "definition of done item grading delivered asks at close"`
 returns no seam in the driver, because the lookup's scan coverage reports `.sh` as an unscanned
 layer, so the lookup is blind to the whole kit this unit extends. The `unattended` dossier's shared
 seams, read instead, name no second DoD mechanism. Where DR and the source disagree: DR says
-`DOD_NO_OVERRIDE` gains the item, which the owner's D12-b ruling reverses; DR's line citations for
-`DOD_CORE`, `DOD_NO_OVERRIDE` and `units-at-landing` hold at BASE, because `unattended.sh` did not
-move between `09a22d2b` and `abac6d59`.
+`DOD_NO_OVERRIDE` gains the item, which the owner's D12-b ruling reverses. DR's line citations for
+`DOD_CORE`, `DOD_NO_OVERRIDE` and `units-at-landing` are `abac6d59` lines; at BASE `fb07ca25`
+`unattended.sh` is 280 lines longer, and this spec cites the moved lines. No build landed in that
+window adds a DoD item, an ask witness, a freeze or a run's-own-commits function: the kit library
+gained only `read_brief_paths`, and `tools/drift-audit/` is byte-identical.
+
+Two landed facts bear on this unit without moving its design. The protocol stands at 60324 B
+against its 61440 B guide cap at `fb07ca25`, 1116 B of headroom that S5 no longer draws on: the row
+is funded by the paragraph S5 moves out, so this unit is net negative on that carrier at its own
+pass and the headroom stays whole for the build's other protocol writers. And ruling D12-h, in its own
+words, lets this unit run the unattended suites once at its end (AC12), while since `5493495a`
+the unit child prompt of `tools/workflows/unattended-unit.js` and M6 of
+`memory/guides/BUILD-METHOD.md` forbid any self-test suite inside a pass, and
+`tools/unattended/gate-guard.js` denies
+`run-unattended-gates.sh` before VERIFYING. That question is PARKED for the owner — no child
+prompt and no hook amends a ratified ruling — and until an owner turn takes it the run folds the
+CONSERVATIVE reading, which is the one both machines already enforce: the attributed run is the one
+the main loop makes at VERIFYING, after the last unit, which is what AC12 and §5 are written to.
 
 Recall terms used: `pieces-complete DOD_NO_OVERRIDE override CORE_FLOOR units-at-landing freeze
 Definition-of-Done close verb mandate scope abandonment PARK_ACTS_OWED`

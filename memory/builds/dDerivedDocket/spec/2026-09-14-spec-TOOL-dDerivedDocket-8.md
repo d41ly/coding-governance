@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-8 — hygiene engine in builds mode
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 8
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -71,7 +71,7 @@ so this repo and every adopter see nothing until they switch.
 - **S13** Every new `fail` branch is armed in the engine's self-test in the same commit, and
   `ARMS_FLOORS` for the engine moves by the branches added. Observed by AC13.
 - **S14** The two frozen waivers this unit's edits would unpin — rows
-  `tools/memory-tree/corpus_ids.py:935` and `:939` of `tools/install-prefix-waivers.txt`, the check-15
+  `tools/memory-tree/corpus_ids.py:997` and `:1001` of `tools/install-prefix-waivers.txt`, the check-15
   selftest's wrong-prefix fixture and the citation it proves — become in-line
   `# gov:root-fixture — <reason>` markers on those two fixture lines, and both rows leave the
   registry in the same commit, so no later edit above them can unpin them again. Observed by AC14.
@@ -110,8 +110,8 @@ so this repo and every adopter see nothing until they switch.
 | 7 | `ex7` at `:751` | unchanged | `BACKLOG.md` exempt; views stay graded |
 | 8 | population at `:828`, fail at `:866`, count line at `:868` | unchanged | retired, one announcement line |
 | 10 | enumeration at `:1076` | unchanged | family archives left to check 9's guard, counted in one line |
-| 13 | `def_builds` at `tools/memory-tree/corpus_ids.py:393` | unchanged | pre-cutoff ask rows are not a folder's claim |
-| 15 | the `present` expression at `tools/memory-tree/corpus_ids.py:372` | unchanged | `backlog/` out, `builds/<slug>/BACKLOG.md` in |
+| 13 | `def_builds` at `tools/memory-tree/corpus_ids.py:394` | unchanged | pre-cutoff ask rows are not a folder's claim |
+| 15 | the `present` expression at `tools/memory-tree/corpus_ids.py:373` | unchanged | `backlog/` out, `builds/<slug>/BACKLOG.md` in |
 | 20, 24 | `row_docs()` at `tools/memory-tree/row_grammar.py:180` | unchanged | the decision log and its archives only |
 
 Check 7's population is no longer derived from check 6's under `builds`, because the two now differ by
@@ -123,11 +123,13 @@ never a second spelling of the base selector (the `ex7` rule the engine records 
 `corpus_ids.walk()` records every anchor in `defs` and, for a build-folder file, in `def_builds`. The
 change touches only the second: an anchored line in a `builds/<slug>/BACKLOG.md` whose ask row, read by
 the parser unit's reader, carries a `filed` date before `ASK_CUTOFF` is not added to `def_builds`.
-Measured at BASE with the real `extract.anchor_at` over every tracked build-folder file: 27 of the 599
-distinct legacy row ids are already anchored in another build's records, the same 27 design §6
-measured, all in unattended runs' own records (design §19.1 K9). Every one of them is migrated with a
-`filed` date before the cutoff the switch-over derives, so all 27 stay quiet and every ask filed
-afterwards is checked.
+Measured with the real `extract.anchor_at` over every tracked build-folder file: at `abac6d59`, 27 of
+the 599 distinct legacy row ids were already anchored in another build's records, the same 27 design
+§6 measured and the figure §8 F2 reasons from; re-measured at `fb07ca25`, 28 of 658, those 27 plus
+`TOOL-aKeyedAnnotation-9`, which a dash bullet in aDeferredBar's unit-2 spec anchors. All are in
+unattended runs' own records (design §19.1 K9). Every one of them is migrated with a `filed` date
+before the cutoff the switch-over derives, so all of them stay quiet and every ask filed afterwards is
+checked.
 
 ### The Python modules and the mode
 
@@ -149,7 +151,10 @@ each way would be a cycle. No third conf reader is written.
 `tools/memory-tree/corpus_ids.py` · `tools/memory-tree/row_grammar.py` ·
 `tools/memory-tree/HYGIENE.template.md` · `memory/HYGIENE.md` ·
 `tools/memory-tree/SPEC-TEMPLATE.template.md` · `memory/TEMPLATE-SPEC.md` · `.memory-tree.conf`
-(`ARMS_FLOORS` only) · `tools/install-prefix-waivers.txt` (two rows leave, S14).
+(`ARMS_FLOORS` only) · `tools/install-prefix-waivers.txt` (two rows leave, S14) ·
+`memory/map/generated/` (re-rendered by `python tools/codebase-map/gen_map.py --write` and staged in
+the pass commit when a module-level function is added, because the pre-commit fast leg runs the
+codebase-map gate on a staged `.py` and refuses a stale or unstaged artifact).
 
 ### Alternatives rejected
 
@@ -178,7 +183,11 @@ each way would be a cycle. No third conf reader is written.
   never-rotate remedy (design §16 risk 4).
 - testing — builds-mode scratch-tree fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`,
   `tools/memory-tree/corpus_ids.py --selftest` and `tools/memory-tree/row_grammar.py --selftest`, each
-  staged RED, and the shards byte-identity arm over this repo.
+  staged RED, and the shards byte-identity comparison over this repo, made outside every suite
+  (AC10). The engine suite's builds-mode arms share one engine run over one scratch tree wherever
+  their assertions allow and never run over an archive of this repository, the shape
+  `TOOL-aLeakedHandle-8` gave its project-key arms when aRatifiedRulings built it; the suite's 900 s
+  ceiling is not re-declared.
 - migration — none; a conf without the key reads `shards`, and the HYGIENE text describes both modes.
 - user docs — the HYGIENE and TEMPLATE-SPEC text in S12, template and instance together.
 
@@ -188,6 +197,13 @@ each way would be a cycle. No third conf reader is written.
   a build folder holding `BACKLOG.md` beside its README, and a folder holding only `BACKLOG.md`, raise
   no check 4 finding; the same folders in its shards-mode fixture raise check 4.
   Red when: the admission is unconditional, so a shards adopter's stray `BACKLOG.md` is never named.
+  permission: the suite is the held `memory-hygiene self-test` leg, which build method M6 keeps out of
+  a pass and the unattended kit's gate-guard hook refuses before `VERIFYING`. This criterion and AC2,
+  AC3, AC4, AC8 and AC11, which read its fixtures, are observed at the one run the main loop makes at
+  `VERIFYING`, which is `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`: the leg is
+  `chunk` `selftests` with `subject` `kit`, so a plain bar and `GATE_FULL=1` alone both HOLD it and
+  neither covers these six criteria. In the pass each arm's RED is observed by hand against a scratch
+  fixture tree with its fix unstaged.
 - **AC2** — When the builds-mode fixture carries a `BACKLOG.md` over the row cap, check 6 fails on the
   branch naming the never-rotate remedy and not the rotate one; a family view over the same cap
   raises no check 6 finding; in the shards fixture an oversized shard fails with today's message.
@@ -212,6 +228,18 @@ each way would be a cycle. No third conf reader is written.
   replaced; or a malformed cutoff is compared as a raw string, so a post-cutoff collision is skipped
   silently; or a blank cutoff is compared as the empty string, so every ask reads as filed after it
   and the legacy foreign anchors red, F2's rejected option (a).
+  permission: the `corpus-ids selftest` leg's declared `ceiling` sits far above both the direct-check
+  bound the unattended kit's gate-guard suite grades and the per-command bound the unit child prompt
+  gives a pass, so the whole-suite flag run this criterion and AC6 read would not return inside a
+  pass and would be reported SKIPPED rather than observed, which is a skip that reads as coverage.
+  The deferral is COST and not denial: the gate-guard hook admits a `--selftest` flag on another
+  file, and this line claims no denial. That run therefore binds at the one run the main loop makes
+  at `VERIFYING` after the last unit, and that leg is HELD — `tools/gate-legs.json` gives it
+  `chunk` `selftests` and `subject` `kit` — so that run must be
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, a plain bar and `GATE_FULL=1`
+  alone both HOLDING the leg. Spelled any other way, this criterion and AC6 go unobserved and the
+  deferral buys a skip. In the pass each arm's RED is observed by hand against a scratch corpus with
+  its fix unstaged, which is this criterion's pass-defining observation.
 - **AC6** — When a builds-mode fixture ask cites a dead backticked path, check 15 names it; the same
   token in a view is not graded; in the shards fixture a dead path in a shard is still named.
   Red when: the present corpus drops `backlog/` without adding `BACKLOG.md`, so 227 graded ask path
@@ -227,6 +255,7 @@ each way would be a cycle. No third conf reader is written.
   and raises no finding of its own; the shards fixture's archive
   missing its preamble reference still fails check 10.
   Red when: check 10 and check 9 both red the one archive, which is two answers to one question.
+  permission: as AC1.
 - **AC9** — When `BACKLOG_MODE` is `buildz` in a fixture conf, `bash tools/memory-tree/check-memory-hygiene.sh`
   exits 2 naming the key and its legal values; for absent, blank, `shards` and `builds` the shell and
   the Python reader report the same mode.
@@ -235,6 +264,9 @@ each way would be a cycle. No third conf reader is written.
   engine and then with this unit's engine, the two outputs are byte-identical.
   Red when: any builds-mode branch runs under `shards`, including a new announcement line.
   cost: two full engine runs, minutes each.
+  permission: both runs are the `memory hygiene` leg's command, which no pass runs (build method M6),
+  so the pass returns the comparison to the main loop, which makes it once after the last unit is
+  terminal.
 - **AC11** — When the builds-mode fixture lists its family view in `curation-debt.txt`, the stale-entry
   guard fails naming that row.
   Red when: the view still records a waived finding from a check it has left, so a row that hides
@@ -244,22 +276,35 @@ each way would be a cycle. No third conf reader is written.
   7, 8, 10, 13, 15, 20 and 24; and `memory/TEMPLATE-SPEC.md` names `closes` and `advances` as
   builds-mode header verbs.
   Red when: the instance is edited and the template is not, which the parity leg exists to catch.
+  permission: the observation above is a bare `*.test.sh` invocation of the `kit/dogfood doc parity`
+  leg, which the unattended kit's gate-guard hook refuses before `VERIFYING` and build method M6
+  keeps out of a pass, so the parity binds at the one post-build bar; in the pass the two instance
+  readings are made directly. The leg's `argv` in `tools/gate-legs.json` writes no verb, and the
+  hook's read-only exemption is TEXTUAL — it matches the words of the command it is handed — so the
+  leg form is denied although the suite's own default MODE is `--check`; whether a pass may type
+  that verb itself is part of the ruling parked for the owner in the build's `RUN.md`, and this spec
+  neither types it nor decides it.
 - **AC13** — When `python3 tools/memory-tree/check-arms.py --check` runs after the unit, the new check 6
   branch is armed by its self-test assertion and the engine's `ARMS_FLOORS` entry has moved by the
   branches added.
   Red when: the branch lands unarmed and the floor stays, so a deletion of the new remedy passes.
+  permission: the command is the `harness arms (fail branches armed or pinned)` leg and binds at the
+  one post-build bar; in the pass the new branch's arm is observed RED by hand, with its self-test
+  assertion deleted in a scratch copy.
 - **AC14** — When `bash tools/check-install-prefix.sh` runs at this unit's commit, it passes;
   `grep -c 'corpus_ids.py' tools/install-prefix-waivers.txt` prints 0, and both fixture lines in
   `tools/memory-tree/corpus_ids.py` carry `gov:root-fixture` with a reason.
-  Red when: a line added above line 935 leaves the two position-keyed rows pointing at shifted lines,
+  Red when: a line added above line 997 leaves the two position-keyed rows pointing at shifted lines,
   which the gate reports as stale waivers and two unwaived hits on the bar while every unit-pass
   observation stays green.
+  permission: the script is the `install-prefix (shipped surface)` leg and binds at the one
+  post-build bar; the count and the two marker lines are read in the pass.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `corpus-ids selftest` · `row-grammar selftest` · `kit/dogfood doc parity` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `corpus-ids selftest` · `row-grammar selftest` · `kit/dogfood doc parity` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness`
 
-New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · builds-mode and shards-mode scratch trees for checks 4, 6, 7, 8 and 10, the curation-debt view row, and a typo'd mode value · the engine's arms floor, by the branches added
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · builds-mode and shards-mode scratch trees for checks 4, 6, 7, 8 and 10, the curation-debt view row, and a typo'd mode value · the engine suite's executed-assertion floor, by the assertions its new arms execute, and the engine's arms floor, by the branches added
 New arm: `tools/memory-tree/corpus_ids.py` `--selftest` · a post-cutoff and a pre-cutoff ask anchored in a second folder, and a dead path in an ask and in a view · none
 New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree with a view, a family archive and a duplicated decision id · none
 
@@ -290,6 +335,62 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
   `install-prefix (shipped surface)`.
 - rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L7 (11, 30): AC5 stages a blank `ASK_CUTOFF`,
   naming V15, beside the malformed one naming V16.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). S14 and AC14 name the waiver rows
+  `tools/memory-tree/corpus_ids.py:997` and `:1001`, and §4's table cites `def_builds` at `:394` and
+  `present` at `:373`, where aReplayedCard's `--print-defined-ids` verb (c298968d) moved them. §4's
+  check 13 measurement is re-taken: 28 of 658 at `fb07ca25`, the 27 of 599 F2 reasons from plus one
+  anchor aDeferredBar's records added. §5 testing keeps the engine suite's new arms to the shared
+  scratch-tree shape aRatifiedRulings (b6bbfa7b) built under `TOOL-aLeakedHandle-8`. AC1, AC5, AC8,
+  AC10, AC12, AC13 and AC14 gain permission lines, because aDeferredBar (1afd26c9) and aProbedUnit
+  (5493495a) keep suites, the flag-form corpus-ids suite and gate legs out of a pass. §4 Files
+  touched names the codebase-map artifacts and §7 gains `codebase-map coverage + freshness`, for
+  dUnstagedSymbol's pre-commit leg (1a774fcd). §10 describes the new base.
+  Regrounding consolidation, 2026-09-20: the build-wide rule folded here defers only what the
+  gate-guard hook DENIES — a `.test.sh` or `selftest.py` FILE invocation carrying none of its
+  read-only verbs — plus a gate-leg command, which the owner rule forbids a pass to run by hand; a
+  `--selftest` FLAG on another file stays the direct check build method M6 and the unit child prompt
+  name, so deferring it would contradict unit 11 §8 F9. The ruling conflict behind that scope is
+  parked for the owner in the build's `RUN.md`; this pass folds the conservative reading and decides
+  nothing. AC5's permission line therefore becomes a cost line, while AC1, AC8, AC10, AC12, AC13
+  and AC14 keep theirs: AC1, AC8 and AC12 name a bare `*.test.sh` suite the hook refuses, and
+  AC10, AC13 and AC14 name a gate-leg command over this tree. AC12's line is reworded so that its
+  reason is that bare invocation, not a claim that the leg's `--check` default argv would also be
+  kept out of a pass, which the measured population does not deny and this spec does not decide.
+  Also checked and unchanged: AC14's `grep -c 'corpus_ids.py'` counts two at `fb07ca25`, so it is
+  not green before the unit; no `New arm:` line of this unit leaves `none` where a floor exists —
+  `corpus_ids.py` and `row_grammar.py` pin none, and the engine suite's line names the arms floor
+  its new branches move; and this unit adds text to no capped carrier, its `memory/HYGIENE.md` and
+  `memory/TEMPLATE-SPEC.md` edits sitting well inside the index cap.
+  Closing consolidation, 2026-09-20: AC5's cost line becomes a permission line, on the
+  orchestrator's COST ruling and not on a denial. The `corpus-ids selftest` leg's declared `ceiling`
+  sits above the per-command bound the unit child prompt gives a pass, so a pass that started the
+  whole-suite flag run would report a SKIP where the spec promised an observation; the run moves to
+  the one the main loop makes at `VERIFYING`, and the per-arm staged-break run against a scratch
+  corpus stays as the criterion's in-pass check. The hook admits the flag form and the line says so,
+  so unit 11 §8 F9 is untouched and units 6, 7, 11 and 12 keep their own flag runs in the pass,
+  their legs' ceilings sitting inside that bound. The line also names what the deferral costs: the
+  leg is held, so the `VERIFYING` run has to be the one that runs held kit self-tests or AC5 and
+  AC6 are skipped rather than observed, and the orchestrator has now SET that run:
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, plus the suite runs it attributes
+  beside the bar. AC1's and AC5's lines spell it in those terms, so a later reader cannot take a held
+  leg as covered by a plain bar. The orchestrator also RATIFIED the NARROW reading for the build: a
+  gate leg's own command over a FIXTURE or a staged break stays in the pass, the same command over
+  the real or rendered tree defers, and a `.test.sh` or `selftest.py` FILE invocation carrying no
+  read-only verb defers wherever it runs. So AC9's fixture run of the hygiene engine stays and
+  AC10's run of it over this tree defers, which is the split those two already draw, and the wider
+  wording the last pass recorded — under which AC9's fixture run would have deferred too — is not
+  the one that binds. §7's engine-suite `New arm:` third field now names
+  that suite's own executed-assertion floor beside the engine's arms floor: the suite pins
+  `FLOOR_ASSERTIONS` and the build's field rule names a pinned floor wherever a suite pins one,
+  rather than only where added arms could breach it. Unit 31 carries the identical line on the same
+  suite, and the matching extension has LANDED there at this pass, so the two now name the same
+  pinned floor and the cross-edit that carried it is closed. Close-out verification corrected one
+  factual claim in AC12's permission line: the `kit/dogfood doc parity` leg's `argv` in
+  `tools/gate-legs.json` carries no verb at all, and the suite's `--check` is its own internal
+  default MODE, which the hook cannot see because its read-only exemption matches the words of the
+  command it is handed. The line had said the leg's argv carried the verb, which would have told a
+  pass the leg form is admitted when the hook denies it. The
+  header date is the last-change date; the rev is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -303,12 +404,27 @@ Recall returned both, `TOOL-aFoldedQuarry-5` for the corpus module's own rule th
 grammar it does not own, and the cGradedDebt partition that keeps a listed file inside checks 6, 7
 and 8.
 
-Where the design and BASE disagree, re-read at `abac6d59`. Design §6 says check 10's silent
-`continue` should announce; `TOOL-cSpliceWarden-2` already made zero-or-many a named finding, so the
-only change left is S9's builds-mode deferral. Design §6 has check 8's population guard "learn the
+Where the design and this spec's first base disagree, re-read at `abac6d59`. Design §6 says check
+10's silent `continue` should announce; `TOOL-cSpliceWarden-2` already made zero-or-many a named
+finding, so the only change left is S9's builds-mode deferral. Design §6 has check 8's population guard "learn the
 mode" using `PRE_STATUSY`; that precondition already counts `BACKLOG.md`, which is exactly why the
 guard would fire under `builds` without S5. Check 24 did not exist when the design was measured; S8
 brings it under the same `row_docs()` switch as check 20. The switch-over spec lists check 3 among the
 checks this unit keeps green; F3 finds it needs no change.
+
+BASE is `fb07ca25`, origin/main 210 commits past `abac6d59`, where this spec was written and
+audited. The hygiene engine moved only its kit version line, so every `check-memory-hygiene.sh`
+citation in §4 and §8 holds; `tools/memory-tree/row_grammar.py`, `tools/memory-tree/check-arms.py`,
+`tools/memory-tree/kit-dogfood-parity.test.sh` and `tools/check-install-prefix.sh` are byte-identical.
+`tools/memory-tree/corpus_ids.py` gained the `--print-defined-ids` verb for the kickoff card, one
+docstring line above the walk and two functions and two selftest arms below it, which shifted the
+walk's lines by one and the two waived fixture lines by 62; the verb prints the `defs` set this unit
+leaves alone, so S6's change to `def_builds` does not reach it. No landed build teaches a check the
+backlog mode. The engine suite's project-key arms now run over its own scratch tree (the hygiene
+dossier's `TOOL-aRatifiedRulings-3` note), and a pass may run neither that suite nor a gate leg,
+which the §6 permission lines answer. The flag-form corpus-ids selftest the hook admits stays the
+pass's own direct check, and AC5's cost line records what it costs. One landed record touches
+§4's measurement: a dash bullet in aDeferredBar's unit-2 spec anchors `TOOL-aKeyedAnnotation-9`, a
+TOOL shard row, which is why the foreign-anchor count is 28 at this base.
 
 Recall terms used: `check 8 status vocabulary check 13 collision def_builds check 15 present corpus check 20 row_docs curation-debt ROTATION_MODE`

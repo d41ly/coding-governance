@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-10 — driver refuses shard-into-view
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 10
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -225,6 +225,10 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
   Red when: the population is empty because the selector is mis-rooted and the check passes by finding
   nothing.
   figure: the governed-path count is DERIVED at run time.
+  permission: this run is the new `row-driver view refusal` leg's own command over the real tree, so
+  under the narrow reading it binds at the one run the main loop makes at `VERIFYING`, which AC9's
+  cost line spells; that leg is unheld, so any bar runs it. In the pass the same command is run over
+  the scratch trees AC7 and AC11 name, where it is the fixture check that stays.
 - **AC7** — When the attribute line for `memory/backlog/*.md` is removed from a scratch copy of
   `.gitattributes` and `--check` runs there, it exits 1 naming `memory/backlog/TOOL.md`; with a
   driver copy whose refusal is disabled, it exits 1 naming the probe.
@@ -236,12 +240,25 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
   reason, and `govkit selfcheck` passes.
   Red when: the leg ships guarded on the kit directory, so an edit elsewhere that breaks the view
   header never re-runs it.
+  permission: `govkit selfcheck` and `codebase-map coverage + freshness` are gate-leg commands, which
+  no pass runs (build method M6), so both bind at the one post-build bar; in the pass the manifest
+  row, the dossier claim and the `[[exempt_leg]]` row are read directly.
 - **AC9** — When each of AC1 to AC7's, AC10's and AC11's fixes is unstaged in turn, its arm in
   `tools/memory-tree/merge-rows.test.sh` or its `--check` observation turns red, and restoring the fix
   turns it green.
   Red when: an arm passes with its fix removed, which is an arm grading nothing; or the range stops
   at AC7, so a refusal keyed on either side being a view, or a mis-rooted `BACKLOG.md` selector, sits
   behind arms nobody has seen red.
+  cost: the replay suite is a held kit leg — `chunk` `selftests` with `subject` `kit` — so its run
+  binds at the one run the main loop makes at `VERIFYING`, which is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`; a plain bar and `GATE_FULL=1`
+  alone both HOLD it, so neither covers this criterion.
+  permission: unit passes run no gate, suite or bar (fix F7, and the child prompt in
+  `tools/workflows/unattended-unit.js` since aProbedUnit), so in the pass each arm's RED is observed
+  by hand in a scratch repository with the driver wired and its fix unstaged, and each `--check` RED
+  by the driver run directly, both recorded in the pass journal; this criterion, the suite runs AC1
+  to AC5 and AC10 name, and the new leg, run at the one run the main loop makes at `VERIFYING`,
+  which the cost line above spells.
 - **AC10** — When `bash tools/memory-tree/merge-rows.test.sh` merges two branches that each
   re-rendered one fixture view with adjacent row changes, the driver takes its key path with no
   refusal, and `gen_build_index.py --write` then exits 0 with the view byte-equal to a fresh render;
@@ -258,7 +275,7 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
 
 `row-keyed merge driver replay` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck`
 
-New arm: `tools/memory-tree/merge-rows.test.sh` · a view-against-shard three-way, the three §18r.1 shapes the driver governs, an unimportable predicate, the two `BACKLOG.md` concurrency pairs, two re-rendered views, and two shards over a view base · none; the suite is on the testsuite-count waiver
+New arm: `tools/memory-tree/merge-rows.test.sh` · a view-against-shard three-way, the three §18r.1 shapes the driver governs, an unimportable predicate, the two `BACKLOG.md` concurrency pairs, two re-rendered views, and two shards over a view base · the suite's grow-only floor on how many of its own cases actually execute the driver, the count its banner ratchet cannot see, raised by the executing cases these arms add; the suite is on the testsuite-count waiver
 New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-driver view refusal` leg · the attribute removed from a scratch `.gitattributes`, and a driver copy with the refusal disabled · none
 
 ## 8. Open questions
@@ -298,6 +315,63 @@ New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-drive
 - rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L6 (10): AC9's mutation sweep covers AC1 to AC7,
   AC10 and AC11. The record's class item 1 applied: Files touched names the regenerated
   `tools/govkit/subject-pins.tsv` for the new leg.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No cited code moved: the driver, its
+  suite, `.gitattributes`, the registry and the subject pins are byte-identical to `abac6d59`, and
+  every §7 leg resolves. AC9 gains a cost line and a permission line, because aProbedUnit's child
+  prompt and aDeferredBar's `gate-guard.js` now refuse a suite inside a pass, so each arm's RED is
+  observed by hand and the suite runs at the post-build bar. §10 records the base and the gotcha
+  class the merge-driver dossier gained at aReplayedCard.
+  Regrounding consolidation, 2026-09-20: the build-wide rule folded here defers only what the
+  gate-guard hook DENIES — a `.test.sh` or `selftest.py` FILE invocation carrying none of its
+  read-only verbs — plus a gate-leg command, which the owner rule forbids a pass to run by hand; a
+  `--selftest` FLAG on another file stays the direct check build method M6 and the unit child
+  prompt name, so deferring it would contradict unit 11 §8 F9. The ruling conflict behind that
+  scope is parked for the owner in the build's `RUN.md`; this pass folds the conservative reading
+  and decides nothing. AC8 therefore gains a permission line for its two gate-leg commands, and
+  AC9's names the criteria whose observation is the suite — this one and AC1 to AC5 and AC10 — so
+  no criterion of this unit leaves a denied run unplaced. AC6, AC7 and AC11 keep their in-pass
+  `--check` runs, which are the driver run directly and not a suite. Also checked and unchanged:
+  no criterion of this unit asserts a phrase counts zero; the
+  `tools/memory-tree/merge-rows.test.sh` `New arm:` line was read against `NEVER_WORSE_FLOOR`
+  alone; and this unit adds text to no capped carrier.
+  Closing consolidation, 2026-09-20: the orchestrator RATIFIED the NARROW reading for the build — a
+  gate leg's own command run over a FIXTURE or a staged break STAYS in the unit pass, that being the
+  direct check `memory/guides/BUILD-METHOD.md` M6 requires; the same command run over the real or
+  rendered tree defers to the one run the main loop makes at `VERIFYING`; and a `.test.sh` or
+  `selftest.py` FILE invocation carrying no read-only verb defers wherever it runs, because the
+  gate-guard hook denies it, while a `--selftest` FLAG on another file is not that shape and stays in
+  the pass — and added a single COST exception, which lands in unit 8 alone, where that leg's declared
+  `ceiling` sits above the per-command bound a pass holds.
+  No permission line moves. One field does. That suite pins THREE floors, not one: a banner
+  ratchet, a grow-only bound on the cases the arithmetic comparison binds on, and a floor on the
+  `run` invocations that actually execute, which the suite's own comment names as the executable
+  population it floors because the banner count cannot see an emptied group. The last of those is
+  an executed-assertion floor and the arms of AC1 and AC3, which drive the driver through `run`,
+  move it, so the `New arm:` third field now names it instead of `none`. The field ties the move to
+  the `run` cases among the arms added and NOT to the groups added, because the arms of AC2, AC4,
+  AC5 and AC10 are git merges over a fixture repository rather than `run` cases: each adds a banner
+  group and no `run` case, so raising the `run` floor by the group count would raise it above the
+  real count and red the suite. The orchestrator asked what that pin actually IS, in words, rather
+  than whether it earns the name: it is a grow-only lower bound the suite asserts, at the end of its
+  own run, on how many of its cases actually invoke the driver, measured by a count the file derives
+  from itself rather than one typed beside it, and it FAILS the suite when that count falls below
+  the bound. Its whole reason is the one the banner ratchet cannot serve — a group emptied under a
+  banner it kept — which is why it is an executed-assertion floor in substance and not only by
+  label. The `New arm:` third field now says that in those words and names neither the count nor its
+  comparison, so it carries no number and no identifier; returning the field to `none` was the
+  alternative and would have denied a pin the file states in its own comment.
+  The orchestrator also SET the `VERIFYING` run:
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, plus the suite runs it attributes
+  beside the bar. AC9's cost line now names it in those terms, because the replay suite it defers to
+  is HELD and a plain bar would skip it while reading green; AC8's two legs are unheld, any bar runs
+  them, and that line is left as it stands. Close-out verification found one criterion the narrow
+  reading had not been applied to and applied it: AC6 runs the new leg's OWN command over the real
+  tree, which the ratified reading defers, and it carried no permission line at all while AC8 and
+  AC9 beside it carried theirs. AC6 now defers that run to the `VERIFYING` run AC9's cost line
+  spells, keeps the fixture runs of AC7 and AC11 as its in-pass observation, and records that the
+  leg is unheld so any bar runs it. To reverse, delete AC6's permission line: the effect is to put
+  one read-only real-tree `--check` back inside the pass. The
+  header date is the last-change date; the rev is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -317,5 +391,15 @@ rows, and F2 finds the census would conflict on the new pair. `tools/check-wirin
 asserts the backlog attribute, but inside a held kit suite; S5 is the unheld reader of the same fact,
 and the two are left to agree rather than one deleted, because the held one also covers the driver's
 wiring.
+
+BASE is `fb07ca25`. Against `abac6d59` it leaves `tools/memory-tree/merge-rows.py`, its suite,
+`.gitattributes`, `tools/govkit/registry.toml` and `tools/govkit/subject-pins.tsv` byte-identical,
+so `row_ids` still sits at `tools/memory-tree/merge-rows.py:329`. Two things moved around the seam.
+First, the merge-driver dossier now claims the gotcha class
+`row-driver-emits-a-plausible-file-with-rows-missing.md` (aReplayedCard). That record says a
+transposed argument order or a two-sided rotation yields a well-formed file with rows missing, and
+`gotchas.py --for-diff` hands it to this unit's review. Second, a pass may no longer run
+`merge-rows.test.sh`: the child prompt in `tools/workflows/unattended-unit.js` forbids any suite, and
+`tools/unattended/gate-guard.js` refuses one before VERIFYING. AC9's permission line follows both.
 
 Recall terms used: `merge-rows driver fail-closed conflict duplicate postcondition union skeleton row-keyed gitattributes merge=rows take-ours`

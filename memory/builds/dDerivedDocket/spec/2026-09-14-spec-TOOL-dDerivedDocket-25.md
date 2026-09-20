@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 25
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -34,7 +34,9 @@ The header carries no `closes` verb because the status parser at BASE does not k
 - **S2** — owned scratch and the dead-owner sweep. `WORK` is created as a named `gate-work.*`
   directory under the ambient `TMPDIR` (captured before S1 redirects it), with an `owner` file
   holding the runner pid, the resolved git common dir and the start epoch, written before any leg
-  dispatches. At start each bar sweeps every `gate-work.*` directory whose `owner` names this
+  dispatches. The ambient `TMPDIR` is `/tmp` when the variable is unset or empty, which is where
+  `mktemp -d` itself falls back and is the state the kickoff manifest's `scratch-guard` trap records
+  on a node of this repository. At start each bar sweeps every `gate-work.*` directory whose `owner` names this
   repository's common dir and whose pid fails `ts_alive` (`tools/run-gates/run-gates.sh:611`), and
   announces each sweep on stderr with the pid. Observed by AC2 and AC3.
 - **S3** — the entries line. After the sweep the runner prints `TMPDIR entries <n>`, the count of
@@ -45,7 +47,7 @@ The header carries no `closes` verb because the status parser at BASE does not k
   (`tools/run-gates/run-gates.sh:34`) and before any output, lock or scratch exists. Its argv, and
   the argv every leg subshell inherits by fork, then carries an absolute repo path the fence can
   reach. Observed by AC5.
-- **S5** — the TREE MOVED exit. When `tree_moved=yes` (`tools/run-gates/run-gates.sh:1812-1813`)
+- **S5** — the TREE MOVED exit. When `tree_moved=yes` (`tools/run-gates/run-gates.sh:1818-1819`)
   and no leg failed, the runner prints `gates TREE MOVED — the tree changed while the bar ran, so no
   verdict describes it`, writes `verdict TREE MOVED` into the run record, writes no full-green
   stamp, and exits 3. A bar that failed AND moved stays RED with exit 1, and its RED line names the
@@ -58,11 +60,16 @@ The header carries no `closes` verb because the status parser at BASE does not k
   agreement.
 - **S7** — the kickoff manifest. `memory/guides/SESSION-KICKOFF.md`'s trap that every hermetic leg
   runs `mktemp -d` into the ambient `TMPDIR` and that a reader should point `TMPDIR` at an empty dir
-  before blaming the diff (`:297-299` at BASE) is rewritten: the runner now redirects each leg's
+  before blaming the diff (`:242-245` at BASE) is rewritten: the runner now redirects each leg's
   `TMPDIR` into its own scratch and sweeps a dead bar's, so the growth comes only from bars that
   predate this unit or run another repository. `last-audit` is re-stamped in the same commit with a
   delta line in the commit message, because `tools/run-gates/run-gates.sh` is in the manifest's
-  `watch:` list. Observed by AC8.
+  `watch:` list. The rewrite LANDS NET ZERO on that carrier. The passage is the four-line §B trap
+  bullet at `memory/guides/SESSION-KICKOFF.md:242-245`, and its replacement is written no longer
+  than the bullet it replaces. The measured detail it drops, the node-`a` entry count and the advice
+  to point `TMPDIR` at an empty dir, moves to the scratch section of `tools/run-gates/README.md`,
+  the document that owns the runner's scratch and which S5 already has this unit writing. Observed
+  by AC8 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -147,7 +154,7 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
   point: its root is the runner's own `mktemp -d` result, in the MSYS spelling, and AC6 is the
   observation that the spelling hazard did not return.
 - **An EXIT trap per leg** (TOOL-aMeteredTurnstile-2's first suggestion). It needs an edit in each of
-  the 63 `mktemp -d` sites and still leaks on signal 9. One export plus one sweep covers both.
+  the legs' `mktemp -d` sites and still leaks on signal 9. One export plus one sweep covers both.
 
 ## 5. Production-readiness checklist
 
@@ -175,48 +182,74 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
   `bash tools/run-gates/run-gates.sh` in the canary's scratch repo exits 3, prints
   `gates TREE MOVED — `, and leaves `verdict TREE MOVED` in the run record, with the arm in
   `tools/run-gates/run-gates.test.sh`. Red when: the runner exits 0 over the moved tree, which is the
-  BASE behaviour at `tools/run-gates/run-gates.sh:1892`.
-  permission: the arm's suite is held; it runs at the build's one post-build bar with
-  `GATE_SELFTESTS=1`, never in this unit's pass.
+  BASE behaviour at `tools/run-gates/run-gates.sh:1898`.
+  permission: the arm's suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
+  unit's pass.
 - **AC2** — When two fixture bars are killed by signal 9 while a leg holds `mktemp -d` scratch, a
   third bar's `TMPDIR entries <n>` line reports the same n the first bar printed. Red when: the sweep
   is skipped, and n grows by the two leaked `gate-work.*` directories.
   fixture: a private ambient `TMPDIR` inside the arm, so another session's scratch cannot move n.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC3** — When a second bar starts while the first still runs, with the turnstile off in the
   fixture, the first bar's `gate-work.*` directory survives and its verdict is unchanged, and a
   `gate-work.*` directory whose `owner` names another common dir survives too. Red when: the sweep
   keys on the name or on age alone and removes a live or foreign owner's scratch. The arm lives in
   `tools/run-gates/run-gates.turnstile.test.sh`.
+  permission: the turnstile suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC4** — When a fixture leg runs `mktemp -d` and prints the path, that path lies under the run's
   `gate-work.*/tmp` and is gone after `bash tools/run-gates/run-gates.sh` exits. Red when: `TMPDIR` is
   exported after dispatch, or not at all, and the path lands in the ambient `TMPDIR`.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC5** — When the runner is started as `bash tools/run-gates/run-gates.sh` and a fixture leg
   sleeps, `/proc/<runner-pid>/cmdline` read from the beacon's `pid` file carries an absolute path
   ending in `tools/run-gates/run-gates.sh`. Red when: the re-exec is removed and the argv stays
   relative, which is the TOOL-aReapedSpinner-14 condition.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC6** — When the post-build bar runs with `GATE_FULL=1 GATE_SELFTESTS=1`, the
   `template size gate selftest` leg is green under the redirected `TMPDIR`. Red when: S1 exports a
   drive-letter spelling, the four-arm failure TOOL-aTetheredScratch-2 measured.
+  permission: the bar it names IS the build's one post-build bar, run after the last unit; this
+  unit's pass runs no bar.
 - **AC7** — When one fixture leg fails an assertion while another edits a tracked file mid-bar,
   `bash tools/run-gates/run-gates.sh` in the canary's scratch repo exits 1, its RED line names the
   moved tree, and the run record holds no `verdict TREE MOVED`.
   Red when: TREE MOVED outranks a failed leg, so exit 3 hides a real red and the gate-wall unit's
   re-run ends UNMET naming the move instead of the leg.
-  permission: the canary is held; it runs at the build's one post-build bar with `GATE_SELFTESTS=1`.
+  permission: the canary is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC8** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
   passes with the re-stamped `last-audit`, and the §B `TMPDIR` trap names the runner's own scratch
   redirect.
   Red when: the stamp moves and the trap still says every hermetic leg writes into the ambient
   `TMPDIR`, which passes the gate while the stamp asserts a re-verification that did not happen.
+  permission: the command is the `kickoff-manifest ratchet` leg; it runs at the build's one
+  post-build bar.
+- **AC9** — When `wc -c < memory/guides/SESSION-KICKOFF.md` is read at this unit's commit and at its
+  parent, the reading at this unit's commit is NO LARGER than the reading at the parent, and
+  `grep -c 'at an empty dir' tools/run-gates/README.md` prints at least 1.
+  Red when: S7's replacement is longer than the trap bullet it replaces, so a carrier other units of
+  this build write too grows on a unit that priced itself at nothing; or the measured detail is dropped
+  from the manifest and lands in no other document, so a trap a session front-loads leaves the tree
+  silently. The second witness is a phrase from the ADVICE, not `mktemp -d`: S1 already puts that
+  token in every sentence this unit writes about the runner's scratch, so a witness on it would
+  print 1 whether the displaced detail landed or not. The cap half is red by the `memory hygiene` leg's index-cap check; the NET delta against
+  the parent is the half no leg reads, which is why this criterion reads it.
+  permission: both readings are `wc -c` and `grep -c` over tracked files in the pass. NO CAP IS
+  RAISED by this unit: moving the 61440 is an owner turn.
 
 ## 7. Gates
 
 `run-gates canary` · `run-gates turnstile` · `template size gate selftest` · `kit version markers` · `kickoff-manifest ratchet` · `memory hygiene`
 
-New arm: tools/run-gates/run-gates.test.sh · a leg that edits a tracked file mid-bar · none
-New arm: tools/run-gates/run-gates.test.sh · a failing leg beside a leg that edits a tracked file mid-bar · none
-New arm: tools/run-gates/run-gates.test.sh · two bars killed by signal 9 with scratch held · none
-New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside a running first · none
+New arm: tools/run-gates/run-gates.test.sh · a leg that edits a tracked file mid-bar · the canary's executed-assertion floor
+New arm: tools/run-gates/run-gates.test.sh · a failing leg beside a leg that edits a tracked file mid-bar · the canary's executed-assertion floor
+New arm: tools/run-gates/run-gates.test.sh · two bars killed by signal 9 with scratch held · the canary's executed-assertion floor
+New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside a running first · the turnstile suite's executed-assertion floor
 
 ## 8. Open questions
 
@@ -244,6 +277,58 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside
   and S5 names it. L7: S7 rewrites the kickoff manifest's TMPDIR trap and re-stamps it (AC8, gate
   `kickoff-manifest ratchet`). H5: §3's claim that every driver reading of a runner exit sits in one
   spec now names the inherited-red arm and its edge.
+- rev-3 · 2026-09-16 · regrounded on fb07ca25 (origin/main). Line citations re-read at fb07ca25,
+  where TOOL-aRatifiedRulings-4's bound-0 kill tail in `report_one` pushed the runner's later lines
+  down: §2 S5's `tree_moved` pair is `run-gates.sh:1818-1819` and §6 AC1's green exit is
+  `run-gates.sh:1898`, while every cite above line 1468 held. §2 S7's kickoff trap is `:242-245`,
+  its text unchanged. §2 S2 says the ambient `TMPDIR` is `/tmp` when the variable is empty, the
+  state the kickoff manifest's `scratch-guard` trap (aProbedUnit) records, so S3's entries count
+  names a real directory there. §4 drops a `mktemp -d` site count this rev could not reproduce at
+  either base. §10's BASE paragraph describes fb07ca25. No S-item landed on main, and no landed
+  build sweeps a dead bar's scratch or gives the runner a TREE MOVED exit. §7's four `New arm:`
+  lines name the floor each one raises instead of `none`: both suites carry an executed-assertion
+  floor, and both moved on main in the window (TOOL-aRatifiedRulings-4 raised the canary's, and
+  577cffbb raised the turnstile's with the claim control it gave scenario 4c).
+  Extended 2026-09-20, same base, by the build-wide consolidation pass. §6's six criteria are
+  evened out: AC2 to AC6 and AC8 gain the `permission:` line AC1 and AC7 already carried, so
+  every criterion whose observation is a held suite or a merge-bar leg command places that run
+  at the build's one post-build bar. That folds the CONSERVATIVE reading of BUILD-METHOD M6 and
+  `tools/unattended/gate-guard.js`; the ruling conflict behind it is parked for the owner in
+  this build's `RUN.md` and is not decided here. AC8's command is the `kickoff-manifest ratchet`
+  leg's own argv, which is why it defers too. §7's four `New arm:` third fields already name the
+  floor each raises and are unchanged: neither suite this unit touches is one of the two that
+  pin an executed-assertion floor under the build-wide arm-line rule. The one capped carrier
+  this unit writes is `memory/guides/SESSION-KICKOFF.md`, 20057 bytes against the 61440 its
+  class declares.
+  Extended again 2026-09-20, same base, by the closing consolidation pass, which applied the
+  build's NET-ZERO rule to every capped carrier rather than only to the contested ones. The
+  headroom argument is no longer load-bearing: §2 S7 now NAMES the passage it rewrites, the
+  §B trap bullet at `memory/guides/SESSION-KICKOFF.md:242-245`, and the document its dropped
+  detail moves to, `tools/run-gates/README.md`, and new §6 AC9 reads the carrier at this unit's
+  commit against its PARENT and reds any growth. Naming the passage is what lets the orchestrator
+  see that no sibling unit trims the same lines: inside this closing set the passages taken are
+  this §B trap, the ceiling line, the §B M6 claim and the `last-audit:` stamp, and specs outside
+  the set write the same file, so the join across the whole build is the orchestrator's and no
+  count of it is typed here. The header date moves
+  to the last-change date; the rev does not, because the unit's scope did not move.
+  Verified in the same pass: AC9's second witness was `grep -c 'mktemp -d'`, which S1 already puts
+  into every sentence this unit writes about the runner's scratch, so it would have printed 1
+  whether the displaced detail landed or not — a witness that cannot fail for the reason its
+  `Red when:` gives. It now reads a phrase from the ADVICE that moves, `at an empty dir`, which
+  appears nowhere in `tools/run-gates/README.md` at HEAD.
+  Closed 2026-09-20, same base, by the last consolidation pass before the spec audits re-run.
+  Every `permission:` line naming a HELD leg now spells the VERIFYING run
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` instead of "with `GATE_SELFTESTS=1`", so
+  the canary, the turnstile suite and the template-size self-test cannot be read as covered by a
+  plain bar. Two rulings reached this spec and changed nothing in it. §2 S7 REWRITES a real §B
+  passage, the `TMPDIR` trap bullet, and does not merely re-stamp `last-audit:`, so it is a
+  genuine replacement rather than the bookkeeping stamp the orchestrator ruled is neither a trim
+  nor a collision. And the scoped net-zero rule binds a carrier with less than 2048 bytes free:
+  `memory/guides/SESSION-KICKOFF.md` has 41383 of its 61440 free, so AC9's no-larger reading is
+  STRICTER than the rule now requires; it is kept as written because a replacement written no
+  longer than what it replaces is what §2 S7 promises, and a criterion should grade the promise.
+  Rule 1's narrow reading moved nothing: AC8 runs `manifest-check.sh` over the real tree and keeps
+  deferring. The header date stays at the last-change date; the rev does not move.
 
 ## 10. Reuse audit
 
@@ -254,10 +339,14 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside
   unit extends `tools/run-gates/run-selftests.sh:571`, the landed per-slot `TMPDIR="$d/tmp"`
   redirect under a private `mktemp -d` root (TOOL-aPooledSweep-3), and it copies the dead-pid
   predicate of `ts_sweep_queue`.
-- **DR against BASE.** DR cites `run-gates.sh:611` for `ts_alive`; BASE agrees. DR says each bar
-  sweeps any `$WORK` whose pid is dead, but at BASE `WORK` is an anonymous `mktemp -d`
-  (`tools/run-gates/run-gates.sh:979`) with no recorded pid, so S2's named directory and `owner`
-  file are new rather than a reuse.
+- **DR against BASE fb07ca25.** DR cites `run-gates.sh:611` for `ts_alive`; BASE agrees. DR says
+  each bar sweeps any `$WORK` whose pid is dead, but at BASE `WORK` is still an anonymous
+  `mktemp -d` (`tools/run-gates/run-gates.sh:979`) with no recorded pid, so S2's named directory and
+  `owner` file are new rather than a reuse. Between `abac6d59` and fb07ca25 the runner moved only in
+  its version pair and in `report_one`'s kill tail: `KITDIR`, `ts_alive`, `ts_sweep_queue`, `WORK`,
+  `cleanup` and the exit-code header did not move, no `TMPDIR` export was added, and
+  `run-selftests.sh`, `.githooks/pre-push` and `tools/process-monitor/scope.py` did not change. The
+  turnstile suite gained a claim control on its ceiling arm, which AC3's new arm sits beside.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: `python tools/memory-recall/query.py "why does the gate runner leak scratch
   repos into TMPDIR and how should a moved tree be reported" --terms "TMPDIR mktemp scratch leak

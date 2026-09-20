@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-7 — generated family view
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 7
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -210,7 +210,10 @@ DEAD PROBE. stdout holds that object and nothing else.
 ### Files touched (estimate)
 
 `tools/memory-tree/gen_build_index.py` · `backlog.py` (the parser unit's module) ·
-`tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/kit.toml`.
+`tools/memory-tree/.memory-tree.conf.example` · `tools/memory-tree/kit.toml` ·
+`memory/map/generated/` (re-rendered by `python tools/codebase-map/gen_map.py --write` and staged in
+the pass commit, because the pre-commit fast leg runs the codebase-map gate on a staged `.py` and
+refuses a stale or unstaged artifact).
 
 ### Alternatives rejected
 
@@ -250,6 +253,10 @@ DEAD PROBE. stdout holds that object and nothing else.
   the two empty ones reading `*No live ask.*`, and each live ask appears once in its family's view.
   Red when: a family with no live ask renders no file, so an absent view and an empty family are the
   same byte.
+  cost: the `build-index selftest` leg's declared `ceiling` sits above the direct-check bound the
+  unattended kit's gate-guard suite grades, so the flag run this criterion and AC2, AC3, AC4 and
+  AC18 read is the pass's most expensive direct check; each arm's RED is observed by hand against a
+  scratch builds-mode fixture tree with its fix unstaged.
 - **AC2** — When the selftest runs every line of every rendered view through the real
   `extract.anchor_at`, none returns an id, and no view line opens with a list marker.
   Red when: the first cell is rendered as a bare or backticked id, which anchors it and makes the
@@ -327,7 +334,7 @@ DEAD PROBE. stdout holds that object and nothing else.
 
 ## 7. Gates
 
-`build-index selftest` · `memory hygiene` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `memory hygiene` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness`
 
 New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixture trees for every verdict, both guards, the mode guard, a filing home and both roster modes, plus the shards zero-diff fixture · none; the leg's ceiling moves only if its evidenced maximum does
 
@@ -388,6 +395,36 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixt
   hands-off to 34 already names the verb.
 - rev-3 · 2026-09-16 · spec-audit round 2 fold. G2 L9's view end (26): hands-off 11, §5 perf and §10
   cite unit 11 S3, which now sizes each prospective family view (unit 11 §8 F7).
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §4 Files touched names the codebase-map
+  artifacts and §7 gains `codebase-map coverage + freshness`, because dUnstagedSymbol's pre-commit
+  leg (1a774fcd) refuses a pass commit staging new generator or `backlog.py` functions over a stale
+  map. AC1 gains a permission line covering AC2, AC3, AC4 and AC18, because aDeferredBar (1afd26c9)
+  declares `gen_build_index.py --selftest` a flag-form suite above the direct-check bound and build
+  method M6 keeps suites out of a pass. §10 describes the new base. The generator is byte-identical to
+  `abac6d59` and the hygiene engine moved only its version line, so every §4 seam citation and AC17's
+  `:187-194` stand. Regrounding consolidation, 2026-09-20: AC1's permission line becomes a cost line.
+  The build-wide rule folded here defers only what the gate-guard hook DENIES — a `.test.sh` or
+  `selftest.py` FILE invocation carrying none of its read-only verbs — plus a gate-leg command, which
+  the owner rule forbids a pass to run by hand; a `--selftest` FLAG on another file stays the direct
+  check build method M6 and the unit child prompt name, so deferring it would contradict unit 11 §8
+  F9. The ruling conflict behind that scope is parked for the owner in the build's `RUN.md`; this
+  pass folds the conservative reading and decides nothing. Also checked and unchanged: no criterion
+  of this unit asserts a phrase counts zero, no `New arm:` line names a suite that pins an
+  executed-assertion floor, and this unit adds text to no capped carrier.
+  Closing consolidation, 2026-09-20: the orchestrator RATIFIED the NARROW reading for the build — a
+  gate leg's own command run over a FIXTURE or a staged break STAYS in the unit pass, that being the
+  direct check `memory/guides/BUILD-METHOD.md` M6 requires; the same command run over the real or
+  rendered tree defers to the one run the main loop makes at `VERIFYING`; and a `.test.sh` or
+  `selftest.py` FILE invocation carrying no read-only verb defers wherever it runs, because the
+  gate-guard hook denies it, while a `--selftest` FLAG on another file is not that shape and stays in
+  the pass — and added a single COST exception, which lands in unit 8 alone, where that leg's declared
+  `ceiling` sits above the per-command bound a pass holds. This leg's does not, so AC1's cost line stands
+  as written and no criterion of this unit moves. The orchestrator also SET the `VERIFYING` run:
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, plus the suite runs it attributes
+  beside the bar. That owes this spec nothing, because no line here defers an observation to a HELD
+  leg — the `build-index selftest` leg is held, but this unit's flag run of it stays in the pass and
+  is observed there. The header date is the last-change date; the rev
+  is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -401,11 +438,21 @@ the lexicon canon's — none of which guards an overwrite, with the shell layer 
 returned `TOOL-aMendedLedger-1`, the retirement of an authored index into this same generator, whose
 shape this repeats one family at a time.
 
-Where the design and BASE disagree, re-read at `abac6d59`: every line the design cites in the
-generator still holds its content, and design §7's "no merge attribute on views" is superseded by
-amendment A2, which this spec follows. The design's size measurement is PINNED at 2026-09-13; the
-TOOL shard has since grown, and the planner's census re-measures each family view before the flip
-(unit 11 S3).
+Where the design and this spec's first base disagree, re-read at `abac6d59`: every line the design
+cites in the generator still holds its content, and design §7's "no merge attribute on views" is
+superseded by amendment A2, which this spec follows. The design's size measurement is PINNED at
+2026-09-13; the TOOL shard has since grown, and the planner's census re-measures each family view
+before the flip (unit 11 S3).
+
+BASE is `fb07ca25`, origin/main 210 commits past `abac6d59`, where this spec was written and
+audited. `tools/memory-tree/gen_build_index.py` is byte-identical across the two, so the §4 seams
+hold at their cited lines, and `tools/memory-tree/check-memory-hygiene.sh` moved only its kit version
+line, so the ON STDERR note AC17 cites holds too. No landed build renders a view, guards a generated
+file against authored rows or adds an `--asks` mode. Two landed mechanisms bind the pass: the
+pre-commit codebase-map leg (dUnstagedSymbol), which is why §4 Files touched names the map
+artifacts, and aDeferredBar's declaration of the generator's selftest as a suite by cost, which
+AC1's cost line records while keeping the flag run in the pass, that declaration being about cost
+and not about what the hook denies.
 
 M12 losses are the design's tested rejections, carried in §4 Alternatives rejected with the
 measurement that rejected each.

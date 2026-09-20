@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 22
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -69,7 +69,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   the recorded phase here too. A record whose committed LANDING has already reached the advertised
   tip, which is the state `--close`'s own instruction to commit before landing produces, therefore
   proceeds to the ancestry test and writes its facts. It is not refused as finished. Observed by AC7.
-- **S9** The leg. Check 7's exclusion (`tools/unattended/check-unattended.sh:1520`) reads S1's
+- **S9** The leg. Check 7's exclusion (`tools/unattended/check-unattended.sh:1557`) reads S1's
   commit instead of the witness, and reports the record `derived LANDED`. Check 4 needs no change,
   because a rotated record says LANDED (S4). Check 15 reads a `landed-derived` fact as the anchor
   evidence of a LANDED record that carries one: no `landed-anchor` is required, since no in-place
@@ -77,7 +77,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   Check 15's `LANDED_ANCHOR_CUTOFF` grandfathering dates a record by
   `git log --follow --diff-filter=A`, as `DISPOSITION_CUTOFF` does, so a rotation does not re-date a
   pre-cutoff record into the graded set. The driver's twin of that exclusion, `check_single_live`
-  (`tools/unattended/unattended.sh:1260-1306`), reads the same S1 commit, so preflight and the leg
+  (`tools/unattended/unattended.sh:1350-1396`), reads the same S1 commit, so preflight and the leg
   agree about one record. Observed by AC6, AC8, AC9 and AC18.
 - **S10** A leg arm for the weak form of TOOL-aBoundedCeiling-11, graded BY MODE. Every record is
   dated by its first commit, read with `git log --follow --diff-filter=A`, against a new
@@ -102,12 +102,38 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   index in one operation gains the precondition that makes it true for an edited record: the terminal
   bytes are staged before the move, because `git mv` carries the STAGED blob, and an unstaged edit
   would ride the move as the old one. The paragraph keeps the rule that no retired record is edited,
-  and the rule that an archived non-terminal phase reds. Observed by AC11.
+  and the rule that an archived non-terminal phase reds. The GROSS growth on
+  `memory/guides/UNATTENDED-PROTOCOL.md` and on its template is at most 300 bytes, which covers the
+  §6 sentence, the §2 precondition and ONE key-table row for `LANDED_FACTS_CUTOFF`. That row is
+  OWED and not optional: check 22 of `tools/unattended/check-unattended.sh` joins §8's table against
+  `tools/unattended/.unattended.conf.example` and reds on a key declared in one and missing from the
+  other. This unit lands NET ZERO OR NEGATIVE on that carrier and spends none of
+  the shared headroom: it FUNDS those bytes by trimming §2, the region it grows, of rationale about
+  the very facts it is here to make checkable. The passages it trims, named precisely so that no
+  sibling unit trims the same text:
+
+  - Fact 8's rationale tail, `tools/unattended/PROTOCOL.template.md:211-214`, from "While a run is
+    LIVE the unit list derives" to the end of that item, 324 bytes. The FACT and its
+    `frozen by --landed alone` clause stay; the argument for freezing the roster moves.
+  - §2's EVIDENCE paragraph after its first sentence,
+    `tools/unattended/PROTOCOL.template.md:243-247`, from "A verb branching on the recorded anchor
+    kind" to the end of the paragraph, 366 bytes. The RULE, that facts 5-7 and 9-11 are evidence and
+    are never read back as inputs, stays in §2; the three-times-burned history and the
+    re-derivation argument move.
+
+  Both go to `tools/unattended/README.md`, the kit README, which carries no size row in
+  `tools/template-size-limits.txt` and owns kit prose, and neither carries a kit-path literal, so
+  the shipped-surface ban does not move. That is 690 bytes trimmed against at most 300 added. No
+  cap is raised: raising one is an owner turn, and the other units of this build draw on the same
+  1,116 bytes, which this unit leaves intact. Anything past the 300 stays in the companion stops
+  guide, which draws on its own cap.
+  Observed by AC11 and AC19.
 - **S13** No unattended version constant moves here: this unit's bytes ride the move
   `TOOL-dDerivedDocket-1` S9 makes once for the build. NOT OBSERVED by a criterion here:
   `kit version markers` grades the final tree's constant-marker agreement.
-- **S14** The unattended suites run once at the unit's end under attribution against BASE. Observed by
-  AC13.
+- **S14** The unattended suites run under attribution against BASE at the build's one post-build
+  bar, the run the main loop makes at VERIFYING after the last unit; this unit's pass writes the
+  arms and stages each RED. Observed by AC13.
 - **S15** Under `LANDER_MODE=in-place` the freeze is written at `--close` (S6). So the
   freeze-presence arm, `TOOL-dDerivedDocket-18` S4 reporting under check 15, also grades every
   committed LANDING record that carries an `asks:` fact, a committed record being one S1's
@@ -120,7 +146,7 @@ is landed. Only `--status`, the phase readers and the leg compute it (KF5); no c
   `released … landed` is never `presumed-stopped`, `--status` names the observation, and `--resume`
   reports nothing to resume and never invokes the lander. The lease is not a phase source, so the
   phase is still derived from the advertised tip. The process-ledger unit removes its ledger at the
-  same point, observed by that unit's AC12. The lease half is observed by AC15.
+  same point, which that unit's AC12 grades. Observed by AC15.
 - **S17** For a LANDING record whose landing commit C (S1) is an ancestor of the advertised tip, the
   run's-own-commits function (unit 17) takes C as its endpoint. Its exclusions are the ones unit
   19's terminal-record exclusion function computes from C:
@@ -218,7 +244,7 @@ history a remote could carry.
 ### Where the tip comes from
 
 `derived_phase` observes the advertised tip through a QUIET helper that returns a code and prints
-nothing, in the shape of `branch_tip_quiet` (`tools/unattended/unattended.sh:821`). It never goes
+nothing, in the shape of `branch_tip_quiet` (`tools/unattended/unattended.sh:904`). It never goes
 through `observe_anchor`'s `fail`, which prints to stdout and sets the global `status` with no
 reset. It observes only for a LANDING record, so `--status` on every other record stays offline. An
 unanswered remote, or an advertised tip whose object this clone lacks, leaves the phase LANDING with
@@ -229,7 +255,7 @@ its reason in the second global. Every caller then reads LANDING, the writing ve
 
 | Reader | Derives? | Why |
 |---|---|---|
-| `derived_phase()`, hence `refuse_if_terminal`, preflight's rotation test, `--resume`, `--status` | yes | KF5 and KF15 |
+| `derived_phase()`, hence `refuse_if_terminal`, preflight's rotation test, `--resume`, `--status`, `--audit` | yes | KF5 and KF15 |
 | `--landed`'s terminal guard | no, recorded | its own postcondition is the terminal; a derived guard refuses it after every good landing |
 | the leg's check 7 exclusion | yes | it already observes the advertised tip (`ADV_HEAD`) |
 | `check_single_live`, the driver's twin of check 7's exclusion | yes, through `landing_commit_of` | preflight and the leg must agree about one record |
@@ -238,7 +264,7 @@ its reason in the second global. Every caller then reads LANDING, the writing ve
 | the freeze-presence arm (check 15) | committed LANDING under in-place, plus recorded LANDED | the freeze is due at close under in-place (S15) |
 | the leg's S10 fact-set arm | by mode: recorded LANDED, rotated derived LANDED, and committed LANDING under in-place | the facts are due at close under in-place and at `--landed` under primary |
 | `archive_name_of` | no, recorded | it reads the bytes it is handed; S4 hands it a scratch copy already carrying the terminal, before the write gate, so the name derives from the post-write bytes |
-| the leg's check 19 cross-run arm (unit 19) | yes, and a rotated record by its witness | a landed record's range ends at its landing commit and, at each merge on its tail, excludes the parent that reaches none of the record's own commits since BASE: the prepared merge's first parent, or a plain reconcile's second; otherwise the owner's default-branch grant reds it, and reds the archived record for ever |
+| the leg's check 19 cross-run arm (unit 19) | yes, and a rotated record by its witness | a landed record's range ends at its landing commit and, at each merge on its tail, excludes the parent from which no commit since BASE touching the record's run-state path is reachable: the prepared merge's first parent, or a plain reconcile's second; otherwise the owner's default-branch grant reds it, and reds the archived record for ever |
 | `gen_build_index.py` and `memory/LIVE.md` | no | KF5: committed and freshness-gated |
 
 ### In-place `--landed`
@@ -294,7 +320,8 @@ reconstructable (TOOL-aBoundedCeiling-11). Reusing the anchor cutoff would red i
 `tools/unattended/check-unattended.sh` · `tools/unattended/unattended.test.sh` ·
 `tools/unattended/check-unattended.test.sh` · `tools/unattended/PROTOCOL.template.md` · the stops
 companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/.unattended.conf.example`
-· `.unattended.conf` · the rendered guides and Skill · `memory/map/features/unattended.md`.
+· `.unattended.conf` · `tools/unattended/README.md`, which receives the two trimmed §2 passages ·
+the rendered guides and Skill · `memory/map/features/unattended.md`.
 
 ### Alternatives rejected
 
@@ -322,10 +349,11 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   and `--status` read the advertisement, never `refs/remotes`.
 - testing — arms in `tools/unattended/unattended.test.sh` over a scratch repository with a bare
   remote, and in `tools/unattended/check-unattended.test.sh` for S9 and S10, each staged RED.
-- migration — additive. Every record at BASE is either terminal already or LANDING; the corpus's
-  stuck LANDING records with pushed work derive LANDED on the next `--status` and rotate on the next
-  preflight of their slug. A stuck LANDING record derives LANDED only in a clone that holds the
-  advertised tip's object, and on an unfetched clone the reason line says to fetch.
+- migration — additive. Every record at fb07ca25 is terminal, LANDING, or in a working phase the
+  derivation never reads; the corpus's stuck LANDING records with pushed work derive LANDED on the
+  next `--status` and rotate on the next preflight of their slug. A stuck LANDING record derives
+  LANDED only in a clone that holds the advertised tip's object, and on an unfetched clone the
+  reason line says to fetch.
 - user docs — protocol §6's sentence, the companion guide's paragraph and the Skill's Land section.
 
 ## 6. Acceptance criteria
@@ -368,7 +396,7 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 
   The fixture's default branch gained an owner commit adding `may:` to another build's README after
   BASE and before `--prepare`. The WHOLE leg, `bash tools/unattended/check-unattended.sh` over the
-  rotated tree, reports no check 4, check 15 or check 19 failure for the record. In a second
+  rotated FIXTURE tree, reports no check 4, check 15 or check 19 failure for the record. In a second
   fixture, where the run's own commit added that `may:` line, check 19 reds on the archive naming
   the commit.
   Red when: any of the following holds.
@@ -400,6 +428,11 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   Red when: the arm is keyed on `LANDED_ANCHOR_CUTOFF`, which reds a record that cannot be
   repaired; or either site dates a record without `--follow`, so a rotation re-dates a pre-cutoff
   record into the graded set.
+  permission: the fixture arms are the pass's own direct check. The one reading over the REAL tree,
+  that `memory/builds/dCarriedReceipt/RUN.md` goes ungraded, runs the `unattended kit gate` leg's
+  own command over this repository, so it defers to the VERIFYING run's
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`; that leg is not held, so a plain
+  bar carries it too.
 - **AC10** — When this grep runs at the unit's build commit, it prints 0:
   `grep -cE 'ls-remote|landing_commit_of|derived_phase|is-ancestor' tools/memory-tree/gen_build_index.py`
   Red when: the generator reads the advertised tip, or runs an ancestry test against it, so the
@@ -409,14 +442,16 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   rest, and the Skill's Land section calls in-place `--landed` an observation.
   Red when: the protocol still states a terminal is reached only by a verb while `--status` derives
   one.
+  permission: both run over the rendered tree rather than a fixture, so they are gate legs and are
+  observed at the build's one post-build bar.
 - **AC12** — When `--preflight` runs under `primary` on a derived-LANDED fixture record that was first
   committed after `LANDED_FACTS_CUTOFF` and lacks `units-at-landing`, it refuses with a numbered
   message naming `--landed`, and the record is neither edited nor moved. The same record first
   committed before the cutoff rotates.
   Red when: the rotation retires a record that the fact-set arm then reds, and no verb can repair it
   once it is archived.
-- **AC13** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once at the
-  unit's end, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
+- **AC13** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
+  build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every arm units 19 and 20 added to the unattended suites passes. A NEW
   failure in one of those arms names its owning unit, whose fix lands before this unit closes. Every
   suite reported with INHERITED lines or `DEAD PROBE at R` is named by its file path in a filed
@@ -427,7 +462,12 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   pushed past its budget, reads as clean; or an inherited failure is attributed away with no record
   filing it.
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
-  permission: the brief lists this unit among those allowed to run the unattended suites (D12-i8).
+  permission: the run drives the unattended self-test suites, which `memory/guides/BUILD-METHOD.md`
+  M6 keeps out of a unit pass, so it is the run the main loop makes at VERIFYING, after the
+  last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
+  made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
+  carries no leg for these suites at any flag setting. This folds the conservative reading of
+  the parked ruling conflict and decides nothing.
 - **AC14** — When the leg grades a fixture under `LANDER_MODE=in-place` holding a committed LANDING
   record that carries `asks:` and no `asks-at-landing:`, check 15 reds naming the record. The same
   record under `primary` does not red, and with the fact present it passes.
@@ -470,16 +510,41 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   witness ancestry test check 15 already runs would otherwise red the record by itself.
   Red when: check 15 accepts any `landed-derived` line as anchor evidence, so a hand-written archive
   meets the anchor rule without ever having landed.
+- **AC19** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
+  build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
+  parent's and is below the 61440-byte guide cap declared in
+  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  `tools/unattended/PROTOCOL.template.md`. Both trims are taken and both landed:
+  `grep -c 'While a run is LIVE the unit list derives' tools/unattended/PROTOCOL.template.md` and
+  `grep -c 'branching on the recorded anchor kind' tools/unattended/PROTOCOL.template.md` each count
+  1 at the parent and 0 at the build commit, both moved passages are present in
+  `tools/unattended/README.md`, and the two rules
+  they were attached to — the roster frozen by `--landed` alone, and facts 5-7 and 9-11 never read
+  back as inputs — are still stated in §2. The owed key-table row arrived:
+  `grep -c 'LANDED_FACTS_CUTOFF' tools/unattended/PROTOCOL.template.md` counts 0 at the parent and 1
+  or more at the build commit. The companion guide `UNATTENDED-STOPS.md`, which takes whatever this
+  unit's 300 bytes do not cover, is read the same way at the build commit and is below the same
+  61440-byte guide cap.
+  Red when: §6's sentence grows into the paragraph the companion owns, so the two answer one
+  question and the 1,116 bytes the build's units share are spent here; or the size is read against
+  the figure written in this spec rather than against the parent commit, so a sibling's landing
+  hides this unit's overspend; or a trim takes the RULE with the rationale, so §2 stops stating what
+  a verb may read back; or the trim is taken and the text lands in no destination, which DELETES the
+  reasoning rather than moving it; or the cap is raised to make the text fit, which is an owner
+  turn; or `LANDED_FACTS_CUTOFF` reaches §8's key table in no row, which reds check 22 of
+  `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
+  protocol lands in a carrier nobody reads the size of.
+  permission: a read, a byte count and three greps, no gate leg and no suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `pass-order history` · `memory hygiene` · `kit version markers` · `line length` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · a pushed and an unpushed LANDING record, a lander killed after its push, an in-place local-arm landing, and `--landed` in each mode with the record commit already on the advertised tip · none
-New arm: tools/unattended/check-unattended.test.sh · a record whose witness was pushed and record was not, and a LANDED record missing a fact after the cutoff · none
-New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row takes no exclusion at a merge · none
-New arm: tools/unattended/check-unattended.test.sh · a pre-cutoff LANDED record, anchorless and without the landing facts, rotated after the cutoff · none
-New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` first-commit date without `--follow` under `tools/unattended/`, the predicate run over the tree with hits and near-misses printed before it is wired (charter §7); `check-unattended.sh:1276` is a live hit at BASE · none
+New arm: tools/unattended/unattended.test.sh · a pushed and an unpushed LANDING record, a lander killed after its push, an in-place local-arm landing, and `--landed` in each mode with the record commit already on the advertised tip · the driver suite's executed-assertion floor
+New arm: tools/unattended/check-unattended.test.sh · a record whose witness was pushed and record was not, and a LANDED record missing a fact after the cutoff · the leg suite's executed-assertion floor
+New arm: tools/unattended/check-unattended.test.sh · a derived-LANDED record rotated through --preflight over a default branch that gained an owner `may:` commit after BASE, then graded by the WHOLE leg through one helper every archive-producing arm calls, which reads the archive with `git show :<archive>` and asserts an empty `git diff` for it; staged RED by removing the pre-move stage, and by a leg copy whose check 19 terminal row takes no exclusion at a merge · the leg suite's executed-assertion floor
+New arm: tools/unattended/check-unattended.test.sh · a pre-cutoff LANDED record, anchorless and without the landing facts, rotated after the cutoff · the leg suite's executed-assertion floor
+New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` first-commit date without `--follow` under `tools/unattended/`, the predicate run over the tree with hits and near-misses printed before it is wired (charter §7); `tools/unattended/check-unattended.sh:1313` is a live hit at fb07ca25 · none
 
 ## 8. Open questions
 
@@ -608,20 +673,81 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   is no exclusion. S17 drops the subject key and the tip test, and says the function reads no tip.
   §8 F8 is rewritten as that decision. The consumes-from edge to unit 19, the readers row for check
   19, AC17's `Red when:` and §7's staged RED for the whole-leg arm follow.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main). Line citations re-read at fb07ca25,
+  where aDeferredBar, aProbedUnit and aRatifiedRulings moved both unattended scripts without
+  touching the code cited: §2 S9's check 7 exclusion is at line 1557 of the leg and
+  `check_single_live` at lines 1350 to 1396 of the driver, §4's `branch_tip_quiet` at line 904,
+  §7's live `--diff-filter=A` hit at line 1313, and §10's `verb_landed`, freeze and `verb_status`
+  at lines 2432, 2525 and 2890. §4's readers row for check 19 now states the run side as S17 and
+  unit 19 do, by the parent that reaches a commit since BASE touching the record's run-state path,
+  where it said the record's own commits. §4's first readers row gains `--audit`, the phase reader
+  TOOL-aProbedUnit-3 landed, which the HELD unit's call-site table classifies as derived. §5
+  migration no longer says every record is terminal or LANDING: working-phase records exist and the
+  derivation never reads them. §10's BASE paragraph describes fb07ca25. No S-item landed on main.
+  AC13's unit-end run meets the gate-guard hook TOOL-aDeferredBar-3 landed, which is reported to the
+  orchestrator.
+  Extended 2026-09-20, regrounding consolidation, folding the conservative reading of that parked
+  conflict and not deciding it. AC13 now reads the attributed run at the build's one post-build
+  bar, the run the main loop makes at VERIFYING after the last unit, and S14 follows it; AC11
+  gains a `permission:` line, because both of its checks run over the rendered tree. AC6, AC8,
+  AC9, AC14, AC16, AC17 and AC18 keep their in-pass observation: each grades a FIXTURE, which M6
+  names as a pass's own direct check. S12 now states the 300-byte MAXIMUM this unit adds to the
+  protocol, including the one key-table row check 22 may owe for `LANDED_FACTS_CUTOFF`, and new
+  AC19 reads the file's size at the pass against the 61440-byte guide cap; no cap is raised.
+  Re-priced to NET ZERO on 2026-09-20, on the orchestrator's ruling that a unit adding bytes to a
+  capped carrier funds them itself: S12 now names the two passages this unit trims — fact 8's
+  rationale tail, 324 bytes, and §2's EVIDENCE paragraph after its first sentence, 366 bytes, both
+  to `tools/unattended/README.md` — and AC19 reds if either carrier grew against this unit's parent
+  commit rather than allowing 300 bytes of growth.
+  Four §7 `New arm:` lines name their suite's executed-assertion floor instead of `none`; the
+  `check-unattended.sh self-scan` line keeps `none`, because it names a script and not a suite.
+  AC10's grep was re-run at fb07ca25 and counts 0 already, which is correct and not the
+  could-not-fail defect: it is a forward BAN on tokens `tools/memory-tree/gen_build_index.py`
+  must not gain, not a retired phrase this unit removes. It is reported so the next reader does
+  not re-derive it.
+  Extended again on 2026-09-20, closing pass. The orchestrator ruled the check 22 key-table row
+  OWED rather than pending, so S12 drops the conditional and carries the `LANDED_FACTS_CUTOFF` row
+  inside its own 300-byte ceiling, which its 690-byte trim over-covers; AC19 now witnesses the row
+  arriving, reds if the key reaches no row, and reads the size of the companion guide this unit
+  overflows into, which is what a carrier with more than 2048 bytes free owes under the same ruling.
+  Rule 1's narrow reading is ratified: AC6 says
+  explicitly that its whole-leg run grades the rotated FIXTURE tree, and AC9 gains a `permission:`
+  line splitting its fixture arms, which stay in the pass, from its one reading over the REAL tree,
+  which defers to the VERIFYING run's
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. AC8, AC14, AC16, AC17 and AC18
+  stand as written, each grading a fixture.
+  Closing verifier, same pass and rev: the `permission:` line of the criterion that reads the
+  attributed run now names that run in the orchestrator's own terms, because
+  `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
+  `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
+  post-build bar" alone would have read as a bar that covers them.
 
 ## 10. Reuse audit
 
 - **Probe result.** `reuse_lookup.py` over "derive a landed phase from the commit the remote
   advertises" returned name-stem matches only (`derive_scope`, `derive_lf`, `derive_carried`) and
   reports `.sh` unscanned, so it is blind to the driver. Reading source found the seams: the
-  remote-arm ancestry test in `verb_landed` (`tools/unattended/unattended.sh:2342`),
+  remote-arm ancestry test in `verb_landed` (`tools/unattended/unattended.sh:2432`),
   `observe_anchor`, `archive_name_of` and the rotation half in `verb_preflight`, the `set_fact`
-  freeze of `units-at-landing` (`tools/unattended/unattended.sh:2435`), and check 7's advertised-tip
+  freeze of `units-at-landing` (`tools/unattended/unattended.sh:2525`), and check 7's advertised-tip
   exclusion in the leg, which is the derivation's precedent — it already treats a pushed LANDING as
   finished and only calls it "not counted".
-- **DR against BASE.** KF5 says `--status` already observes the advertised tip; `verb_status`
-  (`tools/unattended/unattended.sh:2790`) reads local facts only. DR's check-34 and freeze citations
-  hold at BASE, because `unattended.sh` did not move between `09a22d2b` and `abac6d59`.
+- **DR against BASE fb07ca25.** KF5 says `--status` already observes the advertised tip;
+  `verb_status` (`tools/unattended/unattended.sh:2890`) still reads local facts only. DR's check-34
+  and freeze citations hold at fb07ca25. `unattended.sh` moved between `abac6d59` and fb07ca25, by
+  ninety lines above `verb_landed` and the freeze and a hundred above `verb_status`, and none of
+  the moves touched `verb_landed`, check 34's equality test on the lander marker, `archive_name_of`,
+  the rotation's `GIT mv -f` or its code-28 and code-29 refusals; preflight gained a pinned
+  `run-branch` fact beside `anchor-kind`. Neither `derived_phase`, `landing_commit_of`,
+  `LANDER_MODE` nor `LANDED_FACTS_CUTOFF` exists on main.
+  Check 15's `LANDED_ANCHOR_CUTOFF` still dates without `--follow`, while check 2's
+  `DISPOSITION_CUTOFF` and aProbedUnit's new `FOLD_CUTOFF` date with it. What landed bears on this
+  unit twice over. `--audit` (`print_audit`) reads the phase through `is_terminal`, a reader the
+  HELD unit's call-site table classifies beside `--status`. And the wired gate-guard hook
+  (`tools/unattended/gate-guard.js`) denies `run-unattended-gates.sh` and any `*.test.sh` suite
+  while this branch's record is before `VERIFYING`, so AC13's run could not have executed inside a
+  pass as rev-5 first wrote it. The 2026-09-20 consolidation moved it to the build's one post-build
+  bar; the ruling conflict with D12-i8 behind that move is the orchestrator's.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: LANDED LANDING landed-anchor lander-marker check-34 advertised-tip ADV_HEAD
   derived witness units-at-landing rotation no-ff — passed as `--terms` with the question "how does

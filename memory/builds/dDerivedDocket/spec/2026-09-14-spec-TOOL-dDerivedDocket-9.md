@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 9
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -82,10 +82,13 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   `tools/memory-tree/`, every path its arms read, and declares a `ceiling` in `tools/gate-legs.json`:
   900 s, the `memory-hygiene self-test` sibling's, until the post-build bar's first reading
   re-declares it as `tools/run-gates/ceiling-margin.txt` sizes it over that reading, recorded through
-  `derive-ceilings.py --write`. The suite ships to no adopter (S12, §8 F8). Observed by AC10.
+  `derive-ceilings.py --write`. The suite ships to no adopter (S12, §8 F8). No pass runs it: build
+  method M6 keeps a suite out of a pass and the unattended kit's gate-guard hook refuses one before
+  `VERIFYING`, so each arm's RED is observed by hand against a scratch fixture and the leg runs at the
+  one post-build bar. Observed by AC10.
 - **S12** The declarations the new moving parts owe in the same commit, each named in §4 Files
   touched: a `govkit` `[[exempt]]` row for `.githooks/commit-msg` with its reason; `commit-msg` added
-  to `GOV_WIRING_HOOKS` (`tools/check-wiring.sh:209`); the new suite withheld from adopters, its
+  to `GOV_WIRING_HOOKS` (`tools/check-wiring.sh:262`); the new suite withheld from adopters, its
   basename joining the `project-owned` include list in `tools/memory-tree/kit.toml` and its leg
   carried by an `[[exempt_leg]]` row in `tools/govkit/registry.toml` whose reason says the suite
   stages breaks into copies of this kit's checkers and grades gov's own hooks, as its siblings
@@ -98,7 +101,9 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   under builds mode, that govkit reads `requires_if` only in selfcheck, and that an adopter installs
   memory-recall before switching, the remedy S15's refusal prints (§8 F6). The existing edge's `why`
   at `tools/memory-tree/kit.toml:8` is reworded in the same edit to say that selfcheck grades it and
-  that it installs nothing; neither `why` says the edge is true or false at apply. An arm in
+  that it installs nothing; neither `why` says the edge is true or false at apply. The reword keeps
+  the `--print-defined-ids` clause and the `when_verb_used` note that aReplayedCard added to that edge
+  (`KICK-aReplayedCard-2`). An arm in
   `transition-audit.test.sh` asserts the new edge is present in the kit's own descriptor, naming
   `memory-recall` and `BACKLOG_MODE`, observed RED with the edge deleted in a scratch copy.
   Observed by AC10.
@@ -133,8 +138,12 @@ change reds the bar everywhere and is repaired forward instead of trusted.
 - **S17** Under the build's one-owner rule for kit versions, this unit moves `KIT_CHECK_WIRING_VERSION`
   and its `gov:kit check-wiring@` marker on the same line of `tools/check-wiring.sh` once, being the
   earliest unit to change that kit's shipped bytes; unit 13's check-wiring bytes ride this move (§8
-  F9). `tools/check-kit-versions.sh` holds no need row for this constant, so no gate requires the
-  move and a criterion reads it. Observed by AC17.
+  F9). The moved value is strictly higher, as an X.Y pair, than both its value at `fb07ca25`, where
+  aReplayedCard had already taken 1.3 for its own bytes, and the value
+  `git show origin/main:tools/check-wiring.sh` reads at the pass after a fetch; unit 34's landing
+  reconcile re-checks it against the advertised tip and moves it above any tip value at or above it.
+  `tools/check-kit-versions.sh` holds no need row for this constant, so no gate requires the move and
+  a criterion reads it. Observed by AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -195,7 +204,7 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   imported lazily from the memory-recall kit directory the way `tools/memory-tree/merge-rows.py:184-210`
   does, so this module spells no second row grammar. With that kit absent under builds mode, S15
   refuses by name and prints the install remedy. S12's `requires_if` edge installs nothing: govkit
-  reads `requires_if` only in selfcheck check 7 (`tools/govkit/govkit.py:1357-1381` at BASE), which
+  reads `requires_if` only in selfcheck check 7 (`tools/govkit/govkit.py:1385-1409` at BASE), which
   grades the named kit and the condition key, while `derive_install_order` and
   `derive_unsatisfied_requires` read plain `requires` only (§8 F6).
 - **Accounting** — S5. The RELOCATED row is matched on id and sha prefix only; its why-field is prose.
@@ -302,6 +311,10 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
   exits 0. Red when: the predicate reads the parent's tip conf, and a straggler whose tip carries
   the new conf passes unaccounted.
   cost: fixture repos only; observed at the one post-build bar and by hand in a scratch copy.
+  permission: the suite is a bare `*.test.sh` invocation, which `tools/unattended/gate-guard.js`
+  refuses before `VERIFYING`, so the suite runs that this criterion, AC11 and AC15 name are
+  observed at the one post-build bar; in the pass each is observed by hand against a scratch fixture repo, where
+  the hygiene engine runs over that fixture and never over this tree.
 - **AC2** — When the fixture's accounting carries two RELOCATED rows for one entry, `transition_audit.py`
   exits 1 naming both files; with a row whose sha prefix names another commit, it exits 1 as
   unaccounted. Red when: accounting matches on id alone and a stale provenance row certifies a new
@@ -321,6 +334,9 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
   `transitions examined` with a non-zero count. Red when: the dormant branch prints nothing, which
   reads exactly as a clean audit.
   figure: every count on the line is DERIVED at run time.
+  permission: the run over this tree is the `memory hygiene` leg's command, which no pass runs (build
+  method M6), so it is observed at the one post-build bar; in the pass the dormant line is observed by
+  hand on a shards-mode scratch fixture.
 - **AC6** — When the fixture's HEAD is builds mode and the module's conf reader is staged broken to
   read every blob as shards, the check exits 1 as a DEAD PROBE; a
   `git clone --depth 1 file://<fixture>` of the builds-mode fixture, which
@@ -356,7 +372,7 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
   no subject pin, which selfcheck reds as unclaimed and unpinned (the declared-population class); or
   the suite is left to the kit's `**` engine rule and ships to every adopter; or the edge is deleted,
   which selfcheck cannot see because it grades an edge only when one is present; or the leg declares
-  no ceiling, which the run-gates canary reds under `GATE_SELFTESTS=1`.
+  no ceiling, which the `run-gates gov canary` leg reds under `GATE_SELFTESTS=1`.
   permission: unit passes run no gate legs; the edge-presence arm's RED is observed by hand in a
   scratch copy, and the commands above run at the one post-build bar.
 - **AC11** — When `transition-audit.test.sh` calls `transition_audit.delta(ours, theirs)` with a
@@ -407,16 +423,22 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
   diverged hook S9 depends on; or the real-tree arm compares one direction only, so a name left in
   the list after its hook file is deleted passes.
   permission: unit passes run no gate legs; each RED is observed by hand against a scratch copy in
-  the pass, and both suites run at the one post-build bar.
+  the pass, and both suites run at the one run the main loop makes at `VERIFYING`. That run is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, because `check-wiring self-test`
+  is HELD — `chunk` `selftests` with `subject` `kit` — and a plain bar does not reach it; the
+  `transition-audit arms` leg carrying the other suite is unheld and any bar runs it.
 - **AC17** — When the `KIT_CHECK_WIRING_VERSION=` line of `tools/check-wiring.sh` is read at the
-  unit's build commit and, with `git show`, at `abac6d59`, the build commit's value is higher as an
-  X.Y pair and its `gov:kit check-wiring@` marker carries the same value; and
-  `bash tools/check-kit-versions.sh` exits 0.
-  Red when: the move is skipped, which `tools/check-kit-versions.sh` cannot see because it holds no
-  need row for this constant, so an adopter pulling the changed script cannot tell the vintages
-  apart.
-  permission: the two reads are `git show` observations in the pass; `check-kit-versions.sh` is the
-  `kit version markers` leg and runs at the one post-build bar.
+  unit's build commit and, with `git show`, at `fb07ca25` and at `origin/main` after a `git fetch` in
+  the pass, the build commit's value is strictly higher as an X.Y pair than both reads and its
+  `gov:kit check-wiring@` marker carries the same value; and `bash tools/check-kit-versions.sh` exits
+  0.
+  Red when: the move is skipped, or lands on a number the default branch already shipped for other
+  bytes, as a move read only against `abac6d59` would land on the 1.3 aReplayedCard took, which
+  `tools/check-kit-versions.sh` cannot see because it holds no need row for this constant, so an
+  adopter pulling the changed script cannot tell the vintages apart.
+  figure: 1.3 at `fb07ca25` is PINNED; the `origin/main` value is DERIVED in the pass.
+  permission: the reads are `git fetch` and `git show` observations in the pass;
+  `check-kit-versions.sh` is the `kit version markers` leg and runs at the one post-build bar.
 
 ## 7. Gates
 
@@ -449,7 +471,7 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   conf twice inside the module. (iii) is one reader twice, which §4's two-readers rule refuses; (i)
   loses a refusal a caller could still arm. RESOLVED (agent, 2026-09-14, delegated): (ii).
 - **F6 — what installs the memory-recall kit an adopter's check 25 needs under builds mode?** govkit
-  reads `requires_if` only in selfcheck check 7 (`tools/govkit/govkit.py:1357-1381` at BASE);
+  reads `requires_if` only in selfcheck check 7 (`tools/govkit/govkit.py:1385-1409` at BASE);
   `derive_install_order` and `derive_unsatisfied_requires` read plain `requires`. Options: (a) restate
   the edge as a declaration selfcheck grades, have S15's refusal print the install remedy, and hand
   the runbook the kit as a prerequisite of its switch step; (b) make govkit evaluate
@@ -461,7 +483,7 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
 - **F7 — where does the real-tree comparison of tracked hooks with `GOV_WIRING_HOOKS` live?**
   `tools/check-wiring.test.sh` ships to every adopter as role `engine`
   (`tools/govkit/entries/check-wiring.kit.toml`), and check H already skips a hook a tree does not
-  track (`tools/check-wiring.sh:213-215`). Options: (a) the shipped suite, both ways, as rev-2; (b)
+  track (`tools/check-wiring.sh:266-271`). Options: (a) the shipped suite, both ways, as rev-2; (b)
   the shipped suite, tracked-to-list only, skipping on absence; (c) a gov-only unheld arm in
   `transition-audit.test.sh`, with a fixture arm in the shipped suite; (d) a govkit selfcheck arm over
   `.githooks/**`. (a) reds on arrival in an adopter tracking two hooks; (b) loses a direction and
@@ -482,7 +504,8 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   change those bytes, with unit 13's riding its move; (b) unit 13; (c) each unit. (c) breaks the
   build's one-owner rule, and (b) names an owner later than the first change, against the
   first-to-change rule unit 21 S8 states and unit 13 §8 F9 applies to drift-audit.
-  RESOLVED (agent, 2026-09-16, delegated): (a), observed by AC17 against `abac6d59`.
+  RESOLVED (agent, 2026-09-16, delegated): (a), observed by AC17 against `fb07ca25` and the default
+  branch's tip.
 
 ## 9. Revision log
 
@@ -515,6 +538,57 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   earliest-to-scope order in unit 21 S8, which unit 21 §8 F3 rejected, and cites the first-to-change
   rule unit 21 S8 states and unit 13 §8 F9 applies to drift-audit. F9's resolution, S17 and AC17 are
   unchanged.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main). S17, AC17 and F9's observation clause
+  apply the orchestrator's build-wide kit-version decision: aReplayedCard (c298968d) already moved
+  `KIT_CHECK_WIRING_VERSION` to 1.3, so the move is read as strictly above both `fb07ca25` and
+  `origin/main` at the pass, and unit 34's landing reconcile re-checks it; F9's owner is unchanged.
+  S12 cites `GOV_WIRING_HOOKS` at `tools/check-wiring.sh:262` and F7 the skip at `:266-271`, where
+  aReplayedCard's card arm moved them; S12's reword of the `tools/memory-tree/kit.toml:8` edge keeps
+  the `--print-defined-ids` clause that build added. §4 and F6 cite selfcheck check 7 at
+  `tools/govkit/govkit.py:1385-1409`, its code unchanged, so F6's premise holds. S11 and AC5's new
+  permission line keep the suite and the `memory hygiene` leg out of a pass, per aDeferredBar
+  (1afd26c9) and aProbedUnit (5493495a). AC10's Red-when names the `run-gates gov canary` leg, the
+  one whose arm refuses a leg with no ceiling. §10 describes the new base.
+  Regrounding consolidation, 2026-09-20: the build-wide rule folded here defers only what the
+  gate-guard hook DENIES — a `.test.sh` or `selftest.py` FILE invocation carrying none of its
+  read-only verbs — plus a gate-leg command, which the owner rule forbids a pass to run by hand; a
+  `--selftest` FLAG on another file stays the direct check build method M6 and the unit child prompt
+  name, so deferring it would contradict unit 11 §8 F9. The ruling conflict behind that scope is
+  parked for the owner in the build's `RUN.md`; this pass folds the conservative reading and decides
+  nothing. AC1 therefore gains a permission line covering the suite runs it, AC11
+  and AC15 name, while AC5, AC10, AC16 and AC17 keep theirs; AC9 and AC13 keep their in-pass runs,
+  because each runs the hygiene engine over a fixture rather than over this tree, which is the
+  distinction AC5's and AC10's own lines already draw. Also checked and unchanged: AC10's
+  `grep -c 'apply time'` counts one at `fb07ca25`, so it is not green before the unit; the
+  `tools/check-wiring.test.sh` `New arm:` line correctly reads `none`, that suite pinning no
+  executed-assertion floor; and this unit adds text to no capped carrier.
+  Closing consolidation, 2026-09-20: the orchestrator RATIFIED the NARROW reading for the build — a
+  gate leg's own command run over a FIXTURE or a staged break STAYS in the unit pass, that being the
+  direct check `memory/guides/BUILD-METHOD.md` M6 requires; the same command run over the real or
+  rendered tree defers to the one run the main loop makes at `VERIFYING`; and a `.test.sh` or
+  `selftest.py` FILE invocation carrying no read-only verb defers wherever it runs, because the
+  gate-guard hook denies it, while a `--selftest` FLAG on another file is not that shape and stays in
+  the pass — and added a single COST exception, which lands in unit 8 alone, where that leg's declared
+  `ceiling` sits above the per-command bound a pass holds.
+  No criterion of this unit moves: AC13's hygiene run is over a fixture and stays, AC1's sits
+  inside a suite the hook denies and its permission line already splits the deferred suite run from
+  the by-hand fixture run, AC5's is over this tree and defers, and this unit observes no
+  `--selftest` flag. One measured fact for
+  the pass rather than a spec change, re-measured at this pass: `origin/main` is already past
+  `fb07ca25`, holds `KIT_CHECK_WIRING_VERSION` above the base value, and has MOVED AGAIN since the
+  last measurement, so no tip value is typed here or in any criterion of this unit. S17 and AC17 are
+  right only because they READ the advertised tip after a fetch and take a value strictly above both
+  it and the base; a pass that reads the `fb07ca25` value alone ships a duplicate move that
+  `tools/check-kit-versions.sh` cannot see. AC17's `figure:` line pins 1.3 at `fb07ca25`, which
+  `git show fb07ca25:tools/check-wiring.sh` still prints at this pass, so that one number stands and
+  it is a BASE reading, never a tip one. The orchestrator also SET the `VERIFYING` run:
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, plus the suite runs it attributes
+  beside the bar. AC16's line now says so in those terms, because the `check-wiring self-test` leg it
+  names is HELD and a plain bar would skip it while reading green; every other deferral of this unit
+  is to an unheld leg any bar runs, and those lines are left as they stand. Close-out verification
+  corrected the criterion names in this entry's own narrow-reading sentence, which had cited AC9 for
+  a hygiene run AC9 does not make; no criterion moved.
+  The header date is the last-change date; the rev is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -530,5 +604,18 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   leg at 267 s standalone before memoising) is why S10 caches and §4 walks the graph in memory.
 - Where design and BASE disagree: design A3's liveness predicate (§8 F2); design §18r.2 L2 names
   the `--staged` engine, and A7 plus this spec name the direct module call.
+- BASE is `fb07ca25`, origin/main 210 commits past `abac6d59`, where this spec was written and
+  audited. The hygiene engine and `tools/unattended/check-pass-order.sh` moved only their version
+  lines, so `:1092-1100` and `:40-48` hold; `tools/memory-tree/merge-rows.py`,
+  `tools/drift-audit/drift_report.py`, `tools/govkit/registry.toml`, `tools/govkit/subject-pins.tsv`
+  and `tools/check-kit-versions.sh` are byte-identical, and `.githooks/pre-commit` grew only below its
+  probe at `:42-45`. `tools/check-wiring.sh` grew 53 lines above check H and took version 1.3 at
+  aReplayedCard, and `tools/govkit/govkit.py` grew above selfcheck check 7 without changing how it
+  reads `requires_if`. `tools/check-wiring.test.sh` gained aReplayedCard's wiring arms and keeps
+  check H's `DIVERGES` arms, which S16's fixture arm joins, and
+  `tools/govkit/entries/check-wiring.kit.toml` still ships that suite as role `engine`, now beside
+  the kit's SessionStart fragment, so F7's premise holds. The tracked hooks are still `pre-commit`
+  and `pre-push`, check 25 is still unclaimed, and no landed build audits transition merges or adds
+  a `commit-msg` hook.
 - Recall terms used: `transition merge straggler shards builds history audit liveness DEAD-PROBE
   shallow graft replace-ref pass-order`

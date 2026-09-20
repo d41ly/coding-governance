@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory
 
-**Status:** SPECCED · rev-4 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 13
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -89,13 +89,15 @@ before a merge rather than as a repair after one.
 - **S10** The `core.hooksPath` premise is corrected in the five carriers §4 names, with no change in
   line count in `tools/check-wiring.sh`. Each comment carrier and the gotcha body carries the sentence
   §4 pins, its phrase "unless a worktree's config.worktree sets its own" on one physical line; the
-  note at `tools/check-wiring.sh:234` says the value in effect names another checkout, which supplies
+  note at `tools/check-wiring.sh:287` says the value in effect names another checkout, which supplies
   the hook; the gotcha's description drops the premise, and `memory/gotchas/INDEX.md` is regenerated
   with `python tools/memory-tree/gotchas.py --write`. Observed by AC13.
 - **S11** The build's one-owner rule gives each kit's one version move to the unit first in build
   order to change that kit's shipped bytes, and S6 and S9 are the build's first `tools/drift-audit/`
   changes, so this unit moves the drift-audit version (§8 F9). In one commit it raises
-  `KIT_DRIFT_AUDIT_VERSION` in `tools/drift-audit/drift_report.py` as an X.Y pair, and sets every
+  `KIT_DRIFT_AUDIT_VERSION` in `tools/drift-audit/drift_report.py` as an X.Y pair, strictly above
+  both the value each carrier `tools/check-kit-versions.sh` names holds at `fb07ca25` and the value
+  it holds on the advertised tip read after a fetch in the pass, and sets every
   `gov:kit drift-audit@` marker to the same value: in `tools/drift-audit/README.md`,
   `tools/drift-audit/drift_report.py`, `tools/drift-audit/drift_signals.py`,
   `tools/drift-audit/drift_signals.template.py`, `tools/drift-audit/selftest.py` and
@@ -130,7 +132,10 @@ before a merge rather than as a repair after one.
 - **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of the pre-commit refusal
   against a scratch pre-flip branch, once the default branch is in builds mode; the linked-worktree
   topology helper, `straggler-guard.test.sh` in its `--topology` mode (S8), through which AC12 builds
-  its worktree and which that unit's scratch clone runs, so the two cannot drift; and the hooks-path
+  its worktree and which that unit's scratch clone runs, so the two cannot drift; that unit now runs
+  the helper at the one post-build run at `VERIFYING` rather than inside its pass, because its head
+  word ends `.test.sh` and `--topology` is not one of gate-guard's read-only verbs, which is the
+  same reading AC10 already takes of this unit's own `--topology` run; and the hooks-path
   value settled here (§8 F5): under the relative `.githooks` that `tools/check-wiring.sh` writes, a
   straggler in a linked worktree runs its own hooks and is not refused — the documented inert case,
   with the `hooks own-tree` note — and under an absolute `config.worktree` override naming the
@@ -146,7 +151,7 @@ The shared `core.hooksPath` applies unless a worktree's `config.worktree` sets i
 files run depends on the VALUE in effect. An absolute value — this repo's shared config does not hold
 one, but a `config.worktree` override does, on seven of nine live worktrees on node `d` (PINNED,
 measured 2026-09-14) — makes each worktree it governs run the files of the one checkout it names, the
-primary tree's. The relative `.githooks` that `tools/check-wiring.sh:259`
+primary tree's. The relative `.githooks` that `tools/check-wiring.sh:312`
 writes resolves against the worktree running the hook, so a linked worktree runs its OWN hook files,
 and a pre-flip branch's are pre-flip copies with no library. Design §18.1's "absolute" was measured
 from a worktree carrying an override (§9, §10). The library therefore reaches a straggler only under
@@ -154,12 +159,12 @@ an absolute value; under the relative one it is inert there, and the audit and t
 guarantee (§5). It is still sourced from the directory the hook was run from, which is right for
 both values. A pre-flip branch's own tree carries the old kit and no straggler rule, so the rule
 cannot live in any kit the hook resolves through `$top`, the way `.githooks/pre-commit:48` resolves
-the hygiene engine, and it cannot be sourced from `$top` the way `.githooks/pre-push:59-61` sources
+the hygiene engine, and it cannot be sourced from `$top` the way `.githooks/pre-push:198-200` sources
 `gate-env.sh`.
 
 Five carriers state the old premise, and S10 corrects them: the `.githooks/pre-push` header (lines
-6-9), the comment at `tools/check-wiring.sh:188-190` and the note check H prints at `:234`, the
-comment at `tools/check-wiring.test.sh:811`, and `memory/gotchas/hookspath-resolves-into-another-checkout.md`.
+6-9), the comment at `tools/check-wiring.sh:241-243` and the note check H prints at `:287`, the
+comment at `tools/check-wiring.test.sh:918`, and `memory/gotchas/hookspath-resolves-into-another-checkout.md`.
 The comment carriers and the gotcha body carry one sentence: "The shared `core.hooksPath` applies
 unless a worktree's config.worktree sets its own, and the value in effect decides which hook files
 run: an ABSOLUTE value runs the hooks of the checkout it names, the relative `.githooks` check-wiring
@@ -210,10 +215,10 @@ audit runs as `--at <pushed sha> --expect-builds`, never over `HEAD`, since a pu
 
 ### The session step, and where it may sit in a shipped file
 
-`tools/check-wiring.sh` ships verbatim and its root-install spellings at lines 386, 449, 612 and
-621 are held by the install-prefix gate's frozen, position-keyed waiver registry. A line added above
+`tools/check-wiring.sh` ships verbatim and its root-install spellings at lines 442, 492, 708 and
+717 are held by the install-prefix gate's frozen, position-keyed waiver registry. A line added above
 them shifts them and unpins every waiver, and a new root-install literal takes no new waiver. So the
-step is a function defined and called below line 621, and it reaches the memory-tree kit through a
+step is a function defined and called below line 717, and it reaches the memory-tree kit through a
 directory derived from `KIT_REL` with the file name joined at run time. Its line uses the `note`
 severity, which the script reserves for a true condition that is not dormant wiring (its header).
 
@@ -245,8 +250,8 @@ inventory; after it, the stragglers left, until zero.
 `.githooks/straggler-guard.sh` (new) · `.githooks/pre-rebase` (new) ·
 `.githooks/straggler-guard.test.sh` (new) · `.githooks/pre-commit` (S2, and the `gov:root-fixture`
 marker, S7) · `.githooks/pre-push` (S4, and its header, S10) · `tools/check-wiring.sh` (S5, and the
-comment at 188-190 and the note at 234, S10) · `tools/check-wiring.test.sh` (S9, and the comment at
-811, S10) · `tools/install-prefix-waivers.txt` (one row leaves, S7) ·
+comment at 241-243 and the note at 287, S10) · `tools/check-wiring.test.sh` (S9, and the comment at
+918, S10) · `tools/install-prefix-waivers.txt` (one row leaves, S7) ·
 `tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · the other drift-audit
 version carriers (S11): `tools/drift-audit/README.md`, `tools/drift-audit/drift_signals.py`,
 `tools/drift-audit/drift_signals.template.py`, `tools/drift-audit/adopt-drift-audit.sh`,
@@ -257,8 +262,8 @@ version carriers (S11): `tools/drift-audit/README.md`, `tools/drift-audit/drift_
 `memory/gotchas/INDEX.md` (S10). Under the build's one-owner rule this unit moves one kit version,
 `KIT_DRIFT_AUDIT_VERSION` with its markers (S11), being the first unit in build order to change
 `tools/drift-audit/` bytes; its check-wiring bytes ride unit 9's move of `KIT_CHECK_WIRING_VERSION`
-(unit 9 S17). `tools/check-wiring.sh` lines 188-190 and 234 are reworded in place with no change in
-line count; every new line sits below line 621.
+(unit 9 S17). `tools/check-wiring.sh` lines 241-243 and 287 are reworded in place with no change in
+line count; every new line sits below line 717.
 
 ### Alternatives rejected
 
@@ -349,9 +354,16 @@ line count; every new line sits below line 621.
   recipe differs by one byte from `migrate_backlog.py --recipe`.
   Red when: the library's recipe drifts from the canonical text and no arm reds.
   cost: fixture repos only; observed at the one post-build bar.
-  permission: unit passes run no gate legs (fix F7). This criterion, and the suite and leg runs AC6
-  to AC9 name, are observed at the one post-build bar; in the pass, each arm's RED is observed by
-  hand against a scratch fixture repo.
+  permission: unit passes run no gate, suite or bar (fix F7, and the child prompt in
+  `tools/workflows/unattended-unit.js` since aProbedUnit, which `tools/unattended/gate-guard.js`
+  enforces before `VERIFYING`). This criterion, the suite runs AC1 to AC5, AC11 and AC12 name, and
+  the suite and leg runs AC6 to AC9 name, are observed at the one run the main loop makes at
+  `VERIFYING`, which is `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`:
+  `check-wiring self-test`, `drift-audit selftest`, `branch-guard self-test` and
+  `pre-push self-test`, which AC6 to AC8 read, are all HELD, every one carrying `chunk` `selftests`
+  in `tools/gate-legs.json`, and a plain bar and `GATE_FULL=1` alone both skip them. AC14's `--topology` run, which no bar leg makes, is one of
+  the suite runs attributed beside that bar, made by hand once every unit is terminal; in the pass,
+  each arm's RED is observed by hand against a scratch fixture repo, and AC14's `grep -n` runs there.
 - **AC11** — When `straggler-guard.test.sh` gives the fixture a remote whose default branch declares
   builds mode while the local default branch is still in shards mode, a pre-flip branch staging a
   shard edit is refused with the recipe; and when the fixture has no remote-tracking default and no
@@ -385,17 +397,20 @@ line count; every new line sits below line 621.
   that can drift, which the edge to unit 35 exists to prevent; or the mode sets a hooks path, so unit
   35's clone no longer measures the value `tools/check-wiring.sh` writes.
 - **AC15** — When the `KIT_DRIFT_AUDIT_VERSION = ` line of `tools/drift-audit/drift_report.py` is
-  read at the unit's build commit and, with `git show`, at `abac6d59`, the build commit's value is
-  higher as an X.Y pair. `git grep -c "gov:kit drift-audit@<value>"` over each file S11 names counts
-  at least one hit in each, and
-  `git grep -h -o "gov:kit drift-audit@[0-9][0-9.]*" -- tools/drift-audit tools/workflows` prints no
-  other value. `bash tools/check-kit-versions.sh` exits 0.
-  Red when: this unit's drift-audit bytes ship at BASE's version, which `tools/check-kit-versions.sh`
-  cannot see, because it compares the constant with the README marker and the two harnesses and
-  never with BASE, so an adopter pulling the new signal cannot tell the two vintages apart; or a
-  marker that script does not read, such as the one in `tools/drift-audit/drift_signals.template.py`,
-  keeps BASE's value.
-  permission: the two reads and both greps are `git show` and `git grep` observations in the pass;
+  read at the unit's build commit, its value is higher as an X.Y pair than the value
+  `git show fb07ca25:<carrier>` prints and than the value `git show origin/main:<carrier>` prints
+  after a `git fetch` in the pass, for each carrier `tools/check-kit-versions.sh` names: that
+  constant, the `tools/drift-audit/README.md` marker, and the `version:` field and marker of
+  `tools/workflows/drift-audit-code.js` and `tools/workflows/drift-audit-state.js`.
+  `git grep -c "gov:kit drift-audit@<value>"` over each file S11 names counts at least one hit in
+  each, and `git grep -h -o "gov:kit drift-audit@[0-9][0-9.]*" -- tools/drift-audit tools/workflows`
+  prints no other value. `bash tools/check-kit-versions.sh` exits 0.
+  Red when: this unit's drift-audit bytes ship at a version a carrier already holds at `fb07ca25` or
+  on the advertised tip, which `tools/check-kit-versions.sh` cannot see, because it compares the
+  constant with the README marker and the two harnesses and never with another commit, so an adopter
+  pulling the new signal cannot tell the two vintages apart; or a marker that script does not read,
+  such as the one in `tools/drift-audit/drift_signals.template.py`, keeps the old value.
+  permission: the fetch, the reads and both greps are `git` observations in the pass;
   `check-kit-versions.sh` is the `kit version markers` leg and runs at the one post-build bar.
 
 ## 7. Gates
@@ -403,7 +418,7 @@ line count; every new line sits below line 621.
 `memory hygiene` · `branch-guard self-test` · `pre-push self-test` · `check-wiring self-test` · `drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `install-prefix (shipped surface)` · `kit version markers` · `leg ceilings clear their evidenced maximum` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `straggler-guard.test.sh` on a new repo-subject leg · a builds-mode default with a pre-flip branch staging a shard edit, a rebase, two feature pushes, a relocation merge, a recipe byte flipped, a remote-only builds default and an unresolvable one, a decision-log rotation, a broken conf reader on push, a linked worktree under an absolute and a relative hooks path, the `--topology` mode · the new suite's own floor
-New arm: `tools/check-wiring.test.sh` · a builds-mode fixture with one local straggler · the suite's floor
+New arm: `tools/check-wiring.test.sh` · a builds-mode fixture with one local straggler · none
 New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-tracking stragglers, and one with none · none
 
 ## 8. Open questions
@@ -451,7 +466,8 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   unit. (c) breaks the build's one-owner rule, and (b) moves the version after two units'
   drift-audit bytes have already changed, so the tree between orders 13 and 21 ships new drift-audit
   bytes under BASE's version. RESOLVED (agent, 2026-09-16, delegated), decided by the orchestrator: (a), S11,
-  observed by AC15 against `abac6d59`; unit 21 §8 F3 records the same decision from its end.
+  observed by AC15 against `fb07ca25` and the advertised tip at the pass (rev-5 moved it off
+  `abac6d59`); unit 21 §8 F3 records the same decision from its end.
 
 ## 9. Revision log
 
@@ -492,6 +508,54 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   names the version carriers and drops rev-3's claim that the drift-audit bytes ride unit 21 S8.
   New AC15 reads the constant against `abac6d59`, both marker greps and
   `bash tools/check-kit-versions.sh`. New §8 F9 records the decision.
+- rev-5 · 2026-09-16 · regrounded on fb07ca25 (origin/main). Line citations that moved: aReplayedCard
+  grew `tools/check-wiring.sh`, so its hooksPath comment is at 241-243, check H's note at 287, the
+  `.githooks` write at 312, and its four waived spellings at 442, 492, 708 and 717, with §4, S10 and
+  Files touched following. The `tools/check-wiring.test.sh` comment is at 918. §4's gate-env citation
+  was wrong at `abac6d59` too, and now names `.githooks/pre-push:198-200`. S11, AC15 and §8 F9 read
+  the drift-audit move against `fb07ca25` and the advertised tip, per the orchestrator's kit-version
+  decision. That version is still 1.10 at the new base. AC10's permission line covers every suite
+  run, because aProbedUnit's child prompt and aDeferredBar's `gate-guard.js` refuse a suite in a
+  pass, and names AC14's `--topology` run as a by-hand observation after every unit is terminal,
+  since the bar runs the suite and never the mode. `.githooks/pre-commit:10` and `:48`, its waiver
+  row, `tools/drift-audit/` and every §7 leg are unchanged; §10 records the base.
+  Regrounding consolidation, 2026-09-20: the build-wide rule folded here defers only what the
+  gate-guard hook DENIES — a `.test.sh` or `selftest.py` FILE invocation carrying none of its
+  read-only verbs — plus a gate-leg command, which the owner rule forbids a pass to run by hand; a
+  `--selftest` FLAG on another file stays the direct check build method M6 and the unit child
+  prompt name, so deferring it would contradict unit 11 §8 F9. The ruling conflict behind that
+  scope is parked for the owner in the build's `RUN.md`; this pass folds the conservative reading
+  and decides nothing. No permission line moves: AC10's covers every denied run this unit names,
+  AC15's covers the `kit version markers` leg, and no criterion of this unit observes a
+  `--selftest` flag that a line wrongly defers. §7's `tools/check-wiring.test.sh` `New arm:` third
+  field is corrected from `the suite's floor` to `none`: that suite pins no executed-assertion
+  floor at `fb07ca25`, so the old field named a number nothing owns. Also checked and unchanged:
+  AC9's `grep -c 'githooks/pre-commit'` counts one and AC13's `repo-global` sweep counts six at
+  `fb07ca25`, so neither is green before the unit; and this unit adds text to no capped carrier.
+  Closing consolidation, 2026-09-20: the orchestrator RATIFIED the NARROW reading for the build — a
+  gate leg's own command run over a FIXTURE or a staged break STAYS in the unit pass, that being the
+  direct check `memory/guides/BUILD-METHOD.md` M6 requires; the same command run over the real or
+  rendered tree defers to the one run the main loop makes at `VERIFYING`; and a `.test.sh` or
+  `selftest.py` FILE invocation carrying no read-only verb defers wherever it runs, because the
+  gate-guard hook denies it, while a `--selftest` FLAG on another file is not that shape and stays in
+  the pass — and added a single COST exception, which lands in unit 8 alone, where that leg's declared
+  `ceiling` sits above the per-command bound a pass holds.
+  No criterion of this unit moves. The owed cross-edit is applied: the hands-off to unit 35 now
+  records that the unit runs the topology helper at `VERIFYING` rather than in its pass, so the two
+  specs agree; §8 F8 stays resolved as it is, and the alternative of giving that helper an entry
+  point whose head word does not end `.test.sh` is explicitly not taken. One measured fact for the
+  pass rather than a spec change, re-measured at this pass: `origin/main` is already past
+  `fb07ca25`, holds `KIT_DRIFT_AUDIT_VERSION` above the base value, and has MOVED AGAIN since the
+  last measurement, so no tip value is typed here or in any criterion of this unit. S11 and AC15 are
+  right only because they READ the advertised tip after a fetch and take a value strictly above both
+  it and the base; a pass that reads the `fb07ca25` value alone ships a duplicate move that
+  `tools/check-kit-versions.sh` cannot see, because it never compares against another commit. The
+  orchestrator also SET the `VERIFYING` run: `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
+  plus the suite runs it attributes beside the bar. AC10's line now says so in those terms, because
+  the four self-test legs AC6 to AC8 read are HELD and a plain bar would skip every one of them
+  while reading green; this unit's other deferrals are to unheld legs any bar runs, and those lines
+  are left as they stand. The
+  header date is the last-change date; the rev is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -506,12 +570,27 @@ returned `inventory_ids` and `DriftError` and no ref-walking signal. No existing
 backlog changes. Recall surfaced `TOOL-aWeldedTribunal-7`, which gave check H its `GOV_WIRING_HOOKS`
 walk that `pre-rebase` joins, and `TOOL-aStandingWrit-5`, which decides the default-branch rule.
 
-Where the design and BASE disagree: design §18.1's line citations hold at `abac6d59`
+Where the design and BASE disagree: design §18.1's line citations hold at BASE
 (`.githooks/pre-commit:10` and `:48`, `.githooks/pre-push:40`). The design does not know that
 `tools/check-wiring.sh` carries four position-keyed waivers that forbid adding lines above them.
 Design §18.1's `core.hooksPath` premise holds only under an absolute value; the shared config holds
 the relative `.githooks` check-wiring writes, and two of nine live worktrees on node `d` carry no
 override (G2 H2's re-measurement, 2026-09-14).
+
+BASE is `fb07ca25`. Against `abac6d59` it leaves `.githooks/pre-push`, `tools/drift-audit/`, both
+drift-audit harnesses, `tools/govkit/registry.toml`, `tools/check-kit-versions.sh`,
+`tools/run-gates/ceiling-margin.txt` and `tools/run-gates/derive-ceilings.py` byte-identical, and
+`KIT_DRIFT_AUDIT_VERSION` still reads 1.10. Three landed changes touch this unit's seams.
+- aReplayedCard added `check_card`, the `--resolve-fragment` verb and one shared fragment reader to
+  `tools/check-wiring.sh`. That moved every line S10 and §4 cite, re-keyed the four install-prefix
+  waiver rows, and moved `KIT_CHECK_WIRING_VERSION` from 1.2 to 1.3. Unit 9 S17 still owns the next
+  move. The premise sentence is unchanged there and in the suite.
+- dUnstagedSymbol appended a codebase-map leg to the end of `.githooks/pre-commit`. That leaves the
+  `gate_at` probe at line 48 and its waiver row in place, so S7's conversion stands.
+- aProbedUnit's child prompt in `tools/workflows/unattended-unit.js` forbids a suite inside a pass,
+  and `tools/unattended/gate-guard.js` denies any word ending `.test.sh` at command position before
+  VERIFYING unless the command carries a read-only verb. So this unit's pass runs none of its suite
+  arms (AC10). That includes the `--topology` mode S8 gives unit 35.
 
 Recall terms used: `pre-commit pre-push pre-rebase hook branch-guard check-wiring SessionStart
 hooksPath straggler notice`

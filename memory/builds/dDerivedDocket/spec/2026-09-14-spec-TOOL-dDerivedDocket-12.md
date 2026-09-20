@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 12
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -79,7 +79,8 @@ audit can count, and refuses to finish while any change is unaccounted.
   re-renders the views before the table prints. Observed by AC1 and AC11.
 - **S12** Arms for every verb, every row of §4's entry-path table and both policy sets in the kit
   selftest `migrate_backlog.py --selftest`, each observed RED with its fix unstaged, and the
-  selftest's `PASS (<n> assertions)` floor moved in the same commit. Observed by AC10.
+  selftest's `PASS (<n> assertions)` floor moved in the same commit. The leg's ceiling stays at or
+  under the direct-check bound unit 11 §8 F9 sets. Observed by AC10.
 - **S13** Two policy sets (§4). The straggler set runs `--relocate`, `--repair` and `--ingest` in its
   straggler form; the migration set runs `--write` and `--ingest` in its landing form (S6).
   `--signed` and `--triage-ask` on a writing verb or form outside the migration set exit 2 naming the
@@ -119,8 +120,9 @@ audit can count, and refuses to finish while any change is unaccounted.
 - **consumes-from** `TOOL-dDerivedDocket-10` — the row driver's shard-into-view banner, whose recipe
   block S10 compares.
 - **consumes-from** `TOOL-dDerivedDocket-11` — `tools/memory-tree/migrate_backlog.py`, its permissive
-  legacy-row parser, and its `--selftest` leg, which S12 extends; its S7 names-an-id test, which §4
-  P3 adopts for a hold; and the signed-record header cells its §4 pins, which `--signed` reads (P4).
+  legacy-row parser, and its `--selftest` leg, which S12 extends under the ceiling bound its §8 F9
+  sets; its S7 names-an-id test, which §4 P3 adopts for a hold; and the signed-record header cells
+  its §4 pins, which `--signed` reads (P4).
 - **hands-off** `TOOL-dDerivedDocket-13` — `--stragglers` for the session-start inventory and the
   drift signal, and `--recipe` for the hook bodies' parity arm.
 - **hands-off** `TOOL-dDerivedDocket-20` — `--recipe`, the text the unattended carriers tell a run
@@ -143,7 +145,7 @@ audit can count, and refuses to finish while any change is unaccounted.
 One planner, three writing verbs. Its input is a delta: entries of id, change kind, the row version
 at every merge base and at the straggler side, and the change commit, exactly as unit 9 returns
 them. Shard and backlog-archive rows of one family are one population, so a cut-mode rotation on the
-straggler (`ROTATION_MODE="cut"`, `.memory-tree.conf:394`) is no change and a flip rotated away with
+straggler (`ROTATION_MODE="cut"`, `.memory-tree.conf:429`) is no change and a flip rotated away with
 it is one. Legacy rows are read with unit 11's parser, which admits every shape design §9 step 2
 lists. The planner's output is a set of records per file, a NEEDS-HUMAN list and a CONFIRM list;
 the writer applies it only when both lists are empty.
@@ -318,7 +320,7 @@ line for the new modes, if unit 11 created one.
   that reopened an ask since the fork writes the author's close; the table shows it and no
   confirmation is demanded (§4).
 - testing — S12's arms, each staged RED with its fix unstaged; the selftest is a held kit leg, so the
-  landing bar owes `GATE_FULL=1 GATE_SELFTESTS=1`.
+  run the main loop makes at `VERIFYING` is `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
 - migration — none of its own. The straggler set is inert until the default branch is in builds
   mode; the migration set runs before that, `--write` over the pre-flip tree and the landing form
   over a shards-mode default tip; `--stragglers` is read-only in both modes.
@@ -382,13 +384,21 @@ line for the new modes, if unit 11 created one.
   Red when: the verb writes `BACKLOG.md` files into a shards-mode tree, which the mode guard then
   reds as a half-migration.
 - **AC10** — When `migrate_backlog.py --selftest` runs, it prints its
-  `PASS (<n> assertions)` line at or above the moved floor, and `bash tools/check-testsuite-counts.sh`
+  `PASS (<n> assertions)` line at or above the moved floor, the leg's `ceiling` in
+  `tools/gate-legs.json` is still at or under 300, and `bash tools/check-testsuite-counts.sh`
   and `bash tools/check-install-prefix.sh` pass.
   Red when: an arm is added whose failing case was never observed, or the module names a sibling
-  kit's path by literal.
-  cost: one kit selftest run; it is held, so it runs at the landing bar under `GATE_SELFTESTS=1`.
-  permission: unit passes run no gate legs (fix F7), so each arm's RED is observed by hand against a
-  scratch fixture in the pass, and the three commands above run at the one post-build bar.
+  kit's path by literal; or the extension raises the ceiling above `DIRECT_CHECK_BOUND`, which the
+  unattended kit's on-demand gate-guard suite reds as an undeclared suite and no bar leg reads.
+  cost: one kit selftest run, inside the per-command bound a pass holds, which is why the permission
+  line below keeps it in the pass. The LEG carrying it is HELD, so no plain bar and no `GATE_FULL=1`
+  bar executes it: only the one run the main loop makes at `VERIFYING`, which is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and a reader who takes a green
+  plain bar as covering this criterion is reading a held leg as covered.
+  permission: the `--selftest` run is the flag-form direct check the pass makes, its ceiling held at
+  the bound by unit 11 §8 F9; `bash tools/check-testsuite-counts.sh` and
+  `bash tools/check-install-prefix.sh` are gate-leg commands no pass runs (build method M6) and bind
+  at the one post-build bar. Each arm's RED is observed by hand against a scratch fixture in the pass.
 - **AC11** — When the fixture straggler rotated a flipped row into a backlog archive, `--relocate`
   accounts the flip once and removes the archive path the default side does not carry.
   Red when: the archive stays tracked, which the tracked-archive verdict reds after the flip (D8).
@@ -576,6 +586,45 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   `git merge --no-ff --no-commit <tip>`, and no criterion staged it, so AC16 runs the landing form
   inside that merge and its fixture line resolves a conflicted view to HEAD's side; §7's arm line
   names both; two over-long lines rewrapped.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). §4 "The engine" cites
+  `ROTATION_MODE` at `.memory-tree.conf:429`, where it moved when the conf gained keys. S12, AC10 and
+  consumes-from 11 keep the extended selftest leg's ceiling at or under the `DIRECT_CHECK_BOUND` that
+  aDeferredBar's gate-guard suite grades (unit 11 §8 F9); that suite is an on-demand unattended-kit
+  self-test, so AC10 reads the ceiling directly. The pre-push default-tip resolution, the
+  rotated-archive print mode and the driver's anchor seams are unchanged, and every §7 leg resolves.
+  §10 records the base.
+  Regrounding consolidation, 2026-09-20: the build-wide rule folded here defers only what the
+  gate-guard hook DENIES — a `.test.sh` or `selftest.py` FILE invocation carrying none of its
+  read-only verbs — plus a gate-leg command, which the owner rule forbids a pass to run by hand; a
+  `--selftest` FLAG on another file stays the direct check build method M6 and the unit child
+  prompt name, so deferring it would contradict unit 11 §8 F9. The ruling conflict behind that
+  scope is parked for the owner in the build's `RUN.md`; this pass folds the conservative reading
+  and decides nothing. AC10's permission line is therefore narrowed: the `--selftest` run stays
+  the pass's direct check, on unit 11 §8 F9's resolved reading, and only the two gate-leg commands
+  beside it are deferred. AC4 keeps its in-pass hygiene run, which is over a fixture and not over
+  this tree. Also checked and unchanged: no criterion of this unit asserts a phrase counts zero,
+  the `New arm:` line names the selftest's own assertion floor rather than `none`, and this unit
+  adds text to no capped carrier.
+  Closing consolidation, 2026-09-20: the orchestrator RATIFIED the NARROW reading for the build — a
+  gate leg's own command run over a FIXTURE or a staged break STAYS in the unit pass, that being the
+  direct check `memory/guides/BUILD-METHOD.md` M6 requires; the same command run over the real or
+  rendered tree defers to the one run the main loop makes at `VERIFYING`; and a `.test.sh` or
+  `selftest.py` FILE invocation carrying no read-only verb defers wherever it runs, because the
+  gate-guard hook denies it, while a `--selftest` FLAG on another file is not that shape and stays in
+  the pass — and added a single COST exception, which lands in unit 8 alone, where that leg's declared
+  `ceiling` sits above the per-command bound a pass holds.
+  This leg's ceiling is held at that bound by unit 11 §8 F9, so AC10's narrowed line stands and
+  AC4 keeps its in-pass fixture run. No criterion of this unit moves. The orchestrator also SET the
+  `VERIFYING` run: `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, plus the suite runs it
+  attributes beside the bar, and AC10's cost line and §5's testing row now name it in those terms
+  rather than naming the flag alone, because the leg they defer to is HELD and a plain bar would
+  skip it while reading green. Close-out verification rewrote that cost line, which had said the
+  selftest RUN happens at `VERIFYING` while the permission line beside it said the pass makes it —
+  two answers to one question inside one criterion. It now separates them: the flag run stays in the
+  pass because its ceiling is inside the per-command bound, and the HELD LEG carrying it is what no
+  plain bar and no `GATE_FULL=1` bar executes. §5's testing row is unchanged, because it names the
+  leg and not the run. The header date is the
+  last-change date; the rev is unchanged, this being the same consolidation.
 
 ## 10. Reuse audit
 
@@ -593,7 +642,18 @@ rotation an archive holds terminal rows only, so a flip can leave the shard and 
 Where the design and BASE disagree: design §18.4 records a drop as WONTDO, superseded by A4; design
 §9 step 1 counted 11 straggler refs on this node, re-measured here as 6 of 90 against a later
 `origin/main`; `migrate_backlog.py`, `transition_audit.py` and `backlog.py` do not exist at
-`abac6d59` and are units 11, 9 and 6.
+BASE and are units 11, 9 and 6.
+
+BASE is `fb07ca25`. Against `abac6d59` it leaves `.githooks/pre-push`, `tools/memory-tree/merge-rows.py`,
+the generator, `tools/memory-tree/check-verdict-epoch.sh` and `tools/memory-recall/extract.py`
+byte-identical, and the hygiene engine moved only its kit version constant, so
+`--print-rotated-archive-ere` and the resolution at `.githooks/pre-push:91-110` stand. The conf grew
+above the rotation key, which now sits at `.memory-tree.conf:429`. No landed build relocates rows. Two
+landed mechanisms bind the selftest this unit extends. aProbedUnit's child prompt in
+`tools/workflows/unattended-unit.js` forbids a suite inside a pass, which AC10's permission line
+already honours. aDeferredBar's gate-guard suite, an on-demand unattended-kit self-test and not a bar
+leg, reds a `--selftest` leg above `DIRECT_CHECK_BOUND` that it does not declare, which S12 now
+respects and AC10 reads directly.
 
 Recall terms used: `straggler relocate rotation reconcile lost flip merge-rows driver shard archive
 provenance`

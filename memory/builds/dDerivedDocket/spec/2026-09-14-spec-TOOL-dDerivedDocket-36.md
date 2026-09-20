@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 36
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 36
 
 <!-- gen:spec-records -->
 
@@ -58,13 +58,38 @@ one section the adopter runbook points at, and gate the part of it that can drif
   Observed by AC7.
 - **S7** Kit versions. Each kit whose shipped bytes change here carries a matching constant and
   marker, and a kit an earlier unit of this build already moved in this landing range is not moved
-  twice. The memory-tree constant follows `tools/memory-tree/check-verdict-epoch.sh`'s topological
-  rule: its one bump for the landing range sits at or after the range's last engine change, which
-  this unit places here when no later unit moves an engine line. The memory-tree constant sits at
-  `tools/memory-tree/check-memory-hygiene.sh:20`, a file in the kickoff manifest's `watch:` list, so
-  the same commit re-reads the §B claims that file feeds and re-stamps `last-audit` in
-  `memory/guides/SESSION-KICKOFF.md` by the manifest's stamp rule, with a delta line in the commit
-  message. Observed by AC8 and AC9.
+  twice: the drift-audit, review-harness, memory-recall and codebase-map bytes this unit changes
+  ride the move of the unit first in build order to change each. Memory-tree's one move is this
+  unit's, the build's one exception to that rule, because
+  `tools/memory-tree/check-verdict-epoch.sh`'s topological rule puts the one bump at or after the
+  range's last engine change, and no later unit moves an engine line. The constant at
+  `tools/memory-tree/check-memory-hygiene.sh:20` and the `gov:kit memory-tree@` marker on every
+  tracked `tools/memory-tree/*.template.md` and its render
+  move together, to a value strictly greater than both the value at `fb07ca25` and the value the
+  advertised tip carries at this unit's pass. One of those markers renders into a CAPPED carrier,
+  `memory/guides/BUILD-METHOD.md`, which `tools/template-size-limits.txt` declares at 27648 bytes
+  and whose own budget line declares 350 lines; it measures 27264 bytes and 347 lines at `fb07ca25`
+  and at HEAD, and 26439 and 336 at `abac6d59`, before the aDeferredBar and aProbedUnit landings
+  wrote the no-bar-inside-a-pass rule into it. NO
+  CAP IS RAISED AND NO FREE BYTE IS SPENT: this unit lands NET ZERO on that render. The move
+  rewrites the digits of one `<!-- gov:kit memory-tree@<version> -->` comment on line 1 of the
+  render and of its template, and the value at `fb07ca25` spells in four characters, so the delta is 0
+  bytes and 0 lines. A value needing a LONGER spelling would ADD to a capped carrier whose free
+  space this build's other units are already claiming, which this unit may not do; §8 F4 records
+  that case as a fork for the owner rather than a byte spent here. THREE FURTHER CARRIERS THIS UNIT
+  WRITES ARE CAPPED, and by a class cap rather than a `tools/template-size-limits.txt` row:
+  `memory/guides/REVIEW-PROTOCOL.md` at 17479 bytes and 236 lines and
+  `memory/guides/SESSION-KICKOFF.md` at 20057 and 248 sit under the guide class's 61440 and 750,
+  and `memory/README.md` at 2483 sits under the index class's 61440 with its line half declared
+  off, all measured at `fb07ca25` and unmoved at HEAD. Each has tens of thousands of bytes free,
+  so net zero does not bind them and this unit does not claim it: the `mode`-fallback sentence in
+  the protocol and the backlog line in the index are DECLARED at no more than 300 bytes per
+  carrier, and the kickoff re-stamp rewrites one line in place. AC4 reads all three sizes at this
+  unit's commit against those class caps rather than trusting the declaration. The constant's file is in the
+  kickoff manifest's
+  `watch:` list, so the same commit re-reads the §B claims that file feeds and re-stamps
+  `last-audit` in `memory/guides/SESSION-KICKOFF.md` by the manifest's stamp rule, with a delta line
+  in the commit message. Observed by AC8 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -125,12 +150,13 @@ reads within its own kit and names nothing outside it.
 
 ### The carriers, and the one sentence each must survive
 
-At BASE the five carriers say "the backlog shards" (`tools/workflows/tier2-review.js:315`), "the
-backlog rows" (`tools/workflows/drift-audit-state.js:198`), "the OPEN backlog rows"
+At `abac6d59`, and unchanged at `fb07ca25`, the five carriers say "the backlog shards"
+(`tools/workflows/tier2-review.js:315`), "the backlog rows"
+(`tools/workflows/drift-audit-state.js:198`), "the OPEN backlog rows"
 (`tools/drift-audit/SKILL.template.md:109`), "the open backlog"
 (`tools/workflows/REVIEW-PROTOCOL.template.md:188`) and "`DECISIONS.md` / `BACKLOG.md` index"
 (`tools/memory-recall/SKILL.template.md:91`). DR cites the review protocol at `:179`; the sentence
-sits at `:188` at BASE.
+sits at `:188` at `abac6d59` and at `fb07ca25`.
 
 Under `builds` the family file an agent would open is a view of live asks only, so "search the
 backlog" there silently omits every terminal ask and its reason. Under `shards`, which every adopter
@@ -143,10 +169,11 @@ which the install-prefix gate would refuse.
 ### The map
 
 `memory/map/baseline.toml` lists `KICK.md`, `PLAY.md` and `TOOL.md` unclaimed, and
-`memory/map/features/govkit.md` claims `DEPL.md`, measured at BASE. The new dossier claims all four,
-since after the switch they are four views of one mechanism, and govkit's claim of one of them was
-never about the deployer. The baseline only shrinks, which is exactly this move. The extractor keeps
-its name and gains a comment saying the files are authored shards or generated views by mode.
+`memory/map/features/govkit.md` claims `DEPL.md`, measured at `abac6d59` and again at `fb07ca25`. The new
+dossier claims all four, since after the switch they are four views of one mechanism, and govkit's
+claim of one of them was never about the deployer. The baseline only shrinks, which is exactly this
+move. The extractor keeps its name and gains a comment saying the files are authored shards or
+generated views by mode.
 
 ### Inventory
 
@@ -165,7 +192,8 @@ and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md
 `memory/README.md` · `memory/map/features/memory-tree-backlog.md` (new) ·
 `memory/map/features/govkit.md` · `memory/map/features/memory-tree-merge-driver.md` ·
 `memory/map/baseline.toml` · `tools/codebase-map/map_extractors.py` · `memory/map/generated/` ·
-`tools/memory-tree/check-memory-hygiene.sh` (the version constant) ·
+`tools/memory-tree/check-memory-hygiene.sh` (the version constant) · the `gov:kit memory-tree@`
+marker in each `tools/memory-tree/*.template.md` and in its render under `memory/` ·
 `memory/guides/SESSION-KICKOFF.md` (the audit block).
 
 ### Alternatives rejected
@@ -188,7 +216,7 @@ and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md
 - risks — a carrier's wording changes what a reviewer reads, and a review run after this unit reads
   asks where it read shards. The `mode` fallback keeps every shards-mode tree on the old reading.
 - testing — S2's arm, observed RED by deleting one verdict line from a scratch copy of the README;
-  the render and map legs for the rest.
+  the render, map and version legs for the rest, at the one post-build bar.
 - migration — none; every carrier reads both modes.
 - user docs — this unit is the user docs for the backlog modes.
 
@@ -224,44 +252,100 @@ and `memory/guides/REVIEW-PROTOCOL.md` · `tools/memory-recall/SKILL.template.md
   `tools/workflows/tier2-review.js`, `tools/workflows/drift-audit-state.js`,
   `tools/drift-audit/SKILL.template.md`, `tools/workflows/REVIEW-PROTOCOL.template.md` and
   `tools/memory-recall/SKILL.template.md` — each prints a hit inside the sentence naming the `mode`
-  fallback, and each carrier's BASE phrase — `the backlog shards`
+  fallback, and each carrier's `fb07ca25` phrase — `the backlog shards`
   (`tools/workflows/tier2-review.js:315`), `the backlog rows`
   (`tools/workflows/drift-audit-state.js:198`), `the OPEN backlog rows`
   (`tools/drift-audit/SKILL.template.md:109`), `the open backlog`
   (`tools/workflows/REVIEW-PROTOCOL.template.md:188`) and `DECISIONS.md` / `BACKLOG.md` index
-  (`tools/memory-recall/SKILL.template.md:91`) — occurs only inside that sentence; and
-  `bash tools/check-install-prefix.sh` passes.
-  Red when: one carrier keeps its BASE wording, so after the switch its agents read a view of live
+  (`tools/memory-recall/SKILL.template.md:91`) — occurs only inside that sentence;
+  `bash tools/check-install-prefix.sh` passes; and, at this unit's commit,
+  `tr -d '\r' < memory/guides/REVIEW-PROTOCOL.md | wc -c` and
+  `tr -d '\r' < memory/README.md | wc -c` each read at most 300 bytes above what the same
+  command reads at this unit's PARENT, those two and
+  `tr -d '\r' < memory/guides/SESSION-KICKOFF.md | wc -c` each read below 61440, and
+  `wc -l < memory/guides/REVIEW-PROTOCOL.md` and `wc -l < memory/guides/SESSION-KICKOFF.md`
+  each read below 750.
+  Red when: one carrier keeps its `fb07ca25` wording, so after the switch its agents read a view of live
   asks only and miss every terminal ask and its reason, or a verbatim-deployed script names the
-  generator by a prefixed path.
+  generator by a prefixed path; or the `mode` sentence is written long enough to carry a class-capped
+  carrier past its cap, which this size read catches in the pass and which check 6 of
+  `tools/memory-tree/check-memory-hygiene.sh` would otherwise red at the post-build bar, where no
+  pass of this unit is left to trim it.
+  permission: the greps are the pass's observation; `check-install-prefix.sh` is the
+  `install-prefix (shipped surface)` leg, which no pass runs, and it runs at the one post-build bar.
 - **AC5** — When `bash tools/workflows/check-protocol-parity.test.sh`,
   `bash tools/memory-recall/adopt-memory-recall.sh --check` and
   `bash tools/drift-audit/adopt-drift-audit.sh --check` run, each rendered carrier matches its
   template.
   Red when: a template moves and its render is left behind.
+  permission: the three commands are the `review-protocol parity (kit vs dogfood)`,
+  `memory-recall skill wiring` and `drift-audit wiring` legs and run at the one post-build bar; the
+  first is a `*.test.sh` the gate-guard hook refuses before VERIFYING. In the pass each render is
+  re-made by its own render command and committed with its template.
 - **AC6** — When `memory/README.md` is read, its backlog line names each build folder's `BACKLOG.md`
   and calls the family files generated, and `bash tools/memory-tree/check-memory-hygiene.sh` passes.
   Red when: the line still calls each file a mutable shard, the claim this repo's own index makes
   about a file nobody may edit.
+  permission: the read is the pass's observation; `check-memory-hygiene.sh` is the `memory hygiene`
+  leg and runs at the one post-build bar.
 - **AC7** — When `python3 tools/codebase-map/test_codebase_map.py` runs, it passes with
   `memory/map/baseline.toml` holding no `backlog-shards` key and the new dossier claiming all four.
   Red when: `DEPL.md` is claimed by both dossiers, which the map's collision flag reports.
-- **AC8** — When `bash tools/check-kit-versions.sh` runs, and the verdict-epoch check
+  permission: the command is the `codebase-map coverage + freshness` leg and runs at the one
+  post-build bar. In the pass the baseline's and the two dossiers' claims are read directly; the
+  pre-commit hook runs the map gate on this unit's staged `.py` and `.js` paths, which is the hook
+  and not a gate the pass runs.
+- **AC8** — When the `KIT_MEMORY_TREE_VERSION=` line of `tools/memory-tree/check-memory-hygiene.sh`
+  is read at this unit's commit, its value is higher as an X.Y pair than the value
+  `git show fb07ca25:<carrier>` prints and than the value `git show origin/main:<carrier>` prints
+  after a `git fetch` in the pass, for each memory-tree carrier `tools/check-kit-versions.sh` names:
+  that constant and the marker of every `tools/memory-tree/*.template.md`.
+  `git grep -h -o "gov:kit memory-tree@[0-9][0-9.]*" -- 'tools/memory-tree/*.template.md'` prints
+  that value and no other, the same `grep -o` over `memory/guides/BUILD-METHOD.md` prints that value
+  and no other too, so the RENDER is not left behind the templates it is rendered from, and
+  `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` reads at most
+  27264 while `wc -l` over the same render reads at most 347 — the `fb07ca25` byte and line counts S7
+  holds this unit to, 384 bytes below the ceiling `tools/template-size-limits.txt` declares — so a
+  capped carrier this unit only re-marks did not grow. When
+  `bash tools/check-kit-versions.sh` runs, and the verdict-epoch check
   `tools/memory-tree/check-verdict-epoch.sh` runs over the build's range, every kit whose bytes this
   unit moved carries an agreeing constant and marker, and the memory-tree constant's last bump is at
   or after the range's last engine change.
-  Red when: a marker is left behind its constant after a template edit, or the epoch bump lands
-  before an engine line this unit moved.
+  Red when: the move lands at a value a carrier already holds at `fb07ca25` or on the advertised
+  tip, which `tools/check-kit-versions.sh` cannot see, because it compares carriers with each other
+  and never with another commit; or a marker is left behind its constant after a template edit; or
+  the epoch bump lands before an engine line this unit moved; or the RENDER at
+  `memory/guides/BUILD-METHOD.md` is left at the old value while its templates move, which the size
+  read cannot see because a stale render is byte-identical and which only the `kit/dogfood doc
+  parity` leg would otherwise catch, at the post-build bar; or the marker edit in
+  `memory/guides/BUILD-METHOD.md` arrives as a prose edit, or as a longer value spelling (§8 F4), so
+  a render this unit owes nothing GROWS — a read against the ceiling alone passes while the headroom
+  the units after this one were promised is gone, and the `build-method size` leg reds at the
+  post-build bar where no pass is left to trim it.
+  permission: the fetch, the reads and the grep are `git` observations in the pass;
+  `check-kit-versions.sh` and `check-verdict-epoch.sh` are the `kit version markers` and
+  `verdict epoch (kit version dates the engine)` legs and run at the one post-build bar.
 - **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs at this unit's commit, check 5
   passes and the `last-audit` line in `memory/guides/SESSION-KICKOFF.md` differs from its parent's.
   Red when: the version bump is committed without the re-stamp, which the staged leg's check 5
   refuses at pre-commit because `tools/memory-tree/check-memory-hygiene.sh` is in `watch:`.
+  permission: the `last-audit` comparison is a `git` read in the pass, and the pre-commit hook runs
+  the staged leg at commit; `manifest-check.sh` over the tree is the `kickoff-manifest ratchet` leg
+  and runs at the one post-build bar.
 
 ## 7. Gates
 
-`build-index selftest` · `review-protocol parity (kit vs dogfood)` · `memory-recall skill wiring` · `drift-audit wiring` · `workflow script syntax` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `memory hygiene` · `line length` · `kickoff-manifest ratchet`
+`build-index selftest` · `review-protocol parity (kit vs dogfood)` · `memory-recall skill wiring` · `drift-audit wiring` · `workflow script syntax` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit/dogfood doc parity` · `memory hygiene` · `line length` · `kickoff-manifest ratchet`
 
-New arm: `tools/memory-tree/gen_build_index.py --selftest` · a scratch README missing one verdict line, and a module whose extraction yields nothing · the build-index selftest's arm count
+New arm: `tools/memory-tree/gen_build_index.py --selftest` · a scratch README missing one verdict line, and a module whose extraction yields nothing · none
+
+`build-index selftest` is the one HELD leg in the list: it reads `subject = kit` in
+`tools/gate-legs.json` at HEAD, so a plain bar PRINTS it held and runs it not at all, and the arm
+above is covered only by the run after the last unit,
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which this build owes because it
+is kit work. AC2 is NOT waiting on that run: a `--selftest` FLAG on the generator is the direct
+check a pass may make, and it is the leg's VERDICT, not the arm, that defers. Every other leg listed
+is `subject = repo` and runs on any bar.
 
 ## 8. Open questions
 
@@ -274,6 +358,14 @@ New arm: `tools/memory-tree/gen_build_index.py --selftest` · a scratch README m
 - **F3** — The design record names five carriers; how does each read a tree still in shards mode?
   RESOLVED (agent, 2026-09-14, delegated): through the `mode` field of `--asks --json`, falling back
   to the shards, because the generator prints an empty set there by design.
+- **F4 — what if the memory-tree value's next spelling is longer than the one at `fb07ca25`?** The
+  move is 0 bytes only while the value keeps the four-character spelling it carries at `fb07ca25`, and the
+  capped render that holds the marker has no free bytes to give this unit (S7). Options: (a) spend
+  the byte out of that render's remaining space; (b) trim a byte of its prose in the same commit;
+  (c) stop and ask the owner. RESOLVED (agent, 2026-09-20, delegated), decided by the orchestrator:
+  (c), under the build-wide rule that a unit adding bytes to a capped carrier lands net zero or
+  forks rather than spending headroom another unit is counting on. AC8's byte read reds first in
+  either case. The case is not live at `fb07ca25` or at the advertised tip.
 
 ## 9. Revision log
 
@@ -286,6 +378,79 @@ New arm: `tools/memory-tree/gen_build_index.py --selftest` · a scratch README m
   note, the keep-the-line sentence and the M6 clause-3 tokens. G5 M15's unit-36 end: S1 and the
   README table gain the signed-record shape, with consumes-from 11 and 33, two edges the brief's
   table does not list.
+- rev-3 · 2026-09-16 · regrounded on fb07ca25 (origin/main). Every carrier sentence, README heading,
+  map claim and `tools/memory-tree/check-memory-hygiene.sh:20` sits where `abac6d59` had it; memory-tree
+  moved 2.74 to 2.78 through aReplayedCard, aProbedUnit and their reconcile merges. §2 S7 and §6
+  AC8, by the orchestrator's build-wide kit-version decision: memory-tree's move stays here as the
+  verdict-epoch exception, read strictly above `fb07ca25` and the advertised tip across the
+  constant and every template marker, and the other kits' bytes ride their first changers; §4 Files
+  touched names the markers and renders; §7 gains `kit/dogfood doc parity`. AC4 to AC9 gain
+  `permission:` lines, because owner ruling TOOL-aProbedUnit-8 (landed with aProbedUnit) runs no
+  gate leg inside a unit pass and aDeferredBar's gate-guard hook refuses AC5's bare `*.test.sh`
+  before VERIFYING; AC7's names dUnstagedSymbol's pre-commit map leg; §5 testing. §4 and §10
+  re-measured at `fb07ca25`.
+  Second pass, 2026-09-20: every claim above was re-measured at HEAD and holds — the five carrier
+  sentences, the four `backlog-shards` keys, the constant's line, the four template markers and the
+  four renders that carry them, and the thirteen §7 leg names against `tools/gate-legs.json`. §10
+  records the advertised tip this pass will actually be read against, which had already moved past
+  `fb07ca25`; AC8 is unchanged, because it reads that tip at the pass rather than a pinned value.
+  Extended 2026-09-20 by the regrounding consolidation, four build-wide rules applied and each
+  checked rather than assumed. §7's `New arm:` third field read `the build-index selftest's arm
+  count` and now reads `none`, because `tools/memory-tree/gen_build_index.py` pins no
+  executed-assertion floor at HEAD, which was verified in the file rather than inferred from the
+  leg. S7 and AC8 name the one CAPPED carrier this unit's version move reaches,
+  `memory/guides/BUILD-METHOD.md` at 27648 bytes with 384 free, state the move's maximum addition as
+  0 bytes at the current digit count, and read that render's length at the pass; no cap is raised.
+  The suite-permission rule moved nothing here: AC4 to AC9 already carried `permission:` lines from
+  rev-3, AC5's already names the `*.test.sh` the hook refuses, and AC2's
+  `gen_build_index.py --selftest` is a `--selftest` FLAG on another file, which the hook header and
+  `tools/workflows/unattended-unit.js` both name as a direct check a pass may run, so it is
+  deliberately not deferred. No criterion here asserts that a phrase counts zero at HEAD.
+  Extended again 2026-09-20 by the closing consolidation. The orchestrator ratified that reading —
+  a gate-leg command or a suite FILE invocation defers to the run at VERIFYING, a `--selftest` flag
+  or a read-only verb stays in the pass — so AC2's flag and AC1's print modes stay where they are
+  and nothing moved. The capped-carrier rule tightened from a ceiling to NET ZERO: S7 now states
+  that this unit spends none of the render's free bytes, AC8 reads the `fb07ca25` byte AND line counts
+  instead of the ceiling, and new §8 F4 makes a longer value spelling a fork for the owner rather
+  than a byte taken out of the space the CI unit and the charter unit are already pricing. The
+  header date moves to
+  the last-change date, 2026-09-20, with the rev kept. The closing verifier then widened AC8 by one
+  reading: its marker grep covered the templates only, so a bump that moved every
+  `tools/memory-tree/*.template.md` and skipped the render left `memory/guides/BUILD-METHOD.md` at
+  the old value with its byte and line counts unchanged, passing this criterion and reaching the
+  `kit/dogfood doc parity` leg at the post-build bar instead — AC8 now reads the render's own
+  marker, and its Red when names that case.
+  Extended a third time 2026-09-20 by the close-out pass, which corrected a mis-attributed pair of
+  figures and named a held leg's run. THE CORRECTION: S7, AC8, §8 F4 and §9 wrote "at BASE" for
+  `memory/guides/BUILD-METHOD.md`'s 27264 bytes and 347 lines, while §4 and §10 of this spec then
+  used BASE for `abac6d59`, where that render measures 26439 and 336 — the aDeferredBar and
+  aProbedUnit landings
+  between the two bases grew it. The figures are `fb07ca25`'s, so the spec
+  read one word two ways and pinned this unit to a count taken at neither named commit. Every use
+  of the word is now a sha: the two byte-and-line figures and the four-character value spelling
+  read `fb07ca25`, the citation and carrier-phrase reads at `abac6d59` read `abac6d59`, and the
+  arithmetic is unchanged — 27648 minus 27264 is still the 384 free S7 claims, and the ceiling,
+  the 350-line budget and the net-zero verdict all stand. Under the closing scoping rule that
+  render has 384 free, far under 2048, so NET ZERO binds it rather than a stated delta, which is
+  what this unit already declares. THE SCOPING RULE ALSO REACHES THREE CARRIERS THIS SPEC HAD NOT
+  PRICED: S7 covered `memory/guides/BUILD-METHOD.md` alone, while §4's Files touched also names
+  `memory/guides/REVIEW-PROTOCOL.md`, `memory/README.md` and `memory/guides/SESSION-KICKOFF.md`,
+  each capped by its CLASS in `tools/memory-tree/check-memory-hygiene.sh` rather than by a
+  `tools/template-size-limits.txt` row — 61440 bytes for all three, 750 lines for the two under
+  `memory/guides/`. Each has tens of thousands of bytes free, so the ruling asks them for a
+  STATED DELTA and a size read rather than net zero: S7 now declares at most 300 bytes per
+  carrier with their sizes at `fb07ca25` (17479, 2483 and 20057) and AC4 reads all three at the
+  pass against the class caps, its Red when naming check 6 as the leg that would otherwise
+  catch a breach at the post-build bar. Nothing about `memory/guides/BUILD-METHOD.md` moved.
+  §7 gains a paragraph naming `build-index selftest` as the one
+  `subject = kit` leg it lists and the run that covers its arm in the orchestrator's own terms,
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, so no later reader takes a
+  plain bar for coverage; the command is spelled in §7 prose rather than in the leg-list line or an
+  acceptance bullet, the two places `tools/check-spec-tokens.py`'s bar join reads, so it adds no
+  graded token. The remaining closing rulings reach nothing here: this unit adds no key to
+  `tools/unattended/.unattended.conf.example` and sets none in `.unattended.conf`, so no section 8
+  key-table row is owed, and it claims no passage of the unattended protocol, so it is in no trim
+  collision. The header date already reads 2026-09-20 and the rev is kept.
 
 ## 10. Reuse audit
 
@@ -302,9 +467,25 @@ and name-stem `build_*` neighbours; no seam documents or carries ask status toda
 the design record's list of the five carriers and the map's current claim table, where `DEPL.md`
 sits with govkit.
 
-Where DR and the source disagree at BASE: DR cites the review protocol's sentence at `:179`, and it
-sits at `:188`. DR says the dossier claims "the three `backlog-shards` keys", and there are four
-inventory keys, one already claimed (§8 F2).
+Where DR and the source disagree, measured at `abac6d59` and again at `fb07ca25`: DR cites the review
+protocol's sentence at `:179`, and it sits at `:188`. DR says the dossier claims "the three
+`backlog-shards` keys", and there are four inventory keys, one already claimed (§8 F2).
+
+At `fb07ca25`, the base this spec is regrounded on: none of the builds that landed after `abac6d59`
+touched the five carriers' sentences, `memory/README.md`, `memory/map/baseline.toml`'s shard keys,
+govkit's `DEPL.md` claim, the extractor's comment or the kit README's merge-driver and M6 sections,
+and no landed build documents or carries ask status. `KIT_MEMORY_TREE_VERSION` reads 2.78 there,
+2.74 at `abac6d59`. Three landed mechanisms bind this unit's pass: owner ruling TOOL-aProbedUnit-8 (no
+gate leg inside a pass), `tools/unattended/gate-guard.js` from aDeferredBar (a bare `*.test.sh`
+refused before VERIFYING, `--check` and `--render` admitted), and dUnstagedSymbol's pre-commit map
+leg (a staged `.py` or `.js` with a stale map is refused at commit).
+
+The advertised tip had already moved past `fb07ca25` when this spec was regrounded: `origin/main`
+read `3bc78ff6`, six commits ahead, carrying `KIT_MEMORY_TREE_VERSION` 2.79 against `fb07ca25`'s
+2.78. That is an observation, not a pin — AC8 fetches and re-reads the tip at this unit's pass, and
+`TOOL-dDerivedDocket-34`'s landing reconcile re-checks the landed value against the tip again at the
+landing. It is recorded because it is the difference between a move this unit's own criterion passes
+and one the tip has already spent: 2.79 satisfies `tools/check-kit-versions.sh` and still collides.
 
 Recall terms used: `backlog shards carriers dossier baseline backlog-shards map_extractors README
 merge driver asks view prior-art lens`

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-1 — held-suite failure baseline
 
-**Status:** SPECCED · rev-3 · 2026-09-16 · node d · Tier-2 · base abac6d59 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -52,11 +52,11 @@ at L, and no OVER BUDGET at L. It is stated once, in S10. Built first, by owner 
   delegated self-test half and prints one line saying its `--checks` half is not attributed.
   Observed by AC6.
 - **S7** Two backlog rows are disposed at build time, with commit 8b29f0b9 as the evidence. That
-  commit, an ancestor of BASE, already fixed the bare `$1` abort at
-  `tools/unattended/unattended.test.sh:4107`. The first row, TOOL-aTracedSpawn-1, is CLOSED citing
-  it. The second, TOOL-aHoistedPass-36, records its stop (1) as fixed by it and stays OPEN for its
-  stop (2). NOT OBSERVED by a criterion: these are records, and check 13 and the row grammar grade
-  their shape.
+  commit, an ancestor of BASE, already fixed the bare `$1` abort in the case pattern the rows cite
+  at line 4107, which sits at `tools/unattended/unattended.test.sh:4123` at BASE. The first row,
+  TOOL-aTracedSpawn-1, is CLOSED citing it. The second, TOOL-aHoistedPass-36, records its stop (1)
+  as fixed by it and stays OPEN for its stop (2). NOT OBSERVED by a criterion: these are records,
+  and check 13 and the row grammar grade their shape.
 - **S8** The compensating-check wording moves from "a GREEN verdict" to the S10 criterion. The new
   wording is: "`--attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD
   PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at
@@ -66,13 +66,21 @@ at L, and no OVER BUDGET at L. It is stated once, in S10. Built first, by owner 
 - **S9** The run-gates and unattended kit version markers move, because shipped bytes change in
   both kits. Observed by AC11: the `kit version markers` leg grades only presence and pair agreement,
   which BASE's values already satisfy. This is the build's one move for each of the two kits: every
-  later unit's bytes in either kit ride it.
+  later unit's bytes in either kit ride it. The move is read against two values and never against a
+  number pinned when the spec was written: the value at BASE, and the value at the tip of
+  `origin/main` after a fetch at this unit's pass, on every carrier `tools/check-kit-versions.sh`
+  names. The courtesy unattended marker in `tools/unattended/gate-guard.js`, which that gate does not
+  read, moves with them. The landing reconcile re-checks both kits against the advertised tip.
 - **S10** The criterion this unit hands every self-test unit, stated once. When the unit's single
   `--attribute <BASE>` run is read, its summary reads `verdict clean`, and every suite it reports
   with INHERITED lines or `DEAD PROBE at R` is named by its file path in a filed backlog row or ask
   that is not CLOSED, as `git grep -n '<suite file>' -- memory/backlog 'memory/builds/*/BACKLOG.md'`
   shows. A consumer reads the verdict token and never the NEW count alone, and never the exit of a
-  wrapper that also runs unattributed checks. Observed by AC7, where the carriers name it, and AC12.
+  wrapper that also runs unattributed checks. `<BASE>` is the base the consuming spec's status
+  header names, `fb07ca25` since the 2026-09-16 regrounding, and never the run-state file's pinned
+  `base:` fact, which still reads `abac6d59`: against that sha every failure the intervening
+  default-branch commits introduced would read NEW. Observed by AC7, where the carriers name it, and
+  AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -97,30 +105,30 @@ at L, and no OVER BUDGET at L. It is stated once, in S10. Built first, by owner 
   suite filed, over the held push-main self-test suite, read through `--attribute` against this
   build's BASE.
 - **hands-off** `TOOL-dDerivedDocket-3` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-4` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-5` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-16` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-17` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-18` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-22` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-23` — the FAIL-line normaliser and the detached scratch
   worktree runner at R, which that unit reuses to re-run a red bar leg at R.
 - **hands-off** `TOOL-dDerivedDocket-24` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-27` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-28` — the S10 criterion, `verdict clean` with every inherited
-  suite filed, over the unattended suites that unit runs once at its end.
+  suite filed, over the unattended suites that unit's verification reads.
 - **hands-off** `TOOL-dDerivedDocket-30` — `--attribute` and the S10 criterion, `verdict clean` with
-  every inherited suite filed, under which that unit runs the unattended suites once, since they are
-  red at BASE.
+  every inherited suite filed, under which that unit's verification reads the unattended suites,
+  since they are red at BASE.
 - **hands-off** `TOOL-dDerivedDocket-32` — both runner headers as S8 leaves them, whose "nothing
   runs automatically" sentence that unit corrects, and the run-gates and unattended version moves
   (S9) its header edits ride.
@@ -231,7 +239,23 @@ dossier prose · `.githooks/gate-env.sh`, its DoD comment only.
   smudges CRLF on unpinned paths, so a suite reading an unpinned file can differ between R and L
   for that reason alone; it reads NEW, the safe direction.
 - testing — `tools/run-gates/run-selftests.test.sh` gains a two-commit fixture repo with fixture
-  suites, one arm per criterion, each observed RED before it lands.
+  suites, one arm per criterion, each observed RED before it lands. Every criterion that runs a
+  runner runs it INSIDE that fixture repository, whose working directory carries no
+  `.unattended.conf`: `tools/unattended/gate-guard.js` fails open there by its own header, the run
+  grades the fixture's suites and never this repository's tree, and it is the direct check the
+  child prompt requires for the flag this unit BUILDS. INSIDE is literal, and it is the whole of
+  the route: the hook resolves the repository from the WORKING DIRECTORY OF THE TOOL CALL, which
+  `tools/unattended/gate-guard.js:649` reads off the payload, and never from a `cd` written inside
+  the command — so each of these criteria is issued as a call whose own working directory IS the
+  fixture repository, and a `cd <fixture> && bash …` from this worktree is read against THIS
+  worktree's `.unattended.conf` and denied. The VERIFYING run the orchestrator makes after the last
+  unit DOES execute `--attribute`, in the attributed suite runs every other unit's final criterion
+  defers to, but it runs it over the REAL suites: it cannot stage a failure present at R and absent
+  at L, an abort on one side only, or a budget breach, so it observes the runs and never the flag's
+  own behaviour. That is why this unit alone keeps its runner runs inside the pass. The arms
+  themselves land in `tools/run-gates/run-selftests.test.sh`, whose `run-selftests self-test` leg is
+  HELD, so the run that executes them afterwards is that VERIFYING run's
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and never a plain bar.
 - migration — none. The flag is additive and the default mode is byte-identical.
 - user docs — both runners' usage text and the run-gates dossier's prose.
 
@@ -242,26 +266,44 @@ dossier prose · `.githooks/gate-env.sh`, its DoD comment only.
   B, and exits 1.
   Red when: the normaliser is dropped, so A's line carries the scratch path at R and the working
   path at L and reads NEW; or sets are replaced by counts.
+  permission: the run is confined to the two-commit fixture repository this criterion builds, whose
+  working directory carries no `.unattended.conf`, so `tools/unattended/gate-guard.js` fails open by
+  its own header; it grades the fixture's suites and never this repository's tree, and it is the
+  direct check the child prompt requires for the flag this unit BUILDS rather than an evasion of the
+  hook. The call's OWN working directory is that repository, because the hook reads the payload's
+  (`tools/unattended/gate-guard.js:649`) and not a `cd` inside the command.
+  The same reading covers AC2, AC3, AC4, AC5, AC8, AC9, AC10 and AC12; AC6 states its own.
 - **AC2** — When the fixture suite exits non-zero at L before printing any count line or FAIL line,
   its block reads `DEAD PROBE at L`, the summary's N excludes it, and the run exits 1 with the summary
   reading `DEAD L 1` and `verdict red`.
   Red when: the abort is read as an empty FAIL set, so the suite reads clean.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 - **AC3** — When `bash tools/run-gates/run-selftests.sh --attribute <R>` runs over a fixture suite
   that fails arm A at both R and L, it prints `INHERITED 1` and `NEW 0`, the summary reads
   `verdict clean`, and the run exits 0.
   Red when: the exit derives from S(L) being non-empty, as the no-flag loop's `st=1` does, so every
   inherited failure fails the unit that inherited it.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 - **AC4** — When a fixture's R run is killed by a short bound and `--attribute <R>` is then run
   again, the second run reads `fresh` on the R side; a third run after a completed R run reads
   `cached` and `git worktree list` gains no entry during it.
   Red when: the cache is written before the R run completes, so the killed run's partial set is
   served as the baseline from then on.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 - **AC5** — When a FAIL present at R is absent at L, `--attribute` prints it under FIXED and the exit
   status is unaffected by it.
   Red when: FIXED is folded into NEW through a symmetric difference.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 - **AC6** — When `bash tools/unattended/run-unattended-gates.sh --attribute <R>` runs, attribution
   blocks appear for the self-test half and one line states that the checks half is not attributed.
   Red when: the flag is accepted and not forwarded, so the half runs unattributed and says nothing.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree. The head word here is `run-unattended-gates.sh`, gate-guard row
+  D3 rather than D2, and the fail-open reading is the same one.
 - **AC7** — When `git grep -n -e 'GREEN verdict' -e 'prints GREEN' -- tools .githooks` runs, it prints
   nothing; at BASE it prints four lines. `git grep -c 'verdict clean'` over
   `tools/unattended/kit.toml`, `tools/run-gates/run-selftests.sh`,
@@ -273,22 +315,34 @@ dossier prose · `.githooks/gate-env.sh`, its DoD comment only.
 - **AC8** — When `bash tools/run-gates/run-selftests.sh --kit <dir>` runs without `--attribute` over
   the fixture population, its stdout and exit status equal the BASE runner's.
   Red when: any attribution code path executes in the default mode.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 - **AC9** — When a fixture suite prints its count line, prints no line the FAIL selector matches,
   and exits non-zero at L, its block reads `DEAD PROBE at L` and the run exits 1.
   Red when: the rule also requires the count line to be absent, so a suite that prints its count and
   then dies reads as an empty set, which is green by absence.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 - **AC10** — When a fixture suite whose budget row is below its runtime runs under `--attribute`,
   its L block reads `OVER BUDGET`, NEW reads 0, and the run exits 1 with `verdict red`.
   Red when: attribute mode drops the budget verdict, so "a runner REDS on breach" stops holding in
   the mode this build's self-test units verify with.
-- **AC11** — When `tools/run-gates/run-gates.sh` is read with `git show` at `abac6d59` and at this
-  unit's build commit, `KIT_RUN_GATES_VERSION` at the build commit is greater, compared as a dotted
-  version one integer component at a time, so `1.20` follows `1.19`. The same holds for
-  `KIT_UNATTENDED_VERSION` in `tools/unattended/unattended.sh`.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
+- **AC11** — When `tools/run-gates/run-gates.sh` is read with `git show` at `fb07ca25`, at the tip of
+  `origin/main` after a `git fetch` at this unit's pass, and at this unit's build commit,
+  `KIT_RUN_GATES_VERSION` at the build commit is strictly greater than each of the other two,
+  compared as a dotted version one integer component at a time, so `1.10` follows `1.9`. The same
+  holds for `KIT_UNATTENDED_VERSION` in `tools/unattended/unattended.sh`, and
   `bash tools/check-kit-versions.sh` exits 0 at the build commit.
   Red when: the move is skipped and each marker still agrees with its constant at BASE's values, so
-  `kit version markers` stays green over shipped bytes that changed in both kits; or the two values
-  are compared as decimals, which reads BASE's `1.19` to `1.20` move as a decrease.
+  `kit version markers` stays green over shipped bytes that changed in both kits; or the move clears
+  BASE's value while `origin/main` already carries the number it lands on, so adopters receive two
+  byte sets under one version; or the values are compared as decimals, which reads a `1.9` to `1.10`
+  move as a decrease.
+  permission: the two `git show` reads are the pass's own; `bash tools/check-kit-versions.sh` is
+  the `kit version markers` leg over the real tree, so that half is observed at the build's one
+  post-build bar.
 - **AC12** — Three fixture suites run under `--attribute <R>`.
   1. A suite that exits non-zero with no FAIL line at R and passes clean at L: its block reads
      `DEAD PROBE at R`, the summary reads `DEAD R 1` and `verdict clean`, and the run exits 0.
@@ -299,6 +353,8 @@ dossier prose · `.githooks/gate-env.sh`, its DoD comment only.
   Red when: a DEAD PROBE at R exits 1, so the unit that fixes an abort present at BASE can never
   verify its own fix; or an L failure over a dead R reads INHERITED, which is KF14's blocker; or a
   suite dead on both sides exits 0, so a consumer passes with its own arms never run.
+  permission: the fixture-confined run AC1's line states, over this criterion's own fixture suites
+  and never this repository's tree.
 
 ## 7. Gates
 
@@ -373,6 +429,39 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
     a decimal comparison would read as greater than `1.20`).
   - G1 L8 (47): S8 and AC7 cover the fourth copy in `.githooks/gate-env.sh`, which Files touched
     now lists, and AC7 greps the whole `tools` and `.githooks` population.
+- rev-4 · 2026-09-16 · regrounded on fb07ca25 (origin/main). The two runners, their suite and
+  `.githooks/gate-env.sh` are byte-identical there, and AC7's grep still prints four lines. The kit
+  markers moved on main: run-gates from 1.6 to 1.7 at the aRatifiedRulings merge, and unattended
+  from 1.19 to 1.24 across the aRatifiedRulings, dPolishedVitrine, aDeferredBar and aProbedUnit
+  merges. So S9 and AC11 read the move as strictly greater than both BASE's value and the tip of
+  `origin/main` at the pass, on every carrier `tools/check-kit-versions.sh` names, by the
+  orchestrator's build-wide kit version decision. S9 also carries the courtesy marker in
+  aDeferredBar's `gate-guard.js`. S7's line citation moves from 4107 to 4123. S10 names `<BASE>` as
+  the consuming spec's header base, not the run-state file's pinned `abac6d59`. §10 records what
+  moved and the gate-guard refusal reported to the orchestrator.
+  Extended 2026-09-20, regrounding consolidation, folding the conservative reading of the parked
+  suite-permission ruling and not deciding it: the §3 hands-off bullets no longer say a consumer
+  runs the unattended suites at its own end, because BUILD-METHOD M6 moves that verdict to the one
+  post-build run, and §10 names the hook rows as `gate-guard.js` spells them at fb07ca25. This
+  unit's own runner criteria are UNCHANGED: they run the runner over fixture suites and observe
+  the flag this unit builds, which no post-build bar run would observe. The orchestrator settled
+  it on 2026-09-20: every runner criterion runs inside this unit's own fixture repository, whose
+  working directory carries no `.unattended.conf`, where rows D2 and D3 fail open by the hook's
+  own header, and §5 plus a `permission:` line on AC1 to AC6 and AC8 to AC10 and AC12 now say so.
+  The closing verifier added the mechanism that makes INSIDE binding: the hook reads the TOOL
+  CALL's working directory and not a `cd` inside the command, so a `cd <fixture> && …` issued from
+  this worktree is denied and the route needs the call itself made in the fixture repository.
+  AC11 also keeps a
+  `permission:` line, because its `bash tools/check-kit-versions.sh` half is a gate leg over the
+  real tree and not a fixture run. The `New arm:` line keeps `none`:
+  `tools/run-gates/run-selftests.test.sh` pins no executed-assertion floor at fb07ca25. AC7's grep
+  was re-run at fb07ca25 and still prints four lines, so it is not a could-not-fail phrase.
+  Extended again on 2026-09-20, closing pass. §5 no longer says that no post-build run executes
+  `--attribute`: the VERIFYING run's attributed suite runs do, over the REAL suites, and what they
+  cannot produce is this unit's fixture conditions, which is the reason the runner criteria stay in
+  the pass. §5 also names, in the orchestrator's own terms, the run that executes the new arms once
+  they are written: `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, because
+  `run-selftests self-test` is a HELD leg and a plain bar does not reach it.
 
 ## 10. Reuse audit
 
@@ -387,9 +476,25 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
   the rows this answers: TOOL-aBoundedCeiling-10, TOOL-aHoistedPass-36, TOOL-aTracedSpawn-1 and
   TOOL-aQuenchedHarness-9. Where the design record and the source disagree: nowhere found at BASE
   for the compensating-check block or the runners; commit 8b29f0b9 (2026-09-08), an ancestor of
-  BASE, already replaced the bare `$1` in the case pattern at
-  `tools/unattended/unattended.test.sh:4107` with a path-agnostic match, and its message records
+  BASE, already replaced the bare `$1` in the case pattern now at
+  `tools/unattended/unattended.test.sh:4123` with a path-agnostic match, and its message records
   that the arm still fails at check 49. The rev-1 S7 re-specified that fix and is withdrawn.
+- BASE is `fb07ca25`, the origin/main tip this branch merged; the spec was written at `abac6d59`.
+  Between the two, `run-selftests.sh`, its suite, `run-unattended-gates.sh` and
+  `.githooks/gate-env.sh` did not change, and nothing on main builds `--attribute`, a baseline cache
+  or an INHERITED set. What moved: `tools/run-gates/selftest-budgets.txt` gained the
+  `unattended gate-guard selftest` row, so the unattended population the self-test half resolves has
+  one more suite; the kit version markers (S9); and the suite line S7 cites. aDeferredBar landed a
+  rule and a hook this spec's consumers meet. `memory/guides/BUILD-METHOD.md` M6 says a pass runs no
+  self-test suite and returns the need to the main loop, and `tools/unattended/gate-guard.js` denies
+  a command-position `run-selftests.sh` (row D2), `run-unattended-gates.sh` (D3) or `.test.sh` /
+  `selftest.py` (D4) word while the branch's run record is before `VERIFYING`, unless the same
+  command carries one of its read-only verbs (`--list`, `--check`, `--rank`, `--help`, `--render`);
+  `--attribute` is not one of them. That reached this unit's own fixture runs of the runner and
+  every consumer's run "once at the unit's end", which owner rulings D12-h and D12-i8 permit. The
+  2026-09-20 consolidation moved every consumer's attributed run to the build's one post-build bar;
+  this unit's own fixture runs stay, because no post-build run observes `--attribute`. That residue
+  is reported to the orchestrator and not decided here.
 - M12 was not reached, because an existing seam fits and the design names the mechanism.
 - Recall terms used: `held-suite self-tests inherited-red baseline FAIL-set attribution
   run-selftests run-unattended-gates compensating-check kit-DoD GATE_SELFTESTS dead-probe`

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node d · Tier-2 · base abac6d59 · streams tooling · order 31
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
@@ -58,8 +58,14 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
 - **S7** The carriers. `memory/TEMPLATE-SPEC.md` gains a `FORK_ITEM_CUTOFF` section, and its
   resolved-forks rule and skeleton section 8 describe F-items. `memory/HYGIENE.md` check 12 gains
   the cutoff. The stale "graded PER ITEM" comment on `FORK_MARK_CUTOFF` in `.memory-tree.conf` is
-  corrected. BUILD-METHOD M3's sentence that both readers grade the section is updated. Each
-  rendered file moves with its kit template. Observed by AC9.
+  corrected. The sentence saying both readers grade the SECTION and not each item is updated
+  WHEREVER IT SITS at this unit's pass, which is not decided here: the fork-format unit ordered
+  earlier in this build MOVES the whole M3 paragraph carrying it out of
+  `memory/guides/BUILD-METHOD.md` into section 8 of `memory/TEMPLATE-SPEC.md` and its kit template,
+  leaving M3 one pointer line, and this unit already writes both of those carriers. Read the
+  sentence's home at the pass rather than assuming M3 still holds it; either way the rule is
+  updated exactly once and BUILD-METHOD's delta stays at or below zero. Each rendered file moves
+  with its kit template. Observed by AC9 and AC10.
 - **S8** M6 binds DELEGATED passes. In `tools/memory-tree/BUILD-METHOD.template.md` and its render,
   the `parallel-when-disjoint` MUST applies to passes dispatched to other agents; an inline author
   running the passes in its own context may sequence proven-disjoint passes and says so in the
@@ -72,14 +78,19 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
   "parallelise what it can prove disjoint", which this unit makes true only of delegated passes, so
   that claim is rewritten. `last-audit` is re-stamped in the same commit with a delta line in the
   commit message, because `.memory-tree.conf`, `tools/memory-tree/check-memory-hygiene.sh` and
-  `memory/guides/BUILD-METHOD.md` are all in its `watch:` list. Observed by AC12.
+  `memory/guides/BUILD-METHOD.md` are all in its `watch:` list. This carrier LANDS NET ZERO too:
+  the passage is the one §B claim quoting M6, the bullet at
+  `memory/guides/SESSION-KICKOFF.md:50`, its replacement is written no longer than the claim it
+  replaces, and the rule's full text stays where it already lives in
+  `memory/guides/BUILD-METHOD.md`, so nothing is displaced into a third document. Observed by
+  AC12.
 
 ## 3. Non-goals (OUT)
 
 - **No before-state line.** D12-i10 adopts "no before-state line" as the third of its three carriers.
   The design record names it without defining it further, and this spec reads it as the rejected
-  remedy for the audit cost recorded at `dPromptedSeam/RUN.md:34`, which DR 21.4 calls an accepted
-  cost. The spec format gains nothing for it.
+  remedy for the audit cost recorded at `memory/builds/dPromptedSeam/RUN.md:34`, which DR 21.4
+  calls an accepted cost. The spec format gains nothing for it.
 - No rewrite of any landed or live spec. Every spec dated before the cutoff keeps today's section
   reading in both readers.
 - A fork written as a plain bullet inside another F-item's span stays invisible. The shape makes a
@@ -88,10 +99,14 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
   records, are not touched.
 - The memory-tree kit version moves once per landing range under
   `tools/memory-tree/check-verdict-epoch.sh`'s topological rule, not in this unit.
-- No change to the build harness's parallel spec writers in `tools/workflows/unattended-build.js`:
+- No change to the build harness's parallel spec writers in
+  `tools/workflows/unattended-build.template.js` or its render `tools/workflows/unattended-build.js`:
   they are delegated passes, which is exactly what M6 still binds.
 - M2's grouping sentence, M6's clause 3 and M9's table are the carriers unit's edits to the same
-  file; this unit edits M3 and the head of M6 only.
+  file. In that file this unit edits the head of M6 and, where it still sits there at this unit's
+  pass, S7's readers sentence — which the fork-format unit may already have moved into section 8 of
+  `memory/TEMPLATE-SPEC.md`, in which case the sentence is edited there and BUILD-METHOD keeps only
+  the M6 head edit.
 
 ### Edges
 
@@ -128,7 +143,7 @@ would push every author toward it for no gain.
 ### Why forward-only, with a number
 
 Applied to every live spec, per-item grading flips 13 live specs from READY to FORKED, measured by a
-throwaway probe on 2026-09-14 at BASE. Some flips are real: `dRetiredFork`'s DEPL unit 2 carries an
+throwaway probe on 2026-09-14 at `abac6d59`. Some flips are real: `dRetiredFork`'s DEPL unit 2 carries an
 F1 with no mark, hidden today by F2's mark. Others are shape artifacts, such as a mark written in
 prose above the F1 bullet. PINNED as that measurement. Terminal specs cannot be rewritten to clear a
 finding, and 52 terminal specs would change verdict the same way. So both readers switch only for
@@ -152,19 +167,46 @@ question, and the reader that drifts is the one nothing re-reads.
 
 ### M6, and why the brief is the carrier
 
-The recorded conflict is `dSealedTally/RUN.md:54`: order 1's two units were provably disjoint, M6
-required concurrency, and the run sequenced them because the practice is to delegate adversarial
+The recorded conflict is `memory/builds/dSealedTally/RUN.md:54`: order 1's two units were provably
+disjoint, M6 required concurrency, and the run sequenced them because the practice is to delegate adversarial
 review and never authoring. The ruling keeps both rules by scoping one. Parallelism is a property of
 DELEGATION: when passes go to other agents and their write sets are disjoint, they run together, and
 `--dispatch` records both sets as today. An inline author has no second agent to run concurrently,
 so sequencing is not a choice it is making against the rule. Saying so in the unit's brief keeps the
 decision on the record a later reader opens, which is where the parked entry put it.
 
-The edit replaces text rather than adding a paragraph. BUILD-METHOD's render is 26439 bytes and 337
-lines against 27648 and 350 at BASE, so the headroom is 1209 bytes and 13 lines, PINNED as measured
-then. The carriers unit, ordered earlier in this build, edits M2, M6's clause 3 and M9 and spends
-from the same budget first, so this unit measures its headroom at its own commit, and M3's sentence
-about how the readers grade is rewritten in the same pass as a replacement.
+The edit replaces text rather than adding a paragraph. BUILD-METHOD's render read 26439 bytes and
+337 lines against 27648 and 350 at `abac6d59`, a headroom of 1209 bytes and 13 lines. At BASE it
+reads 27264 bytes and 347 lines by `wc -c` and `wc -l`, so the headroom is 384 bytes and 3 lines,
+PINNED as measured 2026-09-16: M6's "A pass runs no merge bar and no self-test suite" paragraph, from
+aDeferredBar and aProbedUnit, and M4's severity-disposal text from aProbedUnit spent the rest. The
+carriers unit, ordered earlier in this build, edits M2, M6's clause 3 and M9 and spends from the same
+budget first, so this unit measures its headroom at its own commit, and M3's sentence about how the
+readers grade is rewritten in the same pass as a replacement. The M6 paragraph aProbedUnit added is
+not this unit's to edit.
+
+This unit's own share of that headroom is PRICED AT ZERO, which is what the build's capped-carrier
+rule asks of it. Both its edit sites are REPLACEMENTS, and each is named here precisely so the
+orchestrator can join them against the two earlier units editing this file: M3's sentence on how
+both readers grade a section (`memory/guides/BUILD-METHOD.md:110-111` at BASE) and the
+`parallel-when-disjoint` MUST at the head of M6's parallelism rule
+(`memory/guides/BUILD-METHOD.md:199-200`). That join finds ONE overlap, and it is reported rather
+than resolved here: the fork-format unit ordered earlier MOVES the whole M3 paragraph those two
+lines end, "Mark it in place" through "§8 says what that cannot see", into section 8 of
+`memory/TEMPLATE-SPEC.md` and its kit template, leaving M3 a pointer. This unit does not compete
+for that passage — it follows the sentence to wherever that unit left it, as S7 now states, and
+both carriers are already in its Files touched. The M6 site is untouched by either earlier unit,
+whose M6 work is clause 3's list and the committed-range paragraph. Each replacement must be no
+longer in bytes or in lines than the text it removes, so nothing is displaced into a third
+document, and AC10 reads both figures in the pass. It takes none of the 384 bytes and none of the
+3 lines. Every other unit of this build carrying `memory/guides/BUILD-METHOD.md` in its Files
+touched now prices itself the same way or better: the fork-format unit MOVES M3's
+`Mark it in place` paragraph out as it adds a pointer line, the carriers unit MOVES M6's
+committed-range paragraph out as it adds its own text, and the rest declare a delta of 0 with a
+criterion reading the file at their pass. Which units those are, and what each declares, is read
+from their own §4 rather than restated here: an earlier revision of this paragraph copied two
+maxima that had already been cut, and said they oversubscribed a budget nothing is now spending.
+NO CAP IS RAISED here.
 
 ### Inventory
 
@@ -209,10 +251,13 @@ about how the readers grade is rewritten in the same pass as a replacement.
 - risks — an author writing a real fork as a plain bullet inside another F-item's span, stated in §3
   and in both readers' headers.
 - testing — new rows in `tools/memory-tree/marker-contract.test.sh`, a repo-subject leg on every bar,
-  and fixture arms in `tools/memory-tree/check-memory-hygiene.test.sh`, observed at the build's one
-  post-build bar and by hand in a scratch copy. This unit may not run the unattended suites, and it
-  observes the real callers by running the verbs in a scratch fixture, D12-h's method (b), plus a
-  structural arm over every call site (AC13).
+  and fixture arms in `tools/memory-tree/check-memory-hygiene.test.sh`, whose `memory-hygiene
+  self-test` leg is HELD and so is observed only in the VERIFYING run spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and by hand in a scratch copy at
+  VERIFYING, since `tools/unattended/gate-guard.js` denies a `.test.sh` in an earlier phase; the
+  pass itself checks the engine directly on a fixture spec. This unit may not run the unattended
+  suites, and it observes the real callers by running the verbs in a scratch fixture, D12-h's
+  method (b), plus a structural arm over every call site (AC13).
 - migration — none for landed specs. Adopters get the key blank, which is off, and set it when they
   choose to.
 - user docs — `memory/TEMPLATE-SPEC.md` is where an author reads the rule; HYGIENE and BUILD-METHOD
@@ -224,44 +269,82 @@ about how the readers grade is rewritten in the same pass as a replacement.
   fixture whose F1 carries a mark and whose F2 does not, the hygiene side reds naming F2 and the
   planning side prints FORKED.
   Red when: the section-level `bmark` still decides, and F1's mark resolves F2.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC2** — When the same section 8 sits in a fixture spec dated before the cutoff, the hygiene side
   is silent and `plan_state` prints READY, exactly as at BASE.
   Red when: per-item grading ignores the filename date, which reds frozen specs.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC3** — When a post-cutoff F-item's only mark sits inside backticks, and separately inside double
   quotes, `marker-contract.test.sh` sees both readers call it unresolved.
   Red when: the quoted spans are not removed, the `TOOL-dHonouredPark-7` case.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC4** — When a post-cutoff F-item's mark wraps inside the parenthesis, both readers call it
   resolved in `marker-contract.test.sh`.
   Red when: the span is matched line by line, the first defect `TOOL-aBoundedVerdict-4` withdrew on.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC5** — When a post-cutoff F-item carries three option bullets and one mark,
   `marker-contract.test.sh` sees both readers call it resolved.
   Red when: every bullet opens an item, the second defect that walk was withdrawn on.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC6** — When a post-cutoff Tier-2 fixture's section 8 opens with a plain bullet before its first
   F-item, `bash tools/memory-tree/check-memory-hygiene.sh --staged` reports the shape finding and
   `plan_state` prints FORKED.
   Red when: the shape arm is terminal-only, so a live spec escapes per-item grading by never using
   an F-item.
+  permission: the `--staged` run is the `memory hygiene` leg's own command over a FIXTURE, which
+  STAYS in this unit's pass under rule 1's narrow reading; the same command over the real tree
+  is AC8's half and defers to the run at VERIFYING. The planning half is observed by running the
+  verb in the same scratch fixture, D12-h's method (b). The suite arm §7 adds beside this
+  criterion, in `tools/memory-tree/check-memory-hygiene.test.sh`, belongs to the HELD
+  `memory-hygiene self-test` leg, which a plain bar does not run: it is covered only by the
+  VERIFYING run spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
 - **AC7** — When `bash tools/memory-tree/marker-contract.test.sh` runs, the "none line, later open"
   case reads red and FORKED for a post-cutoff document and silent and READY for an earlier one, and
   every row passes a cutoff to the sliced `plan_state`.
   Red when: the planning side is handed no cutoff, so its post-cutoff rows pass under today's
   reading.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC8** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs on the real tree, it is
   green with `FORK_ITEM_CUTOFF` set later than every tracked spec's filename date, and
   `unattended.sh --plan` prints the same verdict for every live build as it did at BASE.
   Red when: the cutoff sits at or before a tracked spec's date, and a landed spec goes red.
   figure: the value is DERIVED at build time from the newest tracked spec filename date, and the
   unit's journal records it.
-- **AC9** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs, `memory/TEMPLATE-SPEC.md`,
-  `memory/HYGIENE.md` and `memory/guides/BUILD-METHOD.md` each match their kit templates with the
-  F-item text in them.
+  permission: `check-memory-hygiene.sh` is the `memory hygiene` leg and runs at the build's one
+  post-build bar; the planning half is observed by running the verb in a scratch fixture,
+  D12-h's method (b).
+- **AC9** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` runs,
+  `memory/TEMPLATE-SPEC.md`, `memory/HYGIENE.md` and `memory/guides/BUILD-METHOD.md` each match their
+  kit templates with the F-item text in them.
   Red when: a template carries the rule and its render does not, which the parity leg reds.
-- **AC10** — When `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` runs, it passes;
-  `wc -l < memory/guides/BUILD-METHOD.md` prints at most the line budget the document's own
-  `**Budget:` line declares, the half `tools/template-size-limits.txt` says no checker reads; and M6's
-  rule names delegated passes and the inline-author exception.
-  Red when: the added text breaches the byte budget, which the gate reds, or the line budget, which
-  only the `wc -l` reading shows, since no checker reads that half.
+- **AC10** — When `wc -c < memory/guides/BUILD-METHOD.md` and `wc -l < memory/guides/BUILD-METHOD.md`
+  are read at this unit's pass, the file is at most the 27648 bytes
+  `tools/template-size-limits.txt` declares for it and at most the line budget the document's own
+  `**Budget:` line declares, the half that file says no checker reads; NEITHER reading is LARGER
+  than the same reading taken before this unit's edit, a shorter file and a shorter line count
+  passing at any value, because every edit site this unit still has in that file is a
+  replacement; and M6's rule names delegated passes and the inline-author exception.
+  Red when: a replacement is longer than the text it removes, so a carrier other units of this
+  build write too loses headroom to a unit priced at nothing; or the readers sentence is rewritten
+  into M3 after an earlier unit moved that paragraph out, which puts the rule in two documents and
+  adds bytes to the one file this unit promised not to grow; or the text breaches the byte budget,
+  which the gate reds, or the line budget, which only the `wc -l` reading shows, since no checker
+  reads that half.
+  permission: `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` is the
+  `build-method size` leg and runs at the build's one post-build bar; the two `wc` readings are
+  in-pass observations, and NO CAP IS RAISED by this unit.
 - **AC11** — When `python tools/memory-recall/query.py` is asked why an inline author may sequence
   disjoint passes, with terms naming M6 and inline authoring, it returns the new
   `memory/DECISIONS.md` row, and the row names TOOL-aHoistedPass-10 as the record it narrows.
@@ -269,9 +352,15 @@ about how the readers grade is rewritten in the same pass as a replacement.
   in node-local memory; or the row never cites TOOL-aHoistedPass-10, so the log holds two M6 records
   that disagree with no link between them.
 - **AC12** — When `bash skills/session-kickoff/manifest-check.sh` runs on the unit's commit, check 5
-  passes, and the §B bullet on M6 names delegated passes.
+  passes, the §B bullet on M6 names delegated passes, and `wc -c < memory/guides/SESSION-KICKOFF.md`
+  read at this unit's commit is NO LARGER than the same reading at its parent.
   Red when: the stamp moves and the M6 claim is left as it was, which passes the gate while the
-  stamp asserts a re-verification that did not happen.
+  stamp asserts a re-verification that did not happen; or the rewritten claim is longer than the
+  one it replaces, so a carrier other units of this build write too grows on a unit priced at zero,
+  which the ratchet does not read and no other leg of §7 reads for this file either.
+  permission: the command is the `kickoff-manifest ratchet` leg and runs at the build's one
+  post-build bar; the `wc -c` readings are in-pass observations, and NO CAP IS RAISED by this
+  unit.
 - **AC13** — When `bash tools/memory-tree/marker-contract.test.sh` enumerates every `plan_state` call
   site in `tools/unattended/unattended.sh` and `tools/unattended/check-pass-order.sh` by grep, each
   passes two arguments and the count is printed; and in a scratch fixture build holding a post-cutoff
@@ -279,27 +368,35 @@ about how the readers grade is rewritten in the same pass as a replacement.
   build-complete term and `check-pass-order.sh` each report FORKED or refuse.
   Red when: one caller still passes one argument, so it keeps section-level grading and dispatches
   READY on an unmarked F2 below a marked F1, the defect S2 fixes.
-  permission: this unit may not run the unattended suites; the fixture half is observed by running
-  the verbs themselves, D12-h's method (b).
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, NOT a
+  held one, so the build's one post-build bar covers its half; the file invocation is denied in
+  the pass by `tools/unattended/gate-guard.js`. This unit may not run the unattended suites, and
+  the fixture half is observed by running the verbs themselves, D12-h's method (b).
 - **AC14** — When `bash tools/memory-tree/marker-contract.test.sh` grades four post-cutoff fixtures,
   one per admitted spelling — `- **F1** — …`, `- **F1 — …**`, `### F1`, and
   `- **FACT-QUESTION · F1 — …**` — each unmarked, both readers call each an open F-item; and a
   post-cutoff section carrying bullets and no F-item produces the shape finding and FORKED.
   Red when: the engine admits one spelling only, so it either reds every post-cutoff spec written in
   another or never opens an F-item for it.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC15** — When `bash tools/memory-tree/marker-contract.test.sh` feeds the planning side's reader
   and a subshell `.` of the same fixture conf the spellings `FORK_ITEM_CUTOFF="2026-09-15"  # note`,
   `FORK_ITEM_CUTOFF='2026-09-15'`, the key repeated with a later second value, and the bare value,
   both yield the same value every time; and a value `2026-09-15x` refuses, numbered.
   Red when: the reader takes the first match or keeps the trailing comment, so hygiene and `--plan`
   grade one spec under two cutoffs.
+  permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
+  NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
+  invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 
 ## 7. Gates
 
 `marker contracts` · `memory hygiene` · `memory-hygiene self-test` · `pass-order history` · `kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `verdict epoch (kit version dates the engine)` · `kickoff-manifest ratchet` · `recall floor` · `line length` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/memory-tree/marker-contract.test.sh` · post-cutoff F-item documents with an unmarked sibling, a quoted mark, a wrapped mark, option bullets, a leading plain bullet, and the none-line case · the harness's case count
-New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a post-cutoff Tier-2 fixture with a plain bullet before its first F-item · any `ARMS_FLOORS` move the new branch requires
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a post-cutoff Tier-2 fixture with a plain bullet before its first F-item · the engine suite's executed-assertion floor, by the assertions its new arm executes, and the engine's arms floor, by any branch the new arm adds
 New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call site, enumerated and counted · the harness's case count
 
 ## 8. Open questions
@@ -339,13 +436,107 @@ New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call si
   against the document's own budget line, which is where the line figure lives; the limits file
   records bytes only. Orchestrator: S5 spells the accepted date shape as a regex, because check 12's
   skeleton-placeholder rule reads the format's literal spelling as an unfilled field.
+- rev-3 · 2026-09-16 · regrounded on fb07ca25 (origin/main). No landed build grades forks per item
+  or scopes M6 to delegated passes, and both readers are byte-identical: the hygiene block stays at
+  `:1455-1512`, and `plan_state` moved from `:1660` to `:1750` with the same four callers. §4's
+  BUILD-METHOD headroom is re-measured at 384 bytes and 3 lines, after aDeferredBar's and
+  aProbedUnit's M6 paragraph and aProbedUnit's M4 disposal text, and says that paragraph is not this
+  unit's. §3's harness non-goal names `tools/workflows/unattended-build.template.js`, which
+  dPolishedVitrine made the source. aDeferredBar's `tools/unattended/gate-guard.js` denies a
+  `.test.sh` before VERIFYING, so §5's by-hand runs move there and §6 AC9 uses the read-only
+  `--check` form. §10's citations and BASE paragraph re-measured. Finishing the same pass: §4's two
+  run-record citations are respelled from the build root, `memory/builds/dPromptedSeam/RUN.md:34`
+  and `memory/builds/dSealedTally/RUN.md:54`, so `tools/check-spec-tokens.py` grades them instead of
+  skipping both as untracked; each line still carries the decision it is cited for.
+  M4 was also rewritten around `REVIEW_ROUNDS`, a BOUNDED spec-subject exit and the severity
+  DISPOSAL stage, by `TOOL-aProbedUnit-6` (c117d000) and `TOOL-aProbedUnit-7` (21d506ce) rather than
+  by the `TOOL-aProbedUnit-1` that carries the M6 paragraph (a69c95b4), which an earlier reading of
+  this line credited with all three; M3 and the head of M6, this unit's only two edit sites, are
+  untouched.
+  Extended 2026-09-20, same base, by the build-wide consolidation pass. The permission line the
+  earlier pass wrote into §5 testing was re-read against the gate-guard hook's measured population
+  and KEPT, because those arms are `.test.sh` file invocations carrying no read-only verb; §6 AC9
+  keeps its in-pass observation and its `--check` spelling, because a read-only verb is admitted
+  and must not be deferred. Every other criterion whose observation is the held contract harness,
+  the `memory hygiene` leg's own argv or the `kickoff-manifest ratchet` leg's gained a
+  `permission:` line placing that run at the build's one post-build bar, so §6 is consistent with
+  itself; AC11 reads a recall query and keeps its in-pass observation. That folds the CONSERVATIVE
+  reading of BUILD-METHOD M6 and `tools/unattended/gate-guard.js`, and the ruling conflict behind
+  it is parked for the owner in this build's `RUN.md` rather than decided here. Under the same
+  pass this unit's BUILD-METHOD delta, previously priced against nothing, is PRICED AT ZERO in §4
+  and read in the pass by a rewritten AC10, which observes `wc -c` and `wc -l` directly and leaves
+  `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` to the post-build bar. The
+  384-byte collision with the two earlier units that edit the same file was named and left to the
+  owner, and this unit takes none of that headroom either way. §7's three `New arm:`
+  third fields name a case count and an arms floor rather than `none`, and neither suite they name
+  is one of the two that pin an executed-assertion floor, so they are unchanged.
+  Extended again 2026-09-20, same base, by the closing consolidation pass. The zero price on
+  `memory/guides/BUILD-METHOD.md` stands and is now CHECKABLE by the orchestrator against units 19
+  and 20: §4 cites both replaced passages, M3's readers sentence at
+  `memory/guides/BUILD-METHOD.md:110-111` and the `parallel-when-disjoint` MUST at
+  `memory/guides/BUILD-METHOD.md:199-200`, so a second unit claiming either shows up as a
+  collision instead of as two passes editing "M6". That join found ONE overlap: the fork-format
+  unit ordered earlier MOVES the entire M3 paragraph those two lines end into section 8 of
+  `memory/TEMPLATE-SPEC.md` and its kit template, while its own scope states that no other unit of
+  this build trims that passage. §2 S7 now resolves it the only way a later unit can, by FOLLOWING
+  the sentence to whichever carrier holds it at this pass — both are already in this unit's Files
+  touched — and AC10 reds a rewrite put back into M3 after that move. The overlap is reported to
+  the orchestrator, because the earlier unit's own claim is the half this spec cannot edit. The
+  SECOND capped carrier this unit writes,
+  `memory/guides/SESSION-KICKOFF.md` at 20057 bytes of the 61440 its class declares, was
+  unpriced: §2 S10 now states that its §B M6 claim is replaced no longer than it was and that the
+  rule's text stays in BUILD-METHOD rather than moving to a third document, and AC12 reads that
+  carrier at this unit's commit against its PARENT. The header date moves to the last-change
+  date; the rev does not, because no criterion changed its subject.
+  Verified in the same pass, two repairs. AC10 priced its two readings as "the difference … is
+  at most 0", which reds a replacement coming out SHORTER — the likely outcome of both edit
+  sites, and the one the capped-carrier rule prefers — on the reading that takes a difference as
+  an absolute value; it now says neither reading is LARGER than the pre-edit one. And §4's
+  closing paragraph was STALE at HEAD in the direction that matters: it said the two earlier
+  units editing this file price themselves at at most 300 B and at most 250 B and oversubscribe
+  the 384 B free. Both were re-priced in the same closing round and each now MOVES a larger
+  passage out of the file as it adds one, so neither spends that headroom at all. The paragraph
+  states the PROPERTY and points at those two specs for their declared maxima rather than
+  restating figures that had already moved once under it. The join was also run wider than the
+  two units that paragraph named: every spec of this build carrying the file in its Files
+  touched was read at HEAD, and the two edit sites stay disjoint from all of them — the
+  carriers unit's M6 passage is the committed-range paragraph, not the `parallel-when-disjoint`
+  head this unit replaces, and the remaining units declare a zero delta on the file.
+  Closed 2026-09-20, same base, by the last consolidation pass before the spec audits re-run.
+  The owed cross-edit on §7's hygiene-engine `New arm:` row is APPLIED, with the movement basis
+  the verifier split rather than the text as first drafted: its third field now names the engine
+  suite's own executed-assertion floor, by the assertions its new arm executes, beside the
+  engine's arms floor, by any branch the new arm adds, spelled in the same words the sibling
+  carrying the identical line on the identical suite uses, so the build states one convention
+  and the field carries no bare identifier. The floor is real and read, not decorative:
+  `tools/memory-tree/check-memory-hygiene.test.sh:2460` pins it and the next line compares
+  against it. A FALSE claim is corrected in nine `permission:` lines: `marker contracts` runs
+  `bash tools/memory-tree/marker-contract.test.sh` as a `declarations` leg over the repository,
+  so it is NOT held and the build's one post-build bar covers it whatever flags that bar carries;
+  what denies it inside a pass is the file invocation, which `tools/unattended/gate-guard.js`
+  refuses. Reading it as held would have sent a reader looking for a self-tests flag that leg
+  never needed. Rule 1's NARROW reading is ratified and moves one criterion: AC6's
+  `check-memory-hygiene.sh --staged` run is the leg's own command over a FIXTURE and returns to
+  this unit's pass, while AC8's run of the same command over the REAL tree keeps deferring, and
+  the two permission lines now say which is which. One gap the closing pass left is closed in the
+  verifying sweep: §7 lists `memory-hygiene self-test`, which carries `chunk` `selftests` and
+  `subject` `kit` in `tools/gate-legs.json` and is therefore HELD, so the fixture arms this unit
+  adds to `tools/memory-tree/check-memory-hygiene.test.sh` are run by neither a plain bar nor
+  `GATE_FULL=1` alone; §5 testing and §6 AC6's permission line now name the VERIFYING run in
+  Ruling E's terms. Every other leg this spec names is a `declarations`, `records` or `wiring` leg
+  over the repository, which an ordinary bar runs. The M3 overlap reported in an earlier paragraph
+  is now closed on BOTH sides: the fork-format unit's own scope carries a sentence saying that a
+  later unit rewrites text inside the passage it moves and that the rewrite lands where the move
+  put it, which is what §2 S7 and §6 AC10 say from this side. §3's edit-site bullet is reworded to
+  match, since it read as though this unit always edits M3. The header date stays at the
+  last-change date; the rev does not move, because no criterion changed its subject.
 
 ## 10. Reuse audit
 
 Both readers already exist, and this unit changes their predicate rather than adding a third. The
 hygiene side is the tightened section-8 block in `tools/memory-tree/check-memory-hygiene.sh` at
 `:1455-1512`, gated today by `FORK_MARK_CUTOFF`; the planning side is `plan_state` in
-`tools/unattended/unattended.sh`, whose section-8 branch runs from `:1700`. The agreement proof is the
+`tools/unattended/unattended.sh`, whose section-8 branch runs from `:1790`. The agreement proof is the
 case table in `tools/memory-tree/marker-contract.test.sh`, which slices `plan_state` out of the
 shipped bytes and already pins the gap this unit closes. `python tools/codebase-map/reuse_lookup.py
 "grade each open question fork in a spec section individually by its resolution mark"` returned
@@ -355,10 +546,20 @@ Recall returned `TOOL-aBoundedVerdict-4`, the per-item decision and its withdraw
 `TOOL-dHonouredPark-7` on quoted marks, and `TOOL-aWidenedGuide-2`, which is why S1 admits a `###`
 sub-head as an F-item.
 
-Where DR and the source disagree at BASE: DR cites `plan_state` at `:1700-1741`, and the function
-spans `:1660-1760` with its section-8 branch from `:1700`. DR's F-item spelling is the minority one
-in the corpus (§8 F1). M12's rejected candidates and the probe that rejected each are in §4,
-Alternatives rejected.
+Where DR and the source disagree at BASE: DR cites `plan_state` at `:1700-1741` of `abac6d59`,
+where the function spanned `:1660-1743` with its section-8 branch from `:1700`; at BASE the same
+bytes span `:1750-1833`, the branch from `:1790`. DR's F-item spelling is the minority one in the
+corpus (§8 F1). M12's rejected candidates and the probe that rejected each are in §4, Alternatives
+rejected.
+
+BASE is `fb07ca25`, origin/main 210 commits past the `abac6d59` this spec was first audited at.
+`tools/memory-tree/check-memory-hygiene.sh` differs only in its version line, and `plan_state` only
+in position. Its callers are the same four: `verb_plan` at `tools/unattended/unattended.sh:2244`,
+the build-complete term at `:3611`, `--dispatch` at `:4947`, and `check-pass-order.sh` at
+`tools/unattended/check-pass-order.sh:150` and `:441`; aProbedUnit's `--audit` calls none. The
+unattended kit library gained `read_brief_paths` and no conf reader, and the driver's new
+`read_bound_key` validates values already sourced from `.unattended.conf`, so S5's text reader has
+no landed precedent to reuse.
 
 Recall terms used: `section 8 fork per-item walk RESOLVED mark plan_state option bullet
 FORK_MARK_CUTOFF quoted parallel-when-disjoint inline author`
