@@ -17,13 +17,13 @@ rendered-skills = ["unattended"]
 gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mode-read-eats-a-bare-cr.md",
   "assertion-between-two-derived-values.md", "second-implementation-is-not-a-second-opinion.md",
   "inputs-inside-the-subjects-reach.md", "fixture-inherits-ambient-machine-state.md",
-  "borrowed-seed-inherits-its-head-state.md",
-  "bounded-through-a-pipe-is-unbounded.md",
+  "borrowed-seed-inherits-its-head-state.md", "bounded-through-a-pipe-is-unbounded.md",
   "status-set-in-a-subshell.md", "id-matched-as-a-substring.md", "containment-tested-one-way.md",
   "structured-record-split-on-whitespace.md", "staged-break-substitutes-a-synthetic-value.md",
   "spec-names-code-its-base-lacks.md", "two-guards-one-question-two-answers.md",
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
+  "destructive-step-before-its-precondition.md"
 ]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
 backlog-shards = []

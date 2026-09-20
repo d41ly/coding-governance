@@ -173,6 +173,7 @@
       "containment-tested-one-way.md",
       "criterion-asserts-what-its-own-command-cannot-show.md",
       "degradation-known-but-unreported.md",
+      "destructive-step-before-its-precondition.md",
       "empty-field-collapses-unless-it-is-last.md",
       "fallback-fabricates-the-passing-value.md",
       "fixture-inherits-ambient-machine-state.md",
