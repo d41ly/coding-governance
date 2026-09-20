@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read
 
-**Status:** CLOSED · rev-3 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 9
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -39,7 +39,7 @@ line with its rationale and the kickoff-manifest re-stamp that edit owes.
   re-rendered in the same commit. Observed by AC2.
 - **S4** — The root `.unattended.conf` gains `STOP_GUARD_BLOCKS="6"` with a one-line rationale
   above it, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` is re-stamped in the same
-  commit with a delta line in the subject, because the conf is on the manifest's `watch:` line.
+  commit with a delta line in the message, because the conf is on the manifest's `watch:` line.
   Observed by AC3.
 - **S5** — Check 22's three-way join is observed directly in the pass by the awk-cut section 8
   grep spec 5 AC6 already uses, over both the example's keys and the root conf's keys, so the
@@ -181,6 +181,10 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · S4 · the checklist's amendment-leaves-its-other-half-standing class, run
+  over the build commit: rev-3 moved AC3 and §4 to the delta line's home, the commit MESSAGE, and
+  left S4 saying "subject", where a 200-byte line cannot go and where the kickoff Skill never put
+  it; one word, so the rule has one verdict.
 - rev-3 · 2026-09-20 · §4, AC3 · at the build pass: the stamp rule read "this commit's parent or a
   later sha", which the ratchet's own rule (`HEAD` on the default branch, else the merge-base) and
   the charter's §1 both contradict on a run branch — the merge-base is an ANCESTOR of the parent,

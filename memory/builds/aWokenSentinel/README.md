@@ -103,7 +103,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch](spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md) | 7 | 2 | CLOSED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-20 |
-| [TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read](spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md) | 9 | 2 | CLOSED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read](spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md) | 9 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk](spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md) | 10 | 2 | SPECCED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer](spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md) | 11 | 2 | SPECCED | rev-3 | 2026-09-20 |
 | [TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing](spec/2026-09-20-spec-TOOL-aWokenSentinel-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-09-20 |
