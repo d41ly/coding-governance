@@ -22,8 +22,10 @@ none, and its own verdict is AC9's, owed to the VERIFYING run.
 - AC3 — `--prepare` — fixture arm 9: after `--prepare` the first parent is the sha
   `git ls-remote` advertised and the second is the old branch tip, the branch moved to the merge and
   is checked out. Arm 18: a branch reconciled instead with a plain merge of the fetched tip is
-  refused by `--land`, and the refusal names `--prepare`. Observed RED against break C, the
-  first-parent test disabled: arms 17 and 18 both passed a landing they must refuse.
+  refused by `--land`, and the refusal names `--prepare`. Observed RED twice — break C, the
+  first-parent test disabled, let arms 17 and 18 pass a landing they must refuse; break G, which
+  makes `--prepare` merge the advertised tip INTO the branch the attended way, failed arm 9 and
+  every arm downstream of the shape it makes.
 - AC4 — `HEAD:refs/heads/<def>` — fixture arm 12: the same push issued by hand from the worktree
   without the marker is refused by the copied `pre-push`, and the one `--land` makes is accepted.
   The marker is written in the worktree's own git dir, which is what that hook reads; arm 12d shows
@@ -45,6 +47,9 @@ none, and its own verdict is AC9's, owed to the VERIFYING run.
 - AC8 — `git merge <remote>/<def>` — fixture arm 19: with the racing clone and the run branch
   editing one file differently, `--prepare` exited 1, the branch sha was unchanged, HEAD was on the
   branch, `git status --porcelain` was empty, and the refusal named the reconcile to run first.
+  Observed RED against break H, the conflict path's checkout of the branch removed: the refusal text
+  still read correctly while HEAD sat detached at the tip, which is the half of this criterion that
+  a message assertion alone would never catch.
 - AC10 — `--carry --slug tFix` — fixture arm 16: a single-parent records commit on top of the
   prepared merge is accepted and HEAD, not T, is what reaches the remote. Arm 17: a SECOND merge on
   top of it is refused and the remote does not move. Arm 13: `--carry` over arm 13's fixture exits 1
@@ -77,7 +82,7 @@ keeps gate legs out of a pass regardless. The orchestrator writes AC9's line aft
 
 ## The arms were written from the fixture, and the transcription is the residual risk
 
-The twelve criteria above were observed by a fixture script, not by the suite. The suite's cases 9
+The criteria above were observed by a fixture script, not by the suite. The suite's cases 9
 to 22 are that script transcribed into `tools/push-main.test.sh` with its `ok`/`bad` helpers, its
 `$tmp` layout and its `setup_repo`, which now takes the remote as a second argument so a second
 bare remote can be built beside the first. Everything the transcription changed is named here so a
@@ -86,3 +91,8 @@ moved after `setup_repo`, and case 11 LOCATES the kit library with `git ls-files
 spelling a kit path, because this file ships to adopters who install at another prefix or carry no
 such kit — where it announces a skip rather than passing quietly. What no pass can rule out is a
 typo in that transcription; the run that catches one is AC9's, which is exactly what AC9 is for.
+
+What the new cases COST, measured on node `d`, 2026-09-20, because a leg that breaches its declared
+ceiling is a red and not an annoyance: the fixture holding cases 9 to 22 ran in 27 s of wall clock,
+against the `push-main self-test` leg's declared ceiling in `tools/gate-legs.json`. The suite adds
+the stubbed gate's cost per landing and nothing else slow; every remote here is a path on disk.

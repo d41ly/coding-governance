@@ -99,7 +99,13 @@ case "$out8" in *"determine the default branch"*) ok "8 unresolvable default →
 # below was observed RED against a staged break of the flag it covers before it landed — the push
 # spelled as the local default branch, the carry set computed as T minus that branch, a precondition
 # that accepts any two-parent HEAD, an observation failure sharing exit 2 with an argument refusal,
-# and an unrecognised argument falling through to the attended path.
+# an unrecognised argument falling through to the attended path, a prepare that merges the tip INTO
+# the branch, and a conflict path that does not put the branch back.
+#
+# FOUR CASES PIN MESSAGE TEXT, and an edit to any of these strands its case silently — the case goes
+# on passing for the wrong reason or fails for a reason that is not a defect. They are `--prepare`
+# in case 18, `git merge origin/main` in case 19, `landed main on origin` in case 21b, and the whole
+# merge subject in case 9. Change one of those strings and change its case in the same commit.
 git init -q --bare "$tmp/remote2.git"
 setup_repo "$tmp/work2" "$tmp/remote2.git"
 echo seed > src-seed.txt; git add src-seed.txt; git commit -q -m seed
