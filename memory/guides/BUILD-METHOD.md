@@ -59,7 +59,7 @@ flip.
 
 **Hard floor.** Never build a MISSING or THIN unit; "I will spec it afterwards" is the same act with the record
 written last. When ACCEPTANCE or GATES cannot be *derived* from the goal, the code or the prior records, the
-disposition is the kickoff engine's Step 5b exit 5 — read it there. This file does not restate it and must not
+disposition is the unattended protocol's §13 exit 5 — read it there. This file does not restate it and must not
 contradict it.
 
 **Sub-specs must AGREE with the main spec** — the `sub-specced` directive's rule, and it is here. Before the first code pass, cross-read on four axes: **scope** (nothing
@@ -304,7 +304,7 @@ Three deltas, and no others. The contract — mandate, run state, phases, witnes
   commit's FINAL trailer block beside `Co-Authored-By:`, since git reads trailers nowhere else:
   `Decided: ran two legs, not the bar — the push boundary runs it`. **Never ask:** there is nobody to answer,
   so a question is a stall. The substitutes are derive, ADOPT — `discoveries-adopted`, §11 — park and abort;
-  Step 5b says which one per exit.
+  the protocol's §13 says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
   Create it FIRST, reap it before the wrap-up. Both halves: protocol §5.
 - **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,

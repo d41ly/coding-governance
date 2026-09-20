@@ -517,6 +517,13 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # other than this one.
   F:spec-token-waivers.txt|F:readme-contract.txt) ;;
   F:stale-header-waiver.txt) ;;
+  # THE gate-lint REGISTRY, named here because a KIT SHIPS IT. Its kit.toml resolves the seed to
+  # `{memory_root}/project/substitution-fed-loops.txt` at EVERY target, so every adopter receives a
+  # file this check refused — measured at two, where it blocked the whole update at the pre-commit
+  # hook. Gov's own tree passed only because gov had put the name in its LOCAL
+  # `PROJECT_REGISTRY_EXTRA`, which is the escape for a registry a PROJECT adds; using it for a
+  # kit-shipped one hides the defect at the one repo positioned to notice it.
+  F:substitution-fed-loops.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
   # forking this whitelist, which is what NicoCares carved this file out to do.
   #

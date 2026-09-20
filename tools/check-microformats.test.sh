@@ -109,12 +109,25 @@ arm "a colon glued to a value does NOT red" ok "" \
 arm "an upper-case placeholder reds" red \
   "a placeholder is not a lowercase angle-bracket name" 's/<subject>/<SUBJECT>/'
 
+# TOOL-aHonedRuleset-8's closing review found the charter claiming a gate held the field separator
+# and the alternation rule when nothing did. These are those arms, each with its negative half.
+arm "a semicolon field break reds" red \
+  "a definition breaks a tail field on a semicolon, and the grammar admits only ' · '" \
+  's/· <subject>/; <subject>/'
+arm "the middle dot separator does NOT red" ok "" \
+  's/· <subject>/· <subject>/'
+arm "a bare ASCII pipe outside a placeholder reds" red \
+  "a definition carries a bare ASCII pipe outside a placeholder, and the grammar admits alternation only inside <...>" \
+  's/· <subject>/| <subject>/'
+arm "an ASCII pipe INSIDE a placeholder does NOT red" ok "" \
+  's/<subject>/<subject|topic>/'
+
 printf '\n'
 if [ "$FAILED" -ne 0 ]; then
   printf 'check-microformats.test.sh FAILED — %d arm(s)\n' "$FAILED"
   exit 1
 fi
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=18
 if [ "$ASSERTIONS" -lt "$FLOOR_ASSERTIONS" ]; then
   printf 'check-microformats.test.sh FAILED — ran %d assertion(s) against a floor of %d\n' \
     "$ASSERTIONS" "$FLOOR_ASSERTIONS"

@@ -122,6 +122,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
   Shrink-only, and EMPTY is its working state rather than its retirement.
+- **`substitution-fed-loops.txt`** — the sites `gate-lint`'s shell scan grades, shipped by that kit
+  as an EMPTY seed the repo then owns. Rows are this tree's own; gov's would name paths you do not
+  have.
 - `project/method-carriers.txt` — every file outside the memory tree that POINTS AT
   `guides/BUILD-METHOD.md`, one `<path> · <why>` row each, read by
   `check-method-carriers.sh`. Keyed on PATH alone, never `<path>:<line>`. It is per-repo and the kit

@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.4
+# gov:kit settings-merge@1.5
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -65,7 +65,7 @@ import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.4"  # gov:kit settings-merge@1.4 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.5"  # gov:kit settings-merge@1.5 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -664,8 +664,11 @@ def _selftest() -> int:
         bash = resolve_bash()
         cwsh = here / "check-wiring.sh"
         try:
+            # `encoding="utf-8"` EXPLICITLY, never bare `text=True`: the machine locale is cp125x
+            # on the Windows nodes and UTF-8 in CI, so an unencoded decode fails on one and not the
+            # other. An adopter's encoding-posture gate is what caught both of these.
             frags = subprocess.run(["git", "ls-files", "*.fragment.json"], capture_output=True,
-                                   text=True, check=True).stdout.split()
+                                   text=True, encoding="utf-8", check=True).stdout.split()
         except (OSError, subprocess.CalledProcessError):
             frags = None
         if frags is not None and cwsh.is_file() and bash:
@@ -688,7 +691,8 @@ def _selftest() -> int:
                 # Forward-slashed, both: a backslashed Windows path handed to MSYS bash loses its
                 # separators (`C:UsersDAILY-~1...`), and the arm then reports a missing script.
                 got = subprocess.run([bash, lifted.as_posix(), fr["marker"]], capture_output=True,
-                                     text=True, env=dict(os.environ, SJ=sf.as_posix()))
+                                     text=True, encoding="utf-8",
+                                     env=dict(os.environ, SJ=sf.as_posix()))
                 assert got.returncode == 0, f"{f}: matchers_of exited {got.returncode}: {got.stderr}"
                 assert fr["matcher"] in got.stdout.split("\n"), \
                     f"{f}: matchers_of({fr['marker']!r}) returned {got.stdout!r}, not {fr['matcher']!r}"

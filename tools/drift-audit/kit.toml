@@ -62,6 +62,14 @@ required_keys_render = ["MEMORY_ROOT"]
 argv = ["bash", "{kit}/adopt-drift-audit.sh"]
 mutates_index = false
 
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. The adopter's no-flag mode IS the render:
+# on an adopted tree it leaves drift_signals.py alone by name and rewrites the SKILL, so it is
+# already the narrow refresh this block needs and no new mode was added for it. Without the block
+# the kit's one `rendered` row goes a vintage stale on every update, GOVKIT_RERENDER=1 included,
+# because that flag runs this block and there was no block (TOOL-dRetiredFork-29).
+[[regenerate]]
+argv = ["bash", "{kit}/adopt-drift-audit.sh"]
+
 [check]
 argv = ["bash", "{kit}/adopt-drift-audit.sh", "--check"]
 

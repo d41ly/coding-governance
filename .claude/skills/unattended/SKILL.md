@@ -269,7 +269,7 @@ rather than a claim in a transcript nobody reads.
 
    If ACCEPTANCE or GATES is still missing after the ask, **stop without writing anything**. No run
    has started, so there is no run to abort: `--abort` and `--park` both refuse with no run-state
-   file, and the kickoff engine's Step 5b exit 5 does not reach here — it is scoped to a run already
+   file, and the protocol's §13 exit 5 does not reach here — it is scoped to a run already
    started. Nothing staged, nothing committed, nothing to clean up.
 3. **Write the build folder.** `memory/builds/<slug>/README.md`. **Front matter needs ALL
    SIX required keys** — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus

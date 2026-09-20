@@ -69,6 +69,11 @@ if ! SELF_REL=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
 fi
 SELF_REL=${SELF_REL%/}
 SELF_PREFIX=${SELF_REL:+$SELF_REL/}
+# The awk fields the kit-name walk reads, derived from the same answer: with a prefix the path is
+# `<prefix>/<kit>/<file>` and the kit is field 2, at a root install it is `<kit>/<file>` and the kit
+# is field 1. Spelled here so the walk below carries no assumption about the layout.
+_seg_kit=2; _seg_min=2
+[ -n "$SELF_REL" ] || { _seg_kit=1; _seg_min=1; }
 WAIVERS="${SELF_PREFIX}install-prefix-waivers.txt"
 # Derived for the same reason and hoisted to sit beside its sibling; the ban arm's own section below
 # says what this file IS.
@@ -85,8 +90,14 @@ case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
 
 # The kit names, derived. `git ls-files` so the answer is the same on every node and in every
 # checkout — a directory listing would also see untracked scratch dirs.
-kits=$(git ls-files -- 'tools/*/*' | awk -F/ 'NF>2 {print $2}' | sort -u)
-[ -n "$kits" ] || { echo "install-prefix: no kit directories under tools/ — that is not a pass"; exit 1; }
+#
+# THE PREFIX IS `SELF_PREFIX`, not the literal `tools/`, and this is the same defect the sidecar
+# derivation twenty lines up was written to close — met a second time in the same file, which is why
+# one fix did not cover it. At an adopter installed anywhere else the glob matched NOTHING and the
+# refusal below fired, so the one gate guarding this whole class could only ever REFUSE outside gov.
+# Measured at a `scripts/` adopter, which had been carrying a local carve-out for exactly this line.
+kits=$(git ls-files -- "${SELF_PREFIX}*/*" | awk -F/ "NF>${_seg_min} {print \$${_seg_kit}}" | sort -u)
+[ -n "$kits" ] || { echo "install-prefix: no kit directories under ${SELF_PREFIX:-the repo root} — that is not a pass"; exit 1; }
 alt=$(printf '%s' "$kits" | tr '\n' '|'); alt=${alt%|}
 
 # TOOL-cWidenedNet-1 S5 — HOISTED, and the hoist is the whole reason this sits here rather than
