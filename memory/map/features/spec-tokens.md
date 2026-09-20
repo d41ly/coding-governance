@@ -2,7 +2,7 @@
 
 ```toml
 feature = "spec-tokens"
-title = "Four joins that resolve a live spec's leg names, witness paths and line citations, and refuse a bar invocation as an observation"
+title = "Five joins that resolve a live spec's leg names, witness paths and line citations, refuse a bar invocation as an observation, and hold a hands-off edge to the sibling it names"
 status = "shipped"
 streams = ["tooling"]
 decisions = []
@@ -46,7 +46,8 @@ an exact tracked path, because a bare word is prose. Citations are SCOPED to a t
 the house style cites a kit file by basename and most citations therefore name nothing `git ls-files`
 holds. Redding those is a disposition per row and the lint never lands; passing them silently is a
 could-not-fail arm over much of the corpus. So they are skipped AND COUNTED, and the count prints on
-every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one.
+every run. The fourth join, `bar`, reads the legs and paths populations rather than minting one. The
+fifth, `handoff`, is the one that mints a fourth population of its own.
 
 **A bar or a suite is not an acceptance observation (TOOL-aDeferredBar-2).** The `bar` join reds a
 live spec dated at or after `SPEC_DIRECT_CUTOFF` (`.memory-tree.conf`, blank = off) whose acceptance
@@ -69,6 +70,27 @@ landing day it therefore grades zero tracked specs; the pre-cutoff carriers are 
 line and listed by `--list` as `NEAR`, so that zero is announced rather than silent. The bullet loop
 now finds the acceptance section by heading text, the read the Gates section already had, so a
 light-profile spec is graded where its criteria sit.
+
+**A hands-off edge is a promise, and the sibling has to name what it was promised
+(TOOL-dDerivedDocket-37).** The `handoff` join reds a live spec dated at or after
+`SPEC_HANDOFF_CUTOFF` (`.memory-tree.conf`, blank = off) whose `**hands-off**` bullet, in the
+`### Edges` block of its Non-goals section, backticks a token that the sibling spec it names never
+carries. Both halves of the join are read from H1 uids and never from filenames, inside the one
+build, because a spec may legally be family-less, tailed or in a sub-folder of `spec/`. The key a
+waiver row must match is `<source uid>><target uid>:<token>`, so a row silences ONE edge; a bare
+token key would waive it in every bullet of every build, which is the stale-exception shape this
+registry refuses everywhere else. The bullet grammar is check 12's, copied from
+`tools/memory-tree/check-memory-hygiene.sh` rather than called — the hygiene engine is a
+copy-installed kit, so an arm there would reach every adopter's bar — with ONE rule deliberately
+wider: the bullet's two-space continuation lines are read, so a payload wrapped past the house
+width is still graded. TWO LIMITS, and both are the honest kind. It proves the sibling NAMES the
+token, never that it does the work the bullet describes. And `**consumes-from**` bullets are not
+graded at all: measured over the adopting build, grading them produced twelve misses and no true
+one. Absence is not disagreement — a target naming no live spec in the build is terminal or Tier-1,
+and a source whose H1 carries no uid has no key to report a hit under — so both are skipped AND
+COUNTED on the report line, which prints its bullet, token and silent counts whether the arm is on
+or off. Like its two dated siblings the key is a RELATION and not a constant, re-derived at the
+build commit and again at landing, so it grades zero tracked specs on its landing day.
 
 **Terminal specs are outside the population by construction.** This repo cites a landed decision
 verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to
@@ -141,6 +163,12 @@ Tier-1 accommodation.
   shape exclusion unread, so it neither resolves nor reds.
 - **A spec that omits its Gates section is silent by design**, and the S7 arm cannot reach it. That
   is the Tier-1 accommodation and the price of it.
+- **The hands-off join proves naming, not agreement.** A sibling that mentions the token once in
+  passing satisfies it, and a consumes-from payload is graded only where check 12's reciprocity
+  forces a hands-off at a producer dated at or after the key. Neither check grades a Tier-1
+  consumer's edges, an edge from a consumer dated before `SPEC_EDGES_CUTOFF`, or an edge naming a
+  Tier-1 producer. A token matching `NOT_A_TOKEN` — a deploy-time placeholder among them — is not
+  graded either, which is a real hole in the class the join was built for.
 - **The bar join reads INVOCATIONS as written in backticks.** A path built at runtime, a runner
   inside `sh -c`, a fenced block's body and a suite named in prose are all invisible to it; each is
   the ACT, which the hook of `TOOL-aDeferredBar-3` refuses. The relation's first clause — the

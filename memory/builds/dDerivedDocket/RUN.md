@@ -124,3 +124,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-20T22:37:08Z brief · item TOOL-dDerivedDocket-5 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-20T23:11:43Z dispatch · item cdab9836 TOOL-dDerivedDocket-5 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-20T23:20:19Z dispatch · item de946d81 TOOL-dDerivedDocket-37 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec-tokens.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-37-1-acceptance-ledger.md
+
+2026-09-20T23:20:23Z brief · item TOOL-dDerivedDocket-37 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

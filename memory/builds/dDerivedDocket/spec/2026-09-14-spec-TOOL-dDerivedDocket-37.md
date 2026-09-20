@@ -1,11 +1,12 @@
 # TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-21-build-TOOL-dDerivedDocket-37-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-37-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-16-review-TOOL-dDerivedDocket-37-spec-audit-g6-round1.md](../reviews/2026-09-16-review-TOOL-dDerivedDocket-37-spec-audit-g6-round1.md) | spec-audit | — |
 | [2026-09-20-review-TOOL-dDerivedDocket-37-spec-audit-g6-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-37-spec-audit-g6-round2.md) | spec-audit | — |
@@ -56,7 +57,7 @@ and its conf key stays out of the shipped example (§8 F5).
   that uid in its H1. A source spec whose H1 carries no uid has no key to report a hit under, so its
   bullets are not graded either. Each such bullet is counted, and the report prints the count. A
   bullet naming `external` has no sibling to join and is not read. Observed by AC3.
-- **S3** — the dated demand. `SPEC_HANDOFF_CUTOFF="2026-09-21"` is appended at the end of
+- **S3** — the dated demand. `SPEC_HANDOFF_CUTOFF="2026-09-22"` is appended at the end of
   `.memory-tree.conf`, with a header comment in the idiom of `SPEC_LEGLINE_CUTOFF`: what the arm
   grades, why it exists as measured here, why this date, and that blank means off.
   THE DATE IS DERIVED, NEVER CHOSEN, and the why-this-date slot of that idiom is the derivation.
@@ -65,9 +66,12 @@ and its conf key stays out of the shipped example (§8 F5).
   `.memory-tree.conf:131` and spelled out with both clauses and its three reading commands on the
   `SPEC_DIRECT_CUTOFF` row at `.memory-tree.conf:252`: the value is the day AFTER the later of
   (a) the newest spec filename date on ANY ref or live worktree and (b) the setting commit's own
-  date. The reading taken 2026-09-20 on node `d`, over every local and remote ref and every
-  worktree `git worktree list` names: (a) 2026-09-20, (b) 2026-09-20, the later is 2026-09-20, and
-  the relation returns 2026-09-21. It is RE-DERIVED at the build commit and again at landing, never
+  date. The reading taken AT THE BUILD COMMIT, 2026-09-21 on node `d`, over every local and remote
+  ref and every worktree `git worktree list` names: (a) 2026-09-20, (b) 2026-09-21, the later is
+  2026-09-21, and the relation returns 2026-09-22. It superseded the rev-4 reading of the day
+  before, which returned 2026-09-21 and would have EQUALLED the setting commit's own day rather
+  than sitting past it — the second clause, and the reason this key is re-derived rather than
+  carried. It is RE-DERIVED at the build commit and again at landing, never
   carried, because the relation is to the fleet working day and a value carried across a day
   boundary is stale by construction — `tools/check-spec-tokens.py:47` states that as this file's
   own rule for every cutoff key it reads, and `REV_SCOPE_CUTOFF` moved twice for it.
@@ -415,7 +419,7 @@ retires another row. The shipped example conf is not touched (§8 F5).
   unit's pass.
 - **AC6** — When the orchestrator's run of `python tools/check-spec-tokens.py` over the tree follows
   this unit's commit and any fix S6 makes, it exits 0, and S4's report line names
-  `SPEC_HANDOFF_CUTOFF 2026-09-21` with its bullet, token and silent counts. That bullet count is
+  `SPEC_HANDOFF_CUTOFF 2026-09-22` with its bullet, token and silent counts. That bullet count is
   ZERO on landing day and this criterion does not require otherwise: every spec of this build is
   dated before the relation-derived key (S3), so what the live run observes is that the arm is ARMED
   and REPORTING, and the arm's coverage on landing day is the self-test fixtures AC1 to AC5, AC9 and
@@ -541,8 +545,9 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   RESOLVED (agent, 2026-09-20, delegated): (c), superseding the 2026-09-14 resolution of (a) narrated above. The
   value is RE-DERIVED by the relation rather than recorded as a departure, which is the route
   entirely inside a run's authority — a fork contradicting an owner ruling is not a run's to settle,
-  which is the ground F4 refuses its own option (c) on. The reading taken 2026-09-20 returns
-  2026-09-21 (S3). The day-one zero population is accepted as the relation's stated cost: S6 and AC6
+  which is the ground F4 refuses its own option (c) on. The reading re-taken at the build commit,
+  2026-09-21, returns 2026-09-22 (S3), superseding the 2026-09-21 this fork first recorded from the
+  day before. The day-one zero population is accepted as the relation's stated cost: S6 and AC6
   no longer require a graded count above zero, section 5 risks now reads the straggler case as the
   relation preventing it rather than as the join working, and F4's order resolution is re-read below
   in that light.
@@ -758,6 +763,21 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   Verified in the same round and corrected in place, at no further rev bump: S3's checklist now says
   that section 9's own mentions of the value are frozen records of readings taken and are not
   carriers, so a grep returning more than three hits does not read as a fourth carrier.
+- rev-5 · 2026-09-21 · §2 S3 · §6 AC6 · §8 F3 · the build pass. THE KEY MOVED, by the relation
+  rather than by a choice, which is what S3 ordered and not a departure from it. The three readings
+  were re-taken at the build commit on node `d`, before any file was written: (a) the newest spec
+  filename date is 2026-09-20 over every local and remote ref and, at any depth, over every
+  `git worktree list` worktree; (b) `git log -1 --format=%cs` is 2026-09-21. The later is
+  2026-09-21, so the relation returns 2026-09-22, and rev-4's 2026-09-21 no longer satisfies the
+  second clause it was derived against — it would have EQUALLED the setting commit's own day, which
+  is precisely the shape §8 F3 rejected 2026-09-14 for. S3's three carriers moved together in this
+  one commit, as its checklist says they must: S3's own paragraph, where the key is spelled and
+  where its reading is recorded; AC6's expected report line; and F3's resolution. Section 9's
+  earlier mentions of 2026-09-21 are frozen records of the readings then taken and did NOT move,
+  which S3's checklist already states. Nothing else in this spec changed: no criterion changed its
+  subject, the day-one zero population is unaffected because the key still postdates every spec of
+  this build, and §5 risks reads the same. The relation is re-derived once more AT LANDING.
+  Recorded as its own entry with a single bump, the form rev-4 settled.
 
 ## 10. Reuse audit
 

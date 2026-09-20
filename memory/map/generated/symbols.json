@@ -3163,6 +3163,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_spec_uids",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "read_stale_header_waiver",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4161,6 +4166,11 @@
       "id": "scan_function_names",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_handoffs",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "scan_js_definitions",

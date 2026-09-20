@@ -13,12 +13,15 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=42
+FLOOR_ASSERTIONS=55
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
 # RAISED 38 -> 42 at closing round 2, by the count of `arm`/`pass=` lines its diff added: two
 # leg-line cutoff refusals (R7, R11), the `py` launcher hit (R12) and the parity accounting (R3).
+# RAISED 42 -> 55 at TOOL-dDerivedDocket-37, by the 13 `arm` calls the hands-off join's six
+# fixtures add: two each for the graded edge, the bullet shape and the counted silence, three each
+# for the dated key and the edge-keyed waiver, and one for the H1 join at any depth.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -48,7 +51,7 @@ SPEC
   git -C "$d" add -A >/dev/null; git -C "$d" commit -qm f --no-verify
 }
 
-arm() {              # $1 label · $2 expected rc · $3 dir · $4 optional expected substring
+arm() {              # $1 label · $2 expected rc · $3 dir · $4 expected substring · $5 FORBIDDEN one
   local out rc
   out=$(cd "$3" && "$PY" "$LINT" 2>&1); rc=$?
   if [ "$rc" != "$2" ]; then
@@ -56,6 +59,13 @@ arm() {              # $1 label · $2 expected rc · $3 dir · $4 optional expec
   fi
   if [ $# -ge 4 ] && ! printf '%s' "$out" | grep -qF -- "$4"; then
     echo "arm FAIL  $1 — expected output to carry: $4"; echo "$out" | head -3; fail=$((fail+1)); return
+  fi
+  # TOOL-dDerivedDocket-37: $5 is a substring that must be ABSENT. One arm below needs it. An
+  # implementation keying a waiver on the bare token — the exact defect that arm exists to catch —
+  # reaches the expected exit code by the WRONG route, through a stale-waiver refusal rather than
+  # through the hit, so an arm asserting rc alone passes it. Staged and observed.
+  if [ $# -ge 5 ] && printf '%s' "$out" | grep -qF -- "$5"; then
+    echo "arm FAIL  $1 — expected output NOT to carry: $5"; echo "$out" | head -3; fail=$((fail+1)); return
   fi
   echo "arm ok    $1"; pass=$((pass+1))
 }
@@ -446,6 +456,125 @@ if [ "$unmatched" = 0 ]; then echo "arm ok    parity: BAR matches every whole-su
 else echo "arm FAIL  parity: a manifest suite invocation BAR does not match:"; printf '%s\n' "$parity" | sed '1,/^--$/d' | sed 's/^/          /'; fail=$((fail+1)); fi
 if [ "$((${popn:-0} + ${skipn:-0}))" = "${legn:-x}" ]; then echo "arm ok    parity: graded $popn + exempt $skipn = the manifest's $legn selftests legs, no unannounced skip"; pass=$((pass+1))
 else echo "arm FAIL  parity: graded $popn + exempt $skipn != the manifest's $legn selftests legs — a leg was skipped without being printed"; fail=$((fail+1)); fi
+
+# ---- TOOL-dDerivedDocket-37: the hands-off join. THIRTEEN arms over SIX scratch repos, one per
+#      criterion, and a criterion's later states edit that repo's files IN PLACE: the checker takes
+#      its tracked list from `git ls-files` and then reads each tracked file's working-tree bytes,
+#      so only a state that CREATES a file owes a `git add`. No arm here resets, which is also what
+#      keeps the fixtures' LF bytes — a `reset --hard` under a global `core.autocrlf` re-checks them
+#      out with CRLF and the `### Edges` sub-head then matches nothing, which is a silent zero.
+#      EVERY `Red when:` these criteria name was staged into a copy of the checker and observed RED
+#      before these arms were written: the join reading the source instead of the target, the first
+#      line only, a bullet shape narrower than check 12's, absence redding as disagreement, a target
+#      joined by filename, the key read through `read_conf_key`, and the bare-token waiver. That
+#      last one is why AC5's third arm asserts a PRINTED KEY and a FORBIDDEN `STALE WAIVER` rather
+#      than an exit code: the defect reaches rc 1 by the wrong route.
+HCUT=2026-09-02      # the scratch repos' own SPEC_HANDOFF_CUTOFF, and the date their specs carry.
+                     # The fixture FILENAMES are derived from it, so a re-derivation of the real
+                     # key in `.memory-tree.conf` never has to move a literal in here.
+SPECDIR=memory/builds/tOne/spec
+
+write_handoff_spec() {   # $1 dir · $2 repo-relative path · $3 H1 uid · $4 Status word · rest: body
+  local d=$1 p=$2 uid=$3 st=$4; shift 4
+  mkdir -p "$d/${p%/*}"
+  { printf '# %s — a unit\n\n' "$uid"
+    printf '**Status:** %s · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n' "$st" "$HCUT"
+    printf '%s\n' "$@"; } > "$d/$p"
+}
+
+# AC1 — a hands-off token the target never names, then named. The key carries BOTH uids, each read
+#       from its own spec's H1, so a waiver can silence one edge without silencing the token.
+d=$base/ho1; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-1.md" EXMP-tOne-1 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.'
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-2.md" EXMP-tOne-2 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+git -C "$d" add -A >/dev/null
+arm "a hands-off token the target never names REDS, keyed on both H1 uids" 1 "$d" 'spec-EXMP-tOne-1.md [handoff] `EXMP-tOne-1>EXMP-tOne-2:--frob`'
+sed -i 's|It reads the flag|It reads `--frob`, the flag|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-2.md"
+arm "the same token is green once the target names it, and the counts say what was graded" 0 "$d" "1 bullet(s) graded in live spec(s) · 1 payload token(s)"
+
+# AC2 — the payload on the bullet's two-space CONTINUATION line, which check 12 never reads; then
+#       check 12's other accepted shape, a `*` marker with a tab and an UNBACKTICKED target uid.
+d=$base/ho2; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-1.md" EXMP-tOne-1 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — the flag it is handed is spelled on the' \
+  '  next line, past the house width, and it is `--frob`.'
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-2.md" EXMP-tOne-2 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+git -C "$d" add -A >/dev/null
+arm "a payload wrapped onto the bullet's continuation line is graded, not skipped" 1 "$d" '[handoff] `EXMP-tOne-1>EXMP-tOne-2:--frob`'
+printf '# EXMP-tOne-1 — a unit\n\n**Status:** OPEN · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n## 3. Non-goals (OUT)\n\n### Edges\n\n*\t**hands-off**\tEXMP-tOne-2 — it reads `--frob` from this unit.\n' "$HCUT" > "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-1.md"
+arm "a star marker, a tab and a bare target uid is check 12's shape and is graded here too" 1 "$d" '[handoff] `EXMP-tOne-1>EXMP-tOne-2:--frob`'
+
+# AC3 — SILENCE, COUNTED. Absence is not disagreement: a CLOSED sibling is a frozen record nobody
+#       may edit, and a source whose H1 carries no uid has no key to report a hit under.
+d=$base/ho3; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-1.md" EXMP-tOne-1 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.'
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-2.md" EXMP-tOne-2 CLOSED \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+git -C "$d" add -A >/dev/null
+arm "a hands-off to a CLOSED sibling is silent and COUNTED, never red" 0 "$d" "0 payload token(s) · 1 silent"
+sed -i 's|\*\*Status:\*\* CLOSED|**Status:** OPEN|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-2.md"
+sed -i 's|`EXMP-tOne-2`|`EXMP-tOne-9`|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-1.md"
+printf '# a source whose H1 carries no uid\n\n**Status:** OPEN · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n## 3. Non-goals (OUT)\n\n### Edges\n\n- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.\n' "$HCUT" > "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-3.md"
+git -C "$d" add -A >/dev/null
+arm "an unspecced target uid and a source with no H1 uid each count silent" 0 "$d" "0 payload token(s) · 2 silent"
+
+# AC4 — the dated demand and its refusal, over one tree that reds when the key is set correctly.
+d=$base/ho4; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF=""\n' > "$d/.memory-tree.conf"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-1.md" EXMP-tOne-1 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.'
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-2.md" EXMP-tOne-2 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+git -C "$d" add -A >/dev/null
+arm "a blank SPEC_HANDOFF_CUTOFF turns the join off over a tree that reds when it is set" 0 "$d" "SPEC_HANDOFF_CUTOFF blank (arm off)"
+printf 'SPEC_HANDOFF_CUTOFF="2026-09-30"\n' > "$d/.memory-tree.conf"
+arm "a source dated before the key is not graded, and the bullet count says zero" 0 "$d" "0 bullet(s) graded in live spec(s)"
+printf 'SPEC_HANDOFF_CUTOFF="2026-9-14"\n' > "$d/.memory-tree.conf"
+arm "a key that is not an ISO date is REFUSED before grading, like every other cutoff" 1 "$d" "REFUSING — SPEC_HANDOFF_CUTOFF 2026-9-14 is not an ISO date"
+
+# AC5 — the waiver is keyed on the EDGE, not the token. Three states over one repo: waived, stale,
+#       and a SECOND edge carrying the same token, which that row must not reach.
+d=$base/ho5; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-1.md" EXMP-tOne-1 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.'
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-2.md" EXMP-tOne-2 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+printf 'EXMP-tOne-1>EXMP-tOne-2:--frob\t[handoff] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+git -C "$d" add -A >/dev/null
+arm "a waiver row keyed on the edge clears that hit and is counted" 0 "$d" "1 waiver(s)"
+sed -i 's|It reads the flag|It reads `--frob`, the flag|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-2.md"
+arm "the same row REDS as stale once the target names the token" 1 "$d" "STALE WAIVER"
+sed -i 's|It reads `--frob`, the flag|It reads the flag|' "$d/$SPECDIR/$HCUT-spec-EXMP-tOne-2.md"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-EXMP-tOne-3.md" EXMP-tOne-3 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit too.'
+git -C "$d" add -A >/dev/null
+arm "that row does not reach ANOTHER edge carrying the same token" 1 "$d" '[handoff] `EXMP-tOne-3>EXMP-tOne-2:--frob`' "STALE WAIVER"
+
+# AC9 — the join is by H1 uid at any depth. A family-less, tailed spec inside a `units` sub-folder
+#       of `spec/` is legal, and its filename says nothing about the unit it specs.
+d=$base/ho6; scratch "$d"
+printf 'SPEC_HANDOFF_CUTOFF="%s"\n' "$HCUT" > "$d/.memory-tree.conf"
+write_handoff_spec "$d" "$SPECDIR/$HCUT-spec-tOne-1.md" EXMP-tOne-1 OPEN \
+  '## 3. Non-goals (OUT)' '' '### Edges' '' \
+  '- **hands-off** `EXMP-tOne-2` — it reads `--frob` from this unit.'
+write_handoff_spec "$d" "$SPECDIR/units/$HCUT-spec-tOne-2-u1-part.md" EXMP-tOne-2 OPEN \
+  '## 4. Design' '' 'It reads the flag this unit was handed.'
+git -C "$d" add -A >/dev/null
+arm "a family-less, tailed target in a units sub-folder is joined by its H1, not its filename" 1 "$d" '[handoff] `EXMP-tOne-1>EXMP-tOne-2:--frob`'
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then
