@@ -55,7 +55,7 @@ research record under `build/`.
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aWokenSentinel-1` | CLOSED | the run-state file records the lease: `session:` and `pid:` at preflight and resume, and resume re-records the keepalive id |
-| 2 | `TOOL-aWokenSentinel-2` | PLANNED | `--liveness <slug>`: the one machine-readable predicate every out-of-session reader shares |
+| 2 | `TOOL-aWokenSentinel-2` | CLOSED | `--liveness <slug>`: the one machine-readable predicate every out-of-session reader shares |
 | 3 | `TOOL-aWokenSentinel-3` | PLANNED | `stop-guard`: a `Stop` hook that refuses the turn end of a session bound to a non-terminal run, bounded |
 | 4 | `TOOL-aWokenSentinel-4` | PLANNED | `stall-recorder`: a `StopFailure` hook that writes the stall to a sidecar under the git dir |
 | 5 | `TOOL-aWokenSentinel-5` | PLANNED | `resume-tick.sh`: the OS-scheduled out-of-process resumer, acting on a stale lease only |
@@ -96,7 +96,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it](spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-20 |
-| [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-11 — a kit-gate check that the driver holds ONE derivation of the sidecar root](spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-20 |
@@ -125,7 +125,7 @@ ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28 TOOL-aW
 | [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 36 bound to this build, across 4 record folder(s).
+Records: 37 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,12 +1,13 @@
 # TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 |
+| [2026-09-16-build-TOOL-aWokenSentinel-2-1-acceptance-ledger.md](../build/2026-09-16-build-TOOL-aWokenSentinel-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-2-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-2-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
@@ -282,11 +283,14 @@ at base — the sixth and seventh positionals' precedent. The unit's arms, in a 
    `GIT_COMMITTER_DATE` an hour old over a clean tree → `stale: yes`, `verdict: STALE`,
    `last-move-source: commit`; then `mkdir -p "$(git rev-parse --git-dir)/gate-logs"` and `touch`
    one file there → `stale: no`, `verdict: LIVE`, `last-move-source: gate-log`.
-6. On the STALE fixture, `CLAUDE_CONFIG_DIR=$TMP/cfg` with the encoded directory under its
+6. On the STALE fixture, `CLAUDE_CONFIG_DIR=$ORIGIN_DIR/cfg` with the encoded directory under its
    `projects/` and a `fixture-session.jsonl` touched there → `transcript: <that path>`,
    `last-move-source: transcript`, `verdict: LIVE`; `CLAUDE_CONFIG_DIR` pointing at an empty
    directory → `transcript: absent`. The override and not `HOME`, because `HOME` is also where git
-   reads its global config and moving it changes what every `GIT` call in the driver sees.
+   reads its global config and moving it changes what every `GIT` call in the driver sees. OUTSIDE
+   the fixture tree, under the suite's `$ORIGIN_DIR` rather than `$TMP`: `$TMP` IS the fixture's
+   work tree, so a config directory under it is an untracked WRITE with the transcript's own mtime,
+   and `write` wins the source line on the tie — measured on the block's first run, 2026-09-20.
 7. `printf '2026-09-16T00:00:00Z fixture-session rate_limit {}\n' > "$(git rev-parse
    --git-dir)/unattended/stall.tRun.log"` → `last-stall:` carries that line; removed → `none`.
 8. `run --liveness tNoRun` → the first `fail 52` sentence, exit 1; the `stat` stub of the audit
@@ -486,7 +490,9 @@ graded line removed.
   their templates.
 - **AC10** — When `git show --name-only --format= HEAD` runs on the pass commit, it lists
   `.unattended.conf` and `memory/guides/SESSION-KICKOFF.md` together, the `last-audit` line of the
-  latter names the commit's parent or a later sha, the subject carries a delta line, and
+  latter names the sha the manifest's own stamp rule gives — `git merge-base origin/main HEAD` off
+  the default branch, an ancestor of HEAD and later than the stamp it replaces — with a datetime
+  that advances, the commit message carries the `manifest-audit:` delta line, and
   `git grep -lE '^\*\*Status:\*\* CLOSED' -- memory/builds/aWokenSentinel/spec/` lists this spec.
   Leg half, observed at `--close`: `bash skills/session-kickoff/manifest-check.sh` check 5 reports
   no watched file changed since `last-audit`.
@@ -517,6 +523,13 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · §4 fixture 6 · AC10 · the build pass, before its code: the arm's transcript
+  root moved from `$TMP/cfg` to `$ORIGIN_DIR/cfg`, because `$TMP` is the fixture's work tree and a
+  directory under it is an untracked write that ties the transcript's mtime and wins the source
+  line (observed RED on the block's first run); and AC10's stamp phrase — "the commit's parent or a
+  later sha" — contradicted the manifest's own stamp rule, which off the default branch names
+  `git merge-base origin/main HEAD`, so the criterion now states that rule. Status CLOSED in the
+  pass commit; no other criterion moved.
 - rev-3 · 2026-09-20 · §3 · AC7 · folded spec-audit round 2: sibling agreement for the promoted
   `TOOL-aWokenSentinel-20` (H6, raw 36) — AC7 pins the code-line count of `rev-parse --git-dir`
   at exactly 1 at this unit's tip, the premise spec 11 rested on and nothing asserted, and §3 hands

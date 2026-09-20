@@ -116,6 +116,7 @@ GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
 UNIT_STALL_BOUND="${6-1800}"
 REVIEW_ROUNDS="${7-7}"
+RESUME_STALE_BOUND="${8-5400}"
 WIRING_CHECK="${1-true}"
 KEEPALIVE_CREATE="CronCreate"
 KEEPALIVE_DELETE="CronDelete"
@@ -5274,6 +5275,172 @@ same "AC2 the exposed session survives the withheld pid" "$(grep -c '^session: a
 same "AC2 the withheld pid is absent" "$(grep -c '^pid: absent$' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
+# ---- TOOL-aWokenSentinel-2: `--liveness`, the one predicate every out-of-session reader shares.
+# ---- Thirteen `key: value` lines and ONE verdict over the run-state file, the tree's clocks, the
+# ---- gate logs, the transcript and the recorded pid. Every arm is the driver over the `--audit`
+# ---- fixture; the stale bound rides mkconf's EIGHTH positional, at the derived default so no
+# ---- fixture above sees a NOTE it did not see before. The transcript root is pointed at a scratch
+# ---- directory for the whole block, so the box's real transcripts are never read and `HOME`, which
+# ---- is also where git reads its global config, is untouched. OUTSIDE the fixture tree: `$TMP` IS
+# ---- that tree, and a config directory under it is an untracked WRITE that ties the transcript's
+# ---- mtime to the second and wins the source line — measured on the first run of this block.
+mkdir -p "$ORIGIN_DIR/cfg-empty"; export CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg-empty"
+# AC2 — TERMINAL: every key prints on a terminal record too, in S2's order, and nothing else.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+out=$(run --liveness tRun); rc=$?
+same "AC2 a TERMINAL verdict exits 0" "$rc" "0"
+hit "$out" "state: terminal"
+hit "$out" "verdict: TERMINAL"
+same "AC2 thirteen key: value lines on a terminal record" "$(printf '%s\n' "$out" | grep -c ':')" "13"
+same "AC2 no line that is not key: value" "$(printf '%s\n' "$out" | grep -cvE '^[a-z-]+: ')" "0"
+same "AC2 the keys in S2's order" "$(printf '%s\n' "$out" | sed 's/:.*//' | tr '\n' ' ')" "phase state default-branch session pid keepalive pid-alive last-move last-move-source transcript last-stall stale verdict "
+# ...and the same thirteen on a BUILDING record, so a reader never learns which state omits what.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: BUILDING/'
+out=$(run --liveness tRun); rc=$?
+same "AC2 a LIVE verdict exits 0" "$rc" "0"
+hit "$out" "state: live"
+hit "$out" "session: fixture-session"
+hit "$out" "keepalive: k1"
+hit "$out" "verdict: LIVE"
+same "AC2 thirteen key: value lines on a BUILDING record" "$(printf '%s\n' "$out" | grep -c ':')" "13"
+# AC3 — FINISHED-UNSTAMPED: LANDING with a witness on the fixture's main, offline, against the
+# remote-tracking ref; the witness moved to the unit branch's HEAD reads live; and with no
+# GOV_DEFAULT_BRANCH and no origin/HEAD the ref is announced `unresolved` rather than fabricated.
+build_audit_fixture
+same "AC3 fixture: origin/main is BASE" "$(git rev-parse refs/remotes/origin/main)" "$BASE"
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDING/'
+mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $BASE/"
+out=$(run --liveness tRun); rc=$?
+same "AC3 a FINISHED-UNSTAMPED verdict exits 0" "$rc" "0"
+hit "$out" "state: finished-unstamped"
+hit "$out" "default-branch: refs/remotes/origin/main"
+hit "$out" "verdict: FINISHED-UNSTAMPED"
+mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $(git rev-parse HEAD)/"
+out=$(run --liveness tRun)
+hit "$out" "state: live"
+miss "$out" "verdict: FINISHED-UNSTAMPED"
+mutate memory/builds/tRun/RUN.md "s/^witness: .*/witness: $BASE/"
+out=$(env -u GOV_DEFAULT_BRANCH bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
+same "AC3 an unresolvable default branch exits 0" "$rc" "0"
+hit "$out" "default-branch: unresolved"
+hit "$out" "state: live"
+miss "$out" "default-branch: refs/"
+# UNBOUND — a record with no session to bind to.
+build_audit_fixture
+mutate memory/builds/tRun/RUN.md 's/^session: .*/session: absent/'
+out=$(run --liveness tRun)
+hit "$out" "session: absent"
+hit "$out" "verdict: UNBOUND"
+# AC4 — pid-alive: the fixture's dead pid reads `no`; a background sleep the arm starts reads `yes`
+# by its WINDOWS pid under MSYS (`ps`'s WINPID column) and `no` once killed; `absent` is never
+# probed; and under MSYS a `tasklist` that answers nothing is `unknown`, not `no`.
+build_audit_fixture
+out=$(run --liveness tRun)
+hit "$out" "pid: 999999999"
+hit "$out" "pid-alive: no"
+sleep 60 & SLEEP_PID=$!
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) WPID=$(ps -p "$SLEEP_PID" | awk -v p="$SLEEP_PID" 'NR>1 && $1==p {print $4}') ;;
+  *) WPID=$SLEEP_PID ;;
+esac
+n=$((n+1)); [ -n "$WPID" ] || { echo "FAIL fixture: no pid for the background sleep, so the live-pid arm below would probe an empty value and prove nothing"; st=1; }
+mutate memory/builds/tRun/RUN.md "s/^pid: .*/pid: $WPID/"
+out=$(run --liveness tRun)
+hit "$out" "pid: $WPID"
+hit "$out" "pid-alive: yes"
+kill "$SLEEP_PID" 2>/dev/null; wait "$SLEEP_PID" 2>/dev/null
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: no"
+mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: absent/'
+out=$(run --liveness tRun)
+hit "$out" "pid-alive: unknown"
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*)
+    mkdir -p "$TMP/stubtl"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stubtl/tasklist"; chmod +x "$TMP/stubtl/tasklist"
+    mutate memory/builds/tRun/RUN.md 's/^pid: .*/pid: 999999999/'
+    out=$(PATH="$TMP/stubtl:$PATH" bash "$SCRIPT" --liveness tRun 2>&1)
+    hit "$out" "pid-alive: unknown"
+    rm -rf "$TMP/stubtl" ;;
+esac
+# AC5 — the four signals. An hour-old commit over a clean tree with no gate logs and no transcript
+# is STALE against a 60s bound and names the commit; one gate log flips it LIVE and names the log;
+# a transcript at the derived path names the transcript; one untracked write names the write. The
+# 60s bound is below the fixture's declared sum, which is AC6's NOTE, asserted here once.
+build_audit_fixture
+mkconf "true" "true" "" "3600" "" "1800" "7" "60"
+HOUR_AGO=$(( $(date -u +%s) - 3600 ))
+git add -A && GIT_COMMITTER_DATE="$HOUR_AGO +0000" git commit -q -m "fixture: age the clock" --no-verify
+GATE_LOGS="$(git rev-parse --git-dir)/gate-logs"; rm -rf "$GATE_LOGS"
+out=$(run --liveness tRun); rc=$?
+same "AC5 a STALE verdict exits 0" "$rc" "0"
+hit "$out" "last-move-source: commit"
+hit "$out" "transcript: absent"
+hit "$out" "stale: yes"
+hit "$out" "verdict: STALE"
+same "AC6 the below-sum NOTE prints once" "$(grep -c 'RESUME_STALE_BOUND (60s) is below GATE_BOUND + UNIT_STALL_BOUND (5400s), so a full bar'"'"'s silence reads STALE and an out-of-process resumer may kill a healthy bar' <<<"$out")" "1"
+mkdir -p "$GATE_LOGS" && touch "$GATE_LOGS/leg.log"
+out=$(run --liveness tRun)
+hit "$out" "last-move-source: gate-log"
+hit "$out" "stale: no"
+hit "$out" "verdict: LIVE"
+rm -rf "$GATE_LOGS"
+# ...the transcript: the worktree root with `:`, `\`, `/` and `.` each replaced by `-`, under the
+# override's `projects/`, named by the session the prologue pinned.
+ENC=$(git rev-parse --show-toplevel | tr ':\\/.' '----')
+n=$((n+1)); case "$ENC" in *[:/.]*|"") echo "FAIL fixture: the encoded root still carries a separator or is empty: $ENC"; st=1 ;; esac
+mkdir -p "$ORIGIN_DIR/cfg/projects/$ENC" && touch "$ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
+out=$(CLAUDE_CONFIG_DIR="$ORIGIN_DIR/cfg" bash "$SCRIPT" --liveness tRun 2>&1)
+hit "$out" "transcript: $ORIGIN_DIR/cfg/projects/$ENC/fixture-session.jsonl"
+hit "$out" "last-move-source: transcript"
+hit "$out" "verdict: LIVE"
+rm -rf "$ORIGIN_DIR/cfg"
+touch scratch.txt
+out=$(run --liveness tRun)
+hit "$out" "last-move-source: write"
+hit "$out" "stale: no"
+rm -f scratch.txt
+# AC7 — the last recorded stall, verbatim, from the sidecar under the WORKTREE's git dir; absent
+# is `none`. This unit only reads the file; the line is written by hand here.
+SIDECAR="$(git rev-parse --git-dir)/unattended"; mkdir -p "$SIDECAR"
+printf '2026-09-16T00:00:00Z fixture-session rate_limit {}\n' > "$SIDECAR/stall.tRun.log"
+out=$(run --liveness tRun)
+hit "$out" "last-stall: 2026-09-16T00:00:00Z fixture-session rate_limit {}"
+rm -f "$SIDECAR/stall.tRun.log"
+out=$(run --liveness tRun)
+hit "$out" "last-stall: none"
+# AC1 — no run-state file is check 52's first sentence and no verdict; no slug is check_slug's.
+reset_tree
+out=$(run --liveness tNoRun); rc=$?
+same "AC1 no run-state file exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 52 FAILED"
+hit "$out" "no run-state file, so there is no run whose liveness can be graded:"
+miss "$out" "verdict:"
+out=$(run --liveness); rc=$?
+same "AC1 no slug exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 1 FAILED"
+miss "$out" "verdict:"
+# AC8 — a dead probe is check 52's second sentence and NO verdict line: `stat` shadowed by a stub
+# exiting 1 over a dirty tree, so the mtime probe dies on a path that exists.
+build_audit_fixture
+mkdir -p work && touch work/new.txt
+mkdir -p "$TMP/stub"; printf '#!/bin/sh\nexit 1\n' > "$TMP/stub/stat"; chmod +x "$TMP/stub/stat"
+out=$(PATH="$TMP/stub:$PATH" bash "$SCRIPT" --liveness tRun 2>&1); rc=$?
+same "AC8 a dead mtime probe exits 1" "$rc" "1"
+hit "$out" "UNATTENDED check 52 FAILED"
+hit "$out" "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now:"
+miss "$out" "verdict:"
+# AC6 — junk in the eighth positional is `read_bound_key`'s refusal at exit 2 before any verb runs;
+# the absent-key NOTE is asserted on the NOCONF fixture below, beside its three siblings.
+reset_tree; mkconf "true" "true" "" "3600" "" "1800" "7" "abc"
+out=$(run --liveness tRun); rc=$?
+same "AC6 a non-integer RESUME_STALE_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - RESUME_STALE_BOUND is declared as"
+miss "$out" "verdict:"
+unset CLAUDE_CONFIG_DIR
+reset_tree
+
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
@@ -5547,6 +5714,9 @@ NOCONF
 out=$(run --status tRun)
 hit "$out" "declares no GATE_BOUND, so a declared command is bounded at the kit default"
 hit "$out" "declares no UNIT_STALL_BOUND, so a dispatched unit reads STALLED after the kit default of 1800s"
+# ...and the fourth bound's default is DERIVED from the two above it, 3600 + 1800, so the NOTE
+# reds if the derivation or either addend moves (TOOL-aWokenSentinel-2).
+same "the derived RESUME_STALE_BOUND default is announced once" "$(grep -c 'declares no RESUME_STALE_BOUND, so a run reads STALE after the derived default of 5400s' <<<"$out")" "1"
 # THE DEFAULT IS READ OUT OF THE DRIVER, not retyped: the NOTE interpolates `REVIEW_ROUNDS_DEFAULT`
 # exactly as its two siblings interpolate theirs, so a raised argument cannot leave the sentence
 # saying 1 (cluster I of aProbedUnit's closing review). A literal-digit default in any
@@ -5786,7 +5956,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=824
+FLOOR_ASSERTIONS=897
+# RAISED 824 -> 897 by TOOL-aWokenSentinel-2: the `--liveness` block plus one NOCONF assertion, in
+# region two beside the lease arms, measured by running that block alone over the sourced prologue:
+# n 26 -> 100 on node `a` (MSYS), of which 2 are the MSYS-only `tasklist`-stub arm, so the raise is
+# the 72 every platform executes plus the NOCONF line — a floor is the minimum a green run reaches.
 # RAISED 790 -> 824 by TOOL-aWokenSentinel-1: the lease block's 34 executed assertions, in region two
 # beside the `--audit` arms, measured by running that block alone over the sourced prologue.
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
@@ -5832,7 +6006,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=628
+FLOOR_SHARD_2=701
+# +73 for the TOOL-aWokenSentinel-2 `--liveness` arms and the NOCONF line, in region two — see
+# FLOOR_ASSERTIONS above for the platform split.
 # +34 for the TOOL-aWokenSentinel-1 lease arms, in region two beside the `--audit` arms.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
 # +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.

@@ -40,6 +40,15 @@ GATE_BOUND="3600"
 # Set it to a few keepalive cadences, so a verdict is never one missed tick.
 UNIT_STALL_BOUND="1800"
 
+# The bound, in seconds, past which `--liveness` reads a RUN as STALE when none of its four signals
+# has moved: the last commit, the newest dirty write, the newest gate log, the session transcript.
+# OPTIONAL: absent takes the DERIVED default GATE_BOUND + UNIT_STALL_BOUND and says so on stderr;
+# non-numeric or zero is a refusal; a value BELOW that sum is accepted with a NOTE, because under it
+# a full bar's silence reads STALE and an out-of-process resumer may kill a healthy bar.
+#
+# Leave it absent unless you need to sit ABOVE the sum: raising GATE_BOUND raises the default.
+RESUME_STALE_BOUND="5400"
+
 # The round bound a spec-audit subject -- any `--review` subject that is not the build slug -- takes
 # before it exits BOUNDED; the build slug keeps the runaway ceiling. OPTIONAL, on GATE_BOUND's terms:
 # absent takes the kit default of 1 and says so on stderr; non-numeric, zero, or above the runaway

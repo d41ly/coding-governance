@@ -7,6 +7,7 @@
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
+#   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
 #   unattended.sh --resume <slug> [--keepalive-id <id>]    # the same line, plus the next action; with the id, the lease is replaced
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
@@ -85,7 +86,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --liveness --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -336,7 +337,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""
+GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -368,6 +369,16 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE
 }
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
 read_bound_key UNIT_STALL_BOUND "$UNIT_STALL_BOUND_DEFAULT" seconds "a dispatched unit reads STALLED after the kit default of ${UNIT_STALL_BOUND_DEFAULT}s with no write and no commit"
+# THE STALE BOUND FOR A RUN, the fourth caller (TOOL-aWokenSentinel-2). Its default is DERIVED from
+# the two DECLARED bounds just resolved, never from the kit defaults: a healthy bar is GATE_BOUND of
+# silence on every signal but the gate logs, so the bound at which `--liveness` reads STALE sits one
+# UNIT_STALL_BOUND above it, and an adopter who raises GATE_BOUND for a longer bar raises this with
+# it. A declared value BELOW that sum is the adopter's to declare and this driver's to price: a NOTE,
+# not a refusal, because under it a full bar's silence reads STALE and an out-of-process resumer may
+# kill a healthy bar.
+RESUME_STALE_BOUND_DEFAULT=$((GATE_BOUND + UNIT_STALL_BOUND))
+read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run reads STALE after the derived default of ${RESUME_STALE_BOUND_DEFAULT}s (GATE_BOUND + UNIT_STALL_BOUND) with no signal moved"
+[ "$RESUME_STALE_BOUND" -ge "$RESUME_STALE_BOUND_DEFAULT" ] || echo "unattended: NOTE - RESUME_STALE_BOUND (${RESUME_STALE_BOUND}s) is below GATE_BOUND + UNIT_STALL_BOUND (${RESUME_STALE_BOUND_DEFAULT}s), so a full bar's silence reads STALE and an out-of-process resumer may kill a healthy bar" >&2
 # ARGV STATE, not a conf default. Initialised AFTER the conf is sourced: in the default block above,
 # a tracked `.unattended.conf` could pre-set it and defeat the "--park requires --item" refusal by
 # supplying the item nobody typed.
@@ -2998,6 +3009,32 @@ BRIEFROWS
   return 0
 }
 
+# THE TREE'S CLOCKS, ONE IMPLEMENTATION WITH TWO CALLERS. Extracted verbatim from `print_audit` by
+# TOOL-aWokenSentinel-2 when `--liveness` became the second reader: two copies of "when did this
+# tree last move" is the two-answers class. Four globals, never a return value, because a `$( )`
+# capture would lose the dead-probe name beside the numbers. `TC_LASTC` is HEAD's committer epoch;
+# `TC_LASTW` the newest mtime over the dirty-and-untracked listing `check_clean` counts, EMPTY on a
+# clean tree; `TC_DEAD` names the probe that answered nothing, or is empty. A listed path deleted
+# from disk has no mtime and is SKIPPED, not a dead probe. Each caller decides what a dead probe
+# costs; both refuse, because a zero from one reads as "moved just now".
+TC_NOW=""; TC_LASTC=""; TC_LASTW=""; TC_DEAD=""
+read_tree_clocks() {
+  local dirty p m
+  TC_NOW=""; TC_LASTC=""; TC_LASTW=""; TC_DEAD=""
+  TC_NOW=$(date -u +%s 2>/dev/null) || TC_NOW=""
+  case "$TC_NOW" in ""|*[!0-9]*) TC_DEAD="date -u +%s" ;; esac
+  TC_LASTC=$(GIT log -1 --format=%ct 2>/dev/null) || TC_LASTC=""
+  [ -n "$TC_DEAD" ] || case "$TC_LASTC" in ""|*[!0-9]*) TC_DEAD="git log -1 --format=%ct" ;; esac
+  dirty=$(scan_dirty_paths)
+  [ -n "$TC_DEAD" ] || while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    [ -e "$p" ] || continue      # a deletion: listed, no mtime, skipped
+    m=$(stat -c %Y -- "$p" 2>/dev/null) || m=""
+    case "$m" in ""|*[!0-9]*) TC_DEAD="stat -c %Y on $p"; break ;; esac
+    if [ -z "$TC_LASTW" ] || [ "$m" -gt "$TC_LASTW" ]; then TC_LASTW=$m; fi
+  done <<<"$dirty"
+}
+
 # --audit: THE DISPATCHED-UNIT STALL PROBE. TOOL-aProbedUnit-3. One line per unit whose LATEST
 # pass — every dispatch row at its newest anchor, unioned the way check 23 unions them — is still
 # open and whose spec is not terminal, with how long the TREE has been idle and a verdict against
@@ -3021,7 +3058,7 @@ BRIEFROWS
 # refusals exit 1. `refuse_if_terminal` is not reused for the terminal case: its sentence says the
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug
-  local slug="$1" rel ph now lastc lastw dirty p m dead="" rows u iso g decl disp el wtxt verdict open=0 sp st
+  local slug="$1" rel ph now lastc lastw dead="" rows u iso g decl disp el wtxt verdict open=0 sp st
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 51 "no run-state file, so there is no dispatched unit to audit for idleness: $rel"; return 1; }
@@ -3029,21 +3066,10 @@ print_audit() { # slug
   if [ -n "$ph" ] && is_terminal "$ph"; then
     fail 51 "the run is already finished, so no unit of it can be dispatched and open, and a keepalive still auditing it should have been reaped: $ph"; return 1
   fi
-  # THE TREE'S TWO CLOCKS, once, before the per-unit loop. `last-commit` is the committer date of
-  # HEAD; `last-write` is the newest mtime over the dirty-and-untracked listing `check_clean` counts.
-  now=$(date -u +%s 2>/dev/null) || now=""
-  case "$now" in ""|*[!0-9]*) dead="date -u +%s" ;; esac
-  lastc=$(GIT log -1 --format=%ct 2>/dev/null) || lastc=""
-  [ -n "$dead" ] || case "$lastc" in ""|*[!0-9]*) dead="git log -1 --format=%ct" ;; esac
-  lastw=""
-  dirty=$(scan_dirty_paths)
-  [ -n "$dead" ] || while IFS= read -r p; do
-    [ -n "$p" ] || continue
-    [ -e "$p" ] || continue      # a deletion: listed, no mtime, skipped
-    m=$(stat -c %Y -- "$p" 2>/dev/null) || m=""
-    case "$m" in ""|*[!0-9]*) dead="stat -c %Y on $p"; break ;; esac
-    if [ -z "$lastw" ] || [ "$m" -gt "$lastw" ]; then lastw=$m; fi
-  done <<<"$dirty"
+  # THE TREE'S TWO CLOCKS, once, before the per-unit loop — `read_tree_clocks`, shared with
+  # `--liveness`. The verdict arithmetic below reads them exactly as it read its own locals.
+  read_tree_clocks
+  now=$TC_NOW; lastc=$TC_LASTC; lastw=$TC_LASTW; dead=$TC_DEAD
   # THE LATEST PASS PER UNIT, by the awk shape `verb_status` uses for brief rows: split on the
   # separator, keep rows whose first field ends ` dispatch`, take the ISO from that field, the group
   # and unit from `item`, the declared set from `reason`. One awk pass and no back-reference, for the
@@ -3093,6 +3119,154 @@ print_audit() { # slug
     fail 51 "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now: $dead"; return 1
   fi
   [ "$open" -gt 0 ] || echo "unattended-audit: no unit is dispatched and open"
+  return 0
+}
+
+# THE SIDECAR ROOT, derived ONCE: `<git-dir>/unattended`, the WORKTREE's git dir — where `gate-logs/`
+# already lives — never the common dir, because a run lives in one worktree. Every reader of a
+# sidecar file (the stall log here, the stop log at `--landed`, the resume log in the tick) calls
+# this rather than respelling it, and the kit gate counts the literal on exactly one code line. An
+# empty answer is a DEAD PROBE for the caller, never a path composed from an empty root.
+resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir cannot be derived
+  local g; g=$(GIT rev-parse --git-dir 2>/dev/null) || g=""
+  [ -n "$g" ] || return 1
+  printf '%s/unattended\n' "$g"
+}
+
+# THE SESSION TRANSCRIPT, when it derives. The CLI keeps one per session under
+# `<config>/projects/<encoded worktree root>/<session>.jsonl`, the root in its native spelling with
+# every `:`, `\`, `/` and `.` replaced by `-` — MEASURED on node `a`, 2026-09-16: `.` IS replaced,
+# so `.claude` reads `-claude`. Whether `_` is replaced is UNVERIFIED (no project on the node has
+# one), so it is left alone and a root carrying one degrades to `absent`, never to a wrong path that
+# exists. `CLAUDE_CONFIG_DIR` is the CLI's documented override and the fixture's seam; the default is
+# `$HOME/.claude`. `$ROOT` already holds `--show-toplevel`, so it is not derived a second time.
+resolve_transcript_path() { # session -> the transcript path when it exists, or nothing
+  local sid="$1" enc f
+  case "$sid" in ""|absent) return 1 ;; esac
+  enc=$(printf '%s' "$ROOT" | tr ':\\/.' '----')
+  f="${CLAUDE_CONFIG_DIR:-${HOME:-}/.claude}/projects/$enc/$sid.jsonl"
+  [ -f "$f" ] || return 1
+  printf '%s\n' "$f"
+}
+
+# DOES THE RECORDED PID EXIST. `yes`, `no` or `unknown` — `unknown` for `absent`, for a non-numeric
+# value, and for a probe tool that answered nothing, because a tool that could not look is not a
+# `no`. Under MSYS the probe is `tasklist` and its OUTPUT decides: MEASURED on node `a`, 2026-09-16,
+# it exits 0 for a live pid AND for a dead one (printing `INFO: No tasks are running`), so the exit
+# code decides nothing; and `kill -0` on a live Windows pid reports `No such process` there, so the
+# POSIX arm alone would read every live run on this fleet as dead. The recorded pid is `claude.exe`'s
+# Windows pid, which is the one `tasklist` knows. Existence is not progress: a hung process is `yes`.
+check_pid_alive() { # pid -> yes | no | unknown
+  local pid="$1" out
+  case "$pid" in ""|absent|*[!0-9]*) echo unknown; return 0 ;; esac
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*)
+      command -v tasklist >/dev/null 2>&1 || { echo unknown; return 0; }
+      out=$(tasklist //FI "PID eq $pid" //NH 2>/dev/null) || { echo unknown; return 0; }
+      case " $(printf '%s' "$out" | tr -s '\r\t ' '    ') " in *" $pid "*) echo yes ;; *) echo no ;; esac ;;
+    *) if kill -0 "$pid" 2>/dev/null; then echo yes; else echo no; fi ;;
+  esac
+}
+
+# --liveness: THE ONE PREDICATE EVERY OUT-OF-SESSION READER SHARES. TOOL-aWokenSentinel-2. "Is this
+# run alive" had no single answer: `--status` is prose for a human, `--audit` grades dispatched
+# UNITS and says nothing about the session holding the run, and only `--preflight` knew that a
+# LANDING record whose witness is already on the default branch is a finished run missing a stamp.
+# This prints `key: value` lines and ONE verdict, so the stop-guard, the stall-recorder's readers
+# and the resume tick call it rather than each deciding for themselves. Read-only: it writes no row
+# and stages nothing. No network: `finished-unstamped` is the OFFLINE half of `check_single_live`'s
+# predicate against the local ref for the default branch, so a landing pushed from another tree and
+# not yet fetched here reads `live` — one wasted resume attempt, against an `ls-remote` per tick.
+#
+# WHAT IT DOES NOT KNOW, said where the verb is read. It cannot see what the session is doing,
+# whether a process is hung on a tool call, or which command it is sitting on. `pid-alive` says a
+# process EXISTS; a hung `claude.exe` is alive by this probe. The process-side question is the
+# process-monitor kit's.
+#
+#   phase · state · default-branch · session · pid · keepalive · pid-alive · last-move ·
+#   last-move-source · transcript · last-stall · stale · verdict
+#
+# `state` is `terminal`, `finished-unstamped` or `live`. `last-move` is the seconds since the NEWEST
+# of four signals — the last commit, the newest dirty or untracked write, the newest gate log under
+# `<git-dir>/gate-logs/`, and the session transcript when its path derives — because during a
+# healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs do. `stale`
+# is `last-move` over RESUME_STALE_BOUND. The verdict is the first that holds: TERMINAL,
+# FINISHED-UNSTAMPED, UNBOUND (no session to bind to), STALE, LIVE. Every key prints on every run
+# that reaches the verdict, a terminal record included, so a reader never has to know which keys a
+# state omits. A terminal phase, an absent session and an unresolvable default branch are VALUES;
+# the two refusals are a missing record and a dead probe, and a dead probe prints no verdict line,
+# because a zero from it would read as moved-just-now — the reassuring-zero class `--audit` refuses
+# the same way.
+print_liveness() { # slug
+  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar gl f m tp last stale verdict
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 52 "no run-state file, so there is no run whose liveness can be graded: $rel"; return 1; }
+  ph=$(fact "$rel" phase); [ -n "$ph" ] || ph=absent
+  # THE REF THE ANCESTRY TEST USES, resolved whether or not the test runs, so a skipped test is
+  # announced as `unresolved` rather than read as `live`. The remote-tracking ref when it exists,
+  # the local branch otherwise; `default_branch` reads GOV_DEFAULT_BRANCH then origin/HEAD.
+  dref=unresolved
+  if d=$(default_branch) && [ -n "$d" ]; then
+    if GIT show-ref --verify --quiet "refs/remotes/origin/$d"; then dref="refs/remotes/origin/$d"; else dref="refs/heads/$d"; fi
+  fi
+  state=live
+  if is_terminal "$ph"; then
+    state=terminal
+  elif [ "$ph" = LANDING ] && [ "$dref" != unresolved ]; then
+    # SHA-SHAPED, as at the admission point: a witness reading `main` is an ancestor of `main` by
+    # construction, and the witness is authored by the run being graded.
+    w=$(fact "$rel" witness)
+    case "$w" in
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
+      *) w="" ;;
+    esac
+    if [ -n "$w" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1 && GIT merge-base --is-ancestor "$w" "$dref" 2>/dev/null; then
+      state=finished-unstamped
+    fi
+  fi
+  sid=$(fact "$rel" session); [ -n "$sid" ] || sid=absent
+  pid=$(fact "$rel" pid); [ -n "$pid" ] || pid=absent
+  kid=$(fact "$rel" keepalive); [ -n "$kid" ] || kid=absent
+  alive=$(check_pid_alive "$pid")
+  # THE FOUR SIGNALS. The two tree clocks are `read_tree_clocks`; the gate-log clock and the
+  # transcript clock are this verb's own. An ABSENT gate-logs directory contributes nothing and is
+  # not a dead probe — a repo that has never run the bar has none — but a file under it that `stat`
+  # cannot date is one.
+  read_tree_clocks
+  dead="$TC_DEAD"; newest="$TC_LASTC"; src=commit
+  if [ -z "$dead" ] && [ -n "$TC_LASTW" ] && [ "$TC_LASTW" -gt "$newest" ]; then newest=$TC_LASTW; src=write; fi
+  sidecar=$(resolve_sidecar_dir) || { sidecar=""; [ -n "$dead" ] || dead="resolve_sidecar_dir"; }
+  gl="${sidecar%/unattended}/gate-logs"
+  if [ -z "$dead" ] && [ -d "$gl" ]; then
+    for f in "$gl"/*; do
+      [ -f "$f" ] || continue
+      m=$(stat -c %Y -- "$f" 2>/dev/null) || m=""
+      case "$m" in ""|*[!0-9]*) dead="stat -c %Y on $f"; break ;; esac
+      if [ "$m" -gt "$newest" ]; then newest=$m; src=gate-log; fi
+    done
+  fi
+  tp=$(resolve_transcript_path "$sid") || tp=""
+  if [ -z "$dead" ] && [ -n "$tp" ]; then
+    m=$(stat -c %Y -- "$tp" 2>/dev/null) || m=""
+    case "$m" in ""|*[!0-9]*) dead="stat -c %Y on $tp" ;; esac
+    if [ -z "$dead" ] && [ "$m" -gt "$newest" ]; then newest=$m; src=transcript; fi
+  fi
+  if [ -n "$dead" ]; then
+    fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $dead"; return 1
+  fi
+  # THE LAST RECORDED STALL, verbatim and uninterpreted: the stall-recorder writes the file and this
+  # verb reads its last line. Absent or empty is `none`, a value and not a refusal.
+  last=none; f="$sidecar/stall.$slug.log"
+  if [ -s "$f" ]; then last=$(tail -n 1 -- "$f"); last=${last%$'\r'}; fi
+  stale=no; [ $((TC_NOW - newest)) -gt "$RESUME_STALE_BOUND" ] && stale=yes
+  if [ "$state" = terminal ]; then verdict=TERMINAL
+  elif [ "$state" = finished-unstamped ]; then verdict=FINISHED-UNSTAMPED
+  elif [ "$sid" = absent ]; then verdict=UNBOUND
+  elif [ "$stale" = yes ]; then verdict=STALE
+  else verdict=LIVE; fi
+  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\n' \
+    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict"
   return 0
 }
 
@@ -5358,6 +5532,7 @@ case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
+  --liveness)  print_liveness "$SLUG" ;;
   --resume)    verb_resume "$SLUG" "$KID" ;;
   --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;

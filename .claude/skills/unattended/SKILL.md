@@ -619,6 +619,11 @@ definition, so the absence is a decision and not an oversight.
   their own build method names.)
 - Check yourself with `bash tools/unattended/unattended.sh --status <slug>`, and the units with
   `bash tools/unattended/unattended.sh --audit <slug>`.
+- The one predicate every OUT-OF-SESSION reader shares — key: value lines and one verdict:
+
+  ```bash
+  bash tools/unattended/unattended.sh --liveness <slug>
+  ```
 
 ## While the work runs
 
