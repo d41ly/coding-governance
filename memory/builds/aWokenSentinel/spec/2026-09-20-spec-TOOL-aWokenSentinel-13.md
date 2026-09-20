@@ -1,11 +1,12 @@
 # TOOL-aWokenSentinel-13 — the resume tick sources the root conf before its bound reads, so a declared bound is honoured and the NOTE names the file
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 13 · ratified 2026-09-20
+**Status:** CLOSED · rev-4 · 2026-09-21 · node a · Tier-2 · base 12b3701d · streams tooling · order 13 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-aWokenSentinel-13-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-aWokenSentinel-13-1-acceptance-ledger.md) | journal | — |
 | [2026-09-20-prompt-TOOL-aWokenSentinel-13-1-build-brief.md](../prompts/2026-09-20-prompt-TOOL-aWokenSentinel-13-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-8-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-14 |
 
@@ -47,8 +48,10 @@ arms under a declared key and a NOTE that names a non-empty path.
   neither key → the NOTE, once per key, whose interpolated path is the fixture's conf and exists,
   red against the BLOCK copy — the conf block removed by `sed '/^CONF=/,/^\. "\$CONF"$/d'`, which
   takes `CONF=`, the refusal, the two clearing assignments and `. "$CONF"` with the `shellcheck`
-  comment between them and KEEPS the two `read_bound_key` calls — where at this unit's order both
-  NOTEs print an empty path and `test -f` refuses; and `RESUME_ATTEMPTS=abc` exported into the
+  comment between them and KEEPS the two `read_bound_key` calls — where at this unit's order the
+  tick runs under `set -u`, so the first NOTE's `$CONF` is an unbound variable: exit 1, zero
+  NOTEs, no launcher, and the arm reads zero `Declare one in ` lines where it wants two that name
+  a file; and `RESUME_ATTEMPTS=abc` exported into the
   tick's environment with the conf declaring `2` → the cap is 2 and no refusal, red against a tick
   copy with the two clearing
   assignments removed, where the tick exits 2 blaming the conf for a value it never declared.
@@ -56,18 +59,19 @@ arms under a declared key and a NOTE that names a non-empty path.
 - **S4** — A NOTE naming no file is the signature of this defect and is greppable: one arm
   asserts the two `Declare one in ` lines on the tick's stderr are present and each is followed
   by a path that exists. The source-line-only copy cannot red it — `CONF` stays set there — so its
-  break is the BLOCK copy of S3, where at this unit's order `read_bound_key` runs with `CONF` unset
-  and prints the signature itself, two NOTEs with an empty path, which `test -f` refuses; unit 18,
-  one order later, re-reads the same copy as exit 2 with zero NOTEs, the signature made impossible.
-  Observed by AC2.
+  break is the BLOCK copy of S3, where at this unit's order `read_bound_key` is entered with `CONF`
+  unset under the tick's `set -u` and dies at the NOTE's `$CONF` — `CONF: unbound variable`, exit
+  1, zero NOTEs — so the arm's two-existing-paths assertion reads zero lines; unit 18, one order
+  later, re-reads the same copy as exit 2 with the guard's own sentence and zero NOTEs, the
+  signature made a refusal rather than a shell error. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
 - **No change to `read_bound_key`'s read.** Its calling-shell contract is the driver's and the
   hoist keeps its bytes; this unit satisfies the contract from the tick as the driver does. The
-  guard that makes an unset `CONF` a refusal rather than an empty NOTE is unit 18's, one order
-  later; this unit's NOTE arm reds against the BLOCK copy before that guard exists, on the empty
-  path, and unit 18 changes what the same copy prints, not whether the arm can fail.
+  guard that makes an unset `CONF` a refusal rather than a shell error is unit 18's, one order
+  later; this unit's NOTE arm reds against the BLOCK copy before that guard exists, on `set -u`'s
+  unbound-variable exit, and unit 18 changes what the same copy prints, not whether the arm can fail.
 - **No conf comment sentence.** The one sentence in the conf comments saying the two keys are read
   from the ROOT conf by the tick is spec 5's, written in its §4 Data model; unit 6 finds it
   present and adds nothing, and this unit declares no edge for a sentence it does not write.
@@ -138,10 +142,14 @@ arm greps the tick's stderr for `Declare one in ` and asserts what follows, up t
 is a path that exists, and that exactly two such lines print. It is the liveness assertion for the
 read: a NOTE that names a file proves `CONF` was set before the call. Its break is the BLOCK copy,
 not the source line alone: with the block gone `CONF` is unset, and at this unit's order the
-function runs unguarded and prints the two NOTEs with an EMPTY path — the signature itself, which
-`test -f` refuses, so the arm is red on the copy. Unit 18's guard, one order later, makes the same
-copy exit 2 before any NOTE prints, and the arm then reads zero lines — the signature made
-impossible rather than merely observed; spec 18 records that reading against the same copy. The
+function runs unguarded into the NOTE's `$CONF` under the tick's `set -u` — `CONF: unbound
+variable` from the library line, exit 1, zero NOTEs, no launcher — so the arm reads zero lines
+where it wants two and is red on the copy. Measured at this pass (probe over the fixture,
+2026-09-21, node a): the rev-3 reading of two EMPTY-path NOTEs and a launched attempt 1 needs
+`CONF` SET AND EMPTY, which nothing in the copy or the suite does; `set -u` at the tick's top
+decides it. Unit 18's guard, one order later, makes the same copy exit 2 with its own sentence
+before the function reaches `$CONF`, and the arm still reads zero lines — the signature made a
+refusal rather than a shell error; spec 18 records that reading against the same copy. The
 copy is made by `sed '/^CONF=/,/^\. "\$CONF"$/d'` over the tick: the range takes the four conf
 lines and the `shellcheck` comment between them and leaves both `read_bound_key` calls, which is
 what lets the function be entered at all. Unit 24 makes that range a suite helper both arms call.
@@ -199,14 +207,14 @@ sources each worktree's conf into the tick's own shell during the walk.
   RESUME_ATTEMPTS` and `declares no RESUME_TURNS` exactly once each, and each `Declare one in ` on
   stderr is followed by a path that `test -f` accepts; with no `.unattended.conf` at the root the
   tick prints `REFUSED` naming the root and exits 2. Against the BLOCK copy, at this unit's order,
-  the tick walks on defaults: two `Declare one in ` lines print with an EMPTY path, `test -f`
-  refuses each, and attempt 1 launches — the reading this arm records, red on the signature
-  itself; from unit 18's order on the same copy exits 2 with `read_bound_key was called with CONF
-  unset`, zero `declares no` lines and no launcher, which spec 18 AC2 records. The SOURCE copy
-  leaves `CONF` set and cannot red this arm, and §7 says so.
-  Red when: the NOTE's path is empty, which is the specced defect's own signature and is what unit
-  18 makes a refusal; or the count of NOTEs is not two, which is a read that never happened; or a
-  root with no conf walks on defaults silently.
+  the tick exits 1 with `CONF: unbound variable` on stderr from the library's NOTE line, zero
+  `Declare one in ` lines and no launcher — the reading this arm records, red because the
+  two-existing-paths count is zero; from unit 18's order on the same copy exits 2 with
+  `read_bound_key was called with CONF unset`, zero `declares no` lines and no launcher, which
+  spec 18 AC2 records. The SOURCE copy leaves `CONF` set and cannot red this arm, and §7 says so.
+  Red when: the NOTE's path is empty or absent, which is the specced defect's own signature and
+  is what unit 18 makes a refusal; or the count of NOTEs is not two, which is a read that never
+  happened; or a root with no conf walks on defaults silently.
 - **AC3** — When the fixture's conf declares `RESUME_TURNS="7"`, the launcher file the tick writes
   carries `--max-turns 7` and `stub.log` shows the stub invoked with it; against the SOURCE copy
   it carries `40`.
@@ -225,9 +233,10 @@ sources each worktree's conf into the tick's own shell during the walk.
 - **AC5** — When `RESUME_ATTEMPTS=abc` is exported into the tick's environment and the fixture's
   conf declares `RESUME_ATTEMPTS="2"` with two post-move attempt lines seeded, the tick prints
   `ATTEMPTS EXHAUSTED` and no `REFUSING`; with the conf declaring neither key the tick prints the
-  `declares no RESUME_ATTEMPTS` NOTE and caps at the kit default; against the CLEAR copy the first
-  case exits 2 with `REFUSING - RESUME_ATTEMPTS is declared as 'abc'`, blaming the conf for a
-  value it never declared.
+  `declares no RESUME_ATTEMPTS` NOTE and caps at the kit default; against the CLEAR copy the
+  SECOND case exits 2 with `REFUSING - RESUME_ATTEMPTS is declared as 'abc'`, blaming the conf for
+  a value it never declared — the first case cannot red there, because `. "$CONF"` overwrites the
+  export with the declared `2` whether or not the keys were cleared.
   Red when: an exported value overrides the conf or the default, which is a bound nobody declared
   in the one file the owner edits.
 
@@ -238,7 +247,7 @@ sources each worktree's conf into the tick's own shell during the walk.
 These run once at `--close`. The pass runs none of them: it verifies with the tick over the
 fixtures of AC1 to AC4.
 
-New arm: `tools/unattended/resume-tick.test.sh` · the declared cap and the declared turns, red against the SOURCE copy; the two NOTEs with a non-empty path, red against the BLOCK copy on the empty path at this order and on unit 18's refusal after it; the two-worktree walk with a differing declaration, red against the WORKTREE copy; the exported junk value, red against the CLEAR copy · `FLOOR_ASSERTIONS` rises by the arms' executed assertions
+New arm: `tools/unattended/resume-tick.test.sh` · the declared cap and the declared turns, red against the SOURCE copy; the two NOTEs with a non-empty path, red against the BLOCK copy on `set -u`'s unbound-variable exit at this order and on unit 18's refusal after it; the two-worktree walk with a differing declaration, red against the WORKTREE copy; the exported junk value, red against the CLEAR copy · `FLOOR_ASSERTIONS` rises by the arms' executed assertions
 
 ## 8. Open questions
 
@@ -252,6 +261,20 @@ New arm: `tools/unattended/resume-tick.test.sh` · the declared cap and the decl
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-21 · S3 · S4 · §3 · §4 · AC2 · §7 · FACT-QUESTION resolved by the pass's probe
+  (M3): the BLOCK copy's reading at this order was recorded as two empty-path NOTEs and a launched
+  attempt 1, which needs `CONF` set and empty; the tick runs under `set -u`, so the copy dies at
+  the library's NOTE line with `CONF: unbound variable`, exit 1, zero NOTEs, no launcher — probed
+  over the fixture with the `sed` range as spelled, copy shape `read_bound_key` 2 · `CONF=` 0 ·
+  source 0. The arm's break is unchanged and the arm is still red on it, on a count of zero rather
+  than on `test -f`; every carrier of the old reading is corrected. Spec 18 S4 and spec 24 S2
+  paraphrase the rev-3 reading and inherit this one at their own passes; their mechanisms and the
+  two phrases spec 18 AC4 greps here are untouched. AC5, the same way: the CLEAR copy was said to
+  red the DECLARED case, but sourcing the conf overwrites an export whether or not the keys were
+  cleared, so the observed red is the neither-declared case — `REFUSING … 'abc'`, exit 2, no
+  NOTE, no launch — and AC5 now says so. The tick needed no edit — unit 5's pass built the block
+  and the header sentence as §4 spells them — so this unit's diff to it is empty and the arms are
+  the proof.
 - rev-3 · 2026-09-20 · S3 · S4 · §3 · §4 · AC2 · §7 · folded spec-audit round 3: sibling
   agreement for the promoted `TOOL-aWokenSentinel-24` (H4, raw 18) — the BLOCK copy was defined
   as "the whole conf block of §4" (seven lines, calls included), "WHOLE four-line" and "five

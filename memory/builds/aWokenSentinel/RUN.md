@@ -153,3 +153,7 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-20T20:46:45Z brief · item TOOL-aWokenSentinel-12 · reason cb3a73cc5e65 memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-12-1-build-brief.md
 
 2026-09-20T20:57:03Z dispatch · item 96dd3761 TOOL-aWokenSentinel-12 · reason memory/map/features/unattended.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-09-20T21:03:59Z dispatch · item e1b759e0 TOOL-aWokenSentinel-13 · reason tools/unattended/resume-tick.sh tools/unattended/resume-tick.test.sh memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-13.md memory/builds/aWokenSentinel/README.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-13-1-acceptance-ledger.md
+
+2026-09-20T21:04:05Z brief · item TOOL-aWokenSentinel-13 · reason 184dcaa3c7cd memory/builds/aWokenSentinel/prompts/2026-09-20-prompt-TOOL-aWokenSentinel-13-1-build-brief.md

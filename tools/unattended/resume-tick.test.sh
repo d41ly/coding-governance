@@ -100,6 +100,9 @@ trap remove_leftovers EXIT
 # a tRun build README, a RUN.md at BUILDING carrying the session and the pid, ONE commit dated an
 # hour ago so a clean tree reads STALE against the one-second bound and a "line newer than the
 # last move" is any line dated now. Null global and system git config, the kit's seed idiom.
+# CONF_EXTRA, when set, is appended to the conf BEFORE the commit: a declared knob rides the
+# hour-old commit, because a conf edited after it is a write dated now and the tree reads LIVE.
+CONF_EXTRA=""
 build_fixture() {
   FX="$GITTMP/rt-fx"; rm -rf "$FX"; mkdir -p "$FX/memory/builds/tRun"
   ( cd "$FX" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
@@ -123,6 +126,7 @@ KEEPALIVE_DELETE="CronDelete"
 PHASES_EXTRA=""
 DOD_EXTRA=""
 EOF
+  [ -z "$CONF_EXTRA" ] || printf '%s\n' "$CONF_EXTRA" >> "$FX/.unattended.conf"
   printf -- '---\nslug: tRun\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRun-1\n---\n\n# tRun\n' > "$FX/memory/builds/tRun/README.md"
   printf '# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: %s\n\n## Parked\n' "${2:-$SID}" "$1" > "$FX/memory/builds/tRun/RUN.md"
   ( cd "$FX" && GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git add -A \
@@ -145,10 +149,19 @@ read_stub_log() {
   done
   cat "$STUB_LOG" 2>/dev/null || true
 }
-# seed_log <n> <utc> — n attempt lines in the sidecar, all stamped <utc>.
+# measure_note_files <stderr> — how many `Declare one in <path> to change it` lines name a file that
+# exists. The NOTE-path liveness read (TOOL-aWokenSentinel-13): an empty path, the specced defect's
+# own signature, counts for nothing, and so does a NOTE that never printed.
+measure_note_files() {
+  local n=0 p
+  while IFS= read -r p; do [ -n "$p" ] && [ -f "$p" ] && n=$((n+1)); done <<<"$(printf '%s\n' "$1" | sed -n 's/.*Declare one in \(.*\) to change it.*/\1/p')"
+  printf '%s' "$n"
+}
+# seed_log <n> <utc> [slug] [sidecar] — n attempt lines in the sidecar, all stamped <utc>; tRun in
+# the fixture's own sidecar unless an arm names another tree's.
 seed_log() {
-  local i; mkdir -p "$SIDECAR"
-  for i in $(seq 1 "$1"); do printf '%s attempt %s session %s pid 999999999 pid-alive no out %s/resume.tRun.%s.out\n' "$2" "$i" "$SID" "$SIDECAR" "$i"; done >> "$SIDECAR/resume.tRun.log"
+  local i s="${3:-tRun}" d="${4:-$SIDECAR}"; mkdir -p "$d"
+  for i in $(seq 1 "$1"); do printf '%s attempt %s session %s pid 999999999 pid-alive no out %s/resume.%s.%s.out\n' "$2" "$i" "$SID" "$d" "$s" "$i"; done >> "$d/resume.$s.log"
 }
 # derive_winpid <bash-pid> — the pid the tick's kill would take for a backgrounded `sleep`: under
 # MSYS its WINDOWS pid (ps's WINPID column, polled until the forked child has exec'd into `sleep`),
@@ -340,13 +353,90 @@ check_hit "$OUT" "resume-tick: tRun · $FX · resumed · attempt 1" "AC12 the fi
 check_same "AC12 two lines, one per tree" "$(printf '%s\n' "$OUT" | grep -c '')" "2"
 ( cd "$FX" && git worktree remove --force "$WT2" ) >/dev/null 2>&1; rm -rf "$WT2"
 
+# ---- U13 (TOOL-aWokenSentinel-13): the tick sources the ROOT conf into its own shell before its
+# ---- two bound reads, so a declared bound is honoured and the NOTE names the file. Each arm is
+# ---- named with the tick copy it is RED against; a pass observes those from a sourced copy of
+# ---- this prologue, and only the BLOCK copy is staged here, because unit 18 re-reads it:
+# ----   SOURCE   — `. "$CONF"` removed: a declared 2 reads as 6, a declared 7 as 40, the NOTE prints
+# ----   BLOCK    — `CONF=` through `. "$CONF"` removed, both read_bound_key calls kept: at this
+# ----              order the copy dies under set -u at the NOTE's $CONF — exit 1, zero NOTEs
+# ----   WORKTREE — each worktree's conf sourced into the tick's shell mid-walk: the tree's 6 wins
+# ----   CLEAR    — the two clearing assignments removed: an exported `abc` is blamed on the conf
+# AC1 — a declared RESUME_ATTEMPTS="2" with two post-move lines is EXHAUSTED, and no NOTE prints.
+CONF_EXTRA='RESUME_ATTEMPTS="2"' build_fixture 999999999; seed_log 2 "$NOW_UTC"
+run_tick_over "$TICK"
+check_same "U13 a declared cap exits 0" "$RC" "0"
+check_hit "$OUT" "resume-tick: tRun · $FX · skip · ATTEMPTS EXHAUSTED · last $NOW_UTC · out $SIDECAR/resume.tRun.2.out" "U13 a declared cap of 2 is exhausted by two lines"
+check_miss "$ERR" "declares no RESUME_ATTEMPTS" "U13 a declared cap prints no NOTE"
+check_same "U13 a declared cap invokes nothing" "$([ -f "$STUB_LOG" ] && echo invoked || echo nothing)" "nothing"
+# AC3 — a declared RESUME_TURNS="7" reaches the launcher and the stub's argv.
+CONF_EXTRA='RESUME_TURNS="7"' build_fixture 999999999
+run_tick_over "$TICK"
+check_hit "$OUT" "· resumed · attempt 1 · out " "U13 a declared turns count still resumes"
+check_same "U13 the launcher carries the declared turns" "$(grep -c -- '--max-turns 7 ' "$SIDECAR"/resume.tRun.*.sh)" "1"
+check_hit "$(read_stub_log)" "--max-turns 7 " "U13 the stub was invoked with the declared turns"
+check_miss "$ERR" "declares no RESUME_TURNS" "U13 a declared turns count prints no NOTE"
+# AC2 — neither key declared: the two NOTEs print once each and every `Declare one in ` names a
+# file that exists; the two-space signature `Declare one in  to change it` is absent. Then the
+# BLOCK copy over a fresh fixture: the count of NOTEs naming a file is zero, which is the read
+# unit 18 keeps; how the copy gets there at this order is the three lines after it.
+build_fixture 999999999
+run_tick_over "$TICK"
+check_same "U13 the NOTE for RESUME_ATTEMPTS prints once" "$(printf '%s\n' "$ERR" | grep -c 'declares no RESUME_ATTEMPTS')" "1"
+check_same "U13 the NOTE for RESUME_TURNS prints once" "$(printf '%s\n' "$ERR" | grep -c 'declares no RESUME_TURNS')" "1"
+check_same "U13 two NOTEs name a file that exists" "$(measure_note_files "$ERR")" "2"
+check_same "U13 no NOTE carries the empty-path signature" "$(printf '%s\n' "$ERR" | grep -c 'Declare one in  to change it')" "0"
+BLOCK="$TMP/kit-block"; mkdir -p "$BLOCK"; cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$BLOCK/"
+sed '/^CONF=/,/^\. "\$CONF"$/d' "$TICK" > "$BLOCK/resume-tick.sh"
+check_same "U13 the BLOCK copy keeps both read_bound_key calls" "$(grep -c '^read_bound_key ' "$BLOCK/resume-tick.sh")" "2"
+build_fixture 999999999
+run_tick_over "$BLOCK/resume-tick.sh"
+check_same "U13 the BLOCK copy names a file in no NOTE" "$(measure_note_files "$ERR")" "0"
+check_same "U13 the BLOCK copy exits 1 at this order" "$RC" "1"
+check_hit "$ERR" "CONF: unbound variable" "U13 the BLOCK copy dies under set -u at the NOTE's \$CONF"
+check_same "U13 the BLOCK copy prints no NOTE and no launcher" "$(printf '%s\n' "$ERR" | grep -c 'declares no') · $(ls "$SIDECAR"/resume.tRun.*.sh 2>/dev/null | grep -c '')" "0 · 0"
+# AC4 — the bounds are ROOT-scoped. A second worktree whose conf declares MEMORY_ROOT=mem2 and
+# RESUME_ATTEMPTS="6" is walked under mem2 (MEMORY_ROOT stays that tree's, a subshell read) and
+# capped by the ROOT's 2: two seeded lines read EXHAUSTED and no launcher is written. Every file
+# the arm writes into the worktree is dated an hour back, or the tree's newest write reads LIVE.
+CONF_EXTRA='RESUME_ATTEMPTS="2"' build_fixture 999999999 absent
+WT4="$GITTMP/rt-wt4"; rm -rf "$WT4"
+( cd "$FX" && git worktree add -q "$WT4" -b wt4 ) || print_bad "U13 fixture: git worktree add failed"
+WT4=$( cd "$FX" && git worktree list --porcelain | sed -n 's/^worktree //p' | sed -n 2p )
+sed -e 's/^MEMORY_ROOT=.*/MEMORY_ROOT=mem2/' -e 's/^RESUME_ATTEMPTS=.*/RESUME_ATTEMPTS="6"/' "$FX/.unattended.conf" > "$WT4/.unattended.conf"
+mkdir -p "$WT4/mem2/builds/tWt"
+printf -- '---\nslug: tWt\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tWt-1\n---\n\n# tWt\n' > "$WT4/mem2/builds/tWt/README.md"
+printf '# tWt — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nwitness: abc\nphase: BUILDING\nsession: %s\npid: 999999999\n\n## Parked\n' "$SID" > "$WT4/mem2/builds/tWt/RUN.md"
+touch -d '-1 hour' "$WT4/.unattended.conf" "$WT4/mem2/builds/tWt/README.md" "$WT4/mem2/builds/tWt/RUN.md"
+SIDECAR4="$( cd "$WT4" && git rev-parse --absolute-git-dir )/unattended"
+seed_log 2 "$NOW_UTC" tWt "$SIDECAR4"
+run_tick_over "$TICK"
+check_same "U13 the two-worktree walk exits 0" "$RC" "0"
+check_hit "$OUT" "resume-tick: tWt · $WT4 · skip · ATTEMPTS EXHAUSTED · last $NOW_UTC · out $SIDECAR4/resume.tWt.2.out" "U13 the worktree's record is walked under mem2 and capped by the root's 2"
+check_same "U13 one decision line, the worktree's" "$(printf '%s\n' "$OUT" | grep -c '')" "1"
+check_same "U13 the worktree's 6 wrote no launcher" "$(ls "$SIDECAR4"/resume.tWt.*.sh 2>/dev/null | grep -c '')" "0"
+check_miss "$ERR" "declares no RESUME_ATTEMPTS" "U13 the root's declaration is the one read"
+( cd "$FX" && git worktree remove --force "$WT4" ) >/dev/null 2>&1; rm -rf "$WT4"
+# AC5 — an exported RESUME_ATTEMPTS=abc never stands in for a declaration: under the conf's 2 the
+# cap is 2 and nothing REFUSES; with no declaration the NOTE prints and the kit default caps, so
+# two lines launch attempt 3.
+CONF_EXTRA='RESUME_ATTEMPTS="2"' build_fixture 999999999; seed_log 2 "$NOW_UTC"
+RESUME_ATTEMPTS=abc run_tick_over "$TICK"
+check_same "U13 exported junk under a declared cap exits 0" "$RC" "0"
+check_hit "$OUT" "· skip · ATTEMPTS EXHAUSTED · last $NOW_UTC · out " "U13 the declared cap wins over the environment"
+check_miss "$ERR" "REFUSING" "U13 the exported junk is not blamed on the conf"
+build_fixture 999999999; seed_log 2 "$NOW_UTC"
+RESUME_ATTEMPTS=abc run_tick_over "$TICK"
+check_hit "$ERR" "declares no RESUME_ATTEMPTS" "U13 exported junk with no declaration still announces the default"
+check_hit "$OUT" "· resumed · attempt 3 · out " "U13 the kit default caps, not the environment"
+
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Derived from
-# the eight arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20 (the pass that
-# wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, U12 6,
-# AC12 8 — 67 executed, pinned at ~10% headroom. The main loop's first green at VERIFYING confirms
-# the executed count against this floor. Lower it in a reviewed diff or not at all.
-FLOOR_ASSERTIONS=61
+# the nine arm blocks each run ALONE from the sourced prologue on node a, 2026-09-20/21 (the pass
+# that wrote this file may not run the suite): AC8 6, AC7 11, AC2 10, AC1 15, AC3 7, AC4 4, U12 6,
+# AC12 8, U13 27 — 94 executed, pinned at ~10% headroom. The main loop's first green at VERIFYING
+# confirms the executed count against this floor. Lower it in a reviewed diff or not at all.
+FLOOR_ASSERTIONS=84
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; fail=$((fail+1)); }
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
