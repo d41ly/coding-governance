@@ -107,6 +107,15 @@ bound run and does nothing else — no kill, no launch, no attempt line, no logi
 it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
 on stderr when absent.
 
+## The sidecar
+
+`<git-dir>/unattended/` is where the keepalive actors write, and it is the WORKTREE's git dir,
+never the common dir, because a run lives in one worktree. Three kinds, one file per run each:
+`stop.<slug>.log`, one JSON line per stop the stop-guard decided (unit 3); `stall.<slug>.log`, one
+line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one attempt line per
+tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
+never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
+
 ## Running the kit's own checks
 
 ```

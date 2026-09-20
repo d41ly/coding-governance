@@ -373,49 +373,42 @@ verb refuses the pair rather than recording it. There is no waiver, no attestati
 project escape: an item the kit will not let a run override is the one item whose absence would make
 every other check decorative.
 
-## 5. The keepalive — an AGENT obligation
+## 5. The idle-wake and the keepalive — three actors
 
-The scheduling store is in-memory and session-scoped, and deleting a job removes it from that same
-store. **No script can reach it.** So the obligation splits by actor, and the split is not a
-convenience:
+A mechanism counts as a keepalive only where it does not share the stalled session's process, event
+loop or account: a guard that shares a variable with the thing it guards is not a guard. The
+scheduled job shares all three, so it is demoted, not fixed.
 
-**What this section does NOT say, because it said it for four kit versions and it is measured
-false: that the job dies when the agent process exits.** It may not.
-`TOOL-aPromptedMandate-11` records a run asserting exactly that about two jobs, twice, while the
-scheduler's own listing showed both still firing. Treat a job you did not schedule as ALIVE until a
-delete says otherwise. The consequence is section 5's resume rule below, and the reason the reap is an
-obligation rather than a formality: the failure mode of assuming death is a keepalive firing forever
-under a green `keepalive-reaped` attestation.
+**The IDLE-WAKE** is that job. The AGENT schedules it as the run's first act, before orienting, on
+every start path, and reaps it last — a run that never starts still owns it. It is recorded under
+the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD item, `--keepalive-id`
+and the `KEEPALIVE_*` keys keep their names because each has readers. Its limits, 2026-09-13: it
+fires only while the session is idle (documented) and, owner-reported and unmeasured, stays silent
+while a background task is pending. Its prompt is `--audit`. Presume a job you did not schedule
+ALIVE until a delete says so: `TOOL-aPromptedMandate-11` records two asserted dead the listing
+showed firing.
 
-- The **agent** schedules the keepalive as the run's **FIRST act**, before any orientation and
-  before `--preflight`, on **every** start path — and reaps it before the run reaches a terminal
-  phase. It uses the tool calls its own project layer declares — `KEEPALIVE_CREATE` and
-  `KEEPALIVE_DELETE` in `.unattended.conf`, because an adopter's harness exposes a different
-  scheduler and a kit that hardcodes one repo's spelling is wrong everywhere else.
-- **"First act" replaces "before the run leaves `PREFLIGHT`", which was this sentence for four kit
-  versions and is the weaker claim.** A run enters `PREFLIGHT` only when `--preflight` writes that
-  phase, so the old wording was satisfied by scheduling at preflight time — and two of the four start
-  paths do their longest unattended work BEFORE that instant. A prompt-authorized run orients from
-  prose, runs the research-then-test loop its `prompt`-scoped directives oblige, writes a build
-  folder and pushes a branch, all before its first verb. That stretch is where a run is most likely
-  to stall and was the one stretch nothing could wake it from.
-- **A run that never STARTS still owns the job it created.** Where a start path refuses — a `--prompt`
-  value that does not resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s
-  refusals — the agent reaps the keepalive before it stops. The store is session-scoped, so a job
-  left behind by a run that never began is orphaned in exactly the way one left by a run that ended
-  is, and there is no run-state file for a later reader to find it through.
-- The **driver** RECORDS the id the agent hands it, and later ASSERTS that a reap was recorded. It
-  never schedules and never deletes, and it labels the item agent-attested wherever it reports.
+**The KEEPALIVE** is what wakes a run from outside its own turn: the stop-guard refuses a turn end
+while the run is non-terminal, writing `stop`; the stall-recorder writes an API-error end to
+`stall`; the resume-tick, an OS-scheduled task, resumes a `STALE` run from another process, writing
+`resume` — three sidecar kinds under `<git-dir>/unattended/`. Registering the tick is the owner's,
+one line per OS in the kit README; `--check` reports it as INFO.
 
-A driver verb that claimed to schedule or reap would be claiming an effect it cannot produce.
+**The actors.** The AGENT schedules and reaps the idle-wake and, on resume, runs
+`--resume <slug> --keepalive-id <id>` so the lease is re-recorded. The DRIVER records the lease
+(`session:` and `pid:`), grades liveness (`--liveness`, the one predicate every reader takes), and
+checks the reap at `--landed` against the harness's own listing. The HOOKS and the TICK refuse,
+record and resume.
 
-**RESUME is the third case, and it is the one the actor split does not cover.** A resumed session did
-not schedule the job the run-state file names and cannot assume it died with the process that did.
-So it REAPS that recorded id first, reads the result back and reports it, and only then schedules a
-replacement. `--keepalive-id` is accepted by `--preflight` alone, so the new id cannot be recorded:
-the `keepalive` fact keeps naming the old job, the close attestation covers both, and the wrap-up says
-which. Ordering matters — reap, then schedule — because the reverse leaves the run holding two jobs
-and a record naming neither correctly.
+**The absent-owner default.** A session bound to a non-terminal run never ends its turn by asking:
+it runs `--plan` and builds the next READY unit, or aborts with a code. A resumed session never
+parks a question the protocol lets it decide: it takes the option that makes no measured observable
+worse and records why. The tick's CONTINUE payload is this rule and nothing more; its text lives
+there.
+
+**RESUME.** Reap the recorded id first, read the result back, schedule the replacement, record it
+with `--resume --keepalive-id`. Reap, then schedule: the reverse leaves two jobs and a record naming
+neither.
 
 ## 6. Landing
 

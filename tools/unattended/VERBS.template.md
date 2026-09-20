@@ -72,7 +72,7 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
-  `STALLED` line followed by one remedy line. Read-only; the keepalive runs it. It cannot see what
+  `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
   the unit is doing or whether a process is stuck — its figures are properties of the tree.
 - `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
   lease, whether the recorded pid exists, seconds since anything moved, the last recorded stall,
@@ -141,7 +141,7 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
 
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
-  nothing, so the machine items assert obligations it does not have, while the keepalive is still
+  nothing, so the machine items assert obligations it does not have, while the idle-wake is still
   orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
   refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
   phase said a run stopped and never said why.

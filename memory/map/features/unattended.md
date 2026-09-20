@@ -89,11 +89,11 @@ shimming its tools, skipping the hook layer, relaying through a seeded endpoint,
 run-state file at all — and names the only control that binds: re-running the same leg in a clone the
 run never touched.
 
-**Nothing in a script can reach the scheduler.** The keepalive store is in-memory and session-scoped,
-so a driver verb claiming to schedule or reap it claims an effect it cannot produce. The obligation
-splits by actor — the agent schedules and reaps, the driver records an id and asserts a recorded
-reap — and the reaped item is labelled agent-attested wherever it is reported, so it never spends
-the `--close` override budget. The tick runs `--audit`, the unit stall probe.
+**Nothing in a script can reach the scheduler.** The job the agent schedules there is the IDLE-WAKE:
+it fires only while the session is idle, so it cannot wake a stalled one, and its `--audit` prompt
+is a unit stall probe. What wakes a run is the keepalive — the stop-guard at turn end, the
+stall-recorder at error end, the resume tick from the OS scheduler — three actors outside the
+session, reading one predicate, `--liveness`. The reaped item stays agent-attested.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and

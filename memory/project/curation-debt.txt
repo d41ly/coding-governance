@@ -52,16 +52,3 @@ memory/builds/aUnmannedHelm/README.md
 # reads as a delimiter. All six are fixed, so the row now earns checks 6 and 7 only. Drains when the
 # TOOL index is split or its rows are shortened.
 memory/backlog/TOOL.md
-# memory/guides/UNATTENDED-PROTOCOL.md - a RENDER over the guide cap, and the second row here whose
-# subject is not a build README. 61345 B at 3853a7da against GUIDE_CAP_BYTES=61440, 95 B of headroom,
-# and TOOL-aWokenSentinel-10's one section 8 row for STOP_GUARD_BLOCKS (the key the stop-guard
-# already reads, which check 22 reds undocumented without the row) lands it at 61633 B. Check 10
-# byte-compares this render to tools/unattended/PROTOCOL.template.md, so the render cannot be
-# slimmed on its own, and the template is the kit's BINDING contract that no unit of that build is
-# scoped to trim; the cap is a declaration in .memory-tree.conf, a watched governance carrier a
-# mandated run may not move. The owner call - raise GUIDE_CAP_BYTES for this corpus, or split the
-# protocol's section 8 key table out to its own guide before unit 6 adds its section 5 prose - is
-# parked on the aWokenSentinel run-state record. BLAST RADIUS: check 6 only; a guide is check 7's
-# ex7 exemption already and check 8 grades backlog rows. Drains when the cap is raised past the
-# render or the protocol is split, either of which the stale-row guard reports the same run.
-memory/guides/UNATTENDED-PROTOCOL.md

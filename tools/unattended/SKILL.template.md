@@ -16,7 +16,7 @@ merge and a push — it REPLACES it with something a machine can check. If the r
 checkable, the run is not unattended, it is unsupervised. Everything below exists to keep that
 distinction real.
 
-## Before any path — schedule the keepalive NOW
+## Before any path — schedule the idle-wake NOW
 
 **This is the run's first act, and it comes before you read anything else.** Not before preflight:
 before ORIENTING. Use `{{KEEPALIVE_CREATE}}`, at the cadence this project declares —
@@ -34,12 +34,14 @@ act: stop the unit's task, record why with `--park` or a brief note, then re-dis
 with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
 is doing or whether a process is stuck — its figures are the tree's, and the process side is the
 process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
-while a `Workflow` ran in the background and did nothing with the turn.
+while a `Workflow` ran in the background and did nothing with the turn. On `STALLED` act, and
+never end the turn by asking: the owner is absent, and a session bound to a non-terminal run has
+a stop-guard that refuses the stop and says so.
 
 **Why it is here and not inside a path.** It used to be step 3 of the slug path and nowhere else, so
 three of the four paths below never reached it: the two that start from prose or a playbook orient,
 research, choose a solution, write a build folder and push a branch BEFORE their first verb, and that
-is the longest unattended stretch a run has. A run that stalls in it has no keepalive, nothing wakes
+is the longest unattended stretch a run has. A run that stalls in it has no idle-wake, nothing wakes
 it, and nothing records why. A step written inside one path is a step the other three do not execute,
 which is why this one sits above the table instead.
 
@@ -54,6 +56,17 @@ resolve, an anchor scope that cannot authorize the mode, any of `--preflight`'s 
 is session-scoped, so a job left by a run that never began is orphaned exactly like one left by a run
 that ended, and there is no run-state file for a later reader to find it through. Delete it with
 `{{KEEPALIVE_DELETE}}` before you stop.
+
+## What wakes a stalled run
+
+The idle-wake above fires only while the session is idle, so it cannot wake a stalled one. Three
+actors outside the session's turn can, and all three read one predicate: the stop-guard refuses a
+turn end while the run is non-terminal, up to `STOP_GUARD_BLOCKS` times, and says what to run
+instead; the stall-recorder writes an API-error end to the `stall` sidecar; the resume-tick,
+registered by the owner on the OS scheduler, resumes a `STALE` run from another process. The
+predicate is `bash {{KIT_DIR}}/unattended.sh --liveness <slug>`, the one to run by hand when you
+want to know what they will see. The tick's registration line is in the kit README and is not
+restated here.
 
 ## Which path
 
@@ -76,7 +89,7 @@ Making a playbook and following one are two acts with two authorizations.
 **A fifth path exists and it is not on this list, because it is not a run**: producing pieces from a
 playbook ATTENDED, with an owner in the loop. It writes no run-state file and calls no driver verb.
 It is [below](#produce-pieces-attended), after the unattended paths it shares its records with.
-It schedules no keepalive, and the section above does not bind it: there is an owner in the loop.
+It schedules no idle-wake, and the section above does not bind it: there is an owner in the loop.
 
 ## Start a run
 
@@ -178,7 +191,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    exists or the requested set matches the recorded one. So a later verb cannot take an answer, and
    a re-preflight after a compaction re-issues the recorded set rather than opening a new turn.
 
-3. **Preflight**, handing over the keepalive id you already hold and any waiver pairs step 2
+3. **Preflight**, handing over the idle-wake id you already hold and any waiver pairs step 2
    confirmed:
 
    ```bash
@@ -428,7 +441,7 @@ needs no exception to say so.
 
 **Not a run, and this section is here because it shares the RECORDS with the paths above and nothing
 else.** An owner is in the loop, so there is no run to authorize, no run-state file, no phase, no
-keepalive and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
+idle-wake and no Definition of Done. Every check in the kit gate that is keyed on a run-state file
 sees nothing here, and that is what "not the driver" means.
 
 **What the merge bar still sees is what you PRODUCED.** The per-piece records and the set record are
@@ -726,22 +739,21 @@ Read the run-state file before doing anything else. It survived compaction and p
 context did not.
 
 **Then REAP the recorded id, and only then schedule a replacement.** In that order, and the order is
-the whole point. The intuition is that a resumed session's keepalive died with its process because
+the whole point. The intuition is that a resumed session's idle-wake died with its process because
 the store is session-scoped — and that intuition is MEASURED FALSE: a run asserted it twice about two
 jobs and `{{KEEPALIVE_CREATE}}`'s own listing showed both still firing. So issue
 `{{KEEPALIVE_DELETE}}` against the `keepalive` id the run-state file already names, read the result
 back, and say what it returned. Assume a surviving job, not a dead one; the failure mode of assuming
-dead is a keepalive firing forever with a green `keepalive-reaped` attestation over it.
+dead is an idle-wake firing forever with a green `keepalive-reaped` attestation over it.
 
 Then schedule the new one. This is the only exception to "read the record first": read it, reap,
 schedule, kick off, and then do the work.
 
-**The record cannot be corrected in place, and you must know that rather than discover it.**
-`--keepalive-id` is accepted by `--preflight` alone, so a resumed session has nowhere to write the
-new id. The `keepalive` fact keeps naming the old job, so your `keepalive-reaped` attestation at close
-covers BOTH — the one you deleted here and the one you scheduled — and the wrap-up says so, with what
-the delete returned. Re-preflighting to record the new id is NOT the remedy: it refuses on a dirty
-tree and re-pins the anchor, which costs more than the stale field does.
+**Then record the new id, so the record names the session that now holds the run.** After the reap
+and the re-schedule, run `bash {{KIT_DIR}}/unattended.sh --resume <slug> --keepalive-id <id>` with
+the new id: it re-records `keepalive`, `session` and `pid`, prints what it replaced and stages the
+file, and the close attestation then covers one job. Re-preflighting is NOT the remedy: it refuses
+on a dirty tree and re-pins the anchor.
 
 **Then, if this project ships `/session-kickoff`, invoke it — after the reap and the re-schedule,
 before the first pass.** Its unattended hand-back fires because the run-state file exists in a
@@ -767,7 +779,7 @@ FAILED. Those are different facts, and an operator who confuses them spends an h
 failing leg that does not exist. The same bound covers the wiring check `--preflight` runs.
 
 It BLOCKS on any unmet Definition-of-Done item. Two of them are yours to attest, because no script
-can observe them: that you reaped the keepalive (`{{KEEPALIVE_DELETE}}`), and that every parked
+can observe them: that you reaped the idle-wake (`{{KEEPALIVE_DELETE}}`), and that every parked
 decision reached the wrap-up. Record them honestly — attestation is not a machine verdict, and the
 gate says so wherever it reports them.
 
@@ -871,10 +883,12 @@ never says why. It is validated against a closed vocabulary, and the refusal nam
 you do not have to read source to find it. There is no catch-all member: if nothing fits, take the
 closest code and put the specifics in the reason, and say so — a mismatch worth a backlog row is
 better than a vocabulary with a hole in it. You still owe both attestations first — reap the
-keepalive and surface the parked decisions — since an aborted run orphans exactly the same job and
-leaves exactly the same decisions unseen. An abort does not merge and does not push.
+idle-wake (`keepalive-reaped`) and surface the parked decisions — since an aborted run orphans
+exactly the same job and leaves exactly the same decisions unseen. An abort does not merge and does
+not push.
 
 ## Reap
 
-Delete the keepalive with `{{KEEPALIVE_DELETE}}` before you finish. Nothing else can: when your
-process exits, an unreaped job is orphaned in a store no later run can see.
+Delete the idle-wake with `{{KEEPALIVE_DELETE}}` before you finish, and attest `keepalive-reaped`.
+Nothing else can: when your process exits, an unreaped job is orphaned in a store no later run can
+see.
