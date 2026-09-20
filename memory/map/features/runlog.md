@@ -223,7 +223,7 @@ bash found on PATH and seen to run, since the bare name reaches WSL's launcher f
 - **The record proves shapes, not truth.** A count can be wrong and still an integer. The lists it
   copies from the spec template and hygiene doc are held only by the withheld self-test, and its
   commitment only on the node holding the journal. An unknown count is `-` by the renderer, off a
-  source `check_count_sources` grades the DECLARATION of; the leg grades none.
+  source `check_count_sources` grades the DECLARATION of; the leg grades no count's.
 - **The schema leg compares windows in commit time.** A clock skew between two nodes that puts a
   predecessor's terminal write after its successor's start moves a window without redding it, and the
   leg never compares a record's two copies with each other.
