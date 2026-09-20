@@ -146,3 +146,4 @@ memory/builds/aRatifiedRulings/README.md
 memory/builds/aProbedUnit/README.md
 memory/builds/aDeferredBar/README.md
 memory/builds/dMergedTally/README.md
+memory/builds/aProbedToolkit/README.md
