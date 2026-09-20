@@ -87,8 +87,10 @@ The durable arms are owed to the post-build run, each with the break that stages
   fixture commit would otherwise run this repository's hooks over a scratch tree; `commit.gpgsign`,
   which a signing machine would apply; and `core.autocrlf`, which would rewrite the run-state bytes an
   arm is about to grade. The bug-class checklist named `fixture-inherits-ambient-machine-state` for
-  this diff and this is the answer to it. The two date variables go in through the environment, since
-  a committer time is settable no other way, and come straight back out.
+  this diff and this is the answer to it. It follows `build_scratch_clone`, which pins the same three
+  for the same reason — a reuse the first draft missed, and which is why the hooks path is a directory
+  that exists and is empty rather than a name that happens to be absent. The two date variables go in
+  through the environment, since a committer time is settable no other way, and come straight back out.
 - **A deliberate two-answers exposure, with its compensating check.** The kit README's Summary section
   now names all three `closed-by` members, which `RECORD_SCHEMA` owns. Spec S6 requires the README to
   state them and declares its prose NOT OBSERVED, so no gate holds the pair. The compensating check is

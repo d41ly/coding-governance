@@ -5322,12 +5322,17 @@ def add_fixture_commit(repo, t, subject, paths):
     GLOBALLY on at least one node of this repository, so a fixture commit would run that
     repository's hooks over a scratch tree; a machine with `commit.gpgsign` would try to sign one;
     and `core.autocrlf` would rewrite the run-state bytes an arm is about to grade. All three are
-    pinned on the call, so the fixture is the fixture wherever it runs.
+    pinned on the call, so the fixture is the fixture wherever it runs. `build_scratch_clone` pins the
+    same three for the same reason and this follows its shape: hooks point at a directory that EXISTS
+    and is EMPTY, not at a name that happens to be absent, since an absent name stops guarding the
+    moment something creates it.
     """
+    hooks = repo.parent / "nohooks"
+    hooks.mkdir(exist_ok=True)
     env = {"GIT_AUTHOR_DATE": f"{int(t)} +0000", "GIT_COMMITTER_DATE": f"{int(t)} +0000"}
     os.environ.update(env)
     try:
-        r = run_git(["-c", "core.autocrlf=false", "-c", "core.hooksPath=hooks-none-here",
+        r = run_git(["-c", "core.autocrlf=false", "-c", "core.hooksPath=" + hooks.as_posix(),
                      "-c", "commit.gpgsign=false", "-c", "user.name=Fixture",
                      "-c", "user.email=fixture@runlog.invalid", "commit", "-q", "--only", "-m",
                      subject, "--", *paths], repo)
