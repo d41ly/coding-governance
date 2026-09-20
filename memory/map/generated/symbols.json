@@ -818,6 +818,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_repointed_schema",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_report",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -919,6 +924,11 @@
     },
     {
       "id": "build_source_fixture",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_source_state_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -4133,6 +4143,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_model_counts",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -4256,6 +4271,11 @@
       "id": "read_suggestion",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_summary_counts",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_surface_disagreements",
@@ -4796,6 +4816,11 @@
       "id": "render_twin",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "render_under_schema",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "repo_root",
@@ -5569,6 +5594,11 @@
     },
     {
       "id": "scan_record_rows",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_replaced_spellings",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -7014,6 +7044,11 @@
     },
     {
       "id": "test_record_kind_sweep",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_known_replaced",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

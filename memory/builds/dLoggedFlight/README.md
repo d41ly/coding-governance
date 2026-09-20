@@ -105,12 +105,12 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 27 | `TOOL-dLoggedFlight-27` | CLOSED | the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read |
 | 28 | `TOOL-dLoggedFlight-28` | CLOSED | every expectation the record arms derive from a shared fixture builder is re-checked against a render with one kind of event removed |
 | 29 | `TOOL-dLoggedFlight-29` | CLOSED | each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state |
-| 30 | `TOOL-dLoggedFlight-30` | MISSING | the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value |
+| 30 | `TOOL-dLoggedFlight-30` | CLOSED | the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 30 unit(s) · node d · opened 2026-09-13 · streams tooling
+**Build status:** CLOSED · 30 unit(s) · node d · opened 2026-09-13 · streams tooling
 ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13
 ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26
 ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30
@@ -147,7 +147,7 @@ ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLogg
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 28 | 2 | CLOSED | rev-3 | 2026-09-20 |
 | [TOOL-dLoggedFlight-28 — every expectation the record arms derive from a shared fixture builder is re-checked against a render with one kind of event removed](spec/2026-09-20-spec-TOOL-dLoggedFlight-28.md) | 29 | 2 | CLOSED | rev-2 | 2026-09-20 |
 | [TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state](spec/2026-09-20-spec-TOOL-dLoggedFlight-29.md) | 30 | 2 | CLOSED | rev-4 | 2026-09-20 |
-| [TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value](spec/2026-09-20-spec-TOOL-dLoggedFlight-30.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value](spec/2026-09-20-spec-TOOL-dLoggedFlight-30.md) | 31 | 2 | CLOSED | rev-2 | 2026-09-20 |
 <!-- /gen:build-units -->
 
 Records: 38 bound to this build, across 4 record folder(s).

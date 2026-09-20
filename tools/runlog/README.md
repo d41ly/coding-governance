@@ -404,7 +404,13 @@ transcripts read `present`, so an unjudged run's idle count would be a zero nobo
 `check_count_sources` grades the declaration — a slot with no source, a source the model does not
 have, an entry keyed to no slot — and PRINTS every `{int}` slot outside it, so the counts that
 deliberately declare none are enumerated on every run rather than described by a sentence beside
-them.
+them. The five Summary facts READ that declaration, and no second hand-written test of the rule
+remains beside it: the `known` test that used to decide them is gone from the renderer, so the rule
+is stated once and has nowhere to drift to. `test_record_known_replaced` holds both halves — the
+replaced spelling absent from the renderer's own source, and a Summary fact whose declared source is
+RE-POINTED on a schema copy then following the new source's coverage state while its neighbours keep
+following the transcripts. The second half is what a criterion reading rendered values alone cannot
+observe: the two predicates agree on every model whose declaration names the transcripts.
 
 **The cap, `RECORD_CAP_BYTES`, holds for every input.** The timeline shows its first and last
 `TIMELINE_EDGE` events, and every other list aggregates by kind past `LIST_BOUND` rows, each elision

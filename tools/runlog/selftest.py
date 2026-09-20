@@ -208,7 +208,20 @@ from collections import Counter  # noqa: E402
 # source, and the predicate firing elsewhere in this module. Its decoy checks move it by 3, and the
 # six helpers it arrives with carry none.
 # 25 + 3 = 28
-ASSERTION_FLOOR = 1491
+# RAISED 1491 -> 1507 by TOOL-dLoggedFlight-30, the replacement observed: ONE new arm with 13 checks —
+# AC1's four, that the module read beside this suite is the renderer under test, that it holds neither
+# replaced spelling, that the line the staged copies cut one back in at is unique in it, and that both
+# copies are named by the same scan that cleared the live one; AC2's two livenesses, the counted model
+# behind both coverage copies and those copies as ONE model's counts under swapped states; the
+# re-pointed render, where the fact declared from the gates journal reads `-` while its four
+# transcript-sourced neighbours read counts, and the render with the two states swapped, where the pair
+# reverses; the replaced test RESTORED, which moves all five facts together, with the liveness that the
+# same break leaves AC3's two renders unchanged — the pair of results that IS H2 of the spec audit of
+# units 25 to 27; AC3's two, the counted copy's own counts and the not-local copy's `-`; and the
+# closing check that the staging left the live schema, its declaration and the renderer's lookup as
+# they were. Its decoy checks move it by 3, and the six helpers it arrives with carry none.
+# 13 + 3 = 16
+ASSERTION_FLOOR = 1507
 
 PASS = []
 FAIL = []
@@ -5921,6 +5934,185 @@ def test_record_ac10_unknown_counts():
     check_true("record AC10 liveness: the known render holds a non-zero owner turn and non-zero calls, so a "
                "- in their place would differ", model.owner_positions["counts"]["in-window"] == 1
                and model.attribution["calls"] > 0, str((model.owner_positions["counts"], model.attribution["calls"])))
+
+
+# ====================================================== the replacement observed (TOOL-dLoggedFlight-30)
+#
+# The `known` test `count_sources` replaced agreed with the declaration lookup on every model where
+# that declaration names the transcripts, which is every model the arms above build. A criterion
+# reading rendered VALUES therefore cannot tell the two apart, and none of TOOL-dLoggedFlight-27's
+# reads this module's renderer at all — H2 of the spec audit of units 25 to 27. What discriminates is
+# a source RE-POINTED on a schema copy, where the lookup moves one fact and the replaced test moves
+# all five, and the absence of the replaced spelling from the renderer's own source beside it.
+
+# The two spellings of the test that went, and the renderer line a staged copy cuts one back in at.
+# They are searched in `record.py`, a file of this kit that is not this one, so they are written
+# plainly here: a literal in THIS module is not the text it exists to prove absent in THAT one.
+REPLACED_SPELLINGS = ("derive_known", "known = (cov")
+RENDERER_ANCHOR = "    read = derive_counted_sources(m)\n    values = {"
+
+
+def scan_replaced_spellings(src):
+    """Every replaced spelling present in `src`, empty where the replacement is complete. ONE
+    predicate for the live renderer and for the staged copies, so the refusal that grades a copy is
+    the one that cleared the renderer."""
+    return [needle for needle in REPLACED_SPELLINGS if needle in src]
+
+
+def read_summary_counts(text):
+    """The `{int}` cells of the five Summary facts `count_sources` sources, at the positions the
+    SCHEMA declares them, keyed by label."""
+    return {label: read_fact_slots(text, "Summary", label) for label in TRANSCRIPT_FACTS}
+
+
+def read_model_counts(model):
+    """What those five facts render when every declared source WAS read: the model's own owner turns
+    by position, its three usage splits by field and its attributed calls, each as the string the
+    renderer writes. Read off the model, so no expectation built from this is typed."""
+    m = rl_record.derive_view(model)
+    pos = (m.get("owner_positions") or {}).get("counts") or {}
+    att = m.get("attribution") or {}
+    usage = m.get("usage") or {}
+    out = {"owner turns": [str(pos.get(p, 0)) for p in rl_model.OWNER_POSITIONS],
+           "attributed calls": [str(att.get("attributed", 0)), str(att.get("calls", 0))]}
+    for split in rx.SOURCES:
+        out[f"usage {split}"] = [str((usage.get(split) or {}).get(f, 0)) for f in rl_record.USAGE_FIELDS]
+    return out
+
+
+def build_source_state_copy(model, **states):
+    """A copy of `model` with the named sources' coverage states replaced and nothing else moved, so
+    two copies of one model differ in what was READ and never in what was counted."""
+    m = rl_record.derive_view(model)
+    cov = dict(m.get("coverage") or {})
+    for name, state in states.items():
+        cov[name] = dict(cov.get(name) or {}, state=state)
+    return dict(m, coverage=cov)
+
+
+def build_repointed_schema(label, source):
+    """A schema COPY declaring every `{int}` slot of ONE Summary fact counted from `source`. The slot
+    count is read off that fact's own template, so a fact that gains a position is re-pointed whole,
+    and the live declaration — the shipped contract — is never edited."""
+    sources = rl_record.RECORD_SCHEMA["count_sources"]
+    nth = len(rl_record.derive_int_slots(rl_record.RECORD_SCHEMA)[("Summary", label)])
+    return build_schema_copy(sources={**sources, **{("Summary", label, i): source for i in range(nth)}})
+
+
+def render_under_schema(schema, model):
+    """`render_record` with `schema` in place of the live one, restored in a `finally` so a staged
+    declaration cannot leak into the next render."""
+    live = rl_record.RECORD_SCHEMA
+    rl_record.RECORD_SCHEMA = schema
+    try:
+        return rl_record.render_record(model, "memory")
+    finally:
+        rl_record.RECORD_SCHEMA = live
+
+
+def test_record_known_replaced():
+    """AC1, AC2 and AC3 of TOOL-dLoggedFlight-30: the renderer holds neither spelling of the `known`
+    test, so the five Summary facts' slots are decided by the `count_sources` lookup and by nothing
+    beside it; and on a schema copy where `owner turns` is declared from the gates journal, that fact
+    follows the gates coverage state while its four neighbours keep following the transcripts.
+
+    The re-pointing is the unit. An absence check alone cannot tell a rename from a replacement, and
+    a value-only criterion cannot see the replacement at all — the two predicates agree on every model
+    whose declaration names the transcripts. The staged RED below is the replaced test RESTORED, and
+    its liveness is that the AC3 renders come out unchanged under it while the re-pointed pair
+    reverses: that pair of results IS H2, made observable.
+    """
+    live_schema = rl_record.RECORD_SCHEMA
+    live_sources = dict(live_schema["count_sources"])
+    src = HERE.joinpath("record.py").read_bytes().decode("utf-8")
+    check_true("record AC1 liveness: the module read beside this suite is the renderer under test, so "
+               "an unreadable or wrong file cannot pass as an absent spelling",
+               "def build_summary_facts" in src and "def build_counted_values" in src, str(len(src)))
+    check("record AC1: the renderer defines no derive_known and holds no `known = (cov` test, so the "
+          "five Summary facts' slots are decided by the count_sources lookup alone",
+          scan_replaced_spellings(src), [])
+    check_true("record AC1 liveness: the line the staged copies cut a spelling back in at is in that "
+               "source exactly once, so a splice that missed cannot read as a clean refusal",
+               src.count(RENDERER_ANCHOR) == 1, str(src.count(RENDERER_ANCHOR)))
+    head, tail = RENDERER_ANCHOR.split("\n")
+    check("record AC1 RED: a renderer copy that keeps either replaced spelling is named by the same "
+          "scan that cleared the live one",
+          {n: scan_replaced_spellings(src.replace(RENDERER_ANCHOR, f"{head}\n    {n}\n{tail}", 1))
+           for n in REPLACED_SPELLINGS}, {n: [n] for n in REPLACED_SPELLINGS})
+
+    # ONE model, two coverage states. Its counts come from the real extractor's events for the landed
+    # fixture's own session, as AC10's do, so what the five facts render when their source was read is
+    # the model's own figure and never a number typed beside it.
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    j = write_journals(repo.parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-replaced-", dir=repo.parent))
+    acts = [("call", derive_minute(m) - 1, derive_minute(m) + 1) for m in (1, 3, 4, 6, 21, 27)]
+    write_extract(store, FX_SID, build_session_events(acts + [("owner", float(derive_minute(12)) + 30)]))
+    base = build_model(repo, journals=j, store=store)
+    counts = read_model_counts(base)
+    unknown = {label: [rl_record.NONE] * len(cells) for label, cells in counts.items()}
+    counted = build_source_state_copy(base, gates="dead")
+    swapped = build_source_state_copy(base, transcripts="not-local", gates="present")
+    check_true("record AC2 liveness: the model behind both copies read the transcripts counted and "
+               "holds a non-zero owner turn and non-zero calls, so a count and a `-` differ",
+               base.coverage["transcripts"]["state"] in rl_record.COUNTED_STATES
+               and base.owner_positions["counts"]["in-window"] > 0
+               and base.attribution["calls"] > 0, str(counts))
+    check("record AC2 liveness: the two copies are ONE model's counts under swapped coverage states, "
+          "so nothing below can differ because the models do",
+          ([counted["coverage"][n]["state"] for n in ("transcripts", "gates")],
+           [swapped["coverage"][n]["state"] for n in ("transcripts", "gates")],
+           read_model_counts(counted) == read_model_counts(swapped) == counts),
+          (["present", "dead"], ["not-local", "present"], True))
+
+    repointed = build_repointed_schema("owner turns", "gates")
+    check("record AC2: with `owner turns` declared from the gates journal and that journal dead it "
+          "reads `-`, while the four facts still declared from the transcripts read their counts",
+          read_summary_counts(render_under_schema(repointed, counted)),
+          {lab: (unknown if lab == "owner turns" else counts)[lab] for lab in TRANSCRIPT_FACTS})
+    check("record AC2: with the two coverage states swapped the pair reverses — which the replaced "
+          "test could not do, having read the transcripts for all five",
+          read_summary_counts(render_under_schema(repointed, swapped)),
+          {lab: (counts if lab == "owner turns" else unknown)[lab] for lab in TRANSCRIPT_FACTS})
+
+    # THE STAGED RED: the replaced test restored, as a wrapper around the renderer's own lookup and
+    # never an edit to the schema — the five Summary facts decided by the transcripts coverage state
+    # whatever `count_sources` declares.
+    real_values = rl_record.build_counted_values
+    summary_keys = frozenset(("Summary", label) for label in TRANSCRIPT_FACTS)
+
+    def build_by_transcripts(section, label, values, read):
+        if (section, label) not in summary_keys:
+            return real_values(section, label, values, read)
+        return values if "transcripts" in read else tuple(None for _ in values)
+
+    rl_record.build_counted_values = build_by_transcripts
+    try:
+        broken = {name: read_summary_counts(render_under_schema(repointed, copy))
+                  for name, copy in (("counted", counted), ("swapped", swapped))}
+        same = {name: read_summary_counts(rl_record.render_record(copy, "memory"))
+                for name, copy in (("counted", counted), ("swapped", swapped))}
+    finally:
+        rl_record.build_counted_values = real_values
+    check("record AC2 RED: the replaced test restored moves all five facts together on both copies, "
+          "so the re-pointed pair no longer disagrees", broken,
+          {"counted": counts, "swapped": unknown})
+    check("record AC2 RED liveness: that same break renders AC3's two expectations UNCHANGED, which "
+          "is why no criterion reading values alone could observe the replacement", same,
+          {"counted": counts, "swapped": unknown})
+
+    check("record AC3: under the unmodified schema the counted copy renders the five Summary facts as "
+          "the model's own counts", read_summary_counts(rl_record.render_record(counted, "memory")),
+          counts)
+    check("record AC3: and the not-local copy renders every slot of the five `-`",
+          read_summary_counts(rl_record.render_record(swapped, "memory")), unknown)
+    check("record AC2: the staging left the live schema, its declaration and the renderer's lookup as "
+          "they were, so no arm after this one renders under a re-pointed source",
+          (rl_record.RECORD_SCHEMA is live_schema,
+           rl_record.RECORD_SCHEMA["count_sources"] == live_sources,
+           rl_record.build_counted_values is real_values), (True, True, True))
+
 
 
 # ================================================================ extract freshness (TOOL-dLoggedFlight-16)

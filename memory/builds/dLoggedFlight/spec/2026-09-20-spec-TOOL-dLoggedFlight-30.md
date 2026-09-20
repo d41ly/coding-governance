@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 31
+**Status:** CLOSED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
@@ -47,7 +47,10 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   and whose gates journal reads `dead`, and expects `owner turns` to read `-` while `attributed
   calls` still reads its counts. With the two coverage states swapped — the gates journal counted and
   the transcripts `not-local` — it expects the reverse. Only the lookup can produce that pair: the
-  replaced test reads the transcripts for all five facts and cannot make two of them disagree.
+  replaced test reads the transcripts for all five facts and cannot make two of them disagree. The
+  staged RED is that test RESTORED, as a wrapper around the renderer's own lookup, and it is graded
+  TWICE: it moves all five facts together under the re-pointed declaration, AND it leaves S3's two
+  renders byte-identical. That second reading is the equivalence H2 named, run rather than argued.
   Observed by AC2.
 - **S3** The unchanged behaviour. Over the same two models with the UNMODIFIED schema, the arm
   expects the five Summary facts exactly as `test_record_ac10_unknown_counts`
@@ -141,7 +144,9 @@ gone. What is new here is the target — the renderer, which none of unit 27's c
   `owner turns` reads `-` and `attributed calls` reads its counts; with the two coverage states
   swapped, `owner turns` reads its counts and `attributed calls` reads `-`.
   Red when: both facts move together in either render, which is what the replaced test would do.
-  Staged RED against a renderer copy that ignores `count_sources` for the five Summary facts.
+  Staged RED against a renderer copy that ignores `count_sources` for the five Summary facts by
+  restoring the replaced test over them, with the liveness that the SAME copy leaves AC3's two
+  renders unchanged — so the break is seen to red this criterion and pass that one.
   figure: DERIVED — every expected count is read from the rendered model at observation time.
 - **AC3** — When the arm renders the same two models against the unmodified schema, the five Summary
   facts read exactly what `test_record_ac10_unknown_counts` expects of its own models, read from the
@@ -157,7 +162,7 @@ gone. What is new here is the target — the renderer, which none of unit 27's c
 
 `runlog selftest` · `lexicon naming predicates` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC1's renderer copy keeping `derive_known` and AC2's renderer copy ignoring `count_sources` for the Summary facts · floor raised by this unit's assertion count
+New arm: `tools/runlog/selftest.py` · AC1's two renderer copies keeping a replaced spelling and AC2's renderer copy restoring the replaced test over the five Summary facts · floor raised by this unit's assertion count
 
 ## 8. Open questions
 
@@ -171,6 +176,13 @@ New arm: `tools/runlog/selftest.py` · AC1's renderer copy keeping `derive_known
 
 - rev-1 · 2026-09-20 · initial draft, promoted from H2 of the spec audit of units 25 to 27, round 1,
   at the loop's BOUNDED exit, with that finding's left-shift as its mechanism.
+- rev-2 · 2026-09-20 · built. Two amendments, both made before the code they describe. S2 and AC2
+  name the staged RED as the replaced test RESTORED rather than any renderer that ignores the
+  declaration, and add the liveness that the SAME break leaves S3's renders unchanged: a break seen
+  to red one criterion and pass the other is the equivalence argued in §4, measured instead. AC1's
+  staged copies are TEXT splices of the renderer's source that are never imported or executed, so
+  "every criterion of `TOOL-dLoggedFlight-27` still passes on that copy" holds by construction
+  rather than by a run — that unit's criteria read no source at all, which is §1's finding.
 
 ## 10. Reuse audit
 
