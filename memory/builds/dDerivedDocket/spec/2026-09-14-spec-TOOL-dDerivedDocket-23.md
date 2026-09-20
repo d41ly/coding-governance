@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-23 — red attribution, report-only
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 23
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -19,7 +20,17 @@ A red bar names which legs failed and never whose failure each one is. Five reco
 run deciding, with no owner to ask, that a red "was not mine" (i12, i69, i93, i100 and i152), and at
 least two such claims were wrong: the reds at `memory/builds/aStagedLane/RUN.md:51` and
 `memory/builds/dCarriedReceipt/RUN.md:89`
-were the run's own. Give the runner an attribution mode that re-runs each red leg at a base R the run
+were the run's own. The two lines hold different things, and the difference decides what a replay of
+each can read. `memory/builds/dCarriedReceipt/RUN.md:89` IS the corrective measurement — pristine
+`origin/main` at 382 under a pin of 384 and green against a branch at 429, the per-file delta
+entirely that build's. `memory/builds/aStagedLane/RUN.md:51` is the CLAIM, re-measured at the branch
+point and reporting 463 at both ends; the record that disproves it is `TOOL-aStagedLane-6`
+(`memory/backlog/TOOL.md:405`), which re-measured at the landing — `origin/main` 461/1045 and green,
+the merged tree 467/1059, with all six of the difference named and attributed on that row and none
+of them in the corpus the claim had measured against — and which carries the rule this
+unit implements: a "not mine" claim measured against a base the world has moved past is
+indistinguishable from a "not mine" claim nobody measured, so re-measure at the landing and not at
+the branch point. Give the runner an attribution mode that re-runs each red leg at a base R the run
 cannot rewrite, classifies it OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE by the rules the design
 critique hardened (KF14, KF3), and REPORTS. No exit code changes; the policy that acts on a verdict is
 the inherited-red policy unit's.
@@ -131,7 +142,12 @@ For a red leg with output O_L at L, run at R to O_R and exit rc_R:
    bound in its `.bound` file, or rc 137 under a positive bound whose `.sec` is at or above it, which
    is `timeout -k`'s kill after an ignored TERM. Read from the attempt record, so a later retry pass that keeps the
    first attempt's row keeps this reading. Not re-run. Any other rc 137, a bound of 0 included, is a
-   failure like any other and goes on to rule 3.
+   failure like any other and goes on to rule 3. Unit 26 S1 spells this predicate identically on the
+   retry side, and its AC9 names an arm for each branch AC14 now stages — `4h` for rc 124 under a
+   positive bound, `stubborn` for the fired ceiling, and `4h-nobound` for the bound-0 kill, beside a
+   sub-ceiling self-kill that stays a FAIL there and reaches rule 3 here — so neither copy of a
+   duplicated predicate is graded alone. A parity arm asserting that both classify one rc, bound and `.sec` table identically
+   is the durable form, and it is left-shifted rather than specified here.
 3. **OWN** — the leg has no row in R's manifest; or its `argv` at L differs from R's, the line naming
    `argv`; or the diff between R and the working tree touches its COMPARATOR: every tracked file under
    the directory that holds a tracked file of the leg's argv or of R's `signature` argv, plus every
@@ -154,6 +170,12 @@ direction.
 
 ### The R run
 
+- R is the LANDING base, never the branch point. The recorded basis is `TOOL-aStagedLane-6`
+  (`memory/backlog/TOOL.md:405`), which withdrew a "not mine" claim whose measurement had been taken
+  against a base `origin/main` had moved past, and left the rule that such a claim is
+  indistinguishable from one nobody measured. S8's hook therefore exports the remote sha it reads for
+  the default branch; an R passed as a merge-base or a local ref buys an attribution only as fresh as
+  that ref.
 - R is resolved once; an unresolvable R makes every red leg a DEAD PROBE and the summary says why.
 - The worktree is `git worktree add --detach` under the git COMMON dir, as the baseline unit places
   it, and one worktree serves every red leg of one bar. A trap removes it on every exit path.
@@ -297,11 +319,21 @@ whose regenerated artifacts are unstaged.
   permission: the suite is the held `run-selftests self-test` leg, so it runs at the build's
   one post-build bar, spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`,
   never a plain bar.
-- **AC9** — Replays of the reds recorded at `memory/builds/aStagedLane/RUN.md:51` and
-  `memory/builds/dCarriedReceipt/RUN.md:89`,
-  rebuilt as two-commit fixtures from the records' own descriptions, both read `OWN`.
-  Red when: either replay reads INHERITED, which is the claim those runs made and got wrong.
-  fixture: the replays are reconstructions from prose records; the tree holds neither original state.
+- **AC9** — Replays of the two reds this unit exists to close both read `OWN`, each rebuilt as a
+  two-commit fixture from a MEASURED pair rather than from the sentence that claimed the red away.
+  The first is the lexicon overrun `memory/builds/aStagedLane/RUN.md:51` claimed was not its run's,
+  built from the landing measurement `TOOL-aStagedLane-6` recorded
+  (`memory/backlog/TOOL.md:405`) — R at 461/1045 and green, L at 467/1059 — which rule 3's
+  green-at-R arm reads `OWN`; and the SAME leg rebuilt against the branch-point R that `:51`
+  measured, where the check reports 463 at both ends, reproduces the `INHERITED` reading that run
+  recorded. The second is `memory/builds/dCarriedReceipt/RUN.md:89`'s own corrective measurement — R
+  pristine `origin/main` at 382 under a pin of 384 and green, L the branch at 429 — which reads
+  `OWN` by the same arm.
+  Red when: either landing-base replay reads INHERITED, which is the claim those runs made and got
+  wrong; or the branch-point replay reads anything but INHERITED, so the fixture no longer reproduces
+  the defect this unit closes and the arm grades nothing.
+  fixture: the replays are reconstructions from the figures those records measured, not from their
+  prose; the tree holds neither original state.
   permission: the canary is held, so it runs at the build's one post-build bar, spelled
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC10** — When the fixture branch rewrites its red signature leg's `signature` in its own
@@ -340,13 +372,19 @@ whose regenerated artifacts are unstaged.
   `memory-hygiene self-test` are held kit legs, so they run at the build's one post-build bar,
   spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC14** — When the fixture bar's red legs are one that timed out at 124 under a positive bound,
+  one killed at 137 under a positive bound whose `.sec` is at or above it, one killed at 137 under a
+  bound of 0 whose S(L) is non-empty and ⊆ S(R),
   one whose argv changed between R and L, one absent from R's manifest, one green at R, one whose R
   copy runs past its ceiling, and one signature leg with a non-empty S(L) ⊆ S(R), their lines read
-  `CONTENDED` with no R run recorded, `OWN` naming argv, `OWN` naming the missing row, `OWN` naming
-  green at R, `DEAD PROBE`, and `INHERITED`; and with `GATE_ATTRIBUTE` naming a rev that does not
-  resolve, every red reads `DEAD PROBE` and the summary names the unresolvable R.
+  `CONTENDED` with no R run recorded, `CONTENDED` with no R run recorded, `INHERITED` from the rule-5
+  reading its bound-0 kill fell through to, `OWN` naming argv, `OWN` naming the missing row, `OWN`
+  naming green at R, `DEAD PROBE`, and `INHERITED`; and with `GATE_ATTRIBUTE` naming a rev that does
+  not resolve, every red reads `DEAD PROBE` and the summary names the unresolvable R.
   Red when: any one rule is deleted and its leg falls through to a later one — a CONTENDED leg
-  re-run at R, or a changed argv compared as though unchanged and read INHERITED.
+  re-run at R, or a changed argv compared as though unchanged and read INHERITED. Red too in either
+  direction rule 2's rc-137 halves fail: an rc-137 kill after an ignored TERM that is not read
+  CONTENDED is re-run at R, can read INHERITED, and the policy unit's `land` lands over it; a bound-0
+  rc 137 read as CONTENDED is never re-run and blocks `land` on a self-kill or an OOM.
   permission: the canary is held, so it runs at the build's one post-build bar, spelled
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC15** — When a fixture bar's wall fires while its attribution pass is re-running a red leg at
@@ -361,7 +399,7 @@ whose regenerated artifacts are unstaged.
 
 `run-gates canary` · `run-gates evidence` · `pre-push self-test` · `run-selftests self-test` · `drift-audit selftest` · `memory-hygiene self-test` · `lexicon selftest` · `install-prefix self-test` · `govkit selfcheck` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `kit version markers` · `memory hygiene` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/run-gates/run-gates.test.sh · a two-commit fixture with a signature leg, a comparator edit, a leg absent at R, a KF3 touch and an L-only signature rewrite · the canary's executed-assertion floor, raised by the arms added
+New arm: tools/run-gates/run-gates.test.sh · a two-commit fixture with a signature leg, a comparator edit, a leg absent at R, a KF3 touch, an L-only signature rewrite, an rc-137 kill under a fired ceiling and a bound-0 rc-137 kill · the canary's executed-assertion floor, raised by the arms added
 New arm: .githooks/pre-push.test.sh · a fake runner printing its environment · none
 New arm: tools/lexicon/selftest.py · a fixture with known offenders and an unrelated insertion · none
 New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an unrelated shipped file · none
@@ -470,6 +508,29 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   no byte-capped carrier, so the net-zero rule and its 2048-byte scope reach nothing here. The
   header date stays at the last-change date and the rev does not move, because this pass changed
   no rule, criterion or scope item.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §1 §4 §7 §10 · AC9 AC14. H1: AC9's
+  first replay was built from the description at `memory/builds/aStagedLane/RUN.md:51`, which is the
+  CLAIM — a re-measurement at the branch point reporting 463 at both ends, so a fixture built from it
+  gives S(L) = S(R) and reads INHERITED, the verdict AC9's own `Red when:` names as its failure. AC9
+  now builds that fixture from the pair `TOOL-aStagedLane-6` measured at the landing, R 461/1045 and
+  green against L 467/1059, which reads `OWN` on rule 3's green-at-R arm, and it adds the
+  branch-point replay as an arm of its own, because reproducing the INHERITED reading is the defect
+  this unit closes. That row was cited nowhere in this build and is now cited in §1, in §4 The R run
+  as the recorded basis for R being the landing base, in AC9 and in §10. M3: rev-4 split §4 rule 2
+  into three branches and left AC14 staging one, so AC14's leg list gains an rc-137 kill under a
+  positive bound whose `.sec` is at or above it and a bound-0 rc 137 falling through to rule 3, and
+  its `Red when:` names the opposite directions the two ungraded branches fail in; §4 rule 2 records
+  that unit 26's AC9 stages the same three branches on the retry side and leaves the parity arm as a
+  left-shift. §7's canary `New arm:` line names the two added branches and its third field is
+  unchanged. No `permission:` line moved, this unit still writes to no byte-capped carrier, and the
+  header date stays 2026-09-20. Verified in the same round and corrected in place, at no further rev
+  bump: §1 had read four of the six offenders as the aStagedLane run's own, which
+  `memory/backlog/TOOL.md:405` does not say — it attributes four to another build's prose-census
+  script unpushed on local main and two to `tools/workflows/unattended-build.js` — so §1 now rests on
+  what that row states, that none of the six was in the corpus the claim measured against; and §4
+  rule 2 had named unit 26 AC9's three arms wrongly, listing a sub-ceiling self-kill AC14 does not
+  stage and omitting the `4h` rc-124 arm, so it now names `4h`, `stubborn` and `4h-nobound` against
+  the three branches AC14 stages.
 
 ## 10. Reuse audit
 
@@ -481,6 +542,11 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   `.bound` files in the run record, the shipped canary's pinned key set (`KNOWN` in
   `tools/run-gates/run-gates.test.sh:99`), the eighth wire field after `ceiling`, and the baseline
   unit's normaliser and worktree runner, which S7 lifts rather than re-spells.
+- **Records, not seams.** `TOOL-aStagedLane-6` (`memory/backlog/TOOL.md:405`) is the WONTDO row that
+  re-measured the aStagedLane claim at the landing and carries the rule R implements. It holds no
+  code to reuse; it holds the measured pair AC9's first fixture is built from, and it is cited in
+  §1, in §4 The R run and in AC9. Rounds 1 and 2 of this unit's spec audit both read the `:51`
+  citation without it, which is why the fold names it in four places rather than one.
 - **DR against BASE fb07ca25.** DR places the attribution at `GATE_LEGS`
   (`tools/run-gates/run-gates.sh:91`); BASE agrees that the runner reads one manifest path, so R's
   row is read by `git show` rather than by re-pointing that variable. DR's KF3 list names "the

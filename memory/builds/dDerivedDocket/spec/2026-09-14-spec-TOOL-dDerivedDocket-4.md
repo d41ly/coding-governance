@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -39,8 +40,13 @@ lists among this unit's closes.
   shrink-only `HOLD_FLOOR`, declared in gov's conf as the core count and in the kit's conf example,
   is validated by the leg against the driver's `HOLD_CODES_CORE`, as `HALT_FLOOR` is for the halt
   codes.
+  `HOLD_CODES_EXTRA` is declared `""` in `tools/unattended/.unattended.conf.example` and in gov's
+  own `.unattended.conf`, exactly as its sibling `HALT_CODES_EXTRA` is, and owes a §8 key-table row
+  for the same reason `HOLD_FLOOR` does: check 22 joins that table against the example conf in BOTH
+  directions and against the adopting project's conf in one, so a declared key with no row reds the
+  leg and a row with no declaration reds it too. Section 4 prices that row and funds it.
   `tools/unattended/kit.toml` gains a `hold-floor` hole shaped like `directives-floor`, with its
-  discharge probe. Observed by AC1, AC2, AC9, AC11 and AC16.
+  discharge probe. Observed by AC1, AC2, AC9, AC11, AC16, AC23 and AC24.
 - **S3** `--hold` refuses, numbered and before any write, unless: the record is live and not HELD;
   the tree is clean and committed; the branch tip is on its remote when `ANCHOR_SCOPE=published`;
   and the keepalive the lease and the `keepalive` fact currently name is either reaped, named by
@@ -294,9 +300,13 @@ resume has run. So the section's order sentence reads: read it, reap, schedule, 
 then do the work.
 
 Protocol §5's paragraph saying the new id cannot be recorded (`PROTOCOL.template.md:406-412`)
-becomes: "A take-over records the new id. A holder that replaces its own job records the replacement
-with `--replaces`. The `keepalive` fact therefore names the live job, and the close attestation
-covers that job." Its "reap before schedule" measurement is kept.
+becomes: "A take-over records the new id, and a holder replacing its own job records it with
+`--replaces`, so `keepalive` names the live job the close attests." That replacement measures 149
+bytes against the 157-byte ceiling §4 prices below. Its "reap before schedule" measurement does NOT
+stay in §5: the ordering moves to `UNATTENDED-STOPS.md` with the rest of the paragraph's contract
+detail, which is what funds the trim and is what AC23 witnesses. The user-facing copy of that
+measurement is the Skill's, above, which stays scoped to the take-over case — so the fact keeps the
+two carriers it has at BASE, the user doc and the contract, and §5 keeps neither.
 
 ### The checkpoint
 
@@ -373,25 +383,37 @@ NEGATIVE on that carrier and spends none of the shared headroom. The contract �
 codes, conditions, lease, checkpoint, resume matrix — goes to `UNATTENDED-STOPS.md`, rendered from a
 new kit template beside the verb carrier, and joined by the same wiring check. The protocol gains
 one §3 row for HELD and one §7 row pointing at the companion, each a pointer that carries no
-contract text, at most 180 bytes together. §8's key table also gains one row each for `HOLD_FLOOR`
-and `LEASE_STALE_AFTER`, at most 239 bytes together: check 22 of
-`tools/unattended/check-unattended.sh` joins that table against
+contract text, at most 180 bytes together. §8's key table also gains one row each for `HOLD_FLOOR`,
+`LEASE_STALE_AFTER` and `HOLD_CODES_EXTRA`. The first two are at most 239 bytes together; the third
+is the shape of its sibling `HALT_CODES_EXTRA` at
+`tools/unattended/PROTOCOL.template.md:473`, one first cell and a clause, at most 70 bytes. Check 22
+of `tools/unattended/check-unattended.sh` joins that table against
 `tools/unattended/.unattended.conf.example` and reds on a key declared in one and missing from the
-other, so those rows are OWED rather than optional. They are also the FIXED half of this unit's
-growth, because a key-table row cannot move to the companion the way contract prose can.
+other, so all three rows are OWED rather than optional: S2 declares `HOLD_CODES_EXTRA` in the
+example conf and in gov's own, and a key declared with no row reds the leg as `undocumented`, a row
+with no declaration as `phantom`, and gov's own declaration with no row as `proj_extra`. The three
+rows are also the FIXED half of this unit's growth, because a key-table row cannot move to the
+companion the way contract prose can.
 
 The passage this unit trims, named precisely so that no sibling unit trims the same text:
 
 - §5's RESUME paragraph, `tools/unattended/PROTOCOL.template.md:406-412`, opening "RESUME is the
   third case", 646 bytes. This unit already REPLACES it: the take-over rule makes its central claim
-  false, because a take-over does record the new id. The replacement stated above is roughly 205
-  bytes and stays in §5; the reap-before-schedule ordering and the `--keepalive-id` history the
+  false, because a take-over does record the new id. The replacement stated above is at most 157
+  bytes and stays in §5. That ceiling is not chosen, it is what is LEFT: 646 − 180 − 239 − 70, the
+  trim less the three fixed key-table costs, because a key-table row cannot overflow to the
+  companion the way prose can, which is the same trade unit 3 made when its rows were priced. The
+  paragraph quoted above measures 149 bytes, so the ceiling is met with 8 bytes unspent and the
+  pass closes at net zero rather than at a headroom this unit could bank. The reap-before-schedule
+  ordering and the `--keepalive-id` history the
   paragraph carries move to `UNATTENDED-STOPS.md`, the companion this unit creates, which draws on
   its own cap. The moved text carries no kit-path literal, so the shipped-surface ban does not move.
 
-That is 646 bytes trimmed against at most 624 added — 180 for the two pointer rows, about 205 for
-§5's replacement paragraph, and 239 for the two §8 key-table rows — so
-the protocol and its template each end this unit's pass no larger than they began it. AC23 reads
+That is 646 bytes trimmed against at most 646 added — 180 for the two pointer rows, at most 157 for
+§5's replacement paragraph, 239 for the `HOLD_FLOOR` and `LEASE_STALE_AFTER` rows and at most 70 for
+the `HOLD_CODES_EXTRA` row. The two sides are EQUAL by construction, so this unit claims no headroom
+and leaves none: the protocol and its template each end this unit's pass no larger than they began
+it, and a row that will not fit inside 646 is a re-pricing rather than a rounding. AC23 reads
 both files' sizes at the pass rather than trusting this arithmetic, and reds if either GREW. No cap
 is raised here: raising one is an owner turn, and the other units of this build draw on the same
 1,116 bytes, which this unit leaves intact.
@@ -624,16 +646,28 @@ is raised here: raising one is an owner turn, and the other units of this build 
   path to reap its own keepalive.
 - **AC23** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
-  parent's and is below the 61440-byte guide cap declared in
-  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  parent's and is below the guide BYTE cap; and when the same two revisions are counted with
+  `wc -l`, the build-commit line count is NOT GREATER than the parent's and below the guide LINE
+  cap. Both numbers are RESOLVED from the single line of
+  `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES`
+  together, and neither is retyped here as a literal, because check 6 reds on EITHER half and the
+  two halves bind under different edits: a trim that pays for a table is byte-neutral and
+  line-POSITIVE, and check 6's own break-even is 81.92 bytes per line, which a carrier of rows and
+  short bullets sits under. All four readings hold for
   `tools/unattended/PROTOCOL.template.md`. The trim is taken and landed:
   `grep -c 'RESUME is the third case' tools/unattended/PROTOCOL.template.md` counts 1 at the parent
   and 0 at the build commit, and the reap-before-schedule ordering the paragraph carried is present
   in `UNATTENDED-STOPS.md`. Both owed key-table rows arrived:
-  `grep -c 'HOLD_FLOOR' tools/unattended/PROTOCOL.template.md` and
-  `grep -c 'LEASE_STALE_AFTER' tools/unattended/PROTOCOL.template.md` each count 0 at the parent and
-  1 or more at the build commit. The companion guide `UNATTENDED-STOPS.md` this unit CREATES is read
-  the same way at the build commit and is below the same 61440-byte guide cap.
+  `grep -c 'HOLD_FLOOR' tools/unattended/PROTOCOL.template.md`,
+  `grep -c 'LEASE_STALE_AFTER' tools/unattended/PROTOCOL.template.md` and
+  `grep -c 'HOLD_CODES_EXTRA' tools/unattended/PROTOCOL.template.md` each count 0 at the parent and
+  1 or more at the build commit, and all three keys count 1 in
+  `tools/unattended/.unattended.conf.example` at that commit, which is the reverse direction of the
+  same check 22 join. In gov's own `.unattended.conf`, `HOLD_FLOOR` and `HOLD_CODES_EXTRA` each
+  count 1 and `LEASE_STALE_AFTER` may be absent, because it is optional with a kit default and a
+  project declares only the keys it wants. The
+  companion guide `UNATTENDED-STOPS.md` this unit CREATES is read the same way at the build commit
+  and is below BOTH halves of the same guide cap.
   Red when: a pointer row carries contract text, so the companion and the protocol answer one
   question twice and the 1,116 bytes the build's units share are spent here; or the size is read
   against the figure written in this spec rather than against the parent commit, so a sibling's
@@ -642,8 +676,30 @@ is raised here: raising one is an owner turn, and the other units of this build 
   fit, which is an owner turn; or a conf key this unit declares in
   `tools/unattended/.unattended.conf.example` reaches §8's key table in no row, which reds check 22
   of `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
-  protocol lands in a carrier nobody reads the size of.
-  permission: a read, a byte count and three greps, no gate leg and no suite.
+  protocol lands in a carrier nobody reads the size of; or a trim is byte-neutral and line-positive,
+  so every byte reading passes and the `memory hygiene` leg reds on the line half it never read; or
+  the companion lands under the byte cap and over the line cap, which check 6's own
+  81.92-byte-per-line break-even makes the expected shape for a carrier of rows and short bullets;
+  or a conf key this unit's scope introduces reaches the key table in no row, which is the
+  `undocumented` half of the same check 22 join.
+  permission: a read, two byte-and-line counts and five greps, no gate leg and no suite.
+- **AC24** — The discharge command of `tools/unattended/kit.toml`'s new `hold-floor` hole runs in a
+  fixture whose `.unattended.conf` is the example conf AS THIS UNIT SHIPS IT, with its `HOLD_FLOOR`
+  line removed. It
+  exits non-zero. With that line present in the SHIPPED form of its sibling — quoted, as
+  `tools/unattended/.unattended.conf.example` and gov's own conf both spell `HALT_FLOOR` — it exits
+  0, and so does a bare unquoted integer, because the `directives-floor` probe this one copies
+  admits both. The arm is staged RED
+  against `tools/unattended/kit.toml` as it stands at this unit's parent, which carries no
+  `hold-floor` hole at all, so the probe resolves to nothing and the arm cannot pass.
+  Red when: the hole is promised in scope and never added, which reds nothing in gov — gov's own
+  conf declares the key and the kit gate passes — and surfaces only in an adopter, who reds their
+  own unattended kit gate with no key and no hole to tell them why, which is the failure the
+  sibling `directives-floor` hole's `why` field records verbatim; or the probe accepts a
+  non-numeric or empty value, so a pin nobody set reads as declared; or the probe matches the bare
+  integer alone, which passes a fixture written that way and then reds every conf that declares the
+  key in the QUOTED form both shipped confs actually use for `HALT_FLOOR`.
+  permission: the hole's own discharge command over three fixture confs, no gate leg and no suite.
 
 ## 7. Gates
 
@@ -850,6 +906,43 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
     `tools/unattended/unattended.test.sh` or `tools/unattended/check-unattended.test.sh` at any
     flag setting, so "the build's one post-build bar" alone would have read as a bar that covers
     them.
+- rev-6 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H2 id 24, M2 id 4, H1 id 13).
+  - H2: S2's third conf key stops being unpriced and unwitnessed. S2 now says where
+    `HOLD_CODES_EXTRA` is declared, §4 prices its §8 key-table row at the shape of its sibling
+    `HALT_CODES_EXTRA`, at most 70 bytes, and funds it by dropping §5's replacement-paragraph
+    ceiling from 205 to 135 — prose can overflow to the companion and a key-table row cannot, which
+    is the trade unit 3 made for its own rows. The trimmed-against-added arithmetic still reads 646
+    against at most 624. AC23 witnesses all three rows arriving and all three declarations. Verified
+    at HEAD before folding: `HALT_CODES_EXTRA` is declared at
+    `tools/unattended/.unattended.conf.example:210` and in gov's own conf, carries a key-table row
+    at `tools/unattended/PROTOCOL.template.md:473`, and check 22 at
+    `tools/unattended/check-unattended.sh:1694` joins the two populations in both directions.
+  - M2: new AC24 runs the promised `hold-floor` hole's discharge command over a fixture conf with
+    `HOLD_FLOOR` removed and one with it declared, staged RED against a `kit.toml` that carries no
+    such hole. S2's observer list names it. The five criteria S2 previously claimed observed the
+    hole were re-read at HEAD and none reads `tools/unattended/kit.toml`, contains `hole` or runs a
+    discharge command, which is what made the claim false rather than merely thin.
+  - H1: AC23 reads BOTH halves of the guide cap, resolved from the line of
+    `tools/memory-tree/check-memory-hygiene.sh` that declares them together rather than retyped, and
+    gains the byte-neutral-line-positive and under-bytes-over-lines arms. The companion this unit
+    CREATES is the carrier most exposed to the line half, since a guide of tables and bullets
+    crosses 750 lines well before 61440 bytes.
+  - Closing verifier, same pass and rev: AC24's passing arm declared `HOLD_FLOOR` as a bare integer,
+    which is a form neither shipped conf uses — `tools/unattended/.unattended.conf.example` and
+    gov's own conf both spell the sibling `HALT_FLOOR` quoted — so a probe matching the bare integer
+    alone would have passed the criterion and red the real tree. The arm now reads the shipped
+    quoted form and the bare one, as the `directives-floor` probe it copies does, and the
+    `Red when:` carries that break.
+  - Round-3 verifier, same pass and rev: the H2 fold's 135-byte ceiling could not hold the
+    replacement §4 itself dictates. That replacement measured 203 bytes, so a builder writing
+    exactly the paragraph this spec quotes would have added 180 + 203 + 239 + 70 = 692 against 646
+    trimmed, grown both carriers by 46 bytes and red AC23's NOT-GREATER arm on a correct build. The
+    ceiling is now DERIVED rather than chosen — 646 − 180 − 239 − 70 = 157 — and the quoted
+    replacement is rewritten to 149 bytes, measured, so the sides are equal by construction and the
+    "at most 624" claim with its implied 22 bytes of headroom is gone. The second statement about
+    the reap-before-schedule measurement is settled the way AC23 already witnesses it: the ordering
+    MOVES to `UNATTENDED-STOPS.md`, §5 keeps none of it, and the Skill's user-facing copy above is
+    the one that stays. No criterion moved.
 
 ## 10. Reuse audit
 

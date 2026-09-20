@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 282e0a6bafe2f4979a02297b9d1904f4c68b349e
-phase: FOLDING
+witness: fe3beca6074e7aba27e9643c70c48d48cdd58d16
+phase: REVIEWING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
@@ -60,3 +60,31 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-20T10:03:54Z decision · item Two owner rulings now conflict: D12-h and D12-i8 let twelve units of this build run the unattended suites once at each unit's end, while the later aDeferredBar ruling landed on main says unattended self-tests and gates never run inside build agents, and wires tools/unattended/gate-guard.js to deny them before VERIFYING. Which binds this build? · reason Options: (a) every attributed suite runs once at VERIFYING, after the last unit, which is what the landed rule and the hook allow; (b) a gate-guard exception keyed on this build's run-state file; (c) an owner re-ruling that restores the per-unit runs. Refused: both sides are owner rulings, and the later one is mechanically enforced by a hook no unit of this build scopes. Folded meanwhile: (a), because an acceptance criterion whose observation the hook denies cannot be met in a pass; every such criterion takes a permission line deferring it to the VERIFYING run, and the README's self-test list goes with it.
 
 2026-09-20T11:24:07Z decision · item Correction to the suite-permission question parked earlier today: how wide is the denied population, and does unit 1 have a route at all? · reason Measured at HEAD in tools/unattended/gate-guard.js: the hook carries THREE suite deny rows, not one. D2 denies a command whose head word ends run-selftests.sh, D3 one ending run-unattended-gates.sh, D4 one ending .test.sh or selftest.py; all three are exempt only for the five read-only verbs --list --check --rank --help --render, and --attribute is not one of them. So every attributed suite run in this build is denied, not merely disfavoured. A second carrier is checker-side: the bar join TOOL-aDeferredBar-2 added to tools/check-spec-tokens.py. TOOL-dDerivedDocket-1 is the one unit the deferral cannot reach, because it BUILDS --attribute and no post-build run exercises it. Folded meanwhile: its criteria run inside their own scratch-repository fixtures, whose cwd carries no .unattended.conf, where the hook fails open by its own header; every other attributed run defers to the VERIFYING run.
+
+2026-09-20T15:49:13Z review · item dDerivedDocket-specs-g1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:14Z review · item dDerivedDocket-specs-g2-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:14Z review · item dDerivedDocket-specs-g4-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:14Z review · item dDerivedDocket-specs-g5-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:15Z review · item dDerivedDocket-specs-g6-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:32Z review · item dDerivedDocket-specs-g3-folds · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-20T15:49:33Z rescope · item add TOOL-dDerivedDocket-48 · reason Promoted from the G3 round-2 spec audit's standing blocker at the review bound: units 16 and 17 route the ASKS_CMD witness through run_bounded, which redirects stdout and stderr into one capture file, so every notice unit 15 moved to stderr lands inside the text unit 17's parse rule refuses on and a healthy producer reads as a DEAD PROBE. No spec in the set carries a stream-splitting capture, so the fix is a unit rather than a fold.
+
+2026-09-20T15:50:37Z rescope · item add TOOL-dDerivedDocket-49 · reason Promoted at the G3 bounded exit (H1, id 1): unit 16 AC18 asserts the one next: shape its own fixture forbids, so the UNDECIDED contract and the fixture disagree and no unit scopes the reconciliation.
+
+2026-09-20T15:50:38Z rescope · item add TOOL-dDerivedDocket-50 · reason Promoted at the G3 bounded exit (H2, ids 7 and 32): unit 15 AC13 reaches anchor_at through RECALL_CLI, a route the memory-tree kit declares nowhere, so the witness rests on an undeclared seam.
+
+2026-09-20T15:50:38Z rescope · item add TOOL-dDerivedDocket-51 · reason Promoted at the G3 bounded exit (H3, id 22): the fixture ids of unit 15 AC13 sit in the EXMP family the row grammar does not admit, so anchor_at returns None and the criterion is green before the unit acts.
+
+2026-09-20T15:50:38Z rescope · item add TOOL-dDerivedDocket-52 · reason Promoted at the G3 bounded exit (H4, id 24): rotation renames a record inside its folder, so unit 18's announced ancestry fallback never fires and the rotated-record premise is false.
+
+2026-09-20T15:50:39Z rescope · item add TOOL-dDerivedDocket-53 · reason Promoted at the G3 bounded exit (H5, id 25): --at pins the records a read sees and leaves the conf at evaluation time, against the purity unit 18 F3 resolved by assertion.
+
+2026-09-20T15:50:39Z rescope · item add TOOL-dDerivedDocket-54 · reason Promoted at the G3 bounded exit (H6, id 27): unit 19's cross-run exclusion probe is history-simplified, reproduced in a scratch repo where --full-history prints the merge plain rev-list hides.
+
+2026-09-20T15:51:14Z decision · item Should a run's --close export GATE_SELFTESTS=1 for the VERIFYING bar, when the charter records that flag as ON DEMAND ONLY with no boundary setting it (AGENTS.md merge-bar section, owner 2026-08-27), while the same charter says a kit-work Definition of Done owes the flagged bar? · reason Options: (a) --close exports it, so a kit build cannot land without the suites, which is what TOOL-dDerivedDocket-3 S3 wrote; (b) --close never sets it and the run sets it by hand at VERIFYING, naming the command in the record. Refused: the two charter sentences are in tension and only the owner can say which binds; unit 3 had picked (a) silently, with no citation and no supersession. Folded meanwhile: (b), which keeps the recorded ruling intact and leaves the flagged bar an explicit act the run records.

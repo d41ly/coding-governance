@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-8 — hygiene engine in builds mode
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 8
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
 
 <!-- /gen:spec-records -->
 
@@ -58,8 +59,20 @@ so this repo and every adopter see nothing until they switch.
 - **S9** Check 10 under `builds` leaves a family-stem archive to that same guard and prints one line
   counting what it left, rather than reporting "not referenced from its live index" against a view
   that could never reference it. Observed by AC8.
-- **S10** Shards byte-identity: the engine's full output over this repo is identical before and after
-  the unit, finding for finding and line for line. Observed by AC10.
+- **S10** Shards byte-identity: the ENGINE is the only thing that moves. Over ONE tree, held at this
+  unit's parent commit, this unit's engine prints what the parent's engine prints, finding for
+  finding and line for line. The claim is about the engine and never about the tree, and the two
+  must not move together: this unit also edits `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`,
+  the engine scans the whole memory tree (`tools/memory-tree/check-memory-hygiene.sh:219`,
+  `FILES=$(git ls-files "$M/")`) and check 12 derives its canonical `##` section list FROM
+  `memory/TEMPLATE-SPEC.md` (`tools/memory-tree/check-memory-hygiene.sh:1622`) and grades every
+  tracked spec against it, so a comparison
+  taken across two TREES would report this unit's own records edits as a shards-mode regression.
+  The tree is pinned to the parent commit for a second reason as well, never to whatever the working
+  tree holds when the comparison is made: unit 9's `memory-hygiene: check 25 ` lines and unit 34's
+  flip of this repo to `builds` are text this comparison must never see, because neither is a change
+  this unit made. An adopter takes the KIT and not this repo's memory tree, which is the same reason.
+  Observed by AC10.
 - **S11** The curation-debt stale-entry guard needs no new code, and this unit proves it: under
   `builds` a debt row naming a family view records nothing, reads as stale, and reds — the red the
   switch-over clears by deleting the row. Observed by AC11.
@@ -260,13 +273,31 @@ codebase-map gate on a staged `.py` and refuses a stale or unstaged artifact).
   exits 2 naming the key and its legal values; for absent, blank, `shards` and `builds` the shell and
   the Python reader report the same mode.
   Red when: the shell reads an unrecognised value as `shards` while the Python reader refuses it.
-- **AC10** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over this repo with the BASE
-  engine and then with this unit's engine, the two outputs are byte-identical.
-  Red when: any builds-mode branch runs under `shards`, including a new announcement line.
-  cost: two full engine runs, minutes each.
+- **AC10** — When the main loop makes ONE scratch checkout of this repository at this unit's parent
+  commit and runs that checkout's own `bash tools/memory-tree/check-memory-hygiene.sh` over it; then
+  overlays onto that SAME checkout only the engine files this unit changes —
+  `tools/memory-tree/check-memory-hygiene.sh`, `tools/memory-tree/corpus_ids.py` and
+  `tools/memory-tree/row_grammar.py`, taken from this unit's build commit — and runs the engine
+  again, the two outputs are byte-identical.
+  Red when: any builds-mode branch runs under `shards`, including a new announcement line; or the
+  second run is made over a SECOND checkout at the build commit, so this unit's own
+  `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md` and status-header edits move the engine's verdict
+  over specs this unit never touched — the scan is `git ls-files "$M/"` at
+  `tools/memory-tree/check-memory-hygiene.sh:219` and check 12's canonical section list is derived
+  from `memory/TEMPLATE-SPEC.md` at `tools/memory-tree/check-memory-hygiene.sh:1622` — and the
+  difference reports as a shards-mode
+  regression; or the overlay carries anything beyond those three engine files, such as a render or
+  `.memory-tree.conf`, so the tree becomes a variable again by a smaller door; or the
+  comparison is taken on whatever the working tree holds at the deferred moment, where unit 9 has
+  already added check 25's announcement lines to this same engine and unit 34 has already flipped
+  this repo out of `shards`, so it reds for changes this unit did not make over a tree that is no
+  longer its subject.
+  cost: one scratch checkout, one overlay and two full engine runs, minutes each.
   permission: both runs are the `memory hygiene` leg's command, which no pass runs (build method M6),
   so the pass returns the comparison to the main loop, which makes it once after the last unit is
-  terminal.
+  terminal. The parent commit and the build commit are what keep that deferral honest: the tree is
+  pinned to the first and the overlay to the second, so no later unit of this build can enter the
+  comparison from either side however late it is run.
 - **AC11** — When the builds-mode fixture lists its family view in `curation-debt.txt`, the stale-entry
   guard fails naming that row.
   Red when: the view still records a waived finding from a check it has left, so a row that hides
@@ -391,6 +422,37 @@ New arm: `tools/memory-tree/row_grammar.py` `--selftest` · a builds-mode tree w
   command it is handed. The line had said the leg's argv carried the verb, which would have told a
   pass the leg form is admitted when the hook denies it. The
   header date is the last-change date; the rev is unchanged, this being the same consolidation.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold. G2 H1 (12, 26): AC10 no longer compares two engines
+  over whatever the tree holds at the deferred moment. It now pins the comparison to two scratch
+  checkouts, this unit's parent commit and its own build commit, each run with its own engine, and
+  its Red-when names the failure the old wording scheduled — unit 9's check 25 announcement lines
+  and unit 34's flip to `builds` both land before the one run at `VERIFYING`, so the comparison
+  would have redded for changes this unit did not make over a tree that is no longer its subject.
+  S10 says the same in its own words and names those two texts as ones this comparison must never
+  see, so the next fold cannot re-defer it. The permission line keeps the deferral to the main loop,
+  which is what build method M6 requires of the `memory hygiene` leg's command over a real tree; the
+  two commits are what make the deferral safe. The alternative the record allowed — keeping one
+  real-tree run inside this unit's own pass — is NOT taken, because the orchestrator's ratified
+  narrow reading defers that leg's command over the real tree, and a scratch checkout at a pinned
+  commit answers the same question without contradicting it.
+  Round-3 verifier, same pass and rev: the two-checkout shape fixed the deferral problem and
+  introduced a second variable. Running (parent tree + parent engine) against (build-commit tree +
+  new engine) makes any difference this unit's own RECORDS edits produce read as a shards-mode
+  regression, and that is a concrete input rather than a hypothetical: §4 Files touched names
+  `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`, the engine scans the whole memory tree
+  (`tools/memory-tree/check-memory-hygiene.sh:219`) and check 12 derives its canonical `##` section
+  list from `memory/TEMPLATE-SPEC.md` (`tools/memory-tree/check-memory-hygiene.sh:1622`) and
+  grades every tracked spec against it, so the
+  template edit S12 requires moves check 12's verdict over specs this unit never touched. This
+  unit's own status header at the build commit is a second such input. AC10 now holds ONE tree, at
+  the parent commit, and OVERLAYS only the three engine files this unit changes; S10 says which of
+  the two things it claims unchanged, and says so in the words an adopter's case makes obvious —
+  an adopter takes the kit, not this repo's memory tree. Both pins survive, so the deferral is as
+  honest as the two-checkout version was.
+  Round-3 fold verifier, same pass and rev: the three citations of check 12's canonical section
+  list were written as a bare `:1622` immediately after `memory/TEMPLATE-SPEC.md`, which reads
+  as a line of that file — 430 lines long — rather than of the engine. Each now spells
+  `tools/memory-tree/check-memory-hygiene.sh:1622` in full. No claim moved.
 
 ## 10. Reuse audit
 

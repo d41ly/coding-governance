@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -66,7 +67,15 @@ one section the adopter runbook points at, and gate the part of it that can drif
   `tools/memory-tree/check-memory-hygiene.sh:20` and the `gov:kit memory-tree@` marker on every
   tracked `tools/memory-tree/*.template.md` and its render
   move together, to a value strictly greater than both the value at `fb07ca25` and the value the
-  advertised tip carries at this unit's pass. One of those markers renders into a CAPPED carrier,
+  advertised tip carries at this unit's pass. THERE ARE FOUR PAIRS, not one: at `fb07ca25` the glob
+  resolves to four templates and their four renders are `memory/HYGIENE.md`,
+  `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
+  `memory/guides/BUILD-METHOD.md`, all carrying the same marker at the same value, and the
+  `kit/dogfood doc parity` leg byte-compares each rendered template against its live copy with the
+  marker line included. All four move here. §3's non-goals hand the hygiene-engine unit the PROSE
+  of the first two and nothing hands away their MARKER, and the third is withheld by no non-goal at
+  all, so a raise that stops at one render reds that leg at the post-build bar.
+  One of those markers renders into a CAPPED carrier,
   `memory/guides/BUILD-METHOD.md`, which `tools/template-size-limits.txt` declares at 27648 bytes
   and whose own budget line declares 350 lines; it measures 27264 bytes and 347 lines at `fb07ca25`
   and at HEAD, and 26439 and 336 at `abac6d59`, before the aDeferredBar and aProbedUnit landings
@@ -301,8 +310,10 @@ marker in each `tools/memory-tree/*.template.md` and in its render under `memory
   after a `git fetch` in the pass, for each memory-tree carrier `tools/check-kit-versions.sh` names:
   that constant and the marker of every `tools/memory-tree/*.template.md`.
   `git grep -h -o "gov:kit memory-tree@[0-9][0-9.]*" -- 'tools/memory-tree/*.template.md'` prints
-  that value and no other, the same `grep -o` over `memory/guides/BUILD-METHOD.md` prints that value
-  and no other too, so the RENDER is not left behind the templates it is rendered from, and
+  that value and no other, the same `git grep -h -o` over the FOUR renders those templates have —
+  `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
+  `memory/guides/BUILD-METHOD.md`, the set the `kit/dogfood doc parity` leg pairs with them — prints
+  that value and no other too, so NO render is left behind the templates it is rendered from, and
   `tr -d '\r' < memory/guides/BUILD-METHOD.md | wc -c` reads at most
   27264 while `wc -l` over the same render reads at most 347 — the `fb07ca25` byte and line counts S7
   holds this unit to, 384 bytes below the ceiling `tools/template-size-limits.txt` declares — so a
@@ -314,10 +325,11 @@ marker in each `tools/memory-tree/*.template.md` and in its render under `memory
   Red when: the move lands at a value a carrier already holds at `fb07ca25` or on the advertised
   tip, which `tools/check-kit-versions.sh` cannot see, because it compares carriers with each other
   and never with another commit; or a marker is left behind its constant after a template edit; or
-  the epoch bump lands before an engine line this unit moved; or the RENDER at
-  `memory/guides/BUILD-METHOD.md` is left at the old value while its templates move, which the size
-  read cannot see because a stale render is byte-identical and which only the `kit/dogfood doc
-  parity` leg would otherwise catch, at the post-build bar; or the marker edit in
+  the epoch bump lands before an engine line this unit moved; or ANY of the four renders is left at
+  the old value while its templates move, which the size read cannot see because a stale render is
+  byte-identical and which only the `kit/dogfood doc parity` leg would otherwise catch, at the
+  post-build bar — a read over `memory/guides/BUILD-METHOD.md` alone certifies one instance of four,
+  which is the same could-not-fail shape one level up; or the marker edit in
   `memory/guides/BUILD-METHOD.md` arrives as a prose edit, or as a longer value spelling (§8 F4), so
   a render this unit owes nothing GROWS — a read against the ceiling alone passes while the headroom
   the units after this one were promised is gone, and the `build-method size` leg reds at the
@@ -451,6 +463,22 @@ is `subject = repo` and runs on any bar.
   `tools/unattended/.unattended.conf.example` and sets none in `.unattended.conf`, so no section 8
   key-table row is owed, and it claims no passage of the unattended protocol, so it is in no trim
   collision. The header date already reads 2026-09-20 and the rev is kept.
+  Extended a fourth time 2026-09-20 by the spec-audit round 3 fold, the G5 record, which exited
+  CONVERGED with no blocker; this unit carries one confirmed finding and it is a MEDIUM. G5 M5 (3):
+  the closing verifier's render read, added the same day, widened AC8 for a hazard and then applied
+  it to ONE instance of four. There are four `tools/memory-tree/*.template.md` templates at
+  `fb07ca25` and four renders carrying the same marker at the same value —
+  `memory/HYGIENE.md`, `memory/TEMPLATE-SPEC.md`, `memory/guides/ANNOTATION-STYLE.md` and
+  `memory/guides/BUILD-METHOD.md` — and the `kit/dogfood doc parity` leg pairs all four. A bump
+  that moved the constant, all four templates and only `BUILD-METHOD.md` passed AC8's grep, passed
+  `tools/check-kit-versions.sh`, which reads no render, and red that leg at the post-build bar, the
+  very red AC8's own Red when says it exists to pre-empt. S7 now names the four pairs, states that
+  all four move here, and records that §3's non-goals hand away the PROSE of two of them and not
+  their marker while the third is withheld by no non-goal at all; AC8's render grep runs over the
+  four-render set instead of one path; and its Red when names ANY render left behind, calling the
+  one-of-four read the could-not-fail shape one level up. The byte and line reads stay on
+  `memory/guides/BUILD-METHOD.md` alone, which is the only capped carrier among the four, so no
+  figure, cap or net-zero claim moved. Base and header date unchanged, rev kept.
 
 ## 10. Reuse audit
 

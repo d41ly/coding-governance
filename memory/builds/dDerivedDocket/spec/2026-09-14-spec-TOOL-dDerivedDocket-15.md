@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 15
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
+| [2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md) | spec-audit | TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +44,10 @@ list into a build README the owner lands, so authority stays with the owner's co
 - **S6** Print modes on unit 7's `--asks`: `--ready <IDLIST>` sets M, `--target <slug>` names the
   folder R2 admits its own live specs for, `--live-builds <slug>…` names the builds whose runs are
   live, `--at <rev>` reads one tree through `git ls-tree` and `git cat-file --batch`, and `--tsv`
-  prints the machine projection of §4. All write nothing and exit 0. Observed by AC5, AC7 and AC8.
+  prints the machine projection of §4. `--ready` sets the EXAMINED population to the ids its list
+  names, and an empty list is accepted rather than refused as a usage error: M and that population
+  are both empty, nothing is graded, and the run prints `examined` and 0. All write nothing and exit
+  0. Observed by AC5, AC7 and AC8.
 - **S7** `PROBE_ALLOW` in `.memory-tree.conf`, shipped blank (owner ruling D12-e), and
   `--asks --probe <id>`, the one path that may execute a `seen` command. It refuses unless the
   command's leading argv tokens equal one declared `PROBE_ALLOW` entry token for token (§4, §8 F5),
@@ -83,11 +87,26 @@ list into a build README the owner lands, so authority stays with the owner's co
   the fold R2 reads, the verdict list V13 and V14 join, and the `ASK_CUTOFF` key V14 compares.
 - **consumes-from** `TOOL-dDerivedDocket-7` — the `--asks` print mode S6 extends, its link-wrapped
   first cell, and the `--write` render the scaffold runs.
+- **consumes-from** `TOOL-dDerivedDocket-50` — the in-kit seam this kit reaches `anchor_at` through.
+  The G3 round-2 record's H2 measured that AC13's `fixture:` line routes through `RECALL_CLI`, a key
+  the memory-tree kit does not declare; that unit decides the route and this spec keeps AC13 as
+  written meanwhile.
+- **consumes-from** `TOOL-dDerivedDocket-51` — the id family AC13's fixture files its asks under. The
+  same record's H3 measured that `anchor_at` admits only the conf's declared families, so an `EXMP`
+  id anchors nothing before the scaffold writes a line; that unit picks the family and pins the
+  staged RED.
+- **consumes-from** `TOOL-dDerivedDocket-53` — which tree supplies the conf under `--at`. The same
+  record's H5 measured that the conf is read from the working tree whatever `<rev>` is, so S6's
+  pinned-tree read is not a pure function of that rev; that unit decides it.
 - **hands-off** `TOOL-dDerivedDocket-16` — READY at a pinned rev with a target folder (the driver
   passes no live-build set), the `--tsv` projection, and the `--new-build` command the driver's ids
   refusal prints.
 - **hands-off** `TOOL-dDerivedDocket-17` — the eleven-field `--tsv` row and its closing examined
   line, which the `asks-disposed` witness parses.
+- **hands-off** `TOOL-dDerivedDocket-48` — the rule that under `--tsv` stdout carries only the
+  `ask` lines and the `examined` line while every notice goes to stderr, which is what makes a
+  stream split worth making: that unit gives `run_bounded` two capture files so the row stream the
+  parse reads is `RB_STDOUT` and the notices are reported beside it rather than inside it.
 - **hands-off** `TOOL-dDerivedDocket-19` — V13, which that unit extends to a SCOPE row carrying
   `may`, and the scaffold, which that unit asserts never emits `may:`.
 - **hands-off** `TOOL-dDerivedDocket-20` — the clause grammar, READY and `--probe`, which the
@@ -145,6 +164,15 @@ ask driver pins, because no tree it reads shows every run in flight (unit 16 §8
 spec that R2 admits because its build is not live is printed in the closers field as `stale:<id>`,
 which is how fix F5 names a stale claim without a fourth grade (§8 F2). Status comes from unit 6's
 fold only; this predicate adds no status rule.
+
+Which tree supplies the CONF under `--at` is not settled in this spec. At `fb07ca25` `load_conf`
+reads `.memory-tree.conf` from the WORKING-TREE root
+(`tools/memory-tree/gen_build_index.py:286-291`) and runs before mode dispatch, so `ASK_CUTOFF` and
+`BACKLOG_MODE` stay evaluation-time values whatever `<rev>` is, and READY at a pinned rev is
+therefore not a pure function of that rev. The G3 round-2 record's H5 promoted that to
+`TOOL-dDerivedDocket-53`, which decides whether the conf is read at `<rev>` or the grade-bearing keys
+are named so a caller can skip by name. S6, the predicate above and §5's cost line keep their current
+text and take the answer from that unit.
 
 ### The machine projection
 
@@ -224,7 +252,15 @@ derived from the asks' families through `FAMILIES`, `ids:` (written empty and fi
 authored status beside a parseable spec header is the generator's two-answers refusal (`:644-649`);
 this build's own README did exactly that at `c6cb6951`. The five canon slots of `SLOT_CANON`
 (`tools/memory-tree/gen_build_index.py:107-113`) get generated bodies naming the asks and the tree
-they were read at, so the file carries no authored prose; the units roster pair is empty. Every
+they were read at, so the file carries no authored prose; the units roster pair is empty. Those
+bodies WRAP. Every generated line stays under hygiene check 7's per-line build-README entry cap
+`BUILD_README_ENTRY_CAP_CHARS` (`tools/memory-tree/check-memory-hygiene.sh:94`), through the
+generator's own `_render_wrapped_ids` (`tools/memory-tree/gen_build_index.py:957`) and its
+`IDS_WRAP` cap (`:918`), because a slot body names one id per mandated ask and a dozen ~22-character
+ids plus framing prose already crosses that cap. The front-matter block is exempt from check 7
+(`tools/memory-tree/check-memory-hygiene.sh:790-798`) and a slot body is not, so the one physical
+line the `asks:` key pins is safe and the bodies beside it are the lines that would red the
+`memory hygiene` leg §7 names on the README the owner's one command just wrote. Every
 generated body cites an ask inside prose, never as a bullet's or a table row's first token:
 `A_BOLD_LI`, `A_DASH` and `A_TABLE` anchor an id that leads one
 (`tools/memory-recall/extract.py:117-121`), and the new build would become a second claimant under
@@ -327,12 +363,21 @@ and refuses a stale or unstaged artifact (dUnstagedSymbol, `1a774fcd`).
   lines of exactly eleven TAB-separated fields, then `examined` and 3. Every field holds the value
   the fixture fixes, position by position: field 3 the status; field 4 `-` for the OPEN ask and both
   closing members for the closed one; field 6 `-` for the unlabelled ask; field 7 the grade; field 11
-  `-` or the live closer. No field is empty, and the waiver line appears on stderr.
+  `-` or the live closer. No field is empty, and the waiver line appears on stderr. The run exits 0,
+  and so do two further runs of the same mode: one over a fixture where every examined ask grades
+  `no`, whose stdout is the `ask` lines and the `examined` line and whose exit status is 0; and one
+  `--ready` naming no id, whose stdout is `examined` and 0 and whose exit status is 0.
   Red when: a notice reaches stdout, a field is empty, or two fields swap (status and ready, say), so
-  a consumer parsing by position misreads a row that still has eleven fields.
+  a consumer parsing by position misreads a row that still has eleven fields; or the grade decides
+  the exit status, so an all-`no` mandate reaches unit 16's preflight as a producer failure naming an
+  exit status rather than as the refusal that prints each id's failing rules.
 - **AC8** — When `--asks --ready --at <rev>` runs with a fixture's working tree edited after `<rev>`,
-  the grades reflect `<rev>` only, and `git status --porcelain` is unchanged.
-  Red when: `--at` reads a working-tree file, so a row filed after the pinned base grades as filed.
+  the grades reflect `<rev>` only, and `git status --porcelain` is unchanged; it is unchanged again
+  after a `--tsv --ready <ids> --target <slug> --live-builds <slug>` run over the same fixture, which
+  writes no cache and no log.
+  Red when: `--at` reads a working-tree file, so a row filed after the pinned base grades as filed;
+  or a print mode writes a cache or a log, so the tree unit 16's `--preflight` just required clean is
+  dirty when the producer returns.
 - **AC9** — When `gen_build_index.py --asks --probe <id>` runs with `PROBE_ALLOW` blank it refuses
   naming the key; with a non-blank `PROBE_ALLOW` of which no entry matches, it refuses naming the
   key; with `python3` declared and the command `python3x …` it refuses; with the two-token entry
@@ -346,9 +391,15 @@ and refuses a stale or unstaged artifact (dUnstagedSymbol, `1a774fcd`).
   scratch fixture repository filing both, and the scaffold's files are then staged, the README's
   `asks:` line reads `EXMP-aFoo-3..4`, it carries `authorized-by: slug`, `status: OPEN` and a filled
   `ids:`, its contract row is bound, and `gen_build_index.py --check` and
-  `gen_build_index.py --check-format` both exit 0.
+  `gen_build_index.py --check-format` both exit 0. And when the same command receives a mandate
+  large enough that an unwrapped slot body would exceed the cap, every unfenced line of the written
+  `README.md` outside its front-matter block measures at or under `BUILD_README_ENTRY_CAP_CHARS`,
+  read from `tools/memory-tree/check-memory-hygiene.sh` rather than typed into this criterion.
   Red when: the key list drops `ids`, or the scaffold writes `authorized-by: prompt`, so the owner's
-  one command produces a README the bar refuses or one units 16, 18 and 19 treat as run-writable.
+  one command produces a README the bar refuses or one units 16, 18 and 19 treat as run-writable; or
+  a generated slot body lands as one long line, so the `memory hygiene` leg §7 names reds the
+  `README.md` the owner's one command just wrote and `--check-format`, which grades no slot's size,
+  sees nothing.
 - **AC11** — When the scaffold receives `EXMP-aFoo-3...5`, an unfiled id, a slug the all-time grep
   finds, or a list whose every id grades `no`, it exits non-zero and writes nothing; over an ask
   carrying `may`, its README has no `may:` line.
@@ -372,6 +423,15 @@ and refuses a stale or unstaged artifact (dUnstagedSymbol, `1a774fcd`).
   build.
   fixture: the selftest reaches `anchor_at` through the declared route unit 18 S3 uses,
   `RECALL_CLI`, and a blank key is a named skip of this arm, never a pass.
+  Two G3 round-2 findings against this criterion are units of this build rather than edits here, and
+  it keeps its text until they land. H2 measured that `RECALL_CLI` is declared in the unattended
+  kit's conf alone, so this arm reaches `anchor_at` through a key the memory-tree kit does not carry
+  and takes its named skip on any tree without that kit; `TOOL-dDerivedDocket-50` decides the in-kit
+  seam and rewrites this `fixture:` line. H3 measured that `anchor_at` admits only the conf's
+  declared families, so an `EXMP` id anchors nothing before the scaffold writes a line and this
+  criterion's `Red when:` cannot fire; `TOOL-dDerivedDocket-51` picks the family the fixture files
+  under and pins the staged RED. Until both land, a green run of this arm is not evidence that a
+  generated body anchors nothing.
 
 ## 7. Gates
 
@@ -453,6 +513,39 @@ New arm: `python3 tools/memory-tree/gen_build_index.py --selftest` · one fixtur
   describes cannot later be read as satisfied by a plain bar. The criterion itself does not move:
   Rule 1's narrow reading leaves a `--selftest` FLAG on another file in the pass, and this spec
   writes to no byte-capped carrier, so the net-zero rule reaches nothing here.
+
+- rev-4 · 2026-09-20 · spec-audit round 3 fold, the G3 round-2 record, which exited BOUNDED.
+  §3 Edges · §4 · AC7 AC8 AC10 AC13. M4 (8): S6's "All write nothing and exit 0" was observed for
+  `--at` alone, so AC7 now reads exit 0 over an all-`no` fixture and over an empty `--ready` set, and
+  AC8's `git status --porcelain` assertion covers a `--tsv --ready --target --live-builds` run
+  beside the `--at` one; each half gains its own `Red when:`, the exit-status one naming unit 16's
+  producer-failure refusal it would otherwise be mistaken for. M5 (26): §4's scaffold now pins that
+  generated slot bodies WRAP under check 7's `BUILD_README_ENTRY_CAP_CHARS`, through the generator's
+  own `_render_wrapped_ids` and `IDS_WRAP`, and AC10 measures the written `README.md`'s unfenced
+  lines against that cap read from `tools/memory-tree/check-memory-hygiene.sh` rather than against a
+  number typed here. Three findings are PROMOTED to units of this build and folded nowhere: H2
+  (7, 32) to `TOOL-dDerivedDocket-50` and H3 (22) to `TOOL-dDerivedDocket-51`, both pointed at from
+  AC13, and H5 (25) to `TOOL-dDerivedDocket-53`, pointed at from §4's READY block. §3 gains a
+  consumes-from edge to each, and S6, §4's predicate, §5's cost line and AC13 keep their current
+  text. No cap is raised, §7 does not move, and this unit still writes to no byte-capped carrier.
+- rev-5 · 2026-09-20 · §2 · S6 · the round-3 fold's verifier, repairing the M4 fold above. That
+  fold gave AC7 an arm over a `--ready` naming no id, pinning `examined` 0 and exit 0, on an input
+  no design section admitted: nothing said whether a bare `--ready` is accepted at all rather than
+  refused as a usage error, and nothing said the examined population is the IDLIST rather than the
+  filed rows. Both are now S6's, stated once: `--ready` sets the examined population to the ids its
+  list names, an empty list is accepted rather than refused, and M and that population are both
+  empty, so the arm's `examined` 0 and exit 0 follow from the design instead of being pinned by a
+  criterion. AC7 does not move. This entry is its own line with a single bump, the form this
+  group's other five specs took for the round-3 fold.
+  Extended on the promote close-out pass, same base and rev · §3 Edges · a hands-off edge to
+  `TOOL-dDerivedDocket-48`, the reciprocal of that unit's consumes-from: this unit's stdout-only
+  rule is what its capture split delivers to the witness parse. That unit and
+  `TOOL-dDerivedDocket-49` share this unit's order 15, which is legal because a consumes-from
+  target may share an order and may not be later, because orders 1 to 38 were taken, and because
+  both must land before `TOOL-dDerivedDocket-16` consumes them; dispatch is strictly sequential
+  within a shared order and the id tiebreak runs 15, then 48, then 49, so the sequence is the
+  guarantee and no disjointness is claimed here. Nothing else moves: S6, §4's READY block, §5's
+  cost line and AC13 keep the text the round-3 fold left them.
 
 ## 10. Reuse audit
 

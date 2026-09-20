@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-26 — honest verdicts under contention
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -61,10 +62,33 @@ that row stays OPEN.
   kept in `<git-common-dir>/gate-spawn-floor`, written tmp-then-rename. A retry compares against the
   floor AS READ before this bar measured, so a bar never calibrates against itself and a clone's
   first bar has no floor (§8 F4). Before a deferred leg's retry, and again before the second
-  spawn-cost measurement, the runner reaps the timed-out attempt's process tree with `run_leg_reap`
-  (`tools/run-gates/run-gates.sh:1001`): `runleg` writes `.rc` after a timeout without reaping, and
-  both the outstanding-leg reaper and the wall watcher skip a leg that has an `.rc` (`:1033`,
-  `:1621`). When a deferred leg times out again on its retry, the runner measures once more, and the
+  spawn-cost measurement, the timed-out attempt's process tree must already be gone. WHICH mechanism
+  buys that is F5, parked for the orchestrator, because three properties measured at HEAD rule out
+  every mechanism this runner already carries, and the spec names none until that fork is resolved.
+  First, `run_leg_reap` (`tools/run-gates/run-gates.sh:1001`) MAY NOT be rooted at the walker's own
+  pid: `scan_descendants` seeds its accumulator with the ROOT (`out=$1`,
+  `tools/run-gates/run-gates.sh:429`) and `remove_descendants` iterates that list and `kill -9`s the
+  seed first (`:445-452`), so a `runleg` calling it on its own `$BASHPID`, the pid it records in
+  `$WORK/<i>.pid` (`:1367`), would SIGKILL the worker before it writes `.sec` and `.rc`; the leg's
+  completion signal would never appear and both of its readers would take the leg for one still
+  running (`:1033`, `:1621`). Second, neither of that function's two arms survives a DEAD root, so
+  it cannot simply be moved after the pool drains: `remove_descendants` walks `scan_descendants`
+  over a `ps -ef` snapshot from the root and an exited root yields the seed alone (`:445-473`, whose
+  own comment records that exact failure shape from TOOL-aQuenchedHarness-1), and the monitor arm
+  resolves the msys pid through `tools/process-monitor/reap.py:311`, which REFUSES when the id
+  resolves to no census row and kills nothing. Third, a ppid walk may not reach the residue from
+  EITHER root: on the timeout path `timeout`'s own child is already dead, and the comment at
+  `tools/run-gates/run-gates.sh:419-421` records that killing a parent REPARENTS its children off
+  the chain about to be walked, so a surviving grandchild is no longer a ppid-descendant of the
+  worker either. The monitor's orphan sweep is no route either: it flags by age against
+  `PROCMON_AGE_CEILING`, 14400 seconds as this repository declares it, so a grandchild orphaned
+  seconds ago grades `OK` (`tools/process-monitor/classify.py:38-48`). At BASE `runleg` writes `.rc`
+  after a timeout without reaping at all. Whatever F5 settles, two things hold: the worker still
+  writes `.sec` and `.rc` on the timeout path, and after the pool drains the runner VERIFIES rather
+  than reaps: each deferred leg's recorded `<i>.pid` is dead, and any
+  descendant `remove_descendants` still names is printed with its pid instead of being assumed gone.
+  That is also why the two existing callers skip a leg holding an `.rc` (`:1033`, `:1621`) — the
+  skip's precondition is that same dead root, not a judgement that the tree is clean. When a deferred leg times out again on its retry, the runner measures once more, and the
   leg is HOST when that figure exceeds `GATE_HOST_RATIO` times the floor. The ratio is a source
   constant of 4 (§8 F1). The bar exits 4, printing `gates HOST — <n> leg(s) timed out twice while a
   spawn cost <x>x this clone's floor; the verdict is about the host, not the subject`, only when
@@ -82,7 +106,8 @@ that row stays OPEN.
   missing. `.githooks/pre-push` pins `GATE_RUN_ID` to a fresh unpredictable id, removes any directory
   of that name first, and after an exit 0 requires `verdict GREEN` in that run's record. A missing or
   different verdict blocks the push as RED. With `GOV_GATE_CMD` set, the hook announces that the
-  record check is skipped for an override command. Observed by AC5 and AC12.
+  record check is skipped for an override command. Observed by AC5, AC12 and, for the pin and its
+  pre-removal, AC15.
 - **S7** — the drift signal. `tools/drift-audit/drift_report.py` gains `legs_retried_after_timeout`,
   the sum of `retried` over the run records it can read, report-only. Zero readable verdict files is
   a DEAD PROBE, never a reassuring 0. Observed by AC7.
@@ -158,8 +183,25 @@ The floor is per CLONE, because node `a` pays roughly 251 ms per process against
 second timeout happens after the pool drained AND after the timed-out attempts' trees were reaped,
 so the bar's own concurrency, grandchildren included, is gone and a high figure means another
 tenant; the runner's own comment records a grandchild outliving `timeout` by 51 s on these nodes
-(`:1376-1381`). `GATE_SPAWN_CMD` is a seam for the arm, naming the binary timed, exactly as
-`GATE_RUN_ID` is seamed for an arm (`tools/run-gates/run-gates.sh:1081-1084`).
+(`:1376-1381`). That precondition is bought by the mechanism F5 settles, and S5 states the bounds
+rather than the mechanism. Rooting a live-tree reap at the walker's own pid is REFUSED, because
+`remove_descendants` kills its seed and would take the worker with it before `.sec` and `.rc` are
+written. Moving `run_leg_reap` after the pool drains is refused too, because by then that pid has
+exited and both of its arms die on a dead root — the walk returns its seed, the monitor refuses the
+msys id — so a reap placed there would leave exactly the residue this paragraph asserts is gone, and
+the bar would exit 4 as HOST over its own leftovers while calling them another tenant. Nor may the
+mechanism assume a ppid chain: the timed-out child is already dead and its own children have been
+reparented off it. What the post-drain step contributes is the ASSERTION: the recorded pid is dead and no descendant is still named. If either fails the
+figure is not attributable and the runner says so, rather than reporting a ratio about a tree it
+never cleared. `GATE_SPAWN_CMD` is a seam for the arm, naming the binary timed, exactly as
+`GATE_RUN_ID` is seamed for an arm (`tools/run-gates/run-gates.sh:1081-1084`). `GATE_SPAWN_FLOOR` is
+the second such seam, naming the floor file's PATH, and it exists so the two floor states §5
+declares can be forced by staging rather than by permission bits: these are Git-Bash trees on
+Windows, where mode bits are emulated over ACLs and a `chmod 000` on a file the caller owns is
+frequently a no-op, which would run the ordinary path and leave AC4 green over a branch nothing
+entered. Pointed at a path staged as a DIRECTORY the read fails on every filesystem; pointed at a
+file whose sibling temp path is staged as a DIRECTORY the tmp-then-rename write fails with the old
+line still in place.
 
 ### The boundary check
 
@@ -170,7 +212,10 @@ did: the directory is removed before the run, and the id carries `$$` and `$RAND
 
 `measure_neighbours`, `measure_spawn_cost`, `run_leg_retry`, `check_verdict_record` (hook) in
 `sh.function`; `measure_legs_retried_after_timeout` in `py.function`. `GATE_SPAWN_CMD` is an arm
-seam, and `GATE_HOST_RATIO` is a source constant, not a conf key. Beside `GATE_SPAWN_CMD`, a
+seam, and `GATE_HOST_RATIO` is a source constant, not a conf key. `GATE_SPAWN_FLOOR`, which
+Calibration above introduces, is a SECOND arm seam and not a conf key either: it names the floor
+file's path so AC4 can stage the two floor states §5 declares without permission bits.
+Beside `GATE_SPAWN_CMD`, a
 verdict-write arm seam that forces the verdict-file write to fail, spelled as the runner's existing
 arm seams are (`GATE_` plus a noun), named at build time, and marked an arm seam, not a conf key,
 exactly as `GATE_SPAWN_CMD` is.
@@ -200,8 +245,9 @@ exactly as `GATE_SPAWN_CMD` is.
 
 ## 5. Production-readiness checklist
 
-- **security** — the hook's pinned id is removed before use, so a planted record cannot satisfy it.
-  The floor file is under the git common dir, which this runner already writes.
+- **security** — the hook's pinned id is removed before use, so a planted record cannot satisfy it;
+  AC15 stages that break, and names the half of it no arm can reach. The floor file is under the git
+  common dir, which this runner already writes, and AC4 reads what it holds after a bar.
 - **perf / scale** — ten spawns per bar, about 0.4 s on node `d` and 2.5 s on node `a`, plus one
   retry per timed-out leg. A bar with no timeout pays only the ten spawns.
 - **error / empty / loading states** — an unreadable floor is treated as absent and announced; an
@@ -239,10 +285,31 @@ exactly as `GATE_SPAWN_CMD` is.
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC4** — With a planted floor of 1 ms and `GATE_SPAWN_CMD` seamed to cost 50 ms, a leg that times
   out twice ends HOST and `bash tools/run-gates/run-gates.sh` exits 4; with no floor file the same leg
-  ends `GATE FAIL  ` naming the missing calibration. Red when: HOST is granted without a recorded
+  ends `GATE FAIL  ` naming the missing calibration. The WRITER is read directly, because no other
+  criterion of this unit reads `gate-spawn-floor` at all: after a fixture bar runs in a scratch clone
+  holding NO floor file, `<git-common-dir>/gate-spawn-floor` exists and holds exactly one
+  `<per-spawn-ms><TAB><iso-utc>` line; after a second bar whose seamed spawn is CHEAPER the figure
+  falls to that new minimum, and after a third whose seamed spawn is DEARER it does not rise; with
+  `GATE_SPAWN_FLOOR` pointed at a path staged as a DIRECTORY the bar announces the floor unreadable
+  and treats it as absent; and with `GATE_SPAWN_FLOOR` pointed at a file holding a known line whose
+  sibling temp path is staged as a DIRECTORY, so the tmp-then-rename writer cannot open its temp,
+  the bar announces and that line survives byte-identical. Both floor states are staged through that
+  seam and a directory, never through `chmod`, for the reason §4 states: on these Git-Bash trees a
+  `chmod 000` on a file the caller owns is frequently a no-op, and an arm staged that way runs the
+  ordinary path and passes.
+  Red when: HOST is granted without a recorded
   floor — this bar's own start measurement taken as its calibration, which ends the arm FAIL with a
   ratio and no missing-calibration note, or an absent floor read as zero, which ends it HOST — the
-  break DR 21.4 U24 names.
+  break DR 21.4 U24 names. Red too when the tmp-then-rename writer is omitted ENTIRELY, which the
+  HOST clauses alone cannot see: with `GATE_SPAWN_CMD` seamed to 50 ms the start measurement folds to
+  min(1, 50) = 1 against the planted floor, and F4's rule that a retry compares against the floor AS
+  READ leaves the no-floor arm ending FAIL whether or not anything was written — so on a real clone
+  the file would never appear, HOST would be permanently unavailable, and every double timeout would
+  print `GATE FAIL` naming a calibration that never arrives, the whole host-attribution mechanism
+  dead behind a full green. §5's two floor states are the last two clauses above. Red too when
+  either of those two is staged with `chmod` instead of the seam on a tree where the owner's own
+  mode bits do not deny, so the arm takes the readable and writable path and a green row covers a
+  branch nothing entered.
   permission: the canary is held, so it runs at the build's one post-build bar, spelled
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC5** — When a planted beacon names a dead pid, the bar still prints a verdict line and writes a
@@ -285,10 +352,19 @@ exactly as `GATE_SPAWN_CMD` is.
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC11** — When a fixture leg's timed-out attempt leaves a grandchild that keeps spawning and has
   written its pid to a file, that pid is dead when the leg's serial retry starts, as
-  `tools/run-gates/run-gates.test.sh` observes.
+  `tools/run-gates/run-gates.test.sh` observes; and a second arm of that suite runs `run_leg_reap`
+  against a root pid that has ALREADY exited, leaving the same grandchild ALIVE, which is the
+  measurement that rules out placing the reap after the pool drains; and a third arm asserts that
+  the WORKER SURVIVES whatever mechanism F5 settles — a fixture leg that times out still writes its
+  `.sec` and its `.rc`, and the pool reports that leg's verdict rather than leaving it outstanding.
   Red when: the reap is removed, so the attempt's own descendants run through the retry and the
   spawn measurement, and a bar exits 4 as HOST over its own leftovers — which the gate-wall unit holds
-  as host-degraded and auto-resume re-enters.
+  as host-degraded and auto-resume re-enters; or the reap is rooted at the recorded `<i>.pid` after
+  that subshell has exited, which reaches nothing while reading correct at its call site, and which
+  the second arm is staged RED to demonstrate before the first arm can mean anything; or the reap is
+  rooted at the WALKER's own pid, so `remove_descendants` kills its seed, the worker dies before
+  `.rc` is written, and the outstanding-leg reaper and the wall watcher both read that leg as still
+  running — which the third arm is staged RED to demonstrate.
   permission: the canary is held, so it runs at the build's one post-build bar, spelled
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 - **AC12** — When `bash tools/run-gates/run-gates.sh` runs over an empty fixture manifest, it exits 2
@@ -315,6 +391,22 @@ exactly as `GATE_SPAWN_CMD` is.
   it.
   permission: the reading is `wc -c` over a tracked file in the pass. NO CAP IS RAISED by this
   unit: moving the 61440 is an owner turn.
+- **AC15** — When `.githooks/pre-push.test.sh` exports `GATE_RUN_ID` naming a directory it has
+  pre-planted under `<git-dir>/gate-run/` carrying `verdict GREEN`, and the stubbed runner writes
+  nothing, the push is still BLOCKED, because the hook pins its OWN id and never honours an inherited
+  one; and across two consecutive hook runs the stubbed runner records two DIFFERENT ids.
+  Red when: the hook pins a fixed or derivable id, or honours the caller's, so a leftover or planted
+  `gate-run/<id>/verdict` satisfies the boundary check for a push whose runner wrote nothing — the
+  TOOL-aSurfacedLexicon-25 shape this unit exists to close, and the reason §5 states the pin's
+  security property outright. AC5 cannot see it, because its scratch repo holds no planted directory
+  and the fake runner's push is blocked there whether the pin exists or not, and AC12 grades the
+  runner half.
+  ungraded half, named rather than implied away: the pre-removal of a directory already carrying the
+  hook's freshly computed id. An id carrying `$$` and `$RANDOM` cannot be predicted by an arm, and
+  seaming it to make it predictable would install the very lever this criterion denies a caller, so
+  the removal stays a belt-and-braces write that S6 specifies and no arm grades.
+  permission: the hook suite is held, so it runs at the build's one post-build bar, spelled
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
 
 ## 7. Gates
 
@@ -326,8 +418,9 @@ Existing arms whose pinned tails S1 changes: `4h` (`tools/run-gates/run-gates.te
 `4h-nobound` (`:1216-1244`), which pins the bound-0 kill tail, stays unedited beside it.
 
 New arm: tools/run-gates/run-gates.test.sh · a leg that times out only beside a spinner · the canary's executed-assertion floor
-New arm: tools/run-gates/run-gates.test.sh · a seamed spawn cost against a planted floor · the canary's executed-assertion floor
-New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record · none
+New arm: tools/run-gates/run-gates.test.sh · a seamed spawn cost against a planted floor, and the floor file read after a bar with none, after a cheaper measurement, after a dearer one, unreadable and unwritable · the canary's executed-assertion floor
+New arm: tools/run-gates/run-gates.test.sh · a reap rooted at a pid that has already exited, beside the same reap rooted at a live one · the canary's executed-assertion floor
+New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record, and an inherited GATE_RUN_ID naming a pre-planted GREEN record · none
 
 ## 8. Open questions
 
@@ -353,6 +446,22 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record ·
   measured. (a) leaves AC4's no-floor arm unable to fail as written and calibrates a bar against a
   host it may have started on loaded. RESOLVED (agent, 2026-09-14, delegated): (b); a clone's first
   bar cannot read HOST.
+- **F5 — what reaps a timed-out attempt's residue before the retry and the second spawn
+  measurement?** Options: (a) background `timeout` inside `runleg`, record ITS pid and reap from
+  there, so the seed `remove_descendants` kills is the leg command rather than the worker; (b) a
+  seed-EXCLUDING walk beside `remove_descendants`, called from `runleg` on its own pid, which keeps
+  the worker alive but still walks a ppid chain; (c) keep the step after the drain and make it the
+  process monitor's SCOPE walk, keyed on the recorded `<i>.pid` and a run id rather than on a live
+  ppid chain. None is free. (a) and (b) both assume the residue is still a ppid-descendant of the
+  root they walk, which the reparenting recorded at `tools/run-gates/run-gates.sh:419-421` does not
+  guarantee on the timeout path, where `timeout`'s own child is already dead. (c) is the only option
+  that survives reparenting and the only one needing new surface:
+  `tools/process-monitor/reap.py:311` REFUSES a dead msys id today, so it would need a
+  by-recorded-root entry point. What is already settled, and is not part of this fork, is what may
+  NOT be done: rooting a live-tree reap at the walker's own pid, because `scan_descendants` seeds
+  its accumulator with the root and `remove_descendants` kills that seed first, so the worker dies
+  before `.sec` and `.rc`. PARKED for the orchestrator. S5 and §4 state the bounds and name no
+  mechanism; AC11's third arm holds whichever option is chosen to the worker's survival.
 
 ## 9. Revision log
 
@@ -424,6 +533,51 @@ New arm: .githooks/pre-push.test.sh · a fake runner exiting 0 with no record ·
   narrow reading moved nothing: AC13 runs `manifest-check.sh` over the real tree and keeps
   deferring, and every other observation is a suite file invocation. The header date stays at the
   last-change date; the rev does not move.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §4 §5 §7 · S5 S6 · AC4 AC11 AC15. H2:
+  S5 reaped the timed-out attempt with `run_leg_reap` after the pool drained, at which point the
+  attempt's subshell has written `.rc` and exited, and BOTH of that function's arms die on a dead
+  root — `remove_descendants` walks from the root over a `ps -ef` snapshot and an exited root yields
+  the seed alone, and the monitor arm's `--kill-msys` refuses an msys id that resolves to no census
+  row. The monitor's orphan sweep is no substitute either: it grades by age against a 14400-second
+  ceiling, so a grandchild orphaned seconds ago reads `OK`. S5 now roots the reap inside `runleg` on
+  the timeout path, where the subshell is still alive, and the post-drain step becomes an ASSERTION
+  that the recorded `<i>.pid` is dead with any surviving descendant named; §4 Calibration says why
+  its precondition cannot be bought after the drain, and AC11 gains the dead-root arm that
+  demonstrates it, staged RED. M1: S5's tmp-then-rename writer claimed AC4, AC10 and AC11 and none of
+  the three ever READ `gate-spawn-floor` — with the spawn seamed to 50 ms against a planted 1 ms the
+  start measurement folds to the planted figure and leaves no trace — so an implementation omitting
+  the writer passed all three while HOST stayed permanently unavailable on a real clone. AC4 now
+  reads the file itself after a bar with no floor, after a cheaper measurement, after a dearer one,
+  unreadable and unwritable, which is also where §5's two floor states are observed. M2: the hook's
+  `GATE_RUN_ID` pin and its pre-removal appeared in S6, §4 and §10 and in no criterion, while §5
+  stated the security property they buy; new AC15 stages the break an inherited id makes and names
+  the one half no arm can reach without installing the lever it denies. §7 gains the dead-root arm
+  and extends the spawn-floor and hook rows. No carrier accounting moved.
+- rev-6 · 2026-09-20 · §4 · §8 · S5 · AC4 AC11 · the round-3 fold's verifier, repairing the H2 fold
+  above and hardening AC4's two new floor clauses. The H2 fold replaced an unreachable reap with one
+  that kills the leg worker: `scan_descendants` seeds its accumulator with the ROOT
+  (`tools/run-gates/run-gates.sh:429`) and `remove_descendants` iterates that list and `kill -9`s
+  the seed first (`:445-452`), so `runleg` calling `run_leg_reap` on its own `$BASHPID` would
+  SIGKILL the worker before `.sec` and `.rc`, the completion signal would never appear, and both of
+  its readers would take the leg for one still running (`:1033`, `:1621`). A second doubt rides
+  behind it and is recorded rather than measured: on the timeout path `timeout`'s own child is
+  already dead, so a surviving grandchild has been reparented off the chain either root would walk
+  (`:419-421`). S5 and §4 therefore state the BOUNDS and name no mechanism, and the choice becomes
+  new fork F5 with three candidates for the orchestrator — a backgrounded `timeout` whose pid is the
+  seed, a seed-excluding walk, or the process monitor's scope walk keyed on the recorded pid and a
+  run id, the only one that survives reparenting and the only one needing new surface, since
+  `tools/process-monitor/reap.py:311` refuses a dead msys id. AC11 gains a THIRD arm holding
+  whichever option is chosen to the property this fold broke: the worker survives the reap and still
+  writes `.sec` and `.rc`. Separately, AC4's two new floor clauses were staged with `chmod`, which on
+  these Git-Bash trees frequently does not deny the owner and would have run the ordinary path and
+  passed over an unexercised branch. Both are now forced through a new `GATE_SPAWN_FLOOR` seam
+  beside `GATE_SPAWN_CMD` and a staged DIRECTORY — at the floor path for the read failure, at the
+  writer's sibling temp path for the write failure — which needs no permission bits at all, and
+  AC4's `Red when:` names the `chmod` staging as its own break. No carrier accounting moved, §7 does
+  not move, and no criterion's other assertions changed.
+  Verified in the same round and corrected in place, at no further rev bump: §4's Inventory named
+  `GATE_SPAWN_CMD` and the verdict-write seam and not the third seam this pass added, so
+  `GATE_SPAWN_FLOOR` now sits beside them, marked an arm seam and not a conf key.
 
 ## 10. Reuse audit
 

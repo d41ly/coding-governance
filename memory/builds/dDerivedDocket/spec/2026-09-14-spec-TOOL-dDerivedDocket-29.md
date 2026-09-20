@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-29 — review durability across a dead fan
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -263,8 +264,14 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
 
 - **AC1** — When `bash tools/workflows/tier2-review.test.sh` evaluates the whole script with stub
   hooks, every traced `find:` prompt names a file under `review-lenses/` ending `find-<lens>.json`,
-  and both finding schemas list `path` in `required`.
-  Red when: `path` is optional, so an agent that never wrote its file still returns cleanly.
+  every traced `verify:` prompt names a file in the same directory ending
+  `verify-<first id>-<last id>.json`, and both finding schemas AND the verdict schema list `path` in
+  `required`. S1 has three halves and this criterion reads all three.
+  Red when: `path` is optional on any of the three schemas, so an agent that never wrote its file
+  still returns cleanly; or the skeptic half goes ungraded, in which case skeptic prompts that name
+  no file and a verdict schema whose `path` is optional both pass, no verify file is ever written in
+  production, S4's batch reuse can never match anything, and F3's whole rationale — a dead synthesis
+  not re-running every skeptic — is lost while AC5 stays green on its PLANTED fixture.
   permission: the suite is a held leg, and `tools/unattended/gate-guard.js` denies any `.test.sh`
   before VERIFYING; the arms are written in the pass and run at the build's one post-build bar,
   spelled `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar, and each
@@ -295,6 +302,9 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   different claims, the batch is dispatched; with a matching fingerprint it is reused.
   Red when: batch reuse keys on the id range alone, which after a changed lens pairs old verdicts
   with new findings.
+  fixture: the file is PLANTED, so this criterion grades the READER and can say nothing about the
+  writer that produces such a file. AC1 grades the prompt and the schema, and AC12 grades a real
+  write, which is what keeps a planted fixture from being the only observation of its own mechanism.
   permission: the suite is a held leg, denied in the pass by `tools/unattended/gate-guard.js`; the
   arm is written in the pass and runs at the build's one post-build bar, spelled
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar.
@@ -347,9 +357,11 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
   actually loads still throws on a deferred return.
 - **AC12** — When this build's closing diff review runs through the rebuilt harness, the key
   directory under `git rev-parse --git-common-dir` holds one `find-<lens>.json` per lens that
-  returned, each carrying the key the run computed.
-  Red when: the directory is empty after lenses returned, which means the write instruction is
-  ignored and S1's schema field is satisfied by a path to nothing.
+  returned and one `verify-<first id>-<last id>.json` per skeptic batch that returned, each carrying
+  the key the run computed.
+  Red when: the directory is empty after lenses returned, or holds lens files and no verify file
+  after batches returned, either of which means the write instruction is ignored and S1's schema
+  field is satisfied by a path to nothing.
   cost: nothing beyond the closing review, which runs anyway. fixture: none exists until then.
 - **AC13** — When `tools/workflows/tier2-review.js` is read with `git show` at this unit's build
   commit, the line carrying `version: '` reads, as `meta.version`, in the `gov:kit tier2-review@`
@@ -386,7 +398,7 @@ Each candidate below lost on a fact recorded in the tree or on an observation of
 
 `tier2-review self-test` · `workflow script syntax` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `review-protocol parity (kit vs dogfood)` · `unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene`
 
-New arm: `tools/workflows/tier2-review.test.sh` · a whole-script stub run with dead lens, skeptic and synthesis stubs, a probe return carrying files under a mismatched key · the suite's assertion floor, raised by the new arms
+New arm: `tools/workflows/tier2-review.test.sh` · a whole-script stub run with dead lens, skeptic and synthesis stubs, a probe return carrying files under a mismatched key, and the traced `verify:` prompts and verdict schema read beside the `find:` ones · the suite's assertion floor, raised by the new arms
 New arm: `tools/workflows/unattended-build.test.sh` · a `workflow` double returning a deferred result · none, the suite is on no bar
 New arm: `tools/unattended/unattended.test.sh` · `--hold --pending-run` with a separator in the value · the driver suite's executed-assertion floor
 
@@ -520,6 +532,19 @@ New arm: `tools/unattended/unattended.test.sh` · `--hold --pending-run` with a 
   this unit's 700 in it, and the headroom argument holds on the corrected figures.
   The header date stays at the last-change date; the rev does not move, because no criterion
   changed its subject.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §7 · AC1 AC5 AC12. M6: S1 has three
+  halves — the lens prompts, the skeptic prompts, and a REQUIRED `path` on both finding schemas and
+  the verdict schema — and declared itself observed by AC1 and AC12, which between them read the
+  lens half only: AC1 traced `find:` prompts and both finding schemas, AC12 counted
+  `find-<lens>.json` files, and nothing anywhere named `verify-` or the verdict schema except AC5,
+  which grades REUSE against a planted fixture and is satisfied with no production write path in
+  existence. So skeptic prompts naming no file, or an optional `path` on the verdict schema, passed
+  every criterion while S4's reuse could never match and F3's rationale was lost. AC1 now reads the
+  `verify:` prompts and the verdict schema, AC12 requires one verify file per batch that returned,
+  and AC5 states that its fixture is planted and points at the two criteria that observe a real
+  write. §7's first `New arm:` row names the added assertions and keeps its third field. Nothing
+  else moved: the protocol carrier's 700-byte pricing, the corrected 18500-byte reading of its
+  headroom and every `permission:` line stand as the closing pass left them.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
+| [2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
 
 <!-- /gen:spec-records -->
 
@@ -90,6 +91,17 @@ inputs before the record is published, and announced as not re-derived after (S8
 - **consumes-from** `TOOL-dDerivedDocket-1` — `run-unattended-gates.sh --attribute <BASE>`, whose
   attributed verdict, `verdict clean` with every inherited suite filed, is the only criterion the
   unattended suites, red at BASE (TOOL-aHoistedPass-36), can meet.
+- **consumes-from** `TOOL-dDerivedDocket-48` — the witness capture that keeps the producer's stderr
+  off the row stream, which S8's two re-runs route through as the driver does. The G3 round-2
+  record's B1 measured that `run_bounded` merges both streams; S8 keeps its current text and takes
+  that unit's answer.
+- **consumes-from** `TOOL-dDerivedDocket-52` — how the commit that introduced a pinned line is found
+  across a rotation rename. The same record's H4 measured that rotation renames inside the folder,
+  so §4's announced ancestry fallback never fires where it says it does; §4's S2 paragraph and S8
+  keep their current text.
+- **consumes-from** `TOOL-dDerivedDocket-53` — which tree supplies the conf under `--at`. The same
+  record's H5 measured that `ASK_CUTOFF` and `BACKLOG_MODE` stay evaluation-time values, so §8 F3's
+  pure-function premise does not hold; that unit decides it and S8's equality rule takes the answer.
 - **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of S3, a typed resolution table
   in a mandated run's folder, after gov sets `ASKS_CMD`.
 - **hands-off** `TOOL-dDerivedDocket-20` — the folder-wide anchor ban, whose carrier sentence
@@ -110,6 +122,12 @@ inputs before the record is published, and announced as not re-derived after (S8
 | S5 | the record's `mode:` and the conf's `ASKS_CMD` | anything the Skill printed |
 | S8 | the conf's `ASKS_CMD`; the recorded `m-base:`, `asks:` and folder slug; the commit that introduced the freeze; the advertised tip | the witness output the run recorded, and HEAD's tree for the freeze |
 
+S8's two calls run through the conf's `ASKS_CMD` bounded, exactly as the driver's do, and what that
+capture hands the parse is not settled in this spec. At `fb07ca25` `run_bounded` redirects both
+streams into one file and reads it back (`tools/unattended/unattended.sh:191-196`), so a healthy
+producer's stderr notices arrive inside the rows, and the G3 round-2 record's B1 promoted that to
+`TOOL-dDerivedDocket-48`. S8 keeps its current text and takes that unit's answer.
+
 ### S2, the m-base re-derivation
 
 `m-base:` is merge-base(`anchor-sha:`, HEAD at preflight), both frozen commits, so equality is safe
@@ -122,7 +140,21 @@ record, so the next commit carries it.
 Where that commit cannot be found, as in a rotated record whose path changed, or a shallow clone,
 the arm falls back to two ancestry tests: `m-base:` is an ancestor of `anchor-sha:` and of the
 record's HEAD. It announces the weaker reading by name, so a green row is never read as the
-equality test. The ask-row match itself is the SAME line matcher the driver's P5 calls, shared
+equality test.
+
+The ROTATED case above is not settled in this spec, and the sentence stating it is kept only until
+the unit that owns it lands. At `fb07ca25` rotation is a rename inside the SAME folder:
+`archive_name_of` builds the archived name from the record's own directory
+(`tools/unattended/unattended.sh:1692-1698`) and the move is a staged `git mv`
+(`tools/unattended/unattended.sh:2748`). The rotated path therefore exists and its blob carries
+`m-base:`, so a path-scoped search for the earliest commit whose copy carries that line answers with
+the ROTATION commit rather than the preflight one, and the fallback this paragraph announces for it
+never fires. The G3 round-2 record's H4 promoted that to `TOOL-dDerivedDocket-52`, which says how the
+rename is followed and splits AC4's assumed case into a rotated-record arm graded against the
+RECORDED `m-base:` and a genuinely unfindable one. S2, S8 and AC4 keep their current text and take
+that answer; S8's freeze half, whose first-parent tree rests on the same search, inherits it.
+
+The ask-row match itself is the SAME line matcher the driver's P5 calls, shared
 through the kit library: the second opinion's independence lies in its inputs, never in a second
 grammar, which would be a second implementation and not a second opinion.
 
@@ -234,9 +266,16 @@ join both or the leg reads them blank whatever the conf declares ·
 - **AC7** — When a LANDED fixture record carrying an `asks:` fact has no `asks-at-landing:` fact,
   check 15 reds; with the fact present it passes.
   Red when: the arm grades only records with no `asks:` fact, the population where it cannot fire.
-- **AC8** — When a fixture record carries an `asks:` fact with mode `prompt`, or carries one while
-  `ASKS_CMD` is blank, check 19 reds.
-  Red when: either combination passes, so a run-authored mandate carries a pinned ask set.
+- **AC8** — When a fixture record carries an `asks:` fact with mode `prompt`, when a second carries
+  one with mode `recipe`, or when a THIRD in mode `slug` carries one while `ASKS_CMD` is blank,
+  check 19 reds. The mode fixtures are the whole of `SECOND_ANCHOR_MODES`
+  (`tools/unattended/unattended.sh:580`), and the arm count equals that set's size read from the
+  constant rather than typed here; the blank-conf fixture records mode `slug` so that the refusal
+  S5 declares for a blank conf is the only rule that can fire on it.
+  Red when: any combination passes, so a run-authored mandate carries a pinned ask set; or the
+  refusal keys on `prompt` alone, so a `recipe` record — which resolves at the anchor the run can
+  write, the same hazard — carries a pinned mandate ungraded; or the blank-conf arm is reached only
+  through the mode refusal, so a `slug` record pinning a mandate with no declared producer passes.
 - **AC9** — When the leg runs over today's tree, it prints one line stating that no record pins an
   `asks:` fact, with the count 0.
   Red when: the leg prints nothing, so vacuity reads as a pass.
@@ -271,9 +310,18 @@ join both or the leg reads them blank whatever the conf declares ·
   at the recorded `m-base:` grades that id `no`, and the record's preflight commit is not on the
   fixture remote's advertised tip, `bash tools/unattended/check-unattended.sh` reds check 19 naming
   both pairs; with the preflight commit on the advertised tip, the record is not re-run and is
-  counted in one `published, not re-derived` line.
+  counted in one `published, not re-derived` line. Three further arms over the same fixture observe
+  S8's other declared branches: with a stub `ASKS_CMD` that sleeps past the bound, the record is
+  reported as never answered and the leg does not red on it; with a fixture remote advertising no
+  tip, every mandated record is re-derived and the reason is printed on its own line; and with a
+  record whose introducing commit cannot be found, the arm prints a `skipped` line naming itself and
+  the leg exits on its other arms' verdicts.
   Red when: the arm compares `asks-ready:` against the record's own other facts, or re-runs the
-  producer at HEAD, so a run that edited `yes` to `no` takes F3's laxer path unseen.
+  producer at HEAD, so a run that edited `yes` to `no` takes F3's laxer path unseen; or a bound
+  breach is reported as a red, so a bar owner hunts a forged pin that does not exist; or an
+  unobserved tip re-derives nothing, or re-derives with no reason printed; or the
+  unfindable-commit branch passes without announcing its skip, so a green row is read as a verified
+  one.
 - **AC12** — When an unpublished fixture record's `asks-at-landing:` reads `EXMP-aFoo-3=CLOSED` while
   the stub producer, at the first parent of the commit that introduced that line, reports it OPEN,
   check 15 reds naming both; a REOPEN at HEAD does not red a published record.
@@ -314,6 +362,13 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
   delegated): (iii), which catches a forged pin at every bar before it can land and never grades a
   published record against a later producer. It relies on unit 16 rev-2 passing no live-build set,
   which makes the READY call a pure function of pinned inputs.
+  That premise does not hold for the CONF, and the resolution stands as written until the unit that
+  owns it lands: `load_conf` reads `.memory-tree.conf` from the working-tree root whatever `--at`
+  names (`tools/memory-tree/gen_build_index.py:286-291`), so `ASK_CUTOFF` and `BACKLOG_MODE` are
+  evaluation-time inputs and a grade can move between the pin and this re-derivation while nothing
+  was forged. The G3 round-2 record's H5 promoted that to `TOOL-dDerivedDocket-53`, which decides
+  whether the conf is read at the pinned rev or the grade-bearing keys are named so S8 can skip BY
+  NAME when they have moved; AC11 takes its arm from that unit and gains none here.
 
 ## 9. Revision log
 
@@ -375,6 +430,26 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
   restored ruling D12-h's OWN words in that §10 sentence: the ruling says the suites run once at
   the unit's end, and stating it in the folded terms left the paragraph parking a conflict it had
   just defined away. AC10 and the `cost:` line are untouched.
+
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, the G3 round-2 record, which exited BOUNDED.
+  §3 Edges · §4 · §8 F3 · AC8 AC11. M1 (3): three of S8's declared branches had no criterion, so
+  AC11 gains an arm each for the bound breach reported as never answered, the unobserved tip that
+  re-derives every mandated record with its reason printed, and the unfindable introducing commit
+  that prints a `skipped` line naming the arm, each with its own `Red when:`. L1 (11): AC8's fixture
+  carried `prompt` alone where S5's predicate covers both members of `SECOND_ANCHOR_MODES`, so it
+  now carries a `recipe` record too and its arm count is read from that constant rather than typed.
+  Three findings are PROMOTED to units of this build and folded nowhere: H4 (24) to
+  `TOOL-dDerivedDocket-52`, pointed at from §4's S2 paragraph, where the measured rotation rename is
+  now stated beside the fallback sentence it contradicts; B1 (21) to `TOOL-dDerivedDocket-48`,
+  pointed at from §4 above that paragraph, because S8's two calls route the same capture; and H5
+  (25) to `TOOL-dDerivedDocket-53`, pointed at from §8 F3, whose pure-function premise does not hold
+  for the conf. §3 gains a consumes-from edge to each, and S2, S8, AC4 and F3's resolution keep
+  their current text. No cap is raised, no S-item moves, and §7 does not move: both folded criteria
+  are fixtures inside `tools/unattended/check-unattended.test.sh`, which its `New arm:` line already
+  names. The fold verifier corrected AC8's blank-conf arm: the fold bound it to `either` of the two
+  mode fixtures, where S5 refuses a blank conf for ANY record, so the arm was reachable through the
+  mode refusal alone; it now names a THIRD fixture in mode `slug`, and its `Red when:` names that
+  reading. The verifier also restored the S2 paragraph break the promotion note ran into.
 
 ## 10. Reuse audit
 

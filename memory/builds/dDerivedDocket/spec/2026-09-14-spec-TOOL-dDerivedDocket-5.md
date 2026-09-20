@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -416,8 +417,14 @@ which receives the trimmed §8 rationale · the rendered guides and Skill ·
   extension.
 - **AC16** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
-  parent's and is below the 61440-byte guide cap declared in
-  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  parent's and is below the guide BYTE cap; and when the same two revisions are counted with
+  `wc -l`, the build-commit line count is NOT GREATER than the parent's and below the guide LINE
+  cap. Both numbers are RESOLVED from the single line of
+  `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES`
+  together, and neither is retyped here as a literal, because check 6 reds on EITHER half and the
+  two halves bind under different edits: a trim that pays for a table is byte-neutral and
+  line-POSITIVE, and check 6's own break-even is 81.92 bytes per line, which a carrier of rows and
+  short bullets sits under. All four readings hold for
   `tools/unattended/PROTOCOL.template.md`. The trim is taken and landed:
   `grep -c 'A DECLARATION rather than a path in the driver' tools/unattended/PROTOCOL.template.md`
   counts 2 at the parent and 0 at the build commit, and both sentences are present in
@@ -425,8 +432,8 @@ which receives the trimmed §8 rationale · the rendered guides and Skill ·
   their OPTIONAL terms. The owed key-table row arrived:
   `grep -c 'RESUME_SCHEDULE' tools/unattended/PROTOCOL.template.md` counts 0 at the parent and 1 at
   the build commit, the one joined cell. The companion guide `UNATTENDED-STOPS.md`, which receives
-  this unit's contract text, is read the same way at the build commit and is below the same
-  61440-byte guide cap.
+  this unit's contract text, is read the same way at the build commit and is below BOTH halves of the
+  same guide cap.
   Red when: the §5 pointer restates the contract, so the companion and the protocol answer one
   question twice and the 1,116 bytes the build's units share are spent here; or five separate
   key-table rows are written where one joined first cell carries all five keys; or the size is read
@@ -436,8 +443,11 @@ which receives the trimmed §8 rationale · the rendered guides and Skill ·
   destination, which DELETES the argument rather than moving it; or the cap is raised to make the
   text fit, which is an owner turn; or the five keys reach §8's key table in no row at all, which
   reds check 22 of `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
-  protocol lands in a carrier nobody reads the size of.
-  permission: a read, a byte count and two greps, no gate leg and no suite.
+  protocol lands in a carrier nobody reads the size of; or a trim is byte-neutral and line-positive,
+  so every byte reading passes and the `memory hygiene` leg reds on the line half it never read; or
+  the companion lands under the byte cap and over the line cap, which check 6's own
+  81.92-byte-per-line break-even makes the expected shape for a carrier of rows and short bullets.
+  permission: a read, two byte-and-line counts and two greps, no gate leg and no suite.
 
 ## 7. Gates
 
@@ -627,6 +637,20 @@ pair, and recorded in the unit's journal. No gate can make it.
   `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
   `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
   post-build bar" alone would have read as a bar that covers them.
+- rev-6 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H1 id 13, L1 ids 16, 27 and 36).
+  - H1: AC16 reads BOTH halves of the guide cap for the protocol, its template and the companion,
+    resolved from the line of `tools/memory-tree/check-memory-hygiene.sh` that declares them
+    together rather than retyped, and gains the byte-neutral-line-positive and
+    under-bytes-over-lines arms. Verified at HEAD: that line declares `GUIDE_CAP_BYTES=61440` and
+    `GUIDE_CAP_LINES=750`, check 6 reds on either, and the protocol stands at 675 lines and 60324
+    bytes, which is 75 lines of headroom beside 1116 bytes.
+  - L1: §10's reuse audit no longer says the key-table row is one "S10 does not yet name" or that
+    S10's sentence and that row spend from the shared 1116 bytes. The 2026-09-20 closing pass made
+    both false in S10 and in AC16 and left §10 behind, which is the fold class this build keeps
+    reproducing; §10 now states what S10 states, keeps the
+    `tools/unattended/check-unattended.sh:1689` citation as the provenance of the requirement, and
+    says AC16 grades it. S10, AC16's substance and the funding arithmetic were re-read before this
+    edit and none of them moved.
 
 ## 10. Reuse audit
 
@@ -654,9 +678,15 @@ Resume section gained a `/session-kickoff` step after the reap and the re-schedu
 (TOOL-aReplayedCard-3), which a scheduled session follows like any resume. `tools/unattended/kit.toml`
 still probes the `KEEPALIVE_(CREATE|DELETE|INTERVAL)` alternation AC15 stages RED against, and
 `memory/guides/UNATTENDED-PROTOCOL.md` sits 1116 bytes under its 61440-byte guide cap, where it sat
-3625 under at `abac6d59` (PINNED 2026-09-16, `wc -c`). S10's one sentence spends from it, and so
-does the §8 key-table row that leg check 22 joins against the example conf for each of S1's five
-keys (`tools/unattended/check-unattended.sh:1689`), a row S10 does not yet name. The
+3625 under at `abac6d59` (PINNED 2026-09-16, `wc -c`). S10 NAMES that key-table row in terms — one
+row carrying this unit's five conf keys in a single joined first cell — and prices it together with
+the §5 pointer sentence inside one 300-byte GROSS ceiling, funded by the 509 bytes it trims from the
+`RECALL_CLI` and `MAP_CLI` cells. The row is OWED and not optional, because leg check 22 joins §8's
+table against the example conf for each of those five keys
+(`tools/unattended/check-unattended.sh:1689`). So the unit lands NET ZERO OR NEGATIVE on that
+carrier and spends none of the 1116 shared bytes, and AC16 witnesses the row arriving with
+`grep -c 'RESUME_SCHEDULE'` moving 0 to 1 and reds if five separate rows are written in place of the
+one joined cell. The
 wired gate-guard hook (`tools/unattended/gate-guard.js`) denies `run-unattended-gates.sh` and any
 `*.test.sh` suite while this branch's record is before `VERIFYING`, so AC14's run could not have
 executed inside a pass as rev-5 first wrote it. The 2026-09-20 consolidation moved it to the

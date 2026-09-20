@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-10 — driver refuses shard-into-view
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 10
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
 
 <!-- /gen:spec-records -->
 
@@ -52,13 +53,22 @@ A3).
   line. Observed by AC6, AC7 and AC11.
 - **S6** A new gate leg runs S5 on every bar: chunk `declarations`, subject `repo`, no guard, so the
   kept attribute and the refusal cannot rot quietly between kit edits (design A3). The leg is claimed
-  by the merge-driver dossier, with the map regenerated in the same commit. Observed by AC8.
+  by the merge-driver dossier, with the map regenerated in the same commit. It declares a `ceiling`
+  in `tools/gate-legs.json`: 300 s, the `harness arms (fail branches armed or pinned)` sibling's —
+  the other python `--check` over this repo in chunk `declarations` with subject `repo` and no guard
+  — until the post-build bar's first reading re-declares it as `tools/run-gates/ceiling-margin.txt`
+  sizes it over that reading, recorded through `derive-ceilings.py --write`. Observed by AC8.
 - **S7** The kept attribute (design A2). `memory/backlog/*.md merge=rows` stays; S5 is what reds its
   removal. The `memory/builds/*/BACKLOG.md` line is the switch-over's to add, and this unit proves the
   driver merges that file class correctly before any such file exists. Observed by AC4, AC6 and AC7.
-- **S8** Replay arms in the driver's own suite for every behaviour above, each driven through a real
-  `git merge` in a scratch repository with the driver wired, and each observed RED with its fix
-  unstaged. Observed by AC9.
+- **S8** Replay arms in the driver's own suite for every behaviour above, in the two shapes that
+  suite already keeps and never one shape for all of them: a direct three-way `run` invocation for
+  the view-against-shard refusal (AC1) and the unimportable-predicate case (AC3), and a real
+  `git merge` in a scratch repository with the driver wired for the three §18r.1 merge shapes (AC2),
+  the two `BACKLOG.md` concurrency pairs (AC4 and AC5) and the two re-rendered views with the
+  shard-against-shard base (AC10). Only the first pair adds executing `run` cases, which is the
+  distinction §7's third field rests on. Each arm is observed RED with its fix unstaged. Observed by
+  AC9.
 - **S9** The driver's docstring and the merge-driver dossier say which files it governs now, that a
   view is never merged with a shard, and what the refusal does not cover. Observed by AC8.
 
@@ -235,11 +245,14 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
   Red when: `--check` greps `.gitattributes` instead of asking `git check-attr`, so an attribute
   overridden elsewhere passes.
 - **AC8** — When `tools/gate-legs.json` is read it carries the new leg with subject `repo`, chunk
-  `declarations` and no guard, and the codebase-map coverage leg is green with the leg claimed by the
+  `declarations`, no guard and a `ceiling` at or under the 300 s S6 names, and the codebase-map
+  coverage leg is green with the leg claimed by the
   merge-driver dossier; `tools/govkit/registry.toml` carries an `[[exempt_leg]]` naming it with its
   reason, and `govkit selfcheck` passes.
   Red when: the leg ships guarded on the kit directory, so an edit elsewhere that breaks the view
-  header never re-runs it.
+  header never re-runs it; or it lands with no `ceiling`, which the `run-gates gov canary` leg reds
+  under `GATE_SELFTESTS=1` on the first bar after this unit, naming the leg and refusing the
+  manifest.
   permission: `govkit selfcheck` and `codebase-map coverage + freshness` are gate-leg commands, which
   no pass runs (build method M6), so both bind at the one post-build bar; in the pass the manifest
   row, the dossier claim and the `[[exempt_leg]]` row are read directly.
@@ -273,7 +286,7 @@ an old branch's driver conflicts, or whether anyone later discards rows by hand.
 
 ## 7. Gates
 
-`row-keyed merge driver replay` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck`
+`row-keyed merge driver replay` · `memory hygiene` · `codebase-map coverage + freshness` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck` · `leg ceilings clear their evidenced maximum`
 
 New arm: `tools/memory-tree/merge-rows.test.sh` · a view-against-shard three-way, the three §18r.1 shapes the driver governs, an unimportable predicate, the two `BACKLOG.md` concurrency pairs, two re-rendered views, and two shards over a view base · the suite's grow-only floor on how many of its own cases actually execute the driver, the count its banner ratchet cannot see, raised by the executing cases these arms add; the suite is on the testsuite-count waiver
 New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-driver view refusal` leg · the attribute removed from a scratch `.gitattributes`, and a driver copy with the refusal disabled · none
@@ -372,6 +385,19 @@ New arm: `python3 tools/memory-tree/merge-rows.py --check` on the new `row-drive
   leg is unheld so any bar runs it. To reverse, delete AC6's permission line: the effect is to put
   one read-only real-tree `--check` back inside the pass. The
   header date is the last-change date; the rev is unchanged, this being the same consolidation.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold. G2 M1 (13): S6 declares the `row-driver view
+  refusal` leg's `ceiling` with its basis — 300 s, the `harness arms (fail branches armed or
+  pinned)` sibling's, the other python `--check` over this repo in chunk `declarations` with subject
+  `repo` and no guard — re-declared from the post-build bar's first reading through
+  `derive-ceilings.py --write`, in the words unit 9 S11 and unit 13 S8 use; AC8 reads the row back
+  and its Red-when names the `run-gates gov canary` refusal; §7 gains `leg ceilings clear their
+  evidenced maximum`. Without it the leg landed red on the first `GATE_SELFTESTS=1` bar after this
+  unit: every row in `tools/gate-legs.json` carries a ceiling today and the canary exits 1 on one
+  that does not. G2 L2 (16): S8 no longer claims every replay arm is a real `git merge`. It now
+  names the two shapes the suite keeps — direct three-way `run` invocations for AC1 and AC3, git
+  merges with the driver wired for AC2, AC4, AC5 and AC10 — which is what the closing
+  consolidation's §7 third field already assumed; under the old sentence that field named a `run`
+  floor no added case could move.
 
 ## 10. Reuse audit
 

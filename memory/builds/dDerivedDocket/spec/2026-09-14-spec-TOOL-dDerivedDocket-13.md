@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 13
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 |
 
 <!-- /gen:spec-records -->
 
@@ -48,7 +49,8 @@ before a merge rather than as a repair after one.
   `--expect-builds` because its own PRE-FLIP read found a builds-mode merge base; exit 1 refuses the
   push naming the merge and the repair verb (design A8), and exit 2, a DEAD PROBE, prints that line
   naming the ref and allows the push, since these layers instruct and the bar guarantees. The block
-  does nothing when the library is absent. Observed by AC4 and AC5.
+  does nothing when the library is absent, which is every adopter that took the push-main kit and
+  not the gov-only library. Observed by AC4, AC5 and AC7.
 - **S5** `tools/check-wiring.sh --session` gains a step that, on a FLIPPED tree where the memory-tree
   kit's `migrate_backlog.py` resolves, runs `--stragglers --local --tsv` under a bound and prints at
   most one `note` line naming the local stragglers. The step never gates and `--session` still exits
@@ -58,7 +60,11 @@ before a merge rather than as a repair after one.
   AC6 and AC12.
 - **S6** A report-only drift signal, `backlog_stragglers`, over local and remote-tracking refs: value
   is the straggler count, `of` is refs examined, live only when refs examined is above zero, and
-  not asked when the memory-tree kit or its inventory mode is absent. Observed by AC8.
+  not asked when the memory-tree kit or its inventory mode is absent. Its row joins the
+  `## The signals` table of `tools/drift-audit/README.md` in the same commit, a content edit of that
+  file distinct from S11's version-marker edit to it: the table is hand-kept, no gate binds it, and
+  a signal that ships without its row leaves the kit documenting itself short. Observed by AC8 and
+  AC9.
 - **S7** Declarations in the same commit: a `govkit` `[[exempt]]` row each for
   `.githooks/straggler-guard.sh`, `.githooks/pre-rebase` and `.githooks/straggler-guard.test.sh` (an
   exemption does not cover siblings; precedent `.githooks/pre-commit.test.sh` in
@@ -189,9 +195,10 @@ The bypass hunt's blocker was a straggler that pulled the new conf early and bli
 INTEGRATED the flip, through its merge bases: once a builds-mode default commit is merged in, the
 merge base is that commit and the branch is no longer pre-flip, even though its lineage still holds
 the old shard commits. HAS-DELTA asks whether there is anything to relocate, by lineage. The backlog
-archive population is the family-named one, narrower than unit 9's whole archive directory on
-purpose: a decision-log rotation on a pre-flip branch has nothing to relocate and must not print a
-recipe (§8 F4).
+archive population is the family-named one, on purpose: a decision-log rotation on a pre-flip branch
+has nothing to relocate and must not print a recipe (§8 F4). Unit 9's watched paths were narrowed to
+that same population at the round-3 fold (its S3), so the two layers now read one archive population
+and not two.
 
 | Hook | FLIPPED | PRE-FLIP | HAS-DELTA | Staged backlog path | Result |
 |---|---|---|---|---|---|
@@ -252,7 +259,9 @@ inventory; after it, the stragglers left, until zero.
 marker, S7) · `.githooks/pre-push` (S4, and its header, S10) · `tools/check-wiring.sh` (S5, and the
 comment at 241-243 and the note at 287, S10) · `tools/check-wiring.test.sh` (S9, and the comment at
 918, S10) · `tools/install-prefix-waivers.txt` (one row leaves, S7) ·
-`tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` · the other drift-audit
+`tools/drift-audit/drift_report.py` · `tools/drift-audit/selftest.py` ·
+`tools/drift-audit/README.md`'s `## The signals` table, one row for `backlog_stragglers` (S6), a
+CONTENT edit of that file and not the marker edit below · the other drift-audit
 version carriers (S11): `tools/drift-audit/README.md`, `tools/drift-audit/drift_signals.py`,
 `tools/drift-audit/drift_signals.template.py`, `tools/drift-audit/adopt-drift-audit.sh`,
 `tools/workflows/drift-audit-code.js` and `tools/workflows/drift-audit-state.js` ·
@@ -293,7 +302,9 @@ line count; every new line sits below line 717.
   `--no-verify` still drops rows (design §18r.6 hole 1).
 - testing — S8's suite unheld, S9's arms in held suites; each arm observed RED with its fix unstaged.
 - migration — none; every layer is dormant until the default branch declares builds mode.
-- user docs — the recipe these layers print; the memory-tree README section is unit 36's.
+- user docs — the recipe these layers print; the `## The signals` row `tools/drift-audit/README.md`
+  owes `backlog_stragglers` (S6), the kit's reader-facing enumeration of what it asks; the
+  memory-tree README section is unit 36's.
 
 ## 6. Acceptance criteria
 
@@ -312,8 +323,8 @@ line count; every new line sits below line 717.
   under `memory/archive/` is a decision-log archive rebases with no refusal, and its commits print
   the merge-first notice and never the recipe.
   Red when: the hook reads only its second argument, so `git pull --rebase`, which passes none,
-  rebases the straggler; or HAS-DELTA reads unit 9's whole archive directory, so a decision-log
-  rotation draws the recipe and `pre-rebase` refuses the branch.
+  rebases the straggler; or HAS-DELTA selects archives by directory rather than by family name, so a
+  decision-log rotation draws the recipe and `pre-rebase` refuses the branch.
 - **AC4** — When the fixture pushes a PRE-FLIP, HAS-DELTA feature branch to a local bare remote,
   `.githooks/pre-push` prints the recipe and the push lands.
   Red when: the feature push is refused, which strands the straggler's only off-node copy.
@@ -331,8 +342,13 @@ line count; every new line sits below line 717.
   a refusal stops.
 - **AC7** — When the fixture's default branch is in shards mode, every hook prints nothing from the
   library, and the existing `bash .githooks/pre-commit.test.sh` and `bash .githooks/pre-push.test.sh`
-  pass unchanged.
-  Red when: the dormant path prints a line on every commit in a repo that has not flipped.
+  pass unchanged; and when a second fixture whose default branch IS in builds mode carries this
+  unit's `.githooks/pre-push` with no `straggler-guard.sh` beside it, a feature push lands, the new
+  block prints nothing, and the hook's exit is the one it had at BASE.
+  Red when: the dormant path prints a line on every commit in a repo that has not flipped; or the
+  absent library aborts the hook — an unguarded source, or a predicate called with the library's
+  functions undefined — which refuses every push in every adopter that took the push-main kit and
+  not the gov-only library, a path §3 positively asserts is inert and no other criterion exercises.
 - **AC8** — When `python tools/drift-audit/selftest.py` builds a fixture with one local and one
   remote-tracking straggler, `backlog_stragglers` reads 2 of the refs examined and is not gateable;
   with no ref it reports not live, and without the memory-tree kit it reports not asked.
@@ -342,13 +358,21 @@ line count; every new line sits below line 717.
   `straggler-guard.test.sh` and the new leg tracked and declared; `bash tools/check-install-prefix.sh`
   passes with no new waiver, `grep -c 'githooks/pre-commit' tools/install-prefix-waivers.txt` prints
   0, and the `gate_at` probe line in `.githooks/pre-commit` carries `gov:root-fixture` with a reason;
-  and the both-ways real-tree hook-list arm in `transition-audit.test.sh` (unit 9 S16) passes with
-  `pre-rebase` tracked.
+  the both-ways real-tree hook-list arm in `transition-audit.test.sh` (unit 9 S16) passes with
+  `pre-rebase` tracked; and `git grep -c '^| .backlog_stragglers. |' -- tools/drift-audit/README.md`
+  prints 1, the ROW S6 adds to that file's `## The signals` table — each `.` in that pattern stands
+  for the backtick the table wraps a signal name in, so the pattern nests no backtick inside this
+  span and anchors on the row's FIRST COLUMN rather than on a mention anywhere in the file.
   Red when: a new tracked `.githooks/` path or the new leg passes without its own `[[exempt]]` or
   `[[exempt_leg]]` row, or `pre-rebase` is tracked and absent from `GOV_WIRING_HOOKS`, or a line added
   above check-wiring's waived lines unpins them; or S2's refusal lines shift the pre-commit probe
   while its position-keyed row stays, which `install-prefix` reds as a stale waiver and an unwaived
-  hit at the post-build bar.
+  hit at the post-build bar; or the signal ships with no ROW in that hand-kept table while the
+  README names it in prose somewhere else, which a file-scoped grep reads as a pass — the proven
+  shape here, since `backlog_rows_outliving_closed_specs` is implemented at
+  `tools/drift-audit/drift_report.py:1633` and registered at
+  `tools/drift-audit/drift_signals.py:260` and has no row in that table at BASE — so the kit's own
+  enumeration of what it asks is one signal short of what it implements and no gate binds it.
 - **AC10** — When `bash tools/check-testsuite-counts.sh` runs, the new suite prints its
   `PASS (<n> assertions)` line at or above its floor, including an arm that fails when the library's
   recipe differs by one byte from `migrate_backlog.py --recipe`.
@@ -417,7 +441,7 @@ line count; every new line sits below line 717.
 
 `memory hygiene` · `branch-guard self-test` · `pre-push self-test` · `check-wiring self-test` · `drift-audit selftest` · `drift-audit records` · `govkit selfcheck` · `install-prefix (shipped surface)` · `kit version markers` · `leg ceilings clear their evidenced maximum` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `straggler-guard.test.sh` on a new repo-subject leg · a builds-mode default with a pre-flip branch staging a shard edit, a rebase, two feature pushes, a relocation merge, a recipe byte flipped, a remote-only builds default and an unresolvable one, a decision-log rotation, a broken conf reader on push, a linked worktree under an absolute and a relative hooks path, the `--topology` mode · the new suite's own floor
+New arm: `straggler-guard.test.sh` on a new repo-subject leg · a builds-mode default with a pre-flip branch staging a shard edit, a rebase, two feature pushes, a relocation merge, a recipe byte flipped, a remote-only builds default and an unresolvable one, a decision-log rotation, a broken conf reader on push, a feature push with the library absent, a linked worktree under an absolute and a relative hooks path, the `--topology` mode · the new suite's own floor
 New arm: `tools/check-wiring.test.sh` · a builds-mode fixture with one local straggler · none
 New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-tracking stragglers, and one with none · none
 
@@ -435,9 +459,11 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   holds check 25 in an unguarded leg, and §18r.2 superseded the G layers with L1 to L7. RESOLVED
   (agent, 2026-09-14, delegated): none added; a second copy of the audit in a verbatim-shipped hook
   is a second answer to one question.
-- **F4 — the archive population.** Options: unit 9's whole archive directory, or the family-named
-  backlog archives. RESOLVED (agent, 2026-09-14, delegated): family-named, because these layers
-  print relocation instructions and a decision-log rotation has nothing to relocate.
+- **F4 — the archive population.** Options: the whole of `<MEMORY_ROOT>/archive/`, which unit 9's S3
+  read until the round-3 fold, or the family-named backlog archives. RESOLVED (agent, 2026-09-14,
+  delegated): family-named, because these layers print relocation instructions and a decision-log
+  rotation has nothing to relocate. Unit 9's S3 was narrowed to the same population at that fold, on
+  G2 round-3 H2, so this resolution is no longer a deliberate divergence from it.
 - **F5 — reach under a relative `core.hooksPath`.** Options: (a) check-wiring writes and upgrades an
   absolute value; (c) writes one only when unset and reports a relative one; (b) record the layer
   inert there; (d) (b) plus S5 marking such a straggler `hooks own-tree`. (a) reverses the
@@ -556,6 +582,36 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with local and remote-trac
   while reading green; this unit's other deferrals are to unheld legs any bar runs, and those lines
   are left as they stand. The
   header date is the last-change date; the rev is unchanged, this being the same consolidation.
+- rev-6 · 2026-09-20 · spec-audit round 3 fold. G2 M4 (8): AC7 gains the library-absent push — a
+  builds-mode fixture carrying this unit's `.githooks/pre-push` and no `straggler-guard.sh`, where
+  the push lands, the block prints nothing and the hook's exit is BASE's — and its Red-when names
+  an unguarded source or an undefined predicate. S4 cites AC7 beside AC4 and AC5 and says whose
+  push that path is: every adopter that took the push-main kit and not the gov-only library. AC5's
+  removal arm removes the AUDIT MODULE and never the library, so the sentence §3 positively asserts
+  was observed by nobody. G2 L4 (30): S6 names the `## The signals` row that
+  `tools/drift-audit/README.md` owes `backlog_stragglers`, §4 Files touched carries it as a CONTENT
+  edit distinct from S11's marker edit to the same file, §5 user docs lists it, AC9 greps the row
+  back and S6 cites AC9. That table is hand-kept, no gate reads it, and the gap is already live at
+  BASE for `backlog_rows_outliving_closed_specs`, which is implemented and registered and absent
+  from the table — re-verified at this fold. Unit 34 owes the same for the three signals its S10
+  adds; that is a cross-edit, not folded here. §7's suite arm line names the library-absent push.
+  Consequential, not a finding id: unit 9's S3 was narrowed to the family-named archives by the same
+  fold, so §4's "narrower than unit 9's whole archive directory", AC3's Red-when and §8 F4's option
+  (a) no longer describe that unit. All three now say what they mean about THIS unit's population
+  and record that the two layers read one archive population; F4's resolution and its fork mark are
+  unchanged.
+  Round-3 verifier, same pass and rev: AC9's L4 arm was file-scoped —
+  `git grep -c backlog_stragglers -- tools/drift-audit/README.md` — which passes on a mention
+  ANYWHERE in the README, while L4's defect is the TABLE going short. That is not a hypothetical
+  gap: `backlog_rows_outliving_closed_specs` is implemented at
+  `tools/drift-audit/drift_report.py:1633` and registered at `tools/drift-audit/drift_signals.py:260`
+  and has no row at BASE, so a signal present everywhere except the table is this class's proven
+  shape and the proxy could not see it. The arm is re-anchored on the ROW's first column, and the
+  Red-when names the mention-but-no-row case. The same re-anchoring is carried into the unit 34
+  cross-edit rather than left in its original file-scoped form. The durable answer is still the
+  bidirectional table-versus-registry join the record proposes as L4's left-shift gate; if that
+  lands in the `drift-audit selftest` leg, this arm can point at it instead, and that remains a
+  cross-unit decision rather than something folded here.
 
 ## 10. Reuse audit
 

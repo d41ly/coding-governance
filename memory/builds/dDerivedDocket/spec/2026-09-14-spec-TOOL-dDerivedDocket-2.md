@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -247,9 +248,13 @@ quotes the usage line.
   shows a filed record naming it that is not CLOSED.
   Red when: an arm was wired without its failing case having been observed; or the attributed run is
   read by its NEW count alone, so a suite that aborted before its first FAIL line reads as clean.
-  permission: the suite is the `push-main self-test` leg, which a plain bar HOLDS, so the run that
-  executes it is the VERIFYING run's
-  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and nothing earlier.
+  permission: two runs, because this criterion makes two observations. The arms are the
+  `push-main self-test` leg, which a plain bar HOLDS, so the run that executes them is the VERIFYING
+  run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and nothing earlier. The
+  attributed reading is not in that bar at any flag setting and is made beside it, in the same
+  VERIFYING run: `bash tools/run-gates/run-selftests.sh --attribute <BASE>` over this suite, whose
+  verb `tools/unattended/gate-guard.js` admits only from `VERIFYING` on, because `--attribute` is
+  not one of its read-only verbs.
 - **AC10** — When a single-parent records commit sits on top of T, `--land` accepts it and pushes
   HEAD; when a second merge sits there, `--land` refuses; and `--carry --slug tFix` over AC2's
   fixture exits 1 naming the same sha that `--land` names, while writing nothing.
@@ -349,6 +354,20 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   edit, and the header date follows them; no other section of this spec moved. Closing verifier,
   same pass and rev: this entry was dated 2026-09-16 when it was written on 2026-09-20, which
   claimed a regrounding on a day this spec was untouched, and the date is corrected above.
+  Extended again 2026-09-20, spec-audit round 3 fold (G1 round 3 M5, id 31). AC9 asks for two
+  observations and its `permission:` line named one run, the flagged bar, which never invokes
+  `--attribute`; the attributed half could therefore not be observed by any run the criterion
+  named. The line now names both runs. Re-verified at HEAD before folding:
+  `tools/unattended/gate-guard.js` denies a command-position `run-selftests.sh` token as row D2
+  while the run record is before `VERIFYING`, and its `READ_ONLY_VERBS` list holds `--list`,
+  `--check`, `--rank`, `--help` and `--render` and not `--attribute`, so the attributed run is
+  admitted at `VERIFYING` and not before. AC9's own two observations, its `Red when:` arms and
+  every other section of this spec are unchanged.
+  The round-3 edit rule, settled: a spec whose last revision entry already carries the head date
+  EXTENDS that entry and does not bump, which is this spec alone in the set; every spec whose last
+  entry carried an earlier date takes a new `- rev-<N>` line with a single bump. This entry was
+  briefly folded the second way and is restored to the first; the bump the other specs of the set
+  took was correct for them, because none of them had a same-day entry to extend.
 
 ## 10. Reuse audit
 

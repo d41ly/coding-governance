@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-11 — migration planner
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 11
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
 
 <!-- /gen:spec-records -->
 
@@ -305,12 +306,17 @@ as that measurement; `--plan` re-derives every one of them and the switch-over r
   cell.
   Red when: a signed record missing its `Verdict` header cell is read as all `not-unit`.
 - **AC7** — When a fixture slug's prospective `BACKLOG.md` exceeds the declared row cap, the census
-  names that slug and its size, and the README-less slugs are listed as filing homes; and the census
+  names that slug and its size, and the README-less slugs are listed as filing homes; the census
   prints each fixture family's prospective view size, which grows when the fixture gains one OPEN ask
-  in that family and does not change when it gains one CLOSED ask.
+  in that family and does not change when it gains one CLOSED ask; and when a fixture ask row's text
+  backticks a family-archive path, the census names that row with its file and line and carries the
+  archive-citation count in its summary.
   Red when: an oversized slug goes unreported, so the switch-over reds check 6 on its first run; or
   the view size is measured over every ask rather than the live asks the view renders, so the
-  flip-time figure the view unit's §5 points at reads as the whole corpus.
+  flip-time figure the view unit's §5 points at reads as the whole corpus; or the archive-citation
+  finding is absent while the size and filing-home findings still print, so the population unit 34's
+  fifth normalization is told to rewrite is the one nobody measured, and every unrewritten citation
+  becomes a dead backticked path check 15 reds on the switch-over's first run.
 - **AC8** — When `--plan --record <dir> --record-as EXMP-aFoo-1` runs twice over one fixture tree, it
   writes four records named by the recording grammar with HEAD's commit day, each carrying the Serves
   line, byte-identical across the two runs, and `git status --porcelain` shows nothing outside
@@ -365,7 +371,7 @@ as that measurement; `--plan` re-derives every one of them and the switch-over r
 
 `memory hygiene` · `build-index selftest` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit version markers` · `spec tokens (a spec's own names resolve)` · `every held leg is budgeted, every budget row resolves` · `govkit selfcheck`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `backlog migration selftest` leg · fixture repositories for each census rule, evidence class, proposal rule, normalization and refusal · the suite's own floor constant
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `backlog migration selftest` leg · fixture repositories for each census rule, evidence class, proposal rule, normalization and refusal, and an ask row citing a family archive by path · the suite's own floor constant
 
 ## 8. Open questions
 
@@ -491,6 +497,14 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` on the new `b
   ceiling is inside the per-command bound, and the HELD LEG carrying it is what no plain bar and no
   `GATE_FULL=1` bar executes. The
   header date is the last-change date; the rev is unchanged, this being the same consolidation.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold. G2 M2 (1): AC7 observes S3's last derived item, the
+  rows whose text cites a backlog archive by path — a fixture ask row backticking a family-archive
+  path is named with its file and line and counted in the census summary — and its Red-when names
+  the case no other criterion could see, the archive-citation finding absent while the size and
+  filing-home findings still print. S3 cited AC1, AC2 and AC7 for that item and none of the three
+  read it, while the hands-off to unit 34 makes the same figure load-bearing for that unit's fifth
+  normalization. §7's `New arm:` middle field names the fixture row. The item's citation and
+  wording are unchanged; only its observation is new.
 
 ## 10. Reuse audit
 

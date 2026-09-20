@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-16-review-TOOL-dDerivedDocket-37-spec-audit-g6-round1.md](../reviews/2026-09-16-review-TOOL-dDerivedDocket-37-spec-audit-g6-round1.md) | spec-audit | — |
+| [2026-09-20-review-TOOL-dDerivedDocket-37-spec-audit-g6-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-37-spec-audit-g6-round2.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -55,9 +56,35 @@ and its conf key stays out of the shipped example (§8 F5).
   that uid in its H1. A source spec whose H1 carries no uid has no key to report a hit under, so its
   bullets are not graded either. Each such bullet is counted, and the report prints the count. A
   bullet naming `external` has no sibling to join and is not read. Observed by AC3.
-- **S3** — the dated demand. `SPEC_HANDOFF_CUTOFF="2026-09-14"` is appended at the end of
+- **S3** — the dated demand. `SPEC_HANDOFF_CUTOFF="2026-09-21"` is appended at the end of
   `.memory-tree.conf`, with a header comment in the idiom of `SPEC_LEGLINE_CUTOFF`: what the arm
-  grades, why it exists as measured here, why this date, and that blank means off. Blank or absent
+  grades, why it exists as measured here, why this date, and that blank means off.
+  THE DATE IS DERIVED, NEVER CHOSEN, and the why-this-date slot of that idiom is the derivation.
+  The owner ratified one relation over every cutoff key this register introduces at
+  `TOOL-aJoinedCanon-1` section 8 F1, recorded on the `REV_SCOPE_CUTOFF` row at
+  `.memory-tree.conf:131` and spelled out with both clauses and its three reading commands on the
+  `SPEC_DIRECT_CUTOFF` row at `.memory-tree.conf:252`: the value is the day AFTER the later of
+  (a) the newest spec filename date on ANY ref or live worktree and (b) the setting commit's own
+  date. The reading taken 2026-09-20 on node `d`, over every local and remote ref and every
+  worktree `git worktree list` names: (a) 2026-09-20, (b) 2026-09-20, the later is 2026-09-20, and
+  the relation returns 2026-09-21. It is RE-DERIVED at the build commit and again at landing, never
+  carried, because the relation is to the fleet working day and a value carried across a day
+  boundary is stale by construction — `tools/check-spec-tokens.py:47` states that as this file's
+  own rule for every cutoff key it reads, and `REV_SCOPE_CUTOFF` moved twice for it.
+  THREE PLACES CARRY THE LITERAL and must move together, so the re-derivation has a checklist rather
+  than a memory: this paragraph, both where the key is spelled above and where its reading is
+  recorded; AC6's report line; and §8 F3's resolution. No gate joins them — nothing reds if one
+  moves and the others do not — so re-running the relation means editing all three in one commit or
+  none. A grep for the value also hits section 9, which spells it inside dated records of readings
+  already taken; those are append-only history and do NOT move with a re-derivation, so the
+  checklist is three and not every occurrence. The fixtures deliberately carry no literal: AC1's
+  and AC9's specs are dated AT the scratch repo's own key, whatever it holds.
+  THE COST, stated rather than discovered: the arm grades ZERO bullets on landing day, since every
+  spec of this build is dated 2026-09-14, so the self-test fixtures are its whole coverage until a
+  spec is written on or after the key's date. That is the state `SPEC_LEGLINE_CUTOFF`,
+  `SPEC_DIRECT_CUTOFF` and `REV_SCOPE_CUTOFF` each shipped in, each of those rows states it, and
+  S4's report line makes it visible rather than silent. Section 8 F3 records the relation, the
+  register rows and the one counter-precedent weighed against them. Blank or absent
   turns the arm off, and the report says `SPEC_HANDOFF_CUTOFF blank (arm off)`. The key is read
   through `read_cutoff_key`, so a set value that is not an ISO date refuses before grading, the rule
   the checker's header states for every cutoff key it reads. The key goes in
@@ -76,8 +103,11 @@ and its conf key stays out of the shipped example (§8 F5).
   unchanged. Observed by AC5 and AC9.
 - **S6** — the real-tree pass. This unit's pass runs no hand-run checker, by the owner rule the
   build brief states. After this unit's commit, at `order 6` once units 1 to 5 have closed, the
-  orchestrator runs `python tools/check-spec-tokens.py --list` once over the tree, and its graded
-  bullet count must be above zero. It is not a gate leg run. A hit in a live spec of this build is
+  orchestrator runs `python tools/check-spec-tokens.py --list` once over the tree, and its report
+  line must name the key and its date rather than the arm-off line. The graded bullet count is
+  whatever the corpus holds and is ZERO on landing day, because the relation-derived key (S3)
+  postdates every spec of this build; an above-zero count was the retroactive date's property and
+  went with it (section 8 F3). It is not a gate leg run. A hit in a live spec of this build is
   fixed in that spec, at the source bullet or in the target's text, with a rev line naming this join,
   in a commit the orchestrator makes before the next unit's pass. A hit in another build's live spec
   is that build's writer's to fix, and none exists today (§8 F3). Neither kind takes a waiver row
@@ -227,8 +257,11 @@ passes only where disjointness is proven. It is not proven for this pair, on two
 So the pair runs in sequence. `tools/workflows/unattended-build.js` hands the caller a roster ordered
 by step and then by id (`tools/workflows/unattended-build.js:314`), dispatched strictly sequentially
 (`:70`), which puts this unit first. Measured 2026-09-16 on the spec text at
-`7804eb7f`, S6 then grades 81 bullets, or 72 if unit 6 runs first. This unit declares no sibling
-edge, so check 12's order arm has nothing to compare.
+`7804eb7f`, a 2026-09-14 key would have graded 81 bullets here, or 72 if unit 6 runs first.
+Section 8 F3 took the relation-derived key instead, so S6's own run grades ZERO on landing day and
+those two figures describe the option that was not taken; what binds every later pass of this build
+from this step on is the checker's other four joins, none of which is dated. This unit declares no
+sibling edge, so check 12's order arm has nothing to compare.
 
 **What grades this build after this unit.** A unit pass runs no gate and no hand-run checker, by the
 owner rule the build brief states, so the brief cannot make a later pass run this join. The
@@ -283,9 +316,17 @@ retires another row. The shipped example conf is not touched (§8 F5).
 - **observability** — S4's line on every run, and `--list` printing each hit with its key. A
   dispatch the checker refuses names up to three non-report `spec-tokens:` lines, and S4's wording
   keeps its line out of those three (§8 F9).
-- **risks** — a straggler branch from another node could merge a spec dated on or after the cutoff
-  whose hands-off disagrees with its sibling. That reds the bar at the merge, which is the join
-  working. The merging session fixes the source bullet or names the token in the target spec. It
+- **risks** — the relation S3 derives the key by exists to make the straggler case impossible at
+  the merge: the value sits past the newest spec filename date on ANY ref and past the setting
+  commit's own day, so a spec already in flight on another node's branch is dated before the key and
+  is not graded when it lands. What the relation costs instead is the day-one zero population S3
+  states — the arm lands grading nothing, its coverage is the self-test fixtures until a spec is
+  written on or after the key's date, and S4's report line is what keeps that visible rather than
+  silent. Clause (a) has no tree-side form, because a bar grades one tree and not the fleet
+  (`.memory-tree.conf:252`), so it stays a documented check re-taken at the build commit and again
+  at landing. Once a spec IS dated on or after the key, a hands-off disagreeing with its sibling
+  reds the bar at that spec's merge, which is the join working.
+  The merging session fixes the source bullet or names the token in the target spec. It
   adds no waiver row except in a commit that retires another, because
   `memory/project/spec-token-waivers.txt` is shrink-only by its header and `TOOL-aKeyedAnnotation-9`
   records that absorbing a class there is not available.
@@ -361,24 +402,33 @@ retires another row. The shipped example conf is not touched (§8 F5).
   unit's pass.
 - **AC5** — When `memory/project/spec-token-waivers.txt` in the scratch repo holds
   `EXMP-tOne-1>EXMP-tOne-2:--frob` with a reason, the AC1 fixture exits 0. When the second spec then
-  names `--frob`, the checker exits 1 printing `STALE WAIVER`. A third spec's bullet to the second,
-  naming `--frob` unnamed, still exits 1.
-  Red when: the waiver matches on the token alone, so one row silences the token in every edge.
+  names `--frob`, the checker exits 1 printing `STALE WAIVER`. When that naming is then REVERTED,
+  restoring the waiver to live, and a third live spec with H1 uid `EXMP-tOne-3` carries a hands-off
+  bullet to `EXMP-tOne-2` naming `--frob`, which that target never names, the checker exits 1
+  printing the key `EXMP-tOne-3>EXMP-tOne-2:--frob`, with no `STALE WAIVER` anywhere in its output
+  and the AC1 edge still waived. Three checker runs, as AC7's distribution states.
+  Red when: the waiver matches on the token alone, so one row silences the token in every edge —
+  which the third state can see only once it stops riding the second state's stale hit, so it
+  asserts the PRINTED KEY and the absence of `STALE WAIVER` rather than an exit code alone.
   permission: the suite is held, so it runs at the build's one post-build bar, spelled
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, never a plain bar and never in this
   unit's pass.
 - **AC6** — When the orchestrator's run of `python tools/check-spec-tokens.py` over the tree follows
   this unit's commit and any fix S6 makes, it exits 0, and S4's report line names
-  `SPEC_HANDOFF_CUTOFF 2026-09-14` with a graded bullet count above zero. The ledger records the
-  `--list` output S6 took, with its bullet, token and silent counts.
-  Red when: the key is misspelled or blank, so the arm is off over the corpus that motivated it; the
-  graded bullet count is 0, so the arm landed without grading one real bullet; or a live hit remains
-  unfixed.
+  `SPEC_HANDOFF_CUTOFF 2026-09-21` with its bullet, token and silent counts. That bullet count is
+  ZERO on landing day and this criterion does not require otherwise: every spec of this build is
+  dated before the relation-derived key (S3), so what the live run observes is that the arm is ARMED
+  and REPORTING, and the arm's coverage on landing day is the self-test fixtures AC1 to AC5, AC9 and
+  AC10 exercise. The ledger records the `--list` output S6 took, with all three counts.
+  Red when: the key is misspelled or blank, so the report prints the arm-off line instead of the
+  date and nothing would ever be graded; the report line is absent, so a run that never reached the
+  join is indistinguishable from one that graded zero; or a live hit remains unfixed.
   permission: this unit's pass runs no hand-run checker, by the build brief's owner rule. The
   orchestrator runs it after the commit, before the next unit's pass, and writes this criterion's
   ledger line.
   figure: DERIVED at observation from the specs still live at this unit's step, since every earlier
-  pass closes its own spec. §4 Rollout gives the count measured on the text at `7804eb7f`.
+  pass closes its own spec. §4 Rollout gives the count a 2026-09-14 key would have graded on the
+  text at `7804eb7f`, which is the option section 8 F3 did not take.
 - **AC7** — When `grep -c '^arm "' tools/check-spec-tokens.test.sh` runs on this unit's commit, it
   prints 51, and the `FLOOR_ASSERTIONS=` pin in `tools/check-spec-tokens.test.sh` reads 55: the 38
   `arm` calls at `fb07ca25` plus the 13 this unit adds across §7's six `New arm:` rows, two for
@@ -393,16 +443,26 @@ retires another row. The shipped example conf is not touched (§8 F5).
   is the per-row distribution this criterion states, since §7's third fields name the floor in
   words and carry no count.
 - **AC8** — When `bash skills/session-kickoff/manifest-check.sh` runs on this unit's commit, check 5
-  passes with the re-stamped `last-audit`, and `memory/map/features/spec-tokens.md` names five joins.
+  passes with the re-stamped `last-audit`, `memory/map/features/spec-tokens.md` names five joins,
+  and the module docstring of `tools/check-spec-tokens.py` carries a fifth join row keyed `handoff`
+  beside `legs`, `paths`, `cites` and `bar`, naming its population — a hands-off bullet's backticked
+  payload in a LIVE spec dated at or after `SPEC_HANDOFF_CUTOFF` — and its stated limits, that
+  consumes-from is ungraded and that naming a token is not doing the work.
   Red when: `.memory-tree.conf` moves with no re-stamp, or the dossier still describes four joins,
-  which the map's freshness leg would not catch because it grades claims rather than prose.
+  which the map's freshness leg would not catch because it grades claims rather than prose; or the
+  docstring still describes four joins, so the file's own header understates what the file grades —
+  the false-confidence case charter section 7's own-header rule exists for, arriving through the gate
+  written to prevent it.
   permission: this unit's pass runs no hand-run checker, by the build brief's owner rule. The
   pre-commit hook runs the checker's staged leg, check 5's staged form included, on this unit's
   commit, and the post-build bar's `kickoff-manifest ratchet` leg runs the whole checker; the
   orchestrator writes this criterion's ledger line after that bar.
-- **AC9** — When the scratch build's source spec is named `2026-09-14-spec-tOne-1.md` with H1 uid
-  `EXMP-tOne-1`, and its hands-off target is named `2026-09-14-spec-tOne-2-u1-part.md` inside a
-  `units` sub-folder of `spec` with H1 uid `EXMP-tOne-2`, `python tools/check-spec-tokens.py` exits 1
+- **AC9** — When the scratch build's source spec is named for the scratch repo's own
+  `SPEC_HANDOFF_CUTOFF` followed by `-spec-tOne-1.md`, with H1 uid `EXMP-tOne-1`, and its hands-off
+  target by that same date followed by `-spec-tOne-2-u1-part.md`, inside a `units` sub-folder of
+  `spec` with H1 uid `EXMP-tOne-2` — both dated AT that key, as AC1's fixture is, so the fixture's
+  dates move with the key instead of pinning a value the relation re-derives —
+  `python tools/check-spec-tokens.py` exits 1
   over a token the target never names and prints the key `EXMP-tOne-1>EXMP-tOne-2:--frob`, in
   `tools/check-spec-tokens.test.sh`.
   Red when: the target is found by filename or one directory deep, so a legal family-less, tailed or
@@ -463,20 +523,41 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   to a hands-off at the producer, which this join grades when the producer is dated on or after
   `SPEC_HANDOFF_CUTOFF`; outside that population nothing grades the payload, and S7 names the
   remainder.
-- **F3** — Which cutoff? Options: (a) 2026-09-14, this spec set's date; (b) 2026-09-08,
-  `SPEC_EDGES_CUTOFF`'s date. Measured at rev-1, both select the same 107 bullets, because no other
+- **F3** — Which cutoff? Options: (a) 2026-09-14, this spec set's date, which grades this build's
+  own bullets retroactively; (b) 2026-09-08, `SPEC_EDGES_CUTOFF`'s date; (c) the value the owner's
+  cutoff relation returns, re-derived at the build commit and again at landing. Measured at rev-1,
+  (a) and (b) select the same 107 bullets, because no other
   live spec carries a hands-off bullet. (b) would also reach a straggler spec dated 2026-09-08 to
-  2026-09-13 on another node's branch, which this build never measured. RESOLVED (agent, 2026-09-14,
-  delegated): (a). The coverage is equal on every spec this repo holds, and its reach into branches
-  nobody measured is smaller.
+  2026-09-13 on another node's branch, which this build never measured. (a) was resolved on that
+  reading at 2026-09-14 and is wrong for a reason neither option weighed: the owner ratified a
+  RELATION over every cutoff key this register introduces at `TOOL-aJoinedCanon-1` section 8 F1,
+  recorded at `.memory-tree.conf:131` and spelled out with both clauses at `.memory-tree.conf:252`,
+  and 2026-09-14 breaks both — it EQUALS this build's own newest spec filename date instead of
+  sitting past it, and it precedes the setting commit's own date.
+  `tools/check-spec-tokens.py:47` states the same rule as the CHECKER's own posture for every cutoff
+  key it reads. The counter-precedent was weighed and rejected at that same F1:
+  `ACCEPTANCE_LEDGER_CUTOFF` was taken so a check would ship exercised on real units, which is this
+  unit's exact rationale, and the owner did not take it here.
+  RESOLVED (agent, 2026-09-20, delegated): (c), superseding the 2026-09-14 resolution of (a) narrated above. The
+  value is RE-DERIVED by the relation rather than recorded as a departure, which is the route
+  entirely inside a run's authority — a fork contradicting an owner ruling is not a run's to settle,
+  which is the ground F4 refuses its own option (c) on. The reading taken 2026-09-20 returns
+  2026-09-21 (S3). The day-one zero population is accepted as the relation's stated cost: S6 and AC6
+  no longer require a graded count above zero, section 5 risks now reads the straggler case as the
+  relation preventing it rather than as the join working, and F4's order resolution is re-read below
+  in that light.
 - **F4** — Where does this unit sit in the build order, and what binds the later passes to its join?
   Options for the order: (a) keep order 39, and run S6 and AC6 in a scratch worktree at a sha where
   the build's specs are live; (b) order 6, sharing the step with unit 6, the pair run in sequence as
   §4 Rollout proves it must be; (c) an order ahead of units 1 to 5. (c) contradicts owner ruling
   D12-i11, which builds units 1 to 5 first, so it is not a run's to take. (a) grades a tree the unit
   does not land on, and leaves every later pass of this build without the join.
-  RESOLVED (agent, 2026-09-16, delegated): (b). It grades on the unit's own commit a population
-  measured at 81 bullets, and lets AC6's zero-count clause fire. No veto trips: the order verb is this
+  RESOLVED (agent, 2026-09-16, delegated): (b). RE-READ at the round-3 fold, after F3 took the
+  relation-derived cutoff: the 81-bullet population and AC6's above-zero clause were properties of
+  option (a)'s date and went with it, so neither argues for (b) any more. What still does is
+  unchanged — (a) grades a tree the unit does not land on and leaves every later pass of this build
+  without the join, (c) contradicts D12-i11, and (b) lands the arm in the tree at the earliest step
+  the owner ruling leaves. No veto trips: the order verb is this
   spec's own field, and §4 Rollout shows the shared step owes no parallel pass. Options for the
   binding: (i) a build brief step making each later pass run the checker before its commit;
   (ii) nothing between this unit's commit and the post-build bar, which grades none of this build's
@@ -629,6 +710,54 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   spells the VERIFYING run `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` rather than
   "with `GATE_SELFTESTS=1`", so a held leg is not read as covered by a plain bar. The header date
   stays at the last-change date; the rev does not move.
+  Extended 2026-09-20 by the spec-audit round 3 fold, the G6 round-2 record, which exited CONVERGED
+  with no blocker, so its one HIGH folds here rather than promoting; H1 was folded first, because a
+  re-cut AC6 changes which criteria the other two hang from. G6 H1 (8, 15): the key was
+  `SPEC_HANDOFF_CUTOFF="2026-09-14"`, which breaks BOTH clauses of the cutoff relation the owner
+  ratified at `TOOL-aJoinedCanon-1` section 8 F1 — it equals this build's own newest spec filename
+  date instead of sitting past it, and it precedes the setting commit's day — and no section named
+  the ruling or recorded a departure, while S3 ordered a header comment "in the idiom of
+  `SPEC_LEGLINE_CUTOFF`" whose why-this-date slot IS that relation. The route taken is
+  RE-DERIVATION, the one wholly inside a run's authority, not a recorded exception: the reading of
+  2026-09-20 over every ref and worktree returns 2026-09-21, and S3 now carries the relation, its
+  two register rows at `.memory-tree.conf:131` and `.memory-tree.conf:252`, the reading, the
+  re-derive-at-landing rule and the day-one zero cost. Everything that hung on the retroactive date
+  moved with it: S6 and AC6 drop the above-zero clause and observe instead that the arm is ARMED and
+  REPORTING, AC6's `figure:` and §4 Rollout attribute the 81 and 72 bullet counts to the option not
+  taken, section 5 risks stops affirming the straggler merge as the join working and states the
+  relation prevents it, section 8 F3 gains option (c) with the ruling, the register and the
+  `ACCEPTANCE_LEDGER_CUTOFF` counter-precedent cited and is re-resolved to it, F4's order
+  resolution is re-read so it no longer leans on the 81-bullet population or the zero-count clause,
+  AC9's fixture dates move with the key rather than being pinned, and §10's 109-bullet probe is
+  attributed to the key that was not taken. G6 M1 (3): S7 said the checker's header docstring is
+  "Observed by AC8 and AC11" while neither read a byte of it, so AC8 now reads the fifth join row
+  keyed `handoff` beside the four, with its population and its two stated limits, and its Red when
+  names the four-join header in front of a five-join program. G6 M2 (4): AC5's third state rode the
+  second state's stale hit, so an implementation matching on the bare token — the exact defect its
+  own Red when names — passed all three states; state 3 now REVERTS the second spec's naming, adds
+  a third live spec with H1 uid `EXMP-tOne-3`, and asserts the PRINTED KEY
+  `EXMP-tOne-3>EXMP-tOne-2:--frob` with no `STALE WAIVER` in the output rather than an exit code
+  alone. The arm count does not move, so S8, AC7, AC10 and section 5's cost figures are untouched.
+  Base and header date unchanged; the rev is kept under the fold's edit rule, which extends this
+  spec's existing 2026-09-20 line rather than opening a new one.
+- rev-4 · 2026-09-20 · §2 · S3 · AC9 · the round-3 fold's verifier. Two repairs about one literal.
+  The relation was RE-RUN at HEAD on node `d` before anything was edited, all three readings of the
+  `SPEC_DIRECT_CUTOFF` row at `.memory-tree.conf:258-260`: (a) the newest spec filename date over
+  every ref and every `git worktree list` worktree is 2026-09-20, (b) `git log -1 --format=%cs` is
+  2026-09-20, so the relation still returns 2026-09-21 and the value stands. What did not stand is
+  the maintenance story. Four places carried the date literally with nothing joining them, so a
+  re-derivation at the build commit or at landing could move one and leave three, and no leg would
+  red. AC9 leaves that set entirely: it spelled two literal fixture filenames and then claimed, in
+  the same sentence, that its fixture dates move with the key rather than being pinned — a
+  contradiction inside one clause, since AC1 genuinely is unpinned and AC9 was not. Its fixture
+  names are now derived from the scratch repo's own key, which keeps the family-less, tailed and
+  sub-folder shape the criterion exists to grade and removes one carrier. S3 names the three that
+  remain — its own paragraph, AC6's report line and §8 F3's resolution — and says plainly that no
+  gate joins them, so the re-derivation has a checklist instead of a memory. Recorded as its own
+  entry with a single bump: this build settled that form for a spec already touched the same day.
+  Verified in the same round and corrected in place, at no further rev bump: S3's checklist now says
+  that section 9's own mentions of the value are frozen records of readings taken and are not
+  carriers, so a grep returning more than three hits does not read as a fourth carrier.
 
 ## 10. Reuse audit
 
@@ -649,9 +778,10 @@ New arm: tools/check-spec-tokens.test.sh · a family-less, tailed target filenam
   300 s. The unattended kit's `--dispatch` gained its run of the declared checker, whose report-line
   filter §8 F9 answers. The shipped example conf now declares `SPEC_DIRECT_CUTOFF` blank by hand
   (`tools/memory-tree/.memory-tree.conf.example:140`); §8 F5 stays as resolved, so this unit's key
-  stays out of it. Probed read-only at `94fd2f54`, S1's join grades 109 bullets and 160 tokens with
-  no miss, every one in this build, and no other build's live spec dated on or after the cutoff
-  carries a hands-off bullet.
+  stays out of it. Probed read-only at `94fd2f54` under a 2026-09-14 key, S1's join grades 109
+  bullets and 160 tokens with no miss, every one in this build; under the relation-derived key
+  §8 F3 takes it grades none of them, and no other build's live spec is dated on or after that key
+  at all.
 - **Against check 12.** The grammar S1 takes is check 12's edge arm in
   `tools/memory-tree/check-memory-hygiene.sh`, unchanged from `abac6d59` to `fb07ca25` but for its
   version line, memory-tree 2.74 to 2.78; §4 The selection cites each line, and each holds at

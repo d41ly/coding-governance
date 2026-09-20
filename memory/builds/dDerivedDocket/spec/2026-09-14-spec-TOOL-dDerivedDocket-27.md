@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -36,7 +37,9 @@ fits, instead of reporting all three like a red leg.
   Observed by AC1, AC5 and AC12.
 - **S2** `GATE_PROFILE_CMD`, a declared command that prints the runner's resolved profile; gov sets
   the runner's `--print-profile`. Blank means the bar has no profile, and it stays bounded by
-  `GATE_BOUND`, announced. Observed by AC1.
+  `GATE_BOUND`, announced. A profile that prints no `queue` or no `wall` falls back the same way and
+  names the missing key. Observed by AC1 for the declared arm and by AC15 for the blank and
+  missing-key arms, which are the state every adopter starts in.
 - **S3** The runner's `--print-profile` gains two keys: `queue`, the turnstile's maximum wait, with its
   computation hoisted above the verb's exit; and `ceiling_max`, the largest positive `ceiling` in the
   resolved manifest, or `-` when none is declared. Observed by AC6.
@@ -60,7 +63,7 @@ fits, instead of reporting all three like a red leg.
   kept auto-file by AC10, whose attributed run reds when an arm the policy unit added newly fails.
 - **S6** The conf check: the leg reds, and `--preflight` refuses, when the effective wall is below the
   runner's `ceiling_max`, naming both numbers. Blank `GATE_PROFILE_CMD` makes the check announce that
-  it cannot compare. Observed by AC4 and AC5.
+  it cannot compare. Observed by AC4 and AC5 for the declared arm, and by AC15 for the blank one.
 - **S7** The Skill's Close section: on a `hold` line from `gates-green`, commit the staged records,
   push the branch, reap the keepalive, then run `--hold` with the code and condition the line names
   and `--reaped <id>`, never `--override`. When that push fails because the remote does not answer,
@@ -80,8 +83,8 @@ fits, instead of reporting all three like a red leg.
   the announced fallback when the record carries no fact. KF7 specified
   `max(backstop, declared bound)`, and this is where the build delivers it. Observed by AC9.
 - **S12** This unit's delta on every capped carrier is ZERO OR NEGATIVE. Leg check 22 owes the two
-  conf keys ONE joined protocol key-table row, and §4 names the two §8 restatements that fund it.
-  Observed by AC14.
+  conf keys ONE joined protocol key-table row, and §4 names the two §8 spans that fund it — one
+  restatement and one argument, no rule among them. Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -187,17 +190,46 @@ checked rather than asserted.
 Leg check 22 of `tools/unattended/check-unattended.sh` joins §8's key table against
 `tools/unattended/.unattended.conf.example` and reds on a key declared in one and missing from the
 other, so `GATE_WALL` and `GATE_PROFILE_CMD` are OWED a row rather than pending a ruling. ONE
-joined first cell carries both keys for about 150 bytes, and the protocol and
-`tools/unattended/README.md` are in Files touched for it. The row is paid for by trimming §8's own
-restated boilerplate, named precisely so that no sibling unit trims the same text — the
-`UNIT_STALL_BOUND` cell's restatement of `GATE_BOUND`'s terms at
-`tools/unattended/PROTOCOL.template.md:459`, opening "OPTIONAL, on", 119 bytes, which the cell has
-just pointed at and which the sibling row already states in full; and the `REVIEW_ROUNDS` cell's
-closing clause at `tools/unattended/PROTOCOL.template.md:460`, opening ", and so is a value at or
-above the runaway ceiling", 135 bytes. Both move to `tools/unattended/README.md`, the kit README,
-which carries no size row in `tools/template-size-limits.txt` and owns kit prose; neither carries a
-kit-path literal, so the shipped-surface ban does not move. That is 254 bytes against about 150, so
-the delta stays zero or negative. No cap is raised: raising one is an owner turn.
+joined first cell carries both keys, and it is the EXISTING `GATE_CMD` cell at
+`tools/unattended/PROTOCOL.template.md:457` widened rather than a row of its own, so the table gains
+bytes and NO line. A new row would be line-POSITIVE against two inline trims that remove no line,
+which is the half of AC14's reading a byte price cannot see. Check 22 reads the first cell with
+`awk -F'|' 'NF>2 {print $2}'` piped through `grep -oE` for backticked upper-case tokens
+(`tools/unattended/check-unattended.sh:1694`), taking every key the cell holds, so three keys join as
+readily as the two of the `KEEPALIVE_CREATE` row that comment names. The replacement is written out
+here and MEASURED, because a margin against an unwritten row is a prediction and not a price:
+
+```
+| `GATE_CMD` · `GATE_WALL` · `GATE_PROFILE_CMD` | the full merge bar, for `gates-green`; the whole-run wall in seconds on it, and the command printing its resolved profile. The last two OPTIONAL |
+```
+
+That is 198 bytes where BASE's row is 54: a delta of 144 bytes and 0 lines. Both keys' blank-value
+behaviour stays in S1, S2 and `tools/unattended/README.md` rather than in the cell, which is what
+holds the delta under the trim. The protocol and
+`tools/unattended/README.md` are in Files touched for it. The row is paid for by trimming §8's
+RESTATEMENT and its ARGUMENT and never a rule, each span named precisely so that no sibling unit
+trims the same text:
+
+- the `UNIT_STALL_BOUND` cell at `tools/unattended/PROTOCOL.template.md:459` keeps
+  `OPTIONAL, on GATE_BOUND's terms`, which is both the optionality RULE and the pointer; what leaves
+  is the restatement that follows it, from the colon through "non-numeric or zero is a refusal", 86
+  bytes. The sibling `GATE_BOUND` row states those terms in full, so the pointer still resolves;
+  trimming the pointer with the restatement would have left the cell saying nothing at all about
+  being optional, which is a rule and not boilerplate.
+- the `REVIEW_ROUNDS` cell at `tools/unattended/PROTOCOL.template.md:460` KEEPS its clause ", and so
+  is a value at or above the runaway ceiling" — the protocol's only statement of a refusal the
+  driver actually makes at conf load, `tools/unattended/unattended.sh:533` exiting 2 against
+  `RUNAWAY_CEILING` — and loses only that clause's argument, ", because the ceiling would fire first
+  and the declared bound could never be reached", 84 bytes.
+
+Both spans move to `tools/unattended/README.md`, the kit README, which carries no size row in
+`tools/template-size-limits.txt` and owns kit prose; neither carries a kit-path literal, so the
+shipped-surface ban does not move. That is 170 bytes trimmed against 144 added, both measured, so
+the protocol ends this unit's pass 26 bytes smaller and exactly as many lines long: every span here
+is taken inline and the row is an existing one widened, so nothing adds or removes a line and the
+byte margin and the line delta can each be stated rather than hoped for. A cell that will not fit
+inside 170 is a re-pricing rather than a deeper trim. No cap is
+raised: raising one is an owner turn.
 
 ### Alternatives rejected
 
@@ -222,7 +254,8 @@ the delta stays zero or negative. No cap is raised: raising one is an owner turn
 - risks — a wedged close now waits up to the backstop, about eight hours here; that is D12-i7's
   stated cost. A wall raised in the conf mid-run takes effect only at the next preflight.
 - testing — driver and leg arms with a stub gate that answers the profile and sleeps, exits 3, exits 4
-  or hangs before `acquired`, each staged RED; the runner arm in its held canary.
+  or hangs before `acquired`, plus the blank-profile and missing-key arms AC15 names, each staged
+  RED; the runner arm in its held canary.
 - migration — gov declares both keys in the unit's commit; an adopter keeps `GATE_BOUND` until it
   declares a profile command.
 - user docs — `.unattended.conf.example`, the Skill's Close section, `tools/run-gates/README.md` for
@@ -345,35 +378,71 @@ the delta stays zero or negative. No cap is raised: raising one is an owner turn
   suite.
 - **AC14** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
-  parent's and both trims are taken and landed:
+  parent's, and neither is its `wc -l` line count. Both trims are taken, both landed, and both left
+  their rule behind:
   `grep -c 'terms: absent takes the kit default and says so'` and
-  `grep -c 'and so is a value at or above the runaway ceiling'`, each over
-  `tools/unattended/PROTOCOL.template.md`, count 1 at the parent and 0 at the build commit,
-  with both trimmed passages present in `tools/unattended/README.md`. The owed joined row arrived:
+  `grep -c 'because the ceiling would fire first'`, each over
+  `tools/unattended/PROTOCOL.template.md`, count 1 at the parent and 0 at the build commit, with
+  both trimmed passages present in `tools/unattended/README.md`. Each rule survived its own trim,
+  read at the BUILD COMMIT on the row that owns it:
+  `grep -c 'UNIT_STALL_BOUND.*OPTIONAL, on' tools/unattended/PROTOCOL.template.md` counts 1, and so
+  does
+  `grep -c 'REVIEW_ROUNDS.*and so is a value at or above the runaway ceiling' tools/unattended/PROTOCOL.template.md`.
+  The owed joined row arrived, and arrived inside an EXISTING row:
   `grep -c 'GATE_PROFILE_CMD' tools/unattended/PROTOCOL.template.md` counts 0 at the parent and 1 or
-  more at the build commit. The same
-  two readings hold for `tools/unattended/PROTOCOL.template.md` and for
-  `memory/guides/BUILD-METHOD.md`, and each size is below its declared ceiling — 61440 bytes in
-  `tools/memory-tree/check-memory-hygiene.sh` for the guide, and the `memory/guides/BUILD-METHOD.md`
-  row of `tools/template-size-limits.txt` for the method.
+  more at the build commit, and
+  `grep -c 'GATE_CMD.*GATE_WALL.*GATE_PROFILE_CMD' tools/unattended/PROTOCOL.template.md` counts 1
+  at the build commit, so the three keys share one first cell and the table gained no row. The same byte and line
+  readings hold for `tools/unattended/PROTOCOL.template.md` and for
+  `memory/guides/BUILD-METHOD.md`, and every carrier is below the ceilings that govern it. For the
+  two under `memory/guides/` that is the guide BYTE cap and the guide LINE cap, RESOLVED from the
+  single line of `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and
+  `GUIDE_CAP_LINES` together and never retyped here as literals, because check 6 reds on EITHER
+  half. `memory/guides/BUILD-METHOD.md` carries a SECOND ceiling, its row in
+  `tools/template-size-limits.txt`, which declares bytes and no line half, so that one is graded on
+  bytes alone; this unit's delta on it is 0 either way.
   Red when: the key-table row is added and nothing is trimmed, so a unit whose design says it spends
   nothing quietly spends the headroom the build's units share; or the size is read against the
   figure written in this spec rather than against the parent commit, so a sibling's landing hides
-  this unit's overspend; or the trim is witnessed by a phrase the new row can itself carry, such
-  as a bare `OPTIONAL, on`, so a row written in the table's own house style masks the trim and the
-  count never moves; or only the larger of the two trims is taken, so the row is half funded; or
+  this unit's overspend; or the trim is witnessed by a phrase the widened cell can itself carry,
+  such as a bare `OPTIONAL, on`, so a cell written in the table's own house style masks the trim
+  and the count never moves; or only the larger of the two trims is taken, so the row is half funded; or
   the trim is taken and the text lands in no destination, which DELETES a
   refusal's reason rather than moving it; or the cap is raised to make the row fit, which is an
   owner turn; or the two keys reach §8's key table in no row, which reds check 22 of
-  `tools/unattended/check-unattended.sh` on the next bar.
-  permission: a read, a byte count and three greps, no gate leg and no suite.
+  `tools/unattended/check-unattended.sh` on the next bar; or the two keys arrive as a NEW table row,
+  so the table gains a line that two inline trims remove none of and the `memory hygiene` leg reds
+  on the line half while every byte reading passes; or a trim takes a RULE along with its
+  restatement or its argument, so the shipped table tells an adopter that `UNIT_STALL_BOUND` has no
+  optional terms or that `REVIEW_ROUNDS` refuses only two of the three values the driver refuses;
+  or the edit is byte-neutral and line-POSITIVE, so every byte reading passes and the
+  `memory hygiene` leg reds on the line half it never read.
+  permission: a read, two byte-and-line counts and six greps, no gate leg and no suite.
+- **AC15** — Over a FIXTURE conf whose `GATE_PROFILE_CMD` is blank — the state every adopter starts
+  in — three observations. `gates-green` bounds the stub gate at `GATE_BOUND` and announces the
+  missing profile; `--preflight` pins no `gate-backstop` fact and says why; and
+  `bash tools/unattended/check-unattended.sh` over that same fixture announces that it cannot
+  compare the wall with `ceiling_max` and does NOT red. The same three hold with
+  `GATE_PROFILE_CMD` declared but its stub printing neither `queue` nor `wall`, where each
+  announcement names the missing key.
+  Red when: a blank or unanswered profile refuses at conf load, so an adopter cannot run the driver
+  at all until it declares one; or the backstop is computed from an empty profile and bounds the bar
+  at the margin alone, which kills a healthy bar; or the conf check reds instead of announcing, so
+  the day-one state of every adopter is a red leg; or the fallback is silent, which is the
+  liveness-assertion failure this repo's own gates are written against.
+  permission: the arms are written and staged RED in the pass; the suites that execute them,
+  `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`, sit on no
+  bar leg at all, so the run that executes them is the VERIFYING run's attributed
+  `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for either
+  suite.
 
 ## 7. Gates
 
 `unattended kit gate` · `unattended skill wiring` · `run-gates canary` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · a stub gate that queues, hangs before acquiring, exits 3 twice, or exits 4 · the driver suite's executed-assertion floor
-New arm: tools/unattended/check-unattended.test.sh · a conf whose wall is below the profile's largest ceiling · the leg suite's executed-assertion floor
+New arm: tools/unattended/unattended.test.sh · a stub gate that queues, hangs before acquiring, exits 3 twice, exits 4, answers no profile at all, or answers one carrying neither queue nor wall · the driver suite's executed-assertion floor
+New arm: tools/unattended/check-unattended.test.sh · a conf whose wall is below the profile's largest ceiling, and one whose profile command is blank · the leg suite's executed-assertion floor
 New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest with known ceilings · the canary's executed-assertion floor
 
 ## 8. Open questions
@@ -467,6 +536,46 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
   `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
   `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
   post-build bar" alone would have read as a bar that covers them.
+- rev-6 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 M1 ids 25 and 30, M3 id 6, H1 id 13).
+  - M1: both §8 trims took a RULE and not just its reason, so §4 narrows them. The
+    `UNIT_STALL_BOUND` cell keeps `OPTIONAL, on GATE_BOUND's terms` and loses only the restatement
+    after it, 86 bytes; the `REVIEW_ROUNDS` cell keeps ", and so is a value at or above the runaway
+    ceiling" and loses only its argument, 84 bytes. The 170 bytes that leaves still fund the joined
+    cell, now measured rather than estimated (see the round-3 verifier entry below). S12 and AC14 follow, and AC14 gains unit 22's arm: it now witnesses that each rule is
+    still stated at the build commit, and reds when a trim takes one. Verified at HEAD before
+    folding: `tools/unattended/PROTOCOL.template.md:459`'s tail from `OPTIONAL, on` is the cell's
+    ENTIRE optionality statement, pointer included, so the old rationale that the cell "has just
+    pointed at" the sibling row was falsified by its own trim; and `:460`'s clause is the
+    protocol's only statement of the refusal `tools/unattended/unattended.sh:533` makes at conf
+    load.
+  - M3: new AC15 runs the blank-`GATE_PROFILE_CMD` path and the profile that prints neither `queue`
+    nor `wall` — the day-one state of every adopter, which S2 and S6 claimed observed and which no
+    criterion of this spec reached: AC1 gives the stub a profile, AC4 grades a conf with one
+    present, AC5 runs the real tree where S8 declares the key, and the only other hits for the key
+    were AC12's blank `GATE_WALL` arm and this criterion's grep. S2, S6, §5 testing and two
+    `New arm:` staged breaks name it.
+  - H1: AC14 reads BOTH halves of the guide cap, resolved from the line of
+    `tools/memory-tree/check-memory-hygiene.sh` that declares them together rather than retyped,
+    and states that BUILD-METHOD's second ceiling in `tools/template-size-limits.txt` declares
+    bytes and no line half. Verified at HEAD: that line declares `GUIDE_CAP_BYTES=61440` and
+    `GUIDE_CAP_LINES=750`, check 6 reds on either, and the protocol stands at 675 lines and 60324
+    bytes.
+  - Round-3 verifier, same pass and rev: the M1 narrowing cut the funding from 254 bytes to 170
+    while §4 still priced the owed row at "about 150", so a 20-byte margin stood between two
+    figures of which only one was measured. The row is now WRITTEN OUT in §4 and measured, and it
+    is the existing `GATE_CMD` cell at `tools/unattended/PROTOCOL.template.md:457` widened to carry
+    all three keys — 198 bytes where that row is 54, a delta of 144 against 170 trimmed. Widening
+    beats adding, because two inline trims remove no line while a new row adds one, which would
+    have red AC14's line half on a byte-negative pass; AC14 gains the arm that reds on a new row
+    and a witness that the three keys share one first cell. Verified at HEAD before writing:
+    `tools/unattended/PROTOCOL.template.md:457` is the one-key `GATE_CMD` row, 54 bytes, whose
+    second cell reads "the full merge bar, for `gates-green`"; and check 22's first-cell extractor at
+    `tools/unattended/check-unattended.sh:1694` takes every backticked upper-case token in the
+    cell, which is why its own comment can rely on the `·`-joined `KEEPALIVE_CREATE` row yielding
+    both of its keys.
+  - Round-3 fold verifier, same pass and rev: AC14's first Red-when still called the widened
+    `GATE_CMD` cell "the new row", which the same criterion's last arm reds on. It reads "the
+    widened cell" now. No arm moved.
 
 ## 10. Reuse audit
 

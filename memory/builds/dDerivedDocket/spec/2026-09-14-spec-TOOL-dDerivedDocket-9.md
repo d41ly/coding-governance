@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 9
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
 
 <!-- /gen:spec-records -->
 
@@ -33,15 +34,21 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   from the committed blob, never from a working copy. Observed by AC1 and AC5.
 - **S3** The transition predicate, by LINEAGE and never by tip (design A1). A merge M is a
   transition when some parent P has, in `merge-base --all(P, others)..P`, a commit whose own tree is
-  in shards mode and that touches `<MEMORY_ROOT>/backlog/` or `<MEMORY_ROOT>/archive/`, AND some
-  other parent Q has, in its own lineage against P, a commit whose own tree is in builds mode.
-  Observed by AC1, AC2 and AC3.
+  in shards mode and that touches one of the WATCHED PATHS, AND some other parent Q has, in its own
+  lineage against P, a commit whose own tree is in builds mode. The watched paths are
+  `<MEMORY_ROOT>/backlog/` and, under `<MEMORY_ROOT>/archive/`, the FAMILY-named rotated archives
+  alone — the family half of the alternation
+  `bash tools/memory-tree/check-memory-hygiene.sh --print-rotated-archive-ere` prints, the same
+  population `row_grammar.row_docs` and unit 13 §8 F4 already use — never the archive directory as a
+  whole. Observed by AC1, AC2, AC3 and AC4.
 - **S4** The delta of a transition, keyed by row id through the kit's one anchor grammar. For every
   id whose row version at P differs from its version at EVERY merge base and was never held by a
   shards-mode commit on the other parents' side (design A6), the delta names the id, the change
   kind (new, changed, removed) and the newest lineage commit that made it. Shard and archive rows
   of one family are one population, so a row rotated away with its status flipped is a change and
-  a row removed from both is a REMOVED change (design A5). Observed by AC3, AC4 and AC14.
+  a row removed from both is a REMOVED change (design A5). The delta reads S3's watched paths and
+  nothing else, so the decision log, its rotated archives, the retired ledger shards and the charter
+  snapshots contribute no entry. Observed by AC3, AC4 and AC14.
 - **S5** Accounting (design A4). A delta entry is accounted when HEAD's tree carries EXACTLY ONE
   provenance row `- RELOCATED · <id> · by <sha> · kept|dropped|amended: why` in some
   `<MEMORY_ROOT>/builds/*/BACKLOG.md`, whose sha is a 7+ hex prefix of the change commit. Zero is
@@ -178,7 +185,7 @@ change reds the bar everywhere and is repaired forward instead of trusted.
   history-audit job's liveness step greps.
 - **hands-off** `TOOL-dDerivedDocket-34` — the flip's landing merge, which S3 classifies as a
   transition exactly when main's lineage against the build branch carries a shards-mode commit
-  touching the backlog or archive paths, that is, when main's shards moved since the fork; check 25
+  touching S3's watched paths, that is, when main's shards moved since the fork; check 25
   then audits it. When they did not, the merge is no transition, and a builds-mode HEAD prints
   `transitions examined 0` and exits 0 with no DEAD PROBE (S7, §8 F2).
 - **hands-off** `TOOL-dDerivedDocket-35` — the real-tree staged RED of this check, which the arming
@@ -200,6 +207,16 @@ change reds the bar everywhere and is repaired forward instead of trusted.
 - **Transition** — S3. The second conjunct is what keeps an ordinary pre-flip merge of two
   shards-mode branches out of the population; design A1 states only the first and says the tip does
   not matter, which this keeps.
+- **Watched paths** — S3. `<MEMORY_ROOT>/backlog/` plus the family-named rotated archives, and NOT
+  the archive directory as a whole. `<MEMORY_ROOT>/archive/` also holds the rotated decision log, the
+  retired ledger shards and the frozen charter snapshots: rotating the decision log is a routine,
+  sanctioned action under `ROTATION_MODE="cut"`, and the real `extract.anchor_at` over the existing
+  `memory/archive/DECISIONS.2026-08-10.md` returns 79 anchored ids, every one of which a
+  directory-wide selector would report as a NEW row on a straggler that rotated its log, redding
+  check 25 with decision ids whose only printed remedy is a `RELOCATED` row per decision id. Unit 13
+  narrows HAS-DELTA the same way and for the same reason (its §8 F4); these two are one rule, not
+  two. Do not widen this back. The 79 is PINNED as a measurement over that one file at `fb07ca25`;
+  the predicate derives its own population at run time and no count is authored in the module.
 - **Delta entry** — `(transition sha, id, kind, change sha)`. Keys come from `extract.anchor_at`,
   imported lazily from the memory-recall kit directory the way `tools/memory-tree/merge-rows.py:184-210`
   does, so this module spells no second row grammar. With that kit absent under builds mode, S15
@@ -217,11 +234,14 @@ change reds the bar everywhere and is repaired forward instead of trusted.
    over the distinct blobs. The mode of every commit falls out.
 3. No builds-mode commit anywhere: dormant. This is gov's state until the flip, so the dark cost is
    three processes. Measured at this build's records commit `e7da7bf5`: 2523 commits, 309 merges,
-   585 commits touching the backlog or archive paths. PINNED as a measurement of that date.
+   585 commits touching the backlog directory or the archive directory as a whole. PINNED as a
+   measurement of that date, and an UPPER bound on S3's watched paths, which exclude every archive
+   that is not family-named.
 4. Candidates are merges with a mode boundary among their ancestors; lineage sets are computed in
    Python from the graph of step 1, with no process per merge.
-5. One `git log --diff-merges=first-parent --name-only` over the two paths names the commits that
-   touch them, and one more `cat-file --batch` fetches the blobs the deltas need.
+5. One `git log --diff-merges=first-parent --name-only` over S3's watched paths — the backlog
+   directory and the family-named rotated archives, never the archive directory as a whole — names
+   the commits that touch them, and one more `cat-file --batch` fetches the blobs the deltas need.
 6. Cached deltas skip steps 4 and 5 for every merge already seen.
 
 The first post-flip run on a node pays for every candidate merge once. The `memory hygiene` leg's
@@ -327,16 +347,28 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
   fixture: built by the suite; none exists in the tree today.
 - **AC4** — When a criss-cross fixture holds a row version that differs from one merge base and
   equals another, `transition_audit.py --report` omits it from the delta; a row removed from both
-  the shard and its archive appears as REMOVED. Red when: the delta compares against the first
-  merge base only.
-- **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs on this tree before the flip,
-  it prints check 25's dormant line and exits 0 on that account; on a builds-mode fixture it prints
-  `transitions examined` with a non-zero count. Red when: the dormant branch prints nothing, which
-  reads exactly as a clean audit.
+  the shard and its archive appears as REMOVED; and when a fixture straggler rotates its decision
+  log into `<MEMORY_ROOT>/archive/` across the transition, the delta holds no entry for any id
+  anchored in that rotated log, while a family-named backlog archive rotated in the same commit
+  still contributes its entries.
+  Red when: the delta compares against the first merge base only; or the archive half of the watched
+  set selects by directory, so a routine decision-log rotation makes every id anchored in the rotated
+  log a NEW row, reds check 25 on a straggler with nothing to relocate, and prints one `RELOCATED`
+  remedy per decision id.
+  fixture: the rotation arm is observed RED first with the archive selector widened to the whole
+  directory, because a zero-entry assertion over a fixture holding no rotated decision log passes for
+  the wrong reason.
+- **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs on a shards-mode scratch
+  fixture, it prints check 25's dormant line and exits 0 on that account; on a builds-mode fixture it
+  prints `transitions examined` with a non-zero count.
+  Red when: the dormant branch prints nothing, which reads exactly as a clean audit.
   figure: every count on the line is DERIVED at run time.
-  permission: the run over this tree is the `memory hygiene` leg's command, which no pass runs (build
-  method M6), so it is observed at the one post-build bar; in the pass the dormant line is observed by
-  hand on a shards-mode scratch fixture.
+  permission: both runs are the hygiene engine over a FIXTURE, which the ratified narrow reading
+  keeps inside this unit's own pass, so neither is deferred. The dormant half is deliberately NOT
+  taken over this repository: that run is the `memory hygiene` leg's command over the real tree, so
+  it could only be made at the one run the main loop makes at `VERIFYING`, and unit 34 sets
+  `BACKLOG_MODE="builds"` here at order 34 — by that moment this tree prints the liveness line and
+  not the dormant one, and the deferred half would grade a branch this criterion does not describe.
 - **AC6** — When the fixture's HEAD is builds mode and the module's conf reader is staged broken to
   read every blob as shards, the check exits 1 as a DEAD PROBE; a
   `git clone --depth 1 file://<fixture>` of the builds-mode fixture, which
@@ -444,7 +476,7 @@ edge's `why`, the `project-owned` include) · `transition-audit.txt` (new, empty
 
 `memory hygiene` · `memory-hygiene self-test` · `harness arms (fail branches armed or pinned)` · `testsuite counts (every bar self-test prints one)` · `govkit selfcheck` · `check-wiring self-test` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)` · `kit version markers` · `leg ceilings clear their evidenced maximum`
 
-New arm: `transition-audit.test.sh` on a new repo-subject leg · each §18r.1 fixture merged with no provenance row, a broken conf reader, a shallow clone, a stale registry row, a replace ref and a graft, a `--at` tip differing from HEAD, an absent memory-recall kit, the real-tree hook-list comparison both ways, the `requires_if` edge's presence · the new suite's own floor
+New arm: `transition-audit.test.sh` on a new repo-subject leg · each §18r.1 fixture merged with no provenance row, a broken conf reader, a shallow clone, a stale registry row, a replace ref and a graft, a `--at` tip differing from HEAD, an absent memory-recall kit, a decision-log rotation across a transition, the real-tree hook-list comparison both ways, the `requires_if` edge's presence · the new suite's own floor
 
 New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged `commit-msg`, RED with `commit-msg` removed from `GOV_WIRING_HOOKS` in a scratch copy · none
 
@@ -589,6 +621,23 @@ New arm: `tools/check-wiring.test.sh` fixture arm · check H reports a diverged 
   corrected the criterion names in this entry's own narrow-reading sentence, which had cited AC9 for
   a hygiene run AC9 does not make; no criterion moved.
   The header date is the last-change date; the rev is unchanged, this being the same consolidation.
+- rev-6 · 2026-09-20 · spec-audit round 3 fold. G2 H2 (19): S3 names a WATCHED PATH set and scopes
+  its archive half to the FAMILY-named rotated archives — the family half of the alternation
+  `--print-rotated-archive-ere` prints — instead of the whole of `<MEMORY_ROOT>/archive/`; S4's
+  delta reads that same set; a new §4 Data model item states which archive files are outside it and
+  why, pinning the measurement behind it (the real `extract.anchor_at` returns 79 anchored ids over
+  `memory/archive/DECISIONS.2026-08-10.md` and 0 over a charter snapshot, re-measured at this fold);
+  §4 walk steps 3 and 5 follow, step 3's pinned 585 now labelled an upper bound; the hands-off to
+  unit 34 cites the watched paths; AC4 gains the rotation arm with its RED-first fixture note, and
+  S3 cites AC4; §7's arm line names it. Without this, a routine decision-log rotation on a
+  shards-mode straggler made 79 ids read as NEW rows and redded check 25 with decision ids whose
+  only printed remedy is a `RELOCATED` row each. Unit 13 already narrows HAS-DELTA this way (its §8
+  F4); the two are now one rule. G2 L3 (17): AC5's real-tree dormant half is DROPPED and the
+  shards-mode scratch fixture becomes the whole criterion, because the only moment a real-tree run
+  could be made is the one run at `VERIFYING`, by which point unit 34 has flipped this tree to
+  `builds` and the dormant branch no longer exists here; the permission line says so, and both of
+  AC5's runs now stay in this unit's own pass as fixture runs. S6 and S7 keep their AC5 citations,
+  the dormant observation still being made.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-1 — held-suite failure baseline
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -51,12 +52,21 @@ at L, and no OVER BUDGET at L. It is stated once, in S10. Built first, by owner 
 - **S6** `tools/unattended/run-unattended-gates.sh --attribute <R>` forwards the flag to its
   delegated self-test half and prints one line saying its `--checks` half is not attributed.
   Observed by AC6.
-- **S7** Two backlog rows are disposed at build time, with commit 8b29f0b9 as the evidence. That
-  commit, an ancestor of BASE, already fixed the bare `$1` abort in the case pattern the rows cite
-  at line 4107, which sits at `tools/unattended/unattended.test.sh:4123` at BASE. The first row,
-  TOOL-aTracedSpawn-1, is CLOSED citing it. The second, TOOL-aHoistedPass-36, records its stop (1)
-  as fixed by it and stays OPEN for its stop (2). NOT OBSERVED by a criterion: these are records,
-  and check 13 and the row grammar grade their shape.
+- **S7** Two backlog rows are ADVANCED at build time, with commit 8b29f0b9 as the evidence, and
+  NEITHER is CLOSED on it: each row asks for two things and that commit answers one. That commit, an
+  ancestor of BASE, already fixed the bare `$1` abort in the case pattern the rows cite at line 4107,
+  which sits at `tools/unattended/unattended.test.sh:4123` at BASE. The first row,
+  TOOL-aTracedSpawn-1, records its quote-the-`$1` half as fixed by that commit and stays OPEN for its
+  second half, the re-read of the suite's recorded seconds. The row's own words are that a run
+  aborting in seconds cannot have produced the 2569 s reading, and
+  `tools/run-gates/selftest-budgets.txt` still carries that reading for `unattended driver selftest`.
+  Section 3 keeps every budget row out of this unit's scope, so the row is what has to carry the
+  unpaid half, and it matters here: S5 and S10 make an L-side OVER BUDGET a term of the
+  `verdict clean` token, so a suite that now runs to completion and breaches a budget measured from
+  an aborted run reds every unit that reads that token. The second row, TOOL-aHoistedPass-36,
+  records its stop (1) as fixed by it and stays OPEN for its stop (2), which is the same treatment.
+  NOT OBSERVED by a criterion: these are records, and check 13 and the row grammar grade their
+  shape.
 - **S8** The compensating-check wording moves from "a GREEN verdict" to the S10 criterion. The new
   wording is: "`--attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD
   PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at
@@ -209,7 +219,7 @@ and carries no verdict. With the cache, each (R, suite) is paid once per build, 
 
 `tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` ·
 `tools/unattended/run-unattended-gates.sh` · `tools/unattended/kit.toml` ·
-`memory/backlog/TOOL.md`, for the two dispositions · the two kit version markers · the run-gates
+`memory/backlog/TOOL.md`, for the two row advances, neither of them a close · the two kit version markers · the run-gates
 dossier prose · `.githooks/gate-env.sh`, its DoD comment only.
 
 ### Alternatives rejected
@@ -462,6 +472,16 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
   the pass. §5 also names, in the orchestrator's own terms, the run that executes the new arms once
   they are written: `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, because
   `run-selftests self-test` is a HELD leg and a plain bar does not reach it.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H4, id 29). S7 no longer writes
+  TOOL-aTracedSpawn-1 CLOSED. That row's ask has two halves, the quoted `$1` and a re-read of the
+  suite's recorded seconds, and commit 8b29f0b9 answers only the first; the row was re-read at HEAD
+  and still stands OPEN at `memory/backlog/TOOL.md:462`, while
+  `tools/run-gates/selftest-budgets.txt` still budgets `unattended driver selftest` from the 2569 s
+  reading the row itself calls impossible. So both rows now take the treatment S7 already gave
+  TOOL-aHoistedPass-36: the answered half recorded, the row left OPEN for the rest. Section 3 is
+  unchanged and no budget row is touched here, which is the reading that keeps the re-measurement
+  visible rather than closing it out of sight under the units that read S10's `verdict clean` token.
+  Nothing else in this spec moved: no criterion, no edge and no other S-item.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
+| [2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 |
 
 <!-- /gen:spec-records -->
 
@@ -53,7 +54,10 @@ under it.
   `memory/guides/UNATTENDED-VERBS.md`, the verbs half of the contract, which already carries that
   verb and states most of this paragraph in shorter form — one fact in one place, and §7 of the
   protocol records the same move as a byte decision. §4 keeps one sentence pointing at the verb
-  entry. The paragraph is larger than the row, so each protocol copy is SMALLER at this unit's
+  entry, and that sentence does NOT reuse the moved paragraph's opening clause
+  `The two attested items have a VERB, the only way to write one`, so the phrase AC1 counts belongs
+  to the destination by construction and a correctly performed move cannot red it. The paragraph is
+  larger than the row, so each protocol copy is SMALLER at this unit's
   commit than at its parent. No other unit of this build trims that paragraph. Observed by AC1
   and AC10.
 - **S6** A report-only drift-audit signal, `asks_disposed_overrides`, counting `override` park rows
@@ -73,7 +77,11 @@ under it.
 - Moving the freeze to `--close` under in-place landing is unit 22's.
 - The contract prose for T0 to T5, the override route and the KEEP rule in the companion guide,
   and the Skill's filing steps (a SEV row in the same commit as the ask, closeout timing) are
-  unit 20's. This unit writes only the protocol §4 row that leg check 16 requires.
+  unit 20's. This unit writes the protocol §4 row that leg check 16 requires, the §7 byte-decision
+  line recording S5's move, and the `--attest` entry of the verbs pair that §4's paragraph moves
+  into; the companion-guide contract prose stays with unit 20. §4 Files touched lists all of them,
+  and a builder scoping from the single-carrier sentence this bullet used to carry would under-write
+  and red AC1's third `Red when:`.
 - Setting `ASKS_CMD` in gov and the real-tree staged RED are unit 35's.
 - V10 itself is a verdict of the memory-tree engine (units 6 and 8). This unit enforces its rule for
   this build's own asks at `--close` and adds no verdict to the engine.
@@ -93,6 +101,10 @@ under it.
 - **consumes-from** `TOOL-dDerivedDocket-15` — the `--asks --tsv` row shape the witness parses
   (the status, decided-by, home and closers fields, and the closing examined line). Without it T2
   has nothing to read.
+- **consumes-from** `TOOL-dDerivedDocket-48` — the witness capture that keeps the producer's stderr
+  off the row stream. The G3 round-2 record's B1 measured that `run_bounded` merges both streams,
+  so §4's parse refuses on a healthy producer; §4 and S2 keep their current text and take that
+  unit's answer.
 - **hands-off** `TOOL-dDerivedDocket-18` — the leg's re-derivation that every LANDED record carrying
   a mandate carries `asks-at-landing`.
 - **hands-off** `TOOL-dDerivedDocket-20` — the contract text for T0 to T5, the override route and
@@ -126,6 +138,15 @@ witness: a witness that omits an F ask would otherwise shrink F to match
 line per id with eleven fields, then `examined<TAB><n>`. A line whose first field is not `ask`, or
 that does not carry eleven fields, is a parse refusal rather than a row, because a column-order
 change in the producer must read as a dead probe and never as a pass.
+
+What that parse is handed is not settled in this spec. At `fb07ca25` `run_bounded` redirects both
+streams into one capture file and reads it back (`tools/unattended/unattended.sh:191-196`), so the
+producer's stderr notices — unit 15 §4 routes the waiver line and unit 7's S11 liveness line there
+on every healthy call — arrive inside the text this rule refuses on, and the witness reads as a DEAD
+PROBE on a producer that is working. The G3 round-2 record's B1 promoted that to
+`TOOL-dDerivedDocket-48`, which chooses between a capture that keeps stderr on its own channel and a
+parse that skips non-row lines. This spec keeps the rule above and S2 as written and takes that
+answer; T2's dead-probe verdict is the term that inherits it.
 
 The driver additionally reads two things by LINE MATCH only, which is filing and not status
 (`tools/unattended/lib-unattended.sh:18-19`): disposition rows in THIS build's
@@ -276,12 +297,21 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
   this unit's build commit over `memory/guides/UNATTENDED-PROTOCOL.md` and over
   `tools/unattended/PROTOCOL.template.md`, each reads STRICTLY BELOW what `git cat-file -s`
   reports for the same path at this unit's parent commit, and below the 61440 B guide cap, while
-  `memory/guides/UNATTENDED-VERBS.md` reads under that same cap with the moved paragraph in it.
+  `memory/guides/UNATTENDED-VERBS.md` reads under that same cap with the moved paragraph in it. The
+  LINE count of each of the three, from `git cat-file -p <commit>:<path> | wc -l`, is below the
+  750-line half of that cap, which
+  `tools/memory-tree/check-memory-hygiene.sh:84` declares beside the byte half. The move is
+  witnessed by a phrase INSIDE the moved paragraph rather than by size, which a file well under its
+  cap satisfies either way: `git grep -c 'the only way to write one'` returns 1 in
+  `tools/unattended/VERBS.template.md` and 1 in `memory/guides/UNATTENDED-VERBS.md` and 0 in both
+  protocol copies at this unit's commit, and exactly the reverse at its parent. And check 10 of the
+  same leg finds BOTH pairs byte-identical, the protocol pair and the verbs pair.
   Red when: the protocol still states "Twelve", or the table lacks the `asks-disposed` row, so the
   join reports an item enforced by `--close` that the contract never names; or the row lands
   without S5's trim beside it, so a copy is LARGER at this unit's commit than at its parent and
   this unit spends headroom the rest of this build's protocol edits are priced against; or the
-  paragraph is deleted rather than moved, so the verbs half never gains what §4 gave up.
+  paragraph is deleted rather than moved, so the verbs half never gains what §4 gave up; or it
+  reaches one half of the verbs pair only, so the pair diverges while every size read still passes.
   permission: unit passes run no gate legs (fix F7, and the unit child prompt since
   TOOL-aProbedUnit-1), so this green run of the leg over the real tree is observed at the one
   post-build bar the main loop runs at VERIFYING, after the last unit, where `unattended kit gate`
@@ -514,6 +544,30 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two
   D12-h's OWN words in that §10 sentence: the ruling says the suites run once at the unit's end,
   and stating it in the folded terms left the paragraph parking a conflict it had just defined
   away. AC12 and the `cost:` line are untouched.
+
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, the G3 round-2 record, which exited BOUNDED.
+  §3 · §3 Edges · §4 · AC1. M3 (5): AC1's destination half read a size under a cap, which a file
+  well under that cap satisfies whether the paragraph moved or was deleted, and never read
+  `tools/unattended/VERBS.template.md` at all. It now counts the phrase `the only way to write one`
+  at 1 in each half of the verbs pair and 0 in each protocol copy at this unit's commit, with the
+  reverse at its parent, and asserts check 10 finds BOTH pairs byte-identical; its `Red when:` gains
+  the one-half-only reading. The same edit gives that size criterion the LINE half of the guide cap
+  beside the byte half, because `tools/memory-tree/check-memory-hygiene.sh:84` declares both. M7
+  (17): §3's "writes only" sentence named one carrier where S5 and §4 Files touched mandate three,
+  so it now names the protocol §4 row, the §7 byte-decision line and the `--attest` entry of the
+  verbs pair. One finding is PROMOTED and folded nowhere: B1 (21), inherited here through unit 16's
+  call, goes to `TOOL-dDerivedDocket-48`; §4's data-model section states the measured capture and
+  points at it, §3 gains the consumes-from edge, and the parse rule, S2 and T2 keep their current
+  text. No cap is raised, no term moves, and §7 does not move. The fold verifier named the witness
+  for the new line-count half, `git cat-file -p <commit>:<path> | wc -l`, where the fold wrote only
+  "read the same way".
+- rev-6 · 2026-09-20 · §2 · S5 · the round-3 fold's verifier, repairing the M3 fold above in the
+  safe direction. AC1 counts `the only way to write one` at 0 in both protocol copies at this
+  unit's commit, while S5 also says §4 keeps one sentence pointing at the verb entry; a builder who
+  spells that kept pointer with the moved paragraph's own opening clause performs the move
+  correctly and reds the criterion. S5 now says the kept sentence does not reuse that clause, which
+  makes the witness phrase unique to the destination by construction. AC1 does not move, and the
+  false RED it could have produced cannot arise.
 
 ## 10. Reuse audit
 

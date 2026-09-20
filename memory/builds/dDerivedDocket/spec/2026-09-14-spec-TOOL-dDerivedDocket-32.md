@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md) | spec-audit | TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md) | spec-audit | TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -28,8 +29,13 @@ the push credential has `workflow` scope, so the workflow file is committed and 
 - **S1** One workflow file, `.github/workflows/remote-ci.yml`, so the charter's CI placeholder
   derives exactly one path. Workflow-level `permissions: contents: read`. Only GitHub-owned
   `actions/*` actions, each pinned by a full 40-hex commit sha with its tag in a comment. Every
-  checkout uses `fetch-depth: 0` and `persist-credentials: false`, after a step setting
-  `core.autocrlf false`. Every job runs on `windows-latest` under `shell: bash`. After every
+  checkout uses `fetch-depth: 0` and `persist-credentials: false`, after a step running
+  `git config --global core.autocrlf false`. The SCOPE is load-bearing and is global, never
+  repo-local: that step runs in the workspace before `actions/checkout` initialises a repository
+  there, and a repo-scoped `git config` outside a repository writes nothing — it prints
+  `fatal: not in a git directory` and exits 128, measured on this node at git 2.54.0.windows.1 — so
+  a repo-scoped spelling fails the first step of every job on every push. Every job runs on
+  `windows-latest` under `shell: bash`. After every
   `actions/checkout` step, `git remote set-head origin main`; in every job, a step asserts that
   `git symbolic-ref refs/remotes/origin/HEAD` resolves before any bar command runs, and the `bar`
   job's plain `git clone` sets the symref itself. Observed by AC1, AC2 and AC7.
@@ -40,11 +46,13 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   reached check 25 cannot pass. Observed by AC3 and AC13.
 - **S3** Job `bar`, on every push to the default branch: after the autocrlf step, a plain anonymous
   `git clone` of the repository to `C:/projects/coding-governance` — the path every recorded green was
-  earned at and the one the rendered charter records — then `git checkout -B main <sha>`; it runs
+  earned at and the one the rendered charter records — then `git checkout -B main <sha>`, which
+  pins the event's sha and is the only step making the verdict per-sha, because this job uses no
+  `actions/checkout` and a plain clone takes whatever the branch tip is at clone time; it runs
   `GATE_FULL=1 bash tools/run-gates/run-gates.sh` there with `GATE_WALL` inside the window AC4
   states, so the runner's wall fires and names the outstanding legs before the platform kills the
   job. The job's conclusion is the per-sha verdict, and its run record is uploaded as S8 states.
-  Observed by AC4, AC10, AC12 and AC13.
+  Observed by AC1, AC4, AC10, AC12 and AC13.
 - **S4** Jobs `held-plan` and `held`, on a daily schedule and on `workflow_dispatch`. The plan job
   runs `bash tools/run-gates/run-selftests.sh --list`, the resolved population, and emits one matrix
   entry per suite row: its name, its budget, its full resolved argv and the bound S9 derives. It
@@ -64,8 +72,10 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   sha; `permissions` grants `contents: read` and nothing more; the bar job's `GATE_WALL` is at least
   the `ceiling_max` that `GATE_FULL=1 bash tools/run-gates/run-gates.sh --print-profile` reports and
   below its `timeout-minutes` in seconds, and `timeout-minutes` is at most 360; every
-  `actions/checkout` carries `persist-credentials: false`; the autocrlf step precedes each checkout
-  and the `bar` job's clone; every job carries `runs-on: windows-latest` and `shell: bash`; the `bar`
+  `actions/checkout` carries `persist-credentials: false`; the autocrlf step writes at `--global`
+  scope and precedes each checkout and the `bar` job's clone; the `bar` job's clone is followed in
+  the same job by a checkout pinning the event's sha; every job carries
+  `runs-on: windows-latest` and `shell: bash`; the `bar`
   job's clone URL carries no credential and no `secrets` reference; every checkout is followed by
   `git remote set-head origin main`; and the `on:` block names `push` restricted to `main`,
   `schedule` and `workflow_dispatch` and no `pull_request` or `pull_request_target` event, with each
@@ -102,7 +112,13 @@ the push credential has `workflow` scope, so the workflow file is committed and 
   `tools/unattended/README.md` already owns, in its own words, beside that kit's runner catalog. The
   one fact the kit README does not carry, that those legs left the kit's own descriptor so adopters
   stop receiving them, MOVES into that README in the same commit, and `AGENTS.md` keeps a clause
-  pointing at it, which AC8 reads and which those 443 bytes must cover. The owner ruling and its
+  pointing at it, which AC8 reads and which those 443 bytes must cover. The moved sentence is
+  written in the README's own idiom, naming the merge-bar leg manifest and this kit's `kit.toml` by
+  ROLE rather than by path, so it carries no `tools/` literal into a shipped kit doc:
+  `tools/unattended/README.md` carries zero of them at BASE and has NO row in
+  `tools/install-prefix-carried.txt`, whose header reserves adding a row or raising a count to a
+  person writing it by hand, while `install-prefix (shipped surface)` is an unguarded repo-subject
+  leg that grades that file on every bar. AC8 reads that zero. The owner ruling and its
   date, what stayed on the bar, and the on-demand runner line all stay in `AGENTS.md`; no other unit
   trims this passage. The run-gates and unattended version moves these edits ride are the landing range's single
   ones, NOT OBSERVED by a criterion here: `kit version markers` grades them. Observed by AC8.
@@ -315,19 +331,26 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
 
 - **AC1** — When `grep -c 'fetch-depth: 0'`, `grep -c 'persist-credentials: false'` and
   `grep -c 'actions/checkout@'` run over `remote-ci.yml`, the three counts are equal and non-zero;
-  each checkout and the `bar` job's clone step is preceded in its job by the `core.autocrlf false`
-  step and each checkout is followed by `git remote set-head origin main`; every job declares
+  each checkout and the `bar` job's clone step is preceded in its job by the autocrlf step, which
+  spells `git config --global core.autocrlf false` with its `--global` flag present; the `bar` job's
+  clone step is followed in the same job by `git checkout -B main <sha>` pinning the event's sha;
+  and each checkout is followed by `git remote set-head origin main`; every job declares
   `runs-on: windows-latest` and `shell: bash`, and carries a step running
   `git symbolic-ref refs/remotes/origin/HEAD` before any bar command; and the `bar` job's clone URL
   holds no `secrets.` reference. On a scratch copy, one break per property — a deleted `fetch-depth`
-  line, a deleted `persist-credentials` line, the autocrlf step moved after a checkout, one job on
+  line, a deleted `persist-credentials` line, the autocrlf step moved after a checkout, the
+  autocrlf step's `--global` flag dropped, the `bar` job's `git checkout -B main <sha>` line
+  deleted, one job on
   `ubuntu-latest`, one `set-head` step deleted, one job's `shell: bash` deleted, a
   `${{ secrets.X }}` reference put in the clone URL, and one job's `symbolic-ref` assertion step
   deleted — makes its check fail, and the journal records each reading.
   Red when: only the first job's checkout is full-history or credential-free, so a second job runs
   shallow or leaves the token in the clone's git config, or a job runs on a runner F1 rejected; or a
   job loses its symref assertion, so a missing `set-head` fails later inside a bar leg for a host
-  reason.
+  reason; or the autocrlf step is written repo-local, so it exits 128 in the pre-checkout workspace
+  and every job dies at its first step while every other read here stays green; or the `bar` job
+  loses its sha pin, so its plain clone takes a later tip and publishes a per-sha verdict earned at
+  a tree the push never named.
 - **AC2** — When `grep -nE 'uses:'` runs over the workflow file, every line names `actions/` and
   ends in a 40-hex sha followed by its tag comment; on a scratch copy naming a tag instead, and on one
   naming a non-`actions/` action pinned by a 40-hex sha, the same pattern test fails, and the journal
@@ -368,9 +391,17 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
   equals the population `bash tools/run-gates/run-selftests.sh --list` prints, with no name twice,
   and each entry's `--kit "<argv>" --list` selects exactly its own row; on a scratch copy of the
   derivation with one entry dropped, and with one key shortened to a bare directory, the union check
-  and the one-row check each red, and the journal records both.
+  and the one-row check each red; over a scratch `--list` fixture holding one row the parser cannot
+  read, the derivation reds naming that row rather than emitting the rows it could read; and over a
+  scratch `--list` fixture whose row count exceeds 256, it reds naming the platform's matrix limit.
+  The journal records all four readings.
   Red when: the derivation reads the budget file's argv column, so the rows that inherit their argv
-  are dropped, or a key selects several suites, so the union still matches while suites run twice.
+  are dropped, or a key selects several suites, so the union still matches while suites run twice;
+  or an unparseable row is silently dropped, which the union check catches only when that row is
+  also absent from `--list` and never when it is mis-parsed into a plausible argv that is still a
+  substring of its own row, so the daily held job runs a command that is not the suite's; or the
+  256-entry refusal ships with no arm, which is a guard nobody has seen red over a population of 63
+  rows that never approaches it.
 - **AC6** — When `python tools/lexicon/lexicon.py` and `python tools/govkit/govkit.py selfcheck` run
   with the workflow file tracked, both pass.
   Red when: `yml` stays undeclared in `LANGS`, and the lexicon leg refuses the new extension.
@@ -389,7 +420,9 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
   header and over `AGENTS.md`'s merge-bar section, and `grep -c 'no NEW FAIL'` at least 1 over each
   runner header; `grep -c 'stop receiving them too' AGENTS.md` prints 0 while
   `grep -c 'adopters stop receiving' tools/unattended/README.md` prints at least 1 and `AGENTS.md`
-  still names that README, the trim and its destination S7 pins; and `tr -d '\r' < AGENTS.md | wc -c`
+  still names that README, the trim and its destination S7 pins;
+  `grep -c 'tools/' tools/unattended/README.md` prints 0, the count that file carries at BASE; and
+  `tr -d '\r' < AGENTS.md | wc -c`
   at this unit's commit reads at most what the same command reads at this unit's PARENT, and at most
   64329, the BASE count S7 holds this unit to, 183 below the ceiling
   `tools/template-size-limits.txt` declares for that file.
@@ -399,7 +432,10 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
   paragraph, or the `AGENTS.md` sentence, is deleted rather than rewritten, which passes every
   absence grep and removes the compensating-check sentence unit 1 S8 rewrote; or the trimmed
   sentences are deleted without the fact they carry reaching the kit README, so the build loses it;
-  or `AGENTS.md` GROWS at this unit's commit, which passes a ceiling read while spending headroom the
+  or the moved sentence carries its two `tools/` paths verbatim into the kit README, which ROSEs the
+  unguarded `install-prefix (shipped surface)` leg at the post-build bar, where no pass of this unit
+  is left to fix it and only a hand-written registry row can clear it; or `AGENTS.md` GROWS at this
+  unit's commit, which passes a ceiling read while spending headroom the
   units after this one need, and leaves the `charter size` leg to red at the post-build bar where no
   pass of this unit is left to trim it.
   permission: the render check and the size check are the `playbook render wiring` and `charter size`
@@ -469,7 +505,7 @@ S7) · `tools/run-gates/run-selftests.sh` (header) ·
 
 ## 7. Gates
 
-`playbook render wiring` · `lexicon naming predicates` · `govkit selfcheck` · `charter size` · `memory hygiene` · `line length` · `drift-audit records` · `kit version markers`
+`playbook render wiring` · `lexicon naming predicates` · `govkit selfcheck` · `charter size` · `memory hygiene` · `line length` · `drift-audit records` · `kit version markers` · `install-prefix (shipped surface)`
 
 No new gate arm. The file's contract is observed by staged breaks recorded in the journal (S5), and
 its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
@@ -620,6 +656,25 @@ its liveness in CI is the history audit's own DEAD PROBE on a shallow clone.
   worth stating twice: its reading is deferred because the `GATE_FULL=` PREFIX is what the
   hook denies, not because `ceiling_max` needs a full bar, and that value is the manifest's
   largest declared ceiling either way. The header date already reads 2026-09-20, rev kept.
+  Extended a fourth time 2026-09-20 by the spec-audit round 3 fold, the G5 record, which exited
+  CONVERGED with no blocker, so its highs fold here rather than promoting. G5 H1 (19): S1 and S5
+  now spell the autocrlf step as `git config --global core.autocrlf false` and say why the scope is
+  load-bearing — a repo-scoped write in the pre-checkout workspace prints
+  `fatal: not in a git directory` and exits 128, reproduced on this node at git 2.54.0.windows.1 —
+  and AC1 reads the `--global` flag, stages its removal as a further break and names the
+  every-job-dies-at-its-first-step case in its Red when. G5 M1 (1): S3 states that
+  `git checkout -B main <sha>` is the only step making the verdict per-sha, since the job uses no
+  `actions/checkout`, and adds AC1 to its observers; S5's contract list carries the property; AC1
+  reads the pin, stages the line's deletion as one more break and names the verdict-at-an-unpushed-tree
+  case. G5 M2 (5): AC5 gains the two arms S4's unarmed refusals needed, an unparseable `--list` row
+  and a fixture over 256 rows, with a Red-when clause for each — the mis-parsed row that is still a
+  substring of its own row, and the limit check nobody has seen fire. G5 M3 (14): S7 pins the
+  sentence it MOVES into `tools/unattended/README.md` to the README's own idiom, naming the leg
+  manifest and the kit's `kit.toml` by role so no `tools/` literal lands in a shipped kit doc, and
+  records that the file carries zero of them at BASE with no row in
+  `tools/install-prefix-carried.txt`; AC8 reads that zero and names the ROSE in its Red when; §7
+  gains `install-prefix (shipped surface)`, the unguarded repo-subject leg that grades it. Base and
+  header date unchanged, rev kept.
 
 ## 10. Reuse audit
 

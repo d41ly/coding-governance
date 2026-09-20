@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 |
 
 <!-- /gen:spec-records -->
 
@@ -27,7 +28,10 @@ rule: nothing kills a process this run did not start.
 ## 2. Scope (IN)
 
 - **S1** `run_bounded` (`tools/unattended/unattended.sh:183`) starts its command in the background,
-  records it, and waits for it; the file capture and the `timeout -k` wrapper are unchanged. The
+  records it, and waits for it; the `timeout -k` wrapper is unchanged, and the file capture is
+  unchanged BY THIS UNIT rather than unchanged since `fb07ca25`. `TOOL-dDerivedDocket-48` lands two
+  capture files where that base has one, under the same wrapper and the same `</dev/null`, and this
+  unit neither widens nor narrows that: the ledger still wraps exactly one bounded runner. The
   record is one line in a per-slug ledger beside the lease under the git common dir. Observed by AC1.
 - **S2** A record is an IDENTITY, not a name: the MSYS pid, its start token read from procfs, the
   driver's own pid and start token, the keepalive id, the time, and the first three argv words for
@@ -90,6 +94,9 @@ rule: nothing kills a process this run did not start.
   unit's final criterion (AC10) uses.
 - **consumes-from** `TOOL-dDerivedDocket-22` — the in-place removal point, since an in-place landing
   writes no terminal until a rotation that may never come.
+- **consumes-from** `TOOL-dDerivedDocket-48` — the two-file capture inside `run_bounded`, which this
+  unit wraps rather than rewrites. Without knowing that unit lands first, S1's pin would be read as
+  forbidding the split and the two units would contradict each other on one function.
 
 ## 4. Design
 
@@ -155,7 +162,8 @@ guides and Skill · `memory/map/features/unattended.md`.
 
 `memory/guides/BUILD-METHOD.md` is absent from that list, so this unit's delta on it is 0 bytes and
 it spends none of BUILD-METHOD's 384. The stops companion guide this unit's S8 rule lands in is a
-NEW file under `memory/guides/`, which draws on its own 61440-byte cap and not on the protocol's.
+NEW file under `memory/guides/`, which draws on its own guide cap — BOTH halves of it, bytes and
+lines, since check 6 reds on either — and not on the protocol's.
 The protocol IS touched, for one key-table row, and it ends this unit's pass no larger than it began
 it, so it spends none of the 1,116 bytes the protocol has left at BASE. AC13 reads both capped
 carriers at the pass and reds if either GREW, so the claim is checked rather than asserted.
@@ -284,16 +292,21 @@ anything the other writes.
   live records, so a running process loses the only record that lets a later reap find it.
 - **AC13** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
-  parent's, `grep -c 'unlike the sibling above' tools/unattended/PROTOCOL.template.md` counts 1 at
+  parent's and neither is its `wc -l` line count,
+  `grep -c 'unlike the sibling above' tools/unattended/PROTOCOL.template.md` counts 1 at
   the parent and 0 at the build commit with the trimmed text present in
   `tools/unattended/README.md`, and `grep -c 'PROCMON_CMD' tools/unattended/PROTOCOL.template.md`
   counts 0 at the parent and 1 or more at the build commit. The companion guide
   `UNATTENDED-STOPS.md`, where S8's rule lands, is read the same way at the build commit and is
-  below the same 61440-byte guide cap.
-  The same two size readings hold for `tools/unattended/PROTOCOL.template.md` and for
-  `memory/guides/BUILD-METHOD.md`, and each size is below its declared ceiling — 61440 bytes in
-  `tools/memory-tree/check-memory-hygiene.sh` for the guide, and the `memory/guides/BUILD-METHOD.md`
-  row of `tools/template-size-limits.txt` for the method.
+  below BOTH halves of the guide cap.
+  The same byte and line readings hold for `tools/unattended/PROTOCOL.template.md` and for
+  `memory/guides/BUILD-METHOD.md`, and every carrier is below the ceilings that govern it. For the
+  three under `memory/guides/` that is the guide BYTE cap and the guide LINE cap, RESOLVED from the
+  single line of `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and
+  `GUIDE_CAP_LINES` together and never retyped here as literals, because check 6 reds on EITHER
+  half. `memory/guides/BUILD-METHOD.md` carries a SECOND ceiling, its row in
+  `tools/template-size-limits.txt`, which declares bytes and no line half, so that one is graded on
+  bytes alone; this unit's delta on it is 0 either way.
   Red when: the key-table row is added and nothing is trimmed, so a unit whose design says it spends
   nothing quietly spends the headroom the build's units share; or the size is read against the
   figure written in this spec rather than against the parent commit, so a sibling's landing hides
@@ -302,9 +315,13 @@ anything the other writes.
   an owner turn; or `PROCMON_CMD` reaches §8's key table in no row, which reds check 22 of
   `tools/unattended/check-unattended.sh` on the next bar; or the trim is witnessed by a phrase an
   EARLIER unit of this build removes first, so the count reads 0 at this unit's parent and the arm
-  can never go green; or the companion is measured only in prose, so text pushed out of the
+  can never go green; or the row is added and the trim taken in a way that is byte-neutral and
+  line-POSITIVE, so every byte reading passes and the `memory hygiene` leg reds on the line half it
+  never read; or the new companion lands under the byte cap and over the line cap, which check 6's
+  own 81.92-byte-per-line break-even makes the expected shape for a carrier of rows and short
+  bullets; or the companion is measured only in prose, so text pushed out of the
   protocol lands in a carrier nobody reads the size of.
-  permission: a read, a byte count and two greps, no gate leg and no suite.
+  permission: a read, two byte-and-line counts and two greps, no gate leg and no suite.
 
 ## 7. Gates
 
@@ -388,6 +405,26 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
   `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
   post-build bar" alone would have read as a bar that covers them.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H1, id 13). AC13 read the guide cap by
+  its BYTE half only, on the protocol, its template, the new stops companion and
+  `memory/guides/BUILD-METHOD.md`; the declaration has two halves and check 6 reds on either. All
+  four carriers are now read both ways, with both numbers RESOLVED from the line that declares them
+  rather than retyped, and AC13 states that BUILD-METHOD's second ceiling in
+  `tools/template-size-limits.txt` declares bytes and no line half, so a reader is not left to
+  guess which halves that row has. §4's sentence about the new companion's own cap names both
+  halves too. The criterion gains a `Red when:` arm for a byte-neutral line-POSITIVE edit and one
+  for a companion under the byte cap and over the line cap. Verified at HEAD:
+  `tools/memory-tree/check-memory-hygiene.sh` declares `GUIDE_CAP_BYTES=61440` and
+  `GUIDE_CAP_LINES=750` on one line and check 6 tests both; `memory/guides/UNATTENDED-PROTOCOL.md`
+  stands at 675 lines and 60324 bytes; `memory/guides/BUILD-METHOD.md` stands at 347 lines and
+  27264 bytes against a 27648-byte row, and this unit's delta on it is 0. This round found no other
+  confirmed defect in this spec, and nothing else here moved. Closing verifier, same pass and rev:
+  AC13's `permission:` line still read `a byte count` while the criterion now reads lines as well,
+  and names both counts.
+  Extended on the promote close-out pass, same base and rev · S1 · §3 Edges · the capture pin is
+  re-scoped to what THIS unit changes, and a consumes-from edge names `TOOL-dDerivedDocket-48`,
+  which splits that capture at an earlier order, 15 against this unit's 28. The ledger, the
+  identity record and the reaping are untouched.
 
 ## 10. Reuse audit
 

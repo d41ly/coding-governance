@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-30 — checker defects from the stop census
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -280,17 +281,32 @@ prose.
   the same command over a fixture would stay in the pass.
 - **AC3** — When `GOV_UNATTENDED_REPORT=1 bash tools/unattended/check-unattended.sh --only 28` runs
   on the real tree, it exits 0 and prints one skip line each for checks 30 and 31; without the
-  variable it exits 0 and prints nothing.
+  variable it exits 0 and prints nothing. And when the same command runs over a FIXTURE copy of the
+  leg carrying an extra `# ---- check 32` header after the 28 region, it prints a THIRD skip line
+  naming 32, with no edit to any list.
   Red when: the conf read stays inside the guard, and the run exits 1 on
-  `MEMORY_ROOT: unbound variable`.
-  permission: this is the `unattended kit gate` leg's own command over the REAL tree, so under
-  rule 1's narrow reading it DEFERS to the run at VERIFYING rather than running in this pass;
-  the same command over a fixture would stay in the pass.
+  `MEMORY_ROOT: unbound variable`; or the skip list is a literal, so a check added after this unit is
+  skipped in silence or returns the `set -u` crash this unit closes. The third clause is the one that
+  grades S2's DERIVATION: `# ---- check <n>` occurs exactly twice in
+  `tools/unattended/check-unattended.sh` at BASE, at checks 30 and 31, so a derived implementation
+  and a hand-typed `30 31` produce byte-identical output over today's population and only an
+  EXTENDED population can tell them apart.
+  permission: the real-tree half is the `unattended kit gate` leg's own command, so under
+  rule 1's narrow reading it DEFERS to the run at VERIFYING rather than running in this pass; the
+  fixture-copy half is the same command over a fixture and stays in the pass.
 - **AC4** — When a fixture copy of the leg removes one key from between the `gov:conf-allow`
   sentinels, the leg fails 22 naming that key; with one sentinel deleted, it fails 22 naming the
-  region.
+  region; with a present sentinel PAIR enclosing no key at all, it fails 22 naming the region; and
+  with the sentinel pair DOUBLED, it fails 22 naming the region. Each of the four is staged and seen
+  RED.
   Red when: the region is extracted by a pattern the extractor's own source line matches, which
-  reads keys from outside the list and hides the removal.
+  reads keys from outside the list and hides the removal; or either of the two regions that yield no
+  usable key passes. S3 declares three trigger conditions for that branch — missing, repeated,
+  empty — and the last two are the demonstrable false green: §4 records the first-draft trap where an
+  over-wide extraction read 38 keys instead of 20, and a wider allow-list subtracts more, leaving the
+  `comm` difference empty and check 22 reporting green over a real mismatch. §4 calls that branch
+  the join's liveness, which is why the condition it names as load-bearing may not ship with its
+  failing case unobserved.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
   is parked, §9).
@@ -382,8 +398,8 @@ prose.
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `shell hygiene (a loop fed by a command substitution)` · `lexicon naming predicates` · `line length` · `codebase-map coverage + freshness` · `kickoff-manifest ratchet` · `memory hygiene`
 
 New arm: `tools/unattended/check-unattended.test.sh` · an edited brief, a sibling's brief, and a matching brief in a fixture pass commit · the check-unattended arms floor and the leg suite's executed-assertion floor
-New arm: `tools/unattended/check-unattended.test.sh` · a removed allow-list key, a deleted sentinel, a documented flag with no parser token, a parser flag with no header line, a suite missing `--version` · the check-unattended arms floor and the leg suite's executed-assertion floor
-New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--only 28` · the leg suite's executed-assertion floor
+New arm: `tools/unattended/check-unattended.test.sh` · a removed allow-list key, a deleted sentinel, an empty sentinel region, a doubled sentinel pair, a documented flag with no parser token, a parser flag with no header line, a suite missing `--version` · the check-unattended arms floor and the leg suite's executed-assertion floor
+New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--only 28`, and the same run over a fixture leg carrying an extra check header after the 28 region · the leg suite's executed-assertion floor
 New arm: `tools/unattended/unattended.test.sh` · the driver run with `--version` · the driver suite's executed-assertion floor
 New arm: `tools/unattended/unattended.test.sh` · the driver run with `--plan --framed` · the driver suite's executed-assertion floor
 New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip 28` · the leg suite's executed-assertion floor
@@ -486,6 +502,23 @@ New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip
   `New arm:` third field spelled the arms floor as a backticked conf key while the row above it
   spelled the same floor in words; both now read the same way, so no field of this spec carries
   a bare identifier. The header date stays at the last-change date; the rev does not move.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §7 §10 · AC3 AC4. M8: S3 declares a
+  `fail 22` branch for a sentinel region that is missing, REPEATED or EMPTY, and AC4 staged the
+  missing case alone. The two unstaged conditions are the demonstrable false green — a wider region
+  subtracts more keys, the `comm` difference empties, and check 22 reports green over a real
+  mismatch, which is the first-draft trap §4 records — and §4 itself calls that branch the join's
+  liveness. AC4 now stages all four cases and §7's arm row names the two added ones. M10: S2 requires
+  the `--only 28` skip list to be DERIVED from the file's own `# ---- check <n>` headers and declared
+  itself observed by AC3, which pinned the two checks that exist today; `# ---- check <n>` occurs
+  exactly twice in `tools/unattended/check-unattended.sh` at BASE, so a derived implementation and a
+  typed `30 31` were byte-identical under that criterion. AC3 gains a fixture leg carrying an extra
+  `# ---- check 32` header after the region and requires a third skip line, which extends the
+  population rather than re-reading it, and its `Red when:` names the silent skip a literal leaves
+  behind. M11: §10's third paragraph still described the PRE-fold placement of the attributed
+  unattended suite run, "at this unit's end under D12-i8's lift", against the S7, §5 testing and AC9
+  text that has read VERIFYING since the rev-4 extension; the sentence now says what those say and
+  keeps the report-to-the-orchestrator clause and the aDeferredBar and aProbedUnit provenance. No
+  criterion's permission line moved and no carrier figure changed.
 
 ## 10. Reuse audit
 
@@ -516,9 +549,14 @@ the three defects, check 23's is half closed by aRatifiedRulings, as S1 records;
 dies at check 30; the allow-list is still unjoined, and `TOOL-aHoistedPass-37` and
 `TOOL-aHoistedPass-40` are both still OPEN. aDeferredBar added `tools/unattended/gate-guard.js`,
 which denies `run-unattended-gates.sh` and every `.test.sh` in a run phase before VERIFYING, and
-aProbedUnit's child prompt orders no suite inside a unit pass. §2 S7 and §6 AC9 run the unattended
-suites once at this unit's end under D12-i8's lift, which predates both; that conflict is reported to
-the orchestrator and is not decided here.
+aProbedUnit's child prompt orders no suite inside a unit pass. That conflict with D12-i8's in-pass
+lift, which predates both, is FOLDED on its conservative reading and reported to the orchestrator
+rather than decided here: §2 S7 and §6 AC9 run the unattended suites once under unit 1's attribution
+at VERIFYING, after the last unit, on no bar leg, and the ruling itself stays parked in this build's
+`RUN.md`. The stale reading this paragraph carried until the round-3 fold — the suites run at this
+unit's end under the lift — put the pass at `bash tools/unattended/run-unattended-gates.sh` INSIDE
+the pass, which `tools/unattended/gate-guard.js` denies before VERIFYING, and recorded the position
+the parked question rejected.
 
 Recall terms used: `check-unattended conf-allow sentinel allow-list check 22 only28 MEMORY_ROOT
 unbound check 23 brief prompts dispatch`

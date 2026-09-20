@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -52,7 +53,8 @@ The header carries no `closes` verb because the status parser at BASE does not k
   verdict describes it`, writes `verdict TREE MOVED` into the run record, writes no full-green
   stamp, and exits 3. A bar that failed AND moved stays RED with exit 1, and its RED line names the
   move. The header's exit-code line (`tools/run-gates/run-gates.sh:3`) and
-  `tools/run-gates/README.md` gain exit 3. Observed by AC1 and AC7.
+  `tools/run-gates/README.md` gain exit 3. Observed by AC1 and AC7 for the behaviour and by AC10 for
+  the two documents, which no behavioural criterion can read.
 - **S6** — the kit version. NOT OBSERVED by a criterion here: this unit moves no version constant. A
   new exit code is a contract change a caller reads, so the run-gates kit must move, and it moves
   once in this build's landing range, in `TOOL-dDerivedDocket-1`, whose S9 moves it; this unit's
@@ -241,6 +243,16 @@ both lead with a declared verb. No new leg, no new conf key, no new file outside
   the parent is the half no leg reads, which is why this criterion reads it.
   permission: both readings are `wc -c` and `grep -c` over tracked files in the pass. NO CAP IS
   RAISED by this unit: moving the 61440 is an owner turn.
+- **AC10** — When `tools/run-gates/run-gates.sh` and `tools/run-gates/README.md` are read at this
+  unit's commit, the runner's own exit-code header line (`tools/run-gates/run-gates.sh:3`) names
+  exit 3 as TREE MOVED beside the exits 0, 1 and 2 it carries at BASE, and the README's exit-code
+  section names exit 3 as TREE MOVED too.
+  Red when: either stops at exit 2, so a caller-facing contract exists only in behaviour and a reader
+  of the runner meets TREE MOVED as an undocumented status. AC1 and AC7 grade the BEHAVIOUR and
+  neither reads file text; unit 26's AC8 reads the README half again for exit 4 and the precedence of
+  exits 1, 3 and 4, but that is a LATER unit, so nothing in this unit's own pass would notice the
+  omission.
+  permission: both are reads of tracked files in the pass; no gate leg and no suite is involved.
 
 ## 7. Gates
 
@@ -329,6 +341,17 @@ New arm: tools/run-gates/run-gates.turnstile.test.sh · a live second bar beside
   longer than what it replaces is what §2 S7 promises, and a criterion should grade the promise.
   Rule 1's narrow reading moved nothing: AC8 runs `manifest-check.sh` over the real tree and keeps
   deferring. The header date stays at the last-change date; the rev does not move.
+- rev-4 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · S5 · AC10. L1: S5 requires the runner's
+  own exit-code header line and the README's exit-code section to gain exit 3, and declared itself
+  observed by AC1 and AC7 — two criteria that grade BEHAVIOUR and read no file text, AC1 the exit and
+  the printed line, AC7 the exit-1 precedence. AC9's only grep of the README reads `at an empty dir`,
+  a phrase from S7's displaced advice. So the documentation half of S5 was unobserved, and unit 26's
+  AC8, which does read the README's exit-code section, is a later unit whose pass could not catch an
+  omission made here. New AC10 reads both documents at this unit's commit and reds when either stops
+  at exit 2, and S5's `Observed by` now splits the behaviour half from the document half. Nothing
+  else moved: §7 gains no leg, because both readings are tracked-file reads in the pass, and the
+  carrier accounting is untouched — `memory/guides/SESSION-KICKOFF.md` still has 41383 of its 61440
+  free, so the scoped net-zero rule still does not bind it and AC9 stays voluntarily stricter.
 
 ## 10. Reuse audit
 

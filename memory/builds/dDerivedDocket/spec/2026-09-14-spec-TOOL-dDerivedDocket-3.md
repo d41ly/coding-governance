@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-3 — the run's landing path
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -38,10 +39,20 @@ landing that cannot complete ending HELD instead of on local main.
 - **S3** Under `in-place`, `gates-green` refuses, numbered, unless `$LANDER --prepared --slug <slug>`
   exits 0, mapping its exits as S2 maps them: 1 names `{{LANDER}} --prepare`, 2 names `LANDER_MODE`,
   and 3 names the lander's observation failure and never `--prepare`; and otherwise runs
-  `$GATE_CMD` with `GATE_FULL=1` exported, plus `GATE_SELFTESTS=1` when the landing range touches a
-  path the new `SELFTESTS_OWED_PATHS` key lists. It runs before `--close` writes anything. Under
-  `in-place`, `gates-green` also refuses, numbered and before
-  running, when `git status --porcelain` is non-empty, untracked files included, naming the
+  `$GATE_CMD` with `GATE_FULL=1` exported and `GATE_SELFTESTS=1` NEVER exported, because
+  `AGENTS.md:486` records that flag as on demand only with no boundary setting it and a landing's
+  `gates-green` is a boundary. NEVER EXPORTED means the driver ADDS nothing and REMOVES nothing:
+  `gates-green` neither sets `GATE_SELFTESTS` nor unsets a value it inherited, so an owner who runs
+  `GATE_SELFTESTS=1 bash {{KIT_DIR}}/unattended.sh --close <slug>` keeps it by inheritance. That owner IS
+  the person the same fence's ON DEMAND reading sanctions, and what the ruling forbids is the
+  BOUNDARY setting the term for them. Every claim this spec makes about the flag is therefore a
+  claim about the DELTA between the close's own environment and the bar's, never about an absolute
+  absence. When the landing range touches a path the new `SELFTESTS_OWED_PATHS`
+  key lists, the close ANNOUNCES instead: the kit Definition of Done owes the self-test bar, and the
+  run that pays it is `$GATE_CMD` under both terms, made by hand at `VERIFYING` by the main loop,
+  which names the command it ran in the run's record. It runs before `--close` writes anything.
+  Under `in-place`, `gates-green` also refuses, numbered and before running, when
+  `git status --porcelain` is non-empty, untracked files included, naming the
   full-green stamp's clean-tree precondition (`tools/run-gates/run-gates.sh:1114-1119` and
   `:1861-1863`). Observed by AC1, AC2, AC10 and AC12.
 - **S4** Under `in-place`, `--close` asks `$LANDER --carry --slug <slug>` after the Definition of
@@ -65,12 +76,20 @@ landing that cannot complete ending HELD instead of on local main.
   merges into local main. When the remote answers nothing at all, it holds over the unpublished tip
   under `platform-unavailable`. A `--close` refused on the lander's observation failure takes the
   same hold. The Skill's `While it runs` bullet, which at BASE has the main loop run kit work's
-  `GATE_SELFTESTS=1` bar by hand at `VERIFYING`, names `--close` as where that bar runs under
-  `in-place`, because `gates-green` runs it there. Observed by AC4, AC8 and AC16.
+  `GATE_SELFTESTS=1` bar by hand at `VERIFYING`, keeps saying exactly that under BOTH modes and
+  gains one sentence: an `in-place` close ANNOUNCES when that run is owed, and the main loop names
+  the command it ran in the run's record. Observed by AC4, AC8 and AC16.
 - **S7** Under `primary`, every verb behaves as at BASE. Observed by AC9.
 - **S8** Arms in `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`,
   written in this unit's pass and run under attribution at the build's one post-build bar, the run
   the main loop makes at VERIFYING after the last unit. Observed by AC11.
+- **S9** One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, supersedes
+  the `TOOL-dClosedLexicon-11` clause that the archive name derives from the record's bytes "because
+  no verb here commits". Under `in-place` a verb does commit, and the reason that still holds is the
+  other one that row gives: two runs can honestly share a witness. The log row is the FOURTH carrier
+  of that premise and the only one a session following the charter's session-start reading order
+  meets, so S5 retiring the other three without it leaves the ratified text standing alone.
+  Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -125,18 +144,30 @@ the graded merge, its stamp and the push resolving one git dir from the run's ow
 | Mode | Precondition | Command |
 |---|---|---|
 | `primary` | none, as at BASE | `$GATE_CMD` |
-| `in-place` | `$LANDER --prepared --slug <slug>` exits 0 | `GATE_FULL=1 [GATE_SELFTESTS=1] $GATE_CMD` |
+| `in-place` | `$LANDER --prepared --slug <slug>` exits 0 | `GATE_FULL=1 $GATE_CMD`, and an announcement when the self-tests are owed |
 
-The self-test term is derived, never assumed. The landing range is `<T^1>..HEAD`; when any path it
-touches starts with an entry of `SELFTESTS_OWED_PATHS`, the bar gets `GATE_SELFTESTS=1`. Blank means
-never, announced, which is the charter's "owed by a DoD only for KIT work" with the kit surface
-declared rather than guessed. Gov declares its kit roots. Nothing here runs the unattended kit's
-own suites, which live in no manifest; `GATE_SELFTESTS=1` runs only held manifest legs.
+The self-test term is derived, never assumed, and what the derivation produces is an ANNOUNCEMENT
+and not an export. The landing range is `<T^1>..HEAD`; when any path it touches starts with an entry
+of `SELFTESTS_OWED_PATHS`, the close prints that the kit Definition of Done owes the self-test bar
+and names the run that pays it. Blank means never, announced, which is the charter's "owed by a DoD
+only for KIT work" with the kit surface declared rather than guessed. Gov declares its kit roots.
+Nothing here runs the unattended kit's own suites, which live in no manifest; the owed run reaches
+held manifest legs only.
+
+`gates-green` never exports `GATE_SELFTESTS=1`. `AGENTS.md:486` carries the owner ruling of
+2026-08-27 on the command fence: that flag is ON DEMAND ONLY and no boundary sets it. A landing's
+`gates-green` IS a boundary, since its stamp is the one the push reuses under D12-i1, so a driver
+that exported the term would make every kit-work landing in gov an automated boundary setting a flag
+the ruling reserves to a person, in the one repository that dogfoods the kit. The fence's next line,
+"Owed by a DoD only for KIT work", pulls the other way, and the two sentences cannot both be
+honoured by a driver that decides for itself; F6 parks that tension for the owner, and what this
+unit builds is the side that breaks no recorded ruling.
 
 At BASE the Skill's `While it runs` bullet, the build method's M6 carrier, tells the main loop to run
 the `GATE_SELFTESTS=1` form by hand at `VERIFYING` for kit work, beside the plain bar `--close` runs.
-Under `in-place` that form is this derived term inside `gates-green`, so the bullet names `--close`
-for it and a landing does not pay the self-test bar twice. Under `primary` the bullet is unchanged.
+That bullet is UNCHANGED in substance under both modes. What `in-place` adds is the announcement,
+which tells the main loop WHEN that run is owed rather than leaving it to be remembered, and the
+main loop names the command it ran in the run's record.
 
 A refusal of the precondition is a numbered failure, never an unmet item. An unmet `gates-green`
 invites an override, and an override here would land an ungraded merge. The refusal is keyed on
@@ -228,8 +259,8 @@ and the mode is a conf value.
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` ·
 `tools/unattended/SKILL.template.md` · `tools/unattended/PROTOCOL.template.md` · the companion guide
 template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
-`tools/unattended/README.md`, which receives §7's trimmed paragraph · the rendered guides
-and Skill.
+`tools/unattended/README.md`, which receives §7's trimmed paragraph · `memory/DECISIONS.md`, for
+S9's superseding row · the rendered guides and Skill.
 
 ### Alternatives rejected
 
@@ -250,11 +281,13 @@ and Skill.
 - error / empty / loading states — an undeclared mode reads `primary`, announced; a lander that does
   not implement the mode refuses at preflight rather than at landing; a missing prepared merge,
   a foreign carry and a failed commit each refuse with a number and write nothing further.
-- observability — `--status` names the mode; the close prints the bar's env, the carry verdict and
-  the commit it made; the kit gate's `LANDER_MODE` line and its resolved kit roots.
-- risks — until the declared-wall unit lands, the landing bar runs under `GATE_BOUND`, and gov's
-  full bar with self-tests may outlast it; the bound's own message then names the kill rather than a
-  leg. The derived term `SELFTESTS_OWED_PATHS` can under-declare a kit root; the kit gate reds a
+- observability — `--status` names the mode; the close prints the bar's env, the owed-self-test
+  announcement when the range earns one, the carry verdict and the commit it made; the kit gate's
+  `LANDER_MODE` line and its resolved kit roots.
+- risks — until the declared-wall unit lands, the landing bar runs under `GATE_BOUND` and gov's
+  full bar may outlast it; the bound's own message then names the kill rather than a leg. That bar
+  never carries the self-tests, which is what the announcement exists to hand to a person. The
+  derived term `SELFTESTS_OWED_PATHS` can under-declare a kit root; the kit gate reds a
   declared path that resolves to nothing, not one that is missing; AC13 compares gov's own list
   against the kit roots the tree declares.
 - testing — driver and kit-gate arms over a scratch repository with a bare remote, each staged RED
@@ -304,22 +337,34 @@ and Skill.
   push and a `--hold` under `platform-unavailable` that passes `--reaped`. That includes the case
   where the branch push fails. The rendered Skill documents the same next act for a `--close`
   refused because `--prepared` exited 3. No rendered sentence in the Land section directs a merge
-  into local main. The rendered `While it runs` bullet names `--close` as where an `in-place` run's
-  `GATE_SELFTESTS=1` bar runs.
+  into local main. The rendered `While it runs` bullet still sends the main loop to run kit work's
+  `GATE_SELFTESTS=1` bar by hand at `VERIFYING` under both modes, and names the announcement an
+  `in-place` close prints when that run is owed.
   Red when: the fallback text survives from the primary path, which lands through local main; or
   the Land section gives a failed branch push no next act; or the Land section's `--hold` omits
   `--reaped`, so the HELD unit refuses the run at its only ending; or a close refused on the
   lander's observation failure has no documented next act, so S6's route exists only in this spec;
-  or that bullet still sends an `in-place` run's main loop to run the `GATE_SELFTESTS=1` bar by hand
-  at `VERIFYING`, so kit work pays the self-test bar twice.
+  or the render moves that bar into `--close`, which makes an automated boundary set the flag
+  `AGENTS.md:486` reserves to a person and leaves the rendered Skill and the driver disagreeing
+  about who runs it.
 - **AC9** — When `LANDER_MODE` is blank, `--close` and `gates-green` over the fixture produce the
   BASE driver's output and exit, including no commit and no carry probe.
   Red when: an in-place branch runs in primary mode.
 - **AC10** — When the landing range touches a path under a declared `SELFTESTS_OWED_PATHS` entry, a
-  fixture `GATE_CMD` that prints its environment shows `GATE_SELFTESTS=1`; when it touches none, it
-  does not; and in both cases it shows `GATE_FULL=1`.
-  Red when: the term is exported unconditionally or never; or `GATE_FULL=1` is not exported, so
-  gov's guarded manifest grades the landing merge by guard, which is the i28 and i29 shape.
+  fixture `GATE_CMD` that prints its environment shows `GATE_FULL=1` and the close's OWN
+  `GATE_SELFTESTS` value carried through unchanged, which the arms read in both directions: run from
+  a parent shell that does not set the name, the bar's environment carries no `GATE_SELFTESTS`; run
+  as `GATE_SELFTESTS=1 bash {{KIT_DIR}}/unattended.sh --close <slug>` over the same fixture, the
+  bar's environment still reads `GATE_SELFTESTS=1`. On both, the close's output carries the
+  announcement naming the by-hand run that is owed; when the range touches no such path, the same
+  two environments and no announcement.
+  Red when: `gates-green` ADDS `GATE_SELFTESTS` to the bar's environment on either range, which is
+  the boundary `AGENTS.md:486` forbids; or it REMOVES the `1` its own parent shell set, so the
+  driver overrules the very owner that fence's ON DEMAND reading sanctions; or the announcement is
+  missing on a touching range, so kit work lands
+  with nobody told the self-test bar is owed; or the announcement fires on a range touching no
+  declared entry, so it says nothing a reader can act on; or `GATE_FULL=1` is not exported, so gov's
+  guarded manifest grades the landing merge by guard, which is the i28 and i29 shape.
 - **AC11** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs at the
   build's one post-build bar, its attribution summary reads `verdict clean`: no NEW FAIL, no `DEAD PROBE at L` and
   no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
@@ -351,15 +396,21 @@ and Skill.
   Each member of both starts with some printed entry.
   Red when: gov's conf leaves `LANDER_MODE` blank, so the in-place path ships inert in the one
   repository that dogfoods it while every fixture criterion stays green; or the key is blank or
-  misses a kit root, so an in-place landing of kit work runs without `GATE_SELFTESTS=1`, the kit DoD
-  `AGENTS.md` states.
+  misses a kit root, so an in-place landing of kit work is never told that the kit Definition of
+  Done `AGENTS.md` states owes the self-test bar, and the announcement reads clean over a surface it
+  does not cover.
   permission: the leg runs over the real tree rather than a fixture, so it is observed at the
   build's one post-build bar.
 - **AC14** — When `grep -c 'verb here commits' tools/unattended/PROTOCOL.template.md` runs, it
   prints 0 (1 at BASE, where the premise wraps after `because no`), and so does
   `grep -c 'NO driver verb commits' tools/unattended/unattended.sh`; the rotation paragraph still
-  names a shared witness as the reason.
-  Red when: the shipped protocol keeps a premise the committing close falsifies in gov's own mode.
+  names a shared witness as the reason. `memory/DECISIONS.md` carries S9's row under the TOOL
+  heading, keyed by this unit's id, naming `TOOL-dClosedLexicon-11` and the clause it supersedes for
+  `in-place`, within the 300-character entry budget.
+  Red when: the shipped protocol keeps a premise the committing close falsifies in gov's own mode;
+  or the three shipped carriers lose the premise while the ratified log row still states it, which
+  leaves a session following the charter's session-start reading order with the stale text and
+  nothing pointing away from it.
 - **AC15** — The fixture closes under `in-place`, the lander stub's push reports `red`, the fixture
   commits a fix and re-runs `--prepare`, and `--close` then runs again over the LANDING record. The
   second close exits 0 and names the existing close commit. `git rev-parse HEAD` equals the
@@ -368,8 +419,14 @@ and Skill.
   `gates-green` has already paid a full bar, and both documented re-prepare paths wedge.
 - **AC16** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
-  parent's and is below the 61440-byte guide cap declared in
-  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  parent's and is below the guide BYTE cap; and when the same two revisions are counted with
+  `wc -l`, the build-commit line count is NOT GREATER than the parent's and below the guide LINE
+  cap. Both numbers are RESOLVED from the single line of
+  `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES`
+  together, and neither is retyped here as a literal, because check 6 reds on EITHER half and the
+  two halves bind under different edits: a trim that pays for a table is byte-neutral and
+  line-POSITIVE, and check 6's own break-even is 81.92 bytes per line, which a carrier of rows and
+  short bullets sits under. All four readings hold for
   `tools/unattended/PROTOCOL.template.md`. Both trims are taken and both landed:
   `grep -c 'Listing two anchors' tools/unattended/PROTOCOL.template.md` and
   `grep -c 'The move was a BYTE decision' tools/unattended/PROTOCOL.template.md` each count 1 at the
@@ -379,7 +436,7 @@ and Skill.
   `grep -c 'SELFTESTS_OWED_PATHS' tools/unattended/PROTOCOL.template.md` each count 0 at the parent
   and 1 or more at the build commit. The companion guide `UNATTENDED-STOPS.md`, which receives the
   first trimmed paragraph and this unit's landing overflow, is read the same way at the build commit
-  and is below the same 61440-byte guide cap.
+  and is below BOTH halves of the same guide cap.
   Red when: §6 is appended to rather than rewritten in place, so the paragraph this unit replaces
   survives beside its successor and one unit spends the 1,116 bytes the build's units share; or the
   size is read against the figure written in this spec rather than against the parent commit, so a
@@ -388,8 +445,11 @@ and Skill.
   the edit fit, which is an owner turn and not this unit's; or a conf key this unit declares in
   `tools/unattended/.unattended.conf.example` reaches §8's key table in no row, which reds check 22
   of `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
-  protocol lands in a carrier nobody reads the size of.
-  permission: a read, a byte count and four greps, no gate leg and no suite.
+  protocol lands in a carrier nobody reads the size of; or a trim is byte-neutral and line-positive,
+  so every byte reading passes and the `memory hygiene` leg reds on the line half it never read; or
+  the companion lands under the byte cap and over the line cap, which check 6's own
+  81.92-byte-per-line break-even makes the expected shape for a carrier of rows and short bullets.
+  permission: a read, two byte-and-line counts and four greps, no gate leg and no suite.
 
 ## 7. Gates
 
@@ -422,6 +482,19 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
 
   (b) lands a re-prepared merge that no `gates-green` graded, which is the ungraded merge this unit
   exists to prevent. RESOLVED (agent, 2026-09-16, delegated): (a).
+- **F6 — is a landing's `gates-green` the boundary the 2026-08-27 ruling names?** `AGENTS.md:486`
+  records `GATE_SELFTESTS=1` as ON DEMAND ONLY with no boundary setting it, stamped
+  `(owner, 2026-08-27)`; the fence line under it says the flag is owed by a Definition of Done for
+  KIT work. A landing's `gates-green` is both a boundary and the place a kit-work Definition of Done
+  is evaluated, so the two sentences cannot both be honoured by a driver that decides for itself.
+  Options: export the term when the landing range owes it; never export it and announce instead; ask
+  the owner to retire one of the two sentences. Liveness: the ruling is one grep of `AGENTS.md`, and
+  a session that cannot find that line should not resolve this fork from memory.
+  RESOLVED (agent, 2026-09-20, delegated), decided by the orchestrator: never export it. The close
+  announces, and the `VERIFYING` run sets the flag by hand and names the command in the run's
+  record. F1's derivation stands and now feeds the announcement rather than an export. The tension
+  between the two charter sentences is PARKED for the owner: no charter text is edited here, and no
+  `memory/DECISIONS.md` row records a departure, because on this side there is none.
 
 ## 9. Revision log
 
@@ -496,6 +569,36 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
   `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
   `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
   post-build bar" alone would have read as a bar that covers them.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H3 id 28, M4 id 33, H1 id 13).
+  - H3, decided by the orchestrator and PARKED for the owner. S3, §4's `gates-green` table and its
+    derived-term paragraphs, §5 observability and risks, S6, AC8, AC10 and AC13 no longer have the
+    close export `GATE_SELFTESTS=1`; the derivation over `SELFTESTS_OWED_PATHS` survives as an
+    ANNOUNCEMENT, and the main loop's `VERIFYING` run sets the flag by hand and names the command in
+    the run's record. New fork F6 cites `AGENTS.md:486`, which was re-read at HEAD and still carries
+    the ruling verbatim on the command fence. The key, its §8 key-table row and their pricing are
+    untouched, so §4's byte arithmetic is unchanged. The Skill's `While it runs` bullet goes back to
+    saying what it says at BASE under both modes, plus the announcement.
+  - M4: new S9 mints the `memory/DECISIONS.md` row superseding `TOOL-dClosedLexicon-11`'s "no verb
+    here commits" clause for `in-place`, `memory/DECISIONS.md` joins Files touched, and AC14 reads
+    the row back. Verified at HEAD before folding: `memory/DECISIONS.md:81` still ratifies that
+    premise, which S5 retires from three shipped carriers and which §10 already called superseded
+    with nothing minting the supersession.
+  - H1: AC16 reads BOTH halves of the guide cap, resolved from the line of
+    `tools/memory-tree/check-memory-hygiene.sh` that declares them together rather than retyped, and
+    gains the byte-neutral-line-positive and under-bytes-over-lines arms. Verified at HEAD: that
+    line declares `GUIDE_CAP_BYTES=61440` and `GUIDE_CAP_LINES=750`, check 6 reds on either, and the
+    protocol stands at 675 lines and 60324 bytes, which is 75 lines of headroom beside 1116 bytes.
+  - Closing verifier, same pass and rev: AC13's `Red when:` came out of the H3 fold as a broken
+    sentence and is rewritten to the same claim, and AC16's `permission:` line still read `a byte
+    count` while the criterion it belongs to now reads lines as well, so it names both counts.
+  - Round-3 verifier, same pass and rev: AC10 was stricter than the S3 it observes. It read the
+    bar's environment for "NO `GATE_SELFTESTS` name at all", so an owner running
+    `GATE_SELFTESTS=1 bash {{KIT_DIR}}/unattended.sh --close <slug>` — the ON DEMAND use the same
+    fence sanctions — would red a driver that had exported nothing. S3 now says which of the two
+    readings of "no boundary sets it" this unit builds: the driver ADDS nothing and REMOVES nothing,
+    so every claim about the flag is about the DELTA between the close's own environment and the
+    bar's. AC10 reads that delta in both directions and gains the parent-shell-sets-it arm, and its
+    `Red when:` reds on an ADD and on an unset of an inherited value. No other section moved.
 
 ## 10. Reuse audit
 

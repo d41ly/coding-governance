@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-24 — inherited-red policy
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -281,8 +282,12 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   the one fixture that matters: a branch that commits `INHERITED_RED=land` would enable its own
   landing, which is AC1's break.
 - **Measuring age by the commit that last touched the leg's comparator.** A red introduced by content
-  the checker grades, not by the checker, is never aged by it: the lexicon red of 435 offenders sat for
-  weeks under an unchanged checker (`memory/builds/dFramedEntrypoint/RUN.md:41`).
+  the checker grades, not by the checker, is never aged by it: the lexicon red of 435 offenders sat
+  under an unchanged checker, and the record that found it states outright that it cannot say for how
+  long, the leg being guarded on four paths so that a red can sit in it for the length of any build
+  that moves none of them (`memory/builds/dFramedEntrypoint/RUN.md:41`). The bullet rests on that and
+  not on a duration: the line declines the measurement, which is itself the argument against aging a
+  red by its comparator.
 - **Letting the runner decide `land` from an exported variable alone.** Any caller can export it, so a
   run invoking the runner directly could stamp its own landing. The runner only writes the stamp; both
   deciding readers read the policy at R themselves.
@@ -420,10 +425,20 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   unit, not at this unit's end (D12-i8's in-pass lift is parked, §9).
 - **AC13** — When the fixture run's `gates-run` fact names a bar whose record reads every red leg
   INHERITED at an earlier HEAD, and the run then commits, `--close --override gates-green` and
-  `--abort --code gate-red-out-of-scope` each refuse with the numbered code naming the moved HEAD; with
-  that record at HEAD, `tree_clean yes` and `tree_moved no`, both proceed.
+  `--abort --code gate-red-out-of-scope` each refuse with the numbered code naming the moved HEAD;
+  with the same record at HEAD but its header reading `tree_clean no`, and again with its header at
+  HEAD, `tree_clean yes`, and its verdict reading `tree_moved yes`, both verbs refuse with that same
+  numbered code naming the condition that failed; and with that record at HEAD, `tree_clean yes` and
+  `tree_moved no`, both proceed. S7 ties the consulted record to three conditions, so each is held
+  false ALONE by an arm of its own; the proceed arm supplies all three at once and grades the
+  conjunction, never a conjunct.
   Red when: the refusal reads the newest record without comparing its `head` with HEAD, so a run
-  whose earlier bar was all-INHERITED overrides after committing its own red, which is the i12 path.
+  whose earlier bar was all-INHERITED overrides after committing its own red, which is the i12 path;
+  or it compares `head` alone, so an all-INHERITED record produced on a DIRTY tree, or on a bar whose
+  verdict reads `tree_moved yes`, is admitted and reaches `land` over a red the run may own — the
+  same path with one extra step, and neither AC6 and AC7, which grade attribution CONTENT, nor AC15,
+  which reaches `tree_moved` through `gates-green`, can see it, because S7's two verbs run no bar and
+  always consult an earlier record.
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
@@ -524,12 +539,18 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
-- **AC24** — When `wc -c < memory/guides/UNATTENDED-PROTOCOL.md` is read at this unit's commit and
-  at its parent, the reading at this unit's commit is NO LARGER than the reading at the parent, and
-  `grep -c 'contend on the bar' tools/unattended/README.md` prints 1.
+- **AC24** — When `wc -c < memory/guides/UNATTENDED-PROTOCOL.md` and
+  `wc -l < memory/guides/UNATTENDED-PROTOCOL.md` are read at this unit's commit and at its parent,
+  EACH reading at this unit's commit is NO LARGER than the reading at the parent, and
+  `grep -c 'contend on the bar' tools/unattended/README.md` prints 1. Both halves are read because
+  the checker declares both for this class, 61440 bytes and 750 lines
+  (`tools/memory-tree/check-memory-hygiene.sh:84`), and the carrier is inside the scoped net-zero
+  rule on the byte half with 1116 free at BASE.
   Red when: S2's `GATE_POLICY_FILE` row lands without the §3 residual trim that funds it, or is
   written as a paragraph rather than a table row, so a carrier other units of this build write too
-  loses headroom to a unit that priced itself at nothing; or the residual is removed from the
+  loses headroom to a unit that priced itself at nothing; or the row is folded onto fewer, longer
+  lines so the byte half reads net zero while the line half grows, or the reverse, either of which a
+  one-half criterion passes; or the residual is removed from the
   protocol and lands in no other document, so a stated fact leaves the tree silently. The over-cap
   half is red by the `memory hygiene` leg's index-cap check; the NET delta against the parent is
   the half no leg reads, which is why this criterion reads it.
@@ -540,7 +561,7 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
 
 `unattended kit gate` · `unattended skill wiring` · `run-gates canary` · `pre-push self-test` · `pass-order history` · `memory hygiene` · `kit version markers` · `govkit selfcheck` · `govkit selftest` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · an inherited-only fixture bar under each policy, an override and an abort over an OWN attribution, a blank ASKS_CMD, and a second hold over one inherited red at one R · the driver suite's executed-assertion floor
+New arm: tools/unattended/unattended.test.sh · an inherited-only fixture bar under each policy, an override and an abort over an OWN attribution, the same two verbs over an all-INHERITED record whose header reads tree_clean no and over one whose verdict reads tree_moved yes, a blank ASKS_CMD, and a second hold over one inherited red at one R · the driver suite's executed-assertion floor
 New arm: .githooks/pre-push.test.sh · a branch-committed land policy against a park policy at R, and an inherited stamp with a moved remote sha · none
 New arm: tools/run-gates/run-gates.test.sh · a red leg already red at the age window's far end · the canary's executed-assertion floor
 New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_RED=land` · none
@@ -699,6 +720,30 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
   2048-byte class the rule binds. The park row this build still owes `RUN.md` was returned as a
   cross-edit carrying 195 rather than 194 and without the superseded "at most 200 bytes"
   pricing. The header date stays at the last-change date; the rev does not move.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §4 §10 · S7 AC13. M4: S7 ties the
+  record an override or an abort may consult to THREE conditions — `head` equal to HEAD,
+  `tree_clean yes`, verdict `tree_moved no` — and AC13 staged a refusal for one of them and supplied
+  all three together on its proceed arm, so an implementation comparing `head` alone passed both
+  clauses and round-1 H2's other two conditions went unobserved. AC13 now holds each condition false
+  ALONE, one arm per condition, and its `Red when:` names the admitted state: an all-INHERITED record
+  produced on a dirty tree or on a `tree_moved yes` bar reaching `land` over a red the run may own.
+  The rule behind it is left-shifted rather than restated — an admission predicate with N conditions
+  owes N negative arms. L2: §4's second rejected alternative claimed the 435-offender lexicon red
+  "sat for weeks" on the authority of `memory/builds/dFramedEntrypoint/RUN.md:41`, and that line
+  records the opposite, that the duration is unknowable from that build because the leg is guarded on
+  four paths. The duration clause is gone and the bullet now rests on what the line does establish;
+  §10 gains the documented manual check the respell could not buy, because
+  `tools/check-spec-tokens.py` resolves a citation's existence and range and never its role. No
+  criterion's permission line moved, and the 195-byte trim funding S2's protocol row still stands.
+  One format correction rides with the fold, owed by no finding: AC24 read the BYTE half of this
+  carrier's cap alone, and the checker declares both halves for the class, 61440 bytes and 750 lines
+  at `tools/memory-tree/check-memory-hygiene.sh:84`. A row folded onto fewer, longer lines would have
+  read net zero in bytes while the line half grew, so AC24 now reads `wc -l` beside `wc -c` at the
+  same two commits and its `Red when:` names that trade. No cap is raised and no figure is re-priced.
+  Verified in the same round and corrected in place, at no further rev bump: §7's driver-suite
+  `New arm:` row still listed only the fixture shapes AC13 held before this fold, so it now names the
+  `tree_clean no` and `tree_moved yes` records the two new refusal arms need; its third field is
+  unchanged.
 
 ## 10. Reuse audit
 
@@ -720,6 +765,12 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
   arm, `observe_anchor`, the override skip or `--abort`'s halt-code check. Check 23 of the leg gained
   a brief-row exclusion that reports each excluded path, the shape S9's `ABSORB` line follows, and
   govkit's check 7h3 still compiles its predicate from `GATE_SELFTESTS` alone.
+- **A citation carrying a number must be READ, not resolved.** `memory/builds/dFramedEntrypoint/RUN.md:41`
+  was respelled by the closing consolidation pass so `tools/check-spec-tokens.py` would grade it, and
+  that checker resolves existence and range only — its own header concedes that a citation naming a
+  real line that argues the opposite passes. The line argues the opposite of the duration §4's second
+  rejected alternative attributed to it, which the round-2 audit caught by reading it. Until the
+  checker grades a citation's ROLE, this is a documented manual check on the spec-audit checklist.
 - **Rejected candidates and the test that rejected each** are in §4 Alternatives rejected.
 - Recall terms used: INHERITED_RED land park age-bound gate-inherited-green stamp ABSORB override
   gate-red-out-of-scope auto-file ask — passed as `--terms` with the question "when may an unattended

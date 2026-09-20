@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-13 |
 
 <!-- /gen:spec-records -->
 
@@ -255,7 +256,11 @@ records an environment value that disabled a guard by naming the branch already 
 
 Candidates come from two processes, whatever the ref count: one `git log --format=%H` over the
 selected refs, excluding the default tip's history and limited to the backlog and archive paths,
-names the flagged commits, and one `git rev-list --parents` over the same refs gives the graph. A ref
+names the flagged commits. That path set is DELIBERATELY a cheap SUPERSET of unit 9's watched paths,
+which exclude every archive that is not family-named: one broad `git log` beats one pathspec per
+family, and a candidate whose delta turns out empty is simply not listed, because the delta itself
+is unit 9's. So the walk selects more refs than the delta can act on, and it costs a delta rather
+than a wrong answer. One `git rev-list --parents` over the same refs gives the graph. A ref
 is a candidate when its tip reaches a flagged commit in that graph, computed in memory, so a ref with
 no such commit costs no delta at all, and two refs sharing a straggler's commits are both candidates.
 `git log --source` is not used: it labels each commit with only the first ref that reached it, so a
@@ -268,7 +273,10 @@ Before the flip nothing is accounted, so the listing is design §9 step 1's drai
 `--tsv` prints `straggler<TAB><ref><TAB><tip sha><TAB><unaccounted><TAB><first change sha>` per ref,
 then `examined<TAB><n>`. Measured on node `d` on 2026-09-14 against `origin/main` at `7484d8d7`: 90
 refs, 47 local and 43 remote-tracking, of which 6 carry commits touching the backlog or archive paths
-that `origin/main` lacks. PINNED as that measurement; the command re-derives it.
+that `origin/main` lacks. PINNED as a measurement of that date, and an UPPER bound on CANDIDATES
+rather than a straggler count, for the same reason unit 9's 585 is one: the walk's paths are the
+superset above, so a ref whose only archive change is a rotated decision log is a candidate here and
+yields an empty delta. The command re-derives both numbers.
 
 ### Inventory
 
@@ -369,8 +377,20 @@ line for the new modes, if unit 11 created one.
   none; or candidates come from one ref label per commit, so the second and third branches are never
   listed.
 - **AC7** — When any writing verb runs with `--dry-run`, it prints the plan and the table and
-  `git status --porcelain` is unchanged, including no new filing-home folder.
-  Red when: the restore of S11 runs under `--dry-run` and stages view paths.
+  `git status --porcelain` is unchanged, including no new filing-home folder; a dry run over a plan
+  that WOULD write and holds no NEEDS-HUMAN entry and no unconfirmed status change exits 0, a dry
+  run holding either of those exits 1 (AC14), and a dry run whose plan would write nothing exits 2
+  naming the empty plan. That 2 is the code this spec already gives a refusal naming a missing
+  condition or form (AC9, AC14), and it is DELIBERATELY distinct from 1: the switch-over's landing
+  reconcile step 4 and the adopter runbook both re-run without `--dry-run` only when the dry run did
+  not exit 1, so an empty plan given 1 would PARK them, while an empty plan given 2 lets them re-run
+  a write that writes nothing, which is harmless.
+  Red when: the restore of S11 runs under `--dry-run` and stages view paths; or the empty plan exits
+  1, so a ref with nothing to relocate parks the landing at its ingest step with nothing red
+  anywhere, which is the L1 stall reached by a second route; or the exit is constant
+  across the three dry-run outcomes, so the switch-over's landing reconcile step 4 and the adopter
+  runbook, which both re-run without `--dry-run` only when the dry run did not exit 1, cannot tell a
+  writable plan from an empty one and stall at their ingest step with nothing red anywhere.
 - **AC8** — When the selftest renders a builds-mode fixture view with `gen_build_index.py --write`
   and runs `merge-rows.py` on a shard-into-view fixture, both recipe blocks equal the bytes
   `migrate_backlog.py --recipe` prints.
@@ -479,7 +499,7 @@ line for the new modes, if unit 11 created one.
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `testsuite counts (every bar self-test prints one)` · `codebase-map coverage + freshness` · `build-index selftest` · `row-keyed merge driver replay`
 
-New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, two refs at one straggler tip and a fork, `--dry-run`, the recipe parity, every row of §4's entry-path table, the landing form's in-progress and concluded-merge states and its refusals, the straggler form of `--ingest` from a shards-mode HEAD, the two policy sets over one shared hold fixture, the per-class disposition home, the landing form's replacement of the migration's own record and its NEEDS-HUMAN twin · the selftest's assertion floor
+New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixture per classification row, the all-or-nothing refusal, the confirmation refusal, the three DEAD PROBE cases, two refs at one straggler tip and a fork, `--dry-run` over a writable plan and over an empty one, the recipe parity, every row of §4's entry-path table, the landing form's in-progress and concluded-merge states and its refusals, the straggler form of `--ingest` from a shards-mode HEAD, the two policy sets over one shared hold fixture, the per-class disposition home, the landing form's replacement of the migration's own record and its NEEDS-HUMAN twin · the selftest's assertion floor
 
 ## 8. Open questions
 
@@ -625,6 +645,36 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   plain bar and no `GATE_FULL=1` bar executes. §5's testing row is unchanged, because it names the
   leg and not the run. The header date is the
   last-change date; the rev is unchanged, this being the same consolidation.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold. G2 L1 (9): AC7 observes BOTH halves of S9's
+  "exits 0 only when the plan would write" — exit 0 on a plan with no NEEDS-HUMAN entry and no
+  unconfirmed status change, and a non-zero exit naming the empty plan — with the Red-when that a
+  constant exit leaves the switch-over's landing reconcile step 4 and the adopter runbook, which
+  both re-run without `--dry-run` only when it did not exit 1, unable to tell a writable plan from
+  an empty one. Round 2's L1 fold had covered the exit-1 half through AC14 and left the zero half
+  unobserved. §7's `New arm:` middle field names both dry runs. S9 is unchanged and keeps its AC7
+  and AC14 citations. Fold verification then repaired the first half: as first written it read "a
+  plan holding no NEEDS-HUMAN entry and no unconfirmed status change exits 0", which an EMPTY plan
+  satisfies vacuously, so the two halves demanded different exits for one input — the exact shape
+  the finding was filed against, one clause over. It now reads "a plan that WOULD write and holds
+  no NEEDS-HUMAN entry and no unconfirmed status change", which is S9's own "only when the plan
+  would write" and leaves the empty-plan case to the second half alone.
+  Round-3 verifier, same pass and rev: that second half left the empty plan on "non-zero", which
+  pins three outcomes to two values and hands the builder a coin flip between them. Given 1, the
+  switch-over's landing reconcile step 4 and the adopter runbook park on an empty plan, which is the
+  L1 stall by another route; given 2, they re-run a write that writes nothing, which is harmless.
+  AC7 now PINS it to 2, the code this spec already gives a refusal naming a missing condition or
+  form (AC9, AC14), says in the same clause that the distinction from 1 is deliberate and why, and
+  carries the Red-when for the exit-1 reading. S9's "exits 0 only when the plan would write" is
+  unchanged and still covers both.
+  Same pass and rev, §4 "Straggler inventory": narrowing unit 9's watched paths left this unit's
+  candidate walk as the last broad archive reading in the set, and its pinned 6 read as a straggler
+  count when the walk had become a superset of what the delta can act on. §4 now says the superset
+  is deliberate — one broad `git log` beats one pathspec per family, and a candidate whose delta is
+  empty is not listed — and relabels the 6 an UPPER bound on candidates at that date, in the words
+  unit 9 §4 step 3 uses for its 585. No criterion moved.
+  Round-3 fold verifier, same pass and rev: the superset sentence had been spliced into the
+  middle of §4's two-process sentence, leaving `and one git rev-list --parents` hanging after a
+  full stop. The clause is restored as its own sentence; no wording of either claim moved.
 
 ## 10. Reuse audit
 

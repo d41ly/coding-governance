@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-19 — authority only from an owner-committed README
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 |
+| [2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-20 |
 
 <!-- /gen:spec-records -->
 
@@ -107,6 +108,10 @@ add to it, and the leg says so when something tries.
 - **consumes-from** `TOOL-dDerivedDocket-2` — the prepared merge whose first parent is the
   advertised tip, which is why excluding that tip leaves exactly the run's commits, and whose second
   parent is the run branch, the side the terminal-record exclusion reads as the run's.
+- **consumes-from** `TOOL-dDerivedDocket-54` — the spelling of the terminal-record exclusion probe.
+  The G3 round-2 record's H6 reproduced that `git rev-list -1 <parent> ^<BASE> -- <path>` is
+  history-simplified and answers a different question from §8 F8's predicate; §4's cross-run arm
+  keeps its current text and takes that unit's answer.
 - **hands-off** `TOOL-dDerivedDocket-20` — the Skill and protocol text for the authority rule, which
   this spec's §5 places with the carriers unit.
 - **hands-off** `TOOL-dDerivedDocket-22` — the cross-run arm's endpoint for a derived-LANDED record,
@@ -159,7 +164,14 @@ wrote itself (§8 F8). The endpoint and exclusion per recorded state:
   default-branch tip. It walks from the witness, passing each single-parent commit to its parent.
   At each two-parent commit it meets, the witness included, the RUN SIDE is the parent from which a
   commit since BASE touching the run-state path is reachable,
-  `git rev-list -1 <parent> ^<BASE> -- <run-state path>`. The function excludes the other parent
+  `git rev-list -1 <parent> ^<BASE> -- <run-state path>`, whose SPELLING is not settled here: that
+  form is history-simplified and answers a different question from F8's predicate, because a merge
+  TREESAME to one side for the path prunes the other side entirely, so a touching commit that IS
+  reachable can print nothing. The G3 round-2 record's H6 reproduced that in a scratch repo and
+  promoted it to `TOOL-dDerivedDocket-54`, which spells the probe unsimplified and says in one clause
+  why, and adds the AC6 arm whose merge resolves the run-state path to the other side's content. The
+  predicate above, F8's resolution and the consequences named below keep their current text and take
+  that unit's answer. The function excludes the other parent
   and descends the run side, so nested merges are read in turn. Where neither parent, or both,
   reach such a commit, that merge adds no exclusion and the walk stops there, the fail-closed
   direction; the walk also stops at a commit BASE holds and at a commit with more than two parents.
@@ -321,9 +333,14 @@ not a thing this unit's pass can observe.
 - **AC3** — When the `may:` value carries `EXMP-aFoo3`, an id prefix failing the id grammar,
   preflight refuses naming the token; when it carries `` `tools/push-main.sh` `` and, in a second
   fixture, `tools/push-main.sh`, both pin the fact `may: tools/push-main.sh`, and check 19's S4 arm
-  is green on both.
+  is green on both. One fixture per REMAINING negative S3 declares refuses the same way and names
+  the token: a leading `/` before `tools/push-main.sh`; a `..` segment ahead of it; a backslash,
+  as `tools\push-main.sh`; and a bare token carrying neither a `/` nor a file extension. The arm
+  count equals the number of negatives S3 declares.
   Red when: the malformed token is pinned as a grant, or the two spellings pin differently, so the
-  leg's comparison depends on how the owner copied the grant.
+  leg's comparison depends on how the owner copied the grant; or the guard tests the id grammar and
+  then accepts any token containing a `/`, so an absolute or escaping path is pinned as a grant and
+  AC4's leg arm agrees with the bad pin rather than catching it.
 - **AC4** — When a fixture record's `may:` fact differs from the README's line at its recorded BASE,
   `bash tools/unattended/check-unattended.sh` reds check 19 naming both values.
   Red when: the arm compares against the README at HEAD.
@@ -389,8 +406,10 @@ not a thing this unit's pass can observe.
   `memory/guides/BUILD-METHOD.md`, `tools/memory-tree/BUILD-METHOD.template.md`,
   `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md`, each of the
   first pair also under the 27648 B declared at `tools/template-size-limits.txt:86` and each of the
-  second under the 61440 B guide cap. `wc -l` over `memory/guides/BUILD-METHOD.md` at the same two
-  commits reports FEWER lines at the commit, and under the line budget its own `**Budget:` line
+  second under the 61440 B guide cap and under the 750-line half that
+  `tools/memory-tree/check-memory-hygiene.sh:84` declares beside it. `wc -l` over
+  `memory/guides/BUILD-METHOD.md` at the same two commits reports FEWER lines at the commit, and
+  under the line budget its own `**Budget:` line
   declares. The two destinations carry what left: `git grep -c "fork-unresolvable"` over
   `memory/guides/UNATTENDED-VERBS.md` returns at least 1, `git grep -c "and it may WRAP"` over
   `memory/TEMPLATE-SPEC.md` returns 1; `memory/guides/UNATTENDED-VERBS.md` reads under the 61440 B
@@ -411,7 +430,7 @@ not a thing this unit's pass can observe.
 
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `kit/dogfood doc parity` · `build-method size` · `build-index selftest` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/unattended/unattended.test.sh` · a `slug` README with `may:`, a `prompt` and a `recipe` README with `may:`, a malformed grant, a grant in both spellings · the driver suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
+New arm: `tools/unattended/unattended.test.sh` · a `slug` README with `may:`, a `prompt` and a `recipe` README with `may:`, one refused grant per negative S3 declares, a grant in both spellings · the driver suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/unattended.sh`
 New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt` record with a grant, a run's own commit adding `may:` to a foreign README, an owner commit reaching the run through a prepared merge, a terminal primary-mode record whose witness is the landing merge, pushed and unpushed, a primary record whose witness is a fix commit on that pushed landing merge, a primary record whose witness is push-main's reconcile over another node's owner `may:` commit, a terminal in-place record whose witness is the close commit on that prepared merge, and a run aborted before `--prepare` after a plain reconcile brought an owner `may:` commit in, graded live and with its witness once the reconcile and once a commit after it · the leg suite's executed-assertion floor, and `ARMS_FLOORS` for `tools/unattended/check-unattended.sh`
 
 ## 8. Open questions
@@ -596,6 +615,26 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   "no other unit" as a claim about the destinations. The close-out verifier re-spelled AC3's
   malformed example token in the build's `EXMP` example family; it stays malformed, because the id
   grammar the arm exercises reads `[A-Z]+-[A-Za-z0-9]+-[0-9]+` and is blind to the family.
+
+- rev-6 · 2026-09-20 · spec-audit round 3 fold, the G3 round-2 record, which exited BOUNDED.
+  §3 Edges · §4 · §7 · AC3. M9 (2): S3 declares FIVE refusal shapes for a grant token — the record
+  counted four and missed the one S3 spells as a path containing neither a `/` nor a file extension
+  — and AC3 exercised the id-grammar one alone, so AC3 now carries a fixture per remaining
+  negative — a leading `/`, a `..` segment, a backslash, and a bare token with neither a `/` nor an
+  extension — its arm count is
+  read from S3's declared negatives, and its `Red when:` names the guard that tests the id grammar
+  and then accepts any token containing a `/`, which AC4's leg arm would agree with rather than
+  catch. §7's first `New arm:` line stops saying "a malformed grant" in the singular for the same
+  reason. One finding is PROMOTED to a unit of this build and folded nowhere: H6 (27) to
+  `TOOL-dDerivedDocket-54`, pointed at from §4's cross-run arm, where the measured
+  history-simplification of the exclusion probe is now stated beside the command. §3 gains the
+  consumes-from edge, and the probe, §8 F8's resolution and AC6 keep their current text. No cap is
+  raised, no S-item moves, and the gate list in §7 does not move.
+  One format correction rides along: AC11's protocol clause read the byte half of the guide cap
+  alone, and `tools/memory-tree/check-memory-hygiene.sh:84` declares a 750-line half beside it,
+  so that clause now reads both. No figure is typed here that the checker does not own.
+  The fold verifier corrected this entry's own count: S3 declares five refusal shapes, not four,
+  and AC3's arm count follows S3 rather than the record's tally.
 
 ## 10. Reuse audit
 

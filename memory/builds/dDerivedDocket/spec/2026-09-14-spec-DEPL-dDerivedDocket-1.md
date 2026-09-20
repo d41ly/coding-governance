@@ -1,6 +1,6 @@
 # DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 38
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 38
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
+| [2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -171,6 +172,10 @@ migrates your corpus, so it takes a spec, a signed record and one switch-over co
 6. **Land it when your default branch moved.** If your default branch gained backlog rows while your
    switch build ran, the row driver's refusal prints the `--relocate` recipe, which is for a
    pre-switch branch merged into a switched default branch and exits 2 in this direction. Instead,
+   first confirm `merge.rows.driver` resolves in the tree you are about to merge —
+   `bash tools/check-wiring.sh --check` reporting no `UNWIRED` row for `merge`, or `--fix` to set it
+   — because `merge=rows` in `.gitattributes` is per-clone config and without it git falls back,
+   with a warning but with no refusal, to a line merge that completes instead of conflicting; then,
    on your switch branch, run `git merge --no-ff --no-commit <default tip>` and take your branch's
    side of every generated view and deleted archive; run step 1's `--plan` inside a worktree of the
    tip; sign the rows it adds as step 3 did; then run
@@ -449,6 +454,18 @@ is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the lis
   `tools/unattended/.unattended.conf.example` and sets none in `.unattended.conf`, so it owes no
   section 8 key-table row; and AC3's and AC6's fixture runs already read the narrow rule the
   orchestrator ratified. The header date already reads 2026-09-20 and the rev is kept.
+- rev-5 · 2026-09-20 · §4 · the round-3 fold's verifier, folding into step 6 the exposure the G5
+  round-3 record entered against unit 34 step 1 and the fold closed only there. Step 6 told an
+  adopter to run `git merge --no-ff --no-commit <default tip>` and take their branch's side of every
+  generated view, with no mention of `merge.rows.driver`; unit 34's new step-1 text names THIS spec
+  as copying the procedure "where it is less likely to be wired than here", so the gap was written
+  into the build's own text. Step 6 now opens with the wiring check, in unit 34's own words: the
+  driver is per-clone, `merge=rows` in `.gitattributes` does nothing without it, and git falls back
+  to a line merge that warns and still COMPLETES rather than refusing, which is the failure the
+  take-your-side instruction silently assumes away. The fold left this file alone because the
+  disposal rule folds CONFIRMED findings only and the G5 record enters none against it; the
+  orchestrator's call, not the verifier's, is what lands it. No criterion moves and no measured
+  figure changes.
 
 ## 10. Reuse audit
 

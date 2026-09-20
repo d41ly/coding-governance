@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
+**Status:** SPECCED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round2.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
+| [2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-1-spec-audit-g1-round3.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
 
 <!-- /gen:spec-records -->
 
@@ -306,6 +307,13 @@ states what `--follow` does NOT do: it takes the oldest add along the followed h
 `RUN.md` path can date a later run's archive to an earlier run's first commit, which errs toward
 grandfathering and never toward a frozen red.
 
+`--follow` repairs the ARCHIVED path only. A LIVE `RUN.md` in a folder that has rotated is recorded
+`M` at the rotation and never re-ADDed, so its first-commit date is the PREVIOUS run's preflight and
+the record grades OLDER than it is — the permissive direction for a grandfather clause. Where the
+dated population can include a live record in a re-used folder, the date is FLOORED at the newest
+ADD of an archived sibling in the same directory, which is where that record's tenancy of the path
+begins.
+
 In gov's in-place mode no post-cutoff record says LANDED until a rotation, so rev-1's arm graded an
 empty population. Population (iii) is where gov's landed records are, and (ii) is where they go once
 rotated. A hand-committed, pushed `phase: LANDING` with none of the close's facts is exactly (iii)'s
@@ -425,9 +433,15 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
   `memory/builds/dCarriedReceipt/RUN.md` is not graded by the arm. Neither is a pre-cutoff LANDED
   record rotated to a `RUN.LANDED.` name after the cutoff, and check 15 does not red that rotated,
   anchorless, pre-cutoff record for naming no anchor kind. A blank cutoff prints that the arm is off.
+  And when the fixture's folder holds a rotated sibling, the LIVE record's date is the date of the
+  commit that wrote IT, not the date of the previous run's preflight.
   Red when: the arm is keyed on `LANDED_ANCHOR_CUTOFF`, which reds a record that cannot be
   repaired; or either site dates a record without `--follow`, so a rotation re-dates a pre-cutoff
-  record into the graded set.
+  record into the graded set; or the date is read with `--follow --diff-filter=A` alone, which a
+  rotation defeats for the live path because the rotation is recorded `M` there, so a record younger
+  than the cutoff is grandfathered by a previous run's age — live on this tree at
+  `memory/builds/aBoundedVerdict/RUN.md`, `memory/builds/aPacedTurnstile/RUN.md` and
+  `memory/builds/dUnstalledConvoy/RUN.md`.
   permission: the fixture arms are the pass's own direct check. The one reading over the REAL tree,
   that `memory/builds/dCarriedReceipt/RUN.md` goes ungraded, runs the `unattended kit gate` leg's
   own command over this repository, so it defers to the VERIFYING run's
@@ -512,8 +526,14 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
   meets the anchor rule without ever having landed.
 - **AC19** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
-  parent's and is below the 61440-byte guide cap declared in
-  `tools/memory-tree/check-memory-hygiene.sh`. The same two readings hold for
+  parent's and is below the guide BYTE cap; and when the same two revisions are counted with
+  `wc -l`, the build-commit line count is NOT GREATER than the parent's and below the guide LINE
+  cap. Both numbers are RESOLVED from the single line of
+  `tools/memory-tree/check-memory-hygiene.sh` that declares `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES`
+  together, and neither is retyped here as a literal, because check 6 reds on EITHER half and the
+  two halves bind under different edits: a trim that pays for a table is byte-neutral and
+  line-POSITIVE, and check 6's own break-even is 81.92 bytes per line, which a carrier of rows and
+  short bullets sits under. All four readings hold for
   `tools/unattended/PROTOCOL.template.md`. Both trims are taken and both landed:
   `grep -c 'While a run is LIVE the unit list derives' tools/unattended/PROTOCOL.template.md` and
   `grep -c 'branching on the recorded anchor kind' tools/unattended/PROTOCOL.template.md` each count
@@ -523,8 +543,8 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
   back as inputs — are still stated in §2. The owed key-table row arrived:
   `grep -c 'LANDED_FACTS_CUTOFF' tools/unattended/PROTOCOL.template.md` counts 0 at the parent and 1
   or more at the build commit. The companion guide `UNATTENDED-STOPS.md`, which takes whatever this
-  unit's 300 bytes do not cover, is read the same way at the build commit and is below the same
-  61440-byte guide cap.
+  unit's 300 bytes do not cover, is read the same way at the build commit and is below BOTH halves of
+  the same guide cap.
   Red when: §6's sentence grows into the paragraph the companion owns, so the two answer one
   question and the 1,116 bytes the build's units share are spent here; or the size is read against
   the figure written in this spec rather than against the parent commit, so a sibling's landing
@@ -533,8 +553,11 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
   reasoning rather than moving it; or the cap is raised to make the text fit, which is an owner
   turn; or `LANDED_FACTS_CUTOFF` reaches §8's key table in no row, which reds check 22 of
   `tools/unattended/check-unattended.sh` on the next bar; or the companion is measured only in prose, so text pushed out of the
-  protocol lands in a carrier nobody reads the size of.
-  permission: a read, a byte count and three greps, no gate leg and no suite.
+  protocol lands in a carrier nobody reads the size of; or a trim is byte-neutral and line-positive,
+  so every byte reading passes and the `memory hygiene` leg reds on the line half it never read; or
+  the companion lands under the byte cap and over the line cap, which check 6's own
+  81.92-byte-per-line break-even makes the expected shape for a carrier of rows and short bullets.
+  permission: a read, two byte-and-line counts and three greps, no gate leg and no suite.
 
 ## 7. Gates
 
@@ -721,6 +744,23 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   `tools/gate-legs.json` carries no leg for `tools/unattended/unattended.test.sh` or
   `tools/unattended/check-unattended.test.sh` at any flag setting, so "the build's one
   post-build bar" alone would have read as a bar that covers them.
+- rev-6 · 2026-09-20 · spec-audit round 3 fold (G1 round 3 H1, id 13). AC19 read the guide cap by
+  its BYTE half only, on the protocol, its template and the companion; the declaration has two
+  halves and check 6 reds on either. All three carriers are now read both ways, with both numbers
+  RESOLVED from the line that declares them rather than retyped, and the criterion gains a
+  `Red when:` arm for a byte-neutral line-POSITIVE trim and one for a companion under the byte cap
+  and over the line cap. Verified at HEAD:
+  `tools/memory-tree/check-memory-hygiene.sh` declares `GUIDE_CAP_BYTES=61440` and
+  `GUIDE_CAP_LINES=750` on one line and check 6 tests both, while
+  `memory/guides/UNATTENDED-PROTOCOL.md` stands at 675 lines and 60324 bytes, which is 75 lines of
+  headroom beside 1116 bytes. This round found no other confirmed defect in this spec, and nothing
+  else here moved.
+  Extended on the same pass, same base and rev, by the cross-edit owed by
+  `TOOL-dDerivedDocket-52`'s close-out · §4 · AC9 · the first-commit date gains a floor for a LIVE
+  record in a rotated folder, after `TOOL-dDerivedDocket-52`'s close-out measured
+  `--follow --diff-filter=A` dating three of this tree's live records to a previous run's preflight.
+  The rev is kept rather than bumped, because this spec already carries a 2026-09-20 entry and the
+  pass extends it; the cross-edit's own wording is otherwise verbatim.
 
 ## 10. Reuse audit
 

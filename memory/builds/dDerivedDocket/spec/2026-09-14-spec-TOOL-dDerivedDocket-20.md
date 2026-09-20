@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 20
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 20
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-15-spec-audit-g3-round1.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 |
+| [2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-15-spec-audit-g3-round2.md) | spec-audit | TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +44,10 @@ index.
   build; §11's declined disposition names an ask the run files in its own build; one paragraph
   states that every ask, disposition and header verb a run writes sits in its own folder under the
   folder slug (the charter §2 exception, design §8), and that a sequential pass may declare its own
-  build's `BACKLOG.md`; one pointer names the companion guide; and §2's anchor-ban paragraph covers
+  build's `BACKLOG.md`; one pointer names the companion guide, spelled so that it and no other
+  sentence in either copy carries the phrase §4's table pins to that row, which is what AC3 counts,
+  so §11's kept sentence below is free to be a second sentence naming the same file; and §2's
+  anchor-ban paragraph covers
   every tracked file under the run's build folder, not only the run-state file (design §19.7 layer
   1, enforced by unit 18 S3), and names the link-wrapped `--asks --ready` paste as the sanctioned
   way to cite a foreign ask. That text adds at most 250 B per copy AND IS PAID FOR IN THE SAME
@@ -173,7 +177,7 @@ because the flip is one later commit. The table is the rule for each edit.
 | `tools/unattended/lib-unattended.sh:242-245`, "template section 1 MANDATES a backlog row" | S2's sentence | none; AC2 counts `section 1 MANDATES` to 0 |
 | protocol §2 anchor ban, scoped to the run-state file's authored rows | every tracked file under the run's build folder; cite a foreign ask by the link-wrapped `--asks --ready` paste | `every tracked file under the run's build folder` |
 | none at BASE: protocol, the own-folder paragraph of S3 | every ask, disposition and header verb a run writes sits in its own folder under the folder slug | `sits in its own folder under the folder slug` |
-| none at BASE: protocol, the pointer of S3 | one sentence naming the companion guide | `UNATTENDED-ASKS.md` |
+| none at BASE: protocol, the pointer of S3 | one sentence naming the companion guide, spelled to carry the phrase beside it | `the ask contract and the dispositions live in` |
 
 ### The companion guide
 
@@ -189,10 +193,12 @@ them, because a paraphrase and its source are two answers to one question.
 
 The guide exists because the protocol cannot hold this text: it is at 60324 B at BASE `fb07ca25`
 against the guide cap of 61440 B (`tools/memory-tree/check-memory-hygiene.sh:84`), which leaves
-1116 B where `abac6d59` left 3625 B, and at least five units of this build add to it. This unit's S3
-spends at most 250 B of that and unit 19's at most 350 B, both cut in the regrounding consolidation
-pass so each share fits; whether all of this build's protocol shares sum under 1116 B is the
-orchestrator's to settle, and no cap is raised here. The companion guide S4 adds is a NEW file
+1116 B where `abac6d59` left 3625 B, and at least five units of this build add to it. This unit
+claims no SHARE of that headroom, and no cap is raised here. S3's edit is NET ZERO OR NEGATIVE on
+each protocol copy: the passage it trims, §11's paragraph beginning `Decide AT ONCE`, is larger than
+the text S3 adds and MOVES into the companion guide's DISCOVERY FILING section, so each copy is
+smaller at this unit's commit than at its parent, which is what AC3 compares against rather than a
+declared allowance. The companion guide S4 adds is a NEW file
 carrying its own 61440 B cap, so it draws nothing from this headroom. Moving section 7 into
 `UNATTENDED-VERBS.md` is the precedent (the pair comment at
 `tools/unattended/check-unattended.sh:1624-1630`).
@@ -200,12 +206,14 @@ carrying its own 61440 B cap, so it draws nothing from this headroom. Moving sec
 ### The build method's budget
 
 The rendered copy is 27264 B and 347 lines against its 27648 B and 350-line budget at BASE
-`fb07ca25`: 384 B and 3 lines of headroom, both PINNED as measured there, where `abac6d59` left
+`fb07ca25`: 384 B and 3 lines of headroom, both measured there, where `abac6d59` left
 1209 B and 14 lines. aRatifiedRulings, aDeferredBar and aProbedUnit spent the difference. NO CAP IS
-RAISED in this build — moving M1's budget is an owner turn under veto 2 — so the three shares are
-trimmed to fit instead: unit 19 takes at most 120 B and one line, this unit at most 160 B and two
-lines, and unit 31 replaces text rather than adding a paragraph, which leaves 104 B of the 384 B
-unspent. Only the byte half binds, because no checker reads the line half of that budget row
+RAISED in this build — moving M1's budget is an owner turn under veto 2 — and no SHARE of that
+headroom is claimed here. S7's edit is NET ZERO OR NEGATIVE on the rendered copy: the passage it
+trims, M6's paragraph beginning `It takes a COMMITTED range`, is larger in both bytes and lines than
+what S7 adds and MOVES beside that tool's own row in `tools/memory-tree/README.md`, so the copy is
+smaller and shorter at this unit's commit than at its parent, which is what AC7 compares against.
+Only the byte half binds, because no checker reads the line half of that budget row
 (`tools/template-size-limits.txt:84-85`). M1 forbids
 stating any rule twice, so the M2 sentence is the only place the grouping rule is written; the guide
 points at M2.
@@ -296,12 +304,17 @@ lands · `tools/workflows/unattended-build.template.js` ·
 - **AC3** — When both copies of the protocol are compared, `bash tools/unattended/check-unattended.sh`
   check 10 finds them byte-identical, and `git cat-file -s` run at this unit's parent and at its
   commit reports a SMALLER size at the commit for `memory/guides/UNATTENDED-PROTOCOL.md` and for
-  `tools/unattended/PROTOCOL.template.md`, each also under the 61440 B guide cap;
+  `tools/unattended/PROTOCOL.template.md`, each also under the 61440 B guide cap and under the
+  750-line half `tools/memory-tree/check-memory-hygiene.sh:84` declares beside it;
   `git grep -c "deferred costs the whole finding"` prints 1 for the installed
   `UNATTENDED-ASKS.md` and 0 for each protocol copy, so §11's paragraph moved rather than
   being deleted; `git grep -c "minted as a backlog row"` prints 0 for each copy, and
-  `git grep -c` for each phrase in §4's table prints 1 per copy, except `UNATTENDED-ASKS.md`, which
-  the `ASKS_CMD` row unit 16 writes also names, and which prints at least 1.
+  `git grep -c` for each phrase in §4's table prints 1 per copy at this unit's commit, the pointer
+  row's `the ask contract and the dispositions live in` among them, and that one phrase prints 0 per
+  copy at its parent, the same parent comparison this criterion already makes for bytes. The bare
+  `UNATTENDED-ASKS.md` string is deliberately out of this criterion: the `ASKS_CMD` row unit 16
+  writes names the same file, and §11's kept sentence may name it a second time, so no count of it
+  distinguishes a pass that wrote S3's pointer sentence from one that did not.
   Red when: an edit lands in one copy only, the copy breaches the guide cap other units share, the
   retired sentence survives, or a new sentence is absent, which an empty edit under the budget would
   pass; or the retired-sentence grep is re-tightened to a phrase that leads with the lower-case `a`
@@ -311,7 +324,11 @@ lands · `tools/workflows/unattended-build.template.js` ·
   headroom unit 19 and this build's other protocol writers are priced against instead of funding
   its own text, which is why the comparison is against the parent commit rather than against a
   declared share; or §11's paragraph was DELETED rather than moved, so the contract lost a rule
-  and the carrier shrank for the wrong reason.
+  and the carrier shrank for the wrong reason; or the pointer row is graded by counting the bare
+  `UNATTENDED-ASKS.md` string, which the earlier-ordered unit 16 already writes into the same table,
+  so a pass that never writes S3's pointer sentence passes green; or the pinned phrase is one
+  §11's kept sentence also carries, so a correct pass lands 2 per copy and the criterion reds on a
+  correct build.
   permission: the leg run is observed at the one post-build bar the main loop runs at VERIFYING,
   after the last unit; the byte count and both greps are read in the pass.
 - **AC4** — When `bash tools/unattended/adopt-unattended.sh --check` runs, it reports
@@ -505,6 +522,39 @@ New arm: `tools/workflows/unattended-build.test.sh` · a unit carrying `closes` 
   covers unheld. Nothing else moved. No `permission:` line in this spec names a held leg: every leg
   §7 lists resolves in `tools/gate-legs.json` with a subject of `repo` and a chunk outside
   `selftests`, so a plain bar reaches each of them and no flag clause is owed.
+- rev-4 · 2026-09-20 · §4 · AC3 · the spec-audit round 3 fold, the G3 round-2 record, which
+  exited BOUNDED. Recorded as its own entry with a single bump rather than as an extension of the
+  rev-3 line: the five sibling specs of this group took that form for the same fold, and a reader
+  must be able to tell from the header that a round-3 pass touched this spec. M6 (14): §4's two budget paragraphs still priced this unit's edits as SHARES
+  of free space — 250 B of the protocol's 1116 B, 350 B attributed to unit 19, 160 B of the build
+  method's 384 B with 104 B left over — although the closing consolidation pass had already made S3
+  and S7 net-zero-or-negative and moved AC3 and AC7 to a parent comparison. Both paragraphs are
+  rewritten to that rule: each names the passage its edit trims, says it is larger than what the
+  unit adds, and claims no share; the share arithmetic and the sentence parking the build-wide sum
+  with the orchestrator are gone, because the fold that closed the question preceded them. The
+  measured BASE figures stay as the reason the companion guide exists, and unit 19's own §4 Budgets,
+  which hands its headroom back rather than claiming 350 B, is no longer contradicted here. M8 (35):
+  AC3's `UNATTENDED-ASKS.md` clause accepted `at least 1`, which the `ASKS_CMD` row the
+  earlier-ordered unit 16 writes already satisfies, so a pass that never wrote S3's pointer sentence
+  passed green. It now asserts the count is exactly ONE MORE in each protocol copy at this unit's
+  commit than at its parent, the shape AC3 already uses for bytes, and its `Red when:` names the
+  sibling-supplied string. That SUPERSEDES rev-2's record of `at least 1` as the accepted reading.
+  No S-item moves, no cap is raised, §7 does not move, and no finding of this record is promoted
+  out of this spec.
+  One format correction rides along: AC3's protocol clause read the byte half of the guide cap
+  alone, and `tools/memory-tree/check-memory-hygiene.sh:84` declares a 750-line half beside it,
+  so that clause now reads both.
+- rev-5 · 2026-09-20 · §2 · S3 · §4 · AC3 · the round-3 fold's verifier, repairing the M8 fold
+  above. That fold made AC3 assert exactly ONE MORE `UNATTENDED-ASKS.md` per protocol copy at the
+  commit than at the parent, which is the mandated delta only if S3 mandates exactly one new
+  mention. S3 mandates a pointer sentence AND keeps a §11 sentence pointing at the same guide, so a
+  correct pass can land +2 and red a criterion. AC3 now grades the pointer row by a phrase unique to
+  that sentence, `the ask contract and the dispositions live in`, at 1 per copy at the commit and 0
+  at the parent, and the bare `UNATTENDED-ASKS.md` string leaves the criterion entirely, since unit
+  16's `ASKS_CMD` row and §11's kept sentence both name the same file. §4's phrase table carries the
+  new phrase in the pointer row, which was the one row with no phrase of its own, and S3 says the
+  pointer sentence is spelled to carry it and that §11's kept sentence is deliberately uncounted.
+  This was the review's own first option, which the M8 fold did not take.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 31
+**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 |
 
 <!-- /gen:spec-records -->
 
@@ -49,7 +50,12 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
   conf: the last assignment wins, one layer of matching quotes is stripped, and a trailing comment
   outside quotes is dropped, which is what the hygiene engine's `.` of the same file yields; a
   resolved value that is neither blank nor a date matching `[0-9]{4}-[0-9]{2}-[0-9]{2}` refuses,
-  numbered. Gov's value is derived at
+  numbered; and a file that assigns the key on a line the reader's own pattern does NOT match — an
+  `export` prefix, a leading indent, an assignment inside a conditional — refuses, numbered and
+  naming that line, rather than falling through to blank. An assignment the reader DOES match whose
+  value is empty is the declared off state and resolves blank, which is the adopter default; it is
+  an unmatched line that may never resolve silently, because blank would then turn per-item grading
+  off on the planning side alone. Gov's value is derived at
   build time as the day after the newest tracked spec filename date. Observed by AC7, AC8, AC13 and
   AC15.
 - **S6** The contract table. `tools/memory-tree/marker-contract.test.sh` gains rows for post-cutoff
@@ -97,6 +103,13 @@ and make M6 bind delegated passes only, with the rule carried into the tracked r
   declared fork gradeable; it cannot find an undeclared one, and the readers' own headers say so.
 - The check-12 reader's other arms, and the section-by-heading work `TOOL-dTieredTribunal-17`
   records, are not touched.
+- **A RUNTIME compare of the two readings.** The two-readers gotcha prescribes keeping a deliberate
+  re-parse only beside a compare against the authoritative read, redding on any difference. In
+  production that compare would mean the planning side sourcing `.memory-tree.conf`, a second kit's
+  conf executed inside the driver, which F5 rejected under M3 veto 3. AC15's agreement arm makes the
+  compare at TEST time instead, and S5's numbered refusal covers the case no fixture table can
+  represent — a spelling the text reader does not model, which would otherwise resolve to blank
+  (§4).
 - The memory-tree kit version moves once per landing range under
   `tools/memory-tree/check-verdict-epoch.sh`'s topological rule, not in this unit.
 - No change to the build harness's parallel spec writers in
@@ -157,10 +170,22 @@ agreement with a case table instead. Their CUTOFF can still be one fact. `plan_s
 function sliceable by that harness, taking the cutoff as `$2`, and every planning caller reads the
 value through one text reader in the kit library. `check-unattended.sh` is NOT a precedent for it:
 that leg reads key NAMES as text and gets their VALUES by sourcing in a subshell (`:140-147`). This
-reader re-parses deliberately, because the planning side must not execute a conf, so it carries the
-guard `memory/gotchas/two-readers-of-one-config-one-re-derived.md` prescribes for a deliberate
-re-parse: an agreement arm against a sourced read, and an armed parse (§8 F5). An absent file or a
-blank key is the adopter default, and per-item
+reader re-parses deliberately, because the planning side must not execute a conf. The gotcha
+`memory/gotchas/two-readers-of-one-config-one-re-derived.md` sanctions a deliberate re-parse only
+beside a compare against the AUTHORITATIVE read that reds on ANY difference, and F5's veto puts a
+RUNTIME compare out of reach (§3), so what stands in its place is NAMED rather than claimed to be
+the same guard: an agreement arm against a sourced read at TEST time, an armed parse (§8 F5), and
+S5's numbered refusal when the file assigns the key on a line the reader's pattern does not match.
+That refusal is what closes the hole a fixture table cannot. Blank is the declared OFF state, so a
+legal sourced spelling the text reader does not model — `export FORK_ITEM_CUTOFF="2026-09-15"`, the
+same assignment indented, an assignment inside a conditional — would otherwise resolve to blank,
+turn per-item grading off on the planning side, and leave the hygiene side ON, which takes its value from the engine's own `.` of the same
+file (`tools/memory-tree/check-memory-hygiene.sh:113`). Two readers, one corpus, two cutoffs,
+nothing red: the exact class the gotcha records, from `.unattended.conf`'s `BYPASS_BAN` going RC=1
+to RC=0 while the leg printed that the scan ran. The in-tree precedent for the refusal is the leg's
+own name reader at `tools/unattended/check-unattended.sh:147`, which models the `export` prefix and
+leading whitespace. The refusal is scoped to an UNMATCHED assignment for that reason: an absent file,
+or a matched assignment whose value is empty, is the adopter default, and per-item
 grading is then off in both readers, which is the same meaning blank has on the hygiene side. A
 second key in `.unattended.conf` was rejected: two declarations of one date are two answers to one
 question, and the reader that drifts is the one nothing re-reads.
@@ -273,8 +298,16 @@ NO CAP IS RAISED here.
   NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
   invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC2** — When the same section 8 sits in a fixture spec dated before the cutoff, the hygiene side
-  is silent and `plan_state` prints READY, exactly as at BASE.
-  Red when: per-item grading ignores the filename date, which reds frozen specs.
+  is silent and `plan_state` prints READY, exactly as at BASE. And with `FORK_ITEM_CUTOFF` BLANK,
+  and again with the key absent from the fixture conf altogether, both readers grade every fixture
+  spec exactly as at BASE — the hygiene side silent and `plan_state` READY — including a
+  POST-cutoff-dated one whose F2 carries no mark.
+  Red when: per-item grading ignores the filename date, which reds frozen specs; or blank is
+  compared as a date, so every filename date sorts at or after the empty string and per-item grading
+  turns ON for every spec in the tree. Blank is the SHIPPED adopter default and the one value a date
+  comparison gets wrong by default, so an adopter installing the kit without setting the key reds a
+  landed corpus; AC8 sets gov's own cutoff later than every tracked spec date, so gov's bar cannot
+  reach the off state and no other criterion of this unit could catch it.
   permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
   NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
   invocation is what `tools/unattended/gate-guard.js` denies in the pass.
@@ -384,9 +417,18 @@ NO CAP IS RAISED here.
 - **AC15** — When `bash tools/memory-tree/marker-contract.test.sh` feeds the planning side's reader
   and a subshell `.` of the same fixture conf the spellings `FORK_ITEM_CUTOFF="2026-09-15"  # note`,
   `FORK_ITEM_CUTOFF='2026-09-15'`, the key repeated with a later second value, and the bare value,
-  both yield the same value every time; and a value `2026-09-15x` refuses, numbered.
+  both yield the same value every time; and a value `2026-09-15x` refuses, numbered. And when it
+  feeds the same pair the SOURCED spellings a shell also accepts —
+  `export FORK_ITEM_CUTOFF="2026-09-15"`, the same assignment indented, and one inside a conditional
+  — the text reader either yields what the subshell `.` yields or REFUSES, numbered, naming the line
+  it could not resolve; for a file whose only assignment of the key sits on a line it does not match
+  it never returns blank, while a matched `FORK_ITEM_CUTOFF=` still resolves blank, which is AC2's
+  off-state arm.
   Red when: the reader takes the first match or keeps the trailing comment, so hygiene and `--plan`
-  grade one spec under two cutoffs.
+  grade one spec under two cutoffs; or a spelling it does not model resolves to blank, which is the
+  declared OFF state, so per-item grading goes silently off on the planning side while the hygiene
+  side keeps it on — the two-readers class reached with no value ever disagreeing, which the four
+  column-0 spellings above cannot reach because the reader matches all four.
   permission: `tools/memory-tree/marker-contract.test.sh` is the `marker contracts` leg, which is
   NOT held, so the build's one post-build bar covers it whatever flags that bar carries; the file
   invocation is what `tools/unattended/gate-guard.js` denies in the pass.
@@ -395,7 +437,7 @@ NO CAP IS RAISED here.
 
 `marker contracts` · `memory hygiene` · `memory-hygiene self-test` · `pass-order history` · `kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `verdict epoch (kit version dates the engine)` · `kickoff-manifest ratchet` · `recall floor` · `line length` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/memory-tree/marker-contract.test.sh` · post-cutoff F-item documents with an unmarked sibling, a quoted mark, a wrapped mark, option bullets, a leading plain bullet, and the none-line case · the harness's case count
+New arm: `tools/memory-tree/marker-contract.test.sh` · post-cutoff F-item documents with an unmarked sibling, a quoted mark, a wrapped mark, option bullets, a leading plain bullet, the none-line case, a blank cutoff, an absent cutoff key, and the three sourced spellings the text reader must resolve or refuse · the harness's case count
 New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · a post-cutoff Tier-2 fixture with a plain bullet before its first F-item · the engine suite's executed-assertion floor, by the assertions its new arm executes, and the engine's arms floor, by any branch the new arm adds
 New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call site, enumerated and counted · the harness's case count
 
@@ -530,6 +572,29 @@ New arm: `tools/memory-tree/marker-contract.test.sh` · every plan_state call si
   put it, which is what §2 S7 and §6 AC10 say from this side. §3's edit-site bullet is reworded to
   match, since it read as though this unit always edits M3. The header date stays at the
   last-change date; the rev does not move, because no criterion changed its subject.
+- rev-4 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §3 §4 §7 · S5 · AC2 AC15. M7: S5
+  declares that a blank `FORK_ITEM_CUTOFF` means off in BOTH readers and no criterion staged a blank
+  or an absent key — AC15 staged four set spellings, AC2 a pre-cutoff spec under a SET cutoff, and
+  AC8 puts gov's own cutoff past every tracked spec date, so gov's bar cannot reach the off state
+  either. Blank is the SHIPPED adopter default and the one value a date comparison gets wrong by
+  default, every filename date sorting at or after the empty string, so the natural implementation
+  turns per-item grading on for every spec in an adopter that installs the kit and sets nothing.
+  AC2 now stages blank and absent, including a post-cutoff spec with an unmarked F2. M9: the round-1
+  M11 fold claimed §4 carries the guard the two-readers gotcha prescribes, and the gotcha prescribes
+  a compare against the AUTHORITATIVE read that reds on any difference, which F5's veto on sourcing
+  puts out of reach at runtime. §4 now names what stands in its place instead of claiming the guard,
+  §3 records why the runtime compare is unavailable, S5 adds a numbered refusal for a file that
+  assigns the key on a line no value resolves from, and AC15 stages the three sourced spellings the
+  four column-0 ones could never reach. Without that refusal a blank resolution is
+  indistinguishable from the declared off state, and the two readers grade one corpus under two
+  cutoffs with nothing red. §7's marker-contract row names the added cases. The carriers unit's
+  shared BUILD-METHOD budget and every `permission:` line are untouched.
+  Verified in the same round and corrected in place, at no further rev bump: the refusal as first
+  folded read "a file that ASSIGNS the key on some line from which no value resolves", which a conf
+  holding the shipped default `FORK_ITEM_CUTOFF=` satisfies — so S5 and AC15 refused the very state
+  S5's first sentence, §4's adopter-default paragraph and AC2's new blank arm require to resolve off.
+  The refusal is now scoped to an assignment the reader's own pattern does not MATCH, and a matched
+  empty assignment is stated as the off state in S5, §4 and AC15, so the three read one rule.
 
 ## 10. Reuse audit
 

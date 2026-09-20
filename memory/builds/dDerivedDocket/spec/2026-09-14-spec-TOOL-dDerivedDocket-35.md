@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-35 — arming and the real-tree staged reds
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 35
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 35
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round2.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-32-spec-audit-g5-round3.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 
 <!-- /gen:spec-records -->
 
@@ -86,7 +87,12 @@ against the fixture.
 - **S8** Every RED is copied verbatim into this unit's acceptance ledger, and the scratch clone is
   removed afterwards with its read-only git objects cleared first — afterwards meaning after the
   deferred staging of S6 and S7 at the VERIFYING run (S2), because the linked worktree those two
-  need lives inside that clone, so the pass leaves it in place. The real tree carries only this
+  need lives inside that clone, so the pass leaves it in place. The ledger is COMMITTED before any
+  check reads it, in two commits matching the two copying moments (Rollout step 6):
+  `tools/memory-tree/check-memory-hygiene.sh` enumerates its corpus from the index —
+  `git ls-files` at `tools/memory-tree/check-memory-hygiene.sh:219`, `:1902` and `:2015` — so an
+  uncommitted and unstaged ledger is invisible to check 14, and a reading taken over one is the
+  could-not-fail shape rather than coverage. The real tree carries only this
   unit's declared writes. Observed by AC7.
 - **S9** This build's own asks after arming. Its close is the first one graded with `ASKS_CMD` set,
   so every ask homed in `memory/builds/dDerivedDocket/BACKLOG.md` must be terminal or carry a
@@ -248,6 +254,16 @@ under `memory/builds/dDerivedDocket/build/`.
 5. Read this build's own asks at that commit and record each with its status and deciding row.
    Remove the scratch clone only once step 4's deferred staging has run at VERIFYING, since the
    linked worktree that staging needs lives inside it (S8).
+6. Commit the ledger BEFORE anything reads it, twice, once per copying moment: the three in-pass
+   REDs at the end of the pass, and the two deferred REDs at VERIFYING, in a commit made before the
+   post-build bar takes AC7's `memory hygiene` reading. The engine reads only tracked files (S8),
+   so an uncommitted ledger makes AC7's arm and its Red when both unable to fire. Where the bar has
+   already run when the last RED is copied, it is re-run over the ledger's final content, and the
+   ledger records which of the two readings is the binding one. THIS STEP IS NOT ORDERED AFTER
+   STEP 5 AS A WHOLE, and the two moments it names are why: its first commit, the three in-pass
+   REDs, lands at the end of the pass and therefore BEFORE step 5's VERIFYING actions, while the
+   scratch clone is still standing; only its second commit, the two deferred REDs, is ordered after
+   them. Read 1 to 6 as a sequence and the in-pass REDs get committed after the clone is gone.
 
 ### Alternatives rejected
 
@@ -289,13 +305,15 @@ under `memory/builds/dDerivedDocket/build/`.
   label, P5, never a DEAD PROBE; where the READY witness ran, it returned one row per scoped id.
   Red when: the refusal is the authorization refusal, because the README never reached the scratch
   remote's default branch, and P5 was never asked; or a parse refusal or a DEAD PROBE satisfies the
-  RED, which is what G3 H1 or H2 standing would produce.
+  RED, which is what `TOOL-dDerivedDocket-49` or `TOOL-dDerivedDocket-50` standing would produce —
+  the two units the driver minted from the G3 round-2 record's H1 and H2.
 - **AC3** — When `unattended.sh --close` runs on the scratch mandated run, it refuses, and among its
   unmet items it names `asks-disposed` and the undisposed ask, and the refusal names its term by
   label, T3, never a DEAD PROBE, and the witness returned one row per scoped id.
   Red when: the item reads T0, not adopted, because the scratch clone's conf was not the armed one;
-  or a parse refusal or a DEAD PROBE satisfies the RED, which is what G3 H1 or H2 standing would
-  produce.
+  or a parse refusal or a DEAD PROBE satisfies the RED, which is what `TOOL-dDerivedDocket-49` or
+  `TOOL-dDerivedDocket-50` standing would produce — the two units the driver minted from the G3
+  round-2 record's H1 and H2.
   cost: seconds, because the scratch `GATE_CMD` is `false` and no bar runs.
 - **AC4** — When `bash tools/unattended/check-unattended.sh` runs in the scratch clone with the typed
   table in place, it fails naming the anchor ban and the foreign id.
@@ -331,14 +349,18 @@ under `memory/builds/dDerivedDocket/build/`.
   clone, which the child prompt sanctions, and is not the `memory hygiene` leg's verdict.
 - **AC7** — When `git status --porcelain` runs in the worktree after the scratch clone is removed, it
   lists nothing beyond this unit's declared writes, the scratch directory no longer exists, and
-  `bash tools/memory-tree/check-memory-hygiene.sh` names no orphan id in the ledger that copied the
-  REDs.
+  `bash tools/memory-tree/check-memory-hygiene.sh`, run after the commit Rollout step 6 makes of the
+  ledger's LAST copied RED, names no orphan id in the ledger that copied the REDs; `git ls-files`
+  lists that ledger at the commit the reading is taken on.
   Red when: a fixture carried a real-family id, which the copied RED then cites and check 14 reds as
-  defined nowhere.
+  defined nowhere; or the reading is taken over a ledger that is neither committed nor staged, which
+  the engine enumerates from the index and so cannot see at all, leaving both this arm and the
+  Red when above unable to fire over content that ships anyway.
   permission: the `git status --porcelain` read is the pass's own, and the scratch directory's
   absence is read at the deferred staging run that removes the clone (S2, S8), not in the pass,
   which leaves the clone in place; `check-memory-hygiene.sh` over the real tree is the
-  `memory hygiene` leg and its verdict binds at the one post-build bar.
+  `memory hygiene` leg and its verdict binds at the one post-build bar, taken after step 6's second
+  commit or re-taken over the ledger's final content when the bar ran first.
 - **AC8** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs at this unit's
   commit, every ask homed in this build's `BACKLOG.md` is terminal or carries a disposition row
   there: `<triage-id>` its KEEP from unit 34, and, for every ask that read returns live with a
@@ -520,6 +542,33 @@ observes them on real content.
   change owes rather than a byte claim — so no stated delta is owed here, and AC9 already reads
   that line against its parent's. Nothing else moved, and the header date already reads
   2026-09-20.
+  Extended again 2026-09-20 by the spec-audit round 3 fold, the G5 record, which exited CONVERGED
+  with no blocker; this unit carries one confirmed finding and it is a MEDIUM. G5 M6 (7): the
+  acceptance ledger was a declared tracked write that no rollout step committed, and
+  `tools/memory-tree/check-memory-hygiene.sh` enumerates its corpus from the index —
+  `git ls-files` at `tools/memory-tree/check-memory-hygiene.sh:219`, `:1902` and `:2015` — so AC7's
+  check-14 arm and its Red when were both reading a file that was not there. Rollout gains step 6,
+  which commits the ledger at each of its two copying moments, the three in-pass REDs at the end of
+  the pass and the two deferred ones at VERIFYING before the bar takes AC7's reading; S8 states the
+  two commits and the index-enumeration fact behind them; and AC7 now orders its
+  `check-memory-hygiene.sh` reading after that second commit, asserts `git ls-files` lists the
+  ledger at the commit it reads, and names the uncommitted-ledger case in its Red when. Where the
+  bar has already run when the last RED is copied, step 6 re-runs it over the ledger's final
+  content and the ledger records which reading binds, which also closes the ordering half of the
+  finding: S2 and AC7 deferred the staging and the reading to the same run without ordering them.
+  Base and header date unchanged, rev kept.
+- rev-5 · 2026-09-20 · §4 · AC2 AC3 · the round-3 fold's verifier. Two repairs, neither moving an
+  assertion. The M6 fold's new Rollout step 6 is right in substance and wrong as a sequence: its
+  first half, the three in-pass REDs, commits at the END OF THE PASS, which is before step 5's
+  VERIFYING actions, while its second half is after them. A reader executing 1 to 6 in order
+  commits the in-pass REDs after the scratch clone is already gone. Step 6 now says so in its own
+  clause rather than by renumbering, which keeps §9's existing pointer at Rollout step 5 valid.
+  Second, AC2's and AC3's `Red when:` clauses ended in review-record shorthand, "which is what G3 H1
+  or H2 standing would produce". The driver has PROMOTED both to units of this build — H1 to
+  `TOOL-dDerivedDocket-49` and H2 to `TOOL-dDerivedDocket-50` — and once the review records rotate
+  that shorthand resolves to nothing, leaving a reader unable to tell which mechanism the fixture is
+  waiting on. Both clauses now name the unit ids, with the record provenance kept beside them. No
+  criterion's assertions change, no carrier accounting moves, and §7 does not move.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 21
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 21
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
+| [2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-21-spec-audit-g4-round2.md) | spec-audit | TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 |
 
 <!-- /gen:spec-records -->
 
@@ -306,14 +307,24 @@ drift-audit version carrier is touched either: the drift-audit bytes ride unit 1
   `git diff HEAD^ HEAD -- tools/drift-audit/drift_report.py` runs on the unit's build commit, it
   shows no change to the `KIT_DRIFT_AUDIT_VERSION` line; when
   `git diff HEAD^ HEAD -- tools/workflows/` runs there, it is empty, because the review harness's
-  move belongs to the review-durability unit; and `bash tools/check-kit-versions.sh` exits 0.
+  move belongs to the review-durability unit; when `git diff HEAD^ HEAD -- tools/memory-tree/` runs
+  there, it shows no change to the `KIT_MEMORY_TREE_VERSION` line in
+  `tools/memory-tree/check-memory-hygiene.sh` and none to any `gov:kit memory-tree@` marker in
+  `tools/memory-tree/*.template.md`, S6's edit to `tools/memory-tree/kit.toml` notwithstanding,
+  because S8 hands that kit's one move to the memory-tree docs unit; and
+  `bash tools/check-kit-versions.sh` exits 0.
   Red when: one of the three moves is skipped, which `tools/check-kit-versions.sh` cannot see,
   because it grades presence and constant-marker agreement and BASE's values already satisfy both;
   or a constant moves and its marker does not; or a move is compared only against `abac6d59` or only
   against `fb07ca25`, so a kit another node moved on main between them lands at a value the
   advertised tip already holds; or this unit moves
-  `KIT_DRIFT_AUDIT_VERSION`, or the review harness's `meta.version`, as well — either would be a
-  second move of that kit in one landing range beside the move its owner makes.
+  `KIT_DRIFT_AUDIT_VERSION`, the review harness's `meta.version`, or `KIT_MEMORY_TREE_VERSION` and
+  its `gov:kit memory-tree@` markers, as well — any of the three would be a
+  second move of that kit in one landing range beside the move its owner makes, and the memory-tree
+  case is the one a builder reaches by applying S8's rule (a) mechanically to S6's
+  `tools/memory-tree/kit.toml` edit, invisible to `tools/check-kit-versions.sh` for the same reason
+  the other two are and breaking `check-verdict-epoch.sh`'s topological rule, which places that
+  kit's one bump at or after the range's last engine change.
   figure: the three BASE values are PINNED as read at `fb07ca25`; the `origin/main` half is DERIVED
   at the pass.
   permission: the reads are `git show` and `git diff` observations in the pass;
@@ -462,8 +473,18 @@ New arm: `tools/govkit/selftest.py` · a root-conf guard, an undeclared root fil
   stay `none`, because neither `tools/drift-audit/selftest.py` nor `tools/govkit/selftest.py` pins
   an executed-assertion floor.
   Extended again on the closing consolidation pass · §7 only. Both `New arm:` lines now backtick
-  the suite path, as every other spec of this build spells it and as the token checker reads a
-  path; neither file moved and both third fields still read `none`. Nothing else was owed here:
+  the suite path; neither file moved and both third fields still read `none`. The rationale that
+  pass recorded for the respell — that it matches every other spec of this build and the way the
+  token checker reads a path — is false on both halves and is corrected here rather than left
+  standing. Measured over `memory/builds/dDerivedDocket/spec/` during the round-3 fold, both
+  spellings are live, the bare form sitting in units 22, 23, 24, 25, 26, 27, 28 and 37, four of them
+  this group's own siblings, so there was no single convention for that pass to have matched; no
+  count is pinned here, because every fold that adds an arm moves it. And
+  `tools/check-spec-tokens.py` reads neither spelling: its `LEG_LINE`
+  (`tools/check-spec-tokens.py:94`) matches only a line holding nothing but backticked tokens and
+  separators, which a `New arm:` line is not, while its paths join iterates acceptance-criterion
+  bullets alone. The backticking is a house-style choice no leg grades, and backticking one pushes
+  it into the BAR near-list as a token outside the graded population. Nothing else was owed here:
   the review-harness decision above is applied on both sides, this unit writes to no byte-capped
   carrier so the net-zero rule reaches nothing, and every `permission:` line already matches the
   ratified reading — a suite FILE and a real-tree gate leg defer to VERIFYING, while the scratch
@@ -476,6 +497,17 @@ New arm: `tools/govkit/selftest.py` · a root-conf guard, an undeclared root fil
   loose. AC6, AC8 and AC9 are untouched: `govkit selfcheck` and `kit version markers` are unheld,
   so the bar reaches them either way. Rule 1 reads narrowly here and already did — the fixture and
   scratch-copy runs are the pass's own direct checks, the real-tree and suite-FILE runs defer.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold, G4 round 2 · §9 · AC8. M5: AC8
+  gains the third version clause its two siblings already carried — at this unit's build commit
+  `git diff HEAD^ HEAD -- tools/memory-tree/` shows no move of `KIT_MEMORY_TREE_VERSION` in
+  `tools/memory-tree/check-memory-hygiene.sh` and none of its `gov:kit memory-tree@` markers, S6's
+  `tools/memory-tree/kit.toml` edit notwithstanding, because S8 hands that kit's one move to the
+  memory-tree docs unit — and its `Red when:` names that third case, which
+  `tools/check-kit-versions.sh` cannot see for the same reason it cannot see the other two and which
+  also breaks `check-verdict-epoch.sh`'s topological rule. G4 round 2 L3: the closing consolidation
+  pass's backticking rationale above is corrected in place, both of its halves having been measured
+  false, and §7 itself is untouched — the spelling stays as that pass left it and is now recorded as
+  ungraded house style rather than as a checker requirement.
 
 ## 10. Reuse audit
 

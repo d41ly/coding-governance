@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-7 — generated family view
 
-**Status:** SPECCED · rev-4 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 7
+**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round1.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 |
 | [2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-6-spec-audit-g2-round2.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
+| [2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md](../reviews/2026-09-20-review-TOOL-dDerivedDocket-6-spec-audit-g2-round3.md) | spec-audit | TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 |
 
 <!-- /gen:spec-records -->
 
@@ -295,9 +296,14 @@ refuses a stale or unstaged artifact).
   figure: every count on the line is DERIVED at run time.
 - **AC11** — When `--asks EXMP-aFoo-3`, `--asks TOOL --all --json` and `--asks --build aFoo` run on
   the fixture, each writes nothing and exits 0; the id form prints the terminal ask's status and its
-  deciding evidence, and the JSON carries `mode`, `examined` and every field §4 names.
+  deciding evidence, and the JSON carries `mode`, `examined` and every field §4 names; and when
+  `--asks EXMP --status BLOCKED` runs over a fixture holding one BLOCKED and one OPEN ask of that
+  family, only the BLOCKED row prints and the exit is 0, while `--asks EXMP --status NOPE` refuses by
+  name on stderr and exits non-zero.
   Red when: `--asks` exits non-zero on a verdict-carrying tree, so the one tool meant to explain a
-  verdict refuses to run while one exists.
+  verdict refuses to run while one exists; or the `--status` filter is declared and never
+  implemented, or accepts an unrecognised token and prints zero rows at exit 0, so the one print mode
+  that answers "what is BLOCKED right now" reads a typo as "nothing is blocked".
 - **AC12** — When `BACKLOG_EXCERPT_CHARS` is `0`, `abc` and absent in turn, the first two refuse by
   name and the third renders at 72.
   Red when: an unusable value falls back silently, so a typo re-cuts every summary with no message.
@@ -336,7 +342,7 @@ refuses a stale or unstaged artifact).
 
 `build-index selftest` · `memory hygiene` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness`
 
-New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixture trees for every verdict, both guards, the mode guard, a filing home and both roster modes, plus the shards zero-diff fixture · none; the leg's ceiling moves only if its evidenced maximum does
+New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixture trees for every verdict, both guards, the mode guard, a filing home and both roster modes, the `--status` filter over a BLOCKED and an OPEN ask and over an unrecognised token, plus the shards zero-diff fixture · none; the leg's ceiling moves only if its evidenced maximum does
 
 ## 8. Open questions
 
@@ -425,6 +431,12 @@ New arm: `tools/memory-tree/gen_build_index.py` `--selftest` · builds-mode fixt
   leg — the `build-index selftest` leg is held, but this unit's flag run of it stays in the pass and
   is observed there. The header date is the last-change date; the rev
   is unchanged, this being the same consolidation.
+- rev-5 · 2026-09-20 · spec-audit round 3 fold. G2 M3 (3): AC11 runs the `--status` filter S12
+  declares — one BLOCKED row printed from a fixture holding one BLOCKED and one OPEN ask at exit 0,
+  and an unrecognised token refused by name on stderr — and its Red-when names the silent-accept
+  case, an unknown token printing zero rows at exit 0. §7's selftest `New arm:` line names both
+  arms. S12 is unchanged: the option was declared two rounds ago and only its observation was
+  missing, so this fold adds a criterion and no scope.
 
 ## 10. Reuse audit
 
