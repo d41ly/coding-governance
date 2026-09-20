@@ -245,7 +245,17 @@ from collections import Counter  # noqa: E402
 # that all three specs carry the mark at HEAD, all three windows close at one end, and the late
 # commit lies past it. Its decoy checks move it by 3, and the two helpers it arrives with carry none.
 # 4 + 3 = 7
-ASSERTION_FLOOR = 1533
+# RAISED 1533 -> 1543 by TOOL-dLoggedFlight-9, folding R2-M2's anomalies that vanished unjudged: ONE
+# new arm with 6 checks — the live `ANOMALY_SOURCES` earning no refusal, its coverage of
+# `ANOMALY_KINDS` and its vocabulary held in both directions, and four staged copies each earning
+# exactly one refusal; then the landed fixture rendered with and without its session's extract, each
+# Coverage marker re-derived in the arm from the declaration and that model's own coverage states,
+# the kinds a local transcript adds held to those declaring the transcripts or the idle judgement,
+# and the liveness that the two renders disagree, both fall short of the whole list, and the
+# not-local one commits `anomalies 0`. Its decoy checks move it by 3, and the one helper it arrives
+# with carries none. The Skill-copy arm gains 1 for the renamed-kind staging.
+# 6 + 1 + 3 = 10
+ASSERTION_FLOOR = 1543
 
 PASS = []
 FAIL = []
@@ -6261,6 +6271,70 @@ def render_under_schema(schema, model):
         rl_record.RECORD_SCHEMA = live
 
 
+def read_judged_kinds(model):
+    """How many anomaly kinds `model` could judge, re-derived in this arm from the DECLARATION and the
+    model's own coverage states — never through `derive_judged_kinds`, which is the reader under
+    test. `idle` is the judgement, not a source, exactly as the record's counted-source rule has it."""
+    cov = model.coverage if not isinstance(model, dict) else model["coverage"]
+    read = {s for s in rl_model.SOURCE_NAMES if (cov.get(s) or {}).get("state") in rl_record.COUNTED_STATES}
+    if (cov.get("idle") or {}).get("judged"):
+        read.add("idle")
+    return {k for k in rl_model.ANOMALY_KINDS if set(rl_model.ANOMALY_SOURCES[k]) <= read}
+
+
+def test_record_ac11_anomaly_sources():
+    """AC11 of `TOOL-dLoggedFlight-9`, and AC27 of `-8` (R2-M2 of the closing review, round 2). Every
+    anomaly kind declares the sources its trigger reads, graded in both directions, and the record's
+    Coverage says how many of the closed list the model could judge — so `anomalies 0` is never read
+    as a clean run when the two transcript-sourced kinds were never looked for."""
+    check("model AC27: the live declaration earns no refusal", rl_model.check_anomaly_sources(), [])
+    legal = frozenset(rl_model.SOURCE_NAMES) | {"idle"}
+    check("model AC27: it covers ANOMALY_KINDS exactly and names only the model's own sources",
+          (sorted(set(rl_model.ANOMALY_SOURCES) ^ set(rl_model.ANOMALY_KINDS)),
+           sorted({s for v in rl_model.ANOMALY_SOURCES.values() for s in v} - legal)), ([], []))
+    live = rl_model.ANOMALY_SOURCES
+    staged = {}
+    for name, copy in (("a kind with no entry", {k: v for k, v in live.items() if k != "destructive-git"}),
+                       ("an entry naming no kind", {**live, "no-such-kind": ("git",)}),
+                       ("an empty source set", {**live, "destructive-git": ()}),
+                       ("a source outside the vocabulary", {**live, "destructive-git": ("weather",)})):
+        rl_model.ANOMALY_SOURCES = copy
+        try:
+            staged[name] = len(rl_model.check_anomaly_sources())
+        finally:
+            rl_model.ANOMALY_SOURCES = live
+    check("model AC27: RED — each staged copy of the declaration earns exactly one refusal",
+          staged, {name: 1 for name in staged})
+    # The render, over ONE run with the two transcript-sourced kinds reachable, read both ways.
+    fx = build_landed_fixture()
+    repo = fx["repo"]
+    j = write_journals(repo.parent, driver=fx["driver"], gates=fx["gates"], pushes=fx["pushes"])
+    store = pathlib.Path(tempfile.mkdtemp(prefix="runlog-store-", dir=repo.parent))
+    acts = [("call", derive_minute(m) - 1, derive_minute(m) + 1) for m in (1, 3, 4, 6, 21, 27)]
+    write_extract(store, FX_SID, build_session_events(acts))
+    got = {}
+    for name, st in (("not-local", None), ("present", store)):
+        model = build_model(repo, journals=j, store=st)
+        facts = parse_record_markdown(rl_record.render_record(model, "memory"))["Coverage"]["facts"]
+        got[name] = (model, facts.get("anomaly kinds", ""))
+    check("record AC11: each render says how many of the closed list it could judge, and the figure is "
+          "the declaration read against that model's own coverage",
+          {name: text for name, (_m, text) in got.items()},
+          {name: f"judged {len(read_judged_kinds(m))} of {len(rl_model.ANOMALY_KINDS)}"
+           for name, (m, _t) in got.items()})
+    check("record AC11: the kinds the local transcript adds are exactly those declaring the "
+          "transcripts, or the idle judgement, which only a local transcript turns on",
+          sorted(read_judged_kinds(got["present"][0]) - read_judged_kinds(got["not-local"][0])),
+          sorted(k for k in rl_model.ANOMALY_KINDS
+                 if {"transcripts", "idle"} & set(rl_model.ANOMALY_SOURCES[k])))
+    check_true("record AC11 liveness: the two renders disagree, both fall short of the whole list, and "
+               "the not-local one commits `anomalies 0` — the clean-looking zero this fact marks",
+               got["not-local"][1] != got["present"][1]
+               and len(read_judged_kinds(got["present"][0])) < len(rl_model.ANOMALY_KINDS)
+               and not got["not-local"][0].anomalies,
+               str({name: text for name, (_m, text) in got.items()}))
+
+
 def test_record_known_replaced():
     """AC1, AC2 and AC3 of TOOL-dLoggedFlight-30: the renderer holds neither spelling of the `known`
     test, so the five Summary facts' slots are decided by the `count_sources` lookup and by nothing
@@ -8074,7 +8148,14 @@ def scan_skill_copies(text, kit_rel, memory_root):
         problems.append("names a rotated run-state file the model's ARCHIVE_RE does not read")
     for what, pattern, owner in (
             ("coverage states", r"whether it is ((?:`[a-z-]+`(?:, | or ))+`[a-z-]+`)", rl_model.COVERAGE_STATES),
-            ("usage splits", r"split into ((?:`[a-z]+`(?:, | and ))+`[a-z]+`)", rx.SOURCES)):
+            ("usage splits", r"split into ((?:`[a-z]+`(?:, | and ))+`[a-z]+`)", rx.SOURCES),
+            # R2-M2: the kinds the Skill tells an agent go unjudged with no transcript are DERIVED
+            # from `ANOMALY_SOURCES`, so a kind that gains or loses the transcripts as a source moves
+            # this sentence or reds, rather than leaving the Skill naming yesterday's pair.
+            ("transcript-only anomaly kinds",
+             r"decided from the transcripts alone, ((?:`[a-z-]+`(?:, | and ))+`[a-z-]+`)",
+             tuple(k for k in rl_model.ANOMALY_KINDS
+                   if "transcripts" in (rl_model.ANOMALY_SOURCES.get(k) or ())))):
         m = re.search(pattern, text)
         counted += 1
         if (re.findall(r"`([a-z-]+)`", m.group(1)) if m else []) != list(owner):
@@ -8381,7 +8462,9 @@ def test_skill_copied_names():
              "ARCHIVE_RE"),
             ("the record path spelled another way", "-runlog-<key>.md", "-run-<key>.md", "record path"),
             ("the closing marker spelled another way", "`END TRANSCRIPT TEXT`", "`END OF TRANSCRIPT`",
-             "END marker")):
+             "END marker"),
+            ("an anomaly kind renamed", "`destructive-git`", "`destructive-gits`",
+             "transcript-only anomaly kinds")):
         variant = text.replace(old, new)
         got, _ = scan_skill_copies(variant, SKILL_KIT_REL, SKILL_ROOT)
         check_true(f"skill copies: RED — {name} is caught", variant != text

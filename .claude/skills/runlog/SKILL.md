@@ -77,7 +77,10 @@ a hand-edited copy reds the adopter's `--check` arm.
 - **No local transcript.** The model marks the transcripts `not-local`. Its `usage`, its owner-turn
   counts and its attributed calls then read zero, and zero here means UNKNOWN: never free, and never
   a run that asked nothing. The committed record writes each of them as `-`. There is no narration
-  to print either. It judges no idle gap, and its `coverage` block says so, so a run with no idle
+  to print either. Two anomaly kinds are decided from the transcripts alone, `red-behind-zero` and
+  `destructive-git`, so neither is judged: the record's Coverage `anomaly kinds` fact says how many
+  of the closed list were, and `anomalies 0` beside a short count is not a run that did nothing
+  wrong. It judges no idle gap, and its `coverage` block says so, so a run with no idle
   gap is not thereby a run that never sat idle.
 - **Stale transcript.** A session read from a store extract made before the run's window ends leaves
   the transcripts `stale`: the extract can lack the run's last owner turns and calls. The committed

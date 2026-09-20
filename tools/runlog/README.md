@@ -266,6 +266,13 @@ measurement, are the unit's spec (`TOOL-dLoggedFlight-8`). The ones a reader mos
   run's `start^` baseline are subtracted from its marks at the last record commit at or before the
   window's end. For a build's last run the era runs to HEAD, so reading there made every later edit
   of one of its specs a decision the run took.
+- **Every anomaly kind declares the sources its trigger reads**, in `ANOMALY_SOURCES` beside the
+  closed list, and a kind whose sources the model did not read could not fire at all. Two are the
+  transcripts' alone, so a run with no local transcript could never look for a `git reset --hard` or
+  a background bar that reported rc 0 over a RED gate line. The committed record's Coverage says how
+  many of the list were judged, so `anomalies 0` is never read as a clean run;
+  `check_anomaly_sources` grades the table in both directions, and a kind added to the list reds
+  until it is declared.
 - **The model names what the record reads.** `journal_lines` lists, per producer, the line numbers
   of every journal line it attributed to the run; the extractor's workflow runs inside the window sit
   on the timeline with their labels; and every anomaly carries `t`, the time of the event behind it.

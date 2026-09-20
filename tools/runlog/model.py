@@ -56,6 +56,28 @@ MODEL_SCHEMA = 1
 ANOMALY_KINDS = ("nonterminal-merged", "no-progress", "out-of-band-edit", "refusal-loop", "killed-verb",
                  "push-outside-lander", "red-behind-zero", "destructive-git", "converged-on-blocked",
                  "idle-gap", "multi-run-session", "stalled")
+# WHAT EACH KIND IS DECIDED FROM (R2-M2 of the closing review, round 2), one entry per member above,
+# naming the SOURCES its trigger reads. A kind whose sources the model did not read cannot fire at
+# all, so its absence from the anomaly set is an UNKNOWN and never a clean zero: `destructive-git`
+# and `red-behind-zero` are built from `tools`, which is empty unless a transcript is local, and a
+# run whose transcripts are not local committed `anomalies 0` with neither kind ever looked for. The
+# record renders the judged count of this table beside them. The names are `SOURCE_NAMES` plus
+# `idle`, which names the idle JUDGEMENT rather than a source — the same vocabulary the record's
+# `count_sources` declares in, so one reader answers for both. `check_anomaly_sources` grades it.
+ANOMALY_SOURCES = {
+    "nonterminal-merged": ("git",),
+    "no-progress": ("git",),
+    "out-of-band-edit": ("driver",),
+    "refusal-loop": ("driver",),
+    "killed-verb": ("driver",),
+    "push-outside-lander": ("pushes",),
+    "red-behind-zero": ("transcripts", "gates"),
+    "destructive-git": ("transcripts",),
+    "converged-on-blocked": ("run-state",),
+    "idle-gap": ("idle",),
+    "multi-run-session": ("driver",),
+    "stalled": ("driver", "git"),
+}
 # `refused-landing` first because it is decided from the journal, which the drift signal's table of
 # tracked bytes cannot see; the other four ARE that table, cited in the spec and not restated there.
 MERGED_SUBCLASSES = ("refused-landing", "retired-unit", "surfaced-park", "no-rows", "other")
@@ -1294,6 +1316,32 @@ def scan_anomalies(model) -> list:
                                     f"with phase {streak[0]['phase_to']} and no commit; the rule is "
                                     f"{STALL_HEARTBEATS} heartbeats, one hour at the declared "
                                     f"{HEARTBEAT_CADENCE_S} s cadence"})
+    return out
+
+
+def check_anomaly_sources() -> list:
+    """Every refusal `ANOMALY_SOURCES` earns, one line each, empty for a clean declaration.
+
+    Graded in BOTH directions: a kind of `ANOMALY_KINDS` with no entry, an entry naming no kind, an
+    empty source set, and a source that is neither one of `SOURCE_NAMES` nor `idle`. So a kind added
+    to the closed list reds until its sources are declared, and an entry a retired kind left behind
+    reds too — the shape `check_count_sources` uses for the record's count slots, one level up.
+
+    WHAT THIS DOES NOT CHECK: that a declared source is the one the kind is really decided from.
+    Nothing here reads `scan_anomalies`, so a kind declared `driver` whose trigger reads the
+    transcripts passes this and is caught, if at all, by an arm that renders a model with one source
+    read and the rest not.
+    """
+    legal = frozenset(SOURCE_NAMES) | {"idle"}
+    out = [f"anomaly_sources: the kind {kind!r} declares no source"
+           for kind in ANOMALY_KINDS if kind not in ANOMALY_SOURCES]
+    for kind, sources in sorted(ANOMALY_SOURCES.items()):
+        if kind not in ANOMALY_KINDS:
+            out.append(f"anomaly_sources: {kind!r} is no member of ANOMALY_KINDS")
+        if not sources:
+            out.append(f"anomaly_sources: {kind!r} declares an empty source set")
+        out += [f"anomaly_sources: {kind!r} names the source {src!r}, which is neither one of the "
+                "model's sources nor `idle`" for src in sources if src not in legal]
     return out
 
 

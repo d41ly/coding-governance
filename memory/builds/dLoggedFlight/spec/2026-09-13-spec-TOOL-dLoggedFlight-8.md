@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set
 
-**Status:** CLOSED · rev-19 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
+**Status:** CLOSED · rev-20 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -226,6 +226,15 @@ sources actually support. Every later surface renders from this model rather tha
     another slug's verb.
   - `stalled`: six heartbeat calls, `--status` or `--audit`, in a row with no head or phase change, one hour at the
     declared cadence.
+
+  Each kind DECLARES the sources its trigger reads, in `ANOMALY_SOURCES` beside the closed list, one
+  entry per kind, naming `SOURCE_NAMES` members or `idle`, the idle JUDGEMENT. A kind whose sources
+  the model did not read cannot fire, so its absence from the set is an UNKNOWN, never a clean zero:
+  `destructive-git` and `red-behind-zero` are the transcripts' alone, and a run whose transcripts are
+  not local committed `anomalies 0` with neither ever looked for. `check_anomaly_sources` grades the
+  table in BOTH directions — a kind with no entry, an entry naming no kind, an empty source set, and
+  a source outside the vocabulary — so a kind added to `ANOMALY_KINDS` reds until it is declared.
+  `TOOL-dLoggedFlight-9` S3 renders the judged count from this table. Observed by AC27.
 - **S7** The coverage block. Observed by AC6 and AC7. Each source gets a state from
   `COVERAGE_STATES`, and each journal an EPOCH, the time of its producer file's first line:
   - `absent`: the file does not exist, or the window ends before its epoch;
@@ -650,6 +659,12 @@ command.
   with windows closing at the same end.
   Red when: a mark committed after the run counts as decided inside it, a mark the run inherited
   counts as its own, an in-window mark stops counting, or the split costs a git call.
+- **AC27** — `check_anomaly_sources` earns no refusal over the live `ANOMALY_SOURCES`, the table
+  covers `ANOMALY_KINDS` exactly, and every source it names is one of `SOURCE_NAMES` or `idle`. Four
+  staged copies — a kind with no entry, an entry naming no kind, an empty source set, and a source
+  outside the vocabulary — each earn exactly one refusal.
+  Red when: a kind of the closed list declares no source, an entry outlives its kind, or a source
+  outside the model's own vocabulary passes.
 
 ## 7. Gates
 
@@ -828,6 +843,16 @@ New arm: `tools/runlog/selftest.py` · each AC staged RED on its fixture · floo
   measured for it rather than leaving "constant git cost" to be read as constant cost. The split's
   granularity is a record commit, so a mark made inside the window but after the run's last record
   commit reads as neither; S4 says so.
+- rev-20 · 2026-09-20 · S6 · AC27 · folded the model half of R2-M2 of the closing diff review, round
+  2: tool-call anomalies vanished unjudged. `destructive-git` and `red-behind-zero` are built from
+  the model's `tools`, which is empty unless a transcript is local, so a run that did a
+  `git reset --hard`, or whose background bar reported rc 0 over a RED gate line, committed
+  `anomalies 0` with neither kind ever looked for. The M6 fold rendered five transcript-derived
+  counts `-` and added `idle gaps judged`; these two kinds were the sibling it did not enumerate.
+  Each kind now DECLARES its sources in `ANOMALY_SOURCES`, graded in both directions by
+  `check_anomaly_sources`, and `TOOL-dLoggedFlight-9` S3 renders the judged count from it. The
+  declaration is the class-level shape the review asked for: enumerating a table rather than five
+  facts, so the next kind whose source can go unread cannot arrive unmarked.
 
 ## 10. Reuse audit
 

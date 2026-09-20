@@ -318,6 +318,13 @@ RECORD_SCHEMA = {
                 # judged at all, and how many were kept out beside an owner turn. `-` when not judged,
                 # so an absent judgement never reads as a clean zero.
                 ("idle gaps", ("judged {yes-no} · near an owner turn {int}",)),
+                # HOW MANY ANOMALY KINDS COULD FIRE AT ALL (R2-M2 of the closing review, round 2).
+                # The Anomalies count is ONE total over kinds with different sources, so rendering it
+                # `-` would withhold the kinds that WERE judged. This fact says instead how many of
+                # the model's closed list the model could judge, from `ANOMALY_SOURCES` and the same
+                # `COUNTED_STATES` test every counted slot uses, so `anomalies 0` is never read as
+                # clean when `destructive-git` and `red-behind-zero` were never looked for.
+                ("anomaly kinds", ("judged {int} of {int}",)),
             ),
             "tables": (
                 {"name": "sources", "header": ("#", "source", "state", "lines", "bad"),
@@ -551,6 +558,20 @@ def derive_counted_sources(m) -> frozenset:
     if (cov.get("idle") or {}).get("judged"):
         read.add("idle")
     return frozenset(read)
+
+
+def derive_judged_kinds(read) -> tuple:
+    """The members of `ANOMALY_KINDS` every one of whose declared sources the model READ (R2-M2).
+
+    A kind outside this set could not have fired, so its absence from the Anomalies table says
+    nothing. `read` is `derive_counted_sources`'s answer — the same test every counted slot uses, so
+    the marker and the counts cannot drift apart. A kind `ANOMALY_SOURCES` does not declare is never
+    judged, rather than vacuously judged by an empty source set; `check_anomaly_sources` is what
+    refuses such a kind, and this reader must not pass it in the meantime.
+    """
+    have = set(read)
+    return tuple(k for k in mdl.ANOMALY_KINDS
+                 if set(mdl.ANOMALY_SOURCES.get(k) or ("<undeclared>",)) <= have)
 
 
 def build_counted_values(section, label, values, read) -> tuple:
@@ -1077,7 +1098,11 @@ def build_record_doc(parts, edge, bound) -> dict:
                                             derive_count(tr.get("extracts", 0))), read))),
                   ("idle gaps", render_fact(ctx, derive_fact_templates("Coverage", "idle gaps")[0],
                                             (derive_yes_no(idle.get("judged")),
-                                             derive_count(idle.get("near_owner")))))],
+                                             derive_count(idle.get("near_owner"))))),
+                  ("anomaly kinds", render_fact(
+                      ctx, derive_fact_templates("Coverage", "anomaly kinds")[0],
+                      (derive_count(len(derive_judged_kinds(read))),
+                       derive_count(len(mdl.ANOMALY_KINDS)))))],
         "tables": [{"name": "sources", "header": derive_table("Coverage", "sources")["header"],
                     "rows": rows["coverage"]}]}
     return doc

@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** CLOSED · rev-11 · 2026-09-16 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** CLOSED · rev-12 · 2026-09-20 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -54,7 +54,12 @@ leg can prove nothing else got in.
   the fact lines and tables `RECORD_SCHEMA` declares for it, and every other table's first cell is a
   1-up ordinal. The timeline carries no owner turn: S4 keeps owner turns to counts. `## Coverage`
   also says whether idle gaps were judged and how many were kept out near an owner turn, the model's
-  `idle` entry of `TOOL-dLoggedFlight-8` S7. The `Data` twin is the markdown re-encoded, every fact
+  `idle` entry of `TOOL-dLoggedFlight-8` S7. It also says how many of the model's closed anomaly
+  kinds this model could judge at all, `anomaly kinds: judged {int} of {int}`, read from that spec's
+  `ANOMALY_SOURCES` against the SAME `COUNTED_STATES` test every counted slot uses. The Anomalies
+  count is one total over kinds with different sources, so rendering IT `-` would withhold the kinds
+  that were judged; the marker says instead how many were, and `anomalies 0` beside a short count is
+  not a clean run. Observed by AC11. The `Data` twin is the markdown re-encoded, every fact
   and every shown row of every section, so the two cannot disagree.
 - **S4** The closed schema, `RECORD_SCHEMA`, as value classes. Observed by AC4. The record carries only:
   - shaped values: verb tokens matching `^--[a-z-]{2,20}$`, phase tokens matching `^[A-Z]{3,12}$`,
@@ -280,6 +285,14 @@ command.
   Timeline row's `rc` cell, and the same END reading `exit=clean` renders its `0`.
   Red when: a count from a source the model never read renders as a zero, a known count renders as
   `-`, or a killed verb's `rc` reaches the Timeline.
+- **AC11** — When `render_record` renders the landed fixture's model with no transcript on the
+  machine and again with its session's extract, each record's Coverage `anomaly kinds` fact carries
+  the count re-derived in the arm from `ANOMALY_SOURCES` and that model's own coverage states, over
+  the whole closed list. The kinds the local transcript adds are exactly those declaring the
+  transcripts, or the idle judgement only a local transcript turns on. The two renders disagree,
+  both fall short of the whole list, and the not-local one commits `anomalies 0`.
+  Red when: the marker is absent, is not the declaration read against the model, or agrees across
+  the two renders.
 
 ## 7. Gates
 
@@ -343,6 +356,15 @@ none
   Anomalies and Coverage time columns, its owner-time refusal with AC9, AC10's `--close` Timeline `rc`
   half, and the members of AC4's vocabularies and classes no render reaches, by `-22`; S4's window,
   duration and provenance facts, by `-24`. The text above is left as it was ratified.
+- rev-12 · 2026-09-20 · S3 · AC11 · folded the render half of R2-M2 of the closing diff review,
+  round 2: the Anomalies section read clean when the two transcript-sourced kinds were never judged.
+  Coverage gains `anomaly kinds: judged {int} of {int}`, read from `TOOL-dLoggedFlight-8`'s
+  `ANOMALY_SOURCES` against the same `COUNTED_STATES` test the counted slots use, so the marker and
+  the counts cannot drift. The review offered rendering the count as `-` for the unjudged kinds; the
+  Anomalies count is ONE total over kinds with different sources, so a `-` there would withhold the
+  kinds that WERE judged, and the marker was taken instead. The rendered Skill's missing-transcript
+  paragraph names the two kinds, and that copy is held to the declaration by the Skill-copy arm, in
+  order and in both directions, so it moves with the table rather than beside it.
 
 ## 10. Reuse audit
 
