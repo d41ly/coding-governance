@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first
 
-**Status:** CLOSED · rev-2 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 22
+**Status:** CLOSED · rev-3 · 2026-09-21 · node a · Tier-2 · base 830c46e8 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -218,7 +218,10 @@ break for AC1 and AC2 is the driver at `12513c25` with the lib beside it.
   fixture: the marker fixture plus one `fixture` commit over `tscratch.txt` on a scratch branch.
 - **AC3** — When `python3 tools/memory-tree/check-arms.py --report` runs at the tip, its rows for
   `tools/unattended/unattended.sh` list every check-34 branch as armed, and
-  `grep -c 'check 34' memory/project/unarmed-branches.txt` prints 0; at the tip of unit 16's pass
+  `grep -c $'^tools/unattended/unattended.sh\t34\t' memory/project/unarmed-branches.txt`
+  prints 0 while the same grep keyed `\t9\t` prints at least 1, because the file is tab-keyed by
+  file, check and branch and never spells `check 34`, so a selector on those words matches nothing
+  on every tree; at the tip of unit 16's pass
   — the commit whose subject carries `TOOL-aWokenSentinel-16`, not `830c46e8`, where the two
   sentences do not exist and the report keys only the four pre-predicate `fail 34` sites — the
   report lists the two branches of S1 and S2 as unarmed.
@@ -252,6 +255,10 @@ none
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-21 · AC3 · folded at the pass from the bug-class checklist
+  (`fixture-passes-by-finding-nothing`): `unarmed-branches.txt` is tab-keyed by file, check and
+  branch and never spells `check 34`, so rev-2's `grep -c 'check 34'` printed 0 on every tree; the
+  selector is keyed on the file's own columns and its liveness is the pinned check-9 row.
 - rev-2 · 2026-09-20 · S1 · S2 · §3 · §4 · §5 · AC2 · AC3 · AC4 · §7 · folded spec-audit round 4:
   sibling agreement for the promoted `TOOL-aWokenSentinel-25` (H1, raw 12, 22, 33) — the first
   `hit` of each pair quotes the whole signature `signature()` derives, 123 and 115 characters,
