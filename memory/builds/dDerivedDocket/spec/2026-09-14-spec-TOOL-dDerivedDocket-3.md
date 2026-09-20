@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-3 — the run's landing path
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
+**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-21-build-TOOL-dDerivedDocket-3-1-acceptance-ledger.md](../build/2026-09-21-build-TOOL-dDerivedDocket-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
@@ -83,13 +84,15 @@ landing that cannot complete ending HELD instead of on local main.
 - **S8** Arms in `tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.test.sh`,
   written in this unit's pass and run under attribution at the build's one post-build bar, the run
   the main loop makes at VERIFYING after the last unit. Observed by AC11.
-- **S9** One `memory/DECISIONS.md` row under the TOOL heading, keyed by this unit's id, supersedes
-  the `TOOL-dClosedLexicon-11` clause that the archive name derives from the record's bytes "because
-  no verb here commits". Under `in-place` a verb does commit, and the reason that still holds is the
-  other one that row gives: two runs can honestly share a witness. The log row is the FOURTH carrier
-  of that premise and the only one a session following the charter's session-start reading order
-  meets, so S5 retiring the other three without it leaves the ratified text standing alone.
-  Observed by AC14.
+- **S9** The `memory/DECISIONS.md` row superseding the `TOOL-dClosedLexicon-11` clause is OWED and
+  is NOT written by this unit, because a unit pass cannot write it. `--dispatch` refuses a declared
+  write overlapping a `SHARED_RECORDS` entry outright rather than conditionally, and the kit gate's
+  subset test reds a path the declaration does not carry, so both routes into that file are closed
+  to a pass by design. The row is handed to the orchestrator, which writes outside a pass, and the
+  question is PARKED in the run record with the options and the refusal. What this unit does do is
+  retire the premise from all three SHIPPED carriers, which AC14 still observes; until the row
+  lands, `memory/DECISIONS.md` states the retired premise with nothing pointing away from it, and
+  that residual is named here rather than discovered. Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -104,6 +107,8 @@ landing that cannot complete ending HELD instead of on local main.
 - The bound the landing bar runs under. It stays `GATE_BOUND` until the declared-wall unit derives
   it; the risk that a full bar with self-tests outlasts that bound is stated in §5.
 - Attributing a red landing bar leg. The red-attribution unit owns that; here a red bar is unmet.
+- WRITING the `memory/DECISIONS.md` supersession row. It is owed (S9) and a unit pass is structurally
+  unable to write it, so it belongs to the orchestrator's own commits and is parked for them.
 
 ### Edges
 
@@ -183,7 +188,7 @@ route below rather than re-preparing into the same failure.
 
 1. Every Definition-of-Done item evaluates, `gates-green` among them. `gates-green` refuses first
    when the tree is not clean in `git status --porcelain`'s full sense, untracked files included,
-   because the bar writes its stamp only then and `--prepare`'s own check (`push-main.sh:71`)
+   because the bar writes its stamp only then and `--prepare`'s own check (`push-main.sh:366`)
    passes `-uno`.
 2. `$LANDER --carry --slug <slug>`, bounded by `run_bounded`. Exit 1 refuses, quoting the list. Exit
    2 refuses as a lander that does not implement the mode. Exit 3 refuses as an observation the
@@ -257,10 +262,11 @@ and the mode is a conf value.
 
 `tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
 `tools/unattended/unattended.test.sh` · `tools/unattended/check-unattended.test.sh` ·
-`tools/unattended/SKILL.template.md` · `tools/unattended/PROTOCOL.template.md` · the companion guide
-template · `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
-`tools/unattended/README.md`, which receives §7's trimmed paragraph · `memory/DECISIONS.md`, for
-S9's superseding row · the rendered guides and Skill.
+`tools/unattended/SKILL.template.md` · `tools/unattended/PROTOCOL.template.md` ·
+`tools/unattended/STOPS.template.md`, the companion guide's template ·
+`tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
+`tools/unattended/README.md`, which receives §7's trimmed paragraph · the rendered guides and Skill.
+NOT `memory/DECISIONS.md`: S9 records why a unit pass cannot write it.
 
 ### Alternatives rejected
 
@@ -403,14 +409,12 @@ S9's superseding row · the rendered guides and Skill.
   build's one post-build bar.
 - **AC14** — When `grep -c 'verb here commits' tools/unattended/PROTOCOL.template.md` runs, it
   prints 0 (1 at BASE, where the premise wraps after `because no`), and so does
-  `grep -c 'NO driver verb commits' tools/unattended/unattended.sh`; the rotation paragraph still
-  names a shared witness as the reason. `memory/DECISIONS.md` carries S9's row under the TOOL
-  heading, keyed by this unit's id, naming `TOOL-dClosedLexicon-11` and the clause it supersedes for
-  `in-place`, within the 300-character entry budget.
-  Red when: the shipped protocol keeps a premise the committing close falsifies in gov's own mode;
-  or the three shipped carriers lose the premise while the ratified log row still states it, which
-  leaves a session following the charter's session-start reading order with the stale text and
-  nothing pointing away from it.
+  `grep -c 'NO driver verb commits' tools/unattended/unattended.sh`, and so does
+  `grep -c 'nothing commits it' tools/unattended/unattended.test.sh`; the rotation paragraph still
+  names a shared witness as the reason. AMENDED at rev-6: the `memory/DECISIONS.md` half is not
+  observed here, because S9 no longer has this unit write that row. The residual it leaves is stated
+  in S9 and parked in the run record.
+  Red when: a shipped carrier keeps a premise the committing close falsifies in gov's own mode.
 - **AC15** — The fixture closes under `in-place`, the lander stub's push reports `red`, the fixture
   commits a fix and re-runs `--prepare`, and `--close` then runs again over the LANDING record. The
   second close exits 0 and names the existing close commit. `git rev-parse HEAD` equals the
@@ -599,6 +603,20 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
     so every claim about the flag is about the DELTA between the close's own environment and the
     bar's. AC10 reads that delta in both directions and gains the parent-shell-sets-it arm, and its
     `Red when:` reds on an ADD and on an unset of an inherited value. No other section moved.
+
+- rev-6 · 2026-09-21 · build pass. ONE divergence, taken as a rev bump before the code, and it is
+  S9's. `bash tools/unattended/unattended.sh --dispatch dDerivedDocket --pass TOOL-dDerivedDocket-3
+  --writes memory/DECISIONS.md` refuses with check 49 - a declared write overlapping a
+  `SHARED_RECORDS` entry, refused outright rather than conditionally - and the kit gate's check 23
+  subset test reds a path written outside the declaration, so both routes are closed to a pass. S9
+  therefore hands the row to the orchestrator and names the residual, AC14 drops the
+  `memory/DECISIONS.md` half as AMENDED and gains the test-comment grep the same S5 retires, §3
+  gains a Non-goal and §4's Files touched loses the file and gains `STOPS.template.md`. The question
+  is parked in the run record with its options and the refusal. Two line citations were re-verified
+  on the tree and one moved: `--prepare`'s `-uno` check is `push-main.sh:366`, not `:71`; the
+  stamp's clean-tree terms are still `run-gates.sh:1114-1119` and `:1861-1863`. §4's byte
+  arithmetic held: both protocol carriers end the pass at 60275 bytes and 673 lines against 60313
+  and 674 at the parent, so the trim paid for the §6 rewrite and both §8 rows with room left.
 
 ## 10. Reuse audit
 

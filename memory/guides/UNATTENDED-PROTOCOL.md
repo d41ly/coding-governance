@@ -153,9 +153,9 @@ a build whose first run aborted could never be carried unattended again.
 So `--preflight`, and only `--preflight`, RETIRES a finished record instead of refusing it. The
 retired file is renamed to `RUN.<phase>.<blob8>.md` beside the live one — the terminal phase, then
 the first 8 hex of that record's own blob hash — and a fresh `RUN.md` is created at `RUNNING`. The
-name is DERIVED, never chosen, and it is derived from the BYTES rather than the witness because no
-verb here commits: two runs can honestly share a witness, and a name that collided would block every
-later run with no way out. Two records with the same content are the same record twice.
+name is DERIVED, never chosen, and it is derived from the BYTES rather than the witness because two
+runs can honestly share a witness, and a name that collided would block every later run with no way
+out. Two records with the same content are the same record twice.
 
 What rotation does NOT do: it does not re-open, re-pin, or edit the retired record. Its bytes are
 preserved exactly, `git mv` puts both sides in the index in one operation, and the gate leg reads
@@ -409,11 +409,16 @@ A take-over records the new id, and a holder replacing its own job records it wi
 
 ## 6. Landing
 
-The run lands through the project's declared lander (`LANDER` in `.unattended.conf`) and **never**
-with a hook-bypass flag. A project whose pre-push hook refuses an un-marked default-branch push has
-made the lander mandatory on purpose: it reconciles the remote BEFORE the gate, so the gate never
-runs on an already-stale tree. An unattended run that meets that refusal with nobody to interpret it
-either stalls or learns to bypass — and bypassing discards the entire bar the mandate leaned on.
+The run lands through the project's declared lander (`LANDER`) and **never** with a hook-bypass
+flag: the lander reconciles the remote BEFORE the gate, so the gate never runs on an already-stale
+tree, and a run meeting that refusal with nobody to interpret it either stalls or learns to bypass —
+which discards the entire bar the mandate leaned on.
+
+**`LANDER_MODE` says which SHAPE the landing has.** `primary` grades the BRANCH and lands through
+the node's own default branch. `in-place` is ORDERED and the full-green stamp forces it: `--prepare`
+onto the advertised tip, `--close` grading THAT merge under `GATE_FULL=1` and committing on it,
+`--land`, `--landed`; a reconcile never routes through the local default branch.
+`UNATTENDED-STOPS.md` carries the rest.
 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
@@ -426,19 +431,11 @@ on the default branch is a commit compared with itself. The run-state file recor
 answered, because a record that cannot tell an observation from an assertion has thrown away the
 distinction that matters most.
 
-Listing two anchors without ordering them would permit an implementation that always takes the
-cheaper one, retiring the observation while satisfying every word of this section. The ordering is
-what preserves the strong claim wherever the strong claim is available.
-
 ## 7. The verbs
 
 The nineteen verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
 `VERBS.template.md` and byte-compared against it by the same leg that compares this pair. Read them
 there. Nothing about any verb changed in the move. The stop contract is `UNATTENDED-STOPS.md`, installed and compared the same way.
-
-The move was a BYTE decision and is recorded as one. This document had reached its cap EXACTLY, and
-a contract with no room left to state its next rule has stopped being amendable — which is a
-failure mode of the contract, not of whoever wrote the rule that would not fit.
 
 ## 8. What a project declares
 
@@ -449,6 +446,8 @@ where this document says it may:
 |---|---|
 | `MEMORY_ROOT` | the memory tree's root, matching the memory-tree kit's conf |
 | `LANDER` | the mandated landing command |
+| `LANDER_MODE` | the landing SHAPE, closed set `primary` / `in-place`; blank reads `primary`, announced. §6 |
+| `SELFTESTS_OWED_PATHS` | path prefixes whose touch makes an `in-place` close ANNOUNCE the flagged bar is owed. Blank means never, announced |
 | `BYPASS_BAN` | the flag the close path must never emit |
 | `GATE_CMD` | the full merge bar, for `gates-green` |
 | `GATE_BOUND` | the wall-clock bound, in seconds, on `GATE_CMD` and `WIRING_CHECK`. OPTIONAL: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |

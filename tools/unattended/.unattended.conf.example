@@ -17,6 +17,32 @@ MEMORY_ROOT=memory
 # push, name the script that sets the marker — it exists so the remote is reconciled BEFORE the gate.
 LANDER="bash tools/push-main.sh"
 
+# WHICH SHAPE THAT LANDING HAS. A CLOSED set: `primary` or `in-place`. Blank or absent reads
+# `primary` and says so on stderr; anything else is a REFUSAL, because a misspelling falling through
+# to the wider behaviour would grant a landing nobody declared.
+#
+#   primary   the run leaves its own tree and lands through the primary tree's default branch.
+#             `gates-green` grades the BRANCH, so a branch that is green alone can still land red
+#             once merged onto a tip the remote moved. `--close` STAGES its record; you commit it.
+#   in-place  the landing merge is prepared in the run's OWN worktree first and `gates-green`
+#             grades THAT merge, with `GATE_FULL=1`. `--close` also asks the lander what the push
+#             would carry, and COMMITS its own record on top of the graded merge, so the phase
+#             travels. The push then reuses the full-green stamp sitting in the same git dir.
+#
+# `in-place` requires a LANDER that implements `--prepare`, `--land`, `--carry` and `--prepared`
+# with the exit codes the protocol's section 6 states. `--preflight` PROBES for them rather than
+# trusting the declaration, so a mode declared against a lander that cannot perform it refuses at
+# the start of the run and not after every unit is built.
+LANDER_MODE=""
+
+# THE SELF-TEST SURFACE, as repo-relative path PREFIXES, space separated. Under `in-place`, when
+# the landing range touches a path starting with one of these, `--close` ANNOUNCES that the kit
+# Definition of Done owes the flagged bar and names the by-hand run that pays it. It never sets the
+# flag: a landing's `gates-green` is a boundary, and the charter reserves that flag to a person.
+# Blank or absent means no landing here ever owes one, and the close announces THAT instead, since
+# a term that silently un-owes a Definition-of-Done clause is indistinguishable from coverage.
+SELFTESTS_OWED_PATHS=""
+
 # REPLACE if your hook uses a different bypass. The close path must never emit this, and the leg
 # greps the run-state record for it in both directions.
 BYPASS_BAN="--no-verify"

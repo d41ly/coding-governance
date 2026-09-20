@@ -345,7 +345,7 @@ CONF="$ROOT/.unattended.conf"
 # `default-branch`, because a value-set guard falling through to the wide behaviour would let a
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
-MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
+MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 # The HOLD vocabulary's project half, and its shrink-only floor. Spelled beside the halt keys and
@@ -382,6 +382,36 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE
         exit 2 ;;
   esac
 }
+# THE LANDING SHAPE, DECLARED AND ANNOUNCED - TOOL-dDerivedDocket-3 S1. `primary` is BASE's
+# behaviour: the run leaves its own tree and lands through the primary tree's local default branch,
+# so `gates-green` grades the BRANCH and never the merge that actually lands. `in-place` prepares
+# that merge in the run's OWN worktree first, and the bar then grades exactly what the push
+# publishes.
+#
+# BLANK READS `primary` AND SAYS SO, on `read_bound_key`'s pattern: a value nobody declared must
+# never be invisible, because the difference between the two modes is which commit was graded.
+# A value OUTSIDE the closed set is a REFUSAL rather than a fallback, for ANCHOR_SCOPE's reason -
+# a misspelling falling through to the wider behaviour grants a landing shape nobody declared.
+#
+# THE SET AND THE DEFAULT ARE MARKED so the kit gate READS them off these two lines instead of
+# retyping them. A closed vocabulary spelled in two files is two answers to one question, and the
+# leg's own header already refuses that for the phase and DoD sets.
+case "$LANDER_MODE" in
+  "") LANDER_MODE=primary   # gov:lander-mode-default
+      echo "unattended: NOTE - this project declares no LANDER_MODE, so the landing runs in 'primary' mode: the run lands through the primary tree's default branch and the bar grades the branch. Declare one in $CONF to change it." >&2 ;;
+  # gov:lander-mode-set
+  primary|in-place) ;;
+  *) echo "unattended: REFUSING - LANDER_MODE is declared as '$LANDER_MODE', which is outside the closed set 'primary in-place'. A landing mode that cannot be resolved is a landing nobody declared." >&2
+     exit 2 ;;
+esac
+# ...and `in-place` is expressed ENTIRELY in calls into the declared lander, so a mode declared
+# without one names a lander that does not exist. Refused at load rather than at the landing, which
+# is the whole argument for the preflight probes further down: the first refusal must not arrive
+# after the work is done.
+if [ "$LANDER_MODE" = in-place ] && [ -z "$LANDER" ]; then
+  echo "unattended: REFUSING - LANDER_MODE is 'in-place' and this project declares no LANDER, but every step of that mode is a call into one: there is nothing to prepare the merge, nothing to ask about it and nothing to push it." >&2
+  exit 2
+fi
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
 read_bound_key UNIT_STALL_BOUND "$UNIT_STALL_BOUND_DEFAULT" seconds "a dispatched unit reads STALLED after the kit default of ${UNIT_STALL_BOUND_DEFAULT}s with no write and no commit"
 read_bound_key LEASE_STALE_AFTER "$LEASE_STALE_AFTER_DEFAULT" seconds "a per-slug lease reads stale after the kit default of ${LEASE_STALE_AFTER_DEFAULT}s, or after GATE_BOUND, whichever is longer"
@@ -1243,6 +1273,12 @@ TB=""
 # Set by dod_met when an unmet item has something to SAY beyond its name; verb_close prints it
 # indented under the refusal and clears it. Empty means the item had nothing to add.
 DOD_OUT=""
+# TOOL-dDerivedDocket-3 - SET WHEN AN ITEM REFUSED RATHER THAN CAME BACK UNMET, and the two are not
+# the same fact. An UNMET item invites `--override`; a numbered REFUSAL may not be bought with one,
+# because `gates-green`'s in-place preconditions are what stop an UNGRADED merge from landing and an
+# override there would land exactly that. `verb_close` reads this the moment `dod_met` returns and
+# ends the verb, so no later item can bury the refusal and no override loop can reach it.
+GG_HARD=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
@@ -1449,6 +1485,48 @@ check_wiring() {
   # self-test reds if this source spells one at all. Surfacing beats naming, and works for any adopter.
   [ -n "$wout" ] && printf '%s\n' "$wout" | sed 's/^/    /'
   return 1
+}
+
+# TOOL-dDerivedDocket-3 S2 - THE LANDER, ASKED A QUESTION. One spelling for every read-only call
+# into it - `--carry` and `--prepared` at preflight, both again at the close - so a liveness probe
+# and a landing precondition can never disagree about how the lander is invoked or how its answer is
+# read. $LANDER is deliberately unquoted, exactly as $GATE_CMD is: a project declares a COMMAND
+# LINE, not a path. BOUNDED, because both flags resolve the remote's advertised tip and a remote
+# that does not answer is the case this mode has to survive.
+#
+# THE EXIT CODES ARE THE LANDER'S OWN and are read the same way at every site: 0 done, 1 the
+# landing was refused or failed, 2 an ARGUMENT refusal, 3 an OBSERVATION failure. The 2/3 split is
+# the whole reason the probes exist - a 2 says the declaration names a lander that cannot land this
+# way and no retry helps, a 3 says the clone or the network is what failed and the run holds.
+run_lander() { # flag · slug -> the lander's own exit; its output in RB_OUT
+  # shellcheck disable=SC2086
+  run_bounded $LANDER "$1" --slug "$2"
+}
+
+# THE PREFLIGHT PROBE. `in-place` is a declaration about a lander this kit does not ship, and a
+# declaration nobody tests is a claim: BASE's only reader of it would have been the landing itself,
+# where a lander that never implemented the flags refuses after every unit is built. Both flags are
+# asked once, here, where the refusal costs one preflight.
+#
+# EXIT 1 IS A PASS. `--carry` exits 1 on a foreign commit and `--prepared` exits 1 on a branch tip
+# that is not a prepared merge, which is the ordinary state of every run at preflight; both answers
+# are a lander that IMPLEMENTS the mode, which is the only question this probe asks.
+check_lander_mode() { # slug
+  [ "$LANDER_MODE" = in-place ] || return 0
+  local _f _rc
+  for _f in --carry --prepared; do
+    run_lander "$_f" "$1"; _rc=$?
+    case "$_rc" in
+      0|1) ;;
+      2) fail 60 "LANDER_MODE declares 'in-place' and the declared lander refused that flag as an argument it does not implement, so the mode is declared against a lander that cannot land in it and the first refusal would otherwise arrive after every unit was built: $LANDER $_f"
+         [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+         return 1 ;;
+      *) fail 61 "the declared lander could not make the observation that flag asks for, which is the remote or the clone rather than anything this project declared; re-declaring the landing shape would not move it, and the run holds on the outage instead: $LANDER $_f"
+         [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+         return 1 ;;
+    esac
+  done
+  return 0
 }
 
 # TOOL-cBriefedPilot-4 - every directive this run is bound by is a POINTER into a section of the
@@ -1918,10 +1996,15 @@ stage_or_fail() { # run-state file
 # phase-writer population from source and drives a terminal record through every one of them.
 # WHERE A RETIRED RECORD GOES. DERIVED from the record itself, never chosen: the terminal phase plus
 # the first 8 hex of the record's own blob hash. That makes the name TOTAL, which the obvious
-# `<witness8>` spelling is not — NO driver verb commits (`grep -c "git commit"` over this file and the
-# leg returns 0 for both), so run A aborting at commit W and run B aborting at the same W produce one
-# name for two records, and a refusal on collision would then block every later run with no operator
-# path out. Two records with the same CONTENT are the same record twice, so overwriting is lossless.
+# `<witness8>` spelling is not — two runs can honestly share a witness, so run A aborting at commit W
+# and run B aborting at the same W produce one name for two records, and a refusal on collision would
+# then block every later run with no operator path out. Two records with the same CONTENT are the
+# same record twice, so overwriting is lossless.
+#
+# THE PREMISE THIS PARAGRAPH USED TO LEAD WITH IS RETIRED, not merely softened: it said no verb in
+# this file commits, and under `LANDER_MODE=in-place` `--close` commits its own record on top of the
+# graded merge (TOOL-dDerivedDocket-3 S5). It was never the load-bearing half — the shared witness
+# is, and that holds in both modes.
 #
 # The `<phase>` half cannot carry a path separator: it comes from PHASES_TERMINAL through the same
 # `is_terminal` test that decides whether to rotate at all. The witness could — nothing constrains a
@@ -3181,6 +3264,10 @@ verb_preflight() { # slug · keepalive-id
   check_method || true
   check_waivers "$rel" || true
   check_single_live || true
+  # S2 - the declared lander is PROBED, not believed, and only where the declaration says it will be
+  # used. It joins the other preconditions through `status` rather than returning, so an operator
+  # reads every unmet precondition in one pass.
+  check_lander_mode "$slug" || true
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.
   #
@@ -3480,6 +3567,12 @@ BRIEFROWS
     [ -n "$hc" ] && hc=" · halt-code $hc" || hc=""
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
 ' "$slug" "$p" "${w:-NONE}" "$hc" "$unit" "$parked"
+  # TOOL-dDerivedDocket-3 - THE LANDING SHAPE, on the status a reader actually opens, and printed
+  # only where it DIFFERS from what every other run does. `primary` is announced at conf load like
+  # any other defaulted value, so naming it again here would add a line to every adopter's status
+  # to say nothing changed; `in-place` changes which commit the bar grades and which verb commits,
+  # so a reader of this record is owed it.
+  [ "$LANDER_MODE" = in-place ] && printf 'unattended: LANDER_MODE — in-place · the landing merge is prepared in this worktree and the close grades and commits on it · %s\n' "$LANDER"
   # ---- THE LEASE LINE. Printed only when a lease FILE exists, and that is load-bearing: the Resume
   # ---- rule keys on its ABSENCE, which tells the reader to fall back to the record's own keepalive
   # ---- fact. A malformed lease prints AS malformed rather than as nothing, because nothing is the
@@ -3828,6 +3921,121 @@ is_overridden() { # item -> 0 when it appears in OV_ITEMS
   return 1
 }
 
+# TOOL-dDerivedDocket-3 S3 - WHAT THE BAR IS ALLOWED TO GRADE UNDER `in-place`. Two preconditions,
+# both REFUSALS and neither an unmet item, for the reason GG_HARD's comment gives.
+#
+# THE TREE FIRST, and in `git status --porcelain`'s FULL sense with untracked files included.
+# `tools/run-gates/run-gates.sh` writes its full-green stamp only over an EMPTY porcelain listing
+# (its `TREE_CLEAN` term, beside the at-a-rev fingerprint the push later reproduces), while
+# `--prepare`'s own cleanliness check passes `-uno`. A tree carrying nothing but an untracked file
+# therefore prepares cleanly, greens the bar and stamps NOTHING - and the push then pays a second
+# full bar or scopes against an older stamp, which is the whole saving this mode exists for. The
+# cheaper check runs first because it needs no lander and no network.
+#
+# THEN THE MERGE, asked of the lander rather than re-derived here. Two spellings of one predicate
+# disagree, and the lander is where the landing happens.
+check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared merge in a clean tree
+  local _rc
+  if [ -n "$(GIT status --porcelain 2>/dev/null)" ]; then
+    fail 62 "the working tree is not clean in the full porcelain sense, untracked files included, and the bar writes its full-green stamp only over an empty listing - so a green run here would stamp nothing and the push would pay a second full bar or scope against an older stamp; commit or remove what the listing names, then close again"
+    GIT status --porcelain 2>/dev/null | sed 's/^/    /'
+    return 1
+  fi
+  run_lander --prepared "$1"; _rc=$?
+  case "$_rc" in
+    0) return 0 ;;
+    1) fail 63 "HEAD carries no prepared merge, so the bar would grade this branch and never the merge the push publishes - which is the one thing this landing mode exists to stop; make it first with: $LANDER --prepare --slug $1" ;;
+    2) fail 64 "the declared lander refused the read-only flag this precondition asks it, as an argument it does not implement, so LANDER_MODE names a landing shape this lander cannot perform: $LANDER" ;;
+    *) fail 65 "the declared lander could not observe whether HEAD carries the merge this landing would publish, and that is the remote or the clone rather than anything on this branch; the run holds on the outage instead of remaking a merge that would meet the same failure: $LANDER" ;;
+  esac
+  [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  return 1
+}
+
+# S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT.
+# `AGENTS.md` records `GATE_SELFTESTS=1` as ON DEMAND ONLY with no boundary setting it (owner,
+# 2026-08-27), and a landing's `gates-green` IS a boundary, since its stamp is the one the push
+# reuses. So this verb ADDS the flag to nothing and REMOVES it from nothing: an owner who runs the
+# close with it already exported keeps it by inheritance, which is exactly the on-demand use that
+# ruling sanctions. What the derivation buys is that nobody has to REMEMBER the run is owed.
+print_selftests_owed() { # -> announces when the landing range owes the flagged bar
+  local _p _q _hit="" _touched
+  # BLANK IS NEVER, AND IT SAYS SO. A skip that looks like a pass is indistinguishable from
+  # coverage, and this one silently un-owes a whole Definition-of-Done clause.
+  if [ -z "$SELFTESTS_OWED_PATHS" ]; then
+    echo "unattended: close - SELFTESTS_OWED_PATHS is blank, so no landing range can ever owe the flagged bar here and this close will never announce one; the charter's 'owed by a DoD only for KIT work' then has no declared kit surface to be read against."
+    return 0
+  fi
+  # THE LANDING RANGE, which is what the push publishes and not what the branch contains: the
+  # prepared merge's FIRST parent is the tip the remote advertised, so this is the delta the default
+  # branch actually gains.
+  _touched=$(GIT diff --name-only HEAD^1 HEAD 2>/dev/null)
+  while IFS= read -r _p; do
+    [ -n "$_p" ] || continue
+    for _q in $SELFTESTS_OWED_PATHS; do
+      case "$_p" in
+        "$_q"*) case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac ;;
+      esac
+    done
+  done <<RANGE
+$_touched
+RANGE
+  [ -n "$_hit" ] || return 0
+  echo "unattended: close - the landing range HEAD^1..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar. This close does NOT run it and does NOT set the flag, which the charter reserves to a person: run it BY HAND at VERIFYING as 'GATE_FULL=1 GATE_SELFTESTS=1 $GATE_CMD' and name the command you ran in the run's record."
+}
+
+# S4 - THE CARRY CHECK, ASKED BEFORE ANY WRITE. A landing that would publish another build's
+# unpushed commits is refused while the record still reads what it read before the close, so there
+# is no LANDING record left behind that cannot land. The list is the LANDER's, quoted rather than
+# re-derived, for `check_inplace_preconditions`'s reason.
+check_landing_carry() { # slug -> 0 when this landing publishes nothing foreign
+  local _rc
+  run_lander --carry "$1"; _rc=$?
+  case "$_rc" in
+    0) return 0 ;;
+    1) fail 66 "the landing this close would authorize publishes a commit that belongs to another build, which rode in through the local default branch; the lander's own list follows and nothing was written" ;;
+    2) fail 67 "the declared lander refused the carry flag as an argument it does not implement, so LANDER_MODE names a landing shape this lander cannot perform and nothing was written: $LANDER" ;;
+    *) fail 68 "the declared lander could not observe what this landing would publish, which is the remote or the clone, so the close cannot say whether the set is clean and refuses rather than guessing; nothing was written: $LANDER" ;;
+  esac
+  [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  return 1
+}
+
+# S5 - THE CLOSE COMMITS ITS OWN RECORD, under `in-place` and only there. TOOL-dUnstalledConvoy-24
+# is the defect this closes: a LANDING evaluated in one tree has to TRAVEL, and a staged-but-
+# uncommitted phase carries the OLDER phase into any merge. Under `in-place` there is no other tree
+# and no merge left to make - the graded merge is already HEAD - so the record can simply land on
+# top of it, and the push boundary's scoped bar covers that records-only delta because the
+# full-green stamp at the prepared merge sits in the same git dir.
+#
+# NOTHING STAGED IS NOT A FAILURE (F5). A re-close over a record already at LANDING - which is what
+# a re-prepare after a red push produces - writes the same bytes, so an unconditional commit would
+# refuse on an empty commit AFTER a full bar had already been paid, and both documented re-prepare
+# paths would wedge. The verb reports the commit that last changed the record and exits 0.
+#
+# THE SUBJECT NAMES THE SLUG AND NO UNIT ID, so `build_commit` never takes this for a unit's build
+# commit and no verdict derived from that join moves.
+write_close_commit() { # slug · run-state file
+  local _c
+  if GIT diff --cached --quiet -- "$2" 2>/dev/null; then
+    _c=$(GIT log -1 --format=%h -- "$2" 2>/dev/null)
+    echo "unattended: close OK - every declared DoD item met; the record already reads LANDING and this close changed no byte of it, so nothing was committed. The close record is already committed at ${_c:-an earlier commit}. Land the prepared merge with: $LANDER --land --slug $1"
+    return 0
+  fi
+  # BOUNDED like every other command this driver runs that is not git plumbing: the pre-commit hook
+  # is a gate leg in some adopters and takes minutes. NEVER with the declared bypass flag - the
+  # gate greps this path for it, and a close that bypassed its own hooks would be the run certifying
+  # its own record.
+  if ! run_bounded git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" commit -q -m "records($1): close — LANDING"; then
+    fail 69 "the close evaluated the whole Definition of Done and then could not commit its own record, so the phase is written and staged but does not travel; the commit's own output follows"
+    [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+    return 1
+  fi
+  _c=$(GIT rev-parse --short HEAD 2>/dev/null)
+  echo "unattended: close OK — every declared DoD item met; phase LANDING, committed at ${_c:-HEAD} on top of the graded merge. Land it with: $LANDER --land --slug $1"
+  return 0
+}
+
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
   n=${#OV_ITEMS[@]}
@@ -3907,7 +4115,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     # item that says nothing would otherwise inherit whatever the previous item left behind and
     # attribute one item's explanation to another.
     DOD_OUT=""
+    GG_HARD=""
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
+      # TOOL-dDerivedDocket-3 - A NUMBERED REFUSAL ENDS THE VERB, and is never counted as an unmet
+      # item. An unmet item invites `--override`, and the preconditions that set this flag are what
+      # keep an UNGRADED merge from landing: overriding one would land exactly that. The refusal has
+      # already printed itself; this says only that nothing was written.
+      if [ -n "$GG_HARD" ]; then
+        echo "unattended: --close refused; the run-state file is unchanged"
+        return 1
+      fi
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
         # TOOL-aBoundedVerdict-12 S5 - the RECORD KEY, not only the item. `parked-decisions-surfaced`
@@ -3952,6 +4169,12 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fi
   done
   [ "$unmet" = 0 ] || return 1
+  # TOOL-dDerivedDocket-3 S4 - AFTER the Definition of Done evaluates and BEFORE any write. The
+  # override parks below are writes, so a carry refusal placed after them would leave a record
+  # carrying overrides for a landing that cannot happen. Under `primary` this does not run at all.
+  if [ "$LANDER_MODE" = in-place ]; then
+    check_landing_carry "$slug" || return 1
+  fi
   i=0
   while [ "$i" -lt "$n" ]; do
     ov=${OV_ITEMS[$i]}
@@ -3968,6 +4191,13 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # invisible to every leg check; worse, --landed's `check_clean` then refuses because the tree is
   # dirty and the dirt is THIS verb's own write, with a message that blames the operator's tree.
   stage_or_fail "$rel" || return 1
+  # S5 - UNDER `in-place` THE VERB COMMITS, and under `primary` it stages and names the commit the
+  # operator owes, exactly as at BASE. The two differ because under `in-place` there is no second
+  # tree and no later merge: the graded merge is already HEAD, so the record lands on top of it.
+  if [ "$LANDER_MODE" = in-place ]; then
+    write_close_commit "$slug" "$rel" || return 1
+    return 0
+  fi
   # THE COMMIT IS NAMED because this verb only STAGES the phase. A run that merges from another
   # tree without committing carries the older phase into the merge, and `--landed` then refuses a
   # run whose Definition of Done was in fact evaluated. TOOL-dUnstalledConvoy-24.
@@ -4007,11 +4237,26 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always was:
-      # the project declares a command line, not a path.
-      # shellcheck disable=SC2086
-      run_bounded $GATE_CMD && { DOD_OUT=""; return 0; }
-      local _grc=$?
+      local _grc
+      # TOOL-dDerivedDocket-3 S3 - UNDER `in-place` THE BAR GRADES THE MERGE, and two preconditions
+      # stand between it and running at all. `GATE_FULL=1` is exported through `env` rather than as
+      # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
+      # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
+      # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
+      # bar's environment carries exactly what this close inherited.
+      if [ "$LANDER_MODE" = in-place ]; then
+        check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
+        print_selftests_owed
+        # shellcheck disable=SC2086
+        run_bounded env GATE_FULL=1 $GATE_CMD && { DOD_OUT=""; return 0; }
+        _grc=$?
+      else
+        # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
+        # was: the project declares a command line, not a path.
+        # shellcheck disable=SC2086
+        run_bounded $GATE_CMD && { DOD_OUT=""; return 0; }
+        _grc=$?
+      fi
       DOD_OUT=$RB_OUT
       # A BREACH IS NOT A RED BAR, and the difference is the whole information this adds. A red bar
       # says a check ran and said no; a breach says the bar never answered. Reporting them the same

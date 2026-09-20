@@ -219,3 +219,40 @@ hold's instant would delete the one thing left to restart the run.
 
 A cross-node take-over cannot reap a job in another node's session, so `--hold` accepts
 `--keepalive-unreachable <node>` and records it.
+
+## 10. The in-place landing, and the one that cannot complete
+
+*Protocol section 6 states the ordered `in-place` sequence in four verbs. This section carries what
+that order is FOR, what a reconcile may not go through, and what a run does when the landing cannot
+be completed at all. It is here rather than there because the protocol is at its cap and this is the
+half a run reads only when something stops.*
+
+**Why the order is forced, and not merely recommended.** The merge bar writes its full-green stamp
+only for a clean, unmoved run, and the push boundary reuses that stamp instead of paying a second
+full bar. So the bar has to run on the PREPARED MERGE and before `--close` writes a byte: grade the
+branch tip instead and the only grader of the merge is the push boundary's scoped bar, which is
+scoped by a guard — two green changes that fail together then surface after the run has closed.
+That is the shape of two aborts this kit already records.
+
+**A reconcile comes from the REMOTE's default branch, onto the run branch.** Never through the
+node's own default branch: that is a ref this session can move, and it carries whatever else on this
+node has not been pushed. When `--prepare` reports a conflict, merge the remote's default branch
+into the run branch, resolve, commit, and `--prepare` again.
+
+**A landing that cannot COMPLETE merges nowhere.** The lander reporting the remote unreachable, its
+race retries exhausted, or a `--close` refused because the lander could not make its observation are
+all the same case: nothing is merged, anywhere. The run pushes its branch, so the prepared merge and
+the committed close survive the session, and then holds under `--code platform-unavailable` with the
+lander's own last line as the reason and `--reaped` naming the keepalive the close's attestation
+already reaped. When the branch push fails too, because the remote answers nothing at all, the same
+hold is taken over the unpublished tip — which is exactly the exception section 4 states, and the
+only code it is stated for.
+
+A RED bar at the push is a different thing and takes a different route. A red the run itself caused
+is the run's work: fix it and `--prepare` again. It holds under this code only when the red is the
+declared bound firing, which is a cause outside the run in the way every other hold code is.
+
+**Why the `LANDED` anchor ORDER is a rule.** Listing two anchors without ordering them would permit
+an implementation that always takes the cheaper one, retiring the observation while satisfying every
+word of that section. The ordering is what preserves the strong claim wherever the strong claim is
+available.

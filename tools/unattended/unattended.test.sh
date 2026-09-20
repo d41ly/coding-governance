@@ -111,6 +111,11 @@ MEMORY_ROOT=memory
 UNITS_REGION_CUTOFF="${3-2026-08-19}"
 SPEC_THIN_CUTOFF="${5-}"
 LANDER="echo land"
+# DECLARED, so the shared fixture keeps BASE's output byte for byte: a blank LANDER_MODE
+# announces its default on stderr, `run` merges stderr into what every arm reads, and the two
+# arms that compare WHOLE --status output would then be comparing against an extra line. The
+# blank and in-place values are exercised where they belong, in their own fixtures.
+LANDER_MODE="primary"
 BYPASS_BAN="--no-verify"
 GATE_CMD="${2-true}"
 GATE_BOUND="${4-3600}"
@@ -2480,10 +2485,12 @@ before=$(sum)
 hit "$(run --landed tRun)" "a run reaches LANDED only from LANDING, because LANDING is the record that --close evaluated the Definition-of-Done set and this verb does not evaluate it a second time"
 same "the refused --landed wrote nothing" "$(sum)" "$before"
 
-# ---- TOOL-dUnstalledConvoy-24. A LANDING evaluated in one tree has to TRAVEL. `--close` writes the
-# ---- phase and STAGES it; nothing commits it, so a run that merges from another tree carries the
-# ---- older phase into the merge and check 31 refuses — accurately, and while naming nothing that
-# ---- helps. This build's own landing hit it and paid a full bar to re-close on the merged tree.
+# ---- TOOL-dUnstalledConvoy-24. A LANDING evaluated in one tree has to TRAVEL. Under
+# ---- `LANDER_MODE=primary` `--close` writes the phase and STAGES it, and the operator commits it,
+# ---- so a run that merges from another tree without doing that carries the older phase into the
+# ---- merge and check 31 refuses — accurately, and while naming nothing that helps. This build's own
+# ---- landing hit it and paid a full bar to re-close on the merged tree. Under `in-place` the verb
+# ---- commits the record itself (TOOL-dDerivedDocket-3 S5), which is that mode's answer to this.
 # ----
 
 # ---- S2: the refusal names the OTHER TREE holding the uncommitted LANDING. The fixture is a real
@@ -6089,6 +6096,369 @@ build_hold_fixture
 out=$(run --resume tRun --replaces k1)
 hit "$out" "--replaces says which job is being retired and --keepalive-id says which one takes it on, so a replacement with no new id would leave the lease naming a job that has been reaped: pass --keepalive-id"
 reset_tree
+
+# ---- TOOL-dDerivedDocket-3 — LANDER_MODE, the in-place landing and the committing close -----------
+# ---- SELF-CONTAINED, in its own scratch repository with its own bare origin, because every arm here
+# ---- needs a PREPARED MERGE on HEAD and a lander whose exits it controls. Building that inside the
+# ---- shared fixture would mean force-moving `unit` and `main` under every later arm, which is the
+# ---- class `reset_tree` exists to remove. The precedent is the `_working` block at the head of this
+# ---- file: its own repo, torn down, and `cd "$TMP"` restored at the end.
+# ----
+# ---- The lander is a STUB whose exit codes are env-driven. The real one is graded by its own suite;
+# ---- what these arms are about is how the DRIVER reads 0, 1, 2 and 3 — and those four readings are
+# ---- the whole contract between the two, so a stub is the right subject rather than a shortcut.
+ip_dir=$(mktemp -d); ip_oroot=$(mktemp -d); ip_origin="$ip_oroot/origin.git"
+(
+  cd "$ip_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$ip_origin"
+  git --git-dir="$ip_origin" config user.email t@t.test
+  git --git-dir="$ip_origin" config user.name t
+  git --git-dir="$ip_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$ip_origin"
+  mkdir -p bin kitsurface memory/guides memory/builds/tRun
+  printf 'x\n' > kitsurface/thing.txt
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  cat > bin/lander.sh <<'IPL'
+#!/usr/bin/env bash
+m=""
+for a in "$@"; do case "$a" in --prepare|--land|--carry|--prepared) m=${a#--} ;; esac; done
+echo "lander-stub: $m"
+[ "$m" = carry ] && [ "${STUB_CARRY:-0}" = 1 ] && echo "carry deadbeef - otherBuild - a foreign commit"
+v="STUB_$(printf '%s' "$m" | tr 'a-z' 'A-Z')"
+exit "${!v:-0}"
+IPL
+  cat > bin/bar.sh <<'IPB'
+#!/usr/bin/env bash
+{ printf 'GATE_FULL=%s\n' "${GATE_FULL-<unset>}"
+  printf 'GATE_SELFTESTS=%s\n' "${GATE_SELFTESTS-<unset>}"; } > "$IPOUT/barenv.txt"
+echo "bar-stub ran"
+[ -f poison.txt ] && { echo "bar-stub: leg no-poison FAILED"; exit 1; }
+exit 0
+IPB
+  cat > .unattended.conf <<'IPC'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="bash bin/lander.sh"
+LANDER_MODE="in-place"
+SELFTESTS_OWED_PATHS="kitsurface/"
+BYPASS_BAN="--no-verify"
+GATE_CMD="bash bin/bar.sh"
+GATE_BOUND="600"
+UNIT_STALL_BOUND="1800"
+LEASE_STALE_AFTER="7200"
+REVIEW_ROUNDS="7"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+IPC
+  cat > memory/builds/tRun/README.md <<'IPR'
+---
+slug: tRun
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-tRun-1
+---
+
+# tRun
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s)
+
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+IPR
+  cat > memory/builds/tRun/RUN.md <<'IPS'
+# tRun — run state
+
+<!-- run:generated -->
+<!-- /run:generated -->
+
+## Mandate
+<!-- run:mandate -->
+The owner authorizes build tRun to merge to main and to push.
+<!-- /run:mandate -->
+
+## Run facts
+
+## Parked
+IPS
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+  git checkout -q -b unit
+  git commit -q --allow-empty -m "unit work" --no-verify
+) >/dev/null 2>&1
+ip_unit=$(git -C "$ip_dir" rev-parse unit)
+ip_base=$(git -C "$ip_dir" rev-parse main)
+ip_out=$(mktemp -d)
+# EVERY invocation runs with the scratch repo as its working directory, which is what makes the
+# driver resolve THAT tree; the script itself stays the one under test.
+iprun() { ( cd "$ip_dir" && GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
+ipgit() { git -C "$ip_dir" "$@"; }
+ipreset() {
+  ipgit checkout -q --detach "$ip_unit" 2>/dev/null
+  ipgit branch -qf unit "$ip_unit"; ipgit checkout -q unit
+  ipgit reset -q --hard "$ip_unit"; ipgit clean -qfd
+  ipgit update-ref refs/heads/main "$ip_base"; ipgit push -q -f origin main; ipgit fetch -q origin main
+}
+# A PREPARED MERGE, made with git rather than with the stub: the stub ANSWERS questions and this
+# produces the state those answers are about. `--prepare` itself is the lander's own suite's subject.
+ipprep() { # $1 = a path to touch on the branch, or empty
+  ipreset
+  iprun --preflight tRun --keepalive-id k1 >/dev/null
+  printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> "$ip_dir/memory/builds/tRun/RUN.md"
+  [ -n "${1:-}" ] && date +%s%N > "$ip_dir/$1"
+  ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+  local _old; _old=$(ipgit rev-parse HEAD)
+  ipgit fetch -q origin main
+  ipgit checkout -q --detach origin/main
+  ipgit merge -q --no-ff "$_old" -m "merge: tRun - land onto origin/main" >/dev/null
+  ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"
+  ipgit checkout -q unit
+}
+ipsum() { ipgit hash-object memory/builds/tRun/RUN.md; }
+IPOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
+
+# ---- S2: the preflight PROBE. A mode declared against a lander that cannot perform it refuses at
+# ---- the start of the run, not after every unit is built. Exit 2 is the lander saying the flag is
+# ---- not its; exit 3 is the remote or the clone, which is a different fact and a different remedy.
+ipreset
+out=$(STUB_CARRY=2 iprun --preflight tRun --keepalive-id k1)
+hit "$out" "LANDER_MODE declares 'in-place' and the declared lander refused that flag as an argument it does not implement, so the mode is declared against a lander that cannot land in it and the first refusal would otherwise arrive after every unit was built"
+ipreset
+out=$(STUB_PREPARED=2 iprun --preflight tRun --keepalive-id k1)
+hit "$out" "so the mode is declared against a lander that cannot land in it"
+ipreset
+out=$(STUB_CARRY=3 iprun --preflight tRun --keepalive-id k1)
+hit "$out" "the declared lander could not make the observation that flag asks for, which is the remote or the clone rather than anything this project declared; re-declaring the landing shape would not move it, and the run holds on the outage instead"
+# ---- ...and an OBSERVATION failure is never reported as a misdeclaration. An operator told to fix
+# ---- LANDER_MODE during a remote outage re-declares a correct value forever.
+miss "$out" "LANDER_MODE"
+# ---- EXIT 1 IS A PASS on both flags: a branch tip that is not yet a prepared merge, and a carry set
+# ---- the lander has an opinion about, are the ordinary state of every run at preflight.
+ipreset
+out=$(STUB_CARRY=1 STUB_PREPARED=1 iprun --preflight tRun --keepalive-id k1)
+hit  "$out" "preflight OK"
+miss "$out" "cannot land in it"
+# ---- and under `primary` the probe does not run at all, so a lander with none of the flags is fine.
+ipreset
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' "$ip_dir/.unattended.conf"
+out=$(STUB_CARRY=2 STUB_PREPARED=2 iprun --preflight tRun --keepalive-id k1)
+miss "$out" "cannot land in it"
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' "$ip_dir/.unattended.conf"
+
+# ---- S1: the value is a CLOSED set, and a blank one is announced rather than silently taken.
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="inplace"/' "$ip_dir/.unattended.conf"
+out=$(iprun --status tRun)
+hit "$out" "LANDER_MODE is declared as 'inplace', which is outside the closed set 'primary in-place'"
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE=""/' "$ip_dir/.unattended.conf"
+out=$(iprun --status tRun)
+hit "$out" "this project declares no LANDER_MODE, so the landing runs in 'primary' mode"
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' "$ip_dir/.unattended.conf"
+# ---- ...and `in-place` with no lander at all is a refusal at conf load, because every step of that
+# ---- mode is a call into one. It fires for every verb, which is why it is not a `fail` branch.
+cp "$ip_dir/.unattended.conf" "$ip_out/keep.conf"
+sed -i 's|^LANDER=.*|LANDER=""|' "$ip_dir/.unattended.conf"
+out=$(iprun --status tRun)
+hit "$out" "LANDER_MODE is 'in-place' and this project declares no LANDER"
+cp "$ip_out/keep.conf" "$ip_dir/.unattended.conf"
+
+# ---- S3: the CLEAN-TREE precondition, in `git status --porcelain`'s full sense. The bar writes its
+# ---- full-green stamp only over an empty listing, and `--prepare`'s own check passes `-uno`, so an
+# ---- untracked file prepares cleanly, greens the bar and stamps nothing.
+ipprep ""; rm -f "$ip_out/barenv.txt"; printf 'junk\n' > "$ip_dir/untracked.txt"
+out=$(STUB_PREPARED=0 iprun --close tRun $IPOVR)
+hit "$out" "the working tree is not clean in the full porcelain sense, untracked files included, and the bar writes its full-green stamp only over an empty listing - so a green run here would stamp nothing and the push would pay a second full bar or scope against an older stamp; commit or remove what the listing names, then close again"
+n=$((n+1)); [ ! -f "$ip_out/barenv.txt" ] || { echo "FAIL the bar RAN behind the clean-tree refusal"; st=1; }
+rm -f "$ip_dir/untracked.txt"
+
+# ---- S3: the prepared merge, asked of the lander. Each of its three non-zero exits is a DIFFERENT
+# ---- refusal, and the whole point of the split is that only ONE of them means "run --prepare".
+ipprep ""; before=$(ipsum)
+out=$(STUB_PREPARED=1 iprun --close tRun $IPOVR)
+hit  "$out" "HEAD carries no prepared merge, so the bar would grade this branch and never the merge the push publishes - which is the one thing this landing mode exists to stop; make it first with"
+same "the refused close left the record alone" "$(ipsum)" "$before"
+ipprep ""
+out=$(STUB_PREPARED=2 iprun --close tRun $IPOVR)
+hit "$out" "the declared lander refused the read-only flag this precondition asks it, as an argument it does not implement, so LANDER_MODE names a landing shape this lander cannot perform"
+ipprep ""; before=$(ipsum)
+out=$(STUB_PREPARED=3 iprun --close tRun $IPOVR)
+hit  "$out" "the declared lander could not observe whether HEAD carries the merge this landing would publish, and that is the remote or the clone rather than anything on this branch; the run holds on the outage instead of remaking a merge that would meet the same failure"
+# ---- A REMOTE OUTAGE MUST NOT SEND THE RUN TO --prepare. Re-preparing meets the same failure, and
+# ---- the documented route is a branch push and a hold.
+miss "$out" "--prepare"
+same "the observation failure wrote nothing either" "$(ipsum)" "$before"
+
+# ---- S4: the carry check, asked AFTER the Definition of Done and BEFORE any write.
+ipprep ""; before=$(ipsum)
+out=$(STUB_PREPARED=0 STUB_CARRY=1 iprun --close tRun $IPOVR)
+hit  "$out" "the landing this close would authorize publishes a commit that belongs to another build, which rode in through the local default branch; the lander's own list follows and nothing was written"
+hit  "$out" "carry deadbeef"
+same "the foreign carry set left the record alone" "$(ipsum)" "$before"
+ipprep ""
+out=$(STUB_PREPARED=0 STUB_CARRY=2 iprun --close tRun $IPOVR)
+hit "$out" "the declared lander refused the carry flag as an argument it does not implement, so LANDER_MODE names a landing shape this lander cannot perform and nothing was written"
+ipprep ""
+out=$(STUB_PREPARED=0 STUB_CARRY=3 iprun --close tRun $IPOVR)
+hit "$out" "the declared lander could not observe what this landing would publish, which is the remote or the clone, so the close cannot say whether the set is clean and refuses rather than guessing; nothing was written"
+
+# ---- S5: the close COMMITS its own record on top of the graded merge, and S3's derived term
+# ---- ANNOUNCES rather than exporting. TOOL-dUnstalledConvoy-24 for the first, F6 for the second.
+ipprep kitsurface/thing.txt; rm -f "$ip_out/barenv.txt"
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+hit  "$out" "phase LANDING, committed at"
+hit  "$out" "the landing range HEAD^1..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar"
+same "the close left a clean tree"        "$(ipgit status --porcelain)" ""
+same "the close commit names the slug"    "$(ipgit log -1 --format=%s)" "records(tRun): close — LANDING"
+same "the record reached LANDING"         "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "LANDING"
+# ---- THE BAR'S OWN ENVIRONMENT, read from the bar rather than from the driver's source. GATE_FULL
+# ---- is added because a guarded manifest would grade the landing merge by guard; GATE_SELFTESTS is
+# ---- neither added nor removed, because the charter reserves that flag to a person.
+same "the landing bar runs with every guard off" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt")" "1"
+same "the landing bar is not handed the self-test flag" "$(grep -c '^GATE_SELFTESTS=<unset>$' "$ip_out/barenv.txt")" "1"
+
+# ---- F5: a re-close whose write changes a byte still commits; the EMPTY-stage branch is the one
+# ---- below, and both are needed because only the pair shows the condition is read at all.
+ip_c1=$(ipgit rev-parse HEAD)
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+n=$((n+1)); [ "$ip_c1" != "$(ipgit rev-parse HEAD)" ] || { echo "FAIL the re-close with a changed record made no commit"; st=1; }
+
+# ---- ...and the owner's own GATE_SELFTESTS survives the close untouched, which is the ON DEMAND use
+# ---- the same charter fence sanctions. The driver ADDS nothing and REMOVES nothing.
+ipprep kitsurface/thing.txt; rm -f "$ip_out/barenv.txt"
+( cd "$ip_dir" && GATE_SELFTESTS=1 GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" STUB_PREPARED=0 STUB_CARRY=0 \
+    bash "$SCRIPT" --close tRun $IPOVR ) >/dev/null 2>&1
+same "an inherited GATE_SELFTESTS reaches the bar unchanged" "$(grep -c '^GATE_SELFTESTS=1$' "$ip_out/barenv.txt")" "1"
+
+# ---- ...and a range touching NO declared entry gets the same environment and NO announcement. An
+# ---- announcement that fires on every landing says nothing a reader can act on.
+ipprep ""; rm -f "$ip_out/barenv.txt"
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+miss "$out" "touches a declared self-test surface"
+same "the untouching range still runs the bar with every guard off" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt")" "1"
+
+# ---- AC1, the whole reason this mode exists: a branch that is GREEN ALONE and RED once merged onto
+# ---- a tip the remote moved. Under `primary` the bar would grade the branch and this would land.
+ipreset
+ipgit checkout -q --detach origin/main
+printf 'boom\n' > "$ip_dir/poison.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m "main moved" --no-verify
+ipgit push -q -f origin HEAD:main
+ipgit checkout -q unit
+n=$((n+1)); [ ! -f "$ip_dir/poison.txt" ] || { echo "FAIL the branch tip itself carries the poison, so the arm proves nothing"; st=1; }
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes\nparked-surfaced: yes\n' >> "$ip_dir/memory/builds/tRun/RUN.md"
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ip_old=$(ipgit rev-parse HEAD)
+ipgit fetch -q origin main; ipgit checkout -q --detach origin/main
+ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - land onto moved tip" >/dev/null
+ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"; ipgit checkout -q unit
+n=$((n+1)); [ -f "$ip_dir/poison.txt" ] || { echo "FAIL the prepared merge does not carry the moved tip's commit"; st=1; }
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+same "the red landing bar left the record RUNNING" "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "RUNNING"
+ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
+
+# ---- S5's refusal: the close evaluated everything and then could not commit. Staged by removing the
+# ---- fixture's git identity, which is the one way to fail `git commit` while `git add` succeeds.
+ipprep ""
+ipgit config --unset user.email
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
+hit "$out" "the close evaluated the whole Definition of Done and then could not commit its own record, so the phase is written and staged but does not travel; the commit's own output follows"
+ipgit config user.email t@t.test
+
+# ---- S7: under `primary` every verb behaves as it did at BASE — no probe, no carry check, no
+# ---- commit, and no GATE_FULL in the bar's environment. This is the control the whole unit rests on.
+ipprep ""
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' "$ip_dir/.unattended.conf"
+ipgit add -A >/dev/null && ipgit commit -q -m conf --no-verify
+ip_h=$(ipgit rev-parse HEAD); rm -f "$ip_out/barenv.txt"
+out=$(STUB_PREPARED=2 STUB_CARRY=2 iprun --close tRun $IPOVR)
+hit  "$out" "COMMIT the run-state file"
+miss "$out" "cannot land in it"
+same "the primary close made no commit"          "$(ipgit rev-parse HEAD)" "$ip_h"
+same "the primary bar is not handed GATE_FULL"   "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt")" "1"
+
+# ---- F5, the OTHER half: a re-close over a record ALREADY at LANDING commits NOTHING and names the
+# ---- commit that already carries it. This is the state a re-prepare after a red push leaves, and an
+# ---- unconditional commit would refuse on an empty commit AFTER a full bar had been paid - wedging
+# ---- both documented re-prepare routes. It needs a close with NO overrides, because every override
+# ---- writes a parked row and a written row is a changed record, so the fixture's Definition of Done
+# ---- is satisfied outright rather than bought.
+ipreset
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' "$ip_dir/.unattended.conf"
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+printf 'keepalive-reaped: yes
+parked-surfaced: yes
+' >> "$ip_dir/memory/builds/tRun/RUN.md"
+printf '
+<!-- roster:units -->
+ARCH-tRun-1
+<!-- /roster:units -->
+' >> "$ip_dir/memory/builds/tRun/README.md"
+sed -i 's/| OPEN | rev-1 |/| CLOSED | rev-1 |/' "$ip_dir/memory/builds/tRun/README.md"
+mkdir -p "$ip_dir/memory/builds/tRun/spec" "$ip_dir/memory/builds/tRun/reviews"
+cat > "$ip_dir/memory/builds/tRun/spec/2026-08-01-spec-ARCH-tRun-1.md" <<'IPSPEC'
+# ARCH-tRun-1 — a unit
+
+**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-2 · base abcdef12 · streams architecture
+
+## 1. Goal
+g
+## 2. Scope (IN)
+S1 a thing
+## 6. Acceptance criteria
+AC1 it works
+## 7. Gates
+the bar
+IPSPEC
+printf '**Serves:** spec-audit ARCH-tRun-1
+
+# audit
+'   > "$ip_dir/memory/builds/tRun/reviews/2026-08-01-review-ARCH-tRun-1-audit.md"
+ipgit add -A >/dev/null && ipgit commit -q -m "fixture: ARCH-tRun-1 closed" --no-verify
+ip_f=$(ipgit rev-parse HEAD)
+printf '**Serves:** diff-review ARCH-tRun-1
+
+# closing diff review of %s
+' "$ip_f"   > "$ip_dir/memory/builds/tRun/reviews/2026-08-01-review-ARCH-tRun-1-diff.md"
+iprun --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m "fixture: the closing review round" --no-verify
+ip_old=$(ipgit rev-parse HEAD)
+ipgit fetch -q origin main; ipgit checkout -q --detach origin/main
+ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - land onto origin/main" >/dev/null
+ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"; ipgit checkout -q unit
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun)
+hit "$out" "phase LANDING, committed at"
+ip_c2=$(ipgit rev-parse --short HEAD)
+# the remote moves and the landing is re-prepared, which is what a red push leaves behind
+ipgit checkout -q --detach "$ip_base"; printf 'later
+' > "$ip_dir/later.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m "main moved again" --no-verify
+ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
+ipgit fetch -q origin main; ip_old=$(ipgit rev-parse HEAD)
+ipgit checkout -q --detach origin/main
+ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - re-prepared" >/dev/null
+ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"; ipgit checkout -q unit
+ip_reprep=$(ipgit rev-parse HEAD)
+out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun)
+hit  "$out" "the record already reads LANDING and this close changed no byte of it, so nothing was committed"
+hit  "$out" "$ip_c2"
+same "the re-close left HEAD on the re-prepared merge" "$(ipgit rev-parse HEAD)" "$ip_reprep"
+same "the re-close left a clean tree"                  "$(ipgit status --porcelain)" ""
+ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
+
+cd "$TMP" || exit 2
+rm -rf "$ip_dir" "$ip_out" "$ip_oroot"
 
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 

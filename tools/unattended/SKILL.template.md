@@ -489,7 +489,10 @@ definition, so the absence is a decision and not an oversight.
   at the main loop and never in a child. The rule is the build method's M6; this bullet points at
   it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
   self-test runner or any `*.test.sh` is denied on this branch until the record reaches
-  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal.
+  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. Under
+  `LANDER_MODE=in-place` the close ANNOUNCES when that flagged run is owed — when the landing range
+  touches a path `SELFTESTS_OWED_PATHS` declares — so you are told rather than left to remember; it
+  still does not run it and does not set the flag, and you name the command you ran in the record.
 - Keep the phase honest, and give every phase claim a WITNESS — a sha, a tag, a run id. A claim with
   no witness is skipped by the oracle that would have judged it, so an unwitnessed phase is the
   cheapest possible lie and you are the only author of that field.
@@ -766,6 +769,29 @@ sentence here. Skip it silently if the project has no such skill, as the start p
 bash {{KIT_DIR}}/unattended.sh --close <slug>
 ```
 
+**Under `LANDER_MODE=in-place`, one step comes FIRST.** The close's bar grades what HEAD carries, so
+the landing merge has to exist before it runs. Without it the bar grades this branch and never the
+merge the push publishes, and a branch that is green alone can still land red onto a tip the remote
+moved:
+
+```bash
+{{LANDER}} --prepare --slug <slug>
+bash {{KIT_DIR}}/unattended.sh --close <slug>
+```
+
+That close then refuses BY NUMBER, and not as an unmet item, when HEAD carries no prepared merge, or
+when the tree is not clean in the full porcelain sense — untracked files included, because the bar
+writes its full-green stamp only over an empty listing and the push reuses that stamp. A numbered
+refusal takes no `--override`: overriding one would land a merge nothing graded. Before it writes
+anything it asks the lander what that push would carry, and refuses on a commit belonging to another
+build. Then it COMMITS its own record on top of the graded merge, so the phase travels. Under
+`primary` none of that happens: the verb stages the record and names the commit you owe.
+
+It also ANNOUNCES, on an in-place close, when the landing range touches a path
+`SELFTESTS_OWED_PATHS` declares: the kit Definition of Done then owes the self-test bar, which this
+verb does not run and does not set the flag for. You run that one by hand at `VERIFYING` and name
+the command in the run's record.
+
 **The bar it runs is BOUNDED.** `GATE_BOUND` seconds, declared by the project or defaulted by the
 kit — and when it is the DEFAULT, said so on stderr, because a bound nobody set should not
 be invisible. A bar that does not answer within it is KILLED, and
@@ -826,13 +852,47 @@ keeps blocking the close. Nothing is recorded on a reason that was written about
 
 ## Land
 
+Under `LANDER_MODE=primary`, from the primary tree:
+
 ```bash
 {{LANDER}}
 ```
 
-Never with a hook-bypass flag. The lander is mandatory because it reconciles the remote BEFORE the
-gate, so the bar never runs on an already-stale tree. If it refuses, read why and fix it — bypassing
-discards the entire bar the authorization leaned on, and the gate greps your run-state file for the flag.
+Under `LANDER_MODE=in-place`, the graded merge is already HEAD and the landing is one push of it,
+made from this worktree:
+
+```bash
+{{LANDER}} --land --slug <slug>
+```
+
+Never with a hook-bypass flag, in either mode. The lander is mandatory because it reconciles the
+remote BEFORE the gate, so the bar never runs on an already-stale tree. If it refuses, read why and
+fix it — bypassing discards the entire bar the authorization leaned on, and the gate greps your
+run-state file for the flag.
+
+**Reconcile from the remote's own default branch, onto the run branch.** If `--prepare` reports a
+conflict, run `git merge <remote>/<default-branch>` on the run branch, resolve it, commit, and
+`--prepare` again. Nothing in this mode routes through your node's own default branch: that is a ref
+this session can move, and it carries whatever else on this node has not been pushed.
+
+**If the lander cannot COMPLETE the landing, nothing is merged anywhere.** That is the remote
+reported unreachable, the race retries exhausted, or a `--close` refused because the lander could
+not make its observation. Push the branch, so the prepared merge and the committed close survive
+this session, then hold:
+
+```bash
+git push origin HEAD
+bash {{KIT_DIR}}/unattended.sh --hold <slug> --code platform-unavailable \
+  --until "after <now + 30 minutes>" --reason "<the lander's own last line>" --reaped <keepalive id>
+```
+
+**Take that same hold when the branch push ALSO fails** because the remote answers nothing at all.
+`platform-unavailable` is the one code `--hold` accepts over an unpublished tip, and it records that
+it did. `--reaped` is not optional: the close's attestation already reaped the keepalive, and the
+hold refuses a run that cannot name the job it reaped.
+
+A RED bar at the push is a different thing. That is a bar this run's own work made red, so fix it
+and `--prepare` again; it holds under the same code only when the red is the declared bound firing.
 
 ## Mark it landed — the run is not finished until you do
 

@@ -21,6 +21,13 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
 two rendered ones do carry placeholders, and for them a render is the only correct install.
 
+**Why the verb entries are not in the protocol.** The move was a BYTE decision and is recorded as
+one. That document had reached its cap EXACTLY, and a contract with no room left to state its next
+rule has stopped being amendable — which is a failure mode of the contract, not of whoever wrote the
+rule that would not fit. The sentence lived in the protocol itself until `TOOL-dDerivedDocket-3`
+needed the bytes; it is the kit's own history rather than a rule any run follows, so it belongs
+here, where nothing is capped.
+
 **One Skill placeholder is probed rather than read.** The Skill tells a run to execute the
 memory-tree kit's bug-class checklist, so it names that kit's `gotchas.py` by path. An adopter may
 install the memory-tree kit flat in its tool root, so the adopter takes the first TRACKED of the

@@ -12,7 +12,7 @@
 # Exit 0 + no output = clean, EXCEPT for the two announcements named below. Anything else printed
 # is a violation. Exit 2 = misconfigured.
 #
-# TWO EXCEPTIONS, both named rather than quietly taken.
+# THREE EXCEPTIONS, all named rather than quietly taken.
 #
 # ONE: a check that cannot COMPARE announces the case it could not reach, on the REPORT channel,
 # which the default run does not print. Set GOV_UNATTENDED_REPORT=1 to see them. A skip that looks
@@ -27,6 +27,13 @@
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
 # deleted shape unit 4 exists to prevent; routing them to stdout without amending this paragraph
 # would leave the header asserting something the code disproves. TOOL-aPrimedKeepalive-4.
+#
+# THREE: check 35's LANDER_MODE and SELFTESTS_OWED_PATHS lines print on the DEFAULT channel too, and
+# for TWO's reason rather than by a second concession. They are not skips: they are the effective
+# landing shape and the declared self-test surface, and those decide WHICH COMMIT the landing bar
+# graded and whether a kit-work landing is ever told the flagged bar is owed. A reader of a green bar
+# is entitled to both without setting an environment variable, and routing them through REPORT would
+# make them invisible on every bar run. TOOL-dDerivedDocket-3.
 #
 # READ-ONLY, which is what lets it run on the bar. It writes nothing, renders nothing and derives
 # nothing: the run-state file's generated region is asserted EMPTY, because the unit list is derived
@@ -114,7 +121,7 @@ if [ ! -f "$CONF" ]; then
   exit "$status"
 fi
 ADV_NAME=""
-MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
+MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
 DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
@@ -180,7 +187,7 @@ while IFS= read -r -d '' _ck; do
     # able to match the extractor's own source line, which is how the first draft of that join read 38
     # keys instead of 20 and swept in heredoc markers and phase names.
     # gov:conf-allow-begin
-    MEMORY_ROOT|LANDER|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
+    MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|LEASE_STALE_AFTER|\
@@ -1749,6 +1756,51 @@ elif [ -f "$LIVEDOC" ]; then
   fi
 fi
 
+# ---- 35: THE LANDING SHAPE, GRADED AND ANNOUNCED. TOOL-dDerivedDocket-3 S1. The announcement is as
+# ---- load-bearing as the refusals beside it: `LANDER_MODE` decides which commit the landing bar
+# ---- grades and which verb commits the record, so a reader of a green bar who cannot tell
+# ---- `in-place` from a blank line is reading a verdict about a different landing.
+# ----
+# ---- THE CLOSED SET AND ITS DEFAULT COME FROM THE DRIVER, off the two marked lines, never retyped
+# ---- here. That is this file's own header rule for the phase and DoD sets, and a landing mode is
+# ---- the same kind of thing. A marker that stops resolving is a REFUSAL, because a set read as
+# ---- empty would make every declared value legal.
+_c35_line=$(grep -A1 -F 'gov:lander-mode-set' "$DRIVER" 2>/dev/null | tail -1)
+_c35_set=$(printf '%s' "$_c35_line" | sed 's/[^a-z|-]//g' | tr '|' ' ')
+_c35_def=$(grep -F 'gov:lander-mode-default' "$DRIVER" 2>/dev/null | sed -n 's/.*LANDER_MODE=\([a-z-]*\).*/\1/p' | head -1)
+if [ -z "${_c35_set// /}" ] || [ -z "$_c35_def" ]; then
+  fail 35 "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal: $DRIVER"
+else
+  _c35_eff="$LANDER_MODE"; _c35_src=declared
+  [ -n "$_c35_eff" ] || { _c35_eff="$_c35_def"; _c35_src=defaulted; }
+  case " $_c35_set " in
+    *" $_c35_eff "*)
+      echo "unattended: LANDER_MODE $_c35_eff ($_c35_src) — the landing shape every run in this project takes, graded against the driver's own set: $_c35_set" ;;
+    *)
+      fail 35 "LANDER_MODE is declared outside the driver's closed set, so every run in this project refuses at conf load and no landing is reachable at all, declared $LANDER_MODE against the set $_c35_set" ;;
+  esac
+fi
+# ---- ...and the self-test surface the in-place close derives its announcement from. A DECLARED
+# ---- prefix matching no tracked path is a refusal: it reads as coverage of a surface that is not
+# ---- there, and the landing of kit work under it is then never told the flagged bar is owed. A
+# ---- BLANK key is not a refusal - an adopter may owe no such bar at all - but it is ANNOUNCED,
+# ---- because a term that silently un-owes a Definition-of-Done clause is indistinguishable from
+# ---- one that found nothing to owe.
+if [ -z "$SELFTESTS_OWED_PATHS" ]; then
+  echo "unattended: SELFTESTS_OWED_PATHS is blank — no landing range in this project can ever be told the kit Definition of Done owes the flagged bar, so that clause has no declared surface to be read against"
+else
+  _c35_dead=""
+  for _c35_p in $SELFTESTS_OWED_PATHS; do
+    if [ -n "$(GIT ls-files -- "$_c35_p" 2>/dev/null | head -1)" ]; then
+      echo "unattended: SELFTESTS_OWED_PATHS entry $_c35_p — resolves to tracked paths"
+    else
+      _c35_dead="$_c35_dead $_c35_p"
+    fi
+  done
+  [ -z "${_c35_dead// /}" ] \
+    || fail 35 "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed:$_c35_dead"
+fi
+
 # ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not
 # ---- use the kickoff skill at all. This is the one check that reads a file outside the kit, and it
 # ---- exists because nothing else does: the manifest ratchet watches the project layer, and the
@@ -2154,6 +2206,39 @@ if [ -n "$KICKOFF_ENGINE" ] && [ -f "$tmpl" ]; then
     fail 18 "the Skill template never names /session-kickoff while this project declares a kickoff engine, and a missing step reads exactly like a deadlocked one on any count-based check: $tmpl"
   elif [ "$kol" -lt "$pfl" ]; then
     fail 18 "the Skill template puts the kickoff step BEFORE --preflight, and kickoff invoked first halts at its READY card with nobody under a mandate to answer it: /session-kickoff at line $kol, --preflight at line $pfl in $tmpl"
+  fi
+fi
+
+# ---- 34: THE LAND SECTION CARRIES BOTH LANDING SHAPES. TOOL-dDerivedDocket-3 S6, AC4. The Skill is
+# ---- ONE render shared by every adopter and the mode is a conf value, so this section is graded
+# ---- unconditionally rather than under `LANDER_MODE`: an adopter who switches the key must not have
+# ---- to re-render a document that never described the mode they switched to.
+# ----
+# ---- SECTION-SCOPED, for check 18's recorded reason: a file-wide locator goes green the moment the
+# ---- literal appears in any other section, and `--prepare` legitimately appears in the Close
+# ---- section too. An EMPTY section is its own refusal — an arm reading a section the render never
+# ---- emits passes over nothing, which is this leg's own could-not-fail shape.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the sequence WORKS, or that the steps are in the right order.
+# ---- It grades presence of the two verbs and ABSENCE of a merge into the node's own default branch.
+# ---- The order is protocol section 6's sentence and a reader's job.
+if [ -f "$tmpl" ]; then
+  _c34_land=$(tr -d '\r' < "$tmpl" | awk '/^## Land[ \t]*$/ { f = 1; next } f && /^## / { f = 0 } f')
+  if [ -z "${_c34_land//[[:space:]]/}" ]; then
+    fail 34 "the Skill template carries no Land section body, so every assertion about the landing an agent is told to perform would be graded over nothing and would pass by finding nothing: $tmpl"
+  else
+    _c34_miss=""
+    for _c34_f in "--prepare" "--land"; do
+      printf '%s\n' "$_c34_land" | grep -qF -- "$_c34_f" || _c34_miss="$_c34_miss $_c34_f"
+    done
+    [ -z "${_c34_miss// /}" ] \
+      || fail 34 "the Skill's Land section names neither landing shape in full - an in-place landing prepares the merge and then pushes exactly it, and a section missing either verb sends an agent to a landing it cannot complete:$_c34_miss in $tmpl"
+    # A MERGE INTO THE NODE'S OWN DEFAULT BRANCH is the primary path's fallback text, and it is what
+    # survives a half-finished edit of this section. In `in-place` it is wrong twice over: that ref
+    # is one this session can move, and it carries whatever else on this node has not been pushed.
+    _c34_local=$(printf '%s\n' "$_c34_land" | grep -niE '(merge|merged|merging|merges)[^.]*(local main|local default branch|into main)' || true)
+    [ -z "$_c34_local" ] \
+      || fail 34 "the Skill's Land section directs a merge into the node's own default branch, which is a ref this session can move and which carries whatever else here is unpushed, so the landing it describes is not the one the bar graded: $_c34_local"
   fi
 fi
 # ---- 22 runs in its OWN loop over the run population, NOT inside the BASE-blob block. That block

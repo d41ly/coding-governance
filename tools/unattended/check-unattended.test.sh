@@ -3334,6 +3334,116 @@ out=$(run)
 hit "$out" "the driver is not where this leg reads it, so the phase-read routing below would be graded over no lines at all and would pass by finding nothing"
 reset_tree
 
+# ---- TOOL-dDerivedDocket-3 — checks 34 and 35 ----------------------------------------------------
+# ---- ITS OWN scratch repository, for the reason the driver suite's sibling block gives: these arms
+# ---- edit the SKILL TEMPLATE and the DRIVER the leg reads its closed set out of, and doing that in
+# ---- the shared fixture would leave every later arm grading a mutated carrier.
+# ----
+# ---- EVERY RED ARM HAS A GREEN CONTROL, and the controls come first: a check that was never reached
+# ---- is silent for the same reason a passing one is, and this leg's whole contract is that silence
+# ---- means clean.
+lm_dir=$(mktemp -d)
+(
+  cd "$lm_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  mkdir -p tools/unattended memory/guides
+  cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" \
+     "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" "$HERE/VERBS.template.md" \
+     "$HERE/STOPS.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
+     "$HERE/.unattended.conf.example" tools/unattended/
+  cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
+  cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+  cp "$HERE/STOPS.template.md" memory/guides/UNATTENDED-STOPS.md
+  cat > .unattended.conf <<'LMC'
+MEMORY_ROOT=memory
+LANDER="bash tools/push-main.sh"
+LANDER_MODE="in-place"
+SELFTESTS_OWED_PATHS="tools/"
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+WIRING_CHECK="true"
+LMC
+  git add -A >/dev/null && git commit -q -m seed --no-verify
+) >/dev/null 2>&1
+lmrun() { ( cd "$lm_dir" && bash tools/unattended/check-unattended.sh 2>&1 ); }
+lmrestore() { git -C "$lm_dir" checkout -q -- "$1"; }
+# The Land SECTION alone, rewritten in place. A file-wide edit would also move the Close section,
+# which names `--prepare` too, so an arm made that way could not tell the two apart.
+lmland() { # python-expression-free: awk over the section boundaries
+  LMREPL="$1" awk -v mode="$2" '
+    $0 == "## Land" { inl = 1; print; next }
+    inl && /^## / { inl = 0 }
+    inl && mode == "empty" { next }
+    inl && mode == "sub" { gsub(ENVIRON["LMFROM"], ENVIRON["LMREPL"]) }
+    { print }
+    END { }' "$lm_dir/tools/unattended/SKILL.template.md" > "$lm_dir/.land.tmp" \
+    && mv "$lm_dir/.land.tmp" "$lm_dir/tools/unattended/SKILL.template.md"
+}
+
+# ---- GREEN CONTROLS: the shipped Land section passes, and both announcements are on the DEFAULT
+# ---- channel, because a reader of a green bar is owed the landing shape and the declared surface.
+out=$(lmrun)
+miss "$out" "check 34 FAILED"
+hit  "$out" "LANDER_MODE in-place (declared)"
+hit  "$out" "SELFTESTS_OWED_PATHS entry tools/ — resolves to tracked paths"
+
+# ---- 34: the Land section without `--prepare`, and without `--land`. Two arms, because a section
+# ---- missing either one sends an agent to a landing it cannot complete and the messages differ.
+LMFROM="--prepare" lmland "--ready" sub
+out=$(lmrun)
+hit "$out" "the Skill's Land section names neither landing shape in full - an in-place landing prepares the merge and then pushes exactly it, and a section missing either verb sends an agent to a landing it cannot complete"
+lmrestore tools/unattended/SKILL.template.md
+LMFROM="--land" lmland "--ship" sub
+out=$(lmrun)
+hit "$out" "and a section missing either verb sends an agent to a landing it cannot complete"
+lmrestore tools/unattended/SKILL.template.md
+
+# ---- 34: the primary path's fallback text surviving into the Land section. It is wrong twice over
+# ---- under `in-place`: that ref is one the session can move, and it carries whatever else on the
+# ---- node is unpushed.
+printf '\nIf the push fails, merge the branch into local main and land from the primary tree.\n' \
+  >> "$lm_dir/tools/unattended/SKILL.template.md"
+out=$(lmrun)
+hit "$out" "the Skill's Land section directs a merge into the node's own default branch, which is a ref this session can move and which carries whatever else here is unpushed, so the landing it describes is not the one the bar graded"
+lmrestore tools/unattended/SKILL.template.md
+
+# ---- 34: an EMPTY section. Without this arm the two above would pass over nothing the day the
+# ---- section is renamed, which is this leg's own could-not-fail shape one level up.
+lmland "" empty
+out=$(lmrun)
+hit "$out" "the Skill template carries no Land section body, so every assertion about the landing an agent is told to perform would be graded over nothing and would pass by finding nothing"
+lmrestore tools/unattended/SKILL.template.md
+
+# ---- 35: a declared mode outside the DRIVER's own closed set. Every run in such a project refuses
+# ---- at conf load, so the bar must say so rather than leave it to the next invocation.
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="inplace"/' "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "LANDER_MODE is declared outside the driver's closed set, so every run in this project refuses at conf load and no landing is reachable at all, declared"
+lmrestore .unattended.conf
+
+# ---- 35: a declared self-test prefix that matches no tracked path reads as coverage of a surface
+# ---- that is not there. A BLANK key is not a fault and is announced instead.
+sed -i 's|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS="tools/ nosuchdir/"|' "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed"
+lmrestore .unattended.conf
+sed -i 's|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=""|' "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit  "$out" "SELFTESTS_OWED_PATHS is blank — no landing range in this project can ever be told the kit Definition of Done owes the flagged bar"
+miss "$out" "check 35 FAILED"
+lmrestore .unattended.conf
+
+# ---- 35: the DRIVER's marker removed. The closed set is read off the driver's own line rather than
+# ---- retyped here, so a marker that stops resolving must REFUSE: a set read as empty would make
+# ---- every declared value, including a misspelling, read as legal.
+sed -i '/gov:lander-mode-set/d' "$lm_dir/tools/unattended/unattended.sh"
+out=$(lmrun)
+hit "$out" "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal"
+lmrestore tools/unattended/unattended.sh
+
+rm -rf "$lm_dir"
+
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
