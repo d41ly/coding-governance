@@ -2017,6 +2017,62 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] a row DEPL-cMendedVintage-17 withdrew does not read here as a missing block",
               "REMOVED" not in pc.stdout and "attributes blocks:" not in pc.stdout, pc.stdout)
 
+        # ===== DEPL-cMendedVintage-29 — THE MINT KEYS ON THE BLOCK, NOT ON THE DECLARATION =====
+        # `adopt` measures what a target HOLDS. A declared `lf_pin` is gov's claim; the marked
+        # region is the target's, and the mint used to key on the first of those — so an adopter
+        # with no region got a row hashing gov's RECOMPUTED block, a receipt claiming a region that
+        # was never in that repository. Once `-11` above graded that row, the same target reported
+        # REMOVED about a block it never had.
+        #
+        # THE RED WAS OBSERVED on the pre-change engine, on two scratch adopters rather than
+        # reasoned about: one whose attributes file carried only its own rules reported the block
+        # REMOVED, and one with no such file at all reported it GONE. Both are the same minted row.
+        #
+        # BOTH DIRECTIONS, ONE FIXTURE, and neither arm alone is worth anything: a verb that never
+        # mints the row passes the ABSENT arms, and one that always mints it passes the PRESENT
+        # arms. The fixture is re-adopted twice, with gov's region removed in between.
+        g29 = build_graded_target("u29a")
+        git(g29, "add", "-A"); git(g29, "commit", "-qm", "the install, so adopt's index is clean")
+        _ga29 = g29 / ".gitattributes"
+        check("[-29] LIVENESS the fixture really holds gov's marker pair, or the PRESENT arms "
+              "below grade an absence and pass by finding nothing",
+              _o11 in _ga29.read_text(encoding="utf-8").split(NLp),
+              _ga29.read_text(encoding="utf-8"))
+        _p29 = run("adopt", "--target", str(g29), "--re-adopt", "--write")
+        _r29 = json.loads((g29 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-29] PRESENT: a block the target HOLDS still gets its receipt row",
+              _p29.returncode == 0
+              and any(f.get("role") == "attributes" for f in _r29["files"]),
+              (_p29.stdout + _p29.stderr)[-700:])
+        pc = run("check", "--target", str(g29))
+        check("[-29] PRESENT ...and `-11` grades that row INTACT, so the row minted here is the "
+              "block that is really on disk",
+              "attributes blocks: 1/1 intact" in pc.stdout, pc.stdout)
+
+        # GOV'S REGION REMOVED and a rule of the adopter's OWN left in its place, which is the shape
+        # the ruling was measured on. An emptied file would grade a degenerate case instead.
+        _l29 = _ga29.read_text(encoding="utf-8").split(NLp)
+        _i29, _j29 = _l29.index(_o11), _l29.index(_c11)
+        _ga29.write_text(NLp.join(_l29[:_i29] + ["*.md text eol=lf"] + _l29[_j29 + 1:]),
+                         encoding="utf-8", newline=NLp)
+        git(g29, "add", "-A"); git(g29, "commit", "-qm", "an adopter with no gov pin region")
+        check("[-29] LIVENESS gov's region really left the file and the FILE did not, or the arms "
+              "below grade the wrong absence",
+              _ga29.is_file() and _o11 not in _ga29.read_text(encoding="utf-8").split(NLp),
+              _ga29.read_text(encoding="utf-8"))
+        _p29b = run("adopt", "--target", str(g29), "--re-adopt", "--write")
+        _r29b = json.loads((g29 / ".governance" / "install.json").read_text(encoding="utf-8"))
+        check("[-29] ABSENT: no block on disk, no row in the receipt",
+              _p29b.returncode == 0
+              and not any(f.get("role") == "attributes" for f in _r29b["files"]),
+              str(sorted({f.get("role") for f in _r29b["files"]})))
+        check("[-29] ABSENT ...and the verb SAYS it minted none, rather than going quiet about a "
+              "pin its own selection declares",
+              "NO attributes row" in _p29b.stdout, (_p29b.stdout + _p29b.stderr)[-700:])
+        pc = run("check", "--target", str(g29))
+        check("[-29] ABSENT ...so `check` no longer reports REMOVED a block that was never there",
+              "REMOVED" not in pc.stdout and "attributes blocks:" not in pc.stdout, pc.stdout)
+
         # ===== DEPL-cMendedVintage-23, the receipt path GRADED before it reaches the root =====
         # The `attributes` row's `path` is joined onto the target root and WRITTEN, and it comes off
         # a committed, hand-editable, text-merged file in a repository gov does not own. With `..`
@@ -10066,11 +10122,26 @@ user_skills = "/tmp/gk-fake-skills"
         _BLOCK = "# demo:block\nechodemo\n# /demo:block\n"
         _W1s = dict(_W1, **{"seed-one.py": "seed-v1\n", "block.txt": _BLOCK})
         _g11, _sh11 = a13_gov("s11", [_W1s, _W2], a13_kit(_S11_EXTRA))
+        # DEPL-cMendedVintage-29 MOVED THIS ONE LINE, and only this one. The fixture used to hold a
+        # `.gitattributes` carrying the target's OWN rule and no gov region, and the row AC13 grades
+        # was minted anyway because the mint keyed on the DECLARATION. It keys on the block now, so
+        # a target with no region has no row and AC13 would have nothing to grade — a criterion
+        # passing over an absence. The region is rendered by the engine's own `lf_pin_block` rather
+        # than spelled here, for the reason the paragraph above gives about the marker pair: a
+        # hand-written block reads as the feature not working when it is the fixture that never
+        # triggered it. `apply` would have left exactly these bytes.
+        _GK11 = govkit_module()
+        _, _, _GA11 = _GK11.lf_pin_block([("*.sh", "demo", "")])
         _t11 = a13_target("s11", "scripts", {
             "scripts/demo/verbatim-one.py": b"v1\n",
             "scripts/demo/seed-one.py": b"the target rewrote its own seed entirely\n",
             "hooks/pre-commit": b"#!/bin/sh\n# demo:block\nechodemo\n# /demo:block\n",
-            ".gitattributes": b"*.sh text eol=lf\n"})
+            ".gitattributes": (_GA11 + "\n").encode("utf-8")})
+        check("[-13] AC13 LIVENESS the fixture's attributes file really carries gov's marker pair, "
+              "or the row arms below grade an absence and pass by finding nothing",
+              _GK11.find_block((_t11 / ".gitattributes").read_text(encoding="utf-8"),
+                               *_GK11.marker_pair("hash-comment", _GK11.GA_BLOCK_ID)) is not None,
+              (_t11 / ".gitattributes").read_text(encoding="utf-8"))
         _p11 = run_in_gov(_g11, "adopt", "--target", str(_t11), "--write")
         check("[-13] AC13 adopt exits 0 over a descriptor declaring an lf_pin and a merged rule",
               _p11.returncode == 0, _p11.stdout + _p11.stderr)

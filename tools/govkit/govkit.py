@@ -9730,23 +9730,43 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # ---- or `oid`: both are measured from the target's own bytes rather than attributed to a gov
     # ---- vintage, and `merged`'s exemption from `-7` S9's integrity preamble is by ROLE, which
     # ---- this row inherits by being the same row `apply` writes.
+    # ---- DEPL-cMendedVintage-29. THE MINT IS GATED ON THE BLOCK BEING THERE, not on a pin being
+    # ---- declared. A declaration is gov's; the block is the TARGET's, and this verb measures the
+    # ---- target. The row used to be minted either way and hashed gov's RECOMPUTED block when the
+    # ---- target held none — a receipt claiming a region that was never in that repository. `-11`
+    # ---- then taught `check` to grade this row, so the same target reported `REMOVED` truthfully
+    # ---- about a block it never had, and the ruling narrows the mint rather than softening that
+    # ---- red. MEASURED on a scratch target both ways: an adopter whose `.gitattributes` carries
+    # ---- only its own rules, and one with no such file at all, which reports the file GONE.
+    # ----
+    # ---- WHAT IT GIVES UP, stated rather than discovered later: `update`'s pins arm dispatches off
+    # ---- this row, so a target adopted without a block gets one from `apply` and from nothing
+    # ---- else. That is the division the two verbs already have — `adopt` records an install and
+    # ---- `apply` performs one — and a verb that writes no byte into the working tree cannot be the
+    # ---- one that decides a block belongs there.
     pins_declared = lf_pins(descs, selection, lambda e, dd: target_context(target, deploy, e, dd))
     if pins_declared:
-        _om, _cm, _text = lf_pin_block(pins_declared)
+        _om, _cm, _ = lf_pin_block(pins_declared)
         _ga = target / ".gitattributes"
         _cur = _ga.read_text(encoding="utf-8", errors="replace") if _ga.is_file() else ""
         _span = find_block(_cur, _om, _cm)
         _held = "\n".join(_cur.split("\n")[_span[0]:_span[1] + 1]) if _span else None
-        rows.append({"path": ".gitattributes", "role": "attributes", "kit": "(govkit)",
-                     "version": "(synthesized)", "block_id": GA_BLOCK_ID,
-                     "marker_style": "hash-comment", "mode": "append", "normalized": "lf",
-                     # The block the TARGET holds where it holds one, so `update`'s pins arm
-                     # compares against what is really there; gov's recomputed block otherwise,
-                     # which is the honest reading of a target that never had one.
-                     "block_sha256": hashlib.sha256(
-                         (_held if _held is not None else _text).encode("utf-8")).hexdigest(),
-                     "patterns": [p for p, _c, _w in pins_declared], "written": False})
-        tally["attributes"] = tally.get("attributes", 0) + 1
+        if _held is None:
+            # ANNOUNCED. A mint that silently does not happen is indistinguishable from one that
+            # did, and the operator whose kits declare pins is the one who needs to hear that this
+            # target has none of them recorded.
+            print(f"govkit adopt — NO attributes row: {len(pins_declared)} lf_pin(s) are declared "
+                  f"and gov's marker pair is not in this target's .gitattributes, so there is no "
+                  f"block here to record. `apply` is the verb that writes one")
+        else:
+            rows.append({"path": ".gitattributes", "role": "attributes", "kit": "(govkit)",
+                         "version": "(synthesized)", "block_id": GA_BLOCK_ID,
+                         "marker_style": "hash-comment", "mode": "append", "normalized": "lf",
+                         # The block the TARGET holds, which is the only block this row is ever
+                         # about, so `update`'s pins arm compares against what is really there.
+                         "block_sha256": hashlib.sha256(_held.encode("utf-8")).hexdigest(),
+                         "patterns": [p for p, _c, _w in pins_declared], "written": False})
+            tally["attributes"] = tally.get("attributes", 0) + 1
 
     for eid, vers, d, rule in merged_rules:
         ctx = target_context(target, deploy, eid, d)
