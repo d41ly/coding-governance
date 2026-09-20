@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30
+unpushed-at-landing: 0
 parked-surfaced: yes — 8 parked decisions, every one carried into the wrap-up the owner reads
 keepalive-reaped: yes — CronDelete cancelled f0857e3d, the replacement this session scheduled on 2026-09-16 after the recorded id 577b05c7 was found already gone (CronList empty, CronDelete answered no such job). Both are reaped
-witness: 9a3dce4e
-phase: LANDING
+witness: 762d060f65b7681ba5619688acf96716185979a7
+phase: LANDED
 branch-sha: a4007553c89f244136b3783b3a0b1bd3223f25ab
 branch-ref: refs/heads/branch/unattended-build-transparency-ea83a5
 mode: prompt

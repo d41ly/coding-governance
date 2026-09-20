@@ -9,30 +9,30 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - run-state: memory/builds/dLoggedFlight/RUN.md
 - run: 1 of 1
 - start: 2f11f32dbfd9feb92daef3226d10d8b248e46f25
-- phase: LANDING
-- terminal: no
-- window: 2026-09-13T11:05:47Z to 2026-09-20T21:27:54Z
+- phase: LANDED
+- terminal: yes
+- window: 2026-09-13T11:05:47Z to 2026-09-20T21:31:28Z
 - window opened by: git
-- window closed by: last-activity
-- duration: 642127s
+- window closed by: terminal-pending
+- duration: 642341s
 - own commits: 92
 - last own commit: 09e75cefce6f1d79722e5f039fa404c053049c28
-- merged: no
+- merged: yes
 - units served: 26
 - sources present: 4 of 7
 - owner turns: launch 1 · pre-run 1 · in-window 6 · post-close 0
-- usage main: requests 639 · in 1342 · out 849013 · cache-read 321613326 · cache-write 7583660
-- usage agent: requests 367 · in 734 · out 279340 · cache-read 112646783 · cache-write 794452
+- usage main: requests 666 · in 1396 · out 866033 · cache-read 337900365 · cache-write 7618656
+- usage agent: requests 440 · in 880 · out 358196 · cache-read 124261451 · cache-write 1040171
 - usage workflow: requests 9643 · in 19286 · out 11621801 · cache-read 2392090163 · cache-write 43812336
-- attributed calls: 8898 of 12183
+- attributed calls: 8995 of 12280
 - values withheld: 0
-- commitment: sha256 bbb7c3282663f60a3fdb888a88bdcfda26430e3b50919d088a19fe121ea5076f · lines 253
+- commitment: sha256 898b00f1b44f26772a1e1bf9d8cc3506e2cd930c9e0cdd55fc646637144a06ae · lines 262
 
 ## Timeline
 
-- events: 163 · shown 60 · elided 103
-- elided: 103 events from 2026-09-13T20:46:46Z to 2026-09-20T12:52:35Z
-- withheld rows: verb 123 · push - · push-refused - · gate 7 · compact 2 · limit 103 · idle 2 · workflow 44
+- events: 166 · shown 60 · elided 106
+- elided: 106 events from 2026-09-13T20:46:46Z to 2026-09-20T13:04:21Z
+- withheld rows: verb 124 · push 1 · push-refused 0 · gate 12 · compact 2 · limit 103 · idle 2 · workflow 44
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -69,9 +69,6 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
-| 2026-09-20T12:54:50Z | git | commit | af725942ea17 | - | - | TOOL-dLoggedFlight-22 |
-| 2026-09-20T13:04:16Z | run-state | dispatch | TOOL-dLoggedFlight-27 | - | - | - |
-| 2026-09-20T13:04:21Z | run-state | brief | TOOL-dLoggedFlight-27 | - | - | - |
 | 2026-09-20T13:15:48Z | git | commit | 6588fee2b1cd | - | - | TOOL-dLoggedFlight-27 |
 | 2026-09-20T13:19:52Z | git | commit | 717656323142 | - | - | TOOL-dLoggedFlight-27 |
 | 2026-09-20T13:20:57Z | git | commit | 1cb1960f27f4 | - | - | TOOL-dLoggedFlight-27 |
@@ -99,6 +96,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 2026-09-20T15:24:09Z | git | commit | 2db0cb093fc9 | - | - | TOOL-dLoggedFlight-30 |
 | 2026-09-20T15:28:21Z | git | commit | 09e75cefce6f | - | - | TOOL-dLoggedFlight-30 |
 | 2026-09-20T16:14:27Z | run-state | phase | 5d472fdd | VERIFYING | - | - |
+| 2026-09-20T21:31:28Z | run-state | phase | 9a3dce4e | LANDING | - | - |
+| 2026-09-20T21:50:43Z | git | merge | 3c4aa3e6000a | - | - | - |
+| 2026-09-20T22:03:16Z | git | merge | 762d060f65b7 | - | - | - |
 
 ## Units
 
@@ -159,14 +159,14 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ## Anomalies
 
-- anomalies: 25 · shown 0 · aggregated yes
+- anomalies: 26 · shown 0 · aggregated yes
 
 | # | kind | subclass | count |
 |---|---|---|---|
 | 1 | out-of-band-edit | - | 1 |
 | 2 | refusal-loop | - | 2 |
 | 3 | red-behind-zero | - | 4 |
-| 4 | destructive-git | - | 16 |
+| 4 | destructive-git | - | 17 |
 | 5 | idle-gap | - | 2 |
 
 ## Coverage
@@ -175,14 +175,14 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - unjoined starts: 0
 - sessions: 1 named · 1 extracted
 - idle gaps: judged yes · near an owner turn 2
-- anomaly kinds: judged 11 of 12
+- anomaly kinds: judged 12 of 12
 
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | partial | 246 | 0 |
-| 3 | gates | partial | 7 | 0 |
-| 4 | pushes | absent | 0 | 0 |
+| 2 | driver | partial | 248 | 0 |
+| 3 | gates | partial | 12 | 0 |
+| 4 | pushes | partial | 1 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -191,8 +191,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/dLoggedFlight/RUN.md","run":"1 of 1","start":"2f11f32dbfd9feb92daef3226d10d8b248e46f25","phase":"LANDING","terminal":"no","window":"2026-09-13T11:05:47Z to 2026-09-20T21:27:54Z","window opened by":"git","window closed by":"last-activity","duration":"642127s","own commits":"92","last own commit":"09e75cefce6f1d79722e5f039fa404c053049c28","merged":"no","units served":"26","sources present":"4 of 7","owner turns":"launch 1 · pre-run 1 · in-window 6 · post-close 0","usage main":"requests 639 · in 1342 · out 849013 · cache-read 321613326 · cache-write 7583660","usage agent":"requests 367 · in 734 · out 279340 · cache-read 112646783 · cache-write 794452","usage workflow":"requests 9643 · in 19286 · out 11621801 · cache-read 2392090163 · cache-write 43812336","attributed calls":"8898 of 12183","values withheld":"0","commitment":"sha256 bbb7c3282663f60a3fdb888a88bdcfda26430e3b50919d088a19fe121ea5076f · lines 253"},"tables":[]},
-"Timeline":{"facts":{"events":"163 · shown 60 · elided 103","elided":"103 events from 2026-09-13T20:46:46Z to 2026-09-20T12:52:35Z","withheld rows":"verb 123 · push - · push-refused - · gate 7 · compact 2 · limit 103 · idle 2 · workflow 44"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/dLoggedFlight/RUN.md","run":"1 of 1","start":"2f11f32dbfd9feb92daef3226d10d8b248e46f25","phase":"LANDED","terminal":"yes","window":"2026-09-13T11:05:47Z to 2026-09-20T21:31:28Z","window opened by":"git","window closed by":"terminal-pending","duration":"642341s","own commits":"92","last own commit":"09e75cefce6f1d79722e5f039fa404c053049c28","merged":"yes","units served":"26","sources present":"4 of 7","owner turns":"launch 1 · pre-run 1 · in-window 6 · post-close 0","usage main":"requests 666 · in 1396 · out 866033 · cache-read 337900365 · cache-write 7618656","usage agent":"requests 440 · in 880 · out 358196 · cache-read 124261451 · cache-write 1040171","usage workflow":"requests 9643 · in 19286 · out 11621801 · cache-read 2392090163 · cache-write 43812336","attributed calls":"8995 of 12280","values withheld":"0","commitment":"sha256 898b00f1b44f26772a1e1bf9d8cc3506e2cd930c9e0cdd55fc646637144a06ae · lines 262"},"tables":[]},
+"Timeline":{"facts":{"events":"166 · shown 60 · elided 106","elided":"106 events from 2026-09-13T20:46:46Z to 2026-09-20T13:04:21Z","withheld rows":"verb 124 · push 1 · push-refused 0 · gate 12 · compact 2 · limit 103 · idle 2 · workflow 44"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-09-13T11:05:47Z","run-state","phase","a4007553c89f","RUNNING","-","-"],
 ["2026-09-13T11:58:19Z","git","commit","1dd6f3da2c12","-","-","TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9"],
 ["2026-09-13T11:58:19Z","run-state","phase","2f11f32dbfd9","SPECCING","-","-"],
@@ -224,9 +224,6 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-09-13T20:25:00Z","git","commit","78d97a4824c4","-","-","TOOL-dLoggedFlight-3"],
 ["2026-09-13T20:46:42Z","run-state","dispatch","TOOL-dLoggedFlight-4","-","-","-"]]},
 {"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
-["2026-09-20T12:54:50Z","git","commit","af725942ea17","-","-","TOOL-dLoggedFlight-22"],
-["2026-09-20T13:04:16Z","run-state","dispatch","TOOL-dLoggedFlight-27","-","-","-"],
-["2026-09-20T13:04:21Z","run-state","brief","TOOL-dLoggedFlight-27","-","-","-"],
 ["2026-09-20T13:15:48Z","git","commit","6588fee2b1cd","-","-","TOOL-dLoggedFlight-27"],
 ["2026-09-20T13:19:52Z","git","commit","717656323142","-","-","TOOL-dLoggedFlight-27"],
 ["2026-09-20T13:20:57Z","git","commit","1cb1960f27f4","-","-","TOOL-dLoggedFlight-27"],
@@ -253,7 +250,10 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["2026-09-20T15:20:00Z","git","commit","fbfd04675674","-","-","TOOL-dLoggedFlight-30"],
 ["2026-09-20T15:24:09Z","git","commit","2db0cb093fc9","-","-","TOOL-dLoggedFlight-30"],
 ["2026-09-20T15:28:21Z","git","commit","09e75cefce6f","-","-","TOOL-dLoggedFlight-30"],
-["2026-09-20T16:14:27Z","run-state","phase","5d472fdd","VERIFYING","-","-"]]}]},
+["2026-09-20T16:14:27Z","run-state","phase","5d472fdd","VERIFYING","-","-"],
+["2026-09-20T21:31:28Z","run-state","phase","9a3dce4e","LANDING","-","-"],
+["2026-09-20T21:50:43Z","git","merge","3c4aa3e6000a","-","-","-"],
+["2026-09-20T22:03:16Z","git","merge","762d060f65b7","-","-","-"]]}]},
 "Units":{"facts":{"units":"30 · shown 0 · aggregated yes"},"tables":[{"name":"by-status","header":["#","status","units"],"rows":[
 ["1","CLOSED","26"],
 ["2","WONTDO","4"]]}]},
@@ -286,17 +286,17 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["3","green-at-close","MET","1"],
 ["4","keepalive-reaped","MET","1"],
 ["5","review-exited","UNMET","1"]]}]},
-"Anomalies":{"facts":{"anomalies":"25 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
+"Anomalies":{"facts":{"anomalies":"26 · shown 0 · aggregated yes"},"tables":[{"name":"by-kind","header":["#","kind","subclass","count"],"rows":[
 ["1","out-of-band-edit","-","1"],
 ["2","refusal-loop","-","2"],
 ["3","red-behind-zero","-","4"],
-["4","destructive-git","-","16"],
+["4","destructive-git","-","17"],
 ["5","idle-gap","-","2"]]}]},
-"Coverage":{"facts":{"journal starts":"0 joined of 0 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 2","anomaly kinds":"judged 11 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
+"Coverage":{"facts":{"journal starts":"0 joined of 0 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 2","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","partial","246","0"],
-["3","gates","partial","7","0"],
-["4","pushes","absent","0","0"],
+["2","driver","partial","248","0"],
+["3","gates","partial","12","0"],
+["4","pushes","partial","1","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}
