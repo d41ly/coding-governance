@@ -672,9 +672,12 @@ pair, and recorded in the unit's journal. No gate can make it.
   - **The §8 citations moved.** `RECALL_CLI` and `MAP_CLI` are at `PROTOCOL.template.md:480` and
     `:481`, not 482 and 483; S10 names the passages by their opening words, which is what carried.
   - **S12's row cannot be DECLARED.** `--dispatch` refuses a write set overlapping `SHARED_RECORDS`,
-    which this project declares as `memory/DECISIONS.md` and the backlog. The row therefore lands in
-    its own commit whose subject names no unit, which is this repo's standing shape for the shared
-    records a build owes, and the unit's own commit declares what it declared.
+    which this project declares as `memory/DECISIONS.md` and the backlog. The row landed in the
+    unit's own build commit anyway, UNDECLARED, together with `memory/project/unarmed-branches.txt`,
+    which was simply forgotten in the declaration. Check 23 joins a pass commit's paths against its
+    declaration and names both; it is a REPORT and not a refusal, so the bar is unaffected and this
+    line is the record of what the report will say. Corrected here after the fact: an earlier
+    revision of this bullet said the row would land in a commit of its own, and it did not.
   - **Gov declares all five keys, not three.** S11 names the switch and the carrier pair; the two
     bounds are declared beside them because `read_bound_key` announces a defaulted bound on stderr
     on EVERY driver invocation, and three NOTE lines per verb is noise the other bounds already
