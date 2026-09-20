@@ -194,3 +194,7 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-20T13:59:40Z dispatch · item 849fb869 TOOL-dLoggedFlight-23 · reason tools/runlog/selftest.py tools/runlog/README.md tools/run-gates/selftest-budgets.txt memory/map/features/runlog.md memory/map/generated memory/guides/SESSION-KICKOFF.md memory/builds/dLoggedFlight/spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md memory/builds/dLoggedFlight/build/2026-09-20-build-TOOL-dLoggedFlight-23-1-acceptance-ledger.md memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-20T13:59:46Z brief · item TOOL-dLoggedFlight-23 · reason bc056276b5bf memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md
+
+2026-09-20T14:30:10Z dispatch · item f04bf57c TOOL-dLoggedFlight-28 · reason tools/runlog/selftest.py tools/runlog/README.md tools/run-gates/selftest-budgets.txt memory/map/generated memory/builds/dLoggedFlight/spec/2026-09-20-spec-TOOL-dLoggedFlight-28.md memory/builds/dLoggedFlight/build/2026-09-20-build-TOOL-dLoggedFlight-28-1-acceptance-ledger.md memory/builds/dLoggedFlight/README.md memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md memory/LIVE.md memory/ledger/2026-09.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-20T14:30:15Z brief · item TOOL-dLoggedFlight-28 · reason bc056276b5bf memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md

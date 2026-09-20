@@ -1,11 +1,12 @@
 # TOOL-dLoggedFlight-28 — every expectation the record arms derive from a shared fixture builder is re-checked against a render with one kind of event removed
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 29
+**Status:** CLOSED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-20-build-TOOL-dLoggedFlight-28-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-dLoggedFlight-28-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
 
 <!-- /gen:spec-records -->
@@ -43,8 +44,14 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 - **S2** The swept set and its liveness. The arm derives the swept set from the model's own timeline,
   never from a typed list or a retirement constant, and prints each swept kind beside the number of
   events it removed. Three liveness assertions, because a sweep that removes nothing reads exactly
-  like a sweep that found nothing wrong: the swept set is not empty, every swept kind removed at
-  least one event, and every copy's render differs from the base render. Observed by AC1 and AC2.
+  like a sweep that found nothing wrong: the timeline holds more than one kind; the removals PARTITION
+  it, each swept kind taking at least one event and the counts summing to its length with the base
+  model left as it was; and every kind the base render shows a Timeline row for moves the rendered
+  bytes when it is swept. The third read "every copy's render differs from the base render" until
+  rev-2 measured otherwise. An `owner` event is dropped before a row is built and is counted in no
+  fact (`tools/runlog/record.py:795`), so removing that kind is invisible to the render BY
+  CONSTRUCTION, and an assertion over every copy would have reddened on the one kind the renderer is
+  designed to ignore. Observed by AC1 and AC2.
 - **S3** The wide model. The same sweep runs over `build_big_model`'s model at the nominal bounds,
   where the expectations are `TOOL-dLoggedFlight-26` S6's derived `events`, `shown` and `elided`
   counts. The widest record's overflow liveness is exempt, exactly as `TOOL-dLoggedFlight-26` AC3
@@ -101,6 +108,8 @@ whether the derivation actually tracks its input, which no reading of the source
 |---|---|---|
 | `test_record_kind_sweep` | function | `py.function`, led by `test` |
 | `build_kind_removed` | function | `py.function`, led by `build` |
+| `read_sweep_expectations` | function | `py.function`, led by `read` |
+| `measure_killed` | function | `py.function`, led by `measure` |
 
 ### Files touched (estimate)
 
@@ -128,7 +137,9 @@ whether the derivation actually tracks its input, which no reading of the source
   set reds rather than passing silently.
 - observability — each failure names the swept kind, the expectation and both values.
 - risks — a swept kind no expectation reads passes for that kind and says nothing; S2's
-  render-differs assertion is what keeps such a pass from reading as coverage.
+  render-differs assertion, over the kinds the base render shows a row for, is what keeps such a pass
+  from reading as coverage, and the partition assertion beside it is what keeps a sweep over one kind
+  from reading as a sweep.
 - testing — AC1 and AC3 staged RED on arm copies that type an expectation, AC2 on a
   `build_kind_removed` copy that returns the model unchanged.
 - migration — N/A — test code only.
@@ -143,11 +154,14 @@ whether the derivation actually tracks its input, which no reading of the source
   empty. Staged RED by an arm copy that types the `values withheld` count at the base render's value,
   which must fail on the first swept kind carrying an intruder while the base render still passes.
   figure: DERIVED — the swept set and every expectation are read from the model at observation time.
-- **AC2** — When the arm sweeps, each copy's rendered document differs from the base render, each
-  swept kind removed at least one event, and `build_kind_removed` is called once per swept kind.
-  Red when: a copy renders byte-identically to the base, a swept kind removed nothing, or the
-  printed removal counts sum to zero. Staged RED by a `build_kind_removed` copy that returns the
-  model unchanged, which must red on the first kind rather than passing every expectation.
+- **AC2** — When the arm sweeps, every kind the base render shows a Timeline row for renders a
+  document differing from the base, each swept kind removed at least one event, the removal counts
+  sum to the timeline's length with the base model unmoved, and `build_kind_removed` is called once
+  per swept kind.
+  Red when: a rendered kind's copy renders byte-identically to the base, a swept kind removed
+  nothing, the counts do not sum to the timeline's length, or the base model moved under the sweep.
+  Staged RED by a `build_kind_removed` copy that returns the model unchanged, which reds on all four
+  at once rather than passing every expectation.
 - **AC3** — When the sweep runs over `build_big_model`'s model at the nominal bounds, the `events`,
   `shown` and `elided` expectations `TOOL-dLoggedFlight-26` S6 derives match each copy's render.
   Red when: one of the three fails on a copy, or the arm types any of them. The widest record's
@@ -179,6 +193,15 @@ New arm: `tools/runlog/selftest.py` · AC1's and AC3's arm copies that type an e
 - rev-1 · 2026-09-20 · initial draft, promoted from B1 of the spec audit of units 25 to 27, round 1,
   at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-26` S7's observation and its AC3, which
   that unit now owes to this arm at the post-build suite run.
+- rev-2 · 2026-09-20 · the build pass. S2's and AC2's third liveness narrowed from EVERY copy to the
+  kinds the base render shows a row for, because the assertion as written could not pass: a probe
+  over a synthetic model of the class model's shape, run against the kit's real renderer, measured an
+  `owner` kind's removal leaving the rendered bytes byte-identical, since that kind is dropped before
+  a row is built and counted in no fact. A retired kind's removal does move them, through the
+  `withheld rows` fact, so the sweep still subsumes the retirement case the audit asked for. The two
+  readers the arm needs, `read_sweep_expectations` and `measure_killed`, join the inventory in the
+  same bump; the second derives what the `values withheld` count must fall by from the builder's own
+  `read_placed` list rather than from a kind-to-placement map typed beside the sweep.
 
 ## 10. Reuse audit
 

@@ -643,6 +643,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_kind_removed",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_kit_copy",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -3258,6 +3263,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "measure_killed",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "measure_orphans",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -4226,6 +4236,11 @@
       "id": "read_surface_disagreements",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_sweep_expectations",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "read_text",
@@ -6964,6 +6979,11 @@
     },
     {
       "id": "test_record_copied_sets",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_kind_sweep",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

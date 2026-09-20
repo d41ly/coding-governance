@@ -357,14 +357,17 @@ It asserts that every slot `scan_time_slots` returns rendered a token, so a slot
 reached reds by name instead of passing with nothing to grade, and that no other shaped class
 matches a public time's rendered form or a difference of two.
 
-**One self-test arm reads the whole population back.** It renders a fixture whose every journal-
-and transcript-timed value carries a second no public source shows, and grades every token of a
-`time_classes` class against the commit and run-state times read off that fixture, every sum of a
-rendered time and a rendered duration against those seconds, and each of the three encodings one
-of them can take — its ISO form, its epoch second and its clock time — whatever class carries it.
-It asserts that every slot `scan_time_slots` returns rendered a token, so a slot the fixture never
-reached reds by name instead of passing with nothing to grade, and that no other shaped class
-matches a public time's rendered form or a difference of two.
+**One self-test arm mutates what the two shared fixture builders placed.** It renders each of their
+models once as a base, then once more per kind of event that model's timeline holds, with every event
+of that kind removed, and re-checks each expectation the record arms derive against the copy's own
+render. What it proves is that no expectation over those two builders is a typed literal: a derived
+one follows the copy, a typed one reds on the first swept kind carrying its carrier. What it does not
+prove is anything about any other fixture here, and it grades no derivation's correctness — only that
+each still tracks its input. Its swept set is the timeline's own kinds and never a retirement
+constant, since the retired kinds are dropped before a row is built and a sweep over those alone
+would remove nothing. A kind the renderer writes no row for and counts in no fact leaves the rendered
+bytes identical, so the liveness that a removal reached the render is asserted over the kinds a row
+is written for, and the partition of the timeline over all of them.
 
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
 duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under

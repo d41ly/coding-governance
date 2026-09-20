@@ -184,7 +184,17 @@ from collections import Counter  # noqa: E402
 # liveness; and the closing check that the staging left the live schema as it was. Its decoy
 # checks move it by 3, and the seven helpers it arrives with carry none.
 # 26 + 3 = 29
-ASSERTION_FLOOR = 1451
+# RAISED 1451 -> 1463 by TOOL-dLoggedFlight-28, the mutation sweep: ONE new arm with 9 checks — the
+# unmutated model's own render against every expectation derived from it; the expectations over every
+# copy of the class model with one kind of event removed, one copy per swept kind; the shaped values
+# re-derived from each copy's own carrier event; the copies deriving none held to the kinds that
+# swept a carrier; and three livenesses, that more than one kind was swept and each took an event,
+# that the removals partition the timeline and leave the base model unmoved, and that every kind the
+# base render writes a row for moves the rendered bytes when it goes. Then the same sweep over the
+# wide model, whose elided `events` fact and own liveness are the last two. Its decoy checks move it
+# by 3, and the three helpers it arrives with carry none.
+# 9 + 3 = 12
+ASSERTION_FLOOR = 1463
 
 PASS = []
 FAIL = []
@@ -4714,6 +4724,166 @@ def test_record_ac6_cap():
                re.fullmatch(rf"{measure_timeline_events(wide)} · shown ([0-9]+) · elided [0-9]+",
                             shown) is not None
                and int(shown.split("shown ")[1].split(" ")[0]) < 2 * edge, shown)
+
+
+def build_kind_removed(m, kind):
+    """`m` with every timeline event of `kind` dropped, and nothing else touched.
+
+    The copy is built through the path the base render reads — the model's own events, one kind short
+    — and never by editing a fact a render already wrote. The input model is left as it was, so a
+    sweep's copies are independent of one another and of the order they were built in.
+    """
+    out = dict(m)
+    out["timeline"] = [e for e in m.get("timeline") or [] if e.get("kind") != kind]
+    return out
+
+
+def measure_killed(timeline, kind, fields, values):
+    """How many of the intruders a builder placed on a field the renderer READS ride events of `kind`:
+    what the `values withheld` count must fall by when that kind is swept.
+
+    `fields` are the field names the builder's own `read_placed` list names and `values` its
+    intruders, so the answer is derived from what the builder recorded rather than from a map of kind
+    to placement typed beside the sweep. A placement on a table rather than on a timeline row is
+    reachable by no removal here and counts zero, which is why this reads events and not placements.
+    """
+    n = 0
+    for e in timeline:
+        if e.get("kind") != kind:
+            continue
+        for f in fields:
+            v = e.get(f)
+            n += sum(1 for x in (v if isinstance(v, list) else [v]) if isinstance(x, str) and x in values)
+    return n
+
+
+def read_sweep_expectations(m, text, withheld=None):
+    """`{name: (rendered, derived)}` for ONE render of ONE model: each expectation
+    `TOOL-dLoggedFlight-26` derives, read at observation time from the render on one side and from the
+    model that render was made from on the other.
+
+    The two sides are independent readings — the rendered one off the markdown through
+    `parse_record_markdown`, the derived one off the model's own timeline — so a model and its render
+    are compared and never a figure with itself. The shown slice follows the renderer's edge rule, so
+    an elided render is graded on the rows it kept instead of being skipped. `withheld` is the count
+    the CALLER derived for this model, since only the caller knows what a removal took with it; a
+    caller passing none gets no `values withheld` entry, which is the wide model's case, its builder
+    placing no intruder.
+    """
+    declared = rl_record.derive_table("Timeline", "events")["rows"]
+    doc = parse_record_markdown(text)
+    rows = [r for tb in (doc.get("Timeline") or {}).get("tables") or [] for r in tb["rows"]]
+    kept = [e for e in m.get("timeline") or [] if e.get("kind") in declared]
+    n, edge = measure_timeline_events(m), rl_record.TIMELINE_EDGE
+    shown = kept if n <= 2 * edge else kept[:edge] + kept[-edge:]
+    out = {
+        "events": ((doc.get("Timeline") or {}).get("facts", {}).get("events"),
+                   f"{n} · shown {len(shown)} · elided {n - len(shown)}"),
+        "kinds": (sorted({r[2] for r in rows if len(r) > 2}), sorted({e.get("kind") for e in shown})),
+        "row times": (sorted(r[0] for r in rows if r),
+                      sorted(rl_model.derive_iso(e.get("t")) for e in shown)),
+    }
+    if withheld is not None:
+        out["values withheld"] = ((doc.get("Summary") or {}).get("facts", {}).get("values withheld"),
+                                  str(withheld))
+    return out
+
+
+def test_record_kind_sweep():
+    """AC1, AC2 and AC3: every expectation `TOOL-dLoggedFlight-26` derives from what a shared fixture
+    builder placed is re-checked against a render with ONE kind of event removed, one kind at a time,
+    over both builders' models. A derived expectation follows the copy; a typed one reds on the first
+    swept kind that carries its carrier, and that is the only difference between the two a suite can
+    see. The swept set is the model's OWN timeline and never a retirement constant: once the retired
+    kinds are dropped before a row is built, a filter over those kinds removes nothing and the arm
+    could not fail. NOT graded here: a typed expectation over any fixture but these two builders'
+    models, and the derivations themselves, which are that unit's code and this arm's input.
+    """
+    m, intruders, _j, _fx, placed = build_class_model()
+    fields = sorted({f for _carrier, f in placed})
+    values = set(intruders.values())
+    before = [e.get("kind") for e in m["timeline"]]
+    swept = sorted({k for k in before if k is not None})
+    base = rl_record.render_record(m, "memory")
+    base_bad = [(name, got, want) for name, (got, want)
+                in read_sweep_expectations(m, base, len(placed)).items() if got != want]
+    check("record kind sweep: the unmutated model's own render matches every expectation derived from "
+          "it, so the sweep below starts from agreement", base_bad, [])
+    # S5's shaped values are derived from a CARRIER event, so a copy that swept that carrier derives
+    # nothing: it is recorded as a skip and counted below, never passed over with nothing to compare.
+    shaped_from = (("commit", "utc", lambda e: rl_model.derive_iso(e.get("t"))),
+                   ("commit", "sha", lambda e: rl_record.derive_short_sha(e.get("sha"))),
+                   ("phase", "phase", lambda e: e.get("phase")))
+    own_ids = [u["id"] for u in m["units"] if u.get("id")]
+    removed, moved, calls, bad, shaped_bad, skipped = {}, [], 0, [], [], []
+    for kind in swept:
+        copy = build_kind_removed(m, kind)
+        calls += 1
+        removed[kind] = len(m["timeline"]) - len(copy["timeline"])
+        text = rl_record.render_record(copy, "memory")
+        if text != base:
+            moved.append(kind)
+        wh = len(placed) - measure_killed(m["timeline"], kind, fields, values)
+        bad += [(kind, name, got, want) for name, (got, want)
+                in read_sweep_expectations(copy, text, wh).items() if got != want]
+        reached = read_class_values(text, own_ids=own_ids)
+        for carrier, cls, derive in shaped_from:
+            e = next((x for x in copy["timeline"] if x.get("kind") == carrier), None)
+            if e is None:
+                skipped.append((kind, cls))
+            elif derive(e) not in reached.get(cls, ()):
+                shaped_bad.append((kind, cls, derive(e)))
+    print("  report (grades nothing): record kind sweep, %d renders of the class model · %s"
+          % (calls, " ".join(f"{k} {removed[k]}" for k in swept)))
+    check("record kind sweep: every expectation TOOL-dLoggedFlight-26 S3 and S5 derive matches the "
+          "render of each copy, one copy per swept kind", (bad, calls), ([], len(swept)))
+    check("record kind sweep: each shaped value derived from a copy's own carrier event reaches that "
+          "copy's render, at a slot declaring its class", shaped_bad, [])
+    check("record kind sweep: the copies deriving no shaped value are exactly the ones that swept its "
+          "carrier kind", sorted(skipped),
+          sorted((carrier, cls) for carrier, cls, _d in shaped_from if carrier in swept))
+    check("record kind sweep liveness: the timeline holds more than one kind and every swept kind "
+          "removed at least one event, so no copy is the model itself",
+          (len(swept) > 1, [k for k in swept if removed.get(k, 0) < 1]), (True, []))
+    check("record kind sweep liveness: the removals partition the timeline and leave the base model "
+          "as it was, so nothing was swept twice, missed, or swept in place",
+          (sum(removed.values()), [e.get("kind") for e in m["timeline"]]), (len(before), before))
+    # A kind the renderer writes a ROW for must move the bytes when it goes. One it writes no row for
+    # need not, and that is why this is not asserted over every copy (spec rev-2): an `owner` event is
+    # dropped before a row is built and counted in no fact, so its removal is invisible to the render
+    # by construction, while a retired kind's moves the `withheld rows` fact instead of a row.
+    shown_kinds = sorted({r[2] for tb in (parse_record_markdown(base).get("Timeline") or {}).get("tables") or []
+                          for r in tb["rows"] if len(r) > 2})
+    check("record kind sweep liveness: every kind the base render shows a row for moves the rendered "
+          "bytes when it is swept, and at least one kind does",
+          (sorted(k for k in shown_kinds if k not in moved), bool(moved)), ([], True))
+    # AC3. THE SAME SWEEP OVER THE WIDE MODEL at the nominal bounds, where the expectations are S6's
+    # `events`, `shown` and `elided`, read here through the same reader. The widest record's overflow
+    # liveness is exempt, as AC3 states: `test_record_ac6_cap` owns that reading and a kept row was
+    # widened for it. Every row of this model carries a declared kind, so every removal moves a row.
+    big = build_big_model()
+    big_before = [e.get("kind") for e in big["timeline"]]
+    big_swept = sorted({k for k in big_before if k is not None})
+    big_base = rl_record.render_record(big)
+    big_bad = [("the wide model itself", name, got, want) for name, (got, want)
+               in read_sweep_expectations(big, big_base).items() if got != want]
+    big_removed, big_moved = {}, []
+    for kind in big_swept:
+        copy = build_kind_removed(big, kind)
+        big_removed[kind] = len(big["timeline"]) - len(copy["timeline"])
+        text = rl_record.render_record(copy)
+        if text != big_base:
+            big_moved.append(kind)
+        big_bad += [(kind, name, got, want) for name, (got, want)
+                    in read_sweep_expectations(copy, text).items() if got != want]
+    print("  report (grades nothing): record kind sweep, %d renders of the wide model · %s"
+          % (len(big_swept), " ".join(f"{k} {big_removed[k]}" for k in big_swept)))
+    check("record kind sweep: the events, shown and elided counts TOOL-dLoggedFlight-26 S6 derives "
+          "match the wide model's own render and every copy's, over an ELIDED timeline", big_bad, [])
+    check("record kind sweep liveness: the wide sweep swept more than one kind, took at least one "
+          "event for each, and moved the rendered bytes for every one of them",
+          (len(big_swept) > 1, [k for k in big_swept if big_removed.get(k, 0) < 1],
+           sorted(k for k in big_swept if k not in big_moved)), (True, [], []))
 
 
 def test_record_ac5_verify():
