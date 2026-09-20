@@ -5,7 +5,7 @@ opened: 2026-09-13
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27
+ids: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30
 ---
 
 # dLoggedFlight — unattended runs recorded as they happen, and a record any node can read
@@ -55,13 +55,22 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 - **Landing.** The approved worktree push (owner, 2026-09-13) is refused by the pre-push hook without
   a bypass, so the build lands through `tools/push-main.sh` from the primary tree when that tree is
   idle, and parks otherwise. `TOOL-dLoggedFlight-11` records why.
-- **M2 classification:** units 1 to 13 MISSING at start; 14 to 27 MISSING when promoted or added.
+- **M2 classification:** units 1 to 13 MISSING at start; 14 to 30 MISSING when promoted or added.
 
 ## Parked decisions
 
 - Whether a hygiene check should refuse a spec whose retirement inventory finds readers by name only.
   Parked in `RUN.md` on 2026-09-16 with its options and reason: it changes `memory/HYGIENE.md`, a
   governance carrier, so it is the owner's under BUILD-METHOD M3's second veto.
+- Three spec-audit checks over spec prose, the class left-shifts of B1, H2 and M4 of the spec audit of
+  units 25 to 27. Parked in `RUN.md` on 2026-09-20 with their options and reason: each needs its rule
+  in `memory/TEMPLATE-SPEC.md`, a governance carrier, so M3's second veto makes them the owner's.
+  Units 28, 29 and 30 carry the per-instance half of all three.
+- The spec-audit promotion chain is bounded at round 7, decided in `RUN.md` on 2026-09-20 with its
+  options and reason. Units 28, 29 and 30 were promoted at that round's BOUNDED exit and are built
+  with no further audit round, under a Definition-of-Done override recorded at the close. Rounds 4 to
+  7 each promoted over one class, the inventory of arms and fixtures a retirement touches, and the
+  closing diff review over the real code is the first place a suite can actually reach it.
 
 <!-- roster:units -->
 
@@ -94,14 +103,17 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 | 25 | `TOOL-dLoggedFlight-25` | MISSING | the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements |
 | 26 | `TOOL-dLoggedFlight-26` | MISSING | every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps |
 | 27 | `TOOL-dLoggedFlight-27` | MISSING | the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read |
+| 28 | `TOOL-dLoggedFlight-28` | MISSING | every expectation the record arms derive from a shared fixture builder is re-checked against a render with one kind of event removed |
+| 29 | `TOOL-dLoggedFlight-29` | MISSING | each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state |
+| 30 | `TOOL-dLoggedFlight-30` | MISSING | the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 27 unit(s) · node d · opened 2026-09-13 · streams tooling
+**Build status:** SPECCED · 30 unit(s) · node d · opened 2026-09-13 · streams tooling
 ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13
 ids TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-15 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26
-ids TOOL-dLoggedFlight-27
+ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -127,19 +139,22 @@ ids TOOL-dLoggedFlight-27
 | [TOOL-dLoggedFlight-19 — every UTC slot of the record schema is classed against owner acts, and one arm reads every time a production render writes](spec/2026-09-16-spec-TOOL-dLoggedFlight-19.md) | 19 | 2 | WONTDO | rev-1 | 2026-09-16 |
 | [TOOL-dLoggedFlight-21 — the commitment is a digest and a line count, and `verify` recomputes it from the time-ordered prefix of the run's journal lines](spec/2026-09-16-spec-TOOL-dLoggedFlight-21.md) | 21 | 2 | CLOSED | rev-2 | 2026-09-16 |
 | [TOOL-dLoggedFlight-24 — the Summary window and its duration render the git-only window the schema leg derives](spec/2026-09-16-spec-TOOL-dLoggedFlight-24.md) | 22 | 2 | SPECCED | rev-2 | 2026-09-16 |
-| [TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements](spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-16 |
-| [TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps](spec/2026-09-16-spec-TOOL-dLoggedFlight-26.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements](spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md) | 23 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps](spec/2026-09-16-spec-TOOL-dLoggedFlight-26.md) | 24 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-dLoggedFlight-22 — the journal rows, the time columns and the owner-time refusal retire, with every arm, vocabulary and floor that reads them rewritten by name](spec/2026-09-16-spec-TOOL-dLoggedFlight-22.md) | 25 | 2 | SPECCED | rev-3 | 2026-09-16 |
-| [TOOL-dLoggedFlight-27 — the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read](spec/2026-09-16-spec-TOOL-dLoggedFlight-27.md) | 26 | 2 | SPECCED | rev-1 | 2026-09-16 |
+| [TOOL-dLoggedFlight-27 — the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read](spec/2026-09-16-spec-TOOL-dLoggedFlight-27.md) | 26 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced](spec/2026-09-16-spec-TOOL-dLoggedFlight-20.md) | 27 | 2 | SPECCED | rev-3 | 2026-09-16 |
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 28 | 2 | SPECCED | rev-2 | 2026-09-16 |
+| [TOOL-dLoggedFlight-28 — every expectation the record arms derive from a shared fixture builder is re-checked against a render with one kind of event removed](spec/2026-09-20-spec-TOOL-dLoggedFlight-28.md) | 29 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state](spec/2026-09-20-spec-TOOL-dLoggedFlight-29.md) | 30 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value](spec/2026-09-20-spec-TOOL-dLoggedFlight-30.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 28 bound to this build, across 4 record folder(s).
+Records: 29 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 
-Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27.
+Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -173,6 +188,9 @@ Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFli
 | 26 | `TOOL-dLoggedFlight-27` | no |
 | 27 | `TOOL-dLoggedFlight-20` | no |
 | 28 | `TOOL-dLoggedFlight-23` | no |
+| 29 | `TOOL-dLoggedFlight-28` | no |
+| 30 | `TOOL-dLoggedFlight-29` | no |
+| 31 | `TOOL-dLoggedFlight-30` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

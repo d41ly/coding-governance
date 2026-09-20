@@ -1,9 +1,9 @@
-# Build brief — TOOL-dLoggedFlight-14, -16 and -20 to -27
+# Build brief — TOOL-dLoggedFlight-14, -16 and -20 to -30
 
-**Serves:** journal TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27
+**Serves:** journal TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30
 
-This is what the building agent for any one of these ten units is handed, beyond its spec. Units 1 to
-13 are CLOSED and their code is on this branch; these ten change that code. Read "Every unit", then
+This is what the building agent for any one of these thirteen units is handed, beyond its spec. Units 1 to
+13 are CLOSED and their code is on this branch; these thirteen change that code. Read "Every unit", then
 your own entry under "By unit", then "The pass". Your spec is the design and this file is the house
 knowledge. Where the two disagree, the spec wins. A needed change goes into the spec first, as a rev
 bump with its section 9 line.
@@ -88,8 +88,19 @@ Build in this order; each unit reads the landed code of the units before it.
   source the model did not read renders `-`, never `0`.
 - **20, the source rule.** After 21, 24, 25, 26, 22 and 27. What it still owns after its audit is its spec's
   current rev; read its section 9 before its section 2.
-- **23, the population arm.** Last. One arm over every time-bearing token a render writes, classes and
+- **23, the population arm.** One arm over every time-bearing token a render writes, classes and
   slots read from `RECORD_SCHEMA`, and a fixture that reaches every conditional slot.
+- **29, the placement states.** After 25. Each placement model comes back beside the repository state
+  it was built from, and the arm re-derives it with `build_run_model` and compares. Its source probe
+  reads only the builders `HISTORY_BUILT_BUILDERS` names, so leave the `dataclasses.asdict` neighbours
+  alone.
+- **30, the replacement observed.** After 27. The renderer holds no `derive_known` and no
+  `known = (cov` test, and one arm re-points a Summary slot's declared source on a schema COPY, never
+  in the live schema.
+- **28, the mutation sweep.** Last, after 26 and 22. One arm removes each kind of event the timeline
+  holds, one kind at a time, and re-checks every expectation unit 26 derives. It reads neither
+  `RETIRED_EVENTS` nor any typed kind list, and its three liveness assertions are the point: a sweep
+  that removes nothing reads exactly like a sweep that found nothing wrong.
 
 ## The pass
 

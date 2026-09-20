@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
+**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 |
+| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
+| [2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-27 |
 
 <!-- /gen:spec-records -->
 
@@ -56,7 +57,11 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
     state the `--landed` and `--abort` placements render in.
 
   Each model reads the fixture's own journal lines up to the verb that produced its state: `landing`
-  stops before the `--landed` lines, and `pending` and `landed` hold them. Observed by AC1.
+  stops before the `--landed` lines, and `pending` and `landed` hold them. Observed by AC1 for every
+  rendered value. The CONSTRUCTION discipline — built from a history, never by editing a model field
+  — is observed by `TOOL-dLoggedFlight-29`, which returns each model beside the repository state it
+  was built from and re-derives it; no criterion here can see the difference, which is H1 of the spec
+  audit of units 25 to 27.
 - **S3** Bounds and stability at each placement. This takes `TOOL-dLoggedFlight-24` S4 and restates it
   per placement. On `landed` the rendered closing bound is the LANDED commit's committer time. On
   `landing` and `pending` it is the committer time of the last record commit before that write. On
@@ -81,8 +86,12 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   facts are members. `terminal`, `phase`, every other Summary fact, and every Units, Decisions,
   Conformance and Anomalies item may never be. Observed by AC4.
 - **S6** The docs. The kit README's Summary section states the three closers and the lag S3 declares,
-  and `memory/map/features/runlog.md` claims `derive_window_closer`. NOT OBSERVED: prose, and the map's
-  coverage leg grades the claim at the close.
+  and the runlog dossier's PROSE names `derive_window_closer`. A dossier cannot CLAIM a Python
+  symbol: its `[claims]` block carries no symbol tier, the symbol tier feeds the recall corpus and
+  never the ratchet (`tools/codebase-map/map_extractors.py:128`), and `[paths] globs` already covers
+  `tools/runlog/**`. NOT OBSERVED: prose. What the `codebase-map coverage + freshness` leg grades at
+  the close is that the regenerated map artifacts are committed in the same commit, which is a
+  different assertion and is worth stating as itself.
 
 ## 3. Non-goals (OUT)
 
@@ -103,6 +112,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   derived vocabulary list reaches the fact-only closers.
 - **hands-off** `TOOL-dLoggedFlight-23` — the `window`, `duration` and `window closed by` facts at
   each placement, whose time tokens the population arm grades.
+- **hands-off** `TOOL-dLoggedFlight-29` — `build_placement_models` and its three placement states,
+  which that unit returns beside each model and re-derives, so S2's construction discipline stops
+  being a claim only prose makes.
 
 ## 4. Design
 
@@ -170,9 +182,11 @@ regenerated map.
 - **AC2** — When `RECORD_SCHEMA` is read, `opened-by` holds `git` alone and `closed-by` holds
   `terminal-write`, `terminal-pending` and `last-activity`, and the three renders of AC1 carry every
   member between them. `git grep -n 'window=dict(m\["window"\]' -- tools/runlog/selftest.py` finds
-  nothing.
-  Red when: `driver` or `terminal-end` is a member, a member reaches none of the three renders, or the
-  loop is still defined.
+  nothing. `ASSERTION_FLOOR`'s newest comment names this unit and its arithmetic reaches the value
+  declared beside it, which is what `TOOL-dLoggedFlight-22` AC5 already states for the same constant.
+  Red when: `driver` or `terminal-end` is a member, a member reaches none of the three renders, the
+  loop is still defined, or the floor moves with no comment naming this unit or with arithmetic that
+  does not reach its value.
 - **AC3** — When a commit of another path naming no unit lands after each placement model's fixture
   state, and `render_record` re-renders the rebuilt model, the `window`, `duration` and
   `window closed by` facts are byte-identical to the first render. On `landed`, a commit naming a unit
@@ -182,9 +196,15 @@ regenerated map.
 - **AC4** — When `test_record_placement_replay` replays the close and the `--landed` placements, every
   fact or table that differs between a render and its re-render is a member of `PLACEMENT_LAG`, and at
   the `--landed` placement `window closed by` moves from `terminal-pending` to `terminal-write`.
-  Red when: a non-member differs, the closer does not move, or `terminal` or `phase` is a member.
-  Staged RED by a renderer copy whose `terminal` fact reads the phase of the last committed record
-  commit, which reds naming `terminal`.
+  `PLACEMENT_LAG`'s membership is pinned in BOTH directions: it holds exactly the three Summary facts
+  S5 names, `window`, `duration` and `window closed by`, and no fourth member — so the declared set
+  cannot widen silently, which is the risk §5 names and the both-directions rule charter §7 applies
+  to every declared population.
+  Red when: a non-member differs, the closer does not move, `terminal` or `phase` is a member, or
+  `PLACEMENT_LAG` holds any member outside S5's three. Staged RED twice: a renderer copy whose
+  `terminal` fact reads the phase of the last committed record commit, which reds naming `terminal`,
+  and a copy of the constant that declares a Units item a member, which reds on the membership pin
+  while the replay itself stays green.
 - **AC5** — When `render_record` renders a model that carries no `record_window`, `window opened by`
   and `window closed by` read `-`.
   Red when: either renders a vocabulary member.
@@ -212,6 +232,13 @@ New arm: `tools/runlog/selftest.py` · AC1's two renderer copies, AC3's era-boun
 - rev-1 · 2026-09-16 · initial draft, promoted from B1 and H3 of the spec audit of units 21 to 24,
   round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-24` rev-1 S3 and S4 with its AC2 and
   AC3.
+- rev-2 · 2026-09-20 · S2 · S6 · AC2 · AC4 · §3 · the disposal of the spec audit of units 25 to 27,
+  round 1. Promoted elsewhere: H1 to `TOOL-dLoggedFlight-29`, which returns each placement model
+  beside the state it was built from, so S2 now names that unit for the construction discipline and
+  §3 declares the handoff. Folded: M1, AC4 pins `PLACEMENT_LAG`'s membership in both directions with
+  a staged Units-item member; M4, S6 stops saying a dossier CLAIMS a Python symbol and states what
+  the map leg actually grades; L1, AC2 reads `ASSERTION_FLOOR`'s comment and arithmetic the way
+  `TOOL-dLoggedFlight-22` AC5 does for the same constant.
 
 ## 10. Reuse audit
 

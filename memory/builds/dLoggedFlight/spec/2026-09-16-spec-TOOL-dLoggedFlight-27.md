@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-27 — the Timeline's `withheld rows` fact counts each retired kind from a declared source, and renders `-` for a source the model did not read
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 26
+**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 |
+| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
+| [2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-26 |
 
 <!-- /gen:spec-records -->
 
@@ -44,40 +45,66 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   events of that kind on the model's timeline, which the model has already bounded to the run's window.
   This takes `TOOL-dLoggedFlight-22` rev-2 S1's fact clause; that unit keeps the retirement and the
   dropping of retired events before rows are built. Observed by AC1.
-- **S2** The declaration. `RECORD_SCHEMA["count_sources"]` maps each `{int}` slot of six facts to the
+- **S2** The declaration. `RECORD_SCHEMA["count_sources"]` maps each `{int}` slot of nine facts to the
   source it is counted from, keyed by section, label and position:
   - `withheld rows`: `transcripts` for `compact`, `limit` and `workflow`; `driver` for `verb`; `gates`
     for `gate`; `pushes` for `push` and `push-refused`; and `idle` for `idle`;
   - the Summary's `owner turns`, `usage main`, `usage agent`, `usage workflow` and `attributed calls`:
-    `transcripts` for every slot.
+    `transcripts` for every slot;
+  - the Coverage's `sessions`, both slots: `transcripts`. And `journal starts`, both slots, and
+    `unjoined starts`: `driver`, since the join they count is `derive_journal_join` over the driver
+    journal's own invocations (`tools/runlog/model.py:1492`).
 
-  `idle` names the Coverage `idle` entry's judgement rather than a coverage state. Observed by AC2 and AC4.
+  `idle` names the Coverage `idle` entry's judgement rather than a coverage state, and that judgement
+  is NARROWER than `COUNTED_STATES` by exactly one state: it needs the transcripts `present`
+  (`tools/runlog/model.py:1682`) while a counted slot admits `partial` too. The asymmetry is
+  deliberate. A `partial` extract is a lower bound and says so in Coverage, so a count from it is
+  still a count; an unjudged run carries no idle rows at all, so its idle count would be a zero
+  nobody measured. Observed by AC2 and AC4.
 - **S3** The rule. A declared slot renders `-` unless its source's coverage state is in
   `COUNTED_STATES`, or, for `idle`, unless idle gaps were judged. `build_summary_facts`' `known` test
   (`tools/runlog/record.py:632-635`) is replaced by that lookup, so the five Summary facts keep their
-  present behaviour and the rule is stated once. Observed by AC2 and AC3.
+  present behaviour and the rule is stated once. Observed by AC2 and AC3 for the five facts' VALUES.
+  The REPLACEMENT — the old spelling gone from the renderer, and the lookup rather than the old test
+  deciding each value — is observed by `TOOL-dLoggedFlight-30`: the two predicates agree on every
+  model these criteria build, so no criterion here can tell them apart, which is H2 of the spec audit
+  of units 25 to 27.
 - **S4** The declaration check. `check_count_sources(schema)` refuses, naming the slot, an entry keyed
   to no `{int}` slot of a fact, a source that is neither in `SOURCE_NAMES` nor `idle`, and an `{int}` slot
-  of the six facts with no entry. A kind added to `RETIRED_EVENTS` therefore adds a slot that refuses
-  until its source is declared. The self-test arm calls it. Observed by AC4.
+  of the nine facts with no entry. A kind added to `RETIRED_EVENTS` therefore adds a slot that refuses
+  until its source is declared. It also PRINTS, as an inventory rather than a refusal, every `{int}`
+  slot of `RECORD_SCHEMA` outside those nine that carries no entry — so the undeclared population is
+  enumerated on every run, a newly undeclared count shows up in the diff, and no prose has to carry a
+  description of a derived set. The self-test arm calls it. Observed by AC4.
 - **S5** The expectations. The arm observing S1 renders a copy of `build_class_model`'s model whose
   driver, gates, pushes and transcripts coverage read `present` and whose idle gaps are judged, and
   derives each kind's expected count from that model's timeline at observation time, never a typed
-  number. This replaces unit 22 rev-2 AC1's count of 1. Observed by AC1.
+  number. This replaces unit 22 rev-2 AC1's count of 1. The three Coverage facts S2 adds are derived
+  the same way, from that model's own join and session counts rather than from a number in the arm.
+  Observed by AC1.
 - **S6** The model-fields arm. `test_record_model_fields` reads its workflow run in `withheld rows`,
   expecting the model's `workflow` event count where that model's transcripts read a counted state and
   `-` otherwise, read from the model. Unit 22 retires that arm's rendered workflow row. Observed by AC5.
 - **S7** The docs. The kit README's paragraph on unknown values names `count_sources` and the
-  `withheld rows` fact, and `memory/map/features/runlog.md` claims `check_count_sources`. NOT OBSERVED:
-  prose, and the map's coverage leg grades the claim at the close.
+  `withheld rows` fact, and the runlog dossier's PROSE names `check_count_sources`. A dossier cannot
+  CLAIM a Python symbol: its `[claims]` block carries no symbol tier, the symbol tier feeds the recall
+  corpus and never the ratchet (`tools/codebase-map/map_extractors.py:128`), and `[paths] globs`
+  already covers `tools/runlog/**`. NOT OBSERVED: prose. What the `codebase-map coverage + freshness`
+  leg grades at the close is that the regenerated map artifacts are committed in the same commit,
+  which is a different assertion and is worth stating as itself.
 
 ## 3. Non-goals (OUT)
 
 - Which kinds retire, and dropping their rows. `TOOL-dLoggedFlight-22` owns both.
-- Declaring a source for every count the record renders. Counts read from git, the run-state file or
-  the build folder, such as `own commits` and `units served`, carry no `-` rule today, and declaring
-  them changes readers this unit does not inventory. The arm's header states that an undeclared count
-  outside the six facts is not graded.
+- Declaring a source for every count the record renders. What stays OUT is the counts read from git,
+  the run-state file or the build folder — `own commits`, `units served` and `sources present` — since
+  their sources cannot read unknown, so no `-` rule applies to them. The three Coverage counts that DO
+  come from the transcripts and the driver journal are IN, at S2: `sessions`, `journal starts` and
+  `unjoined starts` each committed a clean zero with its source unread, which is M3 of the spec audit
+  of units 25 to 27. Of the Coverage `{int}` slots only `idle gaps` already read `-`, by a different
+  mechanism — the model leaves `near_owner` None when the gaps are unjudged, which `derive_count`
+  renders absent. The arm's header states that an undeclared `{int}` slot outside S2's nine facts is
+  not graded, and S4 prints that population on every run rather than leaving it to this sentence.
 - The time slots and their sources. `TOOL-dLoggedFlight-20` owns them.
 
 ### Edges
@@ -88,6 +115,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   which S5 derives the counts.
 - **consumes-from** `TOOL-dLoggedFlight-22` — `RETIRED_EVENTS`, the retired kinds dropped before rows
   are built, and its S1 fact clause, which moved here.
+- **hands-off** `TOOL-dLoggedFlight-30` — the `count_sources` lookup that replaces the `known` test,
+  whose replacement that unit observes on the renderer and by re-pointing a declared source, which no
+  criterion here can see.
 
 ## 4. Design
 
@@ -97,6 +127,12 @@ those sources, and the rule reads a declaration rather than being restated per f
 
 The five Summary facts move onto the declaration too. They already render `-` by one hand-written test,
 and a second hand-written test for a second fact is how the rule would drift between them.
+
+The three Coverage counts from those same sources move with them, and that is what makes the first
+paragraph's claim true rather than nearly true: `sessions` from the transcripts and the two journal
+starts from the driver journal rendered a clean zero with their source unread, exactly like the fact
+this unit was promoted for. A concession that misdescribes its own excluded population is a decision
+nobody made, so the population is now spelled in §3 by name.
 
 ### Inventory
 
@@ -128,7 +164,8 @@ regenerated map.
 - error / empty / loading states — a run with no retired events renders `0` only for a kind whose
   source was read, and `-` otherwise.
 - observability — `withheld rows` beside the Coverage table says both what happened and what was read.
-- risks — a new count fact outside the six is not graded, as §3 states.
+- risks — a new count fact outside S2's nine is not graded, as §3 states; S4 prints that population
+  on every run so the ungraded set is enumerated rather than described.
 - testing — each AC staged RED on a renderer copy or a schema copy.
 - migration — no run record is committed in this tree.
 - user docs — the kit README's paragraph on unknown values.
@@ -143,10 +180,18 @@ regenerated map.
 - **AC2** — When `render_record` renders a copy of that model whose transcripts read `not-local`, whose
   gates journal reads `dead`, whose pushes journal reads `absent` and whose idle gaps are not judged,
   `withheld rows` reads `-` for `compact`, `limit`, `workflow`, `idle`, `gate`, `push` and `push-refused`,
-  and a count for `verb` while the driver reads `partial`. With the driver `absent` too, `verb` reads
-  `-`, and every slot of the five Summary facts reads `-`.
-  Red when: a digit renders for a slot whose declared source was not read, or `verb` reads `-` while
-  the driver is `partial`. Staged RED by a renderer copy that ignores `count_sources` for `gate`.
+  and a count for `verb` while the driver reads `partial`. The Coverage `sessions` slots read `-` on
+  that copy, and `journal starts` and `unjoined starts` read counts while the driver is `partial`.
+  With the driver `absent` too, `verb`, `journal starts` and `unjoined starts` read `-`, and every
+  slot of the five Summary facts reads `-`. On a third copy whose transcripts read `partial` with the
+  idle gaps unjudged, `compact`, `limit` and `workflow` read counts while `idle` reads `-` — the one
+  cell where the judgement and `COUNTED_STATES` disagree, from a single source read, and the cell
+  `test_record_ac10_unknown_counts` already fixtures at `tools/runlog/selftest.py:4809`.
+  Red when: a digit renders for a slot whose declared source was not read, `verb` reads `-` while
+  the driver is `partial`, or on the third copy `idle` renders a digit or the three transcript kinds
+  read `-`. Staged RED twice: a renderer copy that ignores `count_sources` for `gate`, and a copy
+  that maps `idle` onto the transcripts coverage state like the rest, which reds on the third copy
+  while the first two still pass.
 - **AC3** — When `git show HEAD -- tools/runlog/selftest.py` is read at this unit's build commit, no
   count assertion of `test_record_ac10_unknown_counts` is in its hunks, and that arm's `not-local` model
   renders the five Summary facts as it expects.
@@ -177,6 +222,15 @@ New arm: `tools/runlog/selftest.py` · AC2's renderer copy ignoring `gate`'s ent
 - rev-1 · 2026-09-16 · initial draft, promoted from H4 and H2 of the spec audit of units 21 to 24,
   round 1, at the loop's BOUNDED exit. It takes `TOOL-dLoggedFlight-22` rev-2 S1's `withheld rows` clause,
   its AC1 count and its §5 empty-state line.
+- rev-2 · 2026-09-20 · S2 · S4 · S5 · S7 · §3 · §4 · §5 · AC2 · the disposal of the spec audit of
+  units 25 to 27, round 1. Promoted elsewhere: H2 to `TOOL-dLoggedFlight-30`, which observes that the
+  `known` test is gone from the renderer and re-points a declared source, so §3 declares the handoff.
+  Folded: M2, S2 states that the `idle` judgement is narrower than `COUNTED_STATES` by one state and
+  why, and AC2 gains the transcripts-`partial` cell where the two disagree with a staged copy that
+  maps `idle` onto the coverage state; M3, the three Coverage counts from the transcripts and the
+  driver journal join S2's declaration, S5 derives them, §3 names the excluded population by fact
+  instead of misdescribing it, and S4 prints every undeclared `{int}` slot as an inventory; M4, S7
+  stops saying a dossier CLAIMS a Python symbol and states what the map leg actually grades.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-26 — every count and value the record arms assert over a shared fixture builder is derived from what the builder placed, on row kinds the record keeps
 
-**Status:** SPECCED · rev-1 · 2026-09-16 · node d · Tier-2 · base 4cf0944d · streams tooling · order 24
+**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-27 |
+| [2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md) | journal | TOOL-dLoggedFlight-14 TOOL-dLoggedFlight-16 TOOL-dLoggedFlight-20 TOOL-dLoggedFlight-21 TOOL-dLoggedFlight-22 TOOL-dLoggedFlight-23 TOOL-dLoggedFlight-24 TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30 |
+| [2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-dLoggedFlight-25-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-25 TOOL-dLoggedFlight-27 |
 
 <!-- /gen:spec-records -->
 
@@ -61,16 +62,22 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   The event count is the number of timeline entries whose kind the Timeline row layouts of
   `RECORD_SCHEMA` declare. At the nominal bounds, `shown` is twice `TIMELINE_EDGE` and `elided` is the
   difference, and the widest record's leading count is its model's event count. Observed by AC2.
-- **S7** The simulated retirement. Before this unit's commit, the build renders both builders' models
-  with every kind `TOOL-dLoggedFlight-22` S1 retires filtered out of the timeline, and checks that each
-  expectation S3, S5 and S6 derive still matches the render. Observed by AC3.
+- **S7** The mutation check, handed off. The render-level proof that no expectation above is secretly
+  a typed literal is `TOOL-dLoggedFlight-28`'s arm, which sweeps every kind the model's timeline holds
+  rather than only the kinds `TOOL-dLoggedFlight-22` retires. This unit builds no probe for it: the
+  only two definitions of both builders live in the suite module, and the build brief bars every route
+  to them before VERIFYING, which is B1 of the spec audit of units 25 to 27. Observed by AC3, which
+  is owed to the post-build suite run.
 - **S8** The documented check. A class record,
   `memory/gotchas/retirement-inventory-misses-readers-by-value.md`, names the class: an inventory of what
   reads a retired thing, found by name, misses an assertion on a count or value the retired thing
   carries. Its instances are this audit's B1 loop, H1's five literals and M5's fixture. Its check for a
-  spec audit is S7's: simulate the retirement on each shared builder and diff every literal an arm
-  asserts. Its anchors are `memory/builds/` and `tools/runlog/selftest.py`, and the gotchas index is
-  re-rendered. Observed by AC5.
+  spec audit is the mutation `TOOL-dLoggedFlight-28` arms: remove one kind of event from each shared
+  builder's model and diff every literal an arm asserts. Its anchors are `memory/builds/` and
+  `tools/runlog/selftest.py`, and the gotchas index is re-rendered. A new file under
+  `memory/gotchas/` is a `gotcha-classes` inventory key and reds the map's coverage test until a
+  dossier claims it (`tools/codebase-map/test_codebase_map.py:93`), so the runlog dossier claims this
+  class and the generated map is regenerated in the same commit. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -89,6 +96,9 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   unit's retirement moves no literal an arm asserts.
 - **hands-off** `TOOL-dLoggedFlight-27` — `read_placed` and the class model, over which that unit derives
   the `withheld rows` counts.
+- **hands-off** `TOOL-dLoggedFlight-28` — the derived expectations of S3, S5 and S6 and S7's
+  observation, which that unit's mutation sweep makes over every kind the timeline holds and this
+  unit may not make at all.
 
 ## 4. Design
 
@@ -109,8 +119,8 @@ retirement.
 
 ### Files touched (estimate)
 
-`tools/runlog/selftest.py`, `memory/gotchas/retirement-inventory-misses-readers-by-value.md` and
-`memory/gotchas/INDEX.md`.
+`tools/runlog/selftest.py`, `memory/gotchas/retirement-inventory-misses-readers-by-value.md`,
+`memory/gotchas/INDEX.md` and `memory/map/features/runlog.md`, with the regenerated map.
 
 ### Alternatives rejected
 
@@ -131,7 +141,9 @@ retirement.
 - observability — each failure names the expectation and the placements it was derived from.
 - risks — a derivation that reads the renderer's own counter would pass vacuously; S3 reads the
   builder's list instead.
-- testing — AC1 staged RED on a builder copy; AC3 is the simulated retirement.
+- testing — AC1 staged RED on a builder copy; AC3 is owed to `TOOL-dLoggedFlight-28`'s mutation
+  sweep at the post-build suite run, since the only definitions of both builders sit inside the suite
+  module this run may not reach.
 - migration — N/A — test code only.
 - user docs — N/A — no user-facing surface; the class record is the documented check.
 
@@ -147,13 +159,13 @@ retirement.
   runs, it finds nothing, and `test_schema_ac1_render_then_grade` and `test_record_ac6_cap` compute each
   expectation from the model they render.
   Red when: the grep finds a typed literal, or an expectation is not read from the rendered model.
-- **AC3** — When S7's probe renders `build_class_model`'s and `build_big_model`'s models with the kinds
-  `TOOL-dLoggedFlight-22` S1 retires filtered out, every expectation S3, S5 and S6 derive matches the
-  render.
-  Red when: an expectation that held on the unfiltered model fails on the filtered one. The widest
-  record's overflow liveness is exempt, since unit 22 S5 widens a kept row for it.
-  cost: a one-time probe at build, recorded in the acceptance ledger and not kept as an arm, since after
-  unit 22 the filter removes nothing.
+- **AC3** — When `test_record_kind_sweep` renders `build_class_model`'s and `build_big_model`'s models
+  with one kind of event removed at a time, every expectation S3, S5 and S6 derive matches the render.
+  Red when: an expectation that held on the whole model fails on a copy with a kind removed. The
+  widest record's overflow liveness is exempt, since unit 22 S5 widens a kept row for it. Owed to the
+  post-build suite run: the arm lands with `TOOL-dLoggedFlight-28` and its RED break is an arm copy
+  that types the `values withheld` count at the whole model's value. This unit's build writes it in
+  the acceptance ledger as owed, naming that arm and that break, never as met.
 - **AC4** — When the liveness block drops the last `anomaly-kind` member on a schema copy, that member
   is in no cell and `values withheld` reads the count S4 derives, and
   `git grep -n 'vocab"\]\["push-decision"\]' -- tools/runlog/selftest.py` finds nothing.
@@ -164,7 +176,7 @@ retirement.
 
 ## 7. Gates
 
-`runlog selftest` · `memory hygiene`
+`runlog selftest` · `codebase-map coverage + freshness` · `memory hygiene`
 
 New arm: `tools/runlog/selftest.py` · AC1's builder copy recording no placement · floor unchanged unless the rewritten arms change the assertion count, re-declared with a comment naming this unit if they do
 
@@ -179,6 +191,14 @@ New arm: `tools/runlog/selftest.py` · AC1's builder copy recording no placement
 
 - rev-1 · 2026-09-16 · initial draft, promoted from H1 of the spec audit of units 21 to 24, round 1, at
   the loop's BOUNDED exit, with the audit's left-shift for H1 as its mechanism.
+- rev-2 · 2026-09-20 · S7 · S8 · AC3 · §3 · §4 · §5 · §7 · the disposal of the spec audit of units 25
+  to 27, round 1. Promoted elsewhere: B1 to `TOOL-dLoggedFlight-28`, so S7 hands its observation to
+  that unit's mutation sweep and AC3 is owed to the post-build suite run naming that arm and its RED
+  break, in place of a probe over two builders this run may not reach. Folded: the unverified S-obs 1,
+  adjudicated MEDIUM on reading `tools/codebase-map/test_codebase_map.py:93` — a new file under
+  `memory/gotchas/` is a `gotcha-classes` inventory key, so S8 now claims the class in the runlog
+  dossier, §4 lists the dossier and the regenerated map, and §7 names the map's coverage leg, which
+  units 25 and 27 both already name for their dossier edits.
 
 ## 10. Reuse audit
 
