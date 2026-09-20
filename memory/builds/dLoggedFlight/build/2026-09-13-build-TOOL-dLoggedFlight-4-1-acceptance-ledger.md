@@ -74,6 +74,9 @@ against a floor of 240, in 28 s.
   the declarations, through `check_ac8_declarations`: the project-owned rule, the budget row, one held,
   guarded and bounded manifest leg, and the registry's `[[exempt_leg]]` row. RED seen with each of the
   four undone on a mirror.
+  MET at the post-build run: `pre-push run-log line` is GREEN, printing `PASS (240 assertions)`
+  against its floor of 240 in 37.6 s, inside its 60 s budget row, and `govkit selfcheck` is GREEN
+  over 27 of 27 registry entries with 0 unclaimed.
 
 ## The decisions AC1 does not reach, and the exits
 
@@ -123,6 +126,14 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `govkit selfcheck`, `codebase-map coverage + freshness` and `lexicon naming predicates`;
 - `install-prefix (shipped surface)`;
 - `shell hygiene (a loop fed by a command substitution)` and `memory hygiene`.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN; `pre-push run-log line` printed
+`PASS (240 assertions)` and `run-gates run-log line` printed `PASS (192 assertions)`. The run's
+one RED, `govkit selftest`, is on none of these legs: its 30 failing assertions are the IDENTICAL
+set `origin/main` carries, pre-existing, untouched by this build and being fixed in a separate
+session. It is not called green here.
 
 ## Residue
 

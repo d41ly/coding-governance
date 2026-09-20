@@ -44,6 +44,8 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   once, so a splice that missed cannot read as a clean refusal. The copies are TEXT and are never
   imported or executed, so every criterion of `TOOL-dLoggedFlight-27` passes on them by construction
   — none of that unit's criteria reads a source at all, which is the finding this unit closes.
+  MET at the post-build run for the shipped arm: `test_record_known_replaced` is GREEN, inside
+  `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `owner turns` rendered by `tools/runlog/record.py` —
   MET on the probe, and OWED to the post-build suite run for the shipped arm. On a schema COPY whose
   four `owner turns` slots are declared counted from `gates`, the shipped renderer was given one
@@ -56,6 +58,8 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   that restores the replaced test over the five Summary facts. That break was run on the probe:
   under it both renders moved all five facts together — counts under the transcripts-present copy,
   `-` under the not-local one — so the re-pointed pair no longer disagrees and this criterion reds.
+  MET at the post-build run for the shipped arm: `test_record_known_replaced` is GREEN there too,
+  on the same 1543 passed and 0 failed.
 - AC3 — `test_record_ac10_unknown_counts`'s expectations over `tools/runlog/record.py` —
   MET on the probe, and OWED to the post-build suite run for the shipped arm. Rendered against the
   UNMODIFIED schema, the transcripts-counted copy gave the five Summary facts exactly the model's
@@ -66,6 +70,8 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   green. That pair of results is H2 of the spec audit of units 25 to 27 — the behavioural
   equivalence it argued — measured rather than argued, and it is why a criterion reading rendered
   values alone could not have observed the replacement.
+  MET at the post-build run for the shipped arm: `test_record_ac10_unknown_counts` is GREEN,
+  inside `runlog selftest`'s `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC4 — `ASSERTION_FLOOR` in `tools/runlog/selftest.py` —
   MET by direct read. `ASSERTION_FLOOR` moved 1491 -> 1507. The newest move's own predicate was
   re-implemented from the docstring that states it and run over the spliced source: the newest
@@ -76,6 +82,10 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   3 is the decoy checks `main` runs after every arm function. The six helpers the unit arrives with
   carry none. The suite run that grades the executed count against the floor is owed to the
   post-build run.
+  MET at the post-build run for the count too: `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`. The floor has risen from this unit's 1507
+  to 1543 with the closing review's round-2 folds, and executed equals floor exactly, so the whole
+  hand-derived chain held.
 
 ## What the post-build run must watch
 
@@ -85,12 +95,23 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   non-zero. Nothing here executed the suite's fixture builders, so those three are the one part of
   the arm that the probe could not reproduce — the probe used a synthetic model with the same shape.
   A failure there would name the liveness, not the mechanism.
+  ANSWERED: no failure there. `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the arm's three unreproduced
+  livenesses over `build_landed_fixture` — transcripts `present`, a non-zero in-window owner turn
+  and non-zero attributed calls — all held.
 - The runlog row of `tools/run-gates/selftest-budgets.txt` still reads 93 s, calibrated at 1291
   assertions on 2026-09-16. The suite now declares 1507. No unit of this build moved that row, so the
   wall-clock ceiling is the post-build run's first real reading of it, and a breach is this build's
   condition rather than this unit's.
+  ANSWERED, and it is not this build's condition to carry: the suite now declares 1543 and ran
+  1543 in 80 s invoked directly, under the 93 s row, so the row does not move. Inside the bar's
+  8-wide pool the same leg recorded 93.9 s, a contention reading that file's own header says to
+  re-read on a quiet box.
 - `.lexicon.conf`'s armed module-constant row is graded by the lexicon kit's own self-test, which is
   held off the default bar. This unit adds two public screaming module constants to the runlog suite,
   and so did several units before it on this branch without moving that row. `py.constant` is an
   UNDECLARED cell, so the `lexicon naming predicates` leg does not grade them; every function name
   this unit mints was put to `lexicon.py --suggest --as py.function` and came back OK.
+  ANSWERED at the post-build run, which ran with the kit self-tests ON: `lexicon selftest` is
+  GREEN, so the armed module-constant row holds, and `lexicon naming predicates` is GREEN in 3.9
+  s.

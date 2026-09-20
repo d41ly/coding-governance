@@ -30,6 +30,8 @@ reach. Every arm below is therefore owed to the post-build run with the break th
   figures. Owed: `test_record_ac1_withheld_rows`, staged RED by typing any count beside the builder or
   by reordering the constant, and the liveness that the class model holds MORE retired events than the
   one per kind its builder appends, which is what makes the fixture non-trivial.
+  MET at the post-build run: `test_record_ac1_withheld_rows` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `render_record` over four coverage shapes — MET on the probe, OWED as an arm. With the
   transcripts `not-local`, the gates journal `dead`, the pushes journal `absent` and the idle gaps
   unjudged, seven kinds rendered `-` and `verb` rendered a count off a driver reading `partial`; the
@@ -44,6 +46,8 @@ reach. Every arm below is therefore owed to the post-build run with the break th
   two still passed. Owed: `test_record_ac1_withheld_rows`, staged RED by those same two wrappers,
   which the arm installs around `build_counted_values` and `derive_counted_sources` and restores in a
   `finally`.
+  MET at the post-build run: `test_record_ac1_withheld_rows` is GREEN there too, on the same 1543
+  passed and 0 failed.
 - AC3 — `git show HEAD~1 -- tools/runlog/selftest.py` — MET, run in this pass. The build commit's
   hunks over the suite carry no line of `test_record_ac10_unknown_counts`: a grep of that diff for
   `record AC10` and for the function's own name exits 1 and prints nothing, so not one of its count
@@ -62,12 +66,15 @@ reach. Every arm below is therefore owed to the post-build run with the break th
   `Summary/phase slot 0 is no {int} slot of a fact the schema declares`; and the copy whose retired
   kind list gained a member named `Timeline/withheld rows slot 8 declares no source`. Owed:
   `test_record_ac1_withheld_rows`, staged RED by any one of those copies passing.
+  MET at the post-build run: the arm is GREEN, on the same 1543 passed and 0 failed.
 - AC5 — `test_record_model_fields` — OWED to the post-build run, not observable here. The arm reads
   its workflow run's count back out of `withheld rows`, expecting the model's own `workflow` event
   count where that model's transcripts read a state in `COUNTED_STATES` and `-` otherwise, both read
   from the model rather than typed. Its fixture is the suite's own and cannot be reached in this pass.
   Owed: `test_record_model_fields`, staged RED by typing the count or by dropping the `COUNTED_STATES`
   branch so the `-` case renders a digit.
+  MET at the post-build run: `test_record_model_fields` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC6 — `test_record_ac1_real_model` — OWED to the post-build run, not observable here. That arm
   compared two WHOLE rendered Timelines, so this unit's fact was always going to move it, and it
   spells neither `withheld rows` nor `count_sources` — the reader-by-value class. The comparison now
@@ -75,6 +82,8 @@ reach. Every arm below is therefore owed to the post-build run with the break th
   the assertion that `withheld rows` DOES, which is the fact's liveness over a REAL model. Owed:
   `test_record_ac1_real_model`, staged RED by a renderer that leaves the fact's counts at zero, which
   makes the two renders agree where they must differ.
+  MET at the post-build run: `test_record_ac1_real_model` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 
 ## What else the pass carried
 
@@ -86,6 +95,9 @@ reach. Every arm below is therefore owed to the post-build run with the break th
   key for every member of `SOURCE_NAMES`, which `measure_coverage` sets unconditionally; and that its
   transcripts row carries `sessions` and `extracts`, which the Coverage fact already reads through
   `.get(..., 0)`.
+  ANSWERED: both hold. `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the arms resting on the class model's
+  coverage rows and its transcripts row are GREEN and neither reasoned property was wrong.
 - **The probe caught a real defect before any arm existed.** `dict(sources, **{key: value})` raises
   `TypeError: keywords must be strings` when the keys are TUPLES, which every `count_sources` key is.
   Two of AC4's four staged copies were written that way and would have killed the whole arm at its
@@ -96,6 +108,10 @@ reach. Every arm below is therefore owed to the post-build run with the break th
   previous move was a LOWERING to 1385, which no pass has been able to verify by running the suite;
   this pass's arithmetic is relative to that figure and does not re-derive it, so if 1385 was wrong
   this is wrong by the same amount. The post-build run is where both are settled.
+  SETTLED: `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`. The
+  floor has risen from this unit's 1404 to 1543 with the units after it, and executed equals floor
+  exactly, so neither the 1385 this arithmetic was relative to nor the chain built on it ever put
+  the floor above the true total.
 - **Five helpers arrive, one in the kit and four in the suite**, plus four nested functions inside the
   new arm. Every one was checked with `lexicon.py --suggest ... --as py.function`:
   `build_withheld_template`, `derive_int_slots`, `derive_counted_sources`, `build_counted_values` and
@@ -156,3 +172,12 @@ reach. Every arm below is therefore owed to the post-build run with the break th
 - `codebase-map coverage + freshness` — that the regenerated artifacts rode the same commit as the
   dossier edit, which they did.
 - `memory hygiene` — check 6 over the dossier's bytes, and check 23 over this ledger.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so every arm listed above is GREEN. `lexicon naming predicates` is GREEN in 3.9 s over the new
+names and the `VERB_OFFENDER_PIN` equality, `codebase-map coverage + freshness` in 2.5 s and
+`memory hygiene` in 29.1 s. The run's one RED, `govkit selftest`, is on none of these legs: its 30
+failing assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by this
+build and being fixed in a separate session. It is not called green here.

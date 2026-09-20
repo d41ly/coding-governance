@@ -52,6 +52,8 @@ real digest rather than absent. That, and every RED below, is owed to the post-b
   nothing else; the ISO form on that `ref` was refused by both the class-blind scan and the `utc`
   rule. The live `ref` class was the one the staging borrowed, restored. Owed: the arm, staged RED by
   those five renders.
+  MET at the post-build run: `test_record_time_population` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `check_record_times` and the rendered `elided` fact — MET on the probe, OWED as an arm. The
   fixture's kept rows passed twice `TIMELINE_EDGE` — 77 rendered rows, 60 shown, 17 elided — and the
   `elided` fact's two times were exactly the first and last kept rows the two shown tables omit,
@@ -59,6 +61,7 @@ real digest rather than absent. That, and every RED below, is owed to the post-b
   model's UNFILTERED timeline, which still holds every journal event the rows dropped, the range came
   back different and named a withheld second, because the journal events are interleaved among the
   kept rows by list position. Owed: the arm, staged RED by that unfiltered range.
+  MET at the post-build run: the arm is GREEN there, on the same 1543 passed and 0 failed.
 - AC3 — `check_slots_rendered(RECORD_SCHEMA, doc)` — MET on the probe, OWED as an arm. Over the
   clean render every one of the 11 slots `scan_time_slots` returns had rendered a token, and the
   population held all three key shapes a slot can have and both classes `time_classes` names. Three
@@ -67,12 +70,14 @@ real digest rather than absent. That, and every RED below, is owed to the post-b
   `Timeline/elided/1`, since nothing is elided; and a schema copy declaring one extra `utc` fact the
   record never fills gave `Summary/landed/0`, which is what a typed slot list could not do. The live
   schema's Summary fact labels were unchanged afterwards. Owed: the arm, staged RED by those three.
+  MET at the post-build run: the arm is GREEN there, on the same 1543 passed and 0 failed.
 - AC4 — `check_time_classes(RECORD_SCHEMA, fixture)` — MET on the probe, OWED as an arm. Over the
   live schema no `shaped` class outside `time_classes` fullmatched a public time's rendered form or
   the rendered form of a difference of two. Over a copy whose `time_classes` holds `utc` alone it red
   naming `duration`, as a class matching a rendered difference of public times. The forms it measures
   against held both halves — more than one public time and more than one difference — so neither is
   an empty set. Owed: the arm, staged RED by that copy.
+  MET at the post-build run: the arm is GREEN there, on the same 1543 passed and 0 failed.
 
 ## What else this pass touched
 
@@ -85,3 +90,7 @@ real digest rather than absent. That, and every RED below, is owed to the post-b
   at 1291 assertions, and this arm builds one more landed fixture and renders a dozen records; the
   cost is real but unmeasured here, since measuring it means running the suite. If the post-build run
   breaches that ceiling, the budget is what moves, with the reading that moved it.
+  ANSWERED: it does not breach. The suite now runs 1543 assertions in 80 s invoked directly, under
+  the row's 93 s, so `tools/run-gates/selftest-budgets.txt` does not move and no reading is owed
+  it. Inside the bar's 8-wide pool the same leg recorded 93.9 s; the row is calibrated from direct
+  runs and that file's own header says to re-read a breach on a quiet box, which the 80 s is.

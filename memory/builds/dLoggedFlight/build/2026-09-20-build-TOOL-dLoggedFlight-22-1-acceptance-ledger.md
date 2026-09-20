@@ -32,6 +32,8 @@ run here.
   Owed: `test_record_ac4_classes` for the class model and `test_record_ac1_real_model` for the idle
   fixture's real model, staged RED by returning one retired kind to the Timeline row layouts of
   `RECORD_SCHEMA`, which puts its rows back and leaves the pinned triple disagreeing.
+  MET at the post-build run: `test_record_ac4_classes` and `test_record_ac1_real_model` are both
+  GREEN, inside `runlog selftest`'s `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `render_record` over that same model, reading the two table headers — observed in this pass.
   The Anomalies table rendered `#`, `kind`, `subclass` and the Coverage table `#`, `source`, `state`,
   `lines`, `bad`. Every Anomalies row still led with its ordinal, checked against `1..n` over the
@@ -41,6 +43,9 @@ run here.
   unaggregated table only — the aggregated path is owed to `test_record_ac6_cap`. Owed:
   `test_record_ac4_classes` and `test_record_ac6_cap`, staged RED by restoring either column to the
   schema, which makes the rendered header a column wider than the arm's.
+  MET at the post-build run: `test_record_ac4_classes` and `test_record_ac6_cap` are both GREEN,
+  inside `runlog selftest`'s `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the
+  aggregated path holds too.
 - AC3 — `git grep -n -e scan_owner_times -e UTC_TOKEN_RE -e TWIN_ROW_RE -e "owner turn's second" -- tools/runlog memory/map/features/runlog.md` —
   MET, run in this pass: exit 1, nothing printed. The second half was observed too: a model whose
   `commit` event carries the exact time of an owner turn it holds rendered its record, and that time
@@ -57,6 +62,8 @@ run here.
   reached. Owed: `test_record_ac4_classes`, whose vocabulary list is `sorted(RECORD_SCHEMA["vocab"])`
   and whose union spans the class model's render and the three `build_placement_models` makes, staged
   RED by either copy.
+  MET at the post-build run: `test_record_ac4_classes` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC5 — `memory/builds/dLoggedFlight/spec/2026-09-16-spec-TOOL-dLoggedFlight-22.md` S5 and S6 against
   the suite source — the floor reads 1385 with a `LOWERED 1392 -> 1385 by TOOL-dLoggedFlight-22`
   comment naming every arm and half that moved, the module defines no `test_record_ac9_owner_times`,
@@ -67,6 +74,11 @@ run here.
   not read off a run**, because no pass may run the suite; it is a lower bound, so a hand count under
   the true total still passes and one over it fails. Owed: the whole suite at that floor, and
   `test_record_placement_windows`, staged RED by typing a figure the arithmetic does not reach.
+  MET at the post-build run: `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the whole suite ran at its floor and
+  `test_record_placement_windows` is GREEN. The hand-derived 1385 has since been raised to 1543 by
+  the units after this one, and executed equals floor exactly, so no step of that hand arithmetic
+  ever put the floor above the true total.
 - AC6 — `git grep -n -e "verb token" -e "check numbers" -e "THREE LISTS" -e "pre-push hook's decisions" -e "Timeline .rc." -e "rc of an END" -- tools/runlog/README.md tools/runlog/record.py memory/map/features/runlog.md` —
   MET, run in this pass: exit 1, nothing printed. It reds honestly: its first run after the record.py
   edit printed one hit, a sentence this pass had just written using the phrase `pre-push hook's
@@ -113,6 +125,10 @@ run here.
   event's phase, its ledger entry count and its `record_window` duration are the shaped values those
   slots carry; that the landed fixture's `commit` and `merge` events carry `FX_UNIT1` in their `units`
   cell; and that the plain 500-row cap model still fits at the nominal bounds with kept kinds alone.
+  ANSWERED: all four hold. `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, which is every arm that grades the class
+  model's render and the placement renders, the landed fixture's `units` cells and the plain
+  500-row cap model; none of them failed.
 - **`build_placement_models` is now called twice a run**, once by `test_record_placement_windows` and
   once by record AC4's union. Three more fixture histories per run is the price of reaching a
   vocabulary only a Summary fact carries, which F2 ratified in rev-3 against a typed exclusion.
@@ -147,3 +163,12 @@ run here.
   dossier edit.
 - `memory hygiene` — check 6 over the dossier at 20358 bytes, check 21 over this ledger's bindings and
   check 23 over its criterion lines.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so every arm listed above is GREEN and the floor question is settled: executed equals floor
+exactly, so the figure was never above the true total. `runlog record schema` is GREEN in 0.7 s
+and `lexicon naming predicates` in 3.9 s. The run's one RED, `govkit selftest`, is on none of
+these legs: its 30 failing assertions are the IDENTICAL set `origin/main` carries, pre-existing,
+untouched by this build and being fixed in a separate session. It is not called green here.

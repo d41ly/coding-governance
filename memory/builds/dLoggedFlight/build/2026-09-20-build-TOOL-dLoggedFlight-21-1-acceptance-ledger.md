@@ -38,12 +38,16 @@ driver said so rather than writing a second row.
   the count. The CLI half — `runlog.py verify` exiting 0, 1 and 2 over the rotation fixture — is owed:
   `test_record_ac5_verify`, whose commitment-shape assertion now ends at the count, staged RED by the
   inserted line the arm writes into its own journal, or by reverting `check_commitment` to a floor.
+  MET at the post-build run: `test_record_ac5_verify` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC3 — `TEMPLATE_PARSERS` — the pair check's logic was observed directly by the same script:
   `TEMPLATE_PARSERS` maps `commitment` to `COMMITMENT_RE` and nothing else, a clean render parsed in
   both copies, and with the schema's `commitment` template widened by a third field while the regex was
   left, the check named `commitment` and nothing else. The schema tuple was restored and asserted
   restored. The arm itself is owed: `test_record_template_pairs`, staged RED by that same widening,
   which it applies to the schema's own tuple inside a `try`/`finally`.
+  MET at the post-build run: `test_record_template_pairs` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC4 — `grep -n "committed first" tools/runlog/README.md tools/runlog/record.py memory/map/features/runlog.md` — run directly, it exits 1 and finds nothing. The README's commitment paragraph now names the time-ordered prefix and the START of it, the module docstring says the count is the whole anchor, and the dossier's sentence says the commitment is a digest and a count with no time.
 
 ## What else the pass carried
@@ -80,3 +84,16 @@ driver said so rather than writing a second row.
   two fields. Its budget row moves by one more `build_class_model`, which builds a landed fixture.
 - `lexicon naming predicates`, `codebase-map coverage + freshness` and `memory hygiene`, the gates the
   spec's section 7 names.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so both owed arms are GREEN; this unit's floor of 1348 has risen with the units after it. The run
+settles the hand-derived chain that carried it there: executed equals floor exactly, so no step in
+it ever put the floor above the true total. The suite cost 80 s run directly, under the 93 s its
+budget row declares, so `tools/run-gates/selftest-budgets.txt` does not move; inside the bar's
+8-wide pool the same leg recorded 93.9 s, a contention reading that file's own header says to
+re-read on a quiet box. `lexicon naming predicates`, `codebase-map coverage + freshness` and
+`memory hygiene` are GREEN too. The run's one RED, `govkit selftest`, is on none of these legs:
+its 30 failing assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by
+this build and being fixed in a separate session. It is not called green here.

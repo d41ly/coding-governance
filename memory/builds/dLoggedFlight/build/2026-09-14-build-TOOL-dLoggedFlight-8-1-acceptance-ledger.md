@@ -312,6 +312,10 @@ AC5.
   build's own dispatch and brief rows. This node's driver journal holds 44 of this run's lines and no
   record-creating preflight, so the run models from git with `driver` reading `partial`. `gates`
   reads `absent` until the post-build gate run writes its first line.
+  ANSWERED: that run wrote the first line, and four before it. `<common-dir>/runlog/gates.log` now
+  carries five gates lines, the newest keyed `20260920T205156Z-786` at head `9e948546`, reading
+  `verdict=RED ran=111 failed=1 fail.1=govkit selftest rc=1` beside `full=1`, `selftests=1`,
+  `kit=1.8` and an empty `wall_breach`. `gates` no longer reads `absent` on this node.
 
 ## Staged RED
 
@@ -349,6 +353,15 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `codebase-map coverage + freshness` and `memory hygiene`;
 - `runlog selftest`, the leg that runs `<suite>`, and
   `every held leg is budgeted, every budget row resolves`, whose row this pass re-measured.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN. `runlog selftest` printed
+`1543 passed, 0 failed (1543 assertions, floor 1543)`, this unit's floor of 774 having risen with
+the units after it, in 80 s run directly against its budget row's 93 s. `govkit selfcheck` is
+GREEN; the run's one RED is its neighbour `govkit selftest`, whose 30 failing assertions are the
+IDENTICAL set `origin/main` carries - pre-existing, untouched by this build, and not called green
+here.
 
 ## Residue
 

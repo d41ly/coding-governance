@@ -39,6 +39,8 @@ suite's own class-model fixture is owed to the post-build run.
   `test_record_ac1_time_sources`, staged RED by each of those three copies, and by the check that
   reads the keys and their subset off the DATA rather than off the checker's verdict — which is the
   arm that still reds if `check_time_sources` itself is gutted.
+  MET at the post-build run: `test_record_ac1_time_sources` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC5 — `check_record` over a rendered record — MET on the probe, OWED as an arm. A record rendered
   from a synthetic model graded clean, zero refusals, so the grader is not one that refuses
   everything. Its kept `commit` row re-sourced `driver` was then refused exactly once, on that row's
@@ -54,6 +56,8 @@ suite's own class-model fixture is owed to the post-build run.
   staged RED by the same substitution over the class model's record, with the block holding that row
   to the source rule alone; that arm also holds `RECORD_RULES` in both directions, so a new rule
   nobody staged reds it.
+  MET at the post-build run: the `source` variant of `test_schema_ac2_refusals` is GREEN, inside
+  `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC7 — `grep -n 'no event times' .claude/skills/runlog/SKILL.md` — MET, run in this pass. It finds
   the sentence twice, in the description and in step 1. The question table's between-two-times row
   now reads the model's `timeline`, which elides nothing, in its first source cell, and the record's
@@ -66,6 +70,8 @@ suite's own class-model fixture is owed to the post-build run.
   and the description's routing clause dropped — which is refused for both routings and not for the
   sentence. Both stagings are DERIVED from the rendered text, never typed, so they cannot quietly
   stage nothing the day the prose is reworded.
+  MET at the post-build run: `test_skill_ac7_time_routing` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC8 — `grep -n 'refuses the whole record' memory/gotchas/withheld-value-recovered-from-a-derived-one.md`
   — MET, run in this pass. It exits 1 and prints nothing. The fix section's second bullet is now
   `Withhold the SOURCE, not the value`, which names `check_time_sources`, the schema leg and
@@ -81,6 +87,11 @@ suite's own class-model fixture is owed to the post-build run.
   floor moved 1404 -> 1422 by 18 — two new arms at 5 and 4 checks with their 6 decoy checks, and 3
   checks inside the schema leg's existing refusal arm — derived by hand, and a floor under the true
   total still passes.
+  ANSWERED at the post-build run, which was the whole bar at `9e948546` with every guard lifted
+  and the kit self-tests on: `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so every arm above is GREEN. The floor
+  this unit moved to 1422 by hand has since risen to 1543, and the run settles the arithmetic:
+  executed equals floor exactly, so no hand-derived step ever put the floor above the true total.
 - **It did not wire `check_time_sources` into the leg's exit code.** It is graded by an arm, exactly
   as `check_count_sources` is: a schema defect is a code defect, and making it a record refusal would
   red every committed record for a fault in none of them.

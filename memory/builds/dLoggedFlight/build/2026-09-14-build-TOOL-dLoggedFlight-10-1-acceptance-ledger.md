@@ -56,6 +56,10 @@ never typed.
   ceiling clears its evidenced maximum is OWED to the `leg ceilings clear their evidenced maximum` leg
   of the post-build gate run. RED seen with the leg reading the working tree, with a git call added per
   record, and with one added per build.
+  MET at the post-build run: `leg ceilings clear their evidenced maximum` is GREEN, so the 60 s
+  ceiling this line reads off the manifest does clear its evidenced maximum, and
+  `runlog record schema` - the leg itself - is GREEN in 0.7 s, reporting `git_calls=5` over this
+  tree.
 - AC5 — `check-records` over this tree and `RUN.md` fixtures (`test_schema_ac5_runs`) — over this tree
   it exited 0 in 5 git calls. It reported aBoundedVerdict, aDeclaredBound, aGradedDialect,
   aPacedTurnstile, dTieredTribunal and dUnstalledConvoy with distinct start commits, every window
@@ -154,6 +158,17 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `runlog selftest`, the leg that runs `<suite>`, and `runlog record schema`, the leg this unit adds,
   both first graded on the bar there; and `every held leg is budgeted, every budget row resolves`,
   whose row this pass re-measured.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN: `govkit selfcheck` at 27 of 27 registry entries
+with 0 unclaimed, `codebase-map coverage + freshness`,
+`leg ceilings clear their evidenced maximum` - AC4's ceiling clause - `lexicon naming predicates`,
+`memory hygiene`, `runlog record schema` at `git_calls=5` in 0.7 s, `runlog selftest` printed
+`1543 passed, 0 failed (1543 assertions, floor 1543)`, and the budget-population leg. The run's
+one RED, `govkit selftest`, is on none of these legs: its 30 failing assertions are the IDENTICAL
+set `origin/main` carries, pre-existing, untouched by this build and being fixed in a separate
+session. It is not called green here.
 
 ## Residue
 

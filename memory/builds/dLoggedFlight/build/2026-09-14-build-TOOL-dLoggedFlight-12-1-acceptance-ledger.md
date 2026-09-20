@@ -38,6 +38,7 @@ not the leg's verdict, which is owed below with the rest.
   four breaks each made the arm fail, and each file came back byte-identical by md5. The breaks were a
   literal `tools/` path in the template, the adopter's literal scan made to match nothing, the
   comparison's CR strip removed, and the memory-root substitution deleted.
+  MET at the post-build run: `runlog skill wiring` is GREEN in 0.7 s.
 - AC2 — `python tools/runlog/selftest.py` (`test_skill_ac2_description`) — the front matter names the
   Skill `runlog`. The description names run, unattended, decided, stopped and cost as whole words, at
   784 characters, under the 1024 a Skill description is allowed. It carries a `Do NOT use` clause
@@ -152,3 +153,13 @@ The legs outside section 7 that this pass's files reach, owed the same way: `run
 directly here, and `python resolver (behaviour + inline parity + idiom ban)`. Also
 `every held leg is budgeted, every budget row resolves`, `leg ceilings clear their evidenced maximum`,
 `lexicon naming predicates`, `dead-path carriers (deleted files still named)` and `kit version markers`.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN, section 7's and the ones outside it alike:
+`runlog skill wiring` in 0.7 s, `govkit selfcheck` at 27 of 27 registry entries and 0 unclaimed
+over a 70-path surface, `kit placeholders (a declared token its adopter substitutes)`, and
+`runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`. The run's one
+RED, `govkit selftest`, is on none of these legs: its 30 failing assertions are the IDENTICAL set
+`origin/main` carries, pre-existing, untouched by this build and being fixed in a separate
+session. It is not called green here.

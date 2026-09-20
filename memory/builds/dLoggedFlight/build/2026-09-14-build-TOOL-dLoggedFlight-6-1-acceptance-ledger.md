@@ -164,6 +164,18 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `every held leg is budgeted, every budget row resolves`, since the budget row's evidence changed;
 - `testsuite counts (every bar self-test prints one)`.
 
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN. `runlog selftest` printed
+`1543 passed, 0 failed (1543 assertions, floor 1543)`, this unit's floor of 591 having risen with
+the units after it. The suite cost 80 s run directly, under the 93 s its budget row declares, so
+`tools/run-gates/selftest-budgets.txt` does not move; inside the bar's 8-wide pool the same leg
+recorded 93.9 s, a contention reading that file's own header says to re-read on a quiet box. The
+row now declares 93 s rather than the 60 s written above. The run's one RED, `govkit selftest`, is
+on none of these legs: its 30 failing assertions are the IDENTICAL set `origin/main` carries,
+pre-existing, untouched by this build and being fixed in a separate session. It is not called
+green here.
+
 ## Residue
 
 - The first session's suite crashed on its AC8 arm: a `WeakSet` cannot hold a dict, and the tracked

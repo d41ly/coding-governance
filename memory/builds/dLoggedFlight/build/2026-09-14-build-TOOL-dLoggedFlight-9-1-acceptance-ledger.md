@@ -33,6 +33,10 @@ added AC10, whose line below that fold observed.
   spelled `memory`, and with the refusal's exit swallowed. The real gate's verdict over a committed
   record is OWED to the `memory hygiene` leg of the bar that grades this run's own record, which
   `TOOL-dLoggedFlight-11` renders.
+  STILL OWED after the post-build run. `memory hygiene` is GREEN there in 29.1 s, but that bar
+  graded no record of this run: `memory/builds/dLoggedFlight/` carries `RUN.md` and no rendered
+  record, and `check-records` names this build nowhere. What still owes this line is the bar that
+  runs once `TOOL-dLoggedFlight-11`'s orchestrator has rendered and committed the record.
 - AC2 — `derive_serves` (`test_record_ac2_serves`) — a run that dispatched units 2, 3 and 5 of a build
   whose specs define 1 to 5, and an undefined 9, served `X-xFixtureRun-2..3 X-xFixtureRun-5`, and the
   head bound exactly those three as check 21 reads it. A unit closed and named by the run's own commit
@@ -173,6 +177,16 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `codebase-map coverage + freshness`;
 - `runlog selftest`, the leg that runs `<suite>`, and
   `every held leg is budgeted, every budget row resolves`, whose row this pass re-measured.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN: `memory hygiene` in 29.1 s,
+`lexicon naming predicates`, `install-prefix (shipped surface)`, `govkit selfcheck`,
+`codebase-map coverage + freshness`, the budget-population leg, and `runlog selftest` printed
+`1543 passed, 0 failed (1543 assertions, floor 1543)`, this unit's floor of 908 having risen with
+the units after it. The run's one RED, `govkit selftest`, is on none of these legs: its 30 failing
+assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by this build and
+being fixed in a separate session. It is not called green here.
 
 ## Residue
 

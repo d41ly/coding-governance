@@ -26,6 +26,11 @@ existed under `tools/unattended/` before this build ran.
   read the rendered method at 26733 bytes: under its 27648 row by 915, under its recorded high-water
   of 26941, and 339 lines against the 350 the method states. The addition is 294 bytes against the
   300 the spec's risks line allows; the first draft read 308, and the M9 row's clause was shortened.
+  MET at the post-build run: `kit/dogfood doc parity` is GREEN, reporting four
+  shipped-and-installed pairs in sync for `tools/memory-tree`, and `build-method size` is GREEN at
+  27558 of its 27648 bytes, 90 under. That leg also printed an advisory WARN this line could not
+  have foreseen: the method has grown past the 26941 high-water recorded here, to 27558, and the
+  growth is later units' rather than this one's.
 - AC3 — `git log --format='%(trailers:key=Decided,valueonly)'` — a scratch arm, a script kept
   outside the tree, read M10's section out of the rendered method and took its one backticked
   `Decided: ` span with no placeholder as the example. In a throwaway repository, the example in the
@@ -46,6 +51,8 @@ existed under `tools/unattended/` before this build ran.
   2.70 marker stood once in each of nine carriers: the engine constant's line in
   `tools/memory-tree/check-memory-hygiene.sh`, line 1 of the four `tools/memory-tree/*.template.md`,
   and line 1 of their four renders.
+  MET at the post-build run: `kit version markers` is GREEN in 2.4 s, at memory-tree 2.79 and not
+  the 2.70 this line records - later units moved every carrier together.
 
 ## What else the pass carried
 
@@ -85,3 +92,14 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `method carriers (every pointer declared)`, `unattended kit gate` and `memory hygiene`;
 - `verdict epoch (kit version dates the engine)`, which section 7 does not name and which grades the
   bump this commit makes.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN: `kit/dogfood doc parity` at four pairs,
+`build-method size` at 27558 of 27648 bytes, `kit version markers`,
+`method carriers (every pointer declared)` at 18 carriers all declared and pointing,
+`unattended kit gate`, `memory hygiene`, and `verdict epoch (kit version dates the engine)`, which
+reported clean over two lines moved with the version at 2.78 -> 2.79. The run's one RED,
+`govkit selftest`, is on none of these legs: its 30 failing assertions are the IDENTICAL set
+`origin/main` carries, pre-existing, untouched by this build and being fixed in a separate
+session. It is not called green here.

@@ -48,6 +48,11 @@ existed under `tools/unattended/` before this build ran.
   `project-owned`. What this pass observed is the declarations, through `check_ac6_declarations`:
   the suite in the kit's project-owned list, a budget row, one held, guarded and bounded manifest leg,
   and the README marker at the runner's version. RED seen with each of those four undone on a mirror.
+  MET at the post-build run: `run-gates run-log line` is GREEN, printing `PASS (192 assertions)`
+  against its floor of 192 in 80.5 s, well inside the 280 s budget row; `kit version markers` is
+  GREEN, though the run-gates marker now reads 1.8 and not the 1.7 written above, moved by a later
+  unit; and `govkit selfcheck` is GREEN, grading 27 of 27 registry entries over a 70-path surface
+  with 0 unclaimed.
 - AC7 — `bash <suite>` (`check_ac7_many_fails`) — 21 failing legs wrote `failed=21`, `fail.1=red 01`,
   `fail.20=red 20`, no `fail.21` and `fail_more=1`, on a line at or under 2048 bytes. RED seen with the
   cap raised to 21, and with the failing legs taken in glob order, where `fail.20` read `red 09`.
@@ -104,6 +109,13 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `install-prefix (shipped surface)`;
 - `shell hygiene (a loop fed by a command substitution)`;
 - `gotchas selftest` and `memory hygiene`.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN. The run's one RED, `govkit selftest`, is on
+none of these legs: its 30 failing assertions are the IDENTICAL set `origin/main` carries,
+pre-existing, untouched by this build and being fixed in a separate session. It is not called
+green here.
 
 ## Residue
 

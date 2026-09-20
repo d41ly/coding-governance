@@ -27,6 +27,8 @@ observes is owed to the landing, and the last section says where it will be reco
   conf key and no `render()` change were added. Counted with the install-prefix gate's own two
   patterns, the template holds 0 hits and 1 carried occurrence, as it did at HEAD, because a
   placeholder-led path is excluded by design.
+  MET at the post-build run: `unattended skill wiring` is GREEN in 0.7 s, so the renderer's own
+  `--check` agrees with the byte comparison this pass made by hand.
 - AC2 — `grep -n 'Record the run' .claude/skills/unattended/SKILL.md` — prints 763, the heading, then
   842 and 865, the pointers from Mark it landed and from If it cannot finish. The section names the
   three placements at 786 (`--abort`), 787 (`--close`, before the merge) and 790 (`--landed`). The
@@ -50,13 +52,21 @@ observes is owed to the landing, and the last section says where it will be reco
   nothing, so byte identity alone would not have passed this criterion. Check 10 of
   `tools/unattended/check-unattended.sh` is owed to the post-build gate run, in the
   `unattended kit gate` leg.
+  MET at the post-build run: `unattended kit gate` is GREEN in 175.9 s, so check 10 holds over the
+  two copies.
 - AC5 — `2f11f32d` — owed to the landing, and never met here. The orchestrator renders this run's
   record after `--close` and before the merge, runs `python tools/runlog/runlog.py check-records` on
   the merged tree before the push, and runs the full bar on that tree. Where the observation is
   recorded is the last section of this file.
+  STILL OWED after the post-build run, which graded the bar at `9e948546` and landed nothing. No
+  merge and no push has run, so no `check-records` output over a record keyed `2f11f32d` and no
+  full bar on a merged tree exists. The landing still owes this line.
 - AC6 — `pushes.log` — owed to the landing, and never met here. It is read in the primary clone's
   common dir after `tools/push-main.sh` runs from the primary tree. If the primary tree is busy, the
   run-state file carries a parked decision instead, and the landing is not forced.
+  STILL OWED after the post-build run, for the same reason: the primary clone's common dir holds
+  `driver.log` and `gates.log` and no `pushes.log` at all, because `tools/push-main.sh` has not
+  run. The landing still owes this line.
 
 ## What else the pass carried
 
@@ -136,6 +146,15 @@ Every leg of the spec's section 7, and the run records each verdict after it:
 - `kit version markers`, over the unattended markers this pass left at 1.20.
 - `memory hygiene`, over the spec, this ledger and the protocol's size under the guide cap.
 
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN: `unattended skill wiring` in 0.7 s,
+`unattended kit gate` in 175.9 s, `kit version markers` in 2.4 s and `memory hygiene` in 29.1 s.
+`kit version markers` is green at unattended 1.25, not the 1.20 written above - later units moved
+the markers. The run's one RED, `govkit selftest`, is on none of these legs: its 30 failing
+assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by this build and
+being fixed in a separate session. It is not called green here.
+
 ## Owed to the landing
 
 AC5 and AC6 are observed by the run itself at its landing, never by this pass. The orchestrator
@@ -144,3 +163,6 @@ commit. AC5's line then names the `check-records` output over the record keyed `
 bar's verdict on the merged tree. AC6's line names the START and END lines in `pushes.log` for the
 merge commit. If the landing is parked because the primary tree is busy, the parked decision in the
 run-state file is the record instead, and both lines stay owed.
+
+The post-build run does not discharge this. It graded the bar at `9e948546` inside this worktree
+and landed nothing, so AC5 and AC6 stay owed to the landing exactly as written above.

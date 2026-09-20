@@ -35,6 +35,8 @@ Two substitutes were used instead, and the line between them matters:
   render's value disagreed with the copy on `brief`, `commit` and `dispatch` and would red on the
   first of them. Owed: `test_record_kind_sweep`, staged RED by an arm copy that types the
   `values withheld` count at the base render's value.
+  MET at the post-build run: `test_record_kind_sweep` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `test_record_kind_sweep` — OWED to the post-build suite run. Observed on the probe: the
   removals summed to the timeline's length with the input model unmoved, every swept kind took at
   least one event, and every kind the base render writes a row for moved the rendered bytes. The one
@@ -42,6 +44,8 @@ Two substitutes were used instead, and the line between them matters:
   this criterion; see below. Owed: `test_record_kind_sweep`, staged RED by a `build_kind_removed`
   copy that returns the model unchanged, which reds on the removal counts, the partition, the
   render-moved liveness and every expectation at once.
+  MET at the post-build run: `test_record_kind_sweep` is GREEN there too, on the same 1543 passed
+  and 0 failed.
 - AC3 — `test_record_kind_sweep` — OWED to the post-build suite run. The same sweep runs over
   `build_big_model`'s model at the nominal bounds, where the expectations are S6's `events`, `shown`
   and `elided`. Observed on the probe over a synthetic model lengthened to 200, 61 and 60 rows —
@@ -50,6 +54,8 @@ Two substitutes were used instead, and the line between them matters:
   so the elided branch the wide model takes is exercised rather than assumed. The widest record's
   overflow liveness is exempt, as AC3 states. Owed: `test_record_kind_sweep`, staged RED by an arm
   copy that types the event count at the base model's value.
+  MET at the post-build run: `test_record_kind_sweep` is GREEN, on the same 1543 passed and 0
+  failed.
 - AC4 — `tools/runlog/selftest.py` — MET for the comment, OWED for the count. `ASSERTION_FLOOR` reads
   1463, its newest move is `# RAISED 1451 -> 1463 by TOOL-dLoggedFlight-28,` and its block's
   arithmetic is `9 + 3 = 12`. Read back through `parse_floor_raise`'s own three regexes, transcribed
@@ -59,6 +65,10 @@ Two substitutes were used instead, and the line between them matters:
   loop, so the count cannot vary per run; the 3 is the decoy checks `main` adds for every new arm.
   Owed: the suite run itself, which grades the executed count against the floor and reds if this arm
   executes fewer than nine assertions.
+  MET at the post-build run for the count too: `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the executed count reached the floor
+  and the arm is GREEN. The floor has risen from this unit's 1463 to 1543 with the units after it,
+  and executed equals floor exactly.
 
 ## What else the pass carried
 
@@ -80,6 +90,10 @@ Two substitutes were used instead, and the line between them matters:
   existing `values withheld` expectation of exactly four already depends on; that the first `commit`
   and `phase` events survive every removal but their own, which the shaped skip check asserts; and
   the arm's wall cost, which nothing here can time.
+  ANSWERED: all four hold. `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the sweep is GREEN over the class
+  model's real rows, the shaped skip check passed, and the arm's wall cost is inside a suite that
+  finished in 80 s run directly.
 - **Two static readings stood in for running the module.** Its source parsed; the four new
   identifiers are each defined exactly once at module level with no name shadowed anywhere in 221
   module-level functions; every free name and every `rl_record.` / `rl_model.` attribute the new code
@@ -112,6 +126,9 @@ Two substitutes were used instead, and the line between them matters:
   seconds for `runlog selftest` against the leg's 180-second ceiling. This arm adds two fixture builds
   and about a dozen renders, which cannot be timed without running the suite, so the figure is left
   where it is deliberately and the post-build run is where a breach would show.
+  ANSWERED: no breach showed. The suite ran 1543 assertions in 80 s invoked directly, under the 93
+  s row and far under the leg's 180 s ceiling, so the row stays where it is; inside the bar's
+  8-wide pool the same leg recorded 93.9 s, a contention reading rather than a regression.
 - **The bug-class checklist named a live one.** `gotchas.py --for-diff` over the first commit
   selected 18 classes, and `amendment-leaves-its-other-half-standing` was a hit rather than a
   reading: rev-2 changed AC2 and left three clauses standing that only made sense under rev-1 —
@@ -133,3 +150,12 @@ Two substitutes were used instead, and the line between them matters:
 - `memory hygiene` — check 23 over this ledger, and the spec's rev-2 status header.
 - `codebase-map coverage + freshness` — the regenerated `symbols.json` rode the same commit as the
   four new symbols.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so `test_record_kind_sweep` is GREEN with the three staged REDs' arms passing.
+`lexicon naming predicates` is GREEN in 3.9 s, `memory hygiene` in 29.1 s and
+`codebase-map coverage + freshness` in 2.5 s. The run's one RED, `govkit selftest`, is on none of
+these legs: its 30 failing assertions are the IDENTICAL set `origin/main` carries, pre-existing,
+untouched by this build and being fixed in a separate session. It is not called green here.

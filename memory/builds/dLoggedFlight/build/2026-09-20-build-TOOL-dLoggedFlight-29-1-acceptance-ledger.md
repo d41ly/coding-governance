@@ -43,6 +43,8 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   reds. Owed: `test_record_placement_states`, staged RED by a `build_placement_models` copy that
   produces `pending` as a keyword copy of the `landing` model with `terminal` set, which must red
   here while `TOOL-dLoggedFlight-25` AC1 still passes on the same copy.
+  MET at the post-build run: `test_record_placement_states` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `test_record_placement_states` — OWED to the post-build suite run. The compared field set is
   each model's own `dataclasses.asdict` key set, recorded inside the comparison loop and compared
   afterwards, so a loop that compared nothing reports an empty set rather than three clean placements.
@@ -52,6 +54,8 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   it. `tools/runlog/model.py:1820` is where it is set, from `time.perf_counter()`, and a grep of the
   kit's three modules found no other wall-clock reading on `build_run_model`'s path. Owed:
   `test_record_placement_states`, staged RED by a comparison copy that compares an empty field set.
+  MET at the post-build run: `test_record_placement_states` is GREEN there too, on the same 1543
+  passed and 0 failed.
 - AC3 — `test_record_placement_states` — OWED to the post-build suite run for the arm; the predicate
   was run over the real tree before wiring, as charter section 7 requires. Observed on the static
   read of the module at the pass's start: the declared member `build_placement_models` was clean, and
@@ -67,6 +71,9 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   `test_record_placement_states`, staged RED by the constant copy naming
   `build_placement_models_absent`, by `build_placement_models_field_edit`, by
   `build_placement_models_rerender`, and by the mutated shipped source.
+  MET at the post-build run for the arm: the shipped predicate ran GREEN inside
+  `runlog selftest`'s `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the mirror and the
+  shipped copy agree.
 - AC4 — `tools/runlog/selftest.py` — MET for the comment, OWED for the count. `ASSERTION_FLOOR` reads
   1491, its newest move is `# RAISED 1463 -> 1491 by TOOL-dLoggedFlight-29,` and its block's
   arithmetic is `25 + 3 = 28`. Read back through `parse_floor_raise`'s own three regexes, transcribed
@@ -75,6 +82,10 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   assertion count, counted from the parse tree with the one `for name in PLACEMENTS` loop weighted by
   its three members and every other call site counted once; the 3 is the decoy checks `main` adds for
   every new arm. Owed: the suite run itself, which grades the executed count against the floor.
+  MET at the post-build run for the count too: `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the executed count reached the floor
+  and the arm is GREEN. The floor has risen from this unit's 1491 to 1543 with the units after it,
+  and executed equals floor exactly.
 
 ## What else the pass carried
 
@@ -98,6 +109,10 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   nothing here can time. The predicate probe is a MIRROR of the shipped predicate, written from the
   same source; it proves what the predicate does to this tree, not that the shipped copy is spelled
   the way the mirror is.
+  ANSWERED: all three hold. `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so `test_record_placement_states` is
+  GREEN over the real `build_landed_fixture` history with its journals, its three distinct
+  placement shas and values, and its wall cost inside a suite that finished in 80 s run directly.
 - **Six helpers arrive** — `scan_model_edits`, `check_built_from_history`, `build_masked_model`,
   `build_placement_models_field_edit`, `build_placement_models_rerender` and
   `build_placement_models_read_only` — plus the arm and one nested `read_call_name`.
@@ -128,6 +143,9 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   `build_placement_models` and re-derives three models, which cannot be timed without running the
   suite, so the figure is left where it is deliberately and the post-build run is where a breach
   would show.
+  ANSWERED: no breach showed. The suite ran 1543 assertions in 80 s invoked directly, under the 93
+  s row, so it stays where it is; inside the bar's 8-wide pool the same leg recorded 93.9 s, a
+  contention reading rather than a regression.
 - **The bug-class checklist named a live one.** `gotchas.py --for-diff` over the first commit selected
   17 classes, and `staged-break-substitutes-a-synthetic-value` was a hit rather than a reading; the
   follow-up commit and rev-3 are its left-shift. `fixture-passes-by-finding-nothing` was answered by
@@ -155,3 +173,12 @@ shipped arm executing. Three substitutes were used, and the line between them ma
 - `memory hygiene` — check 23 over this ledger, and the spec's rev-3 status header.
 - `codebase-map coverage + freshness` — the regenerated `symbols.json` rode the same commit as the
   nine new symbols.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so `test_record_placement_states` is GREEN with the three staged REDs' arms passing.
+`lexicon naming predicates` is GREEN in 3.9 s, `memory hygiene` in 29.1 s and
+`codebase-map coverage + freshness` in 2.5 s. The run's one RED, `govkit selftest`, is on none of
+these legs: its 30 failing assertions are the IDENTICAL set `origin/main` carries, pre-existing,
+untouched by this build and being fixed in a separate session. It is not called green here.

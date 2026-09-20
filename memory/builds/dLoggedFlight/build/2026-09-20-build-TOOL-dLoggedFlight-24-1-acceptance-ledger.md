@@ -31,12 +31,16 @@ run, with the break that stages it RED named beside it.
   `test_window_ac1_ac4_git_only_bounds`, staged RED either by handing the second `derive_window` call
   the journal-bound `term_end` and `last_event` the model's own window uses, or by rendering `window`
   in place of `record_window` in `build_summary_facts`.
+  MET at the post-build run: `test_window_ac1_ac4_git_only_bounds` is GREEN, inside
+  `runlog selftest`'s `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC4 — `render_record` — the same landed model with `record_window` removed from its dict rendered
   `window` as `- to -` and `duration` as `-`, while `values withheld` stayed where it was, so the
   absent field is an absence and not a refused value. Liveness: the same model WITH the field rendered
   a parseable UTC time in each bound, so the `-` is the field's absence and not the fixture's. Owed in
   the same arm, staged RED by making `derive_window_bounds` fall back to the model's `window` when
   `record_window` is missing.
+  MET at the post-build run: the same arm is GREEN, and its output carries the AC4 liveness line
+  that the model WITH the field rendered a time in each bound.
 
 ## What else the pass carried
 
@@ -86,3 +90,15 @@ run, with the break that stages it RED named beside it.
   `duration` fact's value. Its budget row gains one landed fixture and one `check_records` call.
 - `lexicon naming predicates`, `codebase-map coverage + freshness` and `memory hygiene`, the gates the
   spec's section 7 names.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so the durable arm and every record arm listed above are GREEN; this unit's floor of 1358 has
+risen with the units after it. The suite cost 80 s run directly, under the 93 s its budget row
+declares, so `tools/run-gates/selftest-budgets.txt` does not move; inside the bar's 8-wide pool
+the same leg recorded 93.9 s, a contention reading that file's own header says to re-read on a
+quiet box. `lexicon naming predicates`, `codebase-map coverage + freshness` and `memory hygiene`
+are GREEN too. The run's one RED, `govkit selftest`, is on none of these legs: its 30 failing
+assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by this build and
+being fixed in a separate session. It is not called green here.

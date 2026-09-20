@@ -34,6 +34,8 @@ The durable arms are owed to the post-build run, each with the break that stages
   on the probe and both fired — a renderer copy returning `record_window["end_from"]` unmapped made
   `pending` read `last-activity`, and one returning the half-open end raw moved the `landing` bound by
   a second. Owed: `test_record_placement_windows`, staged RED by either of those two renderer copies.
+  MET at the post-build run: `test_record_placement_windows` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `RECORD_SCHEMA` — `opened-by` reads `("git",)` and `closed-by` reads
   `("terminal-write", "terminal-pending", "last-activity")`, and the three renders of AC1 carried
   every member of both between them, checked as a set equality rather than a membership test. The
@@ -44,6 +46,8 @@ The durable arms are owed to the post-build run, each with the break that stages
   the committed suite source by a probe that reads the file as bytes. Owed:
   `test_record_placement_windows`, staged RED by restoring `driver` or `terminal-end` to a
   vocabulary, by re-adding the loop, or by moving the floor with no comment naming this unit.
+  MET at the post-build run: `test_record_placement_windows` is GREEN there too, and the floor it
+  reads has since moved past this unit's 1389 to 1543 with the units after it.
 - AC3 — `build_run_model` — after a commit of `tools/a.txt` naming no unit landed past each
   placement's fixture state, the rebuilt model re-rendered `window`, `duration` and `window closed by`
   byte-identical on all three; on `pending` that commit carried only its own path and
@@ -52,6 +56,8 @@ The durable arms are owed to the post-build run, each with the break that stages
   facts byte-identical on `landed`. Owed: `test_record_placement_windows`, staged RED by a renderer
   copy that bounds the window by the era's last commit — both later commits are inside the run's era,
   so the fixture reaches that break.
+  MET at the post-build run: `test_record_placement_windows` is GREEN, on the same 1543 passed and
+  0 failed.
 - AC4 — `test_record_placement_replay` — the close and `--landed` placements were replayed on the
   fixture's own history: stage the write, render, commit it, render again. At the close placement only
   `window` and `duration` moved; at the `--landed` placement `window`, `duration` and
@@ -63,11 +69,15 @@ The durable arms are owed to the post-build run, each with the break that stages
   `test_record_placement_replay`, staged RED by a renderer copy whose `terminal` fact reads the phase
   of the last committed record commit, which reds naming `terminal`, and by a copy of the constant
   declaring a Units item a member, which reds on the membership pin while the replay stays green.
+  MET at the post-build run: `test_record_placement_replay` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC5 — `render_record` — the landed model with `record_window` removed from its dict rendered both
   `window opened by` and `window closed by` as `-`. Liveness: the same model WITH the field rendered a
   closed-vocabulary member in the closer, so the two `-` are the field's absence and not the
   fixture's. Owed: `test_record_placement_windows`, staged RED by making either provenance fact fall
   back to the model's journal-bounded `window` when `record_window` is missing.
+  MET at the post-build run: `test_record_placement_windows` is GREEN, on the same 1543 passed and
+  0 failed.
 
 ## What else the pass carried
 
@@ -134,3 +144,15 @@ The durable arms are owed to the post-build run, each with the break that stages
 - `lexicon naming predicates`, `codebase-map coverage + freshness` and `memory hygiene`, the gates the
   spec's section 7 names. The map leg grades that the regenerated artifacts rode the same commit as the
   dossier edit, which they did.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so both durable arms and every record and schema-leg arm listed above are GREEN; this unit's floor
+of 1389 has risen with the units after it. The suite cost 80 s run directly, under the 93 s its
+budget row declares, so `tools/run-gates/selftest-budgets.txt` does not move; inside the bar's
+8-wide pool the same leg recorded 93.9 s, a contention reading that file's own header says to
+re-read on a quiet box. `lexicon naming predicates`, `codebase-map coverage + freshness` and
+`memory hygiene` are GREEN too. The run's one RED, `govkit selftest`, is on none of these legs:
+its 30 failing assertions are the IDENTICAL set `origin/main` carries, pre-existing, untouched by
+this build and being fixed in a separate session. It is not called green here.

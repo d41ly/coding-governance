@@ -32,6 +32,8 @@ to the post-build run with the break that stages it RED, except AC5, which has a
   own sha. The staged RED was reproduced there too: a builder copy placing one more intruder on a read
   field without recording it made the rendered count exceed `len(placed)` by exactly one. Owed:
   `test_record_ac4_classes`, staged RED by that same builder copy.
+  MET at the post-build run: `test_record_ac4_classes` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC2 — `git grep -n -e '"- values withheld: [0-9]' -e '500 · shown' -e '505 · shown'` — run over
   `tools/runlog/selftest.py` after the edit, it exits 1 and prints nothing; before it, it printed the
   five literals the spec's section 1 names. `test_schema_ac1_render_then_grade` now reads
@@ -42,6 +44,8 @@ to the post-build run with the break that stages it RED, except AC5, which has a
   unit, anomaly and entry counts read off the model's own lists and the elided-middle row's time read
   off its own timeline. Owed: `test_record_ac6_cap` and `test_schema_ac1_render_then_grade`, staged
   RED by typing any one of those figures back.
+  MET at the post-build run: `test_record_ac6_cap` and `test_schema_ac1_render_then_grade` are
+  both GREEN, inside `runlog selftest`'s `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC3 — `test_record_kind_sweep` — NOT MET IN THIS PASS and not observable in it. The sweep renders
   both shared builders' models with one kind of event removed at a time, and both builders are defined
   only inside the suite module, which the owner's instruction of 2026-09-13 bars every route to before
@@ -49,6 +53,9 @@ to the post-build run with the break that stages it RED, except AC5, which has a
   `test_record_kind_sweep`, staged RED by an arm copy that types the `values withheld` count at the
   whole model's value, so a render with one kind removed disagrees with it. The widest record's
   overflow liveness stays exempt, since `TOOL-dLoggedFlight-22` S5 widens a kept row for it.
+  MET at the post-build run, where this pass could not reach it: `test_record_kind_sweep` — the
+  arm `TOOL-dLoggedFlight-28` landed — is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC4 — `git grep -n 'vocab"\]\["push-decision"\]' -- tools/runlog/selftest.py` — run after the edit
   it exits 1 and prints nothing, so no copy of the old block survives. The block now drops the last
   member of `anomaly-kind`, a vocabulary the Anomalies table carries, and expects `values withheld` to
@@ -59,6 +66,8 @@ to the post-build run with the break that stages it RED, except AC5, which has a
   cells the unmodified render carried. That count was read there through the record's JSON twin while
   the suite's helper reads its markdown, so the two readers are independent. Owed:
   `test_record_ac4_classes`, staged RED by restoring the member to the copy or by typing the count.
+  MET at the post-build run: `test_record_template_pairs` is GREEN, inside `runlog selftest`'s
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`.
 - AC5 — `python tools/memory-tree/gotchas.py --for-paths tools/runlog/selftest.py` — MET, run in this
   pass: it lists `retirement-inventory-misses-readers-by-value`, whose record was written in this
   commit and whose anchors `memory/builds/` and `tools/runlog/selftest.py` are both live paths. The
@@ -75,6 +84,10 @@ to the post-build run with the break that stages it RED, except AC5, which has a
   counts are the cells the withheld count was made from; and its first `commit` row is rendered,
   which the arm's existing shaped `units` expectation already depends on and which the new liveness
   check makes loud if the event is ever absent. Both land at the post-build suite run.
+  ANSWERED: both hold. `runlog selftest` printed
+  `1543 passed, 0 failed (1543 assertions, floor 1543)`, so the arm over the real fixture is GREEN
+  with its 17 anomalies under `LIST_BOUND` and its first `commit` row rendered; neither reasoned
+  property turned out to be wrong.
 - **Three assertions arrive and the floor moves to 1392**, with the reason beside the constant. They
   are the empty-derivation guard the spec's section 5 asks for and its two livenesses: the builder's
   placements counted against its intruders, the model's timeline asserted to hold the commit event the
@@ -119,3 +132,13 @@ to the post-build run with the break that stages it RED, except AC5, which has a
 - `codebase-map coverage + freshness` — the leg grades that the regenerated artifacts rode the same
   commit as the dossier claim, which they did, and that the new `gotcha-classes` key is claimed.
 - `memory hygiene` — checks 17, 18 and 19 over the new class record, and check 23 over this ledger.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. `runlog selftest` printed `1543 passed, 0 failed (1543 assertions, floor 1543)`,
+so every arm listed above is GREEN; this unit's floor of 1392 has risen with the units after it,
+and executed equals floor exactly. `codebase-map coverage + freshness` is GREEN in 2.5 s and
+`memory hygiene` in 29.1 s, so checks 17, 18, 19 and 23 hold. The run's one RED,
+`govkit selftest`, is on none of these legs: its 30 failing assertions are the IDENTICAL set
+`origin/main` carries, pre-existing, untouched by this build and being fixed in a separate
+session. It is not called green here.

@@ -35,6 +35,7 @@ failed the check it aims at both times.
   records` leg, and its verdict is owed to the post-build gate run. The suite ran `--check` over its
   own fixture with the signal at 18 against pin 0, and it exited 0. RED seen: the signal made gateable
   turned that exit to 1, naming the signal over its pin.
+  MET at the post-build run: `drift-audit records` is GREEN in 12.6 s.
 - AC3 — `python tools/drift-audit/selftest.py` (`test_nonterminal_merged_runs`) — each alternative of
   each S3 row is its own fixture, and each reads its sub-class. Rescope retire and supersede read
   `retired-unit`, and rescope add and the item whose second word is `retire` read `other`. Decision,
@@ -64,6 +65,9 @@ failed the check it aims at both times.
   the descriptor's `marker_carriers`, and all eight agree with `KIT_DRIFT_AUDIT_VERSION`. RED seen:
   the README's marker put back to 1.10 failed its check. The suite ran directly and passed, as the
   opening paragraph records.
+  MET at the post-build run: `kit version markers` is GREEN with every drift-audit carrier at
+  1.11, and `drift-audit selftest` is GREEN in 83.5 s, printing
+  `all checks passed (261 executed, floor 261)` - two checks above the 259 this pass measured.
 - AC6 — `python tools/drift-audit/selftest.py` (`test_park_sets_match_the_driver`) — the driver is
   present here. `PHASES_TERMINAL`, `PARK_KINDS`, `PARK_KINDS_OWED` and `PARK_ACTS_OWED` each equal the
   engine's copy in both directions, and each is first asserted to be declared where the arm reads it.
@@ -76,6 +80,8 @@ failed the check it aims at both times.
   rev-6: `load_conf` over a conf holding `MEMORY_ROOT="memory"  # note` and `SINGLE_NOTE='single' # a
   note` read `memory` and `single`, and the reader at HEAD before the fold read `"memory"` and
   `'single'` over the same file. The arm's RED is that break, staged at the post-build run.
+  MET at the post-build run: the suite's `conf parser vs bash` block ran eight assertions GREEN,
+  `QUOTED_NOTE` and `SINGLE_NOTE` among them, inside those 261 executed.
 
 ## What else the pass carried
 
@@ -136,3 +142,13 @@ which is AC2 over this tree, `drift-audit selftest`, `drift-audit wiring`, `kit 
 outside section 7 that this pass's files reach are owed the same way. They are `install-prefix
 (shipped surface)`, over the unchanged carried counts, and `govkit selfcheck`, over the moved version
 marker.
+
+The post-build run happened at `9e948546`, the whole bar with every guard lifted and the kit
+self-tests on: 111 legs ran and 110 are GREEN, in 690.8 s of wall at width 8 against the profile's
+declared 21600 s. Every leg listed above is GREEN: `drift-audit records` in 12.6 s,
+`drift-audit selftest` at 261 executed against a floor of 261 in 83.5 s, `drift-audit wiring`,
+`kit version markers` at 1.11, `lexicon naming predicates`, `codebase-map coverage + freshness`,
+`memory hygiene`, `install-prefix (shipped surface)` and `govkit selfcheck`. The run's one RED,
+`govkit selftest`, is on none of these legs: its 30 failing assertions are the IDENTICAL set
+`origin/main` carries, pre-existing, untouched by this build and being fixed in a separate
+session. It is not called green here.
