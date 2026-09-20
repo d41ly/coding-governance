@@ -435,6 +435,14 @@ write_card sgtest-b1 "$SG_TOP_WT" write 'READY — none yet'
 run_card "AC2 --write card holding the sentinel only -> deny naming the card path, sentinel, /session-kickoff" 2 "any;;$SG_CARD_FIX/sgtest-b1.md;;sentinel;;/session-kickoff" 'git commit -m x' session_id=sgtest-b1 "cwd=$SG_CWD_WT"
 write_card sgtest-b1 "$SG_TOP_WT" write "$SG_READY"
 run_card "AC2 real READY line, matching tree cell -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b1 "cwd=$SG_CWD_WT"
+# TOOL-cMendedVintage-16 — the same line in the charter's §16 R1 form, a markdown list item. This
+# hook is the SECOND reader of the card, and a bare-only anchor here denies the commit of a session
+# that did kick off, whatever the writer accepts. Observed RED before the widening: a deny naming
+# the sentinel. The bare arm directly above is the other half — both forms, not one.
+write_card sgtest-b2 "$SG_TOP_WT" write "- $SG_READY"
+run_card "AC2 the READY line as a §16 R1 list item -> allow, stderr EMPTY" 0 empty 'git commit -m x' session_id=sgtest-b2 "cwd=$SG_CWD_WT"
+write_card sgtest-b3 "$SG_TOP_WT" write "- READY — none yet"
+run_card "AC2 the sentinel as a list item is still the sentinel -> deny naming it" 2 "any;;$SG_CARD_FIX/sgtest-b3.md;;sentinel" 'git commit -m x' session_id=sgtest-b3 "cwd=$SG_CWD_WT"
 
 # ---- AC3: the card names tree A, the payload comes from linked worktree B through its .git FILE ---
 write_card sgtest-c1 "$SG_TOP_FIX" write "$SG_READY"

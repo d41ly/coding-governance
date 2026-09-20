@@ -470,6 +470,15 @@ CARD_PARTS_AWK='{ ln=$0; sub(/\r$/, "", ln)
   if (!intail) { if (ln ~ /^recent —/) inlog=1; else if (inlog && ln !~ /^[0-9a-f]{7,40} /) intail=1 }
   if ((want=="tail") == (intail==1)) print ln }'
 
+# THE READY ANCHOR, and the one place it is spelled. The optional leading `- ` is not cosmetic: the
+# charter's §16 R1 requires an emitted micro-format to be a markdown list item — `- ` at column 0 —
+# so a kickoff body that OBEYS the charter was read here as carrying NO READY line, and the append
+# then reported success while leaving the sentinel in place and skipping the `tree —` re-render.
+# Both forms are accepted, and that is a WIDENING rather than a swap: the sentinel this script
+# renders is bare, as is every card already on disk, and dropping the bare form would strand them.
+# The reader moves; §16 R1 does not (TOOL-cMendedVintage-16).
+CARD_READY_RE='^\(- \)\{0,1\}READY — '
+
 # `--card --append`: the body on stdin, checked, annotated, and stored — or refused with the file
 # byte-identical. Order: the body's READY-line count, the citation check (its refusals come from a
 # reader that could not answer), DEAD PROBE on zero tokens, the stale-BASE refusal, the card's own
@@ -479,21 +488,21 @@ add_card_body() {
   local body="$CARD_TMP/body" nready ready sha tree bytes l
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID before appending to it"; exit 2; }
   tr -d '\r' > "$body"
-  grep -v '^READY — none yet$' "$body" > "$body.x"; mv "$body.x" "$body"
-  nready=$(grep -c '^READY — ' "$body"); nready=${nready:-0}
+  grep -v "${CARD_READY_RE}none yet\$" "$body" > "$body.x"; mv "$body.x" "$body"
+  nready=$(grep -c "$CARD_READY_RE" "$body"); nready=${nready:-0}
   [ "$nready" -le 1 ] || { echo "MANIFEST env ERROR — the body carries $nready READY lines; one card holds one kickoff, so exactly one is accepted and nothing was appended"; exit 2; }
   check_card_citations "$body"
   [ "$CARD_TOKENS" -gt 0 ] || { echo "MANIFEST env ERROR — DEAD PROBE: nothing to check — the body carries no path-shaped and no id-shaped token, so nothing was appended"; exit 1; }
   derive_head_state
   if [ "$nready" = 1 ]; then
-    ready=$(grep -m1 '^READY — ' "$body")
+    ready=$(grep -m1 "$CARD_READY_RE" "$body")
     sha=$(printf '%s\n' "$ready" | sed -n 's/.*[ ·]base \([0-9a-f]\{7,40\}\)\([ ·].*\)\{0,1\}$/\1/p')
     case "$HEAD_SHA" in "$sha"*) [ -n "$sha" ] ;; *) false ;; esac \
       || { echo "MANIFEST env ERROR — the READY line's base ${sha:-<none>} is not HEAD $HEAD_SHA at append time; a kickoff pinned to a stale BASE does not land on the card — kick off again, and nothing was appended"; exit 2; }
   fi
   extract_card_parts "$CARD_FILE"
-  [ "$(grep -c '^READY — ' "$CARD_TMP/tail")" = 1 ] \
-    || { echo "MANIFEST env ERROR — $CARD_FILE holds $(grep -c '^READY — ' "$CARD_TMP/tail") READY lines after its startup lines, not one; rewrite it with --card --write --session $CARD_SID, and nothing was appended"; exit 2; }
+  [ "$(grep -c "$CARD_READY_RE" "$CARD_TMP/tail")" = 1 ] \
+    || { echo "MANIFEST env ERROR — $CARD_FILE holds $(grep -c "$CARD_READY_RE" "$CARD_TMP/tail") READY lines after its startup lines, not one; rewrite it with --card --write --session $CARD_SID, and nothing was appended"; exit 2; }
   awk -F '\t' -v m="$CARD_TMP/misses" 'BEGIN { while ((getline l < m) > 0) { split(l, p, "\t"); a[p[1]] = a[p[1]] p[2] "\n" } }
     { print; if (FNR in a) printf "%s", a[FNR] }' "$body" > "$CARD_TMP/annotated"
   if [ "$nready" = 1 ]; then
@@ -501,7 +510,7 @@ add_card_body() {
     { while IFS= read -r l; do case "$l" in "tree — "*) printf '%s\n' "$tree" ;; *) printf '%s\n' "$l" ;; esac; done < "$CARD_TMP/startup"
       cat "$CARD_TMP/annotated"; } > "$CARD_TMP/new"
   else
-    { cat "$CARD_TMP/startup"; grep -v '^READY — ' "$CARD_TMP/tail"; cat "$CARD_TMP/annotated"; grep '^READY — ' "$CARD_TMP/tail"; } > "$CARD_TMP/new"
+    { cat "$CARD_TMP/startup"; grep -v "$CARD_READY_RE" "$CARD_TMP/tail"; cat "$CARD_TMP/annotated"; grep "$CARD_READY_RE" "$CARD_TMP/tail"; } > "$CARD_TMP/new"
   fi
   bytes=$(wc -c < "$CARD_TMP/new" | tr -d '[:space:]')
   if [ "$bytes" -gt "$CARD_CAP_BYTES" ]; then
@@ -522,7 +531,7 @@ add_card_body() {
 check_card() {
   local real
   [ -f "$CARD_FILE" ] || { echo "MANIFEST env ERROR — no card for session $CARD_SID at $CARD_FILE; write one with --card --write --session $CARD_SID"; exit 2; }
-  real=$(grep '^READY — ' "$CARD_FILE" | grep -vc '^READY — none yet'); real=${real:-0}
+  real=$(grep "$CARD_READY_RE" "$CARD_FILE" | grep -vc "${CARD_READY_RE}none yet"); real=${real:-0}
   if [ "$real" -gt 0 ] && ! grep -q '^## task' "$CARD_FILE"; then
     echo "MANIFEST env ERROR — $CARD_FILE carries a real READY line and no '## task' section: a kickoff ran and left no scope on disk"; exit 1
   fi

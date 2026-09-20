@@ -1048,6 +1048,24 @@ check_eq "K2 AC5 a second append without a READY line leaves the real one, last"
 check_eq "K2 AC5 ...before which the new body sits" '- parked: `AGENTS.md:2`' "$(tail -2 "$K2BCARD" | head -1)"
 check_eq "K2 AC5 ...and the card still holds one READY line and one task section" "1 1" "$(grep -c '^READY — ' "$K2BCARD") $(grep -c '^## task' "$K2BCARD")"
 
+# TOOL-cMendedVintage-16 — the charter-conformant READY line. §16 R1 makes an emitted micro-format
+# a markdown list item, so the form a kickoff actually writes carries a leading `- `. Before the
+# anchor was widened all four arms below failed: the body read as carrying NO READY line, so the
+# append took the no-READY branch, left the sentinel last, skipped the `tree —` re-render, and
+# `--card --check` then saw no real READY line and never demanded the `## task` section. A WIDENING,
+# not a swap — the bare form the AC5 block above exercises is every card already on disk.
+K2R="$NONCE-k2r"; K2RCARD="$CARD_HOME/$K2R.md"
+run_card "K2 R1 setup: a fresh card with the sentinel" "$CWT" 0 - --card --write --session "$K2R"
+printf '## task\n- `AGENTS.md:1`\n- %s\n' "$(render_ready_line "$wt_head")" | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2R" > "$CARD_OUT" 2>&1); got=$?
+check_eq "K2 R1 a list-item READY line appends" "0" "$got"
+check_eq "K2 R1 ...replaces the sentinel, which is gone" "0" "$(grep -c 'READY — none yet' "$K2RCARD")"
+check_eq "K2 R1 ...and is the card's last line" "- $(render_ready_line "$wt_head")" "$(tail -1 "$K2RCARD")"
+printf '## open\n- parked: `AGENTS.md:2`\n' | (cd "$CWT" && bash "$CHECK" --card --append --session "$K2R" > "$CARD_OUT" 2>&1)
+check_eq "K2 R1 a later bodiless-READY append still moves it last, not duplicated" "1 - $(render_ready_line "$wt_head")" \
+  "$(grep -c 'READY — ' "$K2RCARD") $(tail -1 "$K2RCARD")"
+sed -i 's/^## task$/## tsk/' "$K2RCARD"
+run_card "K2 R1 --card --check counts it as a REAL READY line and demands ## task" "$CWT" 1 "carries a real READY line and no '## task' section" --card --check --session "$K2R"
+
 # AC11 — a real READY line with no `## task` beneath it.
 sed -i 's/^## task$/## tsk/' "$K2BCARD"
 run_card "K2 AC11 --card --check refuses a real READY line with no ## task section" "$CWT" 1 "carries a real READY line and no '## task' section" --card --check --session "$K2B"
