@@ -154,6 +154,22 @@ across one session on a machine with an on-access antivirus scanner, and a ceili
 someone else's scan is a ceiling that gets deleted. The 60 s floor is what gives a leg that
 finishes in under five seconds a bound worth having.
 
+**Raising one that fired needs a reading the bar cannot give you.** A leg killed at its ceiling
+never completes, so the only thing its run record holds is the bound that stopped it, and
+`derive-ceilings.py` builds evidence from completed runs — the mechanism cannot reach exactly the
+legs whose bounds fire. Re-run the leg quiet, then hand the number in rather than editing a bound
+from something nobody wrote down:
+
+```
+GOV_NODE=<tag> python derive-ceilings.py --write \
+  --observed '<leg>=<seconds>' --how 'how you took the reading'
+```
+
+It refuses a reading with no stated conditions, one for a leg the manifest does not carry, one whose
+node would have to be defaulted, and one that raises nothing. The row lands in the evidence file
+carrying its source, so a number somebody measured by hand never reads as one the runner watched,
+and `--check` names those legs apart from the rest.
+
 **On a host with no runnable `timeout -k`, every ceiling is INERT** and the runner says so on
 stderr. Legs still run. A bound may cost you speed and may turn a hang into a verdict; it may never
 turn a leg into a pass or a skip.

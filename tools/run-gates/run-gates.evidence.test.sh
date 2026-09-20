@@ -36,7 +36,7 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=70
+FLOOR_ASSERTIONS=84
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -902,6 +902,125 @@ done
 printf '%s\n' "$dc_doc" | grep -q -- '--reset' \
   && ok "read_runs's docstring names the --write --reset <leg> escape, which is the half a reader ACTS on" \
   || nope "read_runs's docstring omits --reset, so the entire mitigation of the monotone-floor hazard ships undocumented"
+
+# --- A READING TAKEN OUTSIDE THE RUNNER (TOOL-cMendedVintage-17) -----------------------------------
+# The circularity the flag breaks: a ceiling is raised from the evidence of a COMPLETED run, a leg
+# killed at its ceiling completes none, and its killed reading enters the monotone file AT that
+# ceiling — so the declared mechanism cannot reach exactly the legs whose bounds fire. Two healthy
+# legs were raised by hand from quiet re-runs during the build that filed this row, and the hand-edit
+# is what these arms grade the replacement of.
+#
+# THE RUN RECORD IS EMPTY HERE, left that way by the DEAD-PROBE control above, and that is the
+# fixture rather than an accident: the state this flag exists for is one where nothing admissible
+# was recorded for the leg being raised, and an implementation whose liveness return fires above the
+# flag refuses the only case it was built for. That return has already been repaired once for this
+# exact shape one section up.
+dc_obs=$(GOV_NODE=z "$DC_PY" "$DC_SCRIPT" --write --observed 'at-ceiling=853' \
+           --how 'quiet re-run, nothing else on the box' 2>&1); dc_obs_rc=$?
+dc_obs_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+if [ "$dc_obs_rc" = 0 ] && awk -v v="$dc_obs_row" 'BEGIN{exit !(v != "" && v+0 == 853)}'; then
+  ok "--write --observed admits a reading taken outside the runner with the run record EMPTY ($dc_obs_row), which is the state a leg killed at its ceiling is in"
+else
+  nope "--write --observed exited $dc_obs_rc leaving the row at '$dc_obs_row' — the out-of-band reading was refused in the one state it exists for"
+  printf '%s\n' "$dc_obs" | sed 's/^/      /'
+fi
+# DISTINGUISHABLE OR IT IS WORTHLESS. An out-of-band number that reads like an in-band one is how a
+# ceiling becomes a number nobody chose, which is the failure the margin file's header already names.
+# Both halves the ruling requires are graded here: the NODE it was taken on and HOW it was taken.
+awk -F'\t' '$1=="at-ceiling" && $4=="z" && $6=="quiet re-run, nothing else on the box" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "the out-of-band row carries the node it was taken on and the operator's account of how, in the artifact itself" \
+  || { nope "the out-of-band row does not carry its node and conditions — the reading is indistinguishable from one the runner produced"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
+# THE CONTROL, and the arm above is a claim about nothing without it: a source column that said the
+# same thing on every row would satisfy that grep and tell two kinds of reading apart for nobody.
+printf 'below-ceiling\tok\t0\t30.0\t0\t0\t-\n' > "$DC_T/.git/gate-run/r1/1.leg"
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+awk -F'\t' '$1=="below-ceiling" && $6=="runner" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "control: a row this tool derived from the run record spells a different source, so the column separates the two kinds" \
+  || { nope "a runner-derived row does not spell its own source — the column cannot tell the two kinds apart"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
+# AND IT SURVIVES AN ORDINARY WRITE, provenance included. A source that reverted to the runner's on
+# the next refresh would relabel a typed number as an observed one, silently, one command later.
+awk -F'\t' '$1=="at-ceiling" && $2=="853.0" && $6=="quiet re-run, nothing else on the box" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "the out-of-band row and its stated provenance SURVIVE an ordinary --write that measured nothing for that leg" \
+  || { nope "an ordinary --write lost the out-of-band row or relabelled its source — a typed number would be read as an observed one"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
+# AND AGAIN WITH THE KILLED READING BACK IN THE WINDOW, which is a DIFFERENT code path and the only
+# one the real case takes. Above, the leg had no retained reading at all and its row was carried by
+# the carry-forward for legs this run measured nothing for. A leg raised out-of-band because its
+# bound fired still HAS its killed reading in the retention window — that is what put the row there
+# — so the row is carried by the monotone hold instead, which is where a rebuilt tuple can quietly
+# relabel a typed number as a runner's. Staging exactly that relabel left every arm here green until
+# this fixture line existed, which is the could-not-fail shape one level up.
+printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n' >> "$DC_T/.git/gate-run/r1/1.leg"
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+awk -F'\t' '$1=="at-ceiling" && $2=="853.0" && $6=="quiet re-run, nothing else on the box" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "the out-of-band row outranks the leg's own killed reading and keeps its source through the monotone hold" \
+  || { nope "the killed reading displaced the out-of-band row or relabelled its source — the ceiling is held above the bound that fired again"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
+# A READING THAT RAISES NOTHING IS REFUSED, not absorbed. The file is monotone, so admitting a lower
+# number writes a fresh row and moves no value — the operator's gesture answered by a report of work
+# that did not happen, which is the shape this whole artifact is arranged against.
+dc_lo=$(GOV_NODE=z "$DC_PY" "$DC_SCRIPT" --write --observed 'at-ceiling=100' --how 'quiet' 2>&1); dc_lo_rc=$?
+dc_lo_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+if [ "$dc_lo_rc" != 0 ] && awk -v v="$dc_lo_row" 'BEGIN{exit !(v+0 == 853)}'; then
+  ok "an --observed reading at or under the recorded maximum is REFUSED and writes nothing (row still $dc_lo_row)"
+else
+  nope "a non-raising --observed reading exited $dc_lo_rc leaving the row at '$dc_lo_row' — a silent no-op reported as a write"
+fi
+# EVERY MISSING HALF OF THE CLAIM IS A REFUSAL. A reading with no stated conditions, one naming a leg
+# that does not exist, and one whose node was defaulted rather than stated are all the hand-edit this
+# flag replaces wearing a command's clothes; the fourth is the gesture made on a read-only verb,
+# where accepting the ordinary output back would read as acceptance of a reading stored nowhere.
+dc_ref_i=0
+while [ "$dc_ref_i" -lt 4 ]; do
+  case "$dc_ref_i" in
+    0) dc_ref_out=$(GOV_NODE=z "$DC_PY" "$DC_SCRIPT" --write --observed 'at-ceiling=9999' 2>&1)
+       dc_ref_rc=$?; dc_ref_what="a reading with no --how account of the conditions" ;;
+    1) dc_ref_out=$(GOV_NODE=z "$DC_PY" "$DC_SCRIPT" --write --observed 'no-such-leg=9999' --how 'quiet' 2>&1)
+       dc_ref_rc=$?; dc_ref_what="a reading for a leg the manifest does not carry" ;;
+    2) dc_ref_out=$(GOV_NODE="" "$DC_PY" "$DC_SCRIPT" --write --observed 'at-ceiling=9999' --how 'quiet' 2>&1)
+       dc_ref_rc=$?; dc_ref_what="a reading whose node would have to be defaulted" ;;
+    # `--report` RATHER THAN `--check`, and the choice is the difference between an arm and a
+    # decoration: this fixture's ceilings fail, so `--check` exits non-zero with the guard gone as
+    # readily as with it there, and the arm would pass over a deleted refusal. `--report` exits 0
+    # on the same fixture, so only the refusal can make this case non-zero.
+    3) dc_ref_out=$(GOV_NODE=z "$DC_PY" "$DC_SCRIPT" --report --observed 'at-ceiling=9999' --how 'quiet' 2>&1)
+       dc_ref_rc=$?; dc_ref_what="a reading handed to a read-only verb" ;;
+  esac
+  dc_ref_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+  if [ "$dc_ref_rc" != 0 ] && awk -v v="$dc_ref_row" 'BEGIN{exit !(v+0 == 853)}'; then
+    ok "REFUSED: $dc_ref_what (rc=$dc_ref_rc, row untouched at $dc_ref_row)"
+  else
+    nope "$dc_ref_what exited $dc_ref_rc and left the row at '$dc_ref_row' — it was admitted, or admitted quietly"
+    printf '%s\n' "$dc_ref_out" | sed 's/^/      /'
+  fi
+  dc_ref_i=$((dc_ref_i+1))
+done
+# THE SECOND HALF OF THE RULING. `--check` called an unbacked ceiling REPORTED-and-not-a-failure, so
+# a never-measured bound and a trusted one read the same to anyone scanning the output. UNBACKED is
+# left alone — a leg that has never run still has nothing to be measured against, and a way to type a
+# reading in does not change that. What changed is the word "backed", which now covers a duration
+# this tool watched the runner produce AND one an operator measured elsewhere. The second kind is
+# named, with the node and the conditions it was taken under.
+dc_chk=$("$DC_PY" "$DC_SCRIPT" --check 2>&1)
+printf '%s\n' "$dc_chk" | grep -q 'OUTSIDE the' \
+  && printf '%s\n' "$dc_chk" | grep 'OUTSIDE the' | grep -q 'at-ceiling' \
+  && printf '%s\n' "$dc_chk" | grep 'OUTSIDE the' | grep -q 'quiet re-run, nothing else on the box' \
+  && ok "--check names the out-of-band-backed leg with its node and stated conditions, rather than counting it as backed and saying nothing" \
+  || { nope "--check does not separate an out-of-band-backed ceiling from one the runner measured"; printf '%s\n' "$dc_chk" | sed 's/^/      /'; }
+printf '%s\n' "$dc_chk" | grep 'OUTSIDE the' | grep -q 'below-ceiling' \
+  && nope "--check named a runner-derived leg on its out-of-band line — the line reports every backed leg and separates nothing" \
+  || ok "control: the runner-derived leg is absent from that line, so naming above is a verdict and not a roll-call"
+# THE REACHED SENTENCE IS A CLAIM ABOUT PROVENANCE, and it is false over an out-of-band row. It says
+# the reading is a LOWER BOUND on the work and that no new ceiling may be sized from it, which holds
+# of a duration `timeout` cut short and of nothing else. Said over a quiet measurement an operator
+# took to completion, it withdraws the invitation in the exact case this flag exists to extend it.
+# The failing verdict is unchanged either way — the ceiling is under the evidenced maximum — so what
+# is graded here is which sentence the operator is handed, and whether it carries the floor.
+dc_reach=$(printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep 'REACHED')
+[ -z "$dc_reach" ] \
+  && ok "an out-of-band reading above its ceiling is NOT called a reached bound, because nothing killed it" \
+  || { nope "an out-of-band reading is reported as a reached ceiling and a lower bound on the work — the operator is told not to size a ceiling from the one reading this flag exists to let them size one from"; printf '%s\n' "$dc_reach" | sed 's/^/      /'; }
+printf '%s\n' "$dc_chk" | grep 'at-ceiling' | grep -q 'does not clear its evidenced maximum' \
+  && ok "it gets the headroom sentence instead, which states the floor such a ceiling has to clear" \
+  || { nope "an out-of-band reading above its ceiling produced neither sentence — the row fails with no target to raise the ceiling to"; printf '%s\n' "$dc_chk" | sed 's/^/      /'; }
 rm -rf "$DC_T"
 
 echo
