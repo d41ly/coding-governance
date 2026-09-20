@@ -150,7 +150,7 @@ ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLogg
 | [TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value](spec/2026-09-20-spec-TOOL-dLoggedFlight-30.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 37 bound to this build, across 4 record folder(s).
+Records: 38 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 
