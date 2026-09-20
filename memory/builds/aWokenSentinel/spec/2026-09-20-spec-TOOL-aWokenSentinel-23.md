@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-23 — a kit-gate check banning the line count that reads an empty capture as one line: `printf '%s\n'`, `echo` or a here-string into `wc -l` over a captured variable, with the class in `memory/gotchas/`
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 23
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 830c46e8 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-21-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-24 |
 
 <!-- /gen:spec-records -->
 
@@ -29,24 +31,37 @@ newlines correctly and are the shape the header says it does not red.
 
 - **S1** — A new check in `tools/unattended/check-unattended.sh`, the next free number above the
   gate's high-water at the pass (31 at this unit's base and 32 after unit 11, DERIVED by
-  `grep -oE 'fail [0-9]+'`), that greps every `*.sh` beside the checker except the checker itself
-  for a CODE line matching `(printf '%s\n'|echo) "$<name>" | wc -l` or `wc -l <<< "$<name>"`, with
-  any whitespace around the pipe, and `fail <n>`s naming the file, the line and the remedy
-  `printf '%s' "$x" | grep -c ''`. Zero hits is the pass; the check does not require a positive
-  population, because a kit with no such line is the state it exists to keep. Observed by AC1.
+  `grep -oE 'fail [0-9]+'`), that greps its OWN population — every `*.sh` beside the checker,
+  `*.test.sh` INCLUDED, minus two files excluded by name: the checker itself and
+  `check-unattended.test.sh` — for a CODE line matching `(printf '%s\n'|echo) "$<name>" | wc -l`
+  or `wc -l <<< "$<name>"`, with any whitespace around the pipe, and `fail <n>`s naming the file,
+  the line and the remedy `printf '%s' "$x" | grep -c ''`. The population departs from the
+  checker's `KIT_SH` at `check-unattended.sh:2728`, which skips every `*.test.sh`, because the
+  instance this class gate exists for lived in a suite helper and a population that skips suites
+  cannot see the next one. Zero hits is the pass; the check does not require a positive
+  population, because a kit with no such line is the state it exists to keep. Observed by AC1 and
+  AC5.
 - **S2** — The check's header states what it does NOT check: `printf '%s'` with no newline piped to
   `wc -l` counts embedded newlines and reads an empty capture as `0`, which is the driver's own
   idiom at `unattended.sh:1296` and seven sibling lines and is correct; a count through an
   intermediate command (`grep -o … | wc -l`) is not read; a `wc -l` over a file or a command
   substitution is not read; the checker's own file is outside the population because its grep
-  carries the pattern; and a comment line is not counted. Observed by AC2.
+  carries the pattern, and `check-unattended.test.sh` is outside it because its arm stages the
+  banned bytes and a self-hit would red the close on the suite that proves the check; a comment
+  line is not counted; and the population is this check's own and wider than `KIT_SH`, with the
+  reason. Observed by AC2.
 - **S3** — The check is observed RED on a staged break before it is wired — a copy of
   `unattended.test.sh` in a scratch kit dir with one line `printf '%s\n' "$_o" | wc -l` added,
-  graded by a copy of the checker seeded beside it — and GREEN with the line removed, and GREEN
-  with the near-miss `printf '%s' "$_o" | wc -l` added instead. Observed by AC1.
+  graded by a copy of the checker seeded beside it together with a copy of
+  `check-unattended.test.sh`, so the scratch run reads the population the close reads — and GREEN
+  with the line removed, and GREEN with the near-miss `printf '%s' "$_o" | wc -l` added instead.
+  The `echo` and here-string spellings are staged and read RED by `TOOL-aWokenSentinel-28` over the
+  same copy. Observed by AC1.
 - **S4** — The check joins the kit's own gate suite: one arm in `check-unattended.test.sh` stages
-  the break and reads the refusal, so the `harness arms` leg counts the new `fail` branch as armed.
-  Observed by AC3.
+  the `printf` break and reads the refusal, so the `harness arms` leg counts the new `fail` branch
+  as armed. The staged line is ASSEMBLED in the arm from fragments — the command word split, the
+  variable and the pipe joined at run time — so this suite's own bytes never match the predicate
+  and the by-name exclusion of S1 is a second guard, not the only one. Observed by AC3 and AC5.
 - **S5** — A new class in `memory/gotchas/`, `line-count-reads-empty-capture-as-one.md`, in that
   folder's grammar — front matter `name`, `description`, `kind: class`, and a body whose backticked
   paths are its DERIVED anchors — naming the suite the helper lives in and the checker that gates
@@ -58,10 +73,15 @@ newlines correctly and are the shape the header says it does not red.
 
 - **No change to `check_status_one_line`.** The `grep -c ''` count and the empty-copy reading are
   spec 17's rev-2; this unit is why the next helper cannot repeat the shape.
-- **No scan outside the kit.** The population is the files beside the checker, which is the
-  population every check in that gate reads; `tools/lib/resolve-python.test.sh:186` pipes a
-  function's output into `wc -l`, which is not a captured variable and is outside both the
-  predicate and the population.
+- **No scan outside the kit.** The population is every `*.sh` beside the checker, suites
+  included, which is THIS check's own population and not `KIT_SH`'s: no existing check in the
+  gate reads a suite (`check-unattended.sh:2729` skips `*.test.sh`, `TOOL-aDeferredBar-4` records
+  why), and unit 11's check reads three named files. `tools/lib/resolve-python.test.sh:186` pipes
+  a function's output into `wc -l`, which is not a captured variable and is outside both the
+  predicate and the population. The repo-wide home — a CLASSES row in
+  `tools/gate-lint/sh_hygiene.py`, whose population is every tracked `*.sh` — was weighed at
+  rev-2 and not taken; §4 says why, and the gotcha record anchors that scanner's population
+  statement so the class is named over a diff there too.
 - **No ban on `wc -l`.** Eight lines in the driver use it correctly over `printf '%s'`; the defect
   is the newline `printf '%s\n'`, `echo` and `<<<` add before the count, and the predicate is those
   three spellings and nothing wider.
@@ -79,6 +99,9 @@ newlines correctly and are the shape the header says it does not red.
   its suite's scratch-kit seeding at
   `check-unattended.test.sh:65`; `tools/memory-tree/gotchas.py`'s checks 17 to 19 and the
   `destructive-step-before-its-precondition` record unit 12 writes, whose shape this one copies.
+- **hands-off** `TOOL-aWokenSentinel-28` — the `echo` and here-string staged lines and their RED
+  readings in this unit's suite arm, over the same suite copy, so every top-level branch of the
+  predicate has been seen to fail; this unit stages the `printf` line only.
 - **hands-off** external — nothing.
 
 ## 4. Design
@@ -89,19 +112,24 @@ In `tools/unattended/check-unattended.sh`, after the highest check at the pass, 
 own idiom (`# ---- check <n>`, a `fail <n>` with a sentence that names the remedy):
 
 ```
+# POPULATION: this check's OWN, not KIT_SH — every *.sh here INCLUDING the suites, because the
+# instance lived in a suite helper. Two files out by name: this checker (its grep carries the
+# pattern) and check-unattended.test.sh (its arm stages the banned bytes).
 _lc_hits=""
 for _lc_f in "$HERE"/*.sh; do
-  [ "$_lc_f" = "$HERE/$(basename "$0")" ] && continue
+  case "$(basename "$_lc_f")" in "$(basename "$0")"|check-unattended.test.sh) continue ;; esac
   _lc_h=$(grep -nE "^[^#]*((printf '%s\\\\n'|echo) \"\\\$[A-Za-z_][A-Za-z0-9_]*\"[[:space:]]*\|[[:space:]]*wc -l|wc -l[[:space:]]*<<<[[:space:]]*\"\\\$[A-Za-z_][A-Za-z0-9_]*\")" "$_lc_f" || true)
   [ -n "$_lc_h" ] && _lc_hits="$_lc_hits$(basename "$_lc_f"):$_lc_h"$'\n'
 done
 [ -z "$_lc_hits" ] || fail <n> "a shell file in this kit counts a captured variable's lines by adding a newline first — printf '%s\n', echo or a here-string into wc -l — which reads an EMPTY capture as one line, so an assertion on the count passes on a command that wrote nothing; count with printf '%s' \"\$x\" | grep -c '' instead, which reads empty as 0. hits: $_lc_hits"
 ```
 
-The exact escaping of the pattern is the pass's to get right against the fixture of S3, and the
-fixture is the proof; the four facts the block must hold are the population (every `*.sh` beside
-the checker, itself excluded), the three spellings, the code-line anchor `^[^#]*`, and the remedy in
-the sentence. `grep -c ''` counts lines the way `wc -l` does on non-empty input — a final line with
+The exact escaping of the pattern is the pass's to get right against the fixture of S3 for the
+`printf` group, and against unit 28's two staged lines for the `echo` spelling and the here-string
+alternation — three fixtures for three spellings, one per top-level case the regex can take, so no
+branch lands unseen; the four facts the block must hold are the population (every `*.sh` beside
+the checker, suites included, the checker and its suite excluded by name), the three spellings,
+the code-line anchor `^[^#]*`, and the remedy in the sentence. `grep -c ''` counts lines the way `wc -l` does on non-empty input — a final line with
 no trailing newline still counts, which `wc -l` misses — and reads `0` on empty input, which is the
 one property the helper needs.
 
@@ -113,20 +141,34 @@ one property the helper needs.
   `unattended.test.sh:1512`: the newline reaches `grep`, not `wc`; not read.
 - A `wc -l` over a file or a `$(…)`: outside the predicate.
 - The checker's own source, which carries the pattern inside its grep: excluded by name.
+- `check-unattended.test.sh`, whose arm stages the banned line into a suite copy: excluded by
+  name, and its staged line is assembled from fragments besides, so the exclusion is a second
+  guard and not the only one.
 - A comment line: not counted, by the anchor; the edit that uncomments it is the one this reds.
+- Any `*.sh` outside `tools/unattended/`: the population is the kit's, wider than `KIT_SH` by the
+  suites and no wider; the repo-wide scanner is `tools/gate-lint/sh_hygiene.py` and this class is
+  not a row there (see Alternatives rejected).
 - A capture counted through a variable that holds the count already: not a line count.
 
 ### The staged break, and the near-miss beside it
 
 A scratch kit dir under a short `%TEMP%` path seeded the way `check-unattended.test.sh` seeds its
 fixture — the checker, the driver, the library and the two templates copied beside each other —
-plus a copy of `unattended.test.sh` with one line appended inside a function body:
-`_x=$(printf '%s\n' "$_o" | wc -l)`. The copied checker prints the new `fail` sentence naming
-`unattended.test.sh` and that line, and exits 1. The same copy with the line removed prints no
-failure for this check; the same copy with `_x=$(printf '%s' "$_o" | wc -l)` appended instead —
-the near-miss — prints no failure either, which the pass prints beside the hit before wiring, per
-charter §7. The checker runs whole, so each observation costs one kit-gate run, 199 s on node `a`
-by the gate ledger on 2026-09-20 as spec 11 read it.
+plus a copy of `check-unattended.test.sh`, which the suite's own fixture at `:65` does not copy
+and this one must, because that file is in the population the close reads and a scratch run that
+omits it cannot see a self-hit; plus a copy of `unattended.test.sh` with one line appended inside
+a function body: `_x=$(printf '%s\n' "$_o" | wc -l)`. The copied checker prints the new `fail`
+sentence naming `unattended.test.sh` and that line, and exits 1. The same copy with the line
+removed prints no failure for this check; the same copy with `_x=$(printf '%s' "$_o" | wc -l)`
+appended instead — the near-miss — prints no failure either, which the pass prints beside the hit
+before wiring, per charter §7. The checker runs whole, so each observation costs one kit-gate run,
+199 s on node `a` by the gate ledger on 2026-09-20 as spec 11 read it. The `echo` line and the
+here-string line are unit 28's, over this same copy.
+
+In the suite arm the staged line is not a literal: `_lc_cmd="pri""ntf"` and the pipe joined at run
+time, so `check-unattended.test.sh` never carries `printf '%s\n' "$_o" | wc -l` contiguously on a
+code line; the quoted-heredoc idiom the suite uses elsewhere (`:188`) would put those exact bytes
+on a non-comment line the `^[^#]*` predicate matches.
 
 ### The class, in `memory/gotchas/`
 
@@ -140,9 +182,11 @@ check 18 requires of a `kind: class` record — `gated by` this unit's check in
 `tools/unattended/check-unattended.sh` — because a class that names no gate and does not say it has
 none reds `tools/memory-tree/gotchas.py --check` at the close. Anchors are DERIVED by `gotchas.py`
 from the backticked path-like tokens in the body, so the body cites
-`tools/unattended/unattended.test.sh` and `tools/unattended/check-unattended.sh`, and
-`--for-diff` prints the class over any diff that touches either. `memory/gotchas/INDEX.md` is
-regenerated by `gotchas.py --write` in the same commit, or check 17 reds.
+`tools/unattended/unattended.test.sh`, `tools/unattended/check-unattended.sh` and — as the
+repo-wide scanner where the class would be a CLASSES row if it ever leaves this kit —
+`tools/gate-lint/sh_hygiene.py`, and `--for-diff` prints the class over any diff that touches any
+of the three. `memory/gotchas/INDEX.md` is regenerated by `gotchas.py --write` in the same commit,
+or check 17 reds.
 
 ### Inventory
 
@@ -171,8 +215,22 @@ No function, key, verb or file under `tools/` is minted.
 - **Widen to every `| wc -l`.** Reds the driver's eight correct lines and the suite's `grep -o`
   count; the defect is the added newline, so the predicate is the three spellings that add one.
 - **Home the check in `check-arms.py`.** That tool discovers gates by a `fail() {` helper and
-  reads suites only as arm carriers; a shell-idiom scan is the kit gate's population, where unit
-  11's check already reads the same files.
+  reads suites only as arm carriers; a shell-idiom scan belongs in a gate that reads shell files,
+  and this check derives its own population for that (rev-1 said unit 11's check "already reads
+  the same files", which is false — it reads three named files).
+- **Home the class in `tools/gate-lint/sh_hygiene.py` as a CLASSES row.** The repo-wide scanner:
+  population every tracked `*.sh` (`:205`), a CLASSES table at `:78`, comment stripping, a
+  shrink-only registry and a `--selftest` in both directions, on a `subject = repo` leg; the
+  retired-launcher ban at `tools/lib/resolve-python.test.sh:113` is the same shape. It is the
+  wider gate and would be the smaller diff over an empty tree. Not taken at rev-2, and the reason
+  is one of authority rather than taste: this unit was promoted at round 3 as "a kit-gate check",
+  its mechanism is recorded in the run-state row and the roster, and moving the home is a change
+  of mechanism, which BUILD-METHOD M2 routes through AMEND — RETIRE or SUPERSEDE — and not
+  through a fold, which is the only disposition a MEDIUM admits. What a kit home costs is stated
+  in §3: the class is gated over this kit's directory, and a suite helper under `tools/workflows/`
+  or `tools/lib/` is not read. The gotcha record anchors `tools/gate-lint/sh_hygiene.py` so a
+  diff there is shown the class, and the row is the follow-up if a second kit ever produces the
+  instance.
 
 ## 5. Production-readiness checklist
 
@@ -192,16 +250,20 @@ No function, key, verb or file under `tools/` is minted.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a scratch kit dir seeded as §4 states holds a copy of the driver suite made by
+- **AC1** — When a scratch kit dir seeded as §4 states — the suite's five files plus the kit gate's
+  own suite, copied by `cp tools/unattended/check-unattended.test.sh <kit>/` — holds a copy of the driver suite made by
   `cp tools/unattended/unattended.test.sh <kit>/` with `_x=$(printf '%s\n' "$_o" | wc -l)` appended
   inside a function, the copied checker beside it prints `UNATTENDED check <n> FAILED` naming the
-  copy's basename and the line, and exits 1; with the line removed the same run prints no
-  failure for that check; with `_x=$(printf '%s' "$_o" | wc -l)` appended instead it prints no
-  failure for that check either.
+  copy's basename and the line and no other file, and exits 1; with the line removed the same run
+  prints no failure for that check; with `_x=$(printf '%s' "$_o" | wc -l)` appended instead it
+  prints no failure for that check either.
   Red when: the added-newline count passes, which is the check reading the wrong spelling or the
   wrong population; or the near-miss reds, which bans the driver's own correct idiom; or the
-  unmodified population fails, which is spec 17's rev-2 not having landed the `grep -c ''` form.
-  fixture: a scratch kit dir under a short `%TEMP%` path, never this worktree.
+  unmodified population fails, which is spec 17's rev-2 not having landed the `grep -c ''` form;
+  or the refusal names the kit gate's own suite file, which is the arm's own staged bytes read as
+  a hit — the self-hit the close would red on.
+  fixture: a scratch kit dir under a short `%TEMP%` path, never this worktree, holding the suite
+  copy the fixture at `check-unattended.test.sh:65` omits.
   cost: one whole kit-gate run per observation, 199 s each on node `a` by the gate ledger on
   2026-09-20 as spec 11 read it; the pass runs it three times, on the break, the restored copy and
   the near-miss.
@@ -227,6 +289,15 @@ No function, key, verb or file under `tools/` is minted.
   Red when: the class is written but reaches no path, which the tool reports as unanchored and is
   a gotcha nobody is shown; or `--check` reds on a stale `INDEX.md` or a class naming no gate,
   which the memory hygiene leg reds at the close.
+- **AC5** — When the check's own predicate — the pattern of §4, `^[^#]*`-anchored — is grepped
+  with `grep -cE` over the kit gate's own suite file, the one §7's `New arm:` line names, at the
+  tip, it prints 0, and
+  `grep -c 'check-unattended.test.sh) continue' tools/unattended/check-unattended.sh` prints at
+  least 1 on the new check's population loop.
+  Red when: the suite carries the banned bytes contiguously on a code line, which the by-name
+  exclusion hides at the close and this criterion does not; or the exclusion is absent, which is
+  the population claim of rev-1 landing as written.
+  figure: both counts are DERIVED by the greps at observation.
 
 ## 7. Gates
 
@@ -238,7 +309,7 @@ reads of AC4. Under `unattended kit gate`, the new check is the arm this unit ad
 `harness arms`, its `fail` branch is the count it moves; under `memory hygiene`, checks 17 to 19
 read the new record.
 
-New arm: `tools/unattended/check-unattended.test.sh` · the staged added-newline count in a suite copy, the same line without the newline (the near-miss, green), and the restored copy · `FLOOR_ASSERTIONS` at `check-unattended.test.sh:3252` and the floor of the shard the arm joins rise by its executed count
+New arm: `tools/unattended/check-unattended.test.sh` · the staged added-newline `printf` count in a suite copy, assembled from fragments, the same line without the newline (the near-miss, green), and the restored copy; the `echo` and here-string lines are unit 28's · `FLOOR_ASSERTIONS` at `check-unattended.test.sh:3252` and the floor of the shard the arm joins rise by its executed count
 
 ## 8. Open questions
 
@@ -246,6 +317,16 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S1 · S2 · S3 · S4 · §3 · §4 · AC1 · AC5 · §7 · §10 · folded spec-audit
+  round 4: sibling agreement for the promoted `TOOL-aWokenSentinel-28` (H6, raw 2) — S3 and AC1
+  stage the `printf` line only and say so, the `echo` and here-string readings are handed off by
+  edge, and §4 names three fixtures for three spellings; M6 (raw 16) — the population INCLUDES
+  `*.test.sh` and excludes the checker and `check-unattended.test.sh` by name with the header
+  saying why, the suite arm assembles its staged line from fragments, AC1's fixture copies the
+  suite so the scratch run reads what the close reads, and AC5 greps the suite for the bytes; M7
+  (raw 35) — §3 and §4 no longer claim `KIT_SH`'s population or that unit 11 reads the same
+  files, the `sh_hygiene.py` home is weighed in Alternatives rejected with the reason it was not
+  taken, and the gotcha anchors that scanner.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 3 as the
   promotion of H3 (raw id 28): the helper's count is spec 17's rev-2 fold, and the class gate and
   its record are this unit.
@@ -262,7 +343,11 @@ grammar as `tools/memory-tree/gotchas.py` reads it (checks 17 to 19 at `:279` to
 unit 12's `destructive-step-before-its-precondition` record as the copied shape. The candidate
 predicate was run over `tools/` before this spec was written: zero hits under `--include='*.sh'`,
 eight near-misses in `tools/unattended/unattended.sh` (`printf '%s'`, no newline) and one at
-`unattended.test.sh:1512` (a `grep -o` between the `printf` and the `wc`). The recall probe
+`unattended.test.sh:1512` (a `grep -o` between the `printf` and the `wc`). `reuse_lookup.py`
+reports `unscanned layers: .sh`, so its miss says nothing about shell seams, and the two that
+exist were read at source at rev-2: `tools/gate-lint/sh_hygiene.py`'s CLASSES table over every
+tracked `*.sh`, and the retired-launcher ban at `tools/lib/resolve-python.test.sh:113`; both are a
+repo-wide home for a shell-idiom ban, weighed in §4 and not taken for the reason given there. The recall probe
 returned `TOOL-aBranchedMandate-5` (an empty render against an empty Skill is a PASS — the same
 class one kit over), this build's round-3 audit at the H3 paragraph, and
 `TOOL-aSurfacedLexicon-21` (a checker reading GREEN over a population it never scanned); no prior

@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aPrimedKeepalive aProbedUnit
 authorized-by: prompt
-ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24
+ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28
 ---
 
 # aWokenSentinel — a keepalive that lives outside the failure domain of the run it keeps alive
@@ -43,7 +43,8 @@ research record under `build/`.
 - **Vocabulary changes land in every carrier in one commit**: driver, leg, VERBS, SKILL, protocol, conf and its example.
 - **The CLI token is the owner's**, minted out of band; unit 5 ships inert until registered and reports an absent login as an announced skip, never a pass.
 - **Classification at open**: all MISSING; specced by the harness's SPEC stage from the briefs under `prompts/`. Unit 7 was ADDED after preflight by `--rescope`, on the measured `session_crons` field.
-- **Spec audits disposed by severity (M4), 2026-09-20, three rounds** over units 1 to 7, 8 to 14 and 15 to 20: every BLOCKER and HIGH PROMOTED by `--rescope --act add` into units 8 to 14, 15 to 20 and 21 to 24, one per defect; every MEDIUM and LOW FOLDED as a rev-N bump. Round 3 swapped orders 7 and 17. None parked, waived, retired or re-reviewed.
+- **Spec audits disposed by severity (M4), 2026-09-20, four rounds** over units 1-7, 8-14, 15-20, 21-24: every BLOCKER and HIGH PROMOTED by `--rescope --act add` into units 8-14, 15-20, 21-24, 25-28, one per defect (round 4's H3-H5 share one); every MEDIUM and LOW FOLDED as a rev-N bump. None parked, waived, retired or re-reviewed.
+- **The promotion cascade has no generation bound**: 7, 6, 4 and 4 units per round, and round 4 did not decay; recorded for the owner, the run invents no bound. Round 3 swapped orders 7 and 17.
 
 ## Parked decisions
 
@@ -78,13 +79,18 @@ research record under `build/`.
 | 23 | `TOOL-aWokenSentinel-23` | PLANNED | a kit-gate check that no shell file in the kit counts a captured variable's lines through `printf '%s
 '`, `echo` or a here-string into `wc -l`, the shape that reads an empty capture as one line, with the class in `memory/gotchas/` (audit round 3 H3) |
 | 24 | `TOOL-aWokenSentinel-24` | PLANNED | the tick's conf-block staged break is ONE artifact: `build_tick_without_conf_block` in the tick's suite makes the copy from two anchor lines and asserts its shape, so spec 13's and spec 18's arms name a helper and no count (audit round 3 H4) |
+| 25 | `TOOL-aWokenSentinel-25` | PLANNED | `check-arms.py` names a STRANDED prefix beside its UNARMED row, in `--report` and in `--check`'s refusal, and prints the whole signature instead of 72 characters of it, so an arm that stops short of a long message is diagnosed with its line rather than read as absent (audit round 4 H1) |
+| 26 | `TOOL-aWokenSentinel-26` | PLANNED | the marker region's accepting arm asserts its own entry state before it runs — a committed `LANDING` record, a clean tree, HEAD advertised on `origin main` — so an arm inserted above it that lands the record reds there naming the property that moved (audit round 4 H2) |
+| 27 | `TOOL-aWokenSentinel-27` | PLANNED | unit 21's leg enrolled in the three meta-gates that grade a manifest leg: the `PASS ($n assertions)` line, the `gate-legs` dossier claim with the map re-rendered, and the GENERATED `subject-pins.tsv` row (audit round 4 H3, H4, H5) |
+| 28 | `TOOL-aWokenSentinel-28` | PLANNED | the `echo` and here-string spellings unit 23's fixture does not stage get their own staged lines and RED readings in the kit gate's suite, over the same suite copy, so every top-level branch of the added-newline predicate has been seen to fail (audit round 4 H6) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 24 unit(s) · node a · opened 2026-09-16 · streams tooling
+**Build status:** SPECCED · 28 unit(s) · node a · opened 2026-09-16 · streams tooling
 ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13
-ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24
+ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24 TOOL-aWokenSentinel-25
+ids TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -109,17 +115,21 @@ ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aW
 | [TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md) | 18 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-15 — the spec-audit commission pins each subject at its committed blob and refuses a dirty subject before a lens is dispatched](spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md) | 20 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md) | 21 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first](spec/2026-09-20-spec-TOOL-aWokenSentinel-22.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-23 — a kit-gate check banning the line count that reads an empty capture as one line: `printf '%s\n'`, `echo` or a here-string into `wc -l` over a captured variable, with the class in `memory/gotchas/`](spec/2026-09-20-spec-TOOL-aWokenSentinel-23.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first](spec/2026-09-20-spec-TOOL-aWokenSentinel-22.md) | 22 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-23 — a kit-gate check banning the line count that reads an empty capture as one line: `printf '%s\n'`, `echo` or a here-string into `wc -l` over a captured variable, with the class in `memory/gotchas/`](spec/2026-09-20-spec-TOOL-aWokenSentinel-23.md) | 23 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-24 — the tick's conf-block staged break is ONE artifact: `build_tick_without_conf_block` in the tick's suite makes the copy from two anchor lines and asserts its shape, so both arms that stage it name a helper and no count](spec/2026-09-20-spec-TOOL-aWokenSentinel-24.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-25 — `check-arms.py` names a STRANDED prefix beside its UNARMED row and prints the whole signature, so an arm that stops short of a long message is diagnosed rather than read as absent](spec/2026-09-20-spec-TOOL-aWokenSentinel-25.md) | 25 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-26 — the marker region's accepting arm asserts its entry state before it runs: a committed `LANDING` record, a clean tree and HEAD advertised on `origin main`](spec/2026-09-20-spec-TOOL-aWokenSentinel-26.md) | 26 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-27 — unit 21's leg satisfies the three meta-gates that grade a manifest leg: the `PASS` count line, the `gate-legs` dossier claim with the map re-rendered, and the `subject-pins.tsv` row](spec/2026-09-20-spec-TOOL-aWokenSentinel-27.md) | 27 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-28 — the `echo` and here-string spellings unit 23 does not stage get their own staged lines and RED readings, so every branch of the added-newline predicate has been seen to fail](spec/2026-09-20-spec-TOOL-aWokenSentinel-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24.
+Ids no record names: TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28.
 
-Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24.
+Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-25 TOOL-aWokenSentinel-26 TOOL-aWokenSentinel-27 TOOL-aWokenSentinel-28.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -150,6 +160,10 @@ Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-21 TOOL-aWokenSen
 | 22 | `TOOL-aWokenSentinel-22` | no |
 | 23 | `TOOL-aWokenSentinel-23` | no |
 | 24 | `TOOL-aWokenSentinel-24` | no |
+| 25 | `TOOL-aWokenSentinel-25` | no |
+| 26 | `TOOL-aWokenSentinel-26` | no |
+| 27 | `TOOL-aWokenSentinel-27` | no |
+| 28 | `TOOL-aWokenSentinel-28` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
