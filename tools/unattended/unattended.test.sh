@@ -5557,18 +5557,48 @@ out=$(run --close tRun $bcov); miss "$out" "closing-review-recorded"
 # ==================================================================================================
 # TOOL-aGradedMandate-2 — `specs-audited`.
 # ==================================================================================================
+# TOOL-aBlindedTrial-2 — the audit is OPT-IN, declared by `spec-audit: <date>` in the build README and
+# read at BASE. Every arm below that expects the item OWED runs inside this epoch: the key is committed
+# on the fixture's main and merged into the epoch tip, because a working-copy edit is exactly what the
+# BASE read must not see. `bcreset` first, so the checkout leaves nothing behind; restored at AC3.
+_sa_main0=$(git rev-parse main); _sa_bcp0=$BCP
+bcreset; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: 2026-09-20'
+git add -A >/dev/null && git commit -q -m sa-declared --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+BCP=$(git rev-parse HEAD)
+
+# ---- AC1/AC6 (aBlindedTrial-2): preflight reads the key at BASE, pins it as a fact and SAYS so;
+# ---- --status carries it, so a resumed run can hand it to the harness without the preflight line.
+bcreset
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by README spec-audit: 2026-09-20"
+miss "$out" "recommend spec-audit"
+same "the spec-audit fact is pinned from the README at BASE" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" "2026-09-20"
+hit "$(run --status tRun)" "spec-audit 2026-09-20"
+
+# ---- AC2: a re-preflight writes the fact ONCE. Committed first, because preflight refuses a dirty tree.
+git add -A >/dev/null; git commit -q -m "sa pinned" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "preflight OK"
+same "a re-preflight leaves one spec-audit fact row" "$(grep -c '^spec-audit: ' memory/builds/tRun/RUN.md)" "1"
+
 # ---- MET-with-nothing-to-check when no unit is CLOSED, and it ANNOUNCES that. A silent pass over an
 # ---- empty selection is indistinguishable from coverage.
 bcopen; crfix; mutate memory/builds/tRun/README.md 's/| CLOSED |/| OPEN |/'; git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "no unit of this build is CLOSED, so no spec audit is owed yet"
 
-# ---- AC1: a CLOSED unit no spec-audit record names blocks, and the message names the id.
+# ---- AC1: a CLOSED unit no spec-audit record names blocks, and the message names the id. This is
+# ---- also aBlindedTrial-2's AC4: DECLARED at BASE, no record at all, the close blocks and the text
+# ---- names the declaration the build made rather than a default it never chose.
 bcopen; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
 rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
 hit "$out" "ARCH-tRun-1"
+hit "$out" "the pre-code review pass this build opted into with its spec-audit: key left no evidence"
+miss "$out" "close OK"
 
 # ---- AC2: a tracked record whose binding line names the id satisfies it.
 printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/reviews/a1.md
@@ -5592,6 +5622,8 @@ printf '**Serves:** spec-audit ARCH-tRun-19\n\n# audit\n' > memory/builds/tRun/r
 git add -A >/dev/null
 out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
+# aBlindedTrial-2 AC4, the DECLARED-and-unmet text the not-owed arm below asserts the absence of.
+hit "$out" "a CLOSED unit is named by no tracked spec-audit record"
 
 # ---- ...and an UNTRACKED record is invisible, because the join reads the INDEX. The likeliest
 # ---- operator state and the least guessable one.
@@ -5600,6 +5632,57 @@ printf '**Serves:** spec-audit ARCH-tRun-1\n\n# audit\n' > memory/builds/tRun/re
 out=$(run --close tRun $bcov)
 hit "$out" "specs-audited"
 rm -f memory/builds/tRun/reviews/a4.md
+
+# ---- AC3 (aBlindedTrial-2): the epoch closes — main back to where tRun declares NO key — and a CLOSED
+# ---- unit with NO record closes with the item MET and ANNOUNCED, never blocked on it.
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; BCP=$_sa_bcp0
+bcopen; crfix; git rm -q --cached memory/builds/tRun/reviews/audit.md >/dev/null
+rm -f memory/builds/tRun/reviews/audit.md; git add -A >/dev/null
+out=$(run --close tRun $bcov)
+hit "$out" "specs-audited — not owed"
+miss "$out" "a CLOSED unit is named by no tracked spec-audit record"
+
+# ---- AC6: not owed, ONE unit, no fork — the line prints and the recommendation clause does NOT.
+bcreset
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "recommend spec-audit"
+
+# ---- ...TWO units in the generated region: the recommendation rides the line.
+bcreset
+setunits tRun '| [ARCH-tRun-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |
+| [ARCH-tRun-2 — the second](spec/two.md) | OPEN | rev-1 | 2026-08-01 |'
+git add -A >/dev/null; git commit -q -m "two units" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "not owed (opt-in); recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: 2 units in the generated region"
+
+# ---- ...and ONE unit whose tracked spec grades FORKED: the same clause, by the other trigger.
+bcreset
+printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n\n## 2. Scope (IN)\n\nS1 a thing\n\n## 6. Acceptance criteria\n\nAC1 a thing\n\n## 7. Gates\n\nthe bar\n\n## 8. Open questions\n\n- F1 — which way? open\n' \
+  > memory/builds/tRun/spec/one.md
+git add -A >/dev/null; git commit -q -m "forked spec" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: a spec grading FORKED"
+
+# ---- AC1's red half: a key committed on the RUN BRANCH only is not at BASE, so it pins NOTHING.
+bcreset
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: 2026-09-20'
+git add -A >/dev/null; git commit -q -m "key on the branch" --no-verify
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+same "a key committed on the run branch pins no fact" "$(sed -n 's/^spec-audit: //p' memory/builds/tRun/RUN.md)" ""
+
+# ---- AC5: a value that is not a date is a REFUSAL at BASE — never read as absent, never pinned.
+bcreset; git checkout -qf main
+mutate memory/builds/tRun/README.md '/^slug: tRun$/a spec-audit: later'
+git add -A >/dev/null && git commit -q -m sa-malformed --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "the build README at the pinned BASE declares spec-audit: with a value that is not a YYYY-MM-DD date, and the pre-code audit is opted in by a dated declaration or not at all - declared: later"
+miss "$out" "preflight OK"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
 
 # ==================================================================================================
 # TOOL-aGradedMandate-5 / -10 — the parked split, on BOTH axes.
@@ -5718,7 +5801,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=790
+FLOOR_ASSERTIONS=812
+# RAISED 790 -> 812 by TOOL-aBlindedTrial-2, the +22 spec-audit opt-in arms (hit/miss/same/mutate lines)
+# in the `specs-audited` block of region two, counted off the block run alone with the prelude
+# sourced: n went 28 -> 50.
 # RAISED 783 -> 790 at the aProbedUnit merge with origin/main, which carried aDeferredBar's +7
 # (713 = 706 + 7 there): the two builds' arms are disjoint blocks in region two, so the floor is
 # the sum of both raises over the shared 706 base.
@@ -5762,7 +5848,8 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=594
+FLOOR_SHARD_2=616
+# +22 for the TOOL-aBlindedTrial-2 spec-audit opt-in arms, all in region two.
 # +7 for the aDeferredBar arms carried in at the merge (SPEC_TOKENS_CLI dispatch +5, resolver +2).
 # +4 for the closing diff review of aProbedUnit, round 2, cluster H, in region two.
 # +19 for the closing diff review of aProbedUnit, all in region two — see FLOOR_ASSERTIONS above.
