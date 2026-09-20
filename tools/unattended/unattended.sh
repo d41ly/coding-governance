@@ -3081,6 +3081,22 @@ BRIEFROWS
     _rtn=$(grep -c '' "$_rt"); _rtl=$(tail -n 1 -- "$_rt"); _rtl=${_rtl%$'\r'}
     parked="$parked · resume-tick $_rtn attempt(s), last ${_rtl%% *}"
   fi
+  # THE STOP-GUARD'S NEWEST LISTING, on the same rule (TOOL-aWokenSentinel-9): a FIELD on this one
+  # line, printed only when the record names a keepalive id AND the sidecar holds a line, so a
+  # record with nothing to report prints the bytes it printed before this unit. `present` and
+  # `absent` are the `grep -qF` --landed grades with, over the listing alone — never the utc or the
+  # phase, which an id could be a substring of. The newest line is read WHATEVER its phase: this
+  # verb reports and does not judge, and the judging is --landed's. It used to be a second stdout
+  # line (unit 7's first cut), which broke the header's `# one line` promise and every whole-output
+  # reader of it; the suite arms that promise now, so the next field joins the line or does not
+  # print. This is the LAST suffix, after every field above it.
+  local _kid _sl _su _sp
+  _kid=$(fact "$rel" keepalive)
+  if [ -n "$_kid" ] && _sl=$(read_stop_listing "$slug"); then
+    _su=$(printf '%s\n' "$_sl" | sed -n 1p)
+    if printf '%s\n' "$_sl" | sed -n '3,$p' | grep -qF -- "$_kid"; then _sp=present; else _sp=absent; fi
+    parked="$parked · keepalive $_kid $_sp in the harness listing at $_su"
+  fi
     # The halt code on the status line, when the record carries one. A vocabulary with no reader
     # is decoration, and this kit says so about its own phase writer.
     local hc; hc=$(fact "$rel" halt-code)

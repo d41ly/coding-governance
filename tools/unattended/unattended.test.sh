@@ -2727,6 +2727,67 @@ hit "$out" "keepalive-reaped: checked — k1 absent from the harness listing at"
 hit "$out" "phase LANDED"
 remove_landed_fixture; rm -f "$STOP7"
 
+# ==================================================================================================
+# TOOL-aWokenSentinel-9 — the stop-guard listing is a FIELD on `--status`'s ONE line, on the
+# parked/noted rule: the LAST suffix, printed only when the record names a keepalive id AND the
+# sidecar holds a line, omitted otherwise, so a record with nothing to report prints the bytes it
+# printed before this unit. `present`/`absent` is unit 7's `grep -qF`; the newest line is read
+# whatever its phase, because the verb reports and --landed judges. Unit 7's fixtures, rebuilt per
+# arm; the sidecar removed before and after. Each field arm RED against a driver copy with the field
+# clause removed (`keepalive` missing, the byte-identical `same` still green); the one-line arm RED
+# against unit 17's two-line copy, because the field-clause copy prints one line too.
+# ==================================================================================================
+# ---- AC1: newest line `LANDING` and the listing names k1 — `present`, the LAST ` · ` field, and
+# ---- `extract_next` still yields the id under the suffix. Then the listing `[]` — `absent`, same utc.
+# ---- The older `[]` line proves the field reads the NEWEST line, as --landed does.
+build_landed_fixture; rm -f "$STOP7"
+s9_before=$(run --status tRun)
+printf '%s\n' '{"utc":"2026-09-16T11:00:00Z","phase":"LANDING","session_crons":[]}' \
+  '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+s9=$(run --status tRun)
+hit  "$s9" " · keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z"
+same "AC1 the keepalive field is the LAST field of the status line" "$(printf '%s\n' "$s9" | sed -n '/· next /p' | sed 's/.* · //')" "keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z"
+same "AC1 extract_next still yields the id under the keepalive suffix" "$(extract_next "$s9")" "$want_unit"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[]}' > "$STOP7"
+s9=$(run --status tRun)
+hit  "$s9" " · keepalive k1 absent in the harness listing at 2026-09-16T12:00:00Z"
+miss "$s9" "k1 present"
+# ---- AC2: no sidecar — byte-identical to the line the same fixture printed before the sidecar
+# ---- existed, with no field on it. A field printed at nothing would grow every existing status
+# ---- line, which is the byte change unit 5 F1 refused for its own field.
+rm -f "$STOP7"
+same "AC2 with no sidecar the line is byte-identical to before" "$(run --status tRun)" "$s9_before"
+miss "$s9_before" "in the harness listing"
+remove_landed_fixture
+# ---- AC2, the `none` arm: a stop line PRESENT and the record's `keepalive` fact deleted — no field,
+# ---- because a listing with no id to compare against has no presence to print. The `next` hit is
+# ---- what keeps the `miss` from passing on a verb that printed nothing.
+build_landed_fixture '/^keepalive: /d'; rm -f "$STOP7"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+s9=$(run --status tRun)
+hit  "$s9" "· next $want_unit"
+miss "$s9" "in the harness listing"
+remove_landed_fixture; rm -f "$STOP7"
+# ---- AC3: EVERY optional field populated — a parked row, a two-line resume log and a stop line
+# ---- naming k1 — and `check_status_one_line` still reads ONE stdout line, with each field on it and
+# ---- the `next` value intact; `--resume`'s first line carries the same field. This is the header's
+# ---- `# one line` as an arm: a future field that arrives on a second line reds here by name. RED
+# ---- against unit 17's two-line driver copy, never against the field-clause copy.
+build_landed_fixture; rm -f "$STOP7"
+run --park tRun --item x --reason y >/dev/null
+printf '2026-09-20T10:00:00Z attempt 1 session s pid 1 pid-alive no out o1\n2026-09-20T10:10:00Z attempt 2 session s pid 1 pid-alive no out o2\n' > "${STOP7%/*}/resume.tRun.log"
+printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
+check_status_one_line tRun > "$ORIGIN_DIR/s9.line"
+grep '^FAIL' "$ORIGIN_DIR/s9.line" || true
+s9=$(cat "$ORIGIN_DIR/s9.line")
+hit  "$s9" "· parked 1"
+hit  "$s9" "· resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z"
+hit  "$s9" "· keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z"
+same "AC3 extract_next yields the id with every suffix on the line" "$(extract_next "$s9")" "$want_unit"
+same "AC3 --resume's first line carries the keepalive field" "$(run --resume tRun | head -n 1 | grep -c 'keepalive k1 present in the harness listing at 2026-09-16T12:00:00Z')" "1"
+rm -f "$STOP7" "${STOP7%/*}/resume.tRun.log"
+remove_landed_fixture
+
 # ---- THE LOCAL ARM (TOOL-dUnstalledConvoy-1). A build merged into local main that could not push had
 # ---- no terminal to reach and aborted with the work complete; three of the five aborted runs in this
 # ---- tree died at or near that wall. The fixtures below are that shape exactly.
@@ -6167,7 +6228,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=946
+FLOOR_ASSERTIONS=961
+# RAISED 946 -> 961 by TOOL-aWokenSentinel-9: the `--status` keepalive-field arms (15) in region two
+# beside the `keepalive-reaped` read-back arms, measured by running that block alone over the sourced
+# prologue and the extraction block: n 23 -> 38 on node `a`.
 # RAISED 917 -> 946 by TOOL-aWokenSentinel-7: the `keepalive-reaped` read-back arms (28) beside the
 # --landed success arm and one hit on the close-OK output (1), all region two, measured by running
 # the two blocks alone over the sourced prologue: n 20 -> 48 and 48 -> 51 (two of those three are
@@ -6230,7 +6294,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=750
+FLOOR_SHARD_2=765
+# +15 for the TOOL-aWokenSentinel-9 `--status` keepalive-field arms, in region two beside the
+# `keepalive-reaped` read-back arms.
 # +29 for the TOOL-aWokenSentinel-7 `keepalive-reaped` read-back arms, in region two beside the
 # --landed success arm, plus one hit on the park-taxonomy close-OK output.
 # +7 for the TOOL-aWokenSentinel-17 field-wise `--status` reader arms, in region two beside the

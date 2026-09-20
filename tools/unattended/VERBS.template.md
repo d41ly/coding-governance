@@ -69,7 +69,11 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
-- `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
+- `--status` — one line: the phase, the first non-terminal unit, and the parked counts, then the
+  fields that print only when there is something to report — the resume tick's attempts, and
+  `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
+  sidecar line, whatever its phase, omitted when the record names no keepalive id or no line
+  exists. The line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
