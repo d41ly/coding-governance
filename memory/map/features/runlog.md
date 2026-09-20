@@ -7,7 +7,8 @@ status = "shipped"
 streams = ["tooling"]
 decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4",
   "TOOL-dLoggedFlight-5", "TOOL-dLoggedFlight-6", "TOOL-dLoggedFlight-8", "TOOL-dLoggedFlight-9",
-  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-14", "TOOL-dLoggedFlight-16"]
+  "TOOL-dLoggedFlight-10", "TOOL-dLoggedFlight-12", "TOOL-dLoggedFlight-14", "TOOL-dLoggedFlight-16",
+  "TOOL-dLoggedFlight-21"]
 
 [claims]
 gate-legs = ["runlog selftest", "pre-push run-log line", "runlog record schema",
@@ -123,8 +124,12 @@ class becomes `-` and is counted, so a model that grew a value the schema lacks 
 Owner turns stay counts, never clock times. The spec's first bounds measured over the cap once the
 JSON twin doubles every row, so `TIMELINE_EDGE` and `LIST_BOUND` fell, with a halving step for
 unusually wide cells; the figures live in those constants. The journal commitment hashes the lines the
-MODEL attributed, and verify takes the committed count from the committed first time, so a line the
-run appends after the render is not an edit.
+MODEL attributed, and it commits a digest and a count and no time at all (owner, 2026-09-16), so
+verify hashes the committed number of lines from the start of the same time order: a line the run
+appends after the render sorts past them and is not an edit, while an edit, a deletion or a line of
+the run landing earlier than a hashed one shifts that prefix and is reported. `TEMPLATE_PARSERS` is
+the left-shift for how the two halves came apart — a template and the parser that reads it back,
+mapped to each other, with a self-test arm rendering and re-parsing every entry.
 
 **The schema leg reads the INDEX and the schema's DATA, never the renderer.** A record edited by hand,
 by a merge or by a later renderer is exactly what a renderer's own discipline cannot vouch for, so

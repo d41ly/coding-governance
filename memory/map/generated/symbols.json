@@ -4483,6 +4483,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_journal_bytes",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "render_kill",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -5451,6 +5456,11 @@
       "id": "scan_substituted",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "scan_template_pairs",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "scan_tracked_specs",
@@ -6819,6 +6829,11 @@
     },
     {
       "id": "test_record_model_fields",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_template_pairs",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

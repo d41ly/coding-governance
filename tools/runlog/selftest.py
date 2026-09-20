@@ -116,7 +116,10 @@ from collections import Counter  # noqa: E402
 # and AC4's shapes with seven, whose decoy checks move it by nine.
 # RAISED 1317 -> 1338 by TOOL-dLoggedFlight-14, source order: three new functions, AC1 with four checks,
 # AC3 with five and AC7 with three, whose decoy checks move it by nine.
-ASSERTION_FLOOR = 1338
+# RAISED 1338 -> 1348 by TOOL-dLoggedFlight-21, the commitment: ONE new arm, the template pair, with
+# four checks, whose decoy checks move it by three; and AC5's inserted line with three more inside an
+# arm that already existed, which moves no decoy check. Two helpers arrive with neither.
+ASSERTION_FLOOR = 1348
 
 PASS = []
 FAIL = []
@@ -2106,6 +2109,20 @@ def write_journals(base, driver=(), gates=(), pushes=()):
             data = "".join(rl.render_line(f) + "\n" for f in sorted(lines, key=lambda f: float(f["t"])))
             (root / rl.PRODUCER_FILES[name]).write_bytes(data.encode("utf-8"))
     return root
+
+
+def render_journal_bytes(raw, extra):
+    """One producer file's bytes with `extra` lines spliced in BY TIME, so the file stays in the time
+    order `write_journals` writes it in. Appending them at the end instead would leave the file
+    non-monotonic, which is a second change beside the one an arm is trying to stage."""
+    out = []
+    for n, line in enumerate(raw.decode("utf-8").split("\n"), 1):
+        if line:
+            out.append((float(rl.parse_line(line, n).fields["t"]), line))
+    for fields in extra:
+        out.append((float(fields["t"]), rl.render_line(fields)))
+    out.sort(key=lambda pair: pair[0])
+    return "".join(line + "\n" for _t, line in out).encode("utf-8")
 
 
 def write_extract(store, sid, events, slug=FX_SLUG, extracted_at=FX_EXTRACTED_AT):
@@ -4456,7 +4473,7 @@ def test_record_ac5_verify():
     env = build_arm_env(repo.parent)
     text = p2.read_bytes().decode("utf-8")
     check_true("record AC5: the live run's record commits its six journal lines, never nothing",
-               re.search(r"^- commitment: sha256 [0-9a-f]{64} · lines 6 · ", text, re.M) is not None,
+               re.search(r"^- commitment: sha256 [0-9a-f]{64} · lines 6$", text, re.M) is not None,
                [ln for ln in text.split("\n") if "commitment" in ln][:1])
     r = run_runlog(["verify", str(p2), "--journals", str(j)], repo, env)
     check("record AC5: verify on the untouched journal exits 0", (r.returncode, "match" in r.stdout), (0, True))
@@ -4479,6 +4496,21 @@ def test_record_ac5_verify():
     check("record AC5: verify on a journal edited after the render exits 1", r.returncode, 1)
     check_true("record AC5: ...naming the mismatch", "mismatch" in r.stdout and "sha256" in r.stdout,
                (r.stdout + r.stderr)[-300:])
+    # A LINE OF THE RUN INSERTED AMONG THE HASHED ONES (spec S4). With the committed first time gone,
+    # the count alone anchors the prefix, so a line earlier than the last hashed one pushes that one
+    # out of the prefix and the digest moves. It is REPORTED, never absorbed: the old floor hashed
+    # from the committed first time on and could not see this case at all.
+    inserted = render_driver_lines(25, "--status", phase_from="BUILDING", phase_to="BUILDING")
+    MODEL_LINES.extend(inserted)
+    log.write_bytes(render_journal_bytes(raw, inserted))
+    r = run_runlog(["verify", str(p2), "--journals", str(j)], repo, env)
+    check("record AC5: a line of the run inserted among the hashed lines exits 1", r.returncode, 1)
+    check_true("record AC5: ...naming the mismatch and the digest, never the count",
+               "mismatch" in r.stdout and "sha256" in r.stdout and "lines committed" not in r.stdout,
+               (r.stdout + r.stderr)[-300:])
+    shifted = build_model(repo, journals=j, run=2)
+    check("record AC5 liveness: the rebuilt model attributes the inserted line, so the prefix really "
+          "moved", len(shifted.journal_lines["driver"]), 10)
     r = run_runlog(["verify", str(p1), "--journals", str(j)], repo, env)
     check("record AC5: the journal-less record reads commitment=none and exits 0",
           (r.returncode, "commitment=none" in r.stdout, "nothing to verify" in r.stdout), (0, True, True))
@@ -4512,6 +4544,51 @@ def test_record_ac7_cli():
     check_true("record AC7: ...and no unit id", subject is not None
                and re.search(ANCHOR_ID, subject.group(1)) is None, subject.group(1) if subject else "")
     check_true("record AC7: its wall time is printed, report-only", "report-only" in r.stdout, r.stdout[-300:])
+
+
+def scan_template_pairs(text):
+    """Every Summary fact `TEMPLATE_PARSERS` maps whose rendered value one of the record's two copies
+    does not parse, named by LABEL. Both copies are read because a twin disagreeing with the markdown
+    is the same defect seen from the other side, and a label the record does not carry at all counts
+    as a failure rather than as nothing to check."""
+    md = parse_record_markdown(text)["Summary"]["facts"]
+    twin = (rl_record.parse_record(text)["sections"].get("Summary") or {}).get("facts") or {}
+    bad = []
+    for label, parser in sorted(rl_record.TEMPLATE_PARSERS.items()):
+        for copy in (md.get(label), twin.get(label)):
+            if copy is None or not parser.fullmatch(copy):
+                bad.append(label)
+                break
+    return bad
+
+
+def test_record_template_pairs():
+    """S5: every Summary fact `TEMPLATE_PARSERS` maps renders a value its OWN parser reads back, in the
+    markdown and in the Data twin, and a template that gains a field while its parser is left behind
+    reds naming that fact. The render is given a commitment, so no mapped fact renders its `none`
+    alternative here."""
+    m, _intruders, j, _fx = build_class_model()
+    commitment = rl_record.measure_commitment(m, j)
+    text = rl_record.render_record(m, "memory", commitment)
+    check_true("record pairs: TEMPLATE_PARSERS maps at least one fact, so the arm has a population",
+               bool(rl_record.TEMPLATE_PARSERS), str(sorted(rl_record.TEMPLATE_PARSERS)))
+    declared = [name for name, _t in rl_record.RECORD_SCHEMA["sections"]["Summary"]["facts"]]
+    check("record pairs: every mapped label is a Summary fact the schema declares",
+          [lab for lab in sorted(rl_record.TEMPLATE_PARSERS) if lab not in declared], [])
+    check("record pairs: every mapped fact's rendered value parses with its own parser, both copies",
+          scan_template_pairs(text), [])
+    # THE STAGED BREAK, on a COPY of the schema's own tuple: the template gains a field and the parser
+    # is left, which is exactly how the commitment's two halves came apart across two specs.
+    facts = rl_record.RECORD_SCHEMA["sections"]["Summary"]["facts"]
+    at = next(k for k, (name, _t) in enumerate(facts) if name == "commitment")
+    widened = (facts[at][0], (facts[at][1][0], facts[at][1][1] + " · first {utc}"))
+    rl_record.RECORD_SCHEMA["sections"]["Summary"]["facts"] = facts[:at] + (widened,) + facts[at + 1:]
+    try:
+        broken = rl_record.render_record(m, "memory", commitment)
+    finally:
+        rl_record.RECORD_SCHEMA["sections"]["Summary"]["facts"] = facts
+    check("record pairs: RED — a commitment template that gains a field its parser cannot read is named",
+          scan_template_pairs(broken), ["commitment"])
 
 
 def test_record_model_fields():

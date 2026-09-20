@@ -31,11 +31,12 @@ text a render would write and `render_record` refuses the whole record when any 
 row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap beside an
 owner turn out already; this is the renderer's own check, so a model that regressed cannot publish one.
 
-THE COMMITMENT makes a later edit to the journal detectable on the node that holds it: the sha256, the
-line count and the first and last times of the journal lines the MODEL attributed to the run, read from
-its `journal_lines` and never re-joined here. `check_commitment` rebuilds the model and hashes the
-committed number of lines from the committed first time on, so a line the run appends after the render
-is not an edit.
+THE COMMITMENT makes a later edit to the journal detectable on the node that holds it: the sha256 and
+the line count of the journal lines the MODEL attributed to the run, read from its `journal_lines` and
+never re-joined here. NO TIME OF A JOURNAL LINE IS COMMITTED (owner, 2026-09-16), so the committed
+count is the whole anchor: `check_commitment` rebuilds the model and hashes that many lines from the
+START of its time order. A line the run appends after the render sorts past them and is not an edit; an
+edit, a deletion, or a line of the run inserted among them reads as a mismatch.
 
 THE SCHEMA LEG (TOOL-dLoggedFlight-10) is `check_records`, run as `runlog.py check-records`. It reads
 every committed record's STAGED bytes and refuses anything outside `RECORD_SCHEMA`, compiling the
@@ -112,7 +113,14 @@ RECORD_NAME_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}-build-([A-Z]+-[A-Za-z0-
                             + RECORD_TAG + r"-([0-9a-f]{8})\.md")
 UNIT_ID_RE = re.compile(r"([A-Z]+)-([A-Za-z0-9]+)-([0-9]+)")
 PLACEHOLDER_RE = re.compile(r"\{([a-z-]+)\}")
-COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+) · first (\S+) · last (\S+)")
+COMMITMENT_RE = re.compile(r"sha256 ([0-9a-f]{64}) · lines ([0-9]+)")
+# EVERY SUMMARY FACT WHOSE RENDERED VALUE A PARSER IN THIS KIT READS BACK, mapped to that parser
+# (TOOL-dLoggedFlight-21 S5). A template and the parser that reads it back are ONE contract kept in
+# two places: the commitment's template and `COMMITMENT_RE` were changed in two different specs, and
+# every record rendered in between would have failed `verify`. The self-test's pair arm renders each
+# mapped fact and re-parses it with its own parser, so the disagreement reds in code rather than
+# waiting for a reader to cross-read two documents.
+TEMPLATE_PARSERS = {"commitment": COMMITMENT_RE}
 
 _PATH_SEG = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 _PATH = r"<root>/builds/<slug>/(?:" + _PATH_SEG + r"/)*" + _PATH_SEG + r"\.md"
@@ -193,7 +201,7 @@ RECORD_SCHEMA = {
                 ("usage workflow", (_WINDOW_USAGE,)),
                 ("attributed calls", ("{int} of {int}",)),
                 ("values withheld", ("{int}",)),
-                ("commitment", ("none", "sha256 {digest} · lines {int} · first {utc} · last {utc}")),
+                ("commitment", ("none", "sha256 {digest} · lines {int}")),
             ),
             "tables": (),
         },
@@ -661,8 +669,7 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
         if label == "commitment":
             if commitment:
                 facts.append((label, render_fact(ctx, templates[1], (
-                    commitment.get("sha256"), derive_count(commitment.get("lines")), commitment.get("first"),
-                    commitment.get("last")))))
+                    commitment.get("sha256"), derive_count(commitment.get("lines"))))))
             else:
                 facts.append((label, templates[0]))
             continue
@@ -933,13 +940,15 @@ def write_record(root, model, journal_root=None, memory_root=None, date=None):
 
 # ---------------------------------------------------------------------------------- the commitment
 
-def measure_commitment(model, journal_root, first=None, count=None) -> dict | None:
-    """The sha256, count and first and last times of the journal lines the model attributed to the run.
+def measure_commitment(model, journal_root, count=None) -> dict | None:
+    """The sha256 and count of the journal lines the model attributed to the run.
 
-    Each line is hashed as `<producer> TAB <its raw bytes> LF`, in time order. With `first` and `count`,
-    this is the verify form: only lines at or after `first` count, and only the first `count` of them,
-    so a line appended after the render changes nothing and an edit or a deletion changes the hash.
-    None when there is no line to hash.
+    Each line is hashed as `<producer> TAB <its raw bytes> LF`, in time order. With `count`, this is the
+    verify form: only the FIRST `count` lines of that order are hashed. A line the run appends after the
+    render sorts past them and changes nothing; an edit, a deletion, or a line of the run inserted among
+    them changes the hash. NO TIME IS RETURNED and none is committed: the count is the whole anchor, so
+    a line earlier than every hashed one shifts the prefix and is REPORTED rather than absorbed, which
+    is the direction an integrity check wants (spec S4). None when there is no line to hash.
     """
     m = derive_view(model)
     refs = m.get("journal_lines") or {}
@@ -959,17 +968,14 @@ def measure_commitment(model, journal_root, first=None, count=None) -> dict | No
                 continue
             picked.append((t, rank, n, producer, line))
     picked.sort()
-    if first is not None:
-        floor = mdl.parse_iso(first)
-        picked = [p for p in picked if floor is not None and p[0] >= floor]
-        picked = picked[:count] if count is not None else picked
+    if count is not None:
+        picked = picked[:count]
     if not picked:
         return None
     digest = hashlib.sha256()
     for _t, _rank, _n, producer, line in picked:
         digest.update(producer.encode("ascii") + b"\t" + line + b"\n")
-    return {"sha256": digest.hexdigest(), "lines": len(picked), "first": mdl.derive_iso(picked[0][0]),
-            "last": mdl.derive_iso(picked[-1][0])}
+    return {"sha256": digest.hexdigest(), "lines": len(picked)}
 
 
 def parse_record(text) -> dict:
@@ -1031,9 +1037,9 @@ def check_commitment(root, record_path, journal_root, memory_root=None) -> tuple
         raise ValueError("runlog: no journal of this run is on this machine, so its commitment cannot be "
                          "recomputed here; it is checkable only on the node that produced it")
     model = mdl.build_run_model(root, slug, run=k, journal_root=journal_root)
-    want = {"sha256": cm.group(1), "lines": int(cm.group(2)), "first": cm.group(3), "last": cm.group(4)}
-    now = measure_commitment(model, journal_root, first=want["first"], count=want["lines"]) or {}
-    bad = [f for f in ("sha256", "lines", "first", "last") if now.get(f) != want[f]]
+    want = {"sha256": cm.group(1), "lines": int(cm.group(2))}
+    now = measure_commitment(model, journal_root, count=want["lines"]) or {}
+    bad = [f for f in ("sha256", "lines") if now.get(f) != want[f]]
     if bad:
         return "mismatch", ("the journal changed after the render: " + "; ".join(
             f"{f} committed {want[f]} and recomputed {now.get(f, 'nothing')}" for f in bad))

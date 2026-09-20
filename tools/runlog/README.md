@@ -335,11 +335,14 @@ turns the run's last stretch held, and nothing in them says so. A Timeline `rc` 
 stated where it happens. A record still over the cap halves the timeline's rows and then the lists'
 bound, in turn, until it fits. The figures are the constants' own, in `record.py`, and not restated.
 
-**The commitment** is the sha256, count and first and last times of the journal lines the model
-attributed to the run, each hashed as its producer, a TAB and its raw bytes. `verify` rebuilds the
-model and hashes that many of its lines from the committed first time on: 0 when they match or the
-record commits `none`, 1 when the journal changed after the render, 2 when the record cannot be read or
-no journal of the run is on this machine. A line the run appended after the render is not an edit.
+**The commitment** is the sha256 and the count of the journal lines the model attributed to the run,
+each hashed as its producer, a TAB and its raw bytes. NO TIME OF A JOURNAL LINE IS COMMITTED (owner,
+2026-09-16), so the count is the whole anchor: `verify` rebuilds the model, sorts its lines the same
+way and hashes the committed number of them from the START of that order. Exit 0 when the two agree or
+the record commits `none`, 1 when the journal changed after the render, naming the field that differs,
+2 when the record cannot be read or no journal of the run is on this machine. A line the run appended
+after the render sorts past the hashed prefix and is not an edit; an edit, a deletion, or a line of the
+run that lands EARLIER than a hashed one shifts the prefix and reads as a mismatch.
 
 **`record --write` prints what it cannot do itself**, on stdout: the build-index re-render, with the
 memory tree's `gen_build_index.py` found beside this kit by its file name, and a commit subject naming
@@ -464,9 +467,10 @@ prefix and root, and hold the render to an independent one.
   it ran there joins only through a push that pinned it.
 - **Whether a record's values are TRUE.** The schema admits a value's shape, never its truth: a count
   can be wrong and still be an integer.
-- **A line inserted before the committed first time.** `verify` hashes from that time on, so it
-  cannot see one. The model attributes no line of a run outside its window, so this misses only a line
-  it would never have counted.
+- **Which line of a shifted prefix moved.** A line of the run that lands earlier than a hashed one
+  changes the digest, and `verify` reports the digest, never the line: it holds the committed hash and
+  a count, so it can say the prefix is not the one committed and nothing about where it parted. The
+  case itself is no longer invisible, which is the one thing the retired time floor bought.
 - **A spec mark made after the run, in the run's era.** The ledger still splits each spec's section 8
   marks at the era's end, where the spec's S4 says the window's: the window's end needs the one blob
   read that also carries the specs. For a build's last run the era is open, so a mark added to one of
