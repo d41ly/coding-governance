@@ -106,7 +106,7 @@ added AC10, whose line below that fold observed.
   read both ways: with no local transcript the Coverage fact read `judged 9 of 12` beside
   `anomalies 0`, the clean-looking zero the marker exists to mark, and with the session's extract
   present it read `judged 12 of 12`. The kinds the local transcript adds are exactly those declaring
-  the transcripts or the idle judgement. The post-build suite run at `30212215` refuted this
+  the transcripts or the idle judgement. The post-build suite run at `4a2d32c9` refuted this
   criterion's LIVENESS, which had asked both renders to fall short of the closed list: spec rev-13
   holds the not-local render short instead, and the arm then ran GREEN, 1543 passed, 0 failed.
 

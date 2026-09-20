@@ -204,7 +204,7 @@ none
   would be a second answer to one question. A record whose Anomalies or Coverage table carries a time
   column `TOOL-dLoggedFlight-22` S2 removed does not match any header that section declares, so
   `check_record_lines` refuses it at the header line under `cell` before a row is read
-  (`tools/runlog/record.py` at `6f481d31`, the `a table header section … declares no table for`
+  (`tools/runlog/record.py` at `1cb1960f`, the `a table header section … declares no table for`
   branch); and a time column RE-ADDED to the schema is a slot `scan_time_slots` returns with no
   entry, which `check_time_sources` refuses by AC1. This is rev-3's own finding one step on: that rev
   moved AC5's fixture off a `verb` row for the same reason, a retired layout being refused under

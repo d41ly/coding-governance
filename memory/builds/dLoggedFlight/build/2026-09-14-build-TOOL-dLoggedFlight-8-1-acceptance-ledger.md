@@ -272,25 +272,25 @@ AC5.
   no non-terminal end; emptied, it stretched the window to itself. The run's own session-less `--audit`
   heartbeats stayed its events and `stalled` still fired, which is why the constant is a proper subset
   of `TREE_BLIND_VERBS` rather than the same set. The arm ran GREEN in the post-build suite run at
-  `30212215`: 1543 passed, 0 failed, floor 1543.
+  `4a2d32c9`: 1543 passed, 0 failed, floor 1543.
 - AC25 — `build_run_model` (`test_model_ac25_visit_places_nothing`) — added at rev-18 by the fold of
   R2-L1, and observed by it: over journals kept through the run and holding another build's older
   lines, one post-landing `--status` or `--audit` left all three journals `not-local`, while the run's
   own `--park` or `--landed` in that same slot read `dead` and named its proof. With
   `READ_ONLY_VERBS` emptied the read read `dead` again, which is L2's own symptom reintroduced by one
   visit. Both staged pairs held the same line count and lay outside the window. GREEN in the
-  post-build suite run at `30212215`.
+  post-build suite run at `4a2d32c9`.
 - AC26 — `build_run_model` (`test_model_ac26_mark_split_at_the_window`) — added at rev-19 by the fold
   of R2-L2, and observed by it: the same `RESOLVED` mark on the same spec read `inside` at a commit
   twenty minutes into the window, counted nothing when committed forty minutes in, past the window's
   end, and read `before` when inherited from before the run. All three cost six git calls, so S12's
   process bound held while each unit's spec became a request at every record commit in the one
   `cat-file --batch`. The staged RED has no constant to empty: putting `split_rev` back to the era's
-  head gives the minute-40 case an `inside` entry. GREEN in the post-build suite run at `30212215`.
+  head gives the minute-40 case an `inside` entry. GREEN in the post-build suite run at `4a2d32c9`.
 - AC27 — `check_anomaly_sources` (`test_record_ac11_anomaly_sources`) — added at rev-20 by the fold of
   R2-M2, and observed by it: the live `ANOMALY_SOURCES` earned no refusal, and four staged copies — a
   kind with no entry, an entry naming no kind, an empty source set, and a source outside the
-  vocabulary — earned exactly one refusal each. GREEN in the post-build suite run at `30212215`.
+  vocabulary — earned exactly one refusal each. GREEN in the post-build suite run at `4a2d32c9`.
 
 ## What else the pass carried
 
