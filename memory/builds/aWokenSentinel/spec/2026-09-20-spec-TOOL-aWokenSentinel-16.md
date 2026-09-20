@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 |
 
 <!-- /gen:spec-records -->
 
@@ -34,9 +36,12 @@ refuses, because an earlier commit does not contain a later witness.
   `observe_anchor` read from the remote's own advertisement. Observed by AC1, AC2 and AC3.
 - **S2** — Each failing read is its own `fail 34` sentence naming what it read: a marker line with
   no sha, a sha this clone does not hold, a commit that does not contain the witness (the earlier
-  landing), and a commit the advertised default branch does not reach. The witness written to the
-  record stays HEAD, exactly as the remote arm has it; the marker's commit is evidence, never the
-  witness. Observed by AC2 and AC3.
+  landing), and a commit the advertised default branch does not reach — four new sentences
+  replacing the one at `:2500`, beside the three check-34 sentences that stay (`:1242`, `:2481`,
+  `:2493`), seven branches of one check for `check-arms.py` to key. S3 arms the second and the
+  third; `TOOL-aWokenSentinel-22` arms the first and the fourth, and the `harness arms` leg runs
+  once at the close after both. The witness written to the record stays HEAD, exactly as the
+  remote arm has it; the marker's commit is evidence, never the witness. Observed by AC2 and AC3.
 - **S3** — The suite's marker arms move with the predicate: the all-zero marker arm at
   `unattended.test.sh:4541` reads the "does not hold" refusal, a new arm writes a marker naming the
   fixture's parent commit and reads the "does not contain the witness" refusal, and a new arm builds
@@ -45,9 +50,10 @@ refuses, because an earlier commit does not contain a later witness.
   run branch's HEAD; that last arm is observed RED first against the driver at this unit's base,
   where it refuses naming a different commit. Observed by AC1, AC2 and AC3.
 - **S4** — The verb's comment above the check states the predicate, cites -38, and states what the
-  predicate does NOT prove: that the lander which wrote the marker is the one this project declares,
-  and the concurrent-landing overwrite `TOOL-aUnblockedFleet-7` records, which this predicate
-  tolerates only when the later landing contains this one. Observed by AC4.
+  predicate does NOT prove, in a sentence carrying the phrase `does not prove`: that the lander
+  which wrote the marker is the one this project declares, and the concurrent-landing overwrite
+  `TOOL-aUnblockedFleet-7` records, cited by id, which this predicate tolerates only when the later
+  landing contains this one. Observed by AC4, which pins the two ids and the phrase.
 
 ## 3. Non-goals (OUT)
 
@@ -72,6 +78,9 @@ refuses, because an earlier commit does not contain a later witness.
 - **hands-off** `TOOL-aWokenSentinel-8` — step 3 of the loop trace reaching `LANDED` on the
   mandated landing shape from the run worktree, so the row spends no block on a refusal the
   lander cannot cure; spec 8 cites this unit and both backlog rows.
+- **hands-off** `TOOL-aWokenSentinel-22` — the arms for the two sentences S3 does not read: the
+  marker with no 40-hex token and the marker naming a commit that contains the witness but was
+  never pushed, each observed RED first against the driver at this unit's base.
 - **hands-off** external — the per-run marker of `TOOL-aUnblockedFleet-7`, a backlog row that
   stays OPEN with the tolerated ordering recorded against it at the close.
 
@@ -116,8 +125,9 @@ to write, which is -7's own concern and not this unit's.
 |---|---|---|
 | `msha` | a local in `verb_landed` | no cell; not a function |
 
-No function, key, verb or file is minted. The `fail 34` number is reused: the four sentences are
-four refusals of one check, as the two existing sentences already are.
+No function, key, verb or file is minted. The `fail 34` number is reused: the four new sentences
+are four refusals of one check, beside the three that stay at `:1242`, `:2481` and `:2493` — seven
+branches, each armed by S3 or by unit 22, and none pinned.
 
 ### Files touched (estimate)
 
@@ -181,22 +191,29 @@ this unit's base.
   `RUN.md` prints 1.
   Red when: the fast-forward landing regressed, which is every landing on a node whose lander
   fast-forwards.
-- **AC4** — When `grep -c 'dUnstalledConvoy-38' tools/unattended/unattended.sh` runs at the tip it
-  prints at least 1 and 0 at this unit's base, and `grep -c 'is-ancestor "\$wit"' tools/unattended/unattended.sh`
-  prints 1.
-  Red when: the comment does not cite the row the predicate closes, or the containment read is
-  absent and only the remote read remains, which accepts any landing by anybody.
-  figure: both counts are DERIVED by the greps at observation.
+- **AC4** — When `grep -c 'dUnstalledConvoy-38' tools/unattended/unattended.sh` and
+  `grep -c 'aUnblockedFleet-7' tools/unattended/unattended.sh` run at the tip each prints at least
+  1 and 0 at this unit's base; `grep -c 'does not prove' tools/unattended/unattended.sh` prints at
+  least 1 at the tip; and `grep -c 'is-ancestor "\$wit"' tools/unattended/unattended.sh` and
+  `grep -c 'is-ancestor "\$msha"' tools/unattended/unattended.sh` each print 1.
+  Red when: the comment does not cite the row the predicate closes or the row whose ordering it
+  tolerates, or states the predicate without its limit; or the containment read is absent and only
+  the remote read remains, which accepts any landing by anybody; or the remote read is absent and
+  only containment remains, which accepts a marker for a merge that was never pushed.
+  figure: every count is DERIVED by the greps at observation, over the tip and over the file at
+  `12513c25`.
 
 ## 7. Gates
 
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `install-prefix (shipped surface)` · `lexicon naming predicates`
 
 These run once at `--close`. The pass runs none of them: it verifies with the driver invocations of
-AC1 to AC3 over the fixture in a scratch clone and the greps of AC4. Under `harness arms`, the two
-new `fail 34` sentences are branches the suite's arms must read.
+AC1 to AC3 over the fixture in a scratch clone and the greps of AC4. Under `harness arms`, four new
+`fail 34` sentences replace one, and every one is a branch the suite's arms must read: S3 reads
+the "does not hold" and "does not contain the witness" sentences, and unit 22 reads the other two
+before the leg runs.
 
-New arm: `tools/unattended/unattended.test.sh` · the `--no-ff` remote-arm fixture with the merge pushed and the marker holding it, the parent-commit marker, and the all-zero marker's moved text; the break is the driver at this unit's base · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed count, region two
+New arm: `tools/unattended/unattended.test.sh` · the `--no-ff` remote-arm fixture with the merge pushed and the marker holding it, the parent-commit marker, and the all-zero marker's moved text; the break is the driver at this unit's base; the no-sha and unpushed-commit arms are unit 22's · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed count, region two
 
 ## 8. Open questions
 
@@ -204,6 +221,13 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S2 · S4 · §3 · §4 · AC4 · §7 · §10 · folded spec-audit round 3: sibling
+  agreement for the promoted `TOOL-aWokenSentinel-22` (H2, raw 5, 17, 27) — four new `fail 34`
+  sentences beside three existing, seven branches, two armed here and two by unit 22, which §7
+  and the Inventory now count rather than "the two new" and "the two existing"; the third read,
+  `is-ancestor "$msha"`, is pinned by AC4 so a predicate that drops the remote read cannot pass
+  AC1 to AC4; M4 (raw 6) — AC4 pins the `-7` citation and the `does not prove` phrase S4
+  requires.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 2 as the
   promotion of H1 (raw id 48); takes the predicate `TOOL-dUnstalledConvoy-38` records rather than
   the audit's reason-text fix, per BUILD-METHOD M3's feature-rich rule.
@@ -215,7 +239,8 @@ on the remote default branch"` ranked `outcome_accepted` in `tools/govkit/govkit
 `.unattended.conf` affordance seam (`branch, land, mark, wit`), and reported `unscanned layers: .sh`;
 no Python seam fits a shell verb. The seam, read at source, is check 34 itself at
 `tools/unattended/unattended.sh:2476` to `:2503` — the marker path resolution against the git common
-dir, the two existing `fail 34` sentences and the `wit` the arm validated — and the `merge-base
+dir, the three check-34 sentences that stay (`:1242`, `:2481`, `:2493`), the one at `:2500` the
+predicate replaces, and the `wit` the arm validated — and the `merge-base
 --is-ancestor` the same verb already runs at `:2434` for the remote arm, which the new reads copy. The
 recall probe's top hit is `TOOL-dUnstalledConvoy-38` itself, whose row states the predicate this unit
 builds; its second is `TOOL-dScaffoldedMirror-22`, CLOSED, the write-before-check sibling found in

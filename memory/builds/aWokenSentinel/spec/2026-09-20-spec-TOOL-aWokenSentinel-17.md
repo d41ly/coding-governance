@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-17 — the driver suite reads `--status` by FIELD: one extraction helper armed on a suffixed line, and a one-line assertion armed against a two-line driver
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 17
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 |
 
 <!-- /gen:spec-records -->
 
@@ -32,9 +34,11 @@ through both.
   suffixes yields the unit id and a line with none yields the same bytes the raw reader did.
   Observed by AC1 and AC3.
 - **S2** — `check_status_one_line` in the same file: runs `bash "$SCRIPT" --status <slug>` with
-  stderr DROPPED, counts stdout lines with `wc -l`, asserts `1` through `same`, and prints the
-  line for the caller. Stderr is dropped because the driver's `read_bound_key` NOTEs go there and
-  are not the promise the header at `unattended.sh:8` makes about stdout. Observed by AC2 and AC4.
+  stderr DROPPED, counts stdout lines with `printf '%s' "$_o" | grep -c ''` — which reads an EMPTY
+  capture as `0`, where `printf '%s\n' "$_o" | wc -l` reads it as `1` — asserts `1` through
+  `same`, and prints the line for the caller. Stderr is dropped because the driver's
+  `read_bound_key` NOTEs go there and are not the promise the header at `unattended.sh:8` makes
+  about stdout. Observed by AC2 and AC4.
 - **S3** — The reader at `:1874` calls `extract_next` on the same fixture and keeps its control
   `want_unit` byte-identical, so the arm still compares the helper's row to an awk re-derivation;
   the `grep -c 'next '` reader at `:1859` is untouched, because a count is indifferent to suffixes.
@@ -51,8 +55,9 @@ through both.
 - **No driver change.** The field order is the code's and stays: `halt-code` before `next`, every
   other suffix after it. The suite learns to read it; the verb does not learn a new order.
 - **No rewrite of the thirty-two `run --status` readers.** Those that grep a substring are
-  indifferent to order and line count; the two whole-line readers are S3's, and any future
-  whole-line reader takes the helpers or reds under review.
+  indifferent to order and line count; at this unit's order the whole-line readers in the file are
+  S3's two, and the units sequenced after it that add one — unit 7's AC5 and unit 9's arm — take
+  the helpers, which is why this unit lands before both.
 - **No field of its own.** The keepalive field is unit 9's; this unit is why unit 9's field can be
   the last suffix without moving a reader.
 
@@ -61,10 +66,17 @@ through both.
 - **consumes-from** external — the `printf` at `tools/unattended/unattended.sh:2975` and its
   operand order, the suite's helpers at `tools/unattended/unattended.test.sh:69` to `:71`, its
   `run` at `:359`, and the two whole-line readers at `:1859` and `:1874`.
+- **hands-off** `TOOL-aWokenSentinel-7` — that unit's AC5, the one-line `--status` assertion over
+  three fixtures, routes through `check_status_one_line` rather than `run --status | wc -l` over
+  merged stderr, the shape §4 rejects; spec 7 is folded at its rev-4 to cite it, and the two units
+  swapped orders so the helper exists when the arm is written.
 - **hands-off** `TOOL-aWokenSentinel-9` — the one-line arm over that unit's fully populated
   fixture through `check_status_one_line`, and the keepalive field appended as the LAST suffix,
   which `extract_next`'s cut leaves out of the `next` value; spec 9's §4 field-order paragraph and
   AC1 are folded at its rev-2 to the code's order and read through these helpers.
+- **hands-off** `TOOL-aWokenSentinel-23` — the CLASS the rev-1 helper carried: a line count over a
+  captured variable that adds a newline before counting; that unit gates it in the kit gate and
+  records it under `memory/gotchas/`, and this unit's helper is the instance it must not red.
 
 ## 4. Design
 
@@ -76,10 +88,17 @@ extract_next() { # status-line -> the `next` field's value, cut at the next sepa
 }
 check_status_one_line() { # slug -> asserts --status wrote exactly one stdout line; prints it
   local _o; _o=$(bash "$SCRIPT" --status "$1" 2>/dev/null)
-  same "--status $1 is one stdout line" "$(printf '%s\n' "$_o" | wc -l | tr -d ' ')" "1"
+  same "--status $1 is one stdout line" "$(printf '%s' "$_o" | grep -c '')" "1"
   printf '%s\n' "$_o"
 }
 ```
+
+`grep -c ''` counts the lines of what it is given and prints `0` on empty input; `wc -l` counts
+newlines, and `printf '%s\n'` adds one to an empty capture, so the rev-1 helper read a verb that
+wrote NOTHING as one line (round-3 audit H3, measured: `_o=""; printf '%s\n' "$_o" | wc -l` prints
+`1`, `printf '%s' "$_o" | grep -c ''` prints `0`). A capture that ends without a newline — one
+line, since `$(…)` strips the trailing one — reads `1` under `grep -c ''` and `0` under `wc -l`,
+which is the other half of why the count is this and not that.
 
 `sed -n 's/.*· next //p'` prints only the line carrying the field, so a NOTE line that reached the
 input through `run`'s `2>&1` is dropped rather than mangled; the second `sed` cuts at the first
@@ -101,10 +120,16 @@ declares everything, which is a test of the fixture's conf and not of the verb.
 |---|---|---|
 | `extract_next` on the parked fixture | the helper's body reduced to `sed 's/.*· next //'` | the unit id followed by ` · parked 1` |
 | `check_status_one_line` on the same fixture | a driver copy with `printf 'x\n'` inserted after the status `printf` | `2` |
+| `check_status_one_line` on the same fixture | a driver copy with the status `printf` line deleted | `0` |
 
 The second break is unit 7 S4's retired shape, the only way the base driver has ever printed a
-second line; it is staged by copying the driver to a scratch path and pointing `SCRIPT` at the copy
-for that one invocation, which is how the suite's other driver-copy arms already work.
+second line; the third is the empty case, a verb that wrote nothing, which the rev-1 helper could
+not tell from one line. Both are staged by copying the driver to a scratch path WITH
+`lib-unattended.sh` copied beside it and pointing `SCRIPT` at the copy for that one invocation —
+the stripped-copy idiom at `unattended.test.sh:2092`, whose comment says why the lib travels, and
+not the L2 idiom at `:5022`, which copies the driver alone on purpose to observe the
+missing-library refusal at `unattended.sh:73`. A copy without the lib exits 2 on stderr before
+reaching its status `printf`, writes nothing to stdout, and reads `0` here for the wrong reason.
 
 ### Inventory
 
@@ -135,7 +160,8 @@ for that one invocation, which is how the suite's other driver-copy arms already
 - perf / scale — two `sed` per read; nothing measurable.
 - error / empty / loading states — a line with no `next` field yields empty output from
   `extract_next`, and the `:1874` `same` then reds naming the empty value; a verb that prints
-  nothing reads `0` lines under `check_status_one_line`, which reds as loudly as `2`.
+  nothing reads `0` lines under `check_status_one_line` because the count is `grep -c ''` over a
+  `printf '%s'`, which reds as loudly as `2` and is AC2's third reading.
 - observability — each helper's `same` names the slug and the count.
 - risks — a future suffix whose VALUE contains ` · ` would be cut early; no field prints one, and
   the field grammar unit 9 states forbids it.
@@ -156,9 +182,13 @@ Each observation runs in a scratch clone.
   breaking the day a fixture carries a suffix; or the cut eats part of the id.
 - **AC2** — When `check_status_one_line tRun` runs on that fixture its `same` passes with `1` and it
   prints the line; against a driver copy with `printf 'x\n'` appended after the status `printf` the
-  `same` reds with `2`.
+  `same` reds with `2`; against a driver copy with the status `printf` line deleted it reds with
+  `0`. Each copy is made with `lib-unattended.sh` beside it, and the copy's own stdout — not a
+  missing-library refusal — is what is counted.
   Red when: the arm passes on the two-line copy, which is the H3 class — an arm only ever seen
-  passing; or stderr is counted, which reds on a conf that declares no bound.
+  passing; or it passes on the empty copy, which is round-3 H3, the same class one helper down;
+  or stderr is counted, which reds on a conf that declares no bound; or the copy lacks its lib
+  and the `0` is the refusal's, not the verb's.
 - **AC3** — When `grep -c 'extract_next' tools/unattended/unattended.test.sh` runs at the tip it
   prints at least 3 — the definition, the `:1874` reader and the arm — and 0 at this unit's base;
   and the `want_unit` control line at `:1872` is byte-identical between base and tip.
@@ -177,7 +207,7 @@ These run once at `--close`. The pass runs none of them: it verifies with the he
 AC1, AC2 and AC4 over the fixture and the greps of AC3. Under `lexicon naming predicates`, the two
 minted names are graded in cell `sh.function`.
 
-New arm: `tools/unattended/unattended.test.sh` · the parked fixture read through `extract_next`, whose break is the helper reduced to the raw `sed`; the one-line assertion, whose break is a driver copy printing a second line · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed count, region two
+New arm: `tools/unattended/unattended.test.sh` · the parked fixture read through `extract_next`, whose break is the helper reduced to the raw `sed`; the one-line assertion, whose breaks are a driver copy printing a second line and a driver copy printing none, each with the lib beside it · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the arms' executed count, region two
 
 ## 8. Open questions
 
@@ -185,6 +215,15 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S2 · §3 · §4 · §5 · AC2 · §7 · folded spec-audit round 3: sibling agreement
+  for the promoted `TOOL-aWokenSentinel-23` (H3, raw 28) — `check_status_one_line` counts with
+  `printf '%s' "$_o" | grep -c ''`, so an empty capture reads `0`, §5's empty-state sentence is
+  true, and AC2 gains the empty-copy reading; M5 (raw 29) — the driver copies are made with the
+  lib beside them, the `:2092` idiom and not the `:5022` one, so the count is the verb's stdout
+  and not a missing-library refusal; M6 (raw 23, 41) — spec 7's AC5 was a third whole-line reader
+  one order before this unit in the shape §4 rejects, so §3 states the readers at this order, a
+  `hands-off` on unit 7 routes its AC5 through the helper, and the two units swapped orders.
+  Order 17 → 16, swapped with unit 7.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 2 as the
   promotion of H2 (raw ids 34, 49) and H3 (raw id 3), one unit because both are the suite's
   reading of one line.

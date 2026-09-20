@@ -1,10 +1,12 @@
 # TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-20 · node a · Tier-2 · base 12513c25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-15-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 |
 
 <!-- /gen:spec-records -->
 
@@ -30,17 +32,20 @@ one, in the lib, with at least one call in the driver — a premise this unit's 
   the rule: the sidecar root is the WORKTREE's git dir plus `/unattended`, derived here and
   nowhere else, and an empty `rev-parse` answer is a refusal under the caller's dead-probe rule.
   The driver sources the lib at `unattended.sh:78` before any verb runs, so every existing call
-  resolves unchanged. Observed by AC1 and AC2.
+  resolves unchanged. "Verbatim" is a `diff` of the extracted body against unit 2's, and the
+  `return 1` branch is exercised from a directory inside no repository. Observed by AC1 and AC2.
 - **S2** — The code-line count of the literal `rev-parse --git-dir` is exactly 1 in the lib and 0
   in the driver at this unit's tip, measured with `grep -cE '^[^#]*rev-parse --git-dir'` per file,
   and the driver carries at least one call `$(resolve_sidecar_dir)`. Observed by AC1 and AC2.
-- **S3** — The lib's header sentence that lists what the file holds gains the function by name,
-  and `tools/unattended/kit.toml` needs no change because the lib is already a shipped file.
-  Observed by AC3.
-- **S4** — Spec 11 is folded at its rev-2 to this population and predicate; spec 5 is folded at its
-  rev-3 so the tick's resume log at S4 resolves through `$(resolve_sidecar_dir)` from the lib it
-  sources rather than an inline `rev-parse`; spec 2 is folded at its rev-3 to hand the move off and
-  to pin the code-line count at its own tip. Observed by AC4.
+- **S3** — The lib's TOP header — the comment region before the file's first code line, which
+  lists what the file holds — gains the function by name, and `tools/unattended/kit.toml` needs
+  no change because the lib is already a shipped file. Observed by AC3, whose grep is scoped to
+  that region so the definition's own comment cannot satisfy it.
+- **S4** — Three sibling folds, all landed with the disposal that authored this spec: spec 11 at
+  its rev-2 to this population and predicate; spec 5 at its rev-3 so the tick's resume log at S4
+  resolves through `$(resolve_sidecar_dir)` from the lib it sources rather than an inline
+  `rev-parse`; spec 2 at its rev-3 to hand the move off and to pin the code-line count at its own
+  tip. Observed by AC4, one needle per fold.
 
 ## 3. Non-goals (OUT)
 
@@ -132,30 +137,48 @@ No identifier is minted; `resolve_sidecar_dir` is unit 2's name, already graded 
 
 - **AC1** — When `grep -cE '^[^#]*rev-parse --git-dir' tools/unattended/lib-unattended.sh` runs
   at the tip it prints 1 and `grep -cE '^[^#]*rev-parse --git-dir' tools/unattended/unattended.sh`
-  prints 0; at this unit's base the two print 0 and 1.
+  prints 0; over the files at the tip of unit 2's pass — the commit whose subject carries
+  `TOOL-aWokenSentinel-2`, one order before this unit — the two print 0 and 1. At `12513c25`, the
+  sha this design was grounded against, both print 0, because unit 2 has not defined the function
+  there, so no reading is taken at that sha.
   Red when: the driver keeps a copy, which is two spellings; or the lib has none, which is a
   reader with no derivation.
   figure: every count is DERIVED by the greps at observation, over the tip and over the files at
-  the base of this unit.
+  the tip of unit 2's pass, never at the status header's `base`.
 - **AC2** — When a bare `bash` sources `tools/unattended/lib-unattended.sh` inside a scratch
   repository and runs `resolve_sidecar_dir`, it prints the repository's git dir with `/unattended`
   appended and exits 0; in a linked worktree of that repository it prints the WORKTREE's git dir,
-  not the common dir; and `grep -cE '^[^#]*\$\(resolve_sidecar_dir\)' tools/unattended/unattended.sh`
-  prints at least 1.
+  not the common dir; from a directory inside no repository the same call prints nothing and exits
+  non-zero, which is the `return 1` branch; `grep -cE '^[^#]*\$\(resolve_sidecar_dir\)' tools/unattended/unattended.sh`
+  prints at least 1; and `diff` of the body extracted by `sed -n '/^resolve_sidecar_dir()/,/^}/p'`
+  from `tools/unattended/unattended.sh` at the tip of unit 2's pass against the same extraction
+  from `tools/unattended/lib-unattended.sh` at this unit's tip is empty.
   Red when: the moved function resolves the common dir, which is every worktree sharing one
-  sidecar; or the driver no longer calls it.
-  fixture: a scratch repository under a short `%TEMP%` path with one `git worktree add`.
-- **AC3** — When `grep -c 'resolve_sidecar_dir' tools/unattended/lib-unattended.sh` runs at the
-  tip it prints at least 2 — the definition and the header sentence — and 0 at this unit's base.
-  Red when: the lib's header does not say the file holds it, which sends the next reader to the
-  driver.
-- **AC4** — When `grep -c 'code lines' memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md`
-  runs it prints at least 1, and `grep -c 'resolve_sidecar_dir' memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md`
-  prints at least 6, the S4 resume-log root read through the lib being one of them; both folds
-  land with the disposal that authored this spec.
-  Red when: a sibling still describes the driver-only count or the tick's inline root, which is
-  the two-spellings class re-entering by prose.
-  figure: both counts are DERIVED by the greps at observation.
+  sidecar; or the driver no longer calls it; or the empty answer returns 0, which composes a
+  sidecar path from an empty root — the liveness class charter §7 names and unit 2's AC8 stages
+  through `stat`, not through an empty git-dir answer; or the body moved with an edit.
+  fixture: a scratch repository under a short `%TEMP%` path with one `git worktree add`, and a
+  plain directory outside any repository.
+- **AC3** — When `sed -n '/^[^#]/q;p' tools/unattended/lib-unattended.sh | grep -c 'resolve_sidecar_dir'`
+  runs at the tip it prints at least 1 — the leading comment region up to the file's first code
+  line, which is the top header and cannot include the definition or the rule comment §4 places
+  directly above it — and 0 at this unit's base; and `grep -c 'resolve_sidecar_dir'` over the
+  whole file prints at least 2, the header and the definition.
+  Red when: the lib's top header does not say the file holds it, which sends the next reader to
+  the driver, and which the whole-file count alone cannot see because the definition and its own
+  comment supply two hits with the header untouched.
+  figure: the header's extent is DERIVED by the `sed` at observation, never typed as a line count.
+- **AC4** — When `grep -ci 'code.line' memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md`
+  runs it prints at least 1 (the landed rev-2 spells it `CODE lines` and `code-line`, never
+  lowercase `code lines`, which the rev-1 needle printed 0 against);
+  `grep -c "resume-log root is that function's answer" memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md`
+  prints at least 1, which is the S4 sentence of that spec's rev-3 and nothing else; and
+  `grep -c 'aWokenSentinel-20' memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md`
+  prints at least 1, the hand-off of that spec's rev-3. All three folds landed with the disposal
+  that authored this spec, and all three greps were run at authoring time.
+  Red when: a sibling still describes the driver-only count or the tick's inline root, or spec 2
+  does not hand the move off, which is the two-spellings class re-entering by prose.
+  figure: every count is DERIVED by the greps at observation; 11, 1 and 2 as read on 2026-09-20.
 
 ## 7. Gates
 
@@ -173,6 +196,17 @@ none
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-20 · S1 · S3 · S4 · AC1 · AC2 · AC3 · AC4 · folded spec-audit round 3: M13
+  (raw 14) — S4 named three folds and AC4 observed two with a count any mention satisfies, so AC4
+  now carries one needle per fold, each the sentence the fold wrote; M14 (raw 21, 35) — AC4's
+  `code lines` needle printed 0 over the landed spec 11, which spells it `CODE lines`, so the
+  needle is case-insensitive and was run at authoring time; M15 (raw 34) — AC1's base-side
+  figures were stated at `12513c25`, where both files print 0 because unit 2 has not defined the
+  function, so they are read at the tip of unit 2's pass and the spec says the status-header base
+  is not where they hold; L5 (raw 15) — AC2 exercises the `return 1` branch from outside any
+  repository and diffs the extracted body against unit 2's, which is what "verbatim" means; L6
+  (raw 16) — AC3's grep is scoped to the leading comment region so the definition and its rule
+  comment cannot satisfy the header requirement.
 - rev-1 · 2026-09-20 · initial draft, authored at the M4 disposal of spec-audit round 2 as the
   promotion of H6 (raw id 36); takes the lib home the lib header's pointer (dUnstalledConvoy seq 22) ratifies over the
   audit's two narrower options, per BUILD-METHOD M3's feature-rich rule.

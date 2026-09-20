@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-20 · node a · Tier-2 · base 12b3701d · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -182,11 +182,14 @@ No function, key, verb or kit file is minted.
   Red when: the class reaches no path, which is a gotcha nobody is shown; or `--check` reds on a
   stale `INDEX.md` or a class naming no gate, which the memory hygiene leg reds at the close for a
   record built as rev-2 specced it.
-- **AC5** — When the close's kit-gate run executes the adopter suite over the committed seed, its
-  per-suite log — read from the file, never through `tail` — ends with `PASS (<n> assertions)`
-  where `n` is at or above unit 19's `FLOOR_ASSERTIONS`, and carries no `FAIL` line.
+- **AC5** — When the close's kit-gate run executes the adopter suite over the committed seed, the
+  `unattended adopter e2e` row of that run's output reads `ok` — the row is the whole
+  observation, because the on-demand runner the kit-gate run delegates to writes each suite under
+  a `mktemp -d` its EXIT trap removes and surfaces neither a log for the suite nor its
+  `PASS (<n> assertions)` line; a suite that fails an arm or unit 19's floor exits non-zero and
+  the runner reds naming it instead of printing the row.
   Red when: an arm that depended on an unborn HEAD now fails, or an arm was lost, which the floor
-  reads as fewer executed assertions.
+  reads as fewer executed assertions and the runner reads as a non-zero exit.
   permission: the suite runs at the close under the build-level rule, never in this unit's pass.
   cost: 38 s on node `a` by the budgets row, at the close.
 
@@ -205,6 +208,10 @@ none
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · AC5 · folded spec-audit round 3 M12 (raw 31), a sibling fold of spec 19
+  rev-2: AC5 read a log of the suite's run ending `PASS (<n> assertions)` that `run-selftests.sh` never
+  persists (`:492` to `:493`, `:664`), so it now reads the runner's `ok` row for the adopter suite,
+  which is what the close actually surfaces.
 - rev-3 · 2026-09-20 · S1 · S2 · S4 · §3 · §4 · §5 · AC2 · AC4 · AC5 · §10 · folded spec-audit
   round 2: sibling agreement for the promoted `TOOL-aWokenSentinel-19` (H5, raw 5) — S2 and §5
   name the close's kit-gate run as the observer of the suite the seed feeds, AC5 reads it from its

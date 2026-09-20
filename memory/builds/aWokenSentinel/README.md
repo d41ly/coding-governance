@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aPrimedKeepalive aProbedUnit
 authorized-by: prompt
-ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20
+ids: TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13 TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24
 ---
 
 # aWokenSentinel — a keepalive that lives outside the failure domain of the run it keeps alive
@@ -39,12 +39,11 @@ research record under `build/`.
 
 - **Every unit ships to adopters through its kit.** A change to a rendered or copy-installed file lands in the template AND its render in one commit.
 - **Failure-domain rule.** A mechanism is only counted as covering a stall class when it does not share the stalled session's process, event loop or account for that class. This is the research record's ranking rule and the reason the cron job is demoted rather than fixed.
-- **No self-test suite runs inside a pass.** A pass observes the single arm or the staged break; `run-unattended-gates.sh` runs once, at the close, on a frozen clone.
+- **No self-test suite runs inside a pass.** A pass observes the single arm or the staged break; `run-unattended-gates.sh` runs once, at the close, on a frozen clone, and from unit 21 on `run-selftests.sh --kit tools/workflows` runs beside it there for the harness suite's leg.
 - **Vocabulary changes land in every carrier in one commit**: driver, leg, VERBS, SKILL, protocol, conf and its example.
 - **The CLI token is the owner's**, minted out of band; unit 5 ships inert until registered and reports an absent login as an announced skip, never a pass.
 - **Classification at open**: all MISSING; specced by the harness's SPEC stage from the briefs under `prompts/`. Unit 7 was ADDED after preflight by `--rescope`, on the measured `session_crons` field.
-- **Spec-audit round 1 disposed by severity (M4), 2026-09-20.** BOUNDED at `REVIEW_ROUNDS` 1, 43 confirmed: the 16 at BLOCKER and HIGH PROMOTED by `--rescope --act add` into units 8 to 14, one per defect, audited as specs before build; the 27 at MEDIUM and LOW FOLDED as rev-2 of units 1 to 7. Nothing parked, waived, retired or re-reviewed.
-- **Spec-audit round 2 disposed by severity (M4), 2026-09-20.** Units 8 to 14, BOUNDED, 31 raw ids in 22 defects: 2 BLOCKER and 6 HIGH PROMOTED into units 15 to 20, one per mechanism (B1+B2 share one, H2+H3 share one); 10 MEDIUM and 4 LOW FOLDED as rev-N bumps, siblings re-agreed, order re-derived. Nothing parked, waived, retired or re-reviewed.
+- **Spec audits disposed by severity (M4), 2026-09-20, three rounds** over units 1 to 7, 8 to 14 and 15 to 20: every BLOCKER and HIGH PROMOTED by `--rescope --act add` into units 8 to 14, 15 to 20 and 21 to 24, one per defect; every MEDIUM and LOW FOLDED as a rev-N bump. Round 3 swapped orders 7 and 17. None parked, waived, retired or re-reviewed.
 
 ## Parked decisions
 
@@ -74,44 +73,53 @@ research record under `build/`.
 | 18 | `TOOL-aWokenSentinel-18` | PLANNED | `read_bound_key` refuses with exit 2 a caller that named no conf, so a bound read from a shell with `CONF` unset is a refusal rather than a default with an empty NOTE (audit round 2 H4) |
 | 19 | `TOOL-aWokenSentinel-19` | PLANNED | `adopt-unattended.test.sh` declares a shrink-only `FLOOR_ASSERTIONS`, and the close's `run-unattended-gates.sh` run is the named observer of every arm the committed `seed()` feeds (audit round 2 H5) |
 | 20 | `TOOL-aWokenSentinel-20` | PLANNED | `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, and unit 11's check counts code lines across the three files (audit round 2 H6) |
+| 21 | `TOOL-aWokenSentinel-21` | PLANNED | the build harness's suite `unattended-build.test.sh` joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm for unit 15's compare (audit round 3 H1) |
+| 22 | `TOOL-aWokenSentinel-22` | PLANNED | check 34's two refusal branches unit 16 leaves unarmed get their arms over the suite's marker fixture — the marker with no sha, the marker the remote default branch does not reach — each read RED first against the pre-predicate driver (audit round 3 H2) |
+| 23 | `TOOL-aWokenSentinel-23` | PLANNED | a kit-gate check that no shell file in the kit counts a captured variable's lines through `printf '%s
+'`, `echo` or a here-string into `wc -l`, the shape that reads an empty capture as one line, with the class in `memory/gotchas/` (audit round 3 H3) |
+| 24 | `TOOL-aWokenSentinel-24` | PLANNED | the tick's conf-block staged break is ONE artifact: `build_tick_without_conf_block` in the tick's suite makes the copy from two anchor lines and asserts its shape, so spec 13's and spec 18's arms name a helper and no count (audit round 3 H4) |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 20 unit(s) · node a · opened 2026-09-16 · streams tooling
+**Build status:** SPECCED · 24 unit(s) · node a · opened 2026-09-16 · streams tooling
 ids TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-5 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 TOOL-aWokenSentinel-8 TOOL-aWokenSentinel-9 TOOL-aWokenSentinel-10 TOOL-aWokenSentinel-11 TOOL-aWokenSentinel-12 TOOL-aWokenSentinel-13
-ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20
+ids TOOL-aWokenSentinel-14 TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20 TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aWokenSentinel-1 — the run-state file records the LEASE: `session:` and `pid:` at preflight, and `--resume --keepalive-id` replaces it](spec/2026-09-16-spec-TOOL-aWokenSentinel-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-20 |
 | [TOOL-aWokenSentinel-2 — `--liveness <slug>`, the one machine-readable predicate every out-of-session reader shares](spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-20 |
-| [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-20 — `resolve_sidecar_dir` lives in `lib-unattended.sh`: one derivation of the sidecar root for the driver and the tick, counted in code lines across the three files](spec/2026-09-20-spec-TOOL-aWokenSentinel-20.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-11 — a kit-gate check that the driver holds ONE derivation of the sidecar root](spec/2026-09-20-spec-TOOL-aWokenSentinel-11.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-14 — `seed()` commits once, so every fixture that borrows it has a born HEAD](spec/2026-09-20-spec-TOOL-aWokenSentinel-14.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-3 — `stop-guard`, the `Stop` hook that refuses a bound session's turn end](spec/2026-09-16-spec-TOOL-aWokenSentinel-3.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-20 |
-| [TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch](spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-16 — `--landed`'s check 34 accepts the `--no-ff` landing the charter mandates: the marker's commit contains the witness and sits on the remote default branch](spec/2026-09-20-spec-TOOL-aWokenSentinel-16.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-8 — the stop-guard's `landing-unstamped` row: a bound session at `FINISHED-UNSTAMPED` is blocked and told to run `--landed`](spec/2026-09-20-spec-TOOL-aWokenSentinel-8.md) | 8 | 2 | SPECCED | rev-3 | 2026-09-20 |
 | [TOOL-aWokenSentinel-10 — `STOP_GUARD_BLOCKS` declared in every carrier check 22 and spec 6 AC6 read](spec/2026-09-20-spec-TOOL-aWokenSentinel-10.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk](spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md) | 10 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk](spec/2026-09-16-spec-TOOL-aWokenSentinel-4.md) | 10 | 2 | SPECCED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer](spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md) | 11 | 2 | SPECCED | rev-3 | 2026-09-20 |
 | [TOOL-aWokenSentinel-12 — the resume tick consults login BEFORE it kills: a logged-out node kills nothing](spec/2026-09-20-spec-TOOL-aWokenSentinel-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-13 — the resume tick sources the root conf before its bound reads, so a declared bound is honoured and the NOTE names the file](spec/2026-09-20-spec-TOOL-aWokenSentinel-13.md) | 13 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-18 — `read_bound_key` refuses a caller that named no conf: a bound read from a shell with `CONF` unset exits 2 instead of taking a default with an empty NOTE](spec/2026-09-20-spec-TOOL-aWokenSentinel-18.md) | 14 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-13 — the resume tick sources the root conf before its bound reads, so a declared bound is honoured and the NOTE names the file](spec/2026-09-20-spec-TOOL-aWokenSentinel-13.md) | 13 | 2 | SPECCED | rev-3 | 2026-09-20 |
+| [TOOL-aWokenSentinel-18 — `read_bound_key` refuses a caller that named no conf: a bound read from a shell with `CONF` unset exits 2 instead of taking a default with an empty NOTE](spec/2026-09-20-spec-TOOL-aWokenSentinel-18.md) | 14 | 2 | SPECCED | rev-2 | 2026-09-20 |
 | [TOOL-aWokenSentinel-6 — the contract: protocol section 5, the Skill, the README, the conf prose and the dossier, with the cron job demoted to the idle-wake](spec/2026-09-16-spec-TOOL-aWokenSentinel-6.md) | 15 | 2 | SPECCED | rev-3 | 2026-09-20 |
-| [TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing](spec/2026-09-16-spec-TOOL-aWokenSentinel-7.md) | 16 | 2 | SPECCED | rev-3 | 2026-09-20 |
-| [TOOL-aWokenSentinel-17 — the driver suite reads `--status` by FIELD: one extraction helper armed on a suffixed line, and a one-line assertion armed against a two-line driver](spec/2026-09-20-spec-TOOL-aWokenSentinel-17.md) | 17 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-17 — the driver suite reads `--status` by FIELD: one extraction helper armed on a suffixed line, and a one-line assertion armed against a two-line driver](spec/2026-09-20-spec-TOOL-aWokenSentinel-17.md) | 16 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing](spec/2026-09-16-spec-TOOL-aWokenSentinel-7.md) | 17 | 2 | SPECCED | rev-4 | 2026-09-20 |
 | [TOOL-aWokenSentinel-9 — the stop-guard listing as a FIELD on `--status`'s one line, and the one-line promise made an arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-9.md) | 18 | 2 | SPECCED | rev-2 | 2026-09-20 |
-| [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | SPECCED | rev-1 | 2026-09-20 |
-| [TOOL-aWokenSentinel-15 — the spec-audit commission pins each subject at its committed blob and refuses a dirty subject before a lens is dispatched](spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md) | 20 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-19 — the adopter suite declares a shrink-only `FLOOR_ASSERTIONS`, and the close's kit-gate run is the named observer of every arm the committed `seed()` feeds](spec/2026-09-20-spec-TOOL-aWokenSentinel-19.md) | 19 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-15 — the spec-audit commission pins each subject at its committed blob and refuses a dirty subject before a lens is dispatched](spec/2026-09-20-spec-TOOL-aWokenSentinel-15.md) | 20 | 2 | SPECCED | rev-2 | 2026-09-20 |
+| [TOOL-aWokenSentinel-21 — the build harness's suite joins the declared self-test population: a held leg, a budget row, a registry exemption and a shrink-only `FLOOR_ASSERTIONS`, so its supplied-subject fixtures are an executed arm](spec/2026-09-20-spec-TOOL-aWokenSentinel-21.md) | 21 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-22 — check 34's two refusal branches unit 16 leaves unarmed get their arms: the marker with no sha and the marker the remote default branch does not reach, each read RED first](spec/2026-09-20-spec-TOOL-aWokenSentinel-22.md) | 22 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-23 — a kit-gate check banning the line count that reads an empty capture as one line: `printf '%s\n'`, `echo` or a here-string into `wc -l` over a captured variable, with the class in `memory/gotchas/`](spec/2026-09-20-spec-TOOL-aWokenSentinel-23.md) | 23 | 2 | SPECCED | rev-1 | 2026-09-20 |
+| [TOOL-aWokenSentinel-24 — the tick's conf-block staged break is ONE artifact: `build_tick_without_conf_block` in the tick's suite makes the copy from two anchor lines and asserts its shape, so both arms that stage it name a helper and no count](spec/2026-09-20-spec-TOOL-aWokenSentinel-24.md) | 24 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20.
+Ids no record names: TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24.
 
-Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-15 TOOL-aWokenSentinel-16 TOOL-aWokenSentinel-17 TOOL-aWokenSentinel-18 TOOL-aWokenSentinel-19 TOOL-aWokenSentinel-20.
+Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-21 TOOL-aWokenSentinel-22 TOOL-aWokenSentinel-23 TOOL-aWokenSentinel-24.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -133,11 +141,15 @@ Ids no `spec-audit` record has ever named: TOOL-aWokenSentinel-15 TOOL-aWokenSen
 | 13 | `TOOL-aWokenSentinel-13` | no |
 | 14 | `TOOL-aWokenSentinel-18` | no |
 | 15 | `TOOL-aWokenSentinel-6` | no |
-| 16 | `TOOL-aWokenSentinel-7` | no |
-| 17 | `TOOL-aWokenSentinel-17` | no |
+| 16 | `TOOL-aWokenSentinel-17` | no |
+| 17 | `TOOL-aWokenSentinel-7` | no |
 | 18 | `TOOL-aWokenSentinel-9` | no |
 | 19 | `TOOL-aWokenSentinel-19` | no |
 | 20 | `TOOL-aWokenSentinel-15` | no |
+| 21 | `TOOL-aWokenSentinel-21` | no |
+| 22 | `TOOL-aWokenSentinel-22` | no |
+| 23 | `TOOL-aWokenSentinel-23` | no |
+| 24 | `TOOL-aWokenSentinel-24` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

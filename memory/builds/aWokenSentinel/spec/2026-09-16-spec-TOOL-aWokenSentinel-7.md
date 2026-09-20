@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-7 — `keepalive-reaped` becomes CHECKED: `--landed` reads the harness's own cron listing
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 16 · ratified 2026-09-16
+**Status:** SPECCED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 17 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
@@ -118,6 +118,9 @@ item nothing could contradict becomes a check against evidence the agent did not
 - **hands-off** `TOOL-aWokenSentinel-9` — the keepalive listing as a field on `--status`'s one
   line, its `none` arm in field form (audit L6), and the `--status` VERBS entry.
 - **consumes-from** `TOOL-aWokenSentinel-1` — the `session:` fact that binds a session to the run.
+- **consumes-from** `TOOL-aWokenSentinel-17` — `check_status_one_line`, the suite's one-line
+  reader over the verb's stdout, which AC5 asserts through; without it AC5's count would be a
+  third whole-line reader over merged stderr in the shape that unit retires.
   The stop-guard writes a line only for a bound session, so a record preflighted before unit 1
   landed never gains a sidecar and every landing of it reads `unchecked`, announced.
 - **hands-off** external — a listing check inside the stop-guard on a TERMINAL verdict, which would
@@ -350,11 +353,15 @@ after.
   `keepalive-reaped: attested, unchecked — the record names no keepalive id` and lands.
   Red when: the verb refuses on a missing file, which would wedge every adopter without the hook;
   or lands with no `unchecked` line.
-- **AC5** — When `run --status tRun` runs on the three fixtures of AC1, AC3 and AC4, its output
-  is exactly ONE line by `wc -l` and that line is byte-identical to what the driver at this unit's
-  base prints on the same fixture, compared with `cmp` over the two outputs.
+- **AC5** — When `check_status_one_line tRun` runs on the three fixtures of AC1, AC3 and AC4, its
+  `same` passes with `1` — the helper unit 17 lands one order before this unit, which counts the
+  verb's stdout alone and drops the stderr NOTEs a conf declaring no bound makes the driver print —
+  and the line it prints is byte-identical to what the driver at this unit's base prints on the
+  same fixture, compared with `cmp` over the two outputs.
   Red when: a second line prints, which reds the `:1874` whole-output reader on every fixture; or
-  the line changed, which is this unit editing a verb unit 9 owns.
+  the line changed, which is this unit editing a verb unit 9 owns; or the count is taken over
+  `run`'s merged output with `wc -l`, which is a test of the fixture's conf and not of the verb
+  (spec 17 §4) and reads an empty output as one line.
 - **AC6** — When `run --close tRun` runs on the suite's close-success fixture with
   `keepalive-reaped: yes` attested, its output carries `unattended: keepalive-reaped: attested;
   checked at --landed against the stop-guard's last harness listing` and still ends `close OK`.
@@ -446,7 +453,8 @@ under `unattended skill wiring`, the Skill render.
 
 New arm: `tools/unattended/unattended.test.sh` · the two new refusals, each observed by the fixture
 of AC1 and AC2 with its `fail` line commented out before the arm is trusted, plus the `checked`,
-`unchecked` and no-id passes of AC3 and AC4, the one-line `--status` assertion of AC5, the
+`unchecked` and no-id passes of AC3 and AC4, the one-line `--status` assertion of AC5 through
+`check_status_one_line`, the
 `--close` row of AC6, and the continuation arm of AC14 through the real hook with unit 8's row
 reverted as its break · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the executed count, AC11;
 `FLOOR_SHARD_1` does not move.
@@ -473,6 +481,11 @@ reverted as its break · `FLOOR_ASSERTIONS` and `FLOOR_SHARD_2` rise by the exec
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · §3 · AC5 · §7 · folded spec-audit round 3 M6 (raw 23, 41): AC5 counted
+  `run --status` output with `wc -l` over merged stderr, a third whole-line reader one order before
+  the unit that retires that shape, so it now asserts through `check_status_one_line` with a
+  `consumes-from` on unit 17 and §7's arm line names the helper. Order 16 → 17, swapped with unit
+  17 so the helper exists when the arm is written.
 - rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: one check-12 line
   the round-2 record's M2 paragraph reports as seen on the full hygiene run at 12513c25 — spec 6
   declares `hands-off` this unit and this unit declared no `consumes-from` back, so the edge is

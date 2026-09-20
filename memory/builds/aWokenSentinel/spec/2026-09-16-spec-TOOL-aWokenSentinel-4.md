@@ -1,6 +1,6 @@
 # TOOL-aWokenSentinel-4 — `stall-recorder`, the `StopFailure` hook that writes an API-error stall to disk
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 10
+**Status:** SPECCED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -265,7 +265,7 @@ at the close.
 
 New arm: tools/unattended/stall-recorder.test.sh · a fixture record bound to the payload's session, one arm per §6 payload, one arm against the real driver's `last-stall` on a git fixture; the break is the hook absent, then each §6 negation · `FLOOR_ASSERTIONS` derived at the suite's first green
 
-New arm: tools/unattended/adopt-unattended.test.sh · the seeded fixture with its `StopFailure` group removed reads UNWIRED naming `stall-recorder`; the break is unit 3's loop with this fragment absent from the seed · no floor exists in this suite
+New arm: tools/unattended/adopt-unattended.test.sh · the seeded fixture with its `StopFailure` group removed reads UNWIRED naming `stall-recorder`; the break is unit 3's loop with this fragment absent from the seed · `FLOOR_ASSERTIONS` is `TOOL-aWokenSentinel-19`'s, pinned at that unit's order from a static count that includes this arm; none exists at this unit's order
 
 ## 8. Open questions
 
@@ -285,6 +285,10 @@ New arm: tools/unattended/adopt-unattended.test.sh · the seeded fixture with it
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · §7 · folded spec-audit round 3 L4 (raw 24), a sibling fold of spec 19
+  rev-2: the adopter-suite arm line said no floor exists in that suite, which is false from unit
+  19's order and left this unit and unit 3 disagreeing; it now cites unit 19's floor as spec 3 §7
+  does.
 - rev-3 · 2026-09-20 · §3 · folded at the M4 disposal of spec-audit round 2: one check-12 line
   the round-2 record's M2 paragraph reports as seen on the full hygiene run at 12513c25 — the
   `hands-off` on unit 5 had no reciprocal, and rightly: the tick acts on `--liveness`'s `verdict`
