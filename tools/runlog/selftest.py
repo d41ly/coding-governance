@@ -195,19 +195,20 @@ from collections import Counter  # noqa: E402
 # wide model, whose elided `events` fact and own liveness are the last two. Its decoy checks move it
 # by 3, and the three helpers it arrives with carry none.
 # 9 + 3 = 12
-# RAISED 1463 -> 1490 by TOOL-dLoggedFlight-29, the placement states: ONE new arm with 24 checks —
+# RAISED 1463 -> 1491 by TOOL-dLoggedFlight-29, the placement states: ONE new arm with 25 checks —
 # four per placement, that it carries the state its model was built from, that the repository is AT
 # the commit that state names, that the run-state write is staged or committed where the state says,
 # and that `build_run_model` re-run over that state reproduces the model field for field; AC2's three
 # over the compared field set, its emptiness and the named masks held in both directions; two
 # livenesses, that a pending model keyword-copied out of the landing one differs from the model
 # pending's own state produces while the honest one did not, and that the three placements are three
-# distinct states; and AC3's seven — the declared builders read clean, the syntax nodes that reading
+# distinct states; and AC3's eight — the declared builders read clean, the syntax nodes that reading
 # walked, the refusal of a declared member the module does not define, the two staged builder copies,
-# the accepted `dataclasses.asdict` neighbour, and the predicate firing elsewhere in this module. Its
-# decoy checks move it by 3, and the six helpers it arrives with carry none.
-# 24 + 3 = 27
-ASSERTION_FLOOR = 1490
+# the accepted `dataclasses.asdict` neighbour, one model-field edit cut into the SHIPPED builder's own
+# source, and the predicate firing elsewhere in this module. Its decoy checks move it by 3, and the
+# six helpers it arrives with carry none.
+# 25 + 3 = 28
+ASSERTION_FLOOR = 1491
 
 PASS = []
 FAIL = []
@@ -6852,6 +6853,15 @@ def test_record_placement_states():
     _read, _nodes, clean = check_built_from_history(("build_placement_models_read_only",))
     check("record AC3: near miss — a builder that only READS a model through dataclasses.asdict is "
           "accepted, so the two refusals above are not a predicate that refuses everything", clean, [])
+    # The two copies above are eight lines each and the shipped builder is thirty, so refusing them
+    # proves the predicate for eight-line copies. The break below is cut into the SHIPPED SOURCE.
+    shipped = inspect.getsource(build_placement_models)
+    variant, cut = build_variant(shipped, lambda ln: ln == "    return out",
+                                 lambda ln: '    out["landed"]["model"].phase = "LANDED"\n' + ln)
+    check(f"record AC3: RED — the shipped builder's own source, with one model-field edit cut in at "
+          f"its line {cut}, is refused while the source it was cut from is clean",
+          (variant != shipped, [rule for _line, rule in scan_model_edits(ast.parse(variant))],
+           scan_model_edits(ast.parse(shipped))), (True, ["model-field-assign"], []))
     staged_here = ("test_record_placement_states", "build_placement_models_field_edit",
                    "build_placement_models_rerender")
     everywhere = [n.name for n in ast.walk(ast.parse(HERE.joinpath("selftest.py").read_bytes()

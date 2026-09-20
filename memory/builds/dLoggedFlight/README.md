@@ -146,7 +146,7 @@ ids TOOL-dLoggedFlight-27 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLogg
 | [TOOL-dLoggedFlight-20 — the committed record carries no time a journal or transcript produced](spec/2026-09-16-spec-TOOL-dLoggedFlight-20.md) | 27 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-dLoggedFlight-23 — one self-test arm holds every time-bearing token a render writes to a public source, over classes and slots read from the schema and a fixture that reaches every conditional slot](spec/2026-09-16-spec-TOOL-dLoggedFlight-23.md) | 28 | 2 | CLOSED | rev-3 | 2026-09-20 |
 | [TOOL-dLoggedFlight-28 — every expectation the record arms derive from a shared fixture builder is re-checked against a render with one kind of event removed](spec/2026-09-20-spec-TOOL-dLoggedFlight-28.md) | 29 | 2 | CLOSED | rev-2 | 2026-09-20 |
-| [TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state](spec/2026-09-20-spec-TOOL-dLoggedFlight-29.md) | 30 | 2 | CLOSED | rev-2 | 2026-09-20 |
+| [TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state](spec/2026-09-20-spec-TOOL-dLoggedFlight-29.md) | 30 | 2 | CLOSED | rev-3 | 2026-09-20 |
 | [TOOL-dLoggedFlight-30 — the replaced `known` test is observed gone from the renderer, and one arm re-points a declared source to prove the lookup decides the value](spec/2026-09-20-spec-TOOL-dLoggedFlight-30.md) | 31 | 2 | SPECCED | rev-1 | 2026-09-20 |
 <!-- /gen:build-units -->
 

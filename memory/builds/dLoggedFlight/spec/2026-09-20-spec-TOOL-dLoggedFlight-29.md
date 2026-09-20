@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state
 
-**Status:** CLOSED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 30
+**Status:** CLOSED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -143,7 +143,8 @@ must not red and which the declared-source scoping excludes.
 - risks — a comparison that silently compares nothing would pass every placement, which is why AC2
   asserts the compared field count against the model's own.
 - testing — AC1 staged RED on a builder copy that edits a field, AC2 on a comparison copy that
-  compares an empty field set, AC3 on a constant copy and a builder copy.
+  compares an empty field set, AC3 on a constant copy, two builder copies, and the SHIPPED builder's
+  own source with one field edit inserted into it.
 - migration — N/A — test code only.
 - user docs — the kit README's self-test paragraph.
 
@@ -168,9 +169,15 @@ must not red and which the declared-source scoping excludes.
   copy that compares an empty field set, which must red rather than reporting three clean placements.
 - **AC3** — When `check_built_from_history` reads every builder `HISTORY_BUILT_BUILDERS` names, it
   finds no keyword re-render of a model and no assignment into a model field, and it prints the
-  number of builders it read. On a constant copy naming a builder the module does not define, and on
-  a `build_placement_models` copy that assigns into a model field, it refuses naming that builder.
-  Red when: either staged copy passes, or the printed builder count is zero.
+  number of builders it read and the syntax nodes it walked. On a constant copy naming a builder the
+  module does not define, on a `build_placement_models` copy that assigns into a model field, and on
+  one that keyword re-renders a model, it refuses naming that builder; on a builder that only reads a
+  model through `dataclasses.asdict` it refuses nothing. The predicate is ALSO run over the SHIPPED
+  `build_placement_models` source with one model-field assignment inserted into it, which must be
+  refused while the unmutated source is clean — the small copies alone would prove the predicate only
+  for small copies.
+  Red when: any staged copy passes, the near miss is refused, the mutated shipped source is accepted,
+  the mutation did not reach the text, or the printed builder or node count is zero.
 - **AC4** — When `ASSERTION_FLOOR` in the runlog kit's self-test module is read after S4, its newest
   RAISED comment names `TOOL-dLoggedFlight-29` and its arithmetic reaches the declared value. The
   suite run that grades the count itself is this spec's `New arm:` line.
@@ -196,6 +203,11 @@ New arm: `tools/runlog/selftest.py` · AC1's field-editing builder copy, AC2's e
 
 - rev-1 · 2026-09-20 · initial draft, promoted from H1 of the spec audit of units 25 to 27, round 1,
   at the loop's BOUNDED exit, with that finding's left-shift as its mechanism.
+- rev-3 · 2026-09-20 · the bug-class checklist over the rev-2 commit selected
+  `staged-break-substitutes-a-synthetic-value`, and it reached AC3: its two staged copies are eight
+  lines each while the shipped builder is thirty, so refusing them proved the predicate for the
+  copies. AC3 and section 5 now add a staged break cut into the SHIPPED builder's own source, and the
+  arm asserts the mutation reached the text and that the unmutated source is clean.
 - rev-2 · 2026-09-20 · built. Two divergences the build measured. `RunModel.cost.wall_s` is set from
   `time.perf_counter()` at `tools/runlog/model.py:1820`, so a field-by-field comparison written as
   rev-1 spelled it would have red on a CORRECT builder every run; S2 and AC2 now declare the mask,
