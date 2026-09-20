@@ -678,6 +678,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_masked_model",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "build_matchers",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -739,6 +744,21 @@
     },
     {
       "id": "build_placement_models",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_placement_models_field_edit",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_placement_models_read_only",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "build_placement_models_rerender",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
@@ -1151,6 +1171,11 @@
       "id": "check_audit",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "check_built_from_history",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "check_calls_invariant",
@@ -5498,6 +5523,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "scan_model_edits",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "scan_module_constants",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -6994,6 +7024,11 @@
     },
     {
       "id": "test_record_placement_replay",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_placement_states",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },

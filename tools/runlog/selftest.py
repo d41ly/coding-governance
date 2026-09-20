@@ -35,6 +35,7 @@ import ast
 import dataclasses
 import hashlib
 import importlib.util
+import inspect
 import json
 import os
 import pathlib
@@ -194,7 +195,19 @@ from collections import Counter  # noqa: E402
 # wide model, whose elided `events` fact and own liveness are the last two. Its decoy checks move it
 # by 3, and the three helpers it arrives with carry none.
 # 9 + 3 = 12
-ASSERTION_FLOOR = 1463
+# RAISED 1463 -> 1490 by TOOL-dLoggedFlight-29, the placement states: ONE new arm with 24 checks —
+# four per placement, that it carries the state its model was built from, that the repository is AT
+# the commit that state names, that the run-state write is staged or committed where the state says,
+# and that `build_run_model` re-run over that state reproduces the model field for field; AC2's three
+# over the compared field set, its emptiness and the named masks held in both directions; two
+# livenesses, that a pending model keyword-copied out of the landing one differs from the model
+# pending's own state produces while the honest one did not, and that the three placements are three
+# distinct states; and AC3's seven — the declared builders read clean, the syntax nodes that reading
+# walked, the refusal of a declared member the module does not define, the two staged builder copies,
+# the accepted `dataclasses.asdict` neighbour, and the predicate firing elsewhere in this module. Its
+# decoy checks move it by 3, and the six helpers it arrives with carry none.
+# 24 + 3 = 27
+ASSERTION_FLOOR = 1490
 
 PASS = []
 FAIL = []
@@ -6404,8 +6417,8 @@ def add_fixture_commit(repo, t, subject, paths):
 
 
 def build_placement_models():
-    """`{placement: {fx, journals, model, times, start_sha, close_sha}}` for the three states of
-    `PLACEMENTS`, each from its own copy of `build_landed_fixture`'s history (spec S2).
+    """`{placement: {fx, journals, model, times, start_sha, close_sha, state}}` for the three states
+    of `PLACEMENTS`, each from its own copy of `build_landed_fixture`'s history (spec S2).
 
     `landed` is the fixture as built, its LANDED write committed at minute 28. `landing` cuts the
     history at the merge, leaving the LANDING write in the working tree and dropping the `--landed`
@@ -6414,6 +6427,13 @@ def build_placement_models():
     the state the `--landed` and `--abort` placements render in. `times` is read from the whole
     fixture before the cut, so an arm grades a rendered bound against a committer time git printed
     and never against the model that rendered it.
+
+    `state` IS THE CLAIM MADE ASSERTABLE (spec S1 of TOOL-dLoggedFlight-29): the repository the model
+    was built from, the journal root it read, `cut` the commit its history was cut at, and `write` the
+    run-state write staged or committed there, named by its blob. Saying "built from a history, never
+    by editing a model field" in this docstring grades nothing; returning the state lets
+    `test_record_placement_states` re-derive the model and compare, so a model shortcut out of another
+    placement's differs from the model its own claimed state produces, whatever field was edited.
     """
     out = {}
     for name in PLACEMENTS:
@@ -6435,8 +6455,14 @@ def build_placement_models():
             else:
                 driver = [ln for ln in driver if ln.get("verb") != "--landed"]
         j = write_journals(repo.parent, driver=driver, gates=fx["gates"], pushes=fx["pushes"])
+        at = "staged" if name == "pending" else "committed"
+        at_ref = ":" + rm if at == "staged" else f"{close_sha}:{rm}"
+        write = {"path": rm, "at": at, "commit": None if at == "staged" else close_sha,
+                 "blob": run_git(["rev-parse", at_ref], repo).stdout.strip()}
+        state = {"repo": repo, "journals": j, "write": write,
+                 "cut": run_git(["rev-parse", "HEAD"], repo).stdout.strip()}
         out[name] = {"fx": fx, "journals": j, "model": build_model(repo, journals=j), "times": times,
-                     "start_sha": fx["shas"][1], "close_sha": close_sha}
+                     "start_sha": fx["shas"][1], "close_sha": close_sha, "state": state}
     return out
 
 
@@ -6619,6 +6645,225 @@ def test_record_placement_replay():
                    all(len(f) >= 20 for f in facts)
                    and all(r["Units"] and r["Decisions"] and r["Conformance"] for r in rows),
                    str((len(facts[0]), len(facts[1]), rows)))
+
+# ==================================================== the placement states (TOOL-dLoggedFlight-29)
+#
+# A BUILDER THAT CLAIMS ITS MODELS COME FROM A HISTORY ASSERTS IT HERE INSTEAD OF STATING IT. Each
+# placement comes back beside the repository state it was built from, so the arm re-derives the model
+# from that state and compares: a model shortcut out of another placement's differs from the model its
+# own claimed state produces, whatever field was edited. The previous unit's one structural probe was
+# a single grep literal, and a `pending` model keyword-copied from the `landing` one with `terminal`
+# set renders exactly the values it grades — the spelling list cannot enumerate the next shortcut,
+# and a re-derivation does not have to.
+
+# The builders whose models are CLAIMED to come from a real history (spec S3). A DECLARED population,
+# asserted in both directions: a member this module does not define is refused, so an exemption cannot
+# widen in silence, and a builder outside the set is never read, so the legitimate `dataclasses.asdict`
+# and plain-dict neighbours elsewhere in this module go on working. Sweeping the module instead would
+# refuse `build_model`, `build_kind_removed` and a dozen more, each of them correct.
+HISTORY_BUILT_BUILDERS = ("build_placement_models",)
+# READ off the kit, never typed here, so a model field renamed or added is graded the day it lands.
+MODEL_FIELDS = frozenset(f.name for f in dataclasses.fields(rl_model.RunModel))
+MODEL_TYPES = frozenset(n for n, o in vars(rl_model).items() if dataclasses.is_dataclass(o))
+# WHAT A RE-DERIVATION CANNOT REPRODUCE, by field and sub-key, each with its reason (spec S2, rev-2).
+# `wall_s` measures the BUILD and not the repository, so a comparison reading it would red on a
+# correct builder. Every mask is NAMED by AC2 and held in both directions: one the model does not
+# carry reds, since an exemption naming nothing silently widens what it was written to narrow.
+MODEL_UNREPRODUCIBLE = {
+    "cost": {"wall_s": "wall clock spent building the model, a measurement of the run rather than of "
+                       "the repository state the model was built from"},
+}
+
+
+def scan_model_edits(tree):
+    """`[(line, rule)]` for every model RE-RENDER or model-field EDIT in one parsed function.
+
+    Five shapes, because the population of spellings is OPEN and one exact literal is what H1 of the
+    audit of units 25 to 27 cost: a keyword `replace`, a model type called with keywords, a `dict()`
+    that copies something and overrides a model field, an assignment into a model attribute or into a
+    constant key naming a model field, and `setattr`. READING a model is not editing one, so
+    `dataclasses.asdict` and a comprehension over it are accepted and one arm below proves it.
+    """
+
+    def read_call_name(node):
+        f = node.func
+        return f.attr if isinstance(f, ast.Attribute) else (f.id if isinstance(f, ast.Name) else "")
+
+    out = []
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Call):
+            name = read_call_name(n)
+            if name == "replace" and n.keywords:
+                out.append((n.lineno, "model-replace"))
+            elif name in MODEL_TYPES and n.keywords:
+                out.append((n.lineno, "model-kwargs"))
+            elif name == "dict" and n.keywords and (n.args or any(k.arg in MODEL_FIELDS
+                                                                  for k in n.keywords)):
+                out.append((n.lineno, "dict-rerender"))
+            elif name in ("setattr", "__setattr__"):
+                out.append((n.lineno, "model-setattr"))
+        elif isinstance(n, ast.BinOp) and isinstance(n.op, ast.BitOr) and isinstance(n.right, ast.Dict):
+            if any(isinstance(k, ast.Constant) and k.value in MODEL_FIELDS for k in n.right.keys):
+                out.append((n.lineno, "dict-rerender"))
+        elif isinstance(n, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
+            for t in (n.targets if isinstance(n, ast.Assign) else [n.target]):
+                if isinstance(t, ast.Attribute) and t.attr in MODEL_FIELDS:
+                    out.append((t.lineno, "model-field-assign"))
+                elif (isinstance(t, ast.Subscript) and isinstance(t.slice, ast.Constant)
+                      and t.slice.value in MODEL_FIELDS):
+                    out.append((t.lineno, "model-field-assign"))
+    return sorted(set(out))
+
+
+def check_built_from_history(names):
+    """`(read, nodes, refusals)` over the builders `names` declares: how many of them this module
+    defines and this read, how many syntax nodes their sources carried, and `[(builder, line, rule)]`
+    for every re-render or field edit found. A name the module does not define IS a refusal, which is
+    the declaration's second direction. Lines are this file's, not the excerpt's, so a refusal points
+    at the source. `nodes` is the liveness: a reading that walked nothing is not a clean reading.
+    """
+    read, nodes, refusals = 0, 0, []
+    for name in names:
+        fn = globals().get(name)
+        if not isinstance(fn, types.FunctionType):
+            refusals.append((name, 0, "builder-undefined"))
+            continue
+        tree = ast.parse(inspect.getsource(fn))
+        ast.increment_lineno(tree, fn.__code__.co_firstlineno - 1)
+        read += 1
+        nodes += sum(1 for _ in ast.walk(tree))
+        refusals += [(name, line, rule) for line, rule in scan_model_edits(tree)]
+    return read, nodes, refusals
+
+
+def build_masked_model(model):
+    """`asdict(model)` with the sub-keys `MODEL_UNREPRODUCIBLE` names dropped. Every FIELD survives —
+    only a named sub-key goes — so a comparison over this reads the model's own field set whole."""
+    d = dataclasses.asdict(model) if dataclasses.is_dataclass(model) else dict(model)
+    for name, keys in MODEL_UNREPRODUCIBLE.items():
+        if isinstance(d.get(name), dict):
+            d[name] = {k: v for k, v in d[name].items() if k not in keys}
+    return d
+
+
+def build_placement_models_field_edit(models):
+    """AC3's STAGED BREAK, and it is never CALLED: the probe READS source, so the break is staged by
+    writing the shape. `pending` produced by editing a field of the `landing` model."""
+    m = models["landing"]["model"]
+    m.terminal = True
+    return {"pending": {"model": m}}
+
+
+def build_placement_models_rerender(models):
+    """AC3's second STAGED BREAK, never called: the same shortcut spelled as a keyword re-render,
+    which is the spelling TOOL-dLoggedFlight-25 AC2's single grep literal never matched."""
+    return {"pending": {"model": dataclasses.replace(models["landing"]["model"], terminal=True)}}
+
+
+def build_placement_models_read_only(models):
+    """AC3's ACCEPTED NEIGHBOUR, never called: a builder that READS a model through
+    `dataclasses.asdict` and edits nothing. A predicate that refused everything would pass both breaks
+    above, and only this neighbour tells the two apart."""
+    return {k: v for k, v in dataclasses.asdict(models["landed"]["model"]).items()
+            if k != "record_window"}
+
+
+def test_record_placement_states():
+    """AC1, AC2 and AC3: each placement model comes back beside the repository state it was built
+    from — the fixture repository, its journal root, the commit its history was cut at and the
+    run-state write staged or committed there — and `build_run_model` re-run over that state
+    reproduces the model field for field. The state is held against git, so it describes the
+    repository rather than labelling it. Beside the re-derivation the declared builders' own source is
+    read and refused a keyword re-render or an edit into a model field."""
+    models = build_placement_models()
+    compared, moved_fields = {}, {}
+    for name in PLACEMENTS:
+        st = models[name].get("state") or {}
+        check(f"record AC1: the {name} placement carries the state its model was built from",
+              sorted(st), ["cut", "journals", "repo", "write"])
+        if sorted(st) != ["cut", "journals", "repo", "write"]:
+            continue
+        repo, w = st["repo"], st["write"]
+        head = run_git(["rev-parse", "HEAD"], repo).stdout.strip()
+        staged = run_git(["diff", "--cached", "--name-only"], repo).stdout.split()
+        at_ref = ":" + w["path"] if w["at"] == "staged" else f"{w['commit']}:{w['path']}"
+        check(f"record AC1: the {name} placement's repository is AT the commit its state names",
+              (head, len(st["cut"])), (st["cut"], 40))
+        check(f"record AC1: the {name} placement's run-state write is {w['at']} where its state says",
+              (run_git(["rev-parse", at_ref], repo).stdout.strip(), len(w["blob"]), staged),
+              (w["blob"], 40, [w["path"]] if w["at"] == "staged" else []))
+        # Through `build_run_model` and never `build_model`: a re-derivation is the SAME model read a
+        # second time, so grading it against the model invariants would count one fixture twice.
+        again = rl_model.build_run_model(repo, FX_SLUG, journal_root=st["journals"])
+        got, want = build_masked_model(again), build_masked_model(models[name]["model"])
+        compared[name] = sorted(want)
+        moved_fields[name] = sorted(k for k in set(got) | set(want) if got.get(k) != want.get(k))
+        check(f"record AC1: the {name} placement's model is the model its own state produces, field "
+              "for field", moved_fields[name], [])
+
+    check("record AC2: the compared field set is each model's own field set, over all three placements",
+          compared, {n: sorted(dataclasses.asdict(models[n]["model"])) for n in PLACEMENTS})
+    check_true("record AC2: ...and no placement compared an empty field set, so three equal "
+               "comparisons are three readings", len(compared) == len(PLACEMENTS)
+               and all(compared.values()), str({k: len(v) for k, v in compared.items()}))
+    cost = dataclasses.asdict(models["landed"]["model"])
+    check("record AC2: every sub-key the comparison masks is NAMED with its reason, and the model "
+          "carries every one of them",
+          {f: sorted(k for k in keys if k in (cost.get(f) or {}))
+           for f, keys in MODEL_UNREPRODUCIBLE.items()},
+          {f: sorted(keys) for f, keys in MODEL_UNREPRODUCIBLE.items()})
+
+    # AC1 liveness: the shortcut a correct builder must not take, built HERE over the returned models
+    # and never returned by the builder. It renders the values TOOL-dLoggedFlight-25 AC1 grades, which
+    # is why that unit's criteria could not see it.
+    shortcut = build_masked_model(dataclasses.replace(models["landing"]["model"],
+                                                      terminal=models["pending"]["model"].terminal))
+    truth = build_masked_model(models["pending"]["model"])
+    shifted = sorted(k for k in set(shortcut) | set(truth) if shortcut.get(k) != truth.get(k))
+    check_true("record AC1 liveness: a pending model keyword-copied out of the landing model with "
+               "terminal set differs from the model pending's own state produces, while the honest "
+               "one did not — so the comparison above is able to fail",
+               bool(shifted) and moved_fields.get("pending") == [], str(shifted))
+    cuts = {n: models[n]["state"]["cut"] for n in PLACEMENTS}
+    check_true("record AC1 liveness: the three placements are three DIFFERENT states — three "
+               "repositories, two distinct cut commits and three distinct models — so a comparison "
+               "clean on all three read three things",
+               len({str(models[n]["state"]["repo"]) for n in PLACEMENTS}) == 3
+               and len(set(cuts.values())) == 2
+               and len({str(build_masked_model(models[n]["model"])) for n in PLACEMENTS}) == 3,
+               str(cuts))
+
+    read, nodes, refusals = check_built_from_history(HISTORY_BUILT_BUILDERS)
+    print(f"  ..   record AC3: read {read} declared history-built builder(s), {nodes} syntax nodes")
+    check("record AC3: every builder declared history-built is defined here and re-renders or edits "
+          "no model field", (read, refusals), (len(HISTORY_BUILT_BUILDERS), []))
+    check_true("record AC3: ...and that reading walked a real syntax tree, so an empty refusal list "
+               "is a reading and not a builder nobody read", read > 0 and nodes > 50, str((read, nodes)))
+    absent = "build_placement_models_absent"
+    read2, _nodes2, refused = check_built_from_history(HISTORY_BUILT_BUILDERS + (absent,))
+    check("record AC3: RED — a declared builder this module does not define is refused by name, which "
+          "is the declaration's second direction",
+          (read2, refused), (len(HISTORY_BUILT_BUILDERS), [(absent, 0, "builder-undefined")]))
+    for copy, rule in (("build_placement_models_field_edit", "model-field-assign"),
+                       ("build_placement_models_rerender", "model-replace")):
+        _read, _nodes, got = check_built_from_history((copy,))
+        check(f"record AC3: RED — {copy} is refused for {rule}",
+              [(b, r) for b, _line, r in got], [(copy, rule)])
+    _read, _nodes, clean = check_built_from_history(("build_placement_models_read_only",))
+    check("record AC3: near miss — a builder that only READS a model through dataclasses.asdict is "
+          "accepted, so the two refusals above are not a predicate that refuses everything", clean, [])
+    staged_here = ("test_record_placement_states", "build_placement_models_field_edit",
+                   "build_placement_models_rerender")
+    everywhere = [n.name for n in ast.walk(ast.parse(HERE.joinpath("selftest.py").read_bytes()
+                                                     .decode("utf-8")))
+                  if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and scan_model_edits(n)]
+    check_true("record AC3 liveness: the predicate fires on functions elsewhere in this module and on "
+               "none of the declared builders — which is why the population is DECLARED and the "
+               "module is not swept",
+               len([n for n in everywhere if n not in staged_here]) > 1
+               and not set(everywhere) & set(HISTORY_BUILT_BUILDERS),
+               str(sorted(n for n in everywhere if n not in staged_here)))
+
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)
 #

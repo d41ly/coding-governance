@@ -369,6 +369,20 @@ would remove nothing. A kind the renderer writes no row for and counts in no fac
 bytes identical, so the liveness that a removal reached the render is asserted over the kinds a row
 is written for, and the partition of the timeline over all of them.
 
+**A fixture builder claiming a real history returns the state it used.** Saying in a docstring that
+three models are built from a history and never by editing a field grades nothing, so the builder
+returns beside each model the repository it was built from, the journal root, the commit its history
+was cut at and the run-state write staged or committed there. One self-test arm holds each of those
+against git, re-runs `build_run_model` over the state and compares the result with the returned model
+field for field — a model shortcut out of another placement's differs from the model its own claimed
+state produces, whatever field was edited, which a list of shortcut spellings cannot promise. The one
+thing a comparison cannot read is declared beside it with its reason: `cost.wall_s` measures the build
+rather than the repository, and a masked sub-key the model does not carry reds. Beside the
+re-derivation the builders named by `HISTORY_BUILT_BUILDERS` have their own source read and refused a
+keyword re-render or an assignment into a model field. That set is declared rather than swept, because
+the same predicate over the whole module refuses a score of functions that copy a plain dict and are
+each correct.
+
 **The schema is data.** Shaped classes are regexes a value matches whole: a UTC time, an integer, a
 duration, a sha, a sha256 digest, a phase token, one of the build's own unit ids, and a path under
 the build's own folder. The vocabularies are closed lists, the model's own wherever it owns one. A

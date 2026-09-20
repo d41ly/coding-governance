@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state
 
-**Status:** SPECCED · rev-1 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 30
+**Status:** CLOSED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -39,14 +39,20 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 ## 2. Scope (IN)
 
 - **S1** The paired return. `build_placement_models` returns, beside each model, the repository state
-  that model was built from: the fixture repository, the commit its history was cut at, and which
-  run-state write was staged or committed in the working tree for that placement. One entry per
-  placement, keyed by the names `TOOL-dLoggedFlight-25` S2 gives them — `landed`, `landing` and
-  `pending`. Observed by AC1.
+  that model was built from: the fixture repository, the journal root it read, the commit its history
+  was cut at, and which run-state write was staged or committed in the working tree for that
+  placement, named by its blob. One entry per placement, keyed by the names `TOOL-dLoggedFlight-25` S2
+  gives them — `landed`, `landing` and `pending`. Every one of those four is READ BACK OUT OF GIT by
+  the arm, so a state that merely labels a repository reds rather than passing as one that describes
+  it. Observed by AC1.
 - **S2** The re-derivation. `test_record_placement_states` re-runs `build_run_model` over each
   returned state and compares the result with the model the builder returned, field by field through
   `dataclasses.asdict`. A model the builder shortcut then differs from the model its own claimed
-  state produces, whatever field was edited. Observed by AC1 and AC2.
+  state produces, whatever field was edited. Every FIELD is compared; what a comparison cannot read is
+  the sub-keys `MODEL_UNREPRODUCIBLE` declares, one per reason, because `cost.wall_s` measures the
+  build and not the repository and a comparison reading it would red on a correct builder. The
+  declaration is held in both directions: a masked sub-key the model does not carry reds. Observed by
+  AC1 and AC2.
 - **S3** The declared builders and the source probe. `HISTORY_BUILT_BUILDERS`, a constant in the
   runlog kit's self-test module, names every builder whose models are claimed to come from a real
   history; at this unit that is `build_placement_models` alone. `check_built_from_history` reads each
@@ -101,7 +107,13 @@ must not red and which the declared-source scoping excludes.
 |---|---|---|
 | `test_record_placement_states` | function | `py.function`, led by `test` |
 | `check_built_from_history` | function | `py.function`, led by `check` |
+| `scan_model_edits` | function | `py.function`, led by `scan` |
+| `build_masked_model` | function | `py.function`, led by `build` |
+| `build_placement_models_field_edit` | function | `py.function`, led by `build` |
+| `build_placement_models_rerender` | function | `py.function`, led by `build` |
+| `build_placement_models_read_only` | function | `py.function`, led by `build` |
 | `HISTORY_BUILT_BUILDERS` | constant | `py.constant` |
+| `MODEL_FIELDS` · `MODEL_TYPES` · `MODEL_UNREPRODUCIBLE` | constants | `py.constant` |
 
 ### Files touched (estimate)
 
@@ -138,19 +150,22 @@ must not red and which the declared-source scoping excludes.
 ## 6. Acceptance criteria
 
 - **AC1** — When `test_record_placement_states` runs, each model `build_placement_models` returns is
-  accompanied by the repository state it was built from, and `build_run_model` re-run over that state
-  produces a model equal to the returned one field for field.
-  Red when: a returned model differs from the model its own state produces, or a placement carries no
-  state. Staged RED by a builder copy that produces `pending` as a keyword copy of the `landing`
+  accompanied by the repository state it was built from, that state is confirmed against git — the
+  repository is AT the commit the state names, and the run-state write is staged or committed exactly
+  where the state says, by blob — and `build_run_model` re-run over that state produces a model equal
+  to the returned one field for field.
+  Red when: a returned model differs from the model its own state produces, a placement carries no
+  state, or a state names a commit or a write the repository does not hold. Staged RED by a builder copy that produces `pending` as a keyword copy of the `landing`
   model with `terminal` set, which must red here while `TOOL-dLoggedFlight-25` AC1 still passes on
   the same copy — that contrast is the evidence this criterion is load-bearing.
   figure: DERIVED — every compared field is read from the re-derived model at observation time.
 - **AC2** — When `test_record_placement_states` compares, the compared field set is the model's own
   field set as `dataclasses.asdict` returns it, it is not empty, and all three placements are
-  compared.
+  compared. Every sub-key masked inside a field is NAMED by `MODEL_UNREPRODUCIBLE` with its reason and
+  is carried by the model.
   Red when: the compared field set is empty or smaller than the model's, fewer than three placements
-  are compared, or a field is skipped without the arm naming it. Staged RED by a comparison copy that
-  compares an empty field set, which must red rather than reporting three clean placements.
+  are compared, or a field or sub-key is skipped without the arm naming it. Staged RED by a comparison
+  copy that compares an empty field set, which must red rather than reporting three clean placements.
 - **AC3** — When `check_built_from_history` reads every builder `HISTORY_BUILT_BUILDERS` names, it
   finds no keyword re-render of a model and no assignment into a model field, and it prints the
   number of builders it read. On a constant copy naming a builder the module does not define, and on
@@ -181,6 +196,14 @@ New arm: `tools/runlog/selftest.py` · AC1's field-editing builder copy, AC2's e
 
 - rev-1 · 2026-09-20 · initial draft, promoted from H1 of the spec audit of units 25 to 27, round 1,
   at the loop's BOUNDED exit, with that finding's left-shift as its mechanism.
+- rev-2 · 2026-09-20 · built. Two divergences the build measured. `RunModel.cost.wall_s` is set from
+  `time.perf_counter()` at `tools/runlog/model.py:1820`, so a field-by-field comparison written as
+  rev-1 spelled it would have red on a CORRECT builder every run; S2 and AC2 now declare the mask,
+  one named sub-key with its reason, held in both directions, and the compared FIELD set is still the
+  model's own and whole. A probe over a synthetic fixture read 36 model fields and found `cost.wall_s`
+  the only one that did not reproduce, `cost.git_calls` included. Second, rev-1's state was a value
+  the arm trusted; S1 and AC1 now hold all four of its parts against git, since a state nothing checks
+  is a label and the re-derivation would then run over whatever repository the builder handed it.
 
 ## 10. Reuse audit
 
