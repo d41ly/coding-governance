@@ -65,6 +65,15 @@ key printed. That last break is why AC5's third arm asserts a printed key and a 
 
 `bash -n` on the suite and an `ast.parse` on the checker were run in the pass as well.
 
+`python tools/memory-tree/gotchas.py --for-diff fb07ca25..HEAD` was run after the unit's commit and
+named one class that reached this diff: `naming-leg-grades-what-python-named`, whose point is that
+the naming gate grades NESTED helpers too. `scan_handoffs` had one, `text_of`, leading with a verb
+`.lexicon.conf` does not declare — and a third function would also have made §4 Inventory's
+two-function claim untrue. It is gone, folded into a flat dict-cache read, in a follow-up commit on
+this same unit. The thirteen fixture states were re-run against the refactored checker afterwards
+and all thirteen arms still agree. AC11's pair is the STAMP commit and its parent, which its own
+wording resolves by sha, so this fix-up does not disturb it.
+
 ## The key was RE-DERIVED at the build commit, and the spec moved with it
 
 S3 orders the relation re-run at the build commit rather than carried. It was, on node `d` on

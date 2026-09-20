@@ -284,18 +284,16 @@ def scan_handoffs(root, specs, uids, cutoff):
     hits, bullets, tokens, silent = [], 0, 0, 0
     if not cutoff:
         return hits, bullets, tokens, silent
+    # One read per file, kept flat rather than behind a nested helper: a nested `def` is a function
+    # the naming gate grades and §4 Inventory of TOOL-dDerivedDocket-37 declares exactly two.
     cache = {}
-
-    def text_of(path):
-        if path not in cache:
-            cache[path] = (root / path).read_bytes().decode("utf-8", "replace")
-        return cache[path]
-
     for f in specs:
         m = SPEC_DATE.search("/" + f)
         if not m or m.group(1) < cutoff:
             continue
-        text = text_of(f)
+        if f not in cache:
+            cache[f] = (root / f).read_bytes().decode("utf-8", "replace")
+        text = cache[f]
         head = NONGOALS_HEAD.search(text)
         if not head:
             continue
@@ -326,7 +324,12 @@ def scan_handoffs(root, specs, uids, cutoff):
                 silent += 1
                 continue
             bullets += 1
-            sibling = "\n".join(text_of(g) for g in uids[(build, target)])
+            parts = []
+            for g in uids[(build, target)]:
+                if g not in cache:
+                    cache[g] = (root / g).read_bytes().decode("utf-8", "replace")
+                parts.append(cache[g])
+            sibling = "\n".join(parts)
             for tok in TICK.findall(bullet):
                 if tok == target or UNIT_ID.match(tok) or NOT_A_TOKEN.match(tok):
                     continue
