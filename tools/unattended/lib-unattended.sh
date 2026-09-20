@@ -19,8 +19,9 @@
 # and the fix for it is one spelling, which is this file.
 #
 # WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
-# root the driver and the resume tick both read; the anchored id tests; path containment; and
-# "has this pass committed yet". The same rule admits the resume tick as a third sourcer.
+# root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
+# key both of them call; the anchored id tests; path containment; and "has this pass committed
+# yet". The same rule admits the resume tick as a third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -61,6 +62,38 @@ resolve_sidecar_dir() { # -> <git-dir>/unattended, or nothing when the git dir c
   local g; g=$(GIT rev-parse --git-dir 2>/dev/null) || g=""
   [ -n "$g" ] || return 1
   printf '%s/unattended\n' "$g"
+}
+
+# ------------------------------------------------------------------------------ bounds, once
+# MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its two
+# knobs through this function, and the driver its four, so it lives where both source it. THE
+# CALLING-SHELL CONTRACT: the caller has sourced its conf into the shell that calls this and has
+# named that file in `CONF` — `${!name}` reads the calling shell, and the NOTE interpolates `$CONF`.
+# A BOUND KEY: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6, hoisted at its second
+# instance by TOOL-aProbedUnit-3 — the charter's section 12 extracts the shared contract when the
+# second caller arrives, and the third (`REVIEW_ROUNDS`) is a call, never a third `case`.
+#
+# A conf that declares nothing still gets a bound, because the population that produced the observed
+# 3h19m hang is exactly the one that never edits this key. What it does NOT get is silence: the line
+# below says which number is in force and where it came from, so a defaulted pin is never invisible.
+#
+# A malformed value is a REFUSAL rather than a silent fallback. "0" would mean no bound at all to
+# `timeout`, so accepting junk and coercing it would unbound the one project whose declaration was
+# wrong -- the failure landing on whoever tried hardest to configure it.
+#
+# <UNIT> is an argument because a caller may count rounds rather than seconds, and a refusal that
+# says `seconds` about a round count is a false sentence. No `fail` branch here: this runs before
+# `fail()` exists and refuses with exit 2, the misconfiguration code, exactly as the block it replaces.
+read_bound_key() { # NAME · DEFAULT · UNIT · NOTE
+  local _bk_name="$1" _bk_default="$2" _bk_unit="$3" _bk_note="$4" _bk_val
+  _bk_val="${!_bk_name:-}"
+  case "$_bk_val" in
+    "") printf -v "$_bk_name" '%s' "$_bk_default"
+        echo "unattended: NOTE - this project declares no $_bk_name, so $_bk_note. Declare one in $CONF to change it." >&2 ;;
+    *[!0-9]*|0)
+        echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
+        exit 2 ;;
+  esac
 }
 
 # ------------------------------------------------------------------------------- ids, anchored

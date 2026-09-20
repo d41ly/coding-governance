@@ -52,6 +52,11 @@ STOP_GUARD_BLOCKS="6"
 # Leave it absent unless you need to sit ABOVE the sum: raising GATE_BOUND raises the default.
 RESUME_STALE_BOUND="5400"
 
+# resumes this many times with no movement between them, then stops and says ATTEMPTS EXHAUSTED; the resume tick reads the root's copy of this line, so one repo has one cap. OPTIONAL, on GATE_BOUND's terms.
+RESUME_ATTEMPTS="6"
+# one resumed turn budget; a run that needs more is resumed again by the next tick. The resume tick reads the root's copy of this line. OPTIONAL, on GATE_BOUND's terms.
+RESUME_TURNS="40"
+
 # The round bound a spec-audit subject -- any `--review` subject that is not the build slug -- takes
 # before it exits BOUNDED; the build slug keeps the runaway ceiling. OPTIONAL, on GATE_BOUND's terms:
 # absent takes the kit default of 1 and says so on stderr; non-numeric, zero, or above the runaway

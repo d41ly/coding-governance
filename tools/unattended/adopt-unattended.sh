@@ -453,6 +453,20 @@ if [ "$MODE" = "--check" ]; then
   # fragments, so a kit dir with none is a copy that lost them.
   [ "$N_FRAG" -gt 0 ] || { echo "unattended: no *.fragment.json in $KIT_REL, so no hook wiring can be checked and nothing else on the bar asserts the files — re-copy the kit"; exit 1; }
   echo "unattended: hooks: $N_FRAG fragment(s) wired"
+  # THE RESUME TICK'S REGISTRATION, reported and never graded (TOOL-aWokenSentinel-5 S9). Registering
+  # `gov-resume-tick` is the OWNER's act, once per node, and an adopter who has not done it has a
+  # working kit, not a broken one — so this is INFO on either answer and the exit code does not
+  # move. Under MSYS `schtasks //query` — a single `/query` from bash is mangled to a Program Files
+  # path, measured 2026-09-16 — elsewhere the crontab listing.
+  case "$(uname -s 2>/dev/null)" in
+    MINGW*|MSYS*|CYGWIN*) if schtasks //query //tn gov-resume-tick >/dev/null 2>&1; then RT_REG=1; else RT_REG=0; fi ;;
+    *) if crontab -l 2>/dev/null | grep -qF resume-tick; then RT_REG=1; else RT_REG=0; fi ;;
+  esac
+  if [ "$RT_REG" = 1 ]; then
+    echo "unattended: INFO — the resume tick is registered as gov-resume-tick"
+  else
+    echo "unattended: INFO — no scheduled task named gov-resume-tick on this node; the resume tick is unregistered (the kit README has the line)"
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi

@@ -1881,6 +1881,28 @@ want_unit=$(awk '/<!-- gen:build-index -->/{f=1;next} /<!-- .gen:build-index -->
 same "the control extracted a non-empty first row" "$([ -n "$want_unit" ] && echo yes || echo no)" "yes"
 same "--status selects the same first row through the extracted helper" "$(run --status tRun | sed 's/.*· next //')" "$want_unit"
 
+# ---- TOOL-aWokenSentinel-5 S8 / AC9: the resume tick's attempts are a FIELD on the one status
+# ---- line, printed only when the sidecar holds a line. Absent, the line is byte-identical to what
+# ---- the verb printed before the sidecar existed — a field printed at zero would grow every
+# ---- existing status line, and a second line would red the whole-output readers above. Present,
+# ---- the count and the last line's stamp ride the parked/noted rule, and --resume's first line
+# ---- carries the same field. The sidecar root is `resolve_sidecar_dir`, so the driver spells no
+# ---- `rev-parse --git-dir` of its own: unit 11's check 32 owns that count across the kit, and the
+# ---- pin here is this unit's base, zero.
+reset_tree
+run --preflight tRun --keepalive-id k1 >/dev/null
+rt_before=$(run --status tRun)
+RT_SIDECAR="$(git rev-parse --git-dir)/unattended"; mkdir -p "$RT_SIDECAR"
+printf '2026-09-20T10:00:00Z attempt 1 session s pid 1 pid-alive no out o1\n2026-09-20T10:10:00Z attempt 2 session s pid 1 pid-alive no out o2\n' > "$RT_SIDECAR/resume.tRun.log"
+out=$(run --status tRun)
+same "AC9 --status is still one line with the sidecar present" "$(printf '%s\n' "$out" | grep -c '')" "1"
+hit "$out" " · resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z"
+same "AC9 --resume's first line carries the same field" "$(run --resume tRun | head -n 1 | grep -c 'resume-tick 2 attempt(s), last 2026-09-20T10:10:00Z')" "1"
+rm -f "$RT_SIDECAR/resume.tRun.log"
+same "AC9 with the sidecar removed the line is byte-identical to before" "$(run --status tRun)" "$rt_before"
+miss "$rt_before" "resume-tick"
+same "AC9 the driver spells no sidecar derivation of its own" "$(grep -cE '^[^#]*rev-parse --git-dir' "$SCRIPT")" "0"
+
 
 # REBUILT IMMEDIATELY BEFORE THE ARM (TOOL-dHonouredPark-4 fallout, not this build's). A
 # `reset_tree` between the setup above and this line wipes tPlanEmpty, so `--plan` ran against
@@ -6004,7 +6026,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # ---- so 212 + 486 - 680 = 18 prologue arms. The three that appeared are the `mutate` calls seeding the
 # ---- three new recipe fixtures, which live in the shared prologue and are therefore paid by both regions.
 # ---- A prologue count that MOVES is normal; one that moves without a fixture landing in the prologue is not.
-FLOOR_ASSERTIONS=904
+FLOOR_ASSERTIONS=910
+# RAISED 904 -> 910 by TOOL-aWokenSentinel-5: the `--status` resume-tick field arm (6), in region
+# two beside the extraction arms, measured by running that block alone over the sourced prologue:
+# n 20 -> 26 on node `a`.
 # RAISED 898 -> 904 by TOOL-aWokenSentinel-16: the parent-commit marker arm (2) and the `--no-ff`
 # remote-arm fixture (4), in region two's lander-marker block, measured by running that block
 # alone over the sourced prologue: n 9 -> 15 on node `a`.
@@ -6057,7 +6082,9 @@ PROLOGUE_ARMS=18
 FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
-FLOOR_SHARD_2=708
+FLOOR_SHARD_2=714
+# +6 for the TOOL-aWokenSentinel-5 `--status` resume-tick field arm, in region two beside the
+# extraction arms.
 # +6 for the TOOL-aWokenSentinel-16 marker arms, in region two's lander-marker block.
 # +74 for the TOOL-aWokenSentinel-2 `--liveness` arms and the NOCONF line, in region two — see
 # FLOOR_ASSERTIONS above for the platform split.

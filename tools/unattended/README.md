@@ -79,6 +79,34 @@ necessarily carries unresolved braces, so grading one reds on a target that is n
 until render time. That second exclusion was widened from the first the moment a second template
 existed.
 
+## The resume tick — registration is the owner's
+
+`resume-tick.sh` is the one keepalive actor that does not share the session's process: an
+OS-scheduled task that walks every worktree, asks the driver `--liveness` about every run whose
+lease names a session, and on `STALE` kills the recorded pid's tree, appends an attempt line under
+`<git-dir>/unattended/resume.<slug>.log` and launches `claude -p --resume <session>` detached. The
+kit never registers it — `schtasks /create` and `crontab` are the owner's acts, once per node, under
+the login whose CLI is authenticated — and until it is registered the tick is inert; the adopter's
+`--check` says which on an `INFO` line and reds on neither answer.
+
+Windows, from cmd or PowerShell (Git-Bash needs every `/` option doubled, `//create`, `//sc`, …):
+
+```
+schtasks /create /sc minute /mo 10 /tn gov-resume-tick /tr "\"<bash.exe>\" -lc \"<kit-dir>/resume-tick.sh --repo <root>\""
+```
+
+POSIX, one crontab line (the trailing comment names it the way the Windows task is named, and
+`--check` finds either spelling in the listing):
+
+```
+*/10 * * * * <kit-dir>/resume-tick.sh --repo <root>  # gov-resume-tick
+```
+
+`<kit-dir>/resume-tick.sh --repo <root> --dry-run` prints the decision a tick would take for every
+bound run and does nothing else — no kill, no launch, no attempt line, no login probe. The two knobs
+it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
+on stderr when absent.
+
 ## Running the kit's own checks
 
 ```

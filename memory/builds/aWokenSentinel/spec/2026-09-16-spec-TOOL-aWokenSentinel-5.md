@@ -1,12 +1,13 @@
 # TOOL-aWokenSentinel-5 — `resume-tick.sh`, the OS-scheduled out-of-process resumer
 
-**Status:** SPECCED · rev-3 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 11 · ratified 2026-09-16
+**Status:** CLOSED · rev-4 · 2026-09-20 · node a · Tier-2 · base 5f9648d6 · streams tooling · order 11 · ratified 2026-09-16
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md](../build/2026-09-16-build-TOOL-aWokenSentinel-1-0-keepalive-research.md) | research | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 |
+| [2026-09-16-build-TOOL-aWokenSentinel-5-1-acceptance-ledger.md](../build/2026-09-16-build-TOOL-aWokenSentinel-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-1-1-spec-briefs.md) | journal | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
 | [2026-09-16-prompt-TOOL-aWokenSentinel-5-1-build-brief.md](../prompts/2026-09-16-prompt-TOOL-aWokenSentinel-5-1-build-brief.md) | journal | — |
 | [2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md](../reviews/2026-09-20-review-TOOL-aWokenSentinel-1-spec-audit-round1.md) | spec-audit | TOOL-aWokenSentinel-1 TOOL-aWokenSentinel-2 TOOL-aWokenSentinel-3 TOOL-aWokenSentinel-4 TOOL-aWokenSentinel-6 TOOL-aWokenSentinel-7 |
@@ -257,6 +258,11 @@ exit 0, and no attempt line: an attempt that could not have launched is not an a
 ### The launch (S7)
 
 The tick writes `<git-dir>/unattended/resume.<slug>.<utc>.sh`, the LAUNCHER, and runs it detached.
+The `<utc>` in a FILE name is the basic-format stamp, `20260920T202456Z`, never the extended one
+with colons: NTFS has no `:` in a file name, MSYS smuggles one through as a private-use
+character that `cygpath -m` and `Start-Process` then disagree about, and the launcher's path
+crosses that boundary (rev-4). The attempt LINE keeps the extended stamp, which is what the
+count compares.
 The launcher is three statements: `export PATH='<the tick's own PATH>'`, `cd '<worktree>'`, and
 
 ```
@@ -553,6 +559,13 @@ arm's assertions, read off the floor-breach line with the floor over-pinned.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-20 · §4 · the build pass: the launcher and `.out` file names carry the
+  basic-format UTC stamp (no colons), because NTFS refuses `:` in a name and the launcher's path
+  crosses into PowerShell; the attempt line's stamp is unchanged. Status CLOSED. Two readings
+  recorded in the ledger rather than folded: AC5's driver call count is compared against the
+  pass's parent (4), not the pinned base (3), because unit 2 landed the fourth call after the
+  base; and the suite's stub dir is POSIX-spelled because a `C:/` element in PATH splits at the
+  drive colon and lets the real CLI win — measured on node `a` the first time an arm ran.
 - rev-3 · 2026-09-20 · §3 · §4 · folded spec-audit round 2: sibling agreement for the promoted
   `TOOL-aWokenSentinel-20` (H6, raw 36) and the rev-2 of spec 11 (M9, raw 50) — S4's resume-log
   root reads through the lib's `resolve_sidecar_dir` and the tick joins the one-derivation

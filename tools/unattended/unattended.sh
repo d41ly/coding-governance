@@ -341,32 +341,11 @@ GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""
 # shellcheck disable=SC1090
 . "$CONF"
 
-# A BOUND KEY: DEFAULTED, VALIDATED, AND ANNOUNCED. TOOL-aBoundedCeiling-6, hoisted at its second
-# instance by TOOL-aProbedUnit-3 — the charter's section 12 extracts the shared contract when the
-# second caller arrives, and the third (`REVIEW_ROUNDS`) is a call, never a third `case`.
-#
-# A conf that declares nothing still gets a bound, because the population that produced the observed
-# 3h19m hang is exactly the one that never edits this key. What it does NOT get is silence: the line
-# below says which number is in force and where it came from, so a defaulted pin is never invisible.
-#
-# A malformed value is a REFUSAL rather than a silent fallback. "0" would mean no bound at all to
-# `timeout`, so accepting junk and coercing it would unbound the one project whose declaration was
-# wrong -- the failure landing on whoever tried hardest to configure it.
-#
-# <UNIT> is an argument because a caller may count rounds rather than seconds, and a refusal that
-# says `seconds` about a round count is a false sentence. No `fail` branch here: this runs before
-# `fail()` exists and refuses with exit 2, the misconfiguration code, exactly as the block it replaces.
-read_bound_key() { # NAME · DEFAULT · UNIT · NOTE
-  local _bk_name="$1" _bk_default="$2" _bk_unit="$3" _bk_note="$4" _bk_val
-  _bk_val="${!_bk_name:-}"
-  case "$_bk_val" in
-    "") printf -v "$_bk_name" '%s' "$_bk_default"
-        echo "unattended: NOTE - this project declares no $_bk_name, so $_bk_note. Declare one in $CONF to change it." >&2 ;;
-    *[!0-9]*|0)
-        echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
-        exit 2 ;;
-  esac
-}
+# `read_bound_key` — a bound key DEFAULTED, VALIDATED and ANNOUNCED — lives in `lib-unattended.sh`,
+# sourced above: TOOL-aWokenSentinel-5 hoisted it there verbatim, because the resume tick reads
+# `RESUME_ATTEMPTS` and `RESUME_TURNS` through the same function, and a bound read spelled twice is
+# two answers to one question. The four calls below stay here; the contract they rely on — the
+# caller has sourced its conf into THIS shell and named it in `CONF` — is stated on the function.
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
 read_bound_key UNIT_STALL_BOUND "$UNIT_STALL_BOUND_DEFAULT" seconds "a dispatched unit reads STALLED after the kit default of ${UNIT_STALL_BOUND_DEFAULT}s with no write and no commit"
 # THE STALE BOUND FOR A RUN, the fourth caller (TOOL-aWokenSentinel-2). Its default is DERIVED from
@@ -3032,6 +3011,18 @@ $(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^
 BRIEFROWS
   [ "$_bstale" -gt 0 ] && parked="$parked · STALE briefs $_bstale"
   [ "$_bgone" -gt 0 ] && parked="$parked · briefs gone $_bgone"
+  # THE RESUME TICK'S ATTEMPTS, on the parked/noted rule: a FIELD on this one line, printed only
+  # when the sidecar holds at least one line, so no existing reader of the whole line sees a byte
+  # it did not see before (TOOL-aWokenSentinel-5, F1). The count is every line the tick appended,
+  # lifetime; the stamp is the last line's first token. The sidecar root is the library's one
+  # derivation, never an inline `rev-parse` — check 32 counts that. `--resume` inherits the field
+  # through this verb, so the status-and-resume agreement arm still holds.
+  local _rt _rtn _rtl
+  _rt=$(resolve_sidecar_dir) && _rt="$_rt/resume.$slug.log" || _rt=""
+  if [ -n "$_rt" ] && [ -s "$_rt" ]; then
+    _rtn=$(grep -c '' "$_rt"); _rtl=$(tail -n 1 -- "$_rt"); _rtl=${_rtl%$'\r'}
+    parked="$parked · resume-tick $_rtn attempt(s), last ${_rtl%% *}"
+  fi
     # The halt code on the status line, when the record carries one. A vocabulary with no reader
     # is decoration, and this kit says so about its own phase writer.
     local hc; hc=$(fact "$rel" halt-code)
