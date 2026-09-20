@@ -134,10 +134,17 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `tools/unattended/` is not done until this prints GREEN and the verdict is in the landing report:
+# `tools/unattended/` is not done until `--attribute` against the build's BASE reads
+# `verdict clean` — no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — and every suite
+# reporting an INHERITED FAIL or a DEAD PROBE at R is named by a filed backlog record:
 #
-#     bash tools/unattended/run-unattended-gates.sh            # the self-tests
-#     bash tools/unattended/run-unattended-gates.sh --all      # and the three legs beside them
+#     bash tools/unattended/run-unattended-gates.sh --attribute <BASE>   # the self-tests, attributed
+#     bash tools/unattended/run-unattended-gates.sh --all                # and the legs beside them
+#
+# THE ATTRIBUTION IS NOT CEREMONY. This kit's suites are red at their base for causes filed against
+# other units (`TOOL-aHoistedPass-36`, `TOOL-aHoistedPass-38`), so the bare GREEN this block used to
+# demand named a state nobody could reach, and the red it produced instead said nothing about the
+# change in front of it. `TOOL-dDerivedDocket-1`.
 #
 # There is no gate behind that sentence. A kit edit that guts a check now lands green unless a person
 # runs it, and this file is where that trade is recorded as having been made deliberately.

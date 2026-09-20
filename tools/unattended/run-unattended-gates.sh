@@ -24,7 +24,16 @@
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
 # nothing runs the self-tests automatically. A change under this directory that guts a check lands
 # green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `tools/unattended/` is a GREEN verdict from `--selftests` pasted into the landing report.
+# `tools/unattended/` is this: `--attribute` against the build's BASE reads `verdict clean` — no NEW
+# FAIL, no DEAD PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or
+# a DEAD PROBE at R is named by a filed backlog record.
+#
+# WHY NOT A BARE GREEN, which is what this line demanded until `TOOL-dDerivedDocket-1`: this kit's
+# own suites are red at their base for causes filed elsewhere (`TOOL-aHoistedPass-36`,
+# `TOOL-aHoistedPass-38`), so the old wording named a state nobody could reach and every run of it
+# produced a red that said nothing about the change in front of it. `--attribute` forwards to the
+# self-test half, which is where those suites live; the `--checks` half is NOT attributed, because
+# those four are repository checks and merge-bar legs.
 #
 # WHAT THIS DOES NOT CHECK: whether an unattended run was HONEST. These read records and stage
 # fixtures; §9 of the protocol says what a check running under the run's own uid can and cannot buy,
@@ -118,13 +127,23 @@ BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day
                               # coinciding here is arithmetic, not a claim. Moving one does not move
                               # the other, and neither should be edited to match.
 
-ONLY="${1:---selftests}"
-case "$ONLY" in
-  --all)       ONLY="" ;;
-  --checks)    ONLY=checks ;;
-  --selftests) ONLY=selftests ;;
+# ---- THE ARGV IS A LOOP NOW, and it was a single positional. `--attribute <R>` composes with the
+# ---- half selector rather than replacing it, so one of the four verbs and a baseline can arrive
+# ---- together. Every existing form keeps its exact behaviour and its exact refusal text.
+ONLY=selftests; ONLY_SET=0; ATTRIBUTE=""
+while [ $# -gt 0 ]; do
+case "$1" in
+  --all)       ONLY=""; ONLY_SET=1; shift ;;
+  --checks)    ONLY=checks; ONLY_SET=1; shift ;;
+  --selftests) ONLY=selftests; ONLY_SET=1; shift ;;
+  # THE VALUE IS REQUIRED BEFORE THE SHIFT. `shift 2` with one positional left fails and leaves
+  # `$#` where it was, which spins this loop forever on a trailing bare `--attribute`.
+  --attribute)
+    ATTRIBUTE=${2:-}
+    [ -n "$ATTRIBUTE" ] || { echo "run-unattended-gates: --attribute needs a commit-ish to baseline against"; exit 2; }
+    shift 2 ;;
   -h|--help)
-    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
+    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all] [--attribute <R>]"
     echo "  --selftests  every suite that stages breaks into this kit (default), and the only"
     echo "               thing that exercises them since none is a bar leg."
     # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
@@ -153,12 +172,31 @@ case "$ONLY" in
     echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
     echo "               because the one that was is what round 8 filed."
     echo "  --all        both"
+    echo "  --attribute <R>"
+    echo "               forwarded to the SELF-TEST half only, which runs each suite at this tree"
+    echo "               AND at R and reports NEW, INHERITED and FIXED failure sets. It exists"
+    echo "               because this kit's suites are red at their base for causes filed"
+    echo "               elsewhere, so an unqualified green is unreachable. The run ends in"
+    echo "               'verdict clean' or 'verdict red'; a DEAD PROBE at L and an L-side"
+    echo "               OVER BUDGET red it, an inherited failure never does. The --checks half"
+    echo "               is NOT attributed: those are repository checks and merge-bar legs."
     echo ""
     echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
     echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
     exit 0 ;;
-  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
+  *) echo "run-unattended-gates: unknown argument '$1'"; exit 2 ;;
 esac
+done
+# THE DEFAULT SURVIVES THE LOOP. With no half selector at all the default is `--selftests`, exactly
+# as the single-positional form defaulted, and `--attribute` alone does not change which half runs.
+[ "$ONLY_SET" = 1 ] || ONLY=selftests
+
+# SAID ON EVERY ATTRIBUTED RUN, rather than left to be inferred from its absence: attributing a bar
+# leg needs the per-leg signature rules this kit does not own, so the four repository checks are
+# reported exactly as they always were and carry no baseline.
+if [ -n "$ATTRIBUTE" ]; then
+  echo "run-unattended-gates: --attribute forwards to the SELF-TEST half only; the --checks half is NOT attributed"
+fi
 
 #
 # THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
@@ -260,7 +298,14 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
   case "$_uc" in ''|*[!0-9]*|0) echo "run-unattended-gates: the declaration holds NO unattended row, so this half would grade nothing" >&2; st=1 ;;
     *) ran=$((ran + _uc)) ;;
   esac
-  bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended || st=1
+  # THE FLAG IS FORWARDED, not re-implemented. The baseline machinery — the R worktree, the FAIL
+  # normaliser, the per-(R, suite, blob) cache — lives in the one on-demand runner, and a second
+  # copy here would be a second answer to "what failed before this tree touched anything".
+  if [ -n "$ATTRIBUTE" ]; then
+    bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --attribute "$ATTRIBUTE" || st=1
+  else
+    bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended || st=1
+  fi
 fi
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean

@@ -143,6 +143,19 @@ heads the deployer matches to read verdicts; those heads are strings in the runn
 calls. When the runner's output moves and the declaration does not, the deployer reports a bar that
 ran nothing — silently, because "no lines matched" and "no legs ran" are one observation to a reader.
 
+**A held suite's verdict is ATTRIBUTED, not absolute.** `run-selftests.sh --attribute <R>` runs each
+selected suite at the working tree AND at R's own copy of it, in a detached worktree under the git
+common dir, and reports NEW, INHERITED and FIXED sets of normalised FAIL lines. It exists because
+several suites in the declared population are red at any base for causes filed against other units,
+so the bare GREEN the compensating-check wording used to demand named a state nobody could reach,
+and the red it produced instead was not about the change being graded. Exit 1 is a NEW FAIL, a DEAD
+PROBE at L or an L-side OVER BUDGET, and never an inherited one; consumers read the `verdict clean`
+token on the summary line and never the NEW count alone. SETS AND NOT COUNTS, because a failure this
+tree fixed plus one it introduced nets to zero. A dead side has no members, so everything at L over
+it reads NEW — the direction that fails toward noise rather than toward a false pass. The R-side set
+is cached per (R, suite, suite blob at R) and written only after a run that COMPLETED, which is what
+bounds a cache miss's doubled cost to once per pair. `TOOL-dDerivedDocket-1`.
+
 ## Shared seams
 
 **The inlined `resolve_python` block.** Between the `>>> resolve_python` / `<<< resolve_python`

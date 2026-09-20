@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: fe3beca6074e7aba27e9643c70c48d48cdd58d16
-phase: REVIEWING
+witness: c1b4d8274f4aa46bcce3290797cf8298aa0cde69
+phase: BUILDING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
@@ -90,3 +90,9 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-20T15:51:14Z decision · item Should a run's --close export GATE_SELFTESTS=1 for the VERIFYING bar, when the charter records that flag as ON DEMAND ONLY with no boundary setting it (AGENTS.md merge-bar section, owner 2026-08-27), while the same charter says a kit-work Definition of Done owes the flagged bar? · reason Options: (a) --close exports it, so a kit build cannot land without the suites, which is what TOOL-dDerivedDocket-3 S3 wrote; (b) --close never sets it and the run sets it by hand at VERIFYING, naming the command in the record. Refused: the two charter sentences are in tension and only the owner can say which binds; unit 3 had picked (a) silently, with no citation and no supersession. Folded meanwhile: (b), which keeps the recorded ruling intact and leaves the flagged bar an explicit act the run records.
 
 2026-09-20T18:40:23Z review · item dDerivedDocket-specs-g7 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T19:34:22Z dispatch · item c1b4d827 TOOL-dDerivedDocket-1 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md tools/unattended/run-unattended-gates.sh tools/unattended/kit.toml tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh tools/unattended/gate-guard.js tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/PROTOCOL.template.md tools/unattended/README.md tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/playbook.fixture.md tools/unattended/playbook.fixture.template.md .claude/skills/unattended/SKILL.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .githooks/gate-env.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-20-build-TOOL-dDerivedDocket-1-1-acceptance-ledger.md memory/map/features memory/LIVE.md
+
+2026-09-20T19:34:27Z brief · item TOOL-dDerivedDocket-1 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T19:51:24Z dispatch · item c1b4d827 TOOL-dDerivedDocket-1 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md tools/unattended/run-unattended-gates.sh tools/unattended/kit.toml tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh tools/unattended/gate-guard.js tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/PROTOCOL.template.md tools/unattended/README.md tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/playbook.fixture.md tools/unattended/playbook.fixture.template.md .claude/skills/unattended/SKILL.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/SESSION-KICKOFF.md .githooks/gate-env.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-20-build-TOOL-dDerivedDocket-1-1-acceptance-ledger.md memory/map/features memory/map/generated memory/LIVE.md

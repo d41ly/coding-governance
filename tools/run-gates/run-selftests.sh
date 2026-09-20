@@ -12,7 +12,16 @@
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
 # nothing runs these automatically. A change under a kit that guts a check lands green. The
 # compensating check is a person invoking this script, and the Definition of Done for any work
-# touching a kit is a GREEN verdict from it pasted into the landing report.
+# touching a kit is this, pasted into the landing report: `--attribute` against the build's BASE
+# reads `verdict clean` — no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — and every suite
+# reporting an INHERITED FAIL or a DEAD PROBE at R is named by a filed backlog record.
+#
+# THAT WORDING REPLACED A BARE `GREEN`, and the replacement is the whole of `TOOL-dDerivedDocket-1`.
+# Several suites in this population are red at BASE for reasons the work in front of them did not
+# cause (`TOOL-aHoistedPass-36`, `TOOL-aHoistedPass-38`, `TOOL-aQuenchedHarness-9`), so a unit told
+# to reach an unqualified green could not reach it at all, and a red run told that unit nothing
+# about its own change. An ATTRIBUTED bar is the only honest one: inherited failures are reported
+# and never fail, and what fails is what this tree did.
 #
 # AND THE COST OF THAT, said just as plainly, because it is the argument for units 5 and 6 rather
 # than an aside: the declared budgets sum to more leg-seconds than anyone will sit through, and
@@ -34,6 +43,12 @@ SELF="$(git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basena
 
 BUDGETS="$HERE/selftest-budgets.txt"
 LEGS="${GATE_LEGS:-$ROOT/tools/gate-legs.json}"
+
+# THE FAIL SELECTOR, ONE SPELLING. Every reader of a suite's output has to agree about what a
+# FAILURE is, or `--attribute` can report `NEW 0` over a suite whose printed tail shows four of
+# them. One variable feeds the tail print the serial mode shows, the one `--sweep` shows, and the
+# set membership attribution computes — a second spelling would be two answers to one question.
+FAIL_SELECTOR='^(FAIL|nope|.*FAILED)'
 # The python-launcher resolver, INLINED byte-identically from the canonical copy named on
 # the marker line below, for
 # the reason the sibling runner states: this kit is deployable and tools/lib/ is gov-internal.
@@ -74,11 +89,31 @@ PYBIN=$(resolve_python) || { echo "run-selftests: no usable python"; exit 2; }
 
 print_usage() {
   cat <<'USAGE'
-usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
+usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--attribute <R>] [--check] [--list]
   (no flag)   run the declared population, time each suite, RED on a breach
   --kit <dir> only the suites whose argv lies under <dir>; a filter matching
               nothing is a REFUSAL, because an unknown filter and a clean sweep
               are indistinguishable from outside
+  --attribute <R>
+              run each selected suite at the working tree L exactly as the no-flag
+              mode does, AND run R's own copy of it at commit R, then report the
+              NEW, INHERITED and FIXED failure sets per suite. Composable with
+              --kit. It EXISTS because several suites here are red at a base this
+              tree did not cause, so an unqualified green is unreachable and a red
+              run says nothing about your change.
+              EXIT: 1 on a NEW FAIL, a DEAD PROBE at L or an L-side OVER BUDGET,
+              and NEVER on an inherited one. A DEAD PROBE at R alone never exits 1
+              and gives S(R) no members, so every L failure over it reads NEW — the
+              safe direction. The summary ends in `verdict clean` or `verdict red`,
+              which always agrees with the exit status; read the token, never the
+              NEW count alone.
+              COST: a cache miss runs the suite TWICE. The R-side set is cached per
+              (R, suite, suite blob at R) under <git-common-dir>/selftest-baseline/
+              and written only after an R run that COMPLETED, so a killed run can
+              never seed a partial baseline. R is immutable, so nothing invalidates
+              an entry — delete that directory to re-measure. R runs in a detached
+              worktree under the git common dir, whose path is printed, and the R
+              side carries NO cost verdict: it is evidence, not a subject.
   --check     the gate: assert the declaration against tools/gate-legs.json in
               BOTH directions, run nothing
   --list      print the population and the derived total, run nothing
@@ -101,10 +136,17 @@ usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
 USAGE
 }
 
-MODE=run; FILTER=""
+MODE=run; FILTER=""; ATTRIBUTE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --kit)   FILTER=${2:-}; shift 2 ;;
+    # THE VALUE IS REQUIRED BEFORE THE SHIFT, not after it. `shift 2` with one positional left
+    # fails and leaves `$#` where it was, so a bare `--attribute` at the end of the argv spins this
+    # loop forever instead of refusing.
+    --attribute)
+      ATTRIBUTE=${2:-}
+      [ -n "$ATTRIBUTE" ] || { echo "run-selftests: --attribute needs a commit-ish to baseline against"; exit 2; }
+      shift 2 ;;
     --check) MODE=check; shift ;;
     --list)  MODE=list; shift ;;
     --rank)  MODE=rank; shift ;;
@@ -113,6 +155,15 @@ while [ $# -gt 0 ]; do
     *) echo "run-selftests: unknown argument '$1'"; print_usage; exit 2 ;;
   esac
 done
+
+# `--attribute` GRADES A RUN, so every mode that runs nothing — or runs the population contended —
+# has no L side for it to attribute. Accepting the pair and ignoring the flag is the silently-inert
+# knob this file refuses everywhere else.
+if [ -n "$ATTRIBUTE" ] && [ "$MODE" != run ]; then
+  echo "run-selftests: --attribute compares a RUN against a baseline, so it cannot be combined with" >&2
+  echo "run-selftests: --$MODE, which either runs nothing or runs the suites contended. Nothing was run." >&2
+  exit 2
+fi
 
 [ -f "$BUDGETS" ] || { echo "run-selftests: no declaration at $BUDGETS"; exit 2; }
 
@@ -228,8 +279,11 @@ fi
 # ---- the declaration, read once. Emitted as: STATE, name, budget, argv -- in that order.
 # ---- A row whose argv is empty takes it from `tools/gate-legs.json`, so the manifest stays the one
 # ---- place a held leg's command is written and this file carries only what the manifest cannot.
-read_population() {
-  "$PYBIN" - "$BUDGETS" "$LEGS" "$FILTER" <<'PY'
+# ---- ITS INPUTS ARE ARGUMENTS, not the globals it used to read. `--attribute` resolves the SAME
+# ---- population at a second commit, from that commit's own declaration and manifest, and a second
+# ---- copy of this reader there would be two answers to "what is the population".
+read_population() { # budgets · legs · filter
+  "$PYBIN" - "$1" "$2" "$3" <<'PY'
 import json, sys
 
 # LF, NOT CRLF, and this is a bug fix rather than tidiness. On Windows `print` translates every
@@ -316,7 +370,7 @@ if [ "$MODE" = sweep ]; then
 fi
 export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] || SELFTEST_INNER_WIDTH=1
 
-POP=$(read_population)
+POP=$(read_population "$BUDGETS" "$LEGS" "$FILTER")
 NROWS=$(printf '%s' "$POP" | grep -c . || true)
 
 # ---- --check: the gate. BOTH DIRECTIONS, because one alone cannot fail usefully -----------------
@@ -678,7 +732,7 @@ EOF
     else
       st=1
       printf 'FAIL  %-46s %5ss  cost withheld  (exit %s)\n' "$name" "$took" "$rc"
-      grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+      grep -E "$FAIL_SELECTOR" "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
     fi
     j=$((j + 1))
   done
@@ -760,6 +814,254 @@ EOF
   exit "$st"
 fi
 
+# ---- --attribute <R>: the failure-set baseline. TOOL-dDerivedDocket-1 --------------------------
+# ---- WHAT IT ANSWERS, and it is not "did this suite fail": it is "did this suite fail BEFORE this
+# ---- tree touched anything". Several suites in the declared population have been red for a long
+# ---- time for causes filed against other units, so a unit told to reach a bare green cannot, and
+# ---- an unqualified red hands it no information about its own change.
+# ----
+# ---- SETS, NEVER COUNTS. A failure this tree fixed plus a failure it introduced nets to zero, so a
+# ---- count comparison reports clean over exactly the change it exists to catch. S(L) and S(R) are
+# ---- sets of NORMALISED FAIL lines and the three sets below are their differences.
+if [ -n "$ATTRIBUTE" ]; then
+  RSHA=$(git rev-parse --verify --quiet "${ATTRIBUTE}^{commit}" 2>/dev/null) || RSHA=""
+  [ -n "$RSHA" ] || {
+    echo "run-selftests: --attribute '$ATTRIBUTE' names no commit in this repository, so there is no" >&2
+    echo "run-selftests: baseline to attribute against and nothing was run. An unresolvable R refuses" >&2
+    echo "run-selftests: rather than running the L side and calling every failure NEW." >&2
+    exit 2; }
+  R8=$(printf '%s' "$RSHA" | cut -c1-8)
+
+  # THE GIT COMMON DIR, MADE ABSOLUTE. `--git-common-dir` answers a bare `.git` in an ordinary
+  # clone, and a relative answer used as a path prefix puts the cache and the worktree wherever the
+  # caller happened to be standing. It is also the deliberate LOCATION for both: this host's
+  # scratch pad exceeds MAX_PATH, and a clone under it silently lost eighteen files before
+  # `core.longpaths` was set.
+  GCD=$(git rev-parse --git-common-dir 2>/dev/null) || GCD=""
+  case "${GCD:-}" in
+    '') echo "run-selftests: the git common dir could not be read, so the baseline has nowhere to live" >&2; exit 2 ;;
+    /*|[A-Za-z]:/*) : ;;
+    *) GCD="$ROOT/$GCD" ;;
+  esac
+  CACHE_ROOT="$GCD/selftest-baseline/$RSHA"
+  # NAMED BEFORE IT IS CREATED, because the normaliser below has to strip this path out of R's
+  # output and a fully cached run must create no worktree at all.
+  ATTR_WT_PATH="$GCD/selftest-baseline-wt.$$"
+  ATTR_WT=""
+
+  ATTR_TMP=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
+  attr_cleanup() {
+    if [ -n "$ATTR_WT" ]; then
+      git worktree remove --force "$ATTR_WT" >/dev/null 2>&1 \
+        || echo "run-selftests: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2
+    fi
+    rm -rf "$ATTR_TMP" 2>/dev/null
+  }
+  # EVERY EXIT PATH, and the three signals are not decoration: bash runs an EXIT trap on a SIGTERM
+  # only when TERM is trapped too, and a run killed by an outer bound is exactly the case that
+  # would otherwise leave a registered worktree behind.
+  trap attr_cleanup EXIT INT TERM HUP
+
+  attr_worktree() {
+    [ -z "$ATTR_WT" ] || return 0
+    if ! git worktree add --detach "$ATTR_WT_PATH" "$RSHA" >/dev/null 2>&1; then
+      echo "run-selftests: could not create the R worktree at $ATTR_WT_PATH, so nothing can be" >&2
+      echo "run-selftests: measured at $R8 and every failure here would read NEW. Refusing instead." >&2
+      return 1
+    fi
+    ATTR_WT=$ATTR_WT_PATH
+    echo "run-selftests: R worktree $ATTR_WT — removed on exit; an orphan is removable by hand"
+    return 0
+  }
+
+  # ---- THE NORMALISER. It reduces a FAIL line to what does not vary between two runs of an
+  # ---- UNCHANGED suite, and it is applied identically to both sides. It strips, in this order:
+  # ---- the absolute root of L and of the R worktree in all three spellings this platform
+  # ---- produces, mktemp-shaped directory names, durations, and trailing CR/whitespace.
+  # ----
+  # ---- IT STRIPS NOTHING ELSE, and the restraint is the design. Over-normalising collapses two
+  # ---- different failures onto one line, which reads a NEW failure as INHERITED and passes the
+  # ---- unit that caused it — the blocker this repo's own attribution critique ranked first. A
+  # ---- varying value the normaliser does not know reads NEW, which is the direction that fails
+  # ---- toward noise rather than toward a false pass.
+  attr_rx() { printf '%s' "$1" | sed 's,[][(){}.*+?^$\\|],\\&,g'; }
+  attr_spellings() { # one absolute root -> forward-slash, backslash and MSYS /c/ spellings
+    local r=$1 d rest
+    printf '%s\n' "$r"
+    printf '%s\n' "$(printf '%s' "$r" | tr '/' '\\')"
+    case "$r" in
+      [A-Za-z]:/*)
+        d=$(printf '%s' "$r" | cut -c1 | tr 'A-Z' 'a-z'); rest=${r#?:}
+        printf '/%s%s\n' "$d" "$rest" ;;
+    esac
+  }
+  NORM_SED="$ATTR_TMP/normalise.sed"
+  : > "$NORM_SED"
+  for _aroot in "$ROOT" "$ATTR_WT_PATH"; do
+    attr_spellings "$_aroot" | while IFS= read -r _asp; do
+      [ -n "$_asp" ] || continue
+      printf 's|%s||g\n' "$(attr_rx "$_asp")" >> "$NORM_SED"
+    done
+  done
+  printf '%s\n' 's|tmp\.[A-Za-z0-9]+||g' >> "$NORM_SED"
+  printf '%s\n' 's|\b[0-9]+(\.[0-9]+)?m?s\b||g' >> "$NORM_SED"
+  printf '%s\n' 's|\r$||' >> "$NORM_SED"
+  printf '%s\n' 's|[[:space:]]+$||' >> "$NORM_SED"
+
+  # THE WHOLE CAPTURED OUTPUT, not the four-line tail the no-flag mode prints: a tail is a display
+  # convenience and a set built from one would call the fifth failure FIXED.
+  attr_fails() { grep -E "$FAIL_SELECTOR" "$1" 2>/dev/null | sed -E -f "$NORM_SED" | LC_ALL=C sort -u; }
+  # ALWAYS A NUMBER. An unreadable file makes `grep -c` print nothing, and an empty count then
+  # errors every `[ "$n" -eq 0 ]` into "not zero" and every `$((a + n))` into a dead shell — the
+  # same shape this file's own header records for a non-numeric budget silencing a cost verdict.
+  attr_count() {
+    local n
+    n=$(grep -c . "$1" 2>/dev/null) || n=0
+    case "${n:-}" in ''|*[!0-9]*) n=0 ;; esac
+    printf '%s' "$n"
+  }
+
+  # ---- R'S OWN DECLARATION, read from the object store and not from a worktree. The question is
+  # ---- "did this suite fail at R", so R's copy of the suite and R's copy of the declaration are
+  # ---- the ones that answer it. Reading them with `git show` is what lets a fully cached run add
+  # ---- no entry to `git worktree list` at all.
+  # ---- THE PATHS ARE DERIVED. A kit file names nothing outside itself by literal (charter §12):
+  # ---- a `tools/…` spelling here resolves to nothing at another install prefix.
+  HERE_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || HERE_REL=""
+  R_BUDGETS="$ATTR_TMP/budgets-at-R"; : > "$R_BUDGETS"
+  git show "$RSHA:${HERE_REL}$(basename -- "$BUDGETS")" > "$R_BUDGETS" 2>/dev/null || : > "$R_BUDGETS"
+  R_LEGS="$ATTR_TMP/legs-at-R"
+  case "$LEGS" in
+    "$ROOT"/*) git show "$RSHA:${LEGS#"$ROOT"/}" > "$R_LEGS" 2>/dev/null || printf '[]\n' > "$R_LEGS" ;;
+    *)         cp -- "$LEGS" "$R_LEGS" 2>/dev/null || printf '[]\n' > "$R_LEGS" ;;
+  esac
+  RPOP=$(read_population "$R_BUDGETS" "$R_LEGS" "")
+  if [ -z "$RPOP" ]; then
+    echo "run-selftests: $R8 declares NO self-test row this reader can resolve, so every suite below"
+    echo "run-selftests: is reported \`absent\` at R and every failure here reads NEW. Said out loud"
+    echo "run-selftests: because an empty baseline and a clean baseline are the same silence."
+  fi
+
+  echo "run-selftests: ATTRIBUTED — $NROWS suite(s) at this tree, baseline $R8${FILTER:+ (--kit $FILTER)}"
+  a_new=0; a_inh=0; a_fix=0; a_deadl=0; a_deadr=0; a_over=0; a_n=0; a_m=0
+  while IFS=$'\t' read -r state name budget argv; do
+    [ -n "${name:-}" ] || continue
+    a_m=$((a_m + 1))
+    # A ROW THAT RESOLVES INTO NO RUNNABLE SUITE IS A PROBE THAT CANNOT MOVE, which is what a DEAD
+    # PROBE is. Reporting it as an empty failure set would read as a clean suite.
+    if [ "$state" != ok ]; then
+      a_deadl=$((a_deadl + 1))
+      printf 'attr  %-46s  DEAD PROBE at L — %s, this row resolves into no runnable suite\n' "$name" "$state"
+      continue
+    fi
+
+    s=$(date +%s)
+    eval "$argv" > "$ATTR_TMP/l.out" 2>&1; lrc=$?
+    e=$(date +%s); ltook=$(( e - s ))
+    attr_fails "$ATTR_TMP/l.out" > "$ATTR_TMP/l.set"
+    lcount=$(attr_count "$ATTR_TMP/l.set")
+    ldead=0
+    # KF14's DEFINITION, with or without a count line. A suite that prints its count and then dies
+    # has run none of the arms after the death, and requiring the count line to be ABSENT would
+    # read that as an empty failure set — green by absence, one level up.
+    [ "$lrc" -ne 0 ] && [ "$lcount" -eq 0 ] && ldead=1
+
+    # THE JOIN IS THE NAME. A suite's argv can differ at R, so matching R's rows against the
+    # `--kit` filter would silently drop the very baseline the filter selected at L.
+    rrow=$(printf '%s\n' "$RPOP" | awk -F'\t' -v n="$name" '$2==n{print; exit}')
+    src=absent; rdead=0; rrc=0; rtook=""
+    : > "$ATTR_TMP/r.set"
+    if [ -n "$rrow" ] && [ "$(printf '%s' "$rrow" | cut -f1)" = ok ]; then
+      rargv=$(printf '%s' "$rrow" | cut -f4)
+      rfile=""
+      for tok in $rargv; do case "$tok" in */*) rfile=$tok; break ;; esac; done
+      # THE KEY IS THE SUITE'S BYTES AT R, not merely its name: a suite whose file moved at R is a
+      # different measurement and must not be served out of the old one. R itself is immutable, so
+      # nothing else can invalidate an entry.
+      rblob=none
+      if [ -n "$rfile" ]; then
+        rb=$(git rev-parse --verify --quiet "$RSHA:$rfile" 2>/dev/null) || rb=""
+        [ -n "$rb" ] && rblob=$(printf '%s' "$rb" | cut -c1-12)
+      fi
+      ckey=$(printf '%s' "$name" | tr -c 'A-Za-z0-9._-' '_')
+      cfile="$CACHE_ROOT/$ckey.$rblob.fails"
+      if [ -r "$cfile" ]; then
+        src=cached
+        rrc=$(sed -n '1s/^rc //p' "$cfile")
+        case "${rrc:-}" in ''|*[!0-9]*) rrc=0 ;; esac
+        sed -n '2,$p' "$cfile" > "$ATTR_TMP/r.set"
+      else
+        src=fresh
+        attr_worktree || exit 2
+        rs=$(date +%s)
+        ( cd "$ATTR_WT" && eval "$rargv" ) > "$ATTR_TMP/r.out" 2>&1; rrc=$?
+        rtook=$(( $(date +%s) - rs ))
+        attr_fails "$ATTR_TMP/r.out" > "$ATTR_TMP/r.set"
+        # WRITTEN BY RENAME, AND ONLY HERE — after the R run RETURNED. A run killed mid-suite never
+        # reaches this line, so a partial set can never be served as the baseline from then on.
+        mkdir -p "$CACHE_ROOT" 2>/dev/null
+        if { printf 'rc %s\n' "$rrc"; cat "$ATTR_TMP/r.set"; } > "$cfile.tmp.$$" 2>/dev/null; then
+          mv -f "$cfile.tmp.$$" "$cfile" 2>/dev/null || rm -f "$cfile.tmp.$$" 2>/dev/null
+        else
+          rm -f "$cfile.tmp.$$" 2>/dev/null
+        fi
+      fi
+      # A DEAD R GIVES S(R) NO MEMBERS, so every line of S(L) reads NEW exactly as it does for a
+      # suite that is `absent` at R. It never fails the run on its own: the unit whose whole job is
+      # to fix an abort present at the baseline could otherwise never verify its own fix.
+      [ "$rrc" -ne 0 ] && [ "$(attr_count "$ATTR_TMP/r.set")" -eq 0 ] && { rdead=1; : > "$ATTR_TMP/r.set"; }
+    fi
+
+    LC_ALL=C comm -23 "$ATTR_TMP/l.set" "$ATTR_TMP/r.set" > "$ATTR_TMP/new.set"
+    LC_ALL=C comm -12 "$ATTR_TMP/l.set" "$ATTR_TMP/r.set" > "$ATTR_TMP/inh.set"
+    LC_ALL=C comm -13 "$ATTR_TMP/l.set" "$ATTR_TMP/r.set" > "$ATTR_TMP/fix.set"
+
+    if [ "$ldead" = 1 ]; then
+      a_deadl=$((a_deadl + 1))
+      printf 'attr  %-46s  DEAD PROBE at L — exit %s, no FAIL line\n' "$name" "$lrc"
+    fi
+    if [ "$rdead" = 1 ]; then
+      a_deadr=$((a_deadr + 1))
+      printf 'attr  %-46s  DEAD PROBE at R — exit %s, no FAIL line\n' "$name" "$rrc"
+    fi
+    if [ "$ldead" = 0 ]; then
+      nn=$(attr_count "$ATTR_TMP/new.set"); ni=$(attr_count "$ATTR_TMP/inh.set"); nf=$(attr_count "$ATTR_TMP/fix.set")
+      printf 'attr  %-46s  NEW %s · INHERITED %s · FIXED %s · R %s %s\n' "$name" "$nn" "$ni" "$nf" "$R8" "$src"
+      sed 's/^/        NEW        /' "$ATTR_TMP/new.set"
+      sed 's/^/        INHERITED  /' "$ATTR_TMP/inh.set"
+      sed 's/^/        FIXED      /' "$ATTR_TMP/fix.set"
+      a_new=$((a_new + nn)); a_inh=$((a_inh + ni)); a_fix=$((a_fix + nf))
+      # N COUNTS ONLY SUITES WITH A VERDICT ON BOTH SIDES. A shortfall against M is the visible
+      # statement that this run attributed less than it selected.
+      if [ "$rdead" = 0 ] && [ "$src" != absent ]; then a_n=$((a_n + 1)); fi
+    fi
+    # THE L SIDE'S COST VERDICT SURVIVES THE FLAG. Charter §7 says a runner REDS on a breach, and a
+    # mode every self-test unit verifies with is the last place to suspend that. The R side carries
+    # no verdict at all: it is evidence nobody asked to be fast.
+    if [ -n "$rtook" ]; then
+      printf '        R side     %ss at %s, no cost verdict — the baseline is evidence, not a subject\n' "$rtook" "$R8"
+    fi
+    if [ "$ltook" -gt "$budget" ]; then
+      a_over=$((a_over + 1))
+      printf 'attr  %-46s  OVER BUDGET at L — %ss against %ss\n' "$name" "$ltook" "$budget"
+    fi
+  done <<EOF
+$POP
+EOF
+
+  echo "----"
+  echo "run-selftests: NEW is this tree's own · INHERITED was already failing at $R8 · FIXED is gone here"
+  echo "run-selftests: a FLAKY arm reads as NEW or FIXED noise — re-run it before filing either one"
+  # THE CAUSES ARE NAMED SEPARATELY, and DEAD is counted per side, so a reader can tell a cost
+  # verdict from a new failure and an inherited abort from one this tree caused. A consumer reads
+  # the verdict TOKEN and never the NEW count alone.
+  a_verdict=clean; a_rc=0
+  if [ "$a_new" -gt 0 ] || [ "$a_deadl" -gt 0 ] || [ "$a_over" -gt 0 ]; then a_verdict=red; a_rc=1; fi
+  printf 'attributed %s of %s suite(s) against %s · NEW %s · INHERITED %s · FIXED %s · DEAD L %s · DEAD R %s · OVER %s · verdict %s\n' \
+    "$a_n" "$a_m" "$R8" "$a_new" "$a_inh" "$a_fix" "$a_deadl" "$a_deadr" "$a_over" "$a_verdict"
+  exit "$a_rc"
+fi
+
 echo "run-selftests: $NROWS suite(s), declared total $(( (TOTAL + 59) / 60 )) minutes, width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
 st=0; ran=0; over=0
 while IFS=$'\t' read -r state name budget argv; do
@@ -782,7 +1084,7 @@ while IFS=$'\t' read -r state name budget argv; do
   else
     st=1
     printf 'FAIL  %-46s %5ss  (exit %s)\n' "$name" "$took" "$rc"
-    printf '%s\n' "$out" | grep -E '^(FAIL|nope|.*FAILED)' | head -4 | sed 's/^/        /'
+    printf '%s\n' "$out" | grep -E "$FAIL_SELECTOR" | head -4 | sed 's/^/        /'
   fi
   if [ "$took" -gt "$budget" ]; then
     st=1; over=$((over + 1))

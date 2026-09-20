@@ -22,10 +22,16 @@
 #
 # WHAT THIS COSTS, said plainly rather than discovered later. Nothing exercises the kit self-tests
 # automatically any more, at any boundary. A change under a kit directory that guts a check lands
-# green. The compensating check is a person running them, and the DoD for work touching a kit is a
-# GREEN verdict pasted into the landing report:
-#     bash tools/unattended/run-unattended-gates.sh --selftests
+# green. The compensating check is a person running them, and the DoD for work touching a kit is
+# this: `--attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD PROBE at
+# L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at R is
+# named by a filed backlog record.
+#     bash tools/run-gates/run-selftests.sh --attribute <BASE>
+#     bash tools/unattended/run-unattended-gates.sh --selftests --attribute <BASE>
 #     GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
+# The wording was a bare GREEN until `TOOL-dDerivedDocket-1`, and that was unreachable: several of
+# the held suites are red at any base for causes filed against other units, so the DoD named a state
+# nobody could produce and the red it produced instead was not about the change being graded.
 # It also costs the drift detection TOOL-aBoundedCeiling-10 filed: a held leg stops reporting when it
 # breaks, and two such reds were found on main in one session. That row is the follow-up.
 #

@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-1 — held-suite failure baseline
 
-**Status:** SPECCED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-20-build-TOOL-dDerivedDocket-1-1-acceptance-ledger.md](../build/2026-09-20-build-TOOL-dDerivedDocket-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-1-spec-audit-g1-round1.md) | spec-audit | TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 |
@@ -201,7 +202,11 @@ blocker (KF14). A varying value the normaliser does not know reads NEW, which is
 ### The cache
 
 - The key is R's full sha, the suite name, and the blob of the suite's first argv file at R.
-- The value is S(R), the R exit code and whether a count line was seen.
+- The value is S(R) and the R exit code, and nothing else (rev-6). The rev-1 draft also stored
+  whether a count line was seen, from a reading of DEAD PROBE that required the count line to be
+  ABSENT; rev-2 took KF14's definition instead — non-zero exit and an empty FAIL set, with or
+  without a count line (S3, AC9) — and nothing has read that field since. A stored value nobody
+  reads is the defect this repo gates elsewhere, so it is gone.
 - It lives at `<git-common-dir>/selftest-baseline/<R>/<key>.fails`, and is written by rename after a
   COMPLETED R run only. A killed run writes nothing, so a partial set can never become the baseline.
 - R is immutable, so nothing invalidates an entry. Deleting the directory re-measures, and the help
@@ -482,6 +487,22 @@ New arm: `tools/run-gates/run-selftests.test.sh` · a two-commit fixture repo wh
   unchanged and no budget row is touched here, which is the reading that keeps the re-measurement
   visible rather than closing it out of sight under the units that read S10's `verdict clean` token.
   Nothing else in this spec moved: no criterion, no edge and no other S-item.
+
+- rev-6 · 2026-09-20 · build pass. §4 "The cache" only: its value drops the count-line flag, which
+  rev-2 left stranded when S3 took KF14's definition of a DEAD PROBE and stopped reading it. Nothing
+  else moved — no criterion, no S-item, no edge — and the implementation matches the rest of §4 as
+  written. Also recorded here because the pass could not do what §5 and the `permission:` lines
+  assume: the harness this build runs under RESETS the Bash tool's working directory between calls,
+  so a tool call whose OWN working directory is the fixture repository cannot be issued, and
+  `tools/unattended/gate-guard.js` resolves the repository from that payload and denies every
+  invocation of the runner and of the suite from this pass. The fixture-confined route is sound and
+  the hook does fail open inside such a repository; what is unavailable is the ability to stand
+  there. AC1 to AC6, AC8, AC9, AC10 and AC12 are therefore NOT observed in this pass. Their arms are
+  written and land in `tools/run-gates/run-selftests.test.sh`, whose `run-selftests self-test` leg is
+  HELD, so the run that executes them is the orchestrator's
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at VERIFYING, and the ledger
+  lines for those criteria are owed to that run. AC7 and the pass's half of AC11 WERE observed
+  here, directly and without a suite.
 
 ## 10. Reuse audit
 
