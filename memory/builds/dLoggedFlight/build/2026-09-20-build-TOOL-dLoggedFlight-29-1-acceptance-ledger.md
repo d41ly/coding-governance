@@ -3,9 +3,10 @@
 **Serves:** journal TOOL-dLoggedFlight-29
 
 Tier-2 · node d · 2026-09-20 · the build pass of the placement states, against spec rev-1. The spec
-moved twice in this pass. Rev-2 declares the one sub-key a re-derivation cannot read and holds the
-returned state against git; rev-3 adds a staged break cut into the shipped builder's own source,
-which the bug-class checklist asked for after the first commit. Both entries are in section 9.
+moved three times in this pass. Rev-2 declares the one sub-key a re-derivation cannot read and holds
+the returned state against git; rev-3 adds a staged break cut into the shipped builder's own source,
+which the bug-class checklist asked for after the first commit; rev-4 is that checklist's second hit,
+the two clauses rev-3's own amendment left standing. All three entries are in section 9.
 
 No suite and no gate leg ran, per the owner's instruction of 2026-09-13.
 `tools/runlog/selftest.py` was not run, imported or copied under any name, and neither was any other
@@ -134,7 +135,12 @@ shipped arm executing. Three substitutes were used, and the line between them ma
   three-distinct-states assertion, and the syntax-node count. `naming-leg-grades-what-python-named`
   was answered by asking `--suggest` for the nested helper as well as the six module-level ones.
   `ledger-token-wrapped-across-a-line-joins-nothing` was checked against this file: every criterion's
-  backticked token sits on its own `- ACn —` line, none wrapped.
+  backticked token sits on its own `- ACn —` line, none wrapped. Run again over the ledger commit, the
+  checklist selected `amendment-leaves-its-other-half-standing`, and that was a hit too: rev-3 had
+  extended AC3 and left S3's builder-count sentence and section 7's `New arm:` line describing one
+  builder copy. Rev-4 moved both, and no code moved with it —
+  `record-without-serves-or-with-a-round-counter` was checked against this file's own name and its
+  `Serves` line, which follow the twenty-eight ledgers before it.
 - **This pass's own prose is unreviewed surface.** No audit runs beside it, so the spec's rev-2 and
   rev-3 text, the README paragraph and this ledger are read for the first time at the closing diff
   review.

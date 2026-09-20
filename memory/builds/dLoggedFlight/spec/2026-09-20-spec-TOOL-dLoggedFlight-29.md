@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-29 — each placement model is returned beside the repository state it was built from, and the arm re-derives the model from that state
 
-**Status:** CLOSED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 30
+**Status:** CLOSED · rev-4 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 30
 
 <!-- gen:spec-records -->
 
@@ -59,9 +59,11 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
   history; at this unit that is `build_placement_models` alone. `check_built_from_history` reads each
   named builder's own source through `inspect.getsource` and refuses a keyword re-render of a model
   or an assignment into a model field, and refuses a member the module does not define. It prints how
-  many builders it read and reds on zero. The predicate reads only the declared builders' source, so
-  the `dataclasses.asdict` at `tools/runlog/selftest.py:4727` is outside it by construction.
-  Observed by AC3.
+  many builders it read and how many syntax nodes those sources carried, and reds on either at zero.
+  `check_built_from_history` reads only the declared builders' source, so the `dataclasses.asdict` at
+  `tools/runlog/selftest.py:4727` is outside it by construction; the predicate underneath it,
+  `scan_model_edits`, takes a parsed function and is what AC3 also runs over a mutated copy of the
+  shipped builder's source. Observed by AC3.
 - **S4** The floor. `ASSERTION_FLOOR` rises by this unit's assertion count, with a RAISED comment
   naming this unit and the arithmetic that reaches the new value. Observed by AC4.
 - **S5** The docs. The kit README's self-test paragraph states that a fixture builder claiming a real
@@ -189,7 +191,7 @@ must not red and which the declared-source scoping excludes.
 
 `runlog selftest` · `lexicon naming predicates` · `memory hygiene`
 
-New arm: `tools/runlog/selftest.py` · AC1's field-editing builder copy, AC2's empty-field-set comparison copy, and AC3's constant copy and builder copy · floor raised by this unit's assertion count
+New arm: `tools/runlog/selftest.py` · AC1's field-editing builder copy, AC2's empty-field-set comparison copy, and AC3's constant copy, its two builder copies and the shipped builder's own source with one field edit cut into it · floor raised by this unit's assertion count
 
 ## 8. Open questions
 
@@ -204,6 +206,11 @@ New arm: `tools/runlog/selftest.py` · AC1's field-editing builder copy, AC2's e
 
 - rev-1 · 2026-09-20 · initial draft, promoted from H1 of the spec audit of units 25 to 27, round 1,
   at the loop's BOUNDED exit, with that finding's left-shift as its mechanism.
+- rev-4 · 2026-09-20 · the bug-class checklist over the ledger commit selected
+  `amendment-leaves-its-other-half-standing`, and it was a hit: rev-3 extended AC3 and left two
+  clauses written under rev-2 standing. S3 still described a probe that prints a builder count alone
+  and named `check_built_from_history` as the only reader of source, and section 7's `New arm:` line
+  still listed one builder copy. Both now match AC3. No code moved for this rev.
 - rev-3 · 2026-09-20 · the bug-class checklist over the rev-2 commit selected
   `staged-break-substitutes-a-synthetic-value`, and it reached AC3: its two staged copies are eight
   lines each while the shipped builder is thirty, so refusing them proved the predicate for the
