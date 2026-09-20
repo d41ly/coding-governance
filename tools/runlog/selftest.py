@@ -123,7 +123,16 @@ from collections import Counter  # noqa: E402
 # with seven checks — the equality against the leg's own call, its liveness that the two windows
 # differ, the rendered pair, the bounds against the fixture's committer times, the last-activity
 # closing time, AC4's absent field and its liveness — whose decoy checks move it by three.
-ASSERTION_FLOOR = 1358
+# RAISED 1358 -> 1389 by TOOL-dLoggedFlight-25, the window's closer: TWO new arms over the three
+# placement models. The windows arm carries 20 checks — AC1's provenance and its bounds on each of
+# three placements, AC3's later commit on each, the staged write still staged on pending, AC3's
+# unit-naming commit on landed, the liveness that the three are one fixture's states, AC2's two
+# vocabularies, the union the three renders carry, the retired loop's absence, this comment's own two
+# readings, and AC5's absent field with its liveness. The replay arm carries 8 — the membership pin
+# both ways, its reasons, and per placement what moved, where the closer went, and that the record
+# compared was populated. Their decoy checks move it by 6, and the three assertions of the window
+# loop this unit retires come off: 20 + 8 + 6 - 3 = 31.
+ASSERTION_FLOOR = 1389
 
 PASS = []
 FAIL = []
@@ -4353,11 +4362,6 @@ def test_record_ac4_classes():
     check("record AC4: the fixture names one value of every shaped class", sorted(shaped), sorted(sch["shaped"]))
     check("record AC4: one value of every shaped class reaches the file",
           [c for c, v in shaped.items() if v not in cells], [])
-    for label, value in (("window opened by", "git"), ("window closed by", "terminal-write"),
-                         ("window closed by", "last-activity")):
-        other = dict(m, window=dict(m["window"], **{"start_from" if "opened" in label else "end_from": value}))
-        check(f"record AC4: {label} {value} reaches the file", f"- {label}: {value}" in rl_record.render_record(other),
-              True)
     leaked = [k for k, v in intruders.items() if v in text or json.dumps(v)[1:-1] in text]
     check("record AC4: none of the four intruders reaches the file", leaked, [])
     check_true("record AC4 liveness: each intruder IS in the model the renderer was handed",
@@ -5277,6 +5281,264 @@ def test_window_ac1_ac4_git_only_bounds():
                all(rl_model.parse_iso(b) is not None for b in facts["window"].split(" to ")),
                facts["window"])
 
+
+
+# ======================================================= the window's closer (TOOL-dLoggedFlight-25)
+#
+# THE SKILL RENDERS A RECORD BEFORE THE COMMIT THAT CARRIES THE RUN-STATE WRITE THE VERB JUST STAGED,
+# at every one of its three placements, so the states below are the only states a committed record is
+# rendered in. Each is a REAL model, built by `build_run_model` from its own copy of the landed
+# fixture's history, and never by editing a model field: an edited field goes on passing while the
+# render stops reading it, which is exactly how B1 of the spec audit of units 21 to 24 went unseen.
+
+PLACEMENTS = ("landed", "landing", "pending")
+# WHAT A SUMMARY FACT MAY DO when the commit a render rides lands, each with the reason it moves
+# (spec S5 of TOOL-dLoggedFlight-25). Pinned in BOTH directions by AC4: a git-derived slot that lags
+# reds until it is declared here, and a member with no business lagging reds too, so the declared set
+# cannot widen in silence.
+PLACEMENT_LAG = {
+    "window": "its closing bound is the last committed record commit until the terminal write lands",
+    "duration": "it is the closing bound less the start, so it moves with the bound",
+    "window closed by": "terminal-pending names the staged write; its commit makes it terminal-write",
+}
+# THE SECTIONS THE REPLAY COMPARES BESIDE EVERY SUMMARY FACT (spec S5, rev-3). What it does NOT reach
+# is the Timeline, Coverage and Data. The commit a render rides IS a record commit, so the window it
+# widens holds it as a phase row and the Timeline gains that row honestly — the row is the write
+# itself rather than a lag, and §3 declares it out. Data is every other section's own twin.
+PLACEMENT_LAG_SECTIONS = ("Units", "Decisions", "Conformance", "Anomalies")
+
+
+def add_fixture_commit(repo, t, subject, paths):
+    """ONE commit onto a fixture repository's current branch, carrying the working-tree bytes of
+    `paths` and nothing else the index holds, at `t` as both its author and its committer time.
+
+    `build_history` cannot make it: that batch resets the working tree hard, which drops a
+    staged-but-uncommitted write, and the `pending` placement is nothing but a run with one. A
+    committer time is settable only through the environment, so the two variables go in and come
+    straight back out, since every git call in this suite must run free of them.
+    """
+    env = {"GIT_AUTHOR_DATE": f"{int(t)} +0000", "GIT_COMMITTER_DATE": f"{int(t)} +0000"}
+    os.environ.update(env)
+    try:
+        r = run_git(["-c", "core.autocrlf=false", "-c", "user.name=Fixture",
+                     "-c", "user.email=fixture@runlog.invalid", "commit", "-q", "--only", "-m",
+                     subject, "--", *paths], repo)
+    finally:
+        for key in env:
+            os.environ.pop(key, None)
+    if r.returncode != 0:
+        raise RuntimeError(f"the fixture commit {subject!r} was refused: {r.stdout}{r.stderr}")
+
+
+def build_placement_models():
+    """`{placement: {fx, journals, model, times, start_sha, close_sha}}` for the three states of
+    `PLACEMENTS`, each from its own copy of `build_landed_fixture`'s history (spec S2).
+
+    `landed` is the fixture as built, its LANDED write committed at minute 28. `landing` cuts the
+    history at the merge, leaving the LANDING write in the working tree and dropping the `--landed`
+    journal lines that had not happened yet. `pending` is the same cut with the fixture's OWN LANDED
+    write — its bytes read off the working tree before the cut — staged and not committed, which is
+    the state the `--landed` and `--abort` placements render in. `times` is read from the whole
+    fixture before the cut, so an arm grades a rendered bound against a committer time git printed
+    and never against the model that rendered it.
+    """
+    out = {}
+    for name in PLACEMENTS:
+        fx = build_landed_fixture()
+        repo, rm = fx["repo"], fx["record"]
+        times = {}
+        for line in run_git(["log", "--format=%H %ct", "--all"], repo).stdout.split("\n"):
+            if line.split():
+                sha, ct = line.split()
+                times[sha] = int(ct)
+        landed_write = (repo / rm).read_bytes()
+        driver, close_sha = fx["driver"], fx["shas"][7]
+        if name != "landed":
+            close_sha = fx["shas"][5]
+            run_git(["-c", "core.autocrlf=false", "checkout", "-q", "-f", "-B", "main", fx["shas"][6]],
+                    repo)
+            if name == "pending":
+                write_staged(repo, rm, landed_write)
+            else:
+                driver = [ln for ln in driver if ln.get("verb") != "--landed"]
+        j = write_journals(repo.parent, driver=driver, gates=fx["gates"], pushes=fx["pushes"])
+        out[name] = {"fx": fx, "journals": j, "model": build_model(repo, journals=j), "times": times,
+                     "start_sha": fx["shas"][1], "close_sha": close_sha}
+    return out
+
+
+def parse_floor_raise(text):
+    """`(from, to, block)` of the NEWEST `ASSERTION_FLOOR` raise in this suite's own source: the two
+    figures its line names and the comment block it opens, or None where no raise is written."""
+    lines = text.split("\n")
+    hits = [(i, m) for i, ln in enumerate(lines)
+            for m in [re.fullmatch(r"# RAISED ([0-9]+) -> ([0-9]+) by (.*)", ln)] if m]
+    if not hits:
+        return None
+    i, m = hits[-1]
+    block = [lines[i]]
+    for ln in lines[i + 1:]:
+        if not ln.startswith("# "):
+            break
+        block.append(ln)
+    return int(m.group(1)), int(m.group(2)), "\n".join(block)
+
+
+def test_record_placement_windows():
+    """AC1, AC2, AC3 and AC5: over the three placement models the Summary names the window's git start
+    and the write that closed it — or the one still to land — with the closing bound and `duration`
+    that placement's own committer times; the two window vocabularies hold exactly what the three
+    renders carry between them, and no arm edits a window any more; a later commit of another path
+    moves none of the three lagging facts; and a model with no `record_window` renders both
+    provenance facts `-`."""
+    models = build_placement_models()
+    closers = {"landed": "terminal-write", "landing": "last-activity", "pending": "terminal-pending"}
+    seen, lag = set(), {}
+
+    def render_state(model, journals):
+        return parse_record_markdown(rl_record.render_record(
+            model, "memory", rl_record.measure_commitment(model, journals)))["Summary"]["facts"]
+
+    for name in PLACEMENTS:
+        st = models[name]
+        facts = render_state(st["model"], st["journals"])
+        start_t, close_t = st["times"][st["start_sha"]], st["times"][st["close_sha"]]
+        check(f"record AC1: the {name} placement opens by git and closes by {closers[name]}",
+              (facts["window opened by"], facts["window closed by"]), ("git", closers[name]))
+        check(f"record AC1: the {name} placement's window is two committer times git printed, and its "
+              "duration is their difference", (facts["window"], facts["duration"]),
+              (f"{rl_model.derive_iso(start_t)} to {rl_model.derive_iso(close_t)}",
+               f"{close_t - start_t}s"))
+        seen.update((facts["window opened by"], facts["window closed by"]))
+        lag[name] = {k: facts[k] for k in PLACEMENT_LAG}
+        # AC3: a commit of one other path, naming no unit, is no record commit at all.
+        repo = st["fx"]["repo"]
+        (repo / "tools" / "a.txt").write_bytes(b"later\n")
+        add_fixture_commit(repo, derive_minute(40),
+                           f"chore({FX_SLUG}): a later commit of one other path, naming no unit",
+                           ["tools/a.txt"])
+        after = render_state(build_model(repo, journals=st["journals"]), st["journals"])
+        check("record AC3: a later commit of another path moves none of the three lagging facts on "
+              f"the {name} placement", {k: after[k] for k in PLACEMENT_LAG}, lag[name])
+        if name == "pending":
+            check("record AC3: ...and on pending the LANDED write is still staged, never committed",
+                  run_git(["diff", "--cached", "--name-only"], repo).stdout.split(),
+                  [st["fx"]["record"]])
+    # AC3 on landed, once more: a unit id on the default branch, past the terminal write. The rendered
+    # window reads no commit but the run's start and its record commits, so nothing of it can move.
+    st = models["landed"]
+    repo = st["fx"]["repo"]
+    (repo / "tools" / "a.txt").write_bytes(b"later still\n")
+    add_fixture_commit(repo, derive_minute(45),
+                       f"feat({FX_SLUG}): {FX_UNIT1} — a commit naming a unit past the terminal write",
+                       ["tools/a.txt"])
+    after = render_state(build_model(repo, journals=st["journals"]), st["journals"])
+    check("record AC3: a later commit naming a unit id on the default branch moves none of the three "
+          "on the landed placement", {k: after[k] for k in PLACEMENT_LAG}, lag["landed"])
+    check_true("record AC1 liveness: landing and pending share both bounds and differ in the closer "
+               "alone, while landed differs in all three — so these are three states of ONE fixture "
+               "and not three fixtures",
+               (lag["landing"]["window"], lag["landing"]["duration"])
+               == (lag["pending"]["window"], lag["pending"]["duration"])
+               and lag["landing"]["window closed by"] != lag["pending"]["window closed by"]
+               and lag["landed"] != lag["pending"], str(lag))
+    sch = rl_record.RECORD_SCHEMA
+    check("record AC2: opened-by holds git alone", sch["vocab"]["opened-by"], ("git",))
+    check("record AC2: closed-by holds the terminal write, the pending one and last activity",
+          sch["vocab"]["closed-by"], ("terminal-write", "terminal-pending", "last-activity"))
+    check("record AC2: the three renders carry every member of both window vocabularies between them",
+          sorted(seen), sorted(set(sch["vocab"]["opened-by"]) | set(sch["vocab"]["closed-by"])))
+    # The needle is ASSEMBLED, as the class model's intruders are: written as one literal it would BE
+    # the text it exists to prove absent, and the check could never fail.
+    src = HERE.joinpath("selftest.py").read_bytes().decode("utf-8")
+    check("record AC2: no arm re-renders a model with an edited window any more",
+          "window=" + "dict(m[" + '"window"' + "]" in src, False)
+    raised = parse_floor_raise(src)
+    check("record AC2: the newest floor raise names this unit and reaches the declared floor",
+          (raised is not None and raised[1] == ASSERTION_FLOOR,
+           raised is not None and "TOOL-dLoggedFlight-25" in raised[2]), (True, True))
+    sums = re.findall(r"((?:[0-9]+ [+-] )+[0-9]+) = ([0-9]+)", raised[2] if raised else "")
+    got = None
+    if sums:
+        expr, total = sums[-1]
+        got = (sum(int(p) for p in expr.replace(" - ", " + -").split(" + ")), int(total))
+    check("record AC2: and the newest raise's own arithmetic reaches the figure it moves the floor by",
+          got, (raised[1] - raised[0],) * 2 if raised else None)
+    bare = {k: v for k, v in dataclasses.asdict(models["landed"]["model"]).items()
+            if k != "record_window"}
+    without = parse_record_markdown(rl_record.render_record(bare, "memory"))["Summary"]["facts"]
+    check("record AC5: a model carrying no record_window renders both provenance facts `-`",
+          (without["window opened by"], without["window closed by"]),
+          (rl_record.NONE, rl_record.NONE))
+    check_true("record AC5 liveness: the same model WITH the field named a closed-vocabulary member, "
+               "so the two `-` above are the field's absence and not the fixture's",
+               lag["landed"]["window closed by"] in sch["vocab"]["closed-by"],
+               lag["landed"]["window closed by"])
+
+
+def test_record_placement_replay():
+    """AC4: the Skill's close and `--landed` placements replayed on the landed fixture's own history —
+    stage the verb's write, render, commit it, render again. Every Summary fact and every row of the
+    sections `PLACEMENT_LAG_SECTIONS` names is compared across that commit, and whatever moved must be
+    a declared member. The declaration is pinned in both directions, so it cannot widen in silence."""
+    check("record AC4: PLACEMENT_LAG declares exactly the three Summary facts, and no fourth member",
+          sorted(PLACEMENT_LAG), ["duration", "window", "window closed by"])
+    check_true("record AC4: and every member carries the reason the commit moves it",
+               all(isinstance(v, str) and len(v) > 20 for v in PLACEMENT_LAG.values()))
+
+    def build_replay(placement):
+        """`(before, after)`: the record rendered with that placement's run-state write staged, and
+        rendered again once the commit carrying it has landed."""
+        fx = build_landed_fixture()
+        rm, repo = fx["record"], fx["repo"]
+        if placement == "close":
+            written, t = fx["shas"][5], derive_minute(22)
+            subject = f"records({FX_SLUG}): close OK, phase LANDING"
+            run_git(["update-ref", "refs/heads/main", fx["base"]], repo)
+            run_git(["-c", "core.autocrlf=false", "checkout", "-q", "-f", "-B", "run", fx["shas"][4]],
+                    repo)
+            driver = [ln for ln in fx["driver"] if ln.get("verb") != "--landed"]
+            gates, pushes = fx["gates"][:1], ()
+        else:
+            written, t = fx["shas"][7], derive_minute(28)
+            subject = f"records({FX_SLUG}): --landed"
+            run_git(["update-ref", "refs/heads/run", fx["shas"][5]], repo)
+            run_git(["-c", "core.autocrlf=false", "checkout", "-q", "-f", "-B", "main", fx["shas"][6]],
+                    repo)
+            driver, gates, pushes = fx["driver"], fx["gates"], fx["pushes"]
+        # The staged write is the fixture's OWN, read back out of the history it made.
+        write = run_git(["-c", "core.autocrlf=false", "show", f"{written}:{rm}"], repo).stdout
+        j = write_journals(repo.parent, driver=driver, gates=gates, pushes=pushes)
+        write_staged(repo, rm, write.encode("utf-8"))
+        first = build_model(repo, journals=j)
+        before = rl_record.render_record(first, "memory", rl_record.measure_commitment(first, j))
+        add_fixture_commit(repo, t, subject, [rm])
+        second = build_model(repo, journals=j)
+        return before, rl_record.render_record(second, "memory",
+                                              rl_record.measure_commitment(second, j))
+
+    for placement, moves in (("close", False), ("landed", True)):
+        pair = [rl_record.parse_record(text)["sections"] for text in build_replay(placement)]
+        facts = [(s.get("Summary") or {}).get("facts") or {} for s in pair]
+        moved = [label for label in sorted(set(facts[0]) | set(facts[1]))
+                 if facts[0].get(label) != facts[1].get(label)]
+        moved += [f"{name} rows" for name in PLACEMENT_LAG_SECTIONS
+                  if (pair[0].get(name) or {}).get("tables") != (pair[1].get(name) or {}).get("tables")]
+        check(f"record AC4: across the {placement} placement's commit every item that moved is a "
+              "declared member", [label for label in moved if label not in PLACEMENT_LAG], [])
+        check(f"record AC4: the {placement} placement's closer "
+              + ("moves from terminal-pending to terminal-write" if moves
+                 else "stays put, its run not yet terminal"),
+              (facts[0].get("window closed by"), facts[1].get("window closed by")),
+              ("terminal-pending", "terminal-write") if moves else ("last-activity", "last-activity"))
+        rows = [{name: sum(len(t.get("rows") or []) for t in (s.get(name) or {}).get("tables") or [])
+                 for name in PLACEMENT_LAG_SECTIONS} for s in pair]
+        check_true(f"record AC4 liveness: the {placement} comparison ran over a POPULATED record — "
+                   "every Summary fact and the Units, Decisions and Conformance rows, the clean "
+                   "fixture's Anomalies being the one empty section",
+                   all(len(f) >= 20 for f in facts)
+                   and all(r["Units"] and r["Decisions"] and r["Conformance"] for r in rows),
+                   str((len(facts[0]), len(facts[1]), rows)))
 
 # ================================================================ the schema leg (TOOL-dLoggedFlight-10)
 #

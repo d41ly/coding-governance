@@ -102,8 +102,8 @@ record commits, which left this build's own later commits and both of its bars o
 Its git cost is constant and counted, because a model per run over a corpus of runs must not grow
 with a run's commits.
 
-**Once the window is known, ONE predicate bounds every timed set the model derives.** It is
-`check_in_window`, and spec 8's S2 names the sets.
+**ONE predicate bounds every timed set the model derives**: `check_in_window`, and spec 8's S2
+names the sets.
 The closing review's round 1 found them bounded three ways: attribution counted every call of every
 session; own commits were bounded by the era, so a later commit naming a unit id became the last own
 commit and made `verify` report an unchanged journal; and the timeline listed commits past its end.
@@ -135,10 +135,10 @@ spec defines is read through the model's `derive_spec_unit`, so neither can disa
 a real one: the `label` class admits a lowercase UUID, so the absolute-path and UUID shapes
 became schema data the renderer withholds by and the leg refuses on. The leg re-derives every run's
 start and window from git alone through the model's `derive_record_commits` and `derive_window`; the
-model keeps that result as `record_window`, what the committed record RENDERS, so its bounds are
-commit times a fresh clone reaches. It passes record commits alone, so a non-terminal end here is at
-or before the model's, which reads its commits and journals; no refusal reads it, since such a run
-is a build's last. Staged against this
+model keeps that result as `record_window`, which the committed record RENDERS, bounds and provenance
+both, reachable from a fresh clone. `derive_window_closer` names the write still to land: a render
+rides the commit carrying its verb's write, so a terminal placement reads `terminal-pending`, not a
+`last-activity` reading as a run gone quiet. Staged against this
 tree, the naive key and the unbounded era each red every rotated build it tracks, the two defects the
 round-2 and round-3 audits named.
 

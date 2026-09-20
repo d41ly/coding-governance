@@ -314,6 +314,19 @@ has come, the last record commit's — and a fresh clone derives the same window
 a half-open end adds is taken back off, since no public source shows that value, and `duration` is the
 two bounds' difference. A model carrying no `record_window` renders both facts `-`.
 
+**The closer names the write still to land.** `window opened by` and `window closed by` read that same
+`record_window`, so the bounds and the names of what set them are one derivation. `opened-by` is `git`
+alone. `closed-by` is one of three. `terminal-write`, where a record commit already carries a terminal
+phase: the bound is that commit's time and it is final. `last-activity`, where the run has not closed
+at all: the bound is its last record commit. And `terminal-pending`, where the run-state file is
+terminal but the commit carrying that write has not landed — which is EVERY record the Skill renders
+after `--landed` or `--abort`, because each render rides the commit that carries the run-state write
+the verb just staged. Such a record's closing bound is the last committed record commit, and the
+closer says so, instead of reading `last-activity` beside `terminal: yes`, which describes a run that
+stopped by going quiet. A re-render once that commit has landed reads `terminal-write` with the
+commit's own time. The lag is declared rather than hidden, and `window`, `duration` and `window closed
+by` are the only three facts it moves.
+
 **No time in an owner turn's second.** A value derived from an owner turn is the same datum, so the
 render refuses the whole record, naming where and never what, when any UTC it would write, or any
 idle row's end, falls in the second of an owner turn the model holds. The model keeps an idle gap

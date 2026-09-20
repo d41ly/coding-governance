@@ -161,8 +161,8 @@ RECORD_SCHEMA = {
     },
     "vocab": {
         "yes-no": ("yes", "no"),
-        "opened-by": ("driver", "git"),
-        "closed-by": ("terminal-end", "terminal-write", "last-activity"),
+        "opened-by": ("git",),
+        "closed-by": ("terminal-write", "terminal-pending", "last-activity"),
         "event": TIMELINE_EVENTS,
         "source": mdl.SOURCE_NAMES,
         "coverage-state": mdl.COVERAGE_STATES,
@@ -361,6 +361,24 @@ def derive_window_bounds(window) -> tuple:
     if any(isinstance(v, bool) or not isinstance(v, (int, float)) for v in (start, end)):
         return None, None
     return start, (end - 1.0 if w.get("end_from") == "last-activity" else end)
+
+
+def derive_window_closer(window, terminal) -> str | None:
+    """The `closed-by` the record renders for a window, or None where there is no window.
+
+    A RENDER RIDES THE COMMIT THAT CARRIES THE TERMINAL WRITE (spec S1 of TOOL-dLoggedFlight-25), so
+    at the `--landed` and `--abort` placements the run-state file in the working tree is already
+    terminal while no record commit carrying that phase exists yet. `derive_window` then closes the
+    window at the last record commit before it and calls that `last-activity` — which beside
+    `terminal: yes` reads as a run that stopped by going quiet. `terminal-pending` names the write
+    instead: the closing bound is the last committed one and the terminal write is still to land. A
+    re-render once it has landed reads `terminal-write` with that commit's own time, which is the lag
+    the kit README declares rather than hides.
+    """
+    end_from = (window or {}).get("end_from")
+    if not end_from:
+        return None
+    return "terminal-pending" if terminal and end_from == "last-activity" else end_from
 
 
 def build_matchers(slug, memory_root, own_ids) -> dict:
@@ -641,7 +659,6 @@ def build_aggregate(rows, keys, order, cols, ctx) -> list:
 def build_summary_facts(m, ctx, serves, commitment) -> list:
     """The summary, one fixed template per line, never elided. `values withheld` is added last, by the
     caller, once every other value has been through its class."""
-    w = m.get("window") or {}
     cov = m.get("coverage") or {}
     pos = (m.get("owner_positions") or {}).get("counts") or {}
     usage = m.get("usage") or {}
@@ -649,8 +666,9 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
     # THE RENDERED WINDOW IS THE GIT-ONLY ONE (spec S2 of TOOL-dLoggedFlight-24): `record_window`,
     # every bound of which is a commit's committer time, so the record states a window a fresh clone
     # derives and the schema leg grades the derivation it renders. The model's journal-bounded
-    # `window` is read here for its provenance alone. A model without the field renders both facts
-    # `-`, the same as any other absent value.
+    # `window` is not read here at all: BOTH provenance facts come from `record_window` too (spec S1
+    # of TOOL-dLoggedFlight-25), so the rendered bounds and the names of what set them are one
+    # derivation. A model without the field renders both facts `-`, as any other absent value.
     start, close = derive_window_bounds(m.get("record_window"))
     dur = f"{int(close - start)}s" if start is not None and close >= start else None
     present = sum(1 for s in mdl.SOURCE_NAMES if (cov.get(s) or {}).get("state") == "present")
@@ -671,8 +689,8 @@ def build_summary_facts(m, ctx, serves, commitment) -> list:
         "phase": (m.get("phase") or None,),
         "terminal": (derive_yes_no(m.get("terminal")),),
         "window": (mdl.derive_iso(start), mdl.derive_iso(close)),
-        "window opened by": (w.get("start_from"),),
-        "window closed by": (w.get("end_from"),),
+        "window opened by": ((m.get("record_window") or {}).get("start_from"),),
+        "window closed by": (derive_window_closer(m.get("record_window"), m.get("terminal")),),
         "duration": (dur,),
         "own commits": (str(len(m.get("own_commits") or [])),),
         "last own commit": (m.get("last_own"),),

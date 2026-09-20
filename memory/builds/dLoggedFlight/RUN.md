@@ -170,3 +170,7 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 2026-09-20T11:07:38Z dispatch · item 08cbaae3 TOOL-dLoggedFlight-24 · reason tools/runlog/model.py tools/runlog/record.py tools/runlog/selftest.py tools/runlog/README.md memory/map/features/runlog.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/builds/dLoggedFlight/spec/2026-09-16-spec-TOOL-dLoggedFlight-24.md memory/builds/dLoggedFlight/build/2026-09-20-build-TOOL-dLoggedFlight-24-1-acceptance-ledger.md memory/builds/dLoggedFlight/README.md memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-20T11:07:42Z brief · item TOOL-dLoggedFlight-24 · reason bc056276b5bf memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md
+
+2026-09-20T11:30:45Z dispatch · item 0873eee7 TOOL-dLoggedFlight-25 · reason tools/runlog/record.py tools/runlog/selftest.py tools/runlog/README.md memory/map/features/runlog.md memory/map/generated/symbols.json memory/builds/dLoggedFlight/spec/2026-09-16-spec-TOOL-dLoggedFlight-25.md memory/builds/dLoggedFlight/build/2026-09-20-build-TOOL-dLoggedFlight-25-1-acceptance-ledger.md memory/builds/dLoggedFlight/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-20T11:30:49Z brief · item TOOL-dLoggedFlight-25 · reason bc056276b5bf memory/builds/dLoggedFlight/prompts/2026-09-16-prompt-TOOL-dLoggedFlight-14-1-build-brief.md

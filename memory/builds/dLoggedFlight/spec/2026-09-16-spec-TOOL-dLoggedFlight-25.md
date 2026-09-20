@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-25 — the Summary window's closer names a terminal write its own commit carries, observed over real models at each of the Skill's render placements
 
-**Status:** SPECCED · rev-2 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
+**Status:** SPECCED · rev-3 · 2026-09-20 · node d · Tier-2 · base 4cf0944d · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -80,11 +80,15 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 - **S5** The placement replay. `test_record_placement_replay` replays the Skill's order on the landed
   fixture's history, twice. At the close placement it stages the LANDING write, renders, commits,
   and re-renders. At the `--landed` placement it does the same with the LANDED write. It compares each
-  render with its re-render through `parse_record`, fact by fact and table by table. Every item that
-  differs must be a member of `PLACEMENT_LAG`, a constant in `tools/runlog/selftest.py` whose members
-  each carry the reason the commit moves them. The Summary `window`, `duration` and `window closed by`
-  facts are members. `terminal`, `phase`, every other Summary fact, and every Units, Decisions,
-  Conformance and Anomalies item may never be. Observed by AC4.
+  render with its re-render through `parse_record`, over a DECLARED scope: every Summary fact, and
+  the tables of the four sections `PLACEMENT_LAG_SECTIONS` names — Units, Decisions, Conformance and
+  Anomalies. Every item in that scope that differs must be a member of `PLACEMENT_LAG`, a constant in
+  `tools/runlog/selftest.py` whose members each carry the reason the commit moves them. The Summary
+  `window`, `duration` and `window closed by` facts are members. `terminal`, `phase`, every other
+  Summary fact, and every Units, Decisions, Conformance and Anomalies item may never be. The Timeline,
+  Coverage and Data sections are OUT of that scope, and §3 says why. A liveness check names the
+  populated sections the comparison ran over and the one the clean fixture leaves empty, so a
+  comparison over nothing cannot read as agreement. Observed by AC4.
 - **S6** The docs. The kit README's Summary section states the three closers and the lag S3 declares,
   and the runlog dossier's PROSE names `derive_window_closer`. A dossier cannot CLAIM a Python
   symbol: its `[claims]` block carries no symbol tier, the symbol tier feeds the recall corpus and
@@ -100,7 +104,11 @@ default-branch sha the format asks for, and `tools/runlog` does not exist there 
 - The rendered bounds, `record_window` and `derive_window_bounds`, which `TOOL-dLoggedFlight-24` S1
   and S2 keep.
 - The Skill's placements. They stay where `tools/unattended/SKILL.template.md:840-849` puts them.
-- Timeline rows the committed write adds. They are graded only as members of `PLACEMENT_LAG`.
+- Timeline rows the committed write adds, which is why S5's scope leaves the Timeline out. The
+  commit a render rides IS a record commit, so the model's journal-bounded window holds it and the
+  Timeline gains a phase row — the write itself, not a lag. Measured on the close placement, where
+  that one row is the only thing outside S5's scope that moved. Coverage and Data are out beside it,
+  Data being every other section's own twin.
 
 ### Edges
 
@@ -139,6 +147,10 @@ slot that lags reds until it is declared with its reason.
 | `test_record_placement_replay` | function | `py.function`, led by `test` |
 | `test_record_placement_windows` | function | `py.function`, led by `test` |
 | `PLACEMENT_LAG` | constant | `py.constant` |
+| `PLACEMENT_LAG_SECTIONS` | constant | `py.constant` |
+| `PLACEMENTS` | constant | `py.constant` |
+| `add_fixture_commit` | function | `py.function`, led by `add` |
+| `parse_floor_raise` | function | `py.function`, led by `parse` |
 | `terminal-pending` | `closed-by` vocabulary member | `RECORD_SCHEMA` |
 
 ### Files touched (estimate)
@@ -194,14 +206,16 @@ regenerated map.
   Red when: any of them moves. Staged RED against a renderer copy that bounds the window by the era's
   last commit, with that commit in the fixture.
 - **AC4** — When `test_record_placement_replay` replays the close and the `--landed` placements, every
-  fact or table that differs between a render and its re-render is a member of `PLACEMENT_LAG`, and at
+  Summary fact, and every table of the sections `PLACEMENT_LAG_SECTIONS` names, that differs between a
+  render and its re-render is a member of `PLACEMENT_LAG`, and at
   the `--landed` placement `window closed by` moves from `terminal-pending` to `terminal-write`.
   `PLACEMENT_LAG`'s membership is pinned in BOTH directions: it holds exactly the three Summary facts
   S5 names, `window`, `duration` and `window closed by`, and no fourth member — so the declared set
   cannot widen silently, which is the risk §5 names and the both-directions rule charter §7 applies
   to every declared population.
-  Red when: a non-member differs, the closer does not move, `terminal` or `phase` is a member, or
-  `PLACEMENT_LAG` holds any member outside S5's three. Staged RED twice: a renderer copy whose
+  Red when: a non-member differs, the closer does not move, `terminal` or `phase` is a member,
+  `PLACEMENT_LAG` holds any member outside S5's three, or the record compared carried no Units,
+  Decisions or Conformance row. Staged RED twice: a renderer copy whose
   `terminal` fact reads the phase of the last committed record commit, which reds naming `terminal`,
   and a copy of the constant that declares a Units item a member, which reds on the membership pin
   while the replay itself stays green.
@@ -239,6 +253,13 @@ New arm: `tools/runlog/selftest.py` · AC1's two renderer copies, AC3's era-boun
   a staged Units-item member; M4, S6 stops saying a dossier CLAIMS a Python symbol and states what
   the map leg actually grades; L1, AC2 reads `ASSERTION_FLOOR`'s comment and arithmetic the way
   `TOOL-dLoggedFlight-22` AC5 does for the same constant.
+- rev-3 · 2026-09-20 · S5 · §3 · AC4 · §4 Inventory · the build pass. S5's "fact by fact and table by
+  table" was written over the whole record, and the close placement's replay moves one Timeline row
+  that no membership of `PLACEMENT_LAG` should ever excuse: the commit a render rides is itself a
+  record commit, so the window holds it as a phase row. Rather than widen a set AC4 pins at three
+  members, S5 now DECLARES the compared scope — every Summary fact and the four sections whose items
+  may never lag — and §3 states what is out with the measurement behind it. The Inventory gains the
+  two helpers and the two module constants the arms needed, none of which rev-2 named.
 
 ## 10. Reuse audit
 

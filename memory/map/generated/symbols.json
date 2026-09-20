@@ -233,6 +233,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "add_fixture_commit",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "add_runstate_row",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -721,6 +726,11 @@
       "id": "build_owner_positions",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "build_placement_models",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "build_planted",
@@ -2223,6 +2233,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_window_closer",
+      "kind": "function",
+      "file": "tools/runlog/record.py"
+    },
+    {
       "id": "derive_worktree_root",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3421,6 +3436,11 @@
       "id": "parse_float",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "parse_floor_raise",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
     },
     {
       "id": "parse_floors",
@@ -6834,6 +6854,16 @@
     },
     {
       "id": "test_record_model_fields",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_placement_replay",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_record_placement_windows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
     },
