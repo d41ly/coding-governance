@@ -124,6 +124,24 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   finding. This rule reads the literal-blanked view, so a mention inside a string is not a hit, and a
   REGEX literal is — which is why a gate holding the ban table excludes itself from its own
   population.
+- An UNDECLARED SPEC AUDIT. A `Workflow` call whose structured `args` carry `kind: "spec-audit"` is
+  denied unless the build README at `<args.repo>/<parent of args.reviewDir>/README.md` carries
+  `spec-audit: <YYYY-MM-DD>` in its FRONT MATTER — the slice between the opening `---` and the next,
+  the same scope `scratch-guard.js` reads `authorized-by:` in, through the one reader both hooks
+  share. A body mention (a fenced example) is not front matter, and `spec-audit: yes` is a claim
+  with no owner date behind it and reads as absent. The pre-code spec audit is OPT-IN by the owner's
+  ruling (`TOOL-aBlindedTrial-6`), and this rule is what makes it FORBIDDEN in an attended session
+  rather than merely not required; the remedy is the key, dated, on the build README. It reads
+  `tool_input.args` ONLY — an object, or the JSON string the Workflow tool often delivers — and
+  never the script text, which both shipped harnesses fill with the word. It fails CLOSED for this
+  kind alone: a `repo` that is not a string, a `reviewDir` not directly under a `builds/<slug>/`
+  folder, and a README it cannot read are each a deny naming the field or the path, and every throw
+  inside it is returned as a deny because a hook that crashes at exit 1 admits. TWO LIMITS, stated
+  rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
+  call and not a tool call, so the programmatic route is the unattended driver's to refuse
+  (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README while that driver reads BASE, so
+  the two can disagree for exactly one uncommitted edit. An `args` string that does not parse shows
+  the hook no `kind` and is admitted here; the harness itself throws on it, so no audit runs.
 
 ## Running ONE rule
 

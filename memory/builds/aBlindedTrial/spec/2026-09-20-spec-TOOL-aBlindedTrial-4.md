@@ -1,6 +1,6 @@
 # TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare
 
-**Status:** INPROGRESS · rev-1 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
+**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
@@ -63,8 +63,8 @@ attended session rather than merely not required.
 - `checkSpecAuditDeclared(args, cwd)` — leads with the lexicon verb `check`; returns `null`
   (admit) or a deny string. `guard…` is refused by the verb table (verified with `lexicon.py
   --suggest`).
-- `readFrontMatterKey(path, key)` — the shared reader, leading with `read`; `scratch-guard.js`'s
-  `authorized-by` exemption becomes a caller of it.
+- `readFrontMatterKey(bytes, key)` — the shared reader, leading with `read`; `scratch-guard.js`'s
+  `authorized-by` exemption becomes a caller of it. It takes BYTES, not a path (rev-2).
 
 ### Files touched (estimate)
 
@@ -135,6 +135,10 @@ New arm: `tools/hooks/agent-cap.test.sh` · README with and without the key, arg
 ## 9. Revision log
 
 - rev-1 · 2026-09-20 · initial draft from the scout of `agent-cap.js` at b7dee206.
+- rev-2 · 2026-09-20 · §4 · AMEND: `readFrontMatterKey` takes BYTES, not a path. The `authorized-by`
+  caller reads a STAGED BLOB through `git show`, which has no file on disk to name, so a path-taking
+  reader could not make it a caller; the rule in `agent-cap.js` reads its file and hands the bytes
+  over. No AC moves.
 
 ## 10. Reuse audit
 

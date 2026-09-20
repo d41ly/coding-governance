@@ -70,7 +70,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.1' // gov:kit agent-cap@1.15 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.16 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6
@@ -605,6 +605,26 @@ function readCard(commonDir, sessionId) {
 }
 
 /**
+ * The ONE front-matter reader both hooks in this home use: the single-token value of `<key>:` on
+ * its own line inside a build README's front matter, or null. FRONT MATTER ONLY — the slice between
+ * the opening `---` on line 1 and the next `---` line, the scope the unattended driver reads its
+ * keys in. Matching the whole file exempted a README whose BODY carried `authorized-by:` in a fenced
+ * example while the driver authorized nothing (F10); agent-cap.js's spec-audit rule reads
+ * `spec-audit:` through the same slice for the same reason (TOOL-aBlindedTrial-4). Takes BYTES, not
+ * a path, because the staged-blob caller below has no file on disk to name. The key is compared as
+ * a string, never interpolated into a regex (the `conf-value-interpolated-into-a-regex` class).
+ */
+function readFrontMatterKey(bytes, key) {
+  const fm = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(bytes || '')
+  if (!fm) return null
+  for (const line of fm[1].split(/\r?\n/)) {
+    const m = /^([^:\s]+):[ \t]*(\S+)[ \t]*$/.exec(line)
+    if (m && m[1] === key) return m[2]
+  }
+  return null
+}
+
+/**
  * S4's exemption: the commit that CREATES the authorization. A `README.md` directly under a
  * `builds/<one>/` segment, NEW — staged as added, or untracked (the single-call `git add … &&
  * git commit` form has an empty index at PreToolUse) — whose bytes carry `authorized-by:` with a
@@ -621,13 +641,9 @@ function checkAuthorizedReadme(toplevel) {
     const r = runGit(args)
     return r.status === 0 ? r.stdout.split(/\r?\n/).filter((p) => /(^|\/)builds\/[^/]+\/README\.md$/.test(p)) : []
   }
-  // FRONT MATTER ONLY — the slice between the opening `---` on line 1 and the next `---` line, the
-  // scope the unattended driver reads the key in. Matching the whole file exempted a README whose
-  // BODY carried the key in a fenced example while the driver authorized nothing (F10).
   const readMode = (bytes) => {
-    const fm = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(bytes || '')
-    const m = fm && /^authorized-by:[ \t]*(\S+)[ \t]*$/m.exec(fm[1])
-    return m && ANCHOR_MODES.includes(m[1]) ? m[1] : null
+    const v = readFrontMatterKey(bytes, 'authorized-by')
+    return v && ANCHOR_MODES.includes(v) ? v : null
   }
   for (const p of readPaths(['diff', '--cached', '--name-only', '--diff-filter=A', '--', '*builds/*/README.md'])) {
     const r = runGit(['show', ':' + p])
@@ -739,4 +755,4 @@ function main() {
 }
 
 if (require.main === module) main()
-module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION }
+module.exports = { checkCommand, buildCommandView, buildComparablePath, resolveAllowedRoots, readFrontMatterKey, ANCHOR_MODES, KIT_SCRATCH_GUARD_VERSION }

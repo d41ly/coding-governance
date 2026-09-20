@@ -26,6 +26,14 @@
  * not a tool call, so no matcher covers it. NOT because a sidechain runs no
  * hooks: it does, and RULE 4 carries the measurement.
  *
+ * ONE RULE HERE IS NOT A FAN-OUT BOUND. RULE 0 (TOOL-aBlindedTrial-6) denies a `Workflow` call whose
+ * structured `args` carry `kind: "spec-audit"` unless the build README under `args.repo` declares
+ * `spec-audit: <YYYY-MM-DD>` in its front matter. What it does NOT see, said here rather than
+ * implied: the `workflow()` a running harness calls from INSIDE its script is a runtime call and not
+ * a tool call, so the programmatic route is the driver's to refuse (TOOL-aBlindedTrial-3); an `args`
+ * string that does not parse shows it no `kind`; and it reads the WORKTREE README while the
+ * unattended driver reads BASE, so the two can disagree for exactly one uncommitted edit.
+ *
  * CAP: 5, a FILE CONSTANT and not overridable. This guard RESOLVES the number
  * wherever a bound is written — the helper CALL SITE, the helper's own DEFAULT
  * PARAMETER, and the width a `gov:bounded-fanout` line claims — and denies one
@@ -63,7 +71,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.15' // gov:kit agent-cap@1.15 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.16' // gov:kit agent-cap@1.16 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1691,6 +1699,67 @@ function scanJoinFindings(script) {
   return out
 }
 
+// RULE 0 — a pre-code SPEC AUDIT is OPT-IN, and the opt-in is a key in the build README's front
+// matter (TOOL-aBlindedTrial-6, ruled after a blinded trial found the audit bought nothing the frozen
+// suites did not). This is the rule that makes it FORBIDDEN in an attended session, rather than
+// merely not required. null = allow · string = the deny message.
+//
+// It reads `tool_input.args` and NOTHING ELSE: both shipped review harnesses spell `spec-audit` in
+// comments and literals and would deny themselves under a text scan. The Workflow tool delivers
+// `args` as a JSON STRING even when the caller hands it JSON, so a string is parsed first; a string
+// that does not parse shows this hook no `kind` and is not this rule's business (the harness itself
+// throws on it, so no audit runs). Placement is `<args.repo>/<parent of args.reviewDir>/README.md` —
+// the harness REQUIRES `repo` and takes `reviewDir` repo-relative, and that parent must be a
+// `builds/<slug>` folder. Never `gitCommonDir(cwd)`: in a linked worktree that is the PRIMARY tree's
+// `.git`, and the README read would be the wrong checkout's.
+//
+// FAIL CLOSED, for this kind only (F1, resolved): a spec-audit call this rule cannot PLACE — `repo`
+// not a string, `reviewDir` outside a build folder, a README it cannot read — is denied by name, and
+// EVERY throw is caught and returned as a deny, because a PreToolUse hook that exits 1 is
+// non-blocking and a crash here would admit the one call the rule exists to refuse. The value must
+// be a DATE: `spec-audit: yes` is a claim with no owner date behind it and reads as absent. The
+// front-matter slice is the sibling hook's `readFrontMatterKey`, the same read scratch-guard.js makes
+// for `authorized-by:` — one reader, so a body-only key (a fenced example) is not front matter for
+// either. Required lazily and inside the try: a withdrawn sibling is a deny, not a crash.
+function checkSpecAuditDeclared(data) {
+  const ID = 'TOOL-aBlindedTrial-6'
+  const renderDeny = (why) =>
+    `BLOCKED by agent-cap: ${why} A pre-code spec audit is OPT-IN (${ID}): to run one, the build ` +
+    `README's FRONT MATTER carries \`spec-audit: <YYYY-MM-DD>\` (the owner's date; a value that is ` +
+    `not a date, or the key inside the body, reads as absent). This rule reads the Workflow call's ` +
+    `structured args only, never the script text.\n`
+  let readme = '(unplaced)'
+  try {
+    let a = data.tool_input && data.tool_input.args
+    if (typeof a === 'string') {
+      try { a = JSON.parse(a) } catch { return null }
+    }
+    if (!a || typeof a !== 'object' || Array.isArray(a) || a.kind !== 'spec-audit') return null
+    if (typeof a.repo !== 'string' || a.repo === '') {
+      return renderDeny(`a spec-audit Workflow call whose \`repo\` is not a non-empty string cannot be placed, so it cannot be admitted.`)
+    }
+    const parts = String(a.reviewDir === undefined || a.reviewDir === null ? '' : a.reviewDir)
+      .replace(/\\/g, '/').replace(/\/+$/, '').split('/')
+    const dir = parts.slice(0, -1) // reviewDir's parent: the build folder
+    if (dir.length < 2 || dir[dir.length - 2] !== 'builds' || dir[dir.length - 1] === '') {
+      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(a.reviewDir)}) is not directly under a \`builds/<slug>/\` folder cannot be placed, so it cannot be admitted.`)
+    }
+    const path = require('path')
+    const root = path.resolve(data.cwd || process.cwd(), a.repo)
+    readme = path.join(root, ...dir, 'README.md').split(path.sep).join('/')
+    const bytes = require('fs').readFileSync(readme, 'utf8')
+    const { readFrontMatterKey } = require(path.join(__dirname, 'scratch-guard.js'))
+    const v = readFrontMatterKey(bytes, 'spec-audit')
+    if (v !== null && /^\d{4}-\d{2}-\d{2}$/.test(v)) return null
+    return renderDeny(
+      `${readme} declares no \`spec-audit:\` date in its front matter` +
+        (v === null ? '' : ` (it reads \`spec-audit: ${v}\`, which is not a date)`) + `.`,
+    )
+  } catch (e) {
+    return renderDeny(`${readme} could not be read for its \`spec-audit:\` key (${(e && e.code) || (e && e.message) || e}), and a README this hook cannot read is not one it may approve.`)
+  }
+}
+
 function main() {
   // TOOL-dTieredTribunal-14 S4 - a rule selector over a CLOSED set, so a second entry point can ask
   // for ONE rule. Absent runs every rule, which is the wiring's invocation and is unchanged.
@@ -1739,6 +1808,18 @@ function main() {
     if (!deny) process.exit(0)
     process.stderr.write(deny)
     process.exit(2)
+  }
+
+  // RULE 0 sits ABOVE the script read on purpose: a `name:`-only run exits below with no source, and
+  // a rule placed among rules 1-5 would never see the spec-audit route invoked by name. It keys on
+  // the structured args, so it needs no script at all. Gated on ONLY like rules 1-3, so
+  // `--only=join` stays exactly the join rule.
+  if (ONLY === null) {
+    const deny = checkSpecAuditDeclared(data)
+    if (deny) {
+      process.stderr.write(deny)
+      process.exit(2)
+    }
   }
 
   // A saved script is a FILE, and a node hook has fs — exiting 0 here made the rules unenforceable

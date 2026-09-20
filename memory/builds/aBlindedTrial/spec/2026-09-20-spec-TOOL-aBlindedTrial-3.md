@@ -1,6 +1,6 @@
 # TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared
 
-**Status:** INPROGRESS · rev-1 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
+**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling · order 2 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
@@ -128,6 +128,9 @@ New arm: `tools/workflows/unattended-build.test.sh` · `UNITS` minus the key aga
 ## 9. Revision log
 
 - rev-1 · 2026-09-20 · initial draft from the scout of the harness at b7dee206.
+- rev-2 · 2026-09-20 · S6 · eleven fixture lines gained the key, not nine: the two fan fixtures also pin
+  `subjects` and would have met the AC5 pairing refusal; the rule in S6 already covered them, the count
+  was short. No criterion moved.
 
 ## 10. Reuse audit
 

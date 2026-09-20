@@ -733,6 +733,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkSpecAuditDeclared",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkThrottled",
       "kind": "function",
       "file": "tools/process-monitor/procmon-hook.js"
@@ -2883,6 +2888,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readFrontMatterKey",
+      "kind": "function",
+      "file": "tools/hooks/scratch-guard.js"
+    },
+    {
       "id": "readHeadRef",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
@@ -3384,6 +3394,11 @@
     },
     {
       "id": "renderCodeView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderDeny",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
     },

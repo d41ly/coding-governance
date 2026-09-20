@@ -80,9 +80,9 @@ ids TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlinded
 |---|---|---|---|---|---|
 | [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aBlindedTrial-2 — the driver reads `spec-audit:` from the build README and owes the audit only when it is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-2.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-20 |
-| [TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-3.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-09-20 |
-| [TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare](spec/2026-09-20-spec-TOOL-aBlindedTrial-4.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-09-20 |
-| [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-09-20 |
+| [TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-3.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-20 |
+| [TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare](spec/2026-09-20-spec-TOOL-aBlindedTrial-4.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-20 |
+| [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | INPROGRESS | rev-2 | 2026-09-20 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 2 record folder(s).

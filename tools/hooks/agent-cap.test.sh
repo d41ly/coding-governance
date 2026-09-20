@@ -672,6 +672,84 @@ check "scriptPath → unreadable path refused, not waved through" 2 '{"tool_name
 # tools/workflows/ instead — declared, not papered over.
 check "name-only run → allow (no source reaches the hook)" 0 '{"tool_name":"Workflow","tool_input":{"name":"tier2-review"}}'
 
+# ---- rule 0: a spec audit is OPT-IN, declared in the build README's front matter ----------------
+# TOOL-aBlindedTrial-4. The rule reads `tool_input.args` ONLY — never the script text, which both
+# shipped harnesses fill with the word `spec-audit` — so every arm here carries the CLEAN script
+# above and differs from its neighbour in args alone. Every deny arm asserts its own branch text,
+# since every rule exits 2; `check_spec_audit` runs each payload TWICE, args as an OBJECT and as a JSON STRING,
+# because the Workflow tool delivers both and the first cut of tier2-review's own guard refused one.
+SAREPO="$TMP/sarepo"; mkdir -p "$SAREPO/memory/builds/tSA/reviews"
+SAJ="$NODEDIR/sarepo"; SAREADME="$SAREPO/memory/builds/tSA/README.md"
+check_spec_audit() { # name expected_exit needles(;;-joined, empty for an allow) args-json
+  local name=$1 want=$2 needles=$3 args=$4 form payload got n miss
+  for form in object string; do
+    payload=$("$TESTPY" -c 'import json,sys
+g,a,form=sys.argv[1:4]
+args=json.loads(a)
+print(json.dumps({"tool_name":"Workflow","tool_input":{"scriptPath":g,"args":args if form=="object" else json.dumps(args)}}))' "$GOOD" "$args" "$form")
+    printf '%s' "$payload" | node "$HOOK" >/dev/null 2>"$TMP/err"; got=$?
+    if [ "$got" != "$want" ]; then
+      echo "FAIL $name [args as $form] (exit $got, want $want)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); continue
+    fi
+    miss=""
+    if [ -n "$needles" ]; then
+      # Split on `;;` alone — a needle may carry spaces ("not a date"), so no word-splitting here.
+      while IFS= read -r n; do
+        [ -n "$n" ] && ! grep -qF -- "$n" "$TMP/err" && miss="$miss [$n]"
+      done <<< "$(printf '%s' "$needles" | sed 's/;;/\n/g')"
+    fi
+    # A deny that spells a kit-install path strands every adopter that installed the kit elsewhere
+    # — the shipped-surface ratchet holds this hook at its current count, and this arm holds the text.
+    if [ "$want" = 2 ] && grep -q 'tools[/]' "$TMP/err"; then miss="$miss <a-kit-path-literal>"; fi
+    if [ -z "$miss" ]; then echo "ok   $name [args as $form]"; pass=$((pass+1))
+    else echo "FAIL $name [args as $form] (exit $got as wanted, but the message misses:$miss)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
+  done
+}
+# AC1 — the README exists and carries no key: denied, naming the decision, the key and the README.
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+check_spec_audit "rule0: spec-audit, README without the key → deny naming id + key + README" 2 \
+  "TOOL-aBlindedTrial-6;;spec-audit:;;builds/tSA/README.md" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\",\"subjects\":[{\"path\":\"memory/builds/tSA/spec/s.md\",\"blob\":\"abc1234\"}]}"
+# S5 — the rule sits ABOVE the script read, so a `name:`-only invocation is judged too.
+check "rule0: spec-audit by NAME only, README without the key → deny" 2 \
+  "{\"tool_name\":\"Workflow\",\"tool_input\":{\"name\":\"tier2-review\",\"args\":{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}}}"
+# AC4 — a diff review, and an absent kind, are not this rule's business; the same undeclared README.
+check_spec_audit "rule0: kind diff-review on the same undeclared README → allow" 0 "" \
+  "{\"kind\":\"diff-review\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+check_spec_audit "rule0: no kind at all → allow" 0 "" "{\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# CONTROL — script TEXT spelling the kind, args carrying none: the rule keys on args, never on text.
+check "rule0: control, 'spec-audit' in the script text with no such args → allow" 0 \
+  '{"tool_name":"Workflow","tool_input":{"script":"// kind: '"'"'spec-audit'"'"' — prose only\nconst s = await agent(\"one\")"}}'
+# STATED LIMIT — an args string that does not parse shows the hook no kind; the harness throws on it.
+check "rule0: unparseable args string → allow (stated limit: no kind is visible)" 0 \
+  "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$GOOD\",\"args\":\"{kind: spec-audit, not json\"}}"
+# AC2 — the key in the front matter, dated: allowed.
+printf -- '---\nslug: tSA\nspec-audit: 2026-09-20\n---\n' > "$SAREADME"
+check_spec_audit "rule0: spec-audit, README declares spec-audit: <date> → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# AC3 — a non-date value is a claim with no owner date behind it; a body-only key is not front matter.
+printf -- '---\nslug: tSA\nspec-audit: yes\n---\n' > "$SAREADME"
+check_spec_audit "rule0: spec-audit: yes → deny, not a date" 2 "not a date;;spec-audit: yes" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+printf -- '---\nslug: tSA\n---\n\n```\nspec-audit: 2026-09-20\n```\n' > "$SAREADME"
+check_spec_audit "rule0: key only inside a fenced BODY block → deny (front matter only)" 2 "front matter" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# AC5 — an unplaceable call fails CLOSED, naming the field: a numeric repo, a reviewDir outside
+# any builds/<slug>/ folder, and no reviewDir at all.
+printf -- '---\nslug: tSA\nspec-audit: 2026-09-20\n---\n' > "$SAREADME"
+check_spec_audit "rule0: repo is a number → deny naming repo" 2 '`repo`' \
+  "{\"kind\":\"spec-audit\",\"repo\":7,\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+check_spec_audit "rule0: reviewDir outside builds/<slug>/ → deny naming reviewDir" 2 '`reviewDir`;;docs/reviews' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"docs/reviews\"}"
+check_spec_audit "rule0: reviewDir absent → deny naming reviewDir" 2 '`reviewDir`' \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\"}"
+# AC6 — a README this hook cannot READ is a deny, never a stack trace at exit 1 (which admits).
+mkdir -p "$SAREPO/memory/builds/tDir/reviews" "$SAREPO/memory/builds/tDir/README.md"
+check_spec_audit "rule0: README path is a DIRECTORY → deny (exit 2, not a crash at 1)" 2 "could not be read;;spec-audit:" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tDir/reviews\"}"
+check_spec_audit "rule0: README absent → deny naming the path tried" 2 "builds/tNone/README.md;;could not be read" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tNone/reviews\"}"
+
 # ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
 # EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm
 # keyed on 2 passes when a completely different branch fires — which is how the retired `cap-5` arm

@@ -1,6 +1,6 @@
 # TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded
 
-**Status:** INPROGRESS · rev-1 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling+playbook · order 2 · ratified 2026-09-20
+**Status:** INPROGRESS · rev-2 · 2026-09-20 · node a · Tier-2 · base b7dee206 · streams tooling+playbook · order 2 · ratified 2026-09-20
 
 <!-- gen:spec-records -->
 
@@ -110,6 +110,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-20 · initial draft from the scout of the method carriers at b7dee206.
+- rev-2 · 2026-09-20 · S2 · M6's `passes-harnessed` sentence also moves: the harness runs AUDIT and
+  DISPOSAL where `specAudit` is declared and hands out the roster on a terminal verdict or NOT-OWED.
+  The builder parked it as outside S1–S6; folded here, render re-measured at 27275 bytes.
 
 ## 10. Reuse audit
 
