@@ -28,10 +28,11 @@ fell into one class and the tree was green; `.nosuch.conf` beside it redded 7c n
 Staged breaks: the parent's `govkit.py` redded the first read, and a `root-conf` test admitting any
 name without a `/` passed `.nosuch.conf`, which the arm caught. The suite run is owed to VERIFYING.
 
-AC6's hand observation, over the scratch clone: selfcheck exited 0 printing `guarded bar legs graded
-8 · root-conf readers 5`. Reverting any one conf from the five reader legs' guards, both of
-`straggler-guard arms`' two among them, redded naming that leg, its conf and its argv file. The
-real-tree run is owed to VERIFYING.
+AC6's hand observation, over the scratch clone: selfcheck exited 0 printing
+`guarded bar legs graded 8 · root-conf readers 5`. Reverting any one conf from the five reader
+legs' guards, both of `straggler-guard arms`' two among them, redded naming that leg, its conf and
+its argv file. Both halves were read again over a fresh clone of the build commit. The real-tree run
+is owed to VERIFYING.
 
 AC8's in-pass reads: at the build commit govkit reads 1.12, lexicon 1.6 and codebase-map 1.8. At
 `fb07ca25` they read 1.11, 1.4 and 1.7, and at `origin/main` after this pass's fetch, `663a0dec`, they
@@ -44,9 +45,10 @@ is owed to the post-build bar.
 
 AC9's hand observation, over the scratch clone: the clean run printed no near-miss line naming
 `recall floor`. With its `.memory-tree.conf` entry reverted, selfcheck stayed at exit 0 and printed
-`near-miss: leg 'recall floor' may read root conf .memory-tree.conf through
-tools/memory-recall/query.py, tools/memory-recall/recall_conf.py (not graded)`. The real-tree run is
-owed to VERIFYING.
+a near-miss line for `recall floor` naming `.memory-tree.conf` and, through the leg's own imports,
+`tools/memory-recall/query.py` and `tools/memory-recall/recall_conf.py`. Both halves were read again
+over a fresh clone of the build commit, with the same result. The real-tree run is owed to
+VERIFYING.
 
 AC1, AC4, AC6, AC8 and AC9 carry `permission:` lines and get no line here; the orchestrator writes
 them after the post-build bar.

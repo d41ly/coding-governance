@@ -101,7 +101,7 @@ does not name.
   is visible; it never reds on one.
 - **Comparing a kit descriptor's guard with gov's manifest row.** TOOL-aPacedTurnstile-12 records
   that nothing compares the two. S6 edits both by hand for the three legs a descriptor declares,
-  `recall floor` having none; the parity gate is that row's work.
+  `recall floor` and the two rows rev-6 adds having none; the parity gate is that row's work.
 - **The pre-push hook, the lander and `run-gates.sh`.** None needs a change: the runner and the
   lander already compare against `origin/<name>`, and the hook uses the name only to classify the
   pushed ref (§4). The hook also ships verbatim to adopters.
@@ -524,8 +524,8 @@ New arm: `tools/govkit/selftest.py` · a root-conf guard, an undeclared root fil
   pass's backticking rationale above is corrected in place, both of its halves having been measured
   false, and §7 itself is untouched — the spelling stays as that pass left it and is now recorded as
   ungraded house style rather than as a checker requirement.
-- rev-6 · 2026-09-21 · build pass, same base · §2 S5 S6 · §4 data model, inventory, completeness,
-  LIVENESS · §5. Three divergences the build tree forced, each measured at HEAD `5ce18129`. First,
+- rev-6 · 2026-09-21 · build pass, same base · §2 S5 S6 · §3 · §4 data model, inventory,
+  completeness, LIVENESS · §5. Three divergences the build tree forced, each measured at HEAD `5ce18129`. First,
   two gov-only guarded bar legs landed after BASE, `transition-audit arms` (TOOL-dDerivedDocket-9)
   and `straggler-guard arms` (TOOL-dDerivedDocket-13). Both argv files name `.memory-tree.conf` and
   the second names `.lexicon.conf` as well, so the probe reads eight guarded bar legs and five conf
@@ -545,7 +545,9 @@ New arm: `tools/govkit/selftest.py` · a root-conf guard, an undeclared root fil
   sentence, in `tools/lexicon/README.md` and a `tools/lexicon/selftest.py` comment, and the build
   rewrites all four; the drift-audit kit has no dossier, its keys sitting in `baseline.toml`, so
   only the govkit and lexicon dossiers are refreshed. No criterion's wording moves: AC3 grades §4's
-  rows, AC6's counts are derived at observation, and AC5 and AC9 read as written.
+  rows, AC6's counts are derived at observation, and AC5 and AC9 read as written. §3's descriptor
+  non-goal names the two new rows beside `recall floor` as rows no descriptor declares, a clause
+  the unit's bug-class checklist found standing after the S6 amendment.
 
 ## 10. Reuse audit
 
