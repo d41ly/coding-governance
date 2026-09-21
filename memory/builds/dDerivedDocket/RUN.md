@@ -244,3 +244,11 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-21T18:27:01Z brief · item TOOL-dDerivedDocket-23 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-21T18:27:02Z brief · item TOOL-dDerivedDocket-29 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T20:41:05Z dispatch · item 32a7ef06 TOOL-dDerivedDocket-25 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/README.md memory/map/features/run-gates.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-25.md
+
+2026-09-21T20:41:37Z dispatch · item 32a7ef06 TOOL-dDerivedDocket-30 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh .memory-tree.conf memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md
+
+2026-09-21T20:41:38Z brief · item TOOL-dDerivedDocket-25 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T20:41:38Z brief · item TOOL-dDerivedDocket-30 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
