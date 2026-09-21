@@ -17,7 +17,7 @@ host: compeeto-agent
 pid: 24068
 session: 2db85696-ae7f-456a-9d88-fffc3fe3482a
 witness: 91cbcf3ca34e14af7302df3b3f6e78dc095170b7
-phase: VERIFYING
+phase: LANDING
 branch-sha: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 branch-ref: refs/heads/branch/unattended-kit-keepalive-a29498
 mode: prompt
@@ -242,3 +242,5 @@ base: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
 2026-09-21T03:18:20Z dispatch · item 8cc0b391 TOOL-aWokenSentinel-5 · reason tools/unattended/resume-tick.sh tools/unattended/resume-tick.test.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/README.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md memory/gotchas/destructive-step-before-its-precondition.md memory/gotchas/INDEX.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-2.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-5.md memory/builds/aWokenSentinel/spec/2026-09-16-spec-TOOL-aWokenSentinel-6.md memory/builds/aWokenSentinel/spec/2026-09-20-spec-TOOL-aWokenSentinel-12.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-2-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-5-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-16-build-TOOL-aWokenSentinel-6-1-acceptance-ledger.md memory/builds/aWokenSentinel/build/2026-09-20-build-TOOL-aWokenSentinel-12-1-acceptance-ledger.md memory/builds/aWokenSentinel/README.md
 
 2026-09-21T03:18:21Z brief · item TOOL-aWokenSentinel-5 · reason 800cef6ab858 memory/builds/aWokenSentinel/prompts/2026-09-21-prompt-TOOL-aWokenSentinel-5-3-fold-brief.md
+
+2026-09-21T09:23:28Z override · item specs-audited · reason units 25-28 are the fourth promotion generation of the spec audit: four audited generations promoted 7, 6, 4 and 4 units and the fourth did not shrink, so per M4's CEILING clause the run promotes and lands anyway rather than audit a fifth generation at about 75 minutes and 3M tokens each with no convergence in sight. TOOL-aWokenSentinel-29 records the decision, TOOL-aWokenSentinel-30 the method defect. Their specs were disposal-authored from the round-4 record, which was CLEAN WITH FIXES with 0 blockers, and each was built with RED-first arms and closed by its own ledger.
