@@ -350,10 +350,21 @@ def read_conf_at_rev(root: str, rev: str) -> dict:
             f"conf at rev {rev}: that rev resolves to no commit in this repository, so {name} "
             f"could not be looked up at it — and a pinned read never falls back to the working tree")
     try:
-        # Through `run()`, the one choke point that scrubs the inherited git environment. Its text
-        # mode folds CRLF exactly as `read_text` does for the working-tree read, and the conf
-        # grammar's structural characters are ASCII, so the two readers see the same declarations.
-        text = run("git", "show", f"{sha}:{name}", cwd=root)
+        # BYTES, and NOT through `run()`, which is this module's one git choke point — the only
+        # site in the file that does not use it. `run()` decodes with the locale encoding and
+        # UNIVERSAL-NEWLINES the result, and both of those make this reader disagree with
+        # `read_text`, which decodes utf-8 and folds `\r\n` alone. A lone CR is the machine-
+        # independent half: universal newlines turns it into a line break, so `A=1<CR>B=2` parses
+        # to TWO declarations here and to one in the working tree — and to one in the shell gate
+        # that SOURCES the same file, which is the split the one-parser rule exists to close. The
+        # locale half hides on a node in UTF-8 mode and appears on one that is not. The env scrub
+        # `run()` centralises is passed explicitly here rather than forgotten, which is the thing
+        # that choke point is for; what it cannot give is bytes. A blob that is not utf-8 raises
+        # here exactly as `read_text` raises for the working-tree read — parity with the reader
+        # this one shadows, rather than a fourth state only one of the two knows about.
+        blob = subprocess.run(("git", "show", f"{sha}:{name}"), cwd=root, capture_output=True,
+                              check=True, env=_build_git_env()).stdout
+        text = blob.decode("utf-8").replace("\r\n", "\n")
     except subprocess.CalledProcessError:
         raise Problem(
             f"conf at rev {rev} ({sha[:12]}): the tree at that rev carries no {name} blob, so "
@@ -3930,24 +3941,24 @@ def cmd_selftest() -> int:
         run("git", "config", "user.email", "t@t.test", cwd=cx)
         run("git", "config", "user.name", "t", cwd=cx)
 
-        def _conf_commit(label: str) -> str:
+        def _build_conf_commit(label: str) -> str:
             run("git", "add", "-A", cwd=cx)
             run("git", "commit", "-q", "-m", label, "--no-verify", cwd=cx)
             return run("git", "rev-parse", "HEAD", cwd=cx).strip()
 
         write_text(os.path.join(cx, "seed.txt"), "a tree that predates the conf entirely\n")
-        _c_noconf = _conf_commit("no conf blob at all")
+        _c_noconf = _build_conf_commit("no conf blob at all")
         write_text(os.path.join(cx, ".memory-tree.conf"),
                    "# every line here is a comment\n\n   \n# and not one of them declares a key\n")
-        _c_silent = _conf_commit("a conf blob that declares nothing")
+        _c_silent = _build_conf_commit("a conf blob that declares nothing")
         write_text(os.path.join(cx, ".memory-tree.conf"),
                    'MEMORY_ROOT=memory-old\nASK_CUTOFF="2026-01-01"\n')
-        _c_old = _conf_commit("the older declaration")
+        _c_old = _build_conf_commit("the older declaration")
         write_text(os.path.join(cx, ".memory-tree.conf"),
                    'MEMORY_ROOT=memory-new\nASK_CUTOFF="2026-09-01"\n')
-        _c_new = _conf_commit("the newer declaration, which the working tree also holds")
+        _c_new = _build_conf_commit("the newer declaration, which the working tree also holds")
 
-        def _pinned(rev: str) -> tuple:
+        def _read_pinned_conf(rev: str) -> tuple:
             """(conf, stderr) for one pinned read, with S3's notice captured off the suite's own
             stream so an arm can assert on it instead of it decorating the run."""
             err = io.StringIO()
@@ -3955,7 +3966,7 @@ def cmd_selftest() -> int:
                 conf = read_conf_at_rev(cx, rev)
             return conf, err.getvalue()
 
-        def _conf_refusal(rev: str) -> str:
+        def _read_conf_refusal(rev: str) -> str:
             """One refusal's text with the REV ITSELF neutralised, so the distinctness arm below
             measures the WORDING and not the argument. Comparing the raw messages would be vacuous:
             every refusal embeds its own rev, so any two of them differ whatever they say, and three
@@ -3971,10 +3982,10 @@ def cmd_selftest() -> int:
         # exactly the shape this unit exists to remove.
         arm("a pinned read takes its declarations from the REV, not from the checkout",
             "pinned=memory-old working=memory-new",
-            lambda: f"pinned={_pinned(_c_old)[0]['MEMORY_ROOT']} "
+            lambda: f"pinned={_read_pinned_conf(_c_old)[0]['MEMORY_ROOT']} "
                     f"working={load_conf(cx)['MEMORY_ROOT']}")
         arm("a second key at the same older rev is pinned too, not just the first",
-            "2026-01-01", lambda: _pinned(_c_old)[0]["ASK_CUTOFF"])
+            "2026-01-01", lambda: _read_pinned_conf(_c_old)[0]["ASK_CUTOFF"])
 
         # AC2 — the three refusals. Each names the rev and the path, and none of them degrades to
         # the working tree, which would still read as pinned.
@@ -3984,8 +3995,8 @@ def cmd_selftest() -> int:
             "carries no .memory-tree.conf blob", lambda: read_conf_at_rev(cx, _c_noconf))
         arm("a conf blob that declares nothing is a named refusal, not a parse to the defaults",
             "yields zero declarations", lambda: read_conf_at_rev(cx, _c_silent))
-        _c_texts = [_conf_refusal("deadbeef" * 5), _conf_refusal(_c_noconf),
-                    _conf_refusal(_c_silent)]
+        _c_texts = [_read_conf_refusal("deadbeef" * 5), _read_conf_refusal(_c_noconf),
+                    _read_conf_refusal(_c_silent)]
         # THE COUNT OF REFUSALS IS IN THE SAME VALUE as the count of distinct texts, because three
         # reads that all returned a conf would also be "one distinct text" and would pass a
         # distinctness arm that only compared strings.
@@ -4014,8 +4025,36 @@ def cmd_selftest() -> int:
         _c_bare = os.path.join(cbase, "bare")
         os.makedirs(_c_bare)
         _c_defaults = load_conf(_c_bare)
-        _c_pinned_new = _pinned(_c_new)[0]
+        _c_pinned_new = _read_pinned_conf(_c_new)[0]
         _c_undeclared = ("DISCIPLINES", "FAMILIES")
+        # S1's one-parser property, over the bytes that actually split two readers of one file. A
+        # SECOND fixture, because this conf must be what the working tree holds AND what the blob
+        # holds, and the repository above pins `memory-new` at both. `core.autocrlf` is turned OFF
+        # in it: the global setting is on, and it would fold the CRLF out of the blob before the
+        # arm ever saw it.
+        cy = os.path.join(cbase, "awkward")
+        os.makedirs(cy)
+        run("git", "init", "-q", ".", cwd=cy)
+        run("git", "config", "user.email", "t@t.test", cwd=cy)
+        run("git", "config", "user.name", "t", cwd=cy)
+        run("git", "config", "core.autocrlf", "false", cwd=cy)
+        # WRITTEN AS BYTES, not through `write_text`, which would normalise the very thing under
+        # test. CRLF endings, a LONE CR mid-file, and a utf-8 value outside ASCII: the first is the
+        # control, the second is what universal newlines turns into a line break, and the third is
+        # what a locale decode mis-reads on a node not in UTF-8 mode.
+        with open(os.path.join(cy, ".memory-tree.conf"), "wb") as _c_fh:
+            _c_fh.write(b'MEMORY_ROOT=m\xc3\xa9moire\r\nASK_CUTOFF="2026-01-01"\r\nA=1\rB=2\n')
+        run("git", "add", "-A", cwd=cy)
+        run("git", "commit", "-q", "-m", "an awkward conf", "--no-verify", cwd=cy)
+        _c_odd_head = run("git", "rev-parse", "HEAD", cwd=cy).strip()
+        _c_odd_err = io.StringIO()
+        with contextlib.redirect_stderr(_c_odd_err):
+            _c_odd_pinned = read_conf_at_rev(cy, _c_odd_head)
+        _c_odd_tree = load_conf(cy)
+        arm("the pinned read and the working-tree read agree on a conf built to split them",
+            "same=True keys=['A', 'ASK_CUTOFF', 'DISCIPLINES', 'FAMILIES', 'MEMORY_ROOT']",
+            lambda: f"same={_c_odd_pinned == _c_odd_tree} keys={sorted(_c_odd_pinned)}")
+
         arm("the pinned reader's seed is load_conf's seed, key for key and value for value",
             "extra=['ASK_CUTOFF'] missing=[] undeclared-agree=True",
             lambda: f"extra={sorted(set(_c_pinned_new) - set(_c_defaults))} "
