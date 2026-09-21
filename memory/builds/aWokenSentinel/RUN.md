@@ -9,6 +9,11 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+lease-utc: 2026-09-21T04:22:27Z
+pid-image: claude.exe
+host: compeeto-agent
+pid: 24068
+session: 2db85696-ae7f-456a-9d88-fffc3fe3482a
 witness: 8bdcb035282b81bd111c9d2af652ab173a3c3230
 phase: BUILDING
 branch-sha: 5f9648d61c020cf3ba902d3c6acc4e8b4992ab2b
