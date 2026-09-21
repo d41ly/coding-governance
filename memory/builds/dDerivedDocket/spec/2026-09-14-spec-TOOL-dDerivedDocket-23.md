@@ -398,12 +398,15 @@ whose regenerated artifacts are unstaged.
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates evidence` · `pre-push self-test` · `run-selftests self-test` · `drift-audit selftest` · `memory-hygiene self-test` · `lexicon selftest` · `install-prefix self-test` · `govkit selfcheck` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `kit version markers` · `memory hygiene` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `run-gates gov canary` · `run-gates evidence` · `pre-push self-test` · `run-selftests self-test` · `drift-audit selftest` · `memory-hygiene self-test` · `lexicon selftest` · `install-prefix self-test` · `govkit selfcheck` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `kit version markers` · `memory hygiene` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/run-gates/run-gates.test.sh · a two-commit fixture with a signature leg, a comparator edit, a leg absent at R, a KF3 touch, an L-only signature rewrite, an rc-137 kill under a fired ceiling and a bound-0 rc-137 kill · the canary's executed-assertion floor, raised by the arms added
 New arm: .githooks/pre-push.test.sh · a fake runner printing its environment · none
 New arm: tools/lexicon/selftest.py · a fixture with known offenders and an unrelated insertion · none
 New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an unrelated shipped file · none
+New arm: tools/run-gates/run-gates.gov.test.sh · G1b, the four-leg `signature` pin over gov's manifest · the gov canary's executed-assertion floor, raised by the arm added
+New arm: tools/drift-audit/selftest.py · the violating fixture's `--offenders` keys and exit against `--check` · none
+New arm: tools/memory-tree/check-memory-hygiene.test.sh · the red fixture's `--offenders` keys, shape and exit · the suite's executed-assertion floor, raised by the arms added
 
 ## 8. Open questions
 
@@ -538,7 +541,9 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   held on the same terms. AC12: the arm grades every `signature` the manifest it reads declares,
   generically, and its staged break is a synthetic `--list`-shaped output (a `path:line:` key, a
   colon-ended header, a `… and` cut) rather than a scratch manifest naming the lexicon leg, for the
-  same reason; the predicate it breaks is the one the real signatures are graded by. AC8: the
+  same reason, beside a SHIPPED one: the first declared `--offenders` signature whose `--list`
+  sibling prints is run with that swap and must red too, so the break is not proved only for the
+  lines somebody typed. The predicate it breaks is the one the real signatures are graded by. AC8: the
   `--attribute` arms are unedited, and the self-test runner's FIXTURE BUILDER copies
   `tools/run-gates/lib-attribute.sh` beside the runner it copies, because both runners source that
   file only on the path that attributes and a runner copied alone has no normaliser to source. S7's
@@ -551,7 +556,10 @@ New arm: tools/check-install-prefix.test.sh · a fixture with known hits and an 
   red DEAD PROBE; and rule 1's pre-push member is derived from `core.hooksPath`, relative paths only.
   S3: the hygiene engine keys each failing line of its delegated checks and of its empty-population
   guard as well as each `fail` list, and the install-prefix mode keys a failing carried-prefix file
-  once per literal it carries, from the same scan the ratchet rows are aggregated from.
+  once per literal it carries, from the same scan the ratchet rows are aggregated from. §7 gains
+  `run-gates gov canary`, which now carries G1b, and a `New arm:` line for each suite this pass
+  extended beyond the four rev-5 named: the gov canary, the drift report's selftest and the hygiene
+  engine's suite, the two floors raised by the arms added.
 
 ## 10. Reuse audit
 

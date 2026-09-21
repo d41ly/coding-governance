@@ -45,9 +45,9 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=187
-# RAISED 149 -> 187 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
-# thirty-seven red-attribution assertions, every one counted on a host with no `timeout` as well.
+FLOOR_ASSERTIONS=188
+# RAISED 149 -> 188 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
+# thirty-eight red-attribution assertions, every one counted on a host with no `timeout` as well.
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -1829,7 +1829,9 @@ open(p, "w", newline="\n").write(json.dumps(legs, indent=1) + "\n")
 }
 run_attr_bar() { # dir · VAR=value… — the runner's merged output
   local d=$1; shift
-  ( cd "$d" && env GATE_FULL= GATE_BASE= GATE_JOBS=6 "$@" bash $KIT_REL/run-gates.sh 2>&1 )
+  # AMBIENT KNOBS CLEARED, because this suite runs as a leg of a bar that may have set them: another
+  # manifest, a reuse pass or a short wall would grade the outer bar's settings instead of the rule.
+  ( cd "$d" && env GATE_FULL= GATE_BASE= GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_JOBS=6 "$@" bash $KIT_REL/run-gates.sh 2>&1 )
 }
 check_attr_line() { # output · leg · expected fragment of its line · label
   n=$((n+1))
@@ -2018,6 +2020,23 @@ _listish=$(printf 'lexicon: verb offenders 3 over pin 0:\n  core/a.py:1: P1 verb
 n=$((n+1))
 [ -z "$(check_signature_shape "$(printf 'core/a.py\tverb\tfrobnicate_a\ncore/a.py\tverb\tfrobnicate_a#2\n')")" ] \
   || { echo "canary: the signature-shape predicate refused a well-formed key set, so it cannot tell the two apart"; fail=1; }
+# ...and the SAME break over a SHIPPED value, because a synthetic one proves the predicate only for
+# the lines somebody thought to type: the first declared signature ending in `--offenders` whose
+# `--list` sibling prints anything here is run with that swap, and its real output must red.
+n=$((n+1))
+_listrun=""
+while IFS= read -r _sr; do
+  case "$_sr" in *$'\x1f'--offenders) ;; *) continue ;; esac
+  IFS=$'\x1f' read -ra _sv <<<"${_sr%--offenders}--list"
+  case "${_sv[0]}" in python|python3) _sv[0]=$PYBIN ;; esac
+  _listrun=$("${_sv[@]}" 2>/dev/null </dev/null)
+  [ -n "$_listrun" ] && break
+done <<<"$_sigrows"
+if [ -z "$_listrun" ]; then
+  echo "canary: SKIP AC12's shipped staged break — no declared signature has a --list sibling that prints anything here (reported, not a pass)"
+elif [ -z "$(check_signature_shape "$_listrun")" ]; then
+  echo "canary: a declared signature's own --list output passed the shape predicate, so AC12 cannot tell a list mode from a key set"; fail=1
+fi
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
