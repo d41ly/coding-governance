@@ -2,13 +2,13 @@
 # unattended.sh — the driver for a run that will merge and push with no owner turn.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
-#   unattended.sh --preflight <slug> --keepalive-id <id>   # assert, pin, record, render
-#   unattended.sh --plan <slug> [--paths] [--asks]         # per-unit state, and the next unit
+#   unattended.sh --preflight <slug> --keepalive-id <id> [--waive <item> --reason <text>]   # assert, pin, record, render
+#   unattended.sh --plan <slug> [<slug> ...] [--paths] [--asks] [--framed]   # per-unit state, and the next unit
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
-#   unattended.sh --resume <slug> [--keepalive-id <id>]    # the same line, plus the next action; with the id, the lease is replaced
+#   unattended.sh --resume <slug> [--keepalive-id <id> [--replaces <id>]]    # the same line, plus the next action; with the id, the lease is replaced
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
@@ -21,8 +21,8 @@
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
-#   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
-#   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA>
+#   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
+#   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --version                                        # the kit version, then exit
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -8771,6 +8771,11 @@ refuse_waive_unless_preflight() { # verb
   fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
   return 1
 }
+# THE ARGUMENT LOOP IS FENCED by a bare argv sentinel pair, and the gate leg's check 26 reads every
+# `--<name>` token between them - sub-loops included - and joins it to this file's header lines and to
+# the sibling suite, both directions. A flag parsed here and documented nowhere reds that check, so a
+# new flag gets its header line in the same edit. TOOL-dDerivedDocket-30 S4.
+# gov:argv-begin
 while [ $# -gt 0 ]; do
   case "$1" in
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
@@ -8877,6 +8882,7 @@ while [ $# -gt 0 ]; do
             fail 14 "unknown argument; the verbs are $vl: $arg"; RUNLOG_CLEAN=1; exit 1; fi ;;
   esac
 done
+# gov:argv-end
 # S10, and then the verb-carrier unit, because S10's fix did not hold: the three spellings were
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing

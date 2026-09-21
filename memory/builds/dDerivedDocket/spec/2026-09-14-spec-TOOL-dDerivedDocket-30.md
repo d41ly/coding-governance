@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-30 — checker defects from the stop census
 
-**Status:** SPECCED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
+**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-22-build-TOOL-dDerivedDocket-30-1-acceptance-ledger.md](../build/2026-09-22-build-TOOL-dDerivedDocket-30-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-21-spec-audit-g4-round1.md) | spec-audit | TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-31 |
@@ -38,12 +39,20 @@ invocation nobody runs.
 - **S2** The conf import, the whole of check 1's block, moves above the `only28` guard, so every
   conf-read value is set whatever the scope. Under `--only 28` each numbered check after the 28
   region prints one announced skip naming itself on the leg's REPORT channel, and the list of those
-  checks is derived from the file's own check headers rather than typed. Observed by AC3.
+  checks is derived from the file's own check headers rather than typed. After the origin/main
+  merge three checks follow the region under another header spelling, `# ---- 39:`, `# ---- 40:` and
+  check 15's `# ---- 15,` dating self-scan; this unit gives each the `# ---- check <n>` form, so the
+  derivation reaches every numbered check after the region and none is skipped in silence. The
+  report channel and its `report` helper move above the guard with the import, since the skip lines
+  need both. Observed by AC3.
 - **S3** The check-22 allow-list join. The keys the shipped `.unattended.conf.example` declares AND
   the leg's initialiser block initialises, minus the keys between the bare `gov:conf-allow-begin`
   and `gov:conf-allow-end` sentinels, must be empty. One direction only. Two `fail 22` branches: a
   missing, repeated or empty sentinel region, and a non-empty difference naming each key. The
-  comment recording the join as withdrawn is replaced. Observed by AC4.
+  comment recording the join as withdrawn is replaced. The initialiser set is read, like the
+  region, from the leg's own source: every `KEY=` assignment on a non-comment line above the
+  region's opening sentinel, which is where a default the import may override has to sit.
+  Observed by AC4.
 - **S4** Check 26 gains a flag arm. The parser population is every `--<name>` token on a
   non-comment line inside a new bare sentinel pair, `gov:argv-begin` and `gov:argv-end`, around the
   driver's top-level argument loop, sub-loops included, PLUS every member of `VERBS_SLUG` and
@@ -55,7 +64,11 @@ invocation nobody runs.
 - **S5** The driver header documents every flag the parser accepts. At BASE seven are parsed and
   undocumented — `--code`, `--framed`, `--playbook-sha`, `--records-root`, `--run`, `--set` and
   `--waive` — and `--framed` goes on the `--plan` header line beside `[--paths]`; any flag an earlier
-  unit of this build added is graded the same way at this unit's commit. Observed by AC7 and AC12.
+  unit of this build added is graded the same way at this unit's commit. Re-measured at `5c33fd5a`
+  after the origin/main merge, the seven are `--framed`, `--playbook-sha`, `--records-root`,
+  `--replaces`, `--run`, `--set` and `--waive`: main documented `--code` on its `--hold` line and
+  brought `--replaces` in undocumented with the lease replacement, which goes on the `--resume`
+  line. Observed by AC7 and AC12.
 - **S6** Every argument a parser accepts appears in an arm. Check 26's flag arm also requires each
   driver parser flag on a non-comment line of `unattended.test.sh`, and each argument the leg's own
   scope parser accepts — every `--<name>` token on a non-comment line between the same bare pair,
@@ -65,7 +78,10 @@ invocation nobody runs.
   is every adopter tree, the arm prints one announced skip naming the suite on the REPORT channel.
   The four arms missing at BASE are added: a `--version` smoke arm and a `--framed` arm in
   `unattended.test.sh`, and `--only 28` and `--skip 28` runs of the leg in
-  `check-unattended.test.sh`. Observed by AC8 and AC13.
+  `check-unattended.test.sh`. At `5c33fd5a` `--skip` already rides three non-comment lines of
+  that suite, main's `run_ak_leg`, `ma_leg` and `run_lg_leg`, so three flags are missing there and
+  not four; the `--skip 28` run is added anyway as the smoke arm §7 names, and AC13's staged break
+  drops those lines with it. Observed by AC8 and AC13.
 - **S7** Every new `fail` branch has an arm in `check-unattended.test.sh`, and `ARMS_FLOORS` in
   `.memory-tree.conf` moves in the same commit. The unattended suites run once under unit 1's
   attribution at VERIFYING, after the last unit, and they are on no bar leg; D12-i8's in-pass
@@ -171,6 +187,12 @@ is empty. The three example keys `abac6d59` lacked, `REVIEW_ROUNDS`, `SPEC_TOKEN
 so the one-direction join does not read them. Units of this build ordered before this one add conf keys, and this join grades every one
 of them the moment it lands; a key one of them forgot to admit is fixed in this unit's commit.
 
+Re-measured at `5c33fd5a`, after the origin/main merge and with the initialiser set read as S3 now
+defines it: 55 keys in the example, 35 of them initialised above the allow-list, 36 in the
+allow-list, and the difference is still empty. The one allow-list key outside the intersection is
+`UNITS_REGION_CUTOFF`, the default-expansion read §3 names, and it is the reverse direction the
+join does not grade.
+
 ### Check 26's flag arm
 
 At BASE the driver's argument loop starts at `tools/unattended/unattended.sh:5215`, and the header
@@ -199,6 +221,12 @@ awk 'NR>=5215 && NR<=5313 && $0 !~ /^[[:space:]]*#/' tools/unattended/unattended
 grep -E '^VERBS_(SLUG|INLINE)=' tools/unattended/unattended.sh | grep -oE -- '--[a-z][a-z0-9-]*' | sort -u
 awk 'NR>=5 && NR<=23' tools/unattended/unattended.sh | grep -E '^#   unattended\.sh' | grep -oE -- '--[a-z][a-z0-9-]*' | sort -u
 ```
+
+Re-measured at `5c33fd5a` over the loop at `:8774-8879`: 37 loop tokens, 21 set members, 54 in the
+union and 47 header tokens. No header token is missing from the union, 17 header tokens have no loop
+token, `--hold` and `--liveness` joining the fifteen, and the seven undocumented are those S5 names.
+The suite halves read `--framed` and `--version` missing from the driver suite and `--only` alone
+missing from the leg suite.
 
 The line numbers are BASE's; after S4 the loop is read between its sentinels. Every one of the seven
 is a real argument of a documented verb. S5 adds each to its verb's header line, which also puts it
@@ -280,17 +308,17 @@ prose.
   rule 1's narrow reading it DEFERS to the run at VERIFYING rather than running in this pass;
   the same command over a fixture would stay in the pass.
 - **AC3** — When `GOV_UNATTENDED_REPORT=1 bash tools/unattended/check-unattended.sh --only 28` runs
-  on the real tree, it exits 0 and prints one skip line each for checks 30 and 31; without the
-  variable it exits 0 and prints nothing. And when the same command runs over a FIXTURE copy of the
-  leg carrying an extra `# ---- check 32` header after the 28 region, it prints a THIRD skip line
-  naming 32, with no edit to any list.
+  on the real tree, it exits 0 and prints one skip line for each numbered check after the 28 region,
+  which at this unit's commit is checks 30, 31, 32, 33, 39, 40 and 15; without the variable it exits
+  0 and prints nothing. And when the same command runs over a FIXTURE copy of the leg carrying an
+  extra `# ---- check 97` header after the 28 region, it prints one more skip line naming 97, with no
+  edit to any list. 97 is a number no check of the leg uses, whose checks run 1 to 40.
   Red when: the conf read stays inside the guard, and the run exits 1 on
   `MEMORY_ROOT: unbound variable`; or the skip list is a literal, so a check added after this unit is
-  skipped in silence or returns the `set -u` crash this unit closes. The third clause is the one that
-  grades S2's DERIVATION: `# ---- check <n>` occurs exactly twice in
-  `tools/unattended/check-unattended.sh` at BASE, at checks 30 and 31, so a derived implementation
-  and a hand-typed `30 31` produce byte-identical output over today's population and only an
-  EXTENDED population can tell them apart.
+  skipped in silence or returns the `set -u` crash this unit closes. The fixture clause is the one
+  that grades S2's DERIVATION: a derived implementation and a hand-typed list of today's seven
+  produce byte-identical output over today's population, and only an EXTENDED population can tell
+  them apart.
   permission: the real-tree half is the `unattended kit gate` leg's own command, so under
   rule 1's narrow reading it DEFERS to the run at VERIFYING rather than running in this pass; the
   fixture-copy half is the same command over a fixture and stays in the pass.
@@ -323,10 +351,10 @@ prose.
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
   is parked, §9).
 - **AC7** — When `bash tools/unattended/check-unattended.sh` runs on the real tree after this unit,
-  the flag arm passes with every parser flag, the seven §4 names included, on its verb's header line,
+  the flag arm passes with every parser flag, the seven S5 names included, on its verb's header line,
   and with every slug verb found through `VERBS_SLUG`.
-  Red when: the header is left as at BASE, which the new arm reds seven times, or the population
-  reads the loop alone, which reds fifteen documented slug verbs.
+  Red when: the header is left as at `5c33fd5a`, which the new arm reds seven times, or the
+  population reads the loop alone, which reds seventeen documented slug verbs.
   permission: this is the `unattended kit gate` leg's own command over the REAL tree, so under
   rule 1's narrow reading it DEFERS to the run at VERIFYING rather than running in this pass;
   the same command over a fixture would stay in the pass.
@@ -522,6 +550,17 @@ New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip
 - rev-6 · 2026-09-21 · order re-declared from 30 to 24 in the status header only, derived from the §3 edges. The remaining
   units run in concurrent waves where M6's three conditions hold (owner, 2026-09-21); a wave shares
   one order, and this unit runs at order 24, beside TOOL-dDerivedDocket-25. No criterion, design or edge moved.
+- rev-7 · 2026-09-22 · regrounded on the origin/main merge at `5c33fd5a` before any code, on the
+  orchestrator's unit note · §2 §4 §6 · AC3 AC7. The merge brought main's checks 32 and 33 in with
+  real `# ---- check <n>` headers and moved this build's phase-routing pair to 39 and 40, so AC3's
+  claim that the header occurs exactly twice is false and its staged `# ---- check 32` collides with
+  a real check: AC3 now names the seven checks that follow the region and stages 97, which no check
+  uses. S2 records that 39, 40 and check 15's dating self-scan follow the region under another
+  header spelling and take the derived form, and that the report channel moves up with the import.
+  S3 defines the initialiser set it had left implicit. S5's seven are re-measured, `--code` out and
+  `--replaces` in, and AC7's slug-verb count moves from fifteen to seventeen. S6 records that
+  `--skip` is already on three lines of the leg suite. §4 carries both re-measurements. The
+  permission lines, the edges and every other criterion are unchanged.
 
 ## 10. Reuse audit
 

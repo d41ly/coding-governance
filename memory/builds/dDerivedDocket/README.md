@@ -153,7 +153,7 @@ ids TOOL-dDerivedDocket-60
 | [TOOL-dDerivedDocket-23 — red attribution, report-only](spec/2026-09-14-spec-TOOL-dDerivedDocket-23.md) | 23 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-29 — review durability across a dead fan](spec/2026-09-14-spec-TOOL-dDerivedDocket-29.md) | 23 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit](spec/2026-09-14-spec-TOOL-dDerivedDocket-25.md) | 24 | 2 | SPECCED | rev-5 | 2026-09-21 |
-| [TOOL-dDerivedDocket-30 — checker defects from the stop census](spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md) | 24 | 2 | SPECCED | rev-6 | 2026-09-21 |
+| [TOOL-dDerivedDocket-30 — checker defects from the stop census](spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md) | 24 | 2 | CLOSED | rev-7 | 2026-09-22 |
 | [TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables](spec/2026-09-14-spec-TOOL-dDerivedDocket-33.md) | 25 | 2 | SPECCED | rev-5 | 2026-09-21 |
 | [TOOL-dDerivedDocket-24 — inherited-red policy](spec/2026-09-14-spec-TOOL-dDerivedDocket-24.md) | 26 | 2 | SPECCED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-26 — honest verdicts under contention](spec/2026-09-14-spec-TOOL-dDerivedDocket-26.md) | 27 | 2 | SPECCED | rev-7 | 2026-09-21 |
@@ -168,7 +168,7 @@ ids TOOL-dDerivedDocket-60
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 35 | 1 | SPECCED | rev-6 | 2026-09-21 |
 <!-- /gen:build-units -->
 
-Records: 56 bound to this build, across 4 record folder(s).
+Records: 57 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

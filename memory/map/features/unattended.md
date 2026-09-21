@@ -265,3 +265,7 @@ silently; re-derive this section whenever the feature is touched.*
 - **The reap is checked at `--landed`; the schedule is not.** With the stop-guard wired, it refuses
   while the newest harness listing names the recorded id. No script can schedule or reap for the
   agent, so that half stays attested and softest.
+- **Joins grade presence only** (`TOOL-dDerivedDocket-30`). Check 26 joins each fenced `gov:argv`
+  parser to the header and its suite, check 22 the import allow-list to the example, and check 23
+  excuses a brief only by unit, own `prompts/` and blob prefix. A suite line merely passing a flag
+  satisfies 26.

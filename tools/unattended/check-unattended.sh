@@ -88,13 +88,20 @@ CONF="$ROOT/.unattended.conf"
 # ---- WHAT THIS DOES NOT DO: scope to an arbitrary check. The checks between 1 and 27 share state
 # ---- freely - a later one reads a count an earlier one computed - so they are one unit until that
 # ---- is untangled, and pretending otherwise would hand back wrong verdicts rather than slow ones.
+# ----
+# ---- WHAT `--only 28` DOES AFTER THE REGION: every numbered check below it prints one announced
+# ---- skip naming itself, on the report channel, off the check headers themselves (see the guard
+# ---- that follows the 28 region). The parser below sits between a bare argv sentinel pair so that
+# ---- check 26 can join every flag it accepts to an arm in this leg's own suite. TOOL-dDerivedDocket-30.
 SCOPE=""
+# gov:argv-begin
 case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
   *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
 esac
+# gov:argv-end
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -113,9 +120,23 @@ region()   { awk -v o="$2" -v c="$3" '
                inside { print }
                END { if (bad || no!=1 || nc!=1 || cat<oat) exit 3 }' "$1"; }
 # <<< kickoff_region
+# <file> -> every `--<name>` token on a non-comment line between the file's bare argv sentinel pair,
+# one per line and sorted; NOTHING when that pair is absent, doubled or out of order, which check 26
+# refuses by name rather than reading as a parser that takes no flag. TOOL-dDerivedDocket-30 S4.
+read_argv_flags() {
+  local _raf
+  _raf=$(region "$1" '# gov:argv-begin' '# gov:argv-end' 2>/dev/null) || return 0
+  printf '%s\n' "$_raf" | grep -vE '^[[:space:]]*#' | grep -oE -- '--[a-z][a-z0-9-]*' | sort -u
+  return 0
+}
 
-if [ "$SCOPE" != only28 ]; then
 # ---------------------------------------------------------------------------------- 1: the conf
+# HOISTED ABOVE THE SCOPE GUARD, the whole block, with the report channel beside it
+# (TOOL-dDerivedDocket-30 S2). It sat inside `if [ "$SCOPE" != only28 ]`, so under `--only 28` every
+# conf-read value was unset and the first later read outside that guard - check 30's `$MEMORY_ROOT` -
+# ended the leg on `set -u` with exit 1 (TOOL-aHoistedPass-37). The import is one subshell and it
+# already ran on every unscoped run, so moving it costs nothing on either scope; a `${VAR:-}` at the
+# read was costed and refused, because it trades the crash for a silent skip of that check's walk.
 if [ ! -f "$CONF" ]; then
   fail 1 "no .unattended.conf at the repo root, and every value this leg checks is declared there"
   exit "$status"
@@ -198,10 +219,12 @@ while IFS= read -r -d '' _ck; do
     # advertisement, and the initialiser exists only so `set -u` survives the path where that parse
     # did not run. Assigning it from the conf is not a feature being kept, it is the same hole
     # wearing a different key.
-    # THE SENTINELS BELOW NAME THIS BLOCK FOR A JOIN THAT IS NOT YET WIRED - see check 22, which
-    # records why it was withdrawn. They are BARE on purpose: an anchored range over them must not be
-    # able to match the extractor's own source line, which is how the first draft of that join read 38
-    # keys instead of 20 and swept in heredoc markers and phase names.
+    # THE SENTINELS BELOW FENCE THIS BLOCK FOR CHECK 22's JOIN, which reads it and the initialiser
+    # block above it out of this file's own source (TOOL-dDerivedDocket-30 S3). They are BARE on
+    # purpose: an anchored range over them must not be able to match the extractor's own source line,
+    # which is how the first draft of that join read 38 keys instead of 20 and swept in heredoc
+    # markers and phase names. Keep them alone on their lines at this indent: the join matches each
+    # as a whole line, and a region it cannot read is a refusal, not an empty set.
     # gov:conf-allow-begin
     MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
@@ -228,6 +251,17 @@ M="$MEMORY_ROOT"
 # The kit default of an undeclared SHARED_RECORDS, resolved by the same library call the driver makes,
 # so the two readers cannot disagree about a conf that leaves the key out.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+
+# THE REPORT CHANNEL. Silent by default, so the contract above holds byte for byte and the three
+# green-control arms in the sibling test keep their meaning. A check that cannot compare says which
+# arm went unexercised and why, and an operator asks for those by setting the variable. Liveness is
+# not left to the default run: the sibling test asserts the channel EMITS, which is the arm that
+# would notice this going quiet. ABOVE THE SCOPE GUARD, because `--only 28` announces its skips
+# through it and a helper defined inside the guard does not exist on that path.
+REPORT=${GOV_UNATTENDED_REPORT:-0}
+report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
+
+if [ "$SCOPE" != only28 ]; then
 
 
 # ====================================================================== bulk git, warmed once
@@ -918,14 +952,6 @@ phase_of() { fact_of "$1" phase; }
 # both slices dropped the whole line, compared byte-equal, and the injected sentence sat inside the
 # block a human reads. Reproduced at gate exit 0 with no output. CR-normalised before comparing,
 # because the prefix test tolerated a CRLF worktree by accident and an equality test does not.
-
-# THE REPORT CHANNEL. Silent by default, so the contract above holds byte for byte and the three
-# green-control arms in the sibling test keep their meaning. A check that cannot compare says which
-# arm went unexercised and why, and an operator asks for those by setting the variable. Liveness is
-# not left to the default run: the sibling test asserts the channel EMITS, which is the arm that
-# would notice this going quiet.
-REPORT=${GOV_UNATTENDED_REPORT:-0}
-report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
 
 # ---- 38: NO PATH IS BOTH A SHARED RECORD AND A GENERATED INDEX. TOOL-dDerivedDocket-20 S1. The two
 # ---- keys are condition 3's two halves and `--dispatch` answers each by its own rule, so one path
@@ -2765,22 +2791,51 @@ elif [ -f "$LIVEDOC" ]; then
   else
     proj_extra=""
   fi
-  # THE FOURTH SPELLING IS NOT JOINED, AND THAT IS A KNOWN GAP RATHER THAN AN OVERSIGHT.
-  # The import's allow-list at the top of this file is a fourth hand-typed spelling of this leg's
-  # conf key set - beside the initialiser block, this example and section 8's table - and it is the
-  # only one of the four nothing reads. A key added to the other three and forgotten there is dropped
-  # SILENTLY: it keeps its initialised default and every gate stays green.
-  #
-  # The join was WRITTEN and then WITHDRAWN unlanded, for a reason worth more than the check: its two
-  # refusal branches each owe an arm under the harness meta-gate, the only suite that can carry one is
-  # on no bar and could not complete a run on the node that wrote this, and a refusal whose failing
-  # case nobody has observed is exactly what this leg's own header calls an assertion about nothing.
-  # The predicate itself WAS measured over the tracked tree before it was withdrawn - the keys this
-  # example declares AND this file initialises, minus the allow-list, is EMPTY, with no near-miss in
-  # either direction - so there is no live instance today and the hazard is the next key, not this
-  # tree. TOOL-aHoistedPass-40 carries the predicate, the sentinel design and that measurement.
+  # THE FOURTH SPELLING - the import's allow-list - is joined in its own block below, beside this
+  # one rather than inside it, because it needs the example and not the protocol.
   if [ -n "$(printf '%s' "$undocumented$phantom$proj_extra" | tr -d '[:space:]')" ]; then
     fail 22 "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol: ${undocumented:-none} | documented but in no example: ${phantom:-none} | set by this project and undocumented: ${proj_extra:-none}"
+  fi
+fi
+
+# ---- 22, THE FOURTH SPELLING, JOINED. TOOL-dDerivedDocket-30 S3, which wires the join
+# ---- TOOL-aHoistedPass-40 wrote and withdrew. The import's allow-list at the top of this file is a
+# ---- hand-typed spelling of this leg's conf key set beside the initialiser block, the example and
+# ---- section 8's table, and it was the only one of the four nothing read: a key added to the other
+# ---- three and forgotten there is dropped SILENTLY, keeping its initialised default with every gate
+# ---- green. The keys the shipped example declares AND this leg initialises, minus the allow-list,
+# ---- must be empty.
+# ----
+# ---- ONE DIRECTION ONLY. A key read through a default expansion, as UNITS_REGION_CUTOFF is, is
+# ---- initialised nowhere, so the reverse direction would red a correct tree.
+# ----
+# ---- BOTH SETS ARE READ FROM THE COPY THAT IS RUNNING, so a fixture copy of the leg is graded on its
+# ---- own bytes. The allow-list is the region between the bare sentinel pair, read by `region`, whose
+# ---- exact-line match is what keeps the extractor's own source line out of it. The initialiser set
+# ---- is every KEY= assignment on a non-comment line above the region's opening sentinel, which is
+# ---- where a default the import may override has to sit. A region that is absent, doubled or yields
+# ---- no key is a REFUSAL rather than an empty set, and that refusal is this join's liveness: a region
+# ---- read as empty or over-wide subtracts nothing or everything and reports green over a mismatch.
+# ----
+# ---- WHAT THIS DOES NOT CHECK: that the allow-list admits nothing extra, that an admitted key is
+# ---- read by anything after the import, or an initialiser written after the allow-list.
+if [ -f "$EXAMPLE_CONF" ]; then
+  _c22_self="$_LIB_DIR/${0##*/}"
+  _c22_open='    # gov:conf-allow-begin'
+  _c22_allow=""
+  if _c22_reg=$(region "$_c22_self" "$_c22_open" '    # gov:conf-allow-end' 2>/dev/null); then
+    _c22_allow=$(printf '%s\n' "$_c22_reg" | grep -oE '[A-Z][A-Z0-9_]*' | sort -u)
+  fi
+  if [ -z "$_c22_allow" ]; then
+    fail 22 "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch: $_c22_self"
+  else
+    _c22_init=$(awk -v o="$_c22_open" '{ ln = $0; sub(/\r$/, "", ln) } ln == o { exit } ln !~ /^[ \t]*#/ { print ln }' "$_c22_self" \
+      | grep -oE '(^|[;[:space:]])[A-Z][A-Z0-9_]*=' | grep -oE '[A-Z][A-Z0-9_]*' | sort -u)
+    _c22_ex=$(grep -oE '^[A-Z_]+=' "$EXAMPLE_CONF" | tr -d '=' | sort -u)
+    _c22_gap=$(comm -12 <(printf '%s\n' "$_c22_ex") <(printf '%s\n' "$_c22_init") \
+      | comm -23 - <(printf '%s\n' "$_c22_allow") | tr '\n' ' ')
+    [ -z "${_c22_gap// /}" ] \
+      || fail 22 "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: $_c22_gap"
   fi
 fi
 
@@ -3857,6 +3912,62 @@ else
       esac
     fi
   done
+
+  # ---- 26, THE FLAG ARM (TOOL-dDerivedDocket-30 S4, S5, S6). The verb join above names VERBS; this
+  # ---- one names every FLAG, because a flag a parser accepts that no document names and no arm
+  # ---- exercises is the one invocation nobody runs, and three recorded stops were exactly that.
+  # ----
+  # ---- THE PARSER POPULATION is every `--<name>` token on a non-comment line between a bare
+  # ---- gov:argv sentinel pair - around the driver's top-level argument loop, sub-loops included,
+  # ---- because `--paths`, `--framed` and `--witness` are parsed inside the `--plan` and `--phase`
+  # ---- arms and are no case label - PLUS every VERBS_SLUG and VERBS_INLINE member, because a slug
+  # ---- verb dispatches by set membership and never appears inside the loop (spec 30 F5). THE
+  # ---- DOCUMENTED POPULATION is every such token on the header lines `usage` renders. Both
+  # ---- directions red: a header flag no parser takes is usage text naming an argument the driver
+  # ---- refuses, and a parsed flag no header names reaches no reader.
+  # ----
+  # ---- THE SUITE HALF: each driver flag on a non-comment line of the driver's sibling suite, and each
+  # ---- flag this leg's own fenced scope parser takes on a non-comment line of this leg's. A suite
+  # ---- this tree does not carry - every adopter tree, since the suites are withheld from installs -
+  # ---- is one announced skip naming it, never an empty suite that reds every flag.
+  # ----
+  # ---- WHAT THIS DOES NOT CHECK: that a header line puts a flag on the RIGHT verb, or that an arm
+  # ---- ASSERTS anything about the flag it passes. It grades presence of the token on a line, and a
+  # ---- suite that merely mentions a flag in a string satisfies it.
+  _c26_self="$_LIB_DIR/${0##*/}"
+  _c26_dflags=""; _c26_lflags=""
+  for _c26_f in "$DRIVER" "$_c26_self"; do
+    _c26_got=$(read_argv_flags "$_c26_f")
+    if [ -z "$_c26_got" ]; then
+      fail 26 "a parser's argument region is not exactly one bare gov:argv-begin and gov:argv-end pair holding at least one flag, so the flag join would grade that parser against nothing and pass by finding nothing: $_c26_f"
+    elif [ "$_c26_f" = "$DRIVER" ]; then
+      _c26_dflags=$_c26_got
+    else
+      _c26_lflags=$_c26_got
+    fi
+  done
+  if [ -n "$_c26_dflags" ]; then
+    _c26_parsed=$(printf '%s\n' $_c26_dflags $VERBS_ALL | sort -u)
+    _c26_doc=$(grep -E '^#   unattended[.]sh ' "$DRIVER" | grep -oE -- '--[a-z][a-z0-9-]*' | sort -u)
+    _c26_unparsed=$(comm -13 <(printf '%s\n' "$_c26_parsed") <(printf '%s\n' "$_c26_doc") | tr '\n' ' ')
+    _c26_undoc=$(comm -23 <(printf '%s\n' "$_c26_parsed") <(printf '%s\n' "$_c26_doc") | tr '\n' ' ')
+    [ -z "${_c26_unparsed// /}" ] \
+      || fail 26 "the driver's header documents a flag no parser token accepts, so the usage text a reader follows names an argument the driver refuses: $_c26_unparsed"
+    [ -z "${_c26_undoc// /}" ] \
+      || fail 26 "the driver's parser accepts a flag no header line documents, and the usage text is rendered from that header, so the argument reaches no reader: $_c26_undoc"
+  fi
+  for _c26_s in "${DRIVER%.sh}.test.sh" "${_c26_self%.sh}.test.sh"; do
+    if [ "$_c26_s" = "${DRIVER%.sh}.test.sh" ]; then _c26_want=${_c26_parsed:-}; else _c26_want=$_c26_lflags; fi
+    [ -n "$_c26_want" ] || continue
+    if [ ! -f "$_c26_s" ]; then
+      report "check 26 skipped for $_c26_s — this tree does not carry the suite, which is withheld from every adopter install, so no arm can be joined to the flags its parser accepts"
+      continue
+    fi
+    _c26_have=$(grep -vE '^[[:space:]]*#' "$_c26_s" | grep -oE -- '--[a-z][a-z0-9-]*' | sort -u)
+    _c26_unarmed=$(comm -23 <(printf '%s\n' "$_c26_want") <(printf '%s\n' "$_c26_have") | tr '\n' ' ')
+    [ -z "${_c26_unarmed// /}" ] \
+      || fail 26 "a flag a parser accepts appears on no non-comment line of its suite, so no arm has ever passed it and it is the one invocation nobody runs: $_c26_s lacks $_c26_unarmed"
+  done
 fi
 
 # ---- 27: every park() CALL SITE names a DECLARED kind. The parked region is parsed by kind - by
@@ -4539,6 +4650,30 @@ fi
 
 fi
 
+# ---- AFTER THE 28 REGION, `--only 28` ANNOUNCES EVERY CHECK IT SKIPS, ONE LINE EACH, and the list is
+# ---- DERIVED from this file's own check headers below the guard that follows, never typed
+# ---- (TOOL-dDerivedDocket-30 S2, F3). A skip whose subject is a set cannot say which check it was
+# ---- about, and a typed list goes quiet on the first check added after it. The checks are skipped
+# ---- because the flag's contract is "the 28 region alone", not because they would crash: the conf
+# ---- import is above every guard now. Read from the copy that is RUNNING, so a fixture copy of the
+# ---- leg is announced off its own headers. The anchor is the guard line itself, matched as a whole
+# ---- line, which is why the extractor's own source line - holding that text inside a longer one -
+# ---- cannot start the population early. A header spelled any other way is not announced, which is
+# ---- why every check after the region carries the one spelling this reads.
+if [ "$SCOPE" = only28 ]; then
+  _o28_self="$_LIB_DIR/${0##*/}"
+  _o28_nums=$(awk -v a='if [ "$SCOPE" = only28 ]; then' '
+      { ln = $0; sub(/\r$/, "", ln) }
+      ln == a { f = 1; next }
+      f && ln ~ /^# ---- check [0-9]+ / {
+        n = ln; sub(/^# ---- check /, "", n); sub(/[^0-9].*$/, "", n)
+        if (!(n in seen)) { seen[n] = 1; print n } }' "$_o28_self")
+  [ -n "$_o28_nums" ] \
+    || report "--only 28 read no check header after the 28 region, so no skip was announced and a check after it may be skipped in silence: $_o28_self"
+  for _o28_n in $_o28_nums; do
+    report "check $_o28_n skipped under --only 28 — this run asked for the 28 region alone"
+  done
+else
 
 # ---- check 30 - a --plan run may never claim terminality over a build it graded nothing on.
 # TOOL-dHonouredPark, closing review round 3. A CORPUS check rather than a fixture one, and
@@ -4710,11 +4845,12 @@ fi
 # rule at all. Backticks rather than bare tokens, because a bare match would take a prose mention or
 # a fenced example as a subject to grade.
 #
-# `${core:-}` AND `${M:-}` ARE DELIBERATE. Both are assigned inside the `only28` guard, so under
-# `--only 28` they are unset and `set -u` would kill the script right here. That flag does not reach
-# this block today for an unrelated reason - check 30 above reads `$MEMORY_ROOT` under the same guard
-# and dies first, measured at e828f778 and filed as TOOL-aHoistedPass-37 - and these two spellings
-# are what stop this check becoming the SECOND crash on that path the day the first one is fixed.
+# `${core:-}` AND `${M:-}` are belt and braces now, and no longer a crash guard. They were written when
+# `--only 28` could reach this block with both unset - check 30 died first on `$MEMORY_ROOT`, measured
+# at e828f778 and filed as TOOL-aHoistedPass-37. TOOL-dDerivedDocket-30 closed that path twice over:
+# the conf import that sets `M` runs above the scope guard on every scope, and under `--only 28` this
+# block is an announced skip and never runs. `core` is still assigned inside a guard, so the two
+# spellings stay as a cheap second guard for a future caller, not as the reason this check survives.
 #
 # TWO CARRIERS, and the second half is the closing review's F6. This check read the build-method
 # render alone while the SKILL - the carrier an agent actually reads, and the one that mandates
@@ -4866,7 +5002,7 @@ _lc_hits=${_lc_hits%$'\n'}
 # ---- 39 AND 40 ARE THE TWO CHECKS TOOL-dDerivedDocket-4's spec and ledger call 32 and 33. main
 # ---- numbered aWokenSentinel's sidecar-root and line-count checks 32 and 33 first, and the
 # ---- reconcile merge of origin/main into this build kept main's numbers and moved this pair.
-# ---- 39: EVERY READ OF THE `phase` FACT GOES THROUGH ONE OF THE TWO READERS (S8). Two readers, a
+# ---- check 39 - EVERY READ OF THE `phase` FACT GOES THROUGH ONE OF THE TWO READERS (S8). Two readers, a
 # ---- call-site classification, and a structural arm that grades it — because a classification
 # ---- nothing enforces is a comment. The rules, stated once here and nowhere else:
 # ----
@@ -4910,7 +5046,7 @@ else
     || fail 39 "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified:$_c39"
 fi
 
-# ---- 40: A PHASE ANOTHER VERB PRODUCES IS NOT REACHABLE THROUGH `--phase`. Vocabulary membership is
+# ---- check 40 - A PHASE ANOTHER VERB PRODUCES IS NOT REACHABLE THROUGH `--phase`. Vocabulary membership is
 # ---- not permission: every literal phase a `set_fact … phase` site writes is a PRODUCER's, written
 # ---- with the facts that make it mean something, and a phase move into it would be that record with
 # ---- none of them. The terminals are covered by `verb_phase`'s own `is_terminal` branch, and
@@ -4930,7 +5066,7 @@ if [ -f "$DRIVER" ]; then
     || fail 40 "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read:$_c40"
 fi
 
-# ---- 15, THE DATING SELF-SCAN - TOOL-dDerivedDocket-22 section 7. A FIRST-COMMIT DATE read with
+# ---- check 15 - THE DATING SELF-SCAN, TOOL-dDerivedDocket-22 section 7. A FIRST-COMMIT DATE read with
 # ---- `--diff-filter=A` and no `--follow` anywhere in this kit's own shell. That spelling dates an
 # ---- archived record to the rotation that added its name, which moves a grandfathered record into a
 # ---- cutoff's graded set where no verb may repair it; check 15's anchor cutoff carried exactly that
@@ -4949,6 +5085,8 @@ _c15s=$(for _c15f in "$HERE"/*.sh; do
         done)
 [ -z "${_c15s//[[:space:]]/}" ] \
   || fail 15 "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather:$_c15s"
+
+fi   # ---- end of the checks `--only 28` skips
 
 
 exit "$status"

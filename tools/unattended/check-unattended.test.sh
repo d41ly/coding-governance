@@ -3319,6 +3319,52 @@ printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
 
+# ---- TOOL-dDerivedDocket-30 S1: THE DIRECTORY AND THE BLOB, the two conditions A to F left out. Four
+# ---- fixtures on arm A's shape, each graded through `--skip 28` because check 23 sits outside that
+# ---- region. G: the brief EDITED after its row hashed it is no longer the brief the row names, so it
+# ---- reports. H: a row naming a SIBLING unit excuses nothing for this one. I: a row naming a path
+# ---- outside the build's own `prompts/` - a product file, hashed correctly - excuses nothing. J: the
+# ---- `{brief, row}` commit carrying an EDITED brief is not skipped as bookkeeping, so it is the commit
+# ---- graded and the edit reports rather than the clean commit after it. G, I and J were silent at
+# ---- the base, where the row's unit alone decided; H is the unit condition's control.
+run_skip_leg() { bash "$SCRIPT" --skip 28 2>&1; }
+# G: edited after hashing
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+printf '# brief, edited after the row hashed it\n' > "$BRIEF"
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
+# H: a sibling's row
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-2 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
+# I: a product file named by a correctly hashed row
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'p\n' > work/product.txt
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s work/product.txt\n' \
+  "$(git hash-object work/product.txt | cut -c1-12)" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote work/product.txt in memory/builds/tRun/RUN.md"
+# J: the bookkeeping commit carrying an edited brief is graded, not skipped
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+printf '# brief, edited after the row hashed it\n' > "$BRIEF"
+git add -A && git commit -q -m "ARCH-tRun-1 brief handed" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
+
 # ---- THE COMPARISON NOW FAILS THE LEG, ABOVE ITS CEILING (TOOL-cMendedVintage-14). This arm used
 # ---- to assert the opposite - spec 23 S1 / AC9 pinned "reports without failing" - and that pin is
 # ---- SUPERSEDED rather than deleted quietly, because it is the whole of what the ruling changed:
@@ -4814,6 +4860,90 @@ out=$(run_lg_leg)
 miss "$out" "a first-commit DATE is read with --diff-filter=A and no --follow"
 rm -f "$TMP/$KIT_REL/probe-date.sh"
 reset_tree
+
+# ==== TOOL-dDerivedDocket-30: the conf hoist, the allow-list join and the flag arm =================
+# ---- AC3. `--only 28` used to die on `set -u` at check 30, because the conf import sat inside the
+# ---- guard it skips. Now it exits 0, announces one skip per numbered check after the 28 region on
+# ---- the report channel, and prints nothing by default. The list below is this suite's pin of the
+# ---- population; the leg DERIVES it, which the staged header after it is what proves.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1); rc=$?
+same "--only 28 exits 0 once the conf is read above the scope guard" "$rc" "0"
+miss "$out" "unbound variable"
+for o28 in 30 31 32 33 39 40 15; do
+  hit "$out" "check $o28 skipped under --only 28 — this run asked for the 28 region alone"
+done
+out=$(bash "$SCRIPT" --only 28 2>&1); rc=$?
+same "--only 28 without the report channel exits 0" "$rc" "0"
+same "--only 28 without the report channel prints nothing" "$out" ""
+# ...and the population is DERIVED: a header staged after the region is announced with no list edited.
+# 97 is a number no check of the leg uses.
+mutate $KIT_REL/check-unattended.sh '/^if \[ "\$SCOPE" = only28 \]; then$/a # ---- check 97 - a fixture header, staged after the 28 region'
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1)" "check 97 skipped under --only 28 — this run asked for the 28 region alone"
+# ---- S6: the `--skip 28` smoke arm, the leg's other scope over the pristine fixture. It is also the
+# ---- GREEN CONTROL for every fixture below: the flag arm and the allow-list join read the pristine
+# ---- driver and leg without a finding, which is AC12's restored-verb half. Graded by what checks 22
+# ---- and 26 say rather than by the whole verdict, because this fixture's conf predates keys other
+# ---- checks now require, and a control that asserted the whole leg green would measure those.
+reset_tree
+out=$(run_skip_leg)
+miss "$out" "unknown argument"
+miss "$out" "UNATTENDED check 22 FAILED"
+miss "$out" "UNATTENDED check 26 FAILED"
+
+# ---- AC4, the allow-list join. A key removed from the region reds NAMING it; then the three region
+# ---- shapes that yield no usable key - one sentinel gone, an empty pair, a doubled pair - each red
+# ---- naming the REGION, because each would otherwise subtract nothing or everything and pass.
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/RECALL_CLI|ASKS_CMD|/RECALL_CLI|/'
+hit "$(run_skip_leg)" "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: ASKS_CMD"
+reset_tree
+mutate $KIT_REL/check-unattended.sh '/^    # gov:conf-allow-end$/d'
+hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
+reset_tree
+mutate $KIT_REL/check-unattended.sh '/^    # gov:conf-allow-begin$/,/^    # gov:conf-allow-end$/{/# gov:conf-allow-/!d}'
+hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/^    # gov:conf-allow-end$/&\n    # gov:conf-allow-begin\n    # gov:conf-allow-end/'
+hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
+
+# ---- AC5 and AC6, the flag arm in both directions: a header flag no parser takes, and a parser arm
+# ---- no header names.
+reset_tree
+mutate $KIT_REL/unattended.sh 's/^#   unattended\.sh --status <slug> /#   unattended.sh --status <slug> [--frobnicate] /'
+hit "$(run_skip_leg)" "the driver's header documents a flag no parser token accepts, so the usage text a reader follows names an argument the driver refuses: --frobnicate"
+reset_tree
+mutate $KIT_REL/unattended.sh 's/^    --pass)         PK_ITEM=/    --frobnicate)   shift ;;\n    --pass)         PK_ITEM=/'
+hit "$(run_skip_leg)" "the driver's parser accepts a flag no header line documents, and the usage text is rendered from that header, so the argument reaches no reader: --frobnicate"
+# ---- AC12: a slug verb is parsed by SET MEMBERSHIP. Dropped from VERBS_SLUG with its header line
+# ---- kept, it is a documented flag nothing parses; restored, the pristine control above is silent.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^VERBS_SLUG=/s/ --audit / /'
+hit "$(run_skip_leg)" "the driver's header documents a flag no parser token accepts, so the usage text a reader follows names an argument the driver refuses: --audit"
+
+# ---- AC8, the suite half. The fixture carries NEITHER suite, which is every adopter tree: one
+# ---- announced skip per suite, and the verdict is the other checks'. Then a driver suite with every
+# ---- `--version` line dropped, and one with every `--framed` line dropped, each red naming the flag.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --skip 28 2>&1)
+miss "$out" "UNATTENDED check 26 FAILED"
+hit "$out" "/unattended.test.sh — this tree does not carry the suite, which is withheld from every adopter install, so no arm can be joined to the flags its parser accepts"
+hit "$out" "/check-unattended.test.sh — this tree does not carry the suite, which is withheld from every adopter install, so no arm can be joined to the flags its parser accepts"
+grep -v -- '--version' "$HERE/unattended.test.sh" > "$TMP/$KIT_REL/unattended.test.sh"
+out=$(run_skip_leg)
+hit "$out" "a flag a parser accepts appears on no non-comment line of its suite, so no arm has ever passed it and it is the one invocation nobody runs"
+hit "$out" "/unattended.test.sh lacks --version"
+grep -v -- '--framed' "$HERE/unattended.test.sh" > "$TMP/$KIT_REL/unattended.test.sh"
+hit "$(run_skip_leg)" "unattended.test.sh lacks --framed"
+# ---- AC13, the leg's own half: its suite with every `--skip` line dropped reds naming `--skip`, and
+# ---- the leg with its argv-begin sentinel deleted reds naming the region.
+reset_tree
+grep -v -- '--skip' "$HERE/check-unattended.test.sh" > "$TMP/$KIT_REL/check-unattended.test.sh"
+hit "$(run_skip_leg)" "check-unattended.test.sh lacks --skip"
+reset_tree
+mutate $KIT_REL/check-unattended.sh '/^# gov:argv-begin$/d'
+hit "$(run_skip_leg)" "a parser's argument region is not exactly one bare gov:argv-begin and gov:argv-end pair holding at least one flag, so the flag join would grade that parser against nothing and pass by finding nothing"
+reset_tree
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -4900,7 +5030,12 @@ fi   # ---- end REGION TWO -----------------------------------------------------
 # ---- lines, not measured through a suite run: the merge runs no suite. main's check-32 and
 # ---- check-33 arms keep main's numbers; this build's phase-routing pair, which its own spec
 # ---- calls 32 and 33, is checks 39 and 40 in the merged leg.
-FLOOR_ASSERTIONS=657
+# ---- RAISED 657 -> 700 by exactly the arm, TOOL-dDerivedDocket-30: forty-three executed assertions,
+# ---- all in region two - four check-23 brief fixtures G to J beside arm F, and thirty-nine in the
+# ---- unit's block at the END of region two - so FLOOR_SHARD_2 carries the same +43 and
+# ---- FLOOR_SHARD_1 is untouched. COUNTED by executing both blocks behind a replica of this
+# ---- prologue by hand; this pass runs no suite.
+FLOOR_ASSERTIONS=700
 # ---- RAISED 406 -> 410 by the closing diff review of aProbedUnit, round 2 (cluster A, id 6): the
 # ---- grandfathered BOUNDED fold control, its at-cutoff red, and the unreadable-FOLD_CUTOFF arm with
 # ---- its `mutate` — four assertions, all in the check-2 block inside region one, so FLOOR_SHARD_1
@@ -4926,7 +5061,7 @@ FLOOR_ASSERTIONS=657
 # relation, and asserting it over floors rather than executed counts is how the first draft of the
 # sibling spec shipped an identity that was false by 60.
 FLOOR_SHARD_1=102
-FLOOR_SHARD_2=555
+FLOOR_SHARD_2=598
 case "$SH_I" in
   1) FLOOR=$FLOOR_SHARD_1; MODE="shard 1/$SHARD_ARITY" ;;
   2) FLOOR=$FLOOR_SHARD_2; MODE="shard 2/$SHARD_ARITY" ;;
