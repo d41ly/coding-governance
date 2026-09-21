@@ -861,8 +861,8 @@ def main() -> int:
              "24f39915b3de86010a30d8698d0d4b317db015de", "--", "tools/check-wiring.sh"],
             capture_output=True, text=True).stdout.strip()
 
-        def stale_target(name: str) -> pathlib.Path:
-            t = make_target(tmp / name, DEPLOY_FULL)
+        def stale_target(name: str, deploy: str = DEPLOY_FULL) -> pathlib.Path:
+            t = make_target(tmp / name, deploy)
             run("apply", "--target", str(t), "--kits", "check-wiring")
             rp = t / ".governance" / "install.json"
             rec = json.loads(rp.read_text(encoding="utf-8"))
@@ -932,7 +932,14 @@ def main() -> int:
         # --- further away on every run, and the row gets harder to recover with no event to notice.
         # --- OBSERVED RED before the guard landed: `update --write` stamped forward over such a row
         # --- (3e11f259 -> b263d5b9 on a scratch fixture) and printed the ordinary re-stamp line.
-        ung = stale_target("ungraded")
+        # THE TARGET DECLARES THE KIT THE REMEDY IS RUN OVER. `adopt` plans the target's own
+        # `kits` list (TOOL-aScouredKit-13), and DEPLOY_FULL declares memory-tree alone, so the
+        # printed remedy could never see `tools/check-wiring.sh` here and refused the pin as
+        # matching no planned destination — a fixture that installs a kit its descriptor does not
+        # declare, which no real target is. The arm below was written while this suite was already
+        # red on the vintage fixture, so it had never been seen green.
+        ung = stale_target("ungraded", DEPLOY_FULL.replace(
+            'kits = ["memory-tree"]', 'kits = ["memory-tree", "check-wiring"]'))
         rp_u = ung / ".governance" / "install.json"
         rec = json.loads(rp_u.read_text(encoding="utf-8"))
         for f in rec["files"]:
@@ -1223,11 +1230,22 @@ def main() -> int:
         ev = make_target(tmp / "u5a", DEPLOY_FULL)
         run("apply", "--target", str(ev), "--kits", "check-wiring")
         pc = run("check", "--target", str(ev))
+        # THE EXPECTED COUNT IS THE DESCRIPTOR'S, read from the file that owns it rather than typed
+        # here: these three arms pinned `2/2` and went red the day a third file joined the kit
+        # (TOOL-aReplayedCard-2), which is a number beside the population it counts. The
+        # descriptor and not the receipt, because the receipt is the product's own output.
+        import tomllib as _cwtoml  # noqa: PLC0415
+        _cw_n = len(_cwtoml.loads((HERE / "entries" / "check-wiring.kit.toml")
+                                  .read_text(encoding="utf-8"))["files"][0]["include"])
+        check("PRECONDITION the descriptor ships more than one file, so the counts below are "
+              "not a 1/1 that any single-row loop would print", _cw_n > 1, str(_cw_n))
         check("a clean install reports a DERIVED integrity count, non-zero",
-              "integrity: 2/2" in pc.stdout, pc.stdout)
-        check("and a derived provenance count", "provenance: 2/2" in pc.stdout, pc.stdout)
+              f"integrity: {_cw_n}/{_cw_n}" in pc.stdout, pc.stdout)
+        check("and a derived provenance count", f"provenance: {_cw_n}/{_cw_n}" in pc.stdout,
+              pc.stdout)
         check("and compares the sidecar against the receipt, both counts named",
-              "sidecar: 2 line(s) compared against 2 hashed row(s)" in pc.stdout, pc.stdout)
+              f"sidecar: {_cw_n} line(s) compared against {_cw_n} hashed row(s)" in pc.stdout,
+              pc.stdout)
         check("a clean install exits 0 through those loops", pc.returncode == 0,
               pc.stdout + pc.stderr)
 
@@ -4981,10 +4999,18 @@ user_skills = "/tmp/gk-fake-skills"
             rp = t / ".governance" / "install.json"
             rec = json.loads(rp.read_text(encoding="utf-8"))
             rec["gov_commit"] = V8[0]
-            for f in rec["files"]:
+            for f in list(rec["files"]):
                 if not f.get("source"):
                     continue
                 b = gblob(V8[0], f["source"])
+                # NEVER RECEIVED AT THIS VINTAGE: a kit file gov did not ship at V8[0] leaves the
+                # receipt and the tree, as `stale_target` above does, rather than carrying the
+                # empty blob `gblob` returns for it as an identity `-7` S9 refuses. The fragment
+                # joined the kit at TOOL-aReplayedCard-2, a month after every one of these four.
+                if not b:
+                    rec["files"].remove(f)
+                    (t / f["path"]).unlink()
+                    continue
                 f["commit"] = V8[0]
                 # BOTH identities from the SAME vintage, or the fixture is `-7` S9's corruption
                 # rather than an older install, and every run below refuses before it classifies.
@@ -5030,8 +5056,16 @@ user_skills = "/tmp/gk-fake-skills"
         _c8 = run("check", "--target", str(t8))
         check("[-8] AC3 check exits 0 immediately after the merged update",
               _c8.returncode == 0, _c8.stdout[-1200:] + _c8.stderr[-400:])
+        # The expected count is what gov SHIPPED at V8[2], derived from its tree — the kit has
+        # grown since these vintages and a `2/2` typed here is a number beside its population.
+        import tomllib as _cw8toml  # noqa: PLC0415
+        _n8 = sum(1 for _f in _cw8toml.loads(
+            (HERE / "entries" / "check-wiring.kit.toml").read_text(encoding="utf-8"))
+            ["files"][0]["include"] if gblob(V8[2], "tools/" + _f))
+        check("[-8] AC3 PRECONDITION more than one kit file exists at V8[2], so the count below "
+              "is not a 1/1 any single-row loop would print", _n8 > 1, str(_n8))
         check("[-8] AC3 ...and its provenance loop RESOLVED the merged row rather than skipping it",
-              "provenance: 2/2 resolved" in _c8.stdout, _c8.stdout[-600:])
+              f"provenance: {_n8}/{_n8} resolved" in _c8.stdout, _c8.stdout[-600:])
 
         # ---- AC1, second half: the run that used to destroy the edit.
         settle(t8, "after the first update")
@@ -8434,10 +8468,20 @@ user_skills = "/tmp/gk-fake-skills"
         _src24d = _eng24d.read_text(encoding="utf-8")
         _mark24d = ("        if not (target / path).is_file():" + NLp
                     + "            return False" + NLp)
+        # TWO edits stage the pre-fix engine, not one. Round 3 (L3) removed the ternary's `else None`
+        # arm because the guard made it unreachable — so with the guard alone staged out, the
+        # worktree read raises on the deleted file and the run dies with a traceback instead of
+        # silently recreating the block, and this arm graded a crash it never asked about. The
+        # fallback goes back in beside the guard's removal, which is the engine the finding was
+        # measured on.
+        _read24d = "derive_outside_region((target / path).read_bytes(), om, cm)]"
+        _read24d_pre = ("derive_outside_region((target / path).read_bytes()"
+                        " if (target / path).is_file() else None, om, cm)]")
         check("[H2] LIVENESS the guard is where the staged break expects it, or the run below "
               "grades an engine this arm never broke",
-              _src24d.count(_mark24d) == 1, _mark24d)
-        _eng24d.write_text(_src24d.replace(_mark24d, "", 1), encoding="utf-8", newline=NLp)
+              _src24d.count(_mark24d) == 1 and _src24d.count(_read24d) == 1, _mark24d)
+        _eng24d.write_text(_src24d.replace(_mark24d, "", 1).replace(_read24d, _read24d_pre, 1),
+                           encoding="utf-8", newline=NLp)
         _u24e = run_in_gov(_g24d, "update", "--target", str(_t24d["broken"]), "--to", _to24d,
                            "--write")
         _o24e = _u24e.stdout + _u24e.stderr
@@ -10682,9 +10726,12 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- beside a `tracked()` that already existed — two spellings of one question, in the one
         # ---- function where they have to agree.
         _g6src = (HERE / "govkit.py").read_text(encoding="utf-8")
+        # The spelling is the CALL, not a binding: DEPL-cMendedVintage-13 inlined the hoisted
+        # `tracked_target` into the legs-emission call it fed, and the binding this arm named for
+        # three weeks stopped existing while the property it stands for did not.
         check("[-6] S6 the legs step reads the target index through `tracked()`, not an inline "
               "ls-files beside it",
-              'tracked_target = set(tracked(target))' in _g6src
+              'set(tracked(target)), r,' in _g6src
               and 'tracked_target = set(subprocess.run' not in _g6src, "inline reader still present")
 
         # ============================================================= DEPL-cMendedVintage-22
