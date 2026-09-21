@@ -4463,6 +4463,11 @@
       "file": "tools/lexicon/subtokens.py"
     },
     {
+      "id": "render_drift_offenders",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "render_edges",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4526,6 +4531,11 @@
       "id": "render_new_build_readme",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_offender_keys",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "render_order",

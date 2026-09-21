@@ -7,6 +7,7 @@
 #
 #   tools/memory-tree/check-memory-hygiene.sh            # full check
 #   tools/memory-tree/check-memory-hygiene.sh --staged   # pre-commit fast leg (file-checks on staged paths)
+#   <this script> --offenders                            # one `check <n><TAB><key>` per offender, nothing else
 #
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm and 23 all skip, and the
@@ -17,6 +18,17 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
+# --offenders: THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). The full
+# check runs exactly as it does with no flag and exits as it does; what changes is stdout, which
+# carries one `check <n><TAB><key>` line per offender each failing check lists and NOTHING ELSE — so
+# every notice, header and count this engine prints goes to /dev/null, and the keys go to fd 3. The
+# bar's red attribution compares two trees' offender SETS, so a key is the offender a check names —
+# a path, an id, or both — with its line locator dropped, because one unrelated insertion above an
+# inherited offender would otherwise move it into S(L) and out of S(R). A key repeating carries
+# `#<k>`, its occurrence ordinal, so two identical offenders stay two. A refusal that exits 2 prints
+# no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
+OFFENDERS=0; OFFENDER_KEYS=""
+if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
 KIT_MEMORY_TREE_VERSION=2.78   # gov:kit memory-tree@2.78 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
@@ -308,7 +320,18 @@ while IFS= read -r _l; do [ -n "$_l" ] && LEGACY_SET["$_l"]=1; done <<<"$LEGACY"
 while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
-fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
+fail() { if [ "$OFFENDERS" = 1 ]; then add_offender_keys "$1" "$2"; else echo "HYGIENE check $1 FAILED — $2"; fi; status=1; }
+# add_offender_keys <check> <message> — one key per offender line the message LISTS. A message's first
+# line is its header and is dropped when a list follows it; a one-line message is its own key. Lines
+# ending in a colon are sub-headers, and a `… and N more` line is a count rather than an offender.
+add_offender_keys() {
+  local _body=$2 _k
+  case "$_body" in *$'\n'*) _body=${_body#*$'\n'} ;; esac
+  _k=$(printf '%s\n' "$_body" \
+    | sed -E 's/\r$//; s/\t/ /g; s/^[[:space:]]+//; s/[[:space:]]+$//; s/([^[:space:]:]):[0-9]+(:[0-9]+)*(:|[[:space:]]|$)/\1\3/g' \
+    | awk -v c="check $1" 'NF && $0 !~ /:$/ && $0 !~ /^(…|\.\.\.) *and / { print c "\t" $0 }')
+  [ -z "$_k" ] || OFFENDER_KEYS="$OFFENDER_KEYS$_k"$'\n'
+}
 
 # --- THE CURATION-DEBT PARTITION. Checks 6, 7 and 8 used to drop a listed file out of their
 # --- population with `in_debt "$f" && continue`, which is why a row whose fault was fixed — or
@@ -1201,6 +1224,7 @@ fi
 if [ "$STAGED" = 0 ]; then
   if ! rotm=$("$_PY" "$HERE/row_grammar.py" --check-rotation 2>&1); then
     printf '%s\n' "$rotm"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 24 $'\n'"$rotm"
   fi
 fi
 
@@ -1225,6 +1249,7 @@ if [ "$STAGED" = 0 ]; then
   fi
   [ -n "$tam" ] && printf '%s\n' "$tam"
   [ "$_tarc" -ne 0 ] && status=1
+  [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 25 $'\n'"$tam"
 fi
 
 # 11 — old-tree tombstone (only if TOMBSTONE_ROOTS is configured; never grandfathered).
@@ -1249,6 +1274,7 @@ done
 if [ -n "$READINESS_ROWS_CUTOFF" ] && [ -z "$READINESS_ROWS" ]; then
   echo "HYGIENE REFUSING — READINESS_ROWS_CUTOFF is $READINESS_ROWS_CUTOFF but READINESS_ROWS is empty, so the §5 row arm would grade no row and report the same zero as a conforming tree."
   status=1
+  [ "$OFFENDERS" = 0 ] || add_offender_keys 12 "READINESS_ROWS is empty while READINESS_ROWS_CUTOFF is set"
 fi
 if [ -n "$SPEC_FORMAT_CUTOFF" ]; then
 SPEC_CANON='## 1. Goal
@@ -1999,6 +2025,7 @@ if [ "$STAGED" = 0 ]; then
   [ -n "$ids" ] && printf '%s
 ' "$ids"
   [ "$_idsrc" -ne 0 ] && status=1
+  [ "$_idsrc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 13-16 $'\n'"$ids"
 fi
 
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
@@ -2008,6 +2035,7 @@ if [ "$STAGED" = 0 ]; then
   if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
     printf '%s
 ' "$got"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"
   fi
 fi
 
@@ -2018,6 +2046,7 @@ if [ "$STAGED" = 0 ]; then
   if ! rowg=$("$_PY" "$HERE/row_grammar.py" --check 2>&1); then
     printf '%s
 ' "$rowg"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 20 $'\n'"$rowg"
   fi
 fi
 
@@ -2360,6 +2389,11 @@ if [ -n "$POP_MISSING" ]; then
   echo "HYGIENE unlinted tree. Either the tree is unscaffolded or a path selector is mis-segmented."
   printf '%s' "$POP_MISSING"
   status=1
+  [ "$OFFENDERS" = 0 ] || add_offender_keys population $'\n'"$POP_MISSING"
 fi
 
+# THE KEYS, numbered where one repeats, on the fd `--offenders` kept for them. Nothing else reaches it.
+if [ "$OFFENDERS" = 1 ]; then
+  printf '%s' "$OFFENDER_KEYS" | awk 'NF { n[$0]++; print (n[$0] > 1 ? $0 "#" n[$0] : $0) }' >&3
+fi
 exit "$status"

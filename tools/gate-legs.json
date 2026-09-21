@@ -808,6 +808,11 @@
       "tools/drift-audit/drift_report.py",
       "--check"
     ],
+    "signature": [
+      "python",
+      "tools/drift-audit/drift_report.py",
+      "--offenders"
+    ],
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 540
@@ -967,6 +972,11 @@
       "bash",
       "tools/check-install-prefix.sh"
     ],
+    "signature": [
+      "bash",
+      "tools/check-install-prefix.sh",
+      "--offenders"
+    ],
     "chunk": "product",
     "subject": "repo",
     "ceiling": 2940
@@ -1083,6 +1093,11 @@
       "python",
       "tools/lexicon/lexicon.py"
     ],
+    "signature": [
+      "python",
+      "tools/lexicon/lexicon.py",
+      "--offenders"
+    ],
     "guard": [
       "tools/",
       "skills/session-kickoff/",
@@ -1148,6 +1163,11 @@
     "argv": [
       "bash",
       "tools/memory-tree/check-memory-hygiene.sh"
+    ],
+    "signature": [
+      "bash",
+      "tools/memory-tree/check-memory-hygiene.sh",
+      "--offenders"
     ],
     "chunk": "records",
     "subject": "repo",

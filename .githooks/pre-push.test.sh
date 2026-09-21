@@ -102,6 +102,39 @@ case "$msg" in
   *) bad "8 expected a refusal, got: ${msg:-<push SUCCEEDED — the whole bar was skipped>}" ;;
 esac
 
+# case 9 — THE RED IS ATTRIBUTED AGAINST THE LANDING BASE (TOOL-dDerivedDocket-23 AC7). The runner is
+#          handed GATE_ATTRIBUTE = the REMOTE sha git feeds the hook on stdin, never the local one: a
+#          red attributed against the tree that has it reads every red as inherited. The hook is
+#          driven DIRECTLY with a hand-fed stdin line, because only then are both shas known to the
+#          arm, and a fake runner prints its environment and exits 3 so the hook's exit is visible.
+git checkout -q main
+git commit -q --allow-empty -m c9
+_c9r=$(git ls-remote origin refs/heads/main | cut -f1)
+_c9l=$(git rev-parse HEAD)
+envr="$tmp/envr.sh"
+printf '#!/usr/bin/env bash\nprintf "ATTR=%%s\\n" "${GATE_ATTRIBUTE:-}"\nexit %s\n' 3 > "$envr"
+msg=$( GATE_ATTRIBUTE= GOV_GATE_CMD="bash $envr" bash "$tmp/hooks/pre-push" origin "$tmp/remote.git" \
+       <<<"refs/heads/main $_c9l refs/heads/main $_c9r" 2>&1 ); _c9rc=$?
+if [ -z "$_c9r" ] || [ "$_c9r" = "$_c9l" ]; then
+  bad "9 precondition — the remote and local shas must both exist and differ, or the arm grades nothing"
+else
+  case "$msg" in
+    *"ATTR=$_c9r"*) ok "9 the runner is handed GATE_ATTRIBUTE = the remote sha fed on stdin" ;;
+    *"ATTR=$_c9l"*) bad "9 the hook exported its LOCAL sha, which attributes a red against the tree that has it" ;;
+    *) bad "9 GATE_ATTRIBUTE did not reach the runner as the remote sha: ${msg:-<no output>}" ;;
+  esac
+  [ "$_c9rc" = 3 ] && ok "9 the hook's exit is the runner's (3)" || bad "9 the hook exited $_c9rc where the runner exited 3"
+fi
+# 9b — THE CONTROL: a remote sha of all zeroes is a branch the remote does not have, and exports nothing.
+_c9z=0000000000000000000000000000000000000000
+msg=$( GATE_ATTRIBUTE= GOV_GATE_CMD="bash $envr" bash "$tmp/hooks/pre-push" origin "$tmp/remote.git" \
+       <<<"refs/heads/main $_c9l refs/heads/main $_c9z" 2>&1 )
+case "$msg" in
+  *"ATTR=$_c9z"*) bad "9b an all-zero remote sha was exported as a base to attribute against" ;;
+  *"ATTR="*) ok "9b an all-zero remote sha exports no GATE_ATTRIBUTE" ;;
+  *) bad "9b the runner did not run, so the control grades nothing: ${msg:-<no output>}" ;;
+esac
+
 # ============================================================================================
 # THE BOUNDARY DECIDES. One arm per forcing predicate, plus the one that matters most: the arm
 # proving a scoped run is EVER chosen. Without it every predicate below is satisfied by a hook

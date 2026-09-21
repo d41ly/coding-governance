@@ -161,6 +161,9 @@ review fold, when the deploy-time catalogue's only `vN.N` was prose and a gate b
 have compared a literal against a real version and redded forever. Both miscounts were caught only by
 measuring, which is why the gate derives the count instead of asserting one.
 
+**`--offenders` is a key per offender, for the bar's red attribution.** No `path:line`, no count, no
+cut, a repeat carrying `#<k>`; its exit is `--check`'s. `TOOL-dDerivedDocket-23`.
+
 ## Shared seams
 
 `tools/lexicon/lexicon_conf.py` is the ONE reader of `.lexicon.conf`. FOUR consumers now need the

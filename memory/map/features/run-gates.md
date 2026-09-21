@@ -34,6 +34,7 @@ lexicon-verbs = []
 globs = [
   "tools/run-gates/run-gates.sh",
   "tools/run-gates/run-selftests.sh",
+  "tools/run-gates/lib-attribute.sh",
   "tools/run-gates/run-selftests.test.sh",
   "tools/run-gates/selftest-budgets.txt",
   "tools/run-gates/derive-ceilings.py",
@@ -155,6 +156,16 @@ tree fixed plus one it introduced nets to zero. A dead side has no members, so e
 it reads NEW — the direction that fails toward noise rather than toward a false pass. The R-side set
 is cached per (R, suite, suite blob at R) and written only after a run that COMPLETED, which is what
 bounds a cache miss's doubled cost to once per pair. `TOOL-dDerivedDocket-1`.
+
+**A red BAR leg is attributed too, and it is REPORT-ONLY.** `GATE_ATTRIBUTE=<R>` re-runs each red
+leg alone at R from a detached worktree and prints a `GATE attr` line per red leg — OWN, INHERITED,
+MIXED, CONTENDED or DEAD PROBE — plus an `attribution` file in the run record; no exit code moves.
+The normaliser and the worktree runner are ONE sourced file, `lib-attribute.sh`, which both runners
+load only on the path that attributes, so a runner copied alone still runs every other mode. R's row
+supplies BOTH ends' `signature`, so a branch cannot choose its own grader, and a diff touching the
+runner, the fingerprint helper, the pre-push hook or that file reads every red OWN (KF3). The
+pre-push hook exports the REMOTE sha as R, because a "not mine" claim measured against a base the
+world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDocket-23`.
 
 ## Shared seams
 

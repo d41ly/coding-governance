@@ -148,6 +148,11 @@ together while every arm still passed.
 non-comment line of the engine must move `KIT_MEMORY_TREE_VERSION` too; `hygiene-parity.test.sh`
 derives its baseline floor from that constant, and a stale one put the floor before the change.
 
+**`--offenders` runs the full check and prints only keys.** One `check <n><TAB><key>` per offender a
+failing check lists, line locators stripped, headers and `… and` lines dropped, a repeat carrying
+`#<k>`; every other line goes to /dev/null and the keys to fd 3, and the exit is the default mode's.
+The merge bar's red attribution grades this leg with it as a SET. `TOOL-dDerivedDocket-23`.
+
 ## Shared seams
 
 - `.memory-tree.conf` — the one declaration both this engine and the sibling Python modules read.

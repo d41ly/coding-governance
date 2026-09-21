@@ -55,6 +55,7 @@ file that had one, byte-identically, under the markers `tools/lib/resolve-python
 |---|---|
 | `run-gates.sh` | the runner. Legs run through a bounded pool, at the width `gate-profiles.txt` declares for the detected hardware; `GATE_JOBS` overrides the width alone |
 | `gate-profiles.txt` | the DECLARED knob table: rows of name, minimum cores, minimum RAM MB, knobs, most-capable-first with a zero-threshold catch-all last. `GATE_PROFILE=<row>` selects one by name and skips detection; `GATE_PROFILES=<path>` reads a different table, and an absent path falls back to the built-in formula — which is the rollback. `GATE_CORES` / `GATE_RAM_MB` replace the detected readings and bypass detection, and `GATE_CGROUP_ROOT` relocates the cgroup files the RAM chain reads |
+| `lib-attribute.sh` | the attribution's two shared halves, SOURCED and never run: the normaliser (`write_normaliser`) and the detached scratch worktree at a base (`add_scratch_worktree` / `remove_scratch_worktree`). The runner sources it only when `GATE_ATTRIBUTE` is set and a leg is red, and `run-selftests.sh` only under `--attribute`, so a copy of either runner without it still runs every other mode |
 | `gate-fingerprint.sh` | "what tree is this, exactly", in two forms. With no argument it digests the tree object at `HEAD` plus the sorted porcelain lines plus the blob hashes of every dirty-or-untracked file; with a `<rev>` argument it digests that rev's tree and supplies the other two components EMPTY. On a CLEAN tree the two forms agree, which is what lets a hook ask whether a recorded green still describes the commit it names. Empty output on any failure — a caller that cannot measure must see nothing rather than a partial digest |
 | `profile_bar.py` | the profiling verb: runs the bar, records it as a RUN, and names the regime — floor-bound or packing-bound — so the next fix is chosen from a measurement |
 | `profile_bar.test.sh` | the profiler's own arms |
@@ -179,6 +180,55 @@ selfcheck.
 
 It REFUSES with exit 2, rather than passing, when the manifest it is pointed at is not gov's. A
 gov-only harness that quietly succeeds against a foreign corpus is the split failing open.
+
+## Whose red is it — `GATE_ATTRIBUTE=<R>`
+
+A red bar names WHICH legs failed and never WHOSE failure each one is. With `GATE_ATTRIBUTE=<R>` set
+the runner re-runs each red leg ALONE at `R` — `R`'s own manifest row, from a detached scratch
+worktree of `R` under the git common dir, under `R`'s ceiling for that row — and prints one line per
+red leg in manifest order, then a summary:
+
+```
+GATE attr  <leg>  INHERITED · offenders <n> · at <R8>
+GATE attr  <leg>  MIXED · inherited <i> · own <o> · at <R8>
+GATE attr  <leg>  OWN · <reason>
+GATE attr  <leg>  CONTENDED · timed out after <n>s; not re-run at R
+GATE attr  <leg>  DEAD PROBE · <reason>
+attributed <N> of <M> red legs against <R8>[ · DEAD PROBE <k>]
+```
+
+The same rows land in the run record as `attribution`, TAB-separated: leg, verdict, inherited, own,
+the full `R` sha, reason — the reason LAST. **It changes no exit code**: a bar that was red is red.
+What to DO with a verdict is a policy, and the policy is not this runner's.
+
+The classifier, first match wins. **OWN, forced** when the diff between `R` and the working tree
+touches this runner, `gate-fingerprint.sh`, `lib-attribute.sh` or the pre-push hook `core.hooksPath`
+names — a run that edited its grader cannot vouch for any verdict. **CONTENDED** when the leg's own
+ceiling fired (124 under a positive bound, or 137 under one whose seconds reached it); it is not
+re-run. **OWN** when `R` has no row for the leg, its argv differs from `R`'s, the diff touches its
+COMPARATOR — every tracked file under the directory of a tracked file in its argv or in `R`'s
+`signature`, plus each tracked root-level file those files' bytes name — or it is green at `R`.
+**DEAD PROBE** when `R` cannot answer, including an `R` run the whole-run wall cuts, or when the
+leg's own output at L normalises to nothing. Otherwise **INHERITED** or **MIXED**, by the rule below.
+
+`R` is meant to be the LANDING base. `.githooks/pre-push` exports the remote sha it reads for the
+default branch; an `R` that is a merge-base or a local ref buys an attribution only as fresh as it.
+
+### The optional `signature` key
+
+A manifest row may declare `"signature": [argv…]`: a command, run in the tree being graded, that
+prints ONE stable key per offender and nothing else — no line number, no count, no header, no cut.
+Where `R`'s row declares one, both ends are graded with `R`'s: INHERITED when the set of keys at L is
+non-empty and inside the set at `R`, else MIXED. Where it declares none, the leg's normalised output
+must be byte-identical to read INHERITED. **L's own `signature` is never run**, so a run cannot choose
+its own grader. The normaliser strips each root in its three spellings, `mktemp`-shaped names,
+durations and trailing whitespace, and nothing else: an unknown variation reads MIXED, the safe way.
+
+WHAT IT DOES NOT CHECK: the comparator reads each grader's own directory and the root files its
+bytes name, so a module imported from ANOTHER directory, or a conf named only at run time, is outside
+it; an edit there that hides the run's own offender can read INHERITED. An untracked file is
+invisible to the diff. A repository at a very deep path on Windows may fail to make the worktree,
+which reads every red DEAD PROBE rather than guessing.
 
 ## The report tail contract
 

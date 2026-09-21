@@ -54,6 +54,12 @@ exited 0 over it. The check designed to catch exactly that — dead repo-path ci
 structurally blind, because it classified a token as a repo path only when its first segment was a
 tracked top-level directory, and at a prefixed install a bare kit name is not one.
 
+**`--offenders` keys every hit, and the carried arm's failing files per literal.** One
+`<path><TAB><kind><TAB><spelling>` per unwaived arm-1 hit (`root`, `marker`), stale waiver
+(`stale-waiver`) and carried literal of a ROSE, UNRECORDED or SWAPPED file (`carried`, or one
+`carried-slack` for a fall), from ONE scan `carried_rows` now aggregates. Its exit is `--check`'s;
+`--check` stops at arm 1, this mode does not, so a later offender cannot hide. `TOOL-dDerivedDocket-23`.
+
 ## What the predicate can see, and what the population is (epoch 3)
 
 Both arms read ONE extension class, `sh py js md json toml txt tsv conf example`, recorded as a

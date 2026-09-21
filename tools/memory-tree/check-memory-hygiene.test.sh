@@ -843,7 +843,7 @@ write_base_spec 191 26 OPEN 2 "$(git rev-parse --short=8 HEAD)"
 git add -A && git commit -q -m base-green --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
-out=$(bash "$SCRIPT" 2>/dev/null)
+out=$(bash "$SCRIPT" 2>/dev/null); mainrc=$?
 st=0; n=0
 hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
@@ -865,6 +865,18 @@ miss 'tFixture-2.md ('
 miss 'tFixture-5.md ('
 miss 'tFixture-11.md ('
 miss 'tFixture-12.md ('
+# ---- --offenders: the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23 S3). Over
+# this same red tree: its exit is the default mode's, and its stdout is `check <n><TAB><key>` rows and
+# nothing else — no prose, no line locator, since the bar compares two trees' key SETS and a locator
+# moves when an unrelated edit lands above an inherited offender.
+offout=$(bash "$SCRIPT" --offenders 2>/dev/null); offrc=$?
+n=$((n+1)); [ "$offrc" = "$mainrc" ] || { echo "FAIL --offenders exited $offrc where the default mode exited $mainrc"; st=1; }
+n=$((n+1)); [ -n "$offout" ] || { echo "FAIL --offenders printed no key over a red fixture"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | awk -F'\t' 'NF != 2 || $1 !~ /^check [^ ]+$/ { bad = 1 } END { exit bad }' \
+  || { echo "FAIL --offenders printed a line that is not one check<TAB>key row"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | grep -qE ':[0-9]+(:|[[:space:]]|$)' && { echo "FAIL --offenders keyed an offender with its line locator"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'tFixture-3.md' || { echo "FAIL --offenders did not key the known check-12 offender tFixture-3.md"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'HYGIENE check' && { echo "FAIL --offenders let the default mode's prose through"; st=1; }
 # ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
 hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
 miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
@@ -2708,7 +2720,9 @@ done
 # the block rather than read off a PASS line, because that suite run is a held leg the unit's pass
 # does not make. The figure is one-sided: this is a `-ge` floor, so an undercount still passes and
 # still catches a block stranded past an exit, which is what the pin is for.
-FLOOR_ASSERTIONS=425
+# RAISED 425 -> 431 by TOOL-dDerivedDocket-23, which adds six executed `--offenders` assertions
+# beside the main block's. Derived from the block, for the reason the paragraph above gives.
+FLOOR_ASSERTIONS=431
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

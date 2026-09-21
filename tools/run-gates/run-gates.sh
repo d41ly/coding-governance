@@ -8,8 +8,17 @@
 #   GATE_PROFILE=<row> bash …                        # select a table row by name, skipping detection
 #   GATE_PROFILES=<path> bash …                      # read a different table; an absent path falls
 #                                                    # back to the built-in formula (the rollback)
+#   GATE_ATTRIBUTE=<rev> bash …                      # re-run each RED leg at <rev> and say whose red
+#                                                    # it is: OWN, INHERITED, MIXED, CONTENDED or
+#                                                    # DEAD PROBE. REPORT-ONLY: no exit code moves
 # Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
 # a thin iterator over it and holds no leg command of its own.
+#
+# THIS RUNNER GRADES ITSELF, and that predates the red attribution (TOOL-dDerivedDocket-23): every
+# verdict below is rendered by this file, so an edit here can move what any leg reads as and no leg
+# can see it. The attribution does not fix that and refuses to compound it (KF3): when the diff
+# between its base and the working tree touches this runner, `gate-fingerprint.sh`, the pre-push
+# hook or `lib-attribute.sh`, every red reads OWN and says why. Nobody grades their own grader.
 #
 # Legs run through a bounded worker pool. They are safe to run together
 # because each heavy leg is already hermetic — it builds its own `mktemp -d` scratch repo, sets git
@@ -89,6 +98,11 @@ fails=0; n=0; skips=0; ondemands=0
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
+# THE ATTRIBUTION BASE IS THIS BAR'S AND NO LEG'S. Read once and removed from the environment, so a
+# leg that runs a bar of its own over a fixture — the canary does, many times — never inherits a base
+# that names a commit of THIS repository and attributes its fixture's reds against nothing.
+ATTR_REV=${GATE_ATTRIBUTE:-}
+unset GATE_ATTRIBUTE
 
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
 # leg() already holds every leg's merged output in $out and PRINTS it on failure, then keeps only the
@@ -1037,7 +1051,10 @@ run_outstanding_reap() {
   return 0
 }
 
-cleanup() { run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# THE ATTRIBUTION WORKTREE goes on every exit path too, AFTER the reap (its R run may be what is
+# being reaped) and before the scratch dir. ATTR_WT is set only once lib-attribute.sh is sourced.
+ATTR_WT=""
+cleanup() { run_outstanding_reap; [ -z "${ATTR_WT:-}" ] || remove_scratch_worktree "$ATTR_WT" || echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'cleanup; exit 130' INT
 trap 'cleanup; exit 143' TERM
@@ -1177,18 +1194,25 @@ rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".joi
          # leg whose declaration was malformed.
          + "\x1e" + (str(l["ceiling"]) if isinstance(l.get("ceiling"), int)
                             and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0 else "")
+         # THE EIGHTH FIELD, `signature`, appended after `ceiling` for the reason every field since
+         # `subject` was appended rather than inserted. CARRIED AND NEVER EXECUTED AT L: the red
+         # attribution grades both ends with the signature in the BASE revision row, so a run cannot
+         # choose its own grader by editing this one (TOOL-dDerivedDocket-23 F4). A non-list reads
+         # as absent, which is the byte-identical rule and the safe direction.
+         + "\x1e" + ("\x1f".join(str(a) for a in l["signature"])
+                            if isinstance(l.get("signature"), list) else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -1447,6 +1471,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
   local i=$1 rc ftail
   n=$((n+1))
   if [ ! -f "$WORK/$i.rc" ]; then
+    RED_LEGS="$RED_LEGS $i"
     fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
@@ -1465,7 +1490,7 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # contract: a reader splits the remainder on a double space and gets the bare leg name back.
     reuses=$((reuses+1)); c_reuse=$((c_reuse+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
   elif [ "$rc" = 0 ]; then c_ran=$((c_ran+1)); printf 'GATE ok    %s\n' "${names[$i]}"
-  else fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1))
+  else fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); RED_LEGS="$RED_LEGS $i"
        # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
        # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
        # exit code. 124 stays behind the bound guard, so a leg that chooses it for its own reasons is
@@ -1587,6 +1612,9 @@ arm_wall() {
   [ "$WALL" -gt 0 ] || return 0
   [ "$WALL_ARMED" = 0 ] || return 0
   WALL_ARMED=1
+  # THE DEADLINE, KEPT IN THIS SHELL TOO, so the red attribution can say how much of the wall its
+  # own bound would need. The watcher below computes the same instant for itself.
+  WALL_END=$(( EPOCHSECONDS + WALL ))
   local _w=$WALL _work=$WORK _me=$$
   (
     # A DEADLINE, NOT A COUNTER. The first cut slept 1 second `$WALL` times, and `sleep` is external:
@@ -1634,6 +1662,361 @@ remove_wall_watcher() {
   WALL_PID=""; WALL_ARMED=0
 }
 
+# ---- RED ATTRIBUTION, REPORT-ONLY. TOOL-dDerivedDocket-23 ----------------------------------------
+# A red bar names WHICH legs failed and never WHOSE failure each one is. Five recorded stops were a
+# run deciding, with nobody to ask, that a red "was not mine", and at least two of those claims were
+# wrong. `GATE_ATTRIBUTE=<R>` re-runs each red leg ALONE at R — R's own manifest row, in a detached
+# scratch worktree of R, under R's ceiling for that row — and prints one `GATE attr` line per red leg
+# in manifest order, then `attributed N of M red legs against <R8>`. The same rows land in the run
+# record as `attribution`, TAB-separated: leg · verdict · inherited · own · R sha · reason, the reason
+# LAST, and a unit that extends the row inserts its columns before it, never after.
+#
+# IT CHANGES NO EXIT CODE. A bar red before this block is red after it; the policy that acts on a
+# verdict is the inherited-red policy unit's, not this one's.
+#
+# R IS THE LANDING BASE, never the branch point. `TOOL-aStagedLane-6` withdrew a "not mine" claim
+# measured against a base the default branch had already moved past, and left the rule this block
+# implements: such a claim is indistinguishable from one nobody measured. The pre-push hook exports
+# the remote sha it reads for the default branch; an R passed as a merge-base or a local ref buys an
+# attribution only as fresh as that ref.
+#
+# THE CLASSIFIER, first match wins:
+#   1  OWN, forced — the diff between R and the working tree touches this runner, the fingerprint
+#      helper, the pre-push hook or lib-attribute.sh (KF3). Every red, a timed-out one included.
+#   2  CONTENDED   — the leg's own attempt ended with its ceiling FIRED (`check_ceiling_fired`, spelled
+#      identically on the retry side). Never re-run at R. A bound-0 rc 137 is a failure and goes on.
+#   3  OWN         — no row at R · its argv differs from R's · the diff touches its COMPARATOR (every
+#      tracked file under the directory of a tracked file in its argv or in R's signature argv, plus
+#      each tracked root-level file those files' bytes name) · it is GREEN at R.
+#   4  DEAD PROBE  — R cannot answer: no worktree, R's argv file absent, R's run past its ceiling, R's
+#      output empty after normalising while it exits non-zero, the wall cut the run — or L's own
+#      output normalises to nothing (KF14: an empty S(L) with a non-zero exit is evidence of nothing).
+#   5  INHERITED / MIXED — with a `signature` in R's row, S(X) is that argv's stdout run in the tree
+#      at X, normalised, as a SET: INHERITED when S(L) is non-empty and S(L) ⊆ S(R). Without one, S(X)
+#      is the leg's normalised output, INHERITED only when byte-identical. L's own `signature` is
+#      never run, so a run cannot choose its grader (F4).
+#
+# WHAT IT DOES NOT CHECK, said out loud. The comparator reads each grader's own directory and the root
+# files its bytes name: a module imported from ANOTHER directory, or a conf named only at run time, is
+# outside it, and an edit there that hides the run's own offender can read INHERITED. A grader
+# directly under a top-level directory is compared against that whole directory, which reads its reds
+# OWN on any edit there — the safe direction. And an untracked file is invisible to the diff.
+#
+# IT RUNS INSIDE THE WALL, before the watcher is removed, so one bound covers the bar and its
+# attribution and the declared-wall backstop stays one number. A run the wall cuts reads DEAD PROBE
+# `cut by the wall`, which reads as not inherited: the safe direction.
+RED_LEGS=""; ATTR_CUT=0; WALL_END=0
+ATTR_US=$'\x1f'; ATTR_RS=$'\x1e'
+
+# check_ceiling_fired <rc> <bound> <seconds> — rc 0 when the attempt's OWN ceiling fired: 124 under a
+# positive bound, or 137 under a positive bound whose seconds reached it (`timeout -k`'s KILL after an
+# ignored TERM). A 137 under no bound, or short of it, is a failure like any other.
+check_ceiling_fired() {
+  local rc=$1 b=${2:-0} s=${3:-} si
+  case "$b" in ''|*[!0-9]*) b=0 ;; esac
+  [ "$b" -gt 0 ] || return 1
+  [ "$rc" = 124 ] && return 0
+  [ "$rc" = 137 ] || return 1
+  si=${s%%.*}
+  case "$si" in ''|*[!0-9]*) return 1 ;; esac
+  [ "$si" -ge "$b" ]
+}
+
+# run_leg_at <dir> <bound> <out> <tag> <both|stdout> <argv…> — one argv run from <dir>, stdin denied,
+# captured through a FILE (a pipe would bound the verdict and not the clock), the same launcher
+# substitution `runleg` applies. The pid goes where the wall looks for unfinished legs, and the `.rc`
+# beside it is what tells the wall and the teardown reap that this one returned.
+run_leg_at() {
+  local dir=$1 bound=$2 out=$3 tag=$4 streams=$5 rc
+  shift 5
+  local -a av=("$@")
+  case "${av[0]:-}" in python|python3) av[0]=$PYBIN ;; esac
+  case "$bound" in ''|*[!0-9]*) bound=0 ;; esac
+  [ "$CEILINGS_LIVE" = 1 ] || bound=0
+  # THE BRACE GROUP'S `2>/dev/null` IS THE SHELL'S, not the run's: a subshell the wall SIGKILLs makes
+  # this shell print a `Killed` job notice on its own stderr, and the verdict line already says it.
+  # The run's own stderr is re-pointed inside, to the capture file or to nothing.
+  {
+    (
+      printf '%s' "$BASHPID" > "$WORK/attr-$tag.pid" 2>/dev/null
+      cd "$dir" || exit 97
+      if [ "$streams" = stdout ]; then exec 2>/dev/null; else exec 2>&1; fi
+      if [ "$bound" -gt 0 ]; then exec timeout -k 5s "$bound" "${av[@]}"; else exec "${av[@]}"; fi
+    ) </dev/null >"$out"
+  } 2>/dev/null
+  rc=$?
+  printf '%s' "$rc" > "$WORK/attr-$tag.rc" 2>/dev/null || true
+  return "$rc"
+}
+
+# read_row_at <leg name> — R's row for that leg (name · argv · ceiling · signature, RS-separated), or
+# nothing. The name goes through the environment, never `-v`, which would process its escapes.
+read_row_at() {
+  AT_NAME=$1 awk -F"$ATTR_RS" '$1 == ENVIRON["AT_NAME"] { print; exit }' "$ATTR_ROWS" 2>/dev/null
+}
+
+# derive_comparator <L argv> <R signature argv> — the first comparator path the diff against R
+# touches, or nothing. Both argvs arrive US-joined; argv[0] is the launcher and is not a grader.
+derive_comparator() {
+  local spec tok d r f files="" dirs=""
+  local -a toks
+  for spec in "$1" "$2"; do
+    [ -n "$spec" ] || continue
+    IFS="$ATTR_US" read -ra toks <<<"$spec"
+    for tok in "${toks[@]:1}"; do
+      case "$tok" in ''|-*) continue ;; esac
+      if [ "$(git ls-files --full-name -- "$tok" 2>/dev/null | head -1)" = "$tok" ] \
+         || [ "$(git cat-file -t "$ATTR_RSHA:$tok" 2>/dev/null)" = blob ]; then
+        files="$files$tok"$'\n'; dirs="$dirs$(dirname -- "$tok")"$'\n'
+      fi
+    done
+  done
+  [ -n "$files" ] || return 0
+  while IFS= read -r d; do
+    [ -n "$d" ] || continue
+    if [ "$d" = . ]; then r=$(printf '%s\n' "$ATTR_CHG" | awk 'NF { print; exit }')
+    else r=$(printf '%s\n' "$ATTR_CHG" | AT_DIR="$d/" awk 'index($0, ENVIRON["AT_DIR"]) == 1 { print; exit }'); fi
+    [ -n "$r" ] && { printf '%s' "$r"; return 0; }
+  done <<<"$dirs"
+  while IFS= read -r r; do
+    case "$r" in ''|*/*) continue ;; esac
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      if [ -f "$f" ]; then
+        grep -qF -- "$r" "$f" 2>/dev/null && { printf '%s' "$r"; return 0; }
+      else
+        git show "$ATTR_RSHA:$f" 2>/dev/null | grep -qF -- "$r" && { printf '%s' "$r"; return 0; }
+      fi
+    done <<<"$files"
+  done <<<"$ATTR_CHG"
+  return 0
+}
+
+# read_offender_set <raw> <set> <set|text> — the normalised offender set, or the normalised text.
+read_offender_set() {
+  if [ "$3" = set ]; then
+    sed -E -f "$ATTR_NORM" "$1" 2>/dev/null | grep -v '^[[:space:]]*$' | LC_ALL=C sort -u > "$2"
+  else
+    sed -E -f "$ATTR_NORM" "$1" > "$2" 2>/dev/null
+  fi
+}
+
+# derive_attribution <leg index> — sets A_V (verdict), A_WHY (reason) and A_I / A_O (the inherited and
+# own counts, or `-` where no comparison was made). Reads the globals `run_attribution` resolved.
+derive_attribution() {
+  local i=$1 rc bound secs row rargv rce rsig f rbound rc_r t0 t1 rsecs lset rset raw src src_rc
+  local -a rav rsv
+  A_V="DEAD PROBE"; A_WHY=""; A_I=-; A_O=-
+  if [ -n "$ATTR_WHY_ALL" ]; then A_WHY=$ATTR_WHY_ALL; return 0; fi
+  if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
+  if [ -n "$ATTR_KF3" ]; then
+    A_V=OWN; A_WHY="KF3: the diff against R touches $ATTR_KF3, so this run edited its own grader"; return 0
+  fi
+  if [ ! -f "$WORK/$i.rc" ]; then A_WHY="no result at L, so there is nothing to compare"; return 0; fi
+  rc=$(cat "$WORK/$i.rc" 2>/dev/null)
+  bound=$(cat "$WORK/$i.bound" 2>/dev/null) || bound=0
+  secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
+  if check_ceiling_fired "$rc" "$bound" "$secs"; then
+    A_V=CONTENDED
+    if [ "$rc" = 124 ]; then A_WHY="timed out after ${bound}s; not re-run at R"
+    else A_WHY="killed after ${secs}s at its ${bound}s ceiling; not re-run at R"; fi
+    return 0
+  fi
+  case "$ATTR_ROWS_STATE" in
+    unparseable) A_WHY="the manifest at R does not parse, so R's row cannot be read"; return 0 ;;
+    untracked)   A_WHY="the manifest is not tracked, so R's row cannot be read"; return 0 ;;
+  esac
+  row=$(read_row_at "${names[$i]}")
+  if [ -z "$row" ]; then A_V=OWN; A_WHY="no row in R's manifest"; return 0; fi
+  IFS="$ATTR_RS" read -r _ rargv rce rsig <<<"$row"
+  if [ "$rargv" != "${argvs[$i]}" ]; then A_V=OWN; A_WHY="its argv differs from R's row"; return 0; fi
+  f=$(derive_comparator "${argvs[$i]}" "${rsig:-}")
+  if [ -n "$f" ]; then A_V=OWN; A_WHY="the diff against R touches its comparator: $f"; return 0; fi
+
+  # ---- THE R RUN. One worktree serves every red leg of one bar, made on first need.
+  if [ -z "$ATTR_WT" ]; then
+    if [ "$ATTR_WT_FAILED" = 1 ] || ! add_scratch_worktree "$ATTR_WT_PATH" "$ATTR_RSHA"; then
+      ATTR_WT_FAILED=1; A_WHY="the R worktree could not be made at $ATTR_WT_PATH"; return 0
+    fi
+    ATTR_WT=$ATTR_WT_PATH
+    echo "run-gates: R worktree $ATTR_WT — removed on exit; an orphan is removable by hand"
+  fi
+  IFS="$ATTR_US" read -ra rav <<<"$rargv"
+  f=${rav[1]:-}
+  if [ -n "$f" ] && [ -f "$f" ] && [ ! -f "$ATTR_WT/$f" ]; then
+    A_WHY="R's argv file $f is absent at R"; return 0
+  fi
+  rbound=${rce:-$PROF_TIMEOUT}
+  t0=$(date +%s%N)
+  run_leg_at "$ATTR_WT" "$rbound" "$ATMP/$i.r.raw" "$i" both "${rav[@]}"; rc_r=$?
+  t1=$(date +%s%N); rsecs=$(( (t1 - t0) / 1000000000 ))
+  if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
+  [ "$CEILINGS_LIVE" = 1 ] || rbound=0
+  if check_ceiling_fired "$rc_r" "$rbound" "$rsecs"; then
+    A_WHY="R's run hit its ${rbound}s ceiling, so R gave no answer"; return 0
+  fi
+  if [ "$rc_r" = 0 ]; then A_V=OWN; A_WHY="green at R"; return 0; fi
+
+  # ---- THE TWO SETS.
+  lset="$ATMP/$i.l.set"; rset="$ATMP/$i.r.set"
+  if [ -n "${rsig:-}" ]; then
+    IFS="$ATTR_US" read -ra rsv <<<"$rsig"
+    for src in l r; do
+      if [ "$src" = l ]; then run_leg_at "$ROOT" "$rbound" "$ATMP/$i.sl.raw" "$i-sl" stdout "${rsv[@]}"
+      else run_leg_at "$ATTR_WT" "$rbound" "$ATMP/$i.sr.raw" "$i-sr" stdout "${rsv[@]}"; fi
+      src_rc=$?
+      if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
+      if { [ "$src_rc" = 124 ] || [ "$src_rc" = 137 ]; } && [ "${rbound:-0}" -gt 0 ]; then
+        A_WHY="R's signature ran past its ${rbound}s ceiling at $(printf '%s' "$src" | tr lr LR)"; return 0
+      fi
+    done
+    read_offender_set "$ATMP/$i.sl.raw" "$lset" set
+    read_offender_set "$ATMP/$i.sr.raw" "$rset" set
+  else
+    raw=$(cat "$ATMP/$i.r.raw" 2>/dev/null)
+    printf '%s\n' "$raw" > "$ATMP/$i.r.out"
+    read_offender_set "$WORK/$i.out" "$lset" text
+    read_offender_set "$ATMP/$i.r.out" "$rset" text
+  fi
+  if ! grep -q '[^[:space:]]' "$rset" 2>/dev/null; then
+    A_WHY="R's output normalises to nothing while it exits $rc_r"; return 0
+  fi
+  if ! grep -q '[^[:space:]]' "$lset" 2>/dev/null; then
+    A_WHY="L's output normalises to nothing while it exits ${rc:-?} (KF14)"; return 0
+  fi
+
+  # ---- RULE 5. Sets for a signature; byte-identity without one, with set counts for the MIXED line.
+  if [ -z "${rsig:-}" ] && cmp -s "$lset" "$rset"; then
+    A_V=INHERITED; A_I=$(grep -c '[^[:space:]]' "$lset" || true); A_O=0
+    A_WHY="byte-identical output at L and R"; return 0
+  fi
+  if [ -z "${rsig:-}" ]; then
+    grep -v '^[[:space:]]*$' "$lset" | LC_ALL=C sort -u > "$lset.u"
+    grep -v '^[[:space:]]*$' "$rset" | LC_ALL=C sort -u > "$rset.u"
+    lset="$lset.u"; rset="$rset.u"
+  fi
+  A_I=$(LC_ALL=C comm -12 "$lset" "$rset" | grep -c . || true)
+  A_O=$(LC_ALL=C comm -23 "$lset" "$rset" | grep -c . || true)
+  if [ -n "${rsig:-}" ] && [ "$A_O" = 0 ]; then
+    A_V=INHERITED; A_WHY="every offender at L is an offender at R, by R's signature"; return 0
+  fi
+  A_V=MIXED
+  if [ -n "${rsig:-}" ]; then A_WHY="offenders at L that R does not carry, by R's signature"
+  else A_WHY="the output differs from R's, and R's row declares no signature"; fi
+  return 0
+}
+
+# run_attribution — the pass. Runs only when asked AND something is red: a green bar pays nothing.
+run_attribution() {
+  [ -n "${ATTR_REV:-}" ] || return 0
+  [ -n "$RED_LEGS" ] || return 0
+  local i m=0 nattr=0 dead=0 sum=0 unbounded=0 row rce legs_rel gcd hp k tail rec="" rem summary
+  ATMP="$WORK/attr"; mkdir -p "$ATMP" 2>/dev/null
+  ATTR_WHY_ALL=""; ATTR_KF3=""; ATTR_CHG=""; ATTR_ROWS="$ATMP/rows-at-R"; ATTR_ROWS_STATE=ok
+  ATTR_NORM="$ATMP/normalise.sed"; ATTR_WT_FAILED=0; ATTR_WT_PATH=""
+  : > "$ATTR_ROWS"
+  ATTR_RSHA=$(git rev-parse --verify -q "${ATTR_REV}^{commit}" 2>/dev/null) || ATTR_RSHA=""
+  if [ -z "$ATTR_RSHA" ]; then
+    ATTR_R8="${ATTR_REV}, which does not resolve to a commit here"
+    ATTR_WHY_ALL="R '${ATTR_REV}' does not resolve to a commit, so nothing was run at R"
+  else
+    ATTR_R8=${ATTR_RSHA:0:8}
+  fi
+  # SOURCED HERE AND NOWHERE EARLIER, derived from this script's own directory. A runner copied into
+  # a fixture without it still runs every other path; this one reads every red DEAD PROBE instead.
+  if [ -z "$ATTR_WHY_ALL" ] && { [ ! -f "$KITDIR/lib-attribute.sh" ] || ! . "$KITDIR/lib-attribute.sh"; }; then
+    ATTR_WHY_ALL="lib-attribute.sh is missing beside the runner, so there is no normaliser to compare with"
+  fi
+  if [ -z "$ATTR_WHY_ALL" ] && ! ATTR_CHG=$(git diff --name-only "$ATTR_RSHA" -- 2>/dev/null); then
+    ATTR_WHY_ALL="the diff between R and this tree could not be read"
+  fi
+  if [ -z "$ATTR_WHY_ALL" ]; then
+    # KF3. The hook's path is DERIVED from `core.hooksPath`, relative ones only: an unset path means
+    # no tracked hook gates this repository's pushes, so there is no tracked hook to have edited.
+    hp=$(git config --get core.hooksPath 2>/dev/null) || hp=""
+    case "$hp" in ''|/*|[A-Za-z]:*) hp="" ;; *) hp="${hp%/}/pre-push" ;; esac
+    for k in "$KITREL/$(basename -- "$0")" "$FPRINT" "$KITREL/lib-attribute.sh" "$hp"; do
+      [ -n "$k" ] || continue
+      if printf '%s\n' "$ATTR_CHG" | grep -qxF -- "$k"; then ATTR_KF3=$k; break; fi
+    done
+    # R'S MANIFEST, from the object store. An untracked manifest has no R copy to read.
+    legs_rel=$(git ls-files --full-name -- "$LEGS_FILE" 2>/dev/null | head -1)
+    if [ -z "$legs_rel" ]; then ATTR_ROWS_STATE=untracked
+    elif git cat-file -e "$ATTR_RSHA:$legs_rel" 2>/dev/null; then
+      git show "$ATTR_RSHA:$legs_rel" > "$ATMP/manifest-at-R" 2>/dev/null
+      "$PYBIN" -c '
+import json, sys
+try:
+    data = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(3)
+if not isinstance(data, list):
+    sys.exit(3)
+out = []
+for l in data:
+    if not isinstance(l, dict) or not l.get("name"):
+        continue
+    ce = l.get("ceiling")
+    ce = str(ce) if isinstance(ce, int) and not isinstance(ce, bool) and ce > 0 else ""
+    sig = l.get("signature") if isinstance(l.get("signature"), list) else []
+    out.append(l["name"] + "\x1e" + "\x1f".join(str(a) for a in (l.get("argv") or []))
+               + "\x1e" + ce + "\x1e" + "\x1f".join(str(a) for a in sig))
+sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
+' "$ATMP/manifest-at-R" > "$ATTR_ROWS" 2>/dev/null || ATTR_ROWS_STATE=unparseable
+    fi
+    # The worktree lives under the git COMMON dir, made absolute, as the baseline runner places its own.
+    gcd=$(git rev-parse --git-common-dir 2>/dev/null) || gcd=""
+    case "$gcd" in /*|[A-Za-z]:/*) : ;; '') gcd="$GD" ;; *) gcd="$ROOT/$gcd" ;; esac
+    ATTR_WT_PATH="$gcd/gate-attr.$$"
+    write_normaliser "$ATTR_NORM" "$ROOT" "$ATTR_WT_PATH" \
+      || ATTR_WHY_ALL="the normaliser could not be written into the scratch dir"
+  fi
+
+  # THE PASS'S OWN BOUND, printed before it starts: the sum of the red legs' R ceilings.
+  for i in $RED_LEGS; do
+    row=$(read_row_at "${names[$i]}")
+    [ -n "$row" ] || continue
+    IFS="$ATTR_RS" read -r _ _ rce _ <<<"$row"
+    rce=${rce:-$PROF_TIMEOUT}
+    case "$rce" in ''|0|*[!0-9]*) unbounded=$((unbounded + 1)) ;; *) sum=$((sum + rce)) ;; esac
+  done
+  printf 'run-gates: attributing red legs against %s; bound %ss, the sum of their R ceilings' "$ATTR_R8" "$sum"
+  [ "$unbounded" -gt 0 ] && printf ', plus %s leg(s) R leaves unbounded' "$unbounded"
+  if [ "$WALL" -gt 0 ] && [ "$WALL_END" -gt 0 ]; then
+    rem=$(( WALL_END - EPOCHSECONDS ))
+    { [ "$sum" -gt "$rem" ] || [ "$unbounded" -gt 0 ]; } \
+      && printf ' — it can outrun the %ss the wall has left, and an R run the wall cuts reads DEAD PROBE `cut by the wall`' "$rem"
+  fi
+  printf '\n'
+
+  [ -n "$RUNDIR" ] && rec="$RUNDIR/attribution" && : > "$rec" 2>/dev/null
+  for i in $(printf '%s\n' $RED_LEGS | LC_ALL=C sort -n -u); do
+    m=$((m + 1))
+    derive_attribution "$i"
+    case "$A_V" in
+      INHERITED) tail="INHERITED · offenders $A_I · at $ATTR_R8" ;;
+      MIXED)     tail="MIXED · inherited $A_I · own $A_O · at $ATTR_R8" ;;
+      *)         tail="$A_V · $A_WHY" ;;
+    esac
+    if [ "$A_V" = "DEAD PROBE" ]; then dead=$((dead + 1)); else nattr=$((nattr + 1)); fi
+    printf 'GATE attr  %s  %s\n' "${names[$i]}" "$tail"
+    if [ -n "$rec" ]; then
+      printf '%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$A_V" "$A_I" "$A_O" "${ATTR_RSHA:--}" \
+        "$(printf '%s' "$A_WHY" | tr '\t\n\r' '   ')" >> "$rec" 2>/dev/null || true
+    fi
+  done
+  summary="attributed $nattr of $m red legs against $ATTR_R8"
+  [ "$dead" -gt 0 ] && summary="$summary · DEAD PROBE $dead"
+  printf '%s\n' "$summary"
+  [ -n "$rec" ] && chmod 600 "$rec" 2>/dev/null
+  if [ -n "$ATTR_WT" ]; then
+    remove_scratch_worktree "$ATTR_WT" \
+      || echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2
+    ATTR_WT=""
+  fi
+  return 0
+}
+
 live() { jobs -rp | wc -l; }
 while [ "$wi" -lt "$nwalk" ]; do
   [ -f "$WORK/wall.breach" ] && break
@@ -1675,8 +2058,11 @@ while [ "$wi" -lt "$nwalk" ]; do
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
 wait
-remove_wall_watcher
 chunk_close                                # the last chunk has no successor to close it
+# AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
+# the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
+run_attribution
+remove_wall_watcher
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
 # one fact, with the older one read by the only tool that grades the newer, is exactly the shape
@@ -1746,6 +2132,10 @@ if [ -f "$WORK/wall.breach" ]; then
     WALL_STUCK="${WALL_STUCK}  still running at the wall: ${names[$i]}
 "
   done
+  # A WALL THAT FIRED DURING THE RED ATTRIBUTION found every leg returned, and says which pass it cut
+  # rather than reading as a wall that fired on nothing.
+  [ -z "$WALL_STUCK" ] && [ "${ATTR_CUT:-0}" = 1 ] && WALL_STUCK="  cut by the wall: the red attribution pass, after every leg had returned
+"
   [ -n "$WALL_STUCK" ] || WALL_STUCK="  (no leg was still marked running — the wall fired as the last leg returned)
 "
   [ -n "$sfile" ] && { printf '%s
