@@ -87,14 +87,14 @@ ids KICK-aBlindedTrial-1 TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlinded
 | [KICK-aBlindedTrial-1 — the kickoff engine puts the spec-audit question to the owner at READY](spec/2026-09-21-spec-KICK-aBlindedTrial-1.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-09-21 |
 | [TOOL-aBlindedTrial-1 — spec-first versus build-first, measured on a blinded trial](spec/2026-09-20-spec-TOOL-aBlindedTrial-1.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aBlindedTrial-2 — the driver reads `spec-audit:` from the build README and owes the audit only when it is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-20 |
-| [TOOL-aBlindedTrial-7 — a project-wide spec-audit default, declared once in the conf and read at BASE](spec/2026-09-21-spec-TOOL-aBlindedTrial-7.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-09-21 |
+| [TOOL-aBlindedTrial-7 — a project-wide spec-audit default, declared once in the conf and read at BASE](spec/2026-09-21-spec-TOOL-aBlindedTrial-7.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-09-21 |
 | [TOOL-aBlindedTrial-8 — a spec's §7 leg line must name every leg its files-touched trips](spec/2026-09-21-spec-TOOL-aBlindedTrial-8.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-09-21 |
 | [TOOL-aBlindedTrial-3 — the build harness runs its AUDIT stage only when `specAudit` is declared](spec/2026-09-20-spec-TOOL-aBlindedTrial-3.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-20 |
 | [TOOL-aBlindedTrial-4 — the fan-out hook denies a direct spec-audit call the build README did not declare](spec/2026-09-20-spec-TOOL-aBlindedTrial-4.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-20 |
 | [TOOL-aBlindedTrial-5 — M4 becomes the procedure for a declared audit, and the ruling is recorded](spec/2026-09-20-spec-TOOL-aBlindedTrial-5.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-20 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

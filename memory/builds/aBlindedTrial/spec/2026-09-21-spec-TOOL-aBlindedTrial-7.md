@@ -1,6 +1,6 @@
 # TOOL-aBlindedTrial-7 — a project-wide spec-audit default, declared once in the conf and read at BASE
 
-**Status:** INPROGRESS · rev-2 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
+**Status:** INPROGRESS · rev-3 · 2026-09-21 · node a · Tier-2 · base 0e61932d · streams tooling · order 1 · ratified 2026-09-21
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
+| [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md) | diff-review | TOOL-aBlindedTrial-8 KICK-aBlindedTrial-1 |
 
 <!-- /gen:spec-records -->
 
@@ -84,7 +85,9 @@ decides; README silent → the conf decides; both silent → not owed.
 `memory/guides/UNATTENDED-PROTOCOL.md` · `tools/unattended/SKILL.template.md` ·
 `.claude/skills/unattended/SKILL.md` · every `KIT_UNATTENDED_VERSION` carrier · `tools/hooks/agent-cap.js` ·
 `tools/hooks/scratch-guard.js` (marker) · `tools/hooks/agent-cap.test.sh` · `tools/hooks/README.md` ·
-`memory/map/features/unattended.md` · `memory/map/features/agent-cap.md`.
+`memory/map/features/unattended.md` · `memory/map/features/agent-cap.md` ·
+`tools/memory-tree/BUILD-METHOD.template.md` · `memory/guides/BUILD-METHOD.md` (rev-3: the M4 carriers S5
+names).
 
 ### Alternatives rejected
 
@@ -139,7 +142,7 @@ decides; README silent → the conf decides; both silent → not owed.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `kickoff-manifest ratchet`
+`unattended kit gate` · `unattended skill wiring` · `harness arms (fail branches armed or pinned)` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `kit version markers` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `kickoff-manifest ratchet`
 
 New arm: `tools/unattended/unattended.test.sh` · the `specs-audited` block, conf default at BASE then on the branch only · none
 New arm: `tools/hooks/agent-cap.test.sh` · a conf beside the fixture README, dated then malformed then absent · none
@@ -159,6 +162,12 @@ New arm: `tools/hooks/agent-cap.test.sh` · a conf beside the fixture README, da
   BASE conf whose evaluation does not finish; the sanctioned `exit` case of rev-1's comment is that
   refusal now. R5: S5 lists the build method as a carrier. R8, R9, R10 are wording in the hook header,
   the three conf carriers and the unevidenced-audit sentence; no criterion changed.
+- rev-3 · 2026-09-21 · §4 · §7 · closing diff review round 3 folded. R6: the files-touched estimate
+  names the two BUILD-METHOD carriers S5 already named and this build edited twice, and the leg line
+  names `kit/dogfood doc parity`, the one leg whose guard carries `memory/guides/BUILD-METHOD.md`.
+  R1 (round 3): the BASE-conf sentinel is glued with two newlines, so a key line ending in a
+  backslash continuation reads as the date rather than as absent; S1's fail-55 sentence stands.
+  R2 (round 3): the not-gradable sentence names all three causes. No criterion changed.
 
 ## 10. Reuse audit
 

@@ -59,8 +59,10 @@ population plus one of its own, the declared write set.
          (closing review round 1, R3; writing the folder instead of the files was a clean pass
          before). A ONE-segment token, `tools/`, is a ROOT and declares nothing: it is how prose
          names a tree ("No file under `tools/` is touched"), and --list names it as NEAR (round
-         2, R1). The residual, stated: a two-segment directory named in prose is still read as
-         declared. The join grades only a spec that CARRIES a Gates heading, the legline arm's own
+         2, R1). The residual, stated in BOTH directions (round 3, R4): a two-segment directory
+         named in prose is still read as declared, and a one-segment directory that is itself a
+         joined guard, `.githooks/`, declared wholesale declares nothing - name its files or a
+         two-segment child. The join grades only a spec that CARRIES a Gates heading, the legline arm's own
          precondition: a Tier-1 spec under the light profile may omit the section, and one that
          does is COUNTED on the guards line rather than joined or examined, its tripping paths
          listed as NEAR (R4, round 2 R8). BROAD guards are EXCLUDED from the join and listed by
@@ -228,9 +230,9 @@ def extract_files_touched(text, files):
     prefix (closing review round 1, R3 — the trailing-slash rule of `check_path_shaped` is right for
     the paths and cites joins and wrong here, where `tools/x/` declares everything under it). `roots`
     is every ONE-segment directory token — `tools/`, `memory/` — which declares NOTHING (round 2,
-    R1: the corpus writes "No file under `tools/` is touched" fourteen times, and reading that as
-    declaring the whole root owed 34 legs on the live manifest); they are returned so `--list` can
-    name the skip. None when the spec carries no such sub-head, which the report counts apart from a
+    R1, measured at 315201b0: a one-segment `tools/` token appeared 14 times over every spec, every
+    one prose such as "No file under `tools/` is touched", and reading it as declared owed 34 legs);
+    they are returned so `--list` can name the skip. None when the spec carries no such sub-head, which the report counts apart from a
     sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the next heading of ANY
     depth, unlike the section readers above, because the sub-head has siblings inside section 4.
     """
@@ -265,8 +267,10 @@ def derive_dir_segments(tok):
 def check_dir_shaped(tok):
     """A declared PREFIX: a directory token of TWO OR MORE real segments. A one-segment token is a
     ROOT (`tools/`), which is how prose names a tree and declares nothing (round 2, R1); round 1's
-    fold kept it and owed every non-broad leg under it. The residual, stated: a two-segment
-    directory named in prose is still read as declared."""
+    fold kept it and owed every non-broad leg under it. The residual, both directions (round 3,
+    R4): a two-segment directory named in prose is still read as declared, and a one-segment
+    directory that is itself a joined guard (`.githooks/`) declared wholesale declares nothing -
+    its files, or a two-segment child, must be named."""
     return len(derive_dir_segments(tok)) >= 2
 
 
@@ -549,7 +553,8 @@ def main(argv):
             touched = ([], [])
         declared, roots = touched
         # A one-segment ROOT under the sub-head declares nothing (round 2, R1), and says so.
-        near += [(f, "guards", p, "a one-segment root declares nothing, not joined") for p in roots]
+        near += [(f, "guards", p, "a one-segment root declares nothing, not joined - name the files or "
+                                  "a directory of two or more segments") for p in roots]
         missing = []
         # The legline arm's precondition, mirrored (R4): a spec with NO Gates heading is the light
         # profile's legal shape and is not joined — counted, NOT examined, and every path it declares

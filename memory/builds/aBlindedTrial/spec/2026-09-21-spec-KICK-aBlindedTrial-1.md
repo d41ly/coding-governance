@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round1.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 | [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round2.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
+| [2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md](../reviews/2026-09-21-review-TOOL-aBlindedTrial-7-8-kick1-closing-diff-round3.md) | diff-review | TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8 |
 
 <!-- /gen:spec-records -->
 

@@ -1541,12 +1541,17 @@ check_authorization() { # slug · base
   # read as the date at startup), an `exit`, an unbound reference under this file's set -u, a
   # syntax error - prints no sentinel and is fail 55, never "no default": unknown is not absent,
   # and reading it as absent was the opt-out fail 52 and fail 54 exist to refuse, through the one
-  # path they did not cover. The $'\n' matters: without it a blob ending in a comment line swallows
-  # the printf. A non-date is fail 54 on fail 52's reasoning, one file over.
+  # path they did not cover. The TWO newlines of glue matter (round 2 R6, round 3 R1): without the
+  # first, a blob ending in a comment line swallows the printf; without the second, a blob whose
+  # LAST line ends in a backslash continuation - `SPEC_AUDIT_DEFAULT="<date>" \`, and $(GIT show)
+  # strips the newline after it - joins the sentinel onto that line as a temp-env PREFIX of the
+  # printf, whose argument had already expanded from the blanked variable, so a declared default
+  # read as `OK ` and therefore as absent. The continuation consumes the first newline; the
+  # sentinel starts its own line. A non-date is fail 54 on fail 52's reasoning, one file over.
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
      && _cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
     _sad=$( SPEC_AUDIT_DEFAULT=""; exec 3>&1
-            eval "$_cf"$'\n''printf "OK %s" "${SPEC_AUDIT_DEFAULT:-}" >&3' >/dev/null 2>&1 )
+            eval "$_cf"$'\n\n''printf "OK %s" "${SPEC_AUDIT_DEFAULT:-}" >&3' >/dev/null 2>&1 )
     case "$_sad" in
       "OK "*) _sad=${_sad#OK } ;;
       *) fail 55 "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
@@ -3919,12 +3924,15 @@ $_bcnon"
       # it takes the same cure: the recorded fact is EVIDENCE compared against the derivation, never
       # the input, and a disagreement on PRESENCE is a refusal. Never the worktree README either.
       #
-      # NOT GRADABLE when the derivation never ran (round 2, R3): `authorization-reachable` returns
-      # early on an unreachable anchor or a missing README, the DoD loop grades every item regardless,
-      # and the global's "never set" and "derived absent" are the same bytes. The fail-53 sentence is
-      # printed only over a derivation that happened; this branch says the anchor is the cause.
+      # NOT GRADABLE when the derivation never finished (round 2, R3; the causes widened at units 7/8
+      # round 3, R2): `authorization-reachable` returns early on an unreachable anchor, a missing
+      # README, or a REFUSED spec-audit read - fail 52, 54 or 55 - the DoD loop grades every item
+      # regardless, and the global's "never set" and "derived absent" are the same bytes. The fail-53
+      # sentence is printed only over a derivation that happened; this branch names the three causes
+      # rather than the anchor alone, because under fail 55 the README half completed and the conf
+      # blob was refused three lines up in the same output.
       if [ -z "${AUTH_SPEC_AUDIT_DERIVED:-}" ]; then
-        DOD_OUT="specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above), so whether this build opted in is unknown here"
+        DOD_OUT="specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read), so whether this build opted in is unknown here"
         return 1
       fi
       _sa_fact=$(fact "$rel" spec-audit)

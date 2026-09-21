@@ -5655,7 +5655,7 @@ bcopen; crfix; git add -A >/dev/null
 git remote set-url origin "$ORIGIN_DIR/nope.git"
 out=$(run --close tRun $bcov)
 git remote set-url origin "$ORIGIN"
-hit "$out" "specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above)"
+hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
 miss "$out" "at BASE: (none)"
 miss "$out" "declares no spec-audit: key"
 miss "$out" "close OK"
@@ -5788,7 +5788,7 @@ git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify
 git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --close tRun $bcov)
 hit "$out" "the project conf at the pinned BASE could not be evaluated to the end"
-hit "$out" "specs-audited — not gradable: the README at BASE was not derived in this shell (authorization-reachable is unmet above)"
+hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
 miss "$out" "at BASE: (none)"
 miss "$out" "specs-audited — not owed"
 miss "$out" "close OK"
@@ -5892,6 +5892,24 @@ init_sa_base_ending_early 'false' 0
 out=$(run --preflight tRun --keepalive-id KA-1234)
 hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
 miss "$out" "could not be evaluated to the end"
+git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
+git checkout -qf unit; bcreset
+
+# ---- round 3, R1 — a TRAILING LINE CONTINUATION on the key line, as the conf's LAST statement. The
+# ---- round-2 sentinel was glued to the blob with ONE newline, so `SPEC_AUDIT_DEFAULT="<date>" \` at
+# ---- the end turned the assignment into a temp-env prefix of the sentinel printf, whose argument had
+# ---- already expanded from the blanked variable: `OK ` — a DECLARED default read as absent, the
+# ---- opt-out fail 52/54/55 exist to refuse. Its own conf, NOT init_sa_base_ending_early: that
+# ---- helper's mkconf already writes the date and the sentinel expands from it, so the break needs a
+# ---- BLANK default above the continuation line. Observed RED-first on the round-2 driver: not owed.
+bcreset; git checkout -qf main
+mkconf true true "" 3600 "" 1800 7 ""
+printf '%s\n' 'SPEC_AUDIT_DEFAULT="2026-09-21" \' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m sa-continuation --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+out=$(run --preflight tRun --keepalive-id KA-1234)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+miss "$out" "not owed (opt-in)"
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
 git checkout -qf unit; bcreset
 

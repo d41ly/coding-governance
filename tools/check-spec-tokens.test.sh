@@ -15,7 +15,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=66
+FLOOR_ASSERTIONS=67
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
@@ -32,6 +32,8 @@ FLOOR_ASSERTIONS=66
 # RAISED 62 -> 66 at round 2 of that review, by the count of `arm`/`pass=` lines its diff added: the
 # one-segment root pair (R1: rc and the --list row), the duplicated-entry breadth arm (R7) and the
 # no-Gates --list row (R8).
+# RAISED 66 -> 67 at round 3 of that review: the dot-token count arm on the one-leg bare-`tools/`
+# fixture (R5), where the `tools/./` refusal is load-bearing.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 # The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
@@ -467,6 +469,15 @@ arm "a two-segment guard carried by floor+1 legs is excluded by breadth, whateve
 printf '[{"name":"real leg"},{"name":"broad leg","guard":["tools/"]}]\n' > "$d/tools/gate-legs.json"
 git -C "$d" add -A >/dev/null
 arm "a one-segment guard carried by ONE leg is joined and REDS" 1 "$d" '[guards] `broad leg <- tools/x/thing.sh`'
+# round 3, R5 — the dot tokens `./`, `../` and `tools/./` declare nothing, asserted where the
+# refusal is LOAD-BEARING: on this Gates-carrying spec under a bare `tools/` guard, an admitted
+# `tools/./` is `tools/.`, which starts with `tools/` and counts as a second examined path (the R8
+# no-Gates fixture could not see it: there the join never runs). Observed RED-first on a mutant
+# checker refusing only a LEADING dot segment: `2 declared path(s) examined`.
+sed -i 's|^`tools/x/thing.sh`$|`tools/x/thing.sh` · `./` · `../` · `tools/./`|' "$spec"
+sed -i 's|^`real leg`\.|`real leg` · `broad leg`.|' "$spec"
+git -C "$d" add -A >/dev/null
+arm "dot tokens beside a real path declare nothing: one path examined, the named leg clean" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s)"
 git -C "$d" reset -q --hard "$clean"
 
 # closing review round 1, R3 — a DIRECTORY token under the sub-head is a declared PREFIX, not prose.
@@ -487,7 +498,8 @@ git -C "$d" reset -q --hard "$clean"
 
 # closing review round 2, R1 — a ONE-SEGMENT root under the sub-head declares NOTHING. Round 1's fold
 # kept `tools/` as a declared prefix, so the corpus's most common negation — "No file under `tools/`
-# is touched" — owed every non-broad leg under `tools/` (34 on the live manifest). A root is prose;
+# is touched" — owed every non-broad leg under `tools/` (34 on the manifest at 315201b0). A root is
+# prose;
 # `--list` names it so the skip is not silent. Observed RED-first on the round-1 checker: exit 1.
 printf '%s\n' "$GUARD_LEGS" > "$d/tools/gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
@@ -495,7 +507,7 @@ write_files_touched '### Files touched (estimate)' 'New: `memory/builds/tOne/bui
 git -C "$d" add -A >/dev/null
 arm "a one-segment root in a negation sentence declares nothing and is no hit" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s)"
 out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
-if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/ — a one-segment root declares nothing, not joined'; then
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: tools/ — a one-segment root declares nothing, not joined - name the files or a directory of two or more segments'; then
   echo "arm ok    --list names the one-segment root as NEAR [guards], not joined"; pass=$((pass+1))
 else
   echo "arm FAIL  --list — expected a NEAR [guards] row naming tools/ as a root that declares nothing"

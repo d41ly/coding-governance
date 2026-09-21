@@ -205,8 +205,8 @@ Echo a compact **READY card** — repo · remote/default branch · `## task` (th
 scope in/out · acceptance · gates · slug or "none") · `## manifest` (the audit delta line, when
 Step 2b ran a repair) · `## read` (governing docs + entrypoints) · `## records` (prior records +
 the `Recall terms used:` line) · `## classes` (the gotcha names) · `## open` (parked items, plus
-Step 3's answer, or what answered for it: `spec audit: declared <date>`, `spec audit: not declared
-(owner)` or `spec audit: project default <date>`) —
+Step 3's answer, or what answered for it: `spec audit: declared <date>`,
+`spec audit: not declared (owner)` or `spec audit: project default <date>`) —
 closed by the READY micro-format at branch + `base` = BASE. Pipe the six sections and that line
 into `bash <check-script> --card --append --session <sid>`, `<sid>` from the `orientation —`
 header in context; report a refusal on the card and still stop. Commit Step 2b's staged repair
