@@ -1894,7 +1894,7 @@ same "--status selects the same first row through the extracted helper" "$(run -
 # printed the message below anyway; S5 removed that fall-through, so the absent README now
 # refuses at check 42 and this arm asserted a branch it could no longer reach.
 reset_tree; readme tPlanEmpty; fixture
-hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against"
+hit "$(run --plan tPlanEmpty)" "no tracked spec under this build, and neither its roster nor an asks: mandate names anything either, so there is no unit set to report on at all"
 
 # ---- TOOL-dHonouredPark-4 — the SET and its ORDER come from the GENERATED region -----------------
 # NOT EXECUTED IN THIS BUILD. A standing owner instruction of 2026-08-23 forbids running this kit's
@@ -5425,7 +5425,7 @@ out=$(run --rescope tRun --act add --item ARCH-tRun-2 --successor ARCH-tRun-1 --
 hit "$out" "--rescope --act add refuses --successor, because an addition names no unit it replaces:"
 
 out=$(run --rescope tRun --act retire --item ARCH-tRun-9 --reason r)
-hit "$out" "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held:"
+hit "$out" "a rescope names a unit the build README's generated units region does not carry and this build's folder does not file as a \`unit\` ask either, and a run cannot retire what its roster never held"
 
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1 --reason "$(printf 'two\nlines')")
 hit "$out" "a rescope field contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second row nothing wrote:"

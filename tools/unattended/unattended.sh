@@ -2866,7 +2866,7 @@ ask_sort_key() { # ask id -> "<sev>-<pos>-<seq>", every field fixed width
 # generator's V6 to report rather than a second verdict invented here.
 ask_rank_order() { # ids… -> those ids in rank order, space separated
   local _left="$*" _out="" _id _h _blocked _best _bestkey _key
-  while [ -n "$(printf '%s' "$_left" | tr -d ' ')" ]; do
+  while [ -n "${_left// /}" ]; do
     _best=""; _bestkey=""
     for _id in $_left; do
       _blocked=0
@@ -3062,6 +3062,10 @@ check_ask_mandate() { # slug · run-state file -> 1 with its own refusal printed
 # ABSENT IS NOT TERMINAL and is not a synonym for it: a run in flight keeps its record on its own
 # branch until it lands, so "no record here" is exactly the case this driver cannot see and must not
 # label. Said in those words, so a reader of the line is not invited to read absence as staleness.
+# CALLED INSIDE A SUBSTITUTION, which every other caller of the derived-phase reader is warned off.
+# It is safe HERE and nowhere else in this file: the two globals that reader sets are consumed by
+# this function, in the same subshell, and nothing outside reads them back. The warning is about a
+# CALLER that expects the globals to survive the substitution; this one returns a sentence instead.
 describe_foreign_run() { # slug -> one clause about that build's run-state record
   local _r
   _r=$(runmd_of "$1")
