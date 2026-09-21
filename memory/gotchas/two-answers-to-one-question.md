@@ -85,3 +85,23 @@ the finished claim out. The fold replaced that copy with a pointer to the protoc
 `BRIEF_RECORDED_CUTOFF` row, so it cannot be half-fixed again. The leg's header in
 `tools/unattended/check-brief-recorded.sh` still states the predicate, because a gate's header says
 what it checks; the row and the header are the two carriers left.
+
+## The fixture form — four self-tests red on `main` at once
+
+A self-test's fixture is a COPY of the contract it feeds the product, and a later unit that moves
+the contract moves the product and its own arms, never the sibling suite's copy. Measured on
+2026-09-21, six red self-test legs on `main`, four of them this shape: `tools/runlog/selftest.py`
+carried the driver's run-state scaffold text from before `TOOL-aWokenSentinel-1` added the lease
+sentence; two disposal doubles in `tools/workflows/unattended-build.test.sh` predated
+`TOOL-cMendedVintage-19`'s `edges` and `placements`; `tools/check-playbook-parity.test.sh`'s
+control fixture built no `skills/` tree, so the one pair `TOOL-aHonedRuleset-5` declared outside
+`tools/` had no owning source; and `tools/govkit/selftest.py`'s "older vintage" fixture hashed
+`tools/check-wiring.fragment.json` at a commit a month before `TOOL-aReplayedCard-2` put it in the
+kit, recording the EMPTY blob as its identity, which govkit refuses. None of the four named the
+unit that broke it, and each was green in that unit's own bar because the self-test legs are held
+by default.
+
+**The check:** a unit that changes a contract another suite's fixture copies runs
+`GATE_SELFTESTS=1` over the kits whose fixtures FEED the changed surface, not only the kit it
+edited; and where the fixture can be replaced by a read of the product — the runlog scaffold can be
+captured from the driver rather than retyped — it is.

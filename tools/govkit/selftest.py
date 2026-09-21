@@ -867,10 +867,20 @@ def main() -> int:
             rp = t / ".governance" / "install.json"
             rec = json.loads(rp.read_text(encoding="utf-8"))
             rec["gov_commit"] = OLD
-            for f in rec["files"]:
+            for f in list(rec["files"]):
                 f["commit"] = OLD
-                b = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{f['source']}"],
-                                   capture_output=True).stdout
+                shown = subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{f['source']}"],
+                                       capture_output=True)
+                # A FILE THE KIT DID NOT SHIP AT THE OLD VINTAGE was never received by an install
+                # landed there, so its row and its bytes go, rather than the EMPTY blob `show`
+                # hands back being recorded as its identity — which `-7` S9 refuses, correctly,
+                # and refused this whole fixture from the day `check-wiring.fragment.json` joined
+                # the kit (TOOL-aReplayedCard-2, a month after the pinned vintage).
+                if shown.returncode != 0:
+                    rec["files"].remove(f)
+                    (t / f["path"]).unlink()
+                    continue
+                b = shown.stdout
                 f["sha256"] = __import__("hashlib").sha256(b).hexdigest()
                 # AND `gov_oid`, or this fixture is not "landed at an older vintage" — it is a row
                 # whose `commit` came from one vintage and whose `gov_oid` came from another, which

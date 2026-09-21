@@ -53,3 +53,16 @@ and would have crashed on any fresh Windows node.
 Gated for that fixture: `tools/govkit/selftest.py` runs every migration block with `PYTHONUTF8=0`
 and `PYTHONIOENCODING` unset, and an arm announces a skip on a node whose code page is UTF-8 anyway,
 where the dependency cannot show. Locale belongs on the list above for exactly this reason.
+
+## It bit again as the launcher's argv, and as an 8.3 TEMP
+
+Three live arms in `tools/process-monitor/selftest.py` and one in
+`tools/process-monitor/adopt-process-monitor.test.sh` asserted that the shipped
+`.process-monitor.conf` roots admitted SOMETHING live. That is a claim about how the bar was
+launched: a pre-push hook's argv is the absolute hook path, a bar started from a Claude session
+inherits its cwd and spells no path at all, and a wide bar was green only when a sibling leg
+happened to spawn an absolute path at the right moment. Fixed by planting a witness child whose
+argv carries the first root, and finding THAT in scope. `tools/run-gates/run-gates.runlog.test.sh`
+AC9 compared two spellings of one directory as strings; node `a`'s `TEMP` is `DAILY-~1`, which
+`mktemp` keeps and git's absolute answer does not. `-ef`. Both were red on that node alone.
+The launch path and the shape of `TEMP` join the list above.

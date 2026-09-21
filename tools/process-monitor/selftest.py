@@ -313,7 +313,7 @@ import scope  # noqa: E402
 ROOTS = ["/c/projects/gov"]
 
 
-def plant_witness(root):
+def seed_witness(root):
     """A child whose argv carries `root` as a plain token, for the LIVE arms to find in scope.
 
     Planted one line before the census that grades it. The live arms used to assert that the
@@ -471,7 +471,7 @@ def test_live_scope_is_not_empty():
         print("  SKIP test_live_scope_is_not_empty (windows-join backend only)")
         return
     roots = scope.load_conf(read_root_dir())
-    witness = plant_witness(roots[0])
+    witness = seed_witness(roots[0])
     try:
         rows = read_live_census()
         if rows is None:
@@ -830,7 +830,7 @@ def test_shipped_conf_admits_this_repo():
         print("  SKIP test_shipped_conf_admits_this_repo (windows-join backend only)")
         return
     roots = scope.load_conf(read_root_dir())
-    witness = plant_witness(roots[0])
+    witness = seed_witness(roots[0])
     try:
         rows = read_live_census()
         if rows is None:

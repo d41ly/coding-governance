@@ -3838,11 +3838,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "plant_witness",
-      "kind": "function",
-      "file": "tools/process-monitor/selftest.py"
-    },
-    {
       "id": "population",
       "kind": "function",
       "file": "tools/govkit/refusal_join.py"
@@ -6046,6 +6041,11 @@
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "seed_witness",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "selectable",
