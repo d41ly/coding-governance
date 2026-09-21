@@ -1418,6 +1418,10 @@ resolve_introducing_commit() { # run-state path · literal line -> the introduci
 #     tree the landing verb examined under both lander modes. A project whose lander commits the
 #     record somewhere else gets a re-derivation of a different tree — and that is a RED here, not
 #     a skip, because the leg cannot tell it from a forged freeze.
+#   * `anchor-sha:` and the recorded BASE are themselves written by the run. S2 grades `m-base:`
+#     against the anchor the record pins and does not re-observe that anchor; what grades the pin
+#     is check 9's reading of the remote's own advertisement, and in the end the same leg re-run in
+#     a clone the run never touched - check 13's honest limit, and it applies here unchanged.
 #   * none of it says the asks were answered WELL. It says the facts on the record are the ones its
 #     own declared inputs produce.
 

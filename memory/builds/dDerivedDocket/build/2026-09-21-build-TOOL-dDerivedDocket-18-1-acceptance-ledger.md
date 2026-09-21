@@ -36,8 +36,8 @@ mandated record, printed the vacuity line with the count 0.
 
 **Evidences:** TOOL-dDerivedDocket-18
 - AC1 — `asks:` — a record whose pinned fact carries one id more than the README line at its recorded
-  BASE reds check 19 with `pinned against declared follow: [EXMP-aFoo-3 EXMP-aFoo-4] against
-  [EXMP-aFoo-3]`. Staged RED: with the BASE comparison disarmed the arm misses it.
+  BASE reds check 19 naming the pinned value, both ids, against the declared one, one id. Staged
+  RED: with the BASE comparison disarmed the arm misses it.
 - AC2 — `asks:` — a README edited at HEAD reds a RUNNING record; the same committed edit under a
   LANDING record and under a LANDED one does not, and the LANDING run prints that the record is past
   its close. Staged RED two ways: the HEAD comparison disarmed, so the live record passes, and the
@@ -51,7 +51,7 @@ mandated record, printed the vacuity line with the count 0.
   three ways: the equality disarmed, the merge-base taken from `base:` instead of `anchor-sha:`, and
   the fallback's announcement removed.
 - AC5 — `anchor_at` — a table row whose first cell is a backticked foreign id reds check 37 naming
-  `memory/builds/tRun/notes.md:3:TOOL-zOther-7`; a link-wrapped first cell in the same file does not.
+  the fixture file, its line 3 and the id; a link-wrapped first cell in the same file does not.
   Staged RED: with the foreign-slug test disarmed inside the extractor call the arm misses it.
 - AC6 — `RECALL_CLI` — blank in the fixture conf, the leg prints `check 37 SKIPPED` naming the key and
   does not red on the same foreign row. Staged RED: with a blank key answered as zero anchors found.

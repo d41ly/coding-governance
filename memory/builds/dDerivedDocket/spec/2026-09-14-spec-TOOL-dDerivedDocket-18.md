@@ -306,7 +306,7 @@ nothing else.
   through the mode refusal, so a `slug` record pinning a mandate with no declared producer passes.
 - **AC9** — When the leg runs over today's tree with `GOV_UNATTENDED_REPORT=1`, it prints one line
   on its report channel stating that no record pins an `asks:` fact, with the count 0.
-  Red when: the leg prints nothing, so vacuity reads as a pass.
+  Red when: the leg prints nothing on that channel, so vacuity reads as a pass.
   permission: unit passes run no gate legs (fix F7, and the unit child prompt since
   TOOL-aProbedUnit-1), so this run of the leg over the real tree is observed at the one post-build
   bar the main loop runs at VERIFYING, after the last unit. The pass's direct check is the leg run
